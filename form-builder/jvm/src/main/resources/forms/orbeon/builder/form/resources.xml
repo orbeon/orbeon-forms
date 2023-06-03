@@ -31,7 +31,7 @@
                 This name shows in the URL of the deployed form, so we recommend you use only lowercase characters.
                 &lt;/p>
             </help>
-            <alert>Use ASCII letters, digits, "-" or "_"</alert>
+            <alert>Use a maximum of 255 ASCII letters, digits, "-" or "_"</alert>
         </application-name>
         <form-name>
             <label>Form Name</label>
@@ -44,7 +44,7 @@
                 This name shows in the URL, so we recommend you use only lowercase characters.
                 &lt;/p>
             </help>
-            <alert>Use ASCII letters, digits, "-" or "_"</alert>
+            <alert>Use a maximum of 255 ASCII letters, digits, "-" or "_"</alert>
         </form-name>
         <title>
             <label>Form Title</label>
@@ -1374,7 +1374,7 @@
                 Le nom est visible dans les URLs du formulaire déployé, et il est recommandé d'utiliser des minuscules uniquement.
                 &lt;/p>
             </help>
-            <alert>Utiliser des lettres ASCII, des chiffres, "-" ou "_"</alert>
+            <alert>Utiliser aux maximum 255 lettres ASCII, des chiffres, "-" ou "_"</alert>
         </application-name>
         <form-name>
             <label>Nom du formulaire</label>
@@ -1387,7 +1387,7 @@
                 Ce nom est visible dans l'URL du formulaire du formulaire quand déployé, donc nous vous recommandons d'utiliser uniquement des minuscules.
                 &lt;/p>
             </help>
-            <alert>Utiliser des lettres ASCII, des chiffres, "-" ou "_"</alert>
+            <alert>Utiliser aux maximum 255 lettres ASCII, des chiffres, "-" ou "_"</alert>
         </form-name>
         <title>
             <label>Titre du formulaire</label>
@@ -2707,13 +2707,13 @@
             <label>Applikasjonsnavn</label>
             <hint todo="true">Identifiserer en gruppe skjemaer, for eksempel ved funksjonalitet eller avdeling (f.eks. «salg»). Hvis du har én gruppe skjemaer, kan du bruke organisasjonsnavnet (f.eks. «acme»). Dette navnet vises URL-en i det publiserte skjemaet, so vi anbefaler at det bare brukes små bokstaver.</hint>
             <help todo="true"/>
-            <alert todo="true">[Use ASCII letters, digits, "-" or "_"]</alert>
+            <alert todo="true">[Use a maximum of 255 ASCII letters, digits, "-" or "_"]</alert>
         </application-name>
         <form-name>
             <label>Skjemanavn</label>
             <hint todo="true">Identifiserer et spesifikt skjema. Dette navnet vises URL-en i det publiserte skjemaet, so vi anbefaler at det bare brukes små bokstaver.</hint>
             <help todo="true"/>
-            <alert todo="true">[Use ASCII letters, digits, "-" or "_"]</alert>
+            <alert todo="true">[Use a maximum of 255 ASCII letters, digits, "-" or "_"]</alert>
         </form-name>
         <title>
             <label>Skjematittel</label>
@@ -4062,13 +4062,13 @@
             <label>Название приложения</label>
             <hint todo="true">Определяет логическую группу форм. Например, по функциональности или по принадлежности к департаменту (например, "hr"). Если группа форм всего одна, можно использовать название организации. Название приложения входит в URL формы, поэтому рекомендуется использовать для него строчные латинские буквы.</hint>
             <help todo="true"/>
-            <alert todo="true">[Use ASCII letters, digits, "-" or "_"]</alert>
+            <alert todo="true">[Use a maximum of 255 ASCII letters, digits, "-" or "_"]</alert>
         </application-name>
         <form-name>
             <label>Название формы</label>
             <hint todo="true">Определяет данную конкретную форму (например, "health-record"). Название формы входит в URL формы, поэтому рекомендуется использовать для него строчные латинские буквы.</hint>
             <help todo="true"/>
-            <alert todo="true">[Use ASCII letters, digits, "-" or "_"]</alert>
+            <alert todo="true">[Use a maximum of 255 ASCII letters, digits, "-" or "_"]</alert>
         </form-name>
         <title>
             <label>Заголовок формы</label>
@@ -5417,13 +5417,13 @@
             <label>Nome dell'applicazione</label>
             <hint todo="true">Identifica un gruppo di moduli, per esempio rappresenta una funzionalità o un dipartimento (esempio: "sales"). Se c'é solo un gruppo di moduli, il nome dell’organizzazione può essere utilizzato. Il nome verrà esposto nelle URL del modulo pubblicato, per questo raccomandiamo di usare solo lettere minuscole. Non è permesso usare accenti e apostrofi o interpunzioni.</hint>
             <help todo="true"/>
-            <alert>Utilizza lettere ASCII, cifre, "-" o "_"</alert>
+            <alert>Utilizza un massimo di 255 lettere ASCII, cifre, "-" o "_"</alert>
         </application-name>
         <form-name>
             <label>Nome del modulo</label>
             <hint todo="true">Identifica il modulo specifico (esempio: "health-record" o "claim"). Il nome verrà esposto nelle URL del modulo pubblicato, per questo raccomandiamo di usare solo lettere minuscole. Non è permesso usare accenti e apostrofi o interpunzioni.</hint>
             <help todo="true"/>
-            <alert>Utilizza lettere ASCII, cifre, "-" o "_"</alert>
+            <alert>Utilizza un massimo di 255 lettere ASCII, cifre, "-" o "_"</alert>
         </form-name>
         <title>
             <label>Titolo del modulo</label>
@@ -6735,13 +6735,13 @@
             <label>Name der Anwendung</label>
             <hint todo="true">Kennzeichnet eine Gruppe von Formularen, z.B. unterteilt nach Funktion oder Abteilung. Wenn Sie eine Gruppe von Formularen haben, können Sie auch den Namen Ihres Unternehmens verwenden. Da dieser Name im URL des Formulars angezeigt wird, empfehlen wir nur Kleinbuchstaben zu verwenden.</hint>
             <help todo="true"/>
-            <alert>Verwenden Sie ASCII-Buchstaben, Ziffern,"-" oder "_"</alert>
+            <alert>Verwenden Sie maximal 255 ASCII-Buchstaben, Ziffern,"-" oder "_"</alert>
         </application-name>
         <form-name>
             <label>Name des Formulars</label>
             <hint todo="true">Wird zu Identifikation des Formulars verwendet(z.B.: "Krankenakte"). Da dieser Name im URL angezeigt wird, empfehlen wir nur Kleinbuchstaben zu verwenden.</hint>
             <help todo="true"/>
-            <alert>Verwenden Sie ASCII-Buchstaben, Ziffern,"-" oder "_"</alert>
+            <alert>Verwenden Sie maximal 255 ASCII-Buchstaben, Ziffern,"-" oder "_"</alert>
         </form-name>
         <title>
             <label>Formulartitel</label>
@@ -8055,13 +8055,13 @@
             <label>Sovelluksen nimi</label>
             <hint todo="true">Tunnistaa ryhmän lomakkeita, esimerkiksi toiminnallisuuden tai osaston perusteella (esim. "myynnit"). Jos sinulla on lomakeryhmä, voit käyttää organisaatiosi nimeä (esim. "huippu"). Tämä nimi näkyy lähetetyn lomakkeen URL:ssä, joten on suositeltavaa käyttää ainoastaan pieniä kirjaimia.</hint>
             <help todo="true"/>
-            <alert>Ei saa olla tyhjä tai sisältää välilyöntejä</alert>
+            <alert todo="true">Ei saa olla tyhjä tai sisältää välilyöntejä</alert>
         </application-name>
         <form-name>
             <label>Lomakkeen nimi</label>
             <hint todo="true">Tunnistaa juuri tämän lomakkeen (esim. "terveysrekisteri" tai "korvausvaatimus"). Tämä nimi näkyy lähetetyn lomakkeen URL:ssä, joten on suositeltavaa käyttää ainoastaan pieniä kirjaimia.</hint>
             <help todo="true"/>
-            <alert>Ei saa olla tyhjä tai sisältää välilyöntejä</alert>
+            <alert todo="true">Ei saa olla tyhjä tai sisältää välilyöntejä</alert>
         </form-name>
         <title>
             <label>Lomakkeen otsikko</label>
@@ -9403,13 +9403,13 @@
             <label>Nombre de la Aplicación</label>
             <hint todo="true">Identifica a un grupo de formularios, por funcionalidad o departamento ("ventas"). Si usted tiene un grupo de formularios, puede usar el nombre de la organización (e.g. "acme"). Este nombre se muestra en la URL del formulario públicado, se recomienda usar minúsculas.</hint>
             <help todo="true"/>
-            <alert>Usar caracteres ASCII , numeros, "-" o "_"</alert>
+            <alert>Usar un máximo de caracteres ASCII , numeros, "-" o "_"</alert>
         </application-name>
         <form-name>
             <label>Nombre del formulario</label>
             <hint todo="true">Identifica el formulario especifico (e.g. "denuncias" or "consulta"). Este nombre se muestra en la URL del formulario públicado, se recomienda usar minúsculas.</hint>
             <help todo="true"/>
-            <alert>Usar caracteres ASCII , números, "-" o "_"</alert>
+            <alert>Usar un máximo de caracteres ASCII , números, "-" o "_"</alert>
         </form-name>
         <title>
             <label>Título del Formulario</label>
@@ -10749,13 +10749,13 @@
             <label>Applicatienaam</label>
             <hint todo="true">Identificeert een groep forms, bijvoorbeeld op basis van functionaliteit of afdeling (bijv. "verkoop"). Als u een groep forms hebt, kunt u uw organisatienaam (bijv. "acme") gebruiken. Deze naam komt terug in de URL van het gepubliceerde form, dus we raden u aan om alleen kleine letters gebruiken.</hint>
             <help todo="true"/>
-            <alert>Gebruik ASCII letters, cijfers, "-" of "_"</alert>
+            <alert>Gebruik maximaal 255 ASCII letters, cijfers, "-" of "_"</alert>
         </application-name>
         <form-name>
             <label>Form naam</label>
             <hint todo="true">Identificeert dit specifieke form (bijv. "zorgdossier" of "claim"). Deze naam komt terug in de URL, dus we raden u aan om alleen kleine letters te gebruiken.</hint>
             <help todo="true"/>
-            <alert>Gebruik ASCII letters, cijfers, "-" of "_"</alert>
+            <alert>Gebruik maximaal 255 ASCII letters, cijfers, "-" of "_"</alert>
         </form-name>
         <title>
             <label>Form titel</label>
@@ -12075,13 +12075,13 @@
             <label>Nome da Aplicação</label>
             <hint todo="true">Identifica um grupo de formulários, agrupado por exemplo por funcionalidade ou departamento (exemplo: vendas). Tendo um grupo de formulários, pode-se usar o nome da organização (ex. "acme"). Este nome é visível no URL do formulário publicado pelo que recomendamos o uso de minúsculas.</hint>
             <help todo="true"/>
-            <alert>Use letras ASCII, algarismos, "-" ou "_"</alert>
+            <alert>Use no máximo 255 letras ASCII, algarismos, "-" ou "_"</alert>
         </application-name>
         <form-name>
             <label>Nome do Formulário</label>
             <hint todo="true">Identifica este formulário específico (ex.: boletim de saúde). Este nome é visível no URL pelo que recomendamos o uso de minúsculas.</hint>
             <help todo="true"/>
-            <alert>Use letras ASCII, algarismos, "-" ou "_"</alert>
+            <alert>Use no máximo 255 letras ASCII, algarismos, "-" ou "_"</alert>
         </form-name>
         <title>
             <label>Título do Formulário</label>
@@ -13428,13 +13428,13 @@
             <label>Område</label>
             <hint todo="true">Ett namn som håller samman en grupp formulär, med exempelvis gemensam funktionalitet eller organisation (som "försäljning" eller företagsnamn). Detta namn visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
             <help todo="true"/>
-            <alert>Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
+            <alert todo="true">Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
         </application-name>
         <form-name>
             <label>Formulär</label>
             <hint todo="true">Ett namn som identifierar detta formulär inom sitt område. Namnet visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
             <help todo="true"/>
-            <alert>Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
+            <alert todo="true">Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
         </form-name>
         <title>
             <label>Titel</label>

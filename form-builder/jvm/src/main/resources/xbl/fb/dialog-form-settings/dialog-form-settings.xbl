@@ -476,7 +476,7 @@
                 <xf:bind
                     ref="app | form"
                     required="true()"
-                    constraint="matches(., '^[A-Za-z0-9\-_]+$')"
+                    constraint="matches(., '^[A-Za-z0-9\-_]+$') and xxf:max-length(255)"
                     xxf:whitespace="trim"
                     readonly="false()"/>
 

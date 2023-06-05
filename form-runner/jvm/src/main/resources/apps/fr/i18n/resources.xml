@@ -145,7 +145,7 @@
                 <show-more>Show More</show-more>
                 <show-less>Show Less</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label>Revision History</label>
                 <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -167,7 +167,7 @@
                 <other-changed>internal information changed</other-changed>
 
                 <workflow-stage-changed>Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form>Untitled Form</untitled-form>
         <errors>
@@ -721,7 +721,7 @@
                 <show-more>Montrer plus</show-more>
                 <show-less>Montrer moins</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label>Historique des révisions</label>
                 <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Révision initiale)}'|1# (Révision courante)}</date>
                 <date-format>[FNn,*-3] [D] [MNn,*-3] [Y] à [H01]:[m01]</date-format>
@@ -743,7 +743,7 @@
                 <other-changed>information interne changée</other-changed>
 
                 <workflow-stage-changed>Étape du workflow changée de "{0}" à "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form>Formulaire sans titre</untitled-form>
         <errors>
@@ -1301,7 +1301,7 @@
                 <show-more>Mostrar Más</show-more>
                 <show-less>Mostrar Menos</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label todo="true">Revision History</label>
                 <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -1323,7 +1323,7 @@
                 <other-changed todo="true">internal information changed</other-changed>
 
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form>Formulario sin Título</untitled-form>
         <errors>
@@ -1867,7 +1867,7 @@
                 <show-more>Mostrar Més</show-more>
                 <show-less>Mostrar Menys</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label todo="true">Revision History</label>
                 <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -1889,7 +1889,7 @@
                 <other-changed todo="true">internal information changed</other-changed>
 
                 <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form>Formulari sense Títol</untitled-form>
         <errors>
@@ -2475,7 +2475,7 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label todo="true">Revision History</label>
                 <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -2497,7 +2497,7 @@
                 <other-changed todo="true">internal information changed</other-changed>
 
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
         <errors>
@@ -3039,7 +3039,7 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label todo="true">Revision History</label>
                 <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -3061,7 +3061,7 @@
                 <other-changed todo="true">internal information changed</other-changed>
 
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
         <errors>
@@ -3602,7 +3602,7 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label todo="true">Revision History</label>
                 <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -3624,7 +3624,7 @@
                 <other-changed todo="true">internal information changed</other-changed>
 
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form>Modulo senza nome</untitled-form>
         <errors>
@@ -4178,7 +4178,7 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label todo="true">Revision History</label>
                 <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -4200,7 +4200,7 @@
                 <other-changed todo="true">internal information changed</other-changed>
 
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form>Formular ohne Namen</untitled-form>
         <errors>
@@ -4754,7 +4754,7 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label todo="true">Revision History</label>
                 <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -4776,7 +4776,7 @@
                 <other-changed todo="true">internal information changed</other-changed>
 
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form>Nimetön lomake</untitled-form>
         <errors>
@@ -5330,7 +5330,7 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label todo="true">Revision History</label>
                 <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -5352,7 +5352,7 @@
                 <other-changed todo="true">internal information changed</other-changed>
 
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form>Formulär utan titel</untitled-form>
         <errors>
@@ -5906,7 +5906,7 @@
                 <show-more>Toon meer</show-more>
                 <show-less>Toon minder</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label todo="true">Revision History</label>
                 <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -5928,7 +5928,7 @@
                 <other-changed todo="true">internal information changed</other-changed>
 
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form>Naamloos form</untitled-form>
         <errors>
@@ -6481,7 +6481,7 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label todo="true">Revision History</label>
                 <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -6503,7 +6503,7 @@
                 <other-changed todo="true">internal information changed</other-changed>
 
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form>Formulário sem título</untitled-form>
         <errors>
@@ -7056,7 +7056,7 @@
                 <show-more>Vis flere</show-more>
                 <show-less>Vis færre</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label todo="true">Revision History</label>
                 <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -7078,7 +7078,7 @@
                 <other-changed todo="true">internal information changed</other-changed>
 
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form>Blanket uden navn</untitled-form>
         <errors>
@@ -7619,7 +7619,7 @@
                 <show-more>Pokaż więcej</show-more>
                 <show-less>Pokaż mniej</show-less>
             </error-summary>
-            <data-history>
+            <revision-history>
                 <label todo="true">Revision History</label>
                 <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
                 <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
@@ -7641,7 +7641,7 @@
                 <other-changed todo="true">internal information changed</other-changed>
 
                 <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
-            </data-history>
+            </revision-history>
         </components>
         <untitled-form>Bez tytułu</untitled-form>
         <errors>

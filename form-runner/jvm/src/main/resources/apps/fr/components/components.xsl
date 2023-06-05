@@ -503,6 +503,14 @@
         as="xs:string?"
         select="p:property(string-join(('oxf.xforms.xbl.fr.grid.insert', $app, $form), '.'))[normalize-space()]"/>
 
+    <xsl:variable
+        name="allow-revision-history"
+        as="xs:boolean"
+        select="
+            not($is-readonly-mode) and
+            $is-detail             and
+            p:property(string-join(('oxf.fr.navbar.revision-history.enable', $app, $form), '.'))"/>
+
     <xsl:template match="/xh:html">
         <!-- Handle document language -->
         <xh:html lang="{{xxf:instance('fr-language-instance')}}"

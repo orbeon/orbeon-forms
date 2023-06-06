@@ -15,11 +15,9 @@ package org.orbeon.oxf.xforms.state
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.logging.LifecycleLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, SecureUtils}
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.util.Logging._
-
-import java.io
 
 
 object XFormsStateStore {

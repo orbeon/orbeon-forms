@@ -26,15 +26,16 @@ import scala.util.control.NonFatal
 
 object Eh2CacheSupport extends CacheProvider {
 
+  import CacheSupport.Logger._
   import Private._
 
   def get(cacheName: String): Option[CacheApi] =
     cacheManager.getCache(cacheName) match {
       case cache: ehcache.Cache =>
-        CacheSupport.Logger.debug(s"found Ehcache 2 cache for `$cacheName`")
+        debug(s"found Ehcache 2 cache for `$cacheName`")
         new JCacheCacheApi(cache).some
       case _ =>
-        CacheSupport.Logger.debug(s"did not find Ehcache 2 cache for `$cacheName`")
+        debug(s"did not find Ehcache 2 cache for `$cacheName`")
         None
     }
 
@@ -42,19 +43,19 @@ object Eh2CacheSupport extends CacheProvider {
   // necessarily use Ehcache 2.x anymore.
   def close(): Unit = {
     val knownCacheManagers = CacheManager.ALL_CACHE_MANAGERS
-    CacheSupport.Logger.debug(s"Shutting down ${knownCacheManagers.size} Ehcache 2.x CacheManagers.")
+    debug(s"Shutting down ${knownCacheManagers.size} Ehcache 2.x CacheManagers.")
     while (! knownCacheManagers.isEmpty)
       CacheManager.ALL_CACHE_MANAGERS.get(0).shutdown()
   }
 
   class JCacheCacheApi(private val cache: ehcache.Cache) extends CacheApi {
-    def put(k: io.Serializable, v: io.Serializable): Unit = cache.put(new ehcache.Element(k, v))
-    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = put(k, v) // TODO: does Ehache 2.x have a more efficient equivalent?
-    def get(k: io.Serializable): Option[io.Serializable] = Option(cache.get(k)).map(_.getObjectValue.asInstanceOf[io.Serializable])
-    def remove(k: io.Serializable): Boolean = cache.remove(k)
-    def getName: String = cache.getName
-    def getMaxEntriesLocalHeap: Option[Long] = cache.getCacheConfiguration.getMaxEntriesLocalHeap.some
-    def getLocalHeapSize: Option[Long] = cache.getCacheConfiguration.getMaxBytesLocalHeap.some
+    def put(k: io.Serializable, v: io.Serializable): Unit         = { trace("put");                    cache.put(new ehcache.Element(k, v)) }
+    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = { trace("putIfAbsent");            cache.put(new ehcache.Element(k, v)) } // TODO: does Ehache 2.x have a more efficient equivalent?
+    def get(k: io.Serializable): Option[io.Serializable]          = { trace("get");                    Option(cache.get(k)).map(_.getObjectValue.asInstanceOf[io.Serializable]) }
+    def remove(k: io.Serializable): Boolean                       = { trace("remove");                 cache.remove(k) }
+    def getName: String                                           = { trace("getName");                cache.getName }
+    def getMaxEntriesLocalHeap: Option[Long]                      = { trace("getMaxEntriesLocalHeap"); cache.getCacheConfiguration.getMaxEntriesLocalHeap.some }
+    def getLocalHeapSize: Option[Long]                            = { trace("getLocalHeapSize");       cache.getCacheConfiguration.getMaxBytesLocalHeap.some }
   }
 
   private object Private {
@@ -64,7 +65,7 @@ object Eh2CacheSupport extends CacheProvider {
     val cacheManager =
       try
         new CacheManager(URLFactory.createURL(EhcachePath)) |!>
-          (_ => CacheSupport.Logger.debug(s"initialized Ehcache 2 cache manager from `$EhcachePath`"))
+          (_ => debug(s"initialized Ehcache 2 cache manager from `$EhcachePath`"))
       catch {
         case NonFatal(t) =>
           throw new OXFException(s"unable to initialize Ehcache 2 cache manager from `$EhcachePath`", t)

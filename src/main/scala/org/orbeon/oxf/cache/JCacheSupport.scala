@@ -13,13 +13,15 @@ import scala.util.control.NonFatal
 
 object JCacheSupport extends CacheProvider {
 
+  import CacheSupport.Logger._
+
   def get(cacheName: String): Option[CacheApi] =
     cacheManager.getCache[io.Serializable, io.Serializable](cacheName) match {
       case null =>
-        CacheSupport.Logger.debug(s"did not find JCache cache for `$cacheName`")
+        debug(s"did not find JCache cache for `$cacheName`")
         None
       case cache =>
-        CacheSupport.Logger.debug(s"found JCache cache for `$cacheName`")
+        debug(s"found JCache cache for `$cacheName`")
         new JCacheCacheApi(cache).some
     }
 
@@ -27,13 +29,13 @@ object JCacheSupport extends CacheProvider {
     provider.close()
 
   class JCacheCacheApi(private val cache: javax.cache.Cache[io.Serializable, io.Serializable]) extends CacheApi  {
-    def put(k: io.Serializable, v: io.Serializable): Unit = cache.put(k, v)
-    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = cache.putIfAbsent(k, v)
-    def get(k: io.Serializable): Option[io.Serializable] = Option(cache.get(k))
-    def remove(k: io.Serializable): Boolean = cache.remove(k)
-    def getName: String = cache.getName
-    def getMaxEntriesLocalHeap: Option[Long] = None
-    def getLocalHeapSize: Option[Long] = None
+    def put(k: io.Serializable, v: io.Serializable): Unit         = { trace("put");                    cache.put(k, v) }
+    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = { trace("putIfAbsent");            cache.putIfAbsent(k, v) }
+    def get(k: io.Serializable): Option[io.Serializable]          = { trace("get");                    Option(cache.get(k)) }
+    def remove(k: io.Serializable): Boolean                       = { trace("remove");                 cache.remove(k) }
+    def getName: String                                           = { trace("getName");                cache.getName }
+    def getMaxEntriesLocalHeap: Option[Long]                      = { trace("getMaxEntriesLocalHeap"); None }
+    def getLocalHeapSize: Option[Long]                            = { trace("getLocalHeapSize");       None }
   }
 
   private lazy val (provider, cacheManager) =
@@ -58,7 +60,7 @@ object JCacheSupport extends CacheProvider {
       (
         provider,
         provider.getCacheManager(configUri, getClass.getClassLoader) |!>
-          (_ => CacheSupport.Logger.debug(s"initialized JCache cache manager"))
+          (_ => debug(s"initialized JCache cache manager"))
       )
     } catch {
       case NonFatal(t) =>

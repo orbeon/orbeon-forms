@@ -391,17 +391,32 @@
                             <xf:action if="$i/fr-summary-show = true()">
                                 <xf:insert
                                     context="$control/fr:index"
-                                    origin="xf:element('fr:summary-show', xf:attribute('require-role', $i/fr-summary-show/@require-role))"/>
+                                    origin="xf:element(
+                                        'fr:summary-show',
+                                        if (normalize-space($i/fr-summary-show/@require-role) != '') then
+                                            xf:attribute('require-role', $i/fr-summary-show/@require-role)
+                                        else
+                                            ())"/>
                             </xf:action>
                             <xf:action if="$i/fr-summary-search = true()">
                                 <xf:insert
                                     context="$control/fr:index"
-                                    origin="xf:element('fr:summary-search', xf:attribute('require-role', $i/fr-summary-search/@require-role))"/>
+                                    origin="xf:element(
+                                        'fr:summary-search',
+                                        if (normalize-space($i/fr-summary-search/@require-role) != '') then
+                                            xf:attribute('require-role', $i/fr-summary-search/@require-role)
+                                        else
+                                            ())"/>
                             </xf:action>
                             <xf:action if="$i/fr-summary-edit = true()">
                                 <xf:insert
                                     context="$control/fr:index"
-                                    origin="xf:element('fr:summary-edit', xf:attribute('require-role', $i/fr-summary-edit/@require-role))"/>
+                                    origin="xf:element(
+                                        'fr:summary-edit',
+                                        if (normalize-space($i/fr-summary-edit/@require-role) != '') then
+                                            xf:attribute('require-role', $i/fr-summary-edit/@require-role)
+                                        else
+                                            ())"/>
                             </xf:action>
                         </xf:action>
                         <!-- Write encrypt settings -->

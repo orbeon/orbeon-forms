@@ -5,6 +5,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils.PipeOps
 
+import java.io
 import java.net.URI
 import javax.cache.Caching
 import scala.util.control.NonFatal
@@ -13,7 +14,7 @@ import scala.util.control.NonFatal
 object JCacheSupport extends CacheProvider {
 
   def get(cacheName: String): Option[CacheApi] =
-    cacheManager.getCache[java.io.Serializable, java.io.Serializable](cacheName) match {
+    cacheManager.getCache[io.Serializable, io.Serializable](cacheName) match {
       case null =>
         CacheSupport.Logger.debug(s"did not find JCache cache for `$cacheName`")
         None
@@ -25,10 +26,11 @@ object JCacheSupport extends CacheProvider {
   def close(): Unit =
     provider.close()
 
-  class JCacheCacheApi(private val cache: javax.cache.Cache[java.io.Serializable, java.io.Serializable]) extends CacheApi  {
-    def put(k: java.io.Serializable, v: java.io.Serializable): Unit = cache.put(k, v)
-    def get(k: java.io.Serializable): Option[java.io.Serializable] = Option(cache.get(k))
-    def remove(k: java.io.Serializable): Boolean = cache.remove(k)
+  class JCacheCacheApi(private val cache: javax.cache.Cache[io.Serializable, io.Serializable]) extends CacheApi  {
+    def put(k: io.Serializable, v: io.Serializable): Unit = cache.put(k, v)
+    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = cache.putIfAbsent(k, v)
+    def get(k: io.Serializable): Option[io.Serializable] = Option(cache.get(k))
+    def remove(k: io.Serializable): Boolean = cache.remove(k)
     def getName: String = cache.getName
     def getMaxEntriesLocalHeap: Option[Long] = None
     def getLocalHeapSize: Option[Long] = None

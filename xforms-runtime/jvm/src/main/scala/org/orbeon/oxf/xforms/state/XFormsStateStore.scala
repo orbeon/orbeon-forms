@@ -56,7 +56,7 @@ object XFormsStateStore {
       Caches.stateCache.put(documentUUID, (staticStateDigest + ":" + dynamicStateKey, sequence): CacheValueMappingType)
 
       // Static and dynamic states
-      Caches.stateCache.put(staticStateDigest, document.staticState.encodedState) // XXX Q: is there a cost to replacing static state? value will be the same!
+      Caches.stateCache.putIfAbsent(staticStateDigest, document.staticState.encodedState)
       Caches.stateCache.put(dynamicStateKey,   DynamicState(document))
     }
   }

@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CoreUtils.PipeOps
 
+import java.io
 import scala.util.control.NonFatal
 
 
@@ -47,9 +48,10 @@ object Eh2CacheSupport extends CacheProvider {
   }
 
   class JCacheCacheApi(private val cache: ehcache.Cache) extends CacheApi {
-    def put(k: java.io.Serializable, v: java.io.Serializable): Unit = cache.put(new ehcache.Element(k, v))
-    def get(k: java.io.Serializable): Option[java.io.Serializable] = Option(cache.get(k)).map(_.getObjectValue.asInstanceOf[java.io.Serializable])
-    def remove(k: java.io.Serializable): Boolean = cache.remove(k)
+    def put(k: io.Serializable, v: io.Serializable): Unit = cache.put(new ehcache.Element(k, v))
+    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = put(k, v) // TODO: does Ehache 2.x have a more efficient equivalent?
+    def get(k: io.Serializable): Option[io.Serializable] = Option(cache.get(k)).map(_.getObjectValue.asInstanceOf[io.Serializable])
+    def remove(k: io.Serializable): Boolean = cache.remove(k)
     def getName: String = cache.getName
     def getMaxEntriesLocalHeap: Option[Long] = cache.getCacheConfiguration.getMaxEntriesLocalHeap.some
     def getLocalHeapSize: Option[Long] = cache.getCacheConfiguration.getMaxBytesLocalHeap.some

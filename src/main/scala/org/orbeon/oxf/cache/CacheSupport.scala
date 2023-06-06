@@ -13,6 +13,7 @@ trait CacheProvider {
 
 trait CacheApi {
   def put(k: Serializable, v: Serializable): Unit
+  def putIfAbsent(k: Serializable, v: Serializable): Unit
   def get(k: Serializable): Option[Serializable]
   def remove(k: Serializable): Boolean
 

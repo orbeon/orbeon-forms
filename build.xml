@@ -190,6 +190,7 @@
             -dontwarn scala.tools.nsc.**
             -dontwarn javax.jms.**
             -dontwarn javax.mail.**
+            -dontwarn javax.cache.**
             -dontwarn org.orbeon.oxf.processor.**
             -dontwarn org.orbeon.oxf.util.ImageMetadata**
             -dontwarn org.orbeon.oxf.util.ImageSupport**

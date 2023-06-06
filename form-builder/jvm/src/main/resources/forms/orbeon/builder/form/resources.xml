@@ -517,6 +517,7 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <restrict-role>Restrict to role</restrict-role>
             <control-appearance>
                 <label>Control Appearance</label>
             </control-appearance>
@@ -1864,6 +1865,7 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <restrict-role>Restreindre au rôle</restrict-role>
             <control-appearance>
                 <label>Apparence du contrôle</label>
             </control-appearance>
@@ -3195,6 +3197,7 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <restrict-role todo="true">[Restrict to role]</restrict-role>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -4554,6 +4557,7 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <restrict-role todo="true">[Restrict to role]</restrict-role>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -5912,6 +5916,7 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <restrict-role todo="true">[Restrict to role]</restrict-role>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -7234,6 +7239,7 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <restrict-role todo="true">[Restrict to role]</restrict-role>
             <control-appearance>
                 <label>Erscheinungsbild der Steuerelemente</label>
             </control-appearance>
@@ -8559,6 +8565,7 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <restrict-role todo="true">[Restrict to role]</restrict-role>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -9909,6 +9916,7 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <restrict-role todo="true">[Restrict to role]</restrict-role>
             <control-appearance>
                 <label>Presentación del Control</label>
             </control-appearance>
@@ -11260,6 +11268,7 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <restrict-role todo="true">[Restrict to role]</restrict-role>
             <control-appearance>
                 <label>Control weergave</label>
             </control-appearance>
@@ -12590,6 +12599,7 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <restrict-role todo="true">[Restrict to role]</restrict-role>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -13947,6 +13957,7 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <restrict-role todo="true">[Restrict to role]</restrict-role>
             <control-appearance>
                 <label>Kontrollens utseende</label>
             </control-appearance>

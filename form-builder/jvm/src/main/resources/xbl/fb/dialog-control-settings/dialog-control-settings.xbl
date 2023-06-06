@@ -997,7 +997,7 @@
                                                                 <xf:case value="true()">
                                                                     <!-- Summary settings can have required roles -->
                                                                     <fr:checkbox-input ref="$base-binding/@role-required">
-                                                                        <xf:label>Restrict to role</xf:label>
+                                                                        <xf:label ref="$resources/dialog-control-settings/restrict-role"/>
                                                                         <xf:action event="xforms-deselect">
                                                                             <xf:setvalue ref="$base-binding/@require-role"/>
                                                                         </xf:action>

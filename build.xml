@@ -168,7 +168,8 @@
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(saxon-*.jar,http*.jar,jcl-over-slf4j-*.jar,log4j-*.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/ehcache-2.10.9.2.jar
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(tink-*.jar,gson-*.jar,protobuf-*.jar;)
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(javax.activation-*.jar;)
+            <!-- Use explicit version number because there is also `javax.activation-api-*.jar` -->
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(javax.activation-1.2.0.jar;)
 
 <!--            -ignorewarnings-->
             -dontwarn net.sf.ehcache.**

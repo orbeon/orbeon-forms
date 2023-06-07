@@ -99,6 +99,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                     <buttons>
                         <grid-8>
                             <standard-button/>
+                            <primary-button/>
+                            <inverse-button/>
+                            <success-button/>
+                            <danger-button/>
+                            <warning-button/>
+                            <info-button/>
                             <link-button/>
                         </grid-8>
                     </buttons>
@@ -199,7 +205,13 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                          relevant="$fr-mode = ('new', 'edit', 'test')">
                     <xf:bind id="grid-8-bind" ref="grid-8" name="grid-8">
                         <xf:bind id="standard-button-bind" ref="standard-button" name="standard-button"/>
+                        <xf:bind id="inverse-button-bind" ref="inverse-button" name="inverse-button"/>
+                        <xf:bind id="success-button-bind" ref="success-button" name="success-button"/>
                         <xf:bind id="link-button-bind" ref="link-button" name="link-button"/>
+                        <xf:bind id="danger-button-bind" ref="danger-button" name="danger-button"/>
+                        <xf:bind id="warning-button-bind" ref="warning-button" name="warning-button"/>
+                        <xf:bind id="primary-button-bind" ref="primary-button" name="primary-button"/>
+                        <xf:bind id="info-button-bind" ref="info-button" name="info-button"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind name="typed-controls" id="typed-controls-bind" ref="typed-controls">
@@ -435,6 +447,31 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label>Standard Button</label>
                             <hint>Standard browser button</hint>
                         </standard-button>
+                        <primary-button>
+                            <label>Primary Button</label>
+                            <hint>Standard browser button</hint>
+                        </primary-button>
+
+                        <inverse-button>
+                            <label>Inverse Button</label>
+                            <hint>Standard browser button</hint>
+                        </inverse-button>
+                        <success-button>
+                            <label>Success Button</label>
+                            <hint>Standard browser button</hint>
+                        </success-button>
+                        <danger-button>
+                            <label>Danger Button</label>
+                            <hint>Standard browser button</hint>
+                        </danger-button>
+                        <warning-button>
+                            <label>Warning Button</label>
+                            <hint>Standard browser button</hint>
+                        </warning-button>
+                        <info-button>
+                            <label>Info Button</label>
+                            <hint>Standard browser button</hint>
+                        </info-button>
                         <link-button>
                             <label>Link Button</label>
                             <hint>Button as a link</hint>
@@ -799,9 +836,34 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <hint>Number field with validation</hint>
                         </number-right>
                         <standard-button>
-                            <label>Bouton</label>
+                            <label>Bouton standard</label>
                             <hint>Bouton navigateur standard</hint>
                         </standard-button>
+                        <primary-button>
+                            <label>Bouton principal</label>
+                            <hint>Bouton navigateur standard</hint>
+                        </primary-button>
+
+                        <inverse-button>
+                            <label>Bouton inversé</label>
+                            <hint>Bouton navigateur standard</hint>
+                        </inverse-button>
+                        <success-button>
+                            <label>Bouton succès</label>
+                            <hint>Bouton navigateur standard</hint>
+                        </success-button>
+                        <danger-button>
+                            <label>Bouton danger</label>
+                            <hint>Bouton navigateur standard</hint>
+                        </danger-button>
+                        <warning-button>
+                            <label>Bouton avertissement</label>
+                            <hint>Bouton navigateur standard</hint>
+                        </warning-button>
+                        <info-button>
+                            <label>Bouton information</label>
+                            <hint>Bouton navigateur standard</hint>
+                        </info-button>
                         <link-button>
                             <label>Bouton lien</label>
                             <hint>Lien agissant comme un bouton</hint>
@@ -1625,20 +1687,67 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                     <xf:label ref="$form-resources/buttons/label"/>
                     <fr:grid columns="2" id="grid-8-grid" bind="grid-8-bind">
                         <fr:c y="1" x="1" w="3">
-                            <xf:trigger bind="standard-button-bind" id="standard-button-control">
+                            <xf:trigger appearance="full" bind="standard-button-bind" id="standard-button-control">
                                 <xf:label ref="$form-resources/standard-button/label"/>
                                 <xf:hint ref="$form-resources/standard-button/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:trigger>
                         </fr:c>
                         <fr:c y="1" x="4" w="3">
+                            <xf:trigger appearance="xxf:primary" bind="primary-button-bind" id="primary-button-control">
+                                <xf:label ref="$form-resources/primary-button/label"/>
+                                <xf:hint ref="$form-resources/primary-button/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:trigger>
+
+                        </fr:c>
+                        <fr:c y="1" x="7" w="3">
+                            <xf:trigger appearance="xxf:inverse" bind="inverse-button-bind" id="inverse-button-control">
+                                <xf:label ref="$form-resources/inverse-button/label"/>
+                                <xf:hint ref="$form-resources/inverse-button/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:trigger>
+                        </fr:c>
+                        <fr:c y="1" x="10" w="3">
+                            <xf:trigger appearance="xxf:success" bind="success-button-bind" id="success-button-control">
+                                <xf:label ref="$form-resources/success-button/label"/>
+                                <xf:hint ref="$form-resources/success-button/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:trigger>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="3">
+                            <xf:trigger appearance="xxf:danger" bind="danger-button-bind" id="danger-button-control">
+                                <xf:label ref="$form-resources/danger-button/label"/>
+                                <xf:hint ref="$form-resources/danger-button/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:trigger>
+                        </fr:c>
+                        <fr:c x="4" y="2" w="3">
+                            <xf:trigger appearance="xxf:warning" bind="warning-button-bind" id="warning-button-control">
+                                <xf:label ref="$form-resources/warning-button/label"/>
+                                <xf:hint ref="$form-resources/warning-button/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:trigger>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="3">
+                            <xf:trigger appearance="xxf:info" bind="info-button-bind" id="info-button-control">
+                                <xf:label ref="$form-resources/info-button/label"/>
+                                <xf:hint ref="$form-resources/info-button/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:trigger>
+                        </fr:c>
+                        <fr:c x="10" y="2" w="3">
                             <xf:trigger appearance="minimal" bind="link-button-bind" id="link-button-control">
                                 <xf:label ref="$form-resources/link-button/label"/>
                                 <xf:hint ref="$form-resources/link-button/hint"/>
                             </xf:trigger>
                         </fr:c>
-                        <fr:c y="1" x="7" w="3"/>
-                        <fr:c y="1" x="10" w="3"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="us-address-control" bind="us-address-bind">

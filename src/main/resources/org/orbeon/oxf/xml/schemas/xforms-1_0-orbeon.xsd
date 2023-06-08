@@ -744,6 +744,8 @@
             <xsd:group ref="xforms:UI.Inline"/>
             <xsd:choice minOccurs="0" maxOccurs="unbounded">
                 <xsd:group ref="xforms:Action"/>
+                <xsd:element ref="xforms:param"/>
+                <xsd:element ref="xforms:body"/>
                 <xsd:any namespace="##other" processContents="lax"/>
             </xsd:choice>
             <xsd:attribute name="type" type="xsd:NMTOKEN" use="optional"/>
@@ -751,6 +753,13 @@
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>
+    <xsd:element name="param">
+        <xsd:complexType>
+            <xsd:attribute name="name" type="xsd:NMTOKEN" use="required"/>
+            <xsd:attribute name="value" type="xforms:XPathExpression" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="body"/>
     <xsd:element name="dispatch">
         <xsd:complexType>
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">

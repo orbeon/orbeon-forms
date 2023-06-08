@@ -81,9 +81,9 @@
                 </xs:choice>
             </xs:sequence>
             <xs:attribute name="type" type="xs:NMTOKEN" use="optional"/>
+            <xs:attribute name="phase" type="xs:NMTOKEN" use="optional"/>
             <xs:attributeGroup ref="xforms:Common.Attributes"/>
             <xs:attributeGroup ref="xforms:XML.Events"/>
-
             <xs:anyAttribute namespace="##other" processContents="lax"/>
         </xs:complexType>
     </xs:element>

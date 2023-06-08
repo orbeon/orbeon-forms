@@ -24,6 +24,7 @@ import org.orbeon.scaxon.SimplePath._
 
 trait FormDefinition {
 
+  // Legacy classes
   private val FRIndex         = "fr-index"
   private val FRSummaryShow   = "fr-summary"
   private val FRSummarySearch = "fr-search"

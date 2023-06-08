@@ -72,8 +72,6 @@ class PersistenceProxyProcessor extends ProcessorImpl {
 
 private object PersistenceProxyProcessor {
 
-  val FrEncryptClass                 = "fr-encrypt"
-
   val RawDataFormatVersion           = "raw"
   val AllowedDataFormatVersionParams = Set() ++ (DataFormatVersion.values map (_.entryName)) + RawDataFormatVersion
 

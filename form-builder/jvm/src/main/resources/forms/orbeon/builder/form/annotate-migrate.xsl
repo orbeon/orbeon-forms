@@ -424,4 +424,37 @@
     </xsl:template>
      -->
 
+    <!-- Migrate control settings from classes to sub-elements -->
+    <xsl:variable name="control-classes-to-migrate"  select="('fr-index', 'fr-summary', 'fr-search', 'fr-encrypt')"/>
+
+    <xsl:template
+            mode="within-body"
+            match="*[./@class[some $class in p:split() satisfies $class = $control-classes-to-migrate]]">
+        <xsl:variable name="has-summary" select="p:has-class('fr-summary')"/>
+        <xsl:variable name="has-search" select="p:has-class('fr-search')"/>
+        <xsl:variable name="has-index" select="p:has-class('fr-index') or $has-summary or $has-search"/>
+        <xsl:variable name="has-encrypt" select="p:has-class('fr-encrypt')"/>
+        <xsl:variable
+            name="filtered-classes"
+            select="p:split(@class)[not (. = $control-classes-to-migrate)]"/>
+        <xsl:copy>
+            <xsl:if test="exists($filtered-classes)">
+                <xsl:attribute name="class" select="string-join($filtered-classes, ' ')"/>
+            </xsl:if>
+            <xsl:apply-templates select="@* except @class | node()" mode="#current"/>
+            <xsl:if test="$has-index and not(./fr:index)">
+                <fr:index>
+                    <xsl:if test="$has-summary and not(./fr:index/fr:summary-show)">
+                        <fr:summary-show/>
+                    </xsl:if>
+                    <xsl:if test="$has-search and not(./fr:index/fr:summary-search)">
+                        <fr:summary-search/>
+                    </xsl:if>
+                </fr:index>
+            </xsl:if>
+            <xsl:if test="$has-encrypt and not(./fr:encrypt)">
+                <fr:encrypt/>
+            </xsl:if>
+        </xsl:copy>
+    </xsl:template>
 </xsl:stylesheet>

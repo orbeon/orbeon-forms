@@ -988,7 +988,6 @@
                             <xf:case id="fr-bulk-edit-closed"/>
                             <xf:case id="fr-bulk-edit-open">
                                 <xh:div class="fr-bulk-edit">
-                                    <xh:div class="fr-bulk-edit">
                                         <xf:repeat ref="instance('fr-bulk-edit-instance')/query[@path and @summary-edit-field = 'true']" id="bulk-repeat">
                                             <xf:var name="control-name"    value="@name"/>
                                             <xf:var name="control-path"    value="@path"/>
@@ -1055,7 +1054,7 @@
                                                     <xf:switch caseref="$is-supported-control">
                                                         <xf:case value="false()"/>
                                                         <xf:case value="true()">
-                                                            <xf:trigger appearance="xxf:mini" ref="if ($bulk-edit-enabled) then . else ''">
+                                                            <xf:trigger appearance="xxf:mini" ref="if ($bulk-edit-enabled) then . else ''" class="fr-summary-bulk-apply">
                                                                 <xf:label ref="$fr-resources/summary/bulk-edit/apply"/>
                                                                 <xf:action event="DOMActivate">
                                                                     <xf:dispatch name="apply" targetid="fr-bulk-apply">
@@ -1073,7 +1072,6 @@
                                             </xf:group>
                                         </xf:repeat>
                                     </xh:div>
-                                </xh:div>
                             </xf:case>
                         </xf:switch>
                     </xf:group>

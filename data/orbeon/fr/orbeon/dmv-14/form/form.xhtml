@@ -461,17 +461,25 @@
                     <xf:label ref="$form-resources/personal-information/label"/>
                     <fr:grid id="grid-1-grid">
                         <fr:c y="1" x="1" w="4">
-                            <xf:input id="last-name-control" bind="last-name-bind" class="fr-summary fr-search">
+                            <xf:input id="last-name-control" bind="last-name-bind">
                                 <xf:label ref="$form-resources/last-name/label"/>
                                 <xf:hint ref="$form-resources/last-name/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="5" w="4">
-                            <xf:input id="first-name-control" bind="first-name-bind" class="fr-summary fr-search">
+                            <xf:input id="first-name-control" bind="first-name-bind">
                                 <xf:label ref="$form-resources/first-name/label"/>
                                 <xf:hint ref="$form-resources/first-name/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="9" w="1">
@@ -484,18 +492,26 @@
                         <fr:c x="10" y="1" w="3" h="1"/>
 
                         <fr:c y="2" x="1" w="4">
-                            <xf:input id="driver-license-number-control" bind="driver-license-number-bind" class="fr-summary fr-search">
+                            <xf:input id="driver-license-number-control" bind="driver-license-number-bind">
                                 <xf:label ref="$form-resources/driver-license-number/label"/>
                                 <xf:hint ref="$form-resources/driver-license-number/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
                             </xf:input>
                         </fr:c>
                         <fr:c y="2" x="5" w="2">
-                            <fr:date id="birth-date-control" bind="birth-date-bind" class="fr-summary fr-search">
+                            <fr:date id="birth-date-control" bind="birth-date-bind">
                                 <xf:label ref="$form-resources/birth-date/label"/>
                                 <xf:hint ref="$form-resources/birth-date/hint"/>
                                 <xf:alert ref="$form-resources/birth-date/alert" validation="validation-6-validation"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
                             </fr:date>
                         </fr:c>
                         <fr:c x="7" y="2" w="2" h="1"/>

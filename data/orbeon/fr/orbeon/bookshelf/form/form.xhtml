@@ -451,19 +451,27 @@
                     <xf:help ref="$form-resources/details/help"/>
                     <fr:grid columns="3" id="details-grid-grid" bind="details-grid-bind">
                         <fr:c y="1" x="1" w="4">
-                            <xf:input id="title-control" bind="title-bind" class="fr-summary fr-search">
+                            <xf:input id="title-control" bind="title-bind">
                                 <xf:label ref="$form-resources/title/label"/>
                                 <xf:hint ref="$form-resources/title/hint"/>
                                 <xf:help ref="$form-resources/title/help"/>
                                 <xf:alert ref="$form-resources/title/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="5" w="4">
-                            <xf:input id="author-control" bind="author-bind" class="fr-summary fr-search">
+                            <xf:input id="author-control" bind="author-bind">
                                 <xf:label ref="$form-resources/author/label"/>
                                 <xf:hint ref="$form-resources/author/hint"/>
                                 <xf:help ref="$form-resources/author/help"/>
                                 <xf:alert ref="$form-resources/author/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="9" h="3" w="4">
@@ -475,7 +483,7 @@
                             </fr:image-attachment>
                         </fr:c>
                         <fr:c y="2" x="1" w="4">
-                            <xf:select1 id="language-control" bind="language-bind" class="fr-summary fr-search">
+                            <xf:select1 id="language-control" bind="language-bind">
                                 <xf:label ref="$form-resources/language/label"/>
                                 <xf:hint ref="$form-resources/language/hint"/>
                                 <xf:help ref="$form-resources/language/help"/>
@@ -488,6 +496,10 @@
                                     <xf:label ref="label"/>
                                     <xf:value ref="value"/>
                                 </xf:itemset>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
                             </xf:select1>
                         </fr:c>
                         <fr:c y="2" x="5" w="4">

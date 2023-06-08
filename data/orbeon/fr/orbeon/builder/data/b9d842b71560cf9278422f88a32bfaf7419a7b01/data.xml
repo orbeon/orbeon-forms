@@ -279,22 +279,29 @@
                     <fr:grid>
                         <xh:tr>
                             <xh:td>
-                                <xf:input id="name-control" bind="name-bind" class="fr-summary fr-search">
+                                <xf:input id="name-control" bind="name-bind">
                                     <xf:label ref="$form-resources/name/label"/>
                                     <xf:hint ref="$form-resources/name/hint"/>
                                     <xf:help ref="$form-resources/name/help"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <fr:index>
+                                        <fr:summary-show/>
+                                        <fr:summary-search/>
+                                    </fr:index>
                                 </xf:input>
                             </xh:td>
                         </xh:tr>
                         <xh:tr>
                             <xh:td>
-                                <xf:input id="business-name-control" bind="business-name-bind"
-                                          class="fr-summary fr-search">
+                                <xf:input id="business-name-control" bind="business-name-bind">
                                     <xf:label ref="$form-resources/business-name/label"/>
                                     <xf:hint ref="$form-resources/business-name/hint"/>
                                     <xf:help ref="$form-resources/business-name/help"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <fr:index>
+                                        <fr:summary-show/>
+                                        <fr:summary-search/>
+                                    </fr:index>
                                 </xf:input>
                             </xh:td>
                         </xh:tr>

@@ -232,24 +232,36 @@
                     <xf:label ref="$form-resources/contact/label"/>
                     <fr:grid columns="2" id="grid-1-grid" bind="grid-1-bind">
                         <fr:c y="1" x="1" w="6">
-                            <xf:input bind="first-name-bind" id="first-name-control" class="fr-summary fr-search">
+                            <xf:input bind="first-name-bind" id="first-name-control">
                                 <xf:label ref="$form-resources/first-name/label"/>
                                 <xf:hint ref="$form-resources/first-name/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="7" w="6">
-                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="last-name-bind" id="last-name-control" class="fr-summary fr-search">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="last-name-bind" id="last-name-control">
                                 <xf:label ref="$form-resources/last-name/label"/>
                                 <xf:hint ref="$form-resources/last-name/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
                             </xf:input>
                         </fr:c>
                         <fr:c y="2" x="1" w="6">
-                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="email-bind" id="email-control" class="fr-summary fr-search">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="email-bind" id="email-control">
                                 <xf:label ref="$form-resources/email/label"/>
                                 <xf:hint ref="$form-resources/email/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
                             </xf:input>
                         </fr:c>
                         <fr:c y="2" x="7" w="6">
@@ -265,10 +277,14 @@
                     <xf:label ref="$form-resources/message/label"/>
                     <fr:grid columns="2" id="grid-2-grid" bind="grid-2-bind">
                         <fr:c y="1" x="1" w="6">
-                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="order-number-bind" id="order-number-control" class="fr-summary fr-search">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="order-number-bind" id="order-number-control">
                                 <xf:label ref="$form-resources/order-number/label"/>
                                 <xf:hint ref="$form-resources/order-number/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="7" w="6">

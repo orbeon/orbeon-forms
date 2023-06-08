@@ -361,30 +361,40 @@
                         <fr:c x="1" y="3" w="6">
                             <fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="date-submitted-control"
                                      bind="date-submitted-bind"
-                                     field-width="natural"
-                                     class="fr-summary fr-search">
+                                     field-width="natural">
                                 <xf:label ref="$form-resources/date-submitted/label"/>
                                 <xf:hint ref="$form-resources/date-submitted/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
 
 
                             </fr:date>
                         </fr:c>
                         <fr:c x="7" y="3" w="6">
-                            <fr:number id="check-number-control" bind="check-number-bind" grouping-separator=""
-                                       class="fr-summary fr-search">
+                            <fr:number id="check-number-control" bind="check-number-bind" grouping-separator="">
                                 <xf:label ref="$form-resources/check-number/label"/>
                                 <xf:hint ref="$form-resources/check-number/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
 
 
                             </fr:number>
                         </fr:c>
                         <fr:c x="1" y="4" w="6">
-                            <xf:input id="comment-control" bind="comment-bind" class="fr-summary fr-search">
+                            <xf:input id="comment-control" bind="comment-bind">
                                 <xf:label ref="$form-resources/comment/label"/>
                                 <xf:hint ref="$form-resources/comment/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
 
 
                             </xf:input>
@@ -409,11 +419,14 @@
                                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                        xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava"
                                        id="members-count-control"
-                                       bind="members-count-bind"
-                                       class="fr-summary fr-search">
+                                       bind="members-count-bind">
                                 <xf:label ref="$form-resources/members-count/label"/>
                                 <xf:hint ref="$form-resources/members-count/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
 
 
 
@@ -523,11 +536,14 @@
                             <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder"
                                          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                          id="total-check-amount-control"
-                                         bind="total-check-amount-bind"
-                                         class="fr-summary fr-search">
+                                         bind="total-check-amount-bind">
                                 <xf:label ref="$form-resources/total-check-amount/label"/>
                                 <xf:hint ref="$form-resources/total-check-amount/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                    <fr:summary-search/>
+                                </fr:index>
 
 
                             </fr:currency>

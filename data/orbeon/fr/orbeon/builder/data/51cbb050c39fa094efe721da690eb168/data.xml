@@ -223,11 +223,15 @@
                     <fr:grid columns="2">
                         <xh:tr>
                             <xh:td>
-                                <xf:input bind="first-name-bind" id="first-name-control" class="fr-summary fr-search">
+                                <xf:input bind="first-name-bind" id="first-name-control">
                                     <xf:label ref="$form-resources/first-name/label"/>
                                     <xf:hint ref="$form-resources/first-name/hint"/>
                                     <xf:help ref="$form-resources/first-name/help"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <fr:index>
+                                        <fr:summary-show/>
+                                        <fr:summary-search/>
+                                    </fr:index>
                                 </xf:input>
                             </xh:td>
                             <xh:td>
@@ -236,12 +240,15 @@
                                               xmlns:xbl="http://www.w3.org/ns/xbl"
                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
                                               bind="last-name-bind"
-                                              id="last-name-control"
-                                              class="fr-summary fr-search">
+                                              id="last-name-control">
                                     <xf:label ref="$form-resources/last-name/label"/>
                                     <xf:hint ref="$form-resources/last-name/hint"/>
                                     <xf:help ref="$form-resources/last-name/help"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <fr:index>
+                                        <fr:summary-show/>
+                                        <fr:summary-search/>
+                                    </fr:index>
                                 </xf:input>
                             </xh:td>
                         </xh:tr>
@@ -252,12 +259,15 @@
                                               xmlns:xbl="http://www.w3.org/ns/xbl"
                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
                                               bind="email-bind"
-                                              id="email-control"
-                                              class="fr-summary fr-search">
+                                              id="email-control">
                                     <xf:label ref="$form-resources/email/label"/>
                                     <xf:hint ref="$form-resources/email/hint"/>
                                     <xf:help ref="$form-resources/email/help"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <fr:index>
+                                        <fr:summary-show/>
+                                        <fr:summary-search/>
+                                    </fr:index>
                                 </xf:input>
                             </xh:td>
                             <xh:td>
@@ -288,12 +298,15 @@
                                               xmlns:xbl="http://www.w3.org/ns/xbl"
                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
                                               bind="order-number-bind"
-                                              id="order-number-control"
-                                              class="fr-summary fr-search">
+                                              id="order-number-control">
                                     <xf:label ref="$form-resources/order-number/label"/>
                                     <xf:hint ref="$form-resources/order-number/hint"/>
                                     <xf:help ref="$form-resources/order-number/help"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <fr:index>
+                                        <fr:summary-show/>
+                                        <fr:summary-search/>
+                                    </fr:index>
                                 </xf:input>
                             </xh:td>
                             <xh:td>

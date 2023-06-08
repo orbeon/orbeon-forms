@@ -70,6 +70,7 @@
                 <url>
                     <xsl:value-of select="p:rewrite-service-uri(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())"/>
                 </url>
+                <always-return-status-code>false</always-return-status-code>
             </config>
         </p:input>
         <p:output name="data" id="fr-resources"/>
@@ -163,6 +164,7 @@
                 <mode>binary</mode>
                 <content-type>application/pdf</content-type>
                 <force-content-type>true</force-content-type>
+                <always-return-status-code>false</always-return-status-code>
             </config>
         </p:input>
         <p:output name="data" id="form-pdf"/>
@@ -177,6 +179,7 @@
                 <mode>binary</mode>
                 <content-type>image/tiff</content-type>
                 <force-content-type>true</force-content-type>
+                <always-return-status-code>false</always-return-status-code>
             </config>
         </p:input>
         <p:output name="data" id="form-tiff"/>
@@ -220,6 +223,7 @@
                                     <name>Orbeon-Form-Definition-Version</name>
                                     <value><xsl:value-of select="/*/request/form-version"/></value>
                                 </header>
+                                <always-return-status-code>false</always-return-status-code>
                             </config>
                         </p:input>
                         <p:output name="data" id="attachment-{position()}"/>

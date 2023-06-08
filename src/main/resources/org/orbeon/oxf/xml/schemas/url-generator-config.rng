@@ -191,7 +191,14 @@
                             </interleave>
                         </element>
                     </optional>
-
+                    <optional>
+                        <element name="always-return-status-code">
+                            <choice>
+                                <value>true</value>
+                                <value>false</value>
+                            </choice>
+                        </element>
+                    </optional>
                 </interleave>
             </choice>
         </element>

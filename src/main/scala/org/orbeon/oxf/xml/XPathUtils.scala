@@ -43,7 +43,7 @@ object XPathUtils {
   private val EmptyVariables  = ju.Collections.emptyMap[String, om.ValueRepresentation]()
   private val EmptyNamespaces = ju.Collections.emptyMap[String, String]()
 
-  // 46 usages
+  // 29 usages
   def selectNodeIterator(contextNode: odom.Node, expr: String): ju.Iterator[odom.Node] =
     selectNodeIterator(contextNode, expr, EmptyNamespaces)
 
@@ -84,7 +84,7 @@ object XPathUtils {
   }
 
   // NOTE: Return `null` if there is no result.
-  // 13 usages
+  // 12 usages
   def selectSingleNode(node: odom.Node, expr: String): odom.Node = {
     val it = selectNodeIterator(node, expr)
     if (it.hasNext)
@@ -93,11 +93,11 @@ object XPathUtils {
       null
   }
 
-  // 25 usages
+  // 22 usages
   def selectStringValue(node: odom.Node, expr: String): String =
     selectStringValueOrNull(node, expr, EmptyNamespaces, null, null)
 
-  // 168 usages
+  // 150 usages
   def selectStringValueNormalize(node: odom.Node, expr: String): String =
     trimAllToNull(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null))
 

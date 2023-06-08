@@ -155,7 +155,8 @@ public class URLGenerator extends ProcessorImpl {
                     null,
                     DEFAULT_PREEMPTIVE_AUTHENTICATION,
                     null,
-                    new TidyConfig(null)
+                    new TidyConfig(null),
+                    null
                 )
             );
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
@@ -185,6 +186,8 @@ public class URLGenerator extends ProcessorImpl {
         private boolean preemptiveAuth = DEFAULT_PREEMPTIVE_AUTHENTICATION;
 
         private TidyConfig tidyConfig;
+
+        private Boolean alwaysReturnStatusCode;
 
         public Config(URL url) {
             this.url = url;
@@ -224,7 +227,8 @@ public class URLGenerator extends ProcessorImpl {
               String password,
               boolean preemptiveAuth,
               String domain,
-              TidyConfig tidyConfig
+              TidyConfig tidyConfig,
+              Boolean alwaysReturnStatusCode
         ) {
 
             this.url = url;
@@ -257,6 +261,8 @@ public class URLGenerator extends ProcessorImpl {
             this.preemptiveAuth = preemptiveAuth;
 
             this.tidyConfig = tidyConfig;
+
+            this.alwaysReturnStatusCode = alwaysReturnStatusCode;
         }
 
         public URL getURL() {
@@ -333,6 +339,10 @@ public class URLGenerator extends ProcessorImpl {
 
         public boolean isPreemptiveAuth() {
             return preemptiveAuth;
+        }
+
+        public Boolean getAlwaysReturnStatusCode() {
+            return alwaysReturnStatusCode;
         }
 
         @Override
@@ -458,6 +468,12 @@ public class URLGenerator extends ProcessorImpl {
                             // Get Tidy config (will only apply if content-type is text/html)
                             final TidyConfig tidyConfig = new TidyConfig(XPathUtils.selectSingleNode(configElement, "/config/tidy-options"));
 
+                            final Boolean alwaysReturnStatusCode =
+                                ProcessorUtils.selectBooleanValueOrNull(
+                                    configElement,
+                                    "/config/always-return-status-code"
+                                );
+
                             // Create configuration object
                             // Use location data if present so that relative URLs can be supported
                             // NOTE: We check whether there is a protocol, because we have
@@ -473,7 +489,7 @@ public class URLGenerator extends ProcessorImpl {
                                     headerNameValues, forwardHeaders, readHeaders,
                                     cacheUseLocalCache, enableConditionalGET,
                                     username, password, preemptiveAuth, domain,
-                                    tidyConfig);
+                                    tidyConfig, alwaysReturnStatusCode);
                             return new ConfigURIReferences(config);
                         }
                     });
@@ -1042,33 +1058,38 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readHTML(XMLReceiver xmlReceiver) throws IOException {
             openConnection();
-            checkStatusCode();
+            if (! Boolean.TRUE.equals(config.getAlwaysReturnStatusCode()))
+                checkStatusCode();
             ResourceHandlerBase.readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), xmlReceiver);
         }
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
-            checkStatusCode();
+            if (Boolean.FALSE.equals(config.getAlwaysReturnStatusCode()))
+                checkStatusCode();
             output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
             BinaryTextSupport.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
         public void readJSON(XMLReceiver output, String contentType, Long lastModified) throws IOException {
             openConnection();
-            checkStatusCode();
+            if (! Boolean.TRUE.equals(config.getAlwaysReturnStatusCode()))
+                checkStatusCode();
             readJSON(inputStream, output);
         }
 
         public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
-            checkStatusCode();
+            if (Boolean.FALSE.equals(config.getAlwaysReturnStatusCode()))
+                checkStatusCode();
             output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
             BinaryTextSupport.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode(), null, headersToPropagate);
         }
 
         public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIReferences uriReferences) throws IOException {
             openConnection();
-            checkStatusCode();
+            if (! Boolean.TRUE.equals(config.getAlwaysReturnStatusCode()))
+                checkStatusCode();
 
             final ParserConfiguration parserConfiguration = ParserConfiguration.apply(config.getParserConfiguration(), uriReferences);
             try {

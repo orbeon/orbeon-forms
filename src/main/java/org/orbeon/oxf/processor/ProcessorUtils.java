@@ -47,6 +47,11 @@ public class ProcessorUtils {
         return (result == null) ? defaultValue : "true".equals(result);
     }
 
+    public static Boolean selectBooleanValueOrNull(Node node, String expr) {
+        final String result = XPathUtils.selectStringValueNormalize(node, expr);
+        return (result == null) ? null : "true".equals(result);
+    }
+
     public static int selectIntValue(Node node, String expr, int defaultValue) {
         Integer result = XPathUtils.selectIntegerValue(node, expr);
         return (result == null) ? defaultValue : result;

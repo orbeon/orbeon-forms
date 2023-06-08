@@ -871,17 +871,13 @@
                     ref="(label | hint | help | text)/value"
                     xxf:whitespace="trim"/>
 
-                <xf:bind ref="$i/fr-index"                         type="xs:boolean"/>
-                <xf:bind ref="$i/fr-summary-show"                  type="xs:boolean"/>
-                <xf:bind ref="$i/fr-summary-show/@role-required"   type="xs:boolean" relevant="$i/fr-summary-show = true()"/>
-                <xf:bind ref="$i/fr-summary-show/@require-role"    relevant="$i/fr-summary-show = true() and $i/fr-summary-show/@role-required = true()"/>
-                <xf:bind ref="$i/fr-summary-search"                type="xs:boolean"/>
-                <xf:bind ref="$i/fr-summary-search/@role-required" type="xs:boolean" relevant="$i/fr-summary-search = true()"/>
-                <xf:bind ref="$i/fr-summary-search/@require-role"  relevant="$i/fr-summary-search = true() and $i/fr-summary-search/@role-required = true()"/>
-                <xf:bind ref="$i/fr-summary-edit"                  type="xs:boolean"/>
-                <xf:bind ref="$i/fr-summary-edit/@role-required"   type="xs:boolean" relevant="$i/fr-summary-edit = true()"/>
-                <xf:bind ref="$i/fr-summary-edit/@require-role"    relevant="$i/fr-summary-edit = true() and $i/fr-summary-edit/@role-required = true()"/>
-                <xf:bind ref="$i/fr-encrypt"                       type="xs:boolean"/>
+                <xf:bind ref="$i/fr-index"          type="xs:boolean"/>
+                <xf:bind ref="$i/*[starts-with(local-name(), 'fr-summary-')]" name="summary-setting">
+                    <xf:bind ref="$summary-setting" type="xs:boolean"/>
+                    <xf:bind ref="@role-required"   type="xs:boolean" relevant="$summary-setting = true()"/>
+                    <xf:bind ref="@require-role"                      relevant="$summary-setting = true() and $summary-setting/@role-required = true()"/>
+                </xf:bind>
+                <xf:bind ref="$i/fr-encrypt"        type="xs:boolean"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">

@@ -54,15 +54,15 @@
                 <xf:setvalue ref="$i/custom-classes"          value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
                 <xf:setvalue ref="$i/fr-index"                         value="exists($control/fr:index)"/>
-                <xf:setvalue ref="$i/fr-summary-show"                  value="exists($control/fr:index/fr:summary-show)"/>
-                <xf:setvalue ref="$i/fr-summary-show/@require-role"    value="$control/fr:index/fr:summary-show/@require-role"/>
-                <xf:setvalue ref="$i/fr-summary-show/@role-required"   value="normalize-space($i/fr-summary-show/@require-role) != ''"/>
-                <xf:setvalue ref="$i/fr-summary-search"                value="exists($control/fr:index/fr:summary-search)"/>
-                <xf:setvalue ref="$i/fr-summary-search/@require-role"  value="$control/fr:index/fr:summary-search/@require-role"/>
-                <xf:setvalue ref="$i/fr-summary-search/@role-required" value="normalize-space($i/fr-summary-search/@require-role) != ''"/>
-                <xf:setvalue ref="$i/fr-summary-edit"                  value="exists($control/fr:index/fr:summary-edit)"/>
-                <xf:setvalue ref="$i/fr-summary-edit/@require-role"    value="$control/fr:index/fr:summary-edit/@require-role"/>
-                <xf:setvalue ref="$i/fr-summary-edit/@role-required"   value="normalize-space($i/fr-summary-edit/@require-role) != ''"/>
+                <xf:action iterate="('show', 'search', 'edit')">
+                    <xf:var name="current"          value="."/>
+                    <xf:var name="instance-element" value="$i/*[local-name()                   = concat('fr-summary-', $current)]"/>
+                    <xf:var name="control-element"  value="$control/fr:index/fr:*[local-name() = concat('summary-', $current)]"/>
+
+                    <xf:setvalue ref="$instance-element"                value="exists($control-element)"/>
+                    <xf:setvalue ref="$instance-element/@require-role"  value="normalize-space($control-element/@require-role)"/>
+                    <xf:setvalue ref="$instance-element/@role-required" value="$instance-element/@require-role != ''"/>
+                </xf:action>
                 <xf:setvalue ref="$i/fr-encrypt"                       value="exists($control/fr:encrypt)"/>
 
                 <!-- Figure which one of label, hint, help, or text the control supports -->
@@ -388,35 +388,19 @@
                         <xf:delete ref="$control/fr:index"/>
                         <xf:action if="$i/fr-index = true()">
                             <xf:insert context="$control" origin="xf:element('fr:index')"/>
-                            <xf:action if="$i/fr-summary-show = true()">
-                                <xf:insert
-                                    context="$control/fr:index"
-                                    origin="xf:element(
-                                        'fr:summary-show',
-                                        if (normalize-space($i/fr-summary-show/@require-role) != '') then
-                                            xf:attribute('require-role', $i/fr-summary-show/@require-role)
+                            <xf:action iterate="('show', 'search', 'edit')">
+                                <xf:var name="current"          value="."/>
+                                <xf:var name="instance-element" value="$i/*[local-name() = concat('fr-summary-', $current)]"/>
+                                <xf:action if="$instance-element = true()">
+                                    <xf:insert
+                                        context="$control/fr:index"
+                                        origin="xf:element(
+                                        concat('fr:summary-', $current),
+                                        if (normalize-space($instance-element/@require-role) != '') then
+                                            xf:attribute('require-role', $instance-element/@require-role)
                                         else
                                             ())"/>
-                            </xf:action>
-                            <xf:action if="$i/fr-summary-search = true()">
-                                <xf:insert
-                                    context="$control/fr:index"
-                                    origin="xf:element(
-                                        'fr:summary-search',
-                                        if (normalize-space($i/fr-summary-search/@require-role) != '') then
-                                            xf:attribute('require-role', $i/fr-summary-search/@require-role)
-                                        else
-                                            ())"/>
-                            </xf:action>
-                            <xf:action if="$i/fr-summary-edit = true()">
-                                <xf:insert
-                                    context="$control/fr:index"
-                                    origin="xf:element(
-                                        'fr:summary-edit',
-                                        if (normalize-space($i/fr-summary-edit/@require-role) != '') then
-                                            xf:attribute('require-role', $i/fr-summary-edit/@require-role)
-                                        else
-                                            ())"/>
+                                </xf:action>
                             </xf:action>
                         </xf:action>
                         <!-- Write encrypt settings -->

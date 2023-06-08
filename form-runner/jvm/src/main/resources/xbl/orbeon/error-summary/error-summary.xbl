@@ -37,7 +37,7 @@
                 <xf:var name="observers" xxbl:scope="outer"><xxf:value value="xxf:split($state/observers)" xxbl:scope="inner"/></xf:var>
                 <xxf:setvisited iterate="$observers" control="{xxf:absolute-id(.)}" visited="true" recurse="true" xxbl:scope="outer"/>
             </xbl:handler>
-            <xbl:handler event="fr-unvisit-all" phase="target">`
+            <xbl:handler event="fr-unvisit-all" phase="target">
                 <!-- Mark all controls as not visited -->
                 <xf:var name="observers" xxbl:scope="outer"><xxf:value value="xxf:split($state/observers)" xxbl:scope="inner"/></xf:var>
                 <xxf:setvisited iterate="$observers" control="{xxf:absolute-id(.)}" visited="false" recurse="true" xxbl:scope="outer"/>
@@ -47,7 +47,7 @@
                 <xf:delete ref="instance('fr-snapshot-instance')/*"/>
                 <xf:insert context="instance('fr-snapshot-instance')" origin="instance('fr-errors-instance')/*"/>
             </xbl:handler>
-            <xbl:handler event="fr-clear" phase="target">`
+            <xbl:handler event="fr-clear" phase="target">
                 <!-- Clear all errors in non-incremental mode -->
                 <xf:delete ref="instance('fr-snapshot-instance')/*"/>
             </xbl:handler>
@@ -62,7 +62,7 @@
                 <!-- Hide the error summary entirely -->
                 <xf:setvalue ref="$state/show" value="false()"/>
             </xbl:handler>
-            <xbl:handler event="fr-show" phase="target">`
+            <xbl:handler event="fr-show" phase="target">
                 <!-- Show the error summary, possibly for specific sections -->
                 <xf:setvalue ref="$state/section-name" value="event('section-name')"/>
                 <xf:setvalue ref="$state/show"         value="true()"/>

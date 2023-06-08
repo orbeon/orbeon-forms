@@ -32,17 +32,33 @@
 
         <xh:div class="xforms-hidden" id="fb-pseudo-body">
             <!-- For the summary page -->
-            <xf:output id="application-name-control" bind="application-name-bind" class="fr-summary fr-search">
+            <xf:output id="application-name-control" bind="application-name-bind">
                 <xf:label ref="$form-resources/application-name/label"/>
+                <fr:index>
+                    <fr:summary-show/>
+                    <fr:summary-search/>
+                </fr:index>
             </xf:output>
-            <xf:output id="form-name-control" bind="form-name-bind" class="fr-summary fr-search">
+            <xf:output id="form-name-control" bind="form-name-bind">
                 <xf:label ref="$form-resources/form-name/label"/>
+                <fr:index>
+                    <fr:summary-show/>
+                    <fr:summary-search/>
+                </fr:index>
             </xf:output>
-            <xf:output id="title-control" bind="title-bind" class="fr-summary fr-search">
+            <xf:output id="title-control" bind="title-bind">
                 <xf:label ref="$form-resources/title/label"/>
+                <fr:index>
+                    <fr:summary-show/>
+                    <fr:summary-search/>
+                </fr:index>
             </xf:output>
-            <xf:output id="description-control" bind="description-bind" class="fr-summary fr-search">
+            <xf:output id="description-control" bind="description-bind">
                 <xf:label ref="$form-resources/description/label"/>
+                <fr:index>
+                    <fr:summary-show/>
+                    <fr:summary-search/>
+                </fr:index>
             </xf:output>
             <!-- Expose property -->
             <xf:output class="fb-tinymce-config" value="xxf:property('oxf.fb.tinymce.config')"/>

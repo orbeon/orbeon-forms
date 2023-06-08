@@ -758,7 +758,7 @@
                                     <xf:trigger
                                         id="fr-bulk-edit-button"
                                         appearance="full"
-                                        ref="if (instance('fr-bulk-edit-instance')/query[@path and @summary-edit-field = 'true'] and $bulk-edit-enabled) then $enabled else $disabled"
+                                        ref="if (instance('fr-bulk-edit-instance')/query[@path and @summary-edit-field = 'true']) then $enabled else $disabled"
                                         class="fr-summary-bulk-show-button">
 
                                         <xf:label
@@ -1055,7 +1055,7 @@
                                                     <xf:switch caseref="$is-supported-control">
                                                         <xf:case value="false()"/>
                                                         <xf:case value="true()">
-                                                            <xf:trigger appearance="xxf:mini">
+                                                            <xf:trigger appearance="xxf:mini" ref="if ($bulk-edit-enabled) then . else ''">
                                                                 <xf:label ref="$fr-resources/summary/bulk-edit/apply"/>
                                                                 <xf:action event="DOMActivate">
                                                                     <xf:dispatch name="apply" targetid="fr-bulk-apply">

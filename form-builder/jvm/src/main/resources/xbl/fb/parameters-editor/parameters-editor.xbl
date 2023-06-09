@@ -242,7 +242,7 @@
                             </xf:case>
                             <xf:case value="'LinkToEditPageParam'">
                                 <xf:select ref="$current-param" appearance="full">
-                                    <xf:itemset ref="xf:element('fr:token', 'true')">
+                                    <xf:itemset ref="xf:element(if (xxf:component-param-value('form-runner-namespace') = 'false') then 'token' else 'fr:token', 'true')">
                                         <xf:label ref="$resources/components/parameters-editor/token/label"/>
                                         <xf:copy ref="."/>
                                     </xf:itemset>
@@ -251,7 +251,7 @@
                             <!-- TODO: duplication -->
                             <xf:case value="'LinkToViewPageParam'">
                                 <xf:select ref="$current-param" appearance="full">
-                                    <xf:itemset ref="xf:element('fr:token', 'true')">
+                                    <xf:itemset ref="xf:element(if (xxf:component-param-value('form-runner-namespace') = 'false') then 'token' else 'fr:token', 'true')">
                                         <xf:label ref="$resources/components/parameters-editor/token/label"/>
                                         <xf:copy ref="."/>
                                     </xf:itemset>

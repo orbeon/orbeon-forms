@@ -18,8 +18,9 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SummarySettings}
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner, InDocFormRunnerDocContext}
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
 
@@ -34,7 +35,7 @@ trait FormDefinition {
 
   // Returns the controls that are searchable from a form definition
   def findIndexedControls(
-    formDoc                   : DocumentInfo,
+    formDoc                   : DocumentNodeInfoType,
     databaseDataFormatVersion : DataFormatVersion,
     forUserRoles              : Option[List[String]]
   ): List[IndexedControl] = {

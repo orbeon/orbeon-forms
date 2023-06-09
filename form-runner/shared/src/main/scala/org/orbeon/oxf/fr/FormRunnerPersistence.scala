@@ -1,4 +1,4 @@
-/**
+ /**
  * Copyright (C) 2013 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -59,6 +59,7 @@ sealed trait FormOrData extends EnumEntry with Lowercase
 object FormOrData extends Enum[FormOrData] {
 
   val values = findValues
+  val valuesSet: Set[FormOrData] = values.toSet
 
   case object Form extends FormOrData
   case object Data extends FormOrData
@@ -107,6 +108,7 @@ object FormRunnerPersistence {
   val ReEncryptAppFormPath                = """/fr/service/persistence(/reencrypt/([^/]+)/([^/]+))""".r // `POST` only
   val PublishedFormsMetadataPath          = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
   val HistoryPath                         = """/fr/service/persistence(/history/([^/]+)/([^/]+)/([^/]+))""".r
+  val ExportPath                          = """/fr/service/persistence/export(?:/([^/]+))?(?:/([^/]+))?(?:/([^/]+))?""".r
   val ReindexPath                         =   "/fr/service/persistence/reindex"
   val ReEncryptStatusPath                 =   "/fr/service/persistence/reencrypt" // `GET` only
 
@@ -334,15 +336,36 @@ trait FormRunnerPersistence {
   // `documentIdOrEmpty` can be empty and if so won't be included. Ideally should be `Option[String]`.
   //@XPathFunction
   def createFormDataBasePath(app: String, form: String, isDraft: Boolean, documentIdOrEmpty: String): String =
-    CRUDBasePath :: createFormDataBasePathNoPrefix(AppForm(app, form), isDraft, documentIdOrEmpty.trimAllToOpt) :: "" :: Nil mkString "/"
+    CRUDBasePath ::
+    createFormDataBasePathNoPrefix(
+      AppForm(app, form),
+      None,
+      isDraft,
+      documentIdOrEmpty.trimAllToOpt
+    ) ::
+    "" ::
+    Nil mkString "/"
 
   // Path neither starts nor ends with with `/`
-  def createFormDataBasePathNoPrefix(appForm: AppForm, isDraft: Boolean, documentIdOpt: Option[String]): String =
-    appForm.app :: appForm.form :: (if (isDraft) "draft" else "data") :: documentIdOpt.toList ::: Nil mkString "/"
+  def createFormDataBasePathNoPrefix(
+    appForm      : AppForm,
+    version      : Option[Int],
+    isDraft      : Boolean,
+    documentIdOpt: Option[String]
+  ): String =
+    appForm.app                                           ::
+    appForm.form                                          ::
+    version.map(_.toString).toList                        :::
+    (if (isDraft) "draft" else FormOrData.Data.entryName) ::
+    documentIdOpt.toList                                  :::
+    Nil mkString "/"
 
   //@XPathFunction
   def createFormDefinitionBasePath(app: String, form: String): String =
-    CRUDBasePath :: app :: form :: FormOrData.Form.entryName :: "" :: Nil mkString "/"
+    CRUDBasePath :: createFormDefinitionBasePathNoPrefix(AppForm(app, form), None) :: "" :: Nil mkString "/"
+
+  def createFormDefinitionBasePathNoPrefix(appForm: AppForm, version: Option[Int]): String =
+    appForm.app :: appForm.form :: version.map(_.toString).toList ::: FormOrData.Form.entryName :: Nil mkString "/"
 
   //@XPathFunction
   def createFormMetadataPathAndQuery(app: String, form: String, allVersions: Boolean, allForms: Boolean): String =

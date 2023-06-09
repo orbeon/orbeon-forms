@@ -70,7 +70,7 @@ class PersistenceProxyProcessor extends ProcessorImpl {
   }
 }
 
-private object PersistenceProxyProcessor {
+private[persistence] object PersistenceProxyProcessor {
 
   val RawDataFormatVersion           = "raw"
   val AllowedDataFormatVersionParams = Set() ++ (DataFormatVersion.values map (_.entryName)) + RawDataFormatVersion
@@ -174,7 +174,8 @@ private object PersistenceProxyProcessor {
       case SearchPath(path, app, form)                      => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None          , path)
       case ReEncryptAppFormPath(path, app, form)            => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
       case HistoryPath(path, app, form, _)                  => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
-      case PublishedFormsMetadataPath(path, app, form)      => proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
+      case ExportPath(app, form, documentId)                => Export.processExport       (request, response, Option(app), Option(form), Option(documentId))
+      case PublishedFormsMetadataPath(_, app, form)         => proxyPublishedFormsMetadata(request, response, Option(app), Option(form))
       case ReindexPath                                      => proxyReindex               (request, response)
       case ReEncryptStatusPath                              => proxyReEncryptStatus       (request, response)
       case incomingPath                                     => throw new OXFException(s"Unsupported path: $incomingPath")
@@ -346,10 +347,10 @@ private object PersistenceProxyProcessor {
 
               val dataServiceUri =
                 PathUtils.recombineQuery(
-                  dataPersistenceBaseUrl.dropTrailingSlash                                            ::
-                    "crud"                                                                            ::
-                    FormRunner.createFormDataBasePathNoPrefix(appForm, v.isDraft, Some(v.documentId)) ::
-                    XmlFormDataFilename                                                               ::
+                  dataPersistenceBaseUrl.dropTrailingSlash                                                  ::
+                    "crud"                                                                                  ::
+                    FormRunner.createFormDataBasePathNoPrefix(appForm, None, v.isDraft, Some(v.documentId)) ::
+                    XmlFormDataFilename                                                                     ::
                     Nil mkString "/",
                   queryForToken
                 )
@@ -809,12 +810,25 @@ private object PersistenceProxyProcessor {
    * results. So the response is not simply proxied, unlike for other persistence layer calls.
    */
   private def proxyPublishedFormsMetadata(
-    request  : Request,
-    response : Response,
-    app      : Option[String],
-    form     : Option[String],
-    path     : String
-  ): Unit = {
+    request   : Request, // for params, headers, and method
+    response  : Response,
+    app       : Option[String],
+    form      : Option[String]
+  ): Unit =
+    streamDocument(
+      callPublishedFormsMetadata(
+        request = request,
+        app     = app,
+        form    = form
+      ),
+      response
+    )
+
+  def callPublishedFormsMetadata(
+    request   : Request, // for params, headers, and method
+    app       : Option[String],
+    form      : Option[String] // TODO: should now be allowed if app is not provided
+  ): NodeInfo = {
 
     val formProviders = getProviders(app, form, FormOrData.Form)
 
@@ -826,8 +840,10 @@ private object PersistenceProxyProcessor {
         (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
       } yield {
         // Read all the forms for the current service
-        val serviceURI = PathUtils.appendQueryString(baseURI + "/form" + Option(path).getOrElse(""), parameters)
-        val cxr        = proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, headers)
+        //val serviceURI = PathUtils.appendQueryString(baseURI + "/form" + Option(path).getOrElse(""), parameters)
+        val servicePath = baseURI :: "form" :: app.toList ::: form.toList ::: Nil mkString "/"
+        val serviceURI  = PathUtils.appendQueryString(servicePath, parameters)
+        val cxr         = proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, headers)
 
         ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
           val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
@@ -835,16 +851,15 @@ private object PersistenceProxyProcessor {
         }
       }
 
-    returnAggregatedDocument(
-      root     = "forms",
-      content  =
+    aggregateDocument(
+      root    = "forms",
+      content =
         FormRunner.filterFormsAndAnnotateWithOperations(
           formsEls               = allFormElements.flatten,
           allForms               = request.getFirstParamAsString("all-forms")                contains "true",
           ignoreAdminPermissions = request.getFirstParamAsString("ignore-admin-permissions") contains "true",
           credentialsOpt         = PermissionsAuthorization.findCurrentCredentialsFromSession
-        ),
-      response = response
+        )
     )
   }
 
@@ -887,29 +902,37 @@ private object PersistenceProxyProcessor {
         FormRunner.providerPropertyAsBoolean(provider, "reencrypt", default = false)
       }
 
-    returnAggregatedDocument(
-      root     = "forms",
-      content  =
-        dataProvidersWithReEncryptSupport.flatMap { provider =>
-          val (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
-          val serviceURI         = baseURI + "/reencrypt"
-          val cxr                = proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, headers)
-          ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
-            val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
-            forms / "forms" / "form"
+    streamDocument(
+      aggregateDocument(
+        root    = "forms",
+        content =
+          dataProvidersWithReEncryptSupport.flatMap { provider =>
+            val (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
+            val serviceURI         = baseURI + "/reencrypt"
+            val cxr                = proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, headers)
+            ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
+              val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
+              forms / "forms" / "form"
+            }
           }
-        },
-      response = response
+      ),
+      response
     )
   }
 
-  private def returnAggregatedDocument(
-    root     : String,
-    content  : List[NodeInfo],
-    response : Response
-  ): Unit = {
+  private def aggregateDocument(
+    root    : String,
+    content : List[NodeInfo]
+  ): NodeInfo = {
     val documentElement = elementInfo(root)
     XFormsAPI.insert(into = documentElement, origin = content)
+    documentElement
+  }
+
+  private def streamDocument(
+    documentElement : NodeInfo,
+    response        : Response
+  ): Unit = {
     response.setContentType(ContentTypes.XmlContentType)
     TransformerUtils.getXMLIdentityTransformer.transform(documentElement, new StreamResult(response.getOutputStream))
   }

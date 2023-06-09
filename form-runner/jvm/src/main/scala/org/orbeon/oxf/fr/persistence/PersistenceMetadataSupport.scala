@@ -2,25 +2,19 @@ package org.orbeon.oxf.fr.persistence
 
 import cats.Eval
 import org.orbeon.oxf.cache.{CacheApi, CacheSupport}
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
-import org.orbeon.oxf.fr.FormRunner.{createFormDefinitionBasePath, createFormMetadataPathAndQuery}
+import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
 import org.orbeon.oxf.fr.persistence.relational.EncryptionAndIndexDetails
-import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunnerPersistence, Names}
-import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, URLRewriterUtils, XPath}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsCrossPlatformSupport
 
-import java.net.URI
 import scala.util.{Success, Try}
 
 
@@ -69,13 +63,9 @@ object PersistenceMetadataSupport {
     version : FormDefinitionVersion
   ): Try[EncryptionAndIndexDetails] =
     readMaybeFromCache(appForm, version, formDefinitionCache) {
+      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
       withDebug("reading published form for indexing/encryption details") {
-        val path = createFormDefinitionBasePath(appForm.app, appForm.form) + "form.xhtml"
-        val customHeaders = version match {
-          case FormDefinitionVersion.Latest            => Map.empty[String, List[String]]
-          case FormDefinitionVersion.Specific(version) => Map(OrbeonFormDefinitionVersion -> List(version.toString))
-        }
-        readDocument(path, customHeaders) map { formDefinitionDoc =>
+        PersistenceApi.readPublishedFormDefinition(appForm.app, appForm.form, version) map { case (_, formDefinitionDoc) =>
           EncryptionAndIndexDetails(
             encryptedFieldsPaths = Eval.later(FieldEncryption.getFieldsToEncrypt(formDefinitionDoc, appForm).map(_.path)),
             indexedFieldsXPaths  = Eval.later(Index.findIndexedControls(
@@ -89,48 +79,18 @@ object PersistenceMetadataSupport {
       }
     }
 
-  // TODO: This should return a `Try`. Right now it throws if the document cannot be read.
-  // Retrieves from the persistence layer the metadata for a form, return an `Option[<form>]`
-  private def readFormMetadataOpt(
-    appForm : AppForm,
-    version : FormDefinitionVersion
-  ): Option[NodeInfo] =
-    readMaybeFromCache(appForm, version, formMetadataCache) {
-
-      val formsDocTry =
-        withDebug("reading published form for metadata only") {
-          readDocument(
-            createFormMetadataPathAndQuery(
-              app         = appForm.app,
-              form        = appForm.form,
-              allVersions = version != FormDefinitionVersion.Latest,
-              allForms    = true
-            ),
-            Map.empty
-          )
-        }
-
-      formsDocTry map { formsDoc =>
-        val formElements = formsDoc / "forms" / "form"
-        val formByVersion = version match {
-          case FormDefinitionVersion.Specific(v) =>
-            formElements.find(_.child("form-version").stringValue == v.toString)
-          case FormDefinitionVersion.Latest =>
-            None
-        }
-
-        formByVersion.orElse(formElements.headOption)
-      }
-    } .get
-
-  def readLatestVersion(appForm: AppForm): Option[Int] =
-    readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)
+  def readLatestVersion(appForm: AppForm): Option[Int] = {
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+    PersistenceApi.readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)
       .flatMap(_.firstChildOpt(Names.FormVersion))
       .map(_.getStringValue.toInt)
+  }
 
-  def readFormPermissions(appForm: AppForm, version: FormDefinitionVersion): Option[NodeInfo]=
-    readFormMetadataOpt(appForm, version)
+  def readFormPermissions(appForm: AppForm, version: FormDefinitionVersion): Option[NodeInfo] = {
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+    PersistenceApi.readFormMetadataOpt(appForm, version)
       .flatMap(_.firstChildOpt(Names.Permissions))
+  }
 
   // Used by search only
   def getEffectiveFormVersionForSearchMaybeCallApi(
@@ -173,70 +133,5 @@ object PersistenceMetadataSupport {
               read |!> (t => cache.put(cacheKey, t))
           }
       }
-
-    // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
-    def readDocument(
-      urlString     : String,
-      customHeaders : Map[String, List[String]]
-    ): Try[DocumentNodeInfoType] =
-      withDebug("reading document", List("url" -> urlString, "headers" -> customHeaders.toString)) {
-        // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the test
-        // on status code),  but the MySQL persistence layer returns a [200 with an empty body][1] (thus a body is
-        // required).
-        //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
-        ConnectionResult.tryWithSuccessConnection(
-          readConnectionResult(HttpMethod.GET, urlString, customHeaders),
-          closeOnSuccess = true
-        ) { is =>
-          XFormsCrossPlatformSupport.readTinyTree(
-            XPath.GlobalConfiguration,
-            is,
-            urlString,
-            handleXInclude = true, // do process XInclude, so Form Builder's model gets included
-            handleLexical  = false
-          )
-        }
-      }
-    }
-
-    private def readConnectionResult(
-      method        : HttpMethod,
-      urlString     : String,
-      customHeaders : Map[String, List[String]]
-    ): ConnectionResult = {
-
-      implicit val externalContext         : ExternalContext = CoreCrossPlatformSupport.externalContext
-      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
-
-      val request = externalContext.getRequest
-
-      val rewrittenURLString =
-        URLRewriterUtils.rewriteServiceURL(
-          request,
-          urlString,
-          UrlRewriteMode.Absolute
-        )
-
-      val url = URI.create(rewrittenURLString)
-
-      val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        url              = url,
-        hasCredentials   = false,
-        customHeaders    = customHeaders,
-        headersToForward = Connection.headersToForwardFromProperty,
-        cookiesToForward = Connection.cookiesToForwardFromProperty,
-        Connection.getHeaderFromRequest(request)
-      )
-
-      Connection.connectNow(
-        method      = method,
-        url         = url,
-        credentials = None,
-        content     = None,
-        headers     = headers,
-        loadState   = true,
-        saveState   = true,
-        logBody     = false
-      )
-    }
+  }
 }

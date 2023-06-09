@@ -301,6 +301,9 @@ object ImportExportSupport {
   def isBindReadonly(bind: om.NodeInfo)(implicit ctx: FormRunnerDocContext): Boolean =
     FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, ModelDefs.Readonly).contains(FormRunner.TrueExpr)
 
+  def isBindRequired(bind: om.NodeInfo)(implicit ctx: FormRunnerDocContext): Boolean =
+    FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, ModelDefs.Required).contains(FormRunner.TrueExpr)
+
   def iterateAncestorOrSelfBinds(b: om.NodeInfo): Iterator[om.NodeInfo] =
     iterateFrom[om.NodeInfo](b, _ parent XMLNames.XFBindTest headOption)
 

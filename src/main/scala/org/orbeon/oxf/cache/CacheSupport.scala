@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 import java.io.Serializable
 
 
-trait CacheProvider {
+trait CacheProviderApi {
   def get(cacheName: String): Option[CacheApi]
   def close(): Unit
 }
@@ -33,7 +33,7 @@ object CacheSupport {
   val ResourcePropertyName = "oxf.xforms.cache.resource"
   val UriPropertyName      = "oxf.xforms.cache.uri"
 
-  private lazy val provider: CacheProvider =
+  private lazy val provider: CacheProviderApi =
     Properties.instance.getPropertySetOrThrow.getNonBlankString(ProviderPropertyName) match {
       case None | Some("ehcache2") => Eh2CacheSupport
       case Some("jcache")          => JCacheSupport

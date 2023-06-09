@@ -24,7 +24,7 @@ import java.io
 import scala.util.control.NonFatal
 
 
-object Eh2CacheSupport extends CacheProvider {
+object Eh2CacheSupport extends CacheProviderApi {
 
   import CacheSupport.Logger._
   import Private._

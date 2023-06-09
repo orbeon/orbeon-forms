@@ -11,7 +11,7 @@ import javax.cache.Caching
 import scala.util.control.NonFatal
 
 
-object JCacheSupport extends CacheProvider {
+object JCacheSupport extends CacheProviderApi {
 
   import CacheSupport.Logger._
 

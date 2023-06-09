@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
-import org.orbeon.oxf.fr.persistence.relational.Statement.{StatementPart, _}
+import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchPermissions
 import org.orbeon.oxf.util.CoreUtils._
 
@@ -26,10 +26,11 @@ object permissionsPart {
       // filtering data the user has access to
       NilPart
     } else {
-      val usernameGroupnameTest = {
 
-        val usernameTest = permissions.authorizedIfUsername.isDefined.option("c.username = ?")
-        val groupnameTest = permissions.authorizedIfGroup.isDefined.option("c.groupname = ?")
+      val testsList = {
+
+        val usernameTest     = permissions.authorizedIfUsername.isDefined.option("c.username = ?")
+        val groupnameTest    = permissions.authorizedIfGroup.isDefined.option("c.groupname = ?")
         val organizationTest = permissions.authorizedIfOrganizationMatch.nonEmpty.option {
           val userOrganizations =
             permissions.authorizedIfOrganizationMatch
@@ -38,18 +39,22 @@ object permissionsPart {
           s"c.organization_id IN (SELECT id FROM orbeon_organization WHERE name IN ($userOrganizations))"
         }
 
-        List(usernameTest, groupnameTest, organizationTest).flatten.mkString(" OR\n")
+        List(usernameTest, groupnameTest, organizationTest).flatten
       }
 
-      StatementPart(
-        sql = s"AND ($usernameGroupnameTest)",
-        setters = {
-          List[Option[Setter]](
-            permissions.authorizedIfUsername.map(username => _.setString(_, username)),
-            permissions.authorizedIfGroup.map(group => _.setString(_, group))
-          ).flatten
-        }
-      )
+      testsList match {
+        case Nil =>
+          NilPart
+        case _   =>
+          StatementPart(
+            sql = s"AND (${testsList.mkString(" OR\n")})",
+            setters = {
+              List[Option[Setter]](
+                permissions.authorizedIfUsername.map(username => _.setString(_, username)),
+                permissions.authorizedIfGroup.map(group => _.setString(_, group))
+              ).flatten
+            }
+          )
+      }
     }
-
 }

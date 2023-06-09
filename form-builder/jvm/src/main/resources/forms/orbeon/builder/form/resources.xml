@@ -3973,7 +3973,7 @@
             <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
             <workflow-role> todo="true"W[orkflow Role]</workflow-role>
             <authentication-role todo="true">[Authentication Role]</authentication-role>
-            <show-button> todo="true"S[how button on detail page]</show-button>
+            <show-button todo="true">[Show button on detail page]</show-button>
             <any todo="true">[Any]</any>
             <all todo="true">[All]</all>
             <actions todo="true">[Actions]</actions>
@@ -5332,7 +5332,7 @@
             <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
             <workflow-role> todo="true"W[orkflow Role]</workflow-role>
             <authentication-role todo="true">[Authentication Role]</authentication-role>
-            <show-button> todo="true"S[how button on detail page]</show-button>
+            <show-button todo="true">[Show button on detail page]</show-button>
             <any todo="true">[Any]</any>
             <all todo="true">[All]</all>
             <actions todo="true">[Actions]</actions>
@@ -6655,7 +6655,7 @@
             <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
             <workflow-role> todo="true"W[orkflow Role]</workflow-role>
             <authentication-role todo="true">[Authentication Role]</authentication-role>
-            <show-button> todo="true"S[how button on detail page]</show-button>
+            <show-button todo="true">[Show button on detail page]</show-button>
             <any todo="true">[Any]</any>
             <all todo="true">[All]</all>
             <actions todo="true">[Actions]</actions>
@@ -7979,7 +7979,7 @@
             <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
             <workflow-role> todo="true"W[orkflow Role]</workflow-role>
             <authentication-role todo="true">[Authentication Role]</authentication-role>
-            <show-button> todo="true"S[how button on detail page]</show-button>
+            <show-button todo="true">[Show button on detail page]</show-button>
             <any todo="true">[Any]</any>
             <all todo="true">[All]</all>
             <actions todo="true">[Actions]</actions>
@@ -9333,7 +9333,7 @@
             <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
             <workflow-role> todo="true"W[orkflow Role]</workflow-role>
             <authentication-role todo="true">[Authentication Role]</authentication-role>
-            <show-button> todo="true"S[how button on detail page]</show-button>
+            <show-button todo="true">[Show button on detail page]</show-button>
             <any todo="true">[Any]</any>
             <all todo="true">[All]</all>
             <actions todo="true">[Actions]</actions>
@@ -10684,7 +10684,7 @@
             <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
             <workflow-role> todo="true"W[orkflow Role]</workflow-role>
             <authentication-role todo="true">[Authentication Role]</authentication-role>
-            <show-button> todo="true"S[how button on detail page]</show-button>
+            <show-button todo="true">[Show button on detail page]</show-button>
             <any todo="true">[Any]</any>
             <all todo="true">[All]</all>
             <actions todo="true">[Actions]</actions>
@@ -13373,7 +13373,7 @@
             <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
             <workflow-role> todo="true"W[orkflow Role]</workflow-role>
             <authentication-role todo="true">[Authentication Role]</authentication-role>
-            <show-button> todo="true"S[how button on detail page]</show-button>
+            <show-button todo="true">[Show button on detail page]</show-button>
             <any todo="true">[Any]</any>
             <all todo="true">[All]</all>
             <actions todo="true">[Actions]</actions>
@@ -14732,7 +14732,7 @@
             <workflow-stage todo="true">[Workflow Stage]</workflow-stage>
             <workflow-role> todo="true"W[orkflow Role]</workflow-role>
             <authentication-role todo="true">[Authentication Role]</authentication-role>
-            <show-button> todo="true"S[how button on detail page]</show-button>
+            <show-button todo="true">[Show button on detail page]</show-button>
             <any todo="true">[Any]</any>
             <all todo="true">[All]</all>
             <actions todo="true">[Actions]</actions>

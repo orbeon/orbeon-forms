@@ -54,6 +54,16 @@
                             <grid-22-iteration bar=""/>
                         </grid-22>
                     </section-18>
+                    <section-25>
+                        <grid-26>
+                            <control-27/>
+                            <control-28/>
+                            <control-29/>
+                            <control-30/>
+                            <control-31/>
+                            <control-32/>
+                        </grid-26>
+                    </section-25>
                 </form>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
@@ -118,6 +128,16 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
+                <xf:bind id="section-25-bind" ref="section-25" name="section-25">
+                    <xf:bind id="grid-26-bind" ref="grid-26" name="grid-26">
+                        <xf:bind id="control-27-bind" ref="control-27" name="control-27"/>
+                        <xf:bind id="control-28-bind" ref="control-28" name="control-28"/>
+                        <xf:bind id="control-29-bind" ref="control-29" name="control-29"/>
+                        <xf:bind id="control-30-bind" ref="control-30" name="control-30" type="xf:time"/>
+                        <xf:bind id="control-31-bind" ref="control-31" name="control-31" type="xf:date"/>
+                        <xf:bind id="control-32-bind" ref="control-32" name="control-32"/>
+                    </xf:bind>
+                </xf:bind>
             </xf:bind>
             <xf:instance id="fr-form-resources" xxf:readonly="false">
                 <resources>
@@ -166,6 +186,26 @@
                             <label/>
                             <hint/>
                         </control-15>
+                        <control-27>
+                            <label/>
+                            <hint/>
+                        </control-27>
+                        <control-28>
+                            <label/>
+                            <hint/>
+                        </control-28>
+                        <control-30>
+                            <label/>
+                            <hint/>
+                        </control-30>
+                        <control-31>
+                            <label/>
+                            <hint/>
+                        </control-31>
+                        <control-32>
+                            <label/>
+                            <hint/>
+                        </control-32>
                     </resource>
                 </resources>
             </xf:instance>
@@ -384,6 +424,75 @@
                                 <xf:hint ref="$form-resources/control-24/hint"/>
                             </xf:input>
                         </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section edit-ref="" xxf:update="full" id="section-25-control" bind="section-25-bind">
+                    <xf:label ref="$form-resources/section-25/label"/>
+                    <fr:grid edit-ref="" id="grid-26-grid" bind="grid-26-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input id="control-27-control" bind="control-27-bind" class="custom1 custom2">
+                                <xf:label ref="$form-resources/control-27/label"/>
+                                <xf:hint ref="$form-resources/control-27/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                <fr:encrypt/>
+                            </xf:input>
+                            <xf:input id="control-28-control" bind="control-28-bind" class="custom1 custom2">
+                                <xf:label ref="$form-resources/control-28/label"/>
+                                <xf:hint ref="$form-resources/control-28/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-search/>
+                                </fr:index>
+                                <fr:encrypt/>
+                            </xf:input>
+                            <fr:databound-select1
+                                    id="control-29-control"
+                                    ref="country-name"
+                                    resource="/fr/service/custom/orbeon/controls/countries?country-name={$fr-search-value}"
+                                    max-results-displayed="4"
+                                    appearance="search"
+                                    service-performs-search="true"
+                                    service-supports-paging="false"
+                                    is-last-page=""
+                                    class="custom1 custom2">
+                                <xf:label>Country code:</xf:label>
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                </xf:itemset>
+                                <xf:alert>Value is mandatory</xf:alert>
+                                <fr:index>
+                                    <fr:summary-search/>
+                                </fr:index>
+                                <fr:encrypt/>
+                            </fr:databound-select1>
+                            <fr:time id="control-30-control" bind="control-30-bind" class="custom1 custom2">
+                                <xf:label ref="$form-resources/control-30/label"/>
+                                <xf:hint ref="$form-resources/control-30/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                            </fr:time>
+                            <fr:date id="control-31-control" bind="control-31-bind" class="custom1 custom2">
+                                <xf:label ref="$form-resources/control-31/label"/>
+                                <xf:hint ref="$form-resources/control-31/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index/>
+                            </fr:date>
+                            <fr:dropdown-select1 id="control-32-control" bind="control-32-bind" class="custom1 custom2">
+                                <xf:label ref="$form-resources/control-32/label"/>
+                                <xf:hint ref="$form-resources/control-32/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:index>
+                                    <fr:summary-search/>
+                                </fr:index>
+                            </fr:dropdown-select1>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
                     </fr:grid>
                 </fr:section>
                 <xf:action event="DOMActivate" xxf:phantom="true" class="fb-annotation">

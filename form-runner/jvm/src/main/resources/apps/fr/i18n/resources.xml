@@ -224,12 +224,14 @@
             <search>
                 <search>Search</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Search Forms</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Search Options</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Search Options</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Search Options</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Search Options</close-search-options>
+                <search-options>Search options</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit</show-bulk-edit>
                 <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit</close-bulk-edit>
+                <bulk-edit>Bulk edit</bulk-edit>
                 <apply>Apply</apply>
             </bulk-edit>
             <paging>
@@ -248,6 +250,7 @@
                 <form-choice>Choose a Form</form-choice>
                 <free-search>Free Search</free-search>
                 <any>[Any]</any>
+                <clear-value>[Clear value]</clear-value>
                 <script>Full Version</script>
                 <refresh>Refresh</refresh>
                 <close-box>[close]</close-box>
@@ -808,12 +811,14 @@
             <search>
                 <search>Recherche</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Rechercher</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer les options de recherche</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher les options de recherche</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer les options de recherche</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher les options de recherche</close-search-options>
+                <search-options>Options de recherche</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer la modification groupée</show-bulk-edit>
                 <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher la modification groupée</close-bulk-edit>
+                <bulk-edit>Modification groupée</bulk-edit>
                 <apply>Appliquer</apply>
             </bulk-edit>
             <paging>
@@ -832,6 +837,7 @@
                 <form-choice>Choisisez un formulaire</form-choice>
                 <free-search>Recherche libre</free-search>
                 <any>[Tous]</any>
+                <clear-value>[Effacer la valeur]</clear-value>
                 <script>Version complète</script>
                 <refresh>Rafraîchir</refresh>
                 <close-box>[fermer]</close-box>
@@ -1384,12 +1390,14 @@
             <search>
                 <search>Buscar</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Buscar formulario</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opciones</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cerrar opciones</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opciones</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cerrar opciones</close-search-options>
+                <search-options>Buscar opciones</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
             </bulk-edit>
             <paging>
@@ -1408,6 +1416,7 @@
                 <form-choice>Seleccione Formulario</form-choice>
                 <free-search>Búsqueda Libre</free-search>
                 <any>Cualquiera</any>
+                <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Versión Completa</script>
                 <refresh>Actualizar</refresh>
                 <close-box>Cerrar</close-box>
@@ -1959,12 +1968,14 @@
             <search>
                 <search>Buscar</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Buscar formulari</search-forms>
-                <show-options>Mostrar opcions de cerca</show-options>
-                <close-options>Tancar opcions de cerca</close-options>
+                <show-search-options>Mostrar opcions de cerca</show-search-options>
+                <close-search-options>Tancar opcions de cerca</close-search-options>
+                <search-options>Opcions de cerca</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
             </bulk-edit>
             <paging>
@@ -1984,6 +1995,7 @@
                 <form-choice>Seleccioni formulari</form-choice>
                 <free-search>Cerca lliure</free-search>
                 <any>Qualsevol</any>
+                <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Versió completa</script>
                 <refresh>Actualitzar</refresh>
                 <close-box>Tancar</close-box>
@@ -2568,12 +2580,14 @@
             <search>
                 <search>Søk</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søk etter skjema</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søk</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Lukk alternativer for søk</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søk</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Lukk alternativer for søk</close-search-options>
+                <search-options>Alternativer for søk</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
             </bulk-edit>
             <paging>
@@ -2592,6 +2606,7 @@
                 <form-choice>Velg et skjema</form-choice>
                 <free-search>Fritekstsøk</free-search>
                 <any>[Vilkårlig]</any>
+                <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Full versjon</script>
                 <refresh>Oppdater</refresh>
                 <close-box>[lukk]</close-box>
@@ -3137,12 +3152,14 @@
             <search>
                 <search>Поиск</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Поиск формы</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Показать настройки поиска</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Закрыть настройки поиска</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Показать настройки поиска</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Закрыть настройки поиска</close-search-options>
+                <search-options>настройки поиска</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
             </bulk-edit>
             <paging>
@@ -3161,6 +3178,7 @@
                 <form-choice>Выберите форму</form-choice>
                 <free-search>Поиск</free-search>
                 <any>[Что угодно]</any>
+                <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Полная версия</script>
                 <refresh>Обновить</refresh>
                 <close-box>[закрыть]</close-box>
@@ -3711,12 +3729,14 @@
             <search>
                 <search>Cerca</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Cerca moduli</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostra opzioni</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Chiudi opzioni</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostra opzioni</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Chiudi opzioni</close-search-options>
+                <search-options>Opzioni di ricerca</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
             </bulk-edit>
             <paging>
@@ -3735,6 +3755,7 @@
                 <form-choice>Seleziona un modulo</form-choice>
                 <free-search>Ricerca libera</free-search>
                 <any>[Tutti]</any>
+                <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Versione completa</script>
                 <refresh>Aggiorna</refresh>
                 <close-box>[chiudi]</close-box>
@@ -4292,12 +4313,14 @@
             <search>
                 <search>Suchen</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Formular suchen</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Suchoptionen anzeigen</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Suchoptionen schließen</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Suchoptionen anzeigen</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Suchoptionen schließen</close-search-options>
+                <search-options>Suchoptionen</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
             </bulk-edit>
             <paging>
@@ -4316,6 +4339,7 @@
                 <form-choice>Wählen Sie ein Formular</form-choice>
                 <free-search>Freie Suche</free-search>
                 <any>[Alle]</any>
+                <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Vollversion</script>
                 <refresh>Aktualisieren</refresh>
                 <close-box>[Schließen]</close-box>
@@ -4873,12 +4897,14 @@
             <search>
                 <search>Etsi</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Etsi lomakkeita</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Näytä hakuvaihtoehdot</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Sulje hakuvaihtoehdot</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Näytä hakuvaihtoehdot</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Sulje hakuvaihtoehdot</close-search-options>
+                <search-options>Hakuvaihtoehdot</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
             </bulk-edit>
             <paging>
@@ -4897,6 +4923,7 @@
                 <form-choice>Valitse taulukko</form-choice>
                 <free-search>Vapaa haku</free-search>
                 <any>[mikä tahansa]</any>
+                <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Täysi versio</script>
                 <refresh>Lataa sivu uudelleen</refresh>
                 <close-box>[sulje]</close-box>
@@ -5454,12 +5481,14 @@
             <search>
                 <search>Sök</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Sök formulär</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Visa sökalternativ</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Dölj sökalternativ</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Visa sökalternativ</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Dölj sökalternativ</close-search-options>
+                <search-options>Sökalternativ</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
             </bulk-edit>
             <paging>
@@ -5478,6 +5507,7 @@
                 <form-choice>Välj ett formulär</form-choice>
                 <free-search>Fri sökning</free-search>
                 <any>[Alla]</any>
+                <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Fullständig version</script>
                 <refresh>Visa på nytt</refresh>
                 <close-box>[stäng]</close-box>
@@ -6035,12 +6065,14 @@
             <search>
                 <search>Zoeken</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Forms zoeken</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Zoekopties tonen</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zoektopties sluiten</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Zoekopties tonen</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zoekopties sluiten</close-search-options>
+                <search-options>Zoekopties</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
             </bulk-edit>
             <paging>
@@ -6059,6 +6091,7 @@
                 <form-choice>Een form kiezen</form-choice>
                 <free-search>Vrij zoeken</free-search>
                 <any>Elke</any>
+                <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Volledige versie</script>
                 <refresh>Verversen</refresh>
                 <close-box>sluiten</close-box>
@@ -6615,12 +6648,14 @@
             <search>
                 <search>Procurar</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Procurar formulários</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opções</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Fechar opções</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opções</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Fechar opções</close-search-options>
+                <search-options>Opções de procurar</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
             </bulk-edit>
             <paging>
@@ -6639,6 +6674,7 @@
                 <form-choice>Escolha um Formulário</form-choice>
                 <free-search>Pesquisa Livre</free-search>
                 <any>[Qualquer]</any>
+                <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Versão Completa</script>
                 <refresh>Refrescar</refresh>
                 <close-box>[fechar]</close-box>
@@ -7189,12 +7225,14 @@
             <search>
                 <search>Søg</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søg efter blanket</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søgning</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Luk alternativer for søgnng</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søgning</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Luk alternativer for søgnng</close-search-options>
+                <search-options>Alternativer for søgning</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
             </bulk-edit>
             <paging>
@@ -7213,6 +7251,7 @@
                 <form-choice>Vælg en blanket</form-choice>
                 <free-search>Fritekstsøgning</free-search>
                 <any>Vilkårlig</any>
+                <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Fuld version</script>
                 <refresh>Opdatér</refresh>
                 <close-box>Luk</close-box>
@@ -7763,12 +7802,14 @@
             <search>
                 <search>Szukaj</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"/&lt; Wyszukaj formularze</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Pokaż opcje wyszukiwania</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zamknij opcje wyszukiwania</close-options>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Pokaż opcje wyszukiwania</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zamknij opcje wyszukiwania</close-search-options>
+                <search-options>Opcje wyszukiwania</search-options>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
             </bulk-edit>
             <paging>
@@ -7787,6 +7828,7 @@
                 <form-choice>Wybierz formularz</form-choice>
                 <free-search>Wyszukiwanie pełnotekstowe</free-search>
                 <any>[Dowolny]</any>
+                <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Pełna wersja</script>
                 <refresh>Odśwież</refresh>
                 <close-box>[zamknij]</close-box>

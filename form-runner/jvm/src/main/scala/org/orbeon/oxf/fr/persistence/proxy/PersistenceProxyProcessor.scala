@@ -166,9 +166,8 @@ private object PersistenceProxyProcessor {
   )
 
   // TODO: Could just pass `ec` and no separate `request`/`response`
-  private def proxyRequest(request: Request, response: Response)(implicit ec: ExternalContext): Unit = {
-    val incomingPath = request.getRequestPath
-    incomingPath match {
+  private def proxyRequest(request: Request, response: Response)(implicit ec: ExternalContext): Unit =
+    request.getRequestPath match {
       case FormPath(path, app, form, _)                     => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, None          , path)
       case DataPath(path, app, form, _, document, filename) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Some(filename), path, Some(document))
       case DataCollectionPath(path, app, form)              => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None          , path)
@@ -178,9 +177,8 @@ private object PersistenceProxyProcessor {
       case PublishedFormsMetadataPath(path, app, form)      => proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
       case ReindexPath                                      => proxyReindex               (request, response)
       case ReEncryptStatusPath                              => proxyReEncryptStatus       (request, response)
-      case _                                                => throw new OXFException(s"Unsupported path: $incomingPath")
+      case incomingPath                                     => throw new OXFException(s"Unsupported path: $incomingPath")
     }
-  }
 
   // TODO: test
   private def proxySimpleRequest(

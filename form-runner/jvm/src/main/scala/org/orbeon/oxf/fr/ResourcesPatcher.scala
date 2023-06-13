@@ -61,7 +61,7 @@ object ResourcesPatcher {
   def transform(
     resourcesDocument : dom.Document,
     appForm           : AppForm,
-    langsOpt             : Option[Set[String]] = None
+    langsOpt          : Option[Set[String]] = None
   )(implicit
     properties        : PropertySet
   ): Unit = {

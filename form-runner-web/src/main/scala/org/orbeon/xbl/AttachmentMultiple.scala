@@ -45,12 +45,6 @@ object AttachmentMultiple {
 
       val isStaticReadonly = uploadInputOpt.isEmpty
 
-      // https://github.com/orbeon/orbeon-forms/issues/4562
-      uploadInputOpt foreach { uploadInput =>
-        val label = selectLabel
-        label.htmlFor = Page.namespaceIdIfNeeded(uploadInput.form.id, label.htmlFor)
-      }
-
       if (! isStaticReadonly && ! companion.isMarkedReadonly && browserSupportsFileDrop) {
         registerAllListeners()
       } else if (! browserSupportsFileDrop) {
@@ -73,7 +67,7 @@ object AttachmentMultiple {
     private object Private {
 
       def dropElem          = containerElem.querySelector(".fr-attachment-drop")
-      def selectLabel       = containerElem.querySelector(".fr-attachment-select").asInstanceOf[html.Label]
+      def selectAnchor      = containerElem.querySelector(".fr-attachment-select").asInstanceOf[html.Anchor]
       def uploadControlElem = containerElem.querySelector(".xforms-upload").asInstanceOf[html.Element]
       def uploadInputOpt    = Option(containerElem.querySelector(".xforms-upload-select").asInstanceOf[html.Input])
 
@@ -145,7 +139,7 @@ object AttachmentMultiple {
         )
 
         EventSupport.addListener(
-          selectLabel,
+          dropElem,
           DomEventNames.KeyDown,
           (ev: dom.raw.KeyboardEvent) => {
             if (ev.key == "Enter" || ev.key == " ") {
@@ -153,6 +147,12 @@ object AttachmentMultiple {
               uploadInputOpt foreach (_.click())
             }
           }
+        )
+
+        EventSupport.addListener(
+          selectAnchor,
+          DomEventNames.Click,
+          (_: dom.raw.EventTarget) => uploadInputOpt foreach (_.click())
         )
       }
     }

@@ -21,10 +21,10 @@ object PersistenceApi extends PersistenceApiTrait {
   )
 
   def getFormMetadata(
-    app       : Option[String],
-    form      : Option[String],
-    headers    : ju.Map[String, Array[String]],
-    allVersions: Boolean)(implicit
+    app            : Option[String],
+    form           : Option[String],
+    incomingHeaders: ju.Map[String, Array[String]],
+    allVersions    : Boolean)(implicit
     logger     : IndentedLogger
   ): Iterator[MetadataDetails] = {
 
@@ -32,7 +32,7 @@ object PersistenceApi extends PersistenceApiTrait {
 
     val formMetadataDocElem =
       PersistenceProxyProcessor.callPublishedFormsMetadata(
-        makeOutgoingRequest(HttpMethod.GET, headers, List(
+        makeOutgoingRequest(HttpMethod.GET, incomingHeaders, List(
           "all-forms"    -> "false",
           "all-versions" -> allVersions.toString,
         )),

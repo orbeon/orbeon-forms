@@ -15,6 +15,8 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.{Connection, ConnectionResult, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, URLRewriterUtils, XPath}
 import org.orbeon.saxon.om
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{Connection, ConnectionResult, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, PathUtils, URLRewriterUtils, XPath}
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
@@ -30,24 +32,32 @@ trait PersistenceApiTrait {
   private val SearchPageSize = 100
 
   case class DataDetails(
-    createdTime     : Instant,
-    lastModifiedTime: Instant,
-    documentId      : String,
-    isDraft         : Boolean
+    createdTime : Instant,
+    modifiedTime: Instant,
+    documentId  : String,
+    isDraft     : Boolean
+  )
+
+  case class DataHistoryDetails(
+    modifiedTime    : Instant,
+    modifiedUsername: Option[String],
+    ownerUsername   : Option[String],
+    ownerGroup      : Option[String],
+    stage           : Option[String],
+    isDeleted       : Boolean
   )
 
   def search(
-    appName                 : String,
-    formName                : String,
-    formVersion             : Int)(implicit
+    appFormVersion: AppFormVersion
+  )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Iterator[DataDetails] = {
 
-    debug(s"calling search for `$appName`/`$formName`/`$formVersion`")
+    debug(s"calling search for `$appFormVersion`")
 
-    val queryUrl =
-      s"/fr/service/persistence/search/$appName/$formName"
+    val servicePath =
+      s"/fr/service/persistence/search/${appFormVersion._1.app}/${appFormVersion._1.form}"
 
     def readPage(pageNumber: Int): Try[DocumentNodeInfoType] = {
 
@@ -64,16 +74,16 @@ trait PersistenceApiTrait {
         ConnectionResult.tryWithSuccessConnection(
           connectPersistence(
             method             = HttpMethod.POST,
-            path               = queryUrl,
+            path               = servicePath,
             requestBodyContent = StreamedContent.fromBytes(queryXml.toString.getBytes(CharsetNames.Utf8), ContentTypes.XmlContentType.some).some,
-            formVersionOpt     = formVersion.some
+            formVersionOpt     = appFormVersion._2.some
           ),
           closeOnSuccess = true
         ) { is =>
           XFormsCrossPlatformSupport.readTinyTree(
             XPath.GlobalConfiguration,
             is,
-            queryUrl,
+            servicePath,
             handleXInclude = false,
             handleLexical  = false
           )
@@ -87,7 +97,7 @@ trait PersistenceApiTrait {
         (page.rootElement / "document").iterator map { documentElem =>
           DataDetails(
             createdTime      = Instant.parse(documentElem.attValue("created")),
-            lastModifiedTime = Instant.parse(documentElem.attValue("last-modified")),
+            modifiedTime = Instant.parse(documentElem.attValue("last-modified")),
             documentId       = documentElem.attValue("name"),
             isDraft          = documentElem.attValue("draft") == "true"
           )
@@ -96,13 +106,81 @@ trait PersistenceApiTrait {
         (page.rootElement / "document").size
       )
 
+    callPagedService(pageNumber => readPage(pageNumber).map(pageToDataDetails))
+  }
+
+  def dataHistory(
+    appForm   : AppForm,
+    documentId: String
+  )(implicit
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Iterator[DataHistoryDetails] = {
+
+    debug(s"calling data history for `$appForm`/`$documentId`")
+
+    val servicePath =
+      s"/fr/service/persistence/history/${appForm.app}/${appForm.form}/$documentId"
+
+    def readPage(pageNumber: Int): Try[DocumentNodeInfoType] = {
+
+      debug(s"reading data history page `$pageNumber`")
+
+      val servicePathParams =
+        PathUtils.recombineQuery(servicePath, List("page-size" -> SearchPageSize.toString, "page-number" -> pageNumber.toString))
+
+      val documentsXmlTry =
+        ConnectionResult.tryWithSuccessConnection(
+          connectPersistence(
+            method = HttpMethod.GET,
+            path   = servicePathParams
+          ),
+          closeOnSuccess = true
+        ) { is =>
+          XFormsCrossPlatformSupport.readTinyTree(
+            XPath.GlobalConfiguration,
+            is,
+            servicePathParams,
+            handleXInclude = false,
+            handleLexical  = false
+          )
+        }
+
+      documentsXmlTry
+    }
+
+    def pageToDataDetails(page: DocumentNodeInfoType): (Iterator[DataHistoryDetails], Int, Int) =
+      (
+        (page.rootElement / "document").iterator map { documentElem =>
+          DataHistoryDetails(
+            modifiedTime     = Instant.parse(documentElem.attValue("modified-time")),
+            modifiedUsername = documentElem.attValueOpt("modified-username").flatMap(_.trimAllToOpt),
+            ownerUsername    = documentElem.attValueOpt("owner-username").flatMap(_.trimAllToOpt),
+            ownerGroup       = documentElem.attValueOpt("owner-group").flatMap(_.trimAllToOpt),
+            stage            = documentElem.attValueOpt("stage").flatMap(_.trimAllToOpt),
+            isDeleted        = documentElem.attValue("deleted") == true.toString,
+          )
+        },
+        page.rootElement.attValue("total").toInt,
+        (page.rootElement / "document").size
+      )
+
+    callPagedService(pageNumber => readPage(pageNumber).map(pageToDataDetails))
+  }
+
+  private def callPagedService[R](
+    readPage: Int => Try[(Iterator[R], Int, Int)]
+  )(implicit
+    logger                  : IndentedLogger
+  ): Iterator[R] = {
+
     var searchTotal: Option[Int] = None
     var currentPage  = 1
     var currentCount = 0
 
-    Iterator.continually[Option[Iterator[DataDetails]]]({
+    Iterator.continually[Option[Iterator[R]]]({
       searchTotal.isEmpty || searchTotal.exists(currentCount < _) flatOption {
-        val (it, total, count) = readPage(currentPage).map(pageToDataDetails).get// can throw xxx
+        val (it, total, count) = readPage(currentPage).get// can throw
         count > 0 option {
           if (searchTotal.isEmpty) {
             debug(s"search total is `$total`")
@@ -117,15 +195,17 @@ trait PersistenceApiTrait {
   }
 
   def readFormData(
-    appFormVersion: AppFormVersion,
-    documentId     : String
+    appFormVersion  : AppFormVersion,
+    documentId      : String,
+    lastModifiedTime: Option[Instant]
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Try[(Map[String, List[String]], DocumentNodeInfoType)] = {
-    debug(s"reading form data for `$appFormVersion`/`$documentId`")
+    debug(s"reading form data for `$appFormVersion`/`$documentId`/`$lastModifiedTime`")
+    val urlPath = FormRunner.createFormDataBasePath(appFormVersion._1.app, appFormVersion._1.form, isDraft = false, documentId) + "data.xml"
     readDocument(
-      urlString     = FormRunner.createFormDataBasePath(appFormVersion._1.app, appFormVersion._1.form, isDraft = false, documentId) + "data.xml",
+      urlString     = PathUtils.recombineQuery(urlPath, lastModifiedTime.toList.map("last-modified-time" -> _.toString)),
       customHeaders = Map(OrbeonFormDefinitionVersion -> List(appFormVersion._2.toString))
     )
   }

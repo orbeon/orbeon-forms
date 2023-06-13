@@ -233,6 +233,8 @@
                 <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit</close-bulk-edit>
                 <bulk-edit>Bulk edit</bulk-edit>
                 <apply>Apply</apply>
+                <value-required>Value is required</value-required>
+                <submission-error>Error while editing form data.</submission-error>
             </bulk-edit>
             <paging>
                 <to>to</to>
@@ -820,6 +822,8 @@
                 <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher la modification groupée</close-bulk-edit>
                 <bulk-edit>Modification groupée</bulk-edit>
                 <apply>Appliquer</apply>
+                <value-required>Valeur requise</value-required>
+                <submission-error>Erreur lors de la mise à jour des données.</submission-error>
             </bulk-edit>
             <paging>
                 <to>à</to>
@@ -1399,6 +1403,8 @@
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
                 <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
+                <value-required todo="true">[Value is required]</value-required>
+                <submission-error todo="true">[Error while editing form data.]</submission-error>
             </bulk-edit>
             <paging>
                 <to>al</to>
@@ -1977,6 +1983,8 @@
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
                 <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
+                <value-required todo="true">[Value is required]</value-required>
+                <submission-error todo="true">[Error while editing form data.]</submission-error>
             </bulk-edit>
             <paging>
                 <to>al</to>
@@ -2589,6 +2597,8 @@
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
                 <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
+                <value-required todo="true">[Value is required]</value-required>
+                <submission-error todo="true">[Error while editing form data.]</submission-error>
             </bulk-edit>
             <paging>
                 <to>til</to>
@@ -3161,6 +3171,8 @@
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
                 <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
+                <value-required todo="true">[Value is required]</value-required>
+                <submission-error todo="true">[Error while editing form data.]</submission-error>
             </bulk-edit>
             <paging>
                 <to>до</to>
@@ -3738,6 +3750,8 @@
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
                 <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
+                <value-required todo="true">[Value is required]</value-required>
+                <submission-error todo="true">[Error while editing form data.]</submission-error>
             </bulk-edit>
             <paging>
                 <to>a</to>
@@ -4322,6 +4336,8 @@
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
                 <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
+                <value-required todo="true">[Value is required]</value-required>
+                <submission-error todo="true">[Error while editing form data.]</submission-error>
             </bulk-edit>
             <paging>
                 <to>bis</to>
@@ -4906,6 +4922,8 @@
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
                 <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
+                <value-required todo="true">[Value is required]</value-required>
+                <submission-error todo="true">[Error while editing form data.]</submission-error>
             </bulk-edit>
             <paging>
                 <to>-</to>
@@ -5490,6 +5508,8 @@
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
                 <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
+                <value-required todo="true">[Value is required]</value-required>
+                <submission-error todo="true">[Error while editing form data.]</submission-error>
             </bulk-edit>
             <paging>
                 <to>till</to>
@@ -6074,6 +6094,8 @@
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
                 <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
+                <value-required todo="true">[Value is required]</value-required>
+                <submission-error todo="true">[Error while editing form data.]</submission-error>
             </bulk-edit>
             <paging>
                 <to>tot</to>
@@ -6657,6 +6679,8 @@
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
                 <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
+                <value-required todo="true">[Value is required]</value-required>
+                <submission-error todo="true">[Error while editing form data.]</submission-error>
             </bulk-edit>
             <paging>
                 <to>a</to>
@@ -7234,6 +7258,8 @@
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
                 <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
+                <value-required todo="true">[Value is required]</value-required>
+                <submission-error todo="true">[Error while editing form data.]</submission-error>
             </bulk-edit>
             <paging>
                 <to>til</to>
@@ -7811,6 +7837,8 @@
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
                 <bulk-edit todo="true">[Bulk edit]</bulk-edit>
                 <apply todo="true">[Apply]</apply>
+                <value-required todo="true">[Value is required]</value-required>
+                <submission-error todo="true">[Error while editing form data.]</submission-error>
             </bulk-edit>
             <paging>
                 <to>do</to>

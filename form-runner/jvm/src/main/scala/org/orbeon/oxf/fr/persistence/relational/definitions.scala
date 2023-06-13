@@ -33,20 +33,21 @@ object WhatToReindex {
   case class  DataForForm(appForm: AppForm, version: Int) extends WhatToReindex
 }
 
-case class IndexSettings(
-  summaryShow   : Boolean,
-  summarySearch : Boolean,
-  summaryEdit   : Boolean
+case class SummarySettings(
+  show   : Boolean,
+  search : Boolean,
+  edit   : Boolean
 )
 
 case class IndexedControl(
-    name          : String,
-    indexSettings : IndexSettings,
-    xpath         : String,
-    xsType        : String,
-    control       : String,
-    htmlLabel     : Boolean,
-    resources     : List[(String, NodeInfo)]
+    name               : String,
+    xpath              : String,
+    xsType             : String,
+    control            : String,
+    summarySettings    : SummarySettings,
+    staticallyRequired : Boolean,
+    htmlLabel          : Boolean,
+    resources          : List[(String, NodeInfo)]
   ) {
     def toXML: NodeInfo =
       <query
@@ -54,9 +55,10 @@ case class IndexedControl(
         path={xpath}
         type={xsType}
         control={control}
-        summary-show-field={indexSettings.summaryShow.toString}
-        summary-search-field={indexSettings.summarySearch.toString}
-        summary-edit-field={indexSettings.summaryEdit.toString}
+        summary-show-field={summarySettings.show.toString}
+        summary-search-field={summarySettings.search.toString}
+        summary-edit-field={summarySettings.edit.toString}
+        statically-required={staticallyRequired.toString}
         match={matchForControl(control)}
         html-label={htmlLabel.toString}>{
         for ((lang, resourceHolder) <- resources)

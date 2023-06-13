@@ -30,13 +30,16 @@
 
     <xf:action event="apply">
 
-        <xf:var name="app"       value="event('app')"/>
-        <xf:var name="form"      value="event('form')"/>
-        <xf:var name="documents" value="event('documents')"/>
-        <xf:var name="path"      value="event('path')"/>
-        <xf:var name="value"     value="event('value')"/>
+        <xf:var name="app"           value="event('app')"/>
+        <xf:var name="form"          value="event('form')"/>
+        <xf:var name="documents"     value="event('documents')"/>
 
-        <xf:action iterate="xxf:split($documents)">
+        <xf:setvalue ref="instance('fr-bulk-edit-control')/path"  value="event('control-path')"/>
+        <xf:setvalue ref="instance('fr-bulk-edit-control')/value" value="event('control-value')"/>
+
+        <xf:delete ref="instance('fr-bulk-edit-errors')/error"/>
+
+        <xf:action iterate="xxf:split($documents)" if="count(instance('fr-bulk-edit-errors')/error)=0">
             <xf:var name="document" value="."/>
             <xf:var name="url"      value="concat('/fr/service/persistence/crud/', $app, '/', $form, '/', $document, '/data.xml')"/>
 
@@ -47,25 +50,49 @@
                 <xf:property name="serialization" value="'none'"/>
                 <xf:property name="replace"       value="'instance'"/>
             </xf:send>
-
-            <xf:action observer="form-data" event="xforms-submit-done">
-                <!-- Locally modify form data -->
-                <xf:setvalue ref="xxf:evaluate(concat('instance(''fr-bulk-edit-form-data'')/', $path))" value="$value"/>
-
-                <!-- Update form data -->
-                <xf:send submission="form-data">
-                    <xf:property name="url"           value="$url"/>
-                    <xf:property name="method"        value="'put'"/>
-                    <xf:property name="serialization" value="'application/xml'"/>
-                    <xf:property name="replace"       value="'none'"/>
-                </xf:send>
-            </xf:action>
         </xf:action>
     </xf:action>
 
-    <xf:instance id="fr-bulk-edit-form-data">
+    <xf:action observer="form-data" event="xforms-submit-done" if="event('response-status-code') = 200">
+
+        <!-- Locally modify form data -->
+        <xf:setvalue
+            ref="xxf:evaluate(concat('instance(''fr-bulk-edit-form-data'')/', instance('fr-bulk-edit-control')/path))"
+            value="instance('fr-bulk-edit-control')/value"/>
+
+        <!-- Update form data -->
+        <xf:send submission="form-data">
+            <xf:property name="url"           value="event('resource-uri')"/>
+            <xf:property name="method"        value="'put'"/>
+            <xf:property name="serialization" value="'application/xml'"/>
+            <xf:property name="replace"       value="'none'"/>
+        </xf:send>
+    </xf:action>
+
+    <xf:action observer="form-data" event="xforms-submit-error">
+
+        <xf:insert
+            context="instance('fr-bulk-edit-errors')"
+            origin="xf:element(
+                        'error',
+                        (xf:attribute('uri',         event('resource-uri')),
+                         xf:attribute('status-code', event('response-status-code'))))"/>
+
+        <xf:message value="xxf:r('summary.bulk-edit.submission-error', '|fr-fr-resources|')"/>
+    </xf:action>
+
+    <xf:instance id="fr-bulk-edit-control">
         <_ xmlns="">
-            <dummy/>
+            <path/>
+            <value/>
         </_>
+    </xf:instance>
+
+    <xf:instance id="fr-bulk-edit-form-data">
+        <_ xmlns=""/>
+    </xf:instance>
+
+    <xf:instance id="fr-bulk-edit-errors">
+        <_ xmlns=""/>
     </xf:instance>
 </xf:model>

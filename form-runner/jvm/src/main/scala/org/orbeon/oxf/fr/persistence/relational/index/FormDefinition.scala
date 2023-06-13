@@ -15,7 +15,8 @@ package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, IndexSettings}
+import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
+import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SummarySettings}
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner, InDocFormRunnerDocContext}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
@@ -56,13 +57,14 @@ trait FormDefinition {
       val controlName = FormRunner.getControlName(control)
 
       IndexedControl(
-        name          = controlName,
-        indexSettings = indexSettings(control, forUserRoles),
-        xpath         = path map (_.value) mkString "/",
-        xsType        = (bind /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
-        control       = control.localname,
-        htmlLabel     = FormRunner.hasHTMLMediatype(control / (XF -> "label")),
-        resources     = resources.toList
+        name               = controlName,
+        xpath              = path map (_.value) mkString "/",
+        xsType             = (bind /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
+        control            = control.localname,
+        summarySettings    = summarySettings(control, forUserRoles),
+        staticallyRequired = isBindRequired(bind),
+        htmlLabel          = FormRunner.hasHTMLMediatype(control / (XF -> "label")),
+        resources          = resources.toList
       )
     }
   }
@@ -75,10 +77,10 @@ trait FormDefinition {
     else
       "exact"
 
-  def indexSettings(
+  def summarySettings(
     control      : NodeInfo,
     forUserRoles : Option[List[String]]
-  ): IndexSettings = {
+  ): SummarySettings = {
     // Check the presence/absence of a given sub-element for a given field
     def setting(field: NodeInfo, elementName: String): Boolean =
       (field / elementName).headOption match {
@@ -97,18 +99,18 @@ trait FormDefinition {
     (control / "*:index").headOption match {
       case Some(index) =>
         // Look for settings in control sub-elements
-        IndexSettings(
-          summaryShow   = setting(index, "*:summary-show"),
-          summarySearch = setting(index, "*:summary-search"),
-          summaryEdit   = setting(index, "*:summary-edit")
+        SummarySettings(
+          show   = setting(index, "*:summary-show"),
+          search = setting(index, "*:summary-search"),
+          edit   = setting(index, "*:summary-edit")
         )
 
       case None =>
         // Control sub-elements not present, use control classes (legacy)
-        IndexSettings(
-          summaryShow   = control.attClasses(FRSummaryShow),
-          summarySearch = control.attClasses(FRSummarySearch),
-          summaryEdit   = false
+        SummarySettings(
+          show   = control.attClasses(FRSummaryShow),
+          search = control.attClasses(FRSummarySearch),
+          edit   = false
         )
     }
   }

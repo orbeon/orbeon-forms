@@ -432,15 +432,14 @@
                     origin="instance('fr-search-instance')/query[@path]"/>
 
                 <!-- Initial values for bulk edit dropdowns -->
-                <xf:action iterate="instance('fr-search-labels-instance')/query[@control = 'select1']">
+                <xf:action iterate="instance('fr-search-labels-instance')/query[@control = ('select1', 'open-select1')]">
                     <xf:var name="control-path"     value="@path"/>
-                    <xf:var name="control-required" value="false()"/> <!-- TODO: retrieve actual value -->
+                    <xf:var name="control-query"    value="instance('fr-bulk-edit-instance')/query[@path = $control-path]"/>
+                    <xf:var name="control-required" value="$control-query/@statically-required = 'true'"/>
                     <xf:var name="first-value"      value="resources[1]/item[1]/value"/>
 
                     <xf:action if="$control-required">
-                        <xf:setvalue
-                            ref   = "instance('fr-bulk-edit-instance')/query[@path = $control-path]"
-                            value = "$first-value"/>
+                        <xf:setvalue ref="$control-query" value="$first-value"/>
                     </xf:action>
                 </xf:action>
 
@@ -1009,7 +1008,7 @@
                                     <xf:repeat ref="instance('fr-bulk-edit-instance')/query[@path and @summary-edit-field = 'true']" id="bulk-repeat">
                                         <xf:var name="control-path"     value="@path"/>
                                         <xf:var name="control-control"  value="@control"/>
-                                        <xf:var name="control-required" value="false()"/> <!-- TODO: retrieve actual value -->
+                                        <xf:var name="control-required" value="@statically-required = 'true'"/>
 
                                         <xf:var
                                             name="resources"
@@ -1079,6 +1078,10 @@
                                                 </xf:select1>
                                                 <fr:open-select1 ref=".[$is-open-select1]" id="bulk-open-select1" appearance="minimal">
                                                     <xf:label mediatype="text/html" value="$label"/>
+                                                    <xf:itemset ref="instance('fr-bulk-edit-clear-value-item')[not($control-required)]">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
                                                     <xf:itemset ref="$resources/item">
                                                         <xf:label ref="label"/>
                                                         <xf:value ref="value"/>
@@ -1112,17 +1115,25 @@
                                                     </xf:itemset>
                                                 </fr:box-select>
 
+                                                <!-- Extra check needed for open-select1 with empty but required value. Enabling/disabling the "Apply" button depending
+                                                     on the actual value would be awkward in that case, since the control value needs to be updated first for the
+                                                     button to become enabled. -->
+                                                <xf:var
+                                                    name="apply-allowed"
+                                                    value="$bulk-edit-enabled and (($control-required and normalize-space(.)!='') or not($control-required))"/>
+
                                                 <xf:trigger appearance="xxf:mini" ref="if ($bulk-edit-enabled) then . else ''" class="fr-summary-bulk-apply">
                                                     <xf:label ref="$fr-resources/summary/bulk-edit/apply"/>
-                                                    <xf:action event="DOMActivate">
+                                                    <xf:action event="DOMActivate" if="$apply-allowed">
                                                         <xf:dispatch name="apply" targetid="fr-bulk-apply">
-                                                            <xf:property name="app"       value="$app"/>
-                                                            <xf:property name="form"      value="$form"/>
-                                                            <xf:property name="documents" value="instance('fr-selection-instance')"/>
-                                                            <xf:property name="path"      value="$control-path"/>
-                                                            <xf:property name="value"     value="."/>
+                                                            <xf:property name="app"           value="$app"/>
+                                                            <xf:property name="form"          value="$form"/>
+                                                            <xf:property name="documents"     value="instance('fr-selection-instance')"/>
+                                                            <xf:property name="control-path"  value="$control-path"/>
+                                                            <xf:property name="control-value" value="."/>
                                                         </xf:dispatch>
                                                     </xf:action>
+                                                    <xf:message event="DOMActivate" if="not($apply-allowed)" value="xxf:r('summary.bulk-edit.value-required', '|fr-fr-resources|')"/>
                                                 </xf:trigger>
                                             </xh:div>
                                         </xf:group>

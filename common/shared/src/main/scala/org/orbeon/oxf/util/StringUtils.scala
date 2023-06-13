@@ -63,13 +63,6 @@ object StringUtils {
      * splitTo[Set]("a b")
      * splitTo[LinkedHashSet]("a b")
      * splitTo("a b")
-     *
-     * Or:
-     *
-     * val result: List[String]          = splitTo("a b")(breakOut)
-     * val result: Array[String]         = splitTo("a b")(breakOut)
-     * val result: Set[String]           = splitTo("a b")(breakOut)
-     * val result: LinkedHashSet[String] = splitTo("a b")(breakOut)
      */
     def splitTo[T[_]](sep: String = null, max: Int = 0)(implicit cbf: Factory[String, T[String]]): T[String] = {
 

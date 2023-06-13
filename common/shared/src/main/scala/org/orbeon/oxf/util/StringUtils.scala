@@ -24,6 +24,10 @@ import scala.util.Try
 @JSExportTopLevel("OrbeonStringUtils")
 object StringUtils {
 
+  object NonAllBlank {
+    def unapply(s: String): Option[String] = s.trimAllToOpt
+  }
+
   // TODO: Move to StringOps.
   def stringOptionToSet(s: Option[String]): Set[String] = s map (_.tokenizeToSet) getOrElse Set.empty[String]
 

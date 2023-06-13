@@ -42,7 +42,6 @@ class CacheableSubmission(submission: XFormsModelSubmission)
 
   def getType = "cacheable"
 
-  // Match if the submission has `replace="instance"` and `xxf:cache="true"`
   def isMatch(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Boolean =
     p.replaceType == ReplaceType.Instance && p2.isCache
 

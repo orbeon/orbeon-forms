@@ -36,15 +36,18 @@ object Export {
   val ContentParam        = "content"
   val MatchParam          = "match"
   val DataHistoryParam    = "include-data-revision-history"
-  val DateRangeGeParam    = "last-modified-time-ge"
-  val DateRangeLeParam    = "last-modified-time-le"
+  val DateRangeGtParam    = "data-last-modified-time-gt"
+  val DateRangeLtParam    = "data-last-modified-time-lt"
 
   val ContentParamSeparator         = ","
   val AppFormVersionParamSeparator  = "/"
 
-  val AllowedContentMap: Map[String, FormOrData] = Map("form-definition" -> FormOrData.Form, "form-data" -> FormOrData.Data) // "attachments"?
+  val AllowedContentMap: Map[String, FormOrData] =
+    Map("form-definition" -> FormOrData.Form, "form-data" -> FormOrData.Data) // "attachments"?
 
   val AllowedContentTokens = AllowedContentMap.keySet
+
+  val LatestTimestampTag = "latest"
 
   sealed trait VersionParam
 
@@ -129,21 +132,33 @@ object Export {
       } getOrElse
         FormOrData.valuesSet
 
+    val dateRangeGtOpt =
+      request.getFirstParamAsString(DateRangeGtParam).map { dateRangeGe =>
+        Instant.parse(dateRangeGe)
+      }
+
+    val dateRangeLtOpt =
+      request.getFirstParamAsString(DateRangeLtParam).map { dateRangeLe =>
+        Instant.parse(dateRangeLe)
+      }
+
     processExportImpl(
       request.getHeaderValuesMap,
       response,
       appFormVersionMatchOpt,
       formOrDataSet,
-      includeDataHistory = request.getFirstParamAsString(DataHistoryParam).contains(true.toString)
+      includeDataHistory = request.getFirstParamAsString(DataHistoryParam).contains(true.toString),
+      dateRangeGtOpt,
+      dateRangeLtOpt
     )
   }
 
   def readPersistenceContentToZip(
-    zos                     : ZipOutputStream,
-    formVersionOpt          : Option[Int],
-    fromPath                : String,
-    zipPath                 : String,
-    debugAction             : String
+    zos           : ZipOutputStream,
+    formVersionOpt: Option[Int],
+    fromPath      : String,
+    zipPath       : String,
+    debugAction   : String
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit = {
@@ -170,7 +185,9 @@ object Export {
     response          : Response,
     matchesOpt        : Option[NonEmptyList[MatchSpec]],
     formOrDataSet     : Set[FormOrData],
-    includeDataHistory: Boolean
+    includeDataHistory: Boolean,
+    dateRangeGtOpt    : Option[Instant],
+    dateRangeLtOpt    : Option[Instant]
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit =
@@ -178,10 +195,10 @@ object Export {
       response.setContentType(ContentTypes.ZipContentType)
       matchesOpt match {
         case None =>
-          exportWithMatch(zos, incomingHeaders, None, formOrDataSet, includeDataHistory)
+          exportWithMatch(zos, incomingHeaders, None, formOrDataSet, includeDataHistory, dateRangeGtOpt, dateRangeLtOpt)
         case Some(filters) =>
           filters.iterator.foreach { filter =>
-            exportWithMatch(zos, incomingHeaders, filter.some, formOrDataSet, includeDataHistory)
+            exportWithMatch(zos, incomingHeaders, filter.some, formOrDataSet, includeDataHistory, dateRangeGtOpt, dateRangeLtOpt)
           }
       }
     }
@@ -191,7 +208,9 @@ object Export {
     incomingHeaders   : ju.Map[String, Array[String]],
     matchOpt          : Option[MatchSpec],
     formOrDataSet     : Set[FormOrData],
-    includeDataHistory: Boolean
+    includeDataHistory: Boolean,
+    dateRangeGtOpt    : Option[Instant],
+    dateRangeLtOpt    : Option[Instant]
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit =
@@ -218,7 +237,9 @@ object Export {
           formOpt            = formOpt,
           versionParam       = versionParam,
           formOrDataSet      = formOrDataSet,
-          includeDataHistory = includeDataHistory
+          includeDataHistory = includeDataHistory,
+          dateRangeGtOpt     = dateRangeGtOpt,
+          dateRangeLtOpt     = dateRangeLtOpt
         )
 
       case Some(MatchSpec(WithOptional(app, Some(WithOptional(form, Some(documentId)))), versionParamOpt)) =>
@@ -251,7 +272,9 @@ object Export {
           appFormVersion     = (AppForm(app, form), formVersion),
           documentId         = documentId,
           formOrDataSet      = formOrDataSet,
-          includeDataHistory = includeDataHistory
+          includeDataHistory = includeDataHistory,
+          dateRangeGtOpt     = dateRangeGtOpt,
+          dateRangeLtOpt     = dateRangeLtOpt
         )
     }
 
@@ -262,7 +285,9 @@ object Export {
     formOpt           : Option[String],
     versionParam      : VersionParam,
     formOrDataSet     : Set[FormOrData],
-    includeDataHistory: Boolean
+    includeDataHistory: Boolean,
+    dateRangeGtOpt    : Option[Instant],
+    dateRangeLtOpt    : Option[Instant]
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit =
@@ -291,7 +316,9 @@ object Export {
               zos,
               appFormVersion,
               documentId,
-              includeDataHistory
+              includeDataHistory,
+              dateRangeGtOpt,
+              dateRangeLtOpt
             )
           case _ =>
         }
@@ -302,7 +329,9 @@ object Export {
     appFormVersion    : AppFormVersion,
     documentId        : String,
     formOrDataSet     : Set[FormOrData],
-    includeDataHistory: Boolean
+    includeDataHistory: Boolean,
+    dateRangeGtOpt    : Option[Instant],
+    dateRangeLtOpt    : Option[Instant]
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit = {
@@ -311,7 +340,7 @@ object Export {
       processFormDefinition(zos, appFormVersion).get // can throw
 
     if (formOrDataSet(FormOrData.Data))
-      processFormDataMaybeWithHistory(zos, appFormVersion, documentId, includeDataHistory)
+      processFormDataMaybeWithHistory(zos, appFormVersion, documentId, includeDataHistory, dateRangeGtOpt, dateRangeLtOpt)
   }
 
   private def processFormDefinition(
@@ -327,10 +356,10 @@ object Export {
       case (headers, formDefinition) =>
 
         writeXmlDocumentToZip(
-          zos                     = zos,
-          zipPath                    = makeZipPath(appFormVersion, None, None, "form.xhtml"),
-          documentNode            = formDefinition,
-          createdTimeOpt         = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.Created).map(Instant.ofEpochMilli),
+          zos             = zos,
+          zipPath         = makeZipPath(appFormVersion, None, None, "form.xhtml"),
+          documentNode    = formDefinition,
+          createdTimeOpt  = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.Created).map(Instant.ofEpochMilli),
           modifiedTimeOpt = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.LastModified).map(Instant.ofEpochMilli)
         )
 
@@ -339,7 +368,8 @@ object Export {
           formDefinition,
           appFormVersion,
           None,
-          None
+          None,
+          mutable.Set[String]()
         )
     }
   }
@@ -348,67 +378,106 @@ object Export {
     zos               : ZipOutputStream,
     appFormVersion    : AppFormVersion,
     documentId        : String,
-    includeDataHistory: Boolean
-  )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
-  ): Unit =
-    if (includeDataHistory)
-      PersistenceApi.dataHistory(appFormVersion._1, documentId).foreach { dataHistoryDetails =>
-        processFormData(
-          zos,
-          appFormVersion,
-          documentId,
-          dataHistoryDetails.modifiedTime.some
-        ).get // can throw
-      }
-    else
-      processFormData(
-        zos,
-        appFormVersion,
-        documentId,
-        None
-      ).get // can throw
-
-  private def processFormData(
-    zos            : ZipOutputStream,
-    appFormVersion : AppFormVersion,
-    documentId     : String,
-    modifiedTimeOpt: Option[Instant]
-  )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
-  ): Try[Unit] =
-    readFormData(appFormVersion, documentId, modifiedTimeOpt) map {
-      case (headers, formData) =>
-
-        writeXmlDocumentToZip(
-          zos                     = zos,
-          zipPath                    = makeZipPath(appFormVersion, documentId.some, modifiedTimeOpt, "data.xml"),
-          documentNode            = formData,
-          createdTimeOpt         = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.Created).map(Instant.ofEpochMilli),
-          modifiedTimeOpt = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.LastModified).map(Instant.ofEpochMilli)
-        )
-
-        processAttachments(
-          zos,
-          formData,
-          appFormVersion,
-          documentId.some,
-          modifiedTimeOpt
-        )
-    }
-
-  private def processAttachments(
-    zos                : ZipOutputStream,
-    xmlData            : DocumentNodeInfoType,
-    appFormVersion     : AppFormVersion,
-    documentIdOpt      : Option[String],
-    modifiedTimeOpt: Option[Instant]
+    includeDataHistory: Boolean,
+    dateRangeGtOpt    : Option[Instant],
+    dateRangeLtOpt    : Option[Instant]
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit = {
 
     val attachmentPaths = mutable.Set[String]()
 
+    if (includeDataHistory)
+      PersistenceApi.dataHistory(appFormVersion._1, documentId).foreach { dataHistoryDetails =>
+        processFormData(
+          zos,
+          appFormVersion,
+          documentId,
+          dataHistoryDetails.modifiedTime.some,
+          attachmentPaths,
+          dateRangeGtOpt,
+          dateRangeLtOpt
+        ).get // can throw
+      }
+    else {
+      // xxx TODO filtering on dates
+      processFormData(
+        zos,
+        appFormVersion,
+        documentId,
+        None,
+        attachmentPaths,
+        dateRangeGtOpt,
+        dateRangeLtOpt
+      ).get
+    } // can throw
+  }
+
+  private def isTimeInRange(
+    modifiedTime  : Instant,
+    dateRangeGtOpt: Option[Instant],
+    dateRangeLtOpt: Option[Instant]
+  ): Boolean =
+    dateRangeGtOpt.forall(modifiedTime.isAfter) && dateRangeLtOpt.forall(modifiedTime.isBefore)
+
+  private def processFormData(
+    zos            : ZipOutputStream,
+    appFormVersion : AppFormVersion,
+    documentId     : String,
+    modifiedTimeOpt: Option[Instant],
+    attachmentPaths: mutable.Set[String],
+    dateRangeGtOpt : Option[Instant],
+    dateRangeLtOpt : Option[Instant]
+  )(implicit
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Try[Unit] =
+    modifiedTimeOpt match {
+      case Some(modifiedTime) if ! isTimeInRange(modifiedTime, dateRangeGtOpt, dateRangeLtOpt) =>
+        // We are passed the modified time so we can co the check right away
+        // We are outside of the range so we can ignore the document
+        Success(())
+      case _ =>
+        readFormData(appFormVersion, documentId, modifiedTimeOpt) map {
+          case (headers, formData) =>
+
+            val effectiveModifiedTimeOpt =
+              modifiedTimeOpt
+                .orElse(DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.LastModified).map(Instant.ofEpochMilli))
+
+            // Process the data if it is within the range
+            // Also process if we don't have a modified time
+            if (effectiveModifiedTimeOpt.forall(isTimeInRange(_, dateRangeGtOpt, dateRangeLtOpt))) {
+
+              writeXmlDocumentToZip(
+                zos             = zos,
+                zipPath         = makeZipPath(appFormVersion, documentId.some, modifiedTimeOpt, "data.xml"),
+                documentNode    = formData,
+                createdTimeOpt  = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.Created).map(Instant.ofEpochMilli),
+                modifiedTimeOpt = effectiveModifiedTimeOpt
+              )
+
+              processAttachments(
+                zos,
+                formData,
+                appFormVersion,
+                documentId.some,
+                None,           // only one revision of each attachment is stored
+                attachmentPaths // to check for duplicate attachment paths
+              )
+            }
+        }
+    }
+
+  private def processAttachments(
+    zos            : ZipOutputStream,
+    xmlData        : DocumentNodeInfoType,
+    appFormVersion : AppFormVersion,
+    documentIdOpt  : Option[String],
+    modifiedTimeOpt: Option[Instant],
+    attachmentPaths: mutable.Set[String]
+  )(implicit
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Unit =
     FormRunner.collectAttachments(
       data            = xmlData,
       attachmentMatch = FormRunner.AttachmentMatch.BasePaths(includes = List(makeFromPath(appFormVersion._1, documentIdOpt)), excludes = Nil)
@@ -440,7 +509,6 @@ object Export {
         )
       }
     }
-  }
 
   private def writeXmlDocumentToZip(
     zos            : ZipOutputStream,
@@ -475,14 +543,14 @@ object Export {
     }
 
   private def makeZipPath(
-    appFormVersion: AppFormVersion,
-    documentIdOpt : Option[String],
-    modifiedTime  : Option[Instant],
-    filename      : String
+    appFormVersion : AppFormVersion,
+    documentIdOpt  : Option[String],
+    modifiedTimeOpt: Option[Instant],
+    filename       : String
   ): String = {
 
     val latestPath =
-      modifiedTime.map(_.toString).getOrElse("latest")
+      modifiedTimeOpt.map(_.toString).getOrElse(LatestTimestampTag)
 
     val basePath =
       documentIdOpt match {

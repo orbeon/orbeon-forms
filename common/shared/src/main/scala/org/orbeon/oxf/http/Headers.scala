@@ -28,6 +28,9 @@ object Headers {
   val OrbeonRoles             = "Orbeon-Roles"
   val OrbeonCredentials       = "Orbeon-Credentials"
 
+  val OrbeonCreated           = "Orbeon-Created"
+  val OrbeonLastModified      = "Orbeon-Last-Modified"
+
   val OrbeonRemoteAddress     = "Orbeon-Remote-Address"
 
   val ContentType             = "Content-Type"

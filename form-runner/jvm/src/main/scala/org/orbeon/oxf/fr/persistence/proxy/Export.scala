@@ -359,8 +359,8 @@ object Export {
           zos             = zos,
           zipPath         = makeZipPath(appFormVersion, None, None, "form.xhtml"),
           documentNode    = formDefinition,
-          createdTimeOpt  = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.Created).map(Instant.ofEpochMilli),
-          modifiedTimeOpt = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.LastModified).map(Instant.ofEpochMilli)
+          createdTimeOpt  = headerFromRFC1123OrIso(headers, Headers.OrbeonCreated, Headers.Created),
+          modifiedTimeOpt = headerFromRFC1123OrIso(headers, Headers.OrbeonLastModified, Headers.LastModified)
         )
 
         processAttachments(
@@ -420,6 +420,14 @@ object Export {
   ): Boolean =
     dateRangeGtOpt.forall(modifiedTime.isAfter) && dateRangeLtOpt.forall(modifiedTime.isBefore)
 
+  private def headerFromRFC1123OrIso(
+    headers          : Map[String, List[String]],
+    isoHeaderName    : String,
+    rfc1123HeaderName: String
+  ): Option[Instant] =
+    Headers.firstItemIgnoreCase(headers, isoHeaderName).map(Instant.parse)
+      .orElse(DateHeaders.firstDateHeaderIgnoreCase(headers, rfc1123HeaderName).map(Instant.ofEpochMilli))
+
   private def processFormData(
     zos            : ZipOutputStream,
     appFormVersion : AppFormVersion,
@@ -442,7 +450,7 @@ object Export {
 
             val effectiveModifiedTimeOpt =
               modifiedTimeOpt
-                .orElse(DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.LastModified).map(Instant.ofEpochMilli))
+                .orElse(headerFromRFC1123OrIso(headers, Headers.OrbeonLastModified, Headers.LastModified))
 
             // Process the data if it is within the range
             // Also process if we don't have a modified time
@@ -452,7 +460,7 @@ object Export {
                 zos             = zos,
                 zipPath         = makeZipPath(appFormVersion, documentId.some, modifiedTimeOpt, "data.xml"),
                 documentNode    = formData,
-                createdTimeOpt  = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.Created).map(Instant.ofEpochMilli),
+                createdTimeOpt  = headerFromRFC1123OrIso(headers, Headers.OrbeonCreated, Headers.Created),
                 modifiedTimeOpt = effectiveModifiedTimeOpt
               )
 

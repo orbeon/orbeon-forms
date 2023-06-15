@@ -175,8 +175,11 @@ trait Read extends FormRunnerPersistence {
         }
 
         fromDatabase.stageOpt.foreach(httpResponse.setHeader(StageHeader.HeaderName, _))
-        httpResponse.setHeader(Headers.Created,      DateUtils.formatRfc1123DateTimeGmt(fromDatabase.createdDateTime.toInstant))
-        httpResponse.setHeader(Headers.LastModified, DateUtils.formatRfc1123DateTimeGmt(fromDatabase.lastModifiedDateTime.toInstant))
+        httpResponse.setHeader(Headers.Created,            DateUtils.formatRfc1123DateTimeGmt(fromDatabase.createdDateTime.toInstant))
+        httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(fromDatabase.lastModifiedDateTime.toInstant))
+        // Also provide this with in ISO format with millisecond precision for compatibility with Search and History APIs
+        httpResponse.setHeader(Headers.OrbeonCreated,      DateUtils.formatIsoDateTimeUtc(fromDatabase.createdDateTime.getTime))
+        httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(fromDatabase.lastModifiedDateTime.getTime))
         if (! req.forAttachment)
           httpResponse.setHeader(Headers.ContentType, ContentTypes.XmlContentType)
 

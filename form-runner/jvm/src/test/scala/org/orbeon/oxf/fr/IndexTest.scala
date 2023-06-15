@@ -371,5 +371,184 @@ class IndexTest
         )
       }
     }
+
+    val formWithSummarySettings =
+      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:ev="http://www.w3.org/2001/xml-events"
+               xmlns:xi="http://www.w3.org/2001/XInclude"
+               xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+               xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+               xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+               xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+               xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+               xmlns:exf="http://www.exforms.org/exf/1-0"
+               xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+               xmlns:saxon="http://saxon.sf.net/"
+               xmlns:sql="http://orbeon.org/oxf/xml/sql"
+               xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+               xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+        <xh:head>
+          <xh:title>Untitled Form</xh:title>
+          <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+              <form>
+                <section-1>
+                  <grid-1>
+                    <control-1/>
+                    <control-2/>
+                    <control-3/>
+                    <control-4/>
+                    <control-5/>
+                    <control-6/>
+                    <control-7/>
+                  </grid-1>
+                </section-1>
+              </form>
+            </xf:instance>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+              <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                  <xf:bind id="control-1-bind" name="control-1" ref="control-1" xxf:whitespace="trim"/>
+                  <xf:bind id="control-2-bind" ref="control-2" name="control-2" xxf:whitespace="trim"/>
+                  <xf:bind id="control-3-bind" ref="control-3" name="control-3" xxf:whitespace="trim"/>
+                  <xf:bind id="control-4-bind" ref="control-4" name="control-4" xxf:whitespace="trim"/>
+                  <xf:bind id="control-5-bind" ref="control-5" name="control-5" xxf:whitespace="trim"/>
+                  <xf:bind id="control-6-bind" ref="control-6" name="control-6" xxf:whitespace="trim"/>
+                  <xf:bind id="control-7-bind" ref="control-7" name="control-7" xxf:whitespace="trim"/>
+                </xf:bind>
+              </xf:bind>
+            </xf:bind>
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+              <metadata>
+                <application-name>test</application-name>
+                <form-name>index</form-name>
+                <title xml:lang="en">Untitled Form</title>
+                <description xml:lang="en"/>
+                <created-with-version>2022.1-SNAPSHOT PE</created-with-version>
+                <email>
+                  <templates>
+                    <template name="default">
+                      <form-fields/>
+                    </template>
+                  </templates>
+                  <parameters/>
+                </email>
+                <grid-tab-order>default</grid-tab-order>
+                <library-versions>
+                  <orbeon>1</orbeon>
+                </library-versions>
+              </metadata>
+            </xf:instance>
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+              <attachments/>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+              <resources>
+                <resource xml:lang="en">
+                </resource>
+              </resources>
+            </xf:instance>
+          </xf:model>
+        </xh:head>
+        <xh:body>
+          <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+              <fr:section id="section-1-section" bind="section-1-bind">
+                <xf:label ref="$form-resources/section-1/label"/>
+                <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                  <fr:c y="1" x="1" w="6">
+                    <xf:input id="control-1-control" bind="control-1-bind">
+                      <fr:index/>
+                      <xf:label ref="$form-resources/control-1/label"/>
+                      <xf:hint ref="$form-resources/control-1/hint"/>
+                      <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xf:input>
+                  </fr:c>
+                  <fr:c y="1" x="7" w="6">
+                    <xf:input id="control-2-control" bind="control-2-bind">
+                      <fr:index>
+                        <fr:summary-show/>
+                      </fr:index>
+                      <xf:label ref="$form-resources/control-2/label"/>
+                      <xf:hint ref="$form-resources/control-2/hint"/>
+                      <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xf:input>
+                  </fr:c>
+                  <fr:c x="1" y="2" w="6">
+                    <xf:input id="control-3-control" bind="control-3-bind">
+                      <fr:index>
+                        <fr:summary-search/>
+                      </fr:index>
+                      <xf:label ref="$form-resources/control-3/label"/>
+                      <xf:hint ref="$form-resources/control-3/hint"/>
+                      <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xf:input>
+                  </fr:c>
+                  <fr:c x="7" y="2" w="6">
+                    <xf:input id="control-4-control" bind="control-4-bind">
+                      <fr:index>
+                        <fr:summary-edit/>
+                      </fr:index>
+                      <xf:label ref="$form-resources/control-4/label"/>
+                      <xf:hint ref="$form-resources/control-4/hint"/>
+                      <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xf:input>
+                  </fr:c>
+                  <fr:c x="1" y="3" w="6">
+                    <xf:input id="control-5-control" bind="control-5-bind">
+                      <fr:index>
+                        <fr:summary-edit/>
+                        <fr:summary-search/>
+                        <fr:summary-show/>
+                      </fr:index>
+                      <xf:label ref="$form-resources/control-5/label"/>
+                      <xf:hint ref="$form-resources/control-5/hint"/>
+                      <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xf:input>
+                  </fr:c>
+                  <fr:c x="7" y="3" w="6">
+                    <xf:input id="control-6-control" bind="control-6-bind">
+                      <fr:encrypt/>
+                      <xf:label ref="$form-resources/control-6/label"/>
+                      <xf:hint ref="$form-resources/control-6/hint"/>
+                      <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xf:input>
+                  </fr:c>
+                  <fr:c x="1" y="4" w="6">
+                    <xf:input id="control-7-control" bind="control-7-bind">
+                      <xf:label ref="$form-resources/control-7/label"/>
+                      <xf:hint ref="$form-resources/control-7/hint"/>
+                      <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xf:input>
+                  </fr:c>
+                  <fr:c x="7" y="4" w="6"/>
+                </fr:grid>
+              </fr:section>
+            </fr:body>
+          </fr:view>
+        </xh:body>
+      </xh:html>
+
+    val expectedSummarySettings =
+      List(
+        IndexedControl("control-1", "section-1/grid-1/control-1", "xs:string", "input", SummarySettings(show = false, search = false,  edit = false), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("control-2", "section-1/grid-1/control-2", "xs:string", "input", SummarySettings(show = true,  search = false,  edit = false), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("control-3", "section-1/grid-1/control-3", "xs:string", "input", SummarySettings(show = false, search = true,   edit = false), staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("control-4", "section-1/grid-1/control-4", "xs:string", "input", SummarySettings(show = false, search = false,  edit = true),  staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("control-5", "section-1/grid-1/control-5", "xs:string", "input", SummarySettings(show = true,  search = true,   edit = true),  staticallyRequired = false, htmlLabel = false, resources = Nil)
+      )
+
+    it("must find the expected indexed controls when using sub-elements instead of classes") {
+      assert(
+        expectedSummarySettings == Index.findIndexedControls(
+          elemToDocumentInfo(formWithSummarySettings),
+          FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm("test", "index")),
+          forUserRoles = None
+        )
+      )
+    }
   }
 }

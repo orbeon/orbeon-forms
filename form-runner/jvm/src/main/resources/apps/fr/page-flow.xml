@@ -60,11 +60,9 @@
 
     <!-- Service putting together Form Runner resources -->
     <service path="/fr/service/i18n/fr-resources/([^/^.]+)/([^/^.]+)"
-          view="i18n/fr-resources.xpl"
-          default-submission="request-parameters.xml">
-        <setvalue ref="/*/app"  matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
-    </service>
+             methods="POST"
+             model="i18n/fr-resources-model.xpl"
+             view="i18n/fr-resources.xpl"/>
 
     <!-- ==== Custom services and pages ============================================================================ -->
 

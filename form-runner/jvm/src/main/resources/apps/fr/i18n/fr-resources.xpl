@@ -15,8 +15,10 @@
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
           xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <!-- app/form (request-parameters.xml) -->
+    <!-- Request parameters (app, form) -->
     <p:param type="input" name="instance"/>
+    <!-- Form metadata -->
+    <p:param type="input" name="data"/>
     <p:param type="output" name="data"/>
 
     <!-- Support XInclude in resources -->
@@ -27,8 +29,9 @@
 
     <!-- Resources -->
     <p:processor name="fr:resources-patcher">
-        <p:input name="data" href="#resources"/>
         <p:input name="instance" href="#instance"/>
+        <p:input name="data" href="#data"/>
+        <p:input name="resources" href="#resources"/>
         <!-- Dependency on overridden properties so stylesheet runs again when properties change -->
         <p:input name="properties-local" href="oxf:/config/properties-local.xml"/>
         <p:output name="data" ref="data"/>

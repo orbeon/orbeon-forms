@@ -51,11 +51,15 @@
 
     <!-- Instance containing the Form Runner resources -->
     <xf:instance id="fr-fr-resources"><dummy/></xf:instance>
+    <xf:instance id="no-form-metadata"><_/></xf:instance>
+    <!-- Here we pass only the relevant subset of the form metadata to the submission, so that the resources are not repatched everytime any
+         value of the form metadata is changed. -->
     <xf:submission
         id="fr-get-fr-resources"
-        serialization="none"
-        method="get"
+        serialization="application/xml"
+        method="post"
         resource="/fr/service/i18n/fr-resources/{$app}/{$form}"
+        ref="(xxf:instance('fr-form-metadata')/messages, xxf:instance('no-form-metadata'))[1]"
         replace="instance"
         instance="fr-fr-resources"
         xxf:readonly="true"

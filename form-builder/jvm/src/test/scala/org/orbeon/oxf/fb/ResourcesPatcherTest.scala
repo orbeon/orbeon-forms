@@ -37,6 +37,8 @@ class ResourcesPatcherTest
      with AnyFunSpecLike
      with FormBuilderSupport {
 
+  val formMetadata = <_/>.toDocument
+
   describe("Patching scenarios") {
     it(s"must patch resources as expected") {
 
@@ -60,14 +62,14 @@ class ResourcesPatcherTest
         <resources>
           <resource xml:lang="en">
             <buttons>
-              <existing>OVERRIDE ME</existing>
               <acme>OVERRIDE ME</acme>
+              <existing>OVERRIDE ME</existing>
             </buttons>
           </resource>
           <resource xml:lang="fr">
             <buttons>
-              <existing>OVERRIDE ME</existing>
               <acme>OVERRIDE ME</acme>
+              <existing>OVERRIDE ME</existing>
             </buttons>
           </resource>
         </resources>.toDocument
@@ -76,25 +78,25 @@ class ResourcesPatcherTest
         <resources>
           <resource xml:lang="en">
             <buttons>
-              <existing>Existing</existing>
               <acme>Acme Existing</acme>
+              <existing>Existing</existing>
             </buttons>
             <detail>
               <labels>
-                <missing>Missing</missing>
                 <acme>Acme Missing</acme>
+                <missing>Missing</missing>
               </labels>
             </detail>
           </resource>
           <resource xml:lang="fr">
             <buttons>
-              <existing>Existant</existing>
               <acme>Acme Existing</acme>
+              <existing>Existant</existing>
             </buttons>
             <detail>
               <labels>
-                <missing>Manquant</missing>
                 <acme>Acme Missing</acme>
+                <missing>Manquant</missing>
               </labels>
             </detail>
           </resource>
@@ -102,9 +104,9 @@ class ResourcesPatcherTest
 
       val initial = newDoc
 
-      ResourcesPatcher.transform(initial, AppForm("*", "*"))(propertySet)
+      ResourcesPatcher.transform(initial, formMetadata, AppForm("*", "*"))(propertySet)
 
-      assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
+      assertXMLDocumentsIgnoreNamespacesInScope(expected, initial)
     }
   }
 
@@ -268,7 +270,7 @@ class ResourcesPatcherTest
           )
         )
 
-      ResourcesPatcher.transform(initial, AppForm("*", "*"))(props)
+      ResourcesPatcher.transform(initial, formMetadata, AppForm("*", "*"))(props)
 
       assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
     }

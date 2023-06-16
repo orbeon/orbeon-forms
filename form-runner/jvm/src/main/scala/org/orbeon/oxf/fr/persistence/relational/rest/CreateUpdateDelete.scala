@@ -37,9 +37,11 @@ import org.xml.sax.InputSource
 
 import java.io.{ByteArrayOutputStream, InputStream, Writer}
 import java.sql.{Array => _, _}
+import java.time.Instant
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
+
 
 object RequestReader {
 
@@ -247,45 +249,75 @@ trait CreateUpdateDelete {
 
     val table = SqlSupport.tableName(req)
 
-    // If for data, start by deleting any draft document and draft attachments
-    req.dataPart match {
-      case Some(dataPart) if ! req.forAttachment =>
+    def doDelete(
+      table          : String,
+      documentId     : String,
+      isDraft        : Boolean,
+      lastModifiedOpt: Option[Instant],
+      filenameOpt    : Option[String]
+    ): Unit = {
 
-        val fromControlIndexWhere =
+      val fromPart =
+        s"FROM $table"
+
+      val iControlTextWhere =
           s"""|WHERE data_id IN
               |    (
               |        SELECT data_id
               |          FROM orbeon_i_current
               |         WHERE document_id = ?   AND
-              |               draft       = 'Y'
+              |               draft       = ?
               |    )
               |""".stripMargin
 
-        val orderByClause = req.provider match {
-          case Provider.MySQL => " ORDER BY last_modified_time"
-          case _              => ""
-        }
+      val otherTableWhere =
+        s"""|WHERE document_id = ?   AND
+            |      draft       = ?
+            |""".stripMargin
 
-        val fromControlIndexCount = "SELECT count(*) FROM orbeon_i_control_text " + fromControlIndexWhere
+      val wherePart =
+        if (table == "orbeon_i_control_text")
+          iControlTextWhere
+        else
+          otherTableWhere
 
-        val count =
-          useAndClose(connection.prepareStatement(fromControlIndexCount)) { ps =>
-            ps.setString(1, dataPart.documentId)
-            useAndClose(ps.executeQuery()) { rs =>
-              rs.next()
-              rs.getInt(1)
-            }
+      val lastModifiedPart = lastModifiedOpt.map(_ => "AND last_modified_time = ?").getOrElse("")
+      val filenamePart     = filenameOpt    .map(_ => "AND file_name          = ?").getOrElse("")
+
+      val orderByPart = req.provider match {
+        case Provider.MySQL => List("ORDER BY last_modified_time")
+        case _              => Nil
+      }
+
+      val selectParts = List("SELECT count(*) count", fromPart, wherePart, lastModifiedPart, filenamePart)
+      val deleteParts = List("DELETE",                fromPart, wherePart, lastModifiedPart, filenamePart) ::: orderByPart
+
+      def setParams(ps: PreparedStatement): Unit = {
+        val position = Iterator.from(1)
+        ps.setString(position.next(), documentId)
+        ps.setString(position.next(), if (isDraft) "Y" else "N")
+        lastModifiedOpt.foreach(lastModified => ps.setTimestamp(position.next(), Timestamp.from(lastModified)))
+        filenameOpt    .foreach(filename     => ps.setString(position.next(), filename))
+      }
+
+      val count =
+        useAndClose(connection.prepareStatement(selectParts.mkString(" "))) { ps =>
+          setParams(ps)
+          useAndClose(ps.executeQuery()) { rs =>
+            rs.next()
+            rs.getInt("count")
           }
-
-        if (count > 0) {
-          val deleteFromControlIndexSql = "DELETE FROM orbeon_i_control_text " + fromControlIndexWhere
-          useAndClose(connection.prepareStatement(deleteFromControlIndexSql)) { ps =>
-            ps.setString(1, dataPart.documentId)
-            ps.executeUpdate()
-          }
         }
+      if (count > 0)
+        useAndClose(connection.prepareStatement(deleteParts.mkString(" "))) { ps =>
+          setParams(ps)
+          ps.executeUpdate()
+        }
+    }
 
-        // Then delete from all the other tables
+    // If for data, start by deleting any draft document and draft attachments
+    req.dataPart match {
+      case Some(dataPart) if ! req.forAttachment =>
 
         // See https://github.com/orbeon/orbeon-forms/issues/2980: when saving the data for a draft, we don't want to
         // remove draft attachments from `orbeon_form_data_attach`, otherwise the attachments which were just saved are
@@ -293,34 +325,14 @@ trait CreateUpdateDelete {
         // saving data which is not for a draft. Note that there is no garbage collection for attachments.
 
         val tablesToDeleteDraftsFrom =
+          "orbeon_i_control_text"                             ::
           (! dataPart.isDraft list "orbeon_form_data_attach") :::
           "orbeon_i_current"                                  ::
           "orbeon_form_data"                                  ::
           Nil
 
         tablesToDeleteDraftsFrom.foreach { table =>
-
-          val fromWhere =
-            s"""|
-                |       FROM $table
-                |      WHERE document_id = ?   AND
-                |            draft       = 'Y'
-                |""".stripMargin
-          val select = "     SELECT count(*) count" + fromWhere
-          val delete = "     DELETE" + fromWhere + orderByClause
-          val count =
-            useAndClose(connection.prepareStatement(select)) { ps =>
-              ps.setString(1, dataPart.documentId)
-              useAndClose(ps.executeQuery()) { rs =>
-                rs.next()
-                rs.getInt("count")
-              }
-            }
-          if (count > 0)
-            useAndClose(connection.prepareStatement(delete)) { ps =>
-              ps.setString(1, dataPart.documentId)
-              ps.executeUpdate()
-            }
+          doDelete(table, dataPart.documentId, isDraft = true, lastModifiedOpt = None, filenameOpt = None)
         }
 
         // 1. In `CreateUpdateDelete.scala`:
@@ -334,12 +346,33 @@ trait CreateUpdateDelete {
         connection.commit()
 
       case _ =>
+    } // end delete draft data and attachments
 
+    req.dataPart match {
+      case Some(dataPart) if dataPart.forceDelete =>
+
+        // Force delete, AKA purge, historical data and/or attachments
+
+        req.filename match {
+          case None if req.lastModifiedOpt.isEmpty =>
+            // For data but missing last modified time
+            throw HttpStatusCodeException(StatusCode.BadRequest)
+          case None =>
+            // For data
+            doDelete("orbeon_form_data", dataPart.documentId, isDraft = false, req.lastModifiedOpt, filenameOpt = None)
+          case someFilename =>
+            // For attachment
+            // Here we delete all data matching the document id and filename, regardless of the last modified time
+            doDelete("orbeon_form_data_attach", dataPart.documentId, isDraft = false, None, someFilename)
+        }
+      case _ =>
     }
 
-    // Do insert, unless we're deleting draft data
     val deletingDataDraft = delete && req.dataPart.exists(_.isDraft)
     if (! deletingDataDraft) {
+
+      // Do insert, unless we're deleting draft data
+
       val includedCols = insertCols(req, existingRowOpt, delete, versionToSet, currentUserOrganization(connection, req))
       val colNames     = includedCols.map(_.name).mkString(", ")
       val colValues    =
@@ -407,31 +440,34 @@ trait CreateUpdateDelete {
 
       debug("CRUD: after commit")
 
-      // Update index
-      val whatToReindex = req.dataPart match {
-        case Some(dataPart) =>
-          // Data: update index for this document id
-          WhatToReindex.DataForDocumentId(dataPart.documentId)
-        case None =>
-          // Form definition: update index for this form version
-          // Re. the asInstanceOf, when updating a form, we must have a specific version specified
-          WhatToReindex.DataForForm(req.appForm, versionToSet)
-      }
+      // Update index if needed
+      if (! req.dataPart.exists(_.forceDelete)) { // no need as we only delete historical data, not current data, so data must already be deindexed
 
-      withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
-        Index.reindex(req.provider, connection, whatToReindex)
-      }
+        val whatToReindex = req.dataPart match {
+          case Some(dataPart) =>
+            // Data: update index for this document id
+            WhatToReindex.DataForDocumentId(dataPart.documentId)
+          case None =>
+            // Form definition: update index for this form version
+            // Re. the asInstanceOf, when updating a form, we must have a specific version specified
+            WhatToReindex.DataForForm(req.appForm, versionToSet)
+        }
 
-      // Create flat view if needed
-      if (
-        req.flatView                                      &&
-        Provider.FlatViewSupportedProviders(req.provider) &&
-        req.forForm                                       &&
-        ! req.forAttachment                               &&
-        ! delete                                          &&
-        req.appForm.form != Names.LibraryFormName
-      ) withDebug("CRUD: creating flat view") {
-        FlatView.createFlatView(req, versionToSet, connection)
+        withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
+          Index.reindex(req.provider, connection, whatToReindex)
+        }
+
+        // Create flat view if needed
+        if (
+          req.flatView                                      &&
+          Provider.FlatViewSupportedProviders(req.provider) &&
+          req.forForm                                       &&
+          ! req.forAttachment                               &&
+          ! delete                                          &&
+          req.appForm.form != Names.LibraryFormName
+        ) withDebug("CRUD: creating flat view") {
+          FlatView.createFlatView(req, versionToSet, connection)
+        }
       }
 
       // Inform caller of the form definition version used

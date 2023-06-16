@@ -21,9 +21,10 @@ import java.time.Instant
 
 
 case class DataPart(
-  isDraft   : Boolean,
-  documentId: String,
-  stage     : Option[String]
+  isDraft    : Boolean,
+  documentId : String,
+  stage      : Option[String],
+  forceDelete: Boolean
 )
 
 case class LockUnlockRequest(
@@ -48,3 +49,4 @@ case class CrudRequest(
   def forData       : Boolean = dataPart.isDefined
   def forAttachment : Boolean = filename.isDefined
 }
+

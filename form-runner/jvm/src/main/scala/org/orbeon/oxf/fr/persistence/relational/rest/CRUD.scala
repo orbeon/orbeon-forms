@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
+import org.orbeon.oxf.controller.Authorizer
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.Logger
@@ -72,7 +73,7 @@ private object CRUD {
   def getLockUnlockRequest(requestPath: String)(implicit httpRequest: ExternalContext.Request): LockUnlockRequest =
     requestPath match {
       case CrudDataPath(provider, _, _, dataOrDraft, documentId, _) =>
-        val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage)
+        val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage, forceDelete = false)
         LockUnlockRequest(Provider.withName(provider), dataPart)
       case _ =>
         throw HttpStatusCodeException(StatusCode.BadRequest)
@@ -93,12 +94,12 @@ private object CRUD {
 
     requestPath match {
       case CrudFormPath(provider, app, form, filename) =>
-        val file = if (filename == "form.xhtml") None else Some(filename)
+        val filenameOpt = if (filename == "form.xhtml") None else Some(filename)
         CrudRequest(
           Provider.withName(provider),
           AppForm(app, form),
           incomingVersion,
-          file,
+          filenameOpt,
           None,
           None,
           requestUsername,
@@ -108,15 +109,29 @@ private object CRUD {
           requestWorkflowStage
         )
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
-        val file            = if (filename == "data.xml") None else Some(filename)
-        val dataPart        = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage)
+
+        val filenameOpt     = if (filename == "data.xml") None else Some(filename)
         val lastModifiedOpt = httpRequest.getFirstParamAsString("last-modified-time").flatMap(_.trimAllToOpt).map(Instant.parse) // xxx TODO constant
+
+        val forceDelete =
+          httpRequest.getMethod == HttpMethod.DELETE &&
+            httpRequest.getFirstParamAsString("force-delete").flatMap(_.trimAllToOpt).contains(true.toString)
+
+        if (forceDelete && (
+          ! Authorizer.authorizedWithToken(NetUtils.getExternalContext) || // force `DELETE` from internal callers only
+          filenameOpt.isEmpty && lastModifiedOpt.isEmpty                || // and only for historical data
+          filenameOpt.isDefined && lastModifiedOpt.isDefined               // or for attachments
+          )
+        ) {
+          throw HttpStatusCodeException(throw HttpStatusCodeException(StatusCode.BadRequest))
+        }
+
         CrudRequest(
           Provider.withName(provider),
           AppForm(app, form),
           incomingVersion,
-          file,
-          Some(dataPart),
+          filenameOpt,
+          Some(DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage, forceDelete = forceDelete)),
           lastModifiedOpt,
           requestUsername,
           requestGroup,

@@ -166,19 +166,21 @@ private[persistence] object PersistenceProxyProcessor {
   )
 
   // TODO: Could just pass `ec` and no separate `request`/`response`
-  private def proxyRequest(request: Request, response: Response)(implicit ec: ExternalContext): Unit =
-    request.getRequestPath match {
-      case FormPath(path, app, form, _)                     => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, None          , path)
-      case DataPath(path, app, form, _, document, filename) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Some(filename), path, Some(document))
-      case DataCollectionPath(path, app, form)              => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None          , path)
-      case SearchPath(path, app, form)                      => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None          , path)
-      case ReEncryptAppFormPath(path, app, form)            => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
-      case HistoryPath(path, app, form, _)                  => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
-      case ExportPath(app, form, documentId)                => Export.processExport       (request, response, Option(app), Option(form), Option(documentId))
-      case PublishedFormsMetadataPath(_, app, form)         => proxyPublishedFormsMetadata(request, response, Option(app), Option(form))
-      case ReindexPath                                      => proxyReindex               (request, response)
-      case ReEncryptStatusPath                              => proxyReEncryptStatus       (request, response)
-      case incomingPath                                     => throw new OXFException(s"Unsupported path: $incomingPath")
+  // Proxy the request to the appropriate persistence implementation
+  def proxyRequest(request: Request, response: Response)(implicit externalContext: ExternalContext): Unit =
+    (request.getMethod, request.getRequestPath) match {
+      case (_,               FormPath(path, app, form, _))                     => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, None            , path)
+      case (_,               DataPath(path, app, form, _, document, filename)) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Some(filename)  , path, Some(document))
+      case (_,               DataCollectionPath(path, app, form))              => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
+      case (HttpMethod.POST, SearchPath(path, app, form))                      => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
+      case (HttpMethod.POST, ReEncryptAppFormPath(path, app, form))            => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
+      case (HttpMethod.GET,  HistoryPath(path, app, form, _))                  => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
+      case (HttpMethod.GET,  ExportPath(app, form, documentId))                => Export.processExport       (request, response, Option(app), Option(form), Option(documentId))
+      case (HttpMethod.POST, PurgePath(app, form, documentId))                 => Purge.processPurge         (request, response, Option(app), Option(form), Option(documentId))
+      case (HttpMethod.GET,  PublishedFormsMetadataPath(_, app, form))         => proxyPublishedFormsMetadata(request, response, Option(app), Option(form))
+      case (HttpMethod.GET,  ReindexPath)                                      => proxyReindex               (request, response) // TODO: should be `POST`
+      case (HttpMethod.GET,  ReEncryptStatusPath)                              => proxyReEncryptStatus       (request, response)
+      case (_, incomingPath)                                                   => throw new OXFException(s"Unsupported path: $incomingPath") // TODO: bad request?
     }
 
   // TODO: test

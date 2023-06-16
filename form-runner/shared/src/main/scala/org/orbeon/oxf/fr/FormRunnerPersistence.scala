@@ -109,6 +109,7 @@ object FormRunnerPersistence {
   val PublishedFormsMetadataPath          = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
   val HistoryPath                         = """/fr/service/persistence(/history/([^/]+)/([^/]+)/([^/]+))""".r
   val ExportPath                          = """/fr/service/persistence/export(?:/([^/]+))?(?:/([^/]+))?(?:/([^/]+))?""".r
+  val PurgePath                           = """/fr/service/persistence/purge(?:/([^/]+))?(?:/([^/]+))?(?:/([^/]+))?""".r
   val ReindexPath                         =   "/fr/service/persistence/reindex"
   val ReEncryptStatusPath                 =   "/fr/service/persistence/reencrypt" // `GET` only
 

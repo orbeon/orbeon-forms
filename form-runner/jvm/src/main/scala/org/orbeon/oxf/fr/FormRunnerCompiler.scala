@@ -179,8 +179,8 @@ class FormRunnerCompiler extends ProcessorImpl {
 
             // Write static attachments and other resources
             distinctResources.iterator foreach { manifestEntry =>
-              Export.readPersistenceContentToZip(
-                zos         = zos,
+              Export.readPersistenceContentAndProcess(
+                ctx            = zos,
                 formVersionOpt =
                   manifestEntry.uri match {
                     case FormPath(_, Names.GlobalLibraryAppName, Names.LibraryFormName, _)               => orbeonLibraryVersionOpt
@@ -189,7 +189,7 @@ class FormRunnerCompiler extends ProcessorImpl {
                     case _                                                                               => None
                   },
                 fromPath    = manifestEntry.uri,
-                zipPath     = manifestEntry.zipPath,
+                toPath      = manifestEntry.zipPath,
                 debugAction = "compiling"
               )
             }

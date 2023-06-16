@@ -201,13 +201,17 @@ trait PersistenceApiTrait {
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
-  ): Try[(Map[String, List[String]], DocumentNodeInfoType)] = {
+  ): Try[((Map[String, List[String]], DocumentNodeInfoType), String)] = {
+
     debug(s"reading form data for `$appFormVersion`/`$documentId`/`$lastModifiedTime`")
-    val urlPath = FormRunner.createFormDataBasePath(appFormVersion._1.app, appFormVersion._1.form, isDraft = false, documentId) + "data.xml"
-    readDocument(
-      urlString     = PathUtils.recombineQuery(urlPath, lastModifiedTime.toList.map("last-modified-time" -> _.toString)),
-      customHeaders = Map(OrbeonFormDefinitionVersion -> List(appFormVersion._2.toString))
+
+    val path = PathUtils.recombineQuery(
+      FormRunner.createFormDataBasePath(appFormVersion._1.app, appFormVersion._1.form, isDraft = false, documentId) + "data.xml",
+      lastModifiedTime.toList.map("last-modified-time" -> _.toString)
     )
+    val customHeaders = Map(OrbeonFormDefinitionVersion -> List(appFormVersion._2.toString))
+
+    readDocument(path, customHeaders).map(_ -> path)
   }
 
   def readDocumentFormVersion(
@@ -267,7 +271,7 @@ trait PersistenceApiTrait {
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
-  ): Try[(Map[String, List[String]], DocumentNodeInfoType)] = {
+  ): Try[((Map[String, List[String]], DocumentNodeInfoType), String)] = {
 
     debug(s"reading published form definition for `$appName`/`$formName`/`$version`")
 
@@ -277,7 +281,7 @@ trait PersistenceApiTrait {
       case FormDefinitionVersion.Specific(version) => Map(OrbeonFormDefinitionVersion -> List(version.toString))
     }
 
-    readDocument(path, customHeaders)
+    readDocument(path, customHeaders).map(_ -> path)
   }
 
   // TODO: This should return a `Try`. Right now it throws if the document cannot be read.

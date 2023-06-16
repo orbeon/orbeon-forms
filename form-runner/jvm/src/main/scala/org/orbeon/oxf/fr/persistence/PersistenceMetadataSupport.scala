@@ -65,7 +65,7 @@ object PersistenceMetadataSupport {
     readMaybeFromCache(appForm, version, formDefinitionCache) {
       implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
       withDebug("reading published form for indexing/encryption details") {
-        PersistenceApi.readPublishedFormDefinition(appForm.app, appForm.form, version) map { case (_, formDefinitionDoc) =>
+        PersistenceApi.readPublishedFormDefinition(appForm.app, appForm.form, version) map { case ((_, formDefinitionDoc), _)=>
           EncryptionAndIndexDetails(
             encryptedFieldsPaths = Eval.later(FieldEncryption.getFieldsToEncrypt(formDefinitionDoc, appForm).map(_.path)),
             indexedFieldsXPaths  = Eval.later(Index.findIndexedControls(

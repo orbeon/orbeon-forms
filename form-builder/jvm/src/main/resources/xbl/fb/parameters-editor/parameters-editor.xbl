@@ -248,7 +248,7 @@
                                     </xf:itemset>
                                 </xf:select>
                             </xf:case>
-                            <!-- TODO: duplication -->
+                            <!-- TODO: duplication: would be good to be able to express a sequence here -->
                             <xf:case value="'LinkToViewPageParam'">
                                 <xf:select ref="$current-param" appearance="full">
                                     <xf:itemset ref="xf:element(if (xxf:component-param-value('form-runner-namespace') = 'false') then 'token' else 'fr:token', 'true')">
@@ -257,7 +257,17 @@
                                     </xf:itemset>
                                 </xf:select>
                             </xf:case>
+                            <!-- TODO: duplication: would be good to be able to express a sequence here -->
+                            <xf:case value="'LinkToPdfParam'">
+                                <xf:select ref="$current-param" appearance="full">
+                                    <xf:itemset ref="xf:element(if (xxf:component-param-value('form-runner-namespace') = 'false') then 'token' else 'fr:token', 'true')">
+                                        <xf:label ref="$resources/components/parameters-editor/token/label"/>
+                                        <xf:copy ref="."/>
+                                    </xf:itemset>
+                                </xf:select>
+                            </xf:case>
                         </xf:switch>
+
 
                         <xh:div class="fb-param-buttons">
                             <xh:i class="fa fa-fw fa-bars fb-param-grab"/>

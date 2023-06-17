@@ -507,8 +507,7 @@
         name="allow-revision-history"
         as="xs:boolean"
         select="
-            not($is-readonly-mode) and
-            $is-detail             and
+            $is-detail and
             p:property(string-join(('oxf.fr.navbar.revision-history.enable', $app, $form), '.'))"/>
 
     <xsl:template match="/xh:html">

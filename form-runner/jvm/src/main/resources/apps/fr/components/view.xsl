@@ -52,7 +52,7 @@
         <xsl:if test="$allow-revision-history">
             <fr:revision-history
                 id="fr-revision-history"
-                ref=".[fr:mode() = 'edit']"
+                ref=".[fr:mode() = ('edit', 'view')]"
                 app="{{fr:app-name()}}"
                 form="{{fr:form-name()}}"
                 form-version="{{fr:form-version()}}"
@@ -881,11 +881,8 @@
         <xf:group
             class="fr-revision-history"
             ref=".[
-                xxf:property(string-join(('oxf.fr.navbar.revision-history.enable', fr:app-name(), fr:form-name()), '.')) and
-                not(fr:is-embedded())                                                                                and
-                fr:mode() = (
-                    'edit'
-                )
+                not(fr:is-embedded()) and
+                fr:mode() = ('edit', 'view')
             ]">
 
             <xf:trigger appearance="minimal" class="fr-revision-history-button">

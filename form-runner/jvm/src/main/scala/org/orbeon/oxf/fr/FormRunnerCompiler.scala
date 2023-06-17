@@ -179,7 +179,7 @@ class FormRunnerCompiler extends ProcessorImpl {
 
             // Write static attachments and other resources
             distinctResources.iterator foreach { manifestEntry =>
-              Export.readPersistenceContentAndProcess(
+              Export.processAttachment(
                 ctx            = zos,
                 formVersionOpt =
                   manifestEntry.uri match {

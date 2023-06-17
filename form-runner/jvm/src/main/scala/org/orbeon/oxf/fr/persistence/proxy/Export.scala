@@ -20,6 +20,7 @@ import java.time.Instant
 import java.util.zip.{ZipEntry, ZipOutputStream}
 import java.{util => ju}
 import javax.xml.transform.stream.StreamResult
+import scala.collection.mutable
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
@@ -80,7 +81,10 @@ object Export extends ExportOrPurge {
     )
   }
 
-  def readPersistenceContentAndProcess(
+
+  val processOtherAttachments: Boolean = false
+
+  def processAttachment(
     ctx           : Context,
     formVersionOpt: Option[Int],
     fromPath      : String,
@@ -106,6 +110,16 @@ object Export extends ExportOrPurge {
       case Failure(_) => error(s"failure retrieving attachment when $debugAction form `$fromPath`")
     }
   }
+
+  def completeAttachments(
+    ctx                 : Context,
+    appFormVersion      : AppFormVersion,
+    documentId          : String,
+    attachmentPaths     : mutable.Set[String], // for data that has been deleted
+    otherAttachmentPaths: mutable.Set[String]  // for data that hasn't been deleted
+  )(implicit
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Unit = ()
 
   private def processExportImpl(
     incomingHeaders    : ju.Map[String, Array[String]],
@@ -136,7 +150,10 @@ object Export extends ExportOrPurge {
     toPath         : String,
     documentNode   : DocumentNodeInfoType,
     createdTimeOpt : Option[Instant],
-    modifiedTimeOpt: Option[Instant]
+    modifiedTimeOpt: Option[Instant],
+    forCurrentData : Boolean
+  )(implicit
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit = {
     debug(s"storing XML ${documentNode.rootElement.getSystemId} as `$toPath`")
     val entry = new ZipEntry(toPath)

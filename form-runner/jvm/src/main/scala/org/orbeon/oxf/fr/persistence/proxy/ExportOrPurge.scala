@@ -5,6 +5,7 @@ import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
+import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi._
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
@@ -130,21 +131,37 @@ trait ExportOrPurge {
     secondaryMatchSpec.map(_.concat(mainMatchSpecOpt.toList)).orElse(mainMatchSpecOpt.map(NonEmptyList.one))
   }
 
+  // TODO: Should be trait parameter with Scala 3
+  val processOtherAttachments: Boolean
+
   def processXmlDocument(
     ctx            : Context,
     fromPath       : String,
     toPath         : String,
     documentNode   : DocumentNodeInfoType,
     createdTimeOpt : Option[Instant],
-    modifiedTimeOpt: Option[Instant]
+    modifiedTimeOpt: Option[Instant],
+    forCurrentData : Boolean
+  )(implicit
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit
 
-  def readPersistenceContentAndProcess(
+  def processAttachment(
     ctx           : Context,
     formVersionOpt: Option[Int],
     fromPath      : String,
     toPath        : String,
     debugAction   : String
+  )(implicit
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Unit
+
+  def completeAttachments(
+    ctx                 : Context,
+    appFormVersion      : AppFormVersion,
+    documentId          : String,
+    attachmentPaths     : mutable.Set[String],
+    otherAttachmentPaths: mutable.Set[String]
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit
@@ -182,13 +199,10 @@ trait ExportOrPurge {
 //        val attachmentFilenameMetadata =
 //          holder.attValueOpt("filename").flatMap(_.trimAllToOpt)
 
-        val attachmentFilename =
-          fromPath.splitTo[List]("/").lastOption.getOrElse(throw new IllegalStateException(fromPath))
-
         val attachmentToPath =
-          makeToPath(appFormVersion, documentIdOpt, modifiedTimeOpt, attachmentFilename)
+          makeToPath(appFormVersion, documentIdOpt, modifiedTimeOpt, extractAttachmentFilename(fromPath))
 
-        readPersistenceContentAndProcess(
+        processAttachment(
           ctx            = ctx,
           formVersionOpt = appFormVersion._2.some,
           fromPath       = fromPath,
@@ -356,7 +370,8 @@ trait ExportOrPurge {
           toPath          = makeToPath(appFormVersion, None, None, "form.xhtml"),
           documentNode    = formDefinition,
           createdTimeOpt  = headerFromRFC1123OrIso(headers, Headers.OrbeonCreated, Headers.Created),
-          modifiedTimeOpt = headerFromRFC1123OrIso(headers, Headers.OrbeonLastModified, Headers.LastModified)
+          modifiedTimeOpt = headerFromRFC1123OrIso(headers, Headers.OrbeonLastModified, Headers.LastModified),
+          forCurrentData  = true
         )
 
         processAttachments(
@@ -381,32 +396,46 @@ trait ExportOrPurge {
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit = {
 
-    val attachmentPaths = mutable.Set[String]()
+    val attachmentPaths      = mutable.Set[String]()
+    val otherAttachmentPaths = mutable.Set[String]()
 
-    if (dataRevisionHistory == DataRevisionHistoryAdt.Include || dataRevisionHistory == DataRevisionHistoryAdt.Only) {
+    if (dataRevisionHistory == DataRevisionHistoryAdt.Include || dataRevisionHistory == DataRevisionHistoryAdt.Only)
+      PersistenceApi.dataHistory(appFormVersion._1, documentId).zipWithIndex.foreach { case (dataHistoryDetails, index) =>
 
-      var first = true
+        val isFirst = index == 0
 
-      PersistenceApi.dataHistory(appFormVersion._1, documentId).foreach { dataHistoryDetails =>
 
         // The first item is the current data
-        val skip = first && dataRevisionHistory == DataRevisionHistoryAdt.Only
+        // TODO: This will change once we can get the history of deleted data.
+        val dataProcessed =
+          if (! (isFirst && dataRevisionHistory == DataRevisionHistoryAdt.Only))
+            processFormData(
+              ctx,
+              appFormVersion,
+              documentId,
+              dataHistoryDetails.modifiedTime.some,
+              attachmentPaths,
+              dateRangeGtOpt,
+              dateRangeLtOpt,
+              forCurrentData = isFirst
+            ).get // can throw
+          else
+            false
 
-        if (first)
-          first = false
-
-        if (! skip)
-          processFormData(
-            ctx,
-            appFormVersion,
-            documentId,
-            dataHistoryDetails.modifiedTime.some,
-            attachmentPaths,
-            dateRangeGtOpt,
-            dateRangeLtOpt
-          ).get // can throw
+        if (processOtherAttachments && ! dataProcessed)
+          readFormData(appFormVersion, documentId, dataHistoryDetails.modifiedTime.some) map {
+            case ((_, formData), _) =>
+              processAttachments(
+                ctx,
+                formData,
+                appFormVersion,
+                documentId.some,
+                None,                // only one revision of each attachment is stored
+                otherAttachmentPaths // to check for duplicate attachment paths
+              )
+          }
       }
-    } else {
+    else
       processFormData(
         ctx,
         appFormVersion,
@@ -414,9 +443,17 @@ trait ExportOrPurge {
         None,
         attachmentPaths,
         dateRangeGtOpt,
-        dateRangeLtOpt
-      ).get
-    } // can throw
+        dateRangeLtOpt,
+        forCurrentData = true
+      ).get // can throw
+
+    completeAttachments(
+      ctx,
+      appFormVersion,
+      documentId,
+      attachmentPaths,
+      otherAttachmentPaths
+    )
   }
 
   private def isTimeInRange(
@@ -426,7 +463,10 @@ trait ExportOrPurge {
   ): Boolean =
     dateRangeGtOpt.forall(modifiedTime.isAfter) && dateRangeLtOpt.forall(modifiedTime.isBefore)
 
-  private def headerFromRFC1123OrIso(
+  protected def extractAttachmentFilename(fromPath: String): String =
+    fromPath.splitTo[List]("/").lastOption.getOrElse(throw new IllegalStateException(fromPath))
+
+  protected def headerFromRFC1123OrIso(
     headers          : Map[String, List[String]],
     isoHeaderName    : String,
     rfc1123HeaderName: String
@@ -435,21 +475,22 @@ trait ExportOrPurge {
       .orElse(DateHeaders.firstDateHeaderIgnoreCase(headers, rfc1123HeaderName).map(Instant.ofEpochMilli))
 
   private def processFormData(
-    ctx            : Context,
-    appFormVersion : AppFormVersion,
-    documentId     : String,
-    modifiedTimeOpt: Option[Instant],
-    attachmentPaths: mutable.Set[String],
-    dateRangeGtOpt : Option[Instant],
-    dateRangeLtOpt : Option[Instant]
+    ctx                    : Context,
+    appFormVersion         : AppFormVersion,
+    documentId             : String,
+    modifiedTimeOpt        : Option[Instant],
+    attachmentPaths        : mutable.Set[String],
+    dateRangeGtOpt         : Option[Instant],
+    dateRangeLtOpt         : Option[Instant],
+    forCurrentData         : Boolean
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
-  ): Try[Unit] =
+  ): Try[Boolean] =
     modifiedTimeOpt match {
       case Some(modifiedTime) if ! isTimeInRange(modifiedTime, dateRangeGtOpt, dateRangeLtOpt) =>
         // We are passed the modified time so we can do the check right away
         // We are outside of the range so we can ignore the document
-        Success(())
+        Success(false)
       case _ =>
         readFormData(appFormVersion, documentId, modifiedTimeOpt) map {
           case ((headers, formData), path) =>
@@ -465,10 +506,11 @@ trait ExportOrPurge {
               processXmlDocument(
                 ctx             = ctx,
                 fromPath        = path,
-                toPath          = makeToPath(appFormVersion, documentId.some, modifiedTimeOpt, "data.xml"),
+                toPath          = makeToPath(appFormVersion, documentId.some, modifiedTimeOpt, DataXml),
                 documentNode    = formData,
                 createdTimeOpt  = headerFromRFC1123OrIso(headers, Headers.OrbeonCreated, Headers.Created),
-                modifiedTimeOpt = effectiveModifiedTimeOpt
+                modifiedTimeOpt = effectiveModifiedTimeOpt,
+                forCurrentData  = forCurrentData
               )
 
               processAttachments(
@@ -479,6 +521,10 @@ trait ExportOrPurge {
                 None,           // only one revision of each attachment is stored
                 attachmentPaths // to check for duplicate attachment paths
               )
+
+              true
+            } else {
+              false
             }
         }
     }

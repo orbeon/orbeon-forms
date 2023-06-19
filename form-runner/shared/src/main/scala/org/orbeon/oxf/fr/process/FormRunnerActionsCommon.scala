@@ -180,7 +180,7 @@ trait FormRunnerActionsCommon {
         toBaseURI         = "", // local save
         fromBasePaths     = List(frc.createFormDataBasePath(app, form, ! isDraft, document) -> formVersion),
         toBasePath        = frc.createFormDataBasePath(app, form,   isDraft, document),
-        filename          = "data.xml",
+        filename          = DataXml,
         commonQueryString = systemParams + querySuffix,
         forceAttachments  = false,
         formVersion       = Some(formVersion.toString),

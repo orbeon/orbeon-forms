@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.FormRunnerPersistence.DataFormatVersionName
+import org.orbeon.oxf.fr.FormRunnerPersistence.{DataFormatVersionName, DataXml}
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
@@ -92,7 +92,7 @@ trait FormRunnerSummary {
       toBaseURI          = "", // local save
       fromBasePaths      = List(createFormDataBasePath(app, form, isDraft = false, fromDocument) -> formVersion.trimAllToOpt.map(_.toInt).getOrElse(1)),
       toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
-      filename           = "data.xml",
+      filename           = DataXml,
       commonQueryString  = s"$DataFormatVersionName=${databaseDataFormatVersion.entryName}",
       forceAttachments   = true,
       formVersion        = Some(formVersion),

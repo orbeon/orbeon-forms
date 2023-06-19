@@ -6,6 +6,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.{ExternalContext, RequestAdapter, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunner.createFormDataBasePath
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
+import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
@@ -110,8 +111,9 @@ trait PersistenceApiTrait {
   }
 
   def dataHistory(
-    appForm   : AppForm,
-    documentId: String
+    appForm              : AppForm,
+    documentId           : String,
+    attachmentFilenameOpt: Option[String] = None
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -120,7 +122,7 @@ trait PersistenceApiTrait {
     debug(s"calling data history for `$appForm`/`$documentId`")
 
     val servicePath =
-      s"/fr/service/persistence/history/${appForm.app}/${appForm.form}/$documentId"
+      s"/fr/service/persistence/history/${appForm.app}/${appForm.form}/$documentId${attachmentFilenameOpt.map(f => s"/$f").getOrElse("")}"
 
     def readPage(pageNumber: Int): Try[DocumentNodeInfoType] = {
 
@@ -206,7 +208,7 @@ trait PersistenceApiTrait {
     debug(s"reading form data for `$appFormVersion`/`$documentId`/`$lastModifiedTime`")
 
     val path = PathUtils.recombineQuery(
-      FormRunner.createFormDataBasePath(appFormVersion._1.app, appFormVersion._1.form, isDraft = false, documentId) + "data.xml",
+      FormRunner.createFormDataBasePath(appFormVersion._1.app, appFormVersion._1.form, isDraft = false, documentId) + DataXml,
       lastModifiedTime.toList.map("last-modified-time" -> _.toString)
     )
     val customHeaders = Map(OrbeonFormDefinitionVersion -> List(appFormVersion._2.toString))
@@ -223,7 +225,7 @@ trait PersistenceApiTrait {
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Option[Int] = {
-    val path = createFormDataBasePath(appName, formName, isDraft, documentId) + "data.xml"
+    val path = createFormDataBasePath(appName, formName, isDraft, documentId) + DataXml
     val headers = readHeaders(path, Map.empty)
     headers.get(Version.OrbeonFormDefinitionVersion).map(_.head).map(_.toInt)
   }

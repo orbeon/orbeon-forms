@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import org.orbeon.oxf.controller.Authorizer
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.Logger
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
@@ -110,7 +111,7 @@ private object CRUD {
         )
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
 
-        val filenameOpt     = if (filename == "data.xml") None else Some(filename)
+        val filenameOpt     = if (filename == DataXml) None else Some(filename)
         val lastModifiedOpt = httpRequest.getFirstParamAsString("last-modified-time").flatMap(_.trimAllToOpt).map(Instant.parse) // xxx TODO constant
 
         val forceDelete =

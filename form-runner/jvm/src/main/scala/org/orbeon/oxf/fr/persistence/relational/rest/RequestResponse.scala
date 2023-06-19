@@ -49,4 +49,3 @@ case class CrudRequest(
   def forData       : Boolean = dataPart.isDefined
   def forAttachment : Boolean = filename.isDefined
 }
-

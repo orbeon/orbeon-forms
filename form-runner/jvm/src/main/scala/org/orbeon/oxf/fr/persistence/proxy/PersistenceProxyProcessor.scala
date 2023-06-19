@@ -175,6 +175,7 @@ private[persistence] object PersistenceProxyProcessor {
       case (HttpMethod.POST, SearchPath(path, app, form))                      => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
       case (HttpMethod.POST, ReEncryptAppFormPath(path, app, form))            => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
       case (HttpMethod.GET,  HistoryPath(path, app, form, _))                  => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
+      case (HttpMethod.GET,  HistoryPath(path, app, form, _, filename))        => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Option(filename).orElse(Some(DataXml)), path)
       case (HttpMethod.GET,  ExportPath(app, form, documentId))                => Export.processExport       (request, response, Option(app), Option(form), Option(documentId))
       case (HttpMethod.POST, PurgePath(app, form, documentId))                 => Purge.processPurge         (request, response, Option(app), Option(form), Option(documentId))
       case (HttpMethod.GET,  PublishedFormsMetadataPath(_, app, form))         => proxyPublishedFormsMetadata(request, response, Option(app), Option(form))

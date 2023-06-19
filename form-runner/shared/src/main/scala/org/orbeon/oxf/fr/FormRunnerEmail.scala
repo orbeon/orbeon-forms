@@ -184,6 +184,7 @@ trait FormRunnerEmail {
     linkType match {
       case "LinkToEditPageParam"    | "link-to-edit-page" if includeToken => build("edit", documentOpt, buildTokenParam(Set(Operation.Read, Operation.Update)).toList)
       case "LinkToViewPageParam"    | "link-to-view-page" if includeToken => build("view", documentOpt, buildTokenParam(Set(Operation.Read)).toList)
+      case "LinkToPdfParam"         | "link-to-pdf"       if includeToken => build("pdf",  documentOpt, buildTokenParam(Set(Operation.Read)).toList)
       case otherLinkType                                  if includeToken => throw new IllegalArgumentException(s"Token not supported for link type: $otherLinkType")
       case "LinkToEditPageParam"    | "link-to-edit-page"                 => build("edit", documentOpt)
       case "LinkToViewPageParam"    | "link-to-view-page"                 => build("view", documentOpt)

@@ -11,17 +11,16 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<html xmlns:xs="http://www.w3.org/2001/XMLSchema"
+<xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:xh="http://www.w3.org/1999/xhtml"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-      xmlns="http://www.w3.org/1999/xhtml">
+      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
-    <head>
+    <xh:head>
         <!-- Make sure to use the source form's title -->
         <xh:title><xf:output value="$source-form-metadata/title[@xml:lang = xxf:lang()], $source-form-metadata/title"/></xh:title>
         <xh:link rel="stylesheet" href="/apps/fr/style/form-runner-summary.css" type="text/css" media="all"/>
@@ -95,7 +94,7 @@
 
             <!-- Source form -->
             <xf:instance id="fr-source-form-instance" xxf:readonly="false" xxf:exclude-result-prefixes="#all"><!-- Set to false so that xf:insert works -->
-                <form xmlns=""/>
+                <form/>
             </xf:instance>
 
             <xf:var
@@ -175,12 +174,12 @@
             <!-- Initially empty, but we copy the source form resources into there during initialization.
                  fr-persistence-model then has access to the form resources as if in the detail page. -->
             <xf:instance id="fr-form-resources" xxf:exclude-result-prefixes="#all">
-                <resources xmlns=""/>
+                <resources/>
             </xf:instance>
 
             <!-- Instance to control the triggers' appearance -->
             <xf:instance id="fr-summary-triggers-instance" xxf:exclude-result-prefixes="#all">
-                <_ xmlns="">
+                <_>
                     <enabled/>
                     <disabled/>
                 </_>
@@ -223,7 +222,7 @@
                  built-in eXist, Oracle and MySQL implementations rely on them in the Form Runner page flow. -->
             <!-- Don't use `xxf:exclude-result-prefixes="#all"` as eXist search needs the `xh` and `xf` namespaces -->
             <xf:instance id="fr-search-instance">
-                <search xmlns="">
+                <search>
                     <query/>
                     <page-size>5</page-size>
                     <page-number>1</page-number>
@@ -233,7 +232,7 @@
 
             <!-- Contains search labels -->
             <xf:instance id="fr-search-labels-instance" xxf:exclude-result-prefixes="#all">
-                <search xmlns=""/>
+                <search/>
             </xf:instance>
 
             <xf:bind ref="instance('fr-search-instance')">
@@ -281,13 +280,13 @@
             </xf:bind>
 
             <xf:instance id="fr-bulk-edit-instance">
-                <bulk-edit xmlns="">
+                <bulk-edit>
                     <query/>
                 </bulk-edit>
             </xf:instance>
 
-            <xf:instance id="fr-bulk-edit-clear-value-item" xmlns="">
-                <_ xmlns="">
+            <xf:instance id="fr-bulk-edit-clear-value-item">
+                <_>
                     <value/>
                     <label/>
                 </_>
@@ -298,7 +297,7 @@
             </xf:action>
 
             <xf:instance id="fr-selection-instance" xxf:exclude-result-prefixes="#all">
-                <_ xmlns=""/>
+                <_/>
             </xf:instance>
 
             <!-- 1. Load form metadata -->
@@ -472,7 +471,7 @@
             <!-- Don't use `xxf:exclude-result-prefixes="#all"` as eXist search needs the `xh` and `xf` namespaces -->
             <!-- With eXist, `return-all-indexed-fields="true"` is not supported, so pass the `<query>` elements anyway -->
             <xf:instance id="fr-search-results-instance">
-                <documents xmlns="" search-total="0">
+                <documents search-total="0">
                     <!-- Content will be like this -->
                     <!--
                     <document name="" created="" last-modified="">
@@ -522,7 +521,7 @@
                 submission="fr-summary-search-submission"/>
 
             <!-- Duplicate -->
-            <xf:instance id="fr-duplicate" xmlns="" xxf:exclude-result-prefixes="#all"><document-id/></xf:instance>
+            <xf:instance id="fr-duplicate" xxf:exclude-result-prefixes="#all"><document-id/></xf:instance>
 
             <!-- Read form data for the duplicate button -->
             <!-- NOTE: It would be nice if this could be done entirely with a process. -->
@@ -548,8 +547,8 @@
         </xf:model>
         <!-- Needs to be after the first model as it makes use of `fr:app()`, etc. -->
         <xi:include href="oxf:/apps/fr/includes/versioning-model.xml"  xxi:omit-xml-base="true"/>
-    </head>
-    <body>
+    </xh:head>
+    <xh:body>
         <fr:view fluid="true">
             <fr:navbar/>
 
@@ -1151,7 +1150,7 @@
                         <xf:var name="show-created-by"       value="xxf:property(string-join(('oxf.fr.summary.show-created-by',       $app, $form), '.'))"/>
                         <xf:var name="show-last-modified-by" value="xxf:property(string-join(('oxf.fr.summary.show-last-modified-by', $app, $form), '.'))"/>
 
-                        <div class="fr-summary-table-div">
+                        <xh:div class="fr-summary-table-div">
                             <xf:var name="have-drafts" value="exists(document[@draft = 'true'])"/>
                             <xf:var name="have-read-only" value="exists(document[not(xxf:split(@operations) = ('*', 'update'))])"/>
                             <xf:var name="labels-class" value="string-join(('fr-summary-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
@@ -1496,7 +1495,7 @@
                                     </xf:group>
                                 </xh:tbody>
                             </xh:table>
-                        </div>
+                        </xh:div>
                     </xf:group>
                 </fr:body>
             </fr:row>
@@ -1657,5 +1656,5 @@
                 </xf:action>
             </fr:positive-choice>
         </fr:alert-dialog>
-    </body>
-</html>
+    </xh:body>
+</xh:html>

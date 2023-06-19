@@ -101,7 +101,7 @@ object PersistenceProxyPermissions {
 
             // Those are combined
             // For example: the data might grand only `Read` but the token might grant `Update` in addition
-             Operations.combine(operationsFromData :: otherOperations :: operationsFromTokenOpt.toList)
+            Operations.combine(operationsFromData :: otherOperations :: operationsFromTokenOpt.toList)
 
           case None =>
             // Non-existing data

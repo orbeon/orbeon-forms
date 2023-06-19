@@ -702,7 +702,14 @@
                    directly request the format we need. See https://github.com/orbeon/orbeon-forms/issues/3110 :)
 
                 frp:providerDataFormatVersion($app, $form)
-            }&amp;{frf:AccessTokenParam()}={encode-for-uri(xxf:get-request-parameter(frf:AccessTokenParam()))}"
+            }{
+                let $token-param := xxf:get-request-parameter(frf:AccessTokenParam())
+                return
+                    if (xxf:non-blank($token-param)) then
+                        concat('&amp;', frf:AccessTokenParam(), '=', encode-for-uri($token-param))
+                    else
+                        ''
+            }"
         replace="instance"
         xxf:instance="fr-form-instance">
 

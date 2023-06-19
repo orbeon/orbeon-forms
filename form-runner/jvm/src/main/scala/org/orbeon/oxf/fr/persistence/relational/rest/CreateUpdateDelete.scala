@@ -23,12 +23,12 @@ import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}
 import org.orbeon.oxf.fr.{FormRunner, Names}
-import org.orbeon.oxf.http.{EmptyInputStream, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.http.{EmptyInputStream, Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.{PipelineContext, TransformerXMLReceiver}
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.{NetUtils, Whitespace, XPath}
+import org.orbeon.oxf.util.{DateUtils, NetUtils, Whitespace, XPath}
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
@@ -245,7 +245,7 @@ trait CreateUpdateDelete {
     existingRowOpt: Option[Row],
     delete        : Boolean,
     versionToSet  : Int
-  ): Unit = {
+  ):Option[Timestamp] = {
 
     val table = SqlSupport.tableName(req)
 
@@ -369,11 +369,13 @@ trait CreateUpdateDelete {
     }
 
     val deletingDataDraft = delete && req.dataPart.exists(_.isDraft)
-    if (! deletingDataDraft) {
+    val lastModifiedOpt = ! deletingDataDraft option {
 
       // Do insert, unless we're deleting draft data
 
-      val includedCols = insertCols(req, existingRowOpt, delete, versionToSet, currentUserOrganization(connection, req))
+      val currentTimestamp = new Timestamp(System.currentTimeMillis())
+
+      val includedCols = insertCols(req, existingRowOpt, delete, versionToSet, currentTimestamp, currentUserOrganization(connection, req))
       val colNames     = includedCols.map(_.name).mkString(", ")
       val colValues    =
         includedCols
@@ -398,7 +400,11 @@ trait CreateUpdateDelete {
 
         ps.executeUpdate()
       }
+
+      currentTimestamp
     }
+
+    lastModifiedOpt
   }
 
   def change(req: CrudRequest, delete: Boolean)(implicit httpResponse: ExternalContext.Response): Unit = {
@@ -430,7 +436,7 @@ trait CreateUpdateDelete {
     RelationalUtils.withConnection { connection =>
 
       // Update database
-      store(connection, req, existingRowOpt, delete, versionToSet)
+      val lastModifiedOpt = store(connection, req, existingRowOpt, delete, versionToSet)
 
       debug("CRUD: database updated, before commit", List("version" -> versionToSet.toString))
 
@@ -472,6 +478,20 @@ trait CreateUpdateDelete {
 
       // Inform caller of the form definition version used
       httpResponse.setHeader(OrbeonFormDefinitionVersion, versionToSet.toString)
+      // Inform caller of the last modified time of the resource
+      //
+      // This is compatible with RFC7231, see sections 6.3.2, 6.3.5, and 7.2. But note that here we return the last
+      // known modified time associated with the resource, which for a `PUT` is definitely correct, however in the case
+      // of a `DELETE` this means the date the resource was *marked* as deleted. We could argue that this should return
+      // the last modified time of the resource when it was extant. However, for our callers (purge API), it is
+      // necessary to know the last modified time of the resource when it was marked as deleted, so we return that.
+      //
+      // This is currently `None` for a force `DELETE`, but we could also try to return the information in that case
+      // although we don't have a use for it at the moment.
+      lastModifiedOpt.foreach { lastModified =>
+        httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(lastModified.toInstant))
+        httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(lastModified.getTime))
+      }
 
       // "If the target resource does not have a current representation and the PUT successfully creates one, then the
       // origin server MUST inform the user agent by sending a 201 (Created) response. If the target resource does have

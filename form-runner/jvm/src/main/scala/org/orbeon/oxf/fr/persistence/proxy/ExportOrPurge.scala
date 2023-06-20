@@ -405,10 +405,10 @@ trait ExportOrPurge {
         val isFirst = index == 0
 
 
-        // The first item is the current data
-        // TODO: This will change once we can get the history of deleted data.
+        // The first item is the current data, unless data is deleted
+        // NOTE: We don't yet support deleted data in the history API.
         val dataProcessed =
-          if (! (isFirst && dataRevisionHistory == DataRevisionHistoryAdt.Only))
+          if (! (isFirst && ! dataHistoryDetails.isDeleted && dataRevisionHistory == DataRevisionHistoryAdt.Only))
             processFormData(
               ctx,
               appFormVersion,
@@ -417,7 +417,7 @@ trait ExportOrPurge {
               attachmentPaths,
               dateRangeGtOpt,
               dateRangeLtOpt,
-              forCurrentData = isFirst
+              forCurrentData = isFirst && ! dataHistoryDetails.isDeleted
             ).get // can throw
           else
             false

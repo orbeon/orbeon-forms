@@ -13,7 +13,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.{Constants, XFormsId}
 
 
-trait FormRunnerDataHistory {
+trait FormRunnerRevisionHistory {
 
   //@XPathFunction
   def compareRfc1123AndIsoDates(rfc1123: String, iso: String): Boolean =

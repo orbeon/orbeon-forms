@@ -11,4 +11,4 @@ object FormRunner
      with FormRunnerPublish
      with FormRunnerEncodeDecode
      with FormRunnerComponents
-     with FormRunnerDataHistory
+     with FormRunnerRevisionHistory

@@ -163,7 +163,8 @@ body.orbeon { background-color: @frBackground }
         padding: 4px 6px;
     }
 
-    .xforms-trigger button {
+    .xforms-trigger button,
+    [role = button][tabindex = '0'] {
         .focusHighlightGroup();
     }
 

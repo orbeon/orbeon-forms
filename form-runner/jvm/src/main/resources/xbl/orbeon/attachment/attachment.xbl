@@ -400,11 +400,12 @@
                         <xf:output
                             value="
                                 xxf:format-message(
-                                    xxf:r(
-                                        if ($multiple) then 'drag-multiple' else 'drag-single'),
-                                        (
-                                            '&lt;a href=&quot;javascript:void(0)&quot; class=&quot;fr-attachment-select&quot; role=&quot;button&quot; tabindex=&quot;0&quot;&gt;',
-                                            '&lt;/a&gt;'))"
+                                    xxf:r(if ($multiple) then 'drag-multiple' else 'drag-single'),
+                                    (
+                                        '&lt;a href=&quot;javascript:void(0)&quot; class=&quot;fr-attachment-select&quot; role=&quot;button&quot;&gt;',
+                                        '&lt;/a&gt;'
+                                    )
+                                )"
                             mediatype="text/html"/>
                     </xh:div>
                     <xf:upload

@@ -239,6 +239,7 @@ trait CreateUpdateDelete {
       .flatMap(_.defaultOrganization)
       .map(OrganizationSupport.createIfNecessary(connection, req.provider, _))
 
+  // TODO: consider splitting into `deleteDrafts()` and `store()`
   private def store(
     connection    : Connection,
     req           : CrudRequest,

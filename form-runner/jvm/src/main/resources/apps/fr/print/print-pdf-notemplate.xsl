@@ -209,14 +209,30 @@
     <xsl:function name="fr:bookmarks">
         <xsl:param name="element"/>
 
-        <xsl:variable name="header" select="$element/*[matches(local-name(), 'h[1-9]')][exists(.//span[@class = 'btn-link'])]"/>
+        <xsl:variable
+            name="headers"
+            select="
+                $element/*[
+                    matches(local-name(), 'h[1-9]')
+                ][
+                    p:has-class('fr-section-iteration-title') or
+                    exists(.//span[@class = 'btn-link'])
+                ]"/>
 
         <xsl:choose>
-            <xsl:when test="exists($header)">
-                <xsl:variable name="button" select="$header//span[@class = 'btn-link']"/>
-                <bookmark name="{$button}" href="#{$button/@id}">
-                    <xsl:copy-of select="$element/*/fr:bookmarks(.)"/>
-                </bookmark>
+            <xsl:when test="exists($headers)">
+                <xsl:for-each select="$headers">
+                    <xsl:variable
+                        name="title-elem"
+                        select="
+                            (
+                                .[p:has-class('fr-section-iteration-title')]//*[p:has-class('xforms-output-output')],
+                                .//span[@class = 'btn-link']
+                            )[1]"/>
+                    <bookmark name="{$title-elem}" href="#{$title-elem/@id}">
+                        <xsl:copy-of select="$element/*/fr:bookmarks(.)"/>
+                    </bookmark>
+                </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:copy-of select="$element/*/fr:bookmarks(.)"/>

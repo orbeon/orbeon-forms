@@ -78,10 +78,9 @@ trait ExportOrPurge {
     }
   }
 
-  case class WithOptional[T, U](_1: T, _2: Option[U])
-
   case class MatchSpec(
-    appFormDoc     : String WithOptional (String WithOptional String),
+    app         : String,
+    formDoc     : Option[(String, Option[String])],
     versionParamOpt: Option[FormVersionAdt]
   )
 
@@ -93,13 +92,13 @@ trait ExportOrPurge {
         case s: String =>
           s.split(AppFormVersionParamSeparator) match { // use Java `split()` as we want blank parts to be kept
             case Array(NonAllBlank(app)) =>
-              MatchSpec(WithOptional(app, None), None)
+              MatchSpec(app, None, None)
             case Array(NonAllBlank(app), NonAllBlank(form)) =>
-              MatchSpec(WithOptional(app, WithOptional(form, None).some), None)
+              MatchSpec(app, (form, None).some, None)
             case Array(NonAllBlank(app), NonAllBlank(form), version) =>
-              MatchSpec(WithOptional(app, WithOptional(form, None).some), FormVersionAdt.fromStringOptOrThrow(version.trimAllToOpt))
+              MatchSpec(app, (form, None).some, FormVersionAdt.fromStringOptOrThrow(version.trimAllToOpt))
             case Array(NonAllBlank(app), NonAllBlank(form), version, NonAllBlank(documentId)) =>
-              MatchSpec(WithOptional(app, WithOptional(form, documentId.some).some), FormVersionAdt.fromStringOptOrThrow(version.trimAllToOpt))
+              MatchSpec(app, (form, documentId.some).some, FormVersionAdt.fromStringOptOrThrow(version.trimAllToOpt))
             case _ =>
               throw HttpStatusCodeException(StatusCode.BadRequest)
           }
@@ -120,7 +119,8 @@ trait ExportOrPurge {
     val mainMatchSpecOpt =
       appOpt.map { app =>
         MatchSpec(
-          appFormDoc      = WithOptional(app, formOpt.map(form => WithOptional(form, documentIdOpt))),
+          app             = app,
+          formDoc         = formOpt.map((_, documentIdOpt)),
           versionParamOpt = versionParamOpt
         )
       }
@@ -212,7 +212,7 @@ trait ExportOrPurge {
       }
     }
 
-  def exportWithMatch(
+  def processWithMatch(
     ctx                : Context,
     incomingHeaders    : ju.Map[String, Array[String]],
     matchOpt           : Option[MatchSpec],
@@ -224,11 +224,11 @@ trait ExportOrPurge {
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit =
     matchOpt match {
-      case None | Some(MatchSpec(WithOptional(_, None), _)) | Some(MatchSpec(WithOptional(_, Some(WithOptional(_, None))), _)) =>
+      case None | Some(MatchSpec(_, None, _)) | Some(MatchSpec(_, Some((_, None)), _)) =>
         // Export a specific app/form
 
-        val appOpt          = matchOpt.map(_.appFormDoc._1)
-        val formOpt         = matchOpt.flatMap(_.appFormDoc._2.map(_._1))
+        val appOpt          = matchOpt.map(_.app)
+        val formOpt         = matchOpt.flatMap(_.formDoc.map(_._1))
         val versionParamOpt = matchOpt.flatMap(_.versionParamOpt)
 
         val versionParam = versionParamOpt.getOrElse(FormVersionAdt.Latest)
@@ -251,7 +251,7 @@ trait ExportOrPurge {
           dateRangeLtOpt     = dateRangeLtOpt
         )
 
-      case Some(MatchSpec(WithOptional(app, Some(WithOptional(form, Some(documentId)))), versionParamOpt)) =>
+      case Some(MatchSpec(app, Some((form, Some(documentId))), versionParamOpt)) =>
         // Export a specific app/form/documentId
 
         val formVersion = {

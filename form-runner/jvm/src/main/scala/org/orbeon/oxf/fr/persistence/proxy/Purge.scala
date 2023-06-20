@@ -80,10 +80,10 @@ object Purge extends ExportOrPurge {
     val ctx = PurgeContext()
     matchesOpt match {
       case None =>
-        exportWithMatch(ctx, incomingHeaders, None, Set(FormOrData.Data), dataRevisionHistory, dateRangeGtOpt, dateRangeLtOpt)
+        processWithMatch(ctx, incomingHeaders, None, Set(FormOrData.Data), dataRevisionHistory, dateRangeGtOpt, dateRangeLtOpt)
       case Some(matches) =>
         matches.iterator.foreach { filter =>
-          exportWithMatch(ctx, incomingHeaders, filter.some, Set(FormOrData.Data), dataRevisionHistory, dateRangeGtOpt, dateRangeLtOpt)
+          processWithMatch(ctx, incomingHeaders, filter.some, Set(FormOrData.Data), dataRevisionHistory, dateRangeGtOpt, dateRangeLtOpt)
         }
     }
   }

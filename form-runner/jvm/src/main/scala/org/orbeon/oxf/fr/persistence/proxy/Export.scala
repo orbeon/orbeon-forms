@@ -136,10 +136,10 @@ object Export extends ExportOrPurge {
       response.setContentType(ContentTypes.ZipContentType)
       matchesOpt match {
         case None =>
-          exportWithMatch(zos, incomingHeaders, None, formOrDataSet, dataRevisionHistory, dateRangeGtOpt, dateRangeLtOpt)
+          processWithMatch(zos, incomingHeaders, None, formOrDataSet, dataRevisionHistory, dateRangeGtOpt, dateRangeLtOpt)
         case Some(matches) =>
           matches.iterator.foreach { filter =>
-            exportWithMatch(zos, incomingHeaders, filter.some, formOrDataSet, dataRevisionHistory, dateRangeGtOpt, dateRangeLtOpt)
+            processWithMatch(zos, incomingHeaders, filter.some, formOrDataSet, dataRevisionHistory, dateRangeGtOpt, dateRangeLtOpt)
           }
       }
     }

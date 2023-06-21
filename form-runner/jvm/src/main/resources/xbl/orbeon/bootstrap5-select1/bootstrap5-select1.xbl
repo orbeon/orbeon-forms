@@ -29,6 +29,7 @@
         <xbl:template>
             <!-- Hidden select to hold itemset -->
             <xf:var name="binding" value="xxf:binding('fr-bootstrap-select1-binding')"/>
+            <xf:var name="dropdown-align-attribute" xbl:attr="xbl:text=fr:dropdown-align"/>
 
             <xf:select ref="$binding" appearance="xxf:internal" id="hidden-select">
                 <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
@@ -39,7 +40,8 @@
                 <xh:a id="menu-button" href="#" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
                     <xf:output value="$items[value/string() = $binding]/label/string()"/>
                 </xh:a>
-                <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="menu-button">
+                <xh:ul class="dropdown-menu{ if ($dropdown-align-attribute = 'right') then ' dropdown-menu-end' else ''}"
+                       role="menu" aria-labelledBy="menu-button">
                     <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
                          repeat nodeset recalculations -->
                     <xf:repeat ref="$items/value/string()">

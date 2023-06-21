@@ -543,7 +543,7 @@
                     <xh:div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <xh:ul class="navbar-nav {if ($bs5) then 'ms-auto mt-2 mt-lg-0' else 'me-auto mb-2 mb-lg-0'}">
                             <xh:li class="nav-item px-0 ps-lg-3 py-1 py-lg-1">
-                                <fr:language-selector appearance="bootstrap5"/>
+                                <fr:language-selector appearance="bootstrap5" fr:dropdown-align="right"/>
                             </xh:li>
                             <xh:li>
                                 <fr:status-icons/>
@@ -731,7 +731,7 @@
                             ]
                         )
                     ]">
-                <xf:select1 ref="$fr-selector-lang" appearance="bootstrap" id="fr-language-selector-select">
+                <xf:select1 ref="$fr-selector-lang" appearance="bootstrap" id="fr-language-selector-select" fr:dropdown-align="right">
                     <xsl:if test="@appearance">
                         <xsl:attribute name="appearance" select="@appearance"/>
                     </xsl:if>

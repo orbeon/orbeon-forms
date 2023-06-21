@@ -169,7 +169,7 @@
 
                             <!-- Language selector -->
                             <xh:div class="fr-language-choice">
-                                <xf:select1 id="fb-resources-language-select" ref="$fb-lang" appearance="bootstrap">
+                                <xf:select1 id="fb-resources-language-select" ref="$fb-lang" appearance="bootstrap" fr:dropdown-align="right">
                                     <xf:itemset ref="$resources/resource">
                                         <xf:label value="xxf:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/@native-name"/>
                                         <xf:value ref="@xml:lang"/>

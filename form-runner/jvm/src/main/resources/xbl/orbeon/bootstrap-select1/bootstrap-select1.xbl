@@ -29,6 +29,7 @@
         <xbl:template>
             <!-- Hidden select to hold itemset -->
             <xf:var name="binding" value="xxf:binding('fr-bootstrap-select1-binding')"/>
+            <xf:var name="dropdown-align-attribute" xbl:attr="xbl:text=fr:dropdown-align"/>
 
             <xf:select ref="$binding" appearance="xxf:internal" id="hidden-select">
                 <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
@@ -38,7 +39,7 @@
             <!-- NOTE: We shouldn't have .nav > .dropdown here, as it's a navbar feature, but .dropdown-toggle must be
                  directly nested per the Bootstrap styles. Would need to be changed to make the Bootstrap dropdown usable
                  outside of the navbar. -->
-            <xh:ul class="nav">
+            <xh:ul class="nav{ if ($dropdown-align-attribute = 'right') then ' pull-right' else ''}">
                 <xh:li class="dropdown">
                     <xh:a id="menu-button" href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <xf:output value="$items[value/string() = $binding]/label/string()"/>

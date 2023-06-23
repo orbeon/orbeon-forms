@@ -283,7 +283,6 @@ def testJavaOptions(buildBaseDirectory: File) =
     // Some code uses the default time zone, which might different on different system, so we need to set it explicitly
     "-Duser.timezone=America/Los_Angeles",
     "-Doxf.resources.common.min-reload-interval=50",
-  //  "-Djava.io.tmpdir=build/temp/test",
     // Getting a JDK error, per http://stackoverflow.com/a/13575810/5295
     "-Djava.util.Arrays.useLegacyMergeSort=true"
   ) ++

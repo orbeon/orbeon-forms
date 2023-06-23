@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.state.XFormsDocumentCache
 import scala.collection.compat._
 
 object FormRunnerSupport {
-  private val FindUUIDInHTMLBodyRE = """(?s).+name="\$uuid"\s+value="([^"]+)".+""".r
+  private val FindUUIDInHTMLBodyRE = """<script src="\/orbeon\/xforms-server\/form\/dynamic\/([^.]+)\.js"""".r
 }
 
 trait FormRunnerSupport extends DocumentTestBase {

@@ -250,6 +250,7 @@
             { "full": "/ops/nprogress-0.2.0/nprogress.js",                                   "min": true  },
             { "full": "/ops/bowser/bowser.js",                                               "min": true  },
             { "full": "/ops/mousetrap/mousetrap.min.js",                                     "min": false },
+            { "full": "/ops/fetch/fetch.umd.js",                                             "min": false },
 
             { "full": "/ops/yui/yahoo/yahoo.js",                                             "min": true  },
             { "full": "/ops/yui/event/event.js",                                             "min": true  },

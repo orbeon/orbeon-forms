@@ -22,7 +22,7 @@
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
+    <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
     <xsl:variable name="app"                    select="doc('input:parameters')/*/app/string()"/>
     <xsl:variable name="form"                   select="doc('input:parameters')/*/form/string()"/>
@@ -67,16 +67,16 @@
         retrieved by oxf:xhtml-to-pdf doesn't know about the namespace. Not doing so, the CSS won't apply
         and also this can cause a ClassCastException in Flying Saucer.
      -->
-    <xsl:template match="@id | @for" mode="#all">
+    <xsl:template match="@id | @for">
         <xsl:attribute name="{name()}" select="substring-after(., doc('input:request')/*/container-namespace)"/>
     </xsl:template>
 
     <!-- While we are at it filter out scripts as they won't be used -->
-    <xsl:template match="*:script | *:noscript" mode="#all"/>
+    <xsl:template match="*:script | *:noscript"/>
 
-    <xsl:template match="xh:html/xh:head" mode="#all">
+    <xsl:template match="xh:html/xh:head">
         <head>
-            <xsl:apply-templates select="@* | node()" mode="#current"/>
+            <xsl:apply-templates select="@* | node()"/>
             <!-- https://github.com/orbeon/orbeon-forms/issues/4206 -->
             <style type="text/css">
                 @page {
@@ -188,57 +188,51 @@
             </xsl:if>
 
             <bookmarks>
-
                 <xsl:variable name="processed-body-content">
-                    <xsl:apply-templates select="../*:body/*"/>
+                    <xsl:apply-templates select="/xh:html/*:body/*"/>
                 </xsl:variable>
-
-                <xsl:copy-of select="fr:bookmarks($processed-body-content)"/>
+                <xsl:apply-templates select="$processed-body-content" mode="bookmarks"/>
             </bookmarks>
         </head>
     </xsl:template>
 
+    <!-- Produce nested `<bookmark>` elements for Open HTML to PDF, based on `h1`, `h2`… -->
+    <xsl:template
+        mode="bookmarks"
+        priority="2"
+        match="
+            *[
+                *[
+                    position() = 1 and
+                    matches(local-name(), 'h[1-9]') and
+                    (
+                        p:has-class('fr-section-iteration-title') or
+                        exists(.//span[@class = 'btn-link'])
+                    )
+                ]
+            ]">
+        <xsl:variable
+            name="title-elem"
+            select="
+                (
+                    *[1][p:has-class('fr-section-iteration-title')]//*[p:has-class('xforms-output-output')],
+                    *[1]//span[@class = 'btn-link']
+                )[1]"/>
+        <bookmark name="{$title-elem}" href="#{$title-elem/@id}">
+            <xsl:apply-templates mode="bookmarks" select="*"/>
+        </bookmark>
+
+    </xsl:template>
+    <xsl:template mode="bookmarks" match="*" priority="1">
+        <xsl:apply-templates mode="bookmarks" select="*"/>
+    </xsl:template>
+
     <!-- Buttons in `h1`, etc. take space and we don't need them so replace them -->
-    <xsl:template match="*:button" mode="#all">
+    <xsl:template match="*:button">
         <span>
             <xsl:apply-templates select="@* | node()"/>
         </span>
     </xsl:template>
-
-    <!-- Produce nested `<bookmark>` elements for Open HTML to PDF, based on `h1`, `h2`… -->
-    <xsl:function name="fr:bookmarks">
-        <xsl:param name="element"/>
-
-        <xsl:variable
-            name="headers"
-            select="
-                $element/*[
-                    matches(local-name(), 'h[1-9]')
-                ][
-                    p:has-class('fr-section-iteration-title') or
-                    exists(.//span[@class = 'btn-link'])
-                ]"/>
-
-        <xsl:choose>
-            <xsl:when test="exists($headers)">
-                <xsl:for-each select="$headers">
-                    <xsl:variable
-                        name="title-elem"
-                        select="
-                            (
-                                .[p:has-class('fr-section-iteration-title')]//*[p:has-class('xforms-output-output')],
-                                .//span[@class = 'btn-link']
-                            )[1]"/>
-                    <bookmark name="{$title-elem}" href="#{$title-elem/@id}">
-                        <xsl:copy-of select="$element/*/fr:bookmarks(.)"/>
-                    </bookmark>
-                </xsl:for-each>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:copy-of select="$element/*/fr:bookmarks(.)"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:function>
 
     <!-- https://github.com/orbeon/orbeon-forms/issues/3096 -->
     <xsl:template
@@ -250,7 +244,7 @@
                 empty(following-sibling::*)                       and
                 p:is-blank(following-sibling::text())
             ]"
-        mode="#all"/>
+       />
 
     <!--
         Hyperlinks, see:
@@ -260,7 +254,7 @@
         https://github.com/orbeon/orbeon-forms/issues/1515
         https://github.com/orbeon/orbeon-forms/issues/264
      -->
-    <xsl:template match="*:a" mode="#all">
+    <xsl:template match="*:a">
         <xsl:element name="{local-name()}">
             <!--
                 Filter all attributes specific to <a> as per HTML 5 except @href unless excluded.
@@ -274,7 +268,7 @@
              -->
             <xsl:apply-templates
                 select="@* except (@href[not($hyperlinks)], @shape, @target, @download, @ping, @rel, @hreflang, @type) | node()"
-                mode="#current"/>
+               />
         </xsl:element>
     </xsl:template>
 
@@ -290,13 +284,13 @@
             *:span[
                 p:has-class('xforms-field')
             ]"
-        mode="#all">
+       >
 
         <xsl:element name="{local-name()}">
 
             <xsl:variable name="new-content" select="saxon:parse(frf:hyperlinkURLs(string(), $hyperlinks))"/>
             <xsl:variable name="is-long-content" select="string-length($new-content) > $long-content-threshold"/>
-            <xsl:apply-templates select="@* except @class" mode="#current"/>
+            <xsl:apply-templates select="@* except @class"/>
             <xsl:if test="$is-long-content or exists(@class)">
                 <xsl:attribute name="class" select="
                     string-join(
@@ -307,7 +301,7 @@
                         ' '
                     )"/>
             </xsl:if>
-            <xsl:apply-templates select="$new-content" mode="#current"/>
+            <xsl:apply-templates select="$new-content"/>
 
         </xsl:element>
     </xsl:template>
@@ -315,9 +309,9 @@
     <!-- Add the class `fr-grid-tr-with-long-content` on table rows, then used in CSS t0 avoid breaking the content of
          table rows that don't contain long content (we'll be able to avoid adding this class when we upgrade
          to a PDF rendered that supports `:has()`) -->
-    <xsl:template match="*:tr[p:has-class('fr-grid-tr', .)]" mode="#all">
+    <xsl:template match="*:tr[p:has-class('fr-grid-tr', .)]">
         <xsl:variable name="applied-content">
-            <xsl:apply-templates select="node()" mode="#current"/>
+            <xsl:apply-templates select="node()"/>
         </xsl:variable>
         <xsl:variable
             name="has-long-content"
@@ -342,9 +336,9 @@
             *:span[
                 p:has-class('xforms-field') and empty(*) and normalize-space() = ''
             ]"
-        mode="#all">
+       >
          <xsl:element name="{local-name()}">
-             <xsl:apply-templates select="@*" mode="#current"/>
+             <xsl:apply-templates select="@*"/>
              <xsl:text>&#160;</xsl:text>
          </xsl:element>
      </xsl:template>
@@ -353,24 +347,23 @@
     <!-- See https://github.com/orbeon/orbeon-forms/issues/5051 -->
     <xsl:template
         match="*:div[p:has-class('xbl-fr-grid') and $empty-grids-ids = generate-id()]"
-        mode="#all"
         priority="100"/>
 
     <!-- Start grid content -->
-    <xsl:template match="*:div[p:has-class('xbl-fr-grid')]" mode="#all">
+    <xsl:template match="*:div[p:has-class('xbl-fr-grid')]">
         <xsl:element name="{local-name()}">
-            <xsl:apply-templates select="@* | node()" mode="in-grid"/>
+            <xsl:apply-templates select="@* | node()"/>
         </xsl:element>
     </xsl:template>
 
     <!-- These are unneeded and can make iText choke (values too long) -->
-    <xsl:template match="*:input[@type = 'hidden']" mode="#all"/>
+    <xsl:template match="*:input[@type = 'hidden']"/>
 
     <!-- Remove xforms-initially-hidden class on the form, normally removed by the script -->
-    <xsl:template match="*:form" mode="#all">
+    <xsl:template match="*:form">
         <xsl:element name="{local-name()}">
             <xsl:attribute name="class" select="string-join(p:classes()[. != 'xforms-initially-hidden'], ' ')"/>
-            <xsl:apply-templates select="@* except @class | node()" mode="#current"/>
+            <xsl:apply-templates select="@* except @class | node()"/>
         </xsl:element>
     </xsl:template>
 
@@ -381,7 +374,7 @@
                 empty(*)                    and
                 p:is-blank(.)
             ]"
-        mode="#all"/>
+       />
 
     <!-- Not a big deal but this is extra unneeded markup -->
     <xsl:template
@@ -390,7 +383,7 @@
                 p:has-class('xforms-case-selected') and
                 empty(*)                            and
                 p:is-blank(.)]"
-        mode="#all"/>
+       />
 
     <!-- https://github.com/orbeon/orbeon-forms/issues/4596 -->
     <xsl:template
@@ -405,44 +398,44 @@
                 p:has-class('xforms-error-dialogs')              or
                 p:has-class('xforms-help-panel')                 or
                 p:has-class('xforms-template')]"
-        mode="#all"/>
+       />
 
     <!-- We could remove the nested `div` but it doesn't seem to make a difference for page breaks -->
-    <!--<xsl:template match="*[p:has-class('xbl-fr-section')]/*:div[1][p:has-class('xforms-group')]" mode="#all">-->
-        <!--<xsl:apply-templates select="node()" mode="#current"/>-->
+    <!--<xsl:template match="*[p:has-class('xbl-fr-section')]/*:div[1][p:has-class('xforms-group')]">-->
+        <!--<xsl:apply-templates select="node()"/>-->
     <!--</xsl:template>-->
 
     <!-- We could remove grouping switches but it doesn't seem to make a difference for page breaks -->
-    <!--<xsl:template match="*[p:has-class('xforms-switch')]" mode="#all">-->
-        <!--<xsl:apply-templates select="node()" mode="#current"/>-->
+    <!--<xsl:template match="*[p:has-class('xforms-switch')]">-->
+        <!--<xsl:apply-templates select="node()"/>-->
     <!--</xsl:template>-->
 
     <!-- Enabling this breaks the `page-break` CSS rules -->
-    <!--<xsl:template match="*:span[p:has-class('xforms-case-selected') and empty(node())]" mode="#all"/>-->
+    <!--<xsl:template match="*:span[p:has-class('xforms-case-selected') and empty(node())]"/>-->
 
     <!-- Remove all prefixes because Flying Saucer doesn't like them -->
-    <xsl:template match="*" mode="#all">
+    <xsl:template match="*">
         <xsl:element name="{local-name()}">
-            <xsl:apply-templates select="@* | node()" mode="#current"/>
+            <xsl:apply-templates select="@* | node()"/>
         </xsl:element>
     </xsl:template>
 
     <!-- Scope color mode CSS class -->
-    <xsl:template match="*:div[@id = 'fr-view']" mode="#all">
+    <xsl:template match="*:div[@id = 'fr-view']">
         <xsl:copy>
             <xsl:attribute name="class" select="concat(@class, ' fr-pdf-color-mode-', $color-mode)"/>
-            <xsl:apply-templates select="(@* except @class) | node()" mode="#current"/>
+            <xsl:apply-templates select="(@* except @class) | node()"/>
         </xsl:copy>
     </xsl:template>
 
     <!-- Make a copy of useful information so it can be moved, via CSS, to headers and footers -->
     <!-- Since #5576, this is no longer the "correct" way of doing things -->
-    <xsl:template match="*:body" mode="#all">
+    <xsl:template match="*:body">
         <xsl:element name="{local-name()}">
-            <xsl:apply-templates select="@*" mode="#current"/>
+            <xsl:apply-templates select="@*"/>
             <div class="fr-header-title xforms-hidden"><div><xsl:value-of select="$title"/></div></div>
             <div class="fr-footer-title xforms-hidden"><div><xsl:value-of select="$title"/></div></div>
-            <xsl:apply-templates select="node()" mode="#current"/>
+            <xsl:apply-templates select="node()"/>
         </xsl:element>
     </xsl:template>
 

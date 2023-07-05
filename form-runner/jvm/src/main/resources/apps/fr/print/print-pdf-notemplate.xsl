@@ -188,43 +188,46 @@
             </xsl:if>
 
             <bookmarks>
-                <xsl:variable name="processed-body-content">
-                    <xsl:apply-templates select="/xh:html/*:body/*"/>
-                </xsl:variable>
                 <xsl:apply-templates select="$processed-body-content" mode="bookmarks"/>
             </bookmarks>
         </head>
     </xsl:template>
 
     <!-- Produce nested `<bookmark>` elements for Open HTML to PDF, based on `h1`, `h2`… -->
-    <xsl:template
-        mode="bookmarks"
-        priority="2"
-        match="
-            *[
-                *[
-                    position() = 1 and
-                    matches(local-name(), 'h[1-9]') and
-                    (
-                        p:has-class('fr-section-iteration-title') or
-                        exists(.//span[@class = 'btn-link'])
-                    )
-                ]
-            ]">
-        <xsl:variable
-            name="title-elem"
-            select="
+    <xsl:variable name="processed-body-content">
+        <xsl:apply-templates select="/xh:html/*:body/*"/>
+    </xsl:variable>
+    <xsl:variable
+        name="headers"
+        select="
+            $processed-body-content//*[
+                matches(local-name(), 'h[1-9]') and
                 (
-                    *[1][p:has-class('fr-section-iteration-title')]//*[p:has-class('xforms-output-output')],
-                    *[1]//span[@class = 'btn-link']
-                )[1]"/>
-        <bookmark name="{$title-elem}" href="#{$title-elem/@id}">
-            <xsl:apply-templates mode="bookmarks" select="*"/>
-        </bookmark>
+                    p:has-class('fr-section-iteration-title') or
+                    exists(.//span[@class = 'btn-link'])
+                )
+            ]/generate-id()"/>
 
+    <xsl:template mode="bookmarks" priority="2" match="*[generate-id() = $headers]">
+        <xsl:variable name="title-elem" select="
+            (
+                .[p:has-class('fr-section-iteration-title')]//*[p:has-class('xforms-output-output')],
+                .//span[@class = 'btn-link']
+            )[1]"/>
+        <xsl:variable name="next-header-opt" select="following-sibling::*[generate-id() = $headers][1]"/>
+        <xsl:variable name="this-header-content" select="
+            if (empty($next-header-opt))
+            then following-sibling::*
+            else following-sibling::* intersect $next-header-opt/preceding-sibling::*"/>
+        <bookmark name="{$title-elem}" href="#{$title-elem/@id}">
+            <xsl:apply-templates mode="bookmarks" select="$this-header-content/*"/>
+        </bookmark>
     </xsl:template>
-    <xsl:template mode="bookmarks" match="*" priority="1">
-        <xsl:apply-templates mode="bookmarks" select="*"/>
+
+    <xsl:template mode="bookmarks" priority="1" match="*">
+        <xsl:if test="not(../*/generate-id() = $headers)">
+            <xsl:apply-templates mode="bookmarks" select="*"/>
+        </xsl:if>
     </xsl:template>
 
     <!-- Buttons in `h1`, etc. take space and we don't need them so replace them -->

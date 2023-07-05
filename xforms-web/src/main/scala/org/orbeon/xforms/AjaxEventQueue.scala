@@ -66,7 +66,11 @@ trait AjaxEventQueue[EventType] {
 
             if (canSendEvents) {
               val events = state.events
-              state = emptyState
+              // We're sending the events, so clear the queue, but keep the event times
+              state = emptyState.copy(
+                newestEventTime = state.newestEventTime,
+                oldestEventTime = state.oldestEventTime
+              )
               NonEmptyList.fromList(events) foreach eventsReady
             } else {
               // We expect that once `canSendEvents` becomes true again, `updateQueueSchedule()`
@@ -103,7 +107,7 @@ trait AjaxEventQueue[EventType] {
       schedule         : Option[EventSchedule]
     )
 
-    def emptyState: State =
+    val emptyState: State =
       State(
         events            = Nil,
         hasNonIncremental = false,
@@ -112,7 +116,11 @@ trait AjaxEventQueue[EventType] {
         schedule          = None
       )
 
-    var state: State = emptyState
+    var state: State = emptyState.copy(
+      // Consider the page load "as an event", so we have an initial "marker" for the session heartbeat
+      oldestEventTime = System.currentTimeMillis(),
+      newestEventTime = System.currentTimeMillis()
+    )
 
     def addEvent(event: EventType, incremental: Boolean): Unit = {
       val currentTime = System.currentTimeMillis()

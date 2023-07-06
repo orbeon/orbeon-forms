@@ -15,11 +15,14 @@ package org.orbeon.xforms
 
 
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.externalcontext.ExternalContext.Scope.Session
 import org.orbeon.xforms
 import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom.html
 
 import scala.scalajs.js
+import scala.collection.mutable
+import scala.scalajs.js.Date
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
@@ -130,11 +133,23 @@ object Page {
     }
   }
 
+  type AboutToExpireListener = AboutToExpire => Unit
+  case class AboutToExpire(
+    sessionHeartbeatEnabled        : Boolean,
+    approxSessionExpiredTimeMillis : Long
+  )
+
+  def addSessionAboutToExpireListener   (listener: AboutToExpireListener): Unit = sessionAboutToExpireListeners += listener
+  def removeSessionAboutToExpireListener(listener: AboutToExpireListener): Unit = sessionAboutToExpireListeners -= listener
+  def fireSessionAboutToExpire(aboutToExpire: AboutToExpire)             : Unit = sessionAboutToExpireListeners.foreach(_(aboutToExpire))
+
   // NOTE: This mechanism is deprecated by XBL and only used for the native `Upload` as of 2019-05-13.
   def registerControlConstructor(controlConstructor: () => Upload, predicate: html.Element => Boolean): Unit =
     controlConstructors ::= ConstructorPredicate(controlConstructor, predicate)
 
   private object Private {
+
+    val sessionAboutToExpireListeners: mutable.ListBuffer[AboutToExpireListener] = mutable.ListBuffer.empty
 
     case class ConstructorPredicate(controlConstructor: () => Upload, predicate: html.Element => Boolean)
 

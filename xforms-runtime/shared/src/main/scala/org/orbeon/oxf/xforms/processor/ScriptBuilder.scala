@@ -87,9 +87,9 @@ object ScriptBuilder {
   }
 
   private def findConfigurationProperties(
-    containingDocument : XFormsContainingDocument,
-    versionedResources : Boolean,
-    heartbeatDelay     : Long
+    containingDocument       : XFormsContainingDocument,
+    versionedResources       : Boolean,
+    maxInactiveIntervalMillis : Long
   ): ConfigurationProperties = {
 
     val staticState = containingDocument.staticState
@@ -104,8 +104,8 @@ object ScriptBuilder {
       versionedResources flatOption CoreCrossPlatformSupport.getApplicationResourceVersion
 
     ConfigurationProperties(
-      sessionHeartbeat                 = staticState.staticBooleanProperty(SessionHeartbeatProperty),                     // static
-      sessionHeartbeatDelay            = heartbeatDelay,                                                                  // dynamic
+      sessionHeartbeatEnabled          = staticState.staticBooleanProperty(SessionHeartbeatProperty),                     // static
+      maxInactiveIntervalMillis        = maxInactiveIntervalMillis,                                                                  // dynamic
       revisitHandling                  = staticState.staticStringProperty(RevisitHandlingProperty),                       // static
       delayBeforeIncrementalRequest    = staticState.staticIntProperty(DelayBeforeIncrementalRequestProperty),            // static
       delayBeforeAjaxTimeout           = getAjaxTimeout,                                                                  // global
@@ -127,12 +127,12 @@ object ScriptBuilder {
   }
 
   def buildJsonInitializationData(
-    containingDocument   : XFormsContainingDocument,
-    rewriteResource      : String => String,
-    rewriteAction        : String => String,
-    controlsToInitialize : List[(String, Option[String])],
-    versionedResources   : Boolean,
-    heartbeatDelay       : Long
+    containingDocument        : XFormsContainingDocument,
+    rewriteResource           : String => String,
+    rewriteAction             : String => String,
+    controlsToInitialize      : List[(String, Option[String])],
+    versionedResources        : Boolean,
+    maxInactiveIntervalMillis : Long
   ): String = {
 
     val currentTime = System.currentTimeMillis
@@ -204,7 +204,7 @@ object ScriptBuilder {
             formId  = containingDocument.getNamespacedFormId
           ),
       configuration =
-        findConfigurationProperties(containingDocument, versionedResources, heartbeatDelay),
+        findConfigurationProperties(containingDocument, versionedResources, maxInactiveIntervalMillis),
     ).asJson.noSpaces
   }
 

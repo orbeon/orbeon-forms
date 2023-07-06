@@ -822,12 +822,12 @@ trait ContainingDocumentClientState {
 
     val jsonInitializationData =
       ScriptBuilder.buildJsonInitializationData(
-        containingDocument   = this,
-        rewriteResource      = response.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
-        rewriteAction        = response.rewriteActionURL,
-        controlsToInitialize = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
-        versionedResources   = URLRewriterUtils.isResourcesVersioned,
-        heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(this, externalContext)
+        containingDocument        = this,
+        rewriteResource           = response.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
+        rewriteAction             = response.rewriteActionURL,
+        controlsToInitialize      = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
+        versionedResources        = URLRewriterUtils.isResourcesVersioned,
+        maxInactiveIntervalMillis = XFormsStateManager.getMaxInactiveIntervalMillis(this, externalContext)
       )
 
     _initializationData = (initializationScripts, jsonInitializationData).some

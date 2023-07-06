@@ -64,8 +64,8 @@ case class WireAjaxEventWithoutTarget(
 ) extends WireAjaxEvent
 
 case class ConfigurationProperties(
-  sessionHeartbeat                : Boolean,
-  sessionHeartbeatDelay           : Long,
+  sessionHeartbeatEnabled         : Boolean,
+  maxInactiveIntervalMillis       : Long,
   revisitHandling                 : String,
   delayBeforeIncrementalRequest   : Int,
   delayBeforeAjaxTimeout          : Long,

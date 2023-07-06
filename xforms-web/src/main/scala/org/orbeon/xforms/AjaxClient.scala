@@ -289,16 +289,17 @@ object AjaxClient {
       ErrorPanel.showError(Page.getXFormsFormFromNamespacedIdOrThrow(formId), detailsString)
   }
 
+  def newestEventTime: Long = EventQueue.newestEventTime
+
   // Sending a heartbeat event if no event has been sent to server in the last time interval
   // determined by the `session-heartbeat-delay` property.
-  def sendHeartBeatIfNeeded(heartBeatDelay: Long): Unit =
-    if ((System.currentTimeMillis() - EventQueue.newestEventTime) >= heartBeatDelay)
-      AjaxClient.fireEvent(
-        AjaxEvent(
-          eventName = EventNames.XXFormsSessionHeartbeat,
-          form      = Support.getFirstForm
-        )
+  def sendHeartBeat(): Unit =
+    AjaxClient.fireEvent(
+      AjaxEvent(
+        eventName = EventNames.XXFormsSessionHeartbeat,
+        form      = Support.getFirstForm
       )
+    )
 
   private object EventQueue extends AjaxEventQueue[AjaxEvent] {
 

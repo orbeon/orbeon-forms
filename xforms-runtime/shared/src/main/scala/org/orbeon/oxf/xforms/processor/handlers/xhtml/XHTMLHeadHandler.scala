@@ -143,12 +143,12 @@ class XHTMLHeadHandler(
         writeContent(
           ScriptBuilder.buildInitializationCall(
             jsonInitialization = buildJsonInitializationData(
-              containingDocument   = containingDocument,
-              rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
-              rewriteAction        = externalContext.getResponse.rewriteActionURL,
-              controlsToInitialize = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
-              versionedResources   = isVersionedResources,
-              heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.externalContext)
+              containingDocument        = containingDocument,
+              rewriteResource           = externalContext.getResponse.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
+              rewriteAction             = externalContext.getResponse.rewriteActionURL,
+              controlsToInitialize      = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
+              versionedResources        = isVersionedResources,
+              maxInactiveIntervalMillis = XFormsStateManager.getMaxInactiveIntervalMillis(containingDocument, handlerContext.externalContext)
             ),
             contextPathOpt = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingContextParameter),
             namespaceOpt   = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingNamespaceParameter)

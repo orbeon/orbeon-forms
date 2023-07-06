@@ -27,6 +27,7 @@ import org.orbeon.web.DomEventNames
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
+import org.orbeon.xforms.Page.AboutToExpire
 import org.orbeon.xforms.StateHandling.StateResult
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.Initializations
@@ -319,14 +320,23 @@ object InitSupport {
     // The heartbeat is per servlet session and we only need one. But see https://github.com/orbeon/orbeon-forms/issues/2014.
     def initializeHeartBeatIfNeeded(configuration: rpc.ConfigurationProperties): Unit =
       if (! heartBeatInitialized) {
-        if (configuration.sessionHeartbeat) {
+        if (configuration.sessionHeartbeatEnabled) {
           // Say session is 60 minutes: heartbeat must come after 48 minutes and we check every 4.8 minutes
-          val heartBeatDelay      = configuration.sessionHeartbeatDelay
-          val heartBeatCheckDelay = heartBeatDelay / 10
-          if (heartBeatCheckDelay > 0) {
-            logger.debug(s"setting heartbeat check every $heartBeatCheckDelay ms")
-            js.timers.setInterval(heartBeatCheckDelay) {
-              AjaxClient.sendHeartBeatIfNeeded(heartBeatDelay)
+          val reactAfterMillis = (configuration.maxInactiveIntervalMillis * 0.8).toLong
+          val checkEveryMillis = reactAfterMillis / 10
+          if (checkEveryMillis > 0) {
+            logger.debug(s"checking if getting close to session expiration every $checkEveryMillis ms")
+            js.timers.setInterval(checkEveryMillis) {
+              val elapsedMillisSinceLastEvent = System.currentTimeMillis() - AjaxClient.newestEventTime
+              if (elapsedMillisSinceLastEvent >= reactAfterMillis) {
+                if (configuration.sessionHeartbeatEnabled)
+                  AjaxClient.sendHeartBeat()
+                val approxSessionExpiredTimeMillis = AjaxClient.newestEventTime + configuration.maxInactiveIntervalMillis
+                Page.fireSessionAboutToExpire(AboutToExpire(
+                  configuration.sessionHeartbeatEnabled,
+                  approxSessionExpiredTimeMillis
+                ))
+              }
             }
           }
         }

@@ -348,6 +348,23 @@
                 <try-acquire>Try to acquire lease</try-acquire>
                 <show-in-view-mode>Show in read-only mode</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring>Session About To Expire</expiring>
+                    <expired>Session Expired</expired>
+                </title>
+                <message>
+                    <expiring>Your session is about to expire. Click the button below if you wish to continue using this page.</expiring>
+                    <expired>Your session has expired.</expired>
+                </message>
+                <renew-button>Renew Session</renew-button>
+            </session-expiration>
+            <available-from>
+                <message>This form isn't available yet</message>
+            </available-from>
+            <available-to>
+                <message>This form isn't available anymore</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Save Locally</dialog-title>
@@ -941,6 +958,23 @@
                 <try-acquire>Essayer d'obtenir le bail</try-acquire>
                 <show-in-view-mode>Visualiser en lecture seule</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message>Ce formulaire n'est pas encore disponible</message>
+            </available-from>
+            <available-to>
+                <message>Ce formulaire n'est plus disponible</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Enregistrer Localement</dialog-title>
@@ -1526,6 +1560,23 @@
                 <try-acquire>Intentar adquirir Bloqueo</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Guardar Localmente</dialog-title>
@@ -2128,6 +2179,17 @@
                 <try-acquire>Intentar adquirir Bloqueig</try-acquire>
                 <show-in-view-mode todo="true">Mostrar-lo en només lectura</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
             <available-from>
                 <message todo="true">This form isn't available yet</message>
             </available-from>
@@ -2730,6 +2792,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Lagre</dialog-title>
@@ -3311,6 +3390,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Сохранить</dialog-title>
@@ -3897,6 +3993,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Salva localmente</dialog-title>
@@ -4487,6 +4600,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Lokal speichern</dialog-title>
@@ -5077,6 +5207,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Tallenna paikallisesti</dialog-title>
@@ -5667,6 +5814,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Spara lokalt</dialog-title>
@@ -6256,6 +6420,23 @@
                 <try-acquire>Lease proberen te krijgen</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Lokaal opslaan</dialog-title>
@@ -6845,6 +7026,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Guardar Localmente</dialog-title>
@@ -7428,6 +7626,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Gem lokalt</dialog-title>
@@ -8014,6 +8229,23 @@
                 <try-acquire>Spróbuj uzyskać prawo do edycji dokumentu.</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Zapisz lokalnie</dialog-title>

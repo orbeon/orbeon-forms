@@ -273,6 +273,8 @@
     <property as="xs:integer" name="oxf.fr.detail.lease.duration.*.*.*"                         value="10"/>
     <property as="xs:integer" name="oxf.fr.detail.lease.renew-threshold.*.*"                    value="1"/>
     <property as="xs:integer" name="oxf.fr.detail.lease.alert-threshold.*.*"                    value="2"/>
+    <property as="xs:boolean" name="oxf.fr.detail.session-expiration-dialog.enabled.*.*"        value="false"/>
+
 
     <property as="xs:integer" name="oxf.fr.access-token.validity.*.*"                           value="0"/>
     <property as="xs:string"  name="oxf.fr.access-token.password"                               value=""/>

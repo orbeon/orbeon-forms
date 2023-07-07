@@ -133,7 +133,7 @@ object Page {
     }
   }
 
-  type AboutToExpireListener = AboutToExpire => Unit
+  type AboutToExpireListener = (Boolean, Long) => Unit
   case class AboutToExpire(
     sessionHeartbeatEnabled        : Boolean,
     approxSessionExpiredTimeMillis : Long
@@ -141,7 +141,11 @@ object Page {
 
   def addSessionAboutToExpireListener   (listener: AboutToExpireListener): Unit = sessionAboutToExpireListeners += listener
   def removeSessionAboutToExpireListener(listener: AboutToExpireListener): Unit = sessionAboutToExpireListeners -= listener
-  def fireSessionAboutToExpire(aboutToExpire: AboutToExpire)             : Unit = sessionAboutToExpireListeners.foreach(_(aboutToExpire))
+  def fireSessionAboutToExpire(aboutToExpire: AboutToExpire)             : Unit =
+    sessionAboutToExpireListeners.foreach(_(
+      aboutToExpire.sessionHeartbeatEnabled,
+      aboutToExpire.approxSessionExpiredTimeMillis
+    ))
 
   // NOTE: This mechanism is deprecated by XBL and only used for the native `Upload` as of 2019-05-13.
   def registerControlConstructor(controlConstructor: () => Upload, predicate: html.Element => Boolean): Unit =

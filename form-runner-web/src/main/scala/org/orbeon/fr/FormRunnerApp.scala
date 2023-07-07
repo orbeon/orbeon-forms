@@ -14,9 +14,10 @@
 package org.orbeon.fr
 
 import org.orbeon.facades.ResizeObserver
+import org.orbeon.web.DomEventNames
 import org.orbeon.xbl
 import org.orbeon.xforms.facade.Events
-import org.orbeon.xforms.{App, XFormsApp}
+import org.orbeon.xforms.{$, AjaxClient, App, GlobalEventListenerSupport, Page, XFormsApp}
 import org.scalajs.dom
 import org.scalajs.dom.{document, html, raw, window}
 import org.scalajs.dom.raw.HTMLElement
@@ -24,6 +25,8 @@ import org.scalajs.dom.raw.HTMLElement
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import org.scalajs.dom.ext._
+
+import scala.scalajs.js.timers
 
 
 // Scala.js starting point for Form Runner
@@ -73,10 +76,10 @@ object FormRunnerApp extends App {
     xbl.Recaptcha
     xbl.ClipboardCopy
 
-    // Add `scroll-padding-top` and `scroll-padding-bottom` to prevent the focused form field from being below the top navbar or button bar
     // TODO: with embedding, unobserve when the form is destroyed
     Events.orbeonLoadedEvent.subscribe(() => {
 
+      // Add `scroll-padding-top` and `scroll-padding-bottom` to prevent the focused form field from being below the top navbar or button bar
       def addScrollPadding(rawElement: raw.Element, cssClass: String): Unit = {
         val htmlElement = rawElement.asInstanceOf[HTMLElement]
         val position    = window.getComputedStyle(htmlElement).position
@@ -93,8 +96,72 @@ object FormRunnerApp extends App {
       Option(document.querySelector(".orbeon .navbar-fixed-top")).foreach(addScrollPadding(_, "scroll-padding-top"))
       Option(document.querySelector(".orbeon .fr-buttons"      )).foreach(addScrollPadding(_, "scroll-padding-bottom"))
 
+      initSessionExpirationDialog()
     })
+  }
 
+  private def initSessionExpirationDialog(): Unit = {
+
+    val dialog                      = document.querySelector(".fr-session-expiration-dialog")
+    def dialogShown: Boolean        = dialog.classList.contains("in")
+    var expirationTimeMillis        = 0L
+    var expiredOpt: Option[Boolean] = None
+    var didExpireTimerOpt: Option[timers.SetTimeoutHandle] = None
+
+    if (dialog.classList.contains("fr-feature-enabled")) {
+      val renewSessionButton = dialog.querySelector("button").asInstanceOf[html.Element]
+      GlobalEventListenerSupport.addListener(renewSessionButton, DomEventNames.Click, (event: dom.raw.EventTarget) => {
+        renewSession()
+      })
+      Page.addSessionAboutToExpireListener(aboutToExpire)
+    }
+
+    def aboutToExpire(sessionHeartbeatEnabled : Boolean, approxSessionExpiredTimeMillis: Long): Unit = {
+      expirationTimeMillis = approxSessionExpiredTimeMillis
+      if (! sessionHeartbeatEnabled && ! dialogShown) {
+        updateDialog(expired = false)
+        showDialog()
+        // TODO: make threshold configurable
+        val timeToExpiration = (approxSessionExpiredTimeMillis - System.currentTimeMillis()) - 10000
+        didExpireTimerOpt = Some(timers.setTimeout(
+          timeToExpiration){
+          updateDialog(expired = true)
+        })
+      }
+    }
+
+    def updateDialog(expired: Boolean): Unit = {
+      // TODO: avoid code duplication
+      if (expired) {
+        dialog.querySelector(".modal-header").firstElementChild.asInstanceOf[html.Element].style.display = "none"
+        dialog.querySelector(".modal-header").lastElementChild .asInstanceOf[html.Element].style.display = "block"
+        dialog.querySelector(".modal-body"  ).firstElementChild.asInstanceOf[html.Element].style.display = "none"
+        dialog.querySelector(".modal-body"  ).lastElementChild .asInstanceOf[html.Element].style.display = "block"
+        dialog.querySelector(".modal-footer")                  .asInstanceOf[html.Element].style.display = "none"
+      } else {
+        dialog.querySelector(".modal-header").firstElementChild.asInstanceOf[html.Element].style.display = "block"
+        dialog.querySelector(".modal-header").lastElementChild .asInstanceOf[html.Element].style.display = "none"
+        dialog.querySelector(".modal-body"  ).firstElementChild.asInstanceOf[html.Element].style.display = "block"
+        dialog.querySelector(".modal-body"  ).lastElementChild .asInstanceOf[html.Element].style.display = "none"
+        dialog.querySelector(".modal-footer")                  .asInstanceOf[html.Element].style.display = "block"
+      }
+    }
+
+    def renewSession(): Unit = {
+      didExpireTimerOpt.foreach(timers.clearTimeout)
+      didExpireTimerOpt = None
+      AjaxClient.sendHeartBeat()
+      hideDialog()
+    }
+
+    def showDialog(): Unit =
+      $(dialog).asInstanceOf[js.Dynamic].modal(new js.Object {
+        val backdrop = "static" // Click on the background doesn't hide dialog
+        val keyboard = false    // Can't use esc to close the dialog
+      })
+
+    def hideDialog(): Unit =
+      $(dialog).asInstanceOf[js.Dynamic].modal("hide")
   }
 
   def onPageContainsFormsMarkup(): Unit =

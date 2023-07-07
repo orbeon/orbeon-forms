@@ -110,6 +110,31 @@
             (not($lease-enabled) or $lease-state-elem = 'current-user')
         "/>
 
+        <!-- Session about to expire or expired dialog -->
+        <xf:var
+            name="session-expiration-dialog-enabled"
+            value="xxf:property(string-join(('oxf.fr.detail.session-expiration-dialog.enabled', fr:app-name(), fr:form-name()), '.'))"/>
+        <xh:div
+            class="
+                fr-session-expiration-dialog modal hide fade
+                fr-feature-{{ if ($session-expiration-dialog-enabled) then 'enabled' else 'disabled' }}"
+            tabindex="-1" role="dialog" aria-hidden="true">
+
+            <xh:div class="modal-header">
+                <xh:h4><xf:output value="$fr-resources/detail/session-expiration/title/expiring"/></xh:h4>
+                <xh:h4><xf:output value="$fr-resources/detail/session-expiration/title/expired"/></xh:h4>
+            </xh:div>
+            <xh:div class="modal-body">
+                <xh:p><xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expiring"/></xh:p>
+                <xh:p><xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expired"/></xh:p>
+            </xh:div>
+            <xh:div class="modal-footer">
+                <xh:button class="btn btn-primary">
+                    <xf:output value="$fr-resources/detail/session-expiration/renew-button"/>
+                </xh:button>
+            </xh:div>
+        </xh:div>
+
         <!-- Lease message -->
         <xf:group
             ref="if ($lease-enabled) then . else ()"

@@ -33,7 +33,7 @@ import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.Initializations
 import org.scalajs.dom
 import org.scalajs.dom.ext._
-import org.scalajs.dom.html
+import org.scalajs.dom.{document, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import java.io.StringWriter
@@ -141,7 +141,7 @@ object InitSupport {
         completeNamespacePromise(namespace, form)
       }
 
-      initializeHeartBeatIfNeeded(initializations.configuration)
+      initializeReactWhenSessionAboutToExpire(initializations.configuration)
 
       if (Page.countInitializedForms == allFormElems.size) {
         logger.info(s"all forms are loaded; total time for client-side web app initialization: ${System.currentTimeMillis() - initTimestampBeforeMs} ms")
@@ -208,9 +208,9 @@ object InitSupport {
 
     val pageContainsFormsMarkupPromise = Promise[Unit]()
 
-    private var topLevelListenerRegistered = false
-    private var heartBeatInitialized       = false
-    private var orbeonLoadedEventScheduled = false
+    private var topLevelListenerRegistered               = false
+    private var reactWhenSessionAboutToExpireInitialized = false
+    private var orbeonLoadedEventScheduled               = false
 
     var formNamespacesToPromise : Map[String, Promise[xforms.Form]] = Map.empty
 
@@ -318,29 +318,29 @@ object InitSupport {
     }
 
     // The heartbeat is per servlet session and we only need one. But see https://github.com/orbeon/orbeon-forms/issues/2014.
-    def initializeHeartBeatIfNeeded(configuration: rpc.ConfigurationProperties): Unit =
-      if (! heartBeatInitialized) {
-        if (configuration.sessionHeartbeatEnabled) {
-          // Say session is 60 minutes: heartbeat must come after 48 minutes and we check every 4.8 minutes
-          val reactAfterMillis = (configuration.maxInactiveIntervalMillis * 0.8).toLong
-          val checkEveryMillis = reactAfterMillis / 10
-          if (checkEveryMillis > 0) {
-            logger.debug(s"checking if getting close to session expiration every $checkEveryMillis ms")
-            js.timers.setInterval(checkEveryMillis) {
-              val elapsedMillisSinceLastEvent = System.currentTimeMillis() - AjaxClient.newestEventTime
-              if (elapsedMillisSinceLastEvent >= reactAfterMillis) {
-                if (configuration.sessionHeartbeatEnabled)
-                  AjaxClient.sendHeartBeat()
-                val approxSessionExpiredTimeMillis = AjaxClient.newestEventTime + configuration.maxInactiveIntervalMillis
-                Page.fireSessionAboutToExpire(AboutToExpire(
-                  configuration.sessionHeartbeatEnabled,
-                  approxSessionExpiredTimeMillis
-                ))
-              }
+    def initializeReactWhenSessionAboutToExpire(configuration: rpc.ConfigurationProperties): Unit =
+      if (! reactWhenSessionAboutToExpireInitialized) {
+        // Say session is 60 minutes: heartbeat must come after 48 minutes and we check every 4.8 minutes
+        val reactAfterMillis = (configuration.maxInactiveIntervalMillis * 0.8).toLong
+        val checkEveryMillis = reactAfterMillis / 10
+        if (checkEveryMillis > 0) {
+          logger.debug(s"checking if getting close to session expiration every $checkEveryMillis ms")
+          js.timers.setInterval(checkEveryMillis) {
+            val elapsedMillisSinceLastEvent = System.currentTimeMillis() - AjaxClient.newestEventTime
+            if (elapsedMillisSinceLastEvent >= reactAfterMillis) {
+              // Trigger session heartbeat
+              if (configuration.sessionHeartbeatEnabled)
+                AjaxClient.sendHeartBeat()
+              // Call about-to-expire listeners
+              val approxSessionExpiredTimeMillis = AjaxClient.newestEventTime + configuration.maxInactiveIntervalMillis
+              Page.fireSessionAboutToExpire(AboutToExpire(
+                configuration.sessionHeartbeatEnabled,
+                approxSessionExpiredTimeMillis
+              ))
             }
           }
         }
-        heartBeatInitialized = true
+        reactWhenSessionAboutToExpireInitialized = true
       }
 
     def scheduleOrbeonLoadedEventIfNeeded(configuration: rpc.ConfigurationProperties): Unit =

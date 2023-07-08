@@ -125,8 +125,8 @@
                 <xh:h4><xf:output value="$fr-resources/detail/session-expiration/title/expired"/></xh:h4>
             </xh:div>
             <xh:div class="modal-body">
-                <xh:p><xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expiring"/></xh:p>
-                <xh:p><xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expired"/></xh:p>
+                <xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expiring"/>
+                <xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expired"/>
             </xh:div>
             <xh:div class="modal-footer">
                 <xh:button class="btn btn-primary">

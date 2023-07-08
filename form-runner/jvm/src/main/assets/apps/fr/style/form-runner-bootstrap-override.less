@@ -590,27 +590,24 @@ body.orbeon {
         }
     }
 
-    .xforms-trigger-appearance-xxforms-primary .btn {
+
+    // TODO: can we remove the `.xforms-trigger-appearance-xxforms-xxx` selectors?
+    .xforms-trigger-appearance-xxforms-primary .btn, .btn-primary, {
         .buttonBackgroundOrbeon(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
     }
-
-    .xforms-trigger-appearance-xxforms-warning .btn {
+    .xforms-trigger-appearance-xxforms-warning .btn, .btn-warning
         .buttonBackgroundOrbeon(@btnWarningBackground, @btnWarningBackgroundHighlight);
     }
-
-    .xforms-trigger-appearance-xxforms-danger .btn {
+    .xforms-trigger-appearance-xxforms-danger .btn, .btn-danger
         .buttonBackgroundOrbeon(@btnDangerBackground, @btnDangerBackgroundHighlight);
     }
-
-    .xforms-trigger-appearance-xxforms-success .btn {
+    .xforms-trigger-appearance-xxforms-success .btn, .btn-success {
         .buttonBackgroundOrbeon(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
     }
-
-    .xforms-trigger-appearance-xxforms-info .btn {
+    .xforms-trigger-appearance-xxforms-info .btn, .btn-info {
         .buttonBackgroundOrbeon(@btnInfoBackground, @btnInfoBackgroundHighlight);
     }
-
-    .xforms-trigger-appearance-xxforms-inverse .btn {
+    .xforms-trigger-appearance-xxforms-inverse .btn, .btn-inverse {
         .buttonBackgroundOrbeon(@btnInverseBackground, @btnInverseBackgroundHighlight);
     }
 

@@ -247,6 +247,15 @@ object AjaxClient {
     EventQueue.addEventAndUpdateQueueSchedule(event, event.incremental)
   }
 
+  def pause(): Unit = {
+    EventQueue.paused = true
+  }
+
+  def unpause(): Unit = {
+    EventQueue.paused = false
+    EventQueue.updateQueueSchedule()
+  }
+
   private val ErrorMessageTitle = "JavaScript error in Orbeon Forms client"
 
   // When an exception happens while we communicate with the server, we catch it and show an error in the UI.
@@ -309,12 +318,13 @@ object AjaxClient {
           processEvents(currentForm, eventsForCurrentForm.reverse)
       }
 
-    def canSendEvents: Boolean = ! EventQueue.ajaxRequestInProgress
+    def canSendEvents: Boolean = ! ajaxRequestInProgress && ! paused
 
     var shortDelay       : FiniteDuration = _
     var incrementalDelay : FiniteDuration = _
 
     var ajaxRequestInProgress: Boolean = false // actual Ajax request has started and not yet successfully completed including response processing
+    var paused               : Boolean = false
   }
 
   private object Private {

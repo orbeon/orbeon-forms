@@ -19,7 +19,7 @@ import org.orbeon.xbl
 import org.orbeon.xforms.facade.Events
 import org.orbeon.xforms.{$, AjaxClient, App, GlobalEventListenerSupport, Page, XFormsApp}
 import org.scalajs.dom
-import org.scalajs.dom.{document, html, raw, window}
+import org.scalajs.dom.{Element, document, html, raw, window}
 import org.scalajs.dom.raw.HTMLElement
 
 import scala.scalajs.js
@@ -119,9 +119,10 @@ object FormRunnerApp extends App {
     def aboutToExpire(sessionHeartbeatEnabled : Boolean, approxSessionExpiredTimeMillis: Long): Unit = {
       expirationTimeMillis = approxSessionExpiredTimeMillis
       if (! sessionHeartbeatEnabled && ! dialogShown) {
+        AjaxClient.pause()
         updateDialog(expired = false)
         showDialog()
-        // TODO: make threshold configurable
+        // TODO: make this padding configurable
         val timeToExpiration = (approxSessionExpiredTimeMillis - System.currentTimeMillis()) - 10000
         didExpireTimerOpt = Some(timers.setTimeout(
           timeToExpiration){
@@ -131,26 +132,28 @@ object FormRunnerApp extends App {
     }
 
     def updateDialog(expired: Boolean): Unit = {
-      // TODO: avoid code duplication
-      if (expired) {
-        dialog.querySelector(".modal-header").firstElementChild.asInstanceOf[html.Element].style.display = "none"
-        dialog.querySelector(".modal-header").lastElementChild .asInstanceOf[html.Element].style.display = "block"
-        dialog.querySelector(".modal-body"  ).firstElementChild.asInstanceOf[html.Element].style.display = "none"
-        dialog.querySelector(".modal-body"  ).lastElementChild .asInstanceOf[html.Element].style.display = "block"
-        dialog.querySelector(".modal-footer")                  .asInstanceOf[html.Element].style.display = "none"
-      } else {
-        dialog.querySelector(".modal-header").firstElementChild.asInstanceOf[html.Element].style.display = "block"
-        dialog.querySelector(".modal-header").lastElementChild .asInstanceOf[html.Element].style.display = "none"
-        dialog.querySelector(".modal-body"  ).firstElementChild.asInstanceOf[html.Element].style.display = "block"
-        dialog.querySelector(".modal-body"  ).lastElementChild .asInstanceOf[html.Element].style.display = "none"
-        dialog.querySelector(".modal-footer")                  .asInstanceOf[html.Element].style.display = "block"
-      }
+      val headerContainer     = dialog.querySelector(".modal-header")
+      val bodyContainer       = dialog.querySelector(".modal-body")
+      val footer              = dialog.querySelector(".modal-footer")
+
+      val visibleWhenExpiring = List(headerContainer.firstElementChild, bodyContainer.firstElementChild, footer)
+      val visibleWhenExpired  = List(headerContainer.lastElementChild , bodyContainer.lastElementChild)
+
+      def setDisplay(elements: List[Element], display: String): Unit =
+        elements.foreach(_.asInstanceOf[html.Element].style.display = display)
+
+      val (toShow, toHide) = if (expired)
+        (visibleWhenExpired , visibleWhenExpiring) else
+        (visibleWhenExpiring, visibleWhenExpired )
+      setDisplay(toShow, "block")
+      setDisplay(toHide, "none")
     }
 
     def renewSession(): Unit = {
       didExpireTimerOpt.foreach(timers.clearTimeout)
       didExpireTimerOpt = None
       AjaxClient.sendHeartBeat()
+      AjaxClient.unpause()
       hideDialog()
     }
 

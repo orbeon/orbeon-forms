@@ -59,7 +59,7 @@
         serialization="application/xml"
         method="post"
         resource="/fr/service/i18n/fr-resources/{$app}/{$form}"
-        ref="(xxf:instance('fr-form-metadata')/messages, xxf:instance('no-form-metadata'))[1]"
+        ref="(xxf:instance('fr-form-metadata')/resources, xxf:instance('no-form-metadata'))[1]"
         replace="instance"
         instance="fr-fr-resources"
         xxf:readonly="true"

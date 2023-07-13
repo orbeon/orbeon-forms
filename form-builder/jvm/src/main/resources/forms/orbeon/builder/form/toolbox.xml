@@ -366,6 +366,16 @@
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
                             </xf:action>
                         </xf:trigger>
+                        <xf:trigger bind="fb-toolbox-messages-bind" id="open-messages-trigger">
+                            <xf:label>
+                                <xh:i class="fa fa-commenting fa-fw"/>
+                                <xf:output value="$form-resources/dialog-messages/label"/>
+                            </xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-messages"/>
+                                <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
+                            </xf:action>
+                        </xf:trigger>
 
                         <!-- Edit Source -->
                         <xf:trigger class="fb-edit-source-button" bind="fb-toolbox-edit-bind">

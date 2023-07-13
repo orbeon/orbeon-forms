@@ -1310,6 +1310,12 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-messages>
+            <label>Messages</label>
+            <language-header>Language</language-header>
+            <name-header>Name</name-header>
+            <value-header>Value</value-header>
+        </dialog-messages>
         <xbl-control-settings>
             <field-width>Field width</field-width>
             <default>Use default</default>
@@ -2659,6 +2665,12 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-messages>
+            <label>Messages</label>
+            <language-header>Langue</language-header>
+            <name-header>Nom</name-header>
+            <value-header>Valeur</value-header>
+        </dialog-messages>
         <xbl-control-settings>
             <field-width>Largeur du champ</field-width>
             <default>Utiliser le défaut</default>
@@ -4019,6 +4031,12 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-messages>
+            <label todo="true">[Messages]</label>
+            <language-header todo="true">[Language]</language-header>
+            <name-header todo="true">[Name]</name-header>
+            <value-header todo="true">[Value]</value-header>
+        </dialog-messages>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -5378,6 +5396,12 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-messages>
+            <label todo="true">[Messages]</label>
+            <language-header todo="true">[Language]</language-header>
+            <name-header todo="true">[Name]</name-header>
+            <value-header todo="true">[Value]</value-header>
+        </dialog-messages>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -6701,6 +6725,12 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-messages>
+            <label todo="true">[Messages]</label>
+            <language-header todo="true">[Language]</language-header>
+            <name-header todo="true">[Name]</name-header>
+            <value-header todo="true">[Value]</value-header>
+        </dialog-messages>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -8025,6 +8055,12 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-messages>
+            <label todo="true">[Messages]</label>
+            <language-header todo="true">[Language]</language-header>
+            <name-header todo="true">[Name]</name-header>
+            <value-header todo="true">[Value]</value-header>
+        </dialog-messages>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -9379,6 +9415,12 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-messages>
+            <label todo="true">[Messages]</label>
+            <language-header todo="true">[Language]</language-header>
+            <name-header todo="true">[Name]</name-header>
+            <value-header todo="true">[Value]</value-header>
+        </dialog-messages>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -10730,6 +10772,12 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-messages>
+            <label todo="true">[Messages]</label>
+            <language-header todo="true">[Language]</language-header>
+            <name-header todo="true">[Name]</name-header>
+            <value-header todo="true">[Value]</value-header>
+        </dialog-messages>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -12061,6 +12109,12 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-messages>
+            <label todo="true">[Messages]</label>
+            <language-header todo="true">[Language]</language-header>
+            <name-header todo="true">[Name]</name-header>
+            <value-header todo="true">[Value]</value-header>
+        </dialog-messages>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -13419,6 +13473,12 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-messages>
+            <label todo="true">[Messages]</label>
+            <language-header todo="true">[Language]</language-header>
+            <name-header todo="true">[Name]</name-header>
+            <value-header todo="true">[Value]</value-header>
+        </dialog-messages>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>
@@ -14778,6 +14838,12 @@
             </operations>
 
         </dialog-workflow>
+        <dialog-messages>
+            <label todo="true">[Messages]</label>
+            <language-header todo="true">[Language]</language-header>
+            <name-header todo="true">[Name]</name-header>
+            <value-header todo="true">[Value]</value-header>
+        </dialog-messages>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
             <default todo="true">Use default</default>

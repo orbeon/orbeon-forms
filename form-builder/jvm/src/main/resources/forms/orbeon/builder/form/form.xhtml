@@ -209,6 +209,7 @@
                                         <xf:delete ref="$metadata-instance/title[@xml:lang = $fb-lang]"/>
                                         <xf:delete ref="$metadata-instance/description[@xml:lang = $fb-lang]"/>
                                         <xf:delete ref="$metadata-instance/email/(subject | body)/template[@xml:lang = $fb-lang]"/>
+                                        <xf:delete ref="$metadata-instance/resources/resource[@xml:lang = $fb-lang]"/>
                                         <xf:setvalue ref="$fb-lang" value="$resources/resource[1]/@xml:lang"/>
 
                                         <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
@@ -760,6 +761,11 @@
                                     </xf:action>
 
                                 </fb:dialog-email-settings>
+
+                                <fb:dialog-messages
+                                    id="dialog-messages"
+                                    resources-ref="$form-resources"
+                                    fr-resources-ref="$fr-resources"/>
 
                                 <!-- Other dialogs -->
                                 <xf:var name="form" value="."/>

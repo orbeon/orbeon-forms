@@ -209,6 +209,7 @@
             <workflow/>
             <permissions/>
             <email/>
+            <messages/>
             <services>
                 <http/>
                 <database/>
@@ -228,6 +229,7 @@
         <xf:bind ref="workflow"          id="fb-toolbox-workflow-bind"          relevant="xxf:property('oxf.fb.menu.workflow')"/>
         <xf:bind ref="permissions"       id="fb-toolbox-permissions-bind"       relevant="xxf:property('oxf.fb.menu.permissions')"/>
         <xf:bind ref="email"             id="fb-toolbox-email-bind"             relevant="xxf:property('oxf.fb.menu.email')"/>
+        <xf:bind ref="messages"          id="fb-toolbox-messages-bind"          relevant="xxf:property('oxf.fb.menu.messages')"/>
         <xf:bind ref="services/http"     id="fb-toolbox-services-http-bind"     relevant="xxf:property('oxf.fb.menu.services.http')"/>
         <xf:bind ref="services/database" id="fb-toolbox-services-database-bind" relevant="xxf:property('oxf.fb.menu.services.database')"/>
         <xf:bind ref="actions"           id="fb-toolbox-actions-bind"           relevant="xxf:property('oxf.fb.menu.actions')"/>

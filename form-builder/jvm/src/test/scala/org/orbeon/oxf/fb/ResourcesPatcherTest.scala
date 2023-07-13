@@ -37,10 +37,10 @@ class ResourcesPatcherTest
      with AnyFunSpecLike
      with FormBuilderSupport {
 
-  val formMetadata = <_/>.toDocument
+  val emptyFormMetadata = <_/>.toDocument
 
   describe("Patching scenarios") {
-    it(s"must patch resources as expected") {
+    it(s"must patch resources as expected (properties only)") {
 
       val propertySet = {
         val properties =
@@ -98,6 +98,166 @@ class ResourcesPatcherTest
                 <acme>Acme Missing</acme>
                 <missing>Manquant</missing>
               </labels>
+            </detail>
+          </resource>
+        </resources>.toDocument
+
+      val initial = newDoc
+
+      ResourcesPatcher.transform(initial, emptyFormMetadata, AppForm("*", "*"))(propertySet)
+
+      assertXMLDocumentsIgnoreNamespacesInScope(expected, initial)
+    }
+
+    it(s"must patch resources as expected (properties and metadata)") {
+
+      val propertySet = {
+        val properties =
+          <properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <property as="xs:string" name="oxf.fr.resource.*.*.*.detail.messages.prop-wildcard-meta-absent" value="prop-wildcard-meta-absent (property)"/>
+            <property as="xs:string" name="oxf.fr.resource.*.*.*.detail.messages.prop-wildcard-meta-wildcard" value="prop-wildcard-meta-wildcard (property)"/>
+            <property as="xs:string" name="oxf.fr.resource.*.*.*.detail.messages.prop-wildcard-meta-en" value="prop-wildcard-meta-en (property)"/>
+            <property as="xs:string" name="oxf.fr.resource.*.*.*.detail.messages.prop-wildcard-meta-wildcard-en" value="prop-wildcard-meta-wildcard-en (property)"/>
+
+            <property as="xs:string" name="oxf.fr.resource.*.*.en.detail.messages.prop-en-meta-absent" value="prop-en-meta-absent (property)"/>
+            <property as="xs:string" name="oxf.fr.resource.*.*.en.detail.messages.prop-en-meta-wildcard" value="prop-en-meta-wildcard (property)"/>
+            <property as="xs:string" name="oxf.fr.resource.*.*.en.detail.messages.prop-en-meta-en" value="prop-en-meta-en (property)"/>
+            <property as="xs:string" name="oxf.fr.resource.*.*.en.detail.messages.prop-en-meta-wildcard-en" value="prop-en-meta-wildcard-en (property)"/>
+
+            <property as="xs:string" name="oxf.fr.resource.*.*.*.detail.messages.prop-wildcard-en-meta-absent" value="prop-wildcard-en-meta-absent (property, *)"/>
+            <property as="xs:string" name="oxf.fr.resource.*.*.*.detail.messages.prop-wildcard-en-meta-wildcard" value="prop-wildcard-en-meta-wildcard (property, *)"/>
+            <property as="xs:string" name="oxf.fr.resource.*.*.*.detail.messages.prop-wildcard-en-meta-en" value="prop-wildcard-en-meta-en (property, *)"/>
+            <property as="xs:string" name="oxf.fr.resource.*.*.*.detail.messages.prop-wildcard-en-meta-wildcard-en" value="prop-wildcard-en-meta-wildcard-en (property, *)"/>
+
+            <property as="xs:string" name="oxf.fr.resource.*.*.en.detail.messages.prop-wildcard-en-meta-absent" value="prop-wildcard-en-meta-absent (property, en)"/>
+            <property as="xs:string" name="oxf.fr.resource.*.*.en.detail.messages.prop-wildcard-en-meta-wildcard" value="prop-wildcard-en-meta-wildcard (property, en)"/>
+            <property as="xs:string" name="oxf.fr.resource.*.*.en.detail.messages.prop-wildcard-en-meta-en" value="prop-wildcard-en-meta-en (property, en)"/>
+            <property as="xs:string" name="oxf.fr.resource.*.*.en.detail.messages.prop-wildcard-en-meta-wildcard-en" value="prop-wildcard-en-meta-wildcard-en (property, en)"/>
+          </properties>.toDocument
+
+        PropertyStore.parse(properties).getGlobalPropertySet
+      }
+
+      val formMetadata =
+        <resources>
+          <resource xml:lang="*">
+            <messages>
+              <message name="prop-absent-meta-wildcard">prop-absent-meta-wildcard (metadata)</message>
+              <message name="prop-absent-meta-wildcard-en">prop-absent-meta-wildcard-en (metadata, *)</message>
+              <message name="prop-wildcard-meta-wildcard">prop-wildcard-meta-wildcard (metadata)</message>
+              <message name="prop-wildcard-meta-wildcard-en">prop-wildcard-meta-wildcard-en (metadata, *)</message>
+              <message name="prop-en-meta-wildcard">prop-en-meta-wildcard (metadata)</message>
+              <message name="prop-en-meta-wildcard-en">prop-en-meta-wildcard-en (metadata, *)</message>
+              <message name="prop-wildcard-en-meta-wildcard">prop-wildcard-en-meta-wildcard (metadata)</message>
+              <message name="prop-wildcard-en-meta-wildcard-en">prop-wildcard-en-meta-wildcard-en (metadata, *)</message>
+            </messages>
+          </resource>
+          <resource xml:lang="en">
+            <messages>
+              <message name="prop-absent-meta-en">prop-absent-meta-en (metadata)</message>
+              <message name="prop-absent-meta-wildcard-en">prop-absent-meta-wildcard-en (metadata, en)</message>
+              <message name="prop-wildcard-meta-en">prop-wildcard-meta-en (metadata)</message>
+              <message name="prop-wildcard-meta-wildcard-en">prop-wildcard-meta-wildcard-en (metadata, en)</message>
+              <message name="prop-en-meta-en">prop-en-meta-en (metadata)</message>
+              <message name="prop-en-meta-wildcard-en">prop-en-meta-wildcard-en (metadata, en)</message>
+              <message name="prop-wildcard-en-meta-en">prop-wildcard-en-meta-en (metadata)</message>
+              <message name="prop-wildcard-en-meta-wildcard-en">prop-wildcard-en-meta-wildcard-en (metadata, en)</message>
+            </messages>
+          </resource>
+        </resources>.toDocument
+
+      def newDoc =
+        <resources>
+          <resource xml:lang="en">
+            <detail>
+              <messages>
+                <prop-absent-meta-absent>OVERRIDE ME</prop-absent-meta-absent>
+                <prop-absent-meta-wildcard>OVERRIDE ME</prop-absent-meta-wildcard>
+                <prop-absent-meta-en>OVERRIDE ME</prop-absent-meta-en>
+                <prop-absent-meta-wildcard-en>OVERRIDE ME</prop-absent-meta-wildcard-en>
+                <prop-wildcard-meta-absent>OVERRIDE ME</prop-wildcard-meta-absent>
+                <prop-wildcard-meta-wildcard>OVERRIDE ME</prop-wildcard-meta-wildcard>
+                <prop-wildcard-meta-en>OVERRIDE ME</prop-wildcard-meta-en>
+                <prop-wildcard-meta-wildcard-en>OVERRIDE ME</prop-wildcard-meta-wildcard-en>
+                <prop-en-meta-absent>OVERRIDE ME</prop-en-meta-absent>
+                <prop-en-meta-wildcard>OVERRIDE ME</prop-en-meta-wildcard>
+                <prop-en-meta-en>OVERRIDE ME</prop-en-meta-en>
+                <prop-en-meta-wildcard-en>OVERRIDE ME</prop-en-meta-wildcard-en>
+                <prop-wildcard-en-meta-absent>OVERRIDE ME</prop-wildcard-en-meta-absent>
+                <prop-wildcard-en-meta-wildcard>OVERRIDE ME</prop-wildcard-en-meta-wildcard>
+                <prop-wildcard-en-meta-en>OVERRIDE ME</prop-wildcard-en-meta-en>
+                <prop-wildcard-en-meta-wildcard-en>OVERRIDE ME</prop-wildcard-en-meta-wildcard-en>
+              </messages>
+            </detail>
+          </resource>
+          <resource xml:lang="fr">
+            <detail>
+              <messages>
+                <prop-absent-meta-absent>OVERRIDE ME</prop-absent-meta-absent>
+                <prop-absent-meta-wildcard>OVERRIDE ME</prop-absent-meta-wildcard>
+                <prop-absent-meta-en>OVERRIDE ME</prop-absent-meta-en>
+                <prop-absent-meta-wildcard-en>OVERRIDE ME</prop-absent-meta-wildcard-en>
+                <prop-wildcard-meta-absent>OVERRIDE ME</prop-wildcard-meta-absent>
+                <prop-wildcard-meta-wildcard>OVERRIDE ME</prop-wildcard-meta-wildcard>
+                <prop-wildcard-meta-en>OVERRIDE ME</prop-wildcard-meta-en>
+                <prop-wildcard-meta-wildcard-en>OVERRIDE ME</prop-wildcard-meta-wildcard-en>
+                <prop-en-meta-absent>OVERRIDE ME</prop-en-meta-absent>
+                <prop-en-meta-wildcard>OVERRIDE ME</prop-en-meta-wildcard>
+                <prop-en-meta-en>OVERRIDE ME</prop-en-meta-en>
+                <prop-en-meta-wildcard-en>OVERRIDE ME</prop-en-meta-wildcard-en>
+                <prop-wildcard-en-meta-absent>OVERRIDE ME</prop-wildcard-en-meta-absent>
+                <prop-wildcard-en-meta-wildcard>OVERRIDE ME</prop-wildcard-en-meta-wildcard>
+                <prop-wildcard-en-meta-en>OVERRIDE ME</prop-wildcard-en-meta-en>
+                <prop-wildcard-en-meta-wildcard-en>OVERRIDE ME</prop-wildcard-en-meta-wildcard-en>
+              </messages>
+            </detail>
+          </resource>
+        </resources>.toDocument
+
+      val expected =
+        <resources>
+          <resource xml:lang="en">
+            <detail>
+              <messages>
+                <prop-absent-meta-absent>OVERRIDE ME</prop-absent-meta-absent>
+                <prop-absent-meta-wildcard>prop-absent-meta-wildcard (metadata)</prop-absent-meta-wildcard>
+                <prop-absent-meta-en>prop-absent-meta-en (metadata)</prop-absent-meta-en>
+                <prop-absent-meta-wildcard-en>prop-absent-meta-wildcard-en (metadata, en)</prop-absent-meta-wildcard-en>
+                <prop-wildcard-meta-absent>prop-wildcard-meta-absent (property)</prop-wildcard-meta-absent>
+                <prop-wildcard-meta-wildcard>prop-wildcard-meta-wildcard (metadata)</prop-wildcard-meta-wildcard>
+                <prop-wildcard-meta-en>prop-wildcard-meta-en (metadata)</prop-wildcard-meta-en>
+                <prop-wildcard-meta-wildcard-en>prop-wildcard-meta-wildcard-en (metadata, en)</prop-wildcard-meta-wildcard-en>
+                <prop-en-meta-absent>prop-en-meta-absent (property)</prop-en-meta-absent>
+                <prop-en-meta-wildcard>prop-en-meta-wildcard (metadata)</prop-en-meta-wildcard>
+                <prop-en-meta-en>prop-en-meta-en (metadata)</prop-en-meta-en>
+                <prop-en-meta-wildcard-en>prop-en-meta-wildcard-en (metadata, en)</prop-en-meta-wildcard-en>
+                <prop-wildcard-en-meta-absent>prop-wildcard-en-meta-absent (property, en)</prop-wildcard-en-meta-absent>
+                <prop-wildcard-en-meta-wildcard>prop-wildcard-en-meta-wildcard (metadata)</prop-wildcard-en-meta-wildcard>
+                <prop-wildcard-en-meta-en>prop-wildcard-en-meta-en (metadata)</prop-wildcard-en-meta-en>
+                <prop-wildcard-en-meta-wildcard-en>prop-wildcard-en-meta-wildcard-en (metadata, en)</prop-wildcard-en-meta-wildcard-en>
+              </messages>
+            </detail>
+          </resource>
+          <resource xml:lang="fr">
+            <detail>
+              <messages>
+                <prop-absent-meta-absent>OVERRIDE ME</prop-absent-meta-absent>
+                <prop-absent-meta-wildcard>prop-absent-meta-wildcard (metadata)</prop-absent-meta-wildcard>
+                <prop-absent-meta-en>OVERRIDE ME</prop-absent-meta-en>
+                <prop-absent-meta-wildcard-en>prop-absent-meta-wildcard-en (metadata, *)</prop-absent-meta-wildcard-en>
+                <prop-wildcard-meta-absent>prop-wildcard-meta-absent (property)</prop-wildcard-meta-absent>
+                <prop-wildcard-meta-wildcard>prop-wildcard-meta-wildcard (metadata)</prop-wildcard-meta-wildcard>
+                <prop-wildcard-meta-en>prop-wildcard-meta-en (property)</prop-wildcard-meta-en>
+                <prop-wildcard-meta-wildcard-en>prop-wildcard-meta-wildcard-en (metadata, *)</prop-wildcard-meta-wildcard-en>
+                <prop-en-meta-absent>OVERRIDE ME</prop-en-meta-absent>
+                <prop-en-meta-wildcard>prop-en-meta-wildcard (metadata)</prop-en-meta-wildcard>
+                <prop-en-meta-en>OVERRIDE ME</prop-en-meta-en>
+                <prop-en-meta-wildcard-en>prop-en-meta-wildcard-en (metadata, *)</prop-en-meta-wildcard-en>
+                <prop-wildcard-en-meta-absent>prop-wildcard-en-meta-absent (property, *)</prop-wildcard-en-meta-absent>
+                <prop-wildcard-en-meta-wildcard>prop-wildcard-en-meta-wildcard (metadata)</prop-wildcard-en-meta-wildcard>
+                <prop-wildcard-en-meta-en>prop-wildcard-en-meta-en (property, *)</prop-wildcard-en-meta-en>
+                <prop-wildcard-en-meta-wildcard-en>prop-wildcard-en-meta-wildcard-en (metadata, *)</prop-wildcard-en-meta-wildcard-en>
+              </messages>
             </detail>
           </resource>
         </resources>.toDocument
@@ -270,7 +430,7 @@ class ResourcesPatcherTest
           )
         )
 
-      ResourcesPatcher.transform(initial, formMetadata, AppForm("*", "*"))(props)
+      ResourcesPatcher.transform(initial, emptyFormMetadata, AppForm("*", "*"))(props)
 
       assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
     }

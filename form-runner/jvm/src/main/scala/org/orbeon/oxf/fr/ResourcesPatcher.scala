@@ -149,14 +149,15 @@ object ResourcesPatcher {
 
   def resourcesFromMetadata(formMetadataDocument : dom.Document): Seq[Resource] =
     for {
-      root     <- new DocumentWrapper(formMetadataDocument, null, XPath.GlobalConfiguration) / *
-      messages <- root / "messages"
-      lang     =  messages attValue XMLNames.XMLLangQName
-      message  <- messages / *
+      resources <- new DocumentWrapper(formMetadataDocument, null, XPath.GlobalConfiguration) / "resources"
+      resource  <- resources / "resource"
+      lang      =  resource attValue XMLNames.XMLLangQName
+      messages  <- resource / "messages"
+      message   <- messages / "message"
     } yield
       Resource(
         lang  = lang,
-        path  = "detail" :: "messages" :: message.localname :: Nil,
+        path  = "detail" :: "messages" :: message.attValue("name") :: Nil,
         value = message.getStringValue
       )
 

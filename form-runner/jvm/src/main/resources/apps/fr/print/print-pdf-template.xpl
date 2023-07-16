@@ -132,10 +132,12 @@
 
                 <mode>binary</mode>
 
-                <header>
-                    <name>Orbeon-Form-Definition-Version</name>
-                    <value><xsl:value-of select="$params/form-version"/></value>
-                </header>
+                <xsl:for-each select="$params/form-version">
+                    <header>
+                        <name>Orbeon-Form-Definition-Version</name>
+                        <value><xsl:value-of select="."/></value>
+                    </header>
+                </xsl:for-each>
 
             </config>
         </p:input>

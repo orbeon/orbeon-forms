@@ -378,6 +378,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
             )
 
             context.contentByte.addImage(image)
+            context.acroFields.removeField(fieldName)
           }
         }
       case None =>

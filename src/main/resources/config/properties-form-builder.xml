@@ -92,6 +92,7 @@
     <property as="xs:boolean" name="oxf.fb.menu.permissions"                                    value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.permissions.owner-group"                        value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.email"                                          value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.messages"                                       value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.services.http"                                  value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.services.database"                              value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.actions"                                        value="true"/>

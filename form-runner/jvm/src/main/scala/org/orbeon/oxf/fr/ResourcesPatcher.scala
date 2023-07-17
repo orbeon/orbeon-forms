@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.SimpleProcessor
 import org.orbeon.oxf.properties.{Properties, PropertySet}
@@ -76,11 +77,13 @@ object ResourcesPatcher {
         (_.detach())
     }
 
-    val resourceElems = new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration).rootElement / "resource"
+    def resourceElems: Seq[NodeInfo] =
+      new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration).rootElement / "resource"
+
+    val originalResourceElems = resourceElems
 
     // All languages remaining in the resources document
-    // For now we don't support creating new top-level resource elements for new languages
-    val allLanguages = resourceElems attValue XMLNames.XMLLangQName
+    val allLanguages = originalResourceElems attValue XMLNames.XMLLangQName
 
     // Retrieve resources from properties and form metadata, and expand wildcards into concrete languages
     val propertyResources = resourcesWithConcreteLanguage(allLanguages, resourcesFromProperties(properties, appForm))
@@ -92,8 +95,16 @@ object ResourcesPatcher {
     // At the moment, wildcards in form metadata have a higher priority than specific languages in properties; this can
     // be changed if needed (by merging the resources first and then only expanding wildcards into specific languages)
 
+    // Languages missing in the resources document, but present in the properties and/or form metadata
+    val extraResourceLanguages = mergedExtraResources.map(_.lang).toSet
+    val missingLanguagesInResources = (extraResourceLanguages -- allLanguages.toSet).intersect(langsOpt.getOrElse(extraResourceLanguages))
+
+    addMissingLanguages(resourcesDocument, appForm, missingLanguagesInResources)
+
+    val updatedResourceElems = resourceElems
+
     def resourceElemsForLang(lang: String) =
-      resourceElems filter (_.attValueOpt(XMLNames.XMLLangQName) contains lang) map unsafeUnwrapElement
+      updatedResourceElems filter (_.attValueOpt(XMLNames.XMLLangQName) contains lang) map unsafeUnwrapElement
 
     // Update or create elements and set values
     for {
@@ -113,12 +124,33 @@ object ResourcesPatcher {
 
     // Add missing brackets for resources marked with "todo"
     for {
-      e <- resourceElems descendant *
+      e <- updatedResourceElems descendant *
       if ! e.hasChildElement && hasTodo(e) && ! isBracketed(e.stringValue)
       elem = unsafeUnwrapElement(e)
     } locally {
       elem.attributeOpt("todo") foreach elem.remove
       elem.setText(s"[${elem.getText}]")
+    }
+  }
+
+  def addMissingLanguages(
+    resourcesDocument : dom.Document,
+    appForm           : AppForm,
+    missingLanguages  : Set[String]
+  ): Unit = {
+    val defaultLang = FormRunnerCommon.frc.getDefaultLang(Some(appForm))
+
+    def resourceForLang(lang: String): Option[dom.Element] =
+      resourcesDocument.getRootElement.elements.find(_.attributeValue(XMLNames.XMLLangQName) == lang)
+
+    val resourceToCopy = resourceForLang(defaultLang) orElse resourceForLang("en") getOrElse {
+      throw new OXFException(s"Could not find resource for default language $defaultLang or English")
+    }
+
+    missingLanguages.foreach { missingLanguage =>
+      val newResource = resourceToCopy.deepCopy
+      newResource.attribute(XMLNames.XMLLangQName).setValue(missingLanguage)
+      resourcesDocument.getRootElement.add(newResource)
     }
   }
 

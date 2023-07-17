@@ -82,11 +82,15 @@ object ResourcesPatcher {
     // For now we don't support creating new top-level resource elements for new languages
     val allLanguages = resourceElems attValue XMLNames.XMLLangQName
 
+    // Retrieve resources from properties and form metadata, and expand wildcards into concrete languages
     val propertyResources = resourcesWithConcreteLanguage(allLanguages, resourcesFromProperties(properties, appForm))
     val metadataResources = resourcesWithConcreteLanguage(allLanguages, resourcesFromMetadata(formMetadataDocument))
 
     // Merge resources from properties and form metadata, giving higher priority to form metadata
     val mergedExtraResources  = mergedResources(resourcesGroups = Seq(metadataResources, propertyResources))
+
+    // At the moment, wildcards in form metadata have a higher priority than specific languages in properties; this can
+    // be changed if needed (by merging the resources first and then only expanding wildcards into specific languages)
 
     def resourceElemsForLang(lang: String) =
       resourceElems filter (_.attValueOpt(XMLNames.XMLLangQName) contains lang) map unsafeUnwrapElement

@@ -43,7 +43,7 @@ import scala.jdk.CollectionConverters._
 // The implementation relies on:
 //
 // - ICEpdf for the PDF-to-image conversion proper
-// - ImageIO for  writing the image (with the Java Advanced Imaging library jai-imageio-core for TIFF support)
+// - ImageIO for writing the image (with the Java Advanced Imaging library jai-imageio-core for TIFF support)
 // - some FOP code for dithering as a shortcut (which in fact uses Java Advanced Imaging library jai-core)
 //
 // The main use case is to use TIFF as an output format, as that supports multi-page and a PDF file is often

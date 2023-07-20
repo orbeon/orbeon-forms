@@ -17,28 +17,26 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
-import org.orbeon.oxf.fr.{AppForm, DataStatus, FormRunnerBaseOps, FormRunnerParams, FormRunnerPersistence, GridDataMigration, Names}
 import org.orbeon.oxf.fr.Names._
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
-import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.util.{MarkupUtils, PathUtils}
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
-import org.orbeon.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.xbl.{ErrorSummary, Wizard}
-import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xbl.{ErrorSummary, Wizard}
+import org.orbeon.xforms.analysis.model.ValidationLevel._
 
 import scala.language.postfixOps
 import scala.util.Try
-import scala.collection.compat._
 
 
 trait FormRunnerActionsCommon {
@@ -251,28 +249,46 @@ trait FormRunnerActionsCommon {
     recalculate(FormModel)
   }
 
-  private def messageFromResourceOrParam(params: ActionParams): Option[String] = {
-    def fromResource = paramByNameOrDefault(params, "resource") map (k => frc.currentFRResources / "detail" / "messages" / k stringValue)
-    def fromParam    = paramByName(params, "message")
+  private case class TextOrHtml(string: String, isHtml: Boolean) {
+    def asHtml: String = if (isHtml) string else MarkupUtils.escapeXmlMinimal(string)
+  }
+
+  private def messageFromResourceOrParam(params: ActionParams): Option[TextOrHtml] = {
+    def fromResource =
+      for {
+        messageName <- paramByNameOrDefault(params, "resource")
+        messageNode <- (frc.currentFRResources / "detail" / "messages" / messageName).headOption
+        isHtml       = FormRunnerActionsCommon.isMessageInHtml(messageNode)
+      } yield TextOrHtml(spc.evaluateValueTemplate(messageNode.getStringValue), isHtml)
+
+    def fromParam =
+      for {
+        message <- paramByName(params, "message")
+        isHtml   = booleanParamByName(params, "is-html", default = false)
+      } yield TextOrHtml(spc.evaluateValueTemplate(message), isHtml)
 
     fromResource orElse fromParam
   }
 
-  def trySuccessMessage(params: ActionParams): Try[Any] =
-    Try(frc.successMessage(messageFromResourceOrParam(params).map(spc.evaluateValueTemplate).get))
+  def trySuccessMessage(params: ActionParams): Try[Any] = {
+    val htmlMessage = messageFromResourceOrParam(params).get.asHtml
+
+    Try(frc.successMessage(htmlMessage))
+  }
 
   def tryErrorMessage(params: ActionParams): Try[Any] = {
-    val message    = messageFromResourceOrParam(params).map(spc.evaluateValueTemplate).get
-    val appearance = paramByName(params, "appearance").map(FormRunnerBaseOps.MessageAppearance.withName).getOrElse(FormRunnerBaseOps.MessageAppearance.Dialog)
-    Try(frc.errorMessage(message, appearance))
+    val htmlMessage = messageFromResourceOrParam(params).get.asHtml
+    val appearance  = paramByName(params, "appearance").map(FormRunnerBaseOps.MessageAppearance.withName).getOrElse(FormRunnerBaseOps.MessageAppearance.Dialog)
+
+    Try(frc.errorMessage(htmlMessage, appearance))
   }
 
   def tryConfirm(params: ActionParams): Try[Any] =
     Try {
-      def defaultMessage = frc.currentFRResources / "detail" / "messages" / "confirmation-dialog-message" stringValue
-      def message        = messageFromResourceOrParam(params).map(spc.evaluateValueTemplate) getOrElse defaultMessage
+      def defaultMessage =  messageFromResourceOrParam(Map(None -> "confirmation-dialog-message")).get
+      def htmlMessage    = (messageFromResourceOrParam(params) getOrElse defaultMessage).asHtml
 
-      show("fr-confirmation-dialog", Map("message" -> Some(message)))
+      show("fr-confirmation-dialog", Map("message" -> Some(htmlMessage), "message-is-html" -> Some("true")))
     }
 
   def tryShowResultDialog(params: ActionParams): Try[Any] =
@@ -381,4 +397,7 @@ object FormRunnerActionsCommon {
 
   def findFrFormAttachmentsRootElem: Option[NodeInfo] =
     frc.formAttachmentsInstance map (_.rootElement)
+
+  def isMessageInHtml(nodeInfo: NodeInfo): Boolean =
+    (nodeInfo /@ "is-html").headOption.exists(_.stringValue == "true")
 }

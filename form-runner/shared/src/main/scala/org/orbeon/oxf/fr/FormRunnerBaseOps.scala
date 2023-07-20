@@ -451,7 +451,7 @@ trait FormRunnerBaseOps {
         dispatch(
           name       = "fr-show",
           targetId   = "fr-error-dialog",
-          properties = Map("message" -> Some(message))
+          properties = Map("message" -> Some(message), "message-is-html" -> Some("true"))
         )
       case MessageAppearance.Ephemeral =>
         setvalue(persistenceInstance.rootElement / "message", message)

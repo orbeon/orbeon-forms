@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.fr.process.FormRunnerActionsCommon
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.SimpleProcessor
 import org.orbeon.oxf.properties.{Properties, PropertySet}
@@ -108,12 +109,13 @@ object ResourcesPatcher {
 
     // Update or create elements and set values
     for {
-      Resource(lang, path, value) <- mergedExtraResources
-      rootForLang                 <- resourceElemsForLang(lang)
+      Resource(lang, path, value, isHtml) <- mergedExtraResources
+      rootForLang                         <- resourceElemsForLang(lang)
     } locally {
       val elem = Support.ensurePath(rootForLang, path map dom.QName.apply)
       elem.attributeOpt("todo") foreach elem.remove
       elem.setText(value)
+      elem.addAttribute("is-html", if (isHtml) "true" else "false")
     }
 
     def hasTodo(e: NodeInfo) =
@@ -155,13 +157,16 @@ object ResourcesPatcher {
   }
 
   case class ResourceKey(lang: String, path: Seq[String])
-  case class Resource   (lang: String, path: Seq[String], value: String) {
+  case class Resource   (lang: String, path: Seq[String], value: String, isHtml: Boolean) {
     def key: ResourceKey = ResourceKey(lang, path)
   }
 
   def resourcesFromProperties(properties: PropertySet, appForm: AppForm): Seq[Resource] = {
 
-    val propertyNames = properties.propertiesStartsWith((Prefix :: appForm.toList).mkString("."))
+    val propertyNames =
+      properties
+        .propertiesStartsWith((Prefix :: appForm.toList).mkString("."))
+        .filterNot(_.endsWith(".is-html"))
 
     // In 4.6 summary/detail buttons are at the top level
     def filterPathForBackwardCompatibility(path: List[String]): List[String] = path match {
@@ -179,7 +184,11 @@ object ResourcesPatcher {
       // Had a case where value was null (more details would be useful)
       val value = properties.getNonBlankString(expandedPropertyName)
 
-      value.map(Resource(lang, filterPathForBackwardCompatibility(resourceTokens), _))
+      // TODO: this doesn't work, as the base (i.e. suffix-less) property doesn't seem to be listed by
+      //  propertiesStartsWith if a property with the .is-html suffix exists
+      val isHtml = properties.getBoolean(expandedPropertyName + ".is-html", default = false)
+
+      value.map(Resource(lang, filterPathForBackwardCompatibility(resourceTokens), _, isHtml))
     }
   }
 
@@ -192,9 +201,10 @@ object ResourcesPatcher {
       message   <- messages / "message"
     } yield
       Resource(
-        lang  = lang,
-        path  = "detail" :: "messages" :: message.attValue("name") :: Nil,
-        value = message.getStringValue
+        lang   = lang,
+        path   = "detail" :: "messages" :: message.attValue("name") :: Nil,
+        value  = message.getStringValue,
+        isHtml = FormRunnerActionsCommon.isMessageInHtml(message)
       )
 
   def resourcesWithConcreteLanguage(allLanguages: Seq[String], resources: Seq[Resource]): Map[ResourceKey, Resource] = {

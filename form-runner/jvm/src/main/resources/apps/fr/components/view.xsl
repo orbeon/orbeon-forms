@@ -1250,10 +1250,10 @@
                 <xh:span/>
             </xf:case>
             <xf:case id="fr-message-success">
-                <xf:output value="instance('fr-persistence-instance')/message" class="fr-message-success alert alert-success"/>
+                <xf:output value="instance('fr-persistence-instance')/message" mediatype="text/html" class="fr-message-success alert alert-success"/>
             </xf:case>
             <xf:case id="fr-message-error">
-                <xf:output value="instance('fr-persistence-instance')/message" class="fr-message-error alert alert-error"/>
+                <xf:output value="instance('fr-persistence-instance')/message" mediatype="text/html" class="fr-message-error alert alert-error"/>
             </xf:case>
 
         </xf:switch>

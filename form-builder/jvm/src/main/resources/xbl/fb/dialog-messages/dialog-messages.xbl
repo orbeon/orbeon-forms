@@ -13,6 +13,7 @@
   -->
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
@@ -35,15 +36,16 @@
 
                     <!-- Do not support 'all languages' (*) for now -->
                     <xf:action if="$lang = $available-languages" iterate="messages/message">
-                        <xf:var name="name"  value="@name"/>
-                        <xf:var name="value" value="string()"/>
+                        <xf:var name="name"    value="@name"/>
+                        <xf:var name="is-html" value="if (exists(@is-html)) then @is-html else false()"/>
+                        <xf:var name="value"   value="string()"/>
 
                         <xf:insert
                             context="$i"
                             ref="*"
                             origin="xf:element(
                                 'message',
-                                ($value, xf:attribute('xml:lang', $lang), xf:attribute('name', $name))
+                                ($value, xf:attribute('xml:lang', $lang), xf:attribute('name', $name), xf:attribute('is-html', $is-html))
                             )"/>
                     </xf:action>
                 </xf:action>
@@ -86,15 +88,16 @@
                         origin="xf:element('messages')"/>
 
                     <xf:action iterate="$i/message[@xml:lang = $lang]">
-                        <xf:var name="name"  value="@name"/>
-                        <xf:var name="value" value="string()"/>
+                        <xf:var name="name"    value="@name"/>
+                        <xf:var name="is-html" value="@is-html"/>
+                        <xf:var name="value"   value="string()"/>
 
                         <xf:insert
                             context="$metadata-resources/resource[@xml:lang = $lang]/messages"
                             ref="*"
                             origin="xf:element(
                                 'message',
-                                ($value, xf:attribute('name', $name))
+                                ($value, xf:attribute('name', $name), xf:attribute('is-html', $is-html))
                             )"/>
                     </xf:action>
                 </xf:action>
@@ -111,7 +114,7 @@
 
                 <xf:instance id="fb-dialog-messages-template-instance">
                     <_>
-                        <message xml:lang="" name=""/>
+                        <message xml:lang="" name="" is-html="false"/>
                     </_>
                 </xf:instance>
 
@@ -128,6 +131,8 @@
                     <!-- No duplicate message names for a given language -->
                     <xf:bind ref="@name" constraint="for $l in string(../@xml:lang) return
                                                      not(($i/message[@xml:lang = $l]/@name except .) = .)"/>
+
+                    <xf:bind ref="@is-html" type="xs:boolean"/>
                 </xf:bind>
             </xf:model>
         </xbl:implementation>
@@ -140,18 +145,11 @@
                 <xxf:dialog id="dialog" class="fb-dialog-messages" appearance="full" model="model" level="modal">
                     <xf:label ref="$resources/dialog-messages/label"/>
                     <xh:div class="fb-dialog-body fb-hide-alert">
-                        <!-- Only allow HTML for full appearance -->
-                        <!--
-                        <fr:checkbox-input ref="$i/html[../appearance = 'full']" class="fb-html-checkbox">
-                            <xf:label ref="$resources/messages/lhha-checkbox"/>
-                        </fr:checkbox-input>
-                        -->
-
                         <xf:group ref="$i">
                             <fr:grid id="fb-messages-repeat" repeat="true" ref="message" template="$ti/message">
                                 <xh:tr>
                                     <xh:td class="fb-messages-language-column">
-                                        <xf:select1 ref="@xml:lang[count($available-languages) > 1]">
+                                        <xf:select1 id="fb-messages-language-select" ref="@xml:lang[count($available-languages) > 1]">
                                             <xf:label ref="$resources/dialog-messages/language-header"/>
 
                                             <xf:itemset ref="$available-languages">
@@ -175,10 +173,19 @@
                                             </xf:itemset>
                                         </fr:open-select1>
                                     </xh:td>
-                                    <xh:td>
-                                        <xf:input id="fb-messages-value-input"  ref=".">
+                                    <xh:td class="fb-messages-is-html-column">
+                                        <fr:checkbox-input id="fb-messages-is-html" ref="@is-html">
+                                            <xf:label ref="$resources/dialog-control-settings/use-html"/>
+                                        </fr:checkbox-input>
+                                    </xh:td>
+                                    <xh:td class="fb-messages-value-column">
+                                        <xf:var name="text" value="."/>
+                                        <xf:input id="fb-messages-value-input" ref="$text[@is-html = false()]" class="fb-messages-value-input">
                                             <xf:label ref="$resources/dialog-messages/value-header"/>
                                         </xf:input>
+                                        <xf:textarea id="fb-messages-value-textarea"  ref="$text[@is-html = true()]" mediatype="text/html" class="fb-messages-value-textarea">
+                                            <xf:label ref="$resources/dialog-messages/value-header"/>
+                                        </xf:textarea>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

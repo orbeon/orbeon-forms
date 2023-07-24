@@ -950,7 +950,11 @@ object FormBuilderXPathApi {
           validBindNames = (
             FormBuilder.iterateNamesInUseCtx(FormBuilderDocContext())
               .filterNot(_ == originalName)
-                ++ Iterator(newName)
+              ++
+              Iterator(
+                newName,
+                "form-resources" // https://github.com/orbeon/orbeon-forms/issues/5909
+              )
           ).toSet
         )
       ) match {

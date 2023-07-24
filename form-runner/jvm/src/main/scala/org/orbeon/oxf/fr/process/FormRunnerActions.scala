@@ -89,9 +89,13 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
           createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
         )
 
-      (path, formRunnerParams.modeType)
-    } flatMap { case (path, sourceModeType) =>
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_NONE, path, sourceModeType = sourceModeType)
+      // https://github.com/orbeon/orbeon-forms/issues/5911
+      val dataFormatVersion =
+        paramByName(params, DataFormatVersionName).map(DataFormatVersion.withName).getOrElse(DataFormatVersion.V400)
+
+      (path, formRunnerParams.modeType, dataFormatVersion)
+    } flatMap { case (path, sourceModeType, dataFormatVersion) =>
+      tryChangeMode(XFORMS_SUBMIT_REPLACE_NONE, path, sourceModeType = sourceModeType, dataFormatVersion = dataFormatVersion)
     }
 
   def trySend(params: ActionParams): Try[Any] =
@@ -288,9 +292,10 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     replace            : String,
     path               : String,
     sourceModeType     : ModeType,
-    formTargetOpt      : Option[String] = None,
-    showProgress       : Boolean        = true,
-    responseIsResource : Boolean        = false
+    formTargetOpt      : Option[String]    = None,
+    showProgress       : Boolean           = true,
+    responseIsResource : Boolean           = false,
+    dataFormatVersion  : DataFormatVersion = DataFormatVersion.Edge
   ): Try[Any] =
     Try {
       val params: List[Option[(Option[String], String)]] =
@@ -301,7 +306,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
           Some(             Some("replace")               -> replace),
           Some(             Some(ShowProgressName)        -> showProgress.toString),
           Some(             Some("content")               -> "xml"),
-          Some(             Some(DataFormatVersionName)   -> DataFormatVersion.Edge.entryName),
+          Some(             Some(DataFormatVersionName)   -> dataFormatVersion.entryName),
           Some(             Some(PruneMetadataName)       -> false.toString),
           Some(             Some("parameters")            -> s"$FormVersionParam $DataFormatVersionName"),
           formTargetOpt.map(Some(FormTargetName)          -> _),

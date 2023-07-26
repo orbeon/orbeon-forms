@@ -115,7 +115,7 @@ object ResourcesPatcher {
       val elem = Support.ensurePath(rootForLang, path map dom.QName.apply)
       elem.attributeOpt("todo") foreach elem.remove
       elem.setText(value)
-      elem.addAttribute("is-html", if (isHtml) "true" else "false")
+      elem.addAttribute("html", if (isHtml) "true" else "false")
     }
 
     def hasTodo(e: NodeInfo) =
@@ -166,7 +166,7 @@ object ResourcesPatcher {
     val propertyNames =
       properties
         .propertiesStartsWith((Prefix :: appForm.toList).mkString("."))
-        .filterNot(_.endsWith(".is-html"))
+        .filterNot(_.endsWith(".html"))
 
     // In 4.6 summary/detail buttons are at the top level
     def filterPathForBackwardCompatibility(path: List[String]): List[String] = path match {
@@ -185,8 +185,8 @@ object ResourcesPatcher {
       val value = properties.getNonBlankString(expandedPropertyName)
 
       // TODO: this doesn't work, as the base (i.e. suffix-less) property doesn't seem to be listed by
-      //  propertiesStartsWith if a property with the .is-html suffix exists
-      val isHtml = properties.getBoolean(expandedPropertyName + ".is-html", default = false)
+      //  propertiesStartsWith if a property with the .html suffix exists
+      val isHtml = properties.getBoolean(expandedPropertyName + ".html", default = false)
 
       value.map(Resource(lang, filterPathForBackwardCompatibility(resourceTokens), _, isHtml))
     }

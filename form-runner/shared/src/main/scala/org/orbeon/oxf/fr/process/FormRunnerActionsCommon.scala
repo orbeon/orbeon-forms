@@ -264,7 +264,7 @@ trait FormRunnerActionsCommon {
     def fromParam =
       for {
         message <- paramByName(params, "message")
-        isHtml   = booleanParamByName(params, "is-html", default = false)
+        isHtml   = booleanParamByName(params, "html", default = false)
       } yield TextOrHtml(spc.evaluateValueTemplate(message), isHtml)
 
     fromResource orElse fromParam
@@ -399,5 +399,5 @@ object FormRunnerActionsCommon {
     frc.formAttachmentsInstance map (_.rootElement)
 
   def isMessageInHtml(nodeInfo: NodeInfo): Boolean =
-    (nodeInfo /@ "is-html").headOption.exists(_.stringValue == "true")
+    (nodeInfo /@ "html").headOption.exists(_.stringValue == "true")
 }

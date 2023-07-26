@@ -25,6 +25,7 @@
     <p:param type="output" name="data"/>
 
     <!-- If data is posted, store as request attribute so that persistence-model.xml picks it up -->
+    <!-- 2023-07-25: We don't run XForms here after this, do we? Do we need this then? -->
     <p:choose href="#instance">
         <p:when test="not(/null/@xsi:nil = 'true')">
             <p:processor name="oxf:scope-serializer">

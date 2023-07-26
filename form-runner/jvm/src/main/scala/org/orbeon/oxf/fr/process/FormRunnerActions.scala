@@ -295,17 +295,17 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     Try {
       val params: List[Option[(Option[String], String)]] =
         List(
-          Some(             Some("uri")                   -> prependUserAndStandardParamsForModeChange(propagateDataPermissions = true, prependCommonFormRunnerParameters(path, forNavigate = false))),
-          Some(             Some("method")                -> HttpMethod.POST.entryName.toLowerCase),
-          Some(             Some(NonRelevantName)         -> RelevanceHandling.Keep.entryName.toLowerCase),
-          Some(             Some("replace")               -> replace),
-          Some(             Some(ShowProgressName)        -> showProgress.toString),
-          Some(             Some("content")               -> "xml"),
-          Some(             Some(DataFormatVersionName)   -> DataFormatVersion.Edge.entryName),
-          Some(             Some(PruneMetadataName)       -> false.toString),
-          Some(             Some("parameters")            -> s"$FormVersionParam $DataFormatVersionName"),
-          formTargetOpt.map(Some(FormTargetName)          -> _),
-          Some(             Some("response-is-resource")  -> responseIsResource.toString)
+          Some(             Some("uri")                  -> prependUserAndStandardParamsForModeChange(propagateDataPermissions = true, prependCommonFormRunnerParameters(path, forNavigate = false))),
+          Some(             Some("method")               -> HttpMethod.POST.entryName.toLowerCase),
+          Some(             Some(NonRelevantName)        -> RelevanceHandling.Keep.entryName.toLowerCase),
+          Some(             Some("replace")              -> replace),
+          Some(             Some(ShowProgressName)       -> showProgress.toString),
+          Some(             Some("content")              -> "xml"),
+          Some(             Some(DataFormatVersionName)  -> getOrGuessFormDataFormatVersion(frc.metadataInstance.map(_.rootElement)).entryName), // use the form's current internal data format version, not `Edge`
+          Some(             Some(PruneMetadataName)      -> false.toString),
+          Some(             Some("parameters")           -> s"$FormVersionParam $DataFormatVersionName"),
+          formTargetOpt.map(Some(FormTargetName)         -> _),
+          Some(             Some("response-is-resource") -> responseIsResource.toString)
         )
       params.flatten.toMap
     } flatMap

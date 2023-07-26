@@ -57,7 +57,7 @@
             </xbl:handler>
 
             <xbl:handler event="xxforms-dialog-open" observer="dialog">
-                <xf:setfocus control="fb-messages-name-select"/>
+                <xf:setfocus control="fb-messages-language-select"/>
             </xbl:handler>
 
             <xbl:handler if="not(valid($i))" event="DOMActivate" observer="fb-save-trigger">

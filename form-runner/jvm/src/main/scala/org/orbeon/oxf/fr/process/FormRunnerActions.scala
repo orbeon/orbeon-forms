@@ -82,10 +82,18 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         } yield
           renderedFormat.entryName -> uri.toString
 
+      // https://github.com/orbeon/orbeon-forms/issues/5911
+      val emailDataFormatVersion =
+        paramByName(params, DataFormatVersionName).map(DataFormatVersion.withName).getOrElse(DataFormatVersion.V400)
+
+      val emailParam =
+        (s"email-$DataFormatVersionName" -> emailDataFormatVersion.entryName)
+
       val path =
         recombineQuery(
           s"/fr/service/$app/$form/email/$document",
-          pdfTiffParams :::
+          emailParam     ::
+          pdfTiffParams  :::
           createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
         )
 

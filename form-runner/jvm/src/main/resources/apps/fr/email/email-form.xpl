@@ -195,9 +195,52 @@
         <p:output name="data" id="form-tiff"/>
     </p:processor>
 
-    <!-- Convert form data for attachment -->
+    <!-- Migrate form data for attachment -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input  name="data"       href="#instance"/>
+        <p:input  name="xhtml"      href="#xhtml-fr-xforms"/>
+        <p:input  name="request"    href="#request"/>
+        <p:input  name="parameters" href="#parameters-with-version"/>
+        <p:input  name="config">
+            <xsl:stylesheet version="2.0">
+                <xsl:variable name="data"          select="/*"                                  as="element()"/>
+                <xsl:variable name="xhtml"         select="doc('input:xhtml')/*"                as="element(xh:html)"/>
+                <xsl:variable name="request"       select="doc('input:request')/*"              as="element(request)"/>
+                <xsl:variable name="app"           select="doc('input:parameters')/*/app"       as="xs:string"/>
+                <xsl:variable name="form"          select="doc('input:parameters')/*/form"      as="xs:string"/>
+                <xsl:variable name="metadata-elem" select="frf:metadataInstanceRootOpt($xhtml)" as="element(metadata)"/>
+
+                <xsl:variable
+                    name="data-format-version-opt"
+                    select="$request/parameters/parameter[name = 'email-data-format-version']/value[p:non-blank()]"
+                    as="xs:string?"/>
+
+                <xsl:variable
+                    name="prune-metadata-opt"
+                    select="$request/parameters/parameter[name = 'prune-metadata']/value[. = ('true', 'false')] = 'true'"
+                    as="xs:boolean?"/>
+
+                <xsl:template match="/">
+                    <xsl:copy-of
+                        xmlns:grid-migration="java:org.orbeon.oxf.fr.GridDataMigration"
+                        select="
+                            grid-migration:dataMaybeMigratedFromEdge(
+                               $app,
+                               $form,
+                               $data/root(),
+                               p:mutable-document($metadata-elem),
+                               ($data-format-version-opt, '4.0.0')[1],
+                               ($prune-metadata-opt,      false())[1]
+                           )"/>
+                </xsl:template>
+            </xsl:stylesheet>
+        </p:input>
+        <p:output name="data" id="migrated-instance"/>
+    </p:processor>
+
+    <!-- Serialize form data for attachment -->
     <p:processor name="oxf:xml-converter">
-        <p:input name="data" href="#instance"/>
+        <p:input name="data" href="#migrated-instance"/>
         <p:input name="config"><config/></p:input>
         <p:output name="data" id="form-xml"/>
     </p:processor>

@@ -65,16 +65,25 @@
     </p:processor>
 
     <!-- Retrieve Form Runner resources -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" transform="oxf:unsafe-xslt" href="#parameters-with-version">
-            <config xsl:version="2.0">
-                <url>
-                    <xsl:value-of select="p:rewrite-service-uri(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())"/>
-                </url>
-                <always-return-status-code>false</always-return-status-code>
-            </config>
+    <!-- 2023-07-26: Use `oxf:xforms-submission` so we can do a POST of the form metadata to handle resources overrides.
+         See https://github.com/orbeon/orbeon-forms/issues/5833 -->
+    <p:processor name="oxf:xforms-submission">
+        <p:input name="submission" transform="oxf:unsafe-xslt" href="#parameters-with-version">
+            <xf:submission
+                xsl:version="2.0"
+                xmlns:xf="http://www.w3.org/2002/xforms"
+                serialization="application/xml"
+                method="post"
+                resource="{p:rewrite-service-uri(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())}"/>
         </p:input>
-        <p:output name="data" id="fr-resources"/>
+        <p:input name="request" transform="oxf:unsafe-xslt" href="#xhtml-fr-xforms">
+            <xsl:stylesheet version="2.0">
+                <xsl:template match="/">
+                    <xsl:copy-of select="frf:metadataInstanceRootOpt(/*)"/>
+                </xsl:template>
+            </xsl:stylesheet>
+        </p:input>
+        <p:output name="response" id="fr-resources"/>
     </p:processor>
 
     <!-- Obtain attachment information -->

@@ -151,12 +151,12 @@ trait FormRunnerActionsCommon {
 
       def maybeMigrateData(originalData: DocumentNodeInfoType): DocumentNodeInfoType =
         GridDataMigration.dataMaybeMigratedFromEdge(
-          app                     = app,
-          form                    = form,
-          data                    = originalData,
-          metadataOpt             = frc.metadataInstance.map(_.root),
-          dataFormatVersionString = databaseDataFormatVersion.entryName,
-          pruneMetadata           = pruneMetadata
+          app                        = app,
+          form                       = form,
+          data                       = originalData,
+          metadataOpt                = frc.metadataInstance.map(_.root),
+          dstDataFormatVersionString = databaseDataFormatVersion.entryName,
+          pruneMetadata              = pruneMetadata
         )
 
       // Forward the token if present so the persistence proxy can use it

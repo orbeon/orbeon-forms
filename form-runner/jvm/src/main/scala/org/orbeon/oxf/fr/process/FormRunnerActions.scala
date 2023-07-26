@@ -232,12 +232,12 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
             def maybeMigrateData(originalData: DocumentNodeInfoType): DocumentNodeInfoType =
               GridDataMigration.dataMaybeMigratedFromEdge(
-                app                     = currentApp,
-                form                    = currentForm,
-                data                    = originalData,
-                metadataOpt             = frc.metadataInstance.map(_.root),
-                dataFormatVersionString = FormRunnerPersistence.providerDataFormatVersionOrThrow(formRunnerParams.appForm).entryName,
-                pruneMetadata           = evaluatedSendProperties.get(PruneMetadataName).flatten.contains(true.toString),
+                app                        = currentApp,
+                form                       = currentForm,
+                data                       = originalData,
+                metadataOpt                = frc.metadataInstance.map(_.root),
+                dstDataFormatVersionString = FormRunnerPersistence.providerDataFormatVersionOrThrow(formRunnerParams.appForm).entryName,
+                pruneMetadata              = evaluatedSendProperties.get(PruneMetadataName).flatten.contains(true.toString),
               )
 
             val basePath =

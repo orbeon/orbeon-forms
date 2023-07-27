@@ -462,6 +462,109 @@
         abort
     </property>
 
+    <!-- ==== Summary page buttons and processes=================================================================== -->
+
+    <property as="xs:string"  name="oxf.fr.summary.button.home.visible.*.*">
+        xxf:relevant(xxf:instance('fr-buttons-logic-instance')/home)
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.home.enabled.*.*">
+        not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/home))
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.print.visible.*.*">
+        xxf:relevant(xxf:instance('fr-buttons-logic-instance')/print)
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.print.enabled.*.*">
+        not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/print))
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.review.visible.*.*">
+        xxf:relevant(xxf:instance('fr-buttons-logic-instance')/review)
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.review.enabled.*.*">
+        not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/review))
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.pdf.visible.*.*">
+        xxf:relevant(xxf:instance('fr-buttons-logic-instance')/pdf)
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.pdf.enabled.*.*">
+        not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/pdf))
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.tiff.visible.*.*">
+        xxf:relevant(xxf:instance('fr-buttons-logic-instance')/tiff)
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.tiff.enabled.*.*">
+        not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/tiff))
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.excel-export.visible.*.*">
+        xxf:relevant(xxf:instance('fr-buttons-logic-instance')/excel-export)
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.excel-export.enabled.*.*">
+        not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/excel-export))
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.xml-export.visible.*.*">
+        xxf:relevant(xxf:instance('fr-buttons-logic-instance')/xml-export)
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.xml-export.enabled.*.*">
+        not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/xml-export))
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.delete.visible.*.*">
+        xxf:relevant(xxf:instance('fr-buttons-logic-instance')/delete)
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.delete.enabled.*.*">
+        not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/delete))
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.import.visible.*.*">
+        xxf:relevant(xxf:instance('fr-buttons-logic-instance')/import)
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.import.enabled.*.*">
+        not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/import))
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.duplicate.visible.*.*">
+        xxf:relevant(xxf:instance('fr-buttons-logic-instance')/duplicate)
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.duplicate.enabled.*.*">
+        not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/duplicate))
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.new.visible.*.*">
+        xxf:relevant(xxf:instance('fr-buttons-logic-instance')/new)
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.new.enabled.*.*">
+        not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/new))
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.summary.process.home.*.*">
+        navigate("/fr/")
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.process.print.*.*">
+        xf:dispatch(name = "fr-summary-view", targetid = "fr-form-model")
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.process.review.*.*">
+        xf:dispatch(name = "fr-summary-view", targetid = "fr-form-model")
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.process.pdf.*.*">
+        xf:dispatch(name = "fr-summary-export", targetid = "fr-form-model", fr-export-format = "pdf")
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.process.tiff.*.*">
+        xf:dispatch(name = "fr-summary-export", targetid = "fr-form-model", fr-export-format = "tiff")
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.process.excel-export.*.*">
+        xf:dispatch(name = "fr-summary-export", targetid = "fr-form-model", fr-export-format = "excel-export")
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.process.xml-export.*.*">
+        xf:dispatch(name = "fr-summary-export", targetid = "fr-form-model", fr-export-format = "xml-export")
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.process.delete.*.*">
+        xf:dispatch(name = "fr-show", targetid = "delete-confirmation-dialog")
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.process.import.*.*">
+        navigate("/fr/{fr:app-name()}/{fr:form-name()}/import")
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.process.duplicate.*.*">
+        xf:dispatch(name = "fr-summary-duplicate", targetid = "fr-form-model")
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.process.new.*.*">
+        xf:dispatch(name = "fr-summary-create", targetid = "fr-form-model")
+    </property>
+
     <!-- ==== Internal Form Builder properties ==================================================================== -->
 
     <!-- In case somebody overrides with weaker properties -->

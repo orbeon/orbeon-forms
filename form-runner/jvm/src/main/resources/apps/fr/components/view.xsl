@@ -86,7 +86,7 @@
         <fr:row>
             <fr:version/>
         </fr:row>
-        <fr:buttons-bar/>
+        <fr:template-buttons-bar/>
         <fr:pdf-header-footer/>
     </xsl:variable>
 
@@ -1259,7 +1259,7 @@
         </xf:switch>
     </xsl:template>
 
-    <xsl:template match="fr:buttons-bar" name="fr-buttons-bar">
+    <xsl:template match="fr:template-buttons-bar" name="fr-buttons-bar">
 
         <xsl:param name="buttons-property"  tunnel="yes" as="xs:string*"  select="()"/>
         <xsl:param name="highlight-primary" tunnel="yes" as="xs:boolean?" select="()"/>
@@ -1280,166 +1280,10 @@
                     model="fr-form-model"
                     class="fr-buttons"
                     ref=".[not($hide-buttons-bar)]">
-
-                    <xf:var name="buttons-property-override"  value="'{$buttons-property}'"/>
-                    <xf:var name="highlight-primary-override" value="'{$highlight-primary}'"/>
-                    <xf:var name="inverse-override"           value="'{$inverse}'"/>
-
-                    <xf:var
-                        name="highlight-primary"
-                        value="
-                            if ($highlight-primary-override = '') then
-                                $fr-mode != 'test'
-                            else
-                                xs:boolean($highlight-primary-override)"
-                    />
-
-                    <xf:var
-                        name="inverse"
-                        value="
-                            if ($inverse-override = '') then
-                                $fr-mode  = 'test'
-                            else
-                                xs:boolean($inverse-override)"/>
-
-                    <!-- Message shown next to the buttons (empty by default) -->
-                    <xh:span class="fr-buttons-message">
-                        <xf:output mediatype="text/html" ref="$fr-resources/detail/messages/buttons-message"/>
-                    </xh:span>
-
-                    <xf:var
-                        name="names-and-refs-if-relevant"
-                        value="
-                            let $buttons-property :=
-                                    if (xxf:non-blank($buttons-property-override)) then
-                                        $buttons-property-override
-                                    else if ($fr-mode = 'view') then
-                                        'oxf.fr.detail.buttons.view'
-                                    else if ($fr-mode = 'import') then
-                                        'oxf.fr.import.buttons'
-                                    else
-                                        'oxf.fr.detail.buttons',
-                                $buttons-names :=
-                                    if (xxf:is-blank($buttons-property-override) and $fr-mode = ('pdf', 'email')) then
-                                        ()
-                                    else if (xxf:is-blank($buttons-property-override) and $fr-mode = 'test') then
-                                        (('wizard-toc', 'wizard-prev', 'wizard-next')[fr:is-wizard-body-shown()], 'validate')
-                                    else
-                                        xxf:split(xxf:property(string-join(($buttons-property, fr:app-name(), fr:form-name()), '.'))),
-                                $is-inner :=
-                                    starts-with($buttons-property-override, 'oxf.fr.detail.buttons.inner')
-                            return
-                                for $button-name in $buttons-names
-                                return
-                                    let $parts          := xxf:split($button-name, '|')[xxf:non-blank()],
-                                        $is-multiple    := count($parts) gt 1,
-                                        $parts-and-refs :=
-                                            for $part in $parts
-                                            return
-                                                let $visible-expression :=
-                                                        xxf:property(
-                                                            string-join(
-                                                                ('oxf.fr.detail.button', $part, 'visible', fr:app-name(), fr:form-name()),
-                                                                '.'
-                                                            )
-                                                        ),
-                                                    $enabled-expression :=
-                                                        xxf:property(
-                                                            string-join(
-                                                                ('oxf.fr.detail.button', $part, 'enabled', fr:app-name(), fr:form-name()),
-                                                                '.'
-                                                            )
-                                                        ),
-                                                    $visible-or-empty :=
-                                                        if (xxf:non-blank($visible-expression)) then
-                                                            boolean(xxf:instance('fr-form-instance')/xxf:evaluate($visible-expression))
-                                                        else
-                                                            (),
-                                                    $enabled-or-empty :=
-                                                        if (xxf:non-blank($enabled-expression)) then
-                                                            boolean(xxf:instance('fr-form-instance')/xxf:evaluate($enabled-expression))
-                                                        else
-                                                            ()
-                                                return
-                                                    for $ref in
-                                                        if (exists($visible-or-empty) or exists($enabled-or-empty)) then
-                                                            (
-                                                                if (exists($enabled-or-empty) and not($enabled-or-empty)) then
-                                                                    ''
-                                                                else
-                                                                    xxf:instance('fr-triggers-instance')/other
-                                                            )[
-                                                                empty($visible-or-empty) or $visible-or-empty
-                                                            ]
-                                                        else if ($is-inner and $part = ('save-final', 'submit', 'send', 'review', 'pdf', 'tiff', 'email')) then
-                                                            xxf:binding('fr-wizard-submit-hide')
-                                                        else
-                                                            xxf:instance('fr-triggers-instance')/*[name() = (
-                                                                if ($part = 'summary') then
-                                                                    'can-access-summary'
-                                                                else if ($part = 'pdf') then
-                                                                    'pdf'
-                                                                else if ($part = 'tiff') then
-                                                                    'tiff'
-                                                                else
-                                                                    'other'
-                                                            )]
-                                                    return
-                                                        ($part, $ref)[xxf:relevant($ref)]
-                                    return
-                                        if ($is-multiple and exists($parts-and-refs)) then
-                                            (string-join($parts-and-refs[position() mod 2 = 1], '|'), xxf:instance('fr-triggers-instance')/other)
-                                        else
-                                            $parts-and-refs
-                        "/>
-
-                    <xf:repeat ref="$names-and-refs-if-relevant[position() mod 2 = 1]">
-                        <xf:var name="position"    value="position()"/>
-                        <xf:var name="button-name" value="."/>
-                        <xf:var name="ref"         value="$names-and-refs-if-relevant[$position * 2]"/>
-                        <xf:var name="primary"     value="$highlight-primary and $position = last()"/>
-                        <xf:var name="parts"       value="xxf:split($button-name, '|')[xxf:non-blank()]"/>
-                        <xf:var name="is-multiple" value="count($parts) gt 1"/>
-
-                        <xf:var
-                            name="class"
-                            value="
-                                concat(
-                                    'xforms-trigger-appearance-xxforms-',
-                                     if ($primary) then
-                                        'primary'
-                                     (: 2021-12-01: Offline, using `position() doesn't return the correct value. :)
-                                     else if ($inverse and $position = last()) then
-                                        'inverse'
-                                     else
-                                        'default'
-                                )
-                        "/>
-
-                        <xf:switch caseref="$is-multiple" xxf:update="full">
-                            <xf:case value="false()">
-                                <!-- Because @appearance is static, use a CSS class instead for primary/inverse. This requires
-                                     changes to dropdown.less, which is not the best solution. Ideally,
-                                     we could find a dynamic way to set that class on the nested <button> so that standard
-                                     Bootstrap rules apply. -->
-                                <fr:process-button
-                                    name="{{$button-name}}"
-                                    ref="if ($is-multiple) then () else $ref"
-                                    class="{{$class}}"/>
-                            </xf:case>
-                            <xf:case value="true()">
-                                <fr:drop-trigger
-                                    class="{{$class}}"
-                                    ref="if (not($is-multiple)) then () else $ref">
-                                    <xf:itemset ref="$parts">
-                                        <xf:label value="xxf:r(concat('buttons.', .), '|fr-fr-resources|')"/>
-                                        <xf:value value="."/>
-                                    </xf:itemset>
-                                </fr:drop-trigger>
-                            </xf:case>
-                        </xf:switch>
-                    </xf:repeat>
-
+                    <fr:buttons-bar
+                        buttons-property="{$buttons-property}"
+                        highlight-primary="{$highlight-primary}"
+                        inverse="{$inverse}"/>
                 </xf:group>
             </xsl:when>
             <xsl:otherwise/>

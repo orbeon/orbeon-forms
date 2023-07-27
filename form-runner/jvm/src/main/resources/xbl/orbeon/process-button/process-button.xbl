@@ -24,9 +24,8 @@
         <xbl:template>
 
             <!-- Figure button label -->
-            <xf:var name="button-name" value="fr:component-param-value('name')"/>
-            <xf:var name="fr-resources"><xxf:value xxbl:scope="outer" value="$fr-resources"/></xf:var>
-            <xf:var name="button-label" value="$fr-resources/buttons/*[name() = $button-name]"/>
+            <xf:var name="button-name"  value="fr:component-param-value('name')"/>
+            <xf:var name="button-label" value="xxf:r(concat('buttons.', $button-name), '|fr-fr-resources|')"/>
 
             <!-- Figure what, if any, loading indicator to use -->
             <xf:var name="loading-indicator-property"
@@ -40,7 +39,10 @@
 
             <!-- React to button pressed -->
             <xf:action event="DOMActivate" type="xpath">
-                xxf:instance('fr-form-instance')/fr:run-process-by-name('oxf.fr.detail.process', $button-name)
+                xxf:instance('fr-form-instance')/fr:run-process-by-name(
+                    if (fr:mode() = 'summary') then 'oxf.fr.summary.process' else 'oxf.fr.detail.process',
+                    $button-name
+                )
             </xf:action>
 
             <xf:group ref="xxf:binding('fr-process-button')">

@@ -34,9 +34,11 @@
                 <xf:action type="xpath">fbf:selectCellForControlId(event('control-id'))</xf:action>
                 <xf:action type="javascript">ORBEON.builder.private.API.moveFocusedCellIntoView();</xf:action>
 
+                <xf:setvalue ref="$li/lang" value="fbf:currentLang()"/>
+
                 <!-- Clear all local values -->
                 <xf:setvalue iterate="$i//*[not(*)] | $i/*//@*" ref="."/>
-                <xf:delete ref="$i/(label, hint, help, text)/fr:param"/>
+                <xf:delete ref="$i/(label, hint, help, text)/*"/>
 
                 <xf:setvalue ref="$i/original-control-name"   value="frf:controlNameFromId(event('control-id'))"/>
                 <xf:setvalue ref="$i/control-name"            value="$i/original-control-name"/>
@@ -148,9 +150,9 @@
 
                     <xf:var name="lhh" value="local-name()"/>
 
-                    <xf:setvalue
-                        ref="value"
-                        value="fbf:getControlLhhOrEmpty($i/control-name, $lhh)"/>
+                    <xf:insert
+                        context="."
+                        origin="fbf:getControlLhhValuesForAllLangs($i/control-name, $lhh)"/>
 
                     <xf:setvalue
                         ref="@isHTML"
@@ -421,7 +423,7 @@
                             for $mip in ('default', 'calculate', 'relevant', 'readonly', 'whitespace') return
                                 fbf:writeAndNormalizeCalculatedMip($i/control-name, $mip, $i/*[name() = $mip]),
                             for $lh in $i/(label, hint, help, text)[@supported = 'true'] return
-                                fbf:setControlLabelHintHelpOrText(
+                                fbf:setControlLhhValuesForAllLangs(
                                     $i/control-name,
                                     local-name($lh),
                                     $lh/value,
@@ -640,19 +642,19 @@
                         <whitespace/>
 
                         <label isHTML="" supported="">
-                            <value/>
+                            <!--<value lang=""/>-->
                             <!--<fr:param/>-->
                         </label>
                         <hint  isHTML="" supported="">
-                            <value/>
+                            <!--<value lang=""/>-->
                             <!--<fr:param/>-->
                         </hint>
                         <help  isHTML="" supported="">
-                            <value/>
+                            <!--<value lang=""/>-->
                             <!--<fr:param/>-->
                         </help>
                         <text  isHTML="" supported="">
-                            <value/>
+                            <!--<value lang=""/>-->
                             <!--<fr:param/>-->
                         </text>
 
@@ -662,6 +664,21 @@
                 </xf:instance>
 
                 <xf:var name="i" value="instance()"/>
+
+                <xf:instance id="language-instance">
+                    <_>
+                        <lang/>
+                    </_>
+                </xf:instance>
+
+                <xf:var name="li" value="instance('language-instance')"/>
+
+                <!-- Language change -->
+                <xf:action event="xxforms-value-changed" observer="language-instance">
+                    <!-- Dynamic bind depends on the current language, we must do an explicit RRR -->
+                    <xf:rebuild/>
+                    <xf:recalculate/>
+                </xf:action>
 
                 <xf:instance id="dynamic">
                     <xh:html/>
@@ -721,18 +738,20 @@
                         ref="alert/@global"
                         type="xs:boolean"/>
                     <xf:bind
-                        ref="alert/@message"
+                        ref="alert/message"
                         xxf:whitespace="trim"
                         readonly="../@global = true()"/>
                     <xf:bind
                         ref="@global-default-alert-message"
                         calculate="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/><!-- FIXME: This uses FB's current language, not the edited form's -->
+
                     <xf:bind
                         id="default-alert"
                         ref="if (alert/@global = true())
                              then @global-default-alert-message
-                             else alert/@message"/>
-                    <!-- Keep copy of default alert, whether default for control or global default -->
+                             else alert/message[@lang = $li/lang]/@value"/>
+
+                    <!-- Keep read-only copy of default alert, to be able to display it in read-only in validation repeated grid. -->
                     <xf:bind
                         ref="@readonly-alert-message"
                         calculate="bind('default-alert')"/>
@@ -851,7 +870,7 @@
                             constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"/>
 
                         <xf:bind
-                            ref="alert/@message"
+                            ref="alert/message/@value"
                             xxf:whitespace="trim"/>
                     </xf:bind>
                 </xf:bind>
@@ -905,7 +924,8 @@
                         name="is-attachment"
                         value="xxf:split($i/standard-classes) = 'fr-attachment'"/>
 
-                    <!-- TODO: Language selector like in `dialog-itemsets.xbl` (create XBL component and use native functions). -->
+                    <!-- TODO: move -->
+                    <fb:language-choice ref="$li/lang"/>
 
                     <fr:tabbable id="fb-tabbable">
                         <fr:tab id="base-tab">
@@ -1313,7 +1333,7 @@
                                             <xf:input
                                                 ref="
                                                     if (@default-alert = false() or @level != 'error') then
-                                                        alert/@message
+                                                        alert/message[@lang = $li/lang]/@value
                                                     else
                                                         $i/default-alert/@readonly-alert-message">
                                                 <xf:label ref="$resources/dialog-control-settings/alert/label"/>
@@ -1385,15 +1405,15 @@
                                         <xf:label ref="$resources/dialog-control-settings/use-html"/>
                                     </fr:checkbox-input>
                                     <xf:var name="is-html" value="@isHTML = 'true'"/>
-                                    <xf:input ref=".[not($is-html) and $lhh = ('label', 'hint')]/value">
+                                    <xf:input ref=".[not($is-html) and $lhh = ('label', 'hint')]/value[@lang = $li/lang]">
                                         <xf:label ref="$resource/label"/>
                                         <xf:hint  ref="$resource/hint"/>
                                     </xf:input>
-                                    <xf:textarea ref=".[not($is-html) and not($lhh = ('label', 'hint'))]/value">
+                                    <xf:textarea ref=".[not($is-html) and not($lhh = ('label', 'hint'))]/value[@lang = $li/lang]">
                                         <xf:label ref="$resource/label"/>
                                         <xf:hint  ref="$resource/hint"/>
                                     </xf:textarea>
-                                    <fr:tinymce ref=".[$is-html]/value">
+                                    <fr:tinymce ref=".[$is-html]/value[@lang = $li/lang]">
                                         <xf:label ref="$resource/label"/>
                                         <xf:hint  ref="$resource/hint"/>
                                     </fr:tinymce>

@@ -21,7 +21,7 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr
-import org.orbeon.oxf.fr.FormRunner.{findControlByName, formRunnerProperty}
+import org.orbeon.oxf.fr.FormRunner.{allLangs, findControlByName, formRunnerProperty}
 import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames.{FRServiceCallTest, XFSendTest}
@@ -445,6 +445,44 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def getControlLhhOrEmpty(controlName: String, lhh: String): String =
     FormBuilder.getControlResourceOrEmpty(controlName, lhh)(FormBuilderDocContext())
+
+  //@XPathFunction
+  def getControlLhhValuesForAllLangs(controlName: String, lhh: String): Iterable[NodeInfo] = {
+    val langs = allLangs(resourcesRoot)
+
+    val valuesForExistingLangs = for {
+      (lang, nodeInfos) <- FormBuilder.getControlResourcesWithLang(controlName, lhh, langs)(FormBuilderDocContext())
+      nodeInfo <- nodeInfos.headOption
+    } yield lang -> nodeInfo.getStringValue
+
+    val existingLangs = valuesForExistingLangs.map(_._1).toSet
+
+    val valuesForMissingLangs = langs.filterNot(existingLangs).map(lang => lang -> "")
+
+    for {
+      (lang, value) <- valuesForExistingLangs ++ valuesForMissingLangs
+    } yield NodeConversions.elemToNodeInfo(<value lang={ lang }>{ value }</value>)
+  }
+
+  //@XPathFunction
+  def setControlLhhValuesForAllLangs(
+    controlName : String,
+    lhh         : String,
+    values      : Array[NodeInfo],
+    params      : Array[NodeInfo],
+    isHTML      : Boolean): Unit = {
+    val langValues = values.map { nodeInfo =>
+      val lang = nodeInfo.attValue("lang")
+      val value = nodeInfo.getStringValue
+      lang -> Seq(value)
+    }
+
+    implicit val formBuilderDocContext: FormBuilderDocContext = FormBuilderDocContext()
+
+    FormBuilder.setControlResourcesWithLang(controlName, lhh, langValues)
+    setControlLHHATParams(controlName, lhh, params)
+    setHTMLMediatype(getControlLhhat(controlName, lhh), isHTML)
+  }
 
   //@XPathFunction
   def getControlLhhtParams(controlName: String, lhh: String): Iterable[NodeInfo] =

@@ -545,11 +545,9 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     // XML representation used by Form Builder
     def toXML(forLang: String): sx.Elem = {
-      // The alert contains the message for the main language as an attribute, and the languages for the other
-      // languages so we can write them back.
-      <alert message={messages.toMap getOrElse (forLang, "")} global={global.toString}>{
+      <alert global={global.toString}>{
         messages collect {
-          case (lang, message) if lang != forLang =>
+          case (lang, message) =>
             <message lang={lang} value={message}/>
         }
       }</alert>

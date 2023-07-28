@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.{FontStyle, PageSizeUnits}
+import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.{FSFontUseCase, FontStyle, PageSizeUnits}
 import com.openhtmltopdf.pdfboxout.{CustomPdfRendererBuilder, PdfRendererBuilder}
 import com.openhtmltopdf.util.XRLog
 import org.orbeon.io.IOUtils
@@ -36,6 +36,10 @@ import scala.util.control.NonFatal
 private object XHTMLToPDFProcessor {
 
   val logger = LoggerFactory.createLogger(classOf[XHTMLToPDFProcessor])
+
+  val DefaultFontFamily = "Inter"
+  val DefaultFontPath   = "/apps/fr/print/Inter-Medium.ttf"
+  val DefaultFontWeight = 500
 
   val PdfFontPropertyPrefix       = "oxf.fr.pdf.font."
   val PdfFontPathProperty         = PdfFontPropertyPrefix + "path"
@@ -62,13 +66,24 @@ private object XHTMLToPDFProcessor {
           propertySet.getNonBlankString(s"$PdfFontFamilyPropertyPrefix$name").orNull,
           400,
           FontStyle.NORMAL,
-          true // `subset`
+          true, // `subset`
+          java.util.EnumSet.of(FSFontUseCase.DOCUMENT)
         )
       } catch {
         case NonFatal(_) =>
           logger.warn(s"Failed to load font by path: `$path` specified with property `$propName`")
       }
     }
+
+  def embedDefaultFont(pdfRendererBuilder: CustomPdfRendererBuilder): Unit =
+    pdfRendererBuilder.useFont(
+      () => ResourceManagerWrapper.instance.getContentAsStream(DefaultFontPath),
+      DefaultFontFamily,
+      DefaultFontWeight,
+      FontStyle.NORMAL,
+      true, // `subset`
+      java.util.EnumSet.of(FSFontUseCase.FALLBACK_PRE)
+    )
 
   // NOTE: Default compression level is 0.75:
   // https://docs.oracle.com/javase/8/docs/api/javax/imageio/plugins/jpeg/JPEGImageWriteParam.html#JPEGImageWriteParam-java.util.Locale-
@@ -125,6 +140,7 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
     )
 
     embedFontsConfiguredInProperties(pdfRendererBuilder, propertySet)
+    embedDefaultFont(pdfRendererBuilder)
 
     IOUtils.useAndClose(outputStream) { os =>
 

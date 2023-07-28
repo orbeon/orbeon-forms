@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.pdf
 
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.PageSizeUnits
-import com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder
+import com.openhtmltopdf.pdfboxout.{CustomPdfRendererBuilder, PdfRendererBuilder}
 import com.openhtmltopdf.util.XRLog
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -108,8 +108,24 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
 
     pdfRendererBuilder.useDefaultPageSize(8.5f, 11f, PageSizeUnits.INCHES)
 
-//    pdfRendererBuilder.usePdfUaAccessbility(true) // java.lang.IndexOutOfBoundsException if uncomment
-//    pdfRendererBuilder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_U)
+    val propertySet = Properties.instance.getPropertySet
+
+    pdfRendererBuilder.usePdfUaAccessbility(propertySet.getBoolean("oxf.fr.pdf.accessibility", default = false))
+
+    pdfRendererBuilder.usePdfAConformance(
+      propertySet.getString("oxf.fr.pdf.pdf/a", default = "none") match {
+        case "none" => PdfRendererBuilder.PdfAConformance.NONE
+        case "1a"   => PdfRendererBuilder.PdfAConformance.PDFA_1_A
+        case "1b"   => PdfRendererBuilder.PdfAConformance.PDFA_1_B
+        case "2a"   => PdfRendererBuilder.PdfAConformance.PDFA_2_A
+        case "2b"   => PdfRendererBuilder.PdfAConformance.PDFA_2_B
+        case "2u"   => PdfRendererBuilder.PdfAConformance.PDFA_2_U
+        case "3a"   => PdfRendererBuilder.PdfAConformance.PDFA_3_A
+        case "3b"   => PdfRendererBuilder.PdfAConformance.PDFA_3_B
+        case "3u"   => PdfRendererBuilder.PdfAConformance.PDFA_3_U
+        case other  => throw new IllegalArgumentException(s"Invalid PDF/A conformance: `$other`")
+      }
+    )
 
     embedFontsConfiguredInProperties(pdfRendererBuilder)
 

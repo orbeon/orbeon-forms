@@ -294,6 +294,10 @@
     <!-- Automatic PDF JPEG compression level for image attachments that needs reencoding -->
     <property as="xs:string"  name="oxf.fr.pdf.jpeg.compression"                                value="0.9"/>
 
+    <!-- Automatic PDF accessibility and PDF/A level -->
+    <property as="xs:boolean" name="oxf.fr.pdf.accessibility"                                   value="false"/>
+    <property as="xs:string"  name="oxf.fr.pdf.pdf/a"                                           value="none"/>
+
     <!-- Email configuration -->
     <property as="xs:string"  name="oxf.fr.email.smtp.host.*.*"                                 value=""/>
     <property as="xs:string"  name="oxf.fr.email.smtp.port.*.*"                                 value=""/>

@@ -55,7 +55,7 @@ private object XHTMLToPDFProcessor {
       propName <- propertySet.propertiesStartsWith(PdfFontPathProperty) ++ propertySet.propertiesStartsWith(PdfFontResourceProperty)
       path     <- propertySet.getNonBlankString(propName)
       _ :: _ :: _ :: _ :: pathOrResource :: name :: Nil = propName.splitTo[List](".")
-    } {
+    } locally {
       try {
         pdfRendererBuilder.useFont(
           () => pathOrResource match {
@@ -70,8 +70,8 @@ private object XHTMLToPDFProcessor {
           java.util.EnumSet.of(FSFontUseCase.DOCUMENT)
         )
       } catch {
-        case NonFatal(_) =>
-          logger.warn(s"Failed to load font by path: `$path` specified with property `$propName`")
+        case NonFatal(t) =>
+          logger.warn(t)(s"Failed to load font with property `$propName` of value `$path`")
       }
     }
 

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.PageSizeUnits
+import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.{FontStyle, PageSizeUnits}
 import com.openhtmltopdf.pdfboxout.{CustomPdfRendererBuilder, PdfRendererBuilder}
 import com.openhtmltopdf.util.XRLog
 import org.orbeon.io.IOUtils
@@ -22,12 +22,12 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.serializer.HttpSerializerBase
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
-import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 
-import java.io.{File, OutputStream}
+import java.io.{FileInputStream, OutputStream}
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -46,32 +46,29 @@ private object XHTMLToPDFProcessor {
   var DefaultContentType  = ContentTypes.PdfContentType
   val DefaultDotsPerPixel = 14 // default is 20, and makes things larger
 
-  def embedFontsConfiguredInProperties(pdfRendererBuilder: CustomPdfRendererBuilder): Unit = {
-    val props = Properties.instance.getPropertySet
-
+  def embedFontsConfiguredInProperties(pdfRendererBuilder: CustomPdfRendererBuilder, propertySet: PropertySet): Unit =
     for {
-      propName <- props.propertiesStartsWith(PdfFontPathProperty) ++ props.propertiesStartsWith(PdfFontResourceProperty)
-      path     <- props.getNonBlankString(propName)
+      propName <- propertySet.propertiesStartsWith(PdfFontPathProperty) ++ propertySet.propertiesStartsWith(PdfFontResourceProperty)
+      path     <- propertySet.getNonBlankString(propName)
       _ :: _ :: _ :: _ :: pathOrResource :: name :: Nil = propName.splitTo[List](".")
     } {
       try {
-
-        val familyOpt = props.getNonBlankString(s"$PdfFontFamilyPropertyPrefix$name")
-
-        val absolutePath =
-          pathOrResource match {
-            case "path"     => path
-            case "resource" => ResourceManagerWrapper.instance.getRealPath(path)
+        pdfRendererBuilder.useFont(
+          () => pathOrResource match {
+            case "path"     => new FileInputStream(path)
+            case "resource" => ResourceManagerWrapper.instance.getContentAsStream(path)
             case _          => throw new IllegalStateException
-          }
-
-        pdfRendererBuilder.useFont(new File(absolutePath), familyOpt.orNull)
+          },
+          propertySet.getNonBlankString(s"$PdfFontFamilyPropertyPrefix$name").orNull,
+          400,
+          FontStyle.NORMAL,
+          true // `subset`
+        )
       } catch {
         case NonFatal(_) =>
           logger.warn(s"Failed to load font by path: `$path` specified with property `$propName`")
       }
     }
-  }
 
   // NOTE: Default compression level is 0.75:
   // https://docs.oracle.com/javase/8/docs/api/javax/imageio/plugins/jpeg/JPEGImageWriteParam.html#JPEGImageWriteParam-java.util.Locale-
@@ -127,7 +124,7 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
       }
     )
 
-    embedFontsConfiguredInProperties(pdfRendererBuilder)
+    embedFontsConfiguredInProperties(pdfRendererBuilder, propertySet)
 
     IOUtils.useAndClose(outputStream) { os =>
 

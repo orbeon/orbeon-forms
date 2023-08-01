@@ -341,14 +341,18 @@
                                     'fa-file-o'
                         }"/>
 
+                        <xf:var
+                            name="disable-download"
+                            value="fr:component-param-value('allow-download') = 'false' or fr:mode() = ('pdf', 'email')"/>
+
                         <xf:output
-                            ref=".[fr:component-param-value('allow-download') = 'false']"
+                            ref=".[$disable-download]"
                             value="@filename"
                             class="fr-attachment-filename"/>
 
                         <xf:output
                             appearance="xxf:download"
-                            ref=".[not(fr:component-param-value('allow-download') = 'false')]"
+                            ref=".[not($disable-download)]"
                             class="fr-attachment-filename">
 
                             <xf:label ref="@filename"/>

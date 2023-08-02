@@ -195,7 +195,7 @@
         <p:output name="data" id="form-tiff"/>
     </p:processor>
 
-    <!-- Migrate form data for attachment -->
+    <!-- Migrate form data for XML attachment -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input  name="data"       href="#instance"/>
         <p:input  name="xhtml"      href="#xhtml-fr-xforms"/>

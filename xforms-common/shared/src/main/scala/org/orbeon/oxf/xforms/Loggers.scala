@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import org.log4s.Logger
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 
-import scala.collection.mutable
+import java.util.concurrent.ConcurrentHashMap
 
 
 // Global indented loggers
@@ -24,17 +24,15 @@ object Loggers {
 
   val logger: Logger = LoggerFactory.createLogger("org.orbeon.oxf.xforms.processor.XFormsServer")
 
-  private val LoggersByCategory = new mutable.HashMap[String, IndentedLogger]
+  private val LoggersByCategory = new ConcurrentHashMap[String, IndentedLogger]
 
-  // Return an indented logger for the given category
-  def getIndentedLogger(category: String): IndentedLogger = synchronized {
-
-    def newLogger = {
-      val logger = Loggers.logger
-      val isDebugEnabled = logger.isDebugEnabled && XFormsGlobalProperties.getDebugLogging.contains(category)
-      new IndentedLogger(logger, isDebugEnabled)
-    }
-
-    LoggersByCategory.getOrElseUpdate(category, newLogger)
-  }
+  def getIndentedLogger(category: String): IndentedLogger =
+    LoggersByCategory.computeIfAbsent(
+      category,
+      _ => {
+        val logger = Loggers.logger
+        val isDebugEnabled = logger.isDebugEnabled && XFormsGlobalProperties.getDebugLogging.contains(category)
+        new IndentedLogger(logger, isDebugEnabled)
+      }
+    )
 }

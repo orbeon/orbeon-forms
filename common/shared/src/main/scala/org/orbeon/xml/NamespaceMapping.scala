@@ -14,8 +14,8 @@
 package org.orbeon.xml
 
 import java.{util => ju}
-
 import scala.jdk.CollectionConverters._
+
 
 case class NamespaceMapping private (hash: String, mapping: Map[String, String]) {
   require((hash ne null) && (mapping ne null))
@@ -44,14 +44,11 @@ object NamespaceMapping {
 
   val EmptyMapping: NamespaceMapping = apply(Map.empty[String, String])
 
-  def apply(mapping: Map[String, String]): NamespaceMapping = {
-    var result = cache.get(mapping)
-    if (result eq null) {
-      result = NamespaceMapping(mapping.hashCode.toString, mapping)
-      cache.put(mapping, result)
-    }
-    result
-  }
+  def apply(mapping: Map[String, String]): NamespaceMapping =
+    cache.computeIfAbsent(
+      mapping,
+      _ => NamespaceMapping(mapping.hashCode.toString, mapping)
+    )
 
   // For legacy callers
   def apply(mapping: ju.Map[String, String]): NamespaceMapping =

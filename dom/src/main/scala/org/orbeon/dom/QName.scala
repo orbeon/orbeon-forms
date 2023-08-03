@@ -3,7 +3,6 @@ package org.orbeon.dom
 import java.{util => ju}
 
 
-
 object QName {
 
   implicit class QNameOps(private val q: QName) extends AnyVal {
@@ -35,16 +34,10 @@ object QName {
 
     val namespace = if (namespaceOrNull eq null) Namespace.EmptyNamespace else namespaceOrNull
 
-    val cache = getOrCreateNamespaceCache(namespace)
-
-    var answer = cache.get(localName)
-
-    if (answer eq null) {
-      answer = applyNormalize(localName, namespace, qualifiedNameOrNull)
-      cache.put(localName, answer)
-    }
-
-    answer
+    getOrCreateNamespaceCache(namespace).computeIfAbsent(
+      localName,
+      _ => applyNormalize(localName, namespace, qualifiedNameOrNull)
+    )
   }
 
   // 2017-10-27: 17 usages
@@ -53,14 +46,11 @@ object QName {
 
   private val namespaceCache = new ju.concurrent.ConcurrentHashMap[Namespace, ju.concurrent.ConcurrentHashMap[String, QName]]()
 
-  private def getOrCreateNamespaceCache(namespace: Namespace): ju.Map[String, QName] = {
-    var answer = namespaceCache.get(namespace)
-    if (answer eq null) {
-      answer = new ju.concurrent.ConcurrentHashMap[String, QName]()
-      namespaceCache.put(namespace, answer)
-    }
-    answer
-  }
+  private def getOrCreateNamespaceCache(namespace: Namespace): ju.concurrent.ConcurrentHashMap[String, QName] =
+    namespaceCache.computeIfAbsent(
+      namespace,
+      _ => new ju.concurrent.ConcurrentHashMap[String, QName]()
+    )
 
   private def applyNormalize(
     localName           : String,

@@ -12,19 +12,11 @@ object MessageFormatCache {
 
   private val cache = new ConcurrentHashMap[String, Message]
 
-  def apply(format: String): Message = {
-    var answer = cache.get(format)
-    if (answer eq null) {
-      cache.synchronized {
-        answer = cache.get(format)
-        if (answer eq null) {
-          answer = MessageFormatter.parse(format)
-          cache.put(format, answer)
-        }
-      }
-    }
-    answer
-  }
+  def apply(format: String): Message =
+    cache.computeIfAbsent(
+      format,
+      MessageFormatter.parse
+    )
 }
 
 // TODO: move when done

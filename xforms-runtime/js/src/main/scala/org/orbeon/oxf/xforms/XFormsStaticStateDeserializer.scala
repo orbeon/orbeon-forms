@@ -718,7 +718,7 @@ object XFormsStaticStateDeserializer {
                           isIfNonRelevant,
                           isXBLHandler
                         ) with WithChildrenTrait
-                      } else if (element.getQName == XFORMS_MESSAGE_QNAME)
+                      } else if (element.getQName == XFORMS_MESSAGE_QNAME || element.getQName == XXFORMS_LOG_QNAME)
                         new EventHandler(
                           index,
                           element,
@@ -779,7 +779,7 @@ object XFormsStaticStateDeserializer {
               } else {
                 if (EventHandler.isContainerAction(element.getQName))
                   new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait with WithChildrenTrait
-                else if (element.getQName == XFORMS_MESSAGE_QNAME)
+                else if (element.getQName == XFORMS_MESSAGE_QNAME || element.getQName == XXFORMS_LOG_QNAME)
                   new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait with WithExpressionOrConstantTrait {
                     val expressionOrConstant: Either[String, String] = c.get[Either[String, String]]("expressionOrConstant").getOrElse(throw new NoSuchElementException) // XXX TODO
                   }

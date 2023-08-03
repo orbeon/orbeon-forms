@@ -52,6 +52,7 @@ object XFormsActions {
     xxformsQName("join-submissions")        -> new XXFormsJoinSubmissions,
     xxformsQName("setvisited")              -> new XXFormsSetvisitedAction,
     xxformsQName("update-validity")         -> new XXFormsUpdateValidityAction,
+    xxformsQName("log")                     -> new XXFormsLogAction,
 
     // xbl:handler as action container working like xf:action
     XBL_HANDLER_QNAME                       -> new XFormsActionAction

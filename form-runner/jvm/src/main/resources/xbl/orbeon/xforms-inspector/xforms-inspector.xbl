@@ -12,26 +12,26 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xbl:xbl
-            xmlns:xf="http://www.w3.org/2002/xforms"
-            xmlns:xh="http://www.w3.org/1999/xhtml"
-            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-            xmlns:ev="http://www.w3.org/2001/xml-events"
-            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:xbl="http://www.w3.org/ns/xbl"
-            xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-            xmlns:saxon="http://saxon.sf.net/"
-            xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xbl:binding element="fr|xforms-inspector" id="fr-xforms-inspector">
         <xbl:handlers>
-            <xbl:handler event="fr-log" phase="target" defaultAction="cancel">
+            <xbl:handler event="xxforms-log fr-log" phase="target" defaultAction="cancel">
                 <xf:action if="instance('inspector-instance')/function = 'view-console'">
+<!--                    <xf:message value="event('message')"/>-->
                     <xf:var name="shown-output" value="instance('inspector-instance')/shown-output"/>
                     <!-- Add newline if we already have content shown -->
                     <xf:setvalue ref="$shown-output" value="concat(., if (. = '') then '' else '&#x0a;')"/>
 
-                    <xf:action iterate="event('fr-messages')">
+                    <xf:action iterate="event('message'), event('fr-messages')">
                         <xf:var name="position" value="position()"/>
                         <xf:var name="current" value="."/>
                         <xf:var name="is-xml" value="$current instance of element()"/>
@@ -101,7 +101,7 @@
                         <current-instance/>
                         <current-instance-clean/>
                         <mode>formatted</mode>
-                        <function>view-instance</function>      <!-- view-instance | evaluate-xpath | view-console -->
+                        <function>view-instance</function><!-- view-instance | evaluate-xpath | view-console -->
                         <xpath>/*</xpath>
                         <xpath-output/>
                         <input/>
@@ -144,6 +144,7 @@
                 <xf:trigger class="fr-xforms-inspector-button">
                     <xf:label><xh:i class="fa fa-window-restore"/></xf:label>
                     <xf:action event="DOMActivate">
+                        <!-- TODO: don't initialize models if initially closed, and make form controls non-relevant -->
                         <xf:setvalue
                             ref="instance('inspector-instance')/layout"
                             value="if (. = 'open') then 'closed' else 'open'"/>
@@ -166,7 +167,7 @@
                 <xf:group xxbl:scope="outer" appearance="xxf:internal">
                     <!-- Do this within a group otherwise listening to #document doesn't work -->
                     <!-- Catch error in action handler and do not let propagation occur -->
-                    <xf:action ev:event="xxforms-action-error" ev:observer="#document" ev:propagate="stop">
+                    <xf:action event="xxforms-action-error" observer="#document" propagate="stop">
                         <xf:dispatch name="fr-log" targetid="fr-xforms-inspector" xxbl:scope="inner">
                             <xf:property name="fr-messages" value="concat('Error: ', xxf:trim(event('message')))"/>
                         </xf:dispatch>
@@ -189,8 +190,10 @@
                 <!-- Function selection-->
                 <xh:div class="fr-xforms-inspector-function">
                     <fr:link-select1 ref="instance('inspector-instance')/function" appearance="full">
-                        <xf:action ev:event="xforms-value-changed">
-                            <xf:setvalue  if=". = 'view-console'" ref="instance('inspector-instance')/shown-output"/>
+                        <xf:action event="xforms-value-changed">
+                            <xf:setvalue
+                                if=". = 'view-console'"
+                                ref="instance('inspector-instance')/shown-output"/>
                         </xf:action>
                         <xf:label>Mode</xf:label>
                         <xf:item>
@@ -213,7 +216,7 @@
                         fr-xforms-inspector-model-instance
                         fr-xforms-inspector-{if (instance('inspector-instance')/function = ('view-instance', 'evaluate-xpath')) then 'enabled' else 'disabled'}-function">
                     <xf:group appearance="xxf:internal">
-                        <xf:dispatch ev:event="xforms-value-changed" name="DOMActivate" targetid="inspector-xpath"/>
+                        <xf:dispatch event="xforms-value-changed" name="DOMActivate" targetid="inspector-xpath"/>
                         <!-- Model -->
                         <xf:var name="models" value="instance('inspector-itemset')/model"/>
                         <xf:group ref=".[count($models) gt 1]" class="fr-xforms-inspector-model">
@@ -223,7 +226,7 @@
                                     <xf:label ref="@id"/>
                                     <xf:value ref="@id"/>
                                 </xf:itemset>
-                                <xf:action ev:event="xforms-value-changed">
+                                <xf:action event="xforms-value-changed">
                                     <xf:setvalue ref="instance('inspector-instance')/current-instance"/>
                                 </xf:action>
                             </xf:select1>
@@ -264,7 +267,7 @@
                         fr-xforms-inspector-{if (instance('inspector-instance')/function = 'evaluate-xpath') then 'enabled' else 'disabled'}-function">
                     <xf:group ref="instance('inspector-instance')/xpath" appearance="xxf:internal">
                         <!-- XPath expression and trigger -->
-                        <xf:action ev:event="DOMActivate">
+                        <xf:action event="DOMActivate">
                             <xf:delete ref="instance('inspector-instance')/xpath-output/node()"/>
                             <xf:insert if="instance('inspector-instance')/xpath != ''"
                                     context="instance('inspector-instance')/xpath-output"
@@ -286,7 +289,7 @@
                 <xf:group ref=".[exists($external-input)]">
                     <xh:div class="fr-xforms-inspector-{if (instance('inspector-instance')/function = 'view-console') then 'enabled' else 'disabled'}-function">
                         <xf:input ref="$internal-input" incremental="true">
-                            <xf:setvalue ev:event="xforms-value-changed" ref="$external-input" value="$internal-input"/>
+                            <xf:setvalue event="xforms-value-changed" ref="$external-input" value="$internal-input"/>
                             <xf:label>Input:</xf:label>
                         </xf:input>
                     </xh:div>
@@ -319,7 +322,7 @@
                                             , '&#x0a;')
                                         else xpath-output
                                 else shown-output">
-                            <xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="shown-output" value="$shown-output"/>
+                            <xf:setvalue event="xforms-enabled xforms-value-changed" ref="shown-output" value="$shown-output"/>
                         </xf:var>
                         <fr:code-mirror ref="shown-output"/>
                     </xf:group>

@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.net.URI
-import java.util.concurrent.locks.Lock
 import cats.Eval
 import cats.syntax.option._
+import org.log4s
+import org.log4s.LogLevel
 import org.orbeon.datatypes.{LocationData, MaximumSize}
 import org.orbeon.dom.Element
 import org.orbeon.oxf.cache.Cacheable
@@ -25,10 +25,11 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.xforms.action.actions.XFormsDispatchAction
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
@@ -48,8 +49,9 @@ import org.orbeon.xforms._
 import org.orbeon.xforms.runtime.XFormsObject
 import shapeless.syntax.typeable._
 
+import java.net.URI
+import java.util.concurrent.locks.Lock
 import scala.annotation.tailrec
-import scala.jdk.CollectionConverters._
 import scala.collection.{immutable, mutable}
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
@@ -536,11 +538,13 @@ private object ContainingDocumentProperties {
 
 trait ContainingDocumentLogging {
 
-  private final val indentation = new IndentedLogger.Indentation
-  private final val loggersMap = mutable.HashMap[String, IndentedLogger]()
+  self: XBLContainer =>
+
+  private final val indentation        = new IndentedLogger.Indentation
+  private final val indentedLoggersMap = mutable.HashMap[String, IndentedLogger]()
 
   def getIndentedLogger(loggingCategory: String): IndentedLogger =
-    loggersMap.getOrElseUpdate(loggingCategory,
+    indentedLoggersMap.getOrElseUpdate(loggingCategory,
       new IndentedLogger(
         Loggers.logger,
         Loggers.logger.isDebugEnabled && XFormsGlobalProperties.getDebugLogging.contains(loggingCategory),
@@ -549,6 +553,37 @@ trait ContainingDocumentLogging {
     )
 
   val indentedLogger = getIndentedLogger("document")
+
+  val loggersMap = mutable.HashMap[String, log4s.Logger]()
+
+  def logMessage(name: String, level: LogLevel, message: String): Unit = {
+
+    val logger = loggersMap.getOrElseUpdate(name, LoggerFactory.createLogger(name))
+
+    level match {
+      case log4s.Trace => logger.trace(message)
+      case log4s.Debug => logger.debug(message)
+      case log4s.Info  => logger.info(message)
+      case log4s.Warn  => logger.warn(message)
+      case log4s.Error => logger.error(message)
+    }
+
+    self.findObjectByEffectiveId("orbeon-inspector") foreach { inspector =>
+      XFormsDispatchAction.dispatch(
+        eventName       = "xxforms-log",
+        target          = inspector.asInstanceOf[XFormsEventTarget],
+        bubbles         = false,
+        cancelable      = false,
+        properties      = Map(
+          "level"   -> level.toString.some,
+          "message" -> message.some
+        ),
+        delayOpt        = None,
+        showProgress    = false,
+        allowDuplicates = false
+      )
+    }
+  }
 }
 
 trait ContainingDocumentRequestStats {

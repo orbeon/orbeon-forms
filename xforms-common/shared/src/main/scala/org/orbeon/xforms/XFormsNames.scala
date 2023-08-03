@@ -254,6 +254,8 @@ object XFormsNames {
 
   val XFORMS_MESSAGE_QNAME                = xformsQName("message")
 
+  val XXFORMS_LOG_QNAME                   = xxformsQName("log")
+
   val XFORMS_SUBMIT_REPLACE_ALL      = "all"
   val XFORMS_SUBMIT_REPLACE_INSTANCE = "instance"
   val XFORMS_SUBMIT_REPLACE_TEXT     = "text"

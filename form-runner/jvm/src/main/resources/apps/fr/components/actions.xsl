@@ -526,10 +526,18 @@
                 <xsl:copy>
                     <xsl:copy-of select="$action/@*"/>
 
-                    <!-- https://github.com/orbeon/orbeon-forms/issues/3685 -->
-                    <xsl:if test="$action/@if = '$fr-mode=''new'''">
-                        <xsl:attribute name="if">fr:mode()='new'</xsl:attribute>
-                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="$action/@if = '$fr-mode=''new'''">
+                            <!-- https://github.com/orbeon/orbeon-forms/issues/3685 -->
+                            <xsl:attribute name="if">fr:mode()='new'</xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="exists($action/@if)">
+                            <!-- https://github.com/orbeon/orbeon-forms/issues/5919 -->
+                            <xsl:attribute
+                                name="if"
+                                select="frf:replaceVarReferencesWithFunctionCalls($action/@if, $action/@if, false(), (), $library-name)"/>
+                        </xsl:when>
+                    </xsl:choose>
 
                     <!-- 1. Choose to iterate or not on `$iterate-control-name`.
                          2. Also store the absolute id of the action source in the request.

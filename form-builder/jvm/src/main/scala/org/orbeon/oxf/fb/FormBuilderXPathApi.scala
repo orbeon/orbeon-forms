@@ -448,6 +448,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def getControlLhhValuesForAllLangs(controlName: String, lhh: String): Iterable[NodeInfo] = {
+
     val langs = allLangs(resourcesRoot)
 
     val valuesForExistingLangs = for {

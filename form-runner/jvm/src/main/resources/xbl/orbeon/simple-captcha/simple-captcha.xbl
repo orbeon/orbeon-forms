@@ -69,7 +69,7 @@
                     <xf:setvalue ref="instance()/image" value="SimpleCaptcha:image($captcha)"/>
                     <xf:setvalue ref="instance()/expected-answer" value="SimpleCaptcha:answer($captcha)"/>
                 </xf:action>
-                <xf:action ev:event="fr-verify">
+                <xf:action ev:event="fr-verify xforms-value-changed">
                     <xf:var name="correct" value="instance()/user-answer = instance()/expected-answer"/>
                     <xf:dispatch if="not($correct)" name="fr-verify-error" targetid="fr-simple-captcha"/>
                     <xf:dispatch if="$correct" name="fr-verify-done" targetid="fr-simple-captcha"/>

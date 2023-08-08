@@ -100,9 +100,9 @@ object FormRunnerApp extends App {
     })
   }
 
-  private def initSessionExpirationDialog(): Unit = {
+  private def initSessionExpirationDialog(): Unit =
+    Option(document.querySelector(".fr-session-expiration-dialog")) foreach { dialog =>
 
-    val dialog                      = document.querySelector(".fr-session-expiration-dialog")
     def dialogShown: Boolean        = dialog.classList.contains("in")
     var expirationTimeMillis        = 0L
     var expiredOpt: Option[Boolean] = None

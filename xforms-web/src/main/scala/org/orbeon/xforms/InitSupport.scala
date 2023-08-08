@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, LoggerFactory, PathUtils}
 import org.orbeon.web.DomEventNames
 import org.orbeon.wsrp.WSRPSupport
+import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
 import org.orbeon.xforms.StateHandling.StateResult
 import org.orbeon.xforms.facade._
@@ -52,6 +53,18 @@ object InitSupport {
 
   def pageContainsFormsMarkup(): Unit =
     pageContainsFormsMarkupPromise.success(())
+
+  def mapNamespacePromise(namespace: String): Future[xforms.Form] = {
+    val promise = Promise[xforms.Form]()
+    formNamespacesToPromise += namespace -> promise
+    promise.future
+  }
+
+  def completeNamespacePromise(namespace: String, form: xforms.Form): Unit =
+    formNamespacesToPromise.get(namespace).foreach(_.success(form))
+
+  def removeNamespacePromise(namespace: String): Unit =
+    formNamespacesToPromise -= namespace
 
   private var initTimestampBeforeMs: Long = -1
 
@@ -119,7 +132,14 @@ object InitSupport {
 
     pageContainsFormsMarkupF foreach { _ =>
 
-      initializeForm(initializations, contextAndNamespaceOpt)
+      for {
+        form      <- initializeForm(initializations, contextAndNamespaceOpt)
+        namespace <- namespaceOrUndef
+      } locally {
+        // https://github.com/orbeon/orbeon-forms/issues/5913
+        completeNamespacePromise(namespace, form)
+      }
+
       initializeHeartBeatIfNeeded(initializations.configuration)
 
       if (Page.countInitializedForms == allFormElems.size) {
@@ -191,6 +211,8 @@ object InitSupport {
     private var heartBeatInitialized       = false
     private var orbeonLoadedEventScheduled = false
 
+    var formNamespacesToPromise : Map[String, Promise[xforms.Form]] = Map.empty
+
     def initializeForm(initializations: Initializations, contextAndNamespaceOpt: Option[(String, String)]): Option[Form] = {
 
       logger.debug(s"initializing form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
@@ -216,7 +238,6 @@ object InitSupport {
             dom.window.location.reload(flag = true)
             return None
         }
-
 
       val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
         processRepeatHierarchy(initializations.repeatTree)
@@ -332,14 +353,14 @@ object InitSupport {
     def allFormElems: Iterable[html.Form] =
       dom.document.forms filter (_.classList.contains(Constants.FormClass)) collect { case f: html.Form => f }
 
-    def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
+    private def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
       for {
         repeatIndexes <- repeatIndexesString.splitTo[List](",")
         repeatInfos   = repeatIndexes.splitTo[List]() // must be of the form "a b"
       } yield
         repeatInfos.head -> repeatInfos.last
 
-    def parseRepeatTree(repeatTreeString: String): List[(String, String)] =
+    private def parseRepeatTree(repeatTreeString: String): List[(String, String)] =
       for {
        repeatTree  <- repeatTreeString.splitTo[List](",")
        repeatInfos = repeatTree.splitTo[List]() // must be of the form "a b"
@@ -347,7 +368,7 @@ object InitSupport {
      } yield
        repeatInfos.head -> repeatInfos.last
 
-    def createParentToChildrenMap(childToParentMap: Map[String, String]): collection.Map[String, js.Array[String]] = {
+    private def createParentToChildrenMap(childToParentMap: Map[String, String]): collection.Map[String, js.Array[String]] = {
 
       val parentToChildren = m.Map[String, js.Array[String]]()
 
@@ -368,10 +389,10 @@ object InitSupport {
       (childToParentMap.toJSDictionary, createParentToChildrenMap(childToParentMap).toJSDictionary)
     }
 
-    def processRepeatIndexes(repeatIndexesString: String): Dictionary[String] =
+    private def processRepeatIndexes(repeatIndexesString: String): Dictionary[String] =
       parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
 
-    def initializeGlobalEventListenersIfNeeded(): Unit =
+    private def initializeGlobalEventListenersIfNeeded(): Unit =
       if (! topLevelListenerRegistered) {
         // We are using jQuery for `change` because the Select2 component, used for the dropdowns with search, dispatches that jQuery
         // event, and if just using the DOM API our code handling `change` in `xforms.js` isn't being notified, and the value isn't
@@ -438,7 +459,7 @@ object InitSupport {
 
     private val KeysForWhichToPreventDefault = Set("up", "down", "left", "right")
 
-    def initializeKeyListeners(listeners: List[rpc.KeyListener], formElem: html.Form): Unit =
+    private def initializeKeyListeners(listeners: List[rpc.KeyListener], formElem: html.Form): Unit =
       listeners foreach { case rpc.KeyListener(eventNames, observer, keyText, modifiers) =>
 
         // NOTE: 2019-01-07: We don't handle dialogs yet.

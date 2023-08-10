@@ -169,19 +169,18 @@ private[persistence] object PersistenceProxyProcessor {
   // Proxy the request to the appropriate persistence implementation
   def proxyRequest(request: Request, response: Response)(implicit externalContext: ExternalContext): Unit =
     (request.getMethod, request.getRequestPath) match {
-      case (_,               FormPath(path, app, form, _))                     => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, None            , path)
-      case (_,               DataPath(path, app, form, _, document, filename)) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Some(filename)  , path, Some(document))
-      case (_,               DataCollectionPath(path, app, form))              => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
-      case (HttpMethod.POST, SearchPath(path, app, form))                      => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
-      case (HttpMethod.POST, ReEncryptAppFormPath(path, app, form))            => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
-      case (HttpMethod.GET,  HistoryPath(path, app, form, _))                  => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
-      case (HttpMethod.GET,  HistoryPath(path, app, form, _, filename))        => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Option(filename).orElse(Some(DataXml)), path)
-      case (HttpMethod.GET,  ExportPath(app, form, documentId))                => Export.processExport       (request, response, Option(app), Option(form), Option(documentId))
-      case (HttpMethod.POST, PurgePath(app, form, documentId))                 => Purge.processPurge         (request, response, Option(app), Option(form), Option(documentId))
-      case (HttpMethod.GET,  PublishedFormsMetadataPath(_, app, form))         => proxyPublishedFormsMetadata(request, response, Option(app), Option(form))
-      case (HttpMethod.GET,  ReindexPath)                                      => proxyReindex               (request, response) // TODO: should be `POST`
-      case (HttpMethod.GET,  ReEncryptStatusPath)                              => proxyReEncryptStatus       (request, response)
-      case (_, incomingPath)                                                   => throw new OXFException(s"Unsupported path: $incomingPath") // TODO: bad request?
+      case (_,               FormPath(path, app, form, _))                       => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, None            , path)
+      case (_,               DataPath(path, app, form, _, documentId, filename)) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Some(filename)  , path, Some(documentId))
+      case (_,               DataCollectionPath(path, app, form))                => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
+      case (HttpMethod.POST, SearchPath(path, app, form))                        => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
+      case (HttpMethod.POST, ReEncryptAppFormPath(path, app, form))              => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
+      case (HttpMethod.GET,  HistoryPath(path, app, form, documentId, filename)) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Option(filename).orElse(Some(DataXml)), path, Some(documentId))
+      case (HttpMethod.GET,  ExportPath(app, form, documentId))                  => Export.processExport       (request, response, Option(app), Option(form), Option(documentId))
+      case (HttpMethod.POST, PurgePath(app, form, documentId))                   => Purge.processPurge         (request, response, Option(app), Option(form), Option(documentId))
+      case (HttpMethod.GET,  PublishedFormsMetadataPath(_, app, form))           => proxyPublishedFormsMetadata(request, response, Option(app), Option(form))
+      case (HttpMethod.GET,  ReindexPath)                                        => proxyReindex               (request, response) // TODO: should be `POST`
+      case (HttpMethod.GET,  ReEncryptStatusPath)                                => proxyReEncryptStatus       (request, response)
+      case (_, incomingPath)                                                     => throw new OXFException(s"Unsupported path: $incomingPath") // TODO: bad request?
     }
 
   // TODO: test

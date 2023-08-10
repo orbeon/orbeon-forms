@@ -25,7 +25,7 @@ object PersistenceApi extends PersistenceApiTrait {
     form           : Option[String],
     incomingHeaders: ju.Map[String, Array[String]],
     allVersions    : Boolean)(implicit
-    logger     : IndentedLogger
+    logger         : IndentedLogger
   ): Iterator[MetadataDetails] = {
 
     debug(s"calling form metadata API")

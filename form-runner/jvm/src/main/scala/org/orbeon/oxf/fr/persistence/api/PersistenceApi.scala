@@ -20,6 +20,7 @@ object PersistenceApi extends PersistenceApiTrait {
     lastModifiedTime: Instant
   )
 
+  // Unlike other functions in `PersistenceApiTrait`, this calls `PersistenceProxyProcessor` directly.
   def getFormMetadata(
     app            : Option[String],
     form           : Option[String],

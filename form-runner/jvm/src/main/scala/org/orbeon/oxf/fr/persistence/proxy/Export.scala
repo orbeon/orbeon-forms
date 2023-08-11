@@ -3,7 +3,7 @@ package org.orbeon.oxf.fr.persistence.proxy
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.io.IOUtils
-import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
+import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
@@ -11,7 +11,7 @@ import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait}
+import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, CoreCrossPlatformSupportTrait}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.SimplePath._
 
@@ -29,26 +29,20 @@ object Export extends ExportOrPurge {
 
   type Context = ZipOutputStream
 
-  // Entry point for the export
-  def processExport(
-    request      : Request,
-    response     : Response,
-    appOpt       : Option[String],
-    formOpt      : Option[String],
-    documentIdOpt: Option[String],
+  def processImpl(
+    getFirstParamAsString: String => Option[String],
+    incomingHeaders      : ju.Map[String, Array[String]],
+    response             : Response,
+    matchesOpt           : Option[NonEmptyList[MatchSpec]],
+    dataRevisionHistory  : DataRevisionHistoryAdt,
+    dateRangeGtOpt       : Option[Instant],
+    dateRangeLtOpt       : Option[Instant]
+  )(implicit
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit = {
 
-    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
-
-    val appFormVersionMatchOpt = findAppFormVersionMatch(
-      request       = request,
-      appOpt        = appOpt,
-      formOpt       = formOpt,
-      documentIdOpt = documentIdOpt
-    )
-
     val formOrDataSet =
-      request.getFirstParamAsString(ContentParam) map { content =>
+      getFirstParamAsString(ContentParam) map { content =>
         val contentTokens = content.splitTo[Set](sep = ContentParamSeparator)
         if (! contentTokens.forall(AllowedContentTokens.contains))
           throw HttpStatusCodeException(StatusCode.BadRequest)
@@ -56,31 +50,18 @@ object Export extends ExportOrPurge {
       } getOrElse
         FormOrData.valuesSet
 
-    val dataRevisionHistory =
-      DataRevisionHistoryAdt.fromStringOptOrThrow(request.getFirstParamAsString(DataRevisionHistoryParam))
-        .getOrElse(DataRevisionHistoryAdt.Exclude)
-
-    val dateRangeGtOpt =
-      request.getFirstParamAsString(DateRangeGtParam).map { dateRangeGe =>
-        Instant.parse(dateRangeGe)
+    IOUtils.useAndClose(new ZipOutputStream(response.getOutputStream)) { zos =>
+      response.setContentType(ContentTypes.ZipContentType)
+      matchesOpt match {
+        case None =>
+          processWithMatch(zos, incomingHeaders, None, formOrDataSet, dataRevisionHistory, dateRangeGtOpt, dateRangeLtOpt)
+        case Some(matches) =>
+          matches.iterator.foreach { filter =>
+            processWithMatch(zos, incomingHeaders, filter.some, formOrDataSet, dataRevisionHistory, dateRangeGtOpt, dateRangeLtOpt)
+          }
       }
-
-    val dateRangeLtOpt =
-      request.getFirstParamAsString(DateRangeLtParam).map { dateRangeLe =>
-        Instant.parse(dateRangeLe)
-      }
-
-    processExportImpl(
-      request.getHeaderValuesMap,
-      response,
-      appFormVersionMatchOpt,
-      formOrDataSet,
-      dataRevisionHistory,
-      dateRangeGtOpt,
-      dateRangeLtOpt
-    )
+    }
   }
-
 
   val processOtherAttachments: Boolean = false
 
@@ -120,29 +101,6 @@ object Export extends ExportOrPurge {
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit = ()
-
-  private def processExportImpl(
-    incomingHeaders    : ju.Map[String, Array[String]],
-    response           : Response,
-    matchesOpt         : Option[NonEmptyList[MatchSpec]],
-    formOrDataSet      : Set[FormOrData],
-    dataRevisionHistory: DataRevisionHistoryAdt,
-    dateRangeGtOpt     : Option[Instant],
-    dateRangeLtOpt     : Option[Instant]
-  )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
-  ): Unit =
-    IOUtils.useAndClose(new ZipOutputStream(response.getOutputStream)) { zos =>
-      response.setContentType(ContentTypes.ZipContentType)
-      matchesOpt match {
-        case None =>
-          processWithMatch(zos, incomingHeaders, None, formOrDataSet, dataRevisionHistory, dateRangeGtOpt, dateRangeLtOpt)
-        case Some(matches) =>
-          matches.iterator.foreach { filter =>
-            processWithMatch(zos, incomingHeaders, filter.some, formOrDataSet, dataRevisionHistory, dateRangeGtOpt, dateRangeLtOpt)
-          }
-      }
-    }
 
   def processXmlDocument(
     ctx            : Context,

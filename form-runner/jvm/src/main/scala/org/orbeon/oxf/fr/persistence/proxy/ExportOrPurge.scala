@@ -3,18 +3,18 @@ package org.orbeon.oxf.fr.persistence.proxy
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
-import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi._
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormOrData, FormRunner}
-import org.orbeon.oxf.http.{DateHeaders, Headers, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.Logging.debug
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.{NonAllBlank, _}
-import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, LoggerFactory}
 
 import java.time.Instant
 import java.{util => ju}
@@ -106,7 +106,61 @@ trait ExportOrPurge {
     }
   }
 
-  def findAppFormVersionMatch(
+  def process(
+    request      : Request,
+    response     : Response,
+    appOpt       : Option[String],
+    formOpt      : Option[String],
+    documentIdOpt: Option[String],
+  ): Unit = {
+
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+
+    val appFormVersionMatchOpt = findAppFormVersionMatch(
+      request       = request,
+      appOpt        = appOpt,
+      formOpt       = formOpt,
+      documentIdOpt = documentIdOpt
+    )
+
+    val dataRevisionHistory =
+      DataRevisionHistoryAdt.fromStringOptOrThrow(request.getFirstParamAsString(DataRevisionHistoryParam))
+        .getOrElse(DataRevisionHistoryAdt.Exclude)
+
+    val dateRangeGtOpt =
+      request.getFirstParamAsString(DateRangeGtParam).map { dateRangeGe =>
+        Instant.parse(dateRangeGe)
+      }
+
+    val dateRangeLtOpt =
+      request.getFirstParamAsString(DateRangeLtParam).map { dateRangeLe =>
+        Instant.parse(dateRangeLe)
+      }
+
+    processImpl(
+      request.getFirstParamAsString,
+      request.getHeaderValuesMap,
+      response,
+      appFormVersionMatchOpt,
+      dataRevisionHistory,
+      dateRangeGtOpt,
+      dateRangeLtOpt
+    )
+  }
+
+  def processImpl(
+    getFirstParamAsString: String => Option[String],
+    incomingHeaders      : ju.Map[String, Array[String]],
+    response             : Response,
+    matchesOpt           : Option[NonEmptyList[MatchSpec]],
+    dataRevisionHistory  : DataRevisionHistoryAdt,
+    dateRangeGtOpt       : Option[Instant],
+    dateRangeLtOpt       : Option[Instant]
+  )(implicit
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Unit
+
+  private def findAppFormVersionMatch(
     request      : Request,
     appOpt       : Option[String],
     formOpt      : Option[String],
@@ -463,16 +517,8 @@ trait ExportOrPurge {
   ): Boolean =
     dateRangeGtOpt.forall(modifiedTime.isAfter) && dateRangeLtOpt.forall(modifiedTime.isBefore)
 
-  protected def extractAttachmentFilename(fromPath: String): String =
+  private def extractAttachmentFilename(fromPath: String): String =
     fromPath.splitTo[List]("/").lastOption.getOrElse(throw new IllegalStateException(fromPath))
-
-  protected def headerFromRFC1123OrIso(
-    headers          : Map[String, List[String]],
-    isoHeaderName    : String,
-    rfc1123HeaderName: String
-  ): Option[Instant] =
-    Headers.firstItemIgnoreCase(headers, isoHeaderName).map(Instant.parse)
-      .orElse(DateHeaders.firstDateHeaderIgnoreCase(headers, rfc1123HeaderName).map(Instant.ofEpochMilli))
 
   private def processFormData(
     ctx                    : Context,

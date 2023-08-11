@@ -10,14 +10,13 @@ import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
-import org.orbeon.oxf.http.{HttpMethod, StreamedContent}
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.{Connection, ConnectionResult, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, URLRewriterUtils, XPath}
-import org.orbeon.saxon.om
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Connection, ConnectionResult, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, PathUtils, URLRewriterUtils, XPath}
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
@@ -28,6 +27,10 @@ import scala.util.Try
 
 
 // Provide a simple API to access the persistence layer from Scala
+//
+// This uses `Connection.connectNow()`, through `connectPersistence()`. which create an internal `Connection`. This
+// results eventually in calling a page flow and then `PersistenceProxyProcessor`. So there is overhead. Possibly
+// `connectPersistence()` could call directly `PersistenceProxyProcessor` instead.
 trait PersistenceApiTrait {
 
   private val SearchPageSize = 100
@@ -170,32 +173,6 @@ trait PersistenceApiTrait {
     callPagedService(pageNumber => readPage(pageNumber).map(pageToDataDetails))
   }
 
-  private def callPagedService[R](
-    readPage: Int => Try[(Iterator[R], Int, Int)]
-  )(implicit
-    logger                  : IndentedLogger
-  ): Iterator[R] = {
-
-    var searchTotal: Option[Int] = None
-    var currentPage  = 1
-    var currentCount = 0
-
-    Iterator.continually[Option[Iterator[R]]]({
-      searchTotal.isEmpty || searchTotal.exists(currentCount < _) flatOption {
-        val (it, total, count) = readPage(currentPage).get// can throw
-        count > 0 option {
-          if (searchTotal.isEmpty) {
-            debug(s"search total is `$total`")
-            searchTotal = total.some
-          }
-          currentPage  += 1
-          currentCount += count
-          it
-        }
-      }
-    }).takeWhile(_.isDefined).flatten.flatten
-  }
-
   def readFormData(
     appFormVersion  : AppFormVersion,
     documentId      : String,
@@ -213,7 +190,7 @@ trait PersistenceApiTrait {
     )
     val customHeaders = Map(OrbeonFormDefinitionVersion -> List(appFormVersion._2.toString))
 
-    readDocument(path, customHeaders).map(_ -> path)
+    readHeadersAndDocument(path, customHeaders).map(_ -> path)
   }
 
   def readDocumentFormVersion(
@@ -228,41 +205,6 @@ trait PersistenceApiTrait {
     val path = createFormDataBasePath(appName, formName, isDraft, documentId) + DataXml
     val headers = readHeaders(path, Map.empty)
     headers.get(Version.OrbeonFormDefinitionVersion).map(_.head).map(_.toInt)
-  }
-
-  // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
-  def readDocument(
-    urlString               : String,
-    customHeaders           : Map[String, List[String]]
-  )(implicit
-    logger                  : IndentedLogger,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
-  ): Try[(Map[String, List[String]], DocumentNodeInfoType)] =
-    withDebug("reading document", List("url" -> urlString, "headers" -> customHeaders.toString)) {
-
-    val cxr =
-      connectPersistence(
-        method        = HttpMethod.GET,
-        path          = urlString,
-        customHeaders = customHeaders
-      )
-
-    // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the test
-    // on status code),  but the MySQL persistence layer returns a [200 with an empty body][1] (thus a body is
-    // required).
-    //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
-    ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = true) { is =>
-      (
-        cxr.headers,
-        XFormsCrossPlatformSupport.readTinyTree(
-          XPath.GlobalConfiguration,
-          is,
-          urlString,
-          handleXInclude = true, // do process XInclude, so Form Builder's model gets included
-          handleLexical  = false
-        )
-      )
-    }
   }
 
   // Retrieves a form definition from the persistence layer
@@ -283,7 +225,7 @@ trait PersistenceApiTrait {
       case FormDefinitionVersion.Specific(version) => Map(OrbeonFormDefinitionVersion -> List(version.toString))
     }
 
-    readDocument(path, customHeaders).map(_ -> path)
+    readHeadersAndDocument(path, customHeaders).map(_ -> path)
   }
 
   // TODO: This should return a `Try`. Right now it throws if the document cannot be read.
@@ -296,7 +238,7 @@ trait PersistenceApiTrait {
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Option[om.NodeInfo] = {
 
-    val formsDocTry = PersistenceApi.readDocument(
+    val formsDocTry = readHeadersAndDocument(
       FormRunner.createFormMetadataPathAndQuery(
         app         = appForm.app,
         form        = appForm.form,
@@ -319,17 +261,49 @@ trait PersistenceApiTrait {
     }
   } .get
 
-  protected def makeOutgoingRequest(
-    method : HttpMethod,
-    headers: ju.Map[String, Array[String]],
-    params : Iterable[(String, String)]
-  ): Request =
-    new RequestAdapter {
-      override def getMethod: HttpMethod = method
-      override def getHeaderValuesMap: ju.Map[String, Array[String]] = headers
-      override def parameters: collection.Map[String, Array[AnyRef]] =
-        params.map{ case (k, v) => k -> Array(v: AnyRef) }.toMap
+  def doDelete(
+    path           : String,
+    modifiedTimeOpt: Option[Instant],
+    forceDelete    : Boolean
+  )(implicit
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Option[Instant] = { // `None` indicates that the document was not found
+
+    // xxx TODO: see what proxy will do wrt version and checking existence of previous doc
+
+    val pathWithParams =
+      PathUtils.recombineQuery(
+        path,
+        (forceDelete list ("force-delete" -> true.toString)) :::
+        modifiedTimeOpt.toList.map(modifiedTime => "last-modified-time" -> modifiedTime.toString)
+      )
+
+    val cxr =
+      connectPersistence(
+        method         = HttpMethod.DELETE,
+        path           = pathWithParams,
+        formVersionOpt = None // xxx TODO
+      )
+
+    if (cxr.statusCode == StatusCode.NotFound) {
+      cxr.close()
+      None
+    } else {
+      ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = true) { _ =>
+        headerFromRFC1123OrIso(cxr.headers, Headers.OrbeonLastModified, Headers.LastModified)
+          .getOrElse(throw HttpStatusCodeException(StatusCode.InternalServerError)).some // require implementation to return modified date
+      } .get // can throw
     }
+  }
+
+  def headerFromRFC1123OrIso(
+    headers          : Map[String, List[String]],
+    isoHeaderName    : String,
+    rfc1123HeaderName: String
+  ): Option[Instant] =
+    Headers.firstItemIgnoreCase(headers, isoHeaderName).map(Instant.parse)
+      .orElse(DateHeaders.firstDateHeaderIgnoreCase(headers, rfc1123HeaderName).map(Instant.ofEpochMilli))
 
   // TODO: call proxy directly?
   def connectPersistence(
@@ -375,6 +349,53 @@ trait PersistenceApiTrait {
     )
   }
 
+  protected def makeOutgoingRequest(
+    method : HttpMethod,
+    headers: ju.Map[String, Array[String]],
+    params : Iterable[(String, String)]
+  ): Request =
+    new RequestAdapter {
+      override def getMethod: HttpMethod = method
+      override def getHeaderValuesMap: ju.Map[String, Array[String]] = headers
+      override def parameters: collection.Map[String, Array[AnyRef]] =
+        params.map{ case (k, v) => k -> Array(v: AnyRef) }.toMap
+    }
+
+  // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
+  private def readHeadersAndDocument(
+    urlString               : String,
+    customHeaders           : Map[String, List[String]]
+  )(implicit
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Try[(Map[String, List[String]], DocumentNodeInfoType)] =
+    withDebug("reading document", List("url" -> urlString, "headers" -> customHeaders.toString)) {
+
+    val cxr =
+      connectPersistence(
+        method        = HttpMethod.GET,
+        path          = urlString,
+        customHeaders = customHeaders
+      )
+
+    // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the test
+    // on status code),  but the MySQL persistence layer returns a [200 with an empty body][1] (thus a body is
+    // required).
+    //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
+    ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = true) { is =>
+      (
+        cxr.headers,
+        XFormsCrossPlatformSupport.readTinyTree(
+          XPath.GlobalConfiguration,
+          is,
+          urlString,
+          handleXInclude = true, // do process XInclude, so Form Builder's model gets included
+          handleLexical  = false
+        )
+      )
+    }
+  }
+
   private def readHeaders(
     urlString    : String,
     customHeaders: Map[String, List[String]]
@@ -383,4 +404,30 @@ trait PersistenceApiTrait {
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Map[String, List[String]] =
     connectPersistence(HttpMethod.HEAD, urlString, customHeaders = customHeaders).headers
+
+  private def callPagedService[R](
+    readPage: Int => Try[(Iterator[R], Int, Int)]
+  )(implicit
+    logger                  : IndentedLogger
+  ): Iterator[R] = {
+
+    var searchTotal: Option[Int] = None
+    var currentPage  = 1
+    var currentCount = 0
+
+    Iterator.continually[Option[Iterator[R]]]({
+      searchTotal.isEmpty || searchTotal.exists(currentCount < _) flatOption {
+        val (it, total, count) = readPage(currentPage).get// can throw
+        count > 0 option {
+          if (searchTotal.isEmpty) {
+            debug(s"search total is `$total`")
+            searchTotal = total.some
+          }
+          currentPage  += 1
+          currentCount += count
+          it
+        }
+      }
+    }).takeWhile(_.isDefined).flatten.flatten
+  }
 }

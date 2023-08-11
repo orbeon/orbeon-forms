@@ -17,7 +17,6 @@ import org.apache.commons.io.input.ReaderInputStream
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
-import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 import org.orbeon.oxf.fr.persistence.relational.Version._
@@ -30,7 +29,7 @@ import java.io.{ByteArrayInputStream, StringReader}
 import java.sql.Timestamp
 
 
-trait Read extends FormRunnerPersistence {
+trait Read {
 
   def getOrHead(req: CrudRequest, method: HttpMethod)(implicit httpResponse: ExternalContext.Response): Unit = {
 

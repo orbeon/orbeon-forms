@@ -114,6 +114,7 @@ object FormRunnerPersistence {
   val ReEncryptStatusPath                 =   "/fr/service/persistence/reencrypt" // `GET` only
 
   val DataXml                             = "data.xml"
+  val FormXhtml                           = "form.xhtml"
   val DataFormatVersionName               = "data-format-version"
   val DataMigrationBehaviorName           = "data-migration-behavior"
   val FormDefinitionFormatVersionName     = "form-definition-format-version"

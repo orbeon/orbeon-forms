@@ -150,11 +150,11 @@ object FormRunnerActionsSupport {
 
       builder.addPart(
         FormBodyPartBuilder.create(
-          "data.xml",
+          DataXml,
           new ByteArrayBody(
             bytes,
             ContentType.create(ContentTypes.XmlContentType, CharsetNames.Utf8),
-            "data.xml"
+            DataXml
           )
         )
         .setField(Headers.ContentDisposition, "form-data") // TODO: name?

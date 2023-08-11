@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import org.orbeon.oxf.controller.Authorizer
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.AppForm
-import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
+import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.Logger
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
@@ -95,7 +95,7 @@ private object CRUD {
 
     requestPath match {
       case CrudFormPath(provider, app, form, filename) =>
-        val filenameOpt = if (filename == "form.xhtml") None else Some(filename)
+        val filenameOpt = if (filename == FormXhtml) None else Some(filename)
         CrudRequest(
           Provider.withName(provider),
           AppForm(app, form),

@@ -6,7 +6,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.{ExternalContext, RequestAdapter, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunner.createFormDataBasePath
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
-import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
+import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
@@ -219,7 +219,7 @@ trait PersistenceApiTrait {
 
     debug(s"reading published form definition for `$appName`/`$formName`/`$version`")
 
-    val path = FormRunner.createFormDefinitionBasePath(appName, formName) + "form.xhtml"
+    val path = FormRunner.createFormDefinitionBasePath(appName, formName) + FormXhtml
     val customHeaders = version match {
       case FormDefinitionVersion.Latest            => Map.empty[String, List[String]]
       case FormDefinitionVersion.Specific(version) => Map(OrbeonFormDefinitionVersion -> List(version.toString))

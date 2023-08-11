@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import cats.syntax.option._
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerPersistence.FormXhtml
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.util.PathUtils._
@@ -78,7 +79,7 @@ trait FormRunnerPublish {
         toBaseURI         = toBaseURI,
         fromBasePaths     = basePathsWithVersions,
         toBasePath        = createFormDefinitionBasePath(app, form),
-        filename          = "form.xhtml",
+        filename          = FormXhtml,
         commonQueryString = documentIdOpt map (documentId => encodeSimpleQuery(List("document" -> documentId))) getOrElse "",
         forceAttachments  = forceAttachments,
         username          = username.trimAllToOpt,

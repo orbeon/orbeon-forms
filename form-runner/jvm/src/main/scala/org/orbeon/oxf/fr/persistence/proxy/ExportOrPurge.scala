@@ -5,7 +5,7 @@ import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
-import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
+import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi._
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
@@ -421,7 +421,7 @@ trait ExportOrPurge {
         processXmlDocument(
           ctx             = ctx,
           fromPath        = path,
-          toPath          = makeToPath(appFormVersion, None, None, "form.xhtml"),
+          toPath          = makeToPath(appFormVersion, None, None, FormXhtml),
           documentNode    = formDefinition,
           createdTimeOpt  = headerFromRFC1123OrIso(headers, Headers.OrbeonCreated, Headers.Created),
           modifiedTimeOpt = headerFromRFC1123OrIso(headers, Headers.OrbeonLastModified, Headers.LastModified),

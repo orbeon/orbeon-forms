@@ -78,8 +78,6 @@ private[persistence] object PersistenceProxyProcessor {
   val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.HEAD, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST, HttpMethod.LOCK, HttpMethod.UNLOCK)
   val GetOrPutMethods                = Set[HttpMethod](HttpMethod.GET, HttpMethod.PUT)
 
-  val XmlFormDataFilename            = "data.xml"
-
   implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(PersistenceProxyProcessor.getClass))
 
   case class OutgoingRequest(
@@ -225,7 +223,7 @@ private[persistence] object PersistenceProxyProcessor {
     // Throws if there is an incompatibility
     checkDataFormatVersionIfNeeded(request, appForm, formOrData)
 
-    val isDataXmlRequest = formOrData == FormOrData.Data && filename.contains(XmlFormDataFilename)
+    val isDataXmlRequest = formOrData == FormOrData.Data && filename.contains(DataXml)
     val isFormBuilder    = appForm == AppForm.FormBuilder
     val isAttachment     = !isDataXmlRequest && filename.isDefined
 
@@ -352,7 +350,7 @@ private[persistence] object PersistenceProxyProcessor {
                   dataPersistenceBaseUrl.dropTrailingSlash                                                  ::
                     "crud"                                                                                  ::
                     FormRunner.createFormDataBasePathNoPrefix(appForm, None, v.isDraft, Some(v.documentId)) ::
-                    XmlFormDataFilename                                                                     ::
+                    DataXml                                                                                 ::
                     Nil mkString "/",
                   queryForToken
                 )

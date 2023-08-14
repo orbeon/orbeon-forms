@@ -34,7 +34,8 @@
                 <xf:action type="xpath">fbf:selectCellForControlId(event('control-id'))</xf:action>
                 <xf:action type="javascript">ORBEON.builder.private.API.moveFocusedCellIntoView();</xf:action>
 
-                <xf:setvalue ref="$li/lang" value="fbf:currentLang()"/>
+                <!-- Re-using previous language, if any (previous/next buttons) -->
+                <xf:setvalue if="$li/lang = ''" ref="$li/lang" value="fbf:currentLang()"/>
 
                 <!-- Clear all local values -->
                 <xf:setvalue iterate="$i//*[not(*)] | $i/*//@*" ref="."/>
@@ -457,6 +458,9 @@
                         <xf:property name="fb-save" value="true()"/>
                     </xxf:hide>
 
+                    <!-- Clear language when closing the dialog, so that the current Form Builder language is used next time it is opened -->
+                    <xf:setvalue if="$must-close" ref="$li/lang"/>
+
                     <xf:dispatch
                         if="not($must-close)"
                         name="fb-save"
@@ -527,6 +531,9 @@
             </xbl:handler>
             <!-- Close and cancel upon DOMActivate -->
             <xbl:handler event="DOMActivate" observer="cancel-button">
+                <!-- Clear language when closing the dialog, so that the current Form Builder language is used next time it is opened -->
+                <xf:setvalue ref="$li/lang"/>
+
                 <xxf:hide dialog="dialog">
                     <xf:property name="fb-save" value="false()"/>
                 </xxf:hide>

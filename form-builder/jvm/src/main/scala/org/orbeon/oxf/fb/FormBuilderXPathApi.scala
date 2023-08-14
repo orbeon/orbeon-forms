@@ -217,32 +217,29 @@ object FormBuilderXPathApi {
   def setControlLHHAMediatype(controlName: String, lhha: String, isHTML: Boolean): Unit =
     FormBuilder.setControlLhhatMediatype(controlName, lhha, isHTML)(FormBuilderDocContext())
 
-  //@XPathFunction
-  def setControlLabelHintHelpOrText(
-    controlName : String,
-    lhht        : String,
-    value       : String,
-    params      : Array[NodeInfo],
-    isHTML      : Boolean
-  ): Unit = {
-
-    implicit val ctx = FormBuilderDocContext()
+  // Do the pre/post insertions/deletions needed for optional LHHT elements
+  private def settingControlLabelHintHelpOrText[T](
+    controlName: String,
+    lhht: String)(
+    controlSetter: FormBuilderDocContext => T
+  ): T = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     val isOptionalLHHAT =
       lhht == LHHA.Help.entryName ||
-      lhht == fr.XMLNames.FRShortLabelQName.localName ||
-      lhht == fr.XMLNames.FRIterationLabelQName.localName ||
-      lhht == fr.XMLNames.FRAddIterationLabelQName.localName
+        lhht == fr.XMLNames.FRShortLabelQName.localName ||
+        lhht == fr.XMLNames.FRIterationLabelQName.localName ||
+        lhht == fr.XMLNames.FRAddIterationLabelQName.localName
 
     // Make sure an optional element is present while we set content or attributes
-    if (isOptionalLHHAT)
+    if (isOptionalLHHAT) {
       FormBuilder.ensureCleanLHHAElements(controlName, lhht, count = 1, replace = true)
+    }
 
-    FormBuilder.setControlLabelHintHelpOrText(controlName, lhht, value, Some(params), isHTML)
+    val t = controlSetter(ctx)
 
     // If an optional element turns out to be empty, then remove it
     if (isOptionalLHHAT) {
-
       val (doDelete, holders) =
         holdersToRemoveIfHasBlankOrMissingLHHAForAllLangs(controlName, FormBuilder.getControlLhhat(controlName, lhht).toList, lhht)
 
@@ -251,6 +248,40 @@ object FormBuilderXPathApi {
         delete(findControlByName(controlName).toList child controlLHHATQName(lhht))
       }
     }
+
+    t
+  }
+
+  //@XPathFunction
+  def setControlLabelHintHelpOrText(
+    controlName : String,
+    lhht        : String,
+    value       : String,
+    params      : Array[NodeInfo],
+    isHTML      : Boolean
+  ): Unit = settingControlLabelHintHelpOrText(controlName, lhht) { implicit ctx: FormBuilderDocContext =>
+
+    FormBuilder.setControlLabelHintHelpOrText(controlName, lhht, value, Some(params), isHTML)
+  }
+
+  //@XPathFunction
+  def setControlLabelHintHelpOrTextForAllLangs(
+    controlName: String,
+    lhht: String,
+    values: Array[NodeInfo],
+    params: Array[NodeInfo],
+    isHTML: Boolean
+  ): Unit = settingControlLabelHintHelpOrText(controlName, lhht) { implicit ctx: FormBuilderDocContext =>
+
+    val langValues = values.map { nodeInfo =>
+      val lang = nodeInfo.attValue("lang")
+      val value = nodeInfo.getStringValue
+      lang -> Seq(value)
+    }
+
+    FormBuilder.setControlResourcesWithLang(controlName, lhht, langValues)
+    setControlLHHATParams(controlName, lhht, params)
+    setHTMLMediatype(getControlLhhat(controlName, lhht), isHTML)
   }
 
   // Set the control's items for all languages
@@ -463,26 +494,6 @@ object FormBuilderXPathApi {
     for {
       (lang, value) <- valuesForExistingLangs ++ valuesForMissingLangs
     } yield NodeConversions.elemToNodeInfo(<value lang={ lang }>{ value }</value>)
-  }
-
-  //@XPathFunction
-  def setControlLhhValuesForAllLangs(
-    controlName : String,
-    lhh         : String,
-    values      : Array[NodeInfo],
-    params      : Array[NodeInfo],
-    isHTML      : Boolean): Unit = {
-    val langValues = values.map { nodeInfo =>
-      val lang = nodeInfo.attValue("lang")
-      val value = nodeInfo.getStringValue
-      lang -> Seq(value)
-    }
-
-    implicit val formBuilderDocContext: FormBuilderDocContext = FormBuilderDocContext()
-
-    FormBuilder.setControlResourcesWithLang(controlName, lhh, langValues)
-    setControlLHHATParams(controlName, lhh, params)
-    setHTMLMediatype(getControlLhhat(controlName, lhh), isHTML)
   }
 
   //@XPathFunction

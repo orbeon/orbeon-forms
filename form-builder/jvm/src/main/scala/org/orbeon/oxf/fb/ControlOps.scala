@@ -495,7 +495,7 @@ trait ControlOps extends ResourcesOps {
   def lhhatChildrenParams(lhhatNodes: Seq[NodeInfo]): Seq[NodeInfo] =
     lhhatNodes child FRParamTest
 
-  /*private*/ def setControlLHHATParams(
+  def setControlLHHATParams(
     controlName : String,
     lhha        : String,
     params      : Seq[NodeInfo])(implicit

@@ -423,7 +423,7 @@
                             for $mip in ('default', 'calculate', 'relevant', 'readonly', 'whitespace') return
                                 fbf:writeAndNormalizeCalculatedMip($i/control-name, $mip, $i/*[name() = $mip]),
                             for $lh in $i/(label, hint, help, text)[@supported = 'true'] return
-                                fbf:setControlLhhValuesForAllLangs(
+                                fbf:setControlLabelHintHelpOrTextForAllLangs(
                                     $i/control-name,
                                     local-name($lh),
                                     $lh/value,

@@ -184,6 +184,11 @@ object XFormsUI {
     ServerAPI.callUserScript(formID, functionName, targetId, observerId, paramValues.toList: _*)
   }
 
+  // 2023-08-14: AjaxServer.js
+  @JSExport
+  def handleCallbackElem(formID: String, callbackElem: raw.Element): Unit =
+    ServerAPI.callUserCallback(formID, attValueOrThrow(callbackElem, "name"))
+
   // 2022-03-16: AjaxServer.js
   @JSExport
   def handleDeleteRepeatElements(controlValuesElems: js.Array[raw.Element]): Unit =

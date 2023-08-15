@@ -378,6 +378,9 @@
                                         </element>
                                     </zeroOrMore>
                                 </element>
+                                <element name="xxf:callback">
+                                    <attribute name="name"/>
+                                </element>
                             </choice>
                         </zeroOrMore>
                         <optional>

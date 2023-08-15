@@ -908,6 +908,12 @@
                                     break;
                                 }
 
+                                // Run JavaScript code
+                                case "callback": {
+                                    ORBEON.xforms.XFormsUi.handleCallbackElem(formID, childNode);
+                                    break;
+                                }
+
                                 // Show help message for specified control
                                 case "help": {
                                     var helpElement = childNode;

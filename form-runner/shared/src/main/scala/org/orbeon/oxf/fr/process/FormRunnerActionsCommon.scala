@@ -41,7 +41,7 @@ import scala.util.Try
 
 trait FormRunnerActionsCommon {
 
-  self =>
+  self: XFormsActions => // for `tryCallback`
 
   def runningProcessId: Option[String]
   def AllowedFormRunnerActions: Map[String, Action]
@@ -68,7 +68,8 @@ trait FormRunnerActionsCommon {
     "wizard-update-validity" -> tryUpdateCurrentWizardPageValidity,
     "wizard-prev"            -> tryWizardPrev,
     "wizard-next"            -> tryWizardNext,
-    "new-to-edit"            -> tryNewToEdit
+    "new-to-edit"            -> tryNewToEdit,
+    "callback"               -> tryCallback,
   )
 
   // Check whether there are pending uploads

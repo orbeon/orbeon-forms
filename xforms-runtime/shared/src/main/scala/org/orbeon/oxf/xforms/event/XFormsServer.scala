@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{ConnectResult, XFormsModelSubmissionSupport}
-import org.orbeon.oxf.xforms.{ScriptInvocation, XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
+import org.orbeon.oxf.xforms.{CallbackInvocation, ScriptInvocation, XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.oxf.xml.{SAXStore, TeeXMLReceiver, XMLReceiver, XMLReceiverHelper}
@@ -420,8 +420,9 @@ object XFormsServer {
 
                 // `javascript:` loads only and regular scripts
                 containingDocument.getScriptsToRun foreach {
-                  case Left(load)              => outputLoad(containingDocument, load)
-                  case Right(scriptInvocation) => outputScriptInvocation(containingDocument, scriptInvocation)
+                  case Left(load)                       => outputLoad(containingDocument, load)
+                  case Right(Left(scriptInvocation))    => outputScriptInvocation(containingDocument, scriptInvocation)
+                  case Right(Right(callbackInvocation)) => outputCallbackInvocation(callbackInvocation)
                 }
 
                 // Output focus instruction
@@ -640,6 +641,17 @@ object XFormsServer {
           )
         }
       }
+
+    def outputCallbackInvocation(
+      callbackInvocation: CallbackInvocation)(implicit
+      receiver          : XMLReceiver
+    ): Unit =
+      element(
+        "callback",
+        prefix = XXFORMS_SHORT_PREFIX,
+        uri    = XXFORMS_NAMESPACE_URI,
+        atts   = List("name" -> callbackInvocation.name)
+      )
 
     def outputFocusInfo(
       containingDocument      : XFormsContainingDocument,

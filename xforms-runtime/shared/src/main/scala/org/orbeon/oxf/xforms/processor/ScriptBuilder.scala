@@ -173,7 +173,7 @@ object ScriptBuilder {
         } yield
           rpc.PollEvent(time - currentTime),
       userScripts =
-        for (script <- containingDocument.getScriptsToRun.toList collect { case Right(s) => s })
+        for (script <- containingDocument.getScriptsToRun.toList collect { case Right(Left(s)) => s })
         yield
           rpc.UserScript(
             functionName = script.script.shared.clientName,

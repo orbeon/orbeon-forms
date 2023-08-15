@@ -42,7 +42,7 @@ import scala.util.Try
 
 trait FormRunnerActions extends FormRunnerActionsCommon {
 
-  self =>
+  self: XFormsActions => // for `tryCallback`
 
   import FormRunnerRenderedFormat._
 

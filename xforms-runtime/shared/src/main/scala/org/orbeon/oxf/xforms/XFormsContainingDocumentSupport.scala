@@ -166,7 +166,7 @@ trait ContainingDocumentTransientState {
     var byName                   : Map[String, Any] = Map.empty[String, Any]
 
     var nonJavaScriptLoadsToRun  : Vector[Load] = Vector.empty
-    var scriptsToRun             : Vector[Load Either ScriptInvocation] = Vector.empty
+    var scriptsToRun             : Vector[Either[Load, Either[ScriptInvocation, CallbackInvocation]]] = Vector.empty
 
     var replaceAllEval           : Option[Eval[ConnectResult]] = None
     var gotSubmissionReplaceAll  : Boolean = false
@@ -193,9 +193,12 @@ trait ContainingDocumentTransientState {
     transientState = new TransientState
 
   def addScriptToRun(scriptInvocation: ScriptInvocation): Unit =
-    transientState.scriptsToRun :+= Right(scriptInvocation)
+    transientState.scriptsToRun :+= Right(Left(scriptInvocation))
 
-  def getScriptsToRun: immutable.Seq[Load Either ScriptInvocation] = transientState.scriptsToRun
+  def addCallbackToRun(scriptInvocation: CallbackInvocation): Unit =
+    transientState.scriptsToRun :+= Right(Right(scriptInvocation))
+
+  def getScriptsToRun: immutable.Seq[Either[Load, Either[ScriptInvocation, CallbackInvocation]]] = transientState.scriptsToRun
 
   def addLoadToRun(load: Load): Unit =
     findTwoPassSubmitEvents match {

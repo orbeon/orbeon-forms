@@ -73,11 +73,17 @@ object ServerAPI {
     }
 
     globalObject.selectDynamic(functionName).asInstanceOf[js.Function].call(
-
       thisArg = getElementOrNull(observerId),
       new js.Object { val target = getElementOrNull(targetId) } +: // `event.target`
       rest                                                         // custom arguments passed with `<xxf:param>` in `<xf:action>`
       : _*                                                         // pass as individual arguments (#3205)
     )
   }
+
+  def callUserCallback(
+    formId      : String,
+    callbackName: String
+  ): Unit =
+    Page.getForm(formId).getCallbacks(callbackName)
+      .foreach(_.call(null))
 }

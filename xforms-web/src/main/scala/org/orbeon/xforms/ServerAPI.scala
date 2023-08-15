@@ -22,10 +22,8 @@ import org.scalajs.dom.raw
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-@JSExportTopLevel("OrbeonServerApi")
 object ServerAPI {
 
-  @JSExport
   def callUserScript(
     formId       : String,
     functionName : String,

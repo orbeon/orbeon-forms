@@ -827,7 +827,7 @@ private[persistence] object PersistenceProxyProcessor {
   def callPublishedFormsMetadata(
     request   : Request, // for params, headers, and method
     app       : Option[String],
-    form      : Option[String] // TODO: should now be allowed if app is not provided
+    form      : Option[String] // TODO: should not be allowed if app is not provided
   ): NodeInfo = {
 
     val formProviders = getProviders(app, form, FormOrData.Form)

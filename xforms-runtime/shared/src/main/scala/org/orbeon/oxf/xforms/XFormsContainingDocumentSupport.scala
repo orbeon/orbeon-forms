@@ -45,6 +45,7 @@ import org.orbeon.oxf.xforms.submission.{ConnectResult, TwoPassSubmissionParamet
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.xforms.Constants.FormId
 import org.orbeon.xforms._
 import org.orbeon.xforms.runtime.XFormsObject
 import shapeless.syntax.typeable._
@@ -647,7 +648,7 @@ trait ContainingDocumentRequest {
   }
 
   def getNamespacedFormId: String =
-    namespaceId("xforms-form")
+    namespaceId(FormId)
 
   /**
    * Resolve a URI string against an element, taking into account ancestor xml:base attributes for

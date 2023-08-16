@@ -265,7 +265,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
   object Select2Ajax extends Select2.Ajax {
 
-    val delay: Int = Page.getFormFromElemOrThrow(containerElem).configuration.delayBeforeIncrementalRequest
+    val delay: Int = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.delayBeforeIncrementalRequest
 
     val transport = (
       params  : Select2.Params,

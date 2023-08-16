@@ -197,7 +197,7 @@ object InitSupport {
     val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
       processRepeatHierarchy(repeatTreeString)
 
-    val form = Page.getForm(formId)
+    val form = Page.getXFormsFormFromNamespacedIdOrThrow(formId)
 
     form.repeatTreeChildToParent       = repeatTreeChildToParent
     form.repeatTreeParentToAllChildren = repeatTreeParentToAllChildren

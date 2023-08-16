@@ -87,7 +87,7 @@ class Upload {
     for (i <- 0 until files.length) {
       UploaderClient.uploadEventQueue.add(
         event    = UploadEvent(self, files(i)),
-        wait     = Page.getFormFromElemOrThrow(self.container).configuration.delayBeforeIncrementalRequest.millis,
+        wait     = Page.getXFormsFormFromHtmlElemOrThrow(self.container).configuration.delayBeforeIncrementalRequest.millis,
         waitType = ExecutionWait.MinWait
       )
     }

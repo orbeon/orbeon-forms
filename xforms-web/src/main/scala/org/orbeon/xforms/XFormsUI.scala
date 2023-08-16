@@ -501,7 +501,7 @@ object XFormsUI {
     val targetOpt       = attValueOpt(submissionElement, "target")
 
 
-    val form = Page.getForm(formID)
+    val form = Page.getXFormsFormFromNamespacedIdOrThrow(formID)
     val formElem = form.elem
 
     // When the target is an iframe, we add a `?t=id` to work around a Chrome bug happening  when doing a POST to the
@@ -870,7 +870,7 @@ object XFormsUI {
     def hideDialog(id: String, formID: String): Unit =
       Globals.dialogs.get(id) foreach { yuiDialog =>
         // Remove timer to show the dialog asynchronously so it doesn't show later!
-        Page.getForm(formID).removeDialogTimerId(id)
+        Page.getXFormsFormFromNamespacedIdOrThrow(formID).removeDialogTimerId(id)
 
         Globals.maskDialogCloseEvents = true
         yuiDialog.hide()

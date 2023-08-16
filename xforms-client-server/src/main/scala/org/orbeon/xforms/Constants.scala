@@ -36,6 +36,7 @@ object Constants {
   val XFormsIosClass                    = "xforms-ios"
   val XFormsMobileClass                 = "xforms-mobile"
   val FormClass                         = "xforms-form"
+  val FormId                            = FormClass
   val InitiallyHiddenClass              = "xforms-initially-hidden"
 
   val HtmlLangAttr                      = "lang"

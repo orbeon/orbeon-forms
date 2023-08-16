@@ -758,7 +758,7 @@
                                     // For each repeat id that changes, see if all the children are also included in
                                     // newRepeatIndexes. If they are not, add an entry with the index unchanged.
 
-                                    var form = ORBEON.xforms.Page.getForm(formID);
+                                    var form = ORBEON.xforms.Page.getXFormsFormFromNamespacedIdOrThrow(formID);
                                     var repeatTreeParentToAllChildren = form.repeatTreeParentToAllChildren;
                                     var repeatIndexes                 = form.repeatIndexes;
 
@@ -932,7 +932,7 @@
                             handleOtherActions(actionElement);
                         }, 200);
 
-                        var form = ORBEON.xforms.Page.getForm(formID)
+                        var form = ORBEON.xforms.Page.getXFormsFormFromNamespacedIdOrThrow(formID)
 
                         _.each(responseDialogIdsToShowAsynchronously, function(dialogId) {
                             form.addDialogTimerId(dialogId, timerId);

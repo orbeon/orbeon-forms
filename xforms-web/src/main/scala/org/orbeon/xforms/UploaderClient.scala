@@ -122,7 +122,7 @@ object UploaderClient {
       val formData = extractFormData(currentEvent)
 
       val requestFormId = currentEvent.upload.getAncestorForm.id
-      val currentForm   = Page.getForm(requestFormId)
+      val currentForm   = Page.getXFormsFormFromNamespacedIdOrThrow(requestFormId)
 
       currentEventOpt = currentEvent.some
       remainingEvents = events.tail
@@ -177,7 +177,7 @@ object UploaderClient {
       new dom.FormData |!> (
         _.append(
           Constants.UuidFieldName,
-          Page.getForm(uploadEvent.upload.getAncestorForm.id).uuid
+          Page.getXFormsFormFromNamespacedIdOrThrow(uploadEvent.upload.getAncestorForm.id).uuid
         )
       ) |!> (
         _.append(

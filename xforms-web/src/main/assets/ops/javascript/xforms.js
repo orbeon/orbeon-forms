@@ -388,7 +388,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 var depth = 1;
                 var currentRepeatId = repeatId;
                 while (true) {
-                    currentRepeatId = ORBEON.xforms.Page.getForm(formID).repeatTreeChildToParent[currentRepeatId];
+                    currentRepeatId = ORBEON.xforms.Page.getXFormsFormFromNamespacedIdOrThrow(formID).repeatTreeChildToParent[currentRepeatId];
                     if (currentRepeatId == null) break;
                     depth = (depth == 4) ? 1 : depth + 1;
                 }
@@ -513,7 +513,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 var parentRepeatIndexes = "";
                 {
                     var currentId = repeatId;
-                    var form = ORBEON.xforms.Page.getForm(formID);
+                    var form = ORBEON.xforms.Page.getXFormsFormFromNamespacedIdOrThrow(formID);
                     var repeatTreeChildToParent = form.repeatTreeChildToParent;
                     var repeatIndexes           = form.repeatIndexes;
                     while (true) {
@@ -610,17 +610,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         // Returns MIP for a given control
         isReadonly: function (control) {
             return $(control).is('.xforms-readonly');
-        },
-
-        // 2022-09-10: 3 usages left from JavaScript, other usages in Scala
-        getForm: function (control) {
-            // If the control is not an HTML form control look for an ancestor which is a form
-            if (_.isUndefined(control.form) || control.form == null) {
-                return $(control).closest('form')[0];
-            } else {
-                // We have directly a form control
-                return control.form;
-            }
         },
 
         getCurrentValue: function (control) {
@@ -1902,7 +1891,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 } else if ($(target).is('.xforms-help')) {
 
                     // Help tooltip
-                    if (control && ORBEON.xforms.Page.getFormFromElemOrThrow(control).helpTooltip()) {
+                    if (control && ORBEON.xforms.Page.getXFormsFormFromHtmlElemOrThrow(control).helpTooltip()) {
                         var message = ORBEON.xforms.Controls.getHelpMessage(control);
                         ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, event);
                     }
@@ -1966,7 +1955,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // We test on `originalTarget` being on the help icon first, so in case the help icon is inside a
                 // trigger, we don't "mistake" the click on the help for a click on the trigger, rendering the help
                 // inaccessible through a click.
-                if (ORBEON.xforms.Page.getFormFromElemOrThrow(controlTarget).helpHandler()) {
+                if (ORBEON.xforms.Page.getXFormsFormFromHtmlElemOrThrow(controlTarget).helpHandler()) {
                     // We are sending the xforms-help event to the server and the server will tell us what do to
                     var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, null, "xforms-help");
                     ORBEON.xforms.AjaxClient.fireEvent(event);
@@ -2024,7 +2013,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
                 // First check clickable group
                 if ($(node).is('.xforms-activable')) {
-                    var form = ORBEON.xforms.Controls.getForm(node);
+                    var form = ORBEON.xforms.Page.getAncestorOrSelfHtmlFormFromHtmlElemOrNull(node);
                     var event = new ORBEON.xforms.AjaxEvent(form, node.id, null, "DOMActivate");
                     ORBEON.xforms.AjaxClient.fireEvent(event);
                     break;
@@ -2038,7 +2027,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     if (ORBEON.util.Dom.isElement(sibling)) {
                         if (sibling.id.indexOf("repeat-begin-") == 0) {
                             // Found beginning of current iteration, tell server
-                            var form = ORBEON.xforms.Controls.getForm(sibling);
+                            var form = ORBEON.xforms.Page.getAncestorOrSelfHtmlFormFromHtmlElemOrNull(sibling);
                             var targetId = sibling.id.substring("repeat-begin-".length);
                             targetId += targetId.indexOf(XF_REPEAT_SEPARATOR) == -1 ? XF_REPEAT_SEPARATOR : XF_REPEAT_INDEX_SEPARATOR;
                             targetId += delimiterCount;
@@ -2287,7 +2276,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         // Keep track of the instance
                         // TODO: We remove those in `Form.destroy()`, but should we do it when the instance is destroyed
                         //  here too?
-                        ORBEON.xforms.Page.getFormFromElemOrThrow(instance.container).xblInstances.push(instance);
+                        ORBEON.xforms.Page.getXFormsFormFromHtmlElemOrThrow(instance.container).xblInstances.push(instance);
                         $(containerElem).data('xforms-xbl-object', instance);
                     }
                     return instance;
@@ -2351,7 +2340,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     fixedcenter        : false,
                     constraintoviewport: true,
                     underlay           : "none",
-                    usearia            : ORBEON.xforms.Page.getFormFromElemOrThrow(dialog).useARIA(),
+                    usearia            : ORBEON.xforms.Page.getXFormsFormFromHtmlElemOrThrow(dialog).useARIA(),
                     role               : "" // See bug 315634 http://goo.gl/54vzd
                 });
             if (isMinimal) {
@@ -2384,7 +2373,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             // (can't escape that block), and in some cases the mask can show on top of the dialog (even if the z-index
             // for the dialog is higher than the z-index for the mask). See:
             // http://forge.ow2.org/tracker/index.php?func=detail&aid=314943&group_id=168&atid=350207
-            var form = ORBEON.xforms.Controls.getForm(yuiDialog.element);
+            var form = ORBEON.xforms.Page.getAncestorOrSelfHtmlFormFromHtmlElemOrNull(yuiDialog.element);
             if (yuiDialog.element.parentNode != form)
                 form.appendChild(yuiDialog.element);
 

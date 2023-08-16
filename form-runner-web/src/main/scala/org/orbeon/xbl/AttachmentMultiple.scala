@@ -107,7 +107,7 @@ object AttachmentMultiple {
               for (i <- 0 until files.length) {
                 UploaderClient.uploadEventQueue.add(
                   event    = UploadEvent(Page.getUploadControl(uploadControlElem), files(i)),
-                  wait     = Page.getFormFromElemOrThrow(companion.containerElem).configuration.delayBeforeIncrementalRequest.millis,
+                  wait     = Page.getXFormsFormFromHtmlElemOrThrow(companion.containerElem).configuration.delayBeforeIncrementalRequest.millis,
                   waitType = ExecutionWait.MinWait
                 )
               }

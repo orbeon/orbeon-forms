@@ -15,4 +15,7 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
 
   def removeCallback(name: String, fn: js.Function): Unit =
     form.removeCallback(name, fn)
+
+  def isFormDataSafe(): Boolean =
+    form.isFormDataSafe
 }

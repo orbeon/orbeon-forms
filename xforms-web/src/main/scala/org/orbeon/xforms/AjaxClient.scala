@@ -120,7 +120,7 @@ object AjaxClient {
 
     object LoginRegexpMatcher {
       def unapply(s: String): Boolean = {
-        val loginRegexp = Page.getForm(formId).configuration.loginPageDetectionRegexp
+        val loginRegexp = Page.getXFormsFormFromNamespacedIdOrThrow(formId).configuration.loginPageDetectionRegexp
         loginRegexp.exists(re => new js.RegExp(re).test(s))
       }
     }
@@ -193,7 +193,7 @@ object AjaxClient {
     formId       : String
   ): Unit = {
 
-    val form = Page.getForm(formId)
+    val form = Page.getXFormsFormFromNamespacedIdOrThrow(formId)
 
     val timerId = timers.setTimeout(delay) {
       fireEvent(
@@ -222,7 +222,7 @@ object AjaxClient {
         AjaxEvent(
           eventName = EventNames.XXFormsPoll,
           targetId  = Constants.DocumentId,
-          form      = Page.getForm(formId).elem.some
+          form      = Page.getXFormsFormFromNamespacedIdOrThrow(formId).elem.some
         )
       )
     }
@@ -284,8 +284,8 @@ object AjaxClient {
         val details: String = detailsString
       }
     )
-    if (! ignoreErrors && Page.getForm(formId).configuration.showErrorDialog)
-      ErrorPanel.showError(Page.getForm(formId), detailsString)
+    if (! ignoreErrors && Page.getXFormsFormFromNamespacedIdOrThrow(formId).configuration.showErrorDialog)
+      ErrorPanel.showError(Page.getXFormsFormFromNamespacedIdOrThrow(formId), detailsString)
   }
 
   // Sending a heartbeat event if no event has been sent to server in the last time interval
@@ -458,7 +458,7 @@ object AjaxClient {
 
       val eventsAsList  = events.toList
       val currentFormId = currentHtmlForm.id
-      val currentForm   = Page.getForm(currentFormId)
+      val currentForm   = Page.getXFormsFormFromNamespacedIdOrThrow(currentFormId)
 
       currentForm.ajaxFieldChangeTracker.beforeRequestSent(eventsAsList)
 

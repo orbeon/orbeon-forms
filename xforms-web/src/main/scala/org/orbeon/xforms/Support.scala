@@ -32,18 +32,15 @@ import scala.util.control.NonFatal
 
 object Support {
 
-  def formElemOrDefaultForm(formElem: js.UndefOr[html.Form]): html.Form =
-    formElem getOrElse getFirstForm
-
   def getFirstForm: html.Form =
     $(dom.document.forms).filter(".xforms-form")(0).asInstanceOf[html.Form]
 
   def adjustIdNamespace(
-    formElem : js.UndefOr[html.Form],
-    targetId : String
+    elem    : js.UndefOr[html.Element],
+    targetId: String
   ): (html.Element, String) = {
 
-    val form   = Support.formElemOrDefaultForm(formElem)
+    val form   = Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(elem)
     val formId = form.id
 
     // See comment on `namespaceIdIfNeeded`

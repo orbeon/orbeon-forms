@@ -20,16 +20,16 @@ import org.scalajs.dom.html
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.|
 
 
 object FormRunnerAPI extends FormRunnerEmbeddingAPI {
 
   def findControlsByName(
-    controlName : String,
-    formElem    : js.UndefOr[html.Form] = js.undefined
+    controlName: String,
+    elem       : js.UndefOr[html.Form] = js.undefined
   ): js.Array[html.Element] = {
-
-    $(Support.formElemOrDefaultForm(formElem))
+    $(Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(elem))
       .find(s".xforms-control[id *= '$controlName-control'], .xbl-component[id *= '$controlName-control']")
       .toArray() collect {
       // The result must be an `html.Element` already
@@ -40,10 +40,14 @@ object FormRunnerAPI extends FormRunnerEmbeddingAPI {
     } toJSArray
   }
 
-  def isFormDataSafe(
-    formElem    : js.UndefOr[html.Form] = js.undefined
-  ): Boolean =
-    Page.getForm(Support.formElemOrDefaultForm(formElem).id).isFormDataSafe
+  def isFormDataSafe(elem: js.UndefOr[html.Form] = js.undefined): Boolean =
+    Page.getXFormsFormFromNamespacedIdOrThrow(Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(elem).id).isFormDataSafe
+
+  def getForm(elemOrNamespacedId: html.Element | String): FormRunnerForm =
+    (elemOrNamespacedId: Any) match {
+      case elem: html.Element   => Page.findXFormsFormFromHtmlElem(elem).map(new FormRunnerForm(_)).orNull
+      case namespacedId: String => Page.findXFormsFormFromNamespacedId(namespacedId).map(new FormRunnerForm(_)).orNull
+    }
 
   val wizard      : FormRunnerWizardAPI.type       = FormRunnerWizardAPI
   val errorSummary: FormRunnerErrorSummaryAPI.type = FormRunnerErrorSummaryAPI

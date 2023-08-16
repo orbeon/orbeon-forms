@@ -82,6 +82,6 @@ object ServerAPI {
     formId      : String,
     callbackName: String
   ): Unit =
-    Page.getForm(formId).getCallbacks(callbackName)
+    Page.getXFormsFormFromNamespacedIdOrThrow(formId).getCallbacks(callbackName)
       .foreach(_.call(null))
 }

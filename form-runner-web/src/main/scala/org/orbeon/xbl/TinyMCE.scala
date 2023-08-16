@@ -91,7 +91,7 @@ object TinyMCE {
           if ($(tinyMceDiv).is(":visible")) {
             tinyMceObject.render()
           } else {
-            val shortDelay = Page.getFormFromElemOrThrow(containerElem).configuration.internalShortDelay
+            val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
             js.timers.setTimeout(shortDelay)(renderIfVisible())
           }
         }

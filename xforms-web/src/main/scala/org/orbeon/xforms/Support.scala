@@ -50,7 +50,7 @@ object Support {
     form -> Page.namespaceIdIfNeeded(formId, targetId)
   }
 
-  def parseStringAsXml(xmlString: String): Option[dom.Document] =
+  private def parseStringAsXml(xmlString: String): Option[dom.Document] =
     try {
       Option((new DOMParser).parseFromString(xmlString, SupportedType.`application/xml`)) filter
         (_.documentElement.getElementsByTagName("parsererror").length == 0)
@@ -96,7 +96,7 @@ object Support {
           redirect       = RequestRedirect.follow // only one supported with the polyfill
           integrity      = js.undefined
           keepalive      = js.undefined
-          signal         = abortSignal map (js.defined.apply) getOrElse js.undefined
+          signal         = abortSignal map js.defined.apply getOrElse js.undefined
           window         = null
         }
       )

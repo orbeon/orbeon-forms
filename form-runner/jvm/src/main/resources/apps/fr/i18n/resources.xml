@@ -295,7 +295,7 @@
                         0&lt;You can choose to review '{1,choice,1#it|1&lt;them}' first or to ignore '{1,choice,1#it|1&lt;them}' and continue with the operation}.
                 </validation-dialog-message>
                 <buttons-message/>
-                <saved-locally-open>Click here to open the document. The information you entered will be displayed on the tool as it was in the moment you saved your work.</saved-locally-open>
+                <saved-locally-open>Click here to open the document. The data you entered will be shown as it was at the time you saved your work.</saved-locally-open>
                 <upload-in-progress>There are file uploads in progress. Please retry once the file upload has completed or has been canceled.</upload-in-progress>
                 <upload-start>Upload started</upload-start>
                 <upload-cancel>Upload canceled by the user</upload-cancel>
@@ -1450,7 +1450,7 @@
                 <save-draft-success todo="true">Borrador guardado correctamente!</save-draft-success>
                 <save-progress-success todo="true">Borrador guardado correctamente!</save-progress-success>
                 <email-success>Email enviado correctamente!</email-success>
-                <form-validation-error>Hay errores de validación. Corrija los errores e intente nuevamente</form-validation-error>
+                <form-validation-error>Hay errores de validación. Corrija los errores e intente nuevamente.</form-validation-error>
                 <database-error>Error de comunicación con la base de datos. Contacte al adminstrador de la aplicación.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
                 <process-error>Error corriendo el proceso. Contacte al adminstrador de la aplicación.</process-error>
@@ -2038,8 +2038,7 @@
                 <save-draft-success todo="true">Esborrany guardat correctament!</save-draft-success>
                 <save-progress-success todo="true">Esborrany guardat correctament!</save-progress-success>
                 <email-success>Correu enviat correctament!</email-success>
-                <form-validation-error>Hi ha errors de validació. Corregeixi els errors i intenti
-                    novament</form-validation-error>
+                <form-validation-error>Hi ha errors de validació. Corregeixi els errors i intenti novament.</form-validation-error>
                 <database-error>Error de comunicació amb la base de dades. Contacti amb els
                     administradors de la aplicació.</database-error>
                 <service-error todo="true">Error de comunicació amb el servei. Contacti amb els

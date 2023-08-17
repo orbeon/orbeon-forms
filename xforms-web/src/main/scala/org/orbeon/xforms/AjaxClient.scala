@@ -27,12 +27,11 @@ import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
-
-import scala.concurrent.duration._
-import scala.concurrent.{Future, Promise}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import scala.collection.mutable
+import scala.concurrent.duration._
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -247,15 +246,6 @@ object AjaxClient {
     EventQueue.addEventAndUpdateQueueSchedule(event, event.incremental)
   }
 
-  def pause(): Unit = {
-    EventQueue.paused = true
-  }
-
-  def unpause(): Unit = {
-    EventQueue.paused = false
-    EventQueue.updateQueueSchedule()
-  }
-
   private val ErrorMessageTitle = "JavaScript error in Orbeon Forms client"
 
   // When an exception happens while we communicate with the server, we catch it and show an error in the UI.
@@ -298,6 +288,9 @@ object AjaxClient {
       ErrorPanel.showError(Page.getXFormsFormFromNamespacedIdOrThrow(formId), detailsString)
   }
 
+  def pause(): Unit         = EventQueue.pause()
+  def unpause(): Unit       = EventQueue.unpause()
+
   def newestEventTime: Long = EventQueue.newestEventTime
 
   // Sending a heartbeat event if no event has been sent to server in the last time interval
@@ -324,7 +317,23 @@ object AjaxClient {
     var incrementalDelay : FiniteDuration = _
 
     var ajaxRequestInProgress: Boolean = false // actual Ajax request has started and not yet successfully completed including response processing
-    var paused               : Boolean = false
+
+    private var paused                     : Boolean = false
+    private var newestEventTimeBeforePause : Long    = 0L
+
+    override def newestEventTime: Long = if (paused) newestEventTimeBeforePause else super.newestEventTime
+
+    def pause(): Unit = {
+      if (! paused) {
+        newestEventTimeBeforePause = EventQueue.newestEventTime
+        paused = true
+      }
+    }
+
+    def unpause(): Unit = {
+      paused = false
+      updateQueueSchedule()
+    }
   }
 
   private object Private {

@@ -87,9 +87,10 @@ object ScriptBuilder {
   }
 
   private def findConfigurationProperties(
-    containingDocument       : XFormsContainingDocument,
-    versionedResources       : Boolean,
-    maxInactiveIntervalMillis : Long
+    containingDocument        : XFormsContainingDocument,
+    versionedResources        : Boolean,
+    maxInactiveIntervalMillis : Long,
+    sessionId                 : String
   ): ConfigurationProperties = {
 
     val staticState = containingDocument.staticState
@@ -105,7 +106,8 @@ object ScriptBuilder {
 
     ConfigurationProperties(
       sessionHeartbeatEnabled          = staticState.staticBooleanProperty(SessionHeartbeatProperty),                     // static
-      maxInactiveIntervalMillis        = maxInactiveIntervalMillis,                                                                  // dynamic
+      maxInactiveIntervalMillis        = maxInactiveIntervalMillis,                                                       // dynamic
+      sessionId                        = sessionId,                                                                       // dynamic
       revisitHandling                  = staticState.staticStringProperty(RevisitHandlingProperty),                       // static
       delayBeforeIncrementalRequest    = staticState.staticIntProperty(DelayBeforeIncrementalRequestProperty),            // static
       delayBeforeAjaxTimeout           = getAjaxTimeout,                                                                  // global
@@ -132,7 +134,8 @@ object ScriptBuilder {
     rewriteAction             : String => String,
     controlsToInitialize      : List[(String, Option[String])],
     versionedResources        : Boolean,
-    maxInactiveIntervalMillis : Long
+    maxInactiveIntervalMillis : Long,
+    sessionId                 : String
   ): String = {
 
     val currentTime = System.currentTimeMillis
@@ -204,7 +207,7 @@ object ScriptBuilder {
             formId  = containingDocument.getNamespacedFormId
           ),
       configuration =
-        findConfigurationProperties(containingDocument, versionedResources, maxInactiveIntervalMillis),
+        findConfigurationProperties(containingDocument, versionedResources, maxInactiveIntervalMillis, sessionId),
     ).asJson.noSpaces
   }
 

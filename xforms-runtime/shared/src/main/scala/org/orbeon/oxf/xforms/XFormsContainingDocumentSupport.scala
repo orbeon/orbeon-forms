@@ -827,7 +827,8 @@ trait ContainingDocumentClientState {
         rewriteAction             = response.rewriteActionURL,
         controlsToInitialize      = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
         versionedResources        = URLRewriterUtils.isResourcesVersioned,
-        maxInactiveIntervalMillis = XFormsStateManager.getMaxInactiveIntervalMillis(this, externalContext)
+        maxInactiveIntervalMillis = XFormsStateManager.getMaxInactiveIntervalMillis(this, externalContext),
+        sessionId                 = externalContext.getSessionOpt(create = false).map(_.getId).getOrElse("")
       )
 
     _initializationData = (initializationScripts, jsonInitializationData).some

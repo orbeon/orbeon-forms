@@ -66,6 +66,7 @@ case class WireAjaxEventWithoutTarget(
 case class ConfigurationProperties(
   sessionHeartbeatEnabled         : Boolean,
   maxInactiveIntervalMillis       : Long,
+  sessionId                       : String,
   revisitHandling                 : String,
   delayBeforeIncrementalRequest   : Int,
   delayBeforeAjaxTimeout          : Long,

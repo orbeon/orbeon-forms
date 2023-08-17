@@ -15,10 +15,10 @@ package org.orbeon.xforms
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Future, Promise}
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.scalajs.js.timers
 import scala.scalajs.js.timers.SetTimeoutHandle
 
@@ -48,7 +48,7 @@ trait AjaxEventQueue[EventType] {
   def shortDelay      : FiniteDuration
   def incrementalDelay: FiniteDuration
 
-  def newestEventTime: Long            = state.newestEventTime // used by heartbeat only
+  def newestEventTime: Long            = state.newestEventTime
   def eventsReversed : List[EventType] = state.events
   def isEmpty        : Boolean         = state.events.isEmpty
 
@@ -66,6 +66,7 @@ trait AjaxEventQueue[EventType] {
 
             if (canSendEvents) {
               val events = state.events
+
               // We're sending the events, so clear the queue, but keep the event times
               state = emptyState.copy(
                 newestEventTime = state.newestEventTime,

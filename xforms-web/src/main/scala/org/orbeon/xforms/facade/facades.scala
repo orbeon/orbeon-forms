@@ -137,3 +137,20 @@ object Utils extends js.Object {
   def getZoomLevel()                                                        : Double           = js.native
   def resetIOSZoom()                                                        : Unit             = js.native
 }
+
+// Minimal (i.e. incomplete) class/trait for the Broadcast Channel API
+
+@js.native
+@JSGlobal("BroadcastChannel")
+class BroadcastChannel(name: String) extends js.Object {
+  def name: String = js.native
+  def postMessage(message: js.Any): Unit = js.native
+  def close(): Unit = js.native
+  var onmessage: js.Function1[MessageEvent, Unit] = js.native
+  var onmessageerror: js.Function1[MessageEvent, Unit] = js.native
+}
+
+@js.native
+trait MessageEvent extends js.Object {
+  val data: js.Any = js.native
+}

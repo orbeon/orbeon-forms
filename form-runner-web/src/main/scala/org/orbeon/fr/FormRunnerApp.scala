@@ -16,16 +16,15 @@ package org.orbeon.fr
 import org.orbeon.facades.ResizeObserver
 import org.orbeon.web.DomEventNames
 import org.orbeon.xbl
+import org.orbeon.xforms.Session.SessionUpdate
+import org.orbeon.xforms._
 import org.orbeon.xforms.facade.Events
-import org.orbeon.xforms.{$, AjaxClient, App, GlobalEventListenerSupport, Page, XFormsApp}
 import org.scalajs.dom
-import org.scalajs.dom.{Element, document, html, raw, window}
+import org.scalajs.dom._
 import org.scalajs.dom.raw.HTMLElement
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
-import org.scalajs.dom.ext._
-
 import scala.scalajs.js.timers
 
 
@@ -102,70 +101,109 @@ object FormRunnerApp extends App {
 
   private def initSessionExpirationDialog(): Unit =
     Option(document.querySelector(".fr-session-expiration-dialog")) foreach { dialog =>
+      // Detecting whether the dialog is shown or not by retrieving its CSS classes is not reliable when aboutToExpire
+      // is called multiple times in a row (e.g. locally and because of a message from another page), so we keep track
+      // of it ourselves.
+      var dialogShown: Boolean = false
+      var didExpireTimerOpt: Option[timers.SetTimeoutHandle] = None
 
-    def dialogShown: Boolean        = dialog.classList.contains("in")
-    var expirationTimeMillis        = 0L
-    var expiredOpt: Option[Boolean] = None
-    var didExpireTimerOpt: Option[timers.SetTimeoutHandle] = None
+      if (dialog.classList.contains("fr-feature-enabled")) {
+        val renewSessionButton = dialog.querySelector("button").asInstanceOf[html.Element]
+        GlobalEventListenerSupport.addListener(renewSessionButton, DomEventNames.Click, (event: dom.raw.EventTarget) => {
+          renewSession()
 
-    if (dialog.classList.contains("fr-feature-enabled")) {
-      val renewSessionButton = dialog.querySelector("button").asInstanceOf[html.Element]
-      GlobalEventListenerSupport.addListener(renewSessionButton, DomEventNames.Click, (event: dom.raw.EventTarget) => {
-        renewSession()
-      })
-      Page.addSessionAboutToExpireListener(aboutToExpire)
-    }
-
-    def aboutToExpire(sessionHeartbeatEnabled : Boolean, approxSessionExpiredTimeMillis: Long): Unit = {
-      expirationTimeMillis = approxSessionExpiredTimeMillis
-      if (! sessionHeartbeatEnabled && ! dialogShown) {
-        AjaxClient.pause()
-        updateDialog(expired = false)
-        showDialog()
-        // TODO: make this padding configurable
-        val timeToExpiration = (approxSessionExpiredTimeMillis - System.currentTimeMillis()) - 10000
-        didExpireTimerOpt = Some(timers.setTimeout(
-          timeToExpiration){
-          updateDialog(expired = true)
+          // Since we sent a heartbeat when the session was renewed, the local newest event time has been updated and
+          // will be broadcast to other pages.
+          Session.updateWithLocalNewestEventTime()
         })
+
+        Session.addSessionUpdateListener(sessionUpdate)
+      }
+
+      def sessionUpdate(sessionUpdate: SessionUpdate): Unit =
+        if (! sessionUpdate.sessionHeartbeatEnabled) {
+          sessionUpdate.sessionStatus match {
+            case Session.SessionActive if dialogShown && ! Session.expired =>
+              renewSession()
+
+            case Session.SessionAboutToExpire =>
+              aboutToExpire(sessionUpdate.approxSessionExpiredTimeMillis)
+
+            case Session.SessionExpired =>
+              sessionExpired()
+
+            case _ =>
+              // Nothing to do
+          }
+        }
+
+      def aboutToExpire(approxSessionExpiredTimeMillis: Long): Unit =
+        if (! dialogShown) {
+          AjaxClient.pause()
+          updateDialog()
+          showDialog()
+
+          // Reason for the padding: we prefer to display that the session is expired a bit sooner, while the session
+          // might actually still be active, rather than a bit later, to avoid a situation where the user tries to
+          // renew an inactive session.
+
+          // TODO: make this padding configurable
+          val timeToExpiration = (approxSessionExpiredTimeMillis - System.currentTimeMillis()) - 10000
+          didExpireTimerOpt.foreach(timers.clearTimeout)
+          didExpireTimerOpt = Some(timers.setTimeout(timeToExpiration) {
+            Session.sessionIsExpired()
+            updateDialog()
+          })
+        }
+
+      def sessionExpired(): Unit =
+        if (! dialogShown) {
+          AjaxClient.pause()
+          updateDialog()
+          showDialog()
+        } else {
+          updateDialog()
+        }
+
+      def updateDialog(): Unit = {
+        val headerContainer = dialog.querySelector(".modal-header")
+        val bodyContainer   = dialog.querySelector(".modal-body")
+        val footer          = dialog.querySelector(".modal-footer")
+
+        val visibleWhenExpiring = List(headerContainer.firstElementChild, bodyContainer.firstElementChild, footer)
+        val visibleWhenExpired  = List(headerContainer.lastElementChild,  bodyContainer.lastElementChild)
+
+        def setDisplay(elements: List[Element], display: String): Unit =
+          elements.foreach(_.asInstanceOf[html.Element].style.display = display)
+
+        val (toShow, toHide) = if (Session.expired)
+          (visibleWhenExpired , visibleWhenExpiring) else
+          (visibleWhenExpiring, visibleWhenExpired )
+        setDisplay(toShow, "block")
+        setDisplay(toHide, "none")
+      }
+
+      def renewSession(): Unit = {
+        didExpireTimerOpt.foreach(timers.clearTimeout)
+        didExpireTimerOpt = None
+        AjaxClient.sendHeartBeat()
+        AjaxClient.unpause()
+        hideDialog()
+      }
+
+      def showDialog(): Unit = {
+        $(dialog).asInstanceOf[js.Dynamic].modal(new js.Object {
+          val backdrop = "static" // Click on the background doesn't hide dialog
+          val keyboard = false    // Can't use esc to close the dialog
+        })
+        dialogShown = true
+      }
+
+      def hideDialog(): Unit = {
+        $(dialog).asInstanceOf[js.Dynamic].modal("hide")
+        dialogShown = false
       }
     }
-
-    def updateDialog(expired: Boolean): Unit = {
-      val headerContainer     = dialog.querySelector(".modal-header")
-      val bodyContainer       = dialog.querySelector(".modal-body")
-      val footer              = dialog.querySelector(".modal-footer")
-
-      val visibleWhenExpiring = List(headerContainer.firstElementChild, bodyContainer.firstElementChild, footer)
-      val visibleWhenExpired  = List(headerContainer.lastElementChild , bodyContainer.lastElementChild)
-
-      def setDisplay(elements: List[Element], display: String): Unit =
-        elements.foreach(_.asInstanceOf[html.Element].style.display = display)
-
-      val (toShow, toHide) = if (expired)
-        (visibleWhenExpired , visibleWhenExpiring) else
-        (visibleWhenExpiring, visibleWhenExpired )
-      setDisplay(toShow, "block")
-      setDisplay(toHide, "none")
-    }
-
-    def renewSession(): Unit = {
-      didExpireTimerOpt.foreach(timers.clearTimeout)
-      didExpireTimerOpt = None
-      AjaxClient.sendHeartBeat()
-      AjaxClient.unpause()
-      hideDialog()
-    }
-
-    def showDialog(): Unit =
-      $(dialog).asInstanceOf[js.Dynamic].modal(new js.Object {
-        val backdrop = "static" // Click on the background doesn't hide dialog
-        val keyboard = false    // Can't use esc to close the dialog
-      })
-
-    def hideDialog(): Unit =
-      $(dialog).asInstanceOf[js.Dynamic].modal("hide")
-  }
 
   def onPageContainsFormsMarkup(): Unit =
     XFormsApp.onPageContainsFormsMarkup()

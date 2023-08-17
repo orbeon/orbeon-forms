@@ -826,7 +826,7 @@
                     else 'xforms-hidden'
                 "/>
             <xh:li role="presentation" class="dropdown-item {{$logout-class}}">
-                <xh:a role="menuitem" href="{{$logout-url}}" class="btn btn-link">
+                <xh:a role="menuitem" href="{{$logout-url}}" class="btn btn-link fr-logout-link">
                     <xf:output value="
                         xxf:r(
                             'authentication.menu.logout',

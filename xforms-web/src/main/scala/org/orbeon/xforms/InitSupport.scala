@@ -27,7 +27,6 @@ import org.orbeon.web.DomEventNames
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
-import org.orbeon.xforms.Page.AboutToExpire
 import org.orbeon.xforms.StateHandling.StateResult
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.Initializations
@@ -322,23 +321,13 @@ object InitSupport {
       if (! reactWhenSessionAboutToExpireInitialized) {
         // Say session is 60 minutes: heartbeat must come after 48 minutes and we check every 4.8 minutes
         val reactAfterMillis = (configuration.maxInactiveIntervalMillis * 0.8).toLong
+
+        Session.initialize(configuration, reactAfterMillis)
+
         val checkEveryMillis = reactAfterMillis / 10
         if (checkEveryMillis > 0) {
           logger.debug(s"checking if getting close to session expiration every $checkEveryMillis ms")
-          js.timers.setInterval(checkEveryMillis) {
-            val elapsedMillisSinceLastEvent = System.currentTimeMillis() - AjaxClient.newestEventTime
-            if (elapsedMillisSinceLastEvent >= reactAfterMillis) {
-              // Trigger session heartbeat
-              if (configuration.sessionHeartbeatEnabled)
-                AjaxClient.sendHeartBeat()
-              // Call about-to-expire listeners
-              val approxSessionExpiredTimeMillis = AjaxClient.newestEventTime + configuration.maxInactiveIntervalMillis
-              Page.fireSessionAboutToExpire(AboutToExpire(
-                configuration.sessionHeartbeatEnabled,
-                approxSessionExpiredTimeMillis
-              ))
-            }
-          }
+          js.timers.setInterval(checkEveryMillis)(Session.updateWithLocalNewestEventTime())
         }
         reactWhenSessionAboutToExpireInitialized = true
       }
@@ -420,6 +409,13 @@ object InitSupport {
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOver, Events.mouseover)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOut,  Events.mouseout)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Click,     Events.click)
+
+        // Catch logout link clicks to inform other pages on the same session that it is going to be invalidated
+        $(".fr-logout-link").get.foreach { logoutAnchor =>
+          GlobalEventListenerSupport.addJsListener(logoutAnchor, DomEventNames.Click, (_: dom.raw.Event) => {
+            Session.sessionIsExpired()
+          })
+        }
 
         // We could do this on `pageshow` or `pagehide`
         // https://github.com/orbeon/orbeon-forms/issues/4552

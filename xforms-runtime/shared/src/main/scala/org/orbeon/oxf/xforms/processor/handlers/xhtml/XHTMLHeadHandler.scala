@@ -148,7 +148,8 @@ class XHTMLHeadHandler(
               rewriteAction             = externalContext.getResponse.rewriteActionURL,
               controlsToInitialize      = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
               versionedResources        = isVersionedResources,
-              maxInactiveIntervalMillis = XFormsStateManager.getMaxInactiveIntervalMillis(containingDocument, handlerContext.externalContext)
+              maxInactiveIntervalMillis = XFormsStateManager.getMaxInactiveIntervalMillis(containingDocument, handlerContext.externalContext),
+              sessionId                 = externalContext.getSessionOpt(create = false).map(_.getId).getOrElse("")
             ),
             contextPathOpt = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingContextParameter),
             namespaceOpt   = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingNamespaceParameter)

@@ -289,7 +289,11 @@
                 <validation-dialog-message>Your form {1,choice,
                     0#does not contain any messages|
                     1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|
-                    1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. You can choose to review {1,choice,1#it|1&lt;them} first or to ignore {1,choice,1#it|1&lt;them} and continue with the operation.</validation-dialog-message>
+                    1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
+                    {0,choice,
+                        0#Please retry once all fields have been properly filled-out|
+                        0&lt;You can choose to review '{1,choice,1#it|1&lt;them}' first or to ignore '{1,choice,1#it|1&lt;them}' and continue with the operation}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Click here to open the document. The information you entered will be displayed on the tool as it was in the moment you saved your work.</saved-locally-open>
                 <upload-in-progress>There are file uploads in progress. Please retry once the file upload has completed or has been canceled.</upload-in-progress>
@@ -878,7 +882,11 @@
                 <validation-dialog-message>Votre formulaire {1,choice,
                     0#ne contient aucun message|
                     1#contient '{0,choice,0#une erreur|1#un avertissement|2#un message d''''information|3#un message}'|
-                    1&lt;contient {1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}'}. Vous pouvez choisir de {1,choice,1#le|1&lt;les} passer en revue ou de {1,choice,1#l''ignorer|1&lt;les ignorer} et de poursuivre l''opération.</validation-dialog-message>
+                    1&lt;contient {1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}'}.
+                    {0,choice,
+                        0#Veuillez ressayer après avoir corrigé les problèmes|
+                        0&lt;Vous pouvez choisir de {1,choice,1#le|1&lt;les} passer en revue ou de {1,choice,1#l''ignorer|1&lt;les ignorer} et de poursuivre l''opération}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été enregistrées.</saved-locally-open>
                 <upload-in-progress>Des téléchargement de fichiers sont en cours. Veuillez ressayer une fois que les transferts sont terminés ou annulés.</upload-in-progress>
@@ -1456,7 +1464,14 @@
                 <submit-dialog-title>Formulario Enviado</submit-dialog-title>
                 <submit-dialog-message>Su información ha sido enviada.</submit-dialog-message>
                 <validation-dialog-title>Revisar mensajes de validación del Formulario</validation-dialog-title>
-                <validation-dialog-message>Su formulario {1,choice,0#no tiene ningún mensaje|1#tiene un '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;tiene {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. Pueder optar por revisarlos {1,choice,1#it|1&lt;them} primero o ignorar {1,choice,1#it|1&lt;them} y continuar la opración.</validation-dialog-message>
+                <validation-dialog-message>Su formulario {1,choice,
+                    0#no tiene ningún mensaje|
+                    1#tiene un '{0,choice,0#error|1#warning|2#informational message|3#message}'|
+                    1&lt;tiene {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
+                    {0,choice,
+                        0#Corrija los errores e intente nuevamente|
+                        0&lt;Pueder optar por revisarlos {1,choice,1#it|1&lt;them} primero o ignorar {1,choice,1#it|1&lt;them} y continuar la opración}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Haga click aquí para abrir el documento. La información ingresada será mostrada por la herramienta de la misma forma que cuando se guardo.</saved-locally-open>
                 <upload-in-progress>Hay subida de archivos en progreso. Por favor, intente nuevamente cuando la subida de archivos haya sido completada o cancelada.</upload-in-progress>
@@ -2041,11 +2056,14 @@
                 <submit-dialog-title>Formulari enviat</submit-dialog-title>
                 <submit-dialog-message>La seva informació he estat enviada.</submit-dialog-message>
                 <validation-dialog-title>Revisi els missatges de validació del seu Formualri</validation-dialog-title>
-                <validation-dialog-message>El seu formulari {1,choice,0#no té cap missatge|1#té un
-                    '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;té
-                    {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational
-                    messages|3#messages}'}. Pot revisar-los si vol {1,choice,1#it|1&lt;them} primer o
-                    ingorar-los {1,choice,1#it|1&lt;them} i continuar amb l'operació.</validation-dialog-message>
+                <validation-dialog-message>El seu formulari {1,choice,
+                    0#no té cap missatge|
+                    1#té un '{0,choice,0#error|1#warning|2#informational message|3#message}'|
+                    1&lt;té {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
+                    {0,choice,
+                        0#Corregeixi els errors i intenti novament|
+                        0&lt;Pot revisar-los si vol {1,choice,1#it|1&lt;them} primer o ingorar-los {1,choice,1#it|1&lt;them} i continuar amb l'operació}.
+                </validation-dialog-message>
                 <buttons-message />
                 <saved-locally-open> Fes click aquí per obrir el document. La informació ingressada és
                     mostrarà per la eina de la mateixa forma com va ser guardada.</saved-locally-open>
@@ -2650,7 +2668,14 @@
                 <submit-dialog-title>Skjemaet er innsendt</submit-dialog-title>
                 <submit-dialog-message>Takk, informasjonen er innsendt.</submit-dialog-message>
                 <validation-dialog-title todo="true">[Review Form Validation Messages]</validation-dialog-title>
-                <validation-dialog-message todo="true">[Your form {1,choice,0#does not contain any messages|1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. You can choose to review {1,choice,1#it|1&lt;them} first or to ignore {1,choice,1#it|1&lt;them} and continue with the operation.]</validation-dialog-message>
+                <validation-dialog-message todo="true">[Your form {1,choice,
+                    0#does not contain any messages|
+                    1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|
+                    1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
+                    {0,choice,
+                        0#Please retry once all fields have been properly filled-out|
+                        0&lt;You can choose to review '{1,choice,1#it|1&lt;them}' first or to ignore '{1,choice,1#it|1&lt;them}' and continue with the operation}.]
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klikk her for å åpne dokumentet. Informasjonen du skrev inn, vil bli vist i verktøyet slik det var da det ble lagret.</saved-locally-open>
                 <upload-in-progress todo="true">[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
@@ -3224,7 +3249,14 @@
                 <submit-dialog-title>Форма отправлена</submit-dialog-title>
                 <submit-dialog-message>Информация успешно отправлена, спасибо!</submit-dialog-message>
                 <validation-dialog-title todo="true">[Review Form Validation Messages]</validation-dialog-title>
-                <validation-dialog-message todo="true">[Your form {1,choice,0#does not contain any messages|1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. You can choose to review {1,choice,1#it|1&lt;them} first or to ignore {1,choice,1#it|1&lt;them} and continue with the operation.]</validation-dialog-message>
+                <validation-dialog-message todo="true">[Your form {1,choice,
+                    0#does not contain any messages|
+                    1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|
+                    1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
+                    {0,choice,
+                        0#Please retry once all fields have been properly filled-out|
+                        0&lt;You can choose to review '{1,choice,1#it|1&lt;them}' first or to ignore '{1,choice,1#it|1&lt;them}' and continue with the operation}.]
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Нажмите для открытия документа. Вся введенная информация будет доступна в том виде, в котором она была при сохранении.</saved-locally-open>
                 <upload-in-progress>Повторите попытку после окончания загрузки файла.</upload-in-progress>
@@ -3806,7 +3838,11 @@
                 <validation-dialog-message>Il tuo modulo {1,choice,
                     0#non contiene avvisi|
                     1#'{0,choice,0#contiene un errore|1#contiene un avvertimento|2#contiene un avviso|3#contiene un avviso}'|
-                    1&lt;contiene {1,number,integer} '{0,choice,0#errori|1#avvertimenti|2#avvisi|3#avvisi}'}. È possibile ricontrollare il modulo oppure procedere.</validation-dialog-message>
+                    1&lt;contiene {1,number,integer} '{0,choice,0#errori|1#avvertimenti|2#avvisi|3#avvisi}'}.
+                    {0,choice,
+                        0#Prego controllare che tutti i spazi sono compilati in modo corretto|
+                        0&lt;È possibile ricontrollare il modulo oppure procedere}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Clicca qui per aprire il documento. Le informazioni immesse veranno visualizzate sullo strumento, come era nel momento in cui é stato salvato il tuo lavoro.</saved-locally-open>
                 <upload-in-progress>Ci sono operazioni di caricamento in corso. Si prega di riprovalo una volta che il caricamento del file è stato completato o annullato.</upload-in-progress>
@@ -4392,7 +4428,11 @@
                 <validation-dialog-message>Ihr Formular enthält {1,choice,
                     0#keine Meldungen|
                     1#'{0,choice,0#einen Fehler|1#eine Warnung|2#eine Informationsmeldung|3#einen Hinweis}'|
-                    1&lt; {1,number,integer} '{0,choice,0#Fehler|1#Warnungen|2#Informationsmeldungen|3#Hinweise}'}. Sie können das Formular nochmals überprüfen, oder fortfahren.</validation-dialog-message>
+                    1&lt; {1,number,integer} '{0,choice,0#Fehler|1#Warnungen|2#Informationsmeldungen|3#Hinweise}'}.
+                    {0,choice,
+                        0#Bitte füllen Sie alle Felder richtig aus und versuchen Sie es erneut|
+                        0&lt;Sie können das Formular nochmals überprüfen, oder fortfahren}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klicken Sie hier, um das Dokument zu öffnen. Die Inhalte werden so angezeigt, wie sie im Moment der Speicherung Ihrer Arbeit waren.</saved-locally-open>
                 <upload-in-progress>Es werden im Moment schon Dateien hochgeladen. Bitte versuchen Sie es erneut, sobald die Dateien erfolgreich hochgeladen oder das Hochladen abgebrochen wurde.</upload-in-progress>
@@ -4978,7 +5018,11 @@
                 <validation-dialog-message>Lomakkeesi {1,choice,
                     0#ei sisällä yhtään viestiä|
                     1#sisältää '{0,choice,0#virheen|1#varoituksen|2#tiedottavan viestin|3#viestin}'|
-                    1&lt;sisältää {1,number,integer} '{0,choice,0#virhettä|1#varoitusta|2#tiedottavaa viestiä|3#viestiä}'}. Voit valita käytkö läpi {1,choice,1#sen|1&lt;ne} ensin vai sivuutatko {1,choice,1#sen|1&lt;ne} ja jatkat operaatiota.</validation-dialog-message>
+                    1&lt;sisältää {1,number,integer} '{0,choice,0#virhettä|1#varoitusta|2#tiedottavaa viestiä|3#viestiä}'}.
+                    {0,choice,
+                        0#Yritä uudelleen kun kaikki kentät on täytetty asianmukaisesti|
+                        0&lt;Voit valita käytkö läpi {1,choice,1#sen|1&lt;ne} ensin vai sivuutatko {1,choice,1#sen|1&lt;ne} ja jatkat operaatiota}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klikkaa tästä dokumentin avataksesi. Syöttämäsi tiedot näytetään siten, kuin ne olivat tallentaessasi työsi.</saved-locally-open>
                 <upload-in-progress>Tiedoston lataaminen käynnissä. Ole hyvä ja yritä latausten päätyttyä tai keskeytettyä uudelleen.</upload-in-progress>
@@ -5564,7 +5608,11 @@
                 <validation-dialog-message>Formuläret {1,choice,
                     0#är fritt från felmeddelanden|
                     1#innehåller '{0,choice,0#ett fel|1#en varning|2#en upplysning|3#ett meddelande}'|
-                    1&lt;innehåller {1,number,integer} '{0,choice,0#fel|1#varningar|2#upplysningar|3#meddelanden}'}. Du kan granska detta nu eller senare.</validation-dialog-message>
+                    1&lt;innehåller {1,number,integer} '{0,choice,0#fel|1#varningar|2#upplysningar|3#meddelanden}'}.
+                    {0,choice,
+                        0#Gå igenom ifyllda värden och försök igen|
+                        0&lt;Du kan granska detta nu eller senare}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klicka för att öppna ett formulär.</saved-locally-open>
                 <upload-in-progress>Filer håller på att överföras. Försök igen när överföringen är avslutad.</upload-in-progress>
@@ -6150,7 +6198,11 @@
                 <validation-dialog-message>Uw form {1,choice,
                     0#bevat geen meldingen|
                     1#bevat één '{0,choice,0#fout|1#waarschuwing|2#melding ter info|3#melding}'|
-                    1&lt;bevat {1,number,integer} '{0,choice,0#fouten|1#waarschuwingen|2#meldingen ter info|3#meldingen}'}. U kunt {1,choice,1#deze|1&lt;deze} eerst bekijken of negerenen doorgaan met de bewerking.</validation-dialog-message>
+                    1&lt;bevat {1,number,integer} '{0,choice,0#fouten|1#waarschuwingen|2#meldingen ter info|3#meldingen}'}.
+                    {0,choice,
+                        0#Probeer het opnieuw als alle velden correct zijn gevuld|
+                        0&lt;U kunt {1,choice,1#deze|1&lt;deze} eerst bekijken of negerenen doorgaan met de bewerking}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klik hier om het document te openen. De informatie die u hebt ingevoerd wordt weergegeven zoals deze was toen u uw werk heeft opgeslagen.</saved-locally-open>
                 <upload-in-progress>Er zijn bestanduploads bezig. Probeer opnieuw als de bestandupload is voltooid of geannuleerd.</upload-in-progress>
@@ -6735,7 +6787,11 @@
                 <validation-dialog-message>O seu formulário {1,choice,
                     0#não contém quaisquer mensagens|
                     1#contém um(a) '{0,choice,0#erro|1#aviso|2#mensagem informativa|3#mensagem}'|
-                    1&lt;contém {1,number,integer} '{0,choice,0#erros|1#avisos|2#mensagens informativas|3#mensagens}'}. Pode optar por revê-{1,choice,1#lo(a)|1&lt;los(as)} primeiro ou ignorá-{1,choice,1#lo(a)|1&lt;los(as)} e continuar com a operação.</validation-dialog-message>
+                    1&lt;contém {1,number,integer} '{0,choice,0#erros|1#avisos|2#mensagens informativas|3#mensagens}'}.
+                    {0,choice,
+                        0#Por favor, tente novamente quando todos os campos forem devidamente preenchidos|
+                        0&lt;Pode optar por revê-{1,choice,1#lo(a)|1&lt;los(as)} primeiro ou ignorá-{1,choice,1#lo(a)|1&lt;los(as)} e continuar com a operação}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Clique aqui para abrir o documento. A informação que introduziu será exibida na ferramenta como estava no momento em que guardou o seu trabalho.</saved-locally-open>
                 <upload-in-progress>Existem documentos a serem carregados. Por favor, tente novamente quando o carregamento dos documentos for concluído ou cancelado.</upload-in-progress>
@@ -7311,7 +7367,14 @@
                 <submit-dialog-title>Blanket er sendt ind</submit-dialog-title>
                 <submit-dialog-message>Tak, informationen er sendt ind.</submit-dialog-message>
                 <validation-dialog-title>Check blanketvalideringer</validation-dialog-title>
-                <validation-dialog-message>Din blanket {1,choice,0#indeholder ingen beskeder|1#indeholder en '{0,choice,0#fejl|1#advarsel|2#information|3#besked}'|1&lt;indehoder {1,number,integer} '{0,choice,0#fejl|1#advarsler|2#informationer|3#beskeder}'}. Du kan vælge at checke {1,choice,1#den|1&lt;dem} først eller ignorere {1,choice,1#den|1&lt;dem} og fortsætte.</validation-dialog-message>
+                <validation-dialog-message>Din blanket {1,choice,
+                    0#indeholder ingen beskeder|
+                    1#indeholder en '{0,choice,0#fejl|1#advarsel|2#information|3#besked}'|
+                    1&lt;indehoder {1,number,integer} '{0,choice,0#fejl|1#advarsler|2#informationer|3#beskeder}'}.
+                    {0,choice,
+                        0#Ret venligst fejlene før du prøver at sende igen|
+                        0&lt;Du kan vælge at checke {1,choice,1#den|1&lt;dem} først eller ignorere {1,choice,1#den|1&lt;dem} og fortsætte}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klik her for at åbne dokument. Informationer du har skrevet i blanketten vil blive vist som da den blev gemt.</saved-locally-open>
                 <upload-in-progress>Prøv igen når fil-indlæsningen er færdig eller blevet afbrudt.</upload-in-progress>
@@ -7893,7 +7956,11 @@
                 <validation-dialog-message>Twój formularz {1,choice,
                     0#nie zawiera błędów|
                     1#zawiera 1 lub więcej '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'|
-                    1&lt;contains {1,number,integer} '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'}. Możesz dokonać przeglądu {1,choice,1#it|1&lt;them} najpierw lub zignoruj {1,choice,1#it|1&lt;them} i kontynuuj uzupełnianie.</validation-dialog-message>
+                    1&lt;contains {1,number,integer} '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'}.
+                    {0,choice,
+                        0#Proszę sprawdzić, czy wszystkie pola zostały wypełnione poprawnie|
+                        0&lt;Możesz dokonać przeglądu {1,choice,1#it|1&lt;them} najpierw lub zignoruj {1,choice,1#it|1&lt;them} i kontynuuj uzupełnianie}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Kliknij tutaj, by otworzyć dokument. Dane wprowadzone przez Ciebie będą zaprezentowane w takiej formie, w jakiej je zapisałeś.</saved-locally-open>
                 <upload-in-progress>Trwa wgrywanie plików. Spróbuj ponownie, gdy wgrywanie plików zakończy się lub zostanie anulowane.</upload-in-progress>

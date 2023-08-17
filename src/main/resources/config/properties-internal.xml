@@ -360,14 +360,19 @@
         recover (
             show-relevant-errors
             then expand-invalid
-            then error-message("form-validation-error")
+            then xf:show(dialog = "fr-validation-dialog")
+            then suspend
+            then xf:dispatch(name = "fr-focus-first-error", targetid = "error-summary-control-bottom")
             then success
         )
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.review-messages.*.*">
         validate("warning")
         then validate("info")
-        recover (xf:show("fr-validation-dialog") then suspend)
+        recover (
+            xf:show(dialog = "fr-validation-dialog")
+            then suspend
+        )
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.validate-all.*.*">
         require-valid

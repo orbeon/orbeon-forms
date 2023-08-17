@@ -26,19 +26,38 @@
 
     <xf:label ref="$fr-resources/detail/messages/validation-dialog-title"/>
 
+    <xf:var
+        name="message-type"
+        as="xs:integer"
+        value="
+            xxf:instance('fr-error-summary-instance')/counts/(
+                if (@error gt 0) then
+                    0 (: errors win and have to be taken care of :)
+                else if (count((@warning, @info)[. gt 0]) gt 1) then
+                    3 (: general message :)
+                else if (@warning gt 0) then
+                    1
+                else if (@info gt 0) then
+                    2
+                else
+                    4
+            )"/>
+
     <xh:i class="fa fa-fw fa-exclamation-circle fr-dialog-icon"/>
     <xh:div class="fr-dialog-message">
         <xf:output
-            value="xxf:format-message(
-                       $fr-resources/detail/messages/validation-dialog-message,
-                       (
-                           xxf:instance('fr-error-summary-instance')/counts/(if (count((@error, @warning, @info)[. gt 0]) gt 1) then 3 else if (@error gt 0) then 0 else if (@warning gt 0) then 1 else if (@info gt 0) then 2 else 4),
-                           xxf:instance('fr-error-summary-instance')/counts/xs:integer(@alert)
-                       )
-                   )"/>
+            value="
+                xxf:format-message(
+                    $fr-resources/detail/messages/validation-dialog-message,
+                    (
+                        (: 0 :) $message-type,
+                        (: 1 :) xxf:instance('fr-error-summary-instance')/counts/xs:integer(@alert)
+                    )
+               )"/>
     </xh:div>
     <xh:div class="fr-dialog-buttons">
-        <xf:trigger>
+        <!-- Don't show the "Continue" button when there are errors. This could later be an option. -->
+        <xf:trigger ref=".[xxf:instance('fr-error-summary-instance')/counts/xs:integer(@error)= 0]">
             <xf:label ref="$fr-resources/buttons/validation-dialog-continue"/>
             <xxf:hide event="DOMActivate" dialog="fr-validation-dialog">
                 <xf:property name="process" value="'validation-dialog-continue'"/>
@@ -46,16 +65,39 @@
         </xf:trigger>
         <xf:trigger id="fr-validation-dialog-cancel" appearance="xxf:primary">
             <xf:label ref="$fr-resources/buttons/validation-dialog-review"/>
-            <xxf:hide event="DOMActivate" dialog="fr-validation-dialog"/>
+            <xxf:hide event="DOMActivate" dialog="fr-validation-dialog">
+                <xf:property name="process" value="'validation-dialog-review'"/>
+            </xxf:hide>
         </xf:trigger>
     </xh:div>
 
     <!-- Focus on Cancel button first as that is the least dangerous operation -->
     <xf:setfocus event="xxforms-dialog-open" control="fr-validation-dialog-cancel"/>
 
-    <!-- Run the "abort" process when the dialog is closed unless a process is specified -->
-    <xf:action event="xxforms-dialog-close" type="xpath" xxf:if-non-relevant="true">
-        fr:run-process-by-name('oxf.fr.detail.process', (event('process'), 'validation-dialog-review')[1])
+    <!-- Run the `abort` process (via `validation-dialog-review`) when the dialog is closed unless a process is
+         specified. Above, `validation-dialog-continue` or `validation-dialog-review` are explicitly specified. -->
+    <xf:action event="xxforms-dialog-close" xxf:if-non-relevant="true">
+
+        <xf:var
+            name="must-review"
+            value="
+                empty(event('process')) or
+                event('process') = 'validation-dialog-review'"/>
+
+        <xf:dispatch
+            if="$must-review"
+            name="fr-focus-first-error"
+            targetid="error-summary-control-bottom"/>
+
+        <xf:action type="xpath">
+            fr:run-process-by-name(
+                'oxf.fr.detail.process',
+                if ($must-review) then
+                    'validation-dialog-review'
+                else
+                    'validation-dialog-continue'
+            )
+        </xf:action>
     </xf:action>
 
 </xxf:dialog>

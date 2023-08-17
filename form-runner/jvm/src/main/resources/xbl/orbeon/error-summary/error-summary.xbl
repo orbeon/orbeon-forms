@@ -67,6 +67,40 @@
                 <xf:setvalue ref="$state/section-name" value="event('section-name')"/>
                 <xf:setvalue ref="$state/show"         value="true()"/>
             </xbl:handler>
+            <xbl:handler event="fr-focus-first-error" phase="target">
+                <!-- Focus on the first focusable error -->
+                <xf:action iterate="$visible-errors-for-section[xxf:focusable(@id, true())][1]">
+                    <xf:dispatch name="fr-internal-focus-error" target="fr-error-summary-binding">
+                        <xf:property name="error"    value="."/>
+                        <xf:property name="position" value="count(preceding-sibling::error) + 1"/>
+                    </xf:dispatch>
+                </xf:action>
+            </xbl:handler>
+            <xbl:handler event="fr-internal-focus-error" phase="target">
+                <xf:action iterate="event('error')">
+                    <xf:action type="javascript" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+                        <xf:param name="elementId"          value="xxf:client-id(@id)"/>
+                        <xf:param name="validationPosition" value="string(event('position'))"/>
+                        <xf:param name="controlName"        value="frf:controlNameFromId(xxf:client-id(@id))"/>
+                        <xf:param name="controlLabel"       value="string(@label)"/>
+                        <xf:param name="validationMessage"  value="string(@alert)"/>
+                        <xf:param name="validationLevel"    value="string(@level)"/>
+                        <xf:param name="sectionNames"       value="string-join(ErrorSummary:ancestorSectionNames(@id), ' ')"/>
+                        <xf:body>
+                            ORBEON.fr.private.API.navigateToError(
+                                validationPosition,
+                                elementId,
+                                controlName,
+                                controlLabel,
+                                validationMessage,
+                                validationLevel,
+                                sectionNames
+                            );
+                        </xf:body>
+                    </xf:action>
+                    <xf:setfocus control="{@id}"/>
+                </xf:action>
+            </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="fr-error-summary-model">
@@ -362,29 +396,10 @@
                                                                             value="@alert"/>
                                                                     </span>
                                                                 </xf:label>
-								                                <xf:action ev:event="DOMActivate">
-                                                                    <xf:action type="javascript" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
-                                                                        <xf:param name="elementId"          value="xxf:client-id(@id)"/>
-                                                                        <xf:param name="validationPosition" value="string(position())"/>
-                                                                        <xf:param name="controlName"        value="frf:controlNameFromId(xxf:client-id(@id))"/>
-                                                                        <xf:param name="controlLabel"       value="string(@label)"/>
-                                                                        <xf:param name="validationMessage"  value="string(@alert)"/>
-                                                                        <xf:param name="validationLevel"    value="string(@level)"/>
-                                                                        <xf:param name="sectionNames"       value="string-join(ErrorSummary:ancestorSectionNames(@id), ' ')"/>
-                                                                        <xf:body>
-                                                                            ORBEON.fr.private.API.navigateToError(
-                                                                                validationPosition,
-                                                                                elementId,
-                                                                                controlName,
-                                                                                controlLabel,
-                                                                                validationMessage,
-                                                                                validationLevel,
-                                                                                sectionNames
-                                                                            );
-                                                                        </xf:body>
-                                                                    </xf:action>
-                                                                    <xf:setfocus control="{{@id}}"/>
-                                                                </xf:action>
+                                                                <xf:dispatch event="DOMActivate" name="fr-internal-focus-error" target="fr-error-summary-binding">
+                                                                    <xf:property name="error"    value="."/>
+                                                                    <xf:property name="position" value="position()"/>
+                                                                </xf:dispatch>
                                                             </xf:trigger>
                                                         </xf:case>
                                                         <xf:case value="false()">

@@ -57,6 +57,7 @@
     <xf:var
         name="is-export"
         value="
+            not(fr:mode() = ('pdf', 'tiff')) and (: these are technically exports but they behave differently :)
             matches(
                 xxf:get-request-path(),
                 '^/fr/(service/)?([^/]+)/([^/]+)/(excel-export|export)(/([^/]+))?$'

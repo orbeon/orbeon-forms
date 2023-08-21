@@ -57,7 +57,7 @@
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <!-- Don't show the "Continue" button when there are errors. This could later be an option. -->
-        <xf:trigger ref=".[xxf:instance('fr-error-summary-instance')/counts/xs:integer(@error)= 0]">
+        <xf:trigger ref=".[xxf:instance('fr-error-summary-instance')/counts/xs:integer(@error) = 0]">
             <xf:label ref="$fr-resources/buttons/validation-dialog-continue"/>
             <xxf:hide event="DOMActivate" dialog="fr-validation-dialog">
                 <xf:property name="process" value="'validation-dialog-continue'"/>

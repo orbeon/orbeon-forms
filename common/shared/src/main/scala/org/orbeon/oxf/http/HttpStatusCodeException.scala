@@ -36,6 +36,6 @@ case class HttpRedirectException(
 }
 
 case class SessionExpiredException(message: String) extends HttpStatusCode {
-  val code = StatusCode.Forbidden
+  val code = StatusCode.LoginTimeOut
   override def toString = s"SessionExpiredException(message= $message)"
 }

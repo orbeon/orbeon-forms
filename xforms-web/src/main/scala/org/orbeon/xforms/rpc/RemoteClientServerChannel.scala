@@ -15,10 +15,11 @@ package org.orbeon.xforms.rpc
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
+import org.orbeon.oxf.http.StatusCode.{LoginTimeOut, ServiceUnavailable}
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.xforms
 import org.orbeon.xforms.AjaxClient.handleFailure
-import org.orbeon.xforms.{AjaxRequest, Page, Support}
+import org.orbeon.xforms.{AjaxClient, AjaxRequest, Page, Support}
 import org.scalajs.dom
 import org.scalajs.dom.FormData
 import org.scalajs.dom.experimental.AbortController
@@ -92,7 +93,13 @@ object RemoteClientServerChannel extends ClientServerChannel[xforms.Form, dom.Do
               // We ignore HTTP status and just check that we have a well-formed response document
               Page.loadingIndicator().requestEnded(showProgress)
               promise.success(responseXml)
-            case Success((503, _, _)) =>
+            case Success((LoginTimeOut, _, _)) =>
+              // https://github.com/orbeon/orbeon-forms/issues/5678
+              AjaxClient.showLoginDetectedDialog(requestForm.namespacedFormId)
+              Page.loadingIndicator().requestEnded(showProgress)
+              // The `Failure` is ignored by the caller of `sendEvents()`
+              promise.failure(new Throwable) // TODO: It would be good to return another error type.
+            case Success((ServiceUnavailable, _, _)) =>
               // The server returns an explicit 503 when the Ajax server is still busy
               retryRequestAfterDelay(requestForm, () =>
                 asyncAjaxRequestWithRetry(requestForm, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
@@ -100,14 +107,16 @@ object RemoteClientServerChannel extends ClientServerChannel[xforms.Form, dom.Do
               )
             case Success((_, responseText, responseXmlOpt)) =>
               // Retry if we DON'T have an explicit error doc or a login
-              if (! handleFailure(responseXmlOpt.toRight(responseText), requestForm.namespacedFormId, ignoreErrors))
+              if (! handleFailure(responseXmlOpt.toRight(responseText), requestForm.namespacedFormId, ignoreErrors)) {
                 retryRequestAfterDelay(requestForm, () =>
                   asyncAjaxRequestWithRetry(requestForm, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
                     promise.complete
                 )
-              else {
+              } else {
                 Page.loadingIndicator().requestEnded(showProgress)
                 // This was handled by showing a dialog or login
+                //   2023-08-21: What does the above comment mean?
+                // The `Failure` is ignored by the caller of `sendEvents()`
                 promise.failure(new Throwable) // TODO: It would be good to return another error type.
               }
             case Failure(_) =>

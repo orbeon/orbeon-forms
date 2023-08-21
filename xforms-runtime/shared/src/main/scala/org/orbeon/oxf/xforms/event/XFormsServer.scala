@@ -310,7 +310,7 @@ object XFormsServer {
     allEvents option XFormsStateManager.createInitialDocumentFromStore(requestParametersForAll) match {
       case Some(None) =>
         info(s"document not found in store while computing all initialization events")
-        ClientEvents.errorResponse(StatusCode.Forbidden) // status code debatable
+        ClientEvents.errorResponse(StatusCode.LoginTimeOut) // status code debatable
       case initialContainingDocumentOptOpt =>
         withDocument {
           xmlReceiver.startPrefixMapping(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI)

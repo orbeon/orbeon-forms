@@ -154,7 +154,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
                   }
                 case None =>
                   info(s"document not found in store while building dynamic form initialization")
-                  response.setStatus(StatusCode.Forbidden)
+                  response.setStatus(StatusCode.LoginTimeOut)
               }
             }
         }

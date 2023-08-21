@@ -113,14 +113,14 @@ object AjaxClient {
   //
   // Public for `UploaderClient`
   def handleFailure(
-    response     : String Either dom.Document,
-    formId       : String,
-    ignoreErrors : Boolean
+    response        : String Either dom.Document,
+    namespacedFormId: String,
+    ignoreErrors    : Boolean
   ): Boolean = {
 
     object LoginRegexpMatcher {
       def unapply(s: String): Boolean = {
-        val loginRegexp = Page.getXFormsFormFromNamespacedIdOrThrow(formId).configuration.loginPageDetectionRegexp
+        val loginRegexp = Page.getXFormsFormFromNamespacedIdOrThrow(namespacedFormId).configuration.loginPageDetectionRegexp
         loginRegexp.exists(re => new js.RegExp(re).test(s))
       }
     }
@@ -138,48 +138,49 @@ object AjaxClient {
         val title = responseXml.getElementsByTagName("title") map (_.textContent) mkString ""
         val body  = responseXml.getElementsByTagName("body")  map (_.textContent) mkString ""
 
-        showError(title, body, formId, ignoreErrors)
+        showError(title, body, namespacedFormId, ignoreErrors)
 
         true
 
       case Left(LoginRegexpMatcher()) =>
-
-         // It seems we got a login page back, so display dialog and reload form
-        val dialogEl = $(s"#$formId .xforms-login-detected-dialog")
-
-        def getUniqueId(prefix: String): String = {
-          var i = 0
-          var r: String = null
-          do {
-            r = prefix + i
-            i += 1
-          } while (dom.document.getElementById(r) ne null)
-          r
-        }
-
-        // Link dialog with title for ARIA
-        val title = dialogEl.find("h4")
-        if (title.attr("id").isEmpty) {
-            val titleId = getUniqueId("xf-aria-dialog-title-")
-            title.attr("id", titleId)
-            dialogEl.attr("aria-labelledby", titleId)
-        }
-
-        dialogEl.find("button").one("click.xf", ((_: JQueryEventObject) => {
-          // Reloading the page will redirect us to the login page if necessary
-          dom.window.location.href = dom.window.location.href
-        }): js.Function1[JQueryEventObject, js.Any])
-        dialogEl.asInstanceOf[js.Dynamic].modal(new js.Object {
-          val backdrop = "static" // Click on the background doesn't hide dialog
-          val keyboard = false    // Can't use esc to close the dialog
-        })
-
+        showLoginDetectedDialog(namespacedFormId)
         true
-
       case _ =>
         // This will cause a retry for event requests (but not uploads)
         false
     }
+  }
+
+  def showLoginDetectedDialog(formId: String): Unit = {
+    // It seems we got a login page back, so display dialog and reload form
+      val dialogEl = $(s"#$formId .xforms-login-detected-dialog")
+
+      def getUniqueId(prefix: String): String = {
+        var i = 0
+        var r: String = null
+        do {
+          r = prefix + i
+          i += 1
+        } while (dom.document.getElementById(r) ne null)
+        r
+      }
+
+      // Link dialog with title for ARIA
+      val title = dialogEl.find("h4")
+      if (title.attr("id").isEmpty) {
+          val titleId = getUniqueId("xf-aria-dialog-title-")
+          title.attr("id", titleId)
+          dialogEl.attr("aria-labelledby", titleId)
+      }
+
+      dialogEl.find("button").one("click.xf", ((_: JQueryEventObject) => {
+        // Reloading the page will redirect us to the login page if necessary
+        dom.window.location.href = dom.window.location.href
+      }): js.Function1[JQueryEventObject, js.Any])
+      dialogEl.asInstanceOf[js.Dynamic].modal(new js.Object {
+        val backdrop = "static" // Click on the background doesn't hide dialog
+        val keyboard = false    // Can't use esc to close the dialog
+      })
   }
 
   // Create a timer which after the specified delay will fire a server event

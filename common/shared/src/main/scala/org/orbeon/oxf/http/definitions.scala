@@ -240,6 +240,7 @@ object StatusCode {
   val Gone                  = 410
   val RequestEntityTooLarge = 413
   val Locked                = 423
+  val LoginTimeOut          = 440 // not standard
   val InternalServerError   = 500
   val ServiceUnavailable    = 503
 

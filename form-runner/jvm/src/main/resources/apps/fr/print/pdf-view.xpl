@@ -25,7 +25,7 @@
     <p:param type="input" name="instance"/>
     <!-- XHTML+FR+XForms for the form -->
     <p:param type="input" name="data"/>
-    <!-- XHTML+XForms -->
+
     <p:param type="output" name="data"/>
 
     <!-- Unroll the form (theme, components, inclusions) -->

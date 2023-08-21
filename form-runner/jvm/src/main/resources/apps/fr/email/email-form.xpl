@@ -40,7 +40,6 @@
         </p:when>
     </p:choose>
 
-    <!-- Extract page detail (app, form, document, and mode) from URL -->
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>

@@ -30,6 +30,8 @@ class FormRunnerCompiler extends ProcessorImpl {
   private val Logger = LoggerFactory.createLogger(classOf[FormRunnerCompiler])
   private implicit val indentedLogger: IndentedLogger = new IndentedLogger(Logger)
 
+  private val FRAppFormResourcesSubmissionPath = "/fr/service/i18n/fr-resources/{$app}/{$form}"
+
   override def createOutput(outputName: String): ProcessorOutput =
     addOutput(
       outputName,
@@ -66,14 +68,13 @@ class FormRunnerCompiler extends ProcessorImpl {
                      instance.cache    &&
                      instance.dependencyURL.isDefined =>
                   instance.dependencyURL
+                case submission: Submission if submission.avtActionOrResource == FRAppFormResourcesSubmissionPath =>
+                  // TODO: Following #5833 we should do a `POST` to retrieve this resource
+                  PathUtils.recombineQuery("/fr/service/i18n/fr-resources/orbeon/offline", usedLangsOpt.map("langs" ->)).some
                 case submission: Submission
                   if submission.avtXxfReadonlyOpt.contains("true") &&
-                     submission.avtXxfCacheOpt.contains("true")    &&
-                     submission.avtMethod.exists(s => HttpMethod.withNameInsensitiveOption(s).contains(HttpMethod.GET)) =>
-
-                  if (submission.avtActionOrResource == "/fr/service/i18n/fr-resources/{$app}/{$form}")
-                    PathUtils.recombineQuery("/fr/service/i18n/fr-resources/orbeon/offline", usedLangsOpt.map("langs" ->)).some
-                  else
+                      submission.avtXxfCacheOpt.contains("true")   &&
+                      submission.avtMethod.exists(s => HttpMethod.withNameInsensitiveOption(s).contains(HttpMethod.GET)) =>
                     submission.avtActionOrResource.some
               }
 

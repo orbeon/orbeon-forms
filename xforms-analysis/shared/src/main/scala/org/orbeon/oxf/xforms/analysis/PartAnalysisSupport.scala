@@ -1,6 +1,5 @@
 package org.orbeon.oxf.xforms.analysis
 
-import cats.syntax.option._
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHAAnalysis, StaticLHHASupport}

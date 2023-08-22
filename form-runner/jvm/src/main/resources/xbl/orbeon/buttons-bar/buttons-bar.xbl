@@ -66,7 +66,11 @@
                             if (empty($buttons-property-opt) and $fr-mode = ('pdf', 'email')) then
                                 ()
                             else if (empty($buttons-property-opt) and $fr-mode = 'test') then
-                                (('wizard-toc', 'wizard-prev', 'wizard-next')[fr:is-wizard-body-shown()], 'validate')
+                                (
+                                    ('wizard-toc', 'wizard-prev', 'wizard-next')[fr:is-wizard-body-shown()],
+                                    'validate',
+                                    'save'[fr:is-browser-environment()]
+                                )
                             else
                                 xxf:split(xxf:property(string-join(($buttons-property, fr:app-name(), fr:form-name()), '.'))),
                         $is-inner :=

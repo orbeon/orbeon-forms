@@ -233,9 +233,10 @@ object ControlAjaxSupport {
     }
   }
 
-  val AriaReadonly    = "aria-readonly"
-  val AriaLabelledby  = "aria-labelledby"
-  val AriaDescribedby = "aria-describedby"
+  val AriaReadonly     = "aria-readonly"
+  val AriaLabelledby   = "aria-labelledby"
+  val AriaDescribedby  = "aria-describedby"
+  val AriaErrorMessage = "aria-errormessage"
 
   val AriaReadonlyQName    = QName("aria-readonly")
   val AriaLabelledbyQName  = QName("aria-labelledby")
@@ -243,8 +244,9 @@ object ControlAjaxSupport {
 //  val AriaDetails     = "aria-details"
 
   val AriaAttsWithLhha: List[(String, List[LHHA])] = List(
-    AriaLabelledby  -> List(LHHA.Label),
-    AriaDescribedby -> List(LHHA.Hint, LHHA.Help),
+    AriaLabelledby   -> List(LHHA.Label),
+    AriaDescribedby  -> List(LHHA.Hint, LHHA.Help),
+    AriaErrorMessage -> List(LHHA.Alert),
   )
 
   def iterateAriaByAtts(
@@ -272,7 +274,7 @@ object ControlAjaxSupport {
   ): Option[String] =
     for {
       staticLhhaSupport <- staticControl.narrowTo[StaticLHHASupport]
-      staticLhha        <- staticLhhaSupport.lhhBy(lhha) orElse staticLhhaSupport.lhh(lhha)
+      staticLhha        <- staticLhhaSupport.anyByOpt(lhha)
       if condition(staticLhha)
     } yield
       staticLhha.lhhaPlacementType match {

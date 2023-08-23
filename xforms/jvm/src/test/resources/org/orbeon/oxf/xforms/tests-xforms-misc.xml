@@ -783,7 +783,7 @@
                                     <h4>Reloading form</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <p>This form has to be reloaded. This most likely happened because your session has expired, which might take to the login page. (If you think that you shouldn't see this message and that the problem persists, please contact support.)</p>
+                                    <p>This form has to be reloaded. This most likely happened because your session has expired, which might take you to the login page. (If you think that you shouldn't see this message and that the problem persists, please contact support.)</p>
                                 </div>
                                 <div class="modal-footer">
                                     <button class="btn btn-primary">OK</button>

@@ -1,5 +1,6 @@
 package org.orbeon.oxf.cache
 
+import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.Properties
@@ -8,6 +9,8 @@ import org.orbeon.oxf.util.CoreUtils.PipeOps
 import java.io
 import java.net.URI
 import javax.cache.Caching
+import scala.jdk.CollectionConverters.iterableAsScalaIterableConverter
+import scala.util.Try
 import scala.util.control.NonFatal
 
 
@@ -26,7 +29,7 @@ object JCacheSupport extends CacheProviderApi {
     }
 
   def close(): Unit =
-    provider.close()
+    provider.close() // xxx TODO: what if provider used by others? should we close it, or just the cache manager?
 
   class JCacheCacheApi(private val cache: javax.cache.Cache[io.Serializable, io.Serializable]) extends CacheApi  {
     def put(k: io.Serializable, v: io.Serializable): Unit         = { trace("put");                    cache.put(k, v) }
@@ -40,14 +43,57 @@ object JCacheSupport extends CacheProviderApi {
 
   private lazy val (provider, cacheManager) =
     try {
-      val provider = Caching.getCachingProvider
 
-      val properties = Properties.instance.getPropertySetOrThrow
+      val properties =
+        Properties.instance.getPropertySetOrThrow |!>
+          (CacheSupport.logProperties(_, CacheSupport.Logger.debug))
+
+      // For debugging only, indicate the default provider set using the Java system property
+      Try(System.getProperty(Caching.JAVAX_CACHE_CACHING_PROVIDER)).toOption.flatMap(Option.apply).foreach { provider =>
+        debug(s"A default JCache provider is set to `$provider` via the system property `${Caching.JAVAX_CACHE_CACHING_PROVIDER}`")
+      }
+
+      val provider =
+        NonEmptyList.fromList(Caching.getCachingProviders.asScala.toList) match {
+          case None =>
+            val msg = "No JCache provider was found in the classpath"
+            error(msg)
+            throw new IllegalStateException(msg)
+          case Some(providers) =>
+
+            debug(s"JCache providers class names found in the classpath:")
+            providers.iterator.zipWithIndex.foreach { case (provider, index) =>
+              debug(s"  ${index + 1}: `${provider.getClass.getName}`")
+            }
+
+            properties.getNonBlankString(CacheSupport.ClassnameRePropertyName) match {
+              case Some(re) =>
+                providers.find(_.getClass.getName.matches(re)) match {
+                  case Some(provider) =>
+                    debug(s"Found JCache provider in the classpath with class name matching `$re`")
+                    provider
+                  case None =>
+                    val msg = s"No JCache provider found in the classpath with class name matching `$re`"
+                    error(msg)
+                    throw new IllegalStateException(msg)
+                }
+              case None =>
+                debug(s"No `${CacheSupport.ClassnameRePropertyName}` property set")
+                if (providers.size > 1)
+                  debug(s"  picking first provider found out of ${providers.size} providers")
+                else
+                  debug(s"  only one provider found")
+                providers.head
+            }
+        }
+
+      info(s"Using the JCache provider found in the classpath with class name: `${provider.getClass.getName}`")
 
       def fromResource: Option[URI] =
         properties
           .getNonBlankString(CacheSupport.ResourcePropertyName)
-          .map(getClass.getResource(_).toURI)
+          .flatMap(p => Option(getClass.getResource(p)))
+          .map(_.toURI)
 
       def fromUri: Option[URI] =
         properties
@@ -64,6 +110,10 @@ object JCacheSupport extends CacheProviderApi {
       )
     } catch {
       case NonFatal(t) =>
+
+        Try(Properties.instance.getPropertySetOrThrow)
+          .foreach(CacheSupport.logProperties(_, CacheSupport.Logger.error))
+
         throw new OXFException(s"unable to initialize JCache cache manager", t)
     }
 }

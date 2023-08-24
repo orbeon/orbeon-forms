@@ -413,7 +413,7 @@ object InitSupport {
         // Catch logout link clicks to inform other pages on the same session that it is going to be invalidated
         $(".fr-logout-link").get.foreach { logoutAnchor =>
           GlobalEventListenerSupport.addJsListener(logoutAnchor, DomEventNames.Click, (_: dom.raw.Event) => {
-            Session.sessionIsExpired()
+            Session.logout()
           })
         }
 

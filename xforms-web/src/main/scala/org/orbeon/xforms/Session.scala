@@ -27,8 +27,11 @@ object Session {
   def updateWithLocalNewestEventTime(): Unit =
     configurationOpt.foreach(sessionActivity(_, AjaxClient.newestEventTime, local = true))
 
-  def sessionIsExpired(): Unit =
-    configurationOpt.foreach(sessionExpiration(_, local = true))
+  def sessionHasExpired(): Unit =
+    configurationOpt.foreach(sessionExpiration)
+
+  def logout(): Unit =
+    configurationOpt.foreach(sessionLogout(_, local = true))
 
   def expired: Boolean = sessionStatus == SessionExpired
 
@@ -51,8 +54,8 @@ object Session {
     )
 
     private sealed trait SessionMessage { def sessionId: String }
-    private case class SessionActivity  (override val sessionId: String, localNewestEventTime: Long) extends SessionMessage
-    private case class SessionExpiration(override val sessionId: String)                             extends SessionMessage
+    private case class SessionActivity(override val sessionId: String, localNewestEventTime: Long) extends SessionMessage
+    private case class SessionLogout  (override val sessionId: String)                             extends SessionMessage
 
     var configurationOpt: Option[Configuration]  = None
     var sessionStatus: SessionStatus             = SessionActive
@@ -72,8 +75,8 @@ object Session {
             case SessionActivity(_, localNewestEventTime) =>
               sessionActivity(configuration, localNewestEventTime, local = false)
 
-            case SessionExpiration(_) =>
-              sessionExpiration(configuration, local = false)
+            case SessionLogout(_) =>
+              sessionLogout(configuration, local = false)
           }
         }
       }
@@ -86,7 +89,7 @@ object Session {
       parser.parse(jsonString).flatMap { json =>
         json.as[SessionActivity] match {
           case Right(sessionActivity) => Right(sessionActivity)
-          case Left(_)                => json.as[SessionExpiration]
+          case Left(_)                => json.as[SessionLogout]
         }
       }
     }
@@ -131,22 +134,36 @@ object Session {
       }
     }
 
-    def sessionExpiration(configuration: Configuration, local: Boolean): Unit = {
+    def sessionExpiration(configuration: Configuration): Unit = {
       // Once the session is expired, we don't do anything anymore
       if (sessionStatus != SessionExpired) {
         sessionStatus = SessionExpired
-
-        if (local) {
-          // Broadcast our local expiration to other pages
-          val message = SessionExpiration(configuration.sessionId).asJson.noSpaces
-          sessionActivityBroadcastChannel.postMessage(message)
-        }
 
         fireSessionUpdate(SessionUpdate(
           sessionStatus = sessionStatus,
           sessionHeartbeatEnabled = configuration.sessionHeartbeatEnabled,
           approxSessionExpiredTimeMillis = System.currentTimeMillis()
         ))
+      }
+    }
+
+    def sessionLogout(configuration: Configuration, local: Boolean): Unit = {
+      // Once the session is expired, we don't do anything anymore
+      if (sessionStatus != SessionExpired) {
+        sessionStatus = SessionExpired
+
+        if (local) {
+          // Broadcast our local logout to other pages
+          val message = SessionLogout(configuration.sessionId).asJson.noSpaces
+          sessionActivityBroadcastChannel.postMessage(message)
+        } else {
+          // If the logout comes from another page, process the logout locally
+          fireSessionUpdate(SessionUpdate(
+            sessionStatus = sessionStatus,
+            sessionHeartbeatEnabled = configuration.sessionHeartbeatEnabled,
+            approxSessionExpiredTimeMillis = System.currentTimeMillis()
+          ))
+        }
       }
     }
   }

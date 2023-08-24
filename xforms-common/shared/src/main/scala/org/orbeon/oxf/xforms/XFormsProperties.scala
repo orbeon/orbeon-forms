@@ -77,8 +77,8 @@ object XFormsProperties {
   val LoginPageDetectionRegexpProperty          = "login-page-detection-regexp"
 
   val SessionHeartbeatProperty                  = "session-heartbeat"
-  val SessionExpirationTriggerProperty          = "session-expiration-trigger"
-  val SessionExpirationMarginProperty           = "session-expiration-margin"
+  val SessionExpirationTriggerProperty          = "session-expiration.trigger"
+  val SessionExpirationMarginProperty           = "session-expiration.margin"
 
   val DelayBeforeIncrementalRequestProperty     = "delay-before-incremental-request"
   val InternalShortDelayProperty                = "internal-short-delay"

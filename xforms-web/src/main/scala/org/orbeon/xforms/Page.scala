@@ -15,14 +15,12 @@ package org.orbeon.xforms
 
 
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.externalcontext.ExternalContext.Scope.Session
 import org.orbeon.xforms
 import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom.html
 
-import scala.scalajs.js
 import scala.collection.mutable
-import scala.scalajs.js.Date
+import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 

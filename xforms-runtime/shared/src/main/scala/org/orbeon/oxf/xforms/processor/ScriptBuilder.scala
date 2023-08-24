@@ -105,26 +105,28 @@ object ScriptBuilder {
       versionedResources flatOption CoreCrossPlatformSupport.getApplicationResourceVersion
 
     ConfigurationProperties(
-      sessionHeartbeatEnabled          = staticState.staticBooleanProperty(SessionHeartbeatProperty),                     // static
-      maxInactiveIntervalMillis        = maxInactiveIntervalMillis,                                                       // dynamic
-      sessionId                        = sessionId,                                                                       // dynamic
-      revisitHandling                  = staticState.staticStringProperty(RevisitHandlingProperty),                       // static
-      delayBeforeIncrementalRequest    = staticState.staticIntProperty(DelayBeforeIncrementalRequestProperty),            // static
-      delayBeforeAjaxTimeout           = getAjaxTimeout,                                                                  // global
-      internalShortDelay               = staticState.staticIntProperty(InternalShortDelayProperty),                       // static
-      delayBeforeDisplayLoading        = staticState.staticIntProperty(DelayBeforeDisplayLoadingProperty),                // static
-      delayBeforeUploadProgressRefresh = staticState.staticIntProperty(DelayBeforeUploadProgressRefreshProperty),         // static
-      helpHandler                      = helpHandler,                                                                     // dynamic
-      resourcesVersioned               = versionedResources,                                                              // dynamic
-      resourcesVersionNumber           = resourcesVersionOpt,                                                             // dynamic
-      helpTooltip                      = staticState.staticBooleanProperty(HelpTooltipProperty),                          // static
-      showErrorDialog                  = staticState.staticBooleanProperty(ShowErrorDialogProperty),                      // static
-      loginPageDetectionRegexp         = staticState.staticStringProperty(LoginPageDetectionRegexpProperty).trimAllToOpt, // static
-      retryDelayIncrement              = getRetryDelayIncrement,                                                          // global
-      retryMaxDelay                    = getRetryMaxDelay,                                                                // global
-      useAria                          = staticState.staticBooleanProperty(UseAriaProperty),                              // static
-      dateFormatInput                  = staticState.staticStringProperty(DateFormatInputProperty),                       // static
-      timeFormatInput                  = staticState.staticStringProperty(TimeFormatInputProperty),                       // static
+      sessionHeartbeatEnabled            = staticState.staticBooleanProperty(SessionHeartbeatProperty),                     // static
+      maxInactiveIntervalMillis          = maxInactiveIntervalMillis,                                                       // dynamic
+      sessionExpirationTriggerPercentage = staticState.staticIntProperty(SessionExpirationTriggerProperty),                 // static
+      sessionExpirationMarginMillis      = staticState.staticIntProperty(SessionExpirationMarginProperty) * 1000L,          // static
+      sessionId                          = sessionId,                                                                       // dynamic
+      revisitHandling                    = staticState.staticStringProperty(RevisitHandlingProperty),                       // static
+      delayBeforeIncrementalRequest      = staticState.staticIntProperty(DelayBeforeIncrementalRequestProperty),            // static
+      delayBeforeAjaxTimeout             = getAjaxTimeout,                                                                  // global
+      internalShortDelay                 = staticState.staticIntProperty(InternalShortDelayProperty),                       // static
+      delayBeforeDisplayLoading          = staticState.staticIntProperty(DelayBeforeDisplayLoadingProperty),                // static
+      delayBeforeUploadProgressRefresh   = staticState.staticIntProperty(DelayBeforeUploadProgressRefreshProperty),         // static
+      helpHandler                        = helpHandler,                                                                     // dynamic
+      resourcesVersioned                 = versionedResources,                                                              // dynamic
+      resourcesVersionNumber             = resourcesVersionOpt,                                                             // dynamic
+      helpTooltip                        = staticState.staticBooleanProperty(HelpTooltipProperty),                          // static
+      showErrorDialog                    = staticState.staticBooleanProperty(ShowErrorDialogProperty),                      // static
+      loginPageDetectionRegexp           = staticState.staticStringProperty(LoginPageDetectionRegexpProperty).trimAllToOpt, // static
+      retryDelayIncrement                = getRetryDelayIncrement,                                                          // global
+      retryMaxDelay                      = getRetryMaxDelay,                                                                // global
+      useAria                            = staticState.staticBooleanProperty(UseAriaProperty),                              // static
+      dateFormatInput                    = staticState.staticStringProperty(DateFormatInputProperty),                       // static
+      timeFormatInput                    = staticState.staticStringProperty(TimeFormatInputProperty),                       // static
     )
   }
 

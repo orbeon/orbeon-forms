@@ -143,12 +143,7 @@ object FormRunnerApp extends App {
           updateDialog()
           showDialog()
 
-          // Reason for the padding: we prefer to display that the session is expired a bit sooner, while the session
-          // might actually still be active, rather than a bit later, to avoid a situation where the user tries to
-          // renew an inactive session.
-
-          // TODO: make this padding configurable
-          val timeToExpiration = (approxSessionExpiredTimeMillis - System.currentTimeMillis()) - 10000
+          val timeToExpiration = approxSessionExpiredTimeMillis - System.currentTimeMillis()
           didExpireTimerOpt.foreach(timers.clearTimeout)
           didExpireTimerOpt = Some(timers.setTimeout(timeToExpiration) {
             Session.sessionHasExpired()

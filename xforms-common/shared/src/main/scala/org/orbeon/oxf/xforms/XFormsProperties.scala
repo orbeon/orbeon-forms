@@ -77,6 +77,8 @@ object XFormsProperties {
   val LoginPageDetectionRegexpProperty          = "login-page-detection-regexp"
 
   val SessionHeartbeatProperty                  = "session-heartbeat"
+  val SessionExpirationTriggerProperty          = "session-expiration-trigger"
+  val SessionExpirationMarginProperty           = "session-expiration-margin"
 
   val DelayBeforeIncrementalRequestProperty     = "delay-before-incremental-request"
   val InternalShortDelayProperty                = "internal-short-delay"
@@ -208,6 +210,8 @@ object XFormsProperties {
 
       PropertyDefinition(UseAriaProperty,                           false,                       propagateToClient = true),
       PropertyDefinition(SessionHeartbeatProperty,                  true,                        propagateToClient = true),
+      PropertyDefinition(SessionExpirationTriggerProperty,          80,                          propagateToClient = true),
+      PropertyDefinition(SessionExpirationMarginProperty,           10,                          propagateToClient = true),
       PropertyDefinition(DelayBeforeIncrementalRequestProperty,     500,                         propagateToClient = true),
       PropertyDefinition(InternalShortDelayProperty,                100,                         propagateToClient = true),
       PropertyDefinition(DelayBeforeDisplayLoadingProperty,         500,                         propagateToClient = true),

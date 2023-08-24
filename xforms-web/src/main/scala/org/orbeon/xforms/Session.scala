@@ -15,17 +15,18 @@ object Session {
   case object SessionAboutToExpire extends SessionStatus
   case object SessionExpired       extends SessionStatus
 
-  def initialize(configuration: rpc.ConfigurationProperties, reactAfterMillis: Long): Unit = {
+  def initialize(configuration: rpc.ConfigurationProperties, sessionExpirationTriggerMillis: Long): Unit = {
     configurationOpt = Some(Configuration(
-      sessionId                 = configuration.sessionId,
-      sessionHeartbeatEnabled   = configuration.sessionHeartbeatEnabled,
-      maxInactiveIntervalMillis = configuration.maxInactiveIntervalMillis,
-      reactAfterMillis          = reactAfterMillis,
+      sessionId                      = configuration.sessionId,
+      sessionHeartbeatEnabled        = configuration.sessionHeartbeatEnabled,
+      maxInactiveIntervalMillis      = configuration.maxInactiveIntervalMillis,
+      sessionExpirationTriggerMillis = sessionExpirationTriggerMillis,
+      sessionExpirationMarginMillis  = configuration.sessionExpirationMarginMillis
     ))
   }
 
   def updateWithLocalNewestEventTime(): Unit =
-    configurationOpt.foreach(sessionActivity(_, AjaxClient.newestEventTime, local = true))
+    configurationOpt.foreach(sessionActivity(_, local = true, AjaxClient.newestEventTime))
 
   def sessionHasExpired(): Unit =
     configurationOpt.foreach(sessionExpiration)
@@ -47,10 +48,11 @@ object Session {
 
   private object Private {
     case class Configuration(
-      sessionId                 : String,
-      sessionHeartbeatEnabled   : Boolean,
-      maxInactiveIntervalMillis : Long,
-      reactAfterMillis          : Long
+      sessionId                     : String,
+      sessionHeartbeatEnabled       : Boolean,
+      maxInactiveIntervalMillis     : Long,
+      sessionExpirationTriggerMillis: Long,
+      sessionExpirationMarginMillis : Long
     )
 
     private sealed trait SessionMessage { def sessionId: String }
@@ -72,11 +74,8 @@ object Session {
           if sessionMessage.sessionId == configuration.sessionId
         } {
           sessionMessage match {
-            case SessionActivity(_, localNewestEventTime) =>
-              sessionActivity(configuration, localNewestEventTime, local = false)
-
-            case SessionLogout(_) =>
-              sessionLogout(configuration, local = false)
+            case SessionActivity(_, localNewestEventTime) => sessionActivity(configuration, local = false, localNewestEventTime)
+            case SessionLogout(_)                         => sessionLogout  (configuration, local = false)
           }
         }
       }
@@ -98,7 +97,7 @@ object Session {
 
     private def fireSessionUpdate(sessionUpdate: SessionUpdate): Unit = sessionUpdateListeners.foreach(_(sessionUpdate))
 
-    def sessionActivity(configuration: Configuration, newestEventTime: Long, local: Boolean): Unit = {
+    def sessionActivity(configuration: Configuration, local: Boolean, newestEventTime: Long): Unit = {
       // Once the session is expired, we don't do anything anymore
       if (sessionStatus != SessionExpired) {
         maxNewestEventTimeAmongAllPages = math.max(maxNewestEventTimeAmongAllPages, newestEventTime)
@@ -107,7 +106,7 @@ object Session {
 
         // Update session status
         sessionStatus =
-          if (elapsedMillisSinceLastEvent < configuration.reactAfterMillis)
+          if (elapsedMillisSinceLastEvent < configuration.sessionExpirationTriggerMillis)
             SessionActive
           else if (elapsedMillisSinceLastEvent > configuration.maxInactiveIntervalMillis)
             SessionExpired
@@ -126,10 +125,20 @@ object Session {
           sessionActivityBroadcastChannel.postMessage(message)
         }
 
+        // Reason for the margin: we prefer to display that the session is expired a bit sooner, while the session might
+        // actually still be active, rather than a bit later, to avoid a situation where the user tries to renew an
+        // inactive session.
+
+        val approxSessionExpiredTimeMillis =
+          math.max(
+            maxNewestEventTimeAmongAllPages + configuration.maxInactiveIntervalMillis - configuration.sessionExpirationMarginMillis,
+            System.currentTimeMillis()
+          )
+
         fireSessionUpdate(SessionUpdate(
-          sessionStatus = sessionStatus,
-          sessionHeartbeatEnabled = configuration.sessionHeartbeatEnabled,
-          approxSessionExpiredTimeMillis = maxNewestEventTimeAmongAllPages + configuration.maxInactiveIntervalMillis
+          sessionStatus                  = sessionStatus,
+          sessionHeartbeatEnabled        = configuration.sessionHeartbeatEnabled,
+          approxSessionExpiredTimeMillis = approxSessionExpiredTimeMillis
         ))
       }
     }
@@ -140,8 +149,8 @@ object Session {
         sessionStatus = SessionExpired
 
         fireSessionUpdate(SessionUpdate(
-          sessionStatus = sessionStatus,
-          sessionHeartbeatEnabled = configuration.sessionHeartbeatEnabled,
+          sessionStatus                  = sessionStatus,
+          sessionHeartbeatEnabled        = configuration.sessionHeartbeatEnabled,
           approxSessionExpiredTimeMillis = System.currentTimeMillis()
         ))
       }
@@ -159,8 +168,8 @@ object Session {
         } else {
           // If the logout comes from another page, process the logout locally
           fireSessionUpdate(SessionUpdate(
-            sessionStatus = sessionStatus,
-            sessionHeartbeatEnabled = configuration.sessionHeartbeatEnabled,
+            sessionStatus                  = sessionStatus,
+            sessionHeartbeatEnabled        = configuration.sessionHeartbeatEnabled,
             approxSessionExpiredTimeMillis = System.currentTimeMillis()
           ))
         }

@@ -319,8 +319,8 @@ object InitSupport {
     // The heartbeat is per servlet session and we only need one. But see https://github.com/orbeon/orbeon-forms/issues/2014.
     def initializeReactWhenSessionAboutToExpire(configuration: rpc.ConfigurationProperties): Unit =
       if (! reactWhenSessionAboutToExpireInitialized) {
-        // Say session is 60 minutes: heartbeat must come after 48 minutes and we check every 4.8 minutes
-        val reactAfterMillis = (configuration.maxInactiveIntervalMillis * 0.8).toLong
+        // Say session is 60 minutes and percentage is 80%: heartbeat must come after 48 minutes and we check every 4.8 minutes
+        val reactAfterMillis = (configuration.maxInactiveIntervalMillis * (configuration.sessionExpirationTriggerPercentage.toDouble / 100.0)).toLong
 
         Session.initialize(configuration, reactAfterMillis)
 

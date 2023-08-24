@@ -64,24 +64,26 @@ case class WireAjaxEventWithoutTarget(
 ) extends WireAjaxEvent
 
 case class ConfigurationProperties(
-  sessionHeartbeatEnabled         : Boolean,
-  maxInactiveIntervalMillis       : Long,
-  sessionId                       : String,
-  revisitHandling                 : String,
-  delayBeforeIncrementalRequest   : Int,
-  delayBeforeAjaxTimeout          : Long,
-  internalShortDelay              : Int,
-  delayBeforeDisplayLoading       : Int,
-  delayBeforeUploadProgressRefresh: Int,
-  helpHandler                     : Boolean,
-  helpTooltip                     : Boolean,
-  showErrorDialog                 : Boolean,
-  loginPageDetectionRegexp        : Option[String],
-  retryDelayIncrement             : Int,
-  retryMaxDelay                   : Int,
-  useAria                         : Boolean,
-  resourcesVersioned              : Boolean,
-  resourcesVersionNumber          : Option[String],
-  dateFormatInput                 : String, // set but not used anymore
-  timeFormatInput                 : String, // set but not used anymore
+  sessionHeartbeatEnabled           : Boolean,
+  maxInactiveIntervalMillis         : Long,
+  sessionExpirationTriggerPercentage: Int,
+  sessionExpirationMarginMillis     : Long,
+  sessionId                         : String,
+  revisitHandling                   : String,
+  delayBeforeIncrementalRequest     : Int,
+  delayBeforeAjaxTimeout            : Long,
+  internalShortDelay                : Int,
+  delayBeforeDisplayLoading         : Int,
+  delayBeforeUploadProgressRefresh  : Int,
+  helpHandler                       : Boolean,
+  helpTooltip                       : Boolean,
+  showErrorDialog                   : Boolean,
+  loginPageDetectionRegexp          : Option[String],
+  retryDelayIncrement               : Int,
+  retryMaxDelay                     : Int,
+  useAria                           : Boolean,
+  resourcesVersioned                : Boolean,
+  resourcesVersionNumber            : Option[String],
+  dateFormatInput                   : String, // set but not used anymore
+  timeFormatInput                   : String, // set but not used anymore
 )

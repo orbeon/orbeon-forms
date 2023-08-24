@@ -185,6 +185,14 @@
                     <xf:bind ref="visible-counts/(@* except @alert)" calculate="for $n in name() return count($visible-errors[@level = $n])"/>
                 </xf:bind>
 
+                <xf:var
+                    name="visit-value-changed"
+                    value="
+                        (
+                            xs:boolean(xxf:component-param-value('visit-value-changed')[. = ('true', 'false')]),
+                            false() (: default :)
+                        )[1]"/>
+
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -229,6 +237,10 @@
                             <xf:recalculate xxbl:scope="inner" xxf:deferred="true"/>
                         </xf:action>
 
+                        <xf:var name="fr-visit-value-changed">
+                            <xxf:value value="$visit-value-changed" xxbl:scope="inner"/>
+                        </xf:var>
+
                         <!-- Control changes validity -->
                         <xf:action
                             xbl:attr="ev:observer=observer"
@@ -239,7 +251,8 @@
 
                             ErrorSummary:removeUpdateOrInsertError(
                                 xxf:instance('fr-errors-instance')/root(),
-                                xxf:instance('fr-state-instance')/root()
+                                xxf:instance('fr-state-instance')/root(),
+                                $fr-visit-value-changed
                             )
                         </xf:action>
 

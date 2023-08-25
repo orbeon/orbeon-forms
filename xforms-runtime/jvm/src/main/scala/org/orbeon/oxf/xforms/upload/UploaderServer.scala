@@ -38,13 +38,14 @@ import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory
 import shapeless.syntax.typeable._
 
+import java.net.URI
 import java.util.ServiceLoader
+import scala.collection.compat._
 import scala.collection.{mutable => m}
 import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
-import scala.collection.compat._
 
 
 object UploaderServer {
@@ -82,12 +83,12 @@ object UploaderServer {
           outerLimiterInputStream  = trustedUploadContext.getInputStream,
           session                  = session
         ) {
-          def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)] =
+          def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
             withDocumentAcquireLock(
               uuid    = uuid,
-              timeout = XFormsGlobalProperties.uploadXFormsAccessTimeout)(
-              block   = _.getUploadConstraintsForControl(controlEffectiveId)
-            ).flatten
+              timeout = XFormsGlobalProperties.uploadXFormsAccessTimeout) { doc =>
+              doc.getUploadConstraintsForControl(controlEffectiveId).map(_ -> doc.getRequestUri)
+            } .flatten
         }
       ),
       maxSize        = MaximumSize.UnlimitedSize, // because we use our own limiter
@@ -134,7 +135,7 @@ object UploaderServer {
     // Session keys created, for cleanup
     val sessionKeys = m.ListBuffer[String]()
 
-    def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)]
+    def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)]
 
     // Can throw
     def fileItemStarting(fieldName: String, fileItem: FileItem): Option[MaximumSize] = {
@@ -145,7 +146,7 @@ object UploaderServer {
       if (progressOpt.isDefined)
         throw new IllegalStateException("more than one file provided")
 
-      val (maxUploadSizeForControl, allowedMediatypeRangesForControl) =
+      val ((maxUploadSizeForControl, allowedMediatypeRangesForControl), requestUri) =
         getUploadConstraintsForControl(uuid, fieldName).get // TODO: will throw if this is a `Failure`
 
       val headersOpt =
@@ -225,7 +226,7 @@ object UploaderServer {
                   filename  = fileItem.getName,
                   headers   = FileScanProvider.convertHeadersToJava(headersOpt map convertFileItemHeaders getOrElse Nil),
                   language  = requestAcceptLanguageOpt.getOrElse("en"),
-                  extension = Map.empty.asJava
+                  extension = Map[String, Any]("request.uri" -> requestUri).asJava
                 )
               ) match {
                 case Success(fs) => Some(Left(fs))

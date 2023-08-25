@@ -615,6 +615,11 @@ trait ContainingDocumentRequest {
   def getContainerNamespace    = _requestInformation.containerNamespace // always "" for servlets.
   def getVersionedPathMatchers = _requestInformation.versionedPathMatchers
 
+  def getRequestUri: URI = {
+    val queryString = PathUtils.encodeSimpleQuery(getRequestParameters.iterator.flatMap { case (k, v) => v.iterator.map(k -> _) })
+    new URI(null, null, getRequestPath, queryString, null)
+  }
+
   def headersGetter: String => Option[List[String]] = getRequestHeaders.get
 
   def isPortletContainer       = _requestInformation.containerType == "portlet"

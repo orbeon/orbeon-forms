@@ -13,9 +13,8 @@
   */
 package org.orbeon.fr
 
-import org.orbeon.oxf.fr.{ControlOps, Names}
+import org.orbeon.oxf.fr.Names
 import org.orbeon.xforms._
-import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -25,6 +24,7 @@ import scala.scalajs.js.|
 
 object FormRunnerAPI extends FormRunnerEmbeddingAPI {
 
+  @deprecated("use `getForm().findControlsByName()`", "Orbeon Forms 2023.1")
   def findControlsByName(
     controlName: String,
     elem       : js.UndefOr[html.Element | String] = js.undefined
@@ -34,6 +34,7 @@ object FormRunnerAPI extends FormRunnerEmbeddingAPI {
       case form => form.findControlsByName(controlName)
     }
 
+  @deprecated("use `getForm().isFormDataSafe()`", "Orbeon Forms 2023.1")
   def isFormDataSafe(elem: js.UndefOr[html.Form] = js.undefined): Boolean =
     getForm(elem) match {
       case null => throw new IllegalArgumentException(s"form not found")

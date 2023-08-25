@@ -25,7 +25,7 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
   def isFormDataSafe(): Boolean =
     form.isFormDataSafe
 
-  def activateFormButton(buttonName: String): Unit = {
+  def activateProcessButton(buttonName: String): Unit = {
 
     def fromProcessButton =
       Option(dom.document.querySelector(s".fr-buttons .xbl-fr-process-button .fr-$buttonName-button button"))

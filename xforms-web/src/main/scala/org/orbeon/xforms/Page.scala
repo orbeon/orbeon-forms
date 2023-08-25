@@ -55,32 +55,38 @@ object Page {
   def findXFormsFormFromNamespacedId(namespacedFormId: String): Option[xforms.Form] =
     formsByNamespacedFormId.get(namespacedFormId)
 
-  // 2023-08-15: 4 callers in `xforms.js`, rest in Scala
-  @JSExport
-  def getXFormsFormFromHtmlElemOrThrow(elem: html.Element): xforms.Form =
-    findXFormsFormFromHtmlElem(elem).getOrElse(throw new IllegalArgumentException)
-
   def findXFormsFormFromHtmlElem(elem: html.Element): Option[xforms.Form] =
     findAncestorOrSelfHtmlFormFromHtmlElem(elem).flatMap(form => Option(form.id)).flatMap(findXFormsFormFromNamespacedId)
 
-  // 2023-08-15: 3 callers in `xforms.js` only
-  @JSExport
-  def getAncestorOrSelfHtmlFormFromHtmlElemOrNull(elem: js.UndefOr[html.Element]): html.Form =
-    findAncestorOrSelfHtmlFormFromHtmlElem(elem).orNull
+  def findXFormsFormFromHtmlElemOrDefault(elem: js.UndefOr[html.Element]): Option[xforms.Form] =
+    findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(elem).flatMap(f => findXFormsFormFromNamespacedId(f.id))
 
-  def findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(elem: js.UndefOr[html.Element]): html.Form =
-    findAncestorOrSelfHtmlFormFromHtmlElem(elem).getOrElse(Support.getFirstForm)
+  // 2023-08-15: 4 callers in `xforms.js`, rest in Scala
+  @JSExport
+  def getXFormsFormFromHtmlElemOrThrow(elem: html.Element): xforms.Form =
+    findXFormsFormFromHtmlElem(elem).getOrElse(throw new IllegalStateException("form not found"))
+
+  // 2023-08-15: 3 callers in `xforms.js` only
+  // Caller doesn't pass `undefined` so we don't need to handle it. It is also expected that the form will be found.
+  @JSExport
+  def getAncestorOrSelfHtmlFormFromHtmlElemOrThrow(elem: html.Element): html.Form =
+    findAncestorOrSelfHtmlFormFromHtmlElem(elem).getOrElse(throw new IllegalStateException("form not found"))
+
+  def findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(elem: js.UndefOr[html.Element]): Option[html.Form] =
+    elem.toOption match {
+      case Some(e) => findAncestorOrSelfHtmlFormFromHtmlElem(e)
+      case None    => Support.allFormElems.headOption
+    }
 
   // Try to optimize the search for the `html.Form`, and also try to ensure that this is an Orbeon Forms form.
-  def findAncestorOrSelfHtmlFormFromHtmlElem(elem: js.UndefOr[html.Element]): Option[html.Form] = {
+  // `None` means no matching element was not found.
+  private def findAncestorOrSelfHtmlFormFromHtmlElem(elem: html.Element): Option[html.Form] = {
 
     val rawHtmlFormOpt =
-      elem.toOption match {
-        case Some(null) | None =>
-          None
-        case Some(formElem: html.Form) =>
+      elem match {
+        case formElem: html.Form =>
           Some(formElem)
-        case Some(elem: html.Element) =>
+        case elem: html.Element =>
           elem.asInstanceOf[js.Dynamic].form match {
             case formElem: html.Form =>
               Some(formElem)
@@ -89,10 +95,7 @@ object Page {
           }
       }
 
-    def isXFormsFormElem(formElem: html.Form): Boolean =
-      formElem.classList.contains(FormClass) && formElem.id.nonAllBlank
-
-    rawHtmlFormOpt.filter(isXFormsFormElem)
+    rawHtmlFormOpt.filter(Support.isXFormsFormElem)
   }
 
   // Handle the case where the id is already prefixed. As of 2019-01-09 this can be a problem only

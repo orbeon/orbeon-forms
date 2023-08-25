@@ -17,14 +17,14 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
+import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
-import org.scalajs.dom.{Element, EventTarget, FocusEvent, FormData, html}
-
-import scala.concurrent.Future
+import org.scalajs.dom._
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
+import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.|
 import scala.util.control.NonFatal
@@ -32,15 +32,20 @@ import scala.util.control.NonFatal
 
 object Support {
 
-  def getFirstForm: html.Form =
-    $(dom.document.forms).filter(".xforms-form")(0).asInstanceOf[html.Form]
+  import org.scalajs.dom.ext._
+
+  def allFormElems: Iterable[html.Form] =
+    dom.document.forms collect { case f: html.Form if isXFormsFormElem(f) => f }
+
+  def isXFormsFormElem(formElem: html.Form): Boolean =
+    formElem.classList.contains(FormClass) && formElem.id.nonAllBlank
 
   def adjustIdNamespace(
     elem    : js.UndefOr[html.Element],
     targetId: String
   ): (html.Element, String) = {
 
-    val form   = Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(elem)
+    val form   = Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(elem).getOrElse(throw new IllegalArgumentException("form not found"))
     val formId = form.id
 
     // See comment on `namespaceIdIfNeeded`

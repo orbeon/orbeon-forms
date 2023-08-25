@@ -299,7 +299,7 @@ object AjaxClient {
     AjaxClient.fireEvent(
       AjaxEvent(
         eventName = EventNames.XXFormsSessionHeartbeat,
-        form      = Support.getFirstForm
+        form      = Support.allFormElems.headOption.getOrElse(throw new IllegalStateException("no form found"))
       )
     )
 

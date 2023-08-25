@@ -142,7 +142,7 @@ object InitSupport {
 
       initializeReactWhenSessionAboutToExpire(initializations.configuration)
 
-      if (Page.countInitializedForms == allFormElems.size) {
+      if (Page.countInitializedForms == Support.allFormElems.size) {
         logger.info(s"all forms are loaded; total time for client-side web app initialization: ${System.currentTimeMillis() - initTimestampBeforeMs} ms")
         scheduleOrbeonLoadedEventIfNeeded(initializations.configuration)
       }
@@ -348,9 +348,6 @@ object InitSupport {
 
     def pageContainsFormsMarkupF: Future[Unit] =
       pageContainsFormsMarkupPromise.future
-
-    def allFormElems: Iterable[html.Form] =
-      dom.document.forms filter (_.classList.contains(Constants.FormClass)) collect { case f: html.Form => f }
 
     private def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
       for {

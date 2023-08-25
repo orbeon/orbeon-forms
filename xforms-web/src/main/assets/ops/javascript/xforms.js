@@ -2013,7 +2013,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
                 // First check clickable group
                 if ($(node).is('.xforms-activable')) {
-                    var form = ORBEON.xforms.Page.getAncestorOrSelfHtmlFormFromHtmlElemOrNull(node);
+                    var form = ORBEON.xforms.Page.getAncestorOrSelfHtmlFormFromHtmlElemOrThrow(node);
                     var event = new ORBEON.xforms.AjaxEvent(form, node.id, null, "DOMActivate");
                     ORBEON.xforms.AjaxClient.fireEvent(event);
                     break;
@@ -2027,7 +2027,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     if (ORBEON.util.Dom.isElement(sibling)) {
                         if (sibling.id.indexOf("repeat-begin-") == 0) {
                             // Found beginning of current iteration, tell server
-                            var form = ORBEON.xforms.Page.getAncestorOrSelfHtmlFormFromHtmlElemOrNull(sibling);
+                            var form = ORBEON.xforms.Page.getAncestorOrSelfHtmlFormFromHtmlElemOrThrow(sibling);
                             var targetId = sibling.id.substring("repeat-begin-".length);
                             targetId += targetId.indexOf(XF_REPEAT_SEPARATOR) == -1 ? XF_REPEAT_SEPARATOR : XF_REPEAT_INDEX_SEPARATOR;
                             targetId += delimiterCount;
@@ -2373,7 +2373,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             // (can't escape that block), and in some cases the mask can show on top of the dialog (even if the z-index
             // for the dialog is higher than the z-index for the mask). See:
             // http://forge.ow2.org/tracker/index.php?func=detail&aid=314943&group_id=168&atid=350207
-            var form = ORBEON.xforms.Page.getAncestorOrSelfHtmlFormFromHtmlElemOrNull(yuiDialog.element);
+            var form = ORBEON.xforms.Page.getAncestorOrSelfHtmlFormFromHtmlElemOrThrow(yuiDialog.element);
             if (yuiDialog.element.parentNode != form)
                 form.appendChild(yuiDialog.element);
 

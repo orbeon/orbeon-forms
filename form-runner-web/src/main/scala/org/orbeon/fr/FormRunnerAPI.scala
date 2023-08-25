@@ -27,27 +27,31 @@ object FormRunnerAPI extends FormRunnerEmbeddingAPI {
 
   def findControlsByName(
     controlName: String,
-    elem       : js.UndefOr[html.Form] = js.undefined
-  ): js.Array[html.Element] = {
-    $(Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(elem))
-      .find(s".xforms-control[id *= '$controlName-control'], .xbl-component[id *= '$controlName-control']")
-      .toArray() collect {
-      // The result must be an `html.Element` already
-      case e: html.Element => e
-    } filter {
-      // Check the id matches the requested name
-      e => (e.id ne null) && (ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)) contains controlName)
-    } toJSArray
-  }
+    elem       : js.UndefOr[html.Element | String] = js.undefined
+  ): js.Array[html.Element] =
+    getForm(elem) match {
+      case null => throw new IllegalArgumentException(s"form not found")
+      case form => form.findControlsByName(controlName)
+    }
 
   def isFormDataSafe(elem: js.UndefOr[html.Form] = js.undefined): Boolean =
-    Page.getXFormsFormFromNamespacedIdOrThrow(Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(elem).id).isFormDataSafe
-
-  def getForm(elemOrNamespacedId: html.Element | String): FormRunnerForm =
-    (elemOrNamespacedId: Any) match {
-      case elem: html.Element   => Page.findXFormsFormFromHtmlElem(elem).map(new FormRunnerForm(_)).orNull
-      case namespacedId: String => Page.findXFormsFormFromNamespacedId(namespacedId).map(new FormRunnerForm(_)).orNull
+    getForm(elem) match {
+      case null => throw new IllegalArgumentException(s"form not found")
+      case form => form.isFormDataSafe()
     }
+
+  // Returns `null` if:
+  // - a `String` is passed and it is not a valid namespaced id
+  // - an `html.Element` is passed and the form is not found
+  // - no `html.Element` is passed and no default form is found
+  def getForm(elemOrNamespacedId: js.UndefOr[html.Element | String]): FormRunnerForm =
+    (
+      (elemOrNamespacedId: Any) match {
+        case namespacedId: String => Page.findXFormsFormFromNamespacedId(namespacedId)
+        case elem: html.Element   => Page.findXFormsFormFromHtmlElemOrDefault(elem)
+        case _                    => Page.findXFormsFormFromHtmlElemOrDefault(js.undefined)
+      }
+    ).map(new FormRunnerForm(_)).orNull
 
   val wizard      : FormRunnerWizardAPI.type       = FormRunnerWizardAPI
   val errorSummary: FormRunnerErrorSummaryAPI.type = FormRunnerErrorSummaryAPI

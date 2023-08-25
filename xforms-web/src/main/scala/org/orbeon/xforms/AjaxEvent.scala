@@ -129,11 +129,12 @@ class AjaxEvent(args: js.Any*) extends js.Object {
       case (Some(_), None) =>
         throw new IllegalArgumentException("targetId")
       case (None, Some(targetId)) =>
-        Option(dom.document.getElementById(targetId)) map (e => Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(e.asInstanceOf[html.Element])) match {
+        Option(dom.document.getElementById(targetId)).flatMap(e => Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(e.asInstanceOf[html.Element])) match {
           case Some(form) =>
             form -> targetId.some // here we could check that the namespaces match!
           case None =>
-            Support.getFirstForm -> targetId.some
+            // Either no element with `targetId` was found, or the element was not associated with a form
+            throw new IllegalArgumentException(s"form not found for target id `$targetId`")
         }
       case (Some(form), Some(targetId)) =>
         form -> Support.adjustIdNamespace(form, targetId)._2.some

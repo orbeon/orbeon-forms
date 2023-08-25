@@ -319,7 +319,7 @@ trait PersistenceApiTrait {
     implicit val ec: ExternalContext = coreCrossPlatformSupport.externalContext
 
     val resolvedUri =
-      new URI(
+      URI.create(
         URLRewriterUtils.rewriteServiceURL(
           ec.getRequest,
           path,

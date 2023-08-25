@@ -56,9 +56,6 @@
 
                 <xh:div>
 
-                    <!-- An element YUI can set the focus on that doesn't steal the focus from the input in the dropdown -->
-                    <xh:a/>
-
                     <fr:grid id="grid">
                         <fr:c x="1" y="1" w="1" h="1">
                             <xh:i class="fa fa-fw fa-search"/>

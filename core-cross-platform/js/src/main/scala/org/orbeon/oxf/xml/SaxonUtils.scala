@@ -36,7 +36,6 @@ import org.orbeon.saxon.value._
 import org.orbeon.scaxon.Implicits
 import org.w3c.dom.Node._
 
-import java.io.PrintStream
 import java.net.URI
 import scala.jdk.CollectionConverters._
 import scala.util.Try

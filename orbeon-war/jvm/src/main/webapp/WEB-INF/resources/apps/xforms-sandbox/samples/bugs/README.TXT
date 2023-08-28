@@ -1,1 +1,0 @@
-This directory contains XForms samples illustrating some Orbeon Forms bugs (corrected or not).

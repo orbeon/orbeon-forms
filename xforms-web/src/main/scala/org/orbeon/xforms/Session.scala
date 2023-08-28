@@ -6,6 +6,7 @@ import io.circe.syntax._
 import org.orbeon.xforms.facade.{BroadcastChannel, MessageEvent}
 
 import scala.collection.mutable
+import scala.scalajs.js
 
 object Session {
   import Private._
@@ -64,23 +65,29 @@ object Session {
 
     private var maxNewestEventTimeAmongAllPages: Long = -1L
 
-    private lazy val sessionActivityBroadcastChannel = {
-      val broadcastChannel = new BroadcastChannel("orbeon-session-activity")
+    private lazy val sessionActivityBroadcastChannelOpt = {
+      val broadcastChannelAvailable = !js.isUndefined(js.Dynamic.global.window.BroadcastChannel)
 
-      broadcastChannel.onmessage = (event: MessageEvent) => {
-        for {
-          sessionMessage <- sessionMessageFromJson(event.data.asInstanceOf[String])
-          configuration  <- configurationOpt
-          if sessionMessage.sessionId == configuration.sessionId
-        } {
-          sessionMessage match {
-            case SessionActivity(_, localNewestEventTime) => sessionActivity(configuration, local = false, localNewestEventTime)
-            case SessionLogout(_)                         => sessionLogout  (configuration, local = false)
+      if (broadcastChannelAvailable) {
+        val broadcastChannel = new BroadcastChannel("orbeon-session-activity")
+
+        broadcastChannel.onmessage = (event: MessageEvent) => {
+          for {
+            sessionMessage <- sessionMessageFromJson(event.data.asInstanceOf[String])
+            configuration <- configurationOpt
+            if sessionMessage.sessionId == configuration.sessionId
+          } {
+            sessionMessage match {
+              case SessionActivity(_, localNewestEventTime) => sessionActivity(configuration, local = false, localNewestEventTime)
+              case SessionLogout(_) => sessionLogout(configuration, local = false)
+            }
           }
         }
-      }
 
-      broadcastChannel
+        Some(broadcastChannel)
+      } else {
+        None
+      }
     }
 
     private def sessionMessageFromJson(jsonString: String): Either[Error, SessionMessage] = {
@@ -120,9 +127,11 @@ object Session {
         }
 
         if (local) {
-          // Broadcast our local newestEventTime value to other pages
-          val message = SessionActivity(configuration.sessionId, newestEventTime).asJson.noSpaces
-          sessionActivityBroadcastChannel.postMessage(message)
+          sessionActivityBroadcastChannelOpt.foreach { sessionActivityBroadcastChannel =>
+            // Broadcast our local newestEventTime value to other pages
+            val message = SessionActivity(configuration.sessionId, newestEventTime).asJson.noSpaces
+            sessionActivityBroadcastChannel.postMessage(message)
+          }
         }
 
         // Reason for the margin: we prefer to display that the session is expired a bit sooner, while the session might
@@ -162,9 +171,11 @@ object Session {
         sessionStatus = SessionExpired
 
         if (local) {
-          // Broadcast our local logout to other pages
-          val message = SessionLogout(configuration.sessionId).asJson.noSpaces
-          sessionActivityBroadcastChannel.postMessage(message)
+          sessionActivityBroadcastChannelOpt.foreach { sessionActivityBroadcastChannel =>
+            // Broadcast our local logout to other pages
+            val message = SessionLogout(configuration.sessionId).asJson.noSpaces
+            sessionActivityBroadcastChannel.postMessage(message)
+          }
         } else {
           // If the logout comes from another page, process the logout locally
           fireSessionUpdate(SessionUpdate(

@@ -611,11 +611,7 @@
                 return
                     if (
                         $mode = 'view' or (
-                            $mode = ('pdf', 'test-pdf', 'email') and (
-                                (: TODO: Consider `fr:use-pdf-template()` function :)
-                                xxf:get-request-parameter('fr-use-pdf-template') = 'false' or
-                                not(xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '')
-                            )
+                            $mode = ('pdf', 'test-pdf', 'email') and not(fr:use-pdf-template())
                         )
                     ) then
                         'static'
@@ -626,9 +622,7 @@
                 for $mode in fr:mode()
                 return not(
                     $mode = ('pdf', 'test-pdf', 'email') and
-                    (: TODO: Consider `fr:use-pdf-template()` function :)
-                    xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '' and
-                    not(xxf:get-request-parameter('fr-use-pdf-template') = 'false')
+                    fr:use-pdf-template()
                 )
             }}"
             xxf:order="{{
@@ -690,28 +684,17 @@
             xxf:static-readonly-hint="{
                 if ($mode = 'test-pdf') then
                     '{
-                        let $use-pdf-template :=
-                            (
-                                (: TODO: Consider `fr:use-pdf-template()` function :)
-                                xxf:instance(''fr-form-attachments'')/pdf/xxf:trim() != '''' and
-                                not(xxf:get-request-parameter(''fr-use-pdf-template'') = ''false'')
-                            )
+                        let $use-pdf-template := fr:use-pdf-template()
                         return
                             if ($use-pdf-template) then
                                 false()
                             else
-                                xxf:get-request-parameter(''fr-pdf-show-hints'') = ''true''
+                                xxf:get-request-method() = ''POST'' and xxf:get-request-parameter(''fr-pdf-show-hints'') = ''true''
                     }'
                 else
                     '{
                         let $mode := fr:mode(),
-                            $use-pdf-template :=
-                                (
-                                    $mode = (''pdf'', ''email'') and
-                                    (: TODO: Consider `fr:use-pdf-template()` function :)
-                                    xxf:instance(''fr-form-attachments'')/pdf/xxf:trim() != '''' and
-                                    not(xxf:get-request-parameter(''fr-use-pdf-template'') = ''false'')
-                                ),
+                            $use-pdf-template := $mode = (''pdf'', ''email'') and fr:use-pdf-template(),
                             $p :=
                                 xxf:property(
                                     string-join(
@@ -723,7 +706,7 @@
                                         ''.''
                                     )
                                 ),
-                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-hints'')[. = (''false'', ''true'')]
+                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-hints'')[xxf:get-request-method() = ''POST'' and . = (''false'', ''true'')]
                         return
                             if ($use-pdf-template) then
                                 false()
@@ -738,28 +721,17 @@
             xxf:static-readonly-alert="{
                 if ($mode = 'test-pdf') then
                     '{
-                        let $use-pdf-template :=
-                            (
-                                (: TODO: Consider `fr:use-pdf-template()` function :)
-                                xxf:instance(''fr-form-attachments'')/pdf/xxf:trim() != '''' and
-                                not(xxf:get-request-parameter(''fr-use-pdf-template'') = ''false'')
-                            )
+                        let $use-pdf-template := fr:use-pdf-template()
                         return
                             if ($use-pdf-template) then
                                 false()
                             else
-                                xxf:get-request-parameter(''fr-pdf-show-alerts'') = ''true''
+                                xxf:get-request-method() = ''POST'' and xxf:get-request-parameter(''fr-pdf-show-alerts'') = ''true''
                     }'
                 else
                     '{
                         let $mode := fr:mode(),
-                            $use-pdf-template :=
-                                (
-                                    $mode = (''pdf'', ''email'') and
-                                    (: TODO: Consider `fr:use-pdf-template()` function :)
-                                    xxf:instance(''fr-form-attachments'')/pdf/xxf:trim() != '''' and
-                                    not(xxf:get-request-parameter(''fr-use-pdf-template'') = ''false'')
-                                ),
+                            $use-pdf-template := $mode = (''pdf'', ''email'') and fr:use-pdf-template(),
                             $p :=
                                 xxf:property(
                                     string-join(
@@ -771,7 +743,7 @@
                                         ''.''
                                     )
                                 ),
-                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-alerts'')[. = (''false'', ''true'')]
+                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-alerts'')[xxf:get-request-method() = ''POST'' and . = (''false'', ''true'')]
                         return
                             if ($use-pdf-template) then
                                 false()

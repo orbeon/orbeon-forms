@@ -39,7 +39,7 @@
     <p:choose href="#unrolled-form">
         <p:when test="
             (: TODO: Form may not allow for disabling PDF template! :)
-            not(p:get-request-parameter('fr-use-pdf-template') = 'false') and
+            not(p:get-request-method() = 'POST' and p:get-request-parameter('fr-use-pdf-template') = 'false') and
             (/*/xh:head//xf:instance[@id = 'fr-form-attachments']/*/pdf/p:trim() != '')">
             <!-- A PDF template is attached to the form and its use is enabled -->
             <p:processor name="oxf:pipeline">

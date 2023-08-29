@@ -14,8 +14,10 @@
 package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory
@@ -112,6 +114,10 @@ object FormRunnerRenderedFormat {
 
   def listPdfTemplates: Seq[PdfTemplate] =
     formAttachmentsInstance map (_.rootElement) map extractPdfTemplates getOrElse Nil
+
+  def usePdfTemplate(req: Request): Boolean =
+    listPdfTemplates.nonEmpty &&
+      ! (req.getMethod == HttpMethod.POST && req.getFirstParamAsString(s"fr-$UsePdfTemplateParam").contains(false.toString))
 
   private def extractPdfTemplates(attachmentsRootElem: NodeInfo) =
     for {

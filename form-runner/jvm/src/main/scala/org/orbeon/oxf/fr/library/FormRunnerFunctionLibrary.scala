@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.fr._
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
 import org.orbeon.oxf.xforms.function
@@ -126,6 +127,8 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     )
 
     Fun("pdf-templates", classOf[FRListPdfTemplates], op = 0, min = 0, ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
+
+    Fun("use-pdf-template", classOf[FRUsePdfTemplate], op = 0, min = 0, BOOLEAN, EXACTLY_ONE)
 
     Fun("created-with-or-newer", classOf[FRCreatedWithOrNewer], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE)
@@ -377,7 +380,6 @@ private object FormRunnerFunctions {
   }
 
   class FRListPdfTemplates extends FunctionSupport with RuntimeDependentFunction {
-
     override def iterate(context: XPathContext): SequenceIterator =
       FormRunnerRenderedFormat.listPdfTemplates map { template =>
         MapFunctions.createValue(
@@ -388,6 +390,11 @@ private object FormRunnerFunctions {
           )
         )
       }
+  }
+
+  class FRUsePdfTemplate extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(context: XPathContext): BooleanValue =
+      FormRunnerRenderedFormat.usePdfTemplate(NetUtils.getExternalContext.getRequest)
   }
 
   // TODO: Remove code duplication with `def createdWithOrNewer()`

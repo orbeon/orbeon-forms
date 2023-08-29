@@ -1000,6 +1000,17 @@
             <xsl:copy-of select="fr:common-dataset-actions-impl(.)"/>
             <xsl:copy-of select="fr:common-service-actions-impl(.)"/>
 
+            <!-- Show relevant errors if requested and allowed
+                 https://github.com/orbeon/orbeon-forms/issues/5722 -->
+            <xf:action
+                type="xpath"
+                event="xforms-ready"
+                if="xxf:get-request-method() = 'POST' and
+                    fr:mode() = 'new'                 and
+                    xxf:get-request-parameter('fr-show-relevant-errors') = 'true'">
+                fr:run-process('oxf.fr.detail.process', 'show-relevant-errors')
+            </xf:action>
+
             <!-- Helper for Form Builder test only -->
             <xf:action
                 event="fb-test-pdf-prepare-data"

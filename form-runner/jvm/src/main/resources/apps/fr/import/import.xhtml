@@ -346,7 +346,7 @@
                             concat('/', xxf:trim($doc))
                         else
                             ''
-                }?data-format-version=edge{
+                }?data-format-version=edge&amp;fr-show-relevant-errors=true{
                     let $prop   := xxf:property(string-join(('oxf.fr.import.forward-parameters', $app, $form), '.')),
                         $params := xxf:split($prop),
                         $tuples :=

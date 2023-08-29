@@ -115,6 +115,7 @@ object FormRunnerRenderedFormat {
   def listPdfTemplates: Seq[PdfTemplate] =
     formAttachmentsInstance map (_.rootElement) map extractPdfTemplates getOrElse Nil
 
+  // https://github.com/orbeon/orbeon-forms/issues/5918
   def usePdfTemplate(req: Request): Boolean =
     listPdfTemplates.nonEmpty &&
       ! (req.getMethod == HttpMethod.POST && req.getFirstParamAsString(s"fr-$UsePdfTemplateParam").contains(false.toString))

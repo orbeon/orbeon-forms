@@ -38,7 +38,8 @@
 
     <p:choose href="#unrolled-form">
         <p:when test="
-            (: TODO: Form may not allow for disabling PDF template! :)
+            (: Require `POST` so that this is not publicly exposed. See also `fr:use-pdf-template()`
+               https://github.com/orbeon/orbeon-forms/issues/5918 :)
             not(p:get-request-method() = 'POST' and p:get-request-parameter('fr-use-pdf-template') = 'false') and
             (/*/xh:head//xf:instance[@id = 'fr-form-attachments']/*/pdf/p:trim() != '')">
             <!-- A PDF template is attached to the form and its use is enabled -->

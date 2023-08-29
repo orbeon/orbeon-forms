@@ -1006,7 +1006,7 @@
                 type="xpath"
                 event="xforms-ready"
                 if="xxf:get-request-method() = 'POST' and
-                    fr:mode() = 'new'                 and
+                    fr:mode() = ('new', 'edit')       and
                     xxf:get-request-parameter('fr-show-relevant-errors') = 'true'">
                 fr:run-process('oxf.fr.detail.process', 'show-relevant-errors')
             </xf:action>

@@ -1147,18 +1147,22 @@
                 fr-feature-{{ if ($session-expiration-dialog-enabled) then 'enabled' else 'disabled' }}"
             tabindex="-1" role="dialog" aria-hidden="true">
 
-            <xh:div class="modal-header">
-                <xh:h4><xf:output value="$fr-resources/detail/session-expiration/title/expiring"/></xh:h4>
-                <xh:h4><xf:output value="$fr-resources/detail/session-expiration/title/expired"/></xh:h4>
-            </xh:div>
-            <xh:div class="modal-body">
-                <xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expiring"/>
-                <xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expired"/>
-            </xh:div>
-            <xh:div class="modal-footer">
-                <xh:button class="btn btn-primary">
-                    <xf:output value="$fr-resources/detail/session-expiration/renew-button"/>
-                </xh:button>
+            <xh:div class="modal-dialog">
+                <xh:div class="modal-content">
+                    <xh:div class="modal-header">
+                        <xh:h4><xf:output value="$fr-resources/detail/session-expiration/title/expiring"/></xh:h4>
+                        <xh:h4><xf:output value="$fr-resources/detail/session-expiration/title/expired"/></xh:h4>
+                    </xh:div>
+                    <xh:div class="modal-body">
+                        <xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expiring"/>
+                        <xf:output mediatype="text/html" value="$fr-resources/detail/session-expiration/message/expired"/>
+                    </xh:div>
+                    <xh:div class="modal-footer">
+                        <xh:button class="btn btn-primary">
+                            <xf:output value="$fr-resources/detail/session-expiration/renew-button"/>
+                        </xh:button>
+                    </xh:div>
+                </xh:div>
             </xh:div>
         </xh:div>
 

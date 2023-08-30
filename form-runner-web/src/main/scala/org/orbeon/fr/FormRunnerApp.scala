@@ -26,6 +26,7 @@ import org.scalajs.dom.raw.HTMLElement
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.timers
+import scala.util.Try
 
 
 // Scala.js starting point for Form Runner
@@ -101,6 +102,17 @@ object FormRunnerApp extends App {
 
   private def initSessionExpirationDialog(): Unit =
     Option(document.querySelector(".fr-session-expiration-dialog")) foreach { dialog =>
+
+      val modalConfiguration: js.Object = new js.Object {
+        val backdrop = "static" // Click on the background doesn't hide dialog
+        val keyboard = false    // Can't use esc to close the dialog
+      }
+
+      val bootstrapFiveModalOpt = Try(js.Dynamic.global.bootstrap).toOption.map { bootstrap =>
+        // Bootstrap 5 modal dialog
+        js.Dynamic.newInstance(bootstrap.Modal)(dialog, modalConfiguration)
+      }
+
       // Detecting whether the dialog is shown or not by retrieving its CSS classes is not reliable when aboutToExpire
       // is called multiple times in a row (e.g. locally and because of a message from another page), so we keep track
       // of it ourselves.
@@ -187,15 +199,20 @@ object FormRunnerApp extends App {
       }
 
       def showDialog(): Unit = {
-        $(dialog).asInstanceOf[js.Dynamic].modal(new js.Object {
-          val backdrop = "static" // Click on the background doesn't hide dialog
-          val keyboard = false    // Can't use esc to close the dialog
-        })
+        bootstrapFiveModalOpt match {
+          case Some(bootstrapFiveModal) => bootstrapFiveModal.show()
+          case None                     => $(dialog).asInstanceOf[js.Dynamic].modal(modalConfiguration)
+        }
+
         dialogShown = true
       }
 
       def hideDialog(): Unit = {
-        $(dialog).asInstanceOf[js.Dynamic].modal("hide")
+        bootstrapFiveModalOpt match {
+          case Some(bootstrapFiveModal) => bootstrapFiveModal.hide()
+          case None                     => $(dialog).asInstanceOf[js.Dynamic].modal("hide")
+        }
+
         dialogShown = false
       }
     }

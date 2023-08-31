@@ -18,7 +18,6 @@ import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl
 import org.orbeon.xforms.*
-import org.orbeon.xforms.facade.Events
 import org.orbeon.xforms.Session.SessionUpdate
 import org.orbeon.xforms.facade.{Bootstrap, Events}
 import org.scalajs.dom
@@ -27,7 +26,6 @@ import org.scalajs.dom.*
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global as g
 import scala.scalajs.js.timers
-import scala.util.Try
 
 
 // Scala.js starting point for Form Runner
@@ -105,15 +103,10 @@ object FormRunnerApp extends App {
   private def initSessionExpirationDialog(): Unit =
     Option(document.querySelector(".fr-session-expiration-dialog")) foreach { dialog =>
 
-      val modalConfiguration: js.Object = new js.Object {
+      val modal = Bootstrap.newModal(dialog, new js.Object {
         val backdrop = "static" // Click on the background doesn't hide dialog
         val keyboard = false    // Can't use esc to close the dialog
-      }
-
-      val bootstrapFiveModalOpt = Try(js.Dynamic.global.bootstrap).toOption.map { bootstrap =>
-        // Bootstrap 5 modal dialog
-        js.Dynamic.newInstance(bootstrap.Modal)(dialog, modalConfiguration)
-      }
+      })
 
       // Detecting whether the dialog is shown or not by retrieving its CSS classes is not reliable when aboutToExpire
       // is called multiple times in a row (e.g. locally and because of a message from another page), so we keep track
@@ -201,20 +194,12 @@ object FormRunnerApp extends App {
       }
 
       def showDialog(): Unit = {
-        bootstrapFiveModalOpt match {
-          case Some(bootstrapFiveModal) => bootstrapFiveModal.show()
-          case None                     => $(dialog).asInstanceOf[js.Dynamic].modal(modalConfiguration)
-        }
-
+        modal.show()
         dialogShown = true
       }
 
       def hideDialog(): Unit = {
-        bootstrapFiveModalOpt match {
-          case Some(bootstrapFiveModal) => bootstrapFiveModal.hide()
-          case None                     => $(dialog).asInstanceOf[js.Dynamic].modal("hide")
-        }
-
+        modal.hide()
         dialogShown = false
       }
     }

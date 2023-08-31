@@ -13,8 +13,10 @@
   */
 package org.orbeon.xforms.facade
 
-import org.orbeon.xforms.YUICustomEvent
+import org.orbeon.xforms.{$, YUICustomEvent}
+import org.scalajs
 import org.scalajs.dom
+import org.scalajs.dom.Element
 import org.scalajs.dom.{FocusEvent, UIEvent, html, raw}
 import io.udash.wrappers.jquery.JQueryPromise
 
@@ -153,7 +155,7 @@ object Utils extends js.Object {
   def overlayUseDisplayHidden(o: js.Object)                                 : Unit             = js.native
 }
 
-// Minimal (i.e. incomplete) class/trait for the Broadcast Channel API
+// Minimal facades for the Broadcast Channel API
 
 @js.native
 @JSGlobal("BroadcastChannel")
@@ -169,3 +171,53 @@ class BroadcastChannel(name: String) extends js.Object {
 trait MessageEvent extends js.Object {
   val data: js.Any = js.native
 }
+
+// Minimal facades for Bootstrap 5 and helpers for Bootstrap 2/5 modal dialogs
+
+@js.native
+trait BootstrapWindow extends scalajs.dom.Window {
+  def bootstrap: js.UndefOr[Bootstrap] = js.native
+}
+
+object Bootstrap {
+  implicit def windowToBootstrapWindow(window: scalajs.dom.Window): BootstrapWindow =
+    window.asInstanceOf[BootstrapWindow]
+
+  implicit class BootstrapOps(private val bootstrap: Bootstrap) extends AnyVal {
+    // Bootstrap 5 modal instantiation
+    def newModal(dialog: Element, configuration: js.Object): Modal =
+      js.Dynamic.newInstance(bootstrap.Modal)(dialog, configuration).asInstanceOf[Modal]
+  }
+
+  def newModal(dialog: Element, configuration: js.Object): GenericModal =
+    scalajs.dom.window.bootstrap.toOption match {
+      case Some(boostrap) => boostrap.newModal(dialog, configuration) // Bootstrap 5
+      case None           => new Modal2(dialog, configuration)        // Bootstrap 2
+    }
+}
+
+@js.native
+trait Bootstrap extends js.Object {
+  val Modal: js.Dynamic = js.native
+}
+
+trait GenericModal extends js.Any {
+  def show(): Unit
+  def hide(): Unit
+}
+
+// Bootstrap 2 modal
+class Modal2(val dialog: Element, val configuration: js.Object) extends js.Object with GenericModal {
+  private val jQuery = $(dialog).asInstanceOf[js.Dynamic]
+
+  override def show(): Unit = jQuery.modal(configuration)
+  override def hide(): Unit = jQuery.modal("hide")
+}
+
+// Bootstrap 5 modal
+@js.native
+trait Modal extends js.Object with GenericModal {
+  def show(): Unit = js.native
+  def hide(): Unit = js.native
+}
+

@@ -16,11 +16,12 @@ package org.orbeon.builder
 import org.orbeon.facades.Mousetrap
 import org.orbeon.fr._
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
-import org.orbeon.xforms.{App, DocumentAPI}
+import org.orbeon.xforms._
 import org.scalajs.dom
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
+
 
 // Scala.js starting point for Form Builder
 object FormBuilderApp extends App {
@@ -73,9 +74,12 @@ object FormBuilderApp extends App {
           val conditionPasses = shortcut.condition.forall(_())
           if (conditionPasses) {
             e.preventDefault()
-            DocumentAPI.dispatchEvent(
-              targetId = shortcut.target,
-              eventName = "DOMActivate"
+            AjaxClient.fireEvent(
+              AjaxEvent(
+                eventName  = EventNames.DOMActivate,
+                targetId   = shortcut.target,
+                form       = Support.allFormElems.headOption, // 2023-09-01: only used by Form Builder, so presumably only one
+              )
             )
           }
         })

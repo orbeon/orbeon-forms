@@ -489,9 +489,10 @@ object InitSupport {
 
           AjaxClient.fireEvent(
             AjaxEvent(
-              eventName   = e.`type`,
-              targetId    = observer,
-              properties  = properties
+              eventName  = e.`type`,
+              targetId   = observer,
+              properties = properties,
+              form       = Some(formElem)
             )
           )
 
@@ -508,7 +509,7 @@ object InitSupport {
         }
       }
 
-    def dispatchInitialServerEvents(events: Option[rpc.PollEvent], formId: String): Unit =
+    private def dispatchInitialServerEvents(events: Option[rpc.PollEvent], formId: String): Unit =
       events foreach { case rpc.PollEvent(delay) =>
         AjaxClient.createDelayedPollEvent(
           delay  = delay.toDouble,

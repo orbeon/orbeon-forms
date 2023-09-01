@@ -13,13 +13,13 @@
   */
 package org.orbeon.xforms
 
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms
 import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom.html
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.|
 
 
 @JSExportTopLevel("OrbeonPage")
@@ -51,6 +51,13 @@ object Page {
   @JSExport
   def getXFormsFormFromNamespacedIdOrThrow(namespacedFormId: String): xforms.Form =
     findXFormsFormFromNamespacedId(namespacedFormId).getOrElse(throw new IllegalArgumentException(s"form `$namespacedFormId` not found"))
+
+  def findXFormsForm(elemOrNamespacedId: js.UndefOr[html.Element | String]): Option[xforms.Form] =
+    (elemOrNamespacedId: Any) match {
+      case namespacedId: String => Page.findXFormsFormFromNamespacedId(namespacedId)
+      case elem: html.Element   => Page.findXFormsFormFromHtmlElemOrDefault(elem)
+      case _                    => Page.findXFormsFormFromHtmlElemOrDefault(js.undefined)
+    }
 
   def findXFormsFormFromNamespacedId(namespacedFormId: String): Option[xforms.Form] =
     formsByNamespacedFormId.get(namespacedFormId)

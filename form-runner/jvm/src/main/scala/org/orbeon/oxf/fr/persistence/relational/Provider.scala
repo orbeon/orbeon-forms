@@ -63,16 +63,28 @@ object Provider extends Enum[Provider] {
       case _          => "?"
     }
 
+  // We would like this search to be case-insensitive, but it is not on all databases:
+  // - Oracle and SQL Server: based on the database collation
+  // - MySQL: case-insensitive, as we set a case-insensitive collation on the `xml` column
+  // - PostgreSQL: case-insensitive, as use ILIKE
   def xmlContains(provider: Provider): String =
     provider match {
-      case MySQL      => "xml like ?"
+      case MySQL      => "instr(xml, ?) > 0"
       case PostgreSQL => "xml::text ilike ?"
     }
 
+  private def paramForLike(param: String): String = {
+    val escapedParam =
+      param.replace("\\", "\\\\")
+           .replace("%" , "\\%" )
+           .replace("_" , "\\_" )
+     s"%$escapedParam%"
+  }
+
   def xmlContainsParam(provider: Provider, param: String): String =
     provider match {
-      case MySQL | PostgreSQL => s"%$param%"
-      case _                  => param
+      case PostgreSQL => s"%$param%"
+      case _          => param
     }
 
   def textContains(provider: Provider, colName: String): String =
@@ -85,8 +97,14 @@ object Provider extends Enum[Provider] {
         s"$colName ILIKE ?"
     }
 
+  def textContainsParam(provider: Provider, param: String): String =
+    paramForLike(param)
+
   def textEquals(provider: Provider, colName: String): String =
     s"$colName = ?"
+
+  def textEqualsParam(provider: Provider, param: String): String =
+    param
 
   def readXmlColumn(
     provider              : Provider,

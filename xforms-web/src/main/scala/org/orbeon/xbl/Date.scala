@@ -16,20 +16,21 @@ package org.orbeon.xbl
 import cats.syntax.option._
 import org.log4s.Logger
 import org.orbeon.date.JSDateUtils
+import org.orbeon.facades.DatePicker._
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
-import org.orbeon.facades.DatePicker._
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.xforms.Constants.XFormsIosClass
-import org.orbeon.xforms.facade.XBL
 import org.orbeon.xforms._
+import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQuery
+import org.scalajs.jquery.JQueryPromise
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.{Promise, UndefOr, |}
 
 
 object Date {
@@ -81,6 +82,9 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
     logger.debug("destroy")
     destroyImpl()
   }
+
+  override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise] =
+    updateStateAndSendValueToServer(newValue)
 
   private def destroyImpl(): Unit =
     if (iOS) {
@@ -244,12 +248,15 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
           }
         }
 
-      valueFromUIOpt.foreach { valueFromUI =>
-        updateStateAndSendValueToServerIfNeeded(
-          newState = state.copy(value = valueFromUI),
-          valueFromState = _.value
-        )
-      }
+      valueFromUIOpt.foreach(updateStateAndSendValueToServer)
+    }
+
+  private def updateStateAndSendValueToServer(newValue: String): Unit =
+    stateOpt foreach { state =>
+      updateStateAndSendValueToServerIfNeeded(
+        newState       = state.copy(value = newValue),
+        valueFromState = _.value
+      )
     }
 
   // Force an update of the date picker if we have a valid date, so when users type "1/2", the value

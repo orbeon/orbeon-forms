@@ -22,10 +22,11 @@ import org.orbeon.web.DomEventNames
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQueryEventObject
+import org.scalajs.jquery.{JQueryEventObject, JQueryPromise}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import scala.scalajs.js
+import scala.scalajs.js.{Promise, UndefOr, |}
 
 
 object Time {
@@ -82,7 +83,7 @@ object Time {
           if (! isMarkedReadonly) {
             logger.debug(s"reacting to event ${e.`type`}")
 
-            updateStateAndSendValueToServer()
+            updateStateAndSendValueToServer(readValue)
 
             // Always update visible value with XForms value:
             //
@@ -115,7 +116,7 @@ object Time {
 
             if (Set(10, 13)(e.which)) {
               e.preventDefault()
-              updateStateAndSendValueToServer()
+              updateStateAndSendValueToServer(readValue)
               AjaxClient.fireEvent(
                 AjaxEvent(
                   eventName = DomEventNames.DOMActivate,
@@ -161,6 +162,9 @@ object Time {
       companion.visibleInputElemOpt foreach (_.focus())
     }
 
+    override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise] =
+      updateStateAndSendValueToServer(_ => newValue)
+
     private object Private {
 
       def updateReadonly(readonly: Boolean): Unit =
@@ -171,11 +175,11 @@ object Time {
             visibleInputElem.removeAttribute("readonly")
         }
 
-      def updateStateAndSendValueToServer(): Unit =
+      def updateStateAndSendValueToServer(read: html.Input => String): Unit =
         visibleInputElemOpt foreach { visibleInputElem =>
           stateOpt foreach { state =>
 
-            val visibleInputElemValue = readValue(visibleInputElem)
+            val visibleInputElemValue = read(visibleInputElem)
 
             val newState =
               state.copy(

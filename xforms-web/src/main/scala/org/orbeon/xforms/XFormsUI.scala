@@ -259,7 +259,7 @@ object XFormsUI {
       val becomesNonRelevant = relevant.contains("false")
 
       def callXFormsUpdateReadonlyIfNeeded(): Unit =
-        if (readonly.isDefined && isObjectWithMethod(instance, "xformsUpdateReadonly"))
+        if (readonly.isDefined && XFormsXbl.isObjectWithMethod(instance, "xformsUpdateReadonly"))
           instance.xformsUpdateReadonly(readonly.contains("true"))
 
       if (becomesRelevant) {
@@ -360,12 +360,12 @@ object XFormsUI {
 
     val promiseOrUndefDyn = promiseOrUndef.asInstanceOf[js.Dynamic]
 
-    if (isObjectWithMethod(promiseOrUndefDyn, "done")) {
+    if (XFormsXbl.isObjectWithMethod(promiseOrUndefDyn, "done")) {
       // JQuery future or similar
       val promise = Promise[Unit]()
       promiseOrUndef.asInstanceOf[JQueryPromise].done((() => promise.success(())): js.Function)
       promise.future
-    } else if (isObjectWithMethod(promiseOrUndefDyn, "then")) {
+    } else if (XFormsXbl.isObjectWithMethod(promiseOrUndefDyn, "then")) {
       // JavaScript future
       promiseOrUndef.asInstanceOf[js.Promise[Unit]].toFuture
     } else {
@@ -739,10 +739,6 @@ object XFormsUI {
 
     val HandleValueIgnoredControls    = List("xforms-trigger", "xforms-submit", "xforms-upload")
     val HandleValueOutputOnlyControls = List("xforms-output", "xforms-static", "xforms-label", "xforms-hint", "xforms-help")
-
-    def isObjectWithMethod(obj: js.Any, method: String): Boolean =
-      obj.isInstanceOf[js.Object] &&                                                 // `obj instanceof Object`
-        obj.asInstanceOf[js.Dynamic].selectDynamic(method).isInstanceOf[js.Function] // `obj[method] instanceof Function`
 
     def childrenWithLocalName(node: raw.Element, name: String): Iterator[raw.Element] =
       node.childNodes.iterator collect {

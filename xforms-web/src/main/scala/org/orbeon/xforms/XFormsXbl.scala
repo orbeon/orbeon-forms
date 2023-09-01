@@ -10,6 +10,10 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 @JSExportTopLevel("OrbeonXFormsXbl")
 object XFormsXbl {
 
+  def isObjectWithMethod(obj: js.Any, method: String): Boolean =
+    obj.isInstanceOf[js.Object] &&                                                 // `obj instanceof Object`
+      obj.asInstanceOf[js.Dynamic].selectDynamic(method).isInstanceOf[js.Function] // `obj[method] instanceof Function`
+
   @JSExport
   def isComponent(control: html.Element): Boolean =
     control.classList.contains("xbl-component")

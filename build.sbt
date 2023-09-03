@@ -45,7 +45,7 @@ val Parboiled1Version             = "1.3.1"
 // Shared Scala libraries
 val CatsVersion                   = "2.7.0"
 val ScalaTestVersion              = "3.2.16"
-val CirceVersion                  = "0.14.5"
+val CirceVersion                  = "0.14.6"
 val EnumeratumVersion             = "1.7.3"
 val EnumeratumCirceVersion        = "1.7.3"
 val ShapelessVersion              = "2.3.7"

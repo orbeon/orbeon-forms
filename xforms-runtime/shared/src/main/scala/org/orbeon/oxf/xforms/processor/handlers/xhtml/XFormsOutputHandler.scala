@@ -237,6 +237,55 @@ class XFormsOutputImageHandler(
   override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] = None
 }
 
+// xf:output[starts-with(@appearance, 'video/')]
+class XFormsOutputVideoHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  localAtts      : Attributes,
+  matched        : ElementAnalysis,
+  handlerContext : HandlerContext
+) extends XFormsControlLifecycleHandler(
+  uri,
+  localname,
+  qName,
+  localAtts,
+  matched,
+  handlerContext,
+  repeating = false,
+  forwarding = false
+) with XFormsOutputHandler {
+
+  protected def handleControlStart(): Unit = {
+
+    implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
+    val xhtmlPrefix = handlerContext.findXHTMLPrefix
+
+    val outputControl = currentControl.asInstanceOf[XFormsOutputControl]
+    val generalMediaType = attributes.getValue("mediatype")
+    val specificMediaType = outputControl.fileMediatype
+
+    val containerAttributes = getContainerAttributes(getEffectiveId, outputControl, isField = false)
+    containerAttributes.addOrReplace("controls", "")
+
+    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
+    currentControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
+
+    withElement("video", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
+      val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, generalMediaType)
+
+      val sourceAttributes = new AttributesImpl()
+      sourceAttributes.addOrReplace("src", srcValue)
+      specificMediaType.foreach(sourceAttributes.addOrReplace("type", _))
+
+      element("source", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = sourceAttributes)
+    }
+  }
+
+  // Don't use @for as we are not pointing to an HTML control
+  override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] = None
+}
+
 // xf:output[@appearance = 'xxf:text']
 class XFormsOutputTextHandler(
   uri            : String,

@@ -49,6 +49,11 @@ object Headers {
   val Timeout                 = "Timeout"
   val TimeoutValuePrefix      = "Second-"
 
+  val Range                   = "Range"
+  val IfRange                 = "If-Range"
+  val AcceptRanges            = "Accept-Ranges"
+  val ContentRange            = "Content-Range"
+
   val OrbeonTokenLower        = OrbeonToken.toLowerCase
   val OrbeonUsernameLower     = OrbeonUsername.toLowerCase
   val OrbeonGroupLower        = OrbeonGroup.toLowerCase

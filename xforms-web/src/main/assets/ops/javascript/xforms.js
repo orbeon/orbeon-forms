@@ -660,6 +660,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 if (output.length > 0) {
                     if (jControl.is(".xforms-mediatype-image")) {
                         return output[0].src;
+                    } else if (jControl.is(".xforms-mediatype-video")) {
+                        return output[0].children[0].src;
                     } else if (jControl.is(".xforms-output-appearance-xxforms-download")) {
                         return null;
                     } else if (jControl.is(".xforms-mediatype-text-html")) {
@@ -733,6 +735,9 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 if (output.length > 0) {
                     if (jControl.is(".xforms-mediatype-image")) {
                         output[0].src = newControlValue;
+                    } else if (jControl.is(".xforms-mediatype-video")) {
+                        output[0].children[0].src = newControlValue;
+                        output[0].load();
                     } else if (jControl.is(".xforms-mediatype-text-html")) {
                         output[0].innerHTML = newControlValue;
                     } else {

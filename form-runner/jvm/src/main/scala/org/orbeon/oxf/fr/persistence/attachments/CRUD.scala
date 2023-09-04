@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.attachments
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
-import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, Ranges, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
@@ -40,6 +40,9 @@ class CRUD extends ProcessorImpl {
         case HttpMethod.DELETE => provider.delete(attachmentInformation)
         case _                 => httpResponse.setStatus(StatusCode.MethodNotAllowed)
       }
+
+      // Rewrite response if HTTP request range header was present
+      Ranges.naivelyRewriteHttpResponseIfNeeded(httpRequest, httpResponse)
     } catch {
       case e: HttpStatusCodeException =>
         httpResponse.setStatus(e.code)

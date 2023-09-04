@@ -74,6 +74,7 @@
         oxf:/xbl/orbeon/image-attachment/image-attachment.xbl
         oxf:/xbl/orbeon/image/image.xbl
         oxf:/xbl/orbeon/wpaint/wpaint.xbl
+        oxf:/xbl/orbeon/video/video.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.button.uri.*.*">

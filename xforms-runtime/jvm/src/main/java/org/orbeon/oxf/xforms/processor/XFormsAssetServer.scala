@@ -18,7 +18,7 @@ import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.GET
-import org.orbeon.oxf.http.{Headers, SessionExpiredException, StatusCode}
+import org.orbeon.oxf.http.{Headers, Ranges, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
 import org.orbeon.oxf.util.PathUtils._
@@ -241,13 +241,17 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
               url         = resource.uri,
               credentials = None,
               content     = None,
-              headers     = resource.headers,
+              // Forward HTTP range headers to server
+              headers     = resource.headers ++ Ranges.rangeHeadersFromRequest(externalContext.getRequest),
               loadState   = true,
               saveState   = true,
               logBody     = false
             )
 
           // TODO: handle 404, etc. and set response parameters *after* we know that we have a successful response code.
+
+          // Forward HTTP range headers/status to client
+          Ranges.setRangeHeadersAndStatus(cxr, response)
 
           IOUtils.copyStreamAndClose(cxr.content.inputStream, response.getOutputStream)
         } catch {

@@ -226,23 +226,25 @@ trait HttpResponse {
 }
 
 object StatusCode {
-  val Ok                    = 200
-  val Created               = 201
-  val NoContent             = 204
-  val Found                 = 302
-  val NotModified           = 304
-  val BadRequest            = 400
-  val Unauthorized          = 401
-  val Forbidden             = 403
-  val NotFound              = 404
-  val MethodNotAllowed      = 405
-  val Conflict              = 409
-  val Gone                  = 410
-  val RequestEntityTooLarge = 413
-  val Locked                = 423
-  val LoginTimeOut          = 440 // not standard
-  val InternalServerError   = 500
-  val ServiceUnavailable    = 503
+  val Ok                           = 200
+  val Created                      = 201
+  val NoContent                    = 204
+  val PartialContent               = 206
+  val Found                        = 302
+  val NotModified                  = 304
+  val BadRequest                   = 400
+  val Unauthorized                 = 401
+  val Forbidden                    = 403
+  val NotFound                     = 404
+  val MethodNotAllowed             = 405
+  val Conflict                     = 409
+  val Gone                         = 410
+  val RequestEntityTooLarge        = 413
+  val RequestedRangeNotSatisfiable = 416
+  val Locked                       = 423
+  val LoginTimeOut                 = 440 // not standard
+  val InternalServerError          = 500
+  val ServiceUnavailable           = 503
 
   def isSuccessCode(code: Int): Boolean =
     code >= 200 && code < 300

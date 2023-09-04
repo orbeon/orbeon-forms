@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.Logger
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
-import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.NetUtils
@@ -53,6 +53,9 @@ class CRUD
         case HttpMethod.UNLOCK                => unlock   (getLockUnlockRequest(requestPath))
         case _                                => httpResponse.setStatus(StatusCode.MethodNotAllowed)
       }
+
+      // Rewrite response if HTTP request range header was present
+      Ranges.naivelyRewriteHttpResponseIfNeeded(httpRequest, httpResponse)
     } catch {
       case e: HttpStatusCodeException =>
         httpResponse.setStatus(e.code)

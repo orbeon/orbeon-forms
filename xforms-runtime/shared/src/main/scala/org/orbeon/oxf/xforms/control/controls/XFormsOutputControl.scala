@@ -95,7 +95,7 @@ class XFormsOutputControl(
     assert(internalValue ne null)
 
     val updatedValue =
-      if (staticControlOpt exists (_.isDownloadAppearance)) {
+      if (staticControlOpt exists (c => c.isDownloadAppearance || c.isVideoMediatype)) {
         proxyValueIfNeeded(internalValue, "", filename, fileMediatype orElse mediatype)
       } else if (staticControlOpt exists (_.isImageMediatype)) {
         // Use dummy image as default value so that client always has something to load
@@ -222,7 +222,7 @@ class XFormsOutputControl(
     }
 
   override def getRelevantEscapedExternalValue: String =
-    if (staticControlOpt exists (c => c.isDownloadAppearance || c.isImageMediatype)) {
+    if (staticControlOpt exists (c => c.isDownloadAppearance || c.isImageMediatype || c.isVideoMediatype)) {
       val externalValue = getExternalValue
       if (externalValue.nonAllBlank) {
         // External value is not blank, rewrite as absolute path. Two cases:
@@ -286,7 +286,7 @@ class XFormsOutputControl(
 
   override def findAriaByControlEffectiveIdWithNs: Option[String] =
     if (appearances(XXFORMS_TEXT_APPEARANCE_QNAME) ||
-        (staticControlOpt exists (c => c.isDownloadAppearance || c.isImageMediatype || c.isHtmlMediatype)))
+        (staticControlOpt exists (c => c.isDownloadAppearance || c.isImageMediatype || c.isVideoMediatype || c.isHtmlMediatype)))
       None
     else
       super.findAriaByControlEffectiveIdWithNs
@@ -307,6 +307,8 @@ object XFormsOutputControl {
     else if ((mediatypeValue ne null) && mediatypeValue.startsWith("image/"))
       // Dummy image
       DUMMY_IMAGE_URI
+    else if ((mediatypeValue ne null) && mediatypeValue.startsWith("video/"))
+      ""
     else
       // Default for other mediatypes
       null

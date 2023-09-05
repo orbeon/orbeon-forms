@@ -23,6 +23,7 @@ import org.orbeon.builder.facade._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.web.DomEventNames
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
@@ -77,7 +78,7 @@ object ControlLabelHintTextEditor {
 
       // Click on label/hint
       $(document).on(
-        s"${EventNames.Click}${Private.ListenerSuffix}",
+        s"${DomEventNames.Click}${Private.ListenerSuffix}",
         LabelHintSelector,
         (event: JQueryEventObject) => {
 
@@ -209,14 +210,14 @@ object ControlLabelHintTextEditor {
          $(".fb-main").append(containerDiv)
 
         // Event handlers
-        textInput.on(s"${EventNames.KeyPress}$ListenerSuffix", (e: JQueryEventObject) => asUnit {
+        textInput.on(s"${DomEventNames.KeyPress}$ListenerSuffix", (e: JQueryEventObject) => asUnit {
           // End edit when users press enter
           if (e.which == 13) {
             e.preventDefault()
             resourceEditorEndEdit()
           }
         })
-        checkboxInput.on(s"${EventNames.Click}$ListenerSuffix", () => asUnit {
+        checkboxInput.on(s"${DomEventNames.Click}$ListenerSuffix", () => asUnit {
           // When checkbox clicked, set focus back on the text field, where it was before
           textInput.focus()
         })

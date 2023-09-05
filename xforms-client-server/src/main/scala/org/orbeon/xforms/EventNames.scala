@@ -13,7 +13,6 @@
  */
 package org.orbeon.xforms
 
-
 object EventNames {
 
   private val Prefix = "xxforms-upload-"
@@ -37,12 +36,9 @@ object EventNames {
   val KeyTextPropertyName      = "text"
   val KeyModifiersPropertyName = "modifiers"
 
-  val Click                    = "click"
   val KeyPress                 = "keypress"
   val KeyDown                  = "keydown"
   val KeyUp                    = "keyup"
-  val Resize                   = "resize"
-  val DOMActivate              = "DOMActivate"
 
   val KeyboardEvents: Set[String] = Set(KeyPress, KeyDown, KeyUp)
 

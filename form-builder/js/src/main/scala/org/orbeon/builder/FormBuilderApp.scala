@@ -16,6 +16,7 @@ package org.orbeon.builder
 import org.orbeon.facades.Mousetrap
 import org.orbeon.fr._
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.web.DomEventNames
 import org.orbeon.xforms._
 import org.scalajs.dom
 
@@ -74,7 +75,7 @@ object FormBuilderApp extends App {
             e.preventDefault()
             AjaxClient.fireEvent(
               AjaxEvent(
-                eventName  = EventNames.DOMActivate,
+                eventName  = DomEventNames.DOMActivate,
                 targetId   = shortcut.target,
                 form       = Support.allFormElems.headOption, // 2023-09-01: only used by Form Builder, so presumably only one
               )

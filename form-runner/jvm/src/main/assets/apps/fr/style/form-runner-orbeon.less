@@ -305,7 +305,12 @@ body.orbeon { background-color: @frBackground }
 
     // Add a star before the label of required fields, but only in new/edit modes
     // NOTE: Also cover Form Builder classes here instead of form-builder.css, so we don't miss changes done here
-    .fr-mode-new, .fr-mode-edit, .fr-mode-test, .xforms-dialog {
+    .fr-mode-new,
+    .fr-mode-edit,
+    .fr-mode-test,
+    .fr-static-readonly-required.fr-mode-view, // https://github.com/orbeon/orbeon-forms/issues/5959
+    .fr-static-readonly-required.fr-mode-pdf,  // https://github.com/orbeon/orbeon-forms/issues/5959
+    .xforms-dialog {
         .xforms-required {
             &.xforms-label, .xforms-label {
                 &:before {

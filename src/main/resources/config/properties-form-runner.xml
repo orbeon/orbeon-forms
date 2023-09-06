@@ -133,6 +133,7 @@
     <property as="xs:string"  name="oxf.fr.detail.lhha-order.*.*"                               value="help label control alert hint"/>
     <property as="xs:boolean" name="oxf.fr.detail.static-readonly-hint.*.*"                     value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.static-readonly-alert.*.*"                    value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.static-readonly-required.*.*"                 value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.label.appearance.*.*"                         value="full"/>
     <property as="xs:string"  name="oxf.fr.detail.hint.appearance.*.*"                          value="full"/>
     <!-- TOC disabled by default -->

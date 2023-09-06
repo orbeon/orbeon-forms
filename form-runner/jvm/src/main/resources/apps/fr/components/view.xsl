@@ -485,7 +485,25 @@
             <xf:group
                 model="fr-form-model"
                 id="fr-view"
-                class="container{if ($fluid) then '-fluid' else ''} fr-view {{concat('fr-mode-', $fr-mode)}}"
+                class="container{
+                    '-fluid'[$fluid]
+                } fr-view fr-mode-{{
+                    $fr-mode
+                }}{{
+                    ' fr-static-readonly-required'[
+                        fr:is-readonly-mode() and (
+                            let $property-opt := xxf:property(string-join(('oxf.fr.detail.static-readonly-required', fr:app-name(), fr:form-name()), '.'))[. = (true(), false())],
+                                $param-opt    := xxf:get-request-parameter('fr-pdf-show-required')[. = ('true', 'false')]
+                            return
+                                if ((fr:is-service-path() or xxf:get-request-method() = 'POST') and exists($param-opt)) then
+                                    xs:boolean($param-opt)    (: for PDF/TIFF :)
+                                else if (exists($property-opt)) then
+                                    xs:boolean($property-opt) (: also for the `view` mode :)
+                                else
+                                    false()
+                        )
+                    ]
+                }}"
                 xxf:element="div">
                 <xsl:apply-templates select="if ($is-detail and not($is-form-builder)) then $default-page-template else node()"/>
                 <xsl:call-template name="fr-hidden-controls"/>

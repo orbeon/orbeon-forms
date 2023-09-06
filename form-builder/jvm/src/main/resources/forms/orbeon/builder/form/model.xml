@@ -755,6 +755,7 @@
 
             fr-pdf-show-hints=""
             fr-pdf-show-alerts=""
+            fr-pdf-show-required=""
 
             fr-form-data=""
             fr-language=""

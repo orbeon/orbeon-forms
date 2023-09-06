@@ -233,9 +233,10 @@ object FormRunnerRenderedFormat {
     }
 
     (s"fr-$UsePdfTemplateParam" -> pdfTemplateOpt.isDefined.toString) ::
-      nameParamList                            :::
-      langParamList                            :::
-      hintsAlertsParamForPdfAutomatic("hints") :::
-      hintsAlertsParamForPdfAutomatic("alerts")
+      nameParamList                             :::
+      langParamList                             :::
+      hintsAlertsParamForPdfAutomatic("hints")  :::
+      hintsAlertsParamForPdfAutomatic("alerts") :::
+      hintsAlertsParamForPdfAutomatic("required")
   }
 }

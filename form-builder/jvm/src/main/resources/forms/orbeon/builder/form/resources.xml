@@ -1211,6 +1211,7 @@
             <disable-relevant>Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints>Show controls hints</show-hints>
             <show-alerts>Show invalid controls alerts</show-alerts>
+            <show-required>Style required controls</show-required>
             <use-pdf-template>Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -2566,6 +2567,7 @@
             <disable-relevant>Montrer les contrôles, grilles, et sections avec visibilité dynamique</disable-relevant>
             <show-hints>Montrer les suggestions des contrôles</show-hints>
             <show-alerts>Montrer les erreurs pour les contrôles invalides</show-alerts>
+            <show-required>Styler les contrôles requis</show-required>
             <use-pdf-template>Utiliser le modèle PDF</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -3932,6 +3934,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todo="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -5297,6 +5300,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -6626,6 +6630,7 @@
             <disable-relevant>Mostrare i controlli, le griglie e le sezioni con visibilità dinamica</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -7956,6 +7961,7 @@
             <disable-relevant>Steuerelemente, Raster und Abschnitte mit dynamischer Sichtbarkeit anzeigen</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -9316,6 +9322,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -10673,6 +10680,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -12010,6 +12018,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -13374,6 +13383,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -14739,6 +14749,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>

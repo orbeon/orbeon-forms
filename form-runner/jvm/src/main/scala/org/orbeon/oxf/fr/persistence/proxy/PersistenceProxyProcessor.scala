@@ -711,8 +711,17 @@ private[persistence] object PersistenceProxyProcessor {
     IOUtils.useAndClose(cxr) { connectionResult =>
       // Proxy status code
       response.setStatus(connectionResult.statusCode)
+
       // Proxy incoming headers
       proxyCapitalizeAndCombineHeaders(connectionResult.headers, request = false) foreach (response.setHeader _).tupled
+
+      request.getMethod match {
+        case HttpMethod.GET | HttpMethod.HEAD if connectionResult.statusCode == StatusCode.Ok =>
+          // Forward HTTP range headers/status to client
+          attachmentsProviderCxrOpt.foreach(Ranges.forwardRangeHeadersAndStatus(_, response))
+
+        case _ =>
+      }
 
       // Proxy content type
       val responseContentType = connectionResult.content.contentType

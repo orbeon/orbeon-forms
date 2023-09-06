@@ -47,7 +47,7 @@ object Ranges {
       value  <- request.getFirstHeaderIgnoreCase(header)
     } yield header -> List(value)
 
-  def setRangeHeadersAndStatus(cxr: ConnectionResult, response: ExternalContext.Response): Unit = {
+  def forwardRangeHeadersAndStatus(cxr: ConnectionResult, response: ExternalContext.Response): Unit = {
     for {
       header <- Seq(Headers.AcceptRanges, Headers.ContentRange)
       value  <- cxr.getFirstHeaderIgnoreCase(header)
@@ -61,41 +61,48 @@ object Ranges {
     }
   }
 
-  def naivelyRewriteHttpResponseIfNeeded(
+  def respondWithAcceptRangesHeader(response: ExternalContext.Response, totalSize: Option[Long]): Unit = {
+    response.setHeader(Headers.AcceptRanges, Units)
+    totalSize.foreach(size => response.setHeader(Headers.ContentLength, size.toString))
+  }
+
+  def respondWithContentRangeHeader(response: ExternalContext.Response, start: Long, end: Long, totalSize: Long): Unit = {
+    response.setHeader(Headers.ContentRange, s"bytes $start-${end - 1}/$totalSize")
+    response.setHeader(Headers.ContentLength, (end - start).toString)
+  }
+
+  def extractRangeFromHttpResponseIfNeeded(
     request  : ExternalContext.Request,
     response : ExternalContext.Response
   ): Unit = {
-    if (request.getMethod == HttpMethod.HEAD) {
-      response.setHeader(Headers.AcceptRanges, Units)
-    } else if (request.getMethod == HttpMethod.GET) {
-      for {
-        ranges     <- Ranges(request).toOption
-        range      <- ranges.singleRange
-        baos       <- Option(response.getOutputStream).collect { case baos: ByteArrayOutputStream => baos }
-        bufferSize = baos.size()
-        if bufferSize > 0
-      } locally {
-        val start = range.start.toInt
-        val end   = range.end.map(_.toInt + 1).getOrElse(bufferSize)
+    val successfulResponse = response match {
+      case response: LocalResponse => response.statusCode == StatusCode.Ok
+      case _                       => true
+    }
 
-        val newOutput = baos.toByteArray.slice(start, end)
-        baos.reset()
-        baos.write(newOutput)
+    if (successfulResponse) {
+      if (request.getMethod == HttpMethod.HEAD) {
+        respondWithAcceptRangesHeader(response, totalSize = None)
+      } else if (request.getMethod == HttpMethod.GET)
+        for {
+          ranges     <- Ranges(request).toOption
+          range      <- ranges.singleRange
+          baos       <- Option(response.getOutputStream).collect { case baos: ByteArrayOutputStream => baos }
+          bufferSize = baos.size()
+          if bufferSize > 0
+        } locally {
+          val start = range.start.toInt
+          val end   = range.end.map(_.toInt + 1).getOrElse(bufferSize)
 
-        val statusCodeOpt = response match {
-          case response: LocalResponse => Some(response.statusCode)
-          case _                       => None
-        }
+          val newOutput = baos.toByteArray.slice(start, end)
+          baos.reset()
+          baos.write(newOutput)
 
-        if (statusCodeOpt.contains(StatusCode.Ok)) {
+          respondWithContentRangeHeader(response, start, end, bufferSize)
           response.setStatus(StatusCode.PartialContent)
         }
-
-        response.setHeader(Headers.ContentRange, s"bytes $start-${end - 1}/$bufferSize")
-        response.setHeader(Headers.ContentLength, newOutput.length.toString)
       }
     }
-  }
 }
 
 object Range {

@@ -737,6 +737,11 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         output[0].src = newControlValue;
                     } else if (jControl.is(".xforms-mediatype-video")) {
                         output[0].children[0].src = newControlValue;
+                        if (newControlValue === "") {
+                            output[0].classList.add("empty-source");
+                        } else {
+                            output[0].classList.remove("empty-source");
+                        }
                         output[0].load();
                     } else if (jControl.is(".xforms-mediatype-text-html")) {
                         output[0].innerHTML = newControlValue;

@@ -251,7 +251,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
           // TODO: handle 404, etc. and set response parameters *after* we know that we have a successful response code.
 
           // Forward HTTP range headers/status to client
-          Ranges.setRangeHeadersAndStatus(cxr, response)
+          Ranges.forwardRangeHeadersAndStatus(cxr, response)
 
           IOUtils.copyStreamAndClose(cxr.content.inputStream, response.getOutputStream)
         } catch {

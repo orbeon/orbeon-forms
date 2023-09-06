@@ -25,6 +25,11 @@ object SaxSupport {
         case index =>
           atts.setAttribute(index, "", name, name, XMLReceiverHelper.CDATA, value)
       }
+
+    def appendToClassAttribute(newClass: String): Unit = {
+      val allClasses = Option(atts.getValue("class")).map(_ + " ").getOrElse("") + newClass
+      atts.addOrReplace("class", allClasses)
+    }
   }
 
   implicit class AttributesOps(private val atts: Attributes) extends AnyVal {

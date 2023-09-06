@@ -55,7 +55,7 @@ class CRUD
       }
 
       // Rewrite response if HTTP request range header was present
-      Ranges.naivelyRewriteHttpResponseIfNeeded(httpRequest, httpResponse)
+      Ranges.extractRangeFromHttpResponseIfNeeded(httpRequest, httpResponse)
     } catch {
       case e: HttpStatusCodeException =>
         httpResponse.setStatus(e.code)

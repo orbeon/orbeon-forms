@@ -18,7 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
 import org.orbeon.oxf.fr.{AppForm, FormOrData, FormRunnerPersistence}
-import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.http.{Ranges, StatusCode, Range => HttpRange}
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary
 import org.orbeon.oxf.util.{LoggerFactory, XPathCache}
 import org.orbeon.saxon.function.{EnvironmentVariable, EnvironmentVariableAlwaysEnabled}
@@ -31,22 +31,47 @@ trait FilesystemCRUD extends CRUDMethods {
   private val logger = LoggerFactory.createLogger(classOf[FilesystemCRUD])
 
   override def head(
-    attachmentInformation : AttachmentInformation)(implicit
+    attachmentInformation : AttachmentInformation,
+    rangOpt               : Option[HttpRange])(implicit
     httpRequest           : Request,
     httpResponse          : Response
   ): Unit = withFile(attachmentInformation, httpRequest, httpResponse) { fileToAccess =>
-    ()
+    if (fileToAccess.exists()) {
+      Ranges.respondWithAcceptRangesHeader(httpResponse, totalSize = Some(fileToAccess.length()))
+      httpResponse.setStatus(StatusCode.Ok)
+    } else {
+      httpResponse.setStatus(StatusCode.NotFound)
+    }
   }
 
   override def get(
-    attachmentInformation : AttachmentInformation)(implicit
+    attachmentInformation : AttachmentInformation,
+    rangOpt               : Option[HttpRange])(implicit
     httpRequest           : Request,
     httpResponse          : Response
   ): Unit = withFile(attachmentInformation, httpRequest, httpResponse) { fileToRead =>
     val fileInputStream = new FileInputStream(fileToRead)
     val outputStream = httpResponse.getOutputStream
 
-    IOUtils.copyStreamAndClose(fileInputStream, outputStream)
+    // Single HTTP range processing
+    val fileSize    = fileToRead.length()
+    val start       = rangOpt.map(_.start).getOrElse(0L)
+    val end         = rangOpt.flatMap(_.end).map(_ + 1).getOrElse(fileSize)
+    val bytesToCopy = end - start
+
+    // Seek and copy just what we need
+    fileInputStream.skip(start)
+    IOUtils.partiallyCopyStreamAndClose(fileInputStream, outputStream, bytesToCopy)
+
+    rangOpt match {
+      case Some(_) =>
+        Ranges.respondWithContentRangeHeader(httpResponse, start, end, fileSize)
+        httpResponse.setStatus(StatusCode.PartialContent)
+
+      case None =>
+        Ranges.respondWithAcceptRangesHeader(httpResponse, totalSize = None)
+        httpResponse.setStatus(StatusCode.Ok)
+    }
   }
 
   override def put(

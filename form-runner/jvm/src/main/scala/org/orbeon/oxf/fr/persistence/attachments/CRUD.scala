@@ -21,6 +21,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
 
+import scala.util.{Failure, Success}
+
 class CRUD extends ProcessorImpl {
   private val logger = LoggerFactory.createLogger(classOf[CRUD])
 
@@ -33,16 +35,23 @@ class CRUD extends ProcessorImpl {
 
       val (provider, attachmentInformation) = CRUD.providerAndAttachmentInformation(httpRequest)
 
-      httpRequest.getMethod match {
-        case HttpMethod.HEAD   => provider.head  (attachmentInformation)
-        case HttpMethod.GET    => provider.get   (attachmentInformation)
-        case HttpMethod.PUT    => provider.put   (attachmentInformation)
-        case HttpMethod.DELETE => provider.delete(attachmentInformation)
-        case _                 => httpResponse.setStatus(StatusCode.MethodNotAllowed)
+      Ranges(httpRequest) match {
+        case Success(ranges) =>
+          // Only support single HTTP ranges for now
+          httpRequest.getMethod match {
+            case HttpMethod.HEAD   => provider.head  (attachmentInformation, ranges.singleRange)
+            case HttpMethod.GET    => provider.get   (attachmentInformation, ranges.singleRange)
+            case HttpMethod.PUT    => provider.put   (attachmentInformation)
+            case HttpMethod.DELETE => provider.delete(attachmentInformation)
+            case _                 => httpResponse.setStatus(StatusCode.MethodNotAllowed)
+          }
+
+        case Failure(throwable) =>
+          logger.error(throwable)(s"Error while processing request ${httpRequest.getRequestPath}")
+          httpResponse.setStatus(StatusCode.BadRequest)
       }
 
-      // Rewrite response if HTTP request range header was present
-      Ranges.naivelyRewriteHttpResponseIfNeeded(httpRequest, httpResponse)
+
     } catch {
       case e: HttpStatusCodeException =>
         httpResponse.setStatus(e.code)

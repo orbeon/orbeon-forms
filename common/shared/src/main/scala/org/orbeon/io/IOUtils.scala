@@ -13,11 +13,11 @@
   */
 package org.orbeon.io
 
-import java.io._
-import java.{lang => jl}
-
 import org.orbeon.oxf.common.Defaults
 
+import java.io._
+import java.{lang => jl}
+import scala.annotation.tailrec
 import scala.util.control.NonFatal
 
 
@@ -37,6 +37,45 @@ object IOUtils {
           progress(read)
           out.write(buffer, 0, read)
         }
+        out.flush()
+      }
+    }
+  }
+
+  def partiallyCopyStreamAndClose(
+    in         : InputStream,
+    out        : OutputStream,
+    bytesToCopy: Long,
+    progress   : Long => Unit = _ => (),
+    doCloseOut : Boolean = true
+  ): Unit = {
+
+    require(in ne null)
+    require(out ne null)
+
+    useAndClose(in) { in =>
+      useAndClose(out, doCloseOut) { out =>
+        val buffer = new Array[Byte](CopyBufferSize)
+
+        @tailrec
+        def copyIfNeeded(bytesRead: Long): Unit = {
+          if (bytesRead >= bytesToCopy) {
+            ()
+          } else {
+            val bytesRemaining = bytesToCopy - bytesRead
+            val bytesToRead    = Math.min(bytesRemaining, CopyBufferSize)
+            val read           = in.read(buffer, 0, bytesToRead.toInt)
+            if (read < 0) {
+              ()
+            } else {
+              progress(read)
+              out.write(buffer, 0, read)
+              copyIfNeeded(bytesRead + read)
+            }
+          }
+        }
+
+        copyIfNeeded(bytesRead = 0L)
         out.flush()
       }
     }

@@ -26,7 +26,7 @@ import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPACE_URI}
 import org.orbeon.oxf.xml.XMLReceiverHelper._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport, XMLUtils}
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
@@ -265,15 +265,18 @@ class XFormsOutputVideoHandler(
     val generalMediaType = attributes.getValue("mediatype")
     val specificMediaType = outputControl.fileMediatype
 
+    val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, generalMediaType)
+
     val containerAttributes = getContainerAttributes(getEffectiveId, outputControl, isField = false)
     containerAttributes.addOrReplace("controls", "")
+    if (srcValue.isEmpty) {
+      containerAttributes.appendToClassAttribute("empty-source")
+    }
 
     XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
     currentControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
 
     withElement("video", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
-      val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, generalMediaType)
-
       val sourceAttributes = new AttributesImpl()
       sourceAttributes.addOrReplace("src", srcValue)
       specificMediaType.foreach(sourceAttributes.addOrReplace("type", _))

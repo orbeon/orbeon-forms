@@ -252,7 +252,7 @@
                             ErrorSummary:removeUpdateOrInsertError(
                                 xxf:instance('fr-errors-instance')/root(),
                                 xxf:instance('fr-state-instance')/root(),
-                                $fr-visit-value-changed
+                                ($fr-visit-value-changed, false())[1]
                             )
                         </xf:action>
 

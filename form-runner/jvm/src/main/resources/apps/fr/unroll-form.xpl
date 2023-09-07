@@ -55,9 +55,10 @@
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
+                <include>/request/method</include>
                 <include>/request/request-path</include>
                 <include>/request/request-uri</include>
-                <include>/request/parameters/parameter[name = ('disable-calculations', 'disable-calculate', 'disable-default', 'disable-relevant')]</include>
+                <include>/request/parameters/parameter[name = ('disable-calculations', 'disable-calculate', 'disable-default', 'disable-relevant', 'fr-disable-calculate', 'fr-disable-default', 'fr-disable-relevant')]</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>

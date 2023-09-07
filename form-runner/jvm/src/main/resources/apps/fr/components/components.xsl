@@ -47,10 +47,16 @@
         name="is-readonly-mode"
         select="$mode = ('view', 'pdf', 'tiff', 'test-pdf', 'email', 'controls')" as="xs:boolean"/>
 
+    <!-- Same logic as `fr:is-service-path()` -->
+    <xsl:variable
+        name="is-service-path"
+        select="starts-with(doc('input:request')/*/request-path, '/fr/service/')"
+        as="xs:boolean"/>
+
     <!-- Same logic as in `fr:is-background()` -->
     <xsl:variable
         name="is-background"
-        select="starts-with(doc('input:request')/*/request-path, '/fr/service/') and $mode = ('new', 'edit', 'export')"
+        select="$is-service-path and $mode = ('new', 'edit', 'export')"
         as="xs:boolean"/>
 
     <!-- Either the model with id fr-form-model, or the first model -->
@@ -75,7 +81,7 @@
         as="xs:boolean?"
         select="
             doc('input:request')/*/parameters/parameter[
-                name  = 'disable-relevant' and
+                name  = ('disable-relevant', 'fr-disable-relevant') and
                 value = ('true', 'false')
             ]/value/xs:boolean(.)"/>
 
@@ -84,7 +90,7 @@
         as="xs:boolean?"
         select="
             doc('input:request')/*/parameters/parameter[
-                name  = 'disable-default' and
+                name  = ('disable-default', 'fr-disable-default') and
                 value = ('true', 'false')
             ]/value/xs:boolean(.)"/>
 
@@ -99,12 +105,12 @@
 
     <xsl:variable
         name="disable-relevant"
-        select="($is-background or $mode = 'test-pdf') and $disable-relevant-param-opt"
+        select="($is-service-path or $mode = 'test-pdf') and $disable-relevant-param-opt"
         as="xs:boolean"/>
 
     <xsl:variable
         name="disable-default"
-        select="($is-background or $mode = 'test-pdf') and $disable-default-param-opt"
+        select="($is-service-path or $mode = 'test-pdf') and $disable-default-param-opt"
         as="xs:boolean"/>
 
     <xsl:variable
@@ -112,7 +118,7 @@
         as="xs:boolean?"
         select="
             doc('input:request')/*/parameters/parameter[
-                name  = ('disable-calculations', 'disable-calculate') and
+                name  = ('disable-calculations', 'disable-calculate', 'fr-disable-calculate') and
                 value = ('true', 'false')
             ]/value/xs:boolean(.)"/>
 
@@ -120,7 +126,7 @@
         name="disable-calculate"
         select="
             (: The parameter takes precedence :)
-            if (($is-background or $mode = 'test-pdf') and exists($disable-calculate-param-opt)) then
+            if (($is-service-path or $mode = 'test-pdf') and exists($disable-calculate-param-opt)) then
                 $disable-calculate-param-opt
             else
                 $is-readonly-mode and
@@ -751,7 +757,7 @@
                             if ($use-pdf-template) then
                                 false()
                             else
-                                xxf:get-request-method() = ''POST'' and xxf:get-request-parameter(''fr-pdf-show-hints'') = ''true''
+                                (fr:is-service-path() or xxf:get-request-method() = ''POST'') and xxf:get-request-parameter(''fr-pdf-show-hints'') = ''true''
                     }'
                 else
                     '{
@@ -768,7 +774,7 @@
                                         ''.''
                                     )
                                 ),
-                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-hints'')[xxf:get-request-method() = ''POST'' and . = (''false'', ''true'')]
+                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-hints'')[(fr:is-service-path() or xxf:get-request-method() = ''POST'') and . = (''false'', ''true'')]
                         return
                             if ($use-pdf-template) then
                                 false()
@@ -788,7 +794,7 @@
                             if ($use-pdf-template) then
                                 false()
                             else
-                                xxf:get-request-method() = ''POST'' and xxf:get-request-parameter(''fr-pdf-show-alerts'') = ''true''
+                                (fr:is-service-path() or xxf:get-request-method() = ''POST'') and xxf:get-request-parameter(''fr-pdf-show-alerts'') = ''true''
                     }'
                 else
                     '{
@@ -805,7 +811,7 @@
                                         ''.''
                                     )
                                 ),
-                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-alerts'')[xxf:get-request-method() = ''POST'' and . = (''false'', ''true'')]
+                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-alerts'')[(fr:is-service-path() or xxf:get-request-method() = ''POST'') and . = (''false'', ''true'')]
                         return
                             if ($use-pdf-template) then
                                 false()
@@ -1039,8 +1045,8 @@
             <xf:action
                 type="xpath"
                 event="xforms-ready"
-                if="xxf:get-request-method() = 'POST' and
-                    fr:mode() = ('new', 'edit')       and
+                if="(fr:is-service-path() or xxf:get-request-method() = 'POST') and
+                    fr:mode() = ('new', 'edit')                                 and
                     xxf:get-request-parameter('fr-show-relevant-errors') = 'true'">
                 fr:run-process('oxf.fr.detail.process', 'show-relevant-errors')
             </xf:action>

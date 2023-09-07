@@ -37,11 +37,13 @@
     </p:processor>
 
     <p:choose href="#unrolled-form">
-        <p:when test="
-            (: Require `POST` so that this is not publicly exposed. See also `fr:use-pdf-template()`
-               https://github.com/orbeon/orbeon-forms/issues/5918 :)
-            not(p:get-request-method() = 'POST' and p:get-request-parameter('fr-use-pdf-template') = 'false') and
-            (/*/xh:head//xf:instance[@id = 'fr-form-attachments']/*/pdf/p:trim() != '')">
+        <p:when
+            xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+            test="
+                (: Require `POST` so that this is not publicly exposed. See also `fr:use-pdf-template()`
+                   https://github.com/orbeon/orbeon-forms/issues/5918 :)
+                not((frf:isServicePath(p:get-request-path()) or p:get-request-method() = 'POST') and p:get-request-parameter('fr-use-pdf-template') = 'false') and
+                (/*/xh:head//xf:instance[@id = 'fr-form-attachments']/*/pdf/p:trim() != '')">
             <!-- A PDF template is attached to the form and its use is enabled -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="print-pdf-template.xpl"/>

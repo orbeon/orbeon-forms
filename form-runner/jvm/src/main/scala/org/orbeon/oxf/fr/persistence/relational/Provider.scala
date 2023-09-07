@@ -297,4 +297,22 @@ object Provider extends Enum[Provider] {
     provider match {
       case _      => None
     }
+
+  def partialBinary(provider: Provider, columnName: String, alias: String, offset: Long, length: Option[Long]): String =
+    provider match {
+      case Oracle     => ???
+      case MySQL      => ???
+      case SQLServer  => ???
+      case PostgreSQL => s"substring($columnName, ${offset + 1}${length.map(l => s", $l").getOrElse("")}) as $alias"
+      case DB2        => ???
+    }
+
+  def binarySize(provider: Provider, columnName: String, alias: String): String =
+    provider match {
+      case Oracle     => ???
+      case MySQL      => ???
+      case SQLServer  => ???
+      case PostgreSQL => s"length($columnName) as $alias"
+      case DB2        => ???
+    }
 }

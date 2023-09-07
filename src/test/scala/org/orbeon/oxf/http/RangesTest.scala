@@ -31,6 +31,7 @@ class RangesTest extends AnyFunSpecLike {
       assert(Range("a-5678")    .isFailure)
       assert(Range("1234-b")    .isFailure)
       assert(Range("a-b")       .isFailure)
+      assert(Range("5678-1234") .isFailure)
     }
   }
 

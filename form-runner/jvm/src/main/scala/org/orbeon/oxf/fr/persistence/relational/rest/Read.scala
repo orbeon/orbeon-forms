@@ -18,10 +18,10 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
-import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
+import org.orbeon.oxf.fr.persistence.relational.Provider.{PostgreSQL, binarySize, partialBinary}
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{ContentTypes, DateUtils, NetUtils}
 
@@ -31,7 +31,7 @@ import java.sql.Timestamp
 
 trait Read {
 
-  def getOrHead(req: CrudRequest, method: HttpMethod)(implicit httpResponse: ExternalContext.Response): Unit = {
+  def getOrHead(req: CrudRequest, method: HttpMethod, ranges: Ranges)(implicit httpResponse: ExternalContext.Response): Unit = {
 
     RelationalUtils.withConnection { connection =>
 
@@ -42,9 +42,33 @@ trait Read {
         val table  = SqlSupport.tableName(req)
         val idCols = SqlSupport.idColumns(req)
         val xmlCol = Provider.xmlColSelect(req.provider, "t")
+
+        // Retrieve partial or full file content depending on whether an HTTP range was specified or not
+        val fileContentAndSize = ranges.singleRange match {
+          case None =>
+            "t.file_content"
+
+          case Some(range) =>
+            val partialFileContent = partialBinary(
+              req.provider,
+              columnName = "t.file_content",
+              alias = "file_content",
+              offset = range.start,
+              length = range.end.map(_ - range.start + 1)
+            )
+
+            val totalFileContentSize = binarySize(
+              req.provider,
+              columnName = "t.file_content",
+              alias = "total_file_content_size"
+            )
+
+            s"$partialFileContent, $totalFileContentSize"
+        }
+
         val body   =
           if (readBody)
-            if (req.forAttachment) ", t.file_content"
+            if (req.forAttachment) s", $fileContentAndSize"
             else                   s", $xmlCol"
           else                     ""
 
@@ -102,12 +126,13 @@ trait Read {
 
         // Holds the data we will read from the database
         case class FromDatabase(
-          dataUserOpt          : Option[CheckWithDataUser], // set to `Some(_)` if `forData == true`
-          formVersion          : Int,
-          stageOpt             : Option[String],
-          createdDateTime      : Timestamp,
-          lastModifiedDateTime : Timestamp,
-          bodyOpt              : Option[Array[Byte]]
+          dataUserOpt         : Option[CheckWithDataUser], // set to `Some(_)` if `forData == true`
+          formVersion         : Int,
+          stageOpt            : Option[String],
+          createdDateTime     : Timestamp,
+          lastModifiedDateTime: Timestamp,
+          bodyOpt             : Option[Array[Byte]],
+          totalFileContentSize: Option[Int]
         )
 
         val fromDatabase = useAndClose(ps.executeQuery()) { resultSet =>
@@ -154,7 +179,8 @@ trait Read {
               stageOpt             = if (hasStage) Option(resultSet.getString("stage")) else None,
               createdDateTime      = resultSet.getTimestamp("created"),
               lastModifiedDateTime = resultSet.getTimestamp("last_modified_time"),
-              bodyOpt              = bodyOpt
+              bodyOpt              = bodyOpt,
+              totalFileContentSize = ranges.singleRange.map(_ => resultSet.getInt("total_file_content_size"))
             )
 
           } else {
@@ -181,6 +207,17 @@ trait Read {
         httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(fromDatabase.lastModifiedDateTime.getTime))
         if (! req.forAttachment)
           httpResponse.setHeader(Headers.ContentType, ContentTypes.XmlContentType)
+
+        for {
+          range                <- ranges.singleRange
+          totalFileContentSize <- fromDatabase.totalFileContentSize
+        } locally {
+          import Ranges._
+
+          // Set HTTP range headers and status
+          httpResponse.addHeaders(range.headers(totalFileContentSize))
+          httpResponse.setStatus(StatusCode.PartialContent)
+        }
 
         // Maybe send body
         fromDatabase.bodyOpt.foreach(httpResponse.getOutputStream.write)

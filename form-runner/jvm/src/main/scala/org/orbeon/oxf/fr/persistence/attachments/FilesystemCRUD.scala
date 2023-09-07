@@ -18,7 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
 import org.orbeon.oxf.fr.{AppForm, FormOrData, FormRunnerPersistence}
-import org.orbeon.oxf.http.{Ranges, StatusCode, Range => HttpRange}
+import org.orbeon.oxf.http.{Ranges, StatusCode}
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary
 import org.orbeon.oxf.util.{LoggerFactory, XPathCache}
 import org.orbeon.saxon.function.{EnvironmentVariable, EnvironmentVariableAlwaysEnabled}
@@ -26,18 +26,21 @@ import org.orbeon.xml.NamespaceMapping
 
 import java.io._
 import java.nio.file.{Files, Path, Paths}
+import scala.util.{Failure, Success}
 
 trait FilesystemCRUD extends CRUDMethods {
   private val logger = LoggerFactory.createLogger(classOf[FilesystemCRUD])
 
   override def head(
     attachmentInformation : AttachmentInformation,
-    rangOpt               : Option[HttpRange])(implicit
+    httpRanges            : Ranges)(implicit
     httpRequest           : Request,
     httpResponse          : Response
   ): Unit = withFile(attachmentInformation, httpRequest, httpResponse) { fileToAccess =>
     if (fileToAccess.exists()) {
-      Ranges.respondWithAcceptRangesHeader(httpResponse, totalSize = Some(fileToAccess.length()))
+      import Ranges._
+
+      httpResponse.addHeaders(Ranges.acceptRangesHeader(fileToAccess.length()))
       httpResponse.setStatus(StatusCode.Ok)
     } else {
       httpResponse.setStatus(StatusCode.NotFound)
@@ -46,31 +49,22 @@ trait FilesystemCRUD extends CRUDMethods {
 
   override def get(
     attachmentInformation : AttachmentInformation,
-    rangOpt               : Option[HttpRange])(implicit
+    httpRanges            : Ranges)(implicit
     httpRequest           : Request,
     httpResponse          : Response
   ): Unit = withFile(attachmentInformation, httpRequest, httpResponse) { fileToRead =>
-    val fileInputStream = new FileInputStream(fileToRead)
-    val outputStream = httpResponse.getOutputStream
+    httpRanges.streamedFile(fileToRead, new FileInputStream(fileToRead)) match {
+      case Success(streamedFile) =>
+        import Ranges._
 
-    // Single HTTP range processing
-    val fileSize    = fileToRead.length()
-    val start       = rangOpt.map(_.start).getOrElse(0L)
-    val end         = rangOpt.flatMap(_.end).map(_ + 1).getOrElse(fileSize)
-    val bytesToCopy = end - start
+        IOUtils.copyStreamAndClose(streamedFile.inputStream, httpResponse.getOutputStream)
 
-    // Seek and copy just what we need
-    fileInputStream.skip(start)
-    IOUtils.partiallyCopyStreamAndClose(fileInputStream, outputStream, bytesToCopy)
+        httpResponse.addHeaders(streamedFile.headers)
+        httpResponse.setStatus(streamedFile.statusCode)
 
-    rangOpt match {
-      case Some(_) =>
-        Ranges.respondWithContentRangeHeader(httpResponse, start, end, fileSize)
-        httpResponse.setStatus(StatusCode.PartialContent)
-
-      case None =>
-        Ranges.respondWithAcceptRangesHeader(httpResponse, totalSize = None)
-        httpResponse.setStatus(StatusCode.Ok)
+      case Failure(throwable) =>
+        logger.error(throwable)(s"Error while processing request ${httpRequest.getRequestPath}")
+        httpResponse.setStatus(StatusCode.InternalServerError)
     }
   }
 

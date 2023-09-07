@@ -15,11 +15,11 @@ package org.orbeon.oxf.fr.persistence.attachments
 
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
-import org.orbeon.oxf.http.{Range => HttpRange}
+import org.orbeon.oxf.http.Ranges
 
 trait CRUDMethods {
-  def head  (attachmentInformation: AttachmentInformation, rangOpt: Option[HttpRange])(implicit httpRequest: Request, httpResponse: Response): Unit
-  def get   (attachmentInformation: AttachmentInformation, rangOpt: Option[HttpRange])(implicit httpRequest: Request, httpResponse: Response): Unit
-  def put   (attachmentInformation: AttachmentInformation                             )(implicit httpRequest: Request, httpResponse: Response): Unit
-  def delete(attachmentInformation: AttachmentInformation                             )(implicit httpRequest: Request, httpResponse: Response): Unit
+  def head  (attachmentInformation: AttachmentInformation, httpRanges: Ranges)(implicit httpRequest: Request, httpResponse: Response): Unit
+  def get   (attachmentInformation: AttachmentInformation, httpRanges: Ranges)(implicit httpRequest: Request, httpResponse: Response): Unit
+  def put   (attachmentInformation: AttachmentInformation                    )(implicit httpRequest: Request, httpResponse: Response): Unit
+  def delete(attachmentInformation: AttachmentInformation                    )(implicit httpRequest: Request, httpResponse: Response): Unit
 }

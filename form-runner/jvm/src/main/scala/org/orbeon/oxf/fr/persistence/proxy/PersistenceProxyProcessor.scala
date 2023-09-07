@@ -717,8 +717,11 @@ private[persistence] object PersistenceProxyProcessor {
 
       request.getMethod match {
         case HttpMethod.GET | HttpMethod.HEAD if connectionResult.statusCode == StatusCode.Ok =>
-          // Forward HTTP range headers/status to client
-          attachmentsProviderCxrOpt.foreach(Ranges.forwardRangeHeadersAndStatus(_, response))
+          // Forward HTTP range headers and status to client
+          attachmentsProviderCxrOpt.foreach { attachmentsProviderCxr =>
+            Ranges.forwardRangeHeaders(attachmentsProviderCxr, response)
+            response.setStatus(attachmentsProviderCxr.statusCode)
+          }
 
         case _ =>
       }

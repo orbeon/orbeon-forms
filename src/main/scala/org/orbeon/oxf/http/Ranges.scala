@@ -1,35 +1,72 @@
 package org.orbeon.oxf.http
 
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalResponse}
-import org.orbeon.oxf.util.{ConnectionResult, TryUtils}
 import org.orbeon.oxf.util.TryUtils._
+import org.orbeon.oxf.util.{ConnectionResult, TryUtils}
 
+import java.io.{ByteArrayOutputStream, File, InputStream}
+import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
-import java.io.ByteArrayOutputStream
 
 case class Ranges(ranges: Seq[Range] = Seq(), ifRange: Option[IfRange] = None) {
   val singleRange: Option[Range] = ranges.headOption
+
+  def streamedFile(file: File, newFileInputStream: => InputStream): Try[StreamedFile] = {
+    val fileLength  = file.length()
+
+    // Only support single range for now
+    singleRange match {
+      case Some(range) =>
+        val outOfBounds = range.start >= fileLength || range.end.exists(_ >= fileLength)
+
+        if (outOfBounds)
+          Failure(new Exception(s"Range ${range.asString} out of bounds (file size: $fileLength)"))
+        else
+          Try(StreamedFile(file, StatusCode.PartialContent, range.headers(fileLength), FileRangeInputStream(file, range)))
+
+      case None =>
+        Try(StreamedFile(file, StatusCode.Ok, Ranges.acceptRangesHeader(fileLength), newFileInputStream))
+    }
+  }
 }
 
-case class Range(start: Long, end: Option[Long])
+// End value is inclusive
+case class Range(start: Long, end: Option[Long]) {
+  def asString: String =
+    s"$start-${end.map(_.toString).getOrElse("")}"
+
+  def effectiveEnd(totalSize: Long): Long =
+    end.getOrElse(totalSize - 1)
+
+  def length(totalSize: Long): Long =
+    effectiveEnd(totalSize) - start + 1
+
+  def contentRangeHeader(totalSize: Long): String =
+    s"bytes $start-${effectiveEnd(totalSize)}/$totalSize"
+
+  def headers(totalSize: Long): Map[String, List[String]] = Map(
+    Headers.ContentRange  -> List(contentRangeHeader(totalSize)),
+    Headers.ContentLength -> List(length(totalSize).toString)
+  )
+}
 
 sealed trait IfRange
 case class IfRangeDate(date: Long)   extends IfRange
 case class IfRangeETag(etag: String) extends IfRange
 
+case class StreamedFile(file: File, statusCode: Int, headers: Map[String, List[String]], inputStream: InputStream)
+
 object Ranges {
   private val Units = "bytes"
 
+  def apply[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Try[Ranges] =
+    for {
+      ranges  <- ranges(headers)
+      ifRange <- ifRange(headers)
+    } yield Ranges(ranges, ifRange)
+
   def apply(request: ExternalContext.Request): Try[Ranges] =
-    request.getFirstHeaderIgnoreCase(Headers.Range) match {
-      case None    => Success(Ranges())
-      case Some(s) =>
-        for {
-          withoutPrefix <- withoutUnitPrefix(s)
-          ranges        <- TryUtils.sequenceLazily(withoutPrefix.split(','))(Range.apply)
-          // TODO: parse ifRange
-        } yield Ranges(ranges, None)
-    }
+    apply(request.getHeaderValuesMap.asScala)
 
   private def withoutUnitPrefix(s: String): Try[String] = {
     // The header must have the following form: bytes=0-1023
@@ -41,68 +78,84 @@ object Ranges {
       Failure(new IllegalArgumentException(s"Invalid range header: $s"))
   }
 
-  def rangeHeadersFromRequest(request: ExternalContext.Request): Seq[(String, List[String])] =
-    for {
+  private def ranges[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Try[Seq[Range]] =
+    Headers.firstItemIgnoreCase(headers, Headers.Range) match {
+      case None    => Success(Seq())
+      case Some(s) =>
+        for {
+          withoutPrefix <- withoutUnitPrefix(s)
+          ranges        <- TryUtils.sequenceLazily(withoutPrefix.split(','))(Range.apply)
+        } yield ranges
+    }
+
+  private def ifRange[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Try[Option[IfRange]] =
+    Headers.firstItemIgnoreCase(headers, Headers.IfRange) match {
+      case None    => Success(None)
+      case Some(s) =>
+        // TODO: parse If-Range header
+        Success(None)
+    }
+
+  def rangeHeadersFromRequest(request: ExternalContext.Request): Map[String, List[String]] =
+    (for {
       header <- Seq(Headers.Range, Headers.IfRange)
       value  <- request.getFirstHeaderIgnoreCase(header)
-    } yield header -> List(value)
+    } yield header -> List(value)).toMap
 
-  def forwardRangeHeadersAndStatus(cxr: ConnectionResult, response: ExternalContext.Response): Unit = {
+  def forwardRangeHeaders(cxr: ConnectionResult, response: ExternalContext.Response): Unit =
     for {
       header <- Seq(Headers.AcceptRanges, Headers.ContentRange)
-      value  <- cxr.getFirstHeaderIgnoreCase(header)
-    } {
-      response.setHeader(header, value)
+      value  <- cxr.getHeaderIgnoreCase(header)
+    } locally {
+      response.addHeader(header, value)
     }
 
-    if (Set(StatusCode.PartialContent, StatusCode.RequestedRangeNotSatisfiable).contains(cxr.statusCode)) {
-      // TODO: check if we want to forward other status codes
-      response.setStatus(cxr.statusCode)
-    }
+  implicit class ResponseOps(response: ExternalContext.Response) {
+    def addHeaders(headers: Map[String, List[String]]): Unit =
+      for {
+        (name, values) <- headers
+        value          <- values
+      } locally {
+        response.addHeader(name, value)
+      }
   }
 
-  def respondWithAcceptRangesHeader(response: ExternalContext.Response, totalSize: Option[Long]): Unit = {
-    response.setHeader(Headers.AcceptRanges, Units)
-    totalSize.foreach(size => response.setHeader(Headers.ContentLength, size.toString))
-  }
+  def acceptRangesHeader(totalSize: Long): Map[String, List[String]] = Map(
+    Headers.AcceptRanges  -> List(Units),
+    Headers.ContentLength -> List(totalSize.toString)
+  )
 
-  def respondWithContentRangeHeader(response: ExternalContext.Response, start: Long, end: Long, totalSize: Long): Unit = {
-    response.setHeader(Headers.ContentRange, s"bytes $start-${end - 1}/$totalSize")
-    response.setHeader(Headers.ContentLength, (end - start).toString)
-  }
-
-  def extractRangeFromHttpResponseIfNeeded(
-    request  : ExternalContext.Request,
-    response : ExternalContext.Response
-  ): Unit = {
+  def extractRangeFromHttpResponseIfNeeded(request: ExternalContext.Request, response: ExternalContext.Response): Unit = {
     val successfulResponse = response match {
       case response: LocalResponse => response.statusCode == StatusCode.Ok
       case _                       => true
     }
 
-    if (successfulResponse) {
-      if (request.getMethod == HttpMethod.HEAD) {
-        respondWithAcceptRangesHeader(response, totalSize = None)
-      } else if (request.getMethod == HttpMethod.GET)
-        for {
-          ranges     <- Ranges(request).toOption
-          range      <- ranges.singleRange
-          baos       <- Option(response.getOutputStream).collect { case baos: ByteArrayOutputStream => baos }
-          bufferSize = baos.size()
-          if bufferSize > 0
-        } locally {
-          val start = range.start.toInt
-          val end   = range.end.map(_.toInt + 1).getOrElse(bufferSize)
+    if (successfulResponse && (request.getMethod == HttpMethod.HEAD || request.getMethod == HttpMethod.GET)) {
+      for {
+        ranges     <- Ranges(request).toOption
+        baos       <- Option(response.getOutputStream).collect { case baos: ByteArrayOutputStream => baos }
+        bufferSize = baos.size()
+        if bufferSize > 0
+      } locally {
+        ranges.singleRange match {
+          case Some(range) if request.getMethod == HttpMethod.GET =>
+            val start = range.start.toInt
+            val end   = range.effectiveEnd(bufferSize).toInt
 
-          val newOutput = baos.toByteArray.slice(start, end)
-          baos.reset()
-          baos.write(newOutput)
+            val newOutput = baos.toByteArray.slice(start, end + 1)
+            baos.reset()
+            baos.write(newOutput)
 
-          respondWithContentRangeHeader(response, start, end, bufferSize)
-          response.setStatus(StatusCode.PartialContent)
+            response.addHeaders(range.headers(bufferSize))
+            response.setStatus(StatusCode.PartialContent)
+
+          case _ =>
+            response.addHeaders(Ranges.acceptRangesHeader(bufferSize))
         }
       }
     }
+  }
 }
 
 object Range {
@@ -115,6 +168,10 @@ object Range {
         for {
           start <- Try(startString.toLong)
           end   <- Try(endString.map(_.toLong))
+          _     <- end match {
+            case Some(end) if end < start => Failure(new IllegalArgumentException(s"Invalid range: $s"))
+            case _                        => Success(())
+          }
         } yield Range(start, end)
       ).onFailure {
         case _: NumberFormatException =>

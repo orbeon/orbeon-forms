@@ -37,10 +37,9 @@ class CRUD extends ProcessorImpl {
 
       Ranges(httpRequest) match {
         case Success(ranges) =>
-          // Only support single HTTP ranges for now
           httpRequest.getMethod match {
-            case HttpMethod.HEAD   => provider.head  (attachmentInformation, ranges.singleRange)
-            case HttpMethod.GET    => provider.get   (attachmentInformation, ranges.singleRange)
+            case HttpMethod.HEAD   => provider.head  (attachmentInformation, ranges)
+            case HttpMethod.GET    => provider.get   (attachmentInformation, ranges)
             case HttpMethod.PUT    => provider.put   (attachmentInformation)
             case HttpMethod.DELETE => provider.delete(attachmentInformation)
             case _                 => httpResponse.setStatus(StatusCode.MethodNotAllowed)
@@ -50,8 +49,6 @@ class CRUD extends ProcessorImpl {
           logger.error(throwable)(s"Error while processing request ${httpRequest.getRequestPath}")
           httpResponse.setStatus(StatusCode.BadRequest)
       }
-
-
     } catch {
       case e: HttpStatusCodeException =>
         httpResponse.setStatus(e.code)

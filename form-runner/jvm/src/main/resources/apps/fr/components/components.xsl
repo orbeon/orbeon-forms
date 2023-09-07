@@ -716,11 +716,17 @@
             xxf:no-updates="{{
                 (:
                     This covers at least: 'email', 'pdf', 'test-pdf', 'tiff', 'controls', 'validate', 'import',
-                    'schema', 'duplicate', 'attachments', 'publish', but also 'new' and 'edit' when
-                    used in background mode, see https://github.com/orbeon/orbeon-forms/issues/3318.
-                    The idea is that all services are non-interactive.
+                    'schema', 'duplicate', 'attachments', 'publish', but also 'new' and 'edit' when used in background
+                    mode, see https://github.com/orbeon/orbeon-forms/issues/3318, as well as exports.
+                    The idea is that all services and exports are non-interactive.
                 :)
-                starts-with(xxf:get-request-path(), '/fr/service/')
+                fr:is-service-path() or
+                fr:mode() = ('pdf', 'tiff') or
+                (: TODO: logic duplicated with `is-export` in `persistence-model.xml` :)
+                matches(
+                    xxf:get-request-path(),
+                    '^/fr/(service/)?([^/]+)/([^/]+)/(excel-export|export)(/([^/]+))?$'
+                )
             }}"
             xxf:external-events="{
                 string-join(
@@ -868,7 +874,7 @@
             <!-- Parameters passed to this page -->
             <!-- NOTE: the `<document>` and `mode` elements may be modified, so we don't set this as read-only -->
             <xf:instance id="fr-parameters-instance" src="input:instance"/>
-            <!-- Internally, at the XForms level, reduce modes so as to avoid checking everywhere for a new mode -->
+            <!-- Internally, at the XForms level, normalize modes so as to avoid checking everywhere for a new mode -->
             <xf:bind
                 ref="instance('fr-parameters-instance')/mode"
                 xxf:default="

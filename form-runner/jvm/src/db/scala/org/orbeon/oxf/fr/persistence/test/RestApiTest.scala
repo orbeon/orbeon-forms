@@ -26,7 +26,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
-import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.http.{HttpRange, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Logging}
@@ -36,7 +36,6 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.ByteArrayInputStream
 import java.nio.file.{Files, Path, Paths}
-import java.util.Comparator
 import scala.util.Random
 
 
@@ -349,10 +348,56 @@ class RestApiTest
           createForm(provider, formName)
 
           for ((size, position) <- Seq(0, 1, 1024, 1024 * 1024).zipWithIndex) {
-            val bytes = new Array[Byte](size) |!> Random.nextBytes |> HttpCall.Binary
-            val dataUrl = HttpCall.crudURLPrefix(provider, formName) + s"data/123/file$position"
-            HttpAssert.put(dataUrl, Specific(1), bytes, StatusCode.Created)
-            HttpAssert.get(dataUrl, Unspecified, HttpAssert.ExpectedBody(bytes, AnyOperation, Some(1)))
+            val bodyArray = new Array[Byte](size) |!> Random.nextBytes
+            val body      = bodyArray |> HttpCall.Binary
+            val url       = HttpCall.crudURLPrefix(provider, formName) + s"data/123/file$position"
+
+            HttpAssert.put(url, Specific(1), body, StatusCode.Created)
+
+            // No range request
+            HttpAssert.get(
+              url       = url,
+              version   = Unspecified,
+              httpRange = None,
+              expected  = HttpAssert.ExpectedBody(
+                body        = body,
+                operations  = AnyOperation,
+                formVersion = Some(1),
+                statusCode  = StatusCode.Ok
+              )
+            )
+
+            if (size > 2) {
+              // Fully-defined range request
+              HttpAssert.get(
+                url       = url,
+                version   = Unspecified,
+                httpRange = Some(HttpRange(0, Some(1))),
+                expected  = HttpAssert.ExpectedBody(
+                  body               = HttpCall.Binary(bodyArray.slice(0, 2)),
+                  operations         = AnyOperation,
+                  formVersion        = Some(1),
+                  contentRangeHeader = Some(s"bytes 0-1/$size"),
+                  statusCode         = StatusCode.PartialContent
+                )
+              )
+            }
+
+            if (size > 128) {
+              // Range request with only start offset
+              HttpAssert.get(
+                url       = url,
+                version   = Unspecified,
+                httpRange = Some(HttpRange(128, None)),
+                expected  = HttpAssert.ExpectedBody(
+                  body               = HttpCall.Binary(bodyArray.drop(128)),
+                  operations         = AnyOperation,
+                  formVersion        = Some(1),
+                  contentRangeHeader = Some(s"bytes 128-${size-1}/$size"),
+                  statusCode         = StatusCode.PartialContent
+                )
+              )
+            }
           }
 
           postTest(appForm, formOrData)
@@ -402,7 +447,7 @@ class RestApiTest
         // Delete the base directory only if it was created by the test
         directoryToCleanAfterTest.foreach { directory =>
           // Delete all sub-directories and files in reverse order, so that children are deleted before parents
-          Files.walk(directory).sorted(java.util.Comparator.reverseOrder()).forEach(Files.delete)
+          Files.walk(directory).sorted(java.util.Comparator.reverseOrder()).forEach(Files.delete(_))
         }
       }
     }

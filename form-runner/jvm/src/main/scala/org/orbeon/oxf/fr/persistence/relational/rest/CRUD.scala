@@ -22,8 +22,8 @@ import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
 
 import java.time.Instant
 import scala.util.{Failure, Success}
@@ -48,7 +48,7 @@ class CRUD
 
       val requestPath  = httpRequest.getRequestPath
 
-      Ranges(httpRequest) match {
+      HttpRanges(httpRequest) match {
         case Success(ranges) =>
           httpRequest.getMethod match {
             case HttpMethod.GET | HttpMethod.HEAD => getOrHead(getCrudRequest      (requestPath), httpRequest.getMethod, ranges)

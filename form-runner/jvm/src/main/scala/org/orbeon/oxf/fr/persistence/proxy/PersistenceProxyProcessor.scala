@@ -716,10 +716,10 @@ private[persistence] object PersistenceProxyProcessor {
       proxyCapitalizeAndCombineHeaders(connectionResult.headers, request = false) foreach (response.setHeader _).tupled
 
       request.getMethod match {
-        case HttpMethod.GET | HttpMethod.HEAD if connectionResult.statusCode == StatusCode.Ok =>
+        case HttpMethod.GET | HttpMethod.HEAD if StatusCode.isSuccessCode(connectionResult.statusCode) =>
           // Forward HTTP range headers and status to client
           attachmentsProviderCxrOpt.foreach { attachmentsProviderCxr =>
-            Ranges.forwardRangeHeaders(attachmentsProviderCxr, response)
+            HttpRanges.forwardRangeHeaders(attachmentsProviderCxr, response)
             response.setStatus(attachmentsProviderCxr.statusCode)
           }
 
@@ -752,8 +752,8 @@ private[persistence] object PersistenceProxyProcessor {
 
       // If an attachments provider is available, always use it to retrieve the actual attachment
       val inputStream = attachmentsProviderCxrOpt match {
-        case Some(attachmentsProviderCxr) if request.getMethod           == HttpMethod.GET &&
-                                             connectionResult.statusCode == HttpStatus.SC_OK =>
+        case Some(attachmentsProviderCxr) if request.getMethod == HttpMethod.GET &&
+                                             StatusCode.isSuccessCode(connectionResult.statusCode) =>
           attachmentsProviderCxr.content.inputStream
 
         case _ =>

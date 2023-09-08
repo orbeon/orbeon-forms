@@ -421,7 +421,7 @@ object Connection extends ConnectionTrait {
             // Take care of HTTP ranges with local files
             val (statusCode, rangeHeaders, inputStream) =
               if (url.getProtocol == "file") {
-                val streamedFile = Ranges(headers).get.streamedFile(new File(url.toURI), urlConnection.getInputStream).get
+                val streamedFile = HttpRanges(headers).get.streamedFile(new File(url.toURI), urlConnection.getInputStream).get
                 (streamedFile.statusCode, streamedFile.headers, streamedFile.inputStream)
               } else {
                 (StatusCode.Ok,           Map(),                urlConnection.getInputStream)

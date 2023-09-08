@@ -1,20 +1,21 @@
 package org.orbeon.oxf.http
 
-import org.orbeon.oxf.externalcontext.{ExternalContext, LocalResponse}
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util.{ConnectionResult, TryUtils}
 
-import java.io.{ByteArrayOutputStream, File, InputStream}
+import java.io.{File, InputStream}
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
-case class Ranges(ranges: Seq[Range] = Seq(), ifRange: Option[IfRange] = None) {
-  val singleRange: Option[Range] = ranges.headOption
+// ifRange is not supported yet (implement ifRange method if needed)
+case class HttpRanges(ranges: Seq[HttpRange] = Seq(), ifRange: Option[IfRange] = None) {
+  val singleRange: Option[HttpRange] = ranges.headOption
 
   def streamedFile(file: File, newFileInputStream: => InputStream): Try[StreamedFile] = {
     val fileLength  = file.length()
 
-    // Only support single range for now
+    // Only support single ranges for now (browsers don't seem to send requests for multiple ranges)
     singleRange match {
       case Some(range) =>
         val outOfBounds = range.start >= fileLength || range.end.exists(_ >= fileLength)
@@ -22,16 +23,16 @@ case class Ranges(ranges: Seq[Range] = Seq(), ifRange: Option[IfRange] = None) {
         if (outOfBounds)
           Failure(new Exception(s"Range ${range.asString} out of bounds (file size: $fileLength)"))
         else
-          Try(StreamedFile(file, StatusCode.PartialContent, range.headers(fileLength), FileRangeInputStream(file, range)))
+          Try(StreamedFile(file, StatusCode.PartialContent, range.responseHeaders(fileLength), FileRangeInputStream(file, range)))
 
       case None =>
-        Try(StreamedFile(file, StatusCode.Ok, Ranges.acceptRangesHeader(fileLength), newFileInputStream))
+        Try(StreamedFile(file, StatusCode.Ok, HttpRanges.acceptRangesHeader(fileLength), newFileInputStream))
     }
   }
 }
 
 // End value is inclusive
-case class Range(start: Long, end: Option[Long]) {
+case class HttpRange(start: Long, end: Option[Long]) {
   def asString: String =
     s"$start-${end.map(_.toString).getOrElse("")}"
 
@@ -41,13 +42,19 @@ case class Range(start: Long, end: Option[Long]) {
   def length(totalSize: Long): Long =
     effectiveEnd(totalSize) - start + 1
 
-  def contentRangeHeader(totalSize: Long): String =
+  def contentRangeHeaderValue(totalSize: Long): String =
     s"bytes $start-${effectiveEnd(totalSize)}/$totalSize"
 
-  def headers(totalSize: Long): Map[String, List[String]] = Map(
-    Headers.ContentRange  -> List(contentRangeHeader(totalSize)),
+  def responseHeaders(totalSize: Long): Map[String, List[String]] = Map(
+    Headers.ContentRange  -> List(contentRangeHeaderValue(totalSize)),
     Headers.ContentLength -> List(length(totalSize).toString)
   )
+
+  def rangeHeaderValue: String =
+    s"bytes=$asString"
+
+  def requestHeaders: Map[String, List[String]] =
+    Map(Headers.Range -> List(rangeHeaderValue))
 }
 
 sealed trait IfRange
@@ -56,16 +63,16 @@ case class IfRangeETag(etag: String) extends IfRange
 
 case class StreamedFile(file: File, statusCode: Int, headers: Map[String, List[String]], inputStream: InputStream)
 
-object Ranges {
+object HttpRanges {
   private val Units = "bytes"
 
-  def apply[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Try[Ranges] =
+  def apply[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Try[HttpRanges] =
     for {
       ranges  <- ranges(headers)
       ifRange <- ifRange(headers)
-    } yield Ranges(ranges, ifRange)
+    } yield HttpRanges(ranges, ifRange)
 
-  def apply(request: ExternalContext.Request): Try[Ranges] =
+  def apply(request: ExternalContext.Request): Try[HttpRanges] =
     apply(request.getHeaderValuesMap.asScala)
 
   private def withoutUnitPrefix(s: String): Try[String] = {
@@ -78,13 +85,13 @@ object Ranges {
       Failure(new IllegalArgumentException(s"Invalid range header: $s"))
   }
 
-  private def ranges[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Try[Seq[Range]] =
+  private def ranges[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Try[Seq[HttpRange]] =
     Headers.firstItemIgnoreCase(headers, Headers.Range) match {
       case None    => Success(Seq())
       case Some(s) =>
         for {
           withoutPrefix <- withoutUnitPrefix(s)
-          ranges        <- TryUtils.sequenceLazily(withoutPrefix.split(','))(Range.apply)
+          ranges        <- TryUtils.sequenceLazily(withoutPrefix.split(','))(HttpRange.apply)
         } yield ranges
     }
 
@@ -110,60 +117,18 @@ object Ranges {
       response.addHeader(header, value)
     }
 
-  implicit class ResponseOps(response: ExternalContext.Response) {
-    def addHeaders(headers: Map[String, List[String]]): Unit =
-      for {
-        (name, values) <- headers
-        value          <- values
-      } locally {
-        response.addHeader(name, value)
-      }
-  }
-
   def acceptRangesHeader(totalSize: Long): Map[String, List[String]] = Map(
     Headers.AcceptRanges  -> List(Units),
     Headers.ContentLength -> List(totalSize.toString)
   )
-
-  def extractRangeFromHttpResponseIfNeeded(request: ExternalContext.Request, response: ExternalContext.Response): Unit = {
-    val successfulResponse = response match {
-      case response: LocalResponse => response.statusCode == StatusCode.Ok
-      case _                       => true
-    }
-
-    if (successfulResponse && (request.getMethod == HttpMethod.HEAD || request.getMethod == HttpMethod.GET)) {
-      for {
-        ranges     <- Ranges(request).toOption
-        baos       <- Option(response.getOutputStream).collect { case baos: ByteArrayOutputStream => baos }
-        bufferSize = baos.size()
-        if bufferSize > 0
-      } locally {
-        ranges.singleRange match {
-          case Some(range) if request.getMethod == HttpMethod.GET =>
-            val start = range.start.toInt
-            val end   = range.effectiveEnd(bufferSize).toInt
-
-            val newOutput = baos.toByteArray.slice(start, end + 1)
-            baos.reset()
-            baos.write(newOutput)
-
-            response.addHeaders(range.headers(bufferSize))
-            response.setStatus(StatusCode.PartialContent)
-
-          case _ =>
-            response.addHeaders(Ranges.acceptRangesHeader(bufferSize))
-        }
-      }
-    }
-  }
 }
 
-object Range {
-  def apply(s: String): Try[Range] = {
+object HttpRange {
+  def apply(s: String): Try[HttpRange] = {
     val trimmed = s.trim
     val parts   = trimmed.split('-').map(_.trim)
 
-    def range(startString: String, endString: Option[String]): Try[Range] =
+    def httpRange(startString: String, endString: Option[String]): Try[HttpRange] =
       (
         for {
           start <- Try(startString.toLong)
@@ -172,7 +137,7 @@ object Range {
             case Some(end) if end < start => Failure(new IllegalArgumentException(s"Invalid range: $s"))
             case _                        => Success(())
           }
-        } yield Range(start, end)
+        } yield HttpRange(start, end)
       ).onFailure {
         case _: NumberFormatException =>
           // Rewrite exception message ("For input string") to something more meaningful
@@ -180,9 +145,9 @@ object Range {
       }
 
     if (parts.length == 2 && ! trimmed.endsWith("-"))
-      range(parts(0), Some(parts(1)))
+      httpRange(parts(0), Some(parts(1)))
     else if (parts.length == 1 && trimmed.endsWith("-"))
-      range(parts(0), None)
+      httpRange(parts(0), None)
     else
       Failure(new IllegalArgumentException(s"Invalid range: $s"))
   }

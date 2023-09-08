@@ -2,10 +2,10 @@ package org.orbeon.oxf.http
 
 import java.io.{File, FileInputStream, IOException, InputStream}
 
-case class FileRangeInputStream(file: File, range: Range) extends InputStream {
+case class FileRangeInputStream(file: File, httpRange: HttpRange) extends InputStream {
   private val fis            = new FileInputStream(file)
-  private val start: Long    = range.start
-  private val end: Long      = range.end.map(_ + 1).getOrElse(file.length()) // End is exclusive
+  private val start: Long    = httpRange.start
+  private val end: Long      = httpRange.end.map(_ + 1).getOrElse(file.length()) // End is exclusive
   private var position: Long = fis.skip(start)
 
   assert(position == start, s"Initial skip failed: $position != $start")

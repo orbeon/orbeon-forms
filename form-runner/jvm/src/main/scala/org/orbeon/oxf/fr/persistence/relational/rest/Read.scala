@@ -31,7 +31,7 @@ import java.sql.Timestamp
 
 trait Read {
 
-  def getOrHead(req: CrudRequest, method: HttpMethod, ranges: Ranges)(implicit httpResponse: ExternalContext.Response): Unit = {
+  def getOrHead(req: CrudRequest, method: HttpMethod, ranges: HttpRanges)(implicit httpResponse: ExternalContext.Response): Unit = {
 
     RelationalUtils.withConnection { connection =>
 
@@ -211,11 +211,11 @@ trait Read {
         for {
           range                <- ranges.singleRange
           totalFileContentSize <- fromDatabase.totalFileContentSize
+          // Check that the file is stored into the database (and not e.g. in the filesystem)
+          if totalFileContentSize > 0
         } locally {
-          import Ranges._
-
           // Set HTTP range headers and status
-          httpResponse.addHeaders(range.headers(totalFileContentSize))
+          httpResponse.addHeaders(range.responseHeaders(totalFileContentSize))
           httpResponse.setStatus(StatusCode.PartialContent)
         }
 

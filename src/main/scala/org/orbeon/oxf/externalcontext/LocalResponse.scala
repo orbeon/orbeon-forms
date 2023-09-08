@@ -58,7 +58,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
           new ByteArrayInputStream(bytes, 0, bytes.length)
         } else if (_byteStream ne null) {
           new ByteArrayInputStream(_byteStream.getByteArray, 0, _byteStream.size)
-        }  else {
+        } else {
           EmptyInputStream
         }
     }

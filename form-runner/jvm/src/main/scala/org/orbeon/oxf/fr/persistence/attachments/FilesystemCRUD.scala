@@ -18,7 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
 import org.orbeon.oxf.fr.{AppForm, FormOrData, FormRunnerPersistence}
-import org.orbeon.oxf.http.{Ranges, StatusCode}
+import org.orbeon.oxf.http.{HttpRanges, StatusCode}
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary
 import org.orbeon.oxf.util.{LoggerFactory, XPathCache}
 import org.orbeon.saxon.function.{EnvironmentVariable, EnvironmentVariableAlwaysEnabled}
@@ -33,14 +33,12 @@ trait FilesystemCRUD extends CRUDMethods {
 
   override def head(
     attachmentInformation : AttachmentInformation,
-    httpRanges            : Ranges)(implicit
+    httpRanges            : HttpRanges)(implicit
     httpRequest           : Request,
     httpResponse          : Response
   ): Unit = withFile(attachmentInformation, httpRequest, httpResponse) { fileToAccess =>
     if (fileToAccess.exists()) {
-      import Ranges._
-
-      httpResponse.addHeaders(Ranges.acceptRangesHeader(fileToAccess.length()))
+      httpResponse.addHeaders(HttpRanges.acceptRangesHeader(fileToAccess.length()))
       httpResponse.setStatus(StatusCode.Ok)
     } else {
       httpResponse.setStatus(StatusCode.NotFound)
@@ -49,14 +47,12 @@ trait FilesystemCRUD extends CRUDMethods {
 
   override def get(
     attachmentInformation : AttachmentInformation,
-    httpRanges            : Ranges)(implicit
+    httpRanges            : HttpRanges)(implicit
     httpRequest           : Request,
     httpResponse          : Response
   ): Unit = withFile(attachmentInformation, httpRequest, httpResponse) { fileToRead =>
     httpRanges.streamedFile(fileToRead, new FileInputStream(fileToRead)) match {
       case Success(streamedFile) =>
-        import Ranges._
-
         IOUtils.copyStreamAndClose(streamedFile.inputStream, httpResponse.getOutputStream)
 
         httpResponse.addHeaders(streamedFile.headers)

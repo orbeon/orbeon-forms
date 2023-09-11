@@ -76,7 +76,7 @@ object Session {
             sessionMessage <- sessionMessageFromJson(event.data.asInstanceOf[String])
             configuration <- configurationOpt
             if sessionMessage.sessionId == configuration.sessionId
-          } {
+          } locally {
             sessionMessage match {
               case SessionActivity(_, localNewestEventTime) => sessionActivity(configuration, local = false, localNewestEventTime)
               case SessionLogout(_) => sessionLogout(configuration, local = false)

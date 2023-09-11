@@ -1141,9 +1141,11 @@
             value="xxf:property(string-join(('oxf.fr.detail.session-expiration-dialog.enabled', fr:app-name(), fr:form-name()), '.'))"/>
 
         <!-- Session about to expire or expired dialog -->
+        <!-- Do not use `fade` class in this modal, as it will prevent the dialog from being hidden when the page/tab is not visible.
+             See: https://stackoverflow.com/questions/23677765/bootstrap-modal-hide-is-not-working -->
         <xh:div
             class="
-                fr-session-expiration-dialog modal hide fade
+                fr-session-expiration-dialog modal hide
                 fr-feature-{{ if ($session-expiration-dialog-enabled) then 'enabled' else 'disabled' }}"
             tabindex="-1" role="dialog" aria-hidden="true">
 

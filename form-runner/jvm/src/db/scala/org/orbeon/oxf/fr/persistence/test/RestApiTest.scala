@@ -398,6 +398,38 @@ class RestApiTest
                 )
               )
             }
+
+            if (size > 32770) {
+              // Large range (1)
+              HttpAssert.get(
+                url = url,
+                version = Unspecified,
+                httpRange = Some(HttpRange(1, Some(32770))),
+                expected = HttpAssert.ExpectedBody(
+                  body = HttpCall.Binary(bodyArray.slice(1, 32771)),
+                  operations = AnyOperation,
+                  formVersion = Some(1),
+                  contentRangeHeader = Some(s"bytes 1-32770/$size"),
+                  statusCode = StatusCode.PartialContent
+                )
+              )
+            }
+
+            if (size > 65538) {
+              // Large range (2)
+              HttpAssert.get(
+                url = url,
+                version = Unspecified,
+                httpRange = Some(HttpRange(1, Some(65540))),
+                expected = HttpAssert.ExpectedBody(
+                  body = HttpCall.Binary(bodyArray.slice(1, 65541)),
+                  operations = AnyOperation,
+                  formVersion = Some(1),
+                  contentRangeHeader = Some(s"bytes 1-65540/$size"),
+                  statusCode = StatusCode.PartialContent
+                )
+              )
+            }
           }
 
           postTest(appForm, formOrData)

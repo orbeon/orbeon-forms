@@ -44,13 +44,14 @@ private[persistence] object HttpCall {
   case class Binary(file: Array[Byte]) extends Body
 
   case class SolicitedRequest(
-    path        : String,
-    method      : HttpMethod,
-    version     : Version             = Unspecified,
-    stage       : Option[Stage]       = None,
-    body        : Option[Body]        = None,
-    credentials : Option[Credentials] = None,
-    timeout     : Option[Int]         = None
+    path              : String,
+    method            : HttpMethod,
+    version           : Version                      = Unspecified,
+    stage             : Option[Stage]                = None,
+    body              : Option[Body]                 = None,
+    credentials       : Option[Credentials]          = None,
+    timeout           : Option[Int]                  = None,
+    xmlResponseFilter : Option[Document => Document] = None
   )
 
   case class ExpectedResponse(
@@ -101,14 +102,22 @@ private[persistence] object HttpCall {
           IOUtils.copyStreamAndClose(actualResponse.content.inputStream, outputStream)
           outputStream.toByteArray
         }
+
         expectedBody match {
-          case HttpCall.XML(expectedDoc) =>
-            val resultDoc  = IOSupport.readOrbeonDom(new ByteArrayInputStream(actualBody))
+          case HttpCall.XML(originalExpectedDoc) =>
+            val originalResultDoc  = IOSupport.readOrbeonDom(new ByteArrayInputStream(actualBody))
+
+            val (resultDoc, expectedDoc) = actualRequest.xmlResponseFilter match {
+              case None         => (       originalResultDoc,         originalExpectedDoc)
+              case Some(filter) => (filter(originalResultDoc), filter(originalExpectedDoc))
+            }
+
             if (! Comparator.compareDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc))
               assert(
                 resultDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===
                   expectedDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat)
               )
+
           case HttpCall.Binary(expectedFile) =>
             assert(actualBody == expectedFile)
         }

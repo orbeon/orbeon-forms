@@ -56,7 +56,7 @@ object columnFilterPart {
                   case FilterType.None              => List.empty
                   case FilterType.Exact(filter)     => path :: List(Provider.textEqualsParam  (request.provider, filter))
                   case FilterType.Substring(filter) => path :: List(Provider.textContainsParam(request.provider, filter))
-                  case FilterType.Token(tokens)     => path :: tokens.map(token => s"% $token %")
+                  case FilterType.Token(tokens)     => path :: tokens.map(token => Provider.textContainsParam(request.provider, s" $token "))
                 }
               }
             values.map(value => (_.setString(_, value)): Setter)

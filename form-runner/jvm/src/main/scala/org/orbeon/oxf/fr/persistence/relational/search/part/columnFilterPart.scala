@@ -43,7 +43,7 @@ object columnFilterPart {
                     case FilterType.Substring(_)      => List("AND " + Provider.textContains(request.provider, s"tf$i.val"))
                     case FilterType.Token    (tokens) =>
                       tokens.map { _ =>
-                        "AND " + Provider.textContains(request.provider, s"concat(' ', tf$i.val, ' ')")
+                        "AND " + Provider.textContains(request.provider, Provider.concat(request.provider, "' '", s"tf$i.val", "' '"))
                       }
                   }
                 dataControlWhere :: valueWhere

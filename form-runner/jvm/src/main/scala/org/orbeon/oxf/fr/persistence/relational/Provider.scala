@@ -298,6 +298,25 @@ object Provider extends Enum[Provider] {
       case _      => None
     }
 
+  def concat(provider: Provider, args: String*): String =
+    provider match {
+      case DB2 =>
+        // DB2's concat takes 2 arguments only
+        def db2Concat(remainingArgs: List[String]): String = {
+          // Make this method readable rather than tail recursive
+          remainingArgs match {
+            case Nil          => "''"
+            case head :: Nil  => head
+            case head :: tail => s"concat($head, ${db2Concat(tail)})"
+          }
+        }
+
+        db2Concat(args.toList)
+
+      case _ =>
+        s"concat(${args.mkString(", ")})"
+    }
+
   def partialBinary(provider: Provider, columnName: String, alias: String, offset: Long, length: Option[Long]): String =
     provider match {
       case Oracle    => ???
@@ -307,7 +326,6 @@ object Provider extends Enum[Provider] {
 
   def binarySize(provider: Provider, columnName: String, alias: String): String =
     provider match {
-      case Oracle    => ???
       case SQLServer => s"datalength($columnName) as $alias"
       case _         => s"length($columnName) as $alias"
     }

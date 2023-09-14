@@ -6,7 +6,7 @@
     <property
         as="xs:boolean"
         name="oxf.xforms.replication"
-        value="true"/>
+        value="false"/>
 
     <property
         as="xs:anyURI"

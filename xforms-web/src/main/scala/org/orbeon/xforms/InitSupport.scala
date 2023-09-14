@@ -31,7 +31,6 @@ import org.orbeon.xforms.StateHandling.StateResult
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.Initializations
 import org.scalajs.dom
-import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 

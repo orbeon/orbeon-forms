@@ -73,12 +73,12 @@ object Provider extends Enum[Provider] {
       case PostgreSQL => "xml::text ilike ?"
     }
 
-  private def paramForLike(param: String): String = {
+  private def paramForLike(param: String, surroundingPercents: Boolean): String = {
     val escapedParam =
       param.replace("\\", "\\\\")
            .replace("%" , "\\%" )
            .replace("_" , "\\_" )
-     s"%$escapedParam%"
+     if (surroundingPercents) s"%$escapedParam%" else escapedParam
   }
 
   def xmlContainsParam(provider: Provider, param: String): String =
@@ -92,19 +92,27 @@ object Provider extends Enum[Provider] {
       case MySQL =>
         // LIKE is case insensitive on MySQL and SQL Server
         s"$colName LIKE ?"
+      case SQLServer =>
+        s"$colName LIKE ? ESCAPE '\\'"
       case PostgreSQL =>
         // PostgreSQL has ILIKE as a case insensitive version of LIKE
         s"$colName ILIKE ?"
     }
 
   def textContainsParam(provider: Provider, param: String): String =
-    paramForLike(param)
+    paramForLike(param, surroundingPercents = true)
 
   def textEquals(provider: Provider, colName: String): String =
-    s"$colName = ?"
+    provider match {
+      // SQL Server doesn't support the `=` operator on `ntext`
+      // Oracle requires `LIKE` to avoid "ORA-00932: inconsistent datatypes: expected - got CLOB"
+      case _         => s"$colName =    ?"
+    }
 
   def textEqualsParam(provider: Provider, param: String): String =
-    param
+    provider match {
+      case _                  => param
+    }
 
   def readXmlColumn(
     provider              : Provider,

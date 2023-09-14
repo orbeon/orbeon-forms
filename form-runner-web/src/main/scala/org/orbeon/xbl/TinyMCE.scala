@@ -20,6 +20,7 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.orbeon.polyfills.HTMLPolyfills._
 
 import scala.concurrent.Promise
 import scala.scalajs.js
@@ -106,10 +107,13 @@ object TinyMCE {
     // Send value in MCE to server
     private def clientToServer(): Unit =
       tinyMceObjectOpt foreach { tinyMceObject =>
-        val rawContent = tinyMceObject.getContent()
-        // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
-        val cleanedContent = if (rawContent == "<div>\u00a0</div>") "" else rawContent
-        DocumentAPI.setValue(containerElem, cleanedContent)
+        // https://github.com/orbeon/orbeon-forms/issues/5963
+        if (containerElem.closest("form").isDefined) {
+          val rawContent = tinyMceObject.getContent()
+          // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
+          val cleanedContent = if (rawContent == "<div>\u00a0</div>") "" else rawContent
+          DocumentAPI.setValue(containerElem, cleanedContent)
+        }
       }
 
     // TinyMCE got the focus

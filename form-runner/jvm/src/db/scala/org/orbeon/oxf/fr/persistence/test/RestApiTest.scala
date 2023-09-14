@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider.{DB2, MySQL, Oracle, PostgreSQL, SQLServer}
+import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.fr.{AppForm, FormOrData}

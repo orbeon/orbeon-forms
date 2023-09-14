@@ -15,7 +15,7 @@ class FormRunnerClientTest extends AsyncFunSpec with ClientTestSupport {
 
   describe("Form Runner client tests") {
     it("must find form controls by name") {
-      withRunTomcatContainer("Tomcat", ServerExternalPort, checkImageRunning = true, network = None) {
+      withRunTomcatContainer("FormRunnerTomcat", ServerExternalPort, checkImageRunning = true, network = None) {
         async {
           val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
           assert(sessionCookie.isSuccess)

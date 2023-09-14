@@ -97,13 +97,12 @@ trait ClientTestSupport {
   implicit override def executionContext: scala.concurrent.ExecutionContext =
     org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
-  def runTomcatContainer(containerName: String, port: Int, checkImageRunning: Boolean): Future[Try[List[String]]] =
+  def runTomcatContainer(containerName: String, port: Int, checkImageRunning: Boolean, network: Option[String]): Future[Try[List[String]]] =
     runContainer(
       TomcatImageName,
       s"""
         |--name $containerName
-        |--network=$OrbeonDockerNetwork
-        |-it
+        |${network.map(n => s"--network=$n ").getOrElse("")}-it
         |-v $$BASE_DIRECTORY/orbeon-war/jvm/target/webapp:$ImageTomcatDir/webapps/orbeon:delegated
         |-v $$HOME/.orbeon/license.xml:/root/.orbeon/license.xml:delegated
         |-v $$BASE_DIRECTORY/orbeon-war/js/src/test/resources/tomcat/orbeon.xml:$ImageTomcatDir/webapps/orbeon/META-INF/context.xml:delegated
@@ -114,8 +113,8 @@ trait ClientTestSupport {
       checkImageRunning
     )
 
-  def withRunTomcatContainer[T](containerName: String, port: Int, checkImageRunning: Boolean)(block: => Future[T]): Future[T] = async {
-    val r = await(runTomcatContainer(containerName, port, checkImageRunning))
+  def withRunTomcatContainer[T](containerName: String, port: Int, checkImageRunning: Boolean, network: Option[String])(block: => Future[T]): Future[T] = async {
+    val r = await(runTomcatContainer(containerName, port, checkImageRunning, network))
     assert(r.isSuccess)
     val result = await(block)
     await(removeContainerByImage(TomcatImageName))

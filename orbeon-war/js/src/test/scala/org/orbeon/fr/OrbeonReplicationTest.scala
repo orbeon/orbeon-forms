@@ -105,7 +105,7 @@ class OrbeonReplicationTest extends AsyncFunSpec with ClientTestSupport {
                 locally {
                   // Start image A
                   val tryContainerIdA =
-                    await(runTomcatContainer("TomcatA", Server1ExternalPort, checkImageRunning = true))
+                    await(runTomcatContainer("TomcatA", Server1ExternalPort, checkImageRunning = true, network = OrbeonDockerNetwork.some))
 
                   assert(tryContainerIdA.isSuccess)
 
@@ -128,7 +128,7 @@ class OrbeonReplicationTest extends AsyncFunSpec with ClientTestSupport {
                 locally {
                   // Start image B
                   val tryContainerIdB =
-                    await(runTomcatContainer("TomcatB", Server2ExternalPort, checkImageRunning = false))
+                    await(runTomcatContainer("TomcatB", Server2ExternalPort, checkImageRunning = false, network = OrbeonDockerNetwork.some))
 
                   assert(tryContainerIdB.isSuccess)
                   val containerIdB = tryContainerIdB.get.head
@@ -155,7 +155,7 @@ class OrbeonReplicationTest extends AsyncFunSpec with ClientTestSupport {
               await(updateWindowsAndAssert(List(windowA, windowB), 3))
 
               // Start image A again
-              await(runTomcatContainer("TomcatA", Server1ExternalPort, checkImageRunning = false))
+              await(runTomcatContainer("TomcatA", Server1ExternalPort, checkImageRunning = false, network = OrbeonDockerNetwork.some))
               assert(await(waitForServerCookie("s1".some, OrbeonHAProxyUrl)).isSuccess)
 
               // Update windows

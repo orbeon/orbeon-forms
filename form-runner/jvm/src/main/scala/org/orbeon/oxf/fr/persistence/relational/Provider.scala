@@ -95,12 +95,6 @@ object Provider extends Enum[Provider] {
       case PostgreSQL =>
         // PostgreSQL has ILIKE as a case insensitive version of LIKE
         s"$colName ILIKE ?"
-      case DB2 =>
-        // Oracle and DB2 require us to use a lower(), which could kill performance if
-        // have lots of data, and call for us adding a separate column with the lowercase val
-        s"lower($colName) LIKE ? ESCAPE '\\'"
-      case Oracle =>
-        s"lower($colName) LIKE ?"
     }
 
   def textContainsParam(provider: Provider, param: String): String =
@@ -306,33 +300,17 @@ object Provider extends Enum[Provider] {
 
   def concat(provider: Provider, args: String*): String =
     provider match {
-      case DB2 =>
-        // DB2's concat takes 2 arguments only
-        def db2Concat(remainingArgs: List[String]): String = {
-          // Make this method readable rather than tail recursive
-          remainingArgs match {
-            case Nil          => "''"
-            case head :: Nil  => head
-            case head :: tail => s"concat($head, ${db2Concat(tail)})"
-          }
-        }
-
-        db2Concat(args.toList)
-
       case _ =>
         s"concat(${args.mkString(", ")})"
     }
 
   def partialBinary(provider: Provider, columnName: String, alias: String, offset: Long, length: Option[Long]): String =
     provider match {
-      case Oracle    => ???
-      case SQLServer => s"substring($columnName, ${offset + 1}, ${length.map(_.toString).getOrElse(s"datalength($columnName)")}) as $alias"
       case _         => s"substring($columnName, ${offset + 1}${length.map(l => s", $l").getOrElse("")}) as $alias"
     }
 
   def binarySize(provider: Provider, columnName: String, alias: String): String =
     provider match {
-      case SQLServer => s"datalength($columnName) as $alias"
       case _         => s"length($columnName) as $alias"
     }
 }

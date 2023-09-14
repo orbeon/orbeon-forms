@@ -75,13 +75,16 @@ class SearchTest
     it("returns correct results with underscores (free-text search)") {
       val searchRequest =
         <search>
-          <query>t_st</query>
+          <query>t_st3</query>
           <query path="section-1/control-1"/>
           <drafts>include</drafts>
           <page-size>10</page-size>
           <page-number>1</page-number>
           <lang>en</lang>
         </search>.toDocument
+
+      // Oracle and SQL Server parse XML columns differently than other databases. 't_st3' will match '*t_st3*', but
+      // 't_st' won't match '*t_st3*'. With other databases, 't_st' will match '*t_st3*'.
 
       val searchResult =
         <documents search-total="1">

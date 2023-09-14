@@ -83,7 +83,7 @@ object Provider extends Enum[Provider] {
 
   def xmlContainsParam(provider: Provider, param: String): String =
     provider match {
-      case PostgreSQL => s"%$param%"
+      case PostgreSQL => paramForLike(param, surroundingPercents = true)
       case _          => param
     }
 
@@ -92,8 +92,6 @@ object Provider extends Enum[Provider] {
       case MySQL =>
         // LIKE is case insensitive on MySQL and SQL Server
         s"$colName LIKE ?"
-      case SQLServer =>
-        s"$colName LIKE ? ESCAPE '\\'"
       case PostgreSQL =>
         // PostgreSQL has ILIKE as a case insensitive version of LIKE
         s"$colName ILIKE ?"

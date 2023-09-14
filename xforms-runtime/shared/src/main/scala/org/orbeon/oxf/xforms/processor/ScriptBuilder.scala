@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsCo
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ShareableScript, XFormsContainingDocument}
 import org.orbeon.xforms._
-import org.orbeon.xforms.rpc.ConfigurationProperties
 
 import java.{lang => jl}
 import scala.collection.mutable
@@ -91,7 +90,7 @@ object ScriptBuilder {
     versionedResources        : Boolean,
     maxInactiveIntervalMillis : Long,
     sessionId                 : String
-  ): ConfigurationProperties = {
+  ): rpc.ConfigurationProperties = {
 
     val staticState = containingDocument.staticState
 
@@ -104,7 +103,7 @@ object ScriptBuilder {
     def resourcesVersionOpt =
       versionedResources flatOption CoreCrossPlatformSupport.getApplicationResourceVersion
 
-    ConfigurationProperties(
+    rpc.ConfigurationProperties(
       sessionHeartbeatEnabled            = staticState.staticBooleanProperty(SessionHeartbeatProperty),                     // static
       maxInactiveIntervalMillis          = maxInactiveIntervalMillis,                                                       // dynamic
       sessionExpirationTriggerPercentage = staticState.staticIntProperty(SessionExpirationTriggerProperty),                 // static

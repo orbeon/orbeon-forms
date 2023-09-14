@@ -95,6 +95,12 @@ object Provider extends Enum[Provider] {
       case PostgreSQL =>
         // PostgreSQL has ILIKE as a case insensitive version of LIKE
         s"$colName ILIKE ?"
+      case DB2 =>
+        // Oracle and DB2 require us to use a lower(), which could kill performance if
+        // have lots of data, and call for us adding a separate column with the lowercase val
+        s"lower($colName) LIKE ? ESCAPE '\\'"
+      case Oracle =>
+        s"lower($colName) LIKE ?"
     }
 
   def textContainsParam(provider: Provider, param: String): String =

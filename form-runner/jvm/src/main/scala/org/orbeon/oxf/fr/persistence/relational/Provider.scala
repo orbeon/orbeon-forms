@@ -106,7 +106,7 @@ object Provider extends Enum[Provider] {
     provider match {
       // SQL Server doesn't support the `=` operator on `ntext`
       // Oracle requires `LIKE` to avoid "ORA-00932: inconsistent datatypes: expected - got CLOB"
-      case _         => s"$colName =    ?"
+      case _                  => s"$colName =    ?"
     }
 
   def textEqualsParam(provider: Provider, param: String): String =

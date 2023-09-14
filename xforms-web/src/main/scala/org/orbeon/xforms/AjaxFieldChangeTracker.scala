@@ -36,7 +36,7 @@ object AjaxFieldChangeTracker {
       DomEventNames.Input,
       // "The `input` event fires when the value of an `<input>`, `<select>`, or `<textarea>` element has
       // been changed. [...] The `input` event is fired every time the value of the element changes. This
-      // is unlike the change event, which only fires when the value is committed, such as by pressing the
+      // is unlike the `change` event, which only fires when the value is committed, such as by pressing the
       // enter key, selecting a value from a list of options, and the like."
       //
       // 2020-05-29: This event appears to work with `<input>` and `<textarea>` with all modern browsers.

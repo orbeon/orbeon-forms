@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
+import org.orbeon.oxf.xml.SaxSupport.AttributesImplOps
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport._
@@ -78,8 +79,14 @@ class XFormsLHHAHandler(
           val containerAtts =
             getContainerAttributes(uri, localname, attributes, lhhaEffectiveId, elementAnalysis, currentControl, None)
 
+          val elementName =
+            lhhaElementName(elementAnalysis.lhhaType)
+
+          if (elementName == "button")
+            containerAtts.addOrReplace("type", "button")
+
           withElement(
-            localName = lhhaElementName(elementAnalysis.lhhaType),
+            localName = elementName,
             prefix    = handlerContext.findXHTMLPrefix,
             uri       = XHTML_NAMESPACE_URI,
             atts      = containerAtts

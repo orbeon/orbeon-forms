@@ -304,6 +304,11 @@ object Provider extends Enum[Provider] {
         s"concat(${args.mkString(", ")})"
     }
 
+  def partialBinaryMaxLength(provider: Provider): Int =
+    provider match {
+      case _      => Int.MaxValue
+    }
+
   def partialBinary(provider: Provider, columnName: String, alias: String, offset: Long, length: Option[Long]): String =
     provider match {
       case _         => s"substring($columnName, ${offset + 1}${length.map(l => s", $l").getOrElse("")}) as $alias"

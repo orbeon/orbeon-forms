@@ -449,7 +449,7 @@ object XFormsBaseHandlerXHTML {
 
     // If a button, add `type="button"` as this is not a button to submit the form
     if (elementName == "button")
-        newAttributes.addOrReplace("type", "button")
+      newAttributes.addOrReplace("type", "button")
 
     val xhtmlPrefix    = handlerContext.findXHTMLPrefix
     val labelQName     = XMLUtils.buildQName(xhtmlPrefix, elementName)

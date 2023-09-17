@@ -175,7 +175,7 @@ val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version fr
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 
 lazy val scala212 = "2.12.18"
-lazy val scala213 = "2.13.11"
+lazy val scala213 = "2.13.12"
 lazy val supportedScalaVersions = List(scala212, scala213)
 
 // "ThisBuild is a Scope encompassing all projects"

@@ -15,13 +15,15 @@ package org.orbeon.xforms.rpc
 
 import io.circe.parser._
 import io.circe.{Decoder, Encoder, Json}
-import org.orbeon.xforms.{AjaxClient, AjaxEvent, Constants, EventNames}
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, Constants, EventNames, Support}
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js.URIUtils
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Success
 
+
+// 2023-09-01: This is only used by Form Builder.
 @JSExportTopLevel("OrbeonRpcClient")
 object RpcClient
   extends autowire.Client[Json, Decoder, Encoder]
@@ -44,7 +46,8 @@ object RpcClient
       AjaxEvent(
         eventName  = EventNames.XXFormsRpcRequest,
         targetId   = Constants.DocumentId,
-        properties = Map(
+        form       = Support.allFormElems.headOption, // 2023-09-01: only used by Form Builder, so presumably only one
+        properties = Map(                             // form. However, we *should* pass a form id or context to calls.
           "id"   -> id,
           "path" -> pathValue,
           "args" -> argsValue

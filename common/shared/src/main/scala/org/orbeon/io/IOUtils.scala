@@ -13,11 +13,10 @@
   */
 package org.orbeon.io
 
-import java.io._
-import java.{lang => jl}
-
 import org.orbeon.oxf.common.Defaults
 
+import java.io._
+import java.{lang => jl}
 import scala.util.control.NonFatal
 
 

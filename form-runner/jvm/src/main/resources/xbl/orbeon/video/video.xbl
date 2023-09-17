@@ -1,0 +1,77 @@
+<!--
+  Copyright (C) 2015 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding id="fr-video" element="fr|video" xxbl:mode="binding lhha" xxbl:container="span" class="fb-upload">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/video/video.css"/>
+        </xbl:resources>
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Static Video</display-name>
+            <display-name lang="es">Video</display-name>
+            <display-name lang="fi">Video</display-name>
+            <display-name lang="fr">Vidéo fixe</display-name>
+            <display-name lang="ru">видео</display-name>
+            <display-name lang="de">Video</display-name>
+            <display-name lang="it">Video</display-name>
+            <display-name lang="nl">Video</display-name>
+            <display-name lang="pt">Vídeo</display-name>
+            <display-name lang="sv">Video</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-file-video-o</icon-class>
+            </icon>
+            <templates>
+                <bind type="xf:anyURI"/>
+                <!-- NOTE: `mediatype` so we can serve it, and `filename` for information. See:
+                     https://github.com/orbeon/orbeon-forms/issues/3042 -->
+                <instance filename="" mediatype=""/>
+                <view>
+                    <fr:video id="" ref="" class="fr-static-attachment">
+                        <xf:label ref=""/>
+                        <xf:help  ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:video>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:template>
+            <xf:output ref="xxf:binding('fr-video')" mediatype="video/*">
+                <xf:filename  ref="@filename"  xxbl:scope="outer"/>
+                <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
+                <xf:header ref="fr:attachment-form-version()">
+                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                    <xf:value value="."/>
+                </xf:header>
+            </xf:output>
+            <xf:group
+                fr:keep-if-design-time="true"
+                ref=".[xxf:is-blank(xxf:binding('fr-video'))]">
+                <xh:i class="fa fa-fw fa-lg fa-file-video-o"/>
+            </xf:group>
+            <fr:attachment
+                fr:keep-if-design-time="true"
+                class="fr-video-attach"
+                ref="xxf:binding('fr-video')"/>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

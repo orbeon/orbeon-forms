@@ -34,6 +34,7 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 
+import java.io.File
 import java.net.URI
 import java.{util => ju}
 import javax.servlet.http.{Cookie, HttpServletRequest}
@@ -396,7 +397,8 @@ object Connection extends ConnectionTrait {
           case scheme if method == GET && SupportedNonHttpReadonlySchemes(scheme) =>
 
             // Create URL connection object
-            val urlConnection = URLFactory.createURL(normalizedUrlString).openConnection
+            val url           = URLFactory.createURL(normalizedUrlString)
+            val urlConnection = url.openConnection
             urlConnection.connect()
 
             // NOTE: The data: scheme doesn't have a path but can have a content type in the URL. Do this for the
@@ -410,18 +412,27 @@ object Connection extends ConnectionTrait {
             def contentTypeHeader =
               contentTypeFromConnection orElse contentTypeFromPath map (ct => ContentType -> List(ct))
 
-            val headers =
+            val headersFromConnection =
               urlConnection.getHeaderFields.asScala map { case (k, v) => k -> v.asScala.to(List) } toMap
 
             val headersWithContentType =
-              headers ++ contentTypeHeader.toList
+              headersFromConnection ++ contentTypeHeader.toList
+
+            // Take care of HTTP ranges with local files
+            val (statusCode, rangeHeaders, inputStream) =
+              if (url.getProtocol == "file") {
+                val streamedFile = HttpRanges(headers).get.streamedFile(new File(url.toURI), urlConnection.getInputStream).get
+                (streamedFile.statusCode, streamedFile.headers, streamedFile.inputStream)
+              } else {
+                (StatusCode.Ok,           Map(),                urlConnection.getInputStream)
+              }
 
             // Create result
             val connectionResult = ConnectionResult(
               url        = normalizedUrlString,
-              statusCode = 200,
-              headers    = headersWithContentType,
-              content    = StreamedContent.fromStreamAndHeaders(urlConnection.getInputStream, headersWithContentType)
+              statusCode = statusCode,
+              headers    = headersWithContentType ++ rangeHeaders,
+              content    = StreamedContent.fromStreamAndHeaders(inputStream, headersWithContentType)
             )
 
             ifDebug {

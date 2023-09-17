@@ -73,6 +73,7 @@
         oxf:/forms/orbeon/builder/xbl/attachment-multiple.xbl
         oxf:/xbl/orbeon/image-attachment/image-attachment.xbl
         oxf:/xbl/orbeon/image/image.xbl
+        oxf:/xbl/orbeon/video/video.xbl
         oxf:/xbl/orbeon/wpaint/wpaint.xbl
     </property>
 

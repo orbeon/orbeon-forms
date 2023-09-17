@@ -29,8 +29,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
     var $ = ORBEON.jQuery;
 
-    var YD = YAHOO.util.Dom;
-
     /**
      * Functions we add to the awesome Underscore.js
      *
@@ -215,7 +213,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             getChildElementByClass: function(parent, clazz) {
                 for (var i = 0; i < parent.childNodes.length; i++) {
                     var child = parent.childNodes[i];
-                    if (ORBEON.util.Dom.isElement(child) && YAHOO.util.Dom.hasClass(child, clazz)) {
+                    if (ORBEON.util.Dom.isElement(child) && child.classList.contains(clazz)) {
                         return child;
                     }
                 }
@@ -314,11 +312,15 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
              * See: http://wiki.orbeon.com/forms/projects/ui/mobile-and-tablet-support#TOC-Problem-and-solution
              */
             overlayUseDisplayHidden: function(overlay) {
-                YD.setStyle(overlay.element, "display", "none");
+                overlay.element.style.display = "none";
                 // For why use subscribers.unshift instead of subscribe, see:
                 // http://wiki.orbeon.com/forms/projects/ui/mobile-and-tablet-support#TOC-Avoiding-scroll-when-showing-a-mess
-                overlay.beforeShowEvent.subscribers.unshift(new YAHOO.util.Subscriber(function() { YD.setStyle(overlay.element, "display", "block"); }));
-                overlay.beforeHideEvent.subscribe(function() { YD.setStyle(overlay.element, "display", "none"); });
+                overlay.beforeShowEvent.subscribers.unshift(new YAHOO.util.Subscriber(function() {
+                    overlay.element.style.display = "block";
+                }));
+                overlay.beforeHideEvent.subscribe(function() {
+                    overlay.element.style.display = "none";
+                });
             },
 
             /**
@@ -660,6 +662,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 if (output.length > 0) {
                     if (jControl.is(".xforms-mediatype-image")) {
                         return output[0].src;
+                    } else if (jControl.is(".xforms-mediatype-video")) {
+                        return output[0].children[0].src;
                     } else if (jControl.is(".xforms-output-appearance-xxforms-download")) {
                         return null;
                     } else if (jControl.is(".xforms-mediatype-text-html")) {
@@ -701,10 +705,10 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 var anchor = ORBEON.util.Dom.getElementsByName(control, "a")[0];
                 if (newControlValue == "") {
                     anchor.setAttribute("href", "#");
-                    YAHOO.util.Dom.addClass(anchor, "xforms-readonly");
+                    anchor.classList.add("xforms-readonly");
                 } else {
                     anchor.setAttribute("href", newControlValue);
-                    YAHOO.util.Dom.removeClass(anchor, "xforms-readonly");
+                    anchor.classList.remove("xforms-readonly");
                 }
             } else if (isStaticReadonly && jControl.is('.xforms-textarea')) {
                 // textarea in "static readonly" mode
@@ -733,6 +737,14 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 if (output.length > 0) {
                     if (jControl.is(".xforms-mediatype-image")) {
                         output[0].src = newControlValue;
+                    } else if (jControl.is(".xforms-mediatype-video")) {
+                        output[0].children[0].src = newControlValue;
+                        if (newControlValue === "") {
+                            output[0].classList.add("empty-source");
+                        } else {
+                            output[0].classList.remove("empty-source");
+                        }
+                        output[0].load();
                     } else if (jControl.is(".xforms-mediatype-text-html")) {
                         output[0].innerHTML = newControlValue;
                     } else {
@@ -1021,9 +1033,9 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 _.each(elementsToUpdate, function(element) {
                     if (element != null) {
                         if (isRelevant) {
-                            YAHOO.util.Dom.removeClass(element, "xforms-disabled");
+                            element.classList.remove("xforms-disabled");
                         } else {
-                            YAHOO.util.Dom.addClass(element, "xforms-disabled");
+                            element.classList.add("xforms-disabled");
                         }
                     }
                 });
@@ -1044,27 +1056,22 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
             // Update class
             if (isReadonly) {
-                YAHOO.util.Dom.addClass(control, "xforms-readonly");
+                control.classList.add("xforms-readonly");
             } else {
-                YAHOO.util.Dom.removeClass(control, "xforms-readonly");
+                control.classList.remove("xforms-readonly");
             }
 
             if (jControl.is('.xforms-group-begin-end')) {
                 // Case of group delimiters
                 // Readonlyness is no inherited by controls inside the group, so we are just updating the class on the begin-marker
                 // to be consistent with the markup generated by the server.
-                if (isReadonly) {
-                    YAHOO.util.Dom.addClass(control, "xforms-readonly");
-                } else {
-                    YAHOO.util.Dom.removeClass(control, "xforms-readonly");
-                }
+                // if (isReadonly) {
+                //     YAHOO.util.Dom.addClass(control, "xforms-readonly");
+                // } else {
+                //     YAHOO.util.Dom.removeClass(control, "xforms-readonly");
+                // }
             } else if (jControl.is('.xforms-input, .xforms-secret')) {
                 // Input fields
-
-                // Add/remove xforms-readonly on span
-                if (isReadonly) YAHOO.util.Dom.addClass(control, "xforms-readonly");
-                else YAHOO.util.Dom.removeClass(control, "xforms-readonly");
-
                 // Update disabled on input fields
                 var inputs = control.getElementsByTagName("input");
                 for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
@@ -1075,11 +1082,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     ORBEON.xforms.Controls.setReadonlyOnFormElement(control, isReadonly);
             } else if (jControl.is('.xforms-select1-appearance-full, .xforms-select-appearance-full')) {
                 // Radio buttons, or checkboxes
-
-                // Add/remove xforms-readonly on span
-                if (isReadonly) YAHOO.util.Dom.addClass(control, "xforms-readonly");
-                else YAHOO.util.Dom.removeClass(control, "xforms-readonly");
-
                 // Update disabled on input fields
                 // See:
                 // - https://github.com/orbeon/orbeon-forms/issues/5595
@@ -1095,8 +1097,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 ORBEON.xforms.Controls.setDisabledOnFormElement(select, isReadonly);
             } else if (jControl.is('.xforms-output, .xforms-group')) {
                 // XForms output and group
-                if (isReadonly) YAHOO.util.Dom.addClass(control, "xforms-readonly");
-                else YAHOO.util.Dom.removeClass(control, "xforms-readonly");
             } else if (jControl.is('.xforms-upload')) {
                 // Upload control
                 ORBEON.xforms.Controls.setDisabledOnFormElement(
@@ -1360,16 +1360,15 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     // Change visibility by switching class
                     if (cursor.id == "xforms-case-end-" + controlId) break;
                     var doAnimate = cursor.id != "xforms-case-begin-" + controlId &&    // Don't animate case-begin/end
-                            $(cursor).is('.xxforms-animate') &&                         // Only animate if class present
-                            YAHOO.env.ua.ie == 0;                                       // Simply disable animation for IE<=10 [1]
+                            $(cursor).is('.xxforms-animate');                           // Only animate if class present
 
                     var updateClasses = _.partial(function (el) {
                         if (visible) {
-                            YAHOO.util.Dom.addClass(el, "xforms-case-selected");
-                            YAHOO.util.Dom.removeClass(el, "xforms-case-deselected");
+                            el.classList.add("xforms-case-selected");
+                            el.classList.remove("xforms-case-deselected");
                         } else {
-                            YAHOO.util.Dom.addClass(el, "xforms-case-deselected");
-                            YAHOO.util.Dom.removeClass(el, "xforms-case-selected");
+                            el.classList.add("xforms-case-deselected");
+                            el.classList.remove("xforms-case-selected");
                         }
                     }, cursor);
 
@@ -1547,28 +1546,30 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
         setRelevant: function (node, isRelevant) {
             var FN = ORBEON.xforms.FlatNesting;
-            var YD = YAHOO.util.Dom;
             var OD = ORBEON.util.Dom;
             var OC = ORBEON.xforms.Controls;
 
             // Update class on group begin or delimiter
-            if (isRelevant) YAHOO.util.Dom.removeClass(node, "xforms-disabled");
-            else YAHOO.util.Dom.addClass(node, "xforms-disabled");
+            if (isRelevant)
+                node.classList.remove("xforms-disabled");
+            else
+                node.classList.add("xforms-disabled");
 
             // If this group/iteration becomes relevant, but has a parent that is non-relevant, we should not
             // remove xforms-disabled otherwise it will incorrectly show, so our job stops here
             if (isRelevant && FN.hasAncestor(node, function (node) {
-                        return $(node).is('.xforms-disabled');
+                        return node.classList.contains("xforms-disabled");
                     })) return;
 
             FN.foldDescendants(node, null, function (node, value) {
                 // Skip sub-tree if we are enabling and this sub-tree is disabled
-                if (isRelevant && FN.isBegin(node) && YD.hasClass(node, "xforms-disabled")) return true;
+                if (isRelevant && FN.isBegin(node) && node.classList.contains("xforms-disabled"))
+                    return true;
                 // Update disabled class on node
                 if (isRelevant) {
-                    YD.removeClass(node, "xforms-disabled");
+                    node.classList.remove("xforms-disabled")
                 } else {
-                    YD.addClass(node, "xforms-disabled");
+                    node.classList.add("xforms-disabled")
                 }
                 return false;
             }, true);
@@ -2198,6 +2199,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         return null;
                     }
                 }
+                // TODO: This can return `undefined`!
             } else {
                 return null;
             }

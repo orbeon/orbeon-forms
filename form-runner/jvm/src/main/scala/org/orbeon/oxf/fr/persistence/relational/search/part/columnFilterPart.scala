@@ -43,7 +43,7 @@ object columnFilterPart {
                     case FilterType.Substring(_)      => List("AND " + Provider.textContains(request.provider, s"tf$i.val"))
                     case FilterType.Token    (tokens) =>
                       tokens.map { _ =>
-                        "AND " + Provider.textContains(request.provider, s"concat(' ', tf$i.val, ' ')")
+                        "AND " + Provider.textContains(request.provider, Provider.concat(request.provider, "' '", s"tf$i.val", "' '"))
                       }
                   }
                 dataControlWhere :: valueWhere
@@ -56,7 +56,7 @@ object columnFilterPart {
                   case FilterType.None              => List.empty
                   case FilterType.Exact(filter)     => path :: List(Provider.textEqualsParam  (request.provider, filter))
                   case FilterType.Substring(filter) => path :: List(Provider.textContainsParam(request.provider, filter))
-                  case FilterType.Token(tokens)     => path :: tokens.map(token => s"% $token %")
+                  case FilterType.Token(tokens)     => path :: tokens.map(token => Provider.textContainsParam(request.provider, s" $token "))
                 }
               }
             values.map(value => (_.setString(_, value)): Setter)

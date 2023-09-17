@@ -297,4 +297,20 @@ object Provider extends Enum[Provider] {
     provider match {
       case _      => None
     }
+
+  def concat(provider: Provider, args: String*): String =
+    provider match {
+      case _ =>
+        s"concat(${args.mkString(", ")})"
+    }
+
+  def partialBinary(provider: Provider, columnName: String, alias: String, offset: Long, length: Option[Long]): String =
+    provider match {
+      case _         => s"substring($columnName, ${offset + 1}${length.map(l => s", $l").getOrElse("")}) as $alias"
+    }
+
+  def binarySize(provider: Provider, columnName: String, alias: String): String =
+    provider match {
+      case _         => s"length($columnName) as $alias"
+    }
 }

@@ -6,7 +6,7 @@
     <property
         as="xs:boolean"
         name="oxf.xforms.replication"
-        value="true"/>
+        value="false"/>
 
     <property
         as="xs:anyURI"
@@ -39,6 +39,11 @@
         form-builder
         form-builder-grid
     </property>
+
+    <property
+        as="xs:string"
+        name="oxf.fr.persistence.provider.tests.*.*"
+        value="resource"/>
 
 </properties>
 

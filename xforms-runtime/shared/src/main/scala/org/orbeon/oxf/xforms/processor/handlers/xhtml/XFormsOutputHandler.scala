@@ -26,7 +26,7 @@ import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPACE_URI}
 import org.orbeon.oxf.xml.XMLReceiverHelper._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport, XMLUtils}
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
@@ -231,6 +231,58 @@ class XFormsOutputImageHandler(
     currentControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
 
     element("img", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes)
+  }
+
+  // Don't use @for as we are not pointing to an HTML control
+  override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] = None
+}
+
+// xf:output[starts-with(@appearance, 'video/')]
+class XFormsOutputVideoHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  localAtts      : Attributes,
+  matched        : ElementAnalysis,
+  handlerContext : HandlerContext
+) extends XFormsControlLifecycleHandler(
+  uri,
+  localname,
+  qName,
+  localAtts,
+  matched,
+  handlerContext,
+  repeating = false,
+  forwarding = false
+) with XFormsOutputHandler {
+
+  protected def handleControlStart(): Unit = {
+
+    implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
+    val xhtmlPrefix = handlerContext.findXHTMLPrefix
+
+    val outputControl = currentControl.asInstanceOf[XFormsOutputControl]
+    val generalMediaType = attributes.getValue("mediatype")
+    val specificMediaType = outputControl.fileMediatype
+
+    val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, generalMediaType)
+
+    val containerAttributes = getContainerAttributes(getEffectiveId, outputControl, isField = false)
+    containerAttributes.addOrReplace("controls", "")
+    if (srcValue.isEmpty) {
+      containerAttributes.appendToClassAttribute("empty-source")
+    }
+
+    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
+    currentControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
+
+    withElement("video", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
+      val sourceAttributes = new AttributesImpl()
+      sourceAttributes.addOrReplace("src", srcValue)
+      specificMediaType.foreach(sourceAttributes.addOrReplace("type", _))
+
+      element("source", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = sourceAttributes)
+    }
   }
 
   // Don't use @for as we are not pointing to an HTML control

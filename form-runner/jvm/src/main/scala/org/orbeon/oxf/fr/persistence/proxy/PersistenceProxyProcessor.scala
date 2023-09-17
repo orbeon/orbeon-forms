@@ -711,8 +711,20 @@ private[persistence] object PersistenceProxyProcessor {
     IOUtils.useAndClose(cxr) { connectionResult =>
       // Proxy status code
       response.setStatus(connectionResult.statusCode)
+
       // Proxy incoming headers
       proxyCapitalizeAndCombineHeaders(connectionResult.headers, request = false) foreach (response.setHeader _).tupled
+
+      request.getMethod match {
+        case HttpMethod.GET | HttpMethod.HEAD if StatusCode.isSuccessCode(connectionResult.statusCode) =>
+          // Forward HTTP range headers and status to client
+          attachmentsProviderCxrOpt.foreach { attachmentsProviderCxr =>
+            HttpRanges.forwardRangeHeaders(attachmentsProviderCxr, response)
+            response.setStatus(attachmentsProviderCxr.statusCode)
+          }
+
+        case _ =>
+      }
 
       // Proxy content type
       val responseContentType = connectionResult.content.contentType
@@ -740,8 +752,8 @@ private[persistence] object PersistenceProxyProcessor {
 
       // If an attachments provider is available, always use it to retrieve the actual attachment
       val inputStream = attachmentsProviderCxrOpt match {
-        case Some(attachmentsProviderCxr) if request.getMethod           == HttpMethod.GET &&
-                                             connectionResult.statusCode == HttpStatus.SC_OK =>
+        case Some(attachmentsProviderCxr) if request.getMethod == HttpMethod.GET &&
+                                             StatusCode.isSuccessCode(connectionResult.statusCode) =>
           attachmentsProviderCxr.content.inputStream
 
         case _ =>

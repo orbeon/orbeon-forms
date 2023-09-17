@@ -101,6 +101,7 @@ object XHTMLOutput {
     case (ns @ XF,  ln @ "output"          , qn, atts, c: AppearanceTrait , hc) if c.appearances(XXFORMS_TEXT_APPEARANCE_QNAME)      => new XFormsOutputTextHandler     (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "output"          , qn, atts, c: AppearanceTrait , hc) if c.appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME)  => new XFormsOutputDownloadHandler (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "output"          , qn, atts, c: OutputControl   , hc) if c.isImageMediatype                                => new XFormsOutputImageHandler    (ns, ln, qn, atts, c, hc)
+    case (ns @ XF,  ln @ "output"          , qn, atts, c: OutputControl   , hc) if c.isVideoMediatype                                => new XFormsOutputVideoHandler    (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "output"          , qn, atts, c: OutputControl   , hc) if c.isHtmlMediatype                                 => new XFormsOutputHTMLHandler     (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "output"          , qn, atts, c                  , hc)                                                      => new XFormsOutputDefaultHandler  (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "group"           , qn, atts, c: AppearanceTrait , hc) if c.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME)  => new TransparentHandler          (ns, ln, qn, atts,    hc)

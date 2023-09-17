@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.fr.persistence.http
 
-import java.io.ByteArrayInputStream
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
-import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{StageHeader, Version}
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
+import org.orbeon.oxf.http.{Headers, HttpRange, StatusCode}
 import org.orbeon.oxf.test.XMLSupport
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger}
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalactic.Equality
+
+import java.io.ByteArrayInputStream
 
 private[persistence] object HttpAssert extends XMLSupport {
 
@@ -40,10 +40,12 @@ private[persistence] object HttpAssert extends XMLSupport {
 
   sealed trait Expected
   case   class ExpectedBody(
-    body        : HttpCall.Body,
-    operations  : Operations,
-    formVersion : Option[Int],
-    stage       : Option[Stage] = None
+    body              : HttpCall.Body,
+    operations        : Operations,
+    formVersion       : Option[Int],
+    stage             : Option[Stage] = None,
+    contentRangeHeader: Option[String] = None,
+    statusCode        : Int = StatusCode.Ok
   ) extends Expected
   case   class ExpectedCode(code: Int) extends Expected
 
@@ -51,21 +53,22 @@ private[persistence] object HttpAssert extends XMLSupport {
     url                      : String,
     version                  : Version,
     expected                 : Expected,
-    credentials              : Option[Credentials] = None)(implicit
+    credentials              : Option[Credentials] = None,
+    httpRange                : Option[HttpRange] = None)(implicit
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Unit = {
 
     val (resultCode, headers, resultBody) = {
-      val (resultCode, headers, resultBody) = HttpCall.get(url, version, credentials)
+      val (resultCode, headers, resultBody) = HttpCall.get(url, version, credentials, httpRange)
       val lowerCaseHeaders = headers.map{case (header, value) => header.toLowerCase -> value}
       (resultCode, lowerCaseHeaders, resultBody)
     }
 
     expected match {
-      case ExpectedBody(body, expectedOperations, expectedFormVersion, expectedStage) =>
-        assert(resultCode == 200)
+      case ExpectedBody(body, expectedOperations, expectedFormVersion, expectedStage, contentRangeHeader, code) =>
+        assert(resultCode == code)
         // Check body
         body match {
           case HttpCall.XML(expectedDoc) =>
@@ -83,6 +86,11 @@ private[persistence] object HttpAssert extends XMLSupport {
         // Check stage
         val resultStage = headers.get(StageHeader.HeaderNameLower).map(_.head).map(Stage.apply(_, ""))
         assert(expectedStage == resultStage)
+        // Check content range header
+        contentRangeHeader.foreach { expectedContentRangeHeader =>
+          val resultContentRangeHeader = headers.get(Headers.ContentRange.toLowerCase).map(_.head)
+          assert(resultContentRangeHeader.contains(expectedContentRangeHeader))
+        }
 
       case ExpectedCode(expectedCode) =>
         assert(resultCode == expectedCode)

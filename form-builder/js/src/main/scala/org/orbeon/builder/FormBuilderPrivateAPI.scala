@@ -13,9 +13,8 @@
   */
 package org.orbeon.builder
 
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Support}
 import org.scalajs.dom
-import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryCallback
 
 import scala.scalajs.js
@@ -46,7 +45,13 @@ object FormBuilderPrivateAPI extends js.Object {
     iframeContainer.append(newIFrame)
 
     // Dispatch the event requested
-    AjaxClient.fireEvent(AjaxEvent(eventName = eventName, targetId = "fr-form-model"))
+    AjaxClient.fireEvent(
+      AjaxEvent(
+        eventName = eventName,
+        targetId = "fr-form-model",
+        form     = Support.allFormElems.headOption // 2023-09-01: only used by Form Builder, so presumably only one
+      )
+    )
   }
 
   // Here we implement our own `scrollIntoView()` in order to handle positioning better. For example if a control is

@@ -19,13 +19,14 @@ import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.Logger
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
-import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
 
 import java.time.Instant
+import scala.util.{Failure, Success}
 
 
 class CRUD
@@ -33,6 +34,8 @@ class CRUD
     with Read
     with CreateUpdateDelete
     with LockUnlock {
+
+  private val logger = LoggerFactory.createLogger(classOf[CRUD])
 
   import CRUD._
 
@@ -45,13 +48,20 @@ class CRUD
 
       val requestPath  = httpRequest.getRequestPath
 
-      httpRequest.getMethod match {
-        case HttpMethod.GET | HttpMethod.HEAD => getOrHead(getCrudRequest      (requestPath), httpRequest.getMethod)
-        case HttpMethod.PUT                   => change   (getCrudRequest      (requestPath), delete = false)
-        case HttpMethod.DELETE                => change   (getCrudRequest      (requestPath), delete = true)
-        case HttpMethod.LOCK                  => lock     (getLockUnlockRequest(requestPath))
-        case HttpMethod.UNLOCK                => unlock   (getLockUnlockRequest(requestPath))
-        case _                                => httpResponse.setStatus(StatusCode.MethodNotAllowed)
+      HttpRanges(httpRequest) match {
+        case Success(ranges) =>
+          httpRequest.getMethod match {
+            case HttpMethod.GET | HttpMethod.HEAD => getOrHead(getCrudRequest      (requestPath), httpRequest.getMethod, ranges)
+            case HttpMethod.PUT                   => change   (getCrudRequest      (requestPath), delete = false)
+            case HttpMethod.DELETE                => change   (getCrudRequest      (requestPath), delete = true)
+            case HttpMethod.LOCK                  => lock     (getLockUnlockRequest(requestPath))
+            case HttpMethod.UNLOCK                => unlock   (getLockUnlockRequest(requestPath))
+            case _                                => httpResponse.setStatus(StatusCode.MethodNotAllowed)
+          }
+
+        case Failure(throwable) =>
+          logger.error(throwable)(s"Error while processing request ${httpRequest.getRequestPath}")
+          httpResponse.setStatus(StatusCode.BadRequest)
       }
     } catch {
       case e: HttpStatusCodeException =>

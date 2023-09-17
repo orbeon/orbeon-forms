@@ -31,8 +31,7 @@ import org.orbeon.xforms.StateHandling.StateResult
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.Initializations
 import org.scalajs.dom
-import org.scalajs.dom.ext._
-import org.scalajs.dom.{document, html}
+import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import java.io.StringWriter
@@ -489,9 +488,10 @@ object InitSupport {
 
           AjaxClient.fireEvent(
             AjaxEvent(
-              eventName   = e.`type`,
-              targetId    = observer,
-              properties  = properties
+              eventName  = e.`type`,
+              targetId   = observer,
+              properties = properties,
+              form       = Some(formElem)
             )
           )
 
@@ -508,7 +508,7 @@ object InitSupport {
         }
       }
 
-    def dispatchInitialServerEvents(events: Option[rpc.PollEvent], formId: String): Unit =
+    private def dispatchInitialServerEvents(events: Option[rpc.PollEvent], formId: String): Unit =
       events foreach { case rpc.PollEvent(delay) =>
         AjaxClient.createDelayedPollEvent(
           delay  = delay.toDouble,

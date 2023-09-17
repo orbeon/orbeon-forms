@@ -177,6 +177,14 @@ object ExternalContext {
     def setHeader(name: String, value: String): Unit
     def addHeader(name: String, value: String): Unit
 
+    def addHeaders(headers: Map[String, List[String]]): Unit =
+      for {
+        (name, values) <- headers
+        value          <- values
+      } locally {
+        addHeader(name, value)
+      }
+
     def sendError(code: Int): Unit
 
     def getCharacterEncoding: String

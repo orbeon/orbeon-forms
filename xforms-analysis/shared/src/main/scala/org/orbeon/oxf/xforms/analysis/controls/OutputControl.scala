@@ -34,6 +34,7 @@ class OutputControl(
   scope                   : Scope,
   containerScope          : Scope,
   val isImageMediatype    : Boolean,
+  val isVideoMediatype    : Boolean,
   val isHtmlMediatype     : Boolean,
   val isDownloadAppearance: Boolean,
   val staticValue         : Option[String] // TODO: `expressionOrConstant`

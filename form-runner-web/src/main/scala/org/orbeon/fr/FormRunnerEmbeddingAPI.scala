@@ -3,14 +3,13 @@ package org.orbeon.fr
 
 import org.orbeon.oxf.fr.ControlOps
 import org.orbeon.xforms
-
 import org.orbeon.xforms.{$, DocumentAPI, XFormsId, XFormsXbl}
-
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 
 
 abstract class FormRunnerEmbeddingAPI extends js.Object

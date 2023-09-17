@@ -19,12 +19,11 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom
+import org.scalajs.dom._
 import org.scalajs.dom.experimental._
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
-import org.scalajs.dom._
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
 import scala.scalajs.js.|
 import scala.util.control.NonFatal
@@ -76,7 +75,8 @@ object Support {
     contentType : Option[String],
     acceptLang  : Option[String],
     transform   : (String, String) => String,
-    abortSignal : Option[AbortSignal]
+    abortSignal : Option[AbortSignal])(implicit
+    executor    : ExecutionContext
   ): Future[(Int, String, Option[dom.Document])] = {
 
     val customHeaders = js.Dictionary[String]()

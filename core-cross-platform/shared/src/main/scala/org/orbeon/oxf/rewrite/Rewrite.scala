@@ -48,6 +48,7 @@ object Rewrite {
   private[rewrite] val METHOD_ATT = "method"
   private[rewrite] val HREF_ATT = "href"
   private[rewrite] val SRC_ATT = "src"
+  private[rewrite] val POSTER_ATT = "poster"
   private[rewrite] val BACKGROUND_ATT = "background"
   private[rewrite] val NOREWRITE_ATT = "url-norewrite"
 

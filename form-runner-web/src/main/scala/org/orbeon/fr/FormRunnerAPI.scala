@@ -46,13 +46,7 @@ object FormRunnerAPI extends FormRunnerEmbeddingAPI {
   // - an `html.Element` is passed and the form is not found
   // - no `html.Element` is passed and no default form is found
   def getForm(elemOrNamespacedId: js.UndefOr[html.Element | String]): FormRunnerForm =
-    (
-      (elemOrNamespacedId: Any) match {
-        case namespacedId: String => Page.findXFormsFormFromNamespacedId(namespacedId)
-        case elem: html.Element   => Page.findXFormsFormFromHtmlElemOrDefault(elem)
-        case _                    => Page.findXFormsFormFromHtmlElemOrDefault(js.undefined)
-      }
-    ).map(new FormRunnerForm(_)).orNull
+    Page.findXFormsForm(elemOrNamespacedId).map(new FormRunnerForm(_)).orNull
 
   val wizard      : FormRunnerWizardAPI.type       = FormRunnerWizardAPI
   val errorSummary: FormRunnerErrorSummaryAPI.type = FormRunnerErrorSummaryAPI
@@ -110,8 +104,9 @@ object FormRunnerErrorSummaryAPI extends js.Object {
 object FormRunnerWizardAPI extends js.Object {
 
   def focus(
-    controlName   : String,
-    repeatIndexes : js.UndefOr[js.Array[Int]] = js.undefined
+    controlName       : String,
+    repeatIndexes     : js.UndefOr[js.Array[Int]] = js.undefined,
+    elemOrNamespacedId: js.UndefOr[html.Element | String] = js.undefined
   ): Unit = {
 
     // Separate variable due to type inference fail when put inline below
@@ -121,6 +116,7 @@ object FormRunnerWizardAPI extends js.Object {
       AjaxEvent(
         eventName  = "fr-wizard-focus",
         targetId   = Names.ViewComponent,
+        form       = Page.findXFormsForm(elemOrNamespacedId).map(_.elem),
         properties = Map(
           "fr-control-name"   -> controlName,
           "fr-repeat-indexes" -> indexesString

@@ -98,21 +98,11 @@
         </xh:div>
     </xsl:template>
 
-    <xsl:template match="fr:body">
-
-        <xf:var name="persistence-instance"    value="xxf:instance('fr-persistence-instance')"/>
-        <xf:var name="lease-enabled"           value="$persistence-instance/lease-enabled = 'true'"/>
-        <xf:var name="lease-state-elem"        value="$persistence-instance/lease-state"/>
-        <xf:var name="show-form-data"          value="
-            (: No draft dialog is showing :)
-            $persistence-instance/found-document-message-to-show = '' and
-            (: Either we don't need a lease or we have the lease :)
-            (not($lease-enabled) or $lease-state-elem = 'current-user')
-        "/>
+    <xsl:template match="fr:top-messages">
 
         <!-- Lease message -->
         <xf:group
-            ref="if ($lease-enabled) then . else ()"
+            ref="if ($_fr-lease-enabled) then . else ()"
             class="alert alert-info fr-top-alert"
             xxf:element="div"
         >
@@ -128,28 +118,28 @@
             </fr:alert-dialog>
 
             <xh:div>
-                <xf:switch caseref="$lease-state-elem">
+                <xf:switch caseref="$_fr-lease-state">
                     <xf:case value="'current-user'">
                         <xh:div>
                             <xf:output value="$fr-resources/detail/lease/current-user-left"/>
                             <!-- Make `fr:countdown` non-relevant if this case isn't shown, as it expects a valid `lease-end-time` -->
-                            <xf:var name="countdown-relevant" value="$lease-state-elem = 'current-user'"/>
+                            <xf:var name="countdown-relevant" value="$_fr-lease-state = 'current-user'"/>
                             <fr:countdown
-                                ref="$persistence-instance/lease-end-time[$countdown-relevant]"
-                                alert-threshold-ref="$persistence-instance/lease-alert-threshold">
+                                ref="$_fr-persistence-instance/lease-end-time[$countdown-relevant]"
+                                alert-threshold-ref="$_fr-persistence-instance/lease-alert-threshold">
                                 <xf:action
                                     event="fr-countdown-ended"
-                                    if="$lease-state-elem = 'current-user'">
+                                    if="$_fr-lease-state = 'current-user'">
                                     <xf:dispatch
                                         target="fr-lease-renew-dialog"
                                         name="fr-hide"/>
                                     <xf:setvalue
-                                        ref="$lease-state-elem"
+                                        ref="$_fr-lease-state"
                                         value="'relinquished'"/>
                                 </xf:action>
                                 <xf:action
                                     event="fr-countdown-alert"
-                                    if="$lease-state-elem = 'current-user'">
+                                    if="$_fr-lease-state = 'current-user'">
                                     <xf:dispatch
                                         target="fr-lease-renew-dialog"
                                         name="fr-show"/>
@@ -172,14 +162,14 @@
                 </xf:switch>
                 <xh:div class="fr-top-alert-buttons">
                     <xf:switch caseref="
-                            if ($lease-state-elem = 'current-user')
+                            if ($_fr-lease-state = 'current-user')
                             then 'has-lease'
                             else 'does-not-have-lease'">
                         <xf:case value="'has-lease'">
                             <xf:trigger class="xforms-trigger-appearance-modal">
                                 <xf:label ref="$fr-resources/detail/lease/relinquish"/>
                                 <xf:action event="DOMActivate">
-                                    <xf:setvalue event="DOMActivate" ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                                    <xf:setvalue event="DOMActivate" ref="$_fr-persistence-instance/found-document-message-to-show"/>
                                     <xf:action type="xpath">
                                         xxf:instance('fr-form-instance')/fr:run-process-by-name('oxf.fr.detail.process', 'relinquish-lease')
                                     </xf:action>
@@ -196,7 +186,7 @@
                             <xf:trigger class="xforms-trigger-appearance-modal">
                                 <xf:label ref="$fr-resources/detail/lease/try-acquire"/>
                                 <xf:action event="DOMActivate">
-                                    <xf:setvalue ref="$persistence-instance/lease-load-document">true</xf:setvalue>
+                                    <xf:setvalue ref="$_fr-persistence-instance/lease-load-document">true</xf:setvalue>
                                     <xf:send submission="fr-acquire-lease-submission"/>
                                 </xf:action>
                             </xf:trigger>
@@ -225,9 +215,24 @@
             </xh:div>
         </xf:group>
 
+        <!-- Availability message -->
+        <xf:group
+            ref="if ($_fr-document-available-too-early-or-late) then . else ()"
+            class="alert alert-info fr-top-alert"
+            xxf:element="div">
+
+            <xf:output
+                mediatype="text/html"
+                value="
+                    if   ($_fr-document-available-too-early)
+                    then ($_fr-document-available-from-elem-opt/message/string(), xxf:r('detail.available-from.message', '|fr-fr-resources|'))[1]
+                    else ($_fr-document-available-to-elem-opt  /message/string(), xxf:r('detail.available-to.message'  , '|fr-fr-resources|'))[1]
+                "/>
+        </xf:group>
+
         <!-- Found document messages -->
         <xf:group
-            ref="if ($persistence-instance/found-document-message-to-show != '') then . else ()"
+            ref="if ($_fr-persistence-instance/found-document-message-to-show != '') then . else ()"
             class="alert alert-info fr-top-alert"
             xxf:element="div"
         >
@@ -236,7 +241,7 @@
                 name="form-version-param"
                 model="fr-persistence-model"
                 value="concat('form-version=', $form-version)"/>
-            <xf:switch caseref="$persistence-instance/found-document-message-to-show">
+            <xf:switch caseref="$_fr-persistence-instance/found-document-message-to-show">
                 <xf:case value="'found-draft-for-document'">
                     <xf:output value="$fr-resources/detail/draft-singleton/found-draft-for-document"/>
                     <xh:div class="fr-top-alert-buttons">
@@ -245,7 +250,7 @@
                                 <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
                                 <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
                                 <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-controls"/>
-                                <xf:setvalue ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                                <xf:setvalue ref="$_fr-persistence-instance/found-document-message-to-show"/>
                             </xf:action>
                             <xf:trigger>
                                 <xf:label value="$fr-resources/detail/draft-singleton/open-saved"/>
@@ -270,7 +275,7 @@
                                 <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
                                 <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
                                 <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-controls"/>
-                                <xf:setvalue ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                                <xf:setvalue ref="$_fr-persistence-instance/found-document-message-to-show"/>
                             </xf:action>
                             <xf:trigger>
                                 <xf:label value="$fr-resources/detail/draft-singleton/start-new"/>
@@ -310,7 +315,7 @@
                                     <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
                                     <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
                                     <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-controls"/>
-                                    <xf:setvalue ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                                    <xf:setvalue ref="$_fr-persistence-instance/found-document-message-to-show"/>
                                 </xf:action>
                             </xf:trigger>
                             <xf:trigger xxf:modal="true">
@@ -344,6 +349,67 @@
             </xf:switch>
         </xf:group>
 
+    </xsl:template>
+
+    <xsl:template name="fr-detail-page-global-variables">
+
+        <xf:var name="_fr-persistence-instance"                 as="element('_')"               value="xxf:instance('fr-persistence-instance')"/>
+        <xf:var name="_fr-lease-enabled"                        as="xs:boolean"                 value="$_fr-persistence-instance/lease-enabled = 'true'"/>
+        <xf:var name="_fr-lease-state"                          as="xs:string"                  value="$_fr-persistence-instance/lease-state/string()"/>
+        <xf:var name="_fr-document-available-from-elem-opt"     as="element('available-from')?" value="xxf:instance('fr-form-metadata')/available-from"/>
+        <xf:var name="_fr-document-available-to-elem-opt"       as="element('available-to')?"   value="xxf:instance('fr-form-metadata')/available-to"/>
+        <xf:var name="_fr-document-available-from-dateTime-opt" as="xs:string?"                 value="if (exists($_fr-document-available-from-elem-opt))
+                                                                                                       then $_fr-document-available-from-elem-opt/@dateTime/string()
+                                                                                                       else xxf:property(string-join(('oxf.fr.detail.available-from.dateTime', fr:app-name(), fr:form-name()), '.'))"/>
+        <xf:var name="_fr-document-available-to-dateTime-opt"   as="xs:string?"                 value="if (exists($_fr-document-available-to-elem-opt))
+                                                                                                       then $_fr-document-available-to-elem-opt/@dateTime/string()
+                                                                                                       else xxf:property(string-join(('oxf.fr.detail.available-to.dateTime', fr:app-name(), fr:form-name()), '.'))"/>
+        <xf:var name="_fr-document-available-too-early"         as="xs:boolean"                 value="xxf:non-blank($_fr-document-available-from-dateTime-opt) and
+                                                                                                       current-dateTime() lt xs:dateTime($_fr-document-available-from-dateTime-opt)"/>
+        <xf:var name="_fr-document-available-too-late"          as="xs:boolean"                 value="xxf:non-blank($_fr-document-available-to-dateTime-opt) and
+                                                                                                       current-dateTime() gt xs:dateTime($_fr-document-available-to-dateTime-opt)"/>
+        <xf:var name="_fr-document-available-too-early-or-late" as="xs:boolean"                 value="$_fr-document-available-too-early or $_fr-document-available-too-late"/>
+
+        <xf:var name="_fr-show-form-data"
+                as="xs:boolean"
+                value="
+                    (: No draft message is showing :)
+                    $_fr-persistence-instance/found-document-message-to-show = '' and
+                    (: Either we don't need a lease or we have the lease :)
+                    (not($_fr-lease-enabled) or $_fr-lease-state = 'current-user') and
+                    (: Either the form is not available yet or not available anymore :)
+                    not($_fr-document-available-too-early) and not($_fr-document-available-too-late)
+                "/>
+
+    </xsl:template>
+
+    <xsl:template match="fr:body[not($is-detail)]">
+        <xf:group
+            id="fr-form-group"
+            class="fr-body"
+            model="fr-form-model"
+            ref="instance('fr-form-instance')"
+        >
+            <!-- FIXME: `<a name>` is deprecated in favor of `id`. -->
+            <xh:a name="fr-form"/>
+            <xf:group id="fr-view-component" class="fr-view-appearance-full">
+
+                <xsl:apply-templates
+                    select="$body/(node() except fr:buttons)"
+                    mode="within-controls">
+                    <!-- Unclear if useful for `not($is-detail)` -->
+                    <xsl:with-param
+                        name="binds-root"
+                        select="$fr-form-model/xf:bind[@id = 'fr-form-binds']"
+                        tunnel="yes"/>
+                </xsl:apply-templates>
+
+            </xf:group>
+        </xf:group>
+    </xsl:template>
+
+    <xsl:template match="fr:body[$is-detail]">
+
         <!--
             Form content. Set context on form instance and define this group as `#fr-form-group` as observers will refer to it.
             NOTE: Use `fr-view-component` whenever possible instead since Orbeon Forms 2017.1.
@@ -355,11 +421,7 @@
                 concat('fr-validation-mode-', $validation-mode)
             }"
             model="fr-form-model"
-            ref="
-                if ($show-form-data) then
-                    instance('fr-form-instance')
-                else
-                    ()"
+            ref="instance('fr-form-instance')[$_fr-show-form-data]"
             xxf:validation-mode="{$validation-mode}"
         >
             <xsl:if test="$is-full-update">
@@ -505,7 +567,15 @@
                     ]
                 }}"
                 xxf:element="div">
-                <xsl:apply-templates select="if ($is-detail and not($is-form-builder)) then $default-page-template else node()"/>
+                <xsl:choose>
+                    <xsl:when test="$is-detail and not($is-form-builder)">
+                        <xsl:call-template name="fr-detail-page-global-variables"/>
+                        <xsl:apply-templates select="$default-page-template"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="node()"/>
+                    </xsl:otherwise>
+                </xsl:choose>
                 <xsl:call-template name="fr-hidden-controls"/>
                 <xsl:call-template name="fr-dialogs"/>
             </xf:group>
@@ -1322,7 +1392,8 @@
             <xsl:when test="not($hide-buttons-bar)">
                 <xf:var
                     name="hide-buttons-bar"
-                    value="xxf:instance('fr-persistence-instance')/found-document-message-to-show != ''"/>
+                    value="$_fr-persistence-instance/found-document-message-to-show != '' or
+                           $_fr-document-available-too-early-or-late"/>
                 <xf:group
                     model="fr-form-model"
                     class="fr-buttons"

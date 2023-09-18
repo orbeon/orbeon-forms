@@ -880,7 +880,7 @@
     </xf:instance>
 
     <xf:instance id="fr-persistence-instance" xxf:exclude-result-prefixes="#all">
-        <save xmlns="">
+        <_ xmlns="">
             <!-- Dialog to show upon xforms-ready for handling drafts -->
             <found-document-message-to-show/>
             <!-- Initial data status -->
@@ -911,7 +911,7 @@
             <lease-start-time/>
             <lease-end-time/>
             <lease-owned-by-current-user/>
-        </save>
+        </_>
     </xf:instance>
 
     <!-- Watch data-status and dispatch fr-data-status-changed -->

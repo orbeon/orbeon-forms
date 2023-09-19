@@ -136,8 +136,13 @@
     <property as="xs:boolean" name="oxf.fr.detail.static-readonly-required.*.*"                 value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.label.appearance.*.*"                         value="full"/>
     <property as="xs:string"  name="oxf.fr.detail.hint.appearance.*.*"                          value="full"/>
-    <!-- TOC disabled by default -->
-    <property as="xs:integer" name="oxf.fr.detail.toc.*.*"                                      value="-1"/>
+
+    <!-- Table of Contents -->
+    <property as="xs:integer" name="oxf.fr.detail.toc.*.*"                                      value="-2"/><!-- legacy property     -->
+    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.*.*"                         value="-2"/><!-- disabled by default -->
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.*.*"                             value="top"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.modes.*.*"                                value="new edit view"/>
+
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                            value="bottom"/>
 
     <property as="xs:boolean" name="oxf.fr.detail.new.service.enable.*.*"                       value="false"/>
@@ -339,7 +344,7 @@
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.controls"              value="wizard"/>
-    <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.controls"                          value="-1"/>
+    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.orbeon.controls"             value="-1"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.dmv-14">
         home summary clear save-final review
@@ -349,7 +354,7 @@
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.dmv-14"                value="wizard"/>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.w9"                    value="wizard"/>
-    <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.w9"                                value="-1"/>
+    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.orbeon.w9"                   value="-1"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.w9.xforms-select1.*"                  value="select-value"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w9"/>

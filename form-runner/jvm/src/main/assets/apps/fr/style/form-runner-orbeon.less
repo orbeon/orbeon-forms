@@ -335,7 +335,69 @@ body.orbeon { background-color: @frBackground }
     .xforms-upload-info { background-color: transparent }
 
     // Table of contents
-    .fr-toc a { text-decoration: none }
+    .fr-toc {
+        margin-bottom: 0;
+        padding: 10px;
+        a {
+            text-decoration: none;
+        }
+        .nav-header {
+            color: @frHeaderColor;
+        }
+        .nav-list > li > span > .btn-link {
+            padding-top: 3px;
+            padding-bottom: 3px;
+            margin-bottom: 0;
+        }
+    }
+
+    .fr-mode-pdf {
+        .fr-toc-with-body {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            .fr-toc {
+                .black-and-white-properties();
+                .nav-header {
+                    color: black;
+                }
+                .btn-link {
+                    text-decoration: none;
+                    color: black;
+                }
+            }
+        }
+    }
+
+    .fr-toc-with-body {
+        &.fr-toc-position-top {
+            & > * { // .span12
+                display: flex;
+                flex-direction: column;
+                row-gap: 10px;
+                .fr-toc {
+                }
+            }
+        }
+
+        &.fr-toc-position-left {
+            & > * { // .span12
+                display: flex;
+                flex-direction: row;
+                column-gap: 10px;
+                .fr-toc {
+                    max-width: 20%;
+                    flex-grow: 1;
+                    height: fit-content;
+
+                    position: sticky;
+                    top: 60px;
+                }
+                .fr-body {
+                    flex-grow: 1;
+                }
+            }
+        }
+    }
 
     // Add background to static read-only fields and special output fields
     .xforms-static, .fr-static { min-height: 1em }

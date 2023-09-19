@@ -134,8 +134,70 @@
         select="version:versionStringIfAllowedOrEmpty()"
         xmlns:version="java:org.orbeon.oxf.common.Version"/>
 
-    <xsl:variable name="min-toc"              select="(p:property(string-join(('oxf.fr.detail.toc', $app, $form), '.')), -1)[1]"                       as="xs:integer"/>
-    <xsl:variable name="has-toc"              select="$min-toc ge 0"                                                                                   as="xs:boolean"/>
+    <!-- TOC properties -->
+    <xsl:variable
+        name="toc-min-sections"
+        as="xs:integer"
+        select="
+            (
+                $fr-form-metadata/xbl/fr:toc/@min-sections[p:non-blank()],
+                (: Use `-2` as internal magic value to indicate that the property is not set :)
+                p:property(string-join(('oxf.fr.detail.toc',              $app, $form), '.'))[. != -2],
+                p:property(string-join(('oxf.fr.detail.toc.min-sections', $app, $form), '.'))[. != -2],
+                -1
+            )[1]"/>
+
+    <xsl:variable
+        name="toc-position-raw-opt"
+        as="xs:string?"
+        select="
+            (
+                $fr-form-metadata/xbl/fr:toc/@position[p:non-blank()],
+                p:property(string-join(('oxf.fr.detail.toc.position', $app, $form), '.'))[p:non-blank()],
+                'top'
+            )[1][
+                . = ('top', 'left') (: `none` is allowed to be explicit and is the same as blank :)
+            ]"/>
+
+    <xsl:variable
+        name="toc-position-opt"
+        as="xs:string?"
+        select="
+            (: Normalize TOC position for PDF :)
+            if (exists($toc-position-raw-opt) and $mode = ('pdf', 'tiff', 'test-pdf')) then
+                'top'
+            else
+                $toc-position-raw-opt"/>
+
+    <xsl:variable
+        name="toc-modes"
+        as="xs:string*"
+        select="
+            p:split(
+                (
+                    $fr-form-metadata/xbl/fr:toc/@modes[p:non-blank()],
+                    p:property(string-join(('oxf.fr.detail.toc.modes', $app, $form), '.'))[p:non-blank()],
+                    'new edit'
+                )[1]
+            )[
+                . = ('new', 'edit', 'view', 'pdf', 'tiff')
+            ]"/>
+
+    <xsl:variable
+        name="has-toc"
+        as="xs:boolean"
+        select="
+            not($is-form-builder)     and                 (: Form Builder never has a TOC               :)
+            not(
+                $use-view-appearance and
+                $view-appearance = 'wizard'
+            )                         and                 (: Wizard view never has a separate TOC       :)
+            $toc-min-sections ge 0    and                 (: negative value disables the TOC            :)
+            exists($toc-position-opt) and                 (: missing position disables the TOC          :)
+            $mode = $toc-modes        and                 (: mode must match                            :)
+            count($body//fr:section) ge $toc-min-sections (: meet constraint on number of form sections :)
+        "/>
+
     <xsl:variable name="error-summary"        select="p:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))"                      as="xs:string?"/>
     <xsl:variable name="default-logo-uri"     select="p:trim(p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.')))[p:non-blank()]"   as="xs:string?"/>
     <xsl:variable name="hide-logo"            select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))"                          as="xs:boolean?"/>

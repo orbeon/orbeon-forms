@@ -59,9 +59,10 @@
                 document="{{fr:document-id()}}"/>
         </xsl:if>
         <fr:row>
-            <fr:toc/>
+            <fr:top-messages/>
         </fr:row>
-        <fr:row>
+        <fr:row class="fr-toc-with-body fr-toc-position-{$toc-position-opt}">
+            <fr:toc/>
             <fr:body/>
         </fr:row>
         <xsl:if test="p:property(string-join(('oxf.fr.detail.captcha.location', $app, $form), '.')) = 'form-bottom'">
@@ -91,9 +92,9 @@
     </xsl:variable>
 
     <xsl:template match="fr:row">
-        <xh:div class="row{if ($fluid) then '-fluid' else ''}">
+        <xh:div class="row{if ($fluid) then '-fluid' else '', @class}">
             <xh:div class="span12">
-                <xsl:apply-templates select="@* | node()"/>
+                <xsl:apply-templates select="node()"/>
             </xh:div>
         </xh:div>
     </xsl:template>
@@ -550,7 +551,7 @@
                 class="container{
                     '-fluid'[$fluid]
                 } fr-view fr-mode-{{
-                    $fr-mode
+                    fr:mode()
                 }}{{
                     ' fr-static-readonly-required'[
                         fr:is-readonly-mode() and (
@@ -1471,16 +1472,14 @@
     </xsl:template>
 
     <!-- TOC: Top-level -->
-    <xsl:template match="fr:toc" name="fr-toc">
+    <xsl:template match="fr:toc[$has-toc]" name="fr-toc">
         <!-- This is statically built in XSLT instead of using XForms -->
-        <xsl:if test="$has-toc and $is-detail and not($is-form-builder) and count($body//fr:section) ge $min-toc">
-            <xh:div class="fr-toc well sidebar-nav">
-                <xh:ul class="nav nav-list">
-                    <xh:li class="nav-header"><xf:output ref="$fr-resources/summary/titles/toc"/></xh:li>
-                    <xsl:apply-templates select="$body" mode="fr-toc-sections"/>
-                </xh:ul>
-            </xh:div>
-        </xsl:if>
+        <xh:div class="fr-toc well sidebar-nav">
+            <xh:ul class="nav nav-list">
+                <xh:li class="nav-header"><xf:output ref="$fr-resources/summary/titles/toc"/></xh:li>
+                <xsl:apply-templates select="$body" mode="fr-toc-sections"/>
+            </xh:ul>
+        </xh:div>
     </xsl:template>
 
     <!-- TOC: Swallow unneeded nodes -->

@@ -245,11 +245,12 @@ object StringUtils {
 
     def escaped(stringsToEscape: Iterable[String], escapeString: String): String = {
       @tailrec
-      def recurse(stringsToEscape: List[String], acc: String): String = stringsToEscape match {
+      def escaped(stringsToEscape: List[String], acc: String): String = stringsToEscape match {
         case Nil          => acc
-        case head :: tail => recurse(tail, acc.replace(head, escapeString + head))
+        case head :: tail => escaped(tail, acc.replace(head, escapeString + head))
       }
-      recurse(stringsToEscape.toList, s)
+
+      escaped(stringsToEscape.toList, s)
     }
   }
 

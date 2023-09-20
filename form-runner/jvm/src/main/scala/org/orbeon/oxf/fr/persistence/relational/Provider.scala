@@ -74,10 +74,7 @@ object Provider extends Enum[Provider] {
     }
 
   private def paramForLike(param: String, surroundingPercents: Boolean): String = {
-    val escapedParam =
-      param.replace("\\", "\\\\")
-           .replace("%" , "\\%" )
-           .replace("_" , "\\_" )
+    val escapedParam = param.escaped(Seq("\\", "%", "_"), "\\")
      if (surroundingPercents) s"%$escapedParam%" else escapedParam
   }
 

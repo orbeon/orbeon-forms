@@ -18,10 +18,12 @@ import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.Provider.{Oracle, SQLServer}
 import org.orbeon.oxf.fr.persistence.relational.Version.{Specific, Unspecified}
 import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.scaxon.NodeConversions
@@ -75,10 +77,42 @@ class SearchTest
       }
     }
 
-    it("returns correct results with underscores (free-text search)") {
+    it("returns correct results with underscores and other special characters (free-text search)") {
+      for {
+        // TODO: investigate why < and > don't work at all with MySQL
+        // TODO: investigate why & and \ don't work at all with SQL Server
+        character <- Seq("\\", "%", "_", "*", "'")
+      } locally {
+        val lookingFor    = s"test$character"
+        val notLookingFor = "tests"
+
+        val searchRequest =
+          <search>
+            <query>{ lookingFor }</query>
+            <query path="section-1/control-1"/>
+            <drafts>include</drafts>
+            <page-size>10</page-size>
+            <page-number>1</page-number>
+            <lang>en</lang>
+          </search>.toDocument
+
+        val searchResult =
+          <documents search-total="1">
+            <document name="1" draft="false" operations="*">
+              <details>
+                <detail path="section-1/control-1">{ lookingFor }</detail>
+              </details>
+            </document>
+          </documents>.toDocument
+
+        testWithSimpleValues(searchRequest, searchResult, values = Seq("1" -> lookingFor, "2" -> notLookingFor))
+      }
+    }
+
+    it("returns correct results with underscores and multiple search terms (free-text search)") {
       val searchRequest =
         <search>
-          <query>t_st3</query>
+          <query>t_st3 *test4*</query>
           <query path="section-1/control-1"/>
           <drafts>include</drafts>
           <page-size>10</page-size>
@@ -86,19 +120,24 @@ class SearchTest
           <lang>en</lang>
         </search>.toDocument
 
-      // Oracle and SQL Server parse XML columns differently than other databases. 't_st3' will match '*t_st3*', but
-      // 't_st' won't match '*t_st3*'. With other databases, 't_st' will match '*t_st3*'.
+      // Test Oracle and SQL Server's AND logic (see Provider.xmlContainsParam)
 
       val searchResult =
         <documents search-total="1">
           <document name="3" draft="false" operations="*">
             <details>
-              <detail path="section-1/control-1">*t_st3*</detail>
+              <detail path="section-1/control-1">*t_st3* *test4* *test5*</detail>
             </details>
           </document>
         </documents>.toDocument
 
-      underscoreTest(searchRequest, searchResult, values = Seq("1" -> "*test1*", "2" -> "*test2*", "3" -> "*t_st3*"))
+      testWithSimpleValues(
+        searchRequest = searchRequest,
+        searchResult  = searchResult,
+        values        = Seq("1" -> "*test1*", "2" -> "*test2*", "3" -> "*t_st3* *test4* *test5*"),
+        // TODO: add test for other databases as well
+        providers     = Some(List(Oracle, SQLServer))
+      )
     }
 
     it("returns correct results with underscores (structured text, substring)") {
@@ -121,7 +160,7 @@ class SearchTest
           </document>
         </documents>.toDocument
 
-      underscoreTest(searchRequest, searchResult, values = Seq("1" -> "*test1*", "2" -> "*test2*", "3" -> "*t_st3*"))
+      testWithSimpleValues(searchRequest, searchResult, values = Seq("1" -> "*test1*", "2" -> "*test2*", "3" -> "*t_st3*"))
     }
 
     it("returns correct results with underscores (structured text, exact)") {
@@ -144,7 +183,7 @@ class SearchTest
           </document>
         </documents>.toDocument
 
-      underscoreTest(searchRequest, searchResult, values = Seq("1" -> "t1st", "2" -> "t2st", "3" -> "t_st", "4" -> "*t_st*"))
+      testWithSimpleValues(searchRequest, searchResult, values = Seq("1" -> "t1st", "2" -> "t2st", "3" -> "t_st", "4" -> "*t_st*"))
     }
 
     it("returns correct results with underscores (structured text, token)") {
@@ -187,7 +226,7 @@ class SearchTest
           </document>
         </documents>.toDocument
 
-      underscoreTest(searchRequest1, searchResult1, values)
+      testWithSimpleValues(searchRequest1, searchResult1, values)
 
       val searchRequest2 =
         <search>
@@ -213,42 +252,48 @@ class SearchTest
           </document>
         </documents>.toDocument
 
-      underscoreTest(searchRequest2, searchResult2, values)
+      testWithSimpleValues(searchRequest2, searchResult2, values)
     }
   }
 
-  def underscoreTest(searchRequest: Document, searchResult: Document, values: Seq[(String, String)]): Unit =
+  def testWithSimpleValues(
+    searchRequest: Document,
+    searchResult : Document,
+    values       : Seq[(String, String)],
+    providers    : Option[List[Provider]] = None
+  ): Unit =
     withTestExternalContext { implicit externalContext =>
       Connect.withOrbeonTables("form definition") { (connection, provider) =>
+        if (providers.forall(_.contains(provider))) {
+          val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
 
-        val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
+          HttpAssert.put(formURL, Unspecified, HttpCall.XML(testFormDefinition(provider)), StatusCode.Created)
 
-        HttpAssert.put(formURL, Unspecified, HttpCall.XML(testFormDefinition(provider)), StatusCode.Created)
+          // TODO: we might want to publish the form and remove the `migration` metadata from the form definition
 
-        // TODO: we might want to publish the form and remove the `migration` metadata from the form definition
+          def dataURL(id: String) = HttpCall.crudURLPrefix(provider) + s"data/$id/data.xml"
 
-        def dataURL(id: String) = HttpCall.crudURLPrefix(provider) + s"data/$id/data.xml"
+          values.foreach { case (id, value) =>
+            HttpAssert.put(dataURL(id), Specific(1), HttpCall.XML(testFormData(value)), StatusCode.Created)
+          }
 
-        values.foreach { case (id, value) =>
-          HttpAssert.put(dataURL(id), Specific(1), HttpCall.XML(testFormData(value)), StatusCode.Created)
-        }
-
-        // Use eventually clause mainly for SQL Server, which doesn't update its indexes during several seconds after
-        // the form data has been created
-        eventually (timeout(Span(30, Seconds)), interval(Span(1, Second))) {
-          HttpCall.assertCall(
-            HttpCall.SolicitedRequest(
-              path              = HttpCall.searchURLPrefix(provider),
-              version           = Unspecified,
-              method            = POST,
-              body              = Some(HttpCall.XML(searchRequest)),
-              xmlResponseFilter = Some(searchResultFilter)
-            ),
-            HttpCall.ExpectedResponse(
-              code = StatusCode.Ok,
-              body = Some(HttpCall.XML(searchResult))
+          // Use eventually clause mainly for SQL Server, which doesn't update its indexes during several seconds after
+          // the form data has been created
+          eventually(timeout(Span(10, Seconds)), interval(Span(1, Second))) {
+            HttpCall.assertCall(
+              HttpCall.SolicitedRequest(
+                path              = HttpCall.searchURLPrefix(provider),
+                version           = Unspecified,
+                method            = POST,
+                body              = Some(HttpCall.XML(searchRequest)),
+                xmlResponseFilter = Some(searchResultFilter)
+              ),
+              HttpCall.ExpectedResponse(
+                code = StatusCode.Ok,
+                body = Some(HttpCall.XML(searchResult))
+              )
             )
-          )
+          }
         }
       }
     }

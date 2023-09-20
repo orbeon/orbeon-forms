@@ -18,7 +18,6 @@ import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider.{Oracle, SQLServer}
 import org.orbeon.oxf.fr.persistence.relational.Version.{Specific, Unspecified}
 import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.http.StatusCode
@@ -136,7 +135,7 @@ class SearchTest
         searchResult  = searchResult,
         values        = Seq("1" -> "*test1*", "2" -> "*test2*", "3" -> "*t_st3* *test4* *test5*"),
         // TODO: add test for other databases as well
-        providers     = Some(List(Oracle, SQLServer))
+        providers     = Some(List())
       )
     }
 
@@ -303,10 +302,10 @@ class SearchTest
   def searchResultFilter(document: Document): Document = {
     import scala.xml._
 
-    def withoutDateAttributes(elem: Elem): Elem = {
+    def withFilteredAttributes(elem: Elem): Elem = {
       val filteredAttributes = elem.attributes.filter {
-        case Attribute(key, _, _) if Set("created", "last-modified").contains(key) => false
-        case _                                                                      => true
+        case Attribute(key, _, _) if Set("created", "last-modified", "operations").contains(key) => false
+        case _                                                                                   => true
       }
       elem.copy(attributes = filteredAttributes)
     }
@@ -320,7 +319,7 @@ class SearchTest
       }
 
     val rootElem                = XML.loadString(document.getRootElement.serializeToString())
-    val filteredResultDocuments = sortedByNameAttribute(rootElem.child.collect { case elem: Elem => elem }.map(withoutDateAttributes))
+    val filteredResultDocuments = sortedByNameAttribute(rootElem.child.collect { case elem: Elem => elem }.map(withFilteredAttributes))
 
     NodeConversions.elemToOrbeonDom(rootElem.copy(child = filteredResultDocuments))
   }

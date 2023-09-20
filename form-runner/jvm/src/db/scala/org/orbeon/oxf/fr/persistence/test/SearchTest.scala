@@ -25,7 +25,10 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupp
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.scaxon.NodeConversions
+import org.scalatest.concurrent.Eventually.eventually
+import org.scalatest.concurrent.Futures.{interval, timeout}
 import org.scalatest.funspec.AnyFunSpecLike
+import org.scalatest.time.{Second, Seconds, Span}
 
 class SearchTest
     extends DocumentTestBase
@@ -222,25 +225,31 @@ class SearchTest
 
         HttpAssert.put(formURL, Unspecified, HttpCall.XML(testFormDefinition(provider)), StatusCode.Created)
 
+        // TODO: we might want to publish the form and remove the `migration` metadata from the form definition
+
         def dataURL(id: String) = HttpCall.crudURLPrefix(provider) + s"data/$id/data.xml"
 
         values.foreach { case (id, value) =>
           HttpAssert.put(dataURL(id), Specific(1), HttpCall.XML(testFormData(value)), StatusCode.Created)
         }
 
-        HttpCall.assertCall(
-          HttpCall.SolicitedRequest(
-            path              = HttpCall.searchURLPrefix(provider),
-            version           = Unspecified,
-            method            = POST,
-            body              = Some(HttpCall.XML(searchRequest)),
-            xmlResponseFilter = Some(searchResultFilter)
-          ),
-          HttpCall.ExpectedResponse(
-            code = StatusCode.Ok,
-            body = Some(HttpCall.XML(searchResult))
+        // Use eventually clause mainly for SQL Server, which doesn't update its indexes during several seconds after
+        // the form data has been created
+        eventually (timeout(Span(30, Seconds)), interval(Span(1, Second))) {
+          HttpCall.assertCall(
+            HttpCall.SolicitedRequest(
+              path              = HttpCall.searchURLPrefix(provider),
+              version           = Unspecified,
+              method            = POST,
+              body              = Some(HttpCall.XML(searchRequest)),
+              xmlResponseFilter = Some(searchResultFilter)
+            ),
+            HttpCall.ExpectedResponse(
+              code = StatusCode.Ok,
+              body = Some(HttpCall.XML(searchResult))
+            )
           )
-        )
+        }
       }
     }
 

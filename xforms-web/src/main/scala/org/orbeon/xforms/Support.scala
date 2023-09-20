@@ -93,7 +93,7 @@ object Support {
           referrer       = js.undefined
           referrerPolicy = js.undefined
           mode           = js.undefined
-          credentials    = js.undefined
+          credentials    = RequestCredentials.include
           cache          = js.undefined
           redirect       = RequestRedirect.follow // only one supported with the polyfill
           integrity      = js.undefined

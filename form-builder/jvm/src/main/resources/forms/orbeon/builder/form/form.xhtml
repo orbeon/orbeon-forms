@@ -951,91 +951,97 @@
                             </xh:div>
 
                             <xh:div class="fb-control-editor-left">
-                                <xh:i
-                                    class="fb-x-merge fa fa-long-arrow-right fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/merge-right-icon/label}"/>
-                                <xh:i
-                                    class="fb-x-split fa fa-unlink fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/split-horizontally-icon/label}"/>
-                                <xh:i
-                                    class="fb-y-merge fa fa-long-arrow-down fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/merge-below-icon/label}"/>
-                                <xh:i
-                                    class="fb-y-split fa fa-unlink fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/split-vertically-icon/label}"/>
+                                <xh:div>
+                                    <xh:i
+                                        class="fb-x-merge fa fa-long-arrow-right fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/merge-right-icon/label}"/>
+                                    <xh:i
+                                        class="fb-x-split fa fa-unlink fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/split-horizontally-icon/label}"/>
+                                    <xh:i
+                                        class="fb-y-merge fa fa-long-arrow-down fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/merge-below-icon/label}"/>
+                                    <xh:i
+                                        class="fb-y-split fa fa-unlink fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/split-vertically-icon/label}"/>
+                                </xh:div>
                             </xh:div>
 
                             <xh:div class="fb-control-editor-right">
-                                <xh:i
-                                    class="fb-control-handle fa fa-arrows fa-fw"
-                                    draggable="true"
-                                    title="{$fb-resources/move-icon/label}"/>
-                                <xh:i
-                                    class="fb-control-edit-details fa fa-cogs fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/control-settings-icon/label}"/>
-                                <xh:i
-                                    class="fb-control-delete fa fa-minus-circle fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/delete-control-icon/label}"/>
-                                <xh:i
-                                    class="fb-control-edit-items fa fa-th-list fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/edit-items/label}"/>
+                                <xh:div>
+                                    <xh:i
+                                        class="fb-control-handle fa fa-arrows fa-fw"
+                                        draggable="true"
+                                        title="{$fb-resources/move-icon/label}"/>
+                                    <xh:i
+                                        class="fb-control-edit-details fa fa-cogs fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/control-settings-icon/label}"/>
+                                    <xh:i
+                                        class="fb-control-delete fa fa-minus-circle fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/delete-control-icon/label}"/>
+                                    <xh:i
+                                        class="fb-control-edit-items fa fa-th-list fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/edit-items/label}"/>
 
-                                <!-- Used by the button/link editor, see the placeholders.coffee which uses a state machine -->
-                                <!--<xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">-->
-                                    <!--<xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = frf:controlNameFromId($control-id)]/label">-->
-                                        <!--<xf:label appearance="minimal" ref="$form-resources/type-label/label"/>-->
-                                    <!--</xf:input>-->
-                                <!--</xf:group>-->
+                                    <!-- Used by the button/link editor, see the placeholders.coffee which uses a state machine -->
+                                    <!--<xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">-->
+                                        <!--<xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = frf:controlNameFromId($control-id)]/label">-->
+                                            <!--<xf:label appearance="minimal" ref="$form-resources/type-label/label"/>-->
+                                        <!--</xf:input>-->
+                                    <!--</xf:group>-->
+                                </xh:div>
 
                             </xh:div>
 
                             <xh:div class="fb-section-grid-editor">
                                 <xf:output class="fb-enter-section-title-label xforms-hidden" ref="$form-resources/enter-section-title/label"/>
                                 <xf:output class="fb-type-section-title-label xforms-hidden"  ref="$form-resources/type-section-title/label"/>
-                                <xh:i
-                                    class="fb-container-edit-details fa fa-cogs fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/section-details-icon/label}"/>
-                                <xh:i
-                                    class="fb-container-delete fa fa-minus-circle fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/delete-container-icon/label}"/>
-                                <xh:i
-                                    class="fb-container-move-up fa fa-arrow-up fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/move-up-icon/label}"/>
-                                <xh:i
-                                    class="fb-container-move-down fa fa-arrow-down fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/move-down-icon/label}"/>
-                                <xh:i
-                                    class="fb-container-move-right fa fa-arrow-right fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/move-right-icon/label}"/>
-                                <xh:i
-                                    class="fb-container-move-left fa fa-arrow-left fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/move-left-icon/label}"/>
-                                <xh:i
-                                    class="fb-container-cut fa fa-cut fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/cut/label}"/>
-                                <xh:i
-                                    class="fb-container-copy fa fa-copy fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/copy/label}"/>
-                                <!-- MAYBE: Paste icon if allowed? -->
-                                <xh:i
-                                    class="fb-container-merge fa fa-share-alt fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/merge-section/label}"/>
+                                <xh:div>
+                                    <xh:i
+                                        class="fb-container-edit-details fa fa-cogs fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/section-details-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-delete fa fa-minus-circle fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/delete-container-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-move-up fa fa-arrow-up fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/move-up-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-move-down fa fa-arrow-down fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/move-down-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-move-right fa fa-arrow-right fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/move-right-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-move-left fa fa-arrow-left fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/move-left-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-cut fa fa-cut fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/cut/label}"/>
+                                    <xh:i
+                                        class="fb-container-copy fa fa-copy fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/copy/label}"/>
+                                    <!-- MAYBE: Paste icon if allowed? -->
+                                    <xh:i
+                                        class="fb-container-merge fa fa-share-alt fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/merge-section/label}"/>
+                                </xh:div>
                             </xh:div>
 
                             <xh:div class="fb-row-editor">

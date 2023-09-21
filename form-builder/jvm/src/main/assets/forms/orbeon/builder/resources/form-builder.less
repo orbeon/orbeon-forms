@@ -18,7 +18,7 @@
 @fbBottomHeight: 54px;
 @fbGridIconsGutter: 22px;
 @fbIconsHeight: 16px;
-@fbGridRowMinHeight: 64px;
+@fbGridRowMinHeight: 66px;
 
 // Retro Summer #2 Color Scheme
 @color1: #FFEA48; // Gargoyle Gas
@@ -112,26 +112,41 @@ body.orbeon {
     .fb-row-editor {
         position: absolute; top: 0; left: 0;                                // Its left/right in the browser relative to the current section
         display: none;                                                      // Shown in code when mouse over section
-        text-align: center;
-        i { display: block }                                                // Icons shown vertically
         i:not([class ~= 'disabled']) { cursor: pointer }                    // Non-disabled icons are clickable
-
-        .fa {
-            height: 18px;
-        }
     }
 
     .fb-section-grid-editor,
     .fb-control-editor-left,
     .fb-control-editor-right {
 
+        &> div {
+            display: flex;
+            flex-direction: column;
+            align-items: baseline;
+            margin-top: 2px;
+
+            .fa {
+                height: 16px;
+                padding: 1px;
+            }
+        }
+
         // Zoom effect on icons
-        // Works well on section icons but needs work on cell and grid row icons
         .fa:not([class ~= 'disabled']):hover {
-            font-size: 130%;
-            vertical-align: -10px;
-            margin-left: -2px;
+
+            &::before {
+                font-size: 120%;
+                transition: all ease 100ms;
+            }
+
             transition: all ease 100ms;
+        }
+    }
+
+    .fb-section-grid-editor,
+    .fb-row-editor {
+        .fa {
+            width: 18px;
         }
     }
 
@@ -140,20 +155,20 @@ body.orbeon {
     .fb-control-editor-top {
         .fa {
             height: 16px;
+            font-size: 14px;
         }
     }
+
     .fb-section-grid-editor {
         padding-right: 10px;                                                // Space between icons and section
     }
     .fb-control-editor-left {
-        padding-top:   8px;                                                 // Space between icons and the cell border
-        padding-left:  8px;
-        padding-right: 0;
+        padding-left:  4px;
+        padding-top: 0;
     }
     .fb-control-editor-right {
-        padding-top:   8px;                                                 // Space between icons and the cell border
-        padding-right: 8px;
-        padding-left:  0;
+        padding-right: 4px;
+        padding-top: 0;
     }
 
     .fb-control-editor-top {
@@ -176,9 +191,7 @@ body.orbeon {
     .fb-control-editor-left {
         .fb-x-split { transform: rotate(135deg) }                           // Default icon is tilted at a 45º angle
         .fb-y-split { transform: rotate(45deg)  }
-        .fb-x-split { position: relative; left: -3px; top: -4px }           // Adjustments
-        .fb-y-merge { position: relative; left: -1px }
-        .fb-y-split { position: relative; left: -3px }
+        .fb-x-split { position: relative; left: -1px; top: -4px }           // Adjustments
     }
 
     .fb-section-label-editor-click-interceptor {                            // Shown on top of each section label to avoid click → collapse
@@ -273,7 +286,7 @@ body.orbeon {
     .gu-mirror.fb-dnd-copy { cursor: copy; cursor: -webkit-copy }
     .gu-mirror.fb-dnd-move { cursor: move; cursor: -webkit-move }
     // So the cursor is inside the element, and picking the cursor works
-    .gu-mirror { padding-right: 28px }
+    .gu-mirror { padding-right: 24px }
 
     .fb-grid-dnd-wall-container {
 
@@ -1430,8 +1443,8 @@ body.orbeon {
             padding-top: 4px;
             padding-bottom: 4px;
             // Space for the icons to the left and right of the control
-            padding-left: 28px;
-            padding-right: 28px;
+            padding-left: 24px;
+            padding-right: 24px;
 
             // Inputs for editing the label and hint to take the whole width of the grid content
             .xforms-label input, .xforms-hint input {

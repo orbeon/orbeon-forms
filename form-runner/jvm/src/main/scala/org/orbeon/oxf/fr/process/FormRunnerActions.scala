@@ -303,7 +303,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     Try {
       val params: List[Option[(Option[String], String)]] =
         List(
-          Some(             Some("uri")                  -> prependUserAndStandardParamsForModeChange(propagateDataPermissions = true, prependCommonFormRunnerParameters(path, forNavigate = false))),
+          Some(             Some("uri")                  -> prependUserAndStandardParamsForModeChange(propagateInternalState = true, prependCommonFormRunnerParameters(path, forNavigate = false))),
           Some(             Some("method")               -> HttpMethod.POST.entryName.toLowerCase),
           Some(             Some(NonRelevantName)        -> RelevanceHandling.Keep.entryName.toLowerCase),
           Some(             Some("replace")              -> replace),
@@ -416,7 +416,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     "prune" // for backward compatibility,
   ) ++ DefaultSendParameters.keys
 
-  private def prependUserAndStandardParamsForModeChange(propagateDataPermissions: Boolean, pathQuery: String) = {
+  private def prependUserAndStandardParamsForModeChange(propagateInternalState: Boolean, pathQuery: String) = {
 
     val (path, params) = splitQueryDecodeParams(pathQuery)
 
@@ -425,10 +425,11 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
     // https://github.com/orbeon/orbeon-forms/issues/2999
     // https://github.com/orbeon/orbeon-forms/issues/5437
-    val internalAuthorizedOperationsParam =
-      propagateDataPermissions flatList {
+    val internalParams =
+      propagateInternalState flatList {
         val ops = authorizedOperations
-        ops.nonEmpty list (InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(ops))
+        (ops.nonEmpty list (InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(ops))) :::
+        FormRunner.documentWorkflowStage.toList.map(stage => InternalWorkflowStageParam -> FormRunnerOperationsEncryption.encryptString(stage))
       }
 
     val userParams =
@@ -439,7 +440,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       } yield
         name -> value
 
-    recombineQuery(path, dataMigrationParam :: internalAuthorizedOperationsParam ::: userParams ::: params)
+    recombineQuery(path, dataMigrationParam :: internalParams ::: userParams ::: params)
   }
 
   private def buildRenderedFormatPath(

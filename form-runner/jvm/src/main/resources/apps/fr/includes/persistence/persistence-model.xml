@@ -260,6 +260,15 @@
                 <xf:setvalue
                     if="$mode = 'edit'"
                     ref="$persistence-instance/initial-data-status">dirty</xf:setvalue>
+
+                <!-- https://github.com/orbeon/orbeon-forms/issues/5984 -->
+                <xf:setvalue
+                    ref="instance('fr-document-metadata')/@workflow-stage"
+                    value="
+                        frf:decryptWorkflowStageIfNeeded(
+                            xxf:get-request-parameter(frf:InternalWorkflowStageParam())[1]
+                        )"/>
+
             </xf:action>
 
             <!-- In 'new' mode only, after an external document has been set, recalculate defaults (and rebuild so the refs

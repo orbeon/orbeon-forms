@@ -139,6 +139,10 @@ trait FormRunnerPermissionsOps {
       )
     }
   }
+
+  //@XPathFunction
+  def decryptWorkflowStageIfNeeded(encryptedWorkflowStageOrNull: String): String =
+    encryptedWorkflowStageOrNull.trimAllToOpt.flatMap(FormRunnerOperationsEncryption.decryptString).getOrElse("")
 }
 
 object FormRunnerPermissionsOps extends FormRunnerPermissionsOps

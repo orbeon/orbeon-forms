@@ -123,6 +123,9 @@ trait FormRunnerBaseOps {
   //@XPathFunction
   val InternalAuthorizedOperationsParam = "fr-internal-authorized-operations"
 
+  //@XPathFunction
+  val InternalWorkflowStageParam = "fr-internal-workflow-stage"
+
   val LiferayLanguageHeader  = "orbeon-liferay-language"
 
   val DefaultIterationSuffix = "-iteration"

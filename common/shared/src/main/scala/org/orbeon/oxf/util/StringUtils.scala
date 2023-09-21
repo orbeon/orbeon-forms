@@ -242,6 +242,15 @@ object StringUtils {
       }
       recurse(Nil, s.toList).mkString.toLowerCase
     }
+
+    def escaped(stringsToEscape: Iterable[String], escapeString: String): String = {
+      @tailrec
+      def recurse(stringsToEscape: List[String], acc: String): String = stringsToEscape match {
+        case Nil          => acc
+        case head :: tail => recurse(tail, acc.replace(head, escapeString + head))
+      }
+      recurse(stringsToEscape.toList, s)
+    }
   }
 
   private class CodePointsIterator(val cs: CharSequence) extends Iterator[Int] {

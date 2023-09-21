@@ -16,7 +16,7 @@ package org.orbeon.xbl
 import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
 import org.orbeon.xbl.DndRepeat._
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames, Page}
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
@@ -125,6 +125,7 @@ object Tabbable {
                 AjaxEvent(
                   eventName  = EventNames.XXFormsDnD,
                   targetId   = repeatId,
+                  form       = Page.findXFormsForm(containerElem).map(_.elem),
                   properties = Map(
                     "dnd-start" -> (dndStart + 1),
                     "dnd-end"   -> (dndEnd + 1)

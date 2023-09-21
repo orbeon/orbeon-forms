@@ -407,6 +407,7 @@ body.orbeon {
                     grid-template-columns: repeat(3, 1fr);
                     padding: 0;
                     margin-bottom: 2px;
+                    align-items: baseline;
 
                     .fb-workflow-button          { grid-row-start: 1; ; grid-column-start: 1; }
                     .fb-permissions-button       { grid-row-start: 1; ; grid-column-start: 1; }
@@ -416,11 +417,18 @@ body.orbeon {
 
                 // Zoom effect on icons
                 .xforms-trigger-appearance-minimal:not([class ~= 'xforms-readonly']) {
-                    .fa:hover {
-                        font-size: 130%;
-                        vertical-align: -2px;
-                        margin-left: -2px;
-                        margin-right: -3px;
+                    button {
+                        padding: 0;
+                        border: none;
+                    }
+                }
+                .xforms-trigger-appearance-minimal:not([class ~= 'xforms-readonly']):hover {
+                    button {
+                        margin-top: 4px;
+                        transition: all ease 100ms;
+                    }
+                    .fa::before {
+                        font-size: 18px;
                         transition: all ease 100ms;
                     }
                 }

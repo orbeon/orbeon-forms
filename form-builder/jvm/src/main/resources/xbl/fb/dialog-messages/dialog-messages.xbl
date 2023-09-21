@@ -31,7 +31,7 @@
                 <xf:delete ref="$i/*"/>
 
                 <!-- Copy messages from form metadata to instance (and flatten them) -->
-                <xf:action iterate="$metadata-resources/resource">
+                <xf:action iterate="$metadata/resources/resource">
                     <xf:var name="lang" value="@xml:lang"/>
 
                     <!-- Do not support 'all languages' (*) for now -->
@@ -65,16 +65,22 @@
             </xbl:handler>
 
             <xbl:handler if="valid($i)" event="DOMActivate" observer="fb-save-trigger">
-                <xf:delete ref="$metadata-resources/resource[@xml:lang = $available-languages]/messages"/>
-                <xf:delete ref="$metadata-resources/resource[count(*) = 0]"/>
+                <xf:delete ref="$metadata/resources/resource[@xml:lang = $available-languages]/messages"/>
+                <xf:delete ref="$metadata/resources/resource[count(*) = 0]"/>
 
                 <!-- Copy messages from instance to form metadata -->
                 <xf:action iterate="distinct-values($i/message/@xml:lang)">
                     <xf:var name="lang" value="."/>
 
                     <xf:insert
-                        if="count($metadata-resources/resource[@xml:lang = $lang]) = 0"
-                        context="$metadata-resources"
+                        if="count($metadata/resources) = 0"
+                        context="$metadata"
+                        ref="*"
+                        origin="xf:element('resources')"/>
+
+                    <xf:insert
+                        if="count($metadata/resources/resource[@xml:lang = $lang]) = 0"
+                        context="$metadata/resources"
                         ref="*"
                         origin="xf:element(
                             'resource',
@@ -82,8 +88,8 @@
                         )"/>
 
                     <xf:insert
-                        if="count($metadata-resources/resource[@xml:lang = $lang]/messages) = 0"
-                        context="$metadata-resources/resource[@xml:lang = $lang]"
+                        if="count($metadata/resources/resource[@xml:lang = $lang]/messages) = 0"
+                        context="$metadata/resources/resource[@xml:lang = $lang]"
                         ref="*"
                         origin="xf:element('messages')"/>
 
@@ -93,7 +99,7 @@
                         <xf:var name="value" value="string()"/>
 
                         <xf:insert
-                            context="$metadata-resources/resource[@xml:lang = $lang]/messages"
+                            context="$metadata/resources/resource[@xml:lang = $lang]/messages"
                             ref="*"
                             origin="xf:element(
                                 'message',
@@ -123,7 +129,7 @@
 
                 <xf:var name="available-languages" value="frf:allLangs(fbf:resourcesRoot())"/>
 
-                <xf:var name="metadata-resources"  value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/resources"/>
+                <xf:var name="metadata"            value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*[1]"/>
 
                 <xf:bind ref="$i/message">
                     <xf:bind ref="@name, ." xxf:whitespace="trim" readonly="false()" constraint=". != ''"/>
@@ -134,6 +140,8 @@
 
                     <xf:bind ref="@html" type="xs:boolean"/>
                 </xf:bind>
+
+                <xf:bind ref="$ti/message" readonly="true()"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">

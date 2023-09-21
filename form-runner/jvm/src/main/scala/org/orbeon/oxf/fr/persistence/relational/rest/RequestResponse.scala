@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.http.HttpRanges
 
 import java.time.Instant
 
@@ -43,7 +44,8 @@ case class CrudRequest(
   groupname      : Option[String],
   flatView       : Boolean,
   credentials    : Option[Credentials],
-  workflowStage  : Option[String]
+  workflowStage  : Option[String],
+  ranges         : HttpRanges
 ) {
   def forForm       : Boolean = dataPart.isEmpty
   def forData       : Boolean = dataPart.isDefined

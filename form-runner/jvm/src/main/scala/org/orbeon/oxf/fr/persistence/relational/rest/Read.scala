@@ -32,7 +32,7 @@ import scala.annotation.tailrec
 
 trait Read {
 
-  def getOrHead(req: CrudRequest, method: HttpMethod, ranges: HttpRanges)(implicit httpResponse: ExternalContext.Response): Unit = {
+  def getOrHead(req: CrudRequest, method: HttpMethod)(implicit httpResponse: ExternalContext.Response): Unit = {
 
     val hasStage = req.forData && ! req.forAttachment
     val readBody = method == HttpMethod.GET
@@ -40,7 +40,7 @@ trait Read {
     // Determine what kind of body we need to read, if any
     val bodyContentOpt = if (readBody) {
       if (req.forAttachment) {
-        ranges.singleRange match {
+        req.ranges.singleRange match {
           case None =>
             Some(FullAttachment)
 
@@ -69,8 +69,8 @@ trait Read {
       httpResponse   = httpResponse,
       headersSet     = false,
       hasStage       = hasStage,
-      bodyContentOpt = bodyContentOpt,
-      singleRangeOpt = ranges.singleRange)
+      bodyContentOpt = bodyContentOpt
+    )
   }
 
   @tailrec
@@ -79,8 +79,7 @@ trait Read {
     httpResponse  : ExternalContext.Response,
     headersSet    : Boolean,
     hasStage      : Boolean,
-    bodyContentOpt: Option[BodyContent],
-    singleRangeOpt: Option[HttpRange]
+    bodyContentOpt: Option[BodyContent]
   ): Unit = {
     val partialBinaryMaxLength = Provider.partialBinaryMaxLength(req.provider)
 
@@ -130,7 +129,7 @@ trait Read {
         httpResponse.setHeader(Headers.ContentType,      ContentTypes.XmlContentType)
 
       for {
-        range                <- singleRangeOpt
+        range                <- req.ranges.singleRange
         totalFileContentSize <- fromDatabase.totalAttachmentSize
         // Check that the file is stored into the database (and not e.g. in the filesystem)
         if totalFileContentSize > 0
@@ -155,8 +154,8 @@ trait Read {
           hasStage       = hasStage,
           // Only set headers once
           headersSet     = true,
-          bodyContentOpt = Some(nextBodyContent),
-          singleRangeOpt = singleRangeOpt)
+          bodyContentOpt = Some(nextBodyContent)
+        )
     }
   }
 

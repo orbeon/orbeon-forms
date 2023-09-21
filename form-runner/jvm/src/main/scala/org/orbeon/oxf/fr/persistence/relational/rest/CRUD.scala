@@ -48,20 +48,13 @@ class CRUD
 
       val requestPath  = httpRequest.getRequestPath
 
-      HttpRanges(httpRequest) match {
-        case Success(ranges) =>
-          httpRequest.getMethod match {
-            case HttpMethod.GET | HttpMethod.HEAD => getOrHead(getCrudRequest      (requestPath), httpRequest.getMethod, ranges)
-            case HttpMethod.PUT                   => change   (getCrudRequest      (requestPath), delete = false)
-            case HttpMethod.DELETE                => change   (getCrudRequest      (requestPath), delete = true)
-            case HttpMethod.LOCK                  => lock     (getLockUnlockRequest(requestPath))
-            case HttpMethod.UNLOCK                => unlock   (getLockUnlockRequest(requestPath))
-            case _                                => httpResponse.setStatus(StatusCode.MethodNotAllowed)
-          }
-
-        case Failure(throwable) =>
-          logger.error(throwable)(s"Error while processing request ${httpRequest.getRequestPath}")
-          httpResponse.setStatus(StatusCode.BadRequest)
+      httpRequest.getMethod match {
+        case HttpMethod.GET | HttpMethod.HEAD => getOrHead(getCrudRequest      (requestPath), httpRequest.getMethod)
+        case HttpMethod.PUT                   => change   (getCrudRequest      (requestPath), delete = false)
+        case HttpMethod.DELETE                => change   (getCrudRequest      (requestPath), delete = true)
+        case HttpMethod.LOCK                  => lock     (getLockUnlockRequest(requestPath))
+        case HttpMethod.UNLOCK                => unlock   (getLockUnlockRequest(requestPath))
+        case _                                => httpResponse.setStatus(StatusCode.MethodNotAllowed)
       }
     } catch {
       case e: HttpStatusCodeException =>
@@ -103,6 +96,11 @@ private object CRUD {
     val requestGroup    = headerValueIgnoreCase(Headers.OrbeonGroup)
     val requestFlatView = headerValueIgnoreCase("orbeon-create-flat-view").contains("true")
 
+    val ranges = HttpRanges(httpRequest) match {
+      case Success(ranges) => ranges
+      case Failure(t)      => throw HttpStatusCodeException(StatusCode.BadRequest, throwable = Some(t))
+    }
+
     requestPath match {
       case CrudFormPath(provider, app, form, filename) =>
         val filenameOpt = if (filename == FormXhtml) None else Some(filename)
@@ -117,7 +115,8 @@ private object CRUD {
           requestGroup,
           requestFlatView,
           httpRequest.credentials,
-          requestWorkflowStage
+          requestWorkflowStage,
+          ranges
         )
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
 
@@ -148,7 +147,8 @@ private object CRUD {
           requestGroup,
           requestFlatView,
           httpRequest.credentials,
-          requestWorkflowStage
+          requestWorkflowStage,
+          ranges
         )
       case _ =>
         throw HttpStatusCodeException(StatusCode.BadRequest)

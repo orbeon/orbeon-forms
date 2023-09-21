@@ -23,6 +23,7 @@ import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.Provider.{DB2, MySQL, Oracle, PostgreSQL, SQLServer}
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
@@ -347,7 +348,25 @@ class RestApiTest
 
           createForm(provider, formName)
 
-          for ((size, position) <- Seq(0, 1, 1024, 1024 * 1024).zipWithIndex) {
+          val MiB = 1024 * 1024
+
+          val largestWorkingSize =
+            if (formName == FilesystemAttachmentsFormName) {
+              // Filesystem attachment
+              256 * MiB
+            } else {
+              // Database attachment
+              provider match {
+                // Some of these sizes could probably be made higher by changing the default database configurations
+                case MySQL      =>   2 * MiB - 256
+                case PostgreSQL => 247 * MiB
+              }
+            }
+
+          // To avoid OutOfMemoryError exceptions without changing the default memory configuration
+          val largestSize = math.min(128 * MiB, largestWorkingSize)
+
+          for ((size, position) <- Seq(0, 1, 1024, largestSize).zipWithIndex) {
             val bodyArray = new Array[Byte](size) |!> Random.nextBytes
             val body      = bodyArray |> HttpCall.Binary
             val url       = HttpCall.crudURLPrefix(provider, formName) + s"data/123/file$position"

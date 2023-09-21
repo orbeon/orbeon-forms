@@ -261,6 +261,17 @@
                     if="$mode = 'edit'"
                     ref="$persistence-instance/initial-data-status">dirty</xf:setvalue>
 
+                <!-- https://github.com/orbeon/orbeon-forms/issues/5437 -->
+                <xf:setvalue
+                    ref="instance('fr-authorized-operations')"
+                    value="
+                        frf:authorizedOperationsForDetailModeOrThrow(
+                            '', (: No permissions from data :)
+                            xxf:get-request-parameter(frf:InternalAuthorizedOperationsParam())[1],
+                            xxf:instance('fr-form-metadata')/permissions,
+                            true()
+                        )"/>
+
                 <!-- https://github.com/orbeon/orbeon-forms/issues/5984 -->
                 <xf:setvalue
                     ref="instance('fr-document-metadata')/@workflow-stage"

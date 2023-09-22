@@ -28,7 +28,7 @@
         <p:output name="data" id="request"/>
     </p:processor>
 
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="request" href="#request"/>
         <p:input name="data" href="zip-flat.xml"/>
         <p:input name="config">
@@ -37,7 +37,11 @@
                 <xsl:variable name="state-abbreviation" as="xs:string?" select="$parameters[name = 'state-abbreviation']/value"/>
                 <xsl:variable name="city" as="xs:string?" select="$parameters[name = 'city']/value"/>
                 <xsl:variable name="max" as="xs:integer?" select="$parameters[name = 'max']/value"/>
-                <xsl:variable name="zips" as="element(zip)*" select="/zips/zip[state-abbreviation = $state-abbreviation and city = $city]"/>
+                <xsl:variable name="zips" as="element(zip)*"
+                    select="/zips/zip[
+                        state-abbreviation = $state-abbreviation and
+                        (p:is-blank($city) or city = $city)
+                    ]"/>
                 <xsl:for-each select="$zips[empty($max) or position() lt $max]">
                     <xsl:sort select="code"/>
                     <zip code="{code}" latitude="{latitude}" longitude="{longitude}"/>

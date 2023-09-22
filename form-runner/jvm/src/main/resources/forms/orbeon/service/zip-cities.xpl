@@ -24,21 +24,26 @@
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
-                <include>/request/parameters/parameter[name = 'state-abbreviation' or name = 'max']</include>
+                <include>/request/parameters/parameter[name = ('state-abbreviation', 'zip', 'max')]</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
 
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="request" href="#request"/>
         <p:input name="data" href="zip-flat.xml"/>
         <p:input name="config">
             <cities xsl:version="2.0">
                 <xsl:variable name="parameters" as="element(parameter)*" select="doc('input:request')/request/parameters/parameter"/>
                 <xsl:variable name="state-abbreviation" as="xs:string?" select="$parameters[name = 'state-abbreviation']/value"/>
+                <xsl:variable name="zip" as="xs:string?" select="$parameters[name = 'zip']/value"/>
                 <xsl:variable name="max" as="xs:integer?" select="$parameters[name = 'max']/value"/>
-                <xsl:variable name="zips" as="element(zip)*" select="/zips/zip[state-abbreviation = $state-abbreviation]"/>
+                <xsl:variable name="zips" as="element(zip)*"
+                    select="/zips/zip[
+                        state-abbreviation = $state-abbreviation and
+                        (p:is-blank($zip) or code = $zip)
+                    ]"/>
                 <xsl:for-each select="distinct-values($zips/city)[empty($max) or position() lt $max]">
                     <xsl:sort/>
                     <city name="{.}"/>

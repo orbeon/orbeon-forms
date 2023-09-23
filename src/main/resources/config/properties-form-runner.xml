@@ -344,7 +344,6 @@
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.controls"              value="wizard"/>
-    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.orbeon.controls"             value="-1"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.dmv-14">
         home summary clear save-final review
@@ -354,7 +353,6 @@
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.dmv-14"                value="wizard"/>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.w9"                    value="wizard"/>
-    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.orbeon.w9"                   value="-1"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.w9.xforms-select1.*"                  value="select-value"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w9"/>
@@ -394,6 +392,14 @@
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.pta-remittance">
         home summary clear pdf|tiff save-final review
     </property>
+
+    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.orbeon.*"             value="2"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.*"                 value="none"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.modes.orbeon.*"                    value="new edit view"/>
+
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.controls"          value="left"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.dmv-14"            value="left"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.w9"                value="left"/>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>
 

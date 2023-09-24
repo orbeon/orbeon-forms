@@ -96,8 +96,11 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         })
 
         // Register event listeners
-        val isDatabound = containerElem.classList.contains("xbl-fr-databound-select1-search")
-        if (isDatabound) jSelect.on("change", onChange _)
+        if (servicePerformsSearch) {
+          // When the search isn't done by the service, we use a `<fr:databound-select1>`, which sets the value
+          // of the bound node, and in that case we also don't need to store the label
+          jSelect.on("change", onChangeDispatchFrChange _)
+        }
         jSelect.on("select2:open", (onOpen _))
         jSelect.data("select2").on("results:focus", onResultsFocus _)
 
@@ -229,7 +232,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     inputElementOpt.foreach(_.setAttribute("aria-activedescendant", focusedElementId))
   }
 
-  private def onChange(event: JQueryEventObject): Unit = {
+  private def onChangeDispatchFrChange(event: JQueryEventObject): Unit = {
     val htmlSelect = event.target.asInstanceOf[html.Select]
     if (htmlSelect.selectedIndex == -1) {
       // `selectedIndex` is -1 when the value was cleared

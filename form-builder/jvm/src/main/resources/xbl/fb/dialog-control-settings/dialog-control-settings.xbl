@@ -56,6 +56,8 @@
                 <xf:setvalue ref="$i/standard-classes"        value="string-join($control-classes[. = $standard-classes], ' ')"/>
                 <xf:setvalue ref="$i/custom-classes"          value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
+                <xf:setvalue ref="$i/autocomplete-attribute"  value="$control/@autocomplete"/>
+
                 <xf:setvalue ref="$i/fr-index/@enabled"       value="exists($control/fr:index)"/>
                 <xf:action iterate="('summary-show', 'allow-bulk-edit')">
                     <xf:var name="current"          value="."/>
@@ -414,6 +416,10 @@
                         <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
                         <xf:delete if="count($classes) = 0" ref="$control/@class"/>
                         <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute('class', string-join($classes, ' '))"/>
+                        <!-- Write autocomplete attribute -->
+                        <xf:var name="autocomplete" value="xxf:trim($i/autocomplete-attribute)"/>
+                        <xf:delete if="$autocomplete  = ''" ref="$control/@autocomplete"/>
+                        <xf:insert if="$autocomplete != ''" context="$control" origin="xf:attribute('autocomplete', $autocomplete)"/>
                         <!-- Write index settings -->
                         <xf:delete ref="$control/fr:index"/>
                         <xf:action if="$i/fr-index/@enabled = true()">
@@ -684,6 +690,7 @@
                         <last-valid-control-name/>  <!-- For renaming -->
                         <standard-classes/>         <!-- `fr-attachment`, etc. -->
                         <custom-classes/>           <!-- All custom classes except the standard ones -->
+                        <autocomplete-attribute/>   <!-- autocomplete attribute -->
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
 
                         <fr-index           enabled=""/>
@@ -784,6 +791,8 @@
                         <alert global="false"/>
                     </validation>
                 </xf:instance>
+
+                <xf:instance id="autocomplete-values" src="oxf:/xbl/fb/dialog-control-settings/autocomplete-values.xml" xxf:readonly="true" xxf:cache="true"/>
 
                 <xf:var
                     name="control-names"
@@ -1243,6 +1252,25 @@
                                                 <xf:input ref="$i/custom-classes">
                                                     <xf:label ref="$resources/classes/label"/>
                                                 </xf:input>
+                                            </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xf:select1 ref="$i/autocomplete-attribute">
+                                                    <xf:label ref="$resources/autocomplete/label"/>
+                                                    <xf:item>
+                                                        <xf:label/>
+                                                        <xf:value/>
+                                                    </xf:item>
+                                                    <xf:itemset ref="instance('autocomplete-values')/autocomplete-value">
+                                                        <xf:label ref="
+                                                            let $level  := if (empty(@level)) then 0 else xs:integer(@level),
+                                                                $prefix := string-join(for $i in 1 to $level return '&#160;', '')
+                                                            return concat($prefix, @value)
+                                                        "/>
+                                                        <xf:value ref="@value"/>
+                                                    </xf:itemset>
+                                                </xf:select1>
                                             </xh:td>
                                         </xh:tr>
                                         <xh:tr>

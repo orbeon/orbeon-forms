@@ -2,6 +2,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.forwardAutocompleteAttribute
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
@@ -51,6 +52,8 @@ class XFormsSecretHandler(
       if (isXFormsReadonlyButNotStaticReadonly(secretControl))
         XFormsBaseHandlerXHTML.outputReadonlyAttribute(containerAttributes)
       XFormsBaseHandler.handleAriaAttributes(secretControl.isRequired, secretControl.isValid, secretControl.visited, containerAttributes)
+
+      forwardAutocompleteAttribute(attributes, "input", containerAttributes)
 
       // Output element
       xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, containerAttributes)

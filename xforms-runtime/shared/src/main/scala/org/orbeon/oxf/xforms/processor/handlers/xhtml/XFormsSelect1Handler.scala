@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, SelectAppear
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.itemset._
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.forwardAutocompleteAttribute
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.SaxSupport._
@@ -213,6 +214,8 @@ object XFormsSelect1Handler {
         if (baseHandler.isXFormsReadonlyButNotStaticReadonly(control))
           outputDisabledAttribute(atts)
 
+        forwardAutocompleteAttribute(attributes, elementName, atts)
+
         element(localName = elementName, prefix = xhtmlPrefix, uri = XHTML, atts = atts)
       }
 
@@ -398,6 +401,8 @@ class XFormsSelect1Handler(
 
       if (control ne null)
         XFormsBaseHandler.handleAriaAttributes(control.isRequired, control.isValid, control.visited, containerAttributes)
+
+      forwardAutocompleteAttribute(attributes, "select", containerAttributes)
 
       withElement(localName = "select", prefix = xhtmlPrefix, uri = XHTML, atts = containerAttributes) {
         itemsetOpt foreach { itemset =>

@@ -282,6 +282,9 @@
         <classes>
             <label>Custom CSS classes</label>
         </classes>
+        <autocomplete>
+            <label>Autocomplete attribute</label>
+        </autocomplete>
         <default-always-never>
             <item id="0">Use property</item>
             <item id="1">Always</item>
@@ -1646,6 +1649,9 @@
         <classes>
             <label>Classes CSS personalisées</label>
         </classes>
+        <autocomplete>
+            <label>Attribut autocomplete</label>
+        </autocomplete>
         <default-always-never>
             <item id="0">Utiliser la propriété</item>
             <item id="1">Toujours</item>
@@ -2993,6 +2999,9 @@
         <classes>
             <label todo="true">[Custom CSS classes]</label>
         </classes>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+        </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
@@ -4368,6 +4377,9 @@
         <classes>
             <label todo="true">[Custom CSS classes]</label>
         </classes>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+        </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
@@ -5743,6 +5755,9 @@
         <classes>
             <label>Classi CSS personalizzati</label>
         </classes>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+        </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
@@ -7082,6 +7097,9 @@
         <classes>
             <label>Benutzerdefinierte CSS-Klassen</label>
         </classes>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+        </autocomplete>
         <default-always-never>
             <item id="0">Standard verwenden</item>
             <item id="1">Immer</item>
@@ -8424,6 +8442,9 @@
         <classes>
             <label>Mukautetut CSS luokat</label>
         </classes>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+        </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
@@ -9791,6 +9812,9 @@
         <classes>
             <label>Classes CSS customizadas</label>
         </classes>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+        </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
@@ -11159,6 +11183,9 @@
         <classes>
             <label>Aangepaste CSS classes</label>
         </classes>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+        </autocomplete>
         <default-always-never>
             <item id="0">Gebruik standaard</item>
             <item id="1">Altijd</item>
@@ -12506,6 +12533,9 @@
         <classes>
             <label>Classes CSS Personalizadas</label>
         </classes>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+        </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>
@@ -13880,6 +13910,9 @@
         <classes>
             <label>Anpassade CSS-klasser</label>
         </classes>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+        </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
             <item todo="true" id="1">[Always]</item>

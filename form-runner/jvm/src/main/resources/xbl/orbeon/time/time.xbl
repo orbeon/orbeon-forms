@@ -339,7 +339,8 @@
                             )}"
                         id="fr-time-input"
                         xxf:control="true"
-                        role="textbox"/>
+                        role="textbox"
+                        xbl:attr="autocomplete"/>
                     <xh:span class="add-on">
                         <xh:i class="fa fa-fw fa-clock-o"/>
                     </xh:span>

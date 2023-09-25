@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsTextareaControl}
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.forwardAutocompleteAttribute
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
@@ -78,6 +79,8 @@ class XFormsTextareaHandler(
         if (placeHolderInfo.value ne null) // unclear whether this can ever be null
           htmlTextareaAttributes.addOrReplace("placeholder", placeHolderInfo.value)
       }
+
+      forwardAutocompleteAttribute(attributes, "textarea", htmlTextareaAttributes)
 
       xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, htmlTextareaAttributes)
       val value = textareaControl.getExternalValue

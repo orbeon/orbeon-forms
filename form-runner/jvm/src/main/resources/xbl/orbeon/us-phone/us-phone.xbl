@@ -141,7 +141,7 @@
                 <xh:span class="input-append fr-field-width-{$field-width}">
                     <xf:input
                         id="input"
-                        xbl:attr="navindex navindex=tabindex"
+                        xbl:attr="navindex navindex=tabindex autocomplete"
                         ref="."
                         xxf:maxlength="14"
                         xxf:format="xxf:formatted-value('fr-us-phone')"

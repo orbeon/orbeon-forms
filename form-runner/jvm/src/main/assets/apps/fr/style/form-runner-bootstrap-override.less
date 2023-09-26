@@ -340,8 +340,8 @@ body.orbeon {
     }
 
     .input-append {
-        input,
-        input.xforms-group[role = group][tabindex] {
+        input:not([type = "date"]),
+        input.xforms-group[role = group][tabindex]:not([type = "date"]) {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
         }

@@ -104,6 +104,9 @@ object FormRunnerPrivateAPI extends js.Object {
     }
   }
 
+  def updateWizardPageName(pageNameWithIndex: String): Unit =
+    removeReplaceOrAddUrlParameter("fr-wizard-page", Some(pageNameWithIndex))
+
   // For Summary page when changing the form version
   def updateLocationFormVersion(version: Int): Unit =
     removeReplaceOrAddUrlParameter("form-version", Some(version.toString))

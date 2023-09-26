@@ -22,6 +22,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:map="http://www.w3.org/2005/xpath-functions/map"
     xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:Wizard="java:org.orbeon.xbl.Wizard">
@@ -404,6 +405,10 @@
                                     name="current-top-level-case-id"
                                     value="(xxf:instance('local')/current-top-level-case-id/string(), xf:random())[1]"/>
 
+                                <xf:var name="allow-initial-url-param">
+                                    <xxf:value xxbl:scope="inner" value="xs:string(fr:component-param-value('allow-initial-url-param')) = 'true'"/>
+                                </xf:var>
+
                                 <!-- NOTE: Initially, current-case-id might be empty, so default to the first relevant case id. -->
                                 <xf:var
                                     name="current-nav-case-id"
@@ -436,6 +441,30 @@
                                 <xf:var
                                     name="current-section-uses-paging"
                                     value="$current-nav-case-id = $sections-with-paging-case-ids"/>
+
+                                <!-- Communicate the name and index of the current page to the client if needed
+                                     https://github.com/orbeon/orbeon-forms/issues/2848 -->
+                                <xf:var
+                                    name="current-page-name-with-index"
+                                    value="
+                                        let $page-name := frf:controlNameFromIdOpt(Wizard:sectionIdFromCaseIdOpt($current-nav-case-id))
+                                        return
+                                            if ($current-section-uses-paging) then
+                                                concat(
+                                                    $page-name,
+                                                    '/',
+                                                    xxf:instance('local')/current-index/string(.)
+                                                )
+                                            else
+                                                $page-name">
+                                    <xf:action
+                                            type="javascript"
+                                            event="xforms-value-changed"
+                                            if="$current-page-name-with-index">
+                                        <xf:param name="pageNameWithIndex" value="$current-page-name-with-index"/>
+                                        <xf:body>ORBEON.fr.private.API.updateWizardPageName(pageNameWithIndex)</xf:body>
+                                    </xf:action>
+                                </xf:var>
 
                                 <xf:var
                                     name="current-repeat-id-and-index-opt"
@@ -762,17 +791,62 @@
                                                 name="last-available-and-visited-top-level-case-id"
                                                 value="concat($last-available-and-visited-top-level-section-id, '-case')"/>
 
+                                            <xf:var name="allow-initial-url-param">
+                                                <xxf:value xxbl:scope="inner" value="xs:string(fr:component-param-value('allow-initial-url-param')) = 'true'"/>
+                                            </xf:var>
+
                                             <xf:var
-                                                name="initial-case-id"
+                                                name="initial-case-id-with-index-opt"
                                                 value="
                                                     (
-                                                        Wizard:caseIdsForTopLevelSection($last-available-and-visited-top-level-section-id)[1],
-                                                        $last-available-and-visited-top-level-case-id
+                                                        (: URL parameter, see https://github.com/orbeon/orbeon-forms/issues/2848 :)
+                                                        for $param in xxf:get-request-parameter('fr-wizard-page')[1][$allow-initial-url-param]
+                                                        return
+                                                            for $page-name-with-index in xxf:trim($param[xxf:non-blank()])
+                                                            return
+                                                                let $relevant-page-names :=
+                                                                        for $i in $relevant-nav-section-or-grid-ids
+                                                                        return frf:controlNameFromId($i),
+                                                                    $sections-with-paging-names :=
+                                                                        for $i in $sections-with-paging-section-ids
+                                                                        return frf:controlNameFromId($i),
+                                                                    $page-name :=
+                                                                        if (contains($page-name-with-index, '/')) then
+                                                                            substring-before($page-name-with-index, '/')
+                                                                        else
+                                                                            $page-name-with-index,
+                                                                    $index-opt :=
+                                                                        if (contains($page-name-with-index, '/') and $sections-with-paging-names = $page-name) then
+                                                                            xs:integer(substring-after($page-name-with-index, '/')[. castable as xs:integer])[. ge 1]
+                                                                        else
+                                                                            (),
+                                                                    $relevant-page-index     := index-of($relevant-page-names, $page-name)
+                                                                return
+                                                                    if (exists($relevant-page-index)) then
+                                                                        array:append(
+                                                                            array:append(
+                                                                                array:join(()),
+                                                                                concat($relevant-nav-section-or-grid-ids[$relevant-page-index], '-case')
+                                                                            ),
+                                                                            $index-opt
+                                                                        )
+                                                                    else
+                                                                        (),
+                                                        (: Nested sections scenario :)
+                                                        array:append(
+                                                            array:join(()),
+                                                            Wizard:caseIdsForTopLevelSection($last-available-and-visited-top-level-section-id)[1]
+                                                        ),
+                                                        (: Regular top-level section scenario :)
+                                                        array:append(
+                                                            array:join(()),
+                                                            $last-available-and-visited-top-level-case-id
+                                                        )
                                                     )[1]"/>
 
                                             <xf:setvalue
                                                 ref="xxf:instance('local')/current-case-id"
-                                                value="$initial-case-id"/>
+                                                value="array:get($initial-case-id-with-index-opt, 1)"/>
 
                                             <xf:setvalue
                                                 ref="xxf:instance('local')/current-top-level-case-id"
@@ -780,7 +854,18 @@
 
                                             <!-- See https://github.com/orbeon/orbeon-forms/issues/3433 -->
                                             <xf:toggle
-                                                case="{{$initial-case-id}}"/>
+                                                case="{{array:get($initial-case-id-with-index-opt, 1)}}"/>
+
+                                            <!-- Set initial index if present -->
+                                            <xf:action if="array:size($initial-case-id-with-index-opt) ge 2">
+                                                <xf:var name="new-index" value="array:get($initial-case-id-with-index-opt, 2)"/>
+                                                <xf:setvalue
+                                                    ref="xxf:instance('local')/current-index"
+                                                    value="$new-index"/>
+                                                <xf:setindex
+                                                    repeat="{{concat(Wizard:sectionIdFromCaseIdOpt(array:get($initial-case-id-with-index-opt, 1)), '-repeater-repeat')}}"
+                                                    index="$new-index"/>
+                                            </xf:action>
 
                                             <!-- Dispatch `fr-section-shown` the first time the body is shown if needed -->
                                             <xf:action if="xxf:instance('local')/show-body/data(.)">

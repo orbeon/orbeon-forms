@@ -85,6 +85,11 @@
                     <xsl:attribute name="ref">xxf:binding('fr-autosize-textarea')</xsl:attribute>
                     <xsl:attribute name="appearance"  select="tokenize(/*/@appearance, '\s+')[. != 'xxf:autosize']"/>
                     <xsl:copy-of select="/*/@xxf:maxlength"/>
+                    <xsl:if test="/*/@autocomplete">
+                        <xsl:attribute name="autocomplete">
+                            <xsl:value-of select="/*/@autocomplete"/>
+                        </xsl:attribute>
+                    </xsl:if>
                     <xsl:if test="/*/xf:label/@appearance = 'minimal'">
                         <xsl:copy-of select="/*/xf:label"/>
                     </xsl:if>

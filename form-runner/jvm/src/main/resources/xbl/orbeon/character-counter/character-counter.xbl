@@ -86,6 +86,11 @@
                     <xsl:attribute name="incremental" select="'true'"/>
                     <xsl:attribute name="appearance"  select="tokenize(/*/@appearance, '\s+')[. != 'character-counter']"/>
                     <xsl:copy-of select="/*/@mediatype"/>
+                    <xsl:if test="/*/@autocomplete">
+                        <xsl:attribute name="autocomplete">
+                            <xsl:value-of select="/*/@autocomplete"/>
+                        </xsl:attribute>
+                    </xsl:if>
                 </xsl:element>
 
                 <xh:span class="fr-charcounter-count">

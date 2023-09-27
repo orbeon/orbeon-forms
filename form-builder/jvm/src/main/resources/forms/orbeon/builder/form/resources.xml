@@ -291,10 +291,6 @@
                 <address>Address</address>
                 <contact>Contact</contact>
                 <payment>Payment</payment>
-                <language>Preferred Language</language>
-                <birthday>Birthday</birthday>
-                <gender>Gender</gender>
-                <url>URLs</url>
             </groups>
         </autocomplete>
         <default-always-never>
@@ -1670,10 +1666,6 @@
                 <address>Adresse</address>
                 <contact>Contact</contact>
                 <payment>Paiement</payment>
-                <language>Langue préférée</language>
-                <birthday>Date de naissance</birthday>
-                <gender>Genre</gender>
-                <url>URL</url>
             </groups>
         </autocomplete>
         <default-always-never>
@@ -3032,10 +3024,6 @@
                 <address todo="true">[Address]</address>
                 <contact todo="true">[Contact]</contact>
                 <payment todo="true">[Payment]</payment>
-                <language todo="true">[Preferred Language]</language>
-                <birthday todo="true">[Birthday]</birthday>
-                <gender todo="true">[Gender]</gender>
-                <url todo="true">[URLs]</url>
             </groups>
         </autocomplete>
         <default-always-never>
@@ -4422,10 +4410,6 @@
                 <address todo="true">[Address]</address>
                 <contact todo="true">[Contact]</contact>
                 <payment todo="true">[Payment]</payment>
-                <language todo="true">[Preferred Language]</language>
-                <birthday todo="true">[Birthday]</birthday>
-                <gender todo="true">[Gender]</gender>
-                <url todo="true">[URLs]</url>
             </groups>
         </autocomplete>
         <default-always-never>
@@ -5812,10 +5796,6 @@
                 <address todo="true">[Address]</address>
                 <contact todo="true">[Contact]</contact>
                 <payment todo="true">[Payment]</payment>
-                <language todo="true">[Preferred Language]</language>
-                <birthday todo="true">[Birthday]</birthday>
-                <gender todo="true">[Gender]</gender>
-                <url todo="true">[URLs]</url>
             </groups>
         </autocomplete>
         <default-always-never>
@@ -7166,10 +7146,6 @@
                 <address todo="true">[Address]</address>
                 <contact todo="true">[Contact]</contact>
                 <payment todo="true">[Payment]</payment>
-                <language todo="true">[Preferred Language]</language>
-                <birthday todo="true">[Birthday]</birthday>
-                <gender todo="true">[Gender]</gender>
-                <url todo="true">[URLs]</url>
             </groups>
         </autocomplete>
         <default-always-never>
@@ -8523,10 +8499,6 @@
                 <address todo="true">[Address]</address>
                 <contact todo="true">[Contact]</contact>
                 <payment todo="true">[Payment]</payment>
-                <language todo="true">[Preferred Language]</language>
-                <birthday todo="true">[Birthday]</birthday>
-                <gender todo="true">[Gender]</gender>
-                <url todo="true">[URLs]</url>
             </groups>
         </autocomplete>
         <default-always-never>
@@ -9905,10 +9877,6 @@
                 <address todo="true">[Address]</address>
                 <contact todo="true">[Contact]</contact>
                 <payment todo="true">[Payment]</payment>
-                <language todo="true">[Preferred Language]</language>
-                <birthday todo="true">[Birthday]</birthday>
-                <gender todo="true">[Gender]</gender>
-                <url todo="true">[URLs]</url>
             </groups>
         </autocomplete>
         <default-always-never>
@@ -11288,10 +11256,6 @@
                 <address todo="true">[Address]</address>
                 <contact todo="true">[Contact]</contact>
                 <payment todo="true">[Payment]</payment>
-                <language todo="true">[Preferred Language]</language>
-                <birthday todo="true">[Birthday]</birthday>
-                <gender todo="true">[Gender]</gender>
-                <url todo="true">[URLs]</url>
             </groups>
         </autocomplete>
         <default-always-never>
@@ -12650,10 +12614,6 @@
                 <address todo="true">[Address]</address>
                 <contact todo="true">[Contact]</contact>
                 <payment todo="true">[Payment]</payment>
-                <language todo="true">[Preferred Language]</language>
-                <birthday todo="true">[Birthday]</birthday>
-                <gender todo="true">[Gender]</gender>
-                <url todo="true">[URLs]</url>
             </groups>
         </autocomplete>
         <default-always-never>
@@ -14039,10 +13999,6 @@
                 <address todo="true">[Address]</address>
                 <contact todo="true">[Contact]</contact>
                 <payment todo="true">[Payment]</payment>
-                <language todo="true">[Preferred Language]</language>
-                <birthday todo="true">[Birthday]</birthday>
-                <gender todo="true">[Gender]</gender>
-                <url todo="true">[URLs]</url>
             </groups>
         </autocomplete>
         <default-always-never>

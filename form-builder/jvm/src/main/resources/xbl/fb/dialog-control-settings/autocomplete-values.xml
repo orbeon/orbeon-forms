@@ -14,7 +14,15 @@
 <autocomplete-values>
     <group name="autocomplete.groups.general">
         <autocomplete value="off"/>
-        <autocomplete value="on"/>
+        <autocomplete value="on"                             disabled="true"/>
+        <autocomplete value="language"/>
+        <autocomplete value="bday"/>
+        <autocomplete value="bday-day"   sub-value-of="bday" disabled="true"/>
+        <autocomplete value="bday-month" sub-value-of="bday" disabled="true"/>
+        <autocomplete value="bday-year"  sub-value-of="bday" disabled="true"/>
+        <autocomplete value="sex"/>
+        <autocomplete value="url"                            disabled="true"/>
+        <autocomplete value="photo"                          disabled="true"/>
     </group>
     <group name="autocomplete.groups.name">
         <autocomplete value="name"/>
@@ -71,22 +79,6 @@
         <autocomplete value="cc-type"                                   disabled="true"/>
         <autocomplete value="transaction-currency"                      disabled="true"/>
         <autocomplete value="transaction-amount"                        disabled="true"/>
-    </group>
-    <group name="autocomplete.groups.language">
-        <autocomplete value="language"/>
-    </group>
-    <group name="autocomplete.groups.birthday">
-        <autocomplete value="bday"/>
-        <autocomplete value="bday-day"   sub-value-of="bday" disabled="true"/>
-        <autocomplete value="bday-month" sub-value-of="bday" disabled="true"/>
-        <autocomplete value="bday-year"  sub-value-of="bday" disabled="true"/>
-    </group>
-    <group name="autocomplete.groups.gender">
-        <autocomplete value="sex"/>
-    </group>
-    <group name="autocomplete.groups.url" disabled="true">
-        <autocomplete value="url"         disabled="true"/>
-        <autocomplete value="photo"       disabled="true"/>
     </group>
     <!--
     shipping

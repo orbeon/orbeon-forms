@@ -57,6 +57,9 @@
                 <xf:setvalue ref="$i/custom-classes"          value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
                 <xf:setvalue ref="$i/autocomplete-attribute"  value="$control/@autocomplete"/>
+                <!-- Use control type and mediatype attribute to determine whether autocomplete attribute is allowed or not -->
+                <xf:setvalue ref="$i/control-local-name"      value="local-name($control)"/>
+                <xf:setvalue ref="$i/control-mediatype"       value="$control/@mediatype"/>
 
                 <xf:setvalue ref="$i/fr-index/@enabled"       value="exists($control/fr:index)"/>
                 <xf:action iterate="('summary-show', 'allow-bulk-edit')">
@@ -419,7 +422,10 @@
                         <!-- Write autocomplete attribute -->
                         <xf:var name="autocomplete" value="xxf:trim($i/autocomplete-attribute)"/>
                         <xf:delete if="$autocomplete  = ''" ref="$control/@autocomplete"/>
-                        <xf:insert if="$autocomplete != ''" context="$control" origin="xf:attribute('autocomplete', $autocomplete)"/>
+                        <xf:insert
+                            if="$i/autocomplete-allowed = true() and $autocomplete != ''"
+                            context="$control"
+                            origin="xf:attribute('autocomplete', $autocomplete)"/>
                         <!-- Write index settings -->
                         <xf:delete ref="$control/fr:index"/>
                         <xf:action if="$i/fr-index/@enabled = true()">
@@ -691,6 +697,9 @@
                         <standard-classes/>         <!-- `fr-attachment`, etc. -->
                         <custom-classes/>           <!-- All custom classes except the standard ones -->
                         <autocomplete-attribute/>   <!-- autocomplete attribute -->
+                        <autocomplete-allowed/>
+                        <control-local-name/>
+                        <control-mediatype/>
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
 
                         <fr-index           enabled=""/>
@@ -793,6 +802,17 @@
                 </xf:instance>
 
                 <xf:instance id="autocomplete-values" src="oxf:/xbl/fb/dialog-control-settings/autocomplete-values.xml" xxf:readonly="true" xxf:cache="true"/>
+
+                <xf:bind
+                    ref="autocomplete-allowed"
+                    calculate="
+                        $i/control-local-name = ('currency', 'input', 'number', 'secret', 'time', 'us-phone', 'us-state')             or
+                        ($i/control-local-name = ('date', 'dropdown-date', 'fields-date') and $i/appearances/@selection = '')         or
+                        ($i/control-local-name = 'databound-select1'                      and $i/appearances/@selection = '')         or
+                        ($i/control-local-name = 'select1'                                and $i/appearances/@selection = 'dropdown') or
+                        ($i/control-local-name = 'textarea'                               and not($i/control-mediatype = 'text/html'))
+                    "
+                    type="xs:boolean"/>
 
                 <xf:var
                     name="control-names"
@@ -1256,7 +1276,7 @@
                                         </xh:tr>
                                         <xh:tr>
                                             <xh:td>
-                                                <xf:select1 ref="$i/autocomplete-attribute">
+                                                <xf:select1 ref="if ($i/autocomplete-allowed = true()) then $i/autocomplete-attribute else ''">
                                                     <xf:label ref="$resources/autocomplete/label"/>
                                                     <xf:item>
                                                         <xf:label/>

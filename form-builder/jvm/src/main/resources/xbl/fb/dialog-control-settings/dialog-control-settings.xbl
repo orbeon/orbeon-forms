@@ -1262,13 +1262,19 @@
                                                         <xf:label/>
                                                         <xf:value/>
                                                     </xf:item>
-                                                    <xf:itemset ref="instance('autocomplete-values')/autocomplete-value">
+                                                    <xf:itemset
+                                                        ref="
+                                                            instance('autocomplete-values')//(
+                                                                group[empty(@disabled) or @disabled != 'true']
+                                                                |
+                                                                autocomplete[empty(@disabled) or @disabled != 'true']
+                                                            )">
                                                         <xf:label ref="
-                                                            let $level  := if (empty(@level)) then 0 else xs:integer(@level),
-                                                                $prefix := string-join(for $i in 1 to $level return '&#160;', '')
-                                                            return concat($prefix, @value)
-                                                        "/>
-                                                        <xf:value ref="@value"/>
+                                                            if (self::group) then
+                                                                xxf:r(@name, '|fr-form-resources|')
+                                                            else
+                                                                @value"/>
+                                                        <xf:value ref="if (self::group) then ()    else @value"/>
                                                     </xf:itemset>
                                                 </xf:select1>
                                             </xh:td>

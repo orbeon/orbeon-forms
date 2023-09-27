@@ -284,6 +284,18 @@
         </classes>
         <autocomplete>
             <label>Autocomplete attribute</label>
+            <groups>
+                <general>General</general>
+                <name>Name and Title</name>
+                <credentials>Credentials</credentials>
+                <address>Address</address>
+                <contact>Contact</contact>
+                <payment>Payment</payment>
+                <language>Preferred Language</language>
+                <birthday>Birthday</birthday>
+                <gender>Gender</gender>
+                <url>URLs</url>
+            </groups>
         </autocomplete>
         <default-always-never>
             <item id="0">Use property</item>
@@ -1651,6 +1663,18 @@
         </classes>
         <autocomplete>
             <label>Attribut autocomplete</label>
+            <groups>
+                <general>Général</general>
+                <name>Nom et titre</name>
+                <credentials>Identifiants</credentials>
+                <address>Adresse</address>
+                <contact>Contact</contact>
+                <payment>Paiement</payment>
+                <language>Langue préférée</language>
+                <birthday>Date de naissance</birthday>
+                <gender>Genre</gender>
+                <url>URL</url>
+            </groups>
         </autocomplete>
         <default-always-never>
             <item id="0">Utiliser la propriété</item>
@@ -3001,6 +3025,18 @@
         </classes>
         <autocomplete>
             <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+                <language todo="true">[Preferred Language]</language>
+                <birthday todo="true">[Birthday]</birthday>
+                <gender todo="true">[Gender]</gender>
+                <url todo="true">[URLs]</url>
+            </groups>
         </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
@@ -4379,6 +4415,18 @@
         </classes>
         <autocomplete>
             <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+                <language todo="true">[Preferred Language]</language>
+                <birthday todo="true">[Birthday]</birthday>
+                <gender todo="true">[Gender]</gender>
+                <url todo="true">[URLs]</url>
+            </groups>
         </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
@@ -5757,6 +5805,18 @@
         </classes>
         <autocomplete>
             <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+                <language todo="true">[Preferred Language]</language>
+                <birthday todo="true">[Birthday]</birthday>
+                <gender todo="true">[Gender]</gender>
+                <url todo="true">[URLs]</url>
+            </groups>
         </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
@@ -7099,6 +7159,18 @@
         </classes>
         <autocomplete>
             <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+                <language todo="true">[Preferred Language]</language>
+                <birthday todo="true">[Birthday]</birthday>
+                <gender todo="true">[Gender]</gender>
+                <url todo="true">[URLs]</url>
+            </groups>
         </autocomplete>
         <default-always-never>
             <item id="0">Standard verwenden</item>
@@ -8444,6 +8516,18 @@
         </classes>
         <autocomplete>
             <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+                <language todo="true">[Preferred Language]</language>
+                <birthday todo="true">[Birthday]</birthday>
+                <gender todo="true">[Gender]</gender>
+                <url todo="true">[URLs]</url>
+            </groups>
         </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
@@ -9814,6 +9898,18 @@
         </classes>
         <autocomplete>
             <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+                <language todo="true">[Preferred Language]</language>
+                <birthday todo="true">[Birthday]</birthday>
+                <gender todo="true">[Gender]</gender>
+                <url todo="true">[URLs]</url>
+            </groups>
         </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
@@ -11185,6 +11281,18 @@
         </classes>
         <autocomplete>
             <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+                <language todo="true">[Preferred Language]</language>
+                <birthday todo="true">[Birthday]</birthday>
+                <gender todo="true">[Gender]</gender>
+                <url todo="true">[URLs]</url>
+            </groups>
         </autocomplete>
         <default-always-never>
             <item id="0">Gebruik standaard</item>
@@ -12535,6 +12643,18 @@
         </classes>
         <autocomplete>
             <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+                <language todo="true">[Preferred Language]</language>
+                <birthday todo="true">[Birthday]</birthday>
+                <gender todo="true">[Gender]</gender>
+                <url todo="true">[URLs]</url>
+            </groups>
         </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>
@@ -13912,6 +14032,18 @@
         </classes>
         <autocomplete>
             <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+                <language todo="true">[Preferred Language]</language>
+                <birthday todo="true">[Birthday]</birthday>
+                <gender todo="true">[Gender]</gender>
+                <url todo="true">[URLs]</url>
+            </groups>
         </autocomplete>
         <default-always-never>
             <item todo="true" id="0">[Use property]</item>

@@ -12,75 +12,92 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <autocomplete-values>
-    <autocomplete-value value="off"/>
-    <autocomplete-value value="on"/>
-
-    <autocomplete-value value="name"/>
-    <autocomplete-value value="honorific-prefix" sub-value-of="name" level="1"/>
-    <autocomplete-value value="given-name"       sub-value-of="name" level="1"/>
-    <autocomplete-value value="additional-name"  sub-value-of="name" level="1"/>
-    <autocomplete-value value="family-name"      sub-value-of="name" level="1"/>
-    <autocomplete-value value="honorific-suffix" sub-value-of="name" level="1"/>
-    <autocomplete-value value="nickname"/>
-    <autocomplete-value value="organization-title"/>
-    <autocomplete-value value="username"/>
-    <autocomplete-value value="new-password"/>
-    <autocomplete-value value="current-password"/>
-    <autocomplete-value value="one-time-code"/>
-    <autocomplete-value value="organization"/>
+    <group name="autocomplete.groups.general">
+        <autocomplete value="off"/>
+        <autocomplete value="on"/>
+    </group>
+    <group name="autocomplete.groups.name">
+        <autocomplete value="name"/>
+        <autocomplete value="honorific-prefix" sub-value-of="name"/>
+        <autocomplete value="given-name"       sub-value-of="name"/>
+        <autocomplete value="additional-name"  sub-value-of="name"/>
+        <autocomplete value="family-name"      sub-value-of="name"/>
+        <autocomplete value="honorific-suffix" sub-value-of="name"/>
+        <autocomplete value="nickname"/>
+        <autocomplete value="organization-title"/>
+    </group>
+    <group name="autocomplete.groups.credentials" disabled="true">
+        <autocomplete value="username"            disabled="true"/>
+        <autocomplete value="new-password"        disabled="true"/>
+        <autocomplete value="current-password"    disabled="true"/>
+        <autocomplete value="one-time-code"       disabled="true"/>
+    </group>
+    <group name="autocomplete.groups.address">
+        <autocomplete value="organization"/>
+        <autocomplete value="street-address"/>
+        <autocomplete value="address-line1" sub-value-of="street-address"/>
+        <autocomplete value="address-line2" sub-value-of="street-address"/>
+        <autocomplete value="address-line3" sub-value-of="street-address"/>
+        <autocomplete value="address-level4"/>
+        <autocomplete value="address-level3"/>
+        <autocomplete value="address-level2"/>
+        <autocomplete value="address-level1"/>
+        <autocomplete value="country"/>
+        <autocomplete value="country-name"/>
+        <autocomplete value="postal-code"/>
+    </group>
+    <group name="autocomplete.groups.contact">
+        <autocomplete value="tel"/>
+        <autocomplete value="tel-country-code" sub-value-of="tel"          disabled="true"/>
+        <autocomplete value="tel-national"     sub-value-of="tel"          disabled="true"/>
+        <autocomplete value="tel-area-code"    sub-value-of="tel-national" disabled="true"/>
+        <autocomplete value="tel-local"        sub-value-of="tel-national" disabled="true"/>
+        <autocomplete value="tel-local-prefix" sub-value-of="tel-local"    disabled="true"/>
+        <autocomplete value="tel-local-suffix" sub-value-of="tel-local"    disabled="true"/>
+        <autocomplete value="tel-extension"/>
+        <autocomplete value="email"/>
+        <autocomplete value="impp"                                         disabled="true"/>
+    </group>
+    <group name="autocomplete.groups.payment"                           disabled="true">
+        <autocomplete value="cc-name"                                   disabled="true"/>
+        <autocomplete value="cc-given-name"      sub-value-of="cc-name" disabled="true"/>
+        <autocomplete value="cc-additional-name" sub-value-of="cc-name" disabled="true"/>
+        <autocomplete value="cc-family-name"     sub-value-of="cc-name" disabled="true"/>
+        <autocomplete value="cc-number"                                 disabled="true"/>
+        <autocomplete value="cc-exp"                                    disabled="true"/>
+        <autocomplete value="cc-exp-month"       sub-value-of="cc-exp"  disabled="true"/>
+        <autocomplete value="cc-exp-year"        sub-value-of="cc-exp"  disabled="true"/>
+        <autocomplete value="cc-csc"                                    disabled="true"/>
+        <autocomplete value="cc-type"                                   disabled="true"/>
+        <autocomplete value="transaction-currency"                      disabled="true"/>
+        <autocomplete value="transaction-amount"                        disabled="true"/>
+    </group>
+    <group name="autocomplete.groups.language">
+        <autocomplete value="language"/>
+    </group>
+    <group name="autocomplete.groups.birthday">
+        <autocomplete value="bday"/>
+        <autocomplete value="bday-day"   sub-value-of="bday" disabled="true"/>
+        <autocomplete value="bday-month" sub-value-of="bday" disabled="true"/>
+        <autocomplete value="bday-year"  sub-value-of="bday" disabled="true"/>
+    </group>
+    <group name="autocomplete.groups.gender">
+        <autocomplete value="sex"/>
+    </group>
+    <group name="autocomplete.groups.url" disabled="true">
+        <autocomplete value="url"         disabled="true"/>
+        <autocomplete value="photo"       disabled="true"/>
+    </group>
     <!--
-    <autocomplete-value value="shipping"/>
-    <autocomplete-value value="billing"/>
-    -->
-    <autocomplete-value value="street-address"/>
-    <autocomplete-value value="address-line1" sub-value-of="street-address" level="1"/>
-    <autocomplete-value value="address-line2" sub-value-of="street-address" level="1"/>
-    <autocomplete-value value="address-line3" sub-value-of="street-address" level="1"/>
-    <autocomplete-value value="address-level4"/>
-    <autocomplete-value value="address-level3"/>
-    <autocomplete-value value="address-level2"/>
-    <autocomplete-value value="address-level1"/>
-    <autocomplete-value value="country"/>
-    <autocomplete-value value="country-name"/>
-    <autocomplete-value value="postal-code"/>
-    <autocomplete-value value="cc-name"/>
-    <autocomplete-value value="cc-given-name"      sub-value-of="cc-name" level="1"/>
-    <autocomplete-value value="cc-additional-name" sub-value-of="cc-name" level="1"/>
-    <autocomplete-value value="cc-family-name"     sub-value-of="cc-name" level="1"/>
-    <autocomplete-value value="cc-number"/>
-    <autocomplete-value value="cc-exp"/>
-    <autocomplete-value value="cc-exp-month" sub-value-of="cc-exp" level="1"/>
-    <autocomplete-value value="cc-exp-year"  sub-value-of="cc-exp" level="1"/>
-    <autocomplete-value value="cc-csc"/>
-    <autocomplete-value value="cc-type"/>
-    <autocomplete-value value="transaction-currency"/>
-    <autocomplete-value value="transaction-amount"/>
-    <autocomplete-value value="language"/>
-    <autocomplete-value value="bday"/>
-    <autocomplete-value value="bday-day"   sub-value-of="bday" level="1"/>
-    <autocomplete-value value="bday-month" sub-value-of="bday" level="1"/>
-    <autocomplete-value value="bday-year"  sub-value-of="bday" level="1"/>
-    <autocomplete-value value="sex"/>
-    <autocomplete-value value="url"/>
-    <autocomplete-value value="photo"/>
+    shipping
+    billing
 
-    <!--
-    <autocomplete-value value="home"/>
-    <autocomplete-value value="work"/>
-    <autocomplete-value value="mobile"/>
-    <autocomplete-value value="fax"/>
-    <autocomplete-value value="pager"/>
-    -->
-    <autocomplete-value value="tel"/>
-    <autocomplete-value value="tel-country-code" sub-value-of="tel"          level="1"/>
-    <autocomplete-value value="tel-national"     sub-value-of="tel"          level="1"/>
-    <autocomplete-value value="tel-area-code"    sub-value-of="tel-national" level="2"/>
-    <autocomplete-value value="tel-local"        sub-value-of="tel-national" level="2"/>
-    <autocomplete-value value="tel-local-prefix" sub-value-of="tel-local"    level="3"/>
-    <autocomplete-value value="tel-local-suffix" sub-value-of="tel-local"    level="3"/>
-    <autocomplete-value value="tel-extension"/>
-    <autocomplete-value value="email"/>
-    <autocomplete-value value="impp"/>
+    home
+    work
+    mobile
+    fax
+    pager
 
-    <autocomplete-value value="webauthn"/>
+    webauthn
+    -->
 </autocomplete-values>

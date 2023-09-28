@@ -56,17 +56,30 @@
                 <xf:setvalue ref="$i/standard-classes"        value="string-join($control-classes[. = $standard-classes], ' ')"/>
                 <xf:setvalue ref="$i/custom-classes"          value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
-                <xf:setvalue ref="$i/fr-index"                         value="exists($control/fr:index)"/>
+                <xf:setvalue ref="$i/fr-index/@enabled"       value="exists($control/fr:index)"/>
                 <xf:action iterate="('show', 'search', 'edit')">
                     <xf:var name="current"          value="."/>
                     <xf:var name="instance-element" value="$i/*[local-name()                   = concat('fr-summary-', $current)]"/>
                     <xf:var name="control-element"  value="$control/fr:index/fr:*[local-name() = concat('summary-', $current)]"/>
 
-                    <xf:setvalue ref="$instance-element"                value="exists($control-element)"/>
-                    <xf:setvalue ref="$instance-element/@require-role"  value="normalize-space($control-element/@require-role)"/>
-                    <xf:setvalue ref="$instance-element/@role-required" value="$instance-element/@require-role != ''"/>
+                    <xf:setvalue ref="$instance-element/@enabled"       value="exists($control-element)"/>
+
+                    <xf:delete ref="$instance-element/require-role"/>
+                    <xf:action iterate="xxf:split(normalize-space($control-element/@require-role))">
+                        <xf:var    name="role"                 value="."/>
+                        <xf:insert context="$instance-element" origin="xf:element('require-role', $role)"/>
+                    </xf:action>
+
+                    <xf:setvalue ref="$instance-element/@role-required" value="count($instance-element/require-role) gt 0"/>
+                    <xf:setvalue
+                        ref="$instance-element/@require-role-constraint"
+                        value="
+                            if ($control-element/@require-role-constraint != '') then
+                                $control-element/@require-role-constraint
+                            else
+                                'all'"/>
                 </xf:action>
-                <xf:setvalue ref="$i/fr-encrypt"                       value="exists($control/fr:encrypt)"/>
+                <xf:setvalue ref="$i/fr-encrypt/@enabled" value="exists($control/fr:encrypt)"/>
 
                 <!-- Figure which one of label, hint, help, or text the control supports -->
                 <xf:action>
@@ -389,20 +402,31 @@
                         <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute('class', string-join($classes, ' '))"/>
                         <!-- Write index settings -->
                         <xf:delete ref="$control/fr:index"/>
-                        <xf:action if="$i/fr-index = true()">
+                        <xf:action if="$i/fr-index/@enabled = true()">
                             <xf:insert context="$control" origin="xf:element('fr:index')"/>
                             <xf:action iterate="('show', 'search', 'edit')">
                                 <xf:var name="current"          value="."/>
                                 <xf:var name="instance-element" value="$i/*[local-name() = concat('fr-summary-', $current)]"/>
-                                <xf:action if="$instance-element = true()">
+                                <xf:action if="$instance-element/@enabled = true()">
+                                    <xf:var name="require-role" value="normalize-space(string-join($instance-element/require-role, ' '))"/>
+                                    <xf:var
+                                        name="require-role-constraint"
+                                        value="if ($instance-element/@require-role-constraint != '') then $instance-element/@require-role-constraint else 'all'"/>
                                     <xf:insert
                                         context="$control/fr:index"
                                         origin="xf:element(
-                                        concat('fr:summary-', $current),
-                                        if (normalize-space($instance-element/@require-role) != '') then
-                                            xf:attribute('require-role', $instance-element/@require-role)
-                                        else
-                                            ())"/>
+                                            concat('fr:summary-', $current),
+                                            (
+                                                if ($instance-element/@role-required and $require-role != '') then
+                                                    xf:attribute('require-role', $require-role)
+                                                else
+                                                    (),
+                                                if ($instance-element/@role-required and count(xxf:split($require-role)) gt 1) then
+                                                    xf:attribute('require-role-constraint', $require-role-constraint)
+                                                else
+                                                    ()
+                                            )
+                                        )"/>
                                 </xf:action>
                             </xf:action>
                         </xf:action>
@@ -629,11 +653,17 @@
                         <custom-classes/>           <!-- All custom classes except the standard ones -->
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
 
-                        <fr-index/>
-                        <fr-summary-show   role-required="" require-role=""/>
-                        <fr-summary-search role-required="" require-role=""/>
-                        <fr-summary-edit   role-required="" require-role=""/>
-                        <fr-encrypt/>
+                        <fr-index          enabled=""/>
+                        <fr-summary-show   enabled="" role-required="" require-role-constraint="">
+                            <!--<require-role/>-->
+                        </fr-summary-show>
+                        <fr-summary-search enabled="" role-required="" require-role-constraint="">
+                            <!--<require-role/>-->
+                        </fr-summary-search>
+                        <fr-summary-edit   enabled="" role-required="" require-role-constraint="">
+                            <!--<require-role/>-->
+                        </fr-summary-edit>
+                        <fr-encrypt        enabled=""/>
 
                         <default-alert
                             global-default-alert-message=""
@@ -671,6 +701,9 @@
                 </xf:instance>
 
                 <xf:var name="i" value="instance()"/>
+
+                <!-- TODO: check this -->
+                <xf:bind ref="$i/@valid" calculate="valid($i)"/>
 
                 <xf:instance id="language-instance">
                     <_>
@@ -897,13 +930,19 @@
                     ref="(label | hint | help | text)/value"
                     xxf:whitespace="trim"/>
 
-                <xf:bind ref="$i/fr-index"          type="xs:boolean"/>
+                <xf:bind ref="$i/fr-index/@enabled" type="xs:boolean"/>
                 <xf:bind ref="$i/*[starts-with(local-name(), 'fr-summary-')]" name="summary-setting">
-                    <xf:bind ref="$summary-setting" type="xs:boolean"/>
-                    <xf:bind ref="@role-required"   type="xs:boolean" relevant="$summary-setting = true()"/>
-                    <xf:bind ref="@require-role"                      relevant="$summary-setting = true() and $summary-setting/@role-required = true()"/>
+                    <xf:bind ref="@enabled"         type="xs:boolean"/>
+                    <xf:bind ref="@role-required"   type="xs:boolean" relevant="$summary-setting/@enabled = true()"/>
+                    <xf:bind
+                            ref="require-role"
+                            relevant="$summary-setting/@enabled = true() and $summary-setting/@role-required = true()"
+                            xxf:whitespace="trim">
+                        <xf:constraint id="role-non-empty"      value=". != ''"/>
+                        <xf:constraint id="role-non-duplicated" value=". = '' or not(. = (../require-role except .))"/>
+                    </xf:bind>
                 </xf:bind>
-                <xf:bind ref="$i/fr-encrypt"        type="xs:boolean"/>
+                <xf:bind ref="$i/fr-encrypt/@enabled" type="xs:boolean"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -963,11 +1002,11 @@
                                                 <xf:group ref=".[exists($items-to-show)]" class="fb-control-settings-options">
                                                     <xf:var
                                                         name="selected-values"
-                                                        value="for $e in $i/*[local-name() = $items-to-show/value and . = true()] return local-name($e)"/>
+                                                        value="for $e in $i/*[local-name() = $items-to-show/value and @enabled = true()] return local-name($e)"/>
 
                                                     <xf:repeat ref="$items-to-show" id="items-to-show-repeat">
-                                                        <xf:var name="item-to-show"      value="."/>
-                                                        <xf:var name="current-value"     value="$item-to-show/value"/>
+                                                        <xf:var name="item-to-show"  value="."/>
+                                                        <xf:var name="current-value" value="$item-to-show/value"/>
                                                         <xf:var
                                                             name="checkbox-disabled"
                                                             value="
@@ -993,7 +1032,7 @@
                                                         <xf:var name="base-binding" value="$i/*[local-name() = $current-value][1]"/>
                                                         <xf:var
                                                             name="checkbox-binding"
-                                                            value="$base-binding/(if ($checkbox-disabled) then string() else .)"/>
+                                                            value="$base-binding/(if ($checkbox-disabled) then @enabled/string() else @enabled)"/>
                                                         <xf:var name="is-summary-select" value="$current-value = ('fr-summary-show', 'fr-summary-search', 'fr-summary-edit')"/>
 
                                                         <xh:div class="{{if ($is-summary-select) then 'fb-control-settings-summary-checkbox' else ''}}">
@@ -1017,13 +1056,85 @@
                                                             <xf:switch caseref="$is-summary-select">
                                                                 <xf:case value="true()">
                                                                     <!-- Summary settings can have required roles -->
-                                                                    <fr:checkbox-input ref="$base-binding/@role-required">
-                                                                        <xf:label ref="$resources/dialog-control-settings/restrict-role"/>
-                                                                        <xf:action event="xforms-deselect">
-                                                                            <xf:setvalue ref="$base-binding/@require-role"/>
-                                                                        </xf:action>
-                                                                    </fr:checkbox-input>
-                                                                    <xf:input ref="$base-binding/@require-role" class="fb-control-settings-summary-role"/>
+                                                                    <xh:div class="fb-role-required-checkbox">
+                                                                        <xh:div>
+                                                                            <fr:checkbox-input ref="$base-binding/@role-required">
+                                                                                <xf:label ref="$resources/dialog-control-settings/role/restrict"/>
+                                                                                <xf:action event="xforms-select">
+                                                                                    <xf:insert
+                                                                                        if="count($base-binding/require-role) = 0"
+                                                                                        context="$base-binding"
+                                                                                        origin="xf:element('require-role')"/>
+                                                                                </xf:action>
+                                                                                <xf:action event="xforms-deselect">
+                                                                                    <xf:delete ref="$base-binding/require-role"/>
+                                                                                </xf:action>
+                                                                            </fr:checkbox-input>
+                                                                        </xh:div>
+                                                                        <xh:div>
+                                                                            <xf:var
+                                                                                name="can-remove-param"
+                                                                                value="count($base-binding/require-role) gt 1"/>
+
+                                                                            <xf:switch caseref="count($base-binding/require-role) gt 1" class="fb-roles-any-or-all">
+                                                                                <xf:case value="true()">
+                                                                                    <xh:div>
+                                                                                        <xf:select1 ref="$base-binding/@require-role-constraint">
+                                                                                            <xf:item>
+                                                                                                <xf:label ref="$resources/dialog-control-settings/role/all"/>
+                                                                                                <xf:value>all</xf:value>
+                                                                                            </xf:item>
+                                                                                            <xf:item>
+                                                                                                <xf:label ref="$resources/dialog-control-settings/role/any"/>
+                                                                                                <xf:value>any</xf:value>
+                                                                                            </xf:item>
+                                                                                        </xf:select1>
+                                                                                        <xf:output ref="$resources/dialog-control-settings/role/of-the-following"/>
+                                                                                    </xh:div>
+                                                                                </xf:case>
+                                                                                <xf:case value="false()"/>
+                                                                            </xf:switch>
+
+                                                                            <fr:dnd-repeat ref="
+                                                                                    if (count($base-binding/require-role) gt 0) then
+                                                                                        $base-binding/require-role
+                                                                                    else
+                                                                                        ()">
+                                                                                <xf:var name="current-role" value="."/>
+
+                                                                                <xf:var name="can-move" value="count($base-binding/require-role) gt 1"/>
+                                                                                <xh:div class="{{'fb-role-row', 'xforms-dnd-item', 'xforms-dnd-moves'[$can-move]}}">
+                                                                                    <xh:div>
+                                                                                        <xf:input ref="$current-role" class="fb-control-settings-summary-role">
+                                                                                            <xf:alert validation="role-non-empty" ref="$resources/dialog-control-settings/role/empty"/>
+                                                                                            <xf:alert validation="role-non-duplicated" ref="$resources/dialog-control-settings/role/duplicate"/>
+                                                                                        </xf:input>
+                                                                                    </xh:div>
+                                                                                    <xh:div class="fb-param-buttons">
+                                                                                        <xh:i class="fa fa-fw fa-bars fb-param-grab"/>
+                                                                                        <xf:trigger
+                                                                                                appearance="minimal"
+                                                                                                ref="if ($can-remove-param) then $current-role else ''">
+                                                                                            <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
+                                                                                            <xf:action event="DOMActivate">
+                                                                                                <xf:delete ref="$current-role"/>
+                                                                                            </xf:action>
+                                                                                        </xf:trigger>
+                                                                                        <xf:trigger appearance="minimal">
+                                                                                            <xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>
+                                                                                            <xf:action event="DOMActivate">
+                                                                                                <xf:insert
+                                                                                                    context="$base-binding"
+                                                                                                    ref="$current-role[parent::* is $base-binding]"
+                                                                                                    position="after"
+                                                                                                    origin="xf:element('require-role')"/>
+                                                                                            </xf:action>
+                                                                                        </xf:trigger>
+                                                                                    </xh:div>
+                                                                                </xh:div>
+                                                                            </fr:dnd-repeat>
+                                                                        </xh:div>
+                                                                    </xh:div>
                                                                 </xf:case>
                                                                 <xf:case value="false()"/>
                                                             </xf:switch>

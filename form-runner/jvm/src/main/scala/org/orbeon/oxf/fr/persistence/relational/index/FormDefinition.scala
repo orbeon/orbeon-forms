@@ -19,6 +19,7 @@ import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SummarySettings}
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner, InDocFormRunnerDocContext}
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
@@ -78,19 +79,60 @@ trait FormDefinition {
     else
       "exact"
 
+  // Re-use existing Condition trait, which already has RolesAnyOf, but is more complex?
+  protected object SimpleConstraint {
+    sealed trait SimpleConstraint {
+      def satisfiedFor(currentRoles: List[String]): Boolean
+    }
+
+    case class All(roles: List[String]) extends SimpleConstraint {
+      override def satisfiedFor(currentRoles: List[String]): Boolean = roles.forall(currentRoles.contains)
+    }
+
+    case class Any(roles: List[String]) extends SimpleConstraint {
+      override def satisfiedFor(currentRoles: List[String]): Boolean = roles.exists(currentRoles.contains)
+    }
+
+    case object AlwaysSatisfied extends SimpleConstraint {
+      def satisfiedFor(currentRoles: List[String]): Boolean = true
+    }
+
+    def apply(rolesOpt: Option[String], constraintOpt: Option[String]): SimpleConstraint =
+      rolesOpt match {
+        case None =>
+          AlwaysSatisfied
+
+        case Some(roles) =>
+          val rolesAsList = roles.splitTo[List]().map(_.trimAllToEmpty)
+          val constraint  = constraintOpt.map(_.toLowerCase.trimAllToEmpty).getOrElse("all")
+
+          constraint match {
+            case "all" | "and" => All(rolesAsList)
+            case "any" | "or"  => Any(rolesAsList)
+            case _             => throw new IllegalArgumentException(s"Illegal roles constraint: $constraint")
+          }
+      }
+  }
+
   def summarySettings(
-    control      : NodeInfo,
-    forUserRoles : Option[List[String]]
+    control         : NodeInfo,
+    forUserRolesOpt : Option[List[String]]
   ): SummarySettings = {
     // Check the presence/absence of a given sub-element for a given field
     def setting(field: NodeInfo, elementName: String): Boolean =
       (field / elementName).headOption match {
         case Some(element) =>
-          val requiredRoleOpt = (element /@ "require-role").map(_.stringValue).headOption.filter(_.nonEmpty)
+          val rolesOpt      = element.attValueNonBlankOpt("require-role")
+          val constraintOpt = element.attValueNonBlankOpt("require-role-constraint")
 
-          requiredRoleOpt match {
-            case Some(requiredRole) => forUserRoles.forall(_.contains(requiredRole))
-            case None               => true
+          forUserRolesOpt match {
+            case Some(forUserRoles) =>
+              val simpleConstraint = SimpleConstraint(rolesOpt = rolesOpt, constraintOpt = constraintOpt)
+              simpleConstraint.satisfiedFor(forUserRoles)
+
+            case None =>
+              // Current user roles not specified (see readPublishedFormEncryptionAndIndexDetails case and tests)
+              true
           }
 
         case None =>

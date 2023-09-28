@@ -168,12 +168,12 @@
                 xxbl:keep-if-function-unavailable="fr:mode"
                 name="view"
                 value="false()"/>
-            <xf:var
-                name="field-width"
-                value="fr:component-param-value('field-width')"/>
+
+            <xf:var name="class-field-width"   value="concat('fr-field-width-'  , fr:component-param-value('field-width'))"/>
+            <xf:var name="class-native-picker" value="concat('fr-native-picker-', fr:component-param-value('native-picker'))"/>
 
             <xf:group ref="$binding[not($view)]">
-                <xh:div class="input-append date fr-field-width-{$field-width}">
+                <xh:div class="input-append date {$class-field-width} {$class-native-picker}">
                     <!-- Create placeholder from Orbeon Forms input format
                          https://doc.orbeon.com/configuration/properties/xforms#for-xf-input -->
                     <xf:var

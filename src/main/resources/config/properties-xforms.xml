@@ -182,6 +182,7 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-align"                   value=""/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.date.field-width"                     value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.date.native-picker"                   value="ios"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.time.field-width"                     value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.datetime.field-width"                 value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.us-phone.field-width"                 value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>

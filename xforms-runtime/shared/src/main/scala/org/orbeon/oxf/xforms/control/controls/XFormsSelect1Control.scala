@@ -342,7 +342,7 @@ class XFormsSelect1Control(
 
     // Make sure the external value is up-to-date, as it might have changed due to the itemset changing
     if (hasNestedContent)
-      evaluateExternalValue()
+      markExternalValueDirty()
 
     val outputNestedContent = (ch: XMLReceiverHelper) => {
 

@@ -22,4 +22,10 @@
 
     // Don't show the add-on when using the native widget
     input[type = "date"] + .add-on { display: none }
+
+    // Override Bootstrap padding for text not to show too low on Safari desktop
+    input[type = "date"] {
+        padding-top: 1px;
+        padding-bottom: 1px;
+    }
 }

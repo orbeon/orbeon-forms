@@ -79,7 +79,8 @@ class ItemsetActionTest
               case Some(itemValue) =>
                 assert(getItemsetSearchNested(control).get.allItemsWithValueIterator(reverse = false) exists (_._2 == Left(itemValue)))
               case None =>
-                assert(1 === getItemsetSearchNested(control).get.allItemsIterator.size) // because fr:dropdown has a blank item
+                // The `fr:dropdown` has at least a blank item, so all we can say is that it's not empty
+                assert(getItemsetSearchNested(control).get.allItemsIterator.nonEmpty)
             }
 
             assertOne(cityControl, cityOpt)

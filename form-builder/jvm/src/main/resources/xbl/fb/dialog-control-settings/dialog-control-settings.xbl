@@ -702,9 +702,6 @@
 
                 <xf:var name="i" value="instance()"/>
 
-                <!-- TODO: check this -->
-                <xf:bind ref="$i/@valid" calculate="valid($i)"/>
-
                 <xf:instance id="language-instance">
                     <_>
                         <lang/>

@@ -432,7 +432,7 @@
                         </xf:action>
                         <!-- Write encrypt settings -->
                         <xf:delete ref="$control/fr:encrypt"/>
-                        <xf:action if="$i/fr-encrypt = true()">
+                        <xf:action if="$i/fr-encrypt/@enabled = true()">
                             <xf:insert context="$control" origin="xf:element('fr:encrypt')"/>
                         </xf:action>
 

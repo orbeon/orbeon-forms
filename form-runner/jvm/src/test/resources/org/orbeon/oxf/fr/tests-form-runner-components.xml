@@ -754,7 +754,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control class="input-append date fr-field-width-natural" id="my-date≡xf-10"/>
+                        <xxf:control class="input-append date fr-field-width-natural fr-native-picker-ios" id="my-date≡xf-10"/>
                         <xxf:attribute for="my-date≡input" name="placeholder"/>
                         <xxf:attribute for="my-date≡input" name="role">textbox</xxf:attribute>
                         <xxf:control id="my-date≡xf-13" relevant="false"/>

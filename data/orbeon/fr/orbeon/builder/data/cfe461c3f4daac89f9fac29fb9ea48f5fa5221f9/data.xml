@@ -38,11 +38,11 @@
                             </grid-3>
                         </detail-section-iteration>
                     </detail-section>
-                    <section-1>
+                    <confirmation>
                         <grid-1>
-                            <control-1/>
+                            <confirmation-message/>
                         </grid-1>
-                    </section-1>
+                    </confirmation>
                 </form>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
@@ -81,9 +81,9 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                <xf:bind id="confirmation-bind" ref="confirmation" name="confirmation">
                     <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
-                        <xf:bind id="control-1-bind" ref="control-1" name="control-1"/>
+                        <xf:bind id="confirmation-message-bind" ref="confirmation-message" name="confirmation-message"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
@@ -113,10 +113,10 @@
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
-                        <control-1>
+                        <confirmation-message>
                             <text xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
                                   xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">&lt;div&gt;You have entered details for all travelers. Congratulations!&lt;/div&gt;</text>
-                        </control-1>
+                        </confirmation-message>
                         <traveler-name-readonly>
                             <label>Traveler Full Name</label>
                             <hint/>
@@ -206,10 +206,10 @@
                             <label>Traveler Details</label>
                             <iteration-label>Details for traveler {$traveler-name}</iteration-label>
                         </detail-section>
-                        <section-1>
+                        <confirmation>
                             <label>Confirmation</label>
                             <help/>
-                        </section-1>
+                        </confirmation>
                     </resource>
                 </resources>
             </xf:instance>
@@ -337,13 +337,13 @@
                         </fr:c>
                     </fr:grid>
                 </fr:section>
-                <fr:section id="section-1-section" bind="section-1-bind">
-                    <xf:label ref="$form-resources/section-1/label"/>
+                <fr:section id="confirmation-section" bind="confirmation-bind">
+                    <xf:label ref="$form-resources/confirmation/label"/>
                     <fr:grid id="grid-1-grid" bind="grid-1-bind">
                         <fr:c x="1" y="1" w="6">
-                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-1-control"
-                                            bind="control-1-bind">
-                                <fr:text ref="$form-resources/control-1/text" mediatype="text/html"/>
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="confirmation-message-control"
+                                            bind="confirmation-message-bind">
+                                <fr:text ref="$form-resources/confirmation-message/text" mediatype="text/html"/>
                             </fr:explanation>
                         </fr:c>
                         <fr:c x="7" y="1" w="6"/>

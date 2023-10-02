@@ -212,9 +212,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
   private object EventSupport extends EventListenerSupport
 
   private def isNativePicker: Boolean = {
-    val dateDiv = containerElem.querySelector(".date")
-    org.scalajs.dom.console.log(dateDiv)
-    val always  = dateDiv.classList.contains("fr-native-picker-always")
+    val always  = containerElem.querySelector(":scope > .fr-native-picker-always") != null
     val iOS     = dom.document.body.classList.contains(XFormsIosClass)
     always || iOS
   }
@@ -291,4 +289,3 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
       datePicker.showDatepicker()
     }
 }
-

@@ -576,7 +576,7 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.subsections-toc.*.*"               value="active"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.lazy-section-relevance.*.*"        value="false"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.full-update.*.*"                   value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.allow-initial-url-param.*.*"       value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.allow-initial-url-param.*.*"       value="true"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"                value="lax"/>
 

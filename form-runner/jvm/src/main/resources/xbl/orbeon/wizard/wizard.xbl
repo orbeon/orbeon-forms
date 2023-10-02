@@ -457,9 +457,12 @@
                                                 )
                                             else
                                                 $page-name">
+                                    <!-- Also set when the page appears so that the URL is up-to-date. This will also
+                                         fix the URL if the requested URL is pointing to a non-existing section or
+                                         index. -->
                                     <xf:action
                                             type="javascript"
-                                            event="xforms-value-changed"
+                                            event="xforms-enabled xforms-value-changed"
                                             if="$current-page-name-with-index">
                                         <xf:param name="pageNameWithIndex" value="$current-page-name-with-index"/>
                                         <xf:body>ORBEON.fr.private.API.updateWizardPageName(pageNameWithIndex)</xf:body>
@@ -799,7 +802,9 @@
                                                 name="initial-case-id-with-index-opt"
                                                 value="
                                                     (
-                                                        (: URL parameter, see https://github.com/orbeon/orbeon-forms/issues/2848 :)
+                                                        (: URL parameter, see https://github.com/orbeon/orbeon-forms/issues/2848
+                                                           We validate the input page name and optional index and return
+                                                           the empty sequence if the input is invalid. :)
                                                         for $param in xxf:get-request-parameter('fr-wizard-page')[1][$allow-initial-url-param]
                                                         return
                                                             for $page-name-with-index in xxf:trim($param[xxf:non-blank()])
@@ -815,14 +820,21 @@
                                                                             substring-before($page-name-with-index, '/')
                                                                         else
                                                                             $page-name-with-index,
+                                                                    $has-paging :=
+                                                                        $page-name = $sections-with-paging-names,
                                                                     $index-opt :=
-                                                                        if (contains($page-name-with-index, '/') and $sections-with-paging-names = $page-name) then
-                                                                            xs:integer(substring-after($page-name-with-index, '/')[. castable as xs:integer])[. ge 1]
+                                                                        if ($has-paging and contains($page-name-with-index, '/')) then
+                                                                            xs:integer(substring-after($page-name-with-index, '/')[. castable as xs:integer])[
+                                                                                (: Range validation :)
+                                                                                . ge 1 and
+                                                                                . le count(bind(concat($page-name, '-bind'))/*)
+                                                                            ]
                                                                         else
                                                                             (),
-                                                                    $relevant-page-index     := index-of($relevant-page-names, $page-name)
+                                                                    $relevant-page-index :=
+                                                                        index-of($relevant-page-names, $page-name)
                                                                 return
-                                                                    if (exists($relevant-page-index)) then
+                                                                    if (exists($relevant-page-index) and (not($has-paging) or exists($index-opt))) then
                                                                         array:append(
                                                                             array:append(
                                                                                 array:join(()),
@@ -833,10 +845,12 @@
                                                                     else
                                                                         (),
                                                         (: Nested sections scenario :)
-                                                        array:append(
-                                                            array:join(()),
-                                                            Wizard:caseIdsForTopLevelSection($last-available-and-visited-top-level-section-id)[1]
-                                                        ),
+                                                        for $i in Wizard:caseIdsForTopLevelSection($last-available-and-visited-top-level-section-id)[1]
+                                                        return
+                                                            array:append(
+                                                                array:join(()),
+                                                                $i
+                                                            ),
                                                         (: Regular top-level section scenario :)
                                                         array:append(
                                                             array:join(()),
@@ -844,17 +858,29 @@
                                                         )
                                                     )[1]"/>
 
+
+                                            <xf:var name="new-case-id" value="array:get($initial-case-id-with-index-opt, 1)"/>
+
                                             <xf:setvalue
                                                 ref="xxf:instance('local')/current-case-id"
-                                                value="array:get($initial-case-id-with-index-opt, 1)"/>
+                                                value="$new-case-id"/>
 
                                             <xf:setvalue
                                                 ref="xxf:instance('local')/current-top-level-case-id"
-                                                value="case('switch')"/>
+                                                value="
+                                                    concat(
+                                                        $nav-matching-top-level-section-ids[
+                                                            index-of(
+                                                                $nav-section-or-grid-ids,
+                                                                Wizard:sectionIdFromCaseIdOpt($new-case-id)
+                                                            )
+                                                        ],
+                                                        '-case'
+                                                    )"/>
 
                                             <!-- See https://github.com/orbeon/orbeon-forms/issues/3433 -->
                                             <xf:toggle
-                                                case="{{array:get($initial-case-id-with-index-opt, 1)}}"/>
+                                                case="{{$new-case-id}}"/>
 
                                             <!-- Set initial index if present -->
                                             <xf:action if="array:size($initial-case-id-with-index-opt) ge 2">
@@ -863,7 +889,7 @@
                                                     ref="xxf:instance('local')/current-index"
                                                     value="$new-index"/>
                                                 <xf:setindex
-                                                    repeat="{{concat(Wizard:sectionIdFromCaseIdOpt(array:get($initial-case-id-with-index-opt, 1)), '-repeater-repeat')}}"
+                                                    repeat="{{concat(Wizard:sectionIdFromCaseIdOpt($new-case-id), '-repeater-repeat')}}"
                                                     index="$new-index"/>
                                             </xf:action>
 

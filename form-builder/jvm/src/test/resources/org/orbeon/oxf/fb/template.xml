@@ -454,7 +454,7 @@
                                     labelref="@label"
                                     resource="/fr/service/custom/orbeon/controls/countries?country-name={$fr-search-value}"
                                     max-results-displayed="4"
-                                    class="custom1 fr-search fr-encrypt custom2 fr-email-subject">
+                                    class="custom1 fr-summary fr-search fr-encrypt custom2 fr-email-subject">
                                 <xf:label>Country code: </xf:label>
                                 <xf:itemset ref="/countries/country">
                                     <xf:label ref="name"/>

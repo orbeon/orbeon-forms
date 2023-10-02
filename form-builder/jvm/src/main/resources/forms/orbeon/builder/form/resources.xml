@@ -505,18 +505,20 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Show in search</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label>Show in bulk edit</label>
-                    <value>fr-summary-edit</value>
+                    <label>Allow bulk edit</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label>Encrypt data at rest</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <summary-show>
+                <do-not-show>Don't show on Summary page</do-not-show>
+                <show>Show on Summary page</show>
+                <column-only>Show column only</column-only>
+                <search-only>Show search only</search-only>
+            </summary-show>
             <role>
                 <restrict>Restrict to role</restrict>
                 <all>All</all>
@@ -1867,18 +1869,20 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Inclure dans la recherche</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label>Inclure dans la modification groupée</label>
-                    <value>fr-summary-edit</value>
+                    <label>Permettre la modification groupée</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label>Crypter les données au repos</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <summary-show>
+                <do-not-show>Ne pas inclure dans le sommaire</do-not-show>
+                <show>Inclure dans le sommaire</show>
+                <column-only>Afficher la colonne uniquement</column-only>
+                <search-only>Afficher la recherche uniquement</search-only>
+            </summary-show>
             <role>
                 <restrict>Restreindre au rôle</restrict>
                 <all>Tous les</all>
@@ -3213,18 +3217,20 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Vis i søk</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
             <role>
                 <restrict todo="true">[Restrict to role]</restrict>
                 <all todo="true">[All]</all>
@@ -4587,18 +4593,20 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Показывать в поиске</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
             <role>
                 <restrict todo="true">[Restrict to role]</restrict>
                 <all todo="true">[All]</all>
@@ -5960,18 +5968,20 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Mostra in cerca</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
             <role>
                 <restrict todo="true">[Restrict to role]</restrict>
                 <all todo="true">[All]</all>
@@ -7297,18 +7307,20 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>In Suche anzeigen</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label>Daten in der Datenbank verschlüsseln</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
             <role>
                 <restrict todo="true">[Restrict to role]</restrict>
                 <all todo="true">[All]</all>
@@ -8637,18 +8649,20 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Näytä haussa</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
             <role>
                 <restrict todo="true">[Restrict to role]</restrict>
                 <all todo="true">[All]</all>
@@ -10002,18 +10016,20 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Mostrar en Búsquedas</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
             <role>
                 <restrict todo="true">[Restrict to role]</restrict>
                 <all todo="true">[All]</all>
@@ -11368,18 +11384,20 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Toon in zoeken</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label>Encrypt gegevens in rust</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
             <role>
                 <restrict todo="true">[Restrict to role]</restrict>
                 <all todo="true">[All]</all>
@@ -12713,18 +12731,20 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Mostrar na Pesquisa</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
             <role>
                 <restrict todo="true">[Restrict to role]</restrict>
                 <all todo="true">[All]</all>
@@ -14085,18 +14105,20 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Visa i sökning</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
             <role>
                 <restrict todo="true">[Restrict to role]</restrict>
                 <all todo="true">[All]</all>

@@ -119,9 +119,10 @@ trait FormDefinition {
     forUserRolesOpt : Option[List[String]]
   ): SummarySettings = {
     // Check the presence/absence of a given sub-element for a given field
-    def setting(field: NodeInfo, elementName: String): Boolean =
+    def setting(field: NodeInfo, elementName: String, attOpt: Option[String] = None): Boolean =
       (field / elementName).headOption match {
-        case Some(element) =>
+        // An optional attribute is checked (default value: true)
+        case Some(element) if attOpt.forall(element.attValueNonBlankOpt(_).forall(_ == "true")) =>
           val rolesOpt      = element.attValueNonBlankOpt("require-role")
           val constraintOpt = element.attValueNonBlankOpt("require-role-constraint")
 
@@ -135,17 +136,17 @@ trait FormDefinition {
               true
           }
 
-        case None =>
+        case _ =>
           false
       }
 
     (control / "*:index").headOption match {
       case Some(index) =>
-        // Look for settings in control sub-elements
+        // Look for settings in control sub-elements (current and legacy format)
         SummarySettings(
-          show   = setting(index, "*:summary-show"),
-          search = setting(index, "*:summary-search"),
-          edit   = setting(index, "*:summary-edit")
+          show   = setting(index, "*:summary-show", Some("column")) || setting(index, "*:summary-show"),
+          search = setting(index, "*:summary-show", Some("search")) || setting(index, "*:summary-search"),
+          edit   = setting(index, "*:allow-bulk-edit", None       ) || setting(index, "*:summary-edit")
         )
 
       case None =>

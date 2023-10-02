@@ -372,8 +372,7 @@ class SearchTest
                 <fr:c y="1" x="1" w="6">
                   <xf:input id="control-1-control" bind="control-1-bind">
                     <fr:index>
-                      <fr:summary-search/>
-                      <fr:summary-search/>
+                      <fr:summary-show/>
                     </fr:index>
                     <xf:label ref="$form-resources/control-1/label"></xf:label>
                     <xf:hint ref="$form-resources/control-1/hint"></xf:hint>

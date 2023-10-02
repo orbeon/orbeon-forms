@@ -425,11 +425,10 @@
      -->
 
     <!-- Migrate control settings from classes to sub-elements -->
-
     <xsl:variable name="control-classes-to-migrate"  select="('fr-index', 'fr-summary', 'fr-search', 'fr-encrypt')"/>
     <xsl:template
             mode="within-body"
-            match="*[./@class[some $class in p:split() satisfies $class = $control-classes-to-migrate]]"
+            match="*[@class[some $class in p:split() satisfies $class = $control-classes-to-migrate]]"
             priority="10">
         <xsl:variable name="has-summary" select="p:has-class('fr-summary')"/>
         <xsl:variable name="has-search"  select="p:has-class('fr-search')"/>
@@ -443,20 +442,65 @@
                 <xsl:if test="exists($filtered-classes)">
                     <xsl:attribute name="class" select="string-join($filtered-classes, ' ')"/>
                 </xsl:if>
-                <xsl:copy-of select="node() | @* except @class"/>
-                <xsl:if test="$has-index and not(./fr:index)">
+                <xsl:copy-of select="@* except @class | node() except (fr:index | fr:encrypt)"/>
+                <xsl:if test="$has-index">
                     <fr:index>
-                        <xsl:if test="$has-summary and not(./fr:index/fr:summary-show)">
-                            <fr:summary-show/>
-                        </xsl:if>
-                        <xsl:if test="$has-search and not(./fr:index/fr:summary-search)">
-                            <fr:summary-search/>
+                        <xsl:if test="$has-summary or $has-search">
+                            <fr:summary-show>
+                                <xsl:if test="not($has-summary)">
+                                    <xsl:attribute name="column" select="'false'"/>
+                                </xsl:if>
+                                <xsl:if test="not($has-search)">
+                                    <xsl:attribute name="search" select="'false'"/>
+                                </xsl:if>
+                            </fr:summary-show>
                         </xsl:if>
                     </fr:index>
                 </xsl:if>
-                <xsl:if test="$has-encrypt and not(./fr:encrypt)">
+                <xsl:if test="$has-encrypt">
                     <fr:encrypt/>
                 </xsl:if>
+            </xsl:copy>
+        </xsl:variable>
+
+        <xsl:apply-templates select="$output" mode="#current"/>
+    </xsl:template>
+
+    <!-- Migrate control settings from fr:summary-* sub-elements to fr:summary-show / fr:allow-bulk-edit -->
+    <xsl:template
+            mode="within-body"
+            match="*[fr:index/(fr:summary-search | fr:summary-edit)]"
+            priority="10">
+        <xsl:variable name="has-show"   select="fr:index/fr:summary-show"/>
+        <xsl:variable name="has-search" select="fr:index/fr:summary-search"/>
+        <xsl:variable name="has-edit"   select="fr:index/fr:summary-edit"/>
+        <xsl:variable name="output">
+            <xsl:copy>
+                <xsl:copy-of select="@* | node() except fr:index"/>
+                <fr:index>
+                    <xsl:if test="$has-show or $has-search">
+                        <fr:summary-show>
+                            <xsl:if test="not($has-show)">
+                                <xsl:attribute name="column" select="'false'"/>
+                            </xsl:if>
+                            <xsl:if test="not($has-search)">
+                                <xsl:attribute name="search" select="'false'"/>
+                            </xsl:if>
+                            <xsl:if test="fr:index/fr:summary-show/@require-role or fr:index/fr:summary-search/@require-role">
+                                <xsl:attribute
+                                    name="require-role"
+                                    select="string-join((fr:index/fr:summary-show/@require-role, fr:index/fr:summary-search/@require-role), ' ')"/>
+                            </xsl:if>
+                        </fr:summary-show>
+                    </xsl:if>
+                    <xsl:if test="$has-edit">
+                        <fr:allow-bulk-edit>
+                            <xsl:if test="fr:index/fr:summary-edit/@require-role">
+                                <xsl:attribute name="require-role" select="fr:index/fr:summary-edit/@require-role"/>
+                            </xsl:if>
+                        </fr:allow-bulk-edit>
+                    </xsl:if>
+                </fr:index>
             </xsl:copy>
         </xsl:variable>
 

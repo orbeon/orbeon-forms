@@ -57,12 +57,12 @@
                 <xf:setvalue ref="$i/custom-classes"          value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
                 <xf:setvalue ref="$i/fr-index/@enabled"       value="exists($control/fr:index)"/>
-                <xf:action iterate="('show', 'search', 'edit')">
+                <xf:action iterate="('summary-show', 'allow-bulk-edit')">
                     <xf:var name="current"          value="."/>
-                    <xf:var name="instance-element" value="$i/*[local-name()                   = concat('fr-summary-', $current)]"/>
-                    <xf:var name="control-element"  value="$control/fr:index/fr:*[local-name() = concat('summary-', $current)]"/>
+                    <xf:var name="instance-element" value="$i/*[local-name()                   = concat('fr-', $current)]"/>
+                    <xf:var name="control-element"  value="$control/fr:index/fr:*[local-name() = $current]"/>
 
-                    <xf:setvalue ref="$instance-element/@enabled"       value="exists($control-element)"/>
+                    <xf:setvalue ref="$instance-element/@enabled" value="exists($control-element)"/>
 
                     <xf:delete ref="$instance-element/require-role"/>
                     <xf:action iterate="xxf:split(normalize-space($control-element/@require-role))">
@@ -78,6 +78,17 @@
                                 $control-element/@require-role-constraint
                             else
                                 'all'"/>
+
+                    <xf:setvalue ref="$instance-element/@legacy"/>
+                    <xf:action if="$current = 'summary-show'">
+                        <!-- Default value: true -->
+                        <xf:var name="column" value="$control-element/@column = 'true' or not(exists($control-element/@column))"/>
+                        <xf:var name="search" value="$control-element/@search = 'true' or not(exists($control-element/@search))"/>
+
+                        <xf:setvalue if="    $column  and not($search)" ref="$instance-element/@legacy"  value="'column-only'"/>
+                        <xf:setvalue if="not($column) and     $search"  ref="$instance-element/@legacy"  value="'search-only'"/>
+                        <xf:setvalue if="not($column) and not($search)" ref="$instance-element/@enabled" value="'false'"/>
+                    </xf:action>
                 </xf:action>
                 <xf:setvalue ref="$i/fr-encrypt/@enabled" value="exists($control/fr:encrypt)"/>
 
@@ -404,9 +415,9 @@
                         <xf:delete ref="$control/fr:index"/>
                         <xf:action if="$i/fr-index/@enabled = true()">
                             <xf:insert context="$control" origin="xf:element('fr:index')"/>
-                            <xf:action iterate="('show', 'search', 'edit')">
+                            <xf:action iterate="('summary-show', 'allow-bulk-edit')">
                                 <xf:var name="current"          value="."/>
-                                <xf:var name="instance-element" value="$i/*[local-name() = concat('fr-summary-', $current)]"/>
+                                <xf:var name="instance-element" value="$i/*[local-name() = concat('fr-', $current)]"/>
                                 <xf:action if="$instance-element/@enabled = true()">
                                     <xf:var name="require-role" value="normalize-space(string-join($instance-element/require-role, ' '))"/>
                                     <xf:var
@@ -415,7 +426,7 @@
                                     <xf:insert
                                         context="$control/fr:index"
                                         origin="xf:element(
-                                            concat('fr:summary-', $current),
+                                            concat('fr:', $current),
                                             (
                                                 if ($instance-element/@role-required and $require-role != '') then
                                                     xf:attribute('require-role', $require-role)
@@ -423,6 +434,12 @@
                                                     (),
                                                 if ($instance-element/@role-required and count(xxf:split($require-role)) gt 1) then
                                                     xf:attribute('require-role-constraint', $require-role-constraint)
+                                                else
+                                                    (),
+                                                if ($current = 'summary-show' and $instance-element/@legacy = 'search-only') then
+                                                    xf:attribute('column', 'false')
+                                                else if ($current = 'summary-show' and $instance-element/@legacy = 'column-only') then
+                                                    xf:attribute('search', 'false')
                                                 else
                                                     ()
                                             )
@@ -653,17 +670,14 @@
                         <custom-classes/>           <!-- All custom classes except the standard ones -->
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
 
-                        <fr-index          enabled=""/>
-                        <fr-summary-show   enabled="" role-required="" require-role-constraint="">
+                        <fr-index           enabled=""/>
+                        <fr-summary-show    enabled="" role-required="" require-role-constraint="" legacy="">
                             <!--<require-role/>-->
                         </fr-summary-show>
-                        <fr-summary-search enabled="" role-required="" require-role-constraint="">
+                        <fr-allow-bulk-edit enabled="" role-required="" require-role-constraint="">
                             <!--<require-role/>-->
-                        </fr-summary-search>
-                        <fr-summary-edit   enabled="" role-required="" require-role-constraint="">
-                            <!--<require-role/>-->
-                        </fr-summary-edit>
-                        <fr-encrypt        enabled=""/>
+                        </fr-allow-bulk-edit>
+                        <fr-encrypt         enabled=""/>
 
                         <default-alert
                             global-default-alert-message=""
@@ -928,7 +942,7 @@
                     xxf:whitespace="trim"/>
 
                 <xf:bind ref="$i/fr-index/@enabled" type="xs:boolean"/>
-                <xf:bind ref="$i/*[starts-with(local-name(), 'fr-summary-')]" name="summary-setting">
+                <xf:bind ref="$i/*[local-name() = ('fr-summary-show', 'fr-allow-bulk-edit')]" name="summary-setting">
                     <xf:bind ref="@enabled"         type="xs:boolean"/>
                     <xf:bind ref="@role-required"   type="xs:boolean" relevant="$summary-setting/@enabled = true()"/>
                     <xf:bind
@@ -999,7 +1013,9 @@
                                                 <xf:group ref=".[exists($items-to-show)]" class="fb-control-settings-options">
                                                     <xf:var
                                                         name="selected-values"
-                                                        value="for $e in $i/*[local-name() = $items-to-show/value and @enabled = true()] return local-name($e)"/>
+                                                        value="
+                                                            for $e in $i/*[local-name() = $items-to-show/value and (@enabled = true() or (exists(@legacy) and xxf:non-blank(@legacy)))]
+                                                            return local-name($e)"/>
 
                                                     <xf:repeat ref="$items-to-show" id="items-to-show-repeat">
                                                         <xf:var name="item-to-show"  value="."/>
@@ -1015,14 +1031,14 @@
                                                                 (
                                                                     (
                                                                         $selected-values   = 'fr-encrypt'
-                                                                        and $current-value = ('fr-summary-show', 'fr-summary-search', 'fr-index', 'fr-summary-edit')
+                                                                        and $current-value = ('fr-index', 'fr-summary-show', 'fr-allow-bulk-edit')
                                                                     ) or
                                                                     (
-                                                                        $selected-values   = ('fr-summary-show', 'fr-summary-search', 'fr-index', 'fr-summary-edit')
+                                                                        $selected-values   = ('fr-index', 'fr-summary-show', 'fr-allow-bulk-edit')
                                                                         and $current-value = 'fr-encrypt'
                                                                     ) or
                                                                     (
-                                                                        $selected-values   = ('fr-summary-show', 'fr-summary-search', 'fr-summary-edit')
+                                                                        $selected-values   = ('fr-summary-show', 'fr-allow-bulk-edit')
                                                                         and $current-value = 'fr-index'
                                                                     )
                                                                 )"/>
@@ -1030,27 +1046,62 @@
                                                         <xf:var
                                                             name="checkbox-binding"
                                                             value="$base-binding/(if ($checkbox-disabled) then @enabled/string() else @enabled)"/>
-                                                        <xf:var name="is-summary-select" value="$current-value = ('fr-summary-show', 'fr-summary-search', 'fr-summary-edit')"/>
+                                                        <xf:var
+                                                            name="select-binding"
+                                                            value="$base-binding/(if ($checkbox-disabled) then @legacy/string() else @legacy)"/>
+                                                        <xf:var name="fr-index-sub-values" value="$current-value = ('fr-summary-show', 'fr-allow-bulk-edit')"/>
 
-                                                        <xh:div class="{{if ($is-summary-select) then 'fb-control-settings-summary-checkbox' else ''}}">
-                                                            <fr:checkbox-input ref="$checkbox-binding" class="fb-control-settings-{{substring-after($current-value, 'fr-')}}">
-                                                                <xf:label ref="$item-to-show/label"/>
-                                                                <!--
-                                                                    We don't like to update values of another checkbox when one is selected, but
-                                                                    we accept this way of doing things here as we indent the Summary checkboxes
-                                                                    under the `fr-index` checkbox, which makes it clear to the user what is
-                                                                    happening.
-                                                                -->
-                                                                <xf:action event="xforms-select" if="$is-summary-select">
-                                                                    <xf:setvalue ref="$i/fr-index" value="true()"/>
-                                                                </xf:action>
-                                                                <xf:action event="xforms-deselect" if="$is-summary-select">
-                                                                    <xf:setvalue ref="$base-binding/@role-required" value="false()"/>
-                                                                    <xf:setvalue ref="$base-binding/@require-role"/>
-                                                                </xf:action>
-                                                            </fr:checkbox-input>
+                                                        <xh:div class="{{if ($fr-index-sub-values) then 'fb-control-settings-fr-index-sub-values' else ''}}">
+                                                            <xf:switch caseref="not(exists($base-binding/@legacy)) or xxf:is-blank($base-binding/@legacy)">
+                                                                <xf:case value="true()">
+                                                                    <!-- Normal case: do not expose 'column only' and 'search only' options -->
+                                                                    <fr:checkbox-input ref="$checkbox-binding" class="fb-control-settings-{{substring-after($current-value, 'fr-')}}">
+                                                                        <xf:label ref="$item-to-show/label"/>
+                                                                        <!--
+                                                                            We don't like to update values of another checkbox when one is selected, but
+                                                                            we accept this way of doing things here as we indent the Summary checkboxes
+                                                                            under the `fr-index` checkbox, which makes it clear to the user what is
+                                                                            happening.
+                                                                        -->
+                                                                        <xf:action event="xforms-select" if="$fr-index-sub-values">
+                                                                            <xf:setvalue ref="$i/fr-index/@enabled" value="true()"/>
+                                                                        </xf:action>
+                                                                        <xf:action event="xforms-deselect" if="$fr-index-sub-values">
+                                                                            <xf:setvalue ref="$base-binding/@role-required" value="false()"/>
+                                                                            <xf:delete   ref="$base-binding/require-role"/>
+                                                                        </xf:action>
+                                                                    </fr:checkbox-input>
+                                                                </xf:case>
+                                                                <xf:case value="false()">
+                                                                    <!-- Legacy case: expose 'column only' and 'search only' options -->
+                                                                    <xf:select1 ref="$select-binding" class="fb-control-settings-{{substring-after($current-value, 'fr-')}}">
+                                                                        <xf:item>
+                                                                            <xf:label ref="$resources/dialog-control-settings/summary-show/do-not-show"/>
+                                                                            <xf:value>do-not-show</xf:value>
+                                                                        </xf:item>
+                                                                        <xf:item>
+                                                                            <xf:label ref="$resources/dialog-control-settings/summary-show/show"/>
+                                                                            <xf:value>show</xf:value>
+                                                                        </xf:item>
+                                                                        <xf:item>
+                                                                            <xf:label ref="$resources/dialog-control-settings/summary-show/column-only"/>
+                                                                            <xf:value>column-only</xf:value>
+                                                                        </xf:item>
+                                                                        <xf:item>
+                                                                            <xf:label ref="$resources/dialog-control-settings/summary-show/search-only"/>
+                                                                            <xf:value>search-only</xf:value>
+                                                                        </xf:item>
 
-                                                            <xf:switch caseref="$is-summary-select">
+                                                                        <xf:action event="xforms-value-changed">
+                                                                            <xf:setvalue ref="$checkbox-binding" value="$select-binding != 'do-not-show'"/>
+                                                                            <xf:setvalue if="$select-binding = 'do-not-show'" ref="$base-binding/@role-required" value="false()"/>
+                                                                            <xf:delete   if="$select-binding = 'do-not-show'" ref="$base-binding/require-role"/>
+                                                                        </xf:action>
+                                                                    </xf:select1>
+                                                                </xf:case>
+                                                            </xf:switch>
+
+                                                            <xf:switch caseref="$fr-index-sub-values" class="fr-index-sub-value">
                                                                 <xf:case value="true()">
                                                                     <!-- Summary settings can have required roles -->
                                                                     <xh:div class="fb-role-required-checkbox">

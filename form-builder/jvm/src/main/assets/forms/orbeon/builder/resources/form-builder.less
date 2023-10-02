@@ -1124,14 +1124,19 @@ body.orbeon {
             }
 
             // Indent these three options under the `index` option
-            .fb-control-settings-summary-show, .fb-control-settings-summary-search, .fb-control-settings-summary-edit {
-                .xforms-items {
+            .fb-control-settings-summary-show, .fb-control-settings-allow-bulk-edit {
+                .xforms-items, &.xforms-select1 {
                     margin-left: 20px;
+                }
+
+                &.xforms-select1 select {
+                    width: min-content;
+                    margin-bottom: 5px;
                 }
             }
 
-            .fb-control-settings-summary-checkbox {
-                .xforms-switch {
+            .fb-control-settings-fr-index-sub-values {
+                .xforms-switch.fr-index-sub-value {
                     display: flex;
                     margin-left: 40px;
                 }

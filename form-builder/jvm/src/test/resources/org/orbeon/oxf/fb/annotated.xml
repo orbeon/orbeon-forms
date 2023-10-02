@@ -435,7 +435,7 @@
                                 <xf:hint ref="$form-resources/control-27/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
-                                    <fr:summary-show/>
+                                    <fr:summary-show search="false"/>
                                 </fr:index>
                                 <fr:encrypt/>
                             </xf:input>
@@ -444,7 +444,7 @@
                                 <xf:hint ref="$form-resources/control-28/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
-                                    <fr:summary-search/>
+                                    <fr:summary-show column="false"/>
                                 </fr:index>
                                 <fr:encrypt/>
                             </xf:input>
@@ -465,7 +465,7 @@
                                 </xf:itemset>
                                 <xf:alert>Value is mandatory</xf:alert>
                                 <fr:index>
-                                    <fr:summary-search/>
+                                    <fr:summary-show/>
                                 </fr:index>
                                 <fr:encrypt/>
                             </fr:databound-select1>
@@ -474,7 +474,7 @@
                                 <xf:hint ref="$form-resources/control-30/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
-                                    <fr:summary-show/>
+                                    <fr:summary-show search="false"/>
                                 </fr:index>
                             </fr:time>
                             <fr:date id="control-31-control" bind="control-31-bind" class="custom1 custom2">
@@ -488,7 +488,7 @@
                                 <xf:hint ref="$form-resources/control-32/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
-                                    <fr:summary-search/>
+                                    <fr:summary-show column="false"/>
                                 </fr:index>
                             </fr:dropdown-select1>
                         </fr:c>

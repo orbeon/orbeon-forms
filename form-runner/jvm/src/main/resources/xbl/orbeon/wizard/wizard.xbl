@@ -1113,7 +1113,7 @@
                                 </xh:div>
 
                                 <!--
-                                <xf:group>
+                                <xf:group id="fr-wizard-debugger" class="fr-wizard-debugger">
                                     <xf:label>Wizard Debugger</xf:label>
                                     <xh:ul>
                                         <xh:li>

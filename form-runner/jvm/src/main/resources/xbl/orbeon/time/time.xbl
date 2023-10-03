@@ -323,9 +323,12 @@
                     property('xxf:readonly-appearance') = 'static' or
                     fr:mode() = 'pdf'
                 "/>
+            <xf:var
+                name="class-field-width"
+                value="concat('fr-field-width-', fr:component-param-value('field-width'))"/>
 
             <xf:group ref="$binding[not($view)]">
-                <xh:div class="input-append fr-field-width-{fr:component-param-value('field-width')}">
+                <xh:div class="input-append {$class-field-width}">
                     <xh:input
                         xh:type="text"
                         placeholder="{
@@ -355,6 +358,7 @@
             -->
             <xf:input
                 ref="$binding[$view]"
+                class="{$class-field-width}"
                 xxf:format="
                     TimeSupport:formatReadonlyModeTime(
                         xxf:binding('fr-time'),

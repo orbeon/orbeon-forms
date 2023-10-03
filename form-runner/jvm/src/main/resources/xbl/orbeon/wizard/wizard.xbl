@@ -413,8 +413,8 @@
                                     name="current-top-level-case-id"
                                     value="(xxf:instance('local')/current-top-level-case-id/string(), xf:random())[1]"/>
 
-                                <xf:var name="allow-initial-url-param">
-                                    <xxf:value xxbl:scope="inner" value="xs:string(fr:component-param-value('allow-initial-url-param')) = 'true'"/>
+                                <xf:var name="allow-url-param">
+                                    <xxf:value xxbl:scope="inner" value="xs:string(fr:component-param-value('allow-url-param')) = 'true'"/>
                                 </xf:var>
 
                                 <!-- NOTE: Initially, current-case-id might be empty, so default to the first relevant case id. -->
@@ -791,8 +791,8 @@
                                             name="last-available-and-visited-top-level-case-id"
                                             value="concat($last-available-and-visited-top-level-section-id, '-case')"/>
 
-                                        <xf:var name="allow-initial-url-param">
-                                            <xxf:value xxbl:scope="inner" value="xs:string(fr:component-param-value('allow-initial-url-param')) = 'true'"/>
+                                        <xf:var name="allow-url-param">
+                                            <xxf:value xxbl:scope="inner" value="xs:string(fr:component-param-value('allow-url-param')) = 'true'"/>
                                         </xf:var>
 
                                         <xf:var
@@ -802,7 +802,7 @@
                                                     (: URL parameter, see https://github.com/orbeon/orbeon-forms/issues/2848
                                                        We validate the input page name and optional index and return
                                                        the empty sequence if the input is invalid. :)
-                                                    for $param in xxf:get-request-parameter('fr-wizard-page')[1][$allow-initial-url-param]
+                                                    for $param in xxf:get-request-parameter('fr-wizard-page')[1][$allow-url-param]
                                                     return
                                                         for $page-name-with-index in xxf:trim($param[xxf:non-blank()])
                                                         return

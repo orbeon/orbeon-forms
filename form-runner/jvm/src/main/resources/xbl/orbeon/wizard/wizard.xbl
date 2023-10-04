@@ -815,10 +815,10 @@
                                                                    into account. We call the function directly because
                                                                    `xxf:instance('available-top-level-sections')` is not
                                                                     yet computed. :)
-                                                                $available-top-level-sections-names := trace(
-                                                                    for $m in trace(Wizard:gatherTopLevelSectionStatusJava(trace($relevant-top-level-section-ids, 'xxx 5')), 'xxx 6')
+                                                                $available-top-level-sections-names :=
+                                                                    for $m in Wizard:gatherTopLevelSectionStatusJava($relevant-top-level-section-ids)
                                                                     return
-                                                                        if (map:get($m, 'is-available')) then map:get($m, 'name') else (), 'xxx 7'),
+                                                                        if (map:get($m, 'is-available')) then map:get($m, 'name') else (),
                                                                 $sections-with-paging-names :=
                                                                     for $i in $sections-with-paging-section-ids
                                                                     return frf:controlNameFromId($i),
@@ -845,11 +845,11 @@
                                                                     return
                                                                         $nav-matching-top-level-section-ids[
                                                                             index-of(
-                                                                                trace($nav-section-or-grid-ids, 'xxx 1'),
-                                                                                trace($new-relevant-nav-section-or-grid-id, 'xxx 2')
+                                                                                $nav-section-or-grid-ids,
+                                                                                $new-relevant-nav-section-or-grid-id
                                                                             )
                                                                         ][
-                                                                            trace(frf:controlNameFromIdOpt(.), 'xxx 3') = trace($available-top-level-sections-names, 'xxx 4')
+                                                                            frf:controlNameFromIdOpt(.) = $available-top-level-sections-names
                                                                         ]
                                                             return
                                                                 if (exists($new-top-level-section-id-opt) and (not($has-paging) or exists($new-validated-index-opt))) then

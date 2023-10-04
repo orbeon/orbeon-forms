@@ -339,7 +339,7 @@
                 ref="bind('validate-bind')/stats/form"
                 method="post"
                 serialization="application/xml"
-                action="/fr/{$app}/{$form}/edit{
+                action="/fr/{$app}/{$form}/new{
                     let $doc := xxf:get-request-parameter('document-id')
                     return
                         if (xxf:non-blank($doc)) then

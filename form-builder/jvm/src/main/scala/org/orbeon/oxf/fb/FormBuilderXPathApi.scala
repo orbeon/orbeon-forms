@@ -464,7 +464,7 @@ object FormBuilderXPathApi {
 
     AlertDetails.fromForm(controlName)(FormBuilderDocContext())              find
       (_.default)                                                            getOrElse
-      AlertDetails(None, List(FormBuilder.currentLang -> ""), global = true) toXML
+      AlertDetails(None, Nil, global = true) toXML
   }
 
   // Return all validations as XML for the given control

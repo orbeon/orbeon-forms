@@ -627,15 +627,13 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     def fromXML(alertElem: NodeInfo, forValidationId: Option[String])(implicit ctx: FormBuilderDocContext) = {
 
-      val messageAtt = alertElem attValue "message"
-
       val messagesElems = (alertElem child "message" toList) map {
         message => (message attValue "lang", message attValue "value")
       }
 
       val isGlobal = (alertElem attValue "global") == "true"
 
-      AlertDetails(forValidationId, (currentLang, messageAtt) :: messagesElems, isGlobal)
+      AlertDetails(forValidationId, messagesElems, isGlobal)
     }
 
     def fromValidationXML(validationElem: NodeInfo, forValidationId: Option[String])(implicit ctx: FormBuilderDocContext) = {
@@ -693,5 +691,5 @@ trait AlertsAndConstraintsOps extends ControlOps {
   private def mipElems(bind: NodeInfo, mip: MIP) = bind /  mipToFBMIPQNames(mip)._2
 
   private def alertOrPlaceholder(alert: Option[AlertDetails])(implicit ctx: FormBuilderDocContext) =
-    alert orElse Some(AlertDetails(None, List(currentLang -> ""), global = false)) map (_.toXML) get
+    alert orElse Some(AlertDetails(None, Nil, global = false)) map (_.toXML) get
 }

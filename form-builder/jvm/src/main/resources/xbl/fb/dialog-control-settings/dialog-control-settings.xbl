@@ -134,6 +134,9 @@
                     ref="$validations/validation"
                     origin="instance('validation-constraint-template')"/>
 
+                <!-- Make sure all alerts have placeholders for all available languages -->
+                <xf:dispatch name="complete-alert-languages" targetid="model"/>
+
                 <!--  Read appearances -->
                 <xf:dispatch
                     name="reload-appearances"
@@ -661,6 +664,19 @@
                     </xf:action>
                 </xf:action>
 
+                <xf:action event="complete-alert-languages">
+                    <xf:action iterate="(instance('validation-constraint-template')/alert, $i/default-alert/alert, $i/validations/validation/alert)">
+                        <xf:var name="alert" value="."/>
+                        <xf:action iterate="frf:allLangs(fbf:resourcesRoot())">
+                            <xf:var name="lang" value="."/>
+                            <xf:insert
+                                if="not(exists($alert/message[@lang = $lang]))"
+                                context="$alert"
+                                origin="xf:element('message', (xf:attribute('lang', $lang), xf:attribute('value', '')))"/>
+                        </xf:action>
+                    </xf:action>
+                </xf:action>
+
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
                     <_ valid="true">
                         <original-control-name/>    <!-- So we can find back the control when saving if users change the name -->
@@ -765,7 +781,7 @@
                 <xf:instance id="validation-constraint-template" xxf:exclude-result-prefixes="#all">
                     <validation id="" type="formula" level="error" default-alert="true">
                         <constraint expression="" argument=""/>
-                        <alert message=""/>
+                        <alert global="false"/>
                     </validation>
                 </xf:instance>
 

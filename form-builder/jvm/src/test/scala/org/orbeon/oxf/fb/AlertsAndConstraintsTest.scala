@@ -267,9 +267,7 @@ class AlertsAndConstraintsTest
         val newValidation =
           <validation type="formula" id="length5-constraint" level="error" default-alert="true">
             <constraint expression="string-length() gt 5" argument=""/>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>
 
         writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, List(newValidation))
@@ -277,9 +275,7 @@ class AlertsAndConstraintsTest
         val expected =
           <validation type="formula" id="" level="error" default-alert="true">
             <constraint expression="string-length() gt 5" argument=""/>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>
 
         assertAlertsXML(List(expected), readConstraintValidationsAsXML(Control1))
@@ -333,17 +329,13 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>true()</required>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>,
           <validation type="datatype" level="error" default-alert="true">
             <builtin-type>string</builtin-type>
             <builtin-type-required>false</builtin-type-required>
             <schema-type/>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>
         )
 
@@ -366,17 +358,13 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>false()</required>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>,
           <validation type="datatype" level="error" default-alert="true">
             <builtin-type>decimal</builtin-type>
             <builtin-type-required>false</builtin-type-required>
             <schema-type/>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>
         )
 
@@ -398,17 +386,13 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>true()</required>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>,
           <validation type="datatype" level="error" default-alert="true">
             <builtin-type>decimal</builtin-type>
             <builtin-type-required>true</builtin-type-required>
             <schema-type/>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>
         )
 
@@ -429,9 +413,7 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>../foo = 'bar'</required>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>
         )
 
@@ -513,17 +495,13 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>true()</required>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>,
           <validation type="datatype" level="error" default-alert="true">
             <builtin-type/>
             <builtin-type-required/>
             <schema-type>foo:email</schema-type>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>
         )
 
@@ -553,17 +531,13 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>true()</required>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>,
           <validation type="datatype" level="error" default-alert="true">
             <builtin-type/>
             <builtin-type-required/>
             <schema-type>rating</schema-type>
-            <alert global="false">
-              <message lang="en" value=""/>
-            </alert>
+            <alert global="false"/>
           </validation>
         )
 
@@ -584,7 +558,7 @@ class AlertsAndConstraintsTest
     }
   }
 
-  private def globalAlert     (implicit ctx: FormBuilderDocContext) = AlertDetails(None, List(FormBuilder.currentLang -> ""), global = true)
+  private def globalAlert     (implicit ctx: FormBuilderDocContext) = AlertDetails(None, Nil, global = true)
   private def globalAlertAsXML(implicit ctx: FormBuilderDocContext) = globalAlert.toXML
 
   private def readConstraintValidationsAsXML(controlName: String)(implicit ctx: FormBuilderDocContext) =

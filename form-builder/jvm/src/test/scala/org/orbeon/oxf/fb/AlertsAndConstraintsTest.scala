@@ -48,11 +48,12 @@ class AlertsAndConstraintsTest
         assert(List(AlertDetails(None, List("en" -> "Alert for en", "fr" -> "Alert for fr"), global = false)) === alertDetails)
 
         val expected =
-          <alert message="Alert for en" global="false">
+          <alert global="false">
+            <message lang="en" value="Alert for en"/>
             <message lang="fr" value="Alert for fr"/>
           </alert>
 
-        assertAlertsXML(List(expected), alertDetails map (a => a.toXML(FormBuilder.currentLang): NodeInfo))
+        assertAlertsXML(List(expected), alertDetails map (a => a.toXML: NodeInfo))
       }
     }
   }
@@ -64,7 +65,8 @@ class AlertsAndConstraintsTest
         val newValidation =
           <validation type="formula" id="" level="warning" default-alert="false">
             <constraint expression="string-length() gt 10" argument=""/>
-            <alert message="Length must be greater than 10" global="false">
+            <alert global="false">
+              <message lang="en" value="Length must be greater than 10"/>
               <message lang="fr" value="Longueur doit être plus grande que 10"/>
             </alert>
           </validation>
@@ -74,7 +76,8 @@ class AlertsAndConstraintsTest
         val expected =
           <validation type="formula" id="validation-1-validation" level="warning" default-alert="false">
             <constraint expression="string-length() gt 10" argument=""/>
-            <alert message="Length must be greater than 10" global="false">
+            <alert global="false">
+              <message lang="en" value="Length must be greater than 10"/>
               <message lang="fr" value="Longueur doit être plus grande que 10"/>
             </alert>
           </validation>
@@ -91,7 +94,8 @@ class AlertsAndConstraintsTest
         val newValidation =
           <validation type="formula" id="length-constraint" level="warning" default-alert="false">
             <constraint expression="string-length() gt 10" argument=""/>
-            <alert message="Length must be greater than 10" global="false">
+            <alert global="false">
+              <message lang="en" value="Length must be greater than 10"/>
               <message lang="fr" value="Longueur doit être plus grande que 10"/>
             </alert>
           </validation>
@@ -109,13 +113,15 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="formula" id="length5-constraint" level="error" default-alert="false">
             <constraint expression="string-length() gt 5" argument=""/>
-            <alert message="Length must be greater than 5" global="false">
+            <alert global="false">
+              <message lang="en" value="Length must be greater than 5"/>
               <message lang="fr" value="Longueur doit être plus grande que 5"/>
             </alert>
           </validation>,
           <validation type="formula" id="length10-constraint" level="warning" default-alert="false">
             <constraint expression="string-length() gt 10" argument=""/>
-            <alert message="Length must be greater than 10" global="false">
+            <alert global="false">
+              <message lang="en" value="Length must be greater than 10"/>
               <message lang="fr" value="Longueur doit être plus grande que 10"/>
             </alert>
           </validation>
@@ -131,20 +137,22 @@ class AlertsAndConstraintsTest
     it("two validations and one validation") {
       withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
-        val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(FormBuilder.currentLang)
+        val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML
 
         locally {
 
           val twoValidations = List(
             <validation type="formula" id="length5-constraint" level="error" default-alert="false">
               <constraint expression="string-length() gt 5" argument=""/>
-              <alert message="Length must be greater than 5" global="false">
+              <alert global="false">
+                <message lang="en" value="Length must be greater than 5"/>
                 <message lang="fr" value="Longueur doit être plus grande que 5"/>
               </alert>
             </validation>,
             <validation type="formula" id="length10-constraint" level="warning" default-alert="false">
               <constraint expression="string-length() gt 10" argument=""/>
-              <alert message="Length must be greater than 10" global="false">
+              <alert global="false">
+                <message lang="en" value="Length must be greater than 10"/>
                 <message lang="fr" value="Longueur doit être plus grande que 10"/>
               </alert>
             </validation>
@@ -188,7 +196,8 @@ class AlertsAndConstraintsTest
           val oneValidation = List(
             <validation type="formula" id="length10-constraint" level="warning" default-alert="false">
               <constraint expression="string-length() gt 10" argument=""/>
-              <alert message="Length must be greater than 10" global="false">
+              <alert global="false">
+                <message lang="en" value="Length must be greater than 10"/>
                 <message lang="fr" value="Longueur doit être plus grande que 10"/>
               </alert>
             </validation>
@@ -233,7 +242,7 @@ class AlertsAndConstraintsTest
     it("must use local default alert") {
       withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
-        val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(FormBuilder.currentLang)
+        val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML
 
         writeAlertsAndValidationsAsXML(Control1, "", defaultAlertAsXML, Nil)
         assert("$form-resources/control-1/alert" === (getControlLhhat(Control1, "alert") att "ref" stringValue))
@@ -243,7 +252,7 @@ class AlertsAndConstraintsTest
     it("must use global default alert") {
       withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
-        val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(FormBuilder.currentLang)
+        val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML
 
         writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, Nil)
         assert("$fr-resources/detail/labels/alert" === (getControlLhhat(Control1, "alert") att "ref" stringValue))
@@ -258,7 +267,9 @@ class AlertsAndConstraintsTest
         val newValidation =
           <validation type="formula" id="length5-constraint" level="error" default-alert="true">
             <constraint expression="string-length() gt 5" argument=""/>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>
 
         writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, List(newValidation))
@@ -266,7 +277,9 @@ class AlertsAndConstraintsTest
         val expected =
           <validation type="formula" id="" level="error" default-alert="true">
             <constraint expression="string-length() gt 5" argument=""/>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>
 
         assertAlertsXML(List(expected), readConstraintValidationsAsXML(Control1))
@@ -285,7 +298,8 @@ class AlertsAndConstraintsTest
         val newValidation =
           <validation type="formula" id="length5-constraint" level="error" default-alert="false">
             <constraint expression="string-length() gt 5" argument=""/>
-            <alert message="Length must be greater than 5" global="false">
+            <alert global="false">
+              <message lang="en" value="Length must be greater than 5"/>
               <message lang="fr" value="Longueur doit être plus grande que 5"/>
             </alert>
           </validation>
@@ -295,7 +309,8 @@ class AlertsAndConstraintsTest
         val expected =
           <validation type="formula" id="length5-constraint" level="error" default-alert="false">
             <constraint expression="string-length() gt 5" argument=""/>
-            <alert message="Length must be greater than 5" global="false">
+            <alert global="false">
+              <message lang="en" value="Length must be greater than 5"/>
               <message lang="fr" value="Longueur doit être plus grande que 5"/>
             </alert>
           </validation>
@@ -318,13 +333,17 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>true()</required>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>,
           <validation type="datatype" level="error" default-alert="true">
             <builtin-type>string</builtin-type>
             <builtin-type-required>false</builtin-type-required>
             <schema-type/>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>
         )
 
@@ -347,13 +366,17 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>false()</required>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>,
           <validation type="datatype" level="error" default-alert="true">
             <builtin-type>decimal</builtin-type>
             <builtin-type-required>false</builtin-type-required>
             <schema-type/>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>
         )
 
@@ -375,13 +398,17 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>true()</required>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>,
           <validation type="datatype" level="error" default-alert="true">
             <builtin-type>decimal</builtin-type>
             <builtin-type-required>true</builtin-type-required>
             <schema-type/>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>
         )
 
@@ -402,7 +429,9 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>../foo = 'bar'</required>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>
         )
 
@@ -421,7 +450,8 @@ class AlertsAndConstraintsTest
           val newValidations = List(
             <validation type="required" level="error" default-alert="false">
               <required>true()</required>
-              <alert message="This is required!" global="false">
+              <alert global="false">
+                <message lang="en" value="This is required!"/>
                 <message lang="fr" value="Ce champ est requis !"/>
               </alert>
             </validation>,
@@ -429,7 +459,8 @@ class AlertsAndConstraintsTest
               <builtin-type>decimal</builtin-type>
               <builtin-type-required>true</builtin-type-required>
               <schema-type/>
-              <alert message="This must be a decimal!" global="false">
+              <alert global="false">
+                <message lang="en" value="This must be a decimal!"/>
                 <message lang="fr" value="Ce champ doit être une valeur décimale !"/>
               </alert>
             </validation>
@@ -482,13 +513,17 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>true()</required>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>,
           <validation type="datatype" level="error" default-alert="true">
             <builtin-type/>
             <builtin-type-required/>
             <schema-type>foo:email</schema-type>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>
         )
 
@@ -518,13 +553,17 @@ class AlertsAndConstraintsTest
         val newValidations = List(
           <validation type="required" level="error" default-alert="true">
             <required>true()</required>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>,
           <validation type="datatype" level="error" default-alert="true">
             <builtin-type/>
             <builtin-type-required/>
             <schema-type>rating</schema-type>
-            <alert message="" global="false"/>
+            <alert global="false">
+              <message lang="en" value=""/>
+            </alert>
           </validation>
         )
 
@@ -546,11 +585,11 @@ class AlertsAndConstraintsTest
   }
 
   private def globalAlert     (implicit ctx: FormBuilderDocContext) = AlertDetails(None, List(FormBuilder.currentLang -> ""), global = true)
-  private def globalAlertAsXML(implicit ctx: FormBuilderDocContext) = globalAlert.toXML(FormBuilder.currentLang)
+  private def globalAlertAsXML(implicit ctx: FormBuilderDocContext) = globalAlert.toXML
 
   private def readConstraintValidationsAsXML(controlName: String)(implicit ctx: FormBuilderDocContext) =
     ConstraintValidation.fromForm(controlName) map
-    (a => a.toXML(FormBuilder.currentLang): NodeInfo) toArray
+    (a => a.toXML: NodeInfo) toArray
 
   private def assertAlertsXML(left: List[sx.Elem], right: Seq[NodeInfo]): Unit = {
 

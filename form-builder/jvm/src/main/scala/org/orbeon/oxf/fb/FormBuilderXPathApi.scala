@@ -462,10 +462,9 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    AlertDetails.fromForm(controlName)(FormBuilderDocContext())             find
-      (_.default)                                                           getOrElse
+    AlertDetails.fromForm(controlName)(FormBuilderDocContext())              find
+      (_.default)                                                            getOrElse
       AlertDetails(None, List(FormBuilder.currentLang -> ""), global = true) toXML
-      FormBuilder.currentLang
   }
 
   // Return all validations as XML for the given control

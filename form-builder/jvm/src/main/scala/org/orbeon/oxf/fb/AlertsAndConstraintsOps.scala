@@ -53,7 +53,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     RequiredValidation.fromForm(controlName)    ::
     DatatypeValidation.fromForm(controlName)    ::
     ConstraintValidation.fromForm(controlName)  map
-    (v => elemToNodeInfo(v.toXML(currentLang)))
+    (v => elemToNodeInfo(v.toXML))
 
   def writeAlertsAndValidationsAsXML(
     controlName      : String,
@@ -254,7 +254,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def stringValue : String
     def alert       : Option[AlertDetails]
 
-    def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem
+    def toXML(implicit ctx: FormBuilderDocContext): sx.Elem
   }
 
   object Validation {
@@ -278,10 +278,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def level       = ValidationLevel.ErrorLevel
     def stringValue = eitherToXPath(required)
 
-    def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem =
+    def toXML(implicit ctx: FormBuilderDocContext): sx.Elem =
       <validation type={Required.name} level={level.entryName} default-alert={alert.isEmpty.toString}>
         <required>{eitherToXPath(required)}</required>
-        {alertOrPlaceholder(alert, forLang)}
+        {alertOrPlaceholder(alert)}
       </validation>
   }
 
@@ -362,7 +362,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       }
     }
 
-    def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem = {
+    def toXML(implicit ctx: FormBuilderDocContext): sx.Elem = {
 
       val builtinTypeString = datatype match {
         case Left((name, _)) => name.localName
@@ -378,7 +378,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         <builtin-type>{builtinTypeString}</builtin-type>
         <builtin-type-required>{builtinTypeRequired}</builtin-type-required>
         <schema-type>{datatype.toOption map (_.qualifiedName) getOrElse ""}</schema-type>
-        {alertOrPlaceholder(alert, forLang)}
+        {alertOrPlaceholder(alert)}
       </validation>
     }
   }
@@ -476,7 +476,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     def stringValue = expression
 
-    def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem = {
+    def toXML(implicit ctx: FormBuilderDocContext): sx.Elem = {
 
       // NOTE: We use the namespaces in scope on the model, not the bind containing the constraint. This is
       // a simplification and implies a constraint that there are no new namespace declarations on binds
@@ -496,7 +496,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           expression={if (analyzed.isEmpty) expression else ""}
           argument={analyzed flatMap (_._2) getOrElse ""}
         />
-        {alertOrPlaceholder(alert, forLang)}
+        {alertOrPlaceholder(alert)}
       </validation>
     }
   }
@@ -539,12 +539,11 @@ trait AlertsAndConstraintsOps extends ControlOps {
   case class AlertDetails(forValidationId: Option[String], messages: List[(String, String)], global: Boolean) {
 
     require(! (global && forValidationId.isDefined))
-    require(messages.nonEmpty)
 
     def default = forValidationId.isEmpty
 
     // XML representation used by Form Builder
-    def toXML(forLang: String): sx.Elem = {
+    def toXML: sx.Elem = {
       <alert global={global.toString}>{
         messages collect {
           case (lang, message) =>
@@ -693,6 +692,6 @@ trait AlertsAndConstraintsOps extends ControlOps {
   private def mipAtts (bind: NodeInfo, mip: MIP) = bind /@ mipToFBMIPQNames(mip)._1
   private def mipElems(bind: NodeInfo, mip: MIP) = bind /  mipToFBMIPQNames(mip)._2
 
-  private def alertOrPlaceholder(alert: Option[AlertDetails], forLang: String)(implicit ctx: FormBuilderDocContext) =
-    alert orElse Some(AlertDetails(None, List(currentLang -> ""), global = false)) map (_.toXML(forLang)) get
+  private def alertOrPlaceholder(alert: Option[AlertDetails])(implicit ctx: FormBuilderDocContext) =
+    alert orElse Some(AlertDetails(None, List(currentLang -> ""), global = false)) map (_.toXML) get
 }

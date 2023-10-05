@@ -144,7 +144,7 @@ trait FormDefinition {
       case Some(index) =>
         // Look for settings in control sub-elements (current and legacy format)
         SummarySettings(
-          show   = setting(index, "*:summary-show", Some("column")) || setting(index, "*:summary-show"),
+          show   = setting(index, "*:summary-show", Some("column")),
           search = setting(index, "*:summary-show", Some("search")) || setting(index, "*:summary-search"),
           edit   = setting(index, "*:allow-bulk-edit", None       ) || setting(index, "*:summary-edit")
         )

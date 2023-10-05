@@ -754,10 +754,11 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control class="input-append date fr-field-width-natural fr-native-picker-ios" id="my-date≡xf-10"/>
+                        <xxf:control id="my-date≡xf-9" class="fr-field-width-natural fr-native-picker-ios"/>
+                        <xxf:control id="my-date≡xf-10" class="input-append date"/>
                         <xxf:attribute for="my-date≡input" name="placeholder"/>
                         <xxf:attribute for="my-date≡input" name="role">textbox</xxf:attribute>
-                        <xxf:control id="my-date≡xf-13" relevant="false"/>
+                        <xxf:control id="my-date≡xf-12" relevant="false"/>
                         <xxf:init id="my-date">
                             <xxf:value>{"value":"2010-01-13","format":"[M]/[D]/[Y]","excludedDates":[],"weekStart":null}</xxf:value>
                         </xxf:init>

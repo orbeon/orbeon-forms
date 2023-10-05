@@ -115,7 +115,10 @@ object ResourcesPatcher {
       val elem = Support.ensurePath(rootForLang, path map dom.QName.apply)
       elem.attributeOpt("todo") foreach elem.remove
       elem.setText(value)
-      elem.addAttribute("html", if (isHtml) "true" else "false")
+      if (isHtml) {
+        // Only add attribute if true, false by default (see FormRunnerActionsCommon.isMessageInHtml)
+        elem.addAttribute("html", "true")
+      }
     }
 
     def hasTodo(e: NodeInfo) =

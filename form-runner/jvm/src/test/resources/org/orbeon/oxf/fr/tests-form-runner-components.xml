@@ -123,7 +123,7 @@
                 <xh:script src="/ops/nprogress-0.2.0/nprogress.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/bowser/bowser.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/mousetrap/mousetrap.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/fetch/promise-polyfill.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/fetch/fetch.umd.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/yahoo/yahoo.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/event/event.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/dom/dom.min.js" class="xforms-baseline"/>

@@ -73,8 +73,8 @@ object DndRepeat {
 
               (sibling ne null)                &&
                 jSibling.is(IsNotGuSelector)   && (
-                  jSibling.is(IsDndItemSelector)                || // regular case
-                  jSibling.next().is(IsRepeatDelimiterSelector)    // at the end of the repeat when there is an empty `<span>` (unclear, see Actions Editor)
+                  jSibling.is(IsDndItemSelector)        || // regular case
+                  jSibling.is(IsRepeatBeginEndSelector)    // at the end of the repeat see https://github.com/orbeon/orbeon-forms/issues/6000
                 )                              &&
                 (! dragState.exists(_.excludedTargets.exists(_ eq sibling)))
             }

@@ -1265,10 +1265,7 @@ lazy val orbeonWarJS = orbeonWar.js
     Test / scalaJSUseMainModuleInitializer  := false,
     Test / jsEnv                            := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
     scalaJSLinkerConfig                     ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
-    Test / testOptions                      += Tests.Filter { s =>
-      // Replication is a PE feature
-      s.endsWith("Test") && !(s.contains("OrbeonReplicationTest") && orbeonEditionFromProperties.value != "PE")
-    },
+
     Test / testOptions                      += {
       val packageFile = (orbeonWarJVM / Keys.`package`).value
       Tests.Setup(() => OrbeonSupport.dummyDependency(packageFile))

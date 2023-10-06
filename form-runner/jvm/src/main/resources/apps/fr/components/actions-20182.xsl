@@ -24,8 +24,6 @@
 
     <xsl:import href="oxf:/apps/fr/components/actions-common.xsl"/>
 
-    <!-- TODO: store document attributes by action id -->
-    <xsl:variable name="action-document-att-ns">fr-action</xsl:variable>
     <xsl:variable name="continuation-event-prefix">fr-action-continuation-</xsl:variable>
 
     <xsl:function name="fr:build-iterate-att" as="attribute(iterate)">
@@ -63,9 +61,7 @@
                     name="iterate"
                     select="
                         concat(
-                            'frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute(''',
-                            $action-document-att-ns,
-                            ''', ''action-source''), ''',
+                            'frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute($current-action-id, ''action-source''), ''',
                             $to-control-name,
                             ''', true(),',
                             if (exists($library-name)) then concat('''', $library-name, '''') else '()',
@@ -81,7 +77,7 @@
         <xsl:param name="context" as="xs:string?"/>
 
          <xsl:if test="$context = 'current-iteration'">
-             <xsl:attribute name="context">xxf:get-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', '<xsl:value-of select="fr:build-context-param($elem/..)"/>')</xsl:attribute>
+             <xsl:attribute name="context">xxf:get-document-attribute($current-action-id, '<xsl:value-of select="fr:build-context-param($elem/..)"/>')</xsl:attribute>
          </xsl:if>
     </xsl:function>
 
@@ -160,6 +156,7 @@
 
                 <xsl:for-each select="$actions">
                     <xf:dispatch name="fr-call-user-{.}-action" targetid="{$model-id}">
+                        <xf:property name="action-id"     value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true" xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"/>
                         <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
                     </xf:dispatch>
                 </xsl:for-each>
@@ -227,6 +224,7 @@
                         <xsl:if test="$is-outer">
                             <xsl:attribute name="xxbl:scope" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">inner</xsl:attribute>
                         </xsl:if>
+                        <xf:property name="action-id"     value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true" xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"/>
                         <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
                     </xf:dispatch>
                 </xsl:for-each>
@@ -278,9 +276,10 @@
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
 
         <xf:dispatch
-            if="xxf:get-document-attribute('{$action-document-att-ns}', '{fr:build-is-last-iteration-param(.)}') = true()"
+            if="xxf:get-document-attribute($current-action-id, '{fr:build-is-last-iteration-param(.)}') = true()"
             name="{$continuation-event-prefix}{fr:continuation-id($action-name, $continuation-position + 1)}"
             targetid="fr-form-model">
+            <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
         </xf:dispatch>
 
     </xsl:template>
@@ -294,6 +293,7 @@
         <xf:dispatch
             name="{$continuation-event-prefix}{fr:continuation-id($action-name, $continuation-position + 1)}"
             targetid="fr-form-model">
+            <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
         </xf:dispatch>
 
     </xsl:template>
@@ -324,19 +324,13 @@
 
             <!-- TODO: Consider handling `iterate-control-name` per https://github.com/orbeon/orbeon-forms/issues/1833 -->
 
-<!--            <xf:var-->
-<!--                xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"-->
-<!--                name="new-action-id"-->
-<!--                value="concat('fr-action-', secure:randomHexId())"/>-->
             <xf:var
-                xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-                name="new-action-id"
-                value="'{$action-document-att-ns}'"/>
+                name="current-action-id"
+                value="event('action-id')"/>
 
             <!-- Initialize action state -->
             <xf:action type="xpath">
-                xxf:set-document-attribute($new-action-id, 'action-source', event('action-source')),
-                xxf:set-document-attribute($new-action-id, 'action-error',  false())
+                xxf:set-document-attribute($current-action-id, 'action-source', event('action-source'))
             </xf:action>
 
             <!-- TODO: clean action state in case of success AND error (but will need action id!) -->
@@ -411,7 +405,11 @@
                             observer="{$preceding-service-name-opt}-submission"
                             event="xforms-submit-done"
                             context="xxf:instance('fr-service-response-instance')"
-                            if="xxf:get-document-attribute('{$action-document-att-ns}', 'action-continuation-id') = '{$current-continuation-id}'">
+                            if="xxf:get-document-attribute(event('action-id'), 'action-continuation-id') = '{$current-continuation-id}'">
+
+                            <xf:var
+                                name="current-action-id"
+                                value="event('action-id')"/>
 
                             <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
                                 <xsl:with-param tunnel="yes" name="view-elem"             select="$view-elem"/>
@@ -446,10 +444,14 @@
                                     if (exists($context-changing-elem-opt/self::fr:service-call)) then
                                         'xxf:instance(''fr-service-response-instance'')'
                                     else if (exists($context-changing-elem-opt/self::fr:data-iterate)) then
-                                        concat('xxf:get-document-attribute(''', $action-document-att-ns, ''', ''', fr:build-context-param($context-changing-elem-opt), ''')')
+                                        concat('xxf:get-document-attribute(event(''action-id''), ''', fr:build-context-param($context-changing-elem-opt), ''')')
                                     else
                                         'instance(''fr-form-instance'')'
                                 "/>
+
+                            <xf:var
+                                name="current-action-id"
+                                value="event('action-id')"/>
 
                             <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
                                 <xsl:with-param tunnel="yes" name="view-elem"             select="$view-elem"/>
@@ -496,7 +498,7 @@
                                 <xsl:variable name="control" select="@control/string()" as="xs:string"/>
                                 <xf:var
                                     name="value"
-                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute('{$action-document-att-ns}', 'action-source'), '{$control}', true(), {if (exists($library-name)) then concat('''', $library-name, '''') else '()'})"/>
+                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute($current-action-id, 'action-source'), '{$control}', true(), {if (exists($library-name)) then concat('''', $library-name, '''') else '()'})"/>
                             </xsl:when>
                             <xsl:when test="exists(@value)">
                                 <xsl:variable name="value" select="@value/string()" as="xs:string"/>
@@ -546,11 +548,13 @@
         </xsl:if>
 
         <xf:action type="xpath">
-            xxf:set-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', 'action-continuation-id', '<xsl:value-of select="fr:continuation-id($action-name, $continuation-position + 1)"/>')
+            xxf:set-document-attribute($current-action-id, 'action-continuation-id', '<xsl:value-of select="fr:continuation-id($action-name, $continuation-position + 1)"/>')
         </xf:action>
 
         <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
-        <xf:send submission="{$service-name}-submission"/>
+        <xf:send submission="{$service-name}-submission">
+            <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+        </xf:send>
 
     </xsl:template>
 
@@ -564,7 +568,9 @@
         <xf:action if="empty(({@ref}))">
             <xf:dispatch
                 name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
-                targetid="fr-form-model"/>
+                targetid="fr-form-model">
+                <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+            </xf:dispatch>
         </xf:action>
         <xf:action iterate="{frf:replaceVarReferencesWithFunctionCalls(. , @ref, false(), $library-name, ())}">
             <xsl:copy-of select="fr:build-context-att($data-iterate-elem, @expression-context)"/>
@@ -576,10 +582,11 @@
 
                 <xsl:variable name="group-position" select="position()"/>
                 <xsl:if test="$group-position = 1">
-                    <xf:action if="not(xxf:get-document-attribute('{$action-document-att-ns}', 'action-error') = true())">
+                    <!-- 2023-10-16: In case of error, we now remove all document attributes for the action. -->
+                    <xf:action if="exists(xxf:get-document-attribute($current-action-id, 'action-source'))">
                         <xf:action type="xpath">
-                            xxf:set-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', '<xsl:value-of select="fr:build-is-last-iteration-param($data-iterate-elem)"/>', position() = last()),
-                            xxf:set-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', '<xsl:value-of select="fr:build-context-param($data-iterate-elem)"/>', .)
+                            xxf:set-document-attribute($current-action-id, '<xsl:value-of select="fr:build-is-last-iteration-param($data-iterate-elem)"/>', position() = last()),
+                            xxf:set-document-attribute($current-action-id, '<xsl:value-of select="fr:build-context-param($data-iterate-elem)"/>', .)
                         </xf:action>
                         <xsl:apply-templates select="current-group()" mode="within-action-2018.2"/>
                     </xf:action>
@@ -618,6 +625,7 @@
             <xf:dispatch
                 name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
                 targetid="fr-form-model">
+                <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
             </xf:dispatch>
         </xf:action>
     </xsl:template>
@@ -844,7 +852,7 @@
                  2021-02-02: Q: The offline `xxf:evaluate()` scopes variables. Maybe the older implementation doesn't?
             -->
             <xf:dispatch name="fr-call-itemset-action" targetid="fr-form-instance">
-                <xf:property name="action-source"      value="xxf:get-document-attribute('{$action-document-att-ns}', 'action-source')"/>
+                <xf:property name="action-source"      value="xxf:get-document-attribute($current-action-id, 'action-source')"/>
                 <xf:property name="control-name"       value="'{$to-control-name}'"/>
                 <xf:property name="new-itemset-id"     value="$new-itemset-id"/>
                 <xf:property name="new-itemset-holder" value="$new-itemset-holder"/>
@@ -1095,9 +1103,10 @@
             <xf:property
                 name="message"
                 value="xxf:r('detail.messages.confirmation-dialog-message-overwrite', '|fr-fr-resources|')"/>
+            <!-- Context is a `|`-separated tuple as we need more than one piece of information -->
             <xf:property
                 name="context"
-                value="'{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}'"/>
+                value="concat($current-action-id, '|{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}')"/>
             <xf:property
                 name="positive-targetid"
                 value="xxf:absolute-id('fr-actions-model')"/>
@@ -1108,7 +1117,9 @@
         <xf:dispatch
             if="not($must-warn)"
             name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
-            targetid="{$model-id}"/>
+            targetid="{$model-id}">
+            <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+        </xf:dispatch>
 
     </xsl:template>
 

@@ -162,7 +162,7 @@
                             <xf:var name="targetid" value="xxf:trim($local/{$handler})"/>
 
                             <xf:dispatch if="$targetid != ''" name="fr-{$handler}" targetid="{{$targetid}}">
-                                <xf:property name="context" value="$local/context"/>
+                                <xf:property name="context" value="$local/context/string()"/>
                             </xf:dispatch>
                         </xf:action>
                     </xf:trigger>

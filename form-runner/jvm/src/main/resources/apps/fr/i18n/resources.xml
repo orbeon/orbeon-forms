@@ -275,6 +275,7 @@
                 <form-validation-error>There are validation errors. Please retry once all fields have been properly filled-out.</form-validation-error>
                 <database-error>There was an error communicating with the database. Please contact the application administrator.</database-error>
                 <service-error>There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error>There was an error communicating with a backend service. Please contact the application administrator.</action-error>
                 <process-error>There was an error running the process. Please contact the application administrator.</process-error>
                 <wizard-prev-error>Please fix errors before moving backward</wizard-prev-error>
                 <wizard-next-error>Please fix errors before moving forward</wizard-next-error>
@@ -892,6 +893,7 @@
                 <form-validation-error>Le document contient des erreurs de validation. Veuillez ressayer après les avoir corrigées.</form-validation-error>
                 <database-error>Une erreur s'est produite en communiquant avec la base de données. Veuillez contacter votre administrateur système.</database-error>
                 <service-error>Une erreur s'est produite en communiquant avec un service. Veuillez contacter votre administrateur système.</service-error>
+                <action-error>Une erreur s'est produite en exécutant une action. Veuillez contacter votre administrateur système.</action-error>
                 <process-error>Une erreur s'est produite en exécutant le processus. Veuillez contacter votre administrateur système.</process-error>
                 <wizard-prev-error>Veuillez corriger les erreurs avant de revenir en arrière</wizard-prev-error>
                 <wizard-next-error>Veuillez corriger les erreurs avant d'avancer</wizard-next-error>
@@ -1501,6 +1503,7 @@
                 <form-validation-error>Hay errores de validación. Corrija los errores e intente nuevamente.</form-validation-error>
                 <database-error>Error de comunicación con la base de datos. Contacte al adminstrador de la aplicación.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Error corriendo el proceso. Contacte al adminstrador de la aplicación.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -2115,6 +2118,7 @@
                     administradors de la aplicació.</database-error>
                 <service-error todo="true">Error de comunicació amb el servei. Contacti amb els
                     administradors de la aplicació.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Error amb el procés. Contacti amb els administradors de la aplicació.</process-error>
                 <wizard-prev-error todo="true">Per favor, corregeix els errors abans d'anar enrere</wizard-prev-error>
                 <wizard-next-error todo="true">Per favor, corregeix els errors abans d'anar endavant</wizard-next-error>
@@ -2746,6 +2750,7 @@
                 <form-validation-error>Skjemaet er ikke innsendt. Vennligst rett opp feilene i skjemaet før du sender inn på nytt.</form-validation-error>
                 <database-error>Feil i kommunikasjon med tjener. Vennligst kontakt din systemadministrator.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error todo="true">[There was an error running the process. Please contact the application administrator.]</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -3351,6 +3356,7 @@
                 <form-validation-error>Документ не сохранен! Пожалуйста, исправьте ошибки в форме и сохраните еще раз.</form-validation-error>
                 <database-error>Нет соединения с базой данных. Свяжитесь с системным администратором.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error todo="true">[There was an error running the process. Please contact the application administrator.]</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -3961,6 +3967,7 @@
                 <form-validation-error>Ci sono errori di validazione. Prego controllare che tutti i spazi sono compilati in modo corretto.</form-validation-error>
                 <database-error>Nella communicazione con la database è apparso un errore. Si prega di contattare l'amministratore.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>È apparso un errore durante l'esecuzione del processo. Si prega di contattare l'amministratore.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -4575,6 +4582,7 @@
                 <form-validation-error>Validierungsfehler! Bitte füllen Sie alle Felder richtig aus und versuchen Sie es erneut.</form-validation-error>
                 <database-error>Bei der Kommunikation mit der Datenbank ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Beim Ausführen dieses Prozesses ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -5189,6 +5197,7 @@
                 <form-validation-error>Löytyi virheitä. Yritä uudelleen kun kaikki kentät on täytetty asianmukaisesti.</form-validation-error>
                 <database-error>Virhe tietokannan kanssa kommunikoinnissa. Ole hyvä ja ota yhteyttä järjestelmänvalvojaan.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Virhetilanne ajettaessa prosessia. Ota yhteyttä ohjelmiston ylläpitäjään.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -5803,6 +5812,7 @@
                 <form-validation-error>Alla värden är inte giltiga. Gå igenom ifyllda värden och försök igen.</form-validation-error>
                 <database-error>Databasfel. Vänligen kontakta administratör.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Processen kunde inte köras. Vänligen kontakta administratör.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -6417,6 +6427,7 @@
                 <form-validation-error>Er waren validatieproblemen. Probeer het opnieuw als alle velden correct zijn gevuld.</form-validation-error>
                 <database-error>Er was een probleem in de databasecommunicatie. Neem contact op met de databasebeheerder.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Er was een probleem bij het starten van het proces. Neem contact op met de databasebeheerder.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -7030,6 +7041,7 @@
                 <form-validation-error>Existem erros de validação. Por favor, tente novamente quando todos os campos forem devidamente preenchidos.</form-validation-error>
                 <database-error>Houve um erro na comunicação com a base de dados. Entre em contacto com o administrador do aplicação.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Houve um erro na execução do processo. Entre em contacto com administrador da aplicação.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -7637,6 +7649,7 @@
                 <form-validation-error>Blanketten er ikke sendt. Ret venligst fejlene før du prøver at sende igen.</form-validation-error>
                 <database-error>Fejl i forbindelse til server. Kontakt systemadministrator.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Der var en fejl i afvikling af programmer. Kontakt systemadministrator.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -8247,6 +8260,7 @@
                 <form-validation-error>Występują błędy walidacji. Proszę sprawdzić, czy wszystkie pola zostały wypełnione poprawnie.</form-validation-error>
                 <database-error>Wystąpił błąd komunikacji z bazą danych. Skontaktuj się się z administratorem aplikacji.</database-error>
                 <service-error>Wystąpił błąd komunikacji z serwisem. Skontaktuj się się z administratorem aplikacji.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>W trakcie wykonywania procesu wystąpił błąd. Skontaktuj się się z administratorem aplikacji.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>

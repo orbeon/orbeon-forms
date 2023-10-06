@@ -523,6 +523,10 @@
         error-message("service-error")
     </property>
 
+    <property as="xs:string"  name="oxf.fr.detail.process.action-action-error.*.*">
+        error-message("action-error")
+    </property>
+
     <!-- Default send parameters -->
     <property as="xs:string"  name="oxf.fr.detail.send.success.replace.*.*"                     value="all"/>
     <property as="xs:string"  name="oxf.fr.detail.send.success.method.*.*"                      value="post"/>

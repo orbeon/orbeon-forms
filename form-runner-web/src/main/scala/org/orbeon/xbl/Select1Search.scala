@@ -65,9 +65,6 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
       def initOrUpdatePlaceholder(): Unit = {
 
-        // Store server value for the dropdown on initialization, as a workaround to #4198
-        ServerValueStore.set(jXFormsSelect.attr("id").get, htmlSelect.value)
-
         if (servicePerformsSearch) {
           val initialLabel = elementWithData.attr(DataInitialLabel).get
           val initialValue = elementWithData.attr(DataInitialValue).get

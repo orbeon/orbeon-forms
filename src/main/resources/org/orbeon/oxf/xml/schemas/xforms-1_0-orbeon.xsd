@@ -327,6 +327,7 @@
         <xsd:attribute name="role" type="xsd:string" use="optional"/>
         <xsd:attribute name="navindex" type="xsd:string" use="optional"/>
         <xsd:attribute name="accesskey" type="xsd:string" use="optional"/>
+        <xsd:anyAttribute processContents="lax"/>
     </xsd:attributeGroup>
     <xsd:group name="UI.Inline">
         <xsd:sequence>

@@ -21,6 +21,7 @@ import org.orbeon.xforms._
 import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
+import org.scalajs.dom.raw.Element
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
@@ -35,11 +36,11 @@ object Select1Search {
 
 private class Select1SearchCompanion(containerElem: html.Element) extends XBLCompanion {
 
-  private val    DataPlaceholder              = "data-placeholder"
-  private val    DataServicePerformsSearch    = "data-service-performs-search"
-  private val    DataInitialLabel             = "data-initial-label"
-  private val    DataInitialValue             = "data-initial-value"
-  private object EventSupport                 extends EventListenerSupport
+  private val    DataPlaceholder           = "data-placeholder"
+  private val    DataServicePerformsSearch = "data-service-performs-search"
+  private val    DataInitialLabel          = "data-initial-label"
+  private val    DataInitialValue          = "data-initial-value"
+  private object EventSupport              extends EventListenerSupport
 
   private val select2SuccessCallbacks      : mutable.Queue[Success] = new mutable.Queue[Select2.Success]
   private var onXFormsSelect1ValueChangeJs : Option[js.Function]    = None
@@ -47,40 +48,39 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private var inputElementOpt              : Option[dom.Element]    = None
 
   override def init(): Unit = {
-    for {
-      jContainer                    <- $(containerElem).headJQuery
-      (xformsSelect, jXFormsSelect) <- jContainer.find(".xforms-select1").headElemJQuery
-      (select, jSelect)             <- jXFormsSelect.find("select").headElemJQuery
-      htmlSelect                    = select.asInstanceOf[dom.html.Select]
-    } locally {
-
-      val elementWithData        = jContainer.children(s"[$DataPlaceholder]")
-      val servicePerformsSearch  = elementWithData.attr(DataServicePerformsSearch).contains("true")
+    for (select <- Option(containerElem.querySelector("select"))) {
+      val xformsSelectOpt       = Option(containerElem.querySelector(".xforms-select1"))
+      val elementWithData       = containerElem.querySelector(s":scope > [$DataPlaceholder]")
+      val servicePerformsSearch = Option(elementWithData.getAttribute(DataServicePerformsSearch)).contains("true")
 
       // Prevent the propagation of `focusout` so the client doesn't send an `xxforms-value` event when users click on the dropdown,
       // as at that point the `<span class="select2-selection--single">` looses the focus, and since Select2 places that element inside
       // the element that represents the `<xf:select1>`, if that event is left to propagate, the XForms code takes that event as the
       // `<xf:select1>` having lost the focus
-      Support.stopFocusOutPropagation(xformsSelect, _.target, "select2-selection--single")
+      xformsSelectOpt.foreach(xformsSelect =>
+        Support.stopFocusOutPropagation(xformsSelect, _.target, "select2-selection--single"))
 
       def initOrUpdatePlaceholder(): Unit = {
 
         if (servicePerformsSearch) {
-          val initialLabel = elementWithData.attr(DataInitialLabel).get
-          val initialValue = elementWithData.attr(DataInitialValue).get
-          if (initialValue.nonEmpty) {
+
+          (for {
+            initialLabel <- Option(elementWithData.getAttribute(DataInitialLabel))
+            initialValue <- Option(elementWithData.getAttribute(DataInitialValue))
+          } yield {
             val initialOption = dom.document.createElement("option").asInstanceOf[html.Option]
             initialOption.text     = initialLabel
             initialOption.value    = initialValue
             initialOption.selected = true
-            htmlSelect.appendChild(initialOption)
-          } else {
-            while (htmlSelect.hasChildNodes())
-              htmlSelect.removeChild(htmlSelect.firstChild)
+            select.appendChild(initialOption)
+          }).getOrElse {
+            while (select.hasChildNodes())
+              select.removeChild(select.firstChild)
           }
         }
 
         // Init Select2
+        val jSelect = $(select)
         jSelect.select2(new Select2.Options {
           allowClear     = true
           ajax           = if (servicePerformsSearch) Select2Ajax else null
@@ -88,7 +88,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           placeholder    =
             new Select2.Option {
               val id   = "0"
-              val text = elementWithData.attr(DataPlaceholder).get
+              val text = elementWithData.getAttribute(DataPlaceholder)
             }
         })
 
@@ -194,11 +194,11 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   }
 
   // TODO: not specific to the autocomplete, should be moved to a utility class
-  private def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit): Unit = {
+  private def onAttributeChange(element: Element, attributeName: String, listener: () => Unit): Unit = {
     val observer = new MutationObserver((_, _) => listener())
     mutationObservers = observer :: mutationObservers
 
-    observer.observe(element.get(0), MutationObserverInit(
+    observer.observe(element, MutationObserverInit(
       attributes = true,
       attributeFilter = js.Array(attributeName)
     ))

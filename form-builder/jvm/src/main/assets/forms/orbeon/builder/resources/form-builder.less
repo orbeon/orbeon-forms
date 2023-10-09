@@ -1123,56 +1123,68 @@ body.orbeon {
                 margin-bottom: 5px; // otherwise they are too close from each other
             }
 
-            // Indent these three options under the `index` option
-            .fb-control-settings-summary-show, .fb-control-settings-allow-bulk-edit {
+            .fb-control-settings-summary-show {
                 .xforms-items, &.xforms-select1 {
                     margin-left: 20px;
                 }
 
+                .fb-role-required-checkbox {
+                    .xforms-items {
+                        margin-left: 40px;
+                    }
+                }
+            }
+
+            .fb-control-settings-allow-bulk-edit {
+                .xforms-items {
+                    margin-left: 40px;
+                }
+
+                .fb-role-required-checkbox {
+                    .xforms-items {
+                        margin-left: 60px;
+                    }
+                }
+            }
+
+            .fb-control-settings-summary-show, .fb-control-settings-allow-bulk-edit {
                 &.xforms-select1 select {
                     width: min-content;
                     margin-bottom: 5px;
                 }
             }
 
-            .fb-control-settings-fr-index-sub-values {
-                .xforms-switch.fr-index-sub-value {
-                    display: flex;
-                    margin-left: 40px;
-                }
+            .fb-role-required-checkbox {
+                display: grid;
+                grid-template-columns: auto 1fr;
 
-                .fb-role-required-checkbox {
-                    display: grid;
-                    grid-template-columns: auto 1fr;
+                span.xforms-switch.fb-roles-any-or-all {
+                    margin-left: 0;
 
-                    span.xforms-switch.fb-roles-any-or-all {
-                        margin-left: 0;
-
-                        select {
-                            width: min-content;
-                            margin-right: 5px;
-                        }
-
-                        div.xforms-case-selected {
-                            padding-bottom: 5px;
-                        }
+                    select {
+                        width: min-content;
+                        margin-right: 5px;
                     }
 
-                    .fb-role-row {
-                        display: grid;
-                        grid-template-columns: auto max-content;
-                        column-gap: 10px;
+                    div.xforms-case-selected {
                         padding-bottom: 5px;
+                    }
+                }
 
-                        .fb-param-grab {
-                            display: inline-block;
-                            opacity: 0.1;
-                        }
+                .fb-role-row {
+                    display: grid;
+                    grid-template-columns: auto max-content;
+                    column-gap: 10px;
+                    padding-bottom: 5px;
 
-                        &.xforms-dnd-moves .fb-param-grab {
-                            cursor: move;
-                            opacity: 0.5;
-                        }
+                    .fb-param-grab {
+                        display: inline-block;
+                        opacity: 0.1;
+                    }
+
+                    &.xforms-dnd-moves .fb-param-grab {
+                        cursor: move;
+                        opacity: 0.5;
                     }
                 }
             }

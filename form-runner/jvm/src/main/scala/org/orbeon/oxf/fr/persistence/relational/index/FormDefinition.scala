@@ -143,10 +143,16 @@ trait FormDefinition {
     (control / "*:index").headOption match {
       case Some(index) =>
         // Look for settings in control sub-elements (current and legacy format)
+        val show   = setting(index, "*:summary-show", Some("column"))
+        val search = setting(index, "*:summary-show", Some("search")) || setting(index, "*:summary-search")
+        val edit   = setting(index, "*:allow-bulk-edit", None       ) || setting(index, "*:summary-edit")
+
         SummarySettings(
-          show   = setting(index, "*:summary-show", Some("column")),
-          search = setting(index, "*:summary-show", Some("search")) || setting(index, "*:summary-search"),
-          edit   = setting(index, "*:allow-bulk-edit", None       ) || setting(index, "*:summary-edit")
+          // #5994: keep show/search separate for now (for compatibility reasons), but we'd like to have a single setting ideally
+          show   = show,
+          search = search,
+          // #6010: edit setting enabled only if show and/or search enabled as well
+          edit   = (show || search) && edit
         )
 
       case None =>

@@ -1065,12 +1065,13 @@
                                                     <xf:repeat ref="$items-to-show" id="items-to-show-repeat">
                                                         <xf:var name="item-to-show"  value="."/>
                                                         <xf:var name="current-value" value="$item-to-show/value"/>
+
                                                         <xf:var
                                                             name="checkbox-disabled"
                                                             value="
                                                                 (: Don't disable this checkbox if checked, for backward compatibility :)
                                                                 (
-                                                                    $current-value = 'fr-index'
+                                                                    $current-value = ('fr-index', 'fr-summary-show')
                                                                     or not($current-value = $selected-values)
                                                                 ) and
                                                                 (
@@ -1085,8 +1086,14 @@
                                                                     (
                                                                         $selected-values   = ('fr-summary-show', 'fr-allow-bulk-edit')
                                                                         and $current-value = 'fr-index'
+                                                                    ) or
+                                                                    (
+                                                                        $selected-values   = 'fr-allow-bulk-edit'
+                                                                        and $current-value = 'fr-summary-show'
+                                                                        and xxf:is-blank($i/fr-summary-show/@legacy)
                                                                     )
                                                                 )"/>
+
                                                         <xf:var name="base-binding" value="$i/*[local-name() = $current-value][1]"/>
                                                         <xf:var
                                                             name="checkbox-binding"
@@ -1094,13 +1101,15 @@
                                                         <xf:var
                                                             name="select-binding"
                                                             value="$base-binding/(if ($checkbox-disabled) then @legacy/string() else @legacy)"/>
-                                                        <xf:var name="fr-index-sub-values" value="$current-value = ('fr-summary-show', 'fr-allow-bulk-edit')"/>
 
-                                                        <xh:div class="{{if ($fr-index-sub-values) then 'fb-control-settings-fr-index-sub-values' else ''}}">
+                                                        <xf:var name="fr-index-sub-values" value="$current-value = ('fr-summary-show', 'fr-allow-bulk-edit')"/>
+                                                        <xf:var name="base-class-name"     value="concat('fb-control-settings-', substring-after($current-value, 'fr-'))"/>
+
+                                                        <xh:div class="{{if ($fr-index-sub-values) then $base-class-name else ''}}">
                                                             <xf:switch caseref="not(exists($base-binding/@legacy)) or xxf:is-blank($base-binding/@legacy)">
                                                                 <xf:case value="true()">
                                                                     <!-- Normal case: do not expose 'column only' and 'search only' options -->
-                                                                    <fr:checkbox-input ref="$checkbox-binding" class="fb-control-settings-{{substring-after($current-value, 'fr-')}}">
+                                                                    <fr:checkbox-input ref="$checkbox-binding" class="{{concat($base-class-name, '-checkbox')}}">
                                                                         <xf:label ref="$item-to-show/label"/>
                                                                         <!--
                                                                             We don't like to update values of another checkbox when one is selected, but
@@ -1110,6 +1119,9 @@
                                                                         -->
                                                                         <xf:action event="xforms-select" if="$fr-index-sub-values">
                                                                             <xf:setvalue ref="$i/fr-index/@enabled" value="true()"/>
+                                                                        </xf:action>
+                                                                        <xf:action event="xforms-select" if="$current-value = 'fr-allow-bulk-edit'">
+                                                                            <xf:setvalue ref="$i/fr-summary-show/@enabled" value="true()"/>
                                                                         </xf:action>
                                                                         <xf:action event="xforms-deselect" if="$fr-index-sub-values">
                                                                             <xf:setvalue ref="$base-binding/@role-required" value="false()"/>
@@ -1146,7 +1158,7 @@
                                                                 </xf:case>
                                                             </xf:switch>
 
-                                                            <xf:switch caseref="$fr-index-sub-values" class="fr-index-sub-value">
+                                                            <xf:switch caseref="$fr-index-sub-values">
                                                                 <xf:case value="true()">
                                                                     <!-- Summary settings can have required roles -->
                                                                     <xh:div class="fb-role-required-checkbox">

@@ -537,7 +537,7 @@ class IndexTest
         IndexedControl("control-1", "section-1/grid-1/control-1", "xs:string", "input", SummarySettings(show = false, search = false,  edit = false), staticallyRequired = false, htmlLabel = false, resources = Nil),
         IndexedControl("control-2", "section-1/grid-1/control-2", "xs:string", "input", SummarySettings(show = true,  search = false,  edit = false), staticallyRequired = false, htmlLabel = false, resources = Nil),
         IndexedControl("control-3", "section-1/grid-1/control-3", "xs:string", "input", SummarySettings(show = false, search = true,   edit = false), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("control-4", "section-1/grid-1/control-4", "xs:string", "input", SummarySettings(show = false, search = false,  edit = true),  staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("control-4", "section-1/grid-1/control-4", "xs:string", "input", SummarySettings(show = false, search = false,  edit = false),  staticallyRequired = false, htmlLabel = false, resources = Nil),
         IndexedControl("control-5", "section-1/grid-1/control-5", "xs:string", "input", SummarySettings(show = true,  search = true,   edit = true),  staticallyRequired = false, htmlLabel = false, resources = Nil)
       )
 

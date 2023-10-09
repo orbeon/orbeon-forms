@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.persistence.test
 
 import org.orbeon.dom
 import org.orbeon.dom.Document
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.permission._
@@ -159,7 +160,10 @@ class RestApiTest
           val dataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
           val data    = HttpCall.XML(<gaga1/>.toDocument)
 
-          HttpAssert.put(dataURL, Specific(1), data, StatusCode.NotFound) // TODO: return `StatusCode.Forbidden` instead as reason is missing permissions!
+          // In PE, encryptDataIfNecessary is implemented and tries to access the form definition, which causes
+          // StatusCode.NotFound. In CE, encryptDataIfNecessary is not implemented, so StatusCode.Created is returned.
+          HttpAssert.put(dataURL, Specific(1), data, if (Version.isPE) StatusCode.NotFound else StatusCode.Created)
+          // TODO: return `StatusCode.Forbidden` instead as reason if missing permissions!
 
           // 2023-04-18: Following changes to the persistence proxy: `PUT`ting data for a non-existing form definition
           // used to not fail, for some reason. Now we enforce the existence of a form definition so we can check
@@ -168,7 +172,10 @@ class RestApiTest
 
           // Storing for specific form version
           val myStage = Some(Stage("my-stage", ""))
-          HttpAssert.put(dataURL, Specific(1), data, StatusCode.Created)
+          // During the previous PUT, in PE, encryptDataIfNecessary didn't find the form definition and didn't store the
+          // form data, so this time the PUT returns Created. In CE, encryptDataIfNecessary didn't fail (no
+          // implementation) and the form data was stored, so the current PUT returns NoContent.
+          HttpAssert.put(dataURL, Specific(1), data, if (Version.isPE) StatusCode.Created else StatusCode.NoContent)
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1)))
           HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent, stage = myStage)
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1), stage = myStage))

@@ -116,13 +116,13 @@ object Support {
   }
 
   def stopFocusOutPropagation(
-    element     : Element,
-    eventTarget : FocusEvent => EventTarget,
-    targetClass : String
+    element       : Element,
+    eventToTarget : FocusEvent => EventTarget,
+    targetClass   : String
   ): Unit =
     element.addEventListener(
       DomEventNames.FocusOut,
-      focusFunction(eventTarget, targetClass),
+      focusFunction(eventToTarget, targetClass),
       useCapture = true
     )
 
@@ -140,13 +140,13 @@ object Support {
     )
 
   private def focusFunction(
-    eventTarget : FocusEvent => EventTarget,
-    targetClass : String
+    eventToTarget : FocusEvent => EventTarget,
+    targetClass   : String
   ): FocusEvent => Unit =
     (event: FocusEvent) => {
       // 2020-12-22: Noted that `relatedTarget` can be `null` in plain XForms.
       // Not sure why, but protecting against crash here with pattern match.
-      eventTarget(event) match {
+      eventToTarget(event) match {
         case relatedTarget: dom.html.Element =>
           if (relatedTarget.classList.contains(targetClass))
             event.stopPropagation()

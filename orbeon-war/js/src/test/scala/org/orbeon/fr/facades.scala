@@ -14,6 +14,7 @@
 package org.orbeon.fr
 
 import org.scalajs.dom
+import org.scalajs.dom.experimental.{RequestInfo, RequestInit, Response}
 
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
@@ -49,4 +50,33 @@ class Cookie extends js.Object
 @JSImport("jsdom", "VirtualConsole")
 class VirtualConsole extends js.Object {
   def sendTo(anyConsole: js.Object, options: UndefOr[Nothing] = js.undefined): VirtualConsole = js.native
+}
+
+// 2020-10-06: Fetch API is not supported by JSDOM out of the box. We use `node-fetch` as
+// implementation.
+@js.native
+@JSImport("node-fetch", JSImport.Namespace)
+object NodeFetch extends js.Function2[RequestInfo, RequestInit, js.Promise[Response]] {
+  def apply(arg1: RequestInfo, arg2: RequestInit): js.Promise[Response] = js.native
+}
+
+//@js.native
+//trait DocumentTrait extends js.Object {
+//
+//  def getValue(
+//    controlIdOrElem : String | html.Element,
+//    formElem        : js.UndefOr[html.Element] = js.undefined
+//  ): js.UndefOr[String] = js.native
+//
+//  // Set the value of an XForms control
+//  def setValue(
+//    controlIdOrElem : String | html.Element,
+//    newValue        : String | Double | Boolean,
+//    formElem        : js.UndefOr[html.Element] = js.undefined
+//  ): Unit = js.native
+//}
+
+@js.native
+trait AjaxServerTrait extends js.Object {
+  def allEventsProcessedP(): js.Promise[Unit] = js.native
 }

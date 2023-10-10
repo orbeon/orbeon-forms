@@ -49,8 +49,6 @@ object FormBuilderApp extends App {
 
     // Other initializations
     BlockCache
-
-    // Keyboard shortcuts for cut/copy/paste/undo/redo
   }
 
   private def registerFormBuilderKeyboardShortcuts(): Unit = {

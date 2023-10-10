@@ -351,15 +351,7 @@
                                     data-initial-label="{{$binding/@label}}"
                                     data-initial-value="{{$binding}}">
 
-                                    <!-- Default values to populate the dropdown before users start typing -->
-                                    <!-- TODO: Unneeded for `$service-performs-search = true()`, right? -->
-                                    <xf:var name="fr-search-value" value="''"/>
-                                    <xf:var name="fr-search-page"  value="'1'"/>
-
-                                    <xf:select1
-                                        id="select1"
-                                        appearance="minimal"
-                                        ref="$binding"/>
+                                    <xh:select id="select1"/>
                                 </xf:group>
                                 <xf:input ref="$binding[$view]/@label"/>
                             </xsl:when>

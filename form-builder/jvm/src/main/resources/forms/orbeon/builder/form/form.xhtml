@@ -326,10 +326,9 @@
                             <xf:dispatch if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o e" name="DOMActivate" targetid="open-email-settings-trigger"/>
                             <xf:dispatch if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o s" name="DOMActivate" targetid="open-edit-source-trigger"/>
                             <xf:dispatch if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o p" name="DOMActivate" targetid="open-permissions-trigger"/>
-
-<!--                            <xf:action type="xpath" if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command option" xxf:text="t">-->
-<!--                                fr:run-process-by-name('oxf.fr.detail.process', 'test')-->
-<!--                            </xf:action>-->
+                            <xf:action   if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o t" type="xpath" >
+                                fr:run-process-by-name('oxf.fr.detail.process', 'test')
+                            </xf:action>
 
 <!--                            <xf:action type="xpath" if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command option" xxf:text="p">-->
 <!--                                fr:run-process-by-name('oxf.fr.detail.process', 'publish')-->

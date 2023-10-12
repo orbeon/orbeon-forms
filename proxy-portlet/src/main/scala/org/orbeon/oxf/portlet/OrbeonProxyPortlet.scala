@@ -228,12 +228,11 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     else
       None
 
-  private def preferenceFromSessionParameter(request: PortletRequest, pref: Pref) = {
+  private def preferenceFromSessionParameter(request: PortletRequest, pref: Pref) =
     if (getBooleanPreference(request, EnableSessionParameters))
       sessionParameters(request) collectFirst { case (pref.nameLabel.publicName, value) => value }
     else
       None
-  }
 
   private def getPreferenceOrRequested(request: PortletRequest, pref: Pref) =
     preferenceFromSessionParameter(request, pref)        orElse

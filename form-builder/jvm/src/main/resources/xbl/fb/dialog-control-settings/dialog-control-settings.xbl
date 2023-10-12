@@ -45,7 +45,7 @@
                 <xf:setvalue ref="$i/control-name"            value="$i/original-control-name"/>
                 <xf:setvalue ref="$i/last-valid-control-name" value="$i/original-control-name"/>
 
-                <xf:setvalue ref="$i/control-names"           value="string-join(fbf:getAllNamesInUse(), ' ')"/>
+                <xf:setvalue ref="$i/control-names"           value="fbf:getAllNamesInUseAsString()"/>
 
                 <xf:var name="control"                        value="fbf:findControlByNameOrEmpty($i/control-name)"/>
                 <xf:var name="resources"                      value="frf:currentFormResources()"/>
@@ -934,7 +934,7 @@
                             type="xxf:XPath2"
                             xxf:whitespace="trim"
                             required="false()"
-                            constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"
+                            constraint="not(fbf:hasUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"
                             relevant="$type = 'formula'"/>
 
                         <xf:bind
@@ -956,14 +956,14 @@
                         <xf:bind
                             ref="constraint/@argument[../../@type = 'excluded-dates']"
                             type="xxf:XPath2"
-                            constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"/>
+                            constraint="not(fbf:hasUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"/>
 
                         <xf:bind
                             ref="required"
                             type="xxf:XPath2"
                             xxf:whitespace="trim"
                             required="true()"
-                            constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"/>
+                            constraint="not(fbf:hasUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"/>
 
                         <xf:bind
                             ref="alert/message/@value"
@@ -975,7 +975,7 @@
                     ref="relevant | readonly | default | calculate"
                     type="xxf:XPath2"
                     xxf:whitespace="trim"
-                    constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"
+                    constraint="not(fbf:hasUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"
                     required="false()"/>
 
                 <xf:bind

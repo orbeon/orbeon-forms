@@ -423,9 +423,9 @@ object FormBuilderXPathApi {
     FormBuilder.getNormalizedMax(doc, gridName)(new InDocFormRunnerDocContext(doc)).orNull
 
   //@XPathFunction
-  def getAllNamesInUse: SequenceIterator = {
+  def getAllNamesInUseAsString: String = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.getAllNamesInUse.iterator map stringToStringValue
+    FormBuilder.getAllNamesInUse.mkString(" ")
   }
 
   //@XPathFunction
@@ -694,7 +694,7 @@ object FormBuilderXPathApi {
     lang              : String,
     resourcesRootElem : NodeInfo
   ): SequenceIterator =
-    FormBuilder.iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
+    FormBuilder.iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem).toList // https://github.com/orbeon/orbeon-forms/issues/6016
 
    // Return all classes that need to be added to an editable grid
   // TODO: Consider whether the client can test for grid deletion directly so we don't have to place CSS classes.
@@ -985,12 +985,12 @@ object FormBuilderXPathApi {
     FormBuilder.findGridColumnMigrationType(gridElem, from, to).isDefined
 
   //@XPathFunction
-  def findUnresolvedVariableReferences(
+  def hasUnresolvedVariableReferences(
     elemOrAtt   : NodeInfo,
     avt         : Boolean,
     originalName: String,
     newName     : String
-  ): SequenceIterator =
+  ): Boolean =
     if (elemOrAtt.stringValue.trimAllToOpt.nonEmpty)
       Try(
         FormRunnerRename.findUnresolvedVariableReferences(
@@ -1007,12 +1007,13 @@ object FormBuilderXPathApi {
           ).toSet
         )
       ) match {
-        case Success(it) => it
-        case Failure(_)  => EmptyIterator.getInstance // The user expression can be incorrect in the UI. We ignore it
-                                                      // here and UI validation should inform the user.
+        case Success(it) if it.nonEmpty => true
+        case Success(it)                => false
+        case Failure(_)                 => false // The user expression can be incorrect in the UI. We ignore it
+                                                 // here and UI validation should inform the user.
       }
     else
-      EmptyIterator.getInstance
+      false
 
   //@XPathFunction
   def renameControlReferences(

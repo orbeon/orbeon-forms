@@ -309,9 +309,8 @@ private object FormRunnerFunctions {
         followIndexes           = booleanArgumentOpt(1) getOrElse false,
         libraryOrSectionNameOpt = stringArgumentOpt(2).flatMap(_.trimAllToOpt).map(Right.apply)
       ) map {
-        _ map (_.getStringValue): SequenceIterator
-      } getOrElse
-        EmptyIterator.getInstance
+        _.map(_.getStringValue).toList // https://github.com/orbeon/orbeon-forms/issues/6016
+      }
     }
   }
 

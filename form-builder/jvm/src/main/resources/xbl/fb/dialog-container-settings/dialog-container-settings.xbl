@@ -75,7 +75,7 @@
                 <xf:setvalue ref="$i/relevant"                       value="fbf:readDenormalizedCalculatedMip($i/control-name, 'relevant')"/>
                 <xf:setvalue ref="$i/readonly"                       value="fbf:readDenormalizedCalculatedMip($i/control-name, 'readonly')"/>
 
-                <xf:setvalue ref="$i/control-names"                  value="string-join(fbf:getAllNamesInUse(), ' ')"/>
+                <xf:setvalue ref="$i/control-names"                  value="fbf:getAllNamesInUseAsString()"/>
 
                 <xf:var name="control"                               value="fbf:findControlByNameOrEmpty($i/control-name)"/>
                 <xf:var name="resources"                             value="frf:currentFormResources()"/>
@@ -450,7 +450,7 @@
                     ref="relevant | readonly"
                     type="xxf:XPath2"
                     required="false()"
-                    constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"/>
+                    constraint="not(fbf:hasUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"/>
 
                 <xf:bind
                     ref="initially-open"
@@ -505,7 +505,7 @@
                     ref="min-repeat | max-repeat | freeze"
                     type="xxf:XPath2"
                     readonly="../user-can-add-remove = false()"
-                    constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"
+                    constraint="not(fbf:hasUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"
                     xxf:whitespace="trim"/>
 
                 <xf:bind

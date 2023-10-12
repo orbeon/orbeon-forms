@@ -317,7 +317,7 @@ object ErrorSummary {
 
   //@XPathFunction
   def ancestorSectionNames(controlAbsoluteId: String): SequenceIterator =
-    ancestorSectionNamesUseDocument(controlAbsoluteId, inScopeContainingDocument)
+    ancestorSectionNamesUseDocument(controlAbsoluteId, inScopeContainingDocument).toList // https://github.com/orbeon/orbeon-forms/issues/6016
 
   def ancestorSectionNamesUseDocument(controlAbsoluteId: String, xfcd: XFormsContainingDocument): Iterator[String] =
     xfcd.controls.getCurrentControlTree

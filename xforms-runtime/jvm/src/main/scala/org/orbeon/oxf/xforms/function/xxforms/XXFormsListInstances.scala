@@ -20,6 +20,7 @@ import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsId
 
+
 class XXFormsListInstances extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
@@ -38,6 +39,6 @@ class XXFormsListInstances extends XFormsFunction {
             absoluteId
       }
 
-    itOpt.getOrElse(Iterator.empty): Iterator[String]
+    itOpt.getOrElse(Iterator.empty).toList // https://github.com/orbeon/orbeon-forms/issues/6016
   }
 }

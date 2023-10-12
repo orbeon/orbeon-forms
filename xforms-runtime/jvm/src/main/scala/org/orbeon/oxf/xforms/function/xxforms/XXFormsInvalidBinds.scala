@@ -21,6 +21,8 @@ import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.Implicits._
 
+import scala.collection.mutable
+
 /**
  * xxf:invalid-binds()
  */
@@ -33,20 +35,22 @@ class XXFormsInvalidBinds
     // First item or context node if any
     val item = argument.headOption map (e => Option(e.iterate(xpathContext).next())) getOrElse Option(xpathContext.getContextItem)
 
-    item match {
-      case Some(nodeInfo: NodeInfo) =>
-        Option(InstanceData.getInvalidBindIds(nodeInfo)) match {
-          case Some(invalidBindIdsString) =>
-            stringArrayToSequenceIterator(invalidBindIdsString.splitTo[Array]())
-          case None =>
-            // No invalid bind ids
-            EmptyIterator.getInstance
-        }
+    (
+      item match {
+        case Some(nodeInfo: NodeInfo) =>
+          Option(InstanceData.getInvalidBindIds(nodeInfo)) match {
+            case Some(invalidBindIdsString) =>
+              invalidBindIdsString.splitTo[Array]()
+            case None =>
+              // No invalid bind ids
+              Nil
+          }
 
-      case _ =>
-        // Return () if we can't access the node
-        EmptyIterator.getInstance
-    }
+        case _ =>
+          // Return () if we can't access the node
+          Nil
+      }
+    ): collection.Seq[String]
   }
 
   // TODO: something smart

@@ -22,6 +22,7 @@ import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 import scala.{collection => coll}
 
+
 object Implicits {
 
   implicit def stringToQName                       (v: String)                   : QName              = QName(v ensuring ! v.contains(':'))
@@ -34,10 +35,8 @@ object Implicits {
   implicit def booleanToBooleanValue               (v: Boolean)                  : BooleanValue       = BooleanValue.get(v)
 
   implicit def itemToSequenceIterator              (v: Item)                     : SequenceIterator   = SingletonIterator.makeIterator(v)
-  implicit def stringIteratorToSequenceIterator    (v: coll.Iterator[String])    : SequenceIterator   = v map stringToStringValue
-  implicit def stringSeqToSequenceIterator         (v: coll.Seq[String])         : SequenceIterator   = new ListIterator (v map stringToStringValue asJava)
-  implicit def stringArrayToSequenceIterator       (v: Array[String])            : SequenceIterator   = new ArrayIterator(v map stringToStringValue)
-  implicit def itemSeqToSequenceIterator[T <: Item](v: coll.Seq[T])              : SequenceIterator   = new ListIterator (v.asJava)
+  implicit def stringSeqToSequenceIterator         (v: coll.Seq[String])         : SequenceIterator   = new ListIterator(v map stringToStringValue asJava)
+  implicit def itemSeqToSequenceIterator[T <: Item](v: coll.Seq[T])              : SequenceIterator   = new ListIterator(v.asJava)
   implicit def itemSeqOptToSequenceIterator        (v: Option[coll.Seq[Item]])   : SequenceIterator   = v map itemSeqToSequenceIterator   getOrElse EmptyIterator.getInstance
   implicit def stringSeqOptToSequenceIterator      (v: Option[coll.Seq[String]]) : SequenceIterator   = v map stringSeqToSequenceIterator getOrElse EmptyIterator.getInstance
 
@@ -45,30 +44,6 @@ object Implicits {
   implicit def booleanOptToBooleanValue            (v: Option[Boolean])          : BooleanValue       = v map booleanToBooleanValue orNull
 
   implicit def nodeInfoToNodeInfoSeq               (v: NodeInfo)                 : coll.Seq[NodeInfo] = List(v ensuring (v ne null))
-
-  implicit def asSequenceIterator                  (i: coll.Iterator[Item])      : SequenceIterator   = new SequenceIterator {
-
-    private var currentItem: Item = _
-    private var _position = 0
-
-    def next(): Item = {
-      if (i.hasNext) {
-        currentItem = i.next()
-        _position += 1
-      } else {
-        currentItem = null
-        _position = -1
-      }
-
-      currentItem
-    }
-
-    def current    : Item             = currentItem
-    def position   : Int              = _position
-    def close()    : Unit             = ()
-    def getAnother : SequenceIterator = null
-    def getProperties                 = 0
-  }
 
   implicit def asScalaIterator(i: SequenceIterator): coll.Iterator[Item] = new coll.Iterator[Item] {
 

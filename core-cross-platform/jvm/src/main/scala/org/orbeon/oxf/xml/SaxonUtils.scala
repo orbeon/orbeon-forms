@@ -273,9 +273,33 @@ object SaxonUtils {
       case _ => true
     }
 
+    def asSequenceIterator(i: collection.Iterator[Item]): SequenceIterator = new SequenceIterator {
+
+      private var currentItem: Item = _
+      private var _position = 0
+
+      def next(): Item = {
+        if (i.hasNext) {
+          currentItem = i.next()
+          _position += 1
+        } else {
+          currentItem = null
+          _position = -1
+        }
+
+        currentItem
+      }
+
+      def current    : Item             = currentItem
+      def position   : Int              = _position
+      def close()    : Unit             = ()
+      def getAnother : SequenceIterator = throw new IllegalStateException // won't be used by the callees
+      def getProperties                 = 0
+    }
+
     DeepEqual.deepEquals(
-      Implicits.asSequenceIterator(if (excludeWhitespaceTextNodes) it1 filter filterWhitespaceNodes else it1),
-      Implicits.asSequenceIterator(if (excludeWhitespaceTextNodes) it2 filter filterWhitespaceNodes else it2),
+      asSequenceIterator(if (excludeWhitespaceTextNodes) it1 filter filterWhitespaceNodes else it1),
+      asSequenceIterator(if (excludeWhitespaceTextNodes) it2 filter filterWhitespaceNodes else it2),
       new GenericAtomicComparer(CodepointCollator.getInstance, config.getConversionContext),
       config,
       DeepEqual.INCLUDE_PREFIXES                  |

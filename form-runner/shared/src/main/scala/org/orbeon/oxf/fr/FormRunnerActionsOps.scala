@@ -19,7 +19,6 @@ import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -28,9 +27,7 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsSi
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
-import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
@@ -80,19 +77,19 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     targetControlName      : String,
     followIndexes          : Boolean,
     libraryName            : String
-  ): ValueRepresentationType =
+  ): SequenceIterator =
     resolveTargetRelativeToActionSourceOpt(
       actionSourceAbsoluteId,
       targetControlName,
       followIndexes,
       libraryName.trimAllToOpt.map(Left.apply)
-    ) map (new SequenceExtent(_)) orNull
+    ).map(_.toList).orNull: List[Item] // https://github.com/orbeon/orbeon-forms/issues/6016
 
   //@XPathFunction
   def resolveTargetRelativeToActionSourceFromBinds(
     actionSourceAbsoluteId : String,
     targetControlName      : String
-  ): ValueRepresentationType = {
+  ): SequenceIterator = {
 
     val functionContext = XFormsFunction.context
 
@@ -102,7 +99,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       functionContext.sourceEffectiveId,
       actionSourceAbsoluteId,
       targetControlName
-    ) map (new SequenceExtent(_)) orNull
+    ).map(_.toList).orNull: List[Item] // https://github.com/orbeon/orbeon-forms/issues/6016
   }
 
   //@XPathFunction
@@ -115,7 +112,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       targetControlName       = targetControlName,
       followIndexes           = false,
       libraryOrSectionNameOpt = libraryName.trimAllToOpt.map(Left.apply)
-    ).getOrElse(Iterator.empty): Iterator[om.Item]
+    ).map(_.toList).getOrElse(Nil): List[Item] // https://github.com/orbeon/orbeon-forms/issues/6016
 
   def resolveTargetRelativeToActionSourceFromControlsUseSectionNameOpt(
     container              : XBLContainer,
@@ -560,7 +557,8 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     atOrNull                  : String,
     lastIsNone                : Boolean // for `fr:repeat-clear` where the last position must not be specified
   ): SequenceIterator =
-    findContainerDetailsCompileTimeImpl(inDoc, repeatedGridOrSectionName, atOrNull, lastIsNone)(new InDocFormRunnerDocContext(inDoc))
+    findContainerDetailsCompileTimeImpl(inDoc, repeatedGridOrSectionName, atOrNull, lastIsNone)(new InDocFormRunnerDocContext(inDoc)).toList
+    // https://github.com/orbeon/orbeon-forms/issues/6016
 
   def findContainerDetailsCompileTimeImpl(
     inDoc                     : NodeInfo,

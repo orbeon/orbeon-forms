@@ -50,6 +50,16 @@
                     </xf:action>
                 </xf:action>
 
+                <!-- Add empty message if no message defined yet -->
+                <xf:insert
+                    if="count($i/message) = 0"
+                    context="$i"
+                    ref="*"
+                    origin="xf:element(
+                            'message',
+                            ('', xf:attribute('xml:lang', $available-languages[1]), xf:attribute('name', ''), xf:attribute('html', false()))
+                        )"/>
+
                 <!-- Update template with default language -->
                 <xf:setvalue ref="$ti/message/@xml:lang" value="$available-languages[1]"/>
 
@@ -132,7 +142,8 @@
                 <xf:var name="metadata"            value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*[1]"/>
 
                 <xf:bind ref="$i/message">
-                    <xf:bind ref="@name, ." xxf:whitespace="trim" readonly="false()" constraint=". != ''"/>
+                    <xf:bind ref="@xml:lang" readonly="count($available-languages) &lt;= 1"/>
+                    <xf:bind ref="@name, ." xxf:whitespace="trim"  readonly="false()" constraint=". != ''"/>
 
                     <!-- No duplicate message names for a given language -->
                     <xf:bind ref="@name" constraint="for $l in string(../@xml:lang) return
@@ -157,7 +168,7 @@
                             <fr:grid id="fb-messages-repeat" repeat="true" ref="message" template="$ti/message">
                                 <xh:tr>
                                     <xh:td class="fb-messages-language-column">
-                                        <xf:select1 id="fb-messages-language-select" ref="@xml:lang[count($available-languages) > 1]">
+                                        <xf:select1 id="fb-messages-language-select" ref="@xml:lang">
                                             <xf:label ref="$resources/dialog-messages/language-header"/>
 
                                             <xf:itemset ref="$available-languages">

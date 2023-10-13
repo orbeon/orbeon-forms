@@ -27,5 +27,5 @@ class NoneReplacer(submission: XFormsModelSubmission) extends Replacer {
     p  : SubmissionParameters,
     p2 : SecondPassParameters
   ): ReplaceResult =
-    ReplaceResult.SendDone(cxr)
+    ReplaceResult.SendDone(cxr, p.tunnelProperties)
 }

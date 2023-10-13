@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.analysis.EventHandler.PropertyQNames
 import org.orbeon.oxf.xforms.analysis.WithChildrenTrait
 import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, VariableAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, PropertyGetter, PropertyValue}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames._
@@ -29,6 +30,7 @@ import org.orbeon.xforms.xbl.Scope
 import shapeless.syntax.typeable.typeableOps
 
 import scala.jdk.CollectionConverters._
+
 
 abstract class XFormsAction extends Logging {
 
@@ -106,11 +108,11 @@ abstract class XFormsAction extends Logging {
 
 object XFormsAction {
 
-  // Obtain context attributes based on nested xf:property elements.
+  // Obtain context attributes based on nested `xf:property` elements.
   def eventProperties(
     actionInterpreter : XFormsActionInterpreter,
     actionAnalysis    : ActionTrait
-  ): Map[String, Option[Any]] = {
+  ): PropertyGetter = {
 
     val contextStack = actionInterpreter.actionXPathContext
 
@@ -129,12 +131,12 @@ object XFormsAction {
 
         // Get and check attributes
         name =
-         resolveQName(
+          resolveQName(
            property.namespaceMapping.mapping.get,
            element.attributeValue(NAME_QNAME),
            unprefixedIsNoNamespace = true
-         ) map (_.clarkName) getOrElse
-            (throw new OXFException(XXFORMS_CONTEXT_QNAME.qualifiedName + " element must have a \"name\" attribute."))
+        ) map (_.clarkName) getOrElse
+          (throw new OXFException(XXFORMS_CONTEXT_QNAME.qualifiedName + " element must have a \"name\" attribute."))
 
         value = VariableAnalysis.valueOrSelectAttribute(element) match {
           case Some(valueExpr) =>
@@ -172,9 +174,11 @@ object XFormsAction {
             // Literal text
             element.getStringValue
         }
-      } yield
-        (name, Option(value))
 
-    tuples.toMap
+        tunnel = element.attributeValueOpt("tunnel").contains("true")
+      } yield
+        PropertyValue(name, Option(value), tunnel)
+
+    new ActionPropertyGetter(tuples)
   }
 }

@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.submission
 
 import java.io.{Externalizable, ObjectInput, ObjectOutput}
 import java.util.concurrent._
-
 import cats.Eval
+
 import javax.enterprise.concurrent.ManagedExecutorService
 import javax.naming.{InitialContext, NamingException}
 import org.orbeon.oxf.externalcontext.{AsyncRequest, LocalExternalContext}
@@ -25,7 +25,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, EventNames}
+import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
+import org.orbeon.xforms.{EventNames, XFormsCrossPlatformSupport}
 
 /**
   * Handle asynchronous submissions.
@@ -59,7 +60,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
         allowDuplicates   = false  // no need for duplicates
       )
 
-  def addAsynchronousSubmission(eval: Eval[ConnectResult]): Unit = {
+  def addAsynchronousSubmission(eval: Eval[AsyncSubmissionResult]): Unit = {
     val asynchronousSubmissionsOpt =
       findAsynchronousSubmissions(
         create = true,
@@ -131,11 +132,10 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
             // Handle next completed task
             val result = asynchronousSubmission.take().get()
 
-            // Process response by dispatching an event to the submission
             val submission =
-              containingDocument.getObjectByEffectiveId(result.submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
+              containingDocument.getObjectByEffectiveId(result._1.submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
 
-            submission.processAsyncSubmissionResponse(result)(submission.getIndentedLogger)
+            submission.processAsyncSubmissionResponse(result._1, result._2)(submission.getIndentedLogger)
 
             processedCount += 1
           }
@@ -170,9 +170,9 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
             val result = future.get.get()
 
             val submission =
-              containingDocument.getObjectByEffectiveId(result.submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
+              containingDocument.getObjectByEffectiveId(result._1.submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
 
-            submission.processAsyncSubmissionResponse(result)(submission.getIndentedLogger)
+            submission.processAsyncSubmissionResponse(result._1, result._2)(submission.getIndentedLogger)
 
             processedCount += 1
 
@@ -190,9 +190,11 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
   }
 }
 
-private object AsynchronousSubmissionManager {
+object AsynchronousSubmissionManager {
 
-  val AsyncSubmissionsSessionKeyPrefix = "oxf.xforms.state.async-submissions."
+  private type AsyncSubmissionResult = (ConnectResult, Option[TunnelProperties])
+
+  private val AsyncSubmissionsSessionKeyPrefix = "oxf.xforms.state.async-submissions."
 
   // Global thread pool if none provided by the app server
   private lazy val threadPool = Executors.newCachedThreadPool
@@ -210,7 +212,7 @@ private object AsynchronousSubmissionManager {
 
   def sessionKey(doc: XFormsContainingDocument): String = AsyncSubmissionsSessionKeyPrefix + doc.uuid
 
-  def findAsynchronousSubmissions(create: Boolean, sessionKey: String): Option[AsynchronousSubmissions] = {
+  private def findAsynchronousSubmissions(create: Boolean, sessionKey: String): Option[AsynchronousSubmissions] = {
 
     val session = XFormsCrossPlatformSupport.externalContext.getRequest.getSession(true)
 
@@ -224,26 +226,26 @@ private object AsynchronousSubmissionManager {
     }
   }
 
-  class AsynchronousSubmissions extends Externalizable {
+  private class AsynchronousSubmissions extends Externalizable {
 
-    private val completionService = new ExecutorCompletionService[ConnectResult](getExecutorService)
+    private val completionService = new ExecutorCompletionService[AsyncSubmissionResult](getExecutorService)
 
     private var _pendingCount = 0
     def pendingCount = _pendingCount
 
-    def submit(task: Eval[ConnectResult]): Future[ConnectResult] = {
+    def submit(task: Eval[AsyncSubmissionResult]): Future[AsyncSubmissionResult] = {
       val future = completionService.submit(() => task.value)
       _pendingCount += 1
       future
     }
 
-    def poll(): Option[Future[ConnectResult]] =
+    def poll(): Option[Future[AsyncSubmissionResult]] =
       Option(completionService.poll()) map { f =>
         _pendingCount -= 1
         f
       }
 
-    def take(): Future[ConnectResult] = {
+    def take(): Future[AsyncSubmissionResult] = {
       val f = completionService.take()
       _pendingCount -= 1
       f

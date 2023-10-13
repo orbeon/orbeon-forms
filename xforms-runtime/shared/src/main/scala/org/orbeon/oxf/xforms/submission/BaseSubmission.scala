@@ -14,14 +14,12 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.Eval
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
+import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
 import org.orbeon.xforms.{UrlType, XFormsCrossPlatformSupport}
 
-trait SubmissionProcess {
-  def process(request: ExternalContext.Request, response: ExternalContext.Response): Unit
-}
 
 abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Submission {
 
@@ -63,7 +61,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
   protected def submitEval(
     p    : SubmissionParameters,
     p2   : SecondPassParameters,
-    eval : Eval[ConnectResult]
+    eval : Eval[(ConnectResult, Option[TunnelProperties])]
   ): Option[ConnectResult] =
     if (p2.isAsynchronous) {
       // Tell XFCD that we have one more async submission
@@ -73,11 +71,11 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
     } else if (p.isDeferredSubmissionSecondPass) {
       // Tell XFCD that we have a submission replace="all" ready for a second pass
       // Tell caller he doesn't need to do anything
-      containingDocument.setReplaceAllEval(eval)
+      containingDocument.setReplaceAllEval(eval.map(_._1))
       None
     } else {
       // Just run it now
-      Option(eval.value)
+      Option(eval.value._1)
     }
 
   protected def getDetailsLogger(

@@ -34,7 +34,7 @@ import scala.util.{Failure, Success}
  * NOTE: This could possibly be made to work as well for optimized submissions, but currently this is not the case.
  */
 private object CacheableSubmission {
-  class ThrowableWrapper(val throwable: Throwable) extends RuntimeException
+  private class ThrowableWrapper(val throwable: Throwable) extends RuntimeException
 }
 
 class CacheableSubmission(submission: XFormsModelSubmission)
@@ -170,7 +170,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
             }
         }
 
-        submitEval(p, p2, eval) // returns `None` if the execution is deferred
+        submitEval(p, p2, eval.map(_ -> p.tunnelProperties)) // returns `None` if the execution is deferred
     }
   }
 
@@ -200,7 +200,8 @@ class CacheableSubmission(submission: XFormsModelSubmission)
               null,
               new XFormsSubmitErrorEvent(
                 submission, ErrorType.TargetError,
-                None
+                None,
+                p.tunnelProperties
               )
             )
         }
@@ -216,7 +217,8 @@ class CacheableSubmission(submission: XFormsModelSubmission)
           new XFormsSubmitErrorEvent(
             submission,
             ErrorType.TargetError,
-            None
+            None,
+            p.tunnelProperties
           )
         )
     }

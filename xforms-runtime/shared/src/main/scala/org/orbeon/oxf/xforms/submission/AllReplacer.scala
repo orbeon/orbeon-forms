@@ -82,7 +82,7 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
     // `error-type` of `resource-error`"
     if (! p.isDeferredSubmissionSecondPass) {
       if (StatusCode.isSuccessCode(cxr.statusCode))
-        ReplaceResult.SendDone(cxr)
+        ReplaceResult.SendDone(cxr, None)
       else
         // Here we dispatch `xforms-submit-error` upon getting a non-success error code, even though the response has
         // already been written out. This gives the form author a chance to do something in cases the response is
@@ -93,12 +93,14 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
             message          = s"xf:submission for submission id `${submission.getId}`, error code received when submitting instance: `${cxr.statusCode}`",
             description      = "processing submission response",
             submitErrorEvent = new XFormsSubmitErrorEvent(
-              target    = submission,
-              errorType = ErrorType.ResourceError,
-              cxrOpt    = cxr.some
+              target           = submission,
+              errorType        = ErrorType.ResourceError,
+              cxrOpt           = cxr.some,
+              tunnelProperties = p.tunnelProperties
             )
           ),
-          Left(cxr.some)
+          Left(cxr.some),
+          p.tunnelProperties
         )
     } else {
       // Two reasons:

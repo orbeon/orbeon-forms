@@ -73,6 +73,6 @@ class BinaryReplacer(
     // MAYBE `xxf:mediatyperef` (also with other replacers!)
     // MAYBE `xxf:sizeref`      (also with other replacers!)
 
-    ReplaceResult.SendDone(cxr)
+    ReplaceResult.SendDone(cxr, p.tunnelProperties)
   }
 }

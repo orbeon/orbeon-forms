@@ -61,9 +61,10 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
           message          = message,
           description      = "reading response body",
           submitErrorEvent = new XFormsSubmitErrorEvent(
-            target    = submission,
-            errorType = ErrorType.ResourceError,
-            cxrOpt    = cxr.some
+            target           = submission,
+            errorType        = ErrorType.ResourceError,
+            cxrOpt           = cxr.some,
+            tunnelProperties = p.tunnelProperties
           )
         )
     }
@@ -74,7 +75,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
     p2 : SecondPassParameters
   ): ReplaceResult =
     responseBodyOpt flatMap (TextReplacer.replaceText(submission, containingDocument, cxr, p, _)) getOrElse
-      ReplaceResult.SendDone(cxr)
+      ReplaceResult.SendDone(cxr, p.tunnelProperties)
 }
 
 
@@ -96,9 +97,10 @@ object TextReplacer {
         message          = message,
         description      = "processing `targetref` attribute",
         submitErrorEvent = new XFormsSubmitErrorEvent(
-          target    = submission,
-          errorType = ErrorType.TargetError,
-          cxrOpt    = connectionResult.some
+          target           = submission,
+          errorType        = ErrorType.TargetError,
+          cxrOpt           = connectionResult.some,
+          tunnelProperties = p.tunnelProperties
         )
       )
 
@@ -139,7 +141,8 @@ object TextReplacer {
         case t: XFormsSubmissionException =>
           ReplaceResult.SendError(
             t,
-            Left(connectionResult.some)
+            Left(connectionResult.some),
+            p.tunnelProperties
           ).some
       }
     }
@@ -158,7 +161,8 @@ object TextReplacer {
           case _ =>
             ReplaceResult.SendError(
               newSubmissionException(s"""`targetref` attribute doesn't point to a node for `replace="${p.replaceType}"`."""),
-              Left(connectionResult.some)
+              Left(connectionResult.some),
+              p.tunnelProperties
             ).some
         }
       case None =>

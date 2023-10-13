@@ -18,12 +18,13 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 
+
 class XFormsSubmitDoneEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsEvent(XFORMS_SUBMIT_DONE, target, properties, bubbles = true, cancelable = false)
     with SubmitResponseEvent {
 
-  def this(target: XFormsEventTarget, cxr: ConnectionResult) = {
-    this(target, EmptyGetter)
+  def this(target: XFormsEventTarget, cxr: ConnectionResult, tunnelProperties: Option[TunnelProperties]) = {
+    this(target, tunnelProperties.getOrElse(EmptyGetter))
     _connectionResult = Option(cxr)
   }
 

@@ -17,6 +17,7 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.util.XPathCache.XPathContext
+import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.om
 
@@ -50,8 +51,8 @@ case class ConnectResult(
 
 sealed trait ReplaceResult
 object ReplaceResult {
-  case object None                                                                           extends ReplaceResult
-  case class  SendDone (cxr: ConnectionResult)                                               extends ReplaceResult
-  case class  SendError(t: Throwable, ctx: Either[Option[ConnectionResult], Option[String]]) extends ReplaceResult
-  case class  Throw    (t: Throwable)                                                        extends ReplaceResult
+  case object None                                                                                                                       extends ReplaceResult
+  case class  SendDone (cxr: ConnectionResult, tunnelProperties: Option[TunnelProperties])                                               extends ReplaceResult
+  case class  SendError(t: Throwable, ctx: Either[Option[ConnectionResult], Option[String]], tunnelProperties: Option[TunnelProperties]) extends ReplaceResult
+  case class  Throw    (t: Throwable)                                                                                                    extends ReplaceResult
 }

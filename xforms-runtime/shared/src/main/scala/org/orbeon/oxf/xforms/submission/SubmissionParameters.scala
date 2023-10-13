@@ -5,6 +5,7 @@ import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache.XPathContext
+import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
@@ -13,7 +14,7 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, RelevanceHandling, UrlType}
+import org.orbeon.xforms.{RelevanceHandling, UrlType, XFormsCrossPlatformSupport}
 
 
 // Subset of `SubmissionParameters`
@@ -57,7 +58,8 @@ case class SubmissionParameters(
   urlType                        : UrlType,
   resolvedIsResponseResourceType : Boolean,
   xxfTargetOpt                   : Option[String],
-  xxfShowProgress                : Boolean
+  xxfShowProgress                : Boolean,
+  tunnelProperties               : Option[TunnelProperties]
 )
 
 object SubmissionParameters {
@@ -69,8 +71,10 @@ object SubmissionParameters {
     p.copy(refContext = createRefContext(dynamicSubmission))
 
   def apply(
-    eventNameOpt      : Option[String])(implicit
-    dynamicSubmission : XFormsModelSubmission
+    eventNameOpt    : Option[String],
+    tunnelProperties: Option[TunnelProperties]
+  )(implicit
+    dynamicSubmission: XFormsModelSubmission
   ): SubmissionParameters = {
 
     val staticSubmission = dynamicSubmission.staticSubmission
@@ -84,9 +88,10 @@ object SubmissionParameters {
         message          = s"Empty single-node binding on xf:submission for submission id: `${dynamicSubmission.getId}`",
         description      = "getting submission single-node binding",
         submitErrorEvent = new XFormsSubmitErrorEvent(
-          target    = dynamicSubmission,
-          errorType = ErrorType.NoData,
-          cxrOpt    = None
+          target           = dynamicSubmission,
+          errorType        = ErrorType.NoData,
+          cxrOpt           = None,
+          tunnelProperties = tunnelProperties
         )
       )
 
@@ -116,7 +121,7 @@ object SubmissionParameters {
     }
 
     // TODO: We pass a Clark name, but we don't process this correctly!
-    val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(resolvedMethodClarkName)
+    val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(resolvedMethodClarkName, tunnelProperties)
     val resolvedMediatypeOpt = staticSubmission.avtMediatypeOpt flatMap stringAvtTrimmedOpt
 
     val serializationOpt = staticSubmission.avtSerializationOpt flatMap stringAvtTrimmedOpt
@@ -129,9 +134,10 @@ object SubmissionParameters {
         message          = "xf:submission: single-node binding must refer to a document node or an element.",
         description      = "getting submission single-node binding",
         submitErrorEvent = new XFormsSubmitErrorEvent(
-          target    = dynamicSubmission,
-          errorType = ErrorType.NoData,
-          cxrOpt    = None
+          target           = dynamicSubmission,
+          errorType        = ErrorType.NoData,
+          cxrOpt           = None,
+          tunnelProperties = tunnelProperties
         )
       )
 
@@ -264,13 +270,16 @@ object SubmissionParameters {
       urlType                        = resolvedUrlType,
       resolvedIsResponseResourceType = resolvedIsResponseResourceType,
       xxfTargetOpt                   = resolvedXxfTargetOpt,
-      xxfShowProgress                = resolvedXxfShowProgress
+      xxfShowProgress                = resolvedXxfShowProgress,
+      tunnelProperties               = tunnelProperties
     )
   }
 
-  def actualHttpMethodFromXFormsMethodName(
-    methodName        : String)(implicit
-    dynamicSubmission : XFormsModelSubmission
+  private def actualHttpMethodFromXFormsMethodName(
+    methodName       : String,
+    tunnelProperties : Option[TunnelProperties]
+  )(implicit
+    dynamicSubmission: XFormsModelSubmission
   ): HttpMethod =
     HttpMethod.withNameInsensitiveOption(methodName) getOrElse {
       if (methodName.endsWith("-post"))
@@ -281,9 +290,10 @@ object SubmissionParameters {
           message          = s"Invalid method name: `$methodName`",
           description      = "getting submission method",
           submitErrorEvent = new XFormsSubmitErrorEvent(
-            target    = dynamicSubmission,
-            errorType = ErrorType.XXFormsMethodError,
-            cxrOpt    = None
+            target           = dynamicSubmission,
+            errorType        = ErrorType.XXFormsMethodError,
+            cxrOpt           = None,
+            tunnelProperties = tunnelProperties
           )
         )
     }

@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
+import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceCaching, InstanceDataOps, XFormsInstance}
@@ -64,7 +65,8 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           isReadonly       = p2.isReadonly,
           isHandleXInclude = p2.isHandleXInclude,
           isJSON           = isJSON,
-          connectionResult = cxr
+          connectionResult = cxr,
+          tunnelProperties = p.tunnelProperties
         )
       )
     } else {
@@ -76,7 +78,8 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         submitErrorEvent = new XFormsSubmitErrorEvent(
           submission,
           ErrorType.ResourceError,
-          cxr.some
+          cxr.some,
+          p.tunnelProperties
         )
       )
     }
@@ -86,7 +89,9 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     isReadonly       : Boolean,
     isHandleXInclude : Boolean,
     isJSON           : Boolean,
-    connectionResult : ConnectionResult)(implicit
+    connectionResult : ConnectionResult,
+    tunnelProperties : Option[TunnelProperties]
+  )(implicit
     logger           : IndentedLogger
   ): InstanceDocument = {
     // Create resulting instance whether entire instance is replaced or not, because this:
@@ -133,7 +138,8 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           submitErrorEvent = new XFormsSubmitErrorEvent(
             submission,
             ErrorType.ParseError,
-            connectionResult.some
+            connectionResult.some,
+            tunnelProperties
           )
         )
     }
@@ -164,10 +170,12 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             submitErrorEvent = new XFormsSubmitErrorEvent(
               target    = submission,
               errorType = ErrorType.TargetError,
-              cxrOpt    = cxr.some
+              cxrOpt    = cxr.some,
+              tunnelProperties = p.tunnelProperties
             )
           ),
-          Left(cxr.some)
+          Left(cxr.some),
+          p.tunnelProperties
         )
 
       case Some(replaceInstanceNoTargetref) =>
@@ -190,12 +198,14 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
                 message          = """targetref attribute doesn't point to an element for `replace="instance"`.""",
                 description      = "processing targetref attribute",
                 submitErrorEvent = new XFormsSubmitErrorEvent(
-                  target    = submission,
-                  errorType = ErrorType.TargetError,
-                  cxrOpt    = cxr.some
+                  target           = submission,
+                  errorType        = ErrorType.TargetError,
+                  cxrOpt           = cxr.some,
+                  tunnelProperties = p.tunnelProperties
                 )
               ),
-              Left(cxr.some)
+              Left(cxr.some),
+              p.tunnelProperties
             )
           case Some(destinationNodeInfo) =>
             // This is the instance which is effectively going to be updated
@@ -207,12 +217,14 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
                     message          = """targetref attribute doesn't point to an element in an existing instance for `replace="instance"`.""",
                     description      = "processing targetref attribute",
                     submitErrorEvent = new XFormsSubmitErrorEvent(
-                      target    = submission,
-                      errorType = ErrorType.TargetError,
-                      cxrOpt    = cxr.some
+                      target           = submission,
+                      errorType        = ErrorType.TargetError,
+                      cxrOpt           = cxr.some,
+                      tunnelProperties = p.tunnelProperties
                     )
                   ),
-                  Left(cxr.some)
+                  Left(cxr.some),
+                  p.tunnelProperties
                 )
               case Some(instanceToUpdate) =>
                 // Whether the destination node is the root element of an instance
@@ -225,12 +237,14 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
                       message          = "targetref attribute must point to instance root element when using read-only instance replacement.",
                       description      = "processing targetref attribute",
                       submitErrorEvent = new XFormsSubmitErrorEvent(
-                        target    = submission,
-                        errorType = ErrorType.TargetError,
-                        cxrOpt    = cxr.some
+                        target           = submission,
+                        errorType        = ErrorType.TargetError,
+                        cxrOpt           = cxr.some,
+                        tunnelProperties = p.tunnelProperties
                       )
                     ),
-                    Left(cxr.some)
+                    Left(cxr.some),
+                    p.tunnelProperties
                   )
                 } else {
                   implicit val detailsLogger  = submission.getDetailsLogger(p, p2)
@@ -315,7 +329,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
                     // - doDelete() does as well
                     // Does this mean that we should check that the node is still where it should be?
                   }
-                  ReplaceResult.SendDone(cxr)
+                  ReplaceResult.SendDone(cxr, p.tunnelProperties)
                 }
             }
         }

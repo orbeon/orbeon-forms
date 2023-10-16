@@ -28,7 +28,7 @@
         <xbl:handlers>
             <xbl:handler event="fr-show xxforms-dialog-open" phase="target">
                 <xf:setvalue if="event('message')"           ref="message"         value="event('message')"/>
-                <xf:setvalue if="event('message-is-html')"   ref="message-is-html" value="event('message-is-html')"/>
+                <xf:setvalue                                 ref="message-is-html" value="(xs:boolean(event('message-is-html')), false())[1]"/>
                 <xf:setvalue if="event('context')"           ref="context"         value="event('context')"/>
                 <xf:setvalue if="event('positive-targetid')" ref="positive"        value="event('positive-targetid')"/>
                 <xf:setvalue if="event('negative-targetid')" ref="negative"        value="event('negative-targetid')"/>
@@ -60,7 +60,7 @@
                         <open-count/>
                     </_>
                 </xf:instance>
-                <xf:bind ref="message-is-html" type="xs:boolean" xxf:default="false()"/>
+                <xf:bind ref="message-is-html" type="xs:boolean"/>
                 <xf:bind ref="open-count"      type="xs:integer" xxf:default="0"/>
             </xf:model>
         </xbl:implementation>

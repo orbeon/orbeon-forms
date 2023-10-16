@@ -1008,7 +1008,7 @@ object FormBuilderXPathApi {
         )
       ) match {
         case Success(it) if it.nonEmpty => true
-        case Success(it)                => false
+        case Success(_)                 => false
         case Failure(_)                 => false // The user expression can be incorrect in the UI. We ignore it
                                                  // here and UI validation should inform the user.
       }

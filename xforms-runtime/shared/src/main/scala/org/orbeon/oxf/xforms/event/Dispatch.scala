@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, PartEventH
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{PartGlobalOps, XFormsContainingDocument, XFormsContextStack}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContextStack}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
@@ -62,7 +62,12 @@ object Dispatch extends Logging {
       var statHandleEvent = 0
       var statNativeHandlers = 0
 
-      def eventLogging = Seq("name" -> event.name, "target" -> target.getEffectiveId, "location" -> (Option(event.locationData) map (_.toString) orNull))
+      def eventLogging =
+        List(
+          "name"     -> event.name,
+          "target"   -> target.getEffectiveId,
+          "location" -> Option(event.locationData).map(_.toString).orNull
+        )
 
       // Ask the target for the handlers associated with the event name
       val (performDefaultAction, handlers) = {
@@ -113,7 +118,7 @@ object Dispatch extends Logging {
             // All ancestor observers (not filtered by scope) gathered lazily so that if there is nothing
             // to do for capture and bubbling, we don't compute them.
             lazy val ancestorObservers =
-              Iterator.iterate(target.parentEventObserver)(_.parentEventObserver) takeWhile (_ ne null) toList
+              Iterator.iterate(target.parentEventObserver)(_.parentEventObserver).takeWhile(_ ne null).toList
 
             // Capture phase
             handlers.get(Phase.Capture) foreach (doPhase(ancestorObservers.reverse, _, Phase.Capture))
@@ -204,7 +209,7 @@ object Dispatch extends Logging {
     replaceIdSuffix(result.getEffectiveId, newSuffix)
   }
 
-  def handleEvent(
+  private def handleEvent(
     eventHandler   : EventHandler,
     eventObserver  : XFormsEventTarget,
     event          : XFormsEvent)(implicit

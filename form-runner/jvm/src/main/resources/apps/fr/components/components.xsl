@@ -1072,6 +1072,7 @@
                     window.parent.ORBEON.xforms.Document.dispatchEvent(
                         {
                             targetId:   'fr-form-model',
+                            form: window.parent.document.querySelector('form'),
                             eventName:  'fb-test-pdf-with-data',
                             properties: { 'fr-form-data': data, 'language': lang }
                         }

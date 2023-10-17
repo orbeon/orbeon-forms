@@ -849,9 +849,11 @@
                                                     name="useFormData"
                                                     value="event('use-form-data')"/>
                                                 <xf:body>
-                                                    window.document.querySelector("iframe.fb-test-iframe").contentWindow.ORBEON.xforms.Document.dispatchEvent(
+                                                    const contentWindow = window.document.querySelector("iframe.fb-test-iframe").contentWindow;
+                                                    contentWindow.ORBEON.xforms.Document.dispatchEvent(
                                                         {
                                                             targetId:  'fr-form-model',
+                                                            form: contentWindow.document.querySelector('form'),
                                                             eventName: 'fb-test-pdf-prepare-data',
                                                             properties: { 'use-form-data': useFormData }
                                                         }

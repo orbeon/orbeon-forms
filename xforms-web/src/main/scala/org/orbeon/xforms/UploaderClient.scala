@@ -40,7 +40,7 @@ object UploaderClient {
 
   // Once we are done processing the events (either because the uploads have been completed or canceled), handle the
   // remaining events.
-  def continueWithRemainingEvents(): Unit = {
+  private def continueWithRemainingEvents(): Unit = {
     currentEventOpt foreach (_.upload.uploadDone())
     currentEventOpt = None
     currentAbortControllerOpt = None
@@ -58,7 +58,7 @@ object UploaderClient {
   // the status of the upload. Initially, it is called by `UploadServer` when it sends the file. Then, it is called
   // by the upload control, when it receives a progress update, as we only want to ask for an updated progress after
   // we get an answer from the server.
-  def askForProgressUpdate(currentForm: xforms.Form): Unit =
+  private def askForProgressUpdate(currentForm: xforms.Form): Unit =
     // Keep asking for progress update at regular interval until there is no upload in progress
     js.timers.setTimeout(currentForm.configuration.delayBeforeUploadProgressRefresh) {
       currentEventOpt foreach { processingEvent =>

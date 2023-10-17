@@ -295,7 +295,6 @@
 
     </xsl:function>
 
-
     <!--
         Update actions so that the implementation of the actions is up to date. Forms generated with Form Builder
         prior to this change embed a specific implementation of the actions. Forms generated after this change

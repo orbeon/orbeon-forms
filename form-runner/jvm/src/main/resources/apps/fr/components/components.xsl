@@ -866,7 +866,7 @@
             </xsl:choose>
 
             <!-- Parameters passed to this page -->
-            <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->
+            <!-- NOTE: the `<document>` and `mode` elements may be modified, so we don't set this as read-only -->
             <xf:instance id="fr-parameters-instance" src="input:instance"/>
             <!-- Internally, at the XForms level, reduce modes so as to avoid checking everywhere for a new mode -->
             <xf:bind

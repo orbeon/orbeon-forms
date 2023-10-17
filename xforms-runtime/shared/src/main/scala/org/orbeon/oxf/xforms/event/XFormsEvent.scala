@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
 import org.orbeon.oxf.xml.{SaxonUtils, SaxonUtilsDependsOnXPath}
 import org.orbeon.saxon.om._
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{SimplePropertyValue, XFormsId}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.Phase
 import shapeless.syntax.typeable._
@@ -74,8 +74,11 @@ abstract class XFormsEvent(
   private lazy val allProperties = getters(this, XFormsEvent.Getters) orElse lazyProperties orElse properties
   def lazyProperties: PropertyGetter = EmptyGetter
 
+  def actionProperties: Option[ActionPropertyGetter] =
+    properties.narrowTo[ActionPropertyGetter]
+
   def tunnelProperties: Option[TunnelProperties] =
-    properties.narrowTo[ActionPropertyGetter].map(_.tunnelProperties)
+    actionProperties.map(_.tunnelProperties)
 
   // Mutable phase and observer as the event is being dispatched
   private var _currentPhase: Phase = _
@@ -149,11 +152,12 @@ object XFormsEvent {
   val EmptyGetter: PropertyGetter = Map.empty
 
   type TunnelProperties = PropertyGetter
+  type SimpleProperties = List[SimplePropertyValue]
 
   case class PropertyValue(
     name  : String,
     value : Option[Any],
-    tunnel: Boolean
+    tunnel: Boolean = false
   )
 
   class ActionPropertyGetter(props: List[PropertyValue]) extends PropertyGetter {
@@ -163,6 +167,17 @@ object XFormsEvent {
 
     def tunnelProperties: TunnelProperties =
       new ActionPropertyGetter(props.filter(_.tunnel))
+
+    def simpleProperties: SimpleProperties =
+      for {
+        p <- props
+        v <- p.value
+        s <- v match {
+          case s: String => Some(s)
+          case _         => None
+        }
+      } yield
+        SimplePropertyValue(p.name, s, p.tunnel)
   }
 
   // Can we benefit from Scala 2.10's applyOrElse here?

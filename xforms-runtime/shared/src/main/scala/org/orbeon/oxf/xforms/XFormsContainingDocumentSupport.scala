@@ -695,7 +695,8 @@ trait ContainingDocumentDelayedEvents {
       showProgress           = p.showProgress,
       browserTarget          = p.target,
       submissionId           = CoreCrossPlatformSupport.randomHexId.some,
-      isResponseResourceType = p.isResponseResourceType
+      isResponseResourceType = p.isResponseResourceType,
+      properties             = p.properties
     )
 
   def findTwoPassSubmitEvents: List[DelayedEvent] =
@@ -713,7 +714,8 @@ trait ContainingDocumentDelayedEvents {
     cancelable        : Boolean,
     time              : Long,
     showProgress      : Boolean,
-    allowDuplicates   : Boolean // 2020-07-24: used by `xf:dispatch` and `false` for `xxforms-poll`
+    allowDuplicates   : Boolean, // 2020-07-24: used by `xf:dispatch` and `false` for `xxforms-poll`
+    properties        : SimpleProperties
   ): Unit = {
 
     // For `xxforms-poll`, we *could* attempt to preserve the earlier time. But currently,
@@ -732,7 +734,8 @@ trait ContainingDocumentDelayedEvents {
         showProgress           = showProgress,
         browserTarget          = None,
         submissionId           = None,
-        isResponseResourceType = false
+        isResponseResourceType = false,
+        properties             = properties
       )
   }
 
@@ -778,7 +781,10 @@ trait ContainingDocumentDelayedEvents {
                   XFormsEventFactory.createEvent(
                     eventName  = dueEvent.eventName,
                     target     = eventTarget,
-                    properties = EmptyGetter, // NOTE: We don't support properties for delayed events yet.
+                    properties = new PartialFunction[String, Option[Any]] {
+                      def isDefinedAt(key: String): Boolean = dueEvent.properties.exists(_.name == key)
+                      def apply(key: String): Option[Any] = dueEvent.properties.collectFirst { case SimplePropertyValue(`key`, value, _) => value }
+                    },
                     bubbles    = dueEvent.bubbles,
                     cancelable = dueEvent.cancelable
                   )

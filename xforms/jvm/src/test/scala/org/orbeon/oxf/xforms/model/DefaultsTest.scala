@@ -17,6 +17,7 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
@@ -181,7 +182,7 @@ class DefaultsTest
 
           // Replace `oldvalue` with `newvalue` but do not recompute defaults
           withAction {
-            sendThrowOnError("replace-element-submission", Map("defaults" -> Some("false")))
+            sendThrowOnError("replace-element-submission", List(PropertyValue("defaults", Some("false"))))
           }
 
           assert(instance.rootElement / "oldvalue" isEmpty)
@@ -190,14 +191,14 @@ class DefaultsTest
 
           // Replace `oldvalue` with `newvalue` and recompute defaults
           withAction {
-            sendThrowOnError("replace-element-submission", Map("defaults" -> Some("true")))
+            sendThrowOnError("replace-element-submission", List(PropertyValue("defaults", Some("true"))))
           }
 
           assert("2" === (instance.rootElement / "newvalue" stringValue))
 
           // Replace entire instance and do not recompute defaults
           withAction {
-            sendThrowOnError("replace-entire-instance-submission", Map("defaults" -> Some("false")))
+            sendThrowOnError("replace-entire-instance-submission", List(PropertyValue("defaults", Some("false"))))
           }
 
           assert("" === (instance.rootElement / "some" stringValue))
@@ -205,7 +206,7 @@ class DefaultsTest
 
           // Replace entire instance and recompute defaults
           withAction {
-            sendThrowOnError("replace-entire-instance-submission", Map("defaults" -> Some("true")))
+            sendThrowOnError("replace-entire-instance-submission", List(PropertyValue("defaults", Some("true"))))
           }
 
           assert("2" === (instance.rootElement / "some" stringValue))

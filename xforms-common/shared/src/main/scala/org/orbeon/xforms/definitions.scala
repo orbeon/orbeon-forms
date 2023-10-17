@@ -95,6 +95,12 @@ case class Load(
   def isJavaScript: Boolean = resource.trim.startsWith("javascript:")
 }
 
+case class SimplePropertyValue(
+  name  : String,
+  value : String,
+  tunnel: Boolean
+)
+
 case class DelayedEvent(
   eventName              : String,
   targetEffectiveId      : String,
@@ -104,5 +110,6 @@ case class DelayedEvent(
   showProgress           : Boolean,        // whether to show the progress indicator when submitting the event
   browserTarget          : Option[String], // optional browser target for submit events
   submissionId           : Option[String],
-  isResponseResourceType : Boolean
+  isResponseResourceType : Boolean,
+  properties             : List[SimplePropertyValue]
 )

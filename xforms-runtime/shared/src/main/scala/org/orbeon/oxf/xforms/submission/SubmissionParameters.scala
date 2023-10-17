@@ -5,7 +5,7 @@ import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache.XPathContext
-import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
+import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, SimpleProperties, TunnelProperties}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
@@ -22,7 +22,8 @@ case class TwoPassSubmissionParameters(
   submissionEffectiveId  : String,
   showProgress           : Boolean,
   target                 : Option[String],
-  isResponseResourceType : Boolean
+  isResponseResourceType : Boolean,
+  properties             : SimpleProperties
 )
 
 object TwoPassSubmissionParameters {
@@ -32,7 +33,8 @@ object TwoPassSubmissionParameters {
       submissionEffectiveId  = submissionEffectiveId,
       showProgress           = p.xxfShowProgress,
       target                 = p.xxfTargetOpt,
-      isResponseResourceType = p.resolvedIsResponseResourceType
+      isResponseResourceType = p.resolvedIsResponseResourceType,
+      properties             = p.actionProperties.map(_.simpleProperties).getOrElse(Nil)
     )
 }
 
@@ -59,8 +61,11 @@ case class SubmissionParameters(
   resolvedIsResponseResourceType : Boolean,
   xxfTargetOpt                   : Option[String],
   xxfShowProgress                : Boolean,
-  tunnelProperties               : Option[TunnelProperties]
-)
+  actionProperties               : Option[ActionPropertyGetter]
+) {
+  def tunnelProperties: Option[TunnelProperties] =
+    actionProperties.map(_.tunnelProperties)
+}
 
 object SubmissionParameters {
 
@@ -72,7 +77,7 @@ object SubmissionParameters {
 
   def apply(
     eventNameOpt    : Option[String],
-    tunnelProperties: Option[TunnelProperties]
+    actionProperties: Option[ActionPropertyGetter]
   )(implicit
     dynamicSubmission: XFormsModelSubmission
   ): SubmissionParameters = {
@@ -91,7 +96,7 @@ object SubmissionParameters {
           target           = dynamicSubmission,
           errorType        = ErrorType.NoData,
           cxrOpt           = None,
-          tunnelProperties = tunnelProperties
+          tunnelProperties = actionProperties.map(_.tunnelProperties)
         )
       )
 
@@ -121,7 +126,7 @@ object SubmissionParameters {
     }
 
     // TODO: We pass a Clark name, but we don't process this correctly!
-    val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(resolvedMethodClarkName, tunnelProperties)
+    val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(resolvedMethodClarkName, actionProperties)
     val resolvedMediatypeOpt = staticSubmission.avtMediatypeOpt flatMap stringAvtTrimmedOpt
 
     val serializationOpt = staticSubmission.avtSerializationOpt flatMap stringAvtTrimmedOpt
@@ -137,7 +142,7 @@ object SubmissionParameters {
           target           = dynamicSubmission,
           errorType        = ErrorType.NoData,
           cxrOpt           = None,
-          tunnelProperties = tunnelProperties
+          tunnelProperties = actionProperties.map(_.tunnelProperties)
         )
       )
 
@@ -271,13 +276,13 @@ object SubmissionParameters {
       resolvedIsResponseResourceType = resolvedIsResponseResourceType,
       xxfTargetOpt                   = resolvedXxfTargetOpt,
       xxfShowProgress                = resolvedXxfShowProgress,
-      tunnelProperties               = tunnelProperties
+      actionProperties               = actionProperties
     )
   }
 
   private def actualHttpMethodFromXFormsMethodName(
-    methodName       : String,
-    tunnelProperties : Option[TunnelProperties]
+    methodName      : String,
+    actionProperties: Option[ActionPropertyGetter]
   )(implicit
     dynamicSubmission: XFormsModelSubmission
   ): HttpMethod =
@@ -293,7 +298,7 @@ object SubmissionParameters {
             target           = dynamicSubmission,
             errorType        = ErrorType.XXFormsMethodError,
             cxrOpt           = None,
-            tunnelProperties = tunnelProperties
+            tunnelProperties = actionProperties.map(_.tunnelProperties)
           )
         )
     }

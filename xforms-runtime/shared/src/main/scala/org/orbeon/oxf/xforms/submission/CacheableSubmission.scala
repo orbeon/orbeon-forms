@@ -170,7 +170,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
             }
         }
 
-        submitEval(p, p2, eval.map(_ -> p.tunnelProperties)) // returns `None` if the execution is deferred
+        submitEval(p, p2, eval.map(_ -> p.actionProperties)) // returns `None` if the execution is deferred
     }
   }
 

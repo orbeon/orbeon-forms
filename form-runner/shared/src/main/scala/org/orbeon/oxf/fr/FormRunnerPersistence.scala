@@ -38,6 +38,7 @@ import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.StringValue
@@ -691,13 +692,13 @@ trait FormRunnerPersistence {
       }
 
     def saveXmlData(migratedData: DocumentNodeInfoType) =
-      sendThrowOnError("fr-create-update-submission", Map(
-        "holder"         -> Some(migratedData.rootElement),
-        "resource"       -> Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
-        "username"       -> username,
-        "password"       -> password,
-        "form-version"   -> formVersion,
-        "workflow-stage" -> workflowStage
+      sendThrowOnError("fr-create-update-submission", List(
+        PropertyValue("holder"        , Some(migratedData.rootElement)),
+        PropertyValue("resource"      , Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString))),
+        PropertyValue("username"      , username),
+        PropertyValue("password"      , password),
+        PropertyValue("form-version"  , formVersion),
+        PropertyValue("workflow-stage", workflowStage),
       ))
 
     // First upload the attachments

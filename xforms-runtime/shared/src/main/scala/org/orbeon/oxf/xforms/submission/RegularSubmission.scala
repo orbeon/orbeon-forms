@@ -146,6 +146,6 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
       }
     }
 
-    submitEval(p, p2, connectionResultEval flatMap processSubmissionResultEval map (_ -> p.tunnelProperties))
+    submitEval(p, p2, connectionResultEval flatMap processSubmissionResultEval map (_ -> p.actionProperties))
   }
 }

@@ -112,7 +112,7 @@ object XFormsAction {
   def eventProperties(
     actionInterpreter : XFormsActionInterpreter,
     actionAnalysis    : ActionTrait
-  ): PropertyGetter = {
+  ): ActionPropertyGetter = {
 
     val contextStack = actionInterpreter.actionXPathContext
 
@@ -123,7 +123,7 @@ object XFormsAction {
         }
 
     // Iterate over context information if any
-    val tuples =
+    val propertyValues =
       for {
         property <- properties
 
@@ -179,6 +179,6 @@ object XFormsAction {
       } yield
         PropertyValue(name, Option(value), tunnel)
 
-    new ActionPropertyGetter(tuples)
+    new ActionPropertyGetter(propertyValues)
   }
 }

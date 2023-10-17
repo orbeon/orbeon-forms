@@ -214,7 +214,7 @@ trait FormRunnerActionsCommon {
   def tryRelinquishLease(params: ActionParams): Try[Any] = Try {
     val leaseState = frc.persistenceInstance.rootElement / "lease-state"
     if (leaseState.stringValue == "current-user") {
-      send("fr-relinquish-lease-submission", Map.empty)(_ => ())
+      sendThrowOnError("fr-relinquish-lease-submission", Nil)
       setvalue(leaseState, "relinquished")
     }
   }

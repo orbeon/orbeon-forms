@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, PropertyValue}
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.scaxon.Implicits._
@@ -289,7 +290,10 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       debug(s"`send` action sending submission", evaluatedSendPropertiesWithUpdates.iterator collect { case (k, Some(v)) => k -> v } toList)
 
-      sendThrowOnError(s"fr-send-submission", evaluatedSendPropertiesWithUpdates)
+      sendThrowOnError(
+        s"fr-send-submission",
+        evaluatedSendPropertiesWithUpdates.map{ case (k, v) => PropertyValue(k, v) }.toList
+      )
     }
 
   private def tryChangeMode(

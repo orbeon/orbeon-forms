@@ -554,6 +554,9 @@
         <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
         <xf:send submission="{$service-name}-submission">
             <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+            <xsl:if test="exists(@async[. = ('true', 'false')])">
+                <xf:property name="fr-async" value="{@async}"/>
+            </xsl:if>
         </xf:send>
 
     </xsl:template>

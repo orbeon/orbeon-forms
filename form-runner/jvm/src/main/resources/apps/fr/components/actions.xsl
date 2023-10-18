@@ -506,6 +506,9 @@
                     <xsl:attribute name="replace">instance</xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
+            <xsl:if test="empty(@mode)">
+                <xsl:attribute name="mode">{(event('fr-async'), 'synchronous')[1]}</xsl:attribute>
+            </xsl:if>
             <!-- https://github.com/orbeon/orbeon-forms/issues/4606 -->
             <xsl:apply-templates select="xf:header"/>
         </xsl:copy>

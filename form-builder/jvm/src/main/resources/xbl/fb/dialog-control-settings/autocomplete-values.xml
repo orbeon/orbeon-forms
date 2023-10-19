@@ -21,7 +21,6 @@
         <autocomplete value="bday-month" sub-value-of="bday" disabled="true"/>
         <autocomplete value="bday-year"  sub-value-of="bday" disabled="true"/>
         <autocomplete value="sex"/>
-        <autocomplete value="url"                            disabled="true"/>
         <autocomplete value="photo"                          disabled="true"/>
     </group>
     <group name="autocomplete.groups.name">
@@ -64,6 +63,7 @@
         <autocomplete value="tel-local-suffix" sub-value-of="tel-local"    disabled="true"/>
         <autocomplete value="tel-extension"/>
         <autocomplete value="email"/>
+        <autocomplete value="url"/>
         <autocomplete value="impp"                                         disabled="true"/>
     </group>
     <group name="autocomplete.groups.payment"                           disabled="true">

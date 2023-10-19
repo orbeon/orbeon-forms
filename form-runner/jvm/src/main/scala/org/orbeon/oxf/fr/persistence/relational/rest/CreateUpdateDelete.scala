@@ -374,9 +374,11 @@ trait CreateUpdateDelete {
     }
 
     val deletingDataDraft = delete && req.dataPart.exists(_.isDraft)
-    val lastModifiedOpt = ! deletingDataDraft option {
+    val forceDelete       = delete && req.dataPart.exists(_.forceDelete)
 
-      // Do insert, unless we're deleting draft data
+    val lastModifiedOpt = (! deletingDataDraft && ! forceDelete) option {
+
+      // Do insert, unless we're deleting draft data or force deleting
 
       val currentTimestamp = new Timestamp(System.currentTimeMillis())
 

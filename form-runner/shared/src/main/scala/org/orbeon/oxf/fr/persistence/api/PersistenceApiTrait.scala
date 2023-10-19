@@ -277,7 +277,9 @@ trait PersistenceApiTrait {
       PathUtils.recombineQuery(
         path,
         (forceDelete list ("force-delete" -> true.toString)) :::
-        modifiedTimeOpt.toList.map(modifiedTime => "last-modified-time" -> modifiedTime.toString)
+        modifiedTimeOpt.toList.map(modifiedTime => "last-modified-time" -> modifiedTime.toString),
+        // Overwrite last-modified-time parameter (might already exist if we got the URL from the history API)
+        overwrite = true
       )
 
     val cxr =
@@ -291,10 +293,16 @@ trait PersistenceApiTrait {
       cxr.close()
       None
     } else {
-      ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = true) { _ =>
+      val lastModificationDateOpt = ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = true) { _ =>
         headerFromRFC1123OrIso(cxr.headers, Headers.OrbeonLastModified, Headers.LastModified)
-          .getOrElse(throw HttpStatusCodeException(StatusCode.InternalServerError)).some // require implementation to return modified date
-      } .get // can throw
+      }.get // can throw
+
+      if (lastModificationDateOpt.isEmpty && ! forceDelete) {
+        // require implementation to return modified date, unless we're force deleting
+        throw HttpStatusCodeException(StatusCode.InternalServerError)
+      }
+
+      lastModificationDateOpt
     }
   }
 

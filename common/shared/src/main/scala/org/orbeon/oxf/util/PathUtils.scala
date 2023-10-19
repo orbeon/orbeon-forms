@@ -56,8 +56,20 @@ object PathUtils {
   }
 
   // Recombine a path/query and parameters into a resulting URL
-  def recombineQuery(pathQuery: String, params: IterableOnce[(String, String)])(implicit ed: UrlEncoderDecoder): String =
-    pathQuery + (if (params.toIterator.isEmpty) "" else (if (pathQuery.contains("?")) "&" else "?") + encodeSimpleQuery(params))
+  def recombineQuery(pathQuery: String, params: IterableOnce[(String, String)], overwrite: Boolean = false)(implicit ed: UrlEncoderDecoder): String = {
+    val paramsToAdd                         = params.toList
+    val (pathWithoutParams, existingParams) = splitQueryDecodeParams(pathQuery)
+
+    val allParams =
+      if (overwrite) {
+        val paramsToAddKeys = paramsToAdd.map(_._1).toSet
+        existingParams.filterNot(kv => paramsToAddKeys.contains(kv._1)) ++ paramsToAdd
+      } else {
+        existingParams ++ paramsToAdd
+      }
+
+    pathWithoutParams + (if (allParams.isEmpty) "" else "?" + encodeSimpleQuery(allParams))
+  }
 
   // Decode a query string into a list of pairs
   // We assume that there are no spaces in the input query

@@ -124,7 +124,7 @@ private object CRUD {
         val lastModifiedOpt = httpRequest.getFirstParamAsString("last-modified-time").flatMap(_.trimAllToOpt).map(Instant.parse) // xxx TODO constant
 
         val forceDelete =
-          httpRequest.getMethod == HttpMethod.DELETE &&
+          (httpRequest.getMethod == HttpMethod.DELETE || httpRequest.getMethod == HttpMethod.HEAD) &&
             httpRequest.getFirstParamAsString("force-delete").flatMap(_.trimAllToOpt).contains(true.toString)
 
         if (forceDelete && (

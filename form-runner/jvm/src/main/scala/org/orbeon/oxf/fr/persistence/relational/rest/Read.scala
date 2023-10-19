@@ -286,8 +286,9 @@ trait Read {
 
           // We can't always return a 403 instead of a 410/404, so we decided it's OK to divulge to unauthorized
           // users that the data exists or existed
-          val deleted = resultSet.getString("deleted") == "Y"
-          if (deleted)
+          val deleted     = resultSet.getString("deleted") == "Y"
+          val forceDelete = req.dataPart.exists(_.forceDelete)
+          if (deleted && ! forceDelete)
             throw HttpStatusCodeException(StatusCode.Gone)
 
           // Check version if specified

@@ -109,7 +109,7 @@ object SecondPassParameters {
       val isRequestedAsynchronousMode =
         staticSubmission.avtModeOpt flatMap stringAvtTrimmedOpt contains Asynchronous
 
-      // For now we don't support replace="all"
+      // For now we don't support `replace="all"`
       if (isRequestedAsynchronousMode && p.replaceType == ReplaceType.All)
         throw new XFormsSubmissionException(
           submission  = dynamicSubmission,

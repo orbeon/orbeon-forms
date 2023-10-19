@@ -332,7 +332,7 @@ object AjaxClient {
 
     def unpause(): Unit = {
       paused = false
-      updateQueueSchedule()
+      EventQueue.updateQueueSchedule()
     }
   }
 
@@ -364,7 +364,7 @@ object AjaxClient {
       result.future
     }
 
-    def handleResponse(
+    private def handleResponse(
       responseXML        : dom.Document,
       currentForm        : xforms.Form,
       requestSequenceOpt : Option[Int],

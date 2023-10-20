@@ -208,6 +208,20 @@
         </xsl:copy>
     </xsl:template>
 
+    <xsl:template match="fr:attachment" mode="within-controls">
+        <xsl:param name="binds-root" tunnel="yes"/>
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()"/>
+            <xsl:variable name="bind-id" select="@bind"/>
+            <xsl:variable name="bind"    select="$binds-root//xf:bind[@id = $bind-id]"/>
+            <xsl:variable name="xpaths"  select="$bind/@constraint, $bind/xf:constraint/@value"/>
+            <xsl:variable name="hint"    select="frf:knownConstraintsToAutomaticHint($xpaths)"/>
+            <xsl:if test="p:non-blank($hint)">
+                <xf:hint ref="{$hint}"/>
+            </xsl:if>
+        </xsl:copy>
+    </xsl:template>
+
     <xsl:function name="fr:build-template-param-map">
         <xsl:param name="params"                                as="element(*)*"/>
         <xsl:param name="library-name"                          as="xs:string?"/>

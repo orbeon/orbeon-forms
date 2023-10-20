@@ -17,12 +17,14 @@ import org.orbeon.dom
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xml.NamespaceMapping
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.jdk.CollectionConverters._
@@ -32,6 +34,9 @@ class FormRunnerFunctionsTest
   extends DocumentTestBase
      with ResourceManagerSupport
      with AnyFunSpecLike {
+
+  private val Logger = LoggerFactory.createLogger(classOf[FormRunnerFunctionsTest])
+  private implicit val indentedLogger: IndentedLogger = new IndentedLogger(Logger)
 
   describe("Persistence headers") {
 
@@ -248,5 +253,50 @@ class FormRunnerFunctionsTest
         }
       }
     }
+  }
+
+  describe("Analyze known constraint") {
+
+    import FormRunnerCommonConstraint.analyzeKnownConstraint
+    import org.orbeon.oxf.xml.XMLConstants._
+    import org.orbeon.xforms.XFormsNames._
+
+    val Library = XFormsFunctionLibrary
+
+    val Mapping =
+      NamespaceMapping(
+        Map(
+          XFORMS_PREFIX        -> XFORMS_NAMESPACE_URI,
+          XFORMS_SHORT_PREFIX  -> XFORMS_NAMESPACE_URI,
+          XXFORMS_PREFIX       -> XXFORMS_NAMESPACE_URI,
+          XXFORMS_SHORT_PREFIX -> XXFORMS_NAMESPACE_URI,
+          XSD_PREFIX           -> XSD_URI
+        )
+      )
+
+    //val Logger  = new IndentedLogger(LoggerFactory.createLogger(classOf[FormBuilderFunctionsTest]), true)
+
+    val data = List(
+      (Some("max-length"        -> Some("5"))                                             , "xxf:max-length(5)"),
+      (Some("min-length"        -> Some("5"))                                             , "xxf:min-length(5)"),
+      (Some("min-length"        -> Some("5"))                                             , "xxf:min-length('5')"),
+      (Some("min-length"        -> Some("5"))                                             , "(xxf:min-length(5))"),
+      (Some("non-negative"      -> None)                                                  , "(xxf:non-negative())"),
+      (Some("negative"          -> None)                                                  , "(xxf:negative())"),
+      (Some("non-positive"      -> None)                                                  , "(xxf:non-positive())"),
+      (Some("positive"          -> None)                                                  , "(xxf:positive())"),
+      (Some("upload-max-size"   -> Some("3221225472"))                                    , "xxf:upload-max-size(3221225472)"),
+      (Some("upload-mediatypes" -> Some("image/jpeg application/pdf"))                    , "xxf:upload-mediatypes('image/jpeg application/pdf')"),
+      (Some("min-length"        -> Some("foo"))                                           , "xxf:min-length(foo)"),
+      (Some("excluded-dates"    -> Some("xs:date('2018-11-29')"))                         , "xxf:excluded-dates(xs:date('2018-11-29'))"),
+      (Some("excluded-dates"    -> Some("xs:date('2018-11-29')"))                         , "xxf:excluded-dates((xs:date('2018-11-29')))"),
+      (Some("excluded-dates"    -> Some("xs:date('2018-11-29'), xs:date('2018-12-02')"))  , "xxf:excluded-dates((xs:date('2018-11-29'), xs:date('2018-12-02')))"),
+      (None                                                                              , "xxf:foobar(5)")
+    )
+
+    for ((expected, expr) <- data)
+      it(s"must pass checking `$expr`") {
+        assert(expected === analyzeKnownConstraint(expr, Mapping, Library))
+      }
   }
 }

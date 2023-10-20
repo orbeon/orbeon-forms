@@ -16,7 +16,7 @@ package org.orbeon.oxf.fb
 import cats.syntax.option._
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.Names
+import org.orbeon.oxf.fr.{FormRunnerCommonConstraint, Names}
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -481,7 +481,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       // NOTE: We use the namespaces in scope on the model, not the bind containing the constraint. This is
       // a simplification and implies a constraint that there are no new namespace declarations on binds
       // compared to the model.
-      val analyzed = CommonConstraint.analyzeKnownConstraint(
+      val analyzed = FormRunnerCommonConstraint.analyzeKnownConstraint(
         expression,
         ctx.formBuilderModel.getOrElse(throw new IllegalStateException).staticModel.namespaceMapping,
         inScopeContainingDocument.functionLibrary

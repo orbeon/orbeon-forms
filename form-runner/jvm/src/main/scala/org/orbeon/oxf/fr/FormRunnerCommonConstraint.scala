@@ -11,21 +11,24 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.fb
+package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{IndentedLogger, XPath}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, XPath}
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunction
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
+import org.orbeon.oxf.xml.XMLConstants.{XSD_PREFIX, XSD_URI}
 import org.orbeon.saxon.expr.{Expression, Literal}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.value._
+import org.orbeon.xforms.XFormsNames.{XFORMS_NAMESPACE_URI, XFORMS_PREFIX, XFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI, XXFORMS_PREFIX, XXFORMS_SHORT_PREFIX}
 import org.orbeon.xml.NamespaceMapping
 
 import scala.util.Try
 
-object CommonConstraint {
+object FormRunnerCommonConstraint {
 
   def analyzeKnownConstraint(
     xpathString      : String,

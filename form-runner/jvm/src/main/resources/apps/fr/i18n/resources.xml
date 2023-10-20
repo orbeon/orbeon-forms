@@ -331,6 +331,13 @@
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>Please check your answer to the CAPTCHA challenge</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size>Files must be under {0}.</upload-max-size>
+                <upload-mediatypes>Only {0} files are accepted.</upload-mediatypes>
+                <upload-image>image</upload-image>
+                <upload-video>video</upload-video>
+                <upload-audio>audio</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     This is a read-only view of your data.
@@ -941,6 +948,13 @@
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>Veuillez vérifier votre réponse au défi CAPTCHA</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size>La taille des fichiers doit être inférieurs à {0}.</upload-max-size>
+                <upload-mediatypes>Seuls les {0} sont acceptés.</upload-mediatypes>
+                <upload-image>image</upload-image>
+                <upload-video>vidéo</upload-video>
+                <upload-audio>audio</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Ceci est une vue en lecture seule de vos données.
@@ -1543,6 +1557,13 @@
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>El valor ingresado es diferente a la imagen, intentelo nuevamente</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Vista de lectura solamente.
@@ -2162,6 +2183,13 @@
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>El valor ingressat és diferent de la imatge, torni a intentar-lo</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Vista de només lectura.
@@ -6403,6 +6431,13 @@
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>De ingevoerde waarde komt niet overeen met de afbeelding, probeer opnieuw</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Dit is een alleen-lezen weergave van uw gegevens.
@@ -7609,6 +7644,13 @@
                 <captcha-label>Captcha</captcha-label>
                 <captcha-alert>De tegn du indtastede passede ikke med billedet - prøv igen</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Dette er en skrivebeskyttet version af dine data.
@@ -8212,6 +8254,13 @@
                 <captcha-label>Captcha</captcha-label>
                 <captcha-alert>Wprowadzona wartość nie zgadza się z obrazem, spróbuj ponownie.</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     To jest podgląd Twoich danych w trybie tylko do odczytu.

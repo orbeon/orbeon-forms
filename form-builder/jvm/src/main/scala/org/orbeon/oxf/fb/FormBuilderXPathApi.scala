@@ -266,11 +266,12 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def setControlLabelHintHelpOrTextForAllLangs(
-    controlName: String,
-    lhht: String,
-    values: Array[NodeInfo],
-    params: Array[NodeInfo],
-    isHTML: Boolean
+    controlName : String,
+    lhht        : String,
+    values      : Array[NodeInfo],
+    params      : Array[NodeInfo],
+    isHTML      : Boolean,
+    automatic   : String
   ): Unit = settingControlLabelHintHelpOrText(controlName, lhht) { implicit ctx: FormBuilderDocContext =>
 
     val langValues = values.map { nodeInfo =>
@@ -281,7 +282,9 @@ object FormBuilderXPathApi {
 
     FormBuilder.setControlResourcesWithLang(controlName, lhht, langValues)
     setControlLHHATParams(controlName, lhht, params)
-    setHTMLMediatype(getControlLhhat(controlName, lhht), isHTML)
+    val lhhaElems = getControlLhhat(controlName, lhht)
+    setHTMLMediatype(lhhaElems, isHTML)
+    setAutomatic(lhhaElems, automatic.toBooleanOption)
   }
 
   // Set the control's items for all languages
@@ -502,6 +505,13 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def isControlLhhatHtmlMediatype(controlName: String, lhha: String): Boolean =
     FormBuilder.isControlLhhatHtmlMediatype(controlName, lhha)(FormBuilderDocContext())
+
+  //@XPathFunction
+  def controlLhhatAutomatic(controlName: String, lhha: String): String =
+    FormBuilder.isControlLhhatAutomatic(controlName, lhha)(FormBuilderDocContext()) match {
+      case Some(value) => value.toString
+      case None        => "default"
+    }
 
   //@XPathFunction
   def findNextControlId(controlName: String, previousOrNext: String): Option[String] = {

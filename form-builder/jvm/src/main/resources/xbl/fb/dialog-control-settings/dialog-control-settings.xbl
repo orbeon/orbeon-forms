@@ -180,21 +180,19 @@
 
                 <!-- Read Label/Hint/Help -->
                 <xf:action iterate="$i/(label, hint, help, text)[@supported = 'true']">
-
                     <xf:var name="lhh" value="local-name()"/>
-
                     <xf:insert
                         context="."
                         origin="fbf:getControlLhhValuesForAllLangs($i/control-name, $lhh)"/>
-
                     <xf:setvalue
                         ref="@isHTML"
                         value="if (fbf:isControlLhhatHtmlMediatype($i/control-name, $lhh)) then 'true' else ''"/>
-
+                    <xf:setvalue
+                        ref="@automatic"
+                        value="fbf:controlLhhatAutomatic($i/control-name, $lhh)"/>
                     <xf:insert
                         ref="value"
                         origin="fbf:getControlLhhtParams($i/control-name, $lhh)"/>
-
                 </xf:action>
 
                 <xf:setvalue
@@ -485,7 +483,8 @@
                                     local-name($lh),
                                     $lh/value,
                                     $lh/fr:param,
-                                    $lh/@isHTML = 'true'
+                                    $lh/@isHTML = 'true',
+                                    $lh/@automatic
                                 )
                         </xf:action>
                     </xf:action>
@@ -728,7 +727,7 @@
                             <!--<value lang=""/>-->
                             <!--<fr:param/>-->
                         </label>
-                        <hint  isHTML="" supported="">
+                        <hint  isHTML="" supported="" automatic="">
                             <!--<value lang=""/>-->
                             <!--<fr:param/>-->
                         </hint>
@@ -1638,7 +1637,6 @@
                             <xf:var
                                 name="lhh"
                                 value="local-name(context())"/>
-
                             <xf:var
                                 name="resource"
                                 value="
@@ -1648,6 +1646,17 @@
 
                             <fr:grid>
                                 <fr:c x="1" y="1" w="12">
+                                    <!-- Automatic hint for now only shown for attachment controls -->
+                                    <xf:select1 ref="@automatic[$is-attachment]" appearance="full xxf:horizontal">
+                                        <xf:label ref="$resources/automatic-hint/label"/>
+                                        <xf:hint  ref="$resources/automatic-hint/hint"/>
+                                        <xf:itemset ref="$resources/default-yes-no/item">
+                                            <xf:label ref="."/>
+                                            <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                        </xf:itemset>
+                                    </xf:select1>
+                                </fr:c>
+                                <fr:c x="1" y="2" w="12">
                                     <fr:checkbox-input ref=".[$lhh != 'text']/@isHTML">
                                         <xf:label ref="$resources/dialog-control-settings/use-html"/>
                                     </fr:checkbox-input>
@@ -1665,7 +1674,7 @@
                                         <xf:hint  ref="$resource/hint"/>
                                     </fr:tinymce>
                                 </fr:c>
-                                <fr:c x="1" y="2" w="12">
+                                <fr:c x="1" y="3" w="12">
                                     <fb:parameters-editor ref="." resources-ref="$resources" form-runner-links="true">
                                         <xf:label ref="$resources/dialog-control-settings/parameters"/>
                                     </fb:parameters-editor>

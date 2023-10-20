@@ -208,17 +208,37 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="fr:attachment" mode="within-controls">
+    <xsl:template match="fr:attachment/xf:hint[exists(@ref) and empty(text())]" mode="within-controls">
         <xsl:param name="binds-root" tunnel="yes"/>
         <xsl:copy>
-            <xsl:apply-templates select="@* | node()"/>
-            <xsl:variable name="bind-id" select="@bind"/>
+            <xsl:apply-templates select="@* except (@ref, @fr:automatic)"/>
+            <xsl:variable name="control" select=".."/>
+            <xsl:variable name="bind-id" select="$control/@bind"/>
             <xsl:variable name="bind"    select="$binds-root//xf:bind[@id = $bind-id]"/>
             <xsl:variable name="xpaths"  select="$bind/@constraint, $bind/xf:constraint/@value"/>
-            <xsl:variable name="hint"    select="frf:knownConstraintsToAutomaticHint($xpaths)"/>
-            <xsl:if test="p:non-blank($hint)">
-                <xf:hint ref="{$hint}"/>
-            </xsl:if>
+
+            <!-- XPath for the automatic hint, or empty string if it shouldn't be used  -->
+            <xsl:variable
+                name="automatic-hint"
+                select="
+                    if   (@fr:automatic = 'true')
+                    then frf:knownConstraintsToAutomaticHint($xpaths)
+                    else ''"/>
+
+            <!-- Generate `@ref` possibly combining form author provided hint with automatic hint -->
+            <xsl:attribute
+                name="ref"
+                select="
+                    if   (p:non-blank($automatic-hint))
+                    then
+                        concat(
+                            'string-join((',
+                            $automatic-hint,
+                            ', ',
+                            @ref,
+                            '), '' '')'
+                        )
+                    else @ref"/>
         </xsl:copy>
     </xsl:template>
 

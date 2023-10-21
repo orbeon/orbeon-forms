@@ -52,7 +52,7 @@ case class InstanceCaching(
     """Only XForms instances externally loaded through the src attribute may have xxf:cache="true"."""
   )
 
-  def debugPairs = Seq(
+  def debugPairs: List[(String, String)] = List(
     "timeToLive"      -> timeToLive.toString,
     "handleXInclude"  -> handleXInclude.toString,
     "sourceURI"       -> pathOrAbsoluteURI,
@@ -490,15 +490,19 @@ object XFormsInstance extends Logging {
     case Right(documentInfo) => documentInfo
   }
 
-  // Take a non-wrapped DocumentInfo and wrap it if needed
-  def wrapDocumentInfo(documentInfo: DocumentNodeInfoType, readonly: Boolean, exposeXPathTypes: Boolean): DocumentNodeInfoType = {
+  // Take a non-wrapped `DocumentInfo` and wrap it if needed
+  def wrapDocumentInfoIfNeeded(
+    documentInfo    : DocumentNodeInfoType,
+    readonly        : Boolean,
+    exposeXPathTypes: Boolean
+  ): DocumentNodeInfoType = {
 
-    assert(
+    require(
       ! documentInfo.isInstanceOf[VirtualNodeType],
       "DocumentInfo must not be a VirtualNode, i.e. it must be a native readonly tree like TinyTree"
     )
 
-    // NOTE: We don't honor exposeXPathTypes on readonly instances, anyway they don't support MIPs at this time
+    // NOTE: We don't honor `exposeXPathTypes` on readonly instances, anyway they don't support MIPs at this time
     if (readonly)
       documentInfo // the optimal case: no copy of the cached document is needed
     else

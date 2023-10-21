@@ -37,7 +37,6 @@ import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.SequenceExtent
-import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId, XFormsNames}

@@ -136,6 +136,7 @@
     <property as="xs:boolean" name="oxf.fr.detail.static-readonly-required.*.*"                 value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.label.appearance.*.*"                         value="full"/>
     <property as="xs:string"  name="oxf.fr.detail.hint.appearance.*.*"                          value="full"/>
+    <property as="xs:boolean" name="oxf.fr.detail.hint.automatic.*.*"                           value="false"/>
 
     <!-- Table of Contents -->
     <property as="xs:integer" name="oxf.fr.detail.toc.*.*"                                      value="-2"/><!-- legacy property     -->

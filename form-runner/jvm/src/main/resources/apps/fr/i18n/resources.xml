@@ -336,7 +336,7 @@
                 <upload-mediatypes>Only {0} files are accepted.</upload-mediatypes>
                 <upload-image>image</upload-image>
                 <upload-video>video</upload-video>
-                <upload-audio>audio</upload-audio>
+                <upload-audio>audio</upload-audio>`
             </hints>
             <view>
                 <explanation>
@@ -2803,6 +2803,13 @@
                 <captcha-label todo="true">[Captcha]</captcha-label>
                 <captcha-alert todo="true">[The value you entered didn't match the image, please try again]</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Dette er en skrivebeskyttet versjon av dine data.
@@ -3401,6 +3408,13 @@
                 <captcha-label>Защита от спама</captcha-label>
                 <captcha-alert todo="true">Введенное значение не совпадает с картинкой. Попробуйте еще раз.</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Это версия только для чтения.
@@ -4004,6 +4018,13 @@
                 <captcha-label>Codice di sicurezza</captcha-label>
                 <captcha-alert todo="true">Il valore inserito no è uguale a quello visualizzato nell'immagine</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Questa è una vista di sola lettura dei dati.
@@ -4611,6 +4632,13 @@
                 <captcha-label>Sicherheitscode</captcha-label>
                 <captcha-alert todo="true">Der eingegebene Wert entspricht nicht dem auf dem Bild. Bitte versuchen Sie es erneut!</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Dies ist eine schreibgeschützte Ansicht Ihrer Daten.
@@ -5218,6 +5246,13 @@
                 <captcha-label>Kuvavarmenne</captcha-label>
                 <captcha-alert todo="true">Antamasi arvo ei täsmännyt kuvan kanssa, ole hyvä ja yritä uudelleen</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Tämä on kirjoitussuojattu näkymä tiedoistasi.
@@ -5825,6 +5860,13 @@
                 <captcha-label>Robotfilter</captcha-label>
                 <captcha-alert todo="true">Inmatningen motsvarade inte bilden. Vänligen försök igen.</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Detta är en skrivskyddad visning av data
@@ -7044,6 +7086,13 @@
                 <captcha-label>Veuillez vérifier votre réponse au défi CAPTCHA</captcha-label>
                 <captcha-alert todo="true">O valor inserido não corresponde à imagem, por favor, tente novamente</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Esta é uma vista só de leitura dos seus dados.

@@ -648,6 +648,14 @@
                                             origin="xf:attribute('xxf:hint.appearance', event('hints'))"/>
 
                                         <xf:delete
+                                            bind="automatic-hints-bind"/>
+                                        <xf:insert
+                                            if="event('automatic-hints') = ('true', 'false')"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="xf:element('automatic-hints', event('automatic-hints'))"/>
+
+                                        <xf:delete
                                             bind="data-migration-bind"/>
                                         <xf:insert
                                             if="event('data-migration') = ('enabled', 'disabled', 'error')"

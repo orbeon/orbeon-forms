@@ -92,6 +92,10 @@
                     value="xxf:split(event('hints')) = 'minimal'"/>
 
                 <xf:setvalue
+                    ref="$i/automatic-hints"
+                    value="(event('automatic-hints')[. = ('true', 'false')], 'default')[1]"/>
+
+                <xf:setvalue
                     ref="$i/data-migration"
                     value="(event('data-migration')[. = ('enabled', 'disabled', 'error')], 'default')[1]"/>
 
@@ -350,6 +354,7 @@
                     <xf:property name="wizard-separate-toc"           value="$i/wizard-separate-toc/string()"/>
                     <xf:property name="wizard-section-status"         value="$i/wizard-section-status/string()"/>
                     <xf:property name="mode"                          value="$i/mode/string()"/>
+                    <xf:property name="automatic-hints"               value="$i/automatic-hints/string()"/>
                     <xf:property name="data-migration"                value="$i/data-migration/string()"/>
                     <xf:property name="grid-tab-order"                value="$i/grid-tab-order/string()"/>
                     <xf:property name="rendered-page-orientation"     value="$i/rendered-page-orientation/string()"/>
@@ -359,6 +364,7 @@
                     <xf:property name="readonly"                      value="$i/readonly/string()"/>
                     <xf:property name="html-page-layout"              value="$i/html-page-layout/string()"/>
                     <xf:property name="analysis-calculate"            value="$i/analysis-calculate/string()"/>
+                    <xf:property name="automatic-hints"               value="$i/automatic-hints/string()"/>
 
                     <xf:property
                         name="labels"
@@ -433,6 +439,7 @@
                         <labels-placeholders/>
                         <hints/>
                         <hints-placeholders/>
+                        <automatic-hints/>
                         <mode/>
                         <created-with-version/>
                         <updated-with-versions/>
@@ -798,6 +805,18 @@
                                                     value="false()"
                                                 />
                                             </fr:checkbox-input>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td/>
+                                        <xh:td>
+                                            <xf:select1 ref="automatic-hints" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/automatic-hints/label"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/property-yes-no/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
                                         </xh:td>
                                     </xh:tr>
                                     <xh:tr>

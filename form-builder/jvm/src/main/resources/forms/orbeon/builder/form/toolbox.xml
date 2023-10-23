@@ -60,6 +60,7 @@
                             <xf:property name="wizard-section-status"         value="bind('wizard-section-status-bind')"/>
                             <xf:property name="labels"                        value="bind('labels-bind')"/>
                             <xf:property name="hints"                         value="bind('hints-bind')"/>
+                            <xf:property name="automatic-hints"               value="bind('automatic-hints-bind')"/>
                             <xf:property name="data-migration"                value="bind('data-migration-bind')"/>
                             <xf:property name="grid-tab-order"                value="bind('grid-tab-order-bind')"/>
                             <xf:property name="rendered-page-orientation"     value="bind('rendered-page-orientation-bind')"/>

@@ -1650,7 +1650,7 @@
                                     <xf:select1 ref="@automatic[$is-attachment]" appearance="full xxf:horizontal">
                                         <xf:label ref="$resources/automatic-hint/label"/>
                                         <xf:hint  ref="$resources/automatic-hint/hint"/>
-                                        <xf:itemset ref="$resources/default-yes-no/item">
+                                        <xf:itemset ref="$resources/dialog-control-settings/default-yes-no/item">
                                             <xf:label ref="."/>
                                             <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
                                         </xf:itemset>

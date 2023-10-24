@@ -109,6 +109,7 @@ object XFormsError {
     if (
       container.getPartAnalysis.isTopLevelPart     &&   // LATER: Other sub-parts could be fatal, depending on settings on `xxf:dynamic`.
       container.getContainingDocument.initializing &&
+      ! container.getContainingDocument.allowErrorRecoveryOnInit &&
       ! isRecoverableOnInit
     ) {
       throw new OXFException(t)

@@ -99,6 +99,9 @@ class XFormsContainingDocument(
   private var _initializing = false
   def initializing: Boolean = _initializing
 
+  def allowErrorRecoveryOnInit: Boolean =
+    staticState.allowErrorRecoveryOnInit
+
   /**
    * Whether the document is currently in a mode where it must remember differences. This is the case when:
    *

@@ -39,7 +39,7 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
       indentedLogger   : IndentedLogger
   ): Option[DocumentNodeInfoType] =
     find(instanceCaching)(indentedLogger) map
-      (wrapDocumentInfo(_, readonly, exposeXPathTypes)) // TODO: shouldn't need to wrap since we don't expose types on readonly instances?
+      (wrapDocumentInfoIfNeeded(_, readonly, exposeXPathTypes))
 
   // Try to find instance content in the cache or load it
   def findContentOrLoad(
@@ -81,7 +81,7 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
 
     find(instanceCaching) orElse
       loadAndCache map
-      (wrapDocumentInfo(_, readonly, exposeXPathTypes)) get
+      (wrapDocumentInfoIfNeeded(_, readonly, exposeXPathTypes)) get
   }
 
   // Remove the given entry from the cache if present

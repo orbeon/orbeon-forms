@@ -23,21 +23,21 @@
 
     <xf:submission
         id="fr-send-submission"
-        resource="{instance('fr-send-submission-params')/@uri}"
-        nonrelevant="{instance('fr-send-submission-params')/@nonrelevant}"
+        resource="{event('uri')}"
+        nonrelevant="{event('nonrelevant')}"
         validate="false"
         xxf:relevant-attribute="fr:relevant"
-        xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
-        method="{instance('fr-send-submission-params')/@method}"
-        serialization="{instance('fr-send-submission-params')/@serialization}"
-        mediatype="{instance('fr-send-submission-params')/@mediatype}"
+        xxf:annotate="{event('annotate')}"
+        method="{event('method')}"
+        serialization="{event('serialization')}"
+        mediatype="{event('mediatype')}"
         ref="
-            let $params := xxf:split(instance('fr-send-submission-params')/@content)
+            let $params := xxf:split(event('content'))
             return
                 if ($params = ('pdf-url', 'tiff-url', 'excel-with-named-ranges-url', 'xml-form-structure-and-data-url')) then
-                    xxf:element('url', instance('fr-send-submission-params')/@binary-content-url/string())
-                else if (xxf:non-blank(instance('fr-send-submission-params')/@binary-content-url)) then
-                   instance('fr-send-submission-params')/@binary-content-url
+                    xxf:element('url', event('binary-content-url')/string())
+                else if (xxf:non-blank(event('binary-content-url'))) then
+                   event('binary-content-url')
                 else if ($params = 'metadata') then
                    metadata:createFormMetadataDocument()
                 else
@@ -46,16 +46,16 @@
                        fr:form-name(),
                        xxf:instance('fr-form-instance')/root(),
                        xxf:instance('fr-form-metadata')/root(),
-                       instance('fr-send-submission-params')/@data-format-version,
-                       instance('fr-send-submission-params')/@prune-metadata = 'true'
+                       event('data-format-version'),
+                       event('prune-metadata') = 'true'
                    )"
-        replace="{instance('fr-send-submission-params')/@replace}"
+        replace="{event('replace')}"
         instance="fr-send-submission-response"
-        xxf:show-progress="{instance('fr-send-submission-params')/@show-progress}"
-        xxf:target="{instance('fr-send-submission-params')/@formtarget}"
+        xxf:show-progress="{event('show-progress')}"
+        xxf:target="{event('formtarget')}"
         xxf:response-url-type="{'resource'[event('response-is-resource') = 'true']}">
 
-        <xf:header ref="instance('fr-send-submission-params')/@headers/tokenize(., '\r?\n', '')[contains(., ':')]">
+        <xf:header ref="event('headers')/tokenize(., '\r?\n', '')[contains(., ':')]">
             <xf:name  value="xxf:trim(substring-before(., ':'))"/>
             <xf:value value="xxf:trim(substring-after(., ':'))"/>
         </xf:header>
@@ -66,32 +66,6 @@
     <xf:instance id="fr-send-submission-response">
         <response xmlns=""/>
     </xf:instance>
-
-    <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
-    <xf:instance id="fr-send-submission-params">
-        <params
-            replace=""
-            uri=""
-            nonrelevant=""
-            annotate=""
-            method=""
-            content=""
-            serialization=""
-            mediatype=""
-            data-format-version=""
-            prune-metadata=""
-            show-progress=""
-            formtarget=""
-            response-is-resource=""
-            binary-content-url=""
-            headers=""/>
-    </xf:instance>
-    <xf:action event="xforms-submit" observer="fr-send-submission">
-        <xf:setvalue
-            iterate="instance('fr-send-submission-params')/@*"
-            ref="."
-            value="event(name(context()))"/>
-    </xf:action>
 
     <!-- Reset data-safe-override after completion -->
     <xf:setvalue

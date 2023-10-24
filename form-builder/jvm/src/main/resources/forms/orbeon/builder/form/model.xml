@@ -993,7 +993,7 @@
             }&amp;repeats-at-least={
                 5 (: TODO: use configuration property :)
             }&amp;export-format={
-                instance('fb-export-submission-params')/@export-format
+                event('export-format')
             }"
         replace="all"/>
 
@@ -1017,17 +1017,6 @@
             <xf:value value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'form-definition-xhtml')"/>
         </xf:header>
     </xf:submission>
-
-    <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
-    <xf:instance id="fb-export-submission-params">
-        <params export-format=""/>
-    </xf:instance>
-    <xf:action event="xforms-submit" observer="fb-export-submission">
-        <xf:setvalue
-            iterate="instance('fb-export-submission-params')/@*"
-            ref="."
-            value="event(name(context()))"/>
-    </xf:action>
 
     <xf:action observer="fb-publish-submission" event="xforms-submit-done">
 

@@ -687,16 +687,16 @@ trait ContainingDocumentDelayedEvents {
 
   def addTwoPassSubmitEvent(p: TwoPassSubmissionParameters): Unit =
     _delayedEvents += DelayedEvent(
-      eventName              = XFormsEvents.XXFORMS_SUBMIT,
-      targetEffectiveId      = p.submissionEffectiveId,
-      bubbles                = true,
-      cancelable             = false,
-      time                   = None,
-      showProgress           = p.showProgress,
-      browserTarget          = p.target,
-      submissionId           = CoreCrossPlatformSupport.randomHexId.some,
-      isResponseResourceType = p.isResponseResourceType,
-      properties             = p.properties
+      eventName              = XFormsEvents.XXFORMS_SUBMIT,               // for dispatch
+      targetEffectiveId      = p.submissionEffectiveId,                   // for dispatch
+      bubbles                = true,                                      // for dispatch
+      cancelable             = false,                                     // for dispatch
+      time                   = None,                                      // for scheduling
+      showProgress           = p.showProgress,                            // for XHR response
+      browserTarget          = p.target,                                  // for XHR response
+      submissionId           = CoreCrossPlatformSupport.randomHexId.some, // for XHR response
+      isResponseResourceType = p.isResponseResourceType,                  // for XHR response
+      properties             = p.properties                               // for dispatch
     )
 
   def findTwoPassSubmitEvents: List[DelayedEvent] =

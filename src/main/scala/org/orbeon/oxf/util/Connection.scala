@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.util
 
-import cats.Eval
 import cats.syntax.option._
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
@@ -22,13 +21,16 @@ import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.{AsyncRequest, ExternalContext, LocalExternalContext, ResponseAdapter, UrlRewriteMode}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http._
+import org.orbeon.oxf.pipeline.InitUtils
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils._
@@ -39,6 +41,7 @@ import java.net.URI
 import java.{util => ju}
 import javax.servlet.http.{Cookie, HttpServletRequest}
 import scala.collection.compat._
+import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
@@ -48,7 +51,7 @@ import scala.util.control.NonFatal
  *
  * Handles:
  *
- * - PUTting or POSTing a body
+ * - `PUT`ting or POSTing a body
  * - credentials
  * - HTTP headers
  * - forwarding session cookies
@@ -74,14 +77,14 @@ object Connection extends ConnectionTrait {
 
     val (cookieStore, cxr) =
       connectInternal(
-        method,
-        url,
-        credentials,
-        content,
-        headers,
-        loadState,
-        logBody
-      ).value
+        method      = method,
+        url         = url,
+        credentials = credentials,
+        content     = content,
+        headers     = headers,
+        loadState   = loadState,
+        logBody     = logBody
+      )
 
     if (saveState)
       ConnectionState.saveHttpState(cookieStore, ConnectionState.stateScopeFromProperty)
@@ -89,8 +92,8 @@ object Connection extends ConnectionTrait {
     cxr
   }
 
-  // Create a connection including loading state, but defer the actual connection to a lazy `Eval`.
-  def connectLater(
+  // Only called by `RegularSubmission`
+  def connectAsync(
     method          : HttpMethod,
     url             : URI,
     credentials     : Option[BasicCredentials],
@@ -100,16 +103,39 @@ object Connection extends ConnectionTrait {
     logBody         : Boolean)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Eval[ConnectionResult] =
-    connectInternal(
-      method,
-      url,
-      credentials,
-      content,
-      headers,
-      loadState,
-      logBody
-    ) map (_._2)
+  ): Future[ConnectionResult] = {
+
+    // Make sure this is created at the time `submit` is called and not within the `Future`, which
+    // could be running within another thread.
+    //
+    // This is used for two purposes down the line:
+    //
+    // - getting request path/parameters/etc. (safe due to `AsyncRequest`)
+    // - getting the session for cookie state handling (safety unclear if request has already returned)
+    //
+    // The `Response` must not be used and we just pass an adapter.
+    val newExternalContext =
+      new LocalExternalContext(
+        externalContext.getWebAppContext,
+        new AsyncRequest(externalContext.getRequest),
+        new ResponseAdapter
+      )
+
+    Future(
+      InitUtils.withPipelineContext { pipelineContext =>
+        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, newExternalContext)
+        connectInternal(
+          method      = method,
+          url         = url,
+          credentials = credentials,
+          content     = content,
+          headers     = headers,
+          loadState   = loadState,
+          logBody     = logBody
+        )._2
+      }
+    )
+  }
 
   // For Java callers
   def jConnectNow(
@@ -154,16 +180,17 @@ object Connection extends ConnectionTrait {
   }
 
   def findInternalUrl(
-    normalizedUrl : URI,
-    filter        : String => Boolean)(implicit
-    ec            : ExternalContext
+    normalizedUrl: URI,
+    filter       : String => Boolean
+  )(implicit
+    request: ExternalContext.Request
   ): Option[String] = {
 
     val normalizedUrlString = normalizedUrl.toString
 
     val servicePrefix =
       URLRewriterUtils.rewriteServiceURL(
-        ec.getRequest,
+        request,
         "/",
         UrlRewriteMode.Absolute
       )
@@ -322,7 +349,7 @@ object Connection extends ConnectionTrait {
 
   private object Private {
 
-    val SupportedNonHttpReadonlySchemes = Set[UriScheme](UriScheme.File, UriScheme.Oxf, UriScheme.Data)
+    private val SupportedNonHttpReadonlySchemes = Set[UriScheme](UriScheme.File, UriScheme.Oxf, UriScheme.Data)
 
     val HttpInternalPathsProperty               = "oxf.http.internal-paths"
     val HttpForwardCookiesProperty              = "oxf.http.forward-cookies"
@@ -344,7 +371,7 @@ object Connection extends ConnectionTrait {
       logBody         : Boolean)(implicit
       logger          : IndentedLogger,
       externalContext : ExternalContext
-    ): Eval[(CookieStore, ConnectionResult)] = {
+    ): (CookieStore, ConnectionResult) = {
 
       val normalizedUrlString = url.toString
 
@@ -356,27 +383,25 @@ object Connection extends ConnectionTrait {
           ConnectionState.loadHttpState(ConnectionState.stateScopeFromProperty) getOrElse
           new BasicCookieStore
 
-      Eval.later {
-        (
-          cookieStore,
-          connect(
-            method        = method,
-            normalizedUrl = url,
-            credentials   = credentials,
-            content       = content,
-            cookieStore   = cookieStore,
-            findClient    = findInternalUrl(url, isInternalPath) match {
-              case Some(internalPath) => (internalPath, InternalHttpClient)
-              case _ => (normalizedUrlString, PropertiesApacheHttpClient)
-            },
-            headers       = headers,
-            logBody       = logBody
-          )
+      (
+        cookieStore,
+        connect(
+          method        = method,
+          normalizedUrl = url,
+          credentials   = credentials,
+          content       = content,
+          cookieStore   = cookieStore,
+          findClient    = findInternalUrl(url, isInternalPath)(externalContext.getRequest) match {
+            case Some(internalPath) => (internalPath, InternalHttpClient)
+            case _ => (normalizedUrlString, PropertiesApacheHttpClient)
+          },
+          headers       = headers,
+          logBody       = logBody
         )
-      }
+      )
     }
 
-    def connect(
+    private def connect(
       method          : HttpMethod,
       normalizedUrl   : URI,
       credentials     : Option[BasicCredentials],
@@ -597,10 +622,10 @@ object Connection extends ConnectionTrait {
 
   private object ConnectionState {
 
-    val HttpStateProperty        = "oxf.http.state"
-    val HttpCookieStoreAttribute = "oxf.http.cookie-store"
+    private val HttpStateProperty        = "oxf.http.state"
+    private val HttpCookieStoreAttribute = "oxf.http.cookie-store"
 
-    val DefaultStateScope        = ExternalContext.Scope.Session
+    private val DefaultStateScope        = ExternalContext.Scope.Session
 
     def loadHttpState(
       stateScope      : ExternalContext.Scope)(implicit
@@ -637,7 +662,7 @@ object Connection extends ConnectionTrait {
       ExternalContext.Scope.withNameLowercaseOnlyOption(scopeString).getOrElse(DefaultStateScope)
     }
 
-    def debugStore(
+    private def debugStore(
       cookieStoreOpt : Option[CookieStore],
       stateScope     : ExternalContext.Scope,
       positive       : String,
@@ -657,7 +682,7 @@ object Connection extends ConnectionTrait {
         }
       }
 
-    def stateAttributes(
+    private def stateAttributes(
       stateScope      : ExternalContext.Scope,
       createSession   : Boolean)(implicit
       externalContext : ExternalContext

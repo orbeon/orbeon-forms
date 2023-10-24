@@ -25,6 +25,10 @@ trait Logging {
   def error(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
     logger.logError("", message, flattenTuples(parameters): _*)
 
+  // Error with optional parameters
+  def error(message: => String, throwable: Throwable)(implicit logger: IndentedLogger): Unit =
+    logger.logError("", message, throwable)
+
   // Warn with optional parameters
   def warn(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
     logger.logWarning("", message, flattenTuples(parameters): _*)

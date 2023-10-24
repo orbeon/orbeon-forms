@@ -17,10 +17,14 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.properties.PropertySet
 
+import scala.concurrent.ExecutionContext
+
 
 trait CoreCrossPlatformSupportTrait {
 
   type FileItemType
+
+  implicit def executionContext: ExecutionContext
 
   def isPE: Boolean
   def isJsEnv: Boolean

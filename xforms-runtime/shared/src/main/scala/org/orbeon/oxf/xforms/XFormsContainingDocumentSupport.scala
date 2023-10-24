@@ -54,6 +54,7 @@ import java.net.URI
 import java.util.concurrent.locks.Lock
 import scala.annotation.tailrec
 import scala.collection.{immutable, mutable}
+import scala.concurrent.Future
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
@@ -169,7 +170,7 @@ trait ContainingDocumentTransientState {
     var nonJavaScriptLoadsToRun  : Vector[Load] = Vector.empty
     var scriptsToRun             : Vector[Either[Load, Either[ScriptInvocation, CallbackInvocation]]] = Vector.empty
 
-    var replaceAllEval           : Option[Eval[ConnectResult]] = None
+    var replaceAllFuture         : Option[Future[ConnectResult]] = None
     var gotSubmissionReplaceAll  : Boolean = false
     var gotSubmissionRedirect    : Boolean = false
 
@@ -214,10 +215,10 @@ trait ContainingDocumentTransientState {
 
   def getNonJavaScriptLoadsToRun: immutable.Seq[Load] = transientState.nonJavaScriptLoadsToRun
 
-  def getReplaceAllEval: Option[Eval[ConnectResult]] = transientState.replaceAllEval
+  def getReplaceAllEval: Option[Future[ConnectResult]] = transientState.replaceAllFuture
 
-  def setReplaceAllEval(eval: Eval[ConnectResult]): Unit =
-    transientState.replaceAllEval = Some(eval ensuring (_ ne null))
+  def setReplaceAllFuture(eval: Future[ConnectResult]): Unit =
+    transientState.replaceAllFuture = Some(eval.ensuring(_ ne null))
 
   def setGotSubmissionReplaceAll(): Unit = {
     if (transientState.gotSubmissionReplaceAll)

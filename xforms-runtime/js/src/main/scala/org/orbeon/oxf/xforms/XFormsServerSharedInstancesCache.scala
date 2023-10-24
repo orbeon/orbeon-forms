@@ -4,6 +4,7 @@ import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.model.InstanceCaching
+import org.orbeon.oxf.xforms.model.XFormsInstance._
 
 
 // TODO: This implementation doesn't yet handle `timeToLive`.
@@ -11,39 +12,36 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
 
   import Private._
 
-  private var cache = Map[CacheKeyType, DocumentNodeInfoType]()
+  def sideLoad(
+    instanceCaching: InstanceCaching,
+    instanceContent: DocumentNodeInfoType
+  ): Unit =
+    cache += createCacheKey(instanceCaching) -> instanceContent
 
-  // Try to find instance content in the cache but do not attempt to load it if not found
-  def findContent(
-    instanceCaching  : InstanceCaching,
-    readonly         : Boolean,
-    exposeXPathTypes : Boolean)(implicit
-    indentedLogger   : IndentedLogger
+  protected def add(
+    instanceCaching: InstanceCaching,
+    instanceContent: InstanceContent,
+    timeToLive     : Long
+  )(implicit
+    indentedLogger : IndentedLogger
+  ): Unit = {
+    debug("adding instance", instanceCaching.debugPairs)
+    cache += createCacheKey(instanceCaching) -> instanceContent.documentInfo
+  }
+
+  protected def find(
+    instanceCaching: InstanceCaching
+  )(implicit
+    logger: IndentedLogger
   ): Option[DocumentNodeInfoType] =
     cache.get(createCacheKey(instanceCaching))
 
-  def findContentOrLoad(
-    instanceCaching  : InstanceCaching,
-    readonly         : Boolean,
-    exposeXPathTypes : Boolean,
-    loadInstance     : InstanceLoader)(implicit
-    indentedLogger   : IndentedLogger
-  ): DocumentNodeInfoType = {
-
-    val cacheKey = createCacheKey(instanceCaching)
-
-    cache.getOrElse(cacheKey, {
-      val result = loadInstance(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude)
-      cache += cacheKey -> result
-      result
-    })
-  }
-
   def remove(
     instanceSourceURI : String,
-    requestBodyHash   : String,
+    requestBodyHash   : Option[String],
     handleXInclude    : Boolean,
-    ignoreQueryString : Boolean)(implicit
+    ignoreQueryString : Boolean
+  )(implicit
     indentedLogger    : IndentedLogger
   ): Unit =
     if (ignoreQueryString) {
@@ -60,21 +58,17 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
       }
 
     } else {
-      cache -= createCacheKey(instanceSourceURI, handleXInclude, Option(requestBodyHash))
+      cache -= createCacheKey(instanceSourceURI, handleXInclude, requestBodyHash)
     }
 
   def removeAll(implicit indentedLogger: IndentedLogger): Unit =
     cache = Map.empty
 
-  def sideLoad(
-    instanceCaching : InstanceCaching,
-    doc             : DocumentNodeInfoType
-  ): Unit =
-    cache += createCacheKey(instanceCaching) -> doc
-
   private object Private {
 
     type CacheKeyType = String
+
+    var cache = Map[CacheKeyType, DocumentNodeInfoType]()
 
     // Make key also depend on handleXInclude and on request body hash if present
     def createCacheKey(instanceCaching: InstanceCaching): CacheKeyType =

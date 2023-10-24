@@ -15,27 +15,34 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.ConnectionResult
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 
-object RedirectReplacer {
+object RedirectReplacer extends Replacer {
+
+  type DeserializeType = Unit
+
+  def deserialize(
+    submission: XFormsModelSubmission,
+    cxr       : ConnectionResult,
+    p         : SubmissionParameters,
+    p2        : SecondPassParameters
+  ): DeserializeType = ()
+
+  def replace(
+    submission: XFormsModelSubmission,
+    cxr       : ConnectionResult,
+    p         : SubmissionParameters,
+    p2        : SecondPassParameters,
+    value     : DeserializeType
+  ): ReplaceResult = {
+    submission.containingDocument.setGotSubmissionRedirect()
+    RedirectReplacer.updateResponse(cxr, XFormsCrossPlatformSupport.externalContext.getResponse)
+    ReplaceResult.None
+  }
 
   def updateResponse(connectionResult: ConnectionResult, response: ExternalContext.Response): Unit = {
     SubmissionUtils.forwardResponseHeaders(connectionResult, response)
     response.setStatus(connectionResult.statusCode)
-  }
-}
-
-class RedirectReplacer(containingDocument: XFormsContainingDocument)
-  extends Replacer {
-
-  // NOP
-  def deserialize(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
-
-  def replace(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): ReplaceResult = {
-    containingDocument.setGotSubmissionRedirect()
-    RedirectReplacer.updateResponse(cxr, XFormsCrossPlatformSupport.externalContext.getResponse)
-    ReplaceResult.None
   }
 }

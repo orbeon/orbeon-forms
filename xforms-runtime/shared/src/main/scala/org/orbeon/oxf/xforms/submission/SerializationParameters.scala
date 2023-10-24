@@ -17,10 +17,10 @@ import cats.syntax.option._
 import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter, UrlRewriteMode}
 import org.orbeon.oxf.json.Converter
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.XMLConstants
@@ -240,8 +240,8 @@ object SerializationParameters {
                   "text",
                   p2.encoding,
                   None,
-                  false,
-                  true,
+                  indent = false,
+                  omitXmlDeclaration = true,
                   false.some
                 )
 

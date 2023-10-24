@@ -1,111 +1,40 @@
-/**
-  * Copyright (C) 2010 Orbeon, Inc.
-  *
-  * This program is free software; you can redistribute it and/or modify it under the terms of the
-  * GNU Lesser General Public License as published by the Free Software Foundation; either version
-  * 2.1 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  * See the GNU Lesser General Public License for more details.
-  *
-  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-  */
 package org.orbeon.oxf.xforms.submission
 
-import java.io.{Externalizable, ObjectInput, ObjectOutput}
-import java.util.concurrent._
-import cats.Eval
-
-import javax.enterprise.concurrent.ManagedExecutorService
-import javax.naming.{InitialContext, NamingException}
-import org.orbeon.oxf.externalcontext.{AsyncRequest, LocalExternalContext}
-import org.orbeon.oxf.pipeline.InitUtils._
-import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
-import org.orbeon.xforms.{EventNames, XFormsCrossPlatformSupport}
 
-/**
-  * Handle asynchronous submissions.
-  *
-  * The `CompletionService` is stored in the session, indexed by document UUID.
-  *
-  * See https://doc.orbeon.com/xforms/submission-asynchronous.html
-  * See http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/ExecutorCompletionService.html
-  */
-class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocument) {
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicInteger
+import scala.concurrent.Future
+import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
-  import AsynchronousSubmissionManager._
 
-  private implicit def indentedLogger: IndentedLogger =
-    containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
+// An instance of this class can become no longer referenced if the `XFCD` becomes passivated/serialized. If the
+// `XFCD` is reactivated/deserialized, a new `AsynchronousSubmissionManager` will be recreated. Running futures can
+// eventually complete, but their results will be ignored, and once all futures have completed, this instance will
+// eventually be garbage-collected. This is not ideal, but it's the best we can do for now.
+class AsynchronousSubmissionManager
+  extends AsynchronousSubmissionManagerTrait {
 
-  /**
-    * Add a special delay event to the containing document if there are pending submissions.
-    *
-    * This should be called just before sending an Ajax response.
-    */
-  def addClientDelayEventIfNeeded(): Unit =
-    if (hasPendingAsynchronousSubmissions)
-      containingDocument.addDelayedEvent(
-        eventName         = EventNames.XXFormsPoll,
-        targetEffectiveId = containingDocument.getEffectiveId,
-        bubbles           = false,
-        cancelable        = false,
-        time              = System.currentTimeMillis + containingDocument.getSubmissionPollDelay,
-        showProgress      = false, // could get from submission, but default must be `false`
-        allowDuplicates   = false  // no need for duplicates
-      )
+  private var totalSubmittedCount = 0
+  private var pendingCount = 0
+  private val runningCount = new AtomicInteger(0)
+  private val completionQueue = new ConcurrentLinkedQueue[(String, Try[SubmissionResult])]
 
-  def addAsynchronousSubmission(eval: Eval[AsyncSubmissionResult]): Unit = {
-    val asynchronousSubmissionsOpt =
-      findAsynchronousSubmissions(
-        create = true,
-        sessionKey(containingDocument)
-      )
-
-    // NOTE: If we want to re-enable foreground async submissions, we must:
-    // - do a better detection: !(xf-submit-done/xf-submit-error listener) && replace="none"
-    // - OR provide an explicit hint on xf:submission
-    asynchronousSubmissionsOpt foreach { asynchronousSubmissions =>
-
-      // Make sure this is created at the time `submit` is called
-      // Should we use `AsyncExternalContext` here?
-      val newExternalContext = {
-
-        val currentExternalContext = XFormsCrossPlatformSupport.externalContext
-
-        new LocalExternalContext(
-          currentExternalContext.getWebAppContext,
-          new AsyncRequest(currentExternalContext.getRequest),
-          currentExternalContext.getResponse
-        )
-      }
-
-      asynchronousSubmissions.submit(
-        Eval.later {
-          withPipelineContext { pipelineContext =>
-            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, newExternalContext)
-            eval.value
-          }
-        }
-      )
+  def addAsynchronousSubmission(submissionEffectiveId: String, future: Future[SubmissionResult]): Unit = {
+    totalSubmittedCount += 1
+    pendingCount += 1
+    runningCount.incrementAndGet()
+    future.onComplete { result =>
+      runningCount.decrementAndGet()
+      completionQueue.add(submissionEffectiveId -> result)
     }
   }
 
-  def hasPendingAsynchronousSubmissions: Boolean = {
-
-    val asynchronousSubmissionsOpt =
-      findAsynchronousSubmissions(
-        create = false,
-        sessionKey(containingDocument)
-      )
-
-    asynchronousSubmissionsOpt exists (_.pendingCount > 0)
-  }
+  def hasPendingAsynchronousSubmissions: Boolean = pendingCount > 0
 
   /**
     * Process all pending asynchronous submissions if any. If processing of a particular submission causes new
@@ -114,36 +43,8 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
     * Submissions are processed in the order in which they are made available upon termination by the completion
     * service.
     */
-  def processAllAsynchronousSubmissionsForJoin(): Unit = {
-
-    val asynchronousSubmissionOpt =
-      findAsynchronousSubmissions(
-        create = false,
-        sessionKey(containingDocument)
-      )
-
-    asynchronousSubmissionOpt filter (_.pendingCount > 0) foreach { asynchronousSubmission =>
-
-      withDebug("processing all background asynchronous submissions") {
-        var processedCount = 0
-        try {
-          while (asynchronousSubmission.pendingCount > 0) {
-
-            // Handle next completed task
-            val result = asynchronousSubmission.take().get()
-
-            val submission =
-              containingDocument.getObjectByEffectiveId(result._1.submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
-
-            submission.processAsyncSubmissionResponse(result._1, result._2)(submission.getIndentedLogger)
-
-            processedCount += 1
-          }
-        } finally
-          debugResults(List("processed" -> processedCount.toString))
-      }
-    }
-  }
+  def processAllAsynchronousSubmissionsForJoin(containingDocument: XFormsContainingDocument): Unit =
+    throw new UnsupportedOperationException("not implemented")
 
   /**
     * Process all completed asynchronous submissions if any. This method returns as soon as no completed submission is
@@ -152,107 +53,49 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
     * Submissions are processed in the order in which they are made available upon termination by the completion
     * service.
     */
-  def processCompletedAsynchronousSubmissions(): Unit = {
+  def processCompletedAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit = {
 
-    val asynchronousSubmissionsOpt =
-      findAsynchronousSubmissions(
-        create = false,
-        sessionKey(containingDocument)
-      )
+    implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
 
-    asynchronousSubmissionsOpt filter (_.pendingCount > 0) foreach { asynchronousSubmissions =>
-      withDebug("processing completed background asynchronous submissions") {
-        var processedCount = 0
-        try {
-          var future = asynchronousSubmissions.poll()
-          while (future.isDefined) {
+    withDebug("processing completed asynchronous submissions") {
+      var processedCount = 0
+      var failedCount = 0
+      Iterator.continually(completionQueue.poll()).takeWhile(_ ne null).foreach {
+        case (submissionEffectiveId, Success(result)) =>
 
-            val result = future.get.get()
+          pendingCount -= 1
 
-            val submission =
-              containingDocument.getObjectByEffectiveId(result._1.submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
-
-            submission.processAsyncSubmissionResponse(result._1, result._2)(submission.getIndentedLogger)
-
+          debug(s"processing asynchronous submission `$submissionEffectiveId`")
+          try {
+            containingDocument
+              .getObjectByEffectiveId(submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
+              .processAsyncSubmissionResponse(result._1, result._2)
             processedCount += 1
-
-            future = asynchronousSubmissions.poll()
+          } catch {
+            case NonFatal(t) =>
+              // This should be rare, as a failing submission will normally cause a `xforms-submit-error` event but not
+              // an exception here. We still want to log the exception here, as it's likely to be a bug.
+              error(s"error processing asynchronous submission `$submissionEffectiveId`", t)
+              failedCount += 1
+              throw t
           }
-        } finally
-          debugResults(
-            List(
-              "processed" -> processedCount.toString,
-              "pending"  -> asynchronousSubmissions.pendingCount.toString
-            )
-          )
-      }
-    }
-  }
-}
 
-object AsynchronousSubmissionManager {
-
-  private type AsyncSubmissionResult = (ConnectResult, Option[TunnelProperties])
-
-  private val AsyncSubmissionsSessionKeyPrefix = "oxf.xforms.state.async-submissions."
-
-  // Global thread pool if none provided by the app server
-  private lazy val threadPool = Executors.newCachedThreadPool
-
-  private def getExecutorService: ExecutorService =
-    try {
-      // If the app server gives us an `ExecutorService` (e.g. with WildFly), use it
-      // (See §EE.5.21, page 146 of the Java EE 7 spec)
-      InitialContext.doLookup[ManagedExecutorService]("java:comp/DefaultManagedExecutorService")
-    } catch {
-      case _: NamingException =>
-        // If no `ExecutorService` is provided by the app server (e.g. with Tomcat), use our global thread pool
-        threadPool
-    }
-
-  def sessionKey(doc: XFormsContainingDocument): String = AsyncSubmissionsSessionKeyPrefix + doc.uuid
-
-  private def findAsynchronousSubmissions(create: Boolean, sessionKey: String): Option[AsynchronousSubmissions] = {
-
-    val session = XFormsCrossPlatformSupport.externalContext.getRequest.getSession(true)
-
-    session.getAttribute(sessionKey) map (_.asInstanceOf[AsynchronousSubmissions]) orElse {
-      if (create) {
-        val asynchronousSubmissions = new AsynchronousSubmissions
-        session.setAttribute(sessionKey, asynchronousSubmissions)
-        Some(asynchronousSubmissions)
-      } else
-        None
-    }
-  }
-
-  private class AsynchronousSubmissions extends Externalizable {
-
-    private val completionService = new ExecutorCompletionService[AsyncSubmissionResult](getExecutorService)
-
-    private var _pendingCount = 0
-    def pendingCount = _pendingCount
-
-    def submit(task: Eval[AsyncSubmissionResult]): Future[AsyncSubmissionResult] = {
-      val future = completionService.submit(() => task.value)
-      _pendingCount += 1
-      future
-    }
-
-    def poll(): Option[Future[AsyncSubmissionResult]] =
-      Option(completionService.poll()) map { f =>
-        _pendingCount -= 1
-        f
+        case (submissionEffectiveId, Failure(t)) =>
+          // This should be rare, because we already encapsulate the result in a `Try`. We still want to log the
+          // exception here, as it's likely to be a bug.
+          error(s"asynchronous submission has failed `Future` for `$submissionEffectiveId`", t)
+          pendingCount -= 1
+          failedCount += 1
       }
 
-    def take(): Future[AsyncSubmissionResult] = {
-      val f = completionService.take()
-      _pendingCount -= 1
-      f
+      debugResults(
+        List(
+          "processed" -> processedCount.toString,
+          "failed"    -> failedCount.toString,
+          "pending"   -> pendingCount.toString,
+          "running"   -> runningCount.toString,
+        )
+      )
     }
-
-    // So that this can be stored in session that require `Serializable`
-    def writeExternal(out: ObjectOutput) = ()
-    def readExternal(in: ObjectInput)    = ()
   }
 }

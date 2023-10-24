@@ -83,7 +83,7 @@ object InstanceCaching {
       pathOrAbsoluteURI = Connection.findInternalUrl(
         normalizedUrl = URI.create(sourceURI).normalize,
         filter        = isInternalPath)(
-        ec            = XFormsCrossPlatformSupport.externalContext
+        request         = XFormsCrossPlatformSupport.externalContext.getRequest
       ) getOrElse sourceURI, // adjust for internal path so replication works
       requestBodyHash   = requestBodyHash
     )
@@ -188,14 +188,14 @@ class XFormsInstance(
   def performDefaultAction(event: XFormsEvent): Unit =
     event match {
       case _: XXFormsInstanceInvalidate =>
-        implicit val indentedLogger = event.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
+        implicit val indentedLogger: IndentedLogger = event.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
         _instanceCaching match {
           case Some(instanceCaching) =>
             XFormsServerSharedInstancesCache.remove(
-              instanceCaching.pathOrAbsoluteURI,
-              null,
-              instanceCaching.handleXInclude,
-              false
+              instanceSourceURI = instanceCaching.pathOrAbsoluteURI,
+              requestBodyHash   = None,
+              handleXInclude    = instanceCaching.handleXInclude,
+              ignoreQueryString = false
             )
           case None =>
             warn(

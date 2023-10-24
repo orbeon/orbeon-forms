@@ -13,20 +13,22 @@
  */
 package org.orbeon.oxf.util
 
-import cats.Eval
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest}
+import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
 import org.scalajs.dom.experimental.{Headers => JSHeaders, URL => JSURL}
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import java.io.InputStream
 import java.net.URI
+import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Iterator
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSName
 import scala.scalajs.js.typedarray.Uint8Array
+import scala.util.Try
 
 
 object Connection extends ConnectionTrait {
@@ -47,17 +49,19 @@ object Connection extends ConnectionTrait {
     logger          : IndentedLogger,
     externalContext : ExternalContext
   ): ConnectionResult =
-    connectLater(
-      method,
-      url,
-      credentials,
-      content,
-      headers,
-      loadState,
-      logBody
+    connectInternal(
+      method      = method,
+      url         = url,
+      credentials = credentials,
+      content     = content,
+      headers     = headers,
+      async       = false,
+      loadState   = loadState,
+      logBody     = logBody
     ).value
+      .getOrElse(throw new IllegalStateException("`connectInternal()` called with `async = false`, but no result is available")).get
 
-  def connectLater(
+  def connectAsync(
     method          : HttpMethod,
     url             : URI,
     credentials     : Option[BasicCredentials],
@@ -67,7 +71,66 @@ object Connection extends ConnectionTrait {
     logBody         : Boolean)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Eval[ConnectionResult] = Eval.now { // Eval.later
+  ): Future[ConnectionResult] =
+    connectInternal(
+      method      = method,
+      url         = url,
+      credentials = credentials,
+      content     = content,
+      headers     = headers,
+      async       = true,
+      loadState   = loadState,
+      logBody     = logBody
+    )
+
+  private class IteratorEntry extends Iterator.Entry[Short] {
+
+    private var _done: Boolean = false
+    private var _value: Short = 0
+
+    def update(done: Boolean, value: Short): Unit = {
+      _done = done
+      _value = value
+    }
+
+    def done: Boolean = _done
+    def value: Short = _value
+  }
+
+  private def inputStreamIterable(is: InputStream): js.Iterable[Short] =
+    new js.Iterable[Short] {
+
+      @JSName(js.Symbol.iterator)
+      def jsIterator(): js.Iterator[Short] = new js.Iterator[Short] {
+
+      var current = is.read()
+
+      val entry = new IteratorEntry
+
+      def next(): Iterator.Entry[Short] = {
+
+        if (current == -1) {
+          entry.update(done = true, 0)
+        } else {
+          entry.update(done = false, current.toShort)
+          current = is.read()
+        }
+        entry
+      }
+    }
+  }
+
+  private def connectInternal(
+    method          : HttpMethod,
+    url             : URI,
+    credentials     : Option[BasicCredentials],
+    content         : Option[StreamedContent],
+    headers         : Map[String, List[String]],
+    async           : Boolean,
+    loadState       : Boolean,
+    logBody         : Boolean)(implicit
+    logger          : IndentedLogger
+  ): Future[ConnectionResult] = {
 
     val urlString = url.toString
 
@@ -77,50 +140,11 @@ object Connection extends ConnectionTrait {
         case _              => None
       }
 
-    class IteratorEntry extends Iterator.Entry[Short] {
-
-      private var _done: Boolean = false
-      private var _value: Short = 0
-
-      def update(done: Boolean, value: Short): Unit = {
-        _done = done
-        _value = value
-      }
-
-      def done: Boolean = _done
-      def value: Short = _value
-    }
-
-    def fromSubmissionProvider: Option[ConnectionResult] = {
-      submissionProvider map { provider =>
+    def fromSubmissionProvider: Option[Future[ConnectionResult]] =
+      submissionProvider.map { provider =>
 
         val methodString = method.entryName
         val jsUrl = new JSURL(urlString, "http://invalid/") // URL needs to be absolute; using `invalid` as base, see RFC6761
-
-        def inputStreamIterable(is: InputStream) =
-          new js.Iterable[Short] {
-            @JSName(js.Symbol.iterator)
-            def jsIterator(): js.Iterator[Short] = new js.Iterator[Short] {
-
-              var current = is.read()
-
-              val entry = new IteratorEntry
-
-              def next(): Iterator.Entry[Short] = {
-
-                if (current == -1) {
-                  entry.update(done = true, 0)
-                } else {
-                  entry.update(done = false, current.toShort)
-                  current = is.read()
-                }
-                entry
-              }
-            }
-          }
-
-        val requestDataOpt =
-          content map (c => new Uint8Array(inputStreamIterable(c.inputStream)))
 
         // The `Headers` constructor expects key/value pairs, with only one value per header
         // TODO: Check if we ever have more than one value per header
@@ -140,43 +164,53 @@ object Connection extends ConnectionTrait {
             } toJSArray
           )
 
-        val response =
-          provider.submit(
-            new SubmissionRequest {
-              val method  = methodString
-              val url     = jsUrl
-              val headers = requestHeaders
-              val body    = requestDataOpt.orUndefined
-            }
+        val requestDataOpt =
+          content.map(c => new Uint8Array(inputStreamIterable(c.inputStream)))
+
+        val submissionRequest =
+          new SubmissionRequest {
+            val method  = methodString
+            val url     = jsUrl
+            val headers = requestHeaders
+            val body    = requestDataOpt.orUndefined
+          }
+
+        def processSubmissionResponse(response: SubmissionResponse): ConnectionResult = {
+
+          val responseHeaders =
+            response.headers.jsIterator().toIterator map { kv =>
+              kv(0) -> List(kv(1))
+            } toMap
+
+          val responseContentTypeOpt =
+            Headers.firstItemIgnoreCase(responseHeaders, Headers.ContentType)
+
+          def contentFromJsIterable(v: js.Iterable[_]) =
+            StreamedContent.fromBytes(v.asInstanceOf[js.Iterable[Byte]].toArray[Byte], responseContentTypeOpt)
+
+          // NOTE: Can't match on `js.Iterable[_]` "because it is a JS trait"
+          val responseBody = response.body.toOption match {
+            case Some(v: js.Array[_]) => contentFromJsIterable(v)
+            case Some(v: Uint8Array)  => contentFromJsIterable(v)
+            case _                    => warn("unrecognized response body type, considering empty body"); StreamedContent.Empty
+          }
+
+          ConnectionResult(
+            url                = urlString,
+            statusCode         = response.statusCode,
+            headers            = responseHeaders,
+            content            = responseBody,
+            dontHandleResponse = false,
           )
-
-        val responseHeaders =
-          response.headers.jsIterator().toIterator map { kv =>
-            kv(0) -> List(kv(1))
-          } toMap
-
-        val responseContentTypeOpt =
-          Headers.firstItemIgnoreCase(responseHeaders, Headers.ContentType)
-
-        def contentFromJsIterable(v: js.Iterable[_]) =
-          StreamedContent.fromBytes(v.asInstanceOf[js.Iterable[Byte]].toArray[Byte], responseContentTypeOpt)
-
-        // NOTE: Can't match on `js.Iterable[_]` "because it is a JS trait"
-        val responseBody = response.body.toOption match {
-          case Some(v: js.Array[_]) => contentFromJsIterable(v)
-          case Some(v: Uint8Array)  => contentFromJsIterable(v)
-          case _                    => warn("unrecognized response body type, considering empty body"); StreamedContent.Empty
         }
 
-        ConnectionResult(
-          url                = urlString,
-          statusCode         = response.statusCode,
-          headers            = responseHeaders,
-          content            = responseBody,
-          dontHandleResponse = false,
-        )
+        if (async)
+          provider.submitAsync(submissionRequest).toFuture.map(processSubmissionResponse)
+        else
+          Future.fromTry( // doesn't schedule the task on the execution context, unlike with `Future.apply`
+            Try(processSubmissionResponse(provider.submit(submissionRequest)))
+          )
       }
-    }
 
     def notFound =
       ConnectionResult(
@@ -196,16 +230,18 @@ object Connection extends ConnectionTrait {
 //        dontHandleResponse = false
 //      )
 
-    fromResourceResolver orElse fromSubmissionProvider getOrElse notFound
-//    fromResourceResolver getOrElse notFound
+    fromResourceResolver.map(Future.successful) orElse
+      fromSubmissionProvider                    getOrElse
+      Future.successful(notFound)
   }
 
   def isInternalPath(path: String): Boolean = false
 
   def findInternalUrl(
     normalizedUrl : URI,
-    filter        : String => Boolean)(implicit
-    ec            : ExternalContext
+    filter        : String => Boolean
+  )(implicit
+    request       : ExternalContext.Request
   ): Option[String] = None
 
   def buildConnectionHeadersCapitalizedIfNeeded(

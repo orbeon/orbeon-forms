@@ -77,7 +77,7 @@ class XFormsContainingDocument(
   // Aggregate other things
   val controls: XFormsControls = new XFormsControls(this)
 
-  private var asynchronousSubmissionManager: AsynchronousSubmissionManager = null
+  private var asynchronousSubmissionManager: Option[AsynchronousSubmissionManager] = None
 
  // Misc state
   private var _sequence = 1L // sequence number of changes to this document
@@ -271,25 +271,26 @@ class XFormsContainingDocument(
   def rememberLastAjaxResponse(response: SAXStore): Unit =
     _lastAjaxResponse = response.some
 
-  def getAsynchronousSubmissionManager(create: Boolean): AsynchronousSubmissionManager = {
-    if (asynchronousSubmissionManager == null && create)
-      asynchronousSubmissionManager = new AsynchronousSubmissionManager(this)
-    asynchronousSubmissionManager
-  }
+  def getAsynchronousSubmissionManager(create: Boolean): Option[AsynchronousSubmissionManager] =
+    asynchronousSubmissionManager match {
+      case some @ Some(_) => some
+      case None if create =>
+        asynchronousSubmissionManager = Some(new AsynchronousSubmissionManager)
+        asynchronousSubmissionManager
+      case None => None
+    }
 
-  private def processCompletedAsynchronousSubmissions(skipDeferredEventHandling: Boolean, addPollEvent: Boolean): Unit = {
-    val manager = getAsynchronousSubmissionManager(false)
-    if (manager != null && manager.hasPendingAsynchronousSubmissions) {
-
+  private def processCompletedAsynchronousSubmissions(skipDeferredEventHandling: Boolean, addPollEvent: Boolean): Unit =
+    getAsynchronousSubmissionManager(create = false)
+      .filter(_.hasPendingAsynchronousSubmissions)
+      .foreach { manager =>
       maybeWithOutermostActionHandler(! skipDeferredEventHandling) {
-        manager.processCompletedAsynchronousSubmissions()
+        manager.processCompletedAsynchronousSubmissions(this)
       }
-
       // Remember to send a poll event if needed
       if (addPollEvent)
-        manager.addClientDelayEventIfNeeded()
+        manager.addClientDelayEventIfNeeded(this)
     }
-  }
 
   override def initializeNestedControls(): Unit = {
     // Call-back from super class models initialization

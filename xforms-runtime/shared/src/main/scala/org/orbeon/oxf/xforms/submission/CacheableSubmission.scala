@@ -13,26 +13,22 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import cats.Eval
 import cats.syntax.option._
-import org.orbeon.oxf.http.{Headers, StreamedContent}
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
+import org.orbeon.dom.Document
+import org.orbeon.oxf.http.{Headers, StatusCode, StreamedContent}
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+import scala.concurrent.Future
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
 
-/**
- * Cacheable remote submission going through a protocol handler.
- *
- * NOTE: This could possibly be made to work as well for optimized submissions, but currently this is not the case.
- */
 private object CacheableSubmission {
   private class ThrowableWrapper(val throwable: Throwable) extends RuntimeException
 }
@@ -45,16 +41,17 @@ class CacheableSubmission(submission: XFormsModelSubmission)
   def isMatch(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Boolean =
     p.replaceType == ReplaceType.Instance && p2.isCache
 
-  def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Option[ConnectResult] = {
-    // Get the instance from shared instance cache
-    // This can only happen is method="get" and replace="instance" and xxf:cache="true"
+  def connect(
+    p : SubmissionParameters,
+    p2: SecondPassParameters,
+    sp: SerializationParameters
+  ): Option[ConnectResult Either Future[ConnectResult]] = {
 
-    // Convert URL to string
-    val absoluteResolvedURLString = getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, p.urlNorewrite, p.urlType)
+    val absoluteResolvedURLString =
+      getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, p.urlNorewrite, p.urlType)
 
-    // Compute a hash of the body if needed
     val requestBodyHash =
-      sp.messageBody map (XFormsCrossPlatformSupport.digestBytes(_, ByteEncoding.Hex))
+      sp.messageBody.map(XFormsCrossPlatformSupport.digestBytes(_, ByteEncoding.Hex))
 
     val detailsLogger = getDetailsLogger(p, p2)
 
@@ -66,112 +63,82 @@ class CacheableSubmission(submission: XFormsModelSubmission)
     val instanceCaching  = InstanceCaching.fromValues(p2.timeToLive, p2.isHandleXInclude, absoluteResolvedURLString, requestBodyHash)
     val instanceStaticId = staticInstance.staticId
 
-    // Obtain replacer
-    // Pass a pseudo connection result which contains information used by getReplacer()
-    // We know that we will get an InstanceReplacer
-    val connectionResult = createPseudoConnectionResult(absoluteResolvedURLString)
-    val replacer = submission.getReplacer(connectionResult, p)(detailsLogger).asInstanceOf[InstanceReplacer]
+    def createReplacerAndConnectionResult(document: DocumentNodeInfoType): ConnectResult = {
+
+      val connectionResult =
+        ConnectionResult(
+          absoluteResolvedURLString,
+          StatusCode.Ok,
+          Headers.EmptyHeaders,
+          StreamedContent.Empty, // we used to create non-empty content because we were using `getReplacer()`
+          dontHandleResponse = false
+        )
+
+      ConnectResult(
+        submissionEffectiveId,
+        Success((new DirectInstanceReplacer((document, instanceCaching)), connectionResult))
+      )
+    }
 
     // As an optimization, try from cache first
     // The purpose of this is to avoid starting a new thread in asynchronous mode if the instance is already in cache
     XFormsServerSharedInstancesCache.findContent(instanceCaching, p2.isReadonly, staticInstance.exposeXPathTypes)(detailsLogger) match {
       case Some(cachedDocumentInfo) =>
-        // Here we cheat a bit: instead of calling generically `deserialize()`, we directly set the instance document
-        replacer.setCachedResult(cachedDocumentInfo, instanceCaching)
-        ConnectResult(submissionEffectiveId, Success((replacer, connectionResult))).some
+        Left(createReplacerAndConnectionResult(cachedDocumentInfo)).some
       case None =>
-        // NOTE: technically, somebody else could put an instance in cache between now and the `Eval` execution
+        // NOTE: somebody else could put an instance in cache between now and the obtaining of the result below
         if (detailsLogger.debugEnabled)
           detailsLogger.logDebug("", "did not find instance in cache", "id", instanceStaticId, "URI", absoluteResolvedURLString, "request hash", requestBodyHash.orNull)
         val timingLogger = getTimingLogger(p, p2)
         // Create deferred evaluation for synchronous or asynchronous loading
-        val eval = Eval.later {
-          if (p2.isAsynchronous && timingLogger.debugEnabled)
-            timingLogger.startHandleOperation("", "running asynchronous submission", "id", submission.getEffectiveId, "cacheable", "true")
-          var loadingAttempted = false
-          var deserialized = false
-          try {
+        if (p2.isAsynchronous && timingLogger.debugEnabled)
+          timingLogger.startHandleOperation("", "running asynchronous submission", "id", submission.getEffectiveId, "cacheable", "true")
+        try {
+          if (p2.isAsynchronous) {
+
+            val futureNewDocumentInfo =
+              XFormsServerSharedInstancesCache.findContentOrLoadAsync(
+                instanceCaching,
+                p2.isReadonly,
+                staticInstance.exposeXPathTypes,
+                loadFn(p, p2, sp)
+              )(detailsLogger)
+
+            // xxx probably not?
+            Right(futureNewDocumentInfo.map(createReplacerAndConnectionResult)).some
+          } else {
+
             val newDocumentInfo =
               XFormsServerSharedInstancesCache.findContentOrLoad(
                 instanceCaching,
                 p2.isReadonly,
                 staticInstance.exposeXPathTypes,
-                (instanceSourceURI: String, handleXInclude: Boolean) => {
-                  // Update status
-                  loadingAttempted = true
-                  // Call regular submission
-                  var submissionResultOpt: Option[ConnectResult] = None
-                  try {
-                    // Run regular submission but force:
-                    // - synchronous execution
-                    // - readonly result
+                loadFn(p, p2, sp)
+              )(detailsLogger)
 
-                    val updatedP2 = p2.copy(isAsynchronous = false, isReadonly = true)
+            // xxx probably not?
+            Left(createReplacerAndConnectionResult(newDocumentInfo)).some
+          }
+        } catch {
+          case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
+            // The ThrowableWrapper was thrown within the inner load() method above
+            Left(ConnectResult(submissionEffectiveId, Failure(throwableWrapper.throwable))).some
+          case NonFatal(throwable) =>
+            // Any other throwable
+            Left(ConnectResult(submissionEffectiveId, Failure(throwable))).some
+        } finally {
+          if (p2.isAsynchronous && timingLogger.debugEnabled) {
 
-                    val submissionResult =
-                      List(new RegularSubmission(submission)) find (_.isMatch(p, p2, sp)) flatMap { submission =>
-                        withDebug("connecting", List("type" -> submission.getType)) {
-                          submission.connect(p, updatedP2, sp)
-                        }(detailsLogger)
-                      } getOrElse
-                        (throw new IllegalArgumentException("can only cache a `RegularSubmission`"))
+            timingLogger.setDebugResults(
+              "id",
+              submission.getEffectiveId,
+              "asynchronous", p2.isAsynchronous.toString,
+            )
 
-                    submissionResultOpt = submissionResult.some
-
-                    submissionResult.result match {
-                      case Success((replacer: InstanceReplacer, _)) =>
-                        deserialized = true
-                        // load() requires an immutable TinyTree
-                        // Since we forced readonly above, the result must also be a readonly instance
-                        replacer.resultingDocumentOpt match {
-                          case Some(Right(_: VirtualNodeType)) => throw new IllegalStateException
-                          case Some(Right(documentInfo))       => documentInfo
-                          case _                               => throw new IllegalStateException
-                        }
-                      case Failure(throwable) =>
-                        throw new CacheableSubmission.ThrowableWrapper(throwable)
-                      case _ =>
-                        // We know that `RegularSubmission` returns a `Replacer` with an instance document so this
-                        // should not happen!
-                        throw new IllegalStateException
-                    }
-                  } catch {
-                    case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
-                      // In case we just threw it above, just propagate
-                      throw throwableWrapper
-                    case NonFatal(throwable) =>
-                      // Exceptions are handled further down
-                      throw new CacheableSubmission.ThrowableWrapper(throwable)
-                  }
-                })(detailsLogger)
-            // Here we cheat a bit: instead of calling generically `deserialize()`, we directly set the `DocumentInfo`
-            replacer.setCachedResult(newDocumentInfo, instanceCaching)
-
-            ConnectResult(submissionEffectiveId, Success((replacer, connectionResult)))
-          } catch {
-            case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
-              // The ThrowableWrapper was thrown within the inner load() method above
-              ConnectResult(submissionEffectiveId, Failure(throwableWrapper.throwable))
-            case NonFatal(throwable) =>
-              // Any other throwable
-              ConnectResult(submissionEffectiveId, Failure(throwable))
-          } finally
-            if (p2.isAsynchronous && timingLogger.debugEnabled) {
-
-              timingLogger.setDebugResults(
-                "id",
-                submission.getEffectiveId,
-                "asynchronous", p2.isAsynchronous.toString,
-                "loading attempted", loadingAttempted.toString,
-                "deserialized", deserialized.toString
-              )
-
-              timingLogger.endHandleOperation()
-            }
+            timingLogger.endHandleOperation()
+          }
         }
-
-        submitEval(p, p2, eval.map(_ -> p.actionProperties)) // returns `None` if the execution is deferred
-    }
+    } // match
   }
 
   private def checkInstanceToUpdate(indentedLogger: IndentedLogger, p: SubmissionParameters): XFormsInstance = {
@@ -224,13 +191,48 @@ class CacheableSubmission(submission: XFormsModelSubmission)
     }
   }
 
-  // NOTE: This is really weird: the ConnectionResult returned must essentially say that it has some content.
-  private def createPseudoConnectionResult(resourceURI: String): ConnectionResult =
-    ConnectionResult(
-      resourceURI,
-      200,
-      Headers.EmptyHeaders,
-      StreamedContent.fromBytes(Array[Byte](0), contentType = None, title = None),
-      dontHandleResponse = false
-    )
+  private def loadFn(
+    p : SubmissionParameters,
+    p2: SecondPassParameters,
+    sp: SerializationParameters
+  )(
+    instanceSourceURI: String,
+    handleXInclude   : Boolean
+  ): DocumentNodeInfoType =
+    try {
+      // Run `RegularSubmission` but force:
+      // - synchronous execution
+      // - readonly result
+      val updatedP2 = p2.copy(isAsynchronous = false, isReadonly = true)
+
+      val submissionResult =
+        new RegularSubmission(submission).connect(p, updatedP2, sp) match {
+          case Some(Left(connectResult)) => connectResult
+          case _                         => throw new IllegalStateException
+        }
+
+      submissionResult.result match {
+        case Success((replacer @ InstanceReplacer, cxr)) =>
+          // `load()` requires an immutable `TinyTree`
+          // Since we forced `isReadonly` above, the result must also be a readonly instance
+          replacer.deserialize(submission, cxr, p, updatedP2) match {
+            case Right((_: VirtualNodeType, _)) => throw new IllegalStateException
+            case Right((documentInfo, _))       => documentInfo
+            case Left(Left(_))                  => throw new IllegalStateException
+            case Left(Right(documentInfo))      => documentInfo
+          }
+        case Failure(throwable) =>
+          throw new CacheableSubmission.ThrowableWrapper(throwable)
+        case _ =>
+          // Must not happen
+          throw new IllegalStateException
+      }
+    } catch {
+      case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
+        // In case we just threw it above, just propagate
+        throw throwableWrapper
+      case NonFatal(throwable) =>
+        // Exceptions are handled further down
+        throw new CacheableSubmission.ThrowableWrapper(throwable)
+    }
 }

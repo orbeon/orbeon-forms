@@ -18,61 +18,35 @@ import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseWrapper}
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.ConnectionResult
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 
 
-/**
-  * Handle replace="all".
-  */
-object AllReplacer {
+object AllReplacer extends Replacer {
 
-  def forwardResultToResponse(cxr: ConnectionResult, response: ExternalContext.Response): Unit = {
+  type DeserializeType = Unit
 
-    // can be null for some unit tests only :(
-    if (response == null)
-      return
+  def deserialize(
+    submission: XFormsModelSubmission,
+    cxr       : ConnectionResult,
+    p         : SubmissionParameters,
+    p2        : SecondPassParameters
+  ): DeserializeType = ()
 
-    response.setStatus(cxr.statusCode)
-
-    cxr.content.contentType foreach
-      response.setContentType
-
-    SubmissionUtils.forwardResponseHeaders(cxr, response)
-
-    IOUtils.copyStreamAndClose(cxr.content.inputStream, response.getOutputStream)
-  }
-
-  class ReplaceAllResponse(val response: ExternalContext.Response)
-    extends ResponseWrapper(response) {
-
-    private var status = -1 // indicate that status was not set
-
-    override def setStatus(status: Int): Unit = {
-      assert(status > 0)
-      this.status = status
-      super.setStatus(status)
-    }
-
-    def getStatus: Int = status
-  }
-}
-
-class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsContainingDocument)
-  extends Replacer {
-
-  // NOP
-  def deserialize(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
-
-  def replace(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): ReplaceResult = {
+  def replace(
+    submission: XFormsModelSubmission,
+    cxr       : ConnectionResult,
+    p         : SubmissionParameters,
+    p2        : SecondPassParameters,
+    value     : DeserializeType
+  ): ReplaceResult = {
 
     // When we get here, we are in a mode where we need to send the reply directly to an external context, if any.
 
     // Remember that we got a submission producing output
-    containingDocument.setGotSubmissionReplaceAll()
+    submission.containingDocument.setGotSubmissionReplaceAll()
 
     val replaceAllResponse =
-      new AllReplacer.ReplaceAllResponse(containingDocument.responseForReplaceAll getOrElse (throw new IllegalStateException))
+      new AllReplacer.ReplaceAllResponse(submission.containingDocument.responseForReplaceAll getOrElse (throw new IllegalStateException))
 
     AllReplacer.forwardResultToResponse(cxr, replaceAllResponse)
 
@@ -109,5 +83,35 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
       // 2. This can be called outside of the document lock, see XFormsServer.
       ReplaceResult.None
     }
+  }
+
+  def forwardResultToResponse(cxr: ConnectionResult, response: ExternalContext.Response): Unit = {
+
+    // can be null for some unit tests only :(
+    if (response == null)
+      return
+
+    response.setStatus(cxr.statusCode)
+
+    cxr.content.contentType foreach
+      response.setContentType
+
+    SubmissionUtils.forwardResponseHeaders(cxr, response)
+
+    IOUtils.copyStreamAndClose(cxr.content.inputStream, response.getOutputStream)
+  }
+
+  private class ReplaceAllResponse(val response: ExternalContext.Response)
+    extends ResponseWrapper(response) {
+
+    private var status = -1 // indicate that status was not set
+
+    override def setStatus(status: Int): Unit = {
+      assert(status > 0)
+      this.status = status
+      super.setStatus(status)
+    }
+
+//    def getStatus: Int = status
   }
 }

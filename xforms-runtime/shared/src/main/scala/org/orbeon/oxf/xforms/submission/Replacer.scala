@@ -18,17 +18,21 @@ import org.orbeon.oxf.util.ConnectionResult
 
 trait Replacer {
 
-  // TODO: Refactor to return a value like `replace()` does.
+  type DeserializeType
+
   def deserialize(
-    cxr: ConnectionResult,
-    p  : SubmissionParameters,
-    p2 : SecondPassParameters)
-  : Unit
+    submission: XFormsModelSubmission,
+    cxr       : ConnectionResult,
+    p         : SubmissionParameters,
+    p2        : SecondPassParameters
+  ): DeserializeType
 
   // NOTE: This is allowed to throw exceptions, including `XFormsSubmissionException`.
   def replace(
-    cxr: ConnectionResult,
-    p  : SubmissionParameters,
-    p2 : SecondPassParameters
+    submission: XFormsModelSubmission,
+    cxr       : ConnectionResult,
+    p         : SubmissionParameters,
+    p2        : SecondPassParameters,
+    value     : DeserializeType
   ): ReplaceResult
 }

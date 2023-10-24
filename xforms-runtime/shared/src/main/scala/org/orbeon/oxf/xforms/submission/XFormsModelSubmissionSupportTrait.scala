@@ -13,11 +13,8 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import cats.Eval
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.Logging._
@@ -37,30 +34,17 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
 import scala.collection.mutable
-import scala.util.{Failure, Success}
+import scala.concurrent.Future
 
 
-object XFormsModelSubmissionSupport {
+trait XFormsModelSubmissionSupportTrait {
 
   import Private._
   import RelevanceHandling._
 
-  // Run the given submission `Eval`. This must be for a `replace="all"` submission.
-  def runDeferredSubmission(eval: Eval[ConnectResult], response: ExternalContext.Response): Unit =
-    eval.value.result match {
-      case Success((replacer, cxr)) =>
-        useAndClose(cxr) { _ =>
-          replacer match {
-            case _: AllReplacer      => AllReplacer.forwardResultToResponse(cxr, response)
-            case _: RedirectReplacer => RedirectReplacer.updateResponse(cxr, response)
-            case _: NoneReplacer     => ()
-            case r                   => throw new IllegalArgumentException(r.getClass.getName)
-          }
-        }
-      case Failure(throwable) =>
-        // Propagate throwable, which might have come from a separate thread
-        throw new OXFException(throwable)
-    }
+  // Run the given submission. This must be for a `replace="all"` submission.
+  // Called from `XFormsServer` only
+  def runDeferredSubmission(future: Future[ConnectResult], response: ExternalContext.Response): Unit
 
   // Prepare XML for submission
   //
@@ -196,7 +180,7 @@ object XFormsModelSubmissionSupport {
     }
   }
 
-  def annotateWithHashes(doc: Document, attQName: QName): Unit = {
+  private def annotateWithHashes(doc: Document, attQName: QName): Unit = {
     val wrapper = new DocumentWrapper(doc, null, XPath.GlobalConfiguration)
     var annotated = false
     doc.accept(new VisitorSupport {
@@ -212,7 +196,7 @@ object XFormsModelSubmissionSupport {
 
   // Annotate elements which have failed constraints with an xxf:error, xxf:warning or xxf:info attribute containing
   // the alert message. Only the levels passed in `annotate` are handled.
-  def annotateWithAlerts(
+  private def annotateWithAlerts(
     xfcd             : XFormsContainingDocument,
     doc              : Document,
     levelsToAnnotate : Map[ValidationLevel, QName]
@@ -306,7 +290,7 @@ object XFormsModelSubmissionSupport {
         true
     }
 
-  def logInvalidNode(node: Node)(implicit indentedLogger: IndentedLogger): Unit =
+  private def logInvalidNode(node: Node)(implicit indentedLogger: IndentedLogger): Unit =
     if (indentedLogger.debugEnabled)
       node match {
         case e: Element =>

@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms
 
 import cats.syntax.option._
-import org.orbeon.oxf.cache.{InternalCacheKey, ObjectCache}
-import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
+import org.orbeon.oxf.cache._
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.model.InstanceCaching
@@ -31,68 +31,56 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
 
   import Private._
 
-  // Try to find instance content in the cache but do not attempt to load it if not found
-  def findContent(
-      instanceCaching  : InstanceCaching,
-      readonly         : Boolean,
-      exposeXPathTypes : Boolean)(implicit
-      indentedLogger   : IndentedLogger
-  ): Option[DocumentNodeInfoType] =
-    find(instanceCaching)(indentedLogger) map
-      (wrapDocumentInfoIfNeeded(_, readonly, exposeXPathTypes))
+  protected def add(
+    instanceCaching: InstanceCaching,
+    instanceContent: InstanceContent,
+    timeToLive     : Long
+  )(implicit
+    indentedLogger : IndentedLogger
+  ): Unit = {
 
-  // Try to find instance content in the cache or load it
-  def findContentOrLoad(
-    instanceCaching  : InstanceCaching,
-    readonly         : Boolean,
-    exposeXPathTypes : Boolean,
-    loadInstance     : InstanceLoader)(implicit
-    indentedLogger   : IndentedLogger
-  ): DocumentNodeInfoType = {
+    debug("adding instance", instanceCaching.debugPairs)
 
-    // Add an entry to the cache
-    def add(instanceContent: InstanceContent, timeToLive: Long): Unit = {
+    val cache = getCache
+    val cacheKey = createCacheKey(instanceCaching)
 
-      debug("adding instance", instanceCaching.debugPairs)
-
-      val cache = ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
-      val cacheKey = createCacheKey(instanceCaching)
-
-      cache.add(cacheKey, ConstantValidity, CacheEntry(instanceContent, timeToLive))
-    }
-
-    // Load and cache new instance content
-    def loadAndCache(): Option[DocumentNodeInfoType] = {
-      // Note that this method is not synchronized. Scenario: if the method is synchronized, the resource URI may
-      // reach an XForms page which itself needs to load a shared resource. The result would be a deadlock.
-      // Without synchronization, what can happen is that two concurrent requests load the same URI at the same
-      // time. In the worst case scenario, the results will be different, and the two requesting XForms instances
-      // will be different. The instance that is retrieved first will be stored in the cache for a very short
-      // amount of time, and the one retrieved last will win and be stored in the cache for a longer time.
-      debug("loading instance into cache", instanceCaching.debugPairs)
-
-      val instanceContent = loadInstance(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude)
-      // NOTE: load() must always returns a TinyTree because we don't want to put in cache a mutable document
-      assert(! instanceContent.isInstanceOf[VirtualNodeType], "load() must return a TinyTree")
-
-      add(InstanceContent(instanceContent), instanceCaching.timeToLive)
-      instanceContent.some
-    }
-
-    find(instanceCaching) orElse
-      loadAndCache map
-      (wrapDocumentInfoIfNeeded(_, readonly, exposeXPathTypes)) get
+    cache.add(cacheKey, ConstantValidity, CacheEntry(instanceContent, timeToLive))
   }
 
-  // Remove the given entry from the cache if present
+  protected def find(instanceCaching: InstanceCaching)(implicit logger: IndentedLogger): Option[DocumentNodeInfoType] = {
+
+    val cache = getCache
+    val cacheKey = createCacheKey(instanceCaching)
+
+    def isExpired(cacheEntry: CacheEntry) =
+      cacheEntry.timeToLive >= 0 && ((cacheEntry.timestamp + cacheEntry.timeToLive) < System.currentTimeMillis)
+
+    Option(cache.findValid(cacheKey, ConstantValidity).asInstanceOf[CacheEntry]) match {
+      case Some(cacheEntry) if isExpired(cacheEntry) =>
+        // Remove expired entry
+        debug("expiring cached instance", instanceCaching.debugPairs)
+        cache.remove(cacheKey)
+        None
+      case Some(cacheEntry) =>
+        // Instance was found
+        debug("found cached instance", instanceCaching.debugPairs)
+        cacheEntry.instanceContent.documentInfo.some
+      case _ =>
+        // Not found
+        debug("cached instance not found", instanceCaching.debugPairs)
+        None
+    }
+  }
+
   def remove(
     instanceSourceURI : String,
-    requestBodyHash   : String,
+    requestBodyHash   : Option[String],
     handleXInclude    : Boolean,
-    ignoreQueryString : Boolean)(implicit
+    ignoreQueryString : Boolean
+  )(implicit
     indentedLogger    : IndentedLogger
   ): Unit = {
-    debug("removing instance", List("URI" -> instanceSourceURI, "request hash" -> requestBodyHash))
+    debug("removing instance", List("URI" -> instanceSourceURI, "request hash" -> requestBodyHash.toString))
 
     val cache = ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
 
@@ -110,14 +98,14 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
       } foreach
         cache.remove
     } else {
-      val cacheKey = createCacheKey(instanceSourceURI, handleXInclude, Option(requestBodyHash))
+      val cacheKey = createCacheKey(instanceSourceURI, handleXInclude, requestBodyHash)
       cache.remove(cacheKey)
     }
   }
 
-  // Empty the cache
   def removeAll(implicit indentedLogger: IndentedLogger): Unit = {
-    val cache = ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
+
+    val cache = getCache
     val count = cache.removeAll()
 
     debug("removed all instances", List("count" -> count.toString))
@@ -127,46 +115,23 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
 
     val XFormsSharedInstancesCacheName        = "xforms.cache.shared-instances"
     val XFormsSharedInstancesCacheDefaultSize = 10
+
     val ConstantValidity                      = 0L
     val SharedInstanceKeyType                 = XFormsSharedInstancesCacheName
 
-    case class InstanceContent(documentInfo: DocumentNodeInfoType) { require(! documentInfo.isInstanceOf[VirtualNodeType]) }
     case class CacheEntry(instanceContent: InstanceContent, timeToLive: Long, timestamp: Long = System.currentTimeMillis)
 
-    // Find instance content in cache
-    def find(instanceCaching: InstanceCaching)(implicit logger: IndentedLogger): Option[DocumentNodeInfoType] = {
-
-      val cache = ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
-      val cacheKey = createCacheKey(instanceCaching)
-
-      def isExpired(cacheEntry: CacheEntry) =
-        cacheEntry.timeToLive >= 0 && ((cacheEntry.timestamp + cacheEntry.timeToLive) < System.currentTimeMillis)
-
-      Option(cache.findValid(cacheKey, ConstantValidity).asInstanceOf[CacheEntry]) match {
-        case Some(cacheEntry) if isExpired(cacheEntry) =>
-          // Remove expired entry
-          debug("expiring cached instance", instanceCaching.debugPairs)
-          cache.remove(cacheKey)
-          None
-        case Some(cacheEntry) =>
-          // Instance was found
-          debug("found cached instance", instanceCaching.debugPairs)
-          cacheEntry.instanceContent.documentInfo.some
-        case _ =>
-          // Not found
-          debug("cached instance not found", instanceCaching.debugPairs)
-          None
-      }
-    }
-
-    // Make key also depend on handleXInclude and on request body hash if present
-    def createCacheKey(instanceCaching: InstanceCaching): InternalCacheKey =
-      createCacheKey(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude, instanceCaching.requestBodyHash)
+    def getCache: org.orbeon.oxf.cache.Cache =
+      ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
 
     def createCacheKey(sourceURI: String, handleXInclude: Boolean, requestBodyHash: Option[String]): InternalCacheKey =
       new InternalCacheKey(
         SharedInstanceKeyType,
         sourceURI + "|" + handleXInclude.toString + (requestBodyHash map ('|' + _) getOrElse "")
       )
+
+    // Make key also depend on handleXInclude and on request body hash if present
+    def createCacheKey(instanceCaching: InstanceCaching): InternalCacheKey =
+      createCacheKey(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude, instanceCaching.requestBodyHash)
   }
 }

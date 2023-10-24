@@ -2403,4 +2403,115 @@ az4K</document>
         </output>
     </test>
 
+    <test description="#4069: Ability to tunnel context information to submission events" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model" xxf:allow-error-recovery-on-init="true">
+
+                        <xf:instance id="my-instance">
+                            <_/>
+                        </xf:instance>
+
+                        <xf:send
+                            event="xforms-model-construct-done"
+                            iterate="'sample-instance.xml', 'i-dont-exist.xml'"
+
+                            submission="my-submission">
+                            <xf:property name="filename" value="."/>
+                            <xf:property name="p1" value="42"/>
+                            <xf:property name="p2" value="43"/>
+                            <xf:property name="p3" value="44" xxf:tunnel="true"/>
+                            <xf:property name="p4" value="45" xxf:tunnel="true"/>
+                        </xf:send>
+
+                        <xf:submission
+                            id="my-submission"
+                            method="get"
+                            serialization="none"
+                            resource="oxf:/org/orbeon/oxf/xforms/data/{event('filename')}"
+                            replace="instance">
+
+                            <!-- Also test action error within submission -->
+                            <xf:action event="xforms-submit-done">
+                                <xf:setvalue ref="title" value="1 div 0"/>
+                            </xf:action>
+                        </xf:submission>
+
+                        <!-- Also test action error -->
+                        <xf:dispatch
+                            event="xforms-model-construct-done"
+
+                            targetid="model"
+                            name="my-action-event">
+                            <xf:property name="p1" value="42"/>
+                            <xf:property name="p2" value="43"/>
+                            <xf:property name="p3" value="44" xxf:tunnel="true"/>
+                            <xf:property name="p4" value="45" xxf:tunnel="true"/>
+                        </xf:dispatch>
+
+                        <xf:action event="my-action-event">
+                            <xf:setvalue ref="title" value="1 div 0"/>
+                        </xf:action>
+
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events">
+                            <events/>
+                        </xf:instance>
+                        <xf:insert
+                            event="xforms-submit xforms-submit-done xforms-submit-error xxforms-action-error"
+                            context="instance('events')"
+                            ref="*"
+                            origin="
+                                xf:element(
+                                    'event',
+                                    (
+                                        xf:attribute('type', event('xxf:type')),
+                                        xf:attribute('target', event('xxf:targetid')),
+                                        for $c in event('error-type')
+                                        return xf:attribute('error-type', $c),
+                                        for $i in 1 to 4,
+                                            $p in concat('p', $i),
+                                            $v in event($p)
+                                        return
+                                            xf:attribute($p, $v)
+                                    )
+                                )"/>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="my-instance" model-id="model">
+                                <book>
+                                    <title lang="en">Pale Blue Dot</title>
+                                    <author>Carl Sagan</author>
+                                </book>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-submit"        target="my-submission" p1="42" p2="43" p3="44" p4="45"/>
+                                    <event type="xxforms-action-error" target="my-submission" p3="44" p4="45"/>
+                                    <event type="xforms-submit-done"   target="my-submission" p3="44" p4="45"/>
+                                    <event type="xforms-submit"        target="my-submission" p1="42" p2="43" p3="44" p4="45"/>
+                                    <event type="xforms-submit-error"  target="my-submission" error-type="xxforms-internal-error" p3="44" p4="45"/>
+                                    <event type="xxforms-action-error" target="model" p3="44" p4="45"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 </group>

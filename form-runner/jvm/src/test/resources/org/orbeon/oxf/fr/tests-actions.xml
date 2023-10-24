@@ -12,7 +12,6 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <group
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xf="http://www.w3.org/2002/xforms"
@@ -125,173 +124,142 @@
         </input>
         <output name="data">
             <xf:model id="fr-form-model">
-                <xf:action observer="my-control-control"
-                    target="#observer"
-                    event="xforms-enabled xforms-value-changed DOMActivate"
-                    if="fr:mode() = ('new')">
-                    <xf:dispatch
-                        name="fr-call-user-my-action-action"
-                        targetid="fr-form-model">
-                        <xf:property name="action-source"
-                            value="event('xxf:absolute-targetid')"/>
-                    </xf:dispatch>
-                </xf:action>
-                <xf:action
-                    target="fr-form-model"
-                    event="fr-run-form-load-action-after-controls">
-                    <xf:dispatch name="fr-call-user-my-action-action"
-                        targetid="fr-form-model">
-                        <xf:property name="action-source"
-                            value="event('xxf:absolute-targetid')"/>
-                    </xf:dispatch>
-                    <xf:dispatch name="fr-call-user-other-action-action"
-                        targetid="fr-form-model">
-                        <xf:property name="action-source"
-                            value="event('xxf:absolute-targetid')"/>
-                    </xf:dispatch>
-                </xf:action>
-                <xf:action
-                    id="my-action-binding"
-                    event="fr-call-user-my-action-action"
-                    target="fr-form-model">
-                    <xf:var name="new-action-id"
-                        value="'fr-action'"/>
-                    <xf:action type="xpath">
-                        xxf:set-document-attribute($new-action-id, 'action-source',
-                        event('action-source')), xxf:set-document-attribute($new-action-id, 'action-error', false())
-                    </xf:action>
-                    <!--Action Implementation Here-->
-                    <xf:insert ref="xxf:instance('fr-service-request-instance')"
-                        origin="xf:parse(xxf:instance('my-service-gaga-instance'))"/>
-                    <!--Action Implementation Here-->
-                    <xf:action type="xpath">
-                        xxf:set-document-attribute('fr-action', 'action-continuation-id', 'my-action-2-id')
-                    </xf:action>
-                    <xf:insert ref="xxf:instance('fr-service-response-instance')"
-                        origin="xf:element('response')"/>
-                    <xf:send submission="my-service-gaga-submission"/>
-                </xf:action>
-                <xf:action
-                    observer="my-service-gaga-submission"
-                    event="xforms-submit-done"
-                    context="xxf:instance('fr-service-response-instance')"
-                    if="xxf:get-document-attribute('fr-action', 'action-continuation-id') = 'my-action-2-id'">
-                    <!--Action Implementation Here-->
-                    <!--Action Implementation Here-->
-                    <xf:insert ref="xxf:instance('fr-service-request-instance')"
-                        origin="xf:parse(xxf:instance('my-service-toto-instance'))"/>
-                    <xf:var name="original-context"
-                        value="."/>
-                    <!--Action Implementation Here-->
-                    <xf:action type="xpath">
-                        xxf:set-document-attribute('fr-action', 'action-continuation-id', 'my-action-3-id')
-                    </xf:action>
-                    <xf:insert ref="xxf:instance('fr-service-response-instance')"
-                        origin="xf:element('response')"/>
-                    <xf:send submission="my-service-toto-submission"/>
-                </xf:action>
-                <xf:action
-                    observer="my-service-toto-submission"
-                    event="xforms-submit-done"
-                    context="xxf:instance('fr-service-response-instance')"
-                    if="xxf:get-document-attribute('fr-action', 'action-continuation-id') = 'my-action-3-id'">
-                    <!--Action Implementation Here-->
-                    <!--Action Implementation Here-->
-                    <xf:var name="cond1"
-                        value="true()"/>
-                    <xf:action if="$cond1">
-                        <!--Action Implementation Here-->
-                        <xf:dispatch name="fr-action-continuation-my-action-4-id"
-                            targetid="fr-form-model"/>
-                    </xf:action>
-                    <xf:action if="not($cond1)">
-                        <xf:dispatch name="fr-action-continuation-my-action-4-id"
-                            targetid="fr-form-model"/>
-                    </xf:action>
-                </xf:action>
-                <xf:action
-                    observer="fr-form-model"
-                    event="fr-action-continuation-my-action-4-id"
-                    context="xxf:instance('fr-service-response-instance')">
-                    <!--Action Implementation Here-->
-                    <xf:action if="empty((/response/row))">
-                        <xf:dispatch name="fr-action-continuation-my-action-5-id"
-                            targetid="fr-form-model"/>
-                    </xf:action>
-                    <xf:action iterate="/response/row">
-                        <xf:action if="not(xxf:get-document-attribute('fr-action', 'action-error') = true())">
-                            <xf:action type="xpath">
-                                xxf:set-document-attribute('fr-action', 'action-continuation-is-last-iteration-1', position() = last()),
-                                xxf:set-document-attribute('fr-action', 'iteration-context-1', .)
-                            </xf:action>
-                            <!--Action Implementation Here-->
-                            <!--Action Implementation Here-->
-                            <!--Action Implementation Here-->
-                            <!--Action Implementation Here-->
-                            <!--Action Implementation Here-->
-                            <!--Action Implementation Here-->
-                            <xf:dispatch if="xxf:get-document-attribute('fr-action', 'action-continuation-is-last-iteration-1') = true()"
-                                name="fr-action-continuation-my-action-5-id"
-                                targetid="fr-form-model"/>
-                        </xf:action>
-                    </xf:action>
-                </xf:action>
-                <xf:action
-                    observer="fr-form-model"
-                    event="fr-action-continuation-my-action-5-id"
-                    context="xxf:instance('fr-service-response-instance')">
-                    <!--Action Implementation Here-->
-                    <xf:action if="empty((/response/row[exists(foo)]))">
-                        <xf:dispatch name="fr-action-continuation-my-action-7-id"
-                            targetid="fr-form-model"/>
-                    </xf:action>
-                    <xf:action iterate="/response/row[exists(foo)]">
-                        <xf:action if="not(xxf:get-document-attribute('fr-action', 'action-error') = true())">
-                            <xf:action type="xpath">
-                                xxf:set-document-attribute('fr-action', 'action-continuation-is-last-iteration-1', position() = last()),
-                                xxf:set-document-attribute('fr-action', 'iteration-context-1', .)
-                            </xf:action>
-                            <!--Action Implementation Here-->
-                            <xf:insert ref="xxf:instance('fr-service-request-instance')"
-                                origin="xf:parse(xxf:instance('my-service-get-attachment-instance'))"/>
-                            <xf:var name="original-context"
-                                value="."/>
-                            <!--Action Implementation Here-->
-                            <xf:action type="xpath">xxf:set-document-attribute('fr-action', 'action-continuation-id',
-                                'my-action-6-id')
-                            </xf:action>
-                            <xf:insert ref="xxf:instance('fr-service-response-instance')"
-                                origin="xf:element('response')"/>
-                            <xf:send submission="my-service-get-attachment-submission"/>
-                        </xf:action>
-                    </xf:action>
-                </xf:action>
-                <xf:action
-                    observer="my-service-get-attachment-submission"
-                    event="xforms-submit-done"
-                    context="xxf:instance('fr-service-response-instance')"
-                    if="xxf:get-document-attribute('fr-action', 'action-continuation-id') = 'my-action-6-id'">
-                    <!--Action Implementation Here-->
-                    <!--Action Implementation Here-->
-                    <xf:dispatch if="xxf:get-document-attribute('fr-action', 'action-continuation-is-last-iteration-1') = true()"
-                        name="fr-action-continuation-my-action-7-id"
-                        targetid="fr-form-model"/>
-                </xf:action>
-                <xf:action
-                    observer="fr-form-model"
-                    event="fr-action-continuation-my-action-7-id"
-                    context="xxf:instance('fr-service-response-instance')">
-                    <!--Action Implementation Here-->
-                    <!--Action Implementation Here-->
-                    <!--Action Implementation Here-->
-                </xf:action>
-                <xf:action
-                    event="xforms-submit-error"
-                    observer="my-service-gaga-submission my-service-toto-submission my-service-get-attachment-submission"
-                    type="xpath">xxf:set-document-attribute('fr-action', 'action-error', true()),
-                    fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')
-                </xf:action>
-            </xf:model>
+               <xf:action observer="my-control-control" target="#observer" event="xforms-enabled xforms-value-changed DOMActivate"
+                          if="fr:mode() = ('new')">
+                       <xf:dispatch name="fr-call-user-my-action-action"
+                                    targetid="fr-form-model">
+                           <xf:property xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" name="action-id"
+                                        value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true"/>
+                           <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                       </xf:dispatch>
+                   </xf:action>
+                   <xf:action
+                           target="fr-form-model" event="fr-run-form-load-action-after-controls">
+                       <xf:dispatch name="fr-call-user-my-action-action" targetid="fr-form-model">
+                           <xf:property xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" name="action-id"
+                                        value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true"/>
+                           <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                       </xf:dispatch>
+                       <xf:dispatch name="fr-call-user-other-action-action" targetid="fr-form-model">
+                           <xf:property xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" name="action-id"
+                                        value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true"/>
+                           <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                       </xf:dispatch>
+                   </xf:action>
+                   <xf:action id="my-action-binding"
+                              event="fr-call-user-my-action-action" target="fr-form-model">
+                       <xf:var name="current-action-id" value="event('action-id')"/>
+                       <!--Action Implementation Here-->
+                       <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-source', event('action-source'))</xf:action>
+                       <!--Action Implementation Here-->
+                       <xf:insert ref="xxf:instance('fr-service-request-instance')" origin="xf:parse(xxf:instance('my-service-gaga-instance'))"/>
+                       <!--Action Implementation Here-->
+                       <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-id', 'my-action-2-id')</xf:action>
+                       <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                       <xf:send submission="my-service-gaga-submission">
+                           <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                       </xf:send>
+                   </xf:action>
+                   <xf:action observer="my-service-gaga-submission"
+                              event="xforms-submit-done" context="xxf:instance('fr-service-response-instance')"
+                              if="xxf:get-document-attribute(event('action-id'), 'action-continuation-id') = 'my-action-2-id'">
+                       <xf:var name="current-action-id" value="event('action-id')"/>
+                       <!--Action Implementation Here-->
+                       <xf:insert ref="xxf:instance('fr-service-request-instance')" origin="xf:parse(xxf:instance('my-service-toto-instance'))"/>
+                       <xf:var name="original-context" value="."/>
+                       <!--Action Implementation Here-->
+                       <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-id', 'my-action-3-id')</xf:action>
+                       <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                       <xf:send submission="my-service-toto-submission">
+                           <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                       </xf:send>
+                   </xf:action>
+                   <xf:action observer="my-service-toto-submission"
+                              event="xforms-submit-done" context="xxf:instance('fr-service-response-instance')"
+                              if="xxf:get-document-attribute(event('action-id'), 'action-continuation-id') = 'my-action-3-id'">
+                       <xf:var name="current-action-id" value="event('action-id')"/>
+                       <!--Action Implementation Here-->
+                       <xf:var name="cond1" value="true()"/>
+                       <xf:action if="$cond1">
+                           <!--Action Implementation Here-->
+                           <xf:dispatch name="fr-action-continuation-my-action-4-id" targetid="fr-form-model">
+                               <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                           </xf:dispatch>
+                       </xf:action>
+                       <xf:action if="not($cond1)">
+                           <xf:dispatch name="fr-action-continuation-my-action-4-id" targetid="fr-form-model">
+                               <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                           </xf:dispatch>
+                       </xf:action>
+                   </xf:action>
+                   <xf:action observer="fr-form-model"
+                              event="fr-action-continuation-my-action-4-id" context="xxf:instance('fr-service-response-instance')">
+                       <xf:var name="current-action-id" value="event('action-id')"/>
+                       <!--Action Implementation Here-->
+                       <xf:action if="empty((/response/row))">
+                           <xf:dispatch name="fr-action-continuation-my-action-5-id" targetid="fr-form-model">
+                               <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                           </xf:dispatch>
+                       </xf:action>
+                       <xf:action iterate="/response/row">
+                           <xf:action if="exists(xxf:get-document-attribute($current-action-id, 'action-source'))">
+                               <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-is-last-iteration-1', position() = last()), xxf:set-document-attribute($current-action-id, 'iteration-context-1', .)</xf:action>
+                               <!--Action Implementation Here-->
+                               <xf:dispatch if="xxf:get-document-attribute($current-action-id, 'action-continuation-is-last-iteration-1') = true()" name="fr-action-continuation-my-action-5-id" targetid="fr-form-model">
+                                   <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                               </xf:dispatch>
+                           </xf:action>
+                       </xf:action>
+                   </xf:action>
+                   <xf:action observer="fr-form-model"
+                              event="fr-action-continuation-my-action-5-id" context="xxf:instance('fr-service-response-instance')">
+                       <xf:var name="current-action-id" value="event('action-id')"/>
+                       <!--Action Implementation Here-->
+                       <xf:action if="empty((/response/row[exists(foo)]))">
+                           <xf:dispatch name="fr-action-continuation-my-action-7-id" targetid="fr-form-model">
+                               <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                           </xf:dispatch>
+                       </xf:action>
+                       <xf:action iterate="/response/row[exists(foo)]">
+                           <xf:action if="exists(xxf:get-document-attribute($current-action-id, 'action-source'))">
+                               <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-is-last-iteration-1', position() = last()), xxf:set-document-attribute($current-action-id, 'iteration-context-1', .)</xf:action>
+                               <!--Action Implementation Here-->
+                               <xf:insert ref="xxf:instance('fr-service-request-instance')" origin="xf:parse(xxf:instance('my-service-get-attachment-instance'))"/>
+                               <xf:var name="original-context" value="."/>
+                               <!--Action Implementation Here-->
+                               <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-id', 'my-action-6-id')</xf:action>
+                               <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                               <xf:send submission="my-service-get-attachment-submission">
+                                   <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                               </xf:send>
+                           </xf:action>
+                       </xf:action>
+                   </xf:action>
+                   <xf:action observer="my-service-get-attachment-submission"
+                              event="xforms-submit-done" context="xxf:instance('fr-service-response-instance')"
+                              if="xxf:get-document-attribute(event('action-id'), 'action-continuation-id') = 'my-action-6-id'">
+                       <xf:var name="current-action-id" value="event('action-id')"/>
+                       <!--Action Implementation Here-->
+                       <xf:dispatch if="xxf:get-document-attribute($current-action-id, 'action-continuation-is-last-iteration-1') = true()" name="fr-action-continuation-my-action-7-id" targetid="fr-form-model">
+                           <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                       </xf:dispatch>
+                   </xf:action>
+                   <xf:action observer="fr-form-model"
+                              event="fr-action-continuation-my-action-7-id" context="xxf:instance('fr-service-response-instance')">
+                       <xf:var name="current-action-id" value="event('action-id')"/>
+                       <!--Action Implementation Here-->
+                   </xf:action>
+                   <xf:action
+                           event="xforms-submit-error"
+                           observer="my-service-gaga-submission my-service-toto-submission my-service-get-attachment-submission"
+                           type="xpath">xxf:remove-document-attributes(event('action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')</xf:action>
+                   <xf:action
+                           event="xxforms-action-error" target="#observer" propagate="stop">
+                       <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
+                       <xf:message level="xxf:log-error" value="event('element')"/>
+                       <xf:action type="xpath" if="exists(event('action-id'))">xxf:remove-document-attributes(event('action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
+                   </xf:action>
+                </xf:model>
         </output>
     </test>
 
@@ -323,44 +291,44 @@
         <output name="data">
             <xf:model id="fr-form-model">
                 <xf:action
-                    target="fr-form-model"
-                    event="fr-run-form-load-action-after-controls">
-                    <xf:dispatch name="fr-call-user-my-action-action"
-                        targetid="fr-form-model">
-                        <xf:property name="action-source"
-                            value="event('xxf:absolute-targetid')"/>
-                    </xf:dispatch>
-                </xf:action>
+                        target="fr-form-model" event="fr-run-form-load-action-after-controls">
+                   <xf:dispatch name="fr-call-user-my-action-action" targetid="fr-form-model">
+                       <xf:property xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" name="action-id"
+                                    value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true"/>
+                       <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                   </xf:dispatch>
+               </xf:action>
+                <xf:action id="my-action-binding"
+                           event="fr-call-user-my-action-action" target="fr-form-model">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+                   <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-source', event('action-source'))</xf:action>
+                   <!--Action Implementation Here-->
+                   <xf:var name="cond1" value="true()"/>
+                   <xf:action if="$cond1">
+                       <!--Action Implementation Here-->
+                       <xf:dispatch name="fr-action-continuation-my-action-2-id" targetid="fr-form-model">
+                           <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                       </xf:dispatch>
+                   </xf:action>
+                   <xf:action if="not($cond1)">
+                       <xf:dispatch name="fr-action-continuation-my-action-2-id" targetid="fr-form-model">
+                           <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                       </xf:dispatch>
+                   </xf:action>
+               </xf:action>
+                <xf:action observer="fr-form-model"
+                           event="fr-action-continuation-my-action-2-id" context="instance('fr-form-instance')">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+               </xf:action>
                 <xf:action
-                    id="my-action-binding"
-                    event="fr-call-user-my-action-action"
-                    target="fr-form-model">
-                    <xf:var name="new-action-id"
-                        value="'fr-action'"/>
-                    <xf:action type="xpath">
-                        xxf:set-document-attribute($new-action-id, 'action-source', event('action-source')),
-                        xxf:set-document-attribute($new-action-id, 'action-error', false())
-                    </xf:action>
-                    <!--Action Implementation Here-->
-                    <xf:var name="cond1"
-                        value="true()"/>
-                    <xf:action if="$cond1">
-                        <!--Action Implementation Here-->
-                        <xf:dispatch name="fr-action-continuation-my-action-2-id"
-                            targetid="fr-form-model"/>
-                    </xf:action>
-                    <xf:action if="not($cond1)">
-                        <xf:dispatch name="fr-action-continuation-my-action-2-id"
-                            targetid="fr-form-model"/>
-                    </xf:action>
-                </xf:action>
-                <xf:action
-                    observer="fr-form-model"
-                    event="fr-action-continuation-my-action-2-id"
-                    context="instance('fr-form-instance')">
-                    <!--Action Implementation Here-->
-                </xf:action>
-            </xf:model>
+                        event="xxforms-action-error" target="#observer" propagate="stop">
+                   <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
+                   <xf:message level="xxf:log-error" value="event('element')"/>
+                   <xf:action type="xpath" if="exists(event('action-id'))">xxf:remove-document-attributes(event('action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
+               </xf:action>
+           </xf:model>
         </output>
     </test>
 
@@ -409,134 +377,123 @@
         <output name="data">
             <xf:model id="fr-form-model">
                 <xf:action
-                    target="fr-form-model"
-                    event="fr-run-form-load-action-after-controls">
-                    <xf:dispatch name="fr-call-user-my-action-action"
-                        targetid="fr-form-model">
-                        <xf:property name="action-source"
-                            value="event('xxf:absolute-targetid')"/>
-                    </xf:dispatch>
-                </xf:action>
+                        target="fr-form-model" event="fr-run-form-load-action-after-controls">
+                   <xf:dispatch name="fr-call-user-my-action-action" targetid="fr-form-model">
+                       <xf:property xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" name="action-id"
+                                    value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true"/>
+                       <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                   </xf:dispatch>
+               </xf:action>
                 <xf:action
-                    id="my-action-binding"
-                    event="fr-call-user-my-action-action"
-                    target="fr-form-model">
-                    <xf:var name="new-action-id"
-                        value="'fr-action'"/>
-                    <xf:action type="xpath">
-                        xxf:set-document-attribute($new-action-id, 'action-source', event('action-source')),
-                        xxf:set-document-attribute($new-action-id, 'action-error', false())
-                    </xf:action>
-                    <!--Action Implementation Here-->
-                    <xf:insert ref="xxf:instance('fr-service-request-instance')"
-                        origin="xf:parse(xxf:instance('my-service-1-instance'))"/>
-                    <xf:action type="xpath">xxf:set-document-attribute('fr-action', 'action-continuation-id', 'my-action-2-id')</xf:action>
-                    <xf:insert ref="xxf:instance('fr-service-response-instance')"
-                        origin="xf:element('response')"/>
-                    <xf:send submission="my-service-1-submission"/>
-                </xf:action>
+                        id="my-action-binding" event="fr-call-user-my-action-action" target="fr-form-model">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+                   <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-source', event('action-source'))</xf:action>
+                   <!--Action Implementation Here-->
+                   <xf:insert ref="xxf:instance('fr-service-request-instance')" origin="xf:parse(xxf:instance('my-service-1-instance'))"/>
+                   <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-id', 'my-action-2-id')</xf:action>
+                   <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                   <xf:send submission="my-service-1-submission">
+                       <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                   </xf:send>
+               </xf:action>
                 <xf:action
-                    observer="my-service-1-submission"
-                    event="xforms-submit-done"
-                    context="xxf:instance('fr-service-response-instance')"
-                    if="xxf:get-document-attribute('fr-action', 'action-continuation-id') = 'my-action-2-id'">
-                    <!--Action Implementation Here-->
-                    <xf:action if="empty((/*/record))">
-                        <xf:dispatch name="fr-action-continuation-my-action-6-id"
-                            targetid="fr-form-model"/>
-                    </xf:action>
-                    <xf:action iterate="/*/record">
-                        <xf:action if="not(xxf:get-document-attribute('fr-action', 'action-error') = true())">
-                            <xf:action type="xpath">
-                                xxf:set-document-attribute('fr-action', 'action-continuation-is-last-iteration-1', position() = last()),
-                                xxf:set-document-attribute('fr-action', 'iteration-context-1', .)
-                            </xf:action>
-                            <!--Action Implementation Here-->
-                            <xf:insert ref="xxf:instance('fr-service-request-instance')"
-                                origin="xf:parse(xxf:instance('my-service-2-instance'))"/>
-                            <xf:action type="xpath">
-                                xxf:set-document-attribute('fr-action', 'action-continuation-id', 'my-action-3-id')
-                            </xf:action>
-                            <xf:insert ref="xxf:instance('fr-service-response-instance')"
-                                origin="xf:element('response')"/>
-                            <xf:send submission="my-service-2-submission"/>
-                        </xf:action>
-                    </xf:action>
-                </xf:action>
+                        observer="my-service-1-submission" event="xforms-submit-done"
+                        context="xxf:instance('fr-service-response-instance')"
+                        if="xxf:get-document-attribute(event('action-id'), 'action-continuation-id') = 'my-action-2-id'">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+                   <xf:action if="empty((/*/record))">
+                       <xf:dispatch name="fr-action-continuation-my-action-6-id" targetid="fr-form-model">
+                           <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                       </xf:dispatch>
+                   </xf:action>
+                   <xf:action iterate="/*/record">
+                       <xf:action if="exists(xxf:get-document-attribute($current-action-id, 'action-source'))">
+                           <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-is-last-iteration-1', position() = last()), xxf:set-document-attribute($current-action-id, 'iteration-context-1', .)</xf:action>
+                           <!--Action Implementation Here-->
+                           <xf:insert ref="xxf:instance('fr-service-request-instance')" origin="xf:parse(xxf:instance('my-service-2-instance'))"/>
+                           <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-id', 'my-action-3-id')</xf:action>
+                           <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                           <xf:send submission="my-service-2-submission">
+                               <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                           </xf:send>
+                       </xf:action>
+                   </xf:action>
+               </xf:action>
                 <xf:action
-                    observer="my-service-2-submission"
-                    event="xforms-submit-done"
-                    context="xxf:instance('fr-service-response-instance')"
-                    if="xxf:get-document-attribute('fr-action', 'action-continuation-id') = 'my-action-3-id'">
-                    <!--Action Implementation Here-->
-                    <xf:var name="cond1"
-                        value="true()"/>
-                    <xf:action if="$cond1">
-                        <!--Action Implementation Here-->
-                        <xf:insert ref="xxf:instance('fr-service-request-instance')"
-                            origin="xf:parse(xxf:instance('my-service-3-instance'))"/>
-                        <xf:var name="original-context"
-                            value="."/>
-                        <!--Action Implementation Here-->
-                        <xf:action type="xpath">
-                            xxf:set-document-attribute('fr-action', 'action-continuation-id', 'my-action-4-id')
-                        </xf:action>
-                        <xf:insert ref="xxf:instance('fr-service-response-instance')"
-                            origin="xf:element('response')"/>
-                        <xf:send submission="my-service-3-submission"/>
-                    </xf:action>
-                    <xf:action if="not($cond1)">
-                        <xf:dispatch name="fr-action-continuation-my-action-5-id"
-                            targetid="fr-form-model"/>
-                    </xf:action>
-                </xf:action>
+                        observer="my-service-2-submission" event="xforms-submit-done"
+                        context="xxf:instance('fr-service-response-instance')"
+                        if="xxf:get-document-attribute(event('action-id'), 'action-continuation-id') = 'my-action-3-id'">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+                   <xf:var name="cond1" value="true()"/>
+                   <xf:action if="$cond1">
+                       <!--Action Implementation Here-->
+                       <xf:insert ref="xxf:instance('fr-service-request-instance')" origin="xf:parse(xxf:instance('my-service-3-instance'))"/>
+                       <xf:var name="original-context" value="."/>
+                       <!--Action Implementation Here-->
+                       <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-id', 'my-action-4-id')</xf:action>
+                       <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                       <xf:send submission="my-service-3-submission">
+                           <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                       </xf:send>
+                   </xf:action>
+                   <xf:action if="not($cond1)">
+                       <xf:dispatch name="fr-action-continuation-my-action-5-id" targetid="fr-form-model">
+                           <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                       </xf:dispatch>
+                   </xf:action>
+               </xf:action>
                 <xf:action
-                    observer="my-service-3-submission"
-                    event="xforms-submit-done"
-                    context="xxf:instance('fr-service-response-instance')"
-                    if="xxf:get-document-attribute('fr-action', 'action-continuation-id') = 'my-action-4-id'">
-                    <!--Action Implementation Here-->
-                    <xf:dispatch name="fr-action-continuation-my-action-5-id"
-                        targetid="fr-form-model"/>
-                </xf:action>
+                        observer="my-service-3-submission" event="xforms-submit-done"
+                        context="xxf:instance('fr-service-response-instance')"
+                        if="xxf:get-document-attribute(event('action-id'), 'action-continuation-id') = 'my-action-4-id'">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+                   <xf:dispatch name="fr-action-continuation-my-action-5-id" targetid="fr-form-model">
+                       <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                   </xf:dispatch>
+               </xf:action>
                 <xf:action
-                    observer="fr-form-model"
-                    event="fr-action-continuation-my-action-5-id"
-                    context="xxf:instance('fr-service-response-instance')">
-                    <!--Action Implementation Here-->
-                    <xf:dispatch if="xxf:get-document-attribute('fr-action', 'action-continuation-is-last-iteration-1') = true()"
-                        name="fr-action-continuation-my-action-6-id"
-                        targetid="fr-form-model"/>
-                </xf:action>
+                        observer="fr-form-model" event="fr-action-continuation-my-action-5-id"
+                        context="xxf:instance('fr-service-response-instance')">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+                   <xf:dispatch if="xxf:get-document-attribute($current-action-id, 'action-continuation-is-last-iteration-1') = true()" name="fr-action-continuation-my-action-6-id" targetid="fr-form-model">
+                       <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                   </xf:dispatch>
+               </xf:action>
                 <xf:action
-                    observer="fr-form-model"
-                    event="fr-action-continuation-my-action-6-id"
-                    context="xxf:instance('fr-service-response-instance')">
-                    <!--Action Implementation Here-->
-                    <xf:insert ref="xxf:instance('fr-service-request-instance')"
-                        origin="xf:parse(xxf:instance('my-service-4-instance'))"/>
-                    <xf:action type="xpath">
-                        xxf:set-document-attribute('fr-action', 'action-continuation-id', 'my-action-7-id')
-                    </xf:action>
-                    <xf:insert ref="xxf:instance('fr-service-response-instance')"
-                        origin="xf:element('response')"/>
-                    <xf:send submission="my-service-4-submission"/>
-                </xf:action>
+                        observer="fr-form-model" event="fr-action-continuation-my-action-6-id"
+                        context="xxf:instance('fr-service-response-instance')">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+                   <xf:insert ref="xxf:instance('fr-service-request-instance')" origin="xf:parse(xxf:instance('my-service-4-instance'))"/>
+                   <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-id', 'my-action-7-id')</xf:action>
+                   <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                   <xf:send submission="my-service-4-submission">
+                       <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                   </xf:send>
+               </xf:action>
                 <xf:action
-                    observer="my-service-4-submission"
-                    event="xforms-submit-done"
-                    context="xxf:instance('fr-service-response-instance')"
-                    if="xxf:get-document-attribute('fr-action', 'action-continuation-id') = 'my-action-7-id'">
-                    <!--Action Implementation Here-->
-                </xf:action>
+                        observer="my-service-4-submission" event="xforms-submit-done"
+                        context="xxf:instance('fr-service-response-instance')"
+                        if="xxf:get-document-attribute(event('action-id'), 'action-continuation-id') = 'my-action-7-id'">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+               </xf:action>
                 <xf:action
-                    event="xforms-submit-error"
-                    observer="my-service-1-submission my-service-2-submission my-service-3-submission my-service-4-submission"
-                    type="xpath">
-                    xxf:set-document-attribute('fr-action', 'action-error', true()),
-                    fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')
-                </xf:action>
-            </xf:model>
+                        event="xforms-submit-error"
+                        observer="my-service-1-submission my-service-2-submission my-service-3-submission my-service-4-submission"
+                        type="xpath">xxf:remove-document-attributes(event('action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')</xf:action>
+                <xf:action
+                        event="xxforms-action-error" target="#observer" propagate="stop">
+                   <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
+                   <xf:message level="xxf:log-error" value="event('element')"/>
+                   <xf:action type="xpath" if="exists(event('action-id'))">xxf:remove-document-attributes(event('action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
+               </xf:action>
+           </xf:model>
         </output>
     </test>
 
@@ -594,89 +551,76 @@
         <output name="data">
             <xf:model id="fr-form-model">
                 <xf:action
-                    target="fr-form-model"
-                    event="fr-run-form-load-action-after-controls">
-                    <xf:dispatch name="fr-call-user-my-action-action"
-                        targetid="fr-form-model">
-                        <xf:property name="action-source"
-                            value="event('xxf:absolute-targetid')"/>
-                    </xf:dispatch>
-                </xf:action>
+                        target="fr-form-model" event="fr-run-form-load-action-after-controls">
+                   <xf:dispatch name="fr-call-user-my-action-action" targetid="fr-form-model">
+                       <xf:property xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" name="action-id"
+                                    value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true"/>
+                       <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                   </xf:dispatch>
+               </xf:action>
                 <xf:action
-                    id="my-action-binding"
-                    event="fr-call-user-my-action-action"
-                    target="fr-form-model">
-                    <xf:var name="new-action-id"
-                        value="'fr-action'"/>
-                    <xf:action type="xpath">
-                        xxf:set-document-attribute($new-action-id, 'action-source', event('action-source')),
-                        xxf:set-document-attribute($new-action-id, 'action-error', false())
-                    </xf:action>
-                    <xf:insert ref="xxf:instance('fr-service-request-instance')"
-                        origin="xf:parse(xxf:instance('echo-instance'))"/>
-                    <xf:action type="xpath">
-                        xxf:set-document-attribute('fr-action', 'action-continuation-id', 'my-action-2-id')
-                    </xf:action>
-                    <xf:insert ref="xxf:instance('fr-service-response-instance')"
-                        origin="xf:element('response')"/>
-                    <xf:send submission="echo-submission"/>
-                </xf:action>
+                        id="my-action-binding" event="fr-call-user-my-action-action" target="fr-form-model">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+                   <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-source', event('action-source'))</xf:action>
+                   <!--Action Implementation Here-->
+                   <xf:insert ref="xxf:instance('fr-service-request-instance')" origin="xf:parse(xxf:instance('echo-instance'))"/>
+                   <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-id', 'my-action-2-id')</xf:action>
+                   <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
+                   <xf:send submission="echo-submission">
+                       <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                   </xf:send>
+               </xf:action>
                 <xf:action
-                    observer="echo-submission"
-                    event="xforms-submit-done"
-                    context="xxf:instance('fr-service-response-instance')"
-                    if="xxf:get-document-attribute('fr-action', 'action-continuation-id') = 'my-action-2-id'">
-                    <!--Action Implementation Here-->
-                    <xf:action if="empty((/*/level1))">
-                        <xf:dispatch name="fr-action-continuation-my-action-4-id"
-                            targetid="fr-form-model"/>
-                    </xf:action>
-                    <xf:action iterate="/*/level1">
-                        <xf:action if="not(xxf:get-document-attribute('fr-action', 'action-error') = true())">
-                            <xf:action type="xpath">
-                                xxf:set-document-attribute('fr-action', 'action-continuation-is-last-iteration-1', position() = last()),
-                                xxf:set-document-attribute('fr-action', 'iteration-context-1', .)
-                            </xf:action>
-                            <!--Action Implementation Here-->
-                            <!--Action Implementation Here-->
-                            <xf:action if="empty((level2))">
-                                <xf:dispatch name="fr-action-continuation-my-action-3-id"
-                                    targetid="fr-form-model"/>
-                            </xf:action>
-                            <xf:action iterate="level2"
-                                context="xxf:get-document-attribute('fr-action', 'iteration-context-1')">
-                                <xf:action if="not(xxf:get-document-attribute('fr-action', 'action-error') = true())">
-                                    <xf:action type="xpath">
-                                        xxf:set-document-attribute('fr-action', 'action-continuation-is-last-iteration-2', position() = last()),
-                                        xxf:set-document-attribute('fr-action', 'iteration-context-2', .)
-                                    </xf:action>
-                                    <!--Action Implementation Here-->
-                                    <!--Action Implementation Here-->
-                                    <xf:dispatch if="xxf:get-document-attribute('fr-action', 'action-continuation-is-last-iteration-2') = true()"
-                                        name="fr-action-continuation-my-action-3-id"
-                                        targetid="fr-form-model"/>
-                                </xf:action>
-                            </xf:action>
-                        </xf:action>
-                    </xf:action>
-                </xf:action>
+                        observer="echo-submission" event="xforms-submit-done"
+                        context="xxf:instance('fr-service-response-instance')"
+                        if="xxf:get-document-attribute(event('action-id'), 'action-continuation-id') = 'my-action-2-id'">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+                   <xf:action if="empty((/*/level1))">
+                       <xf:dispatch name="fr-action-continuation-my-action-4-id" targetid="fr-form-model">
+                           <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                       </xf:dispatch>
+                   </xf:action>
+                   <xf:action iterate="/*/level1">
+                       <xf:action if="exists(xxf:get-document-attribute($current-action-id, 'action-source'))">
+                           <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-is-last-iteration-1', position() = last()), xxf:set-document-attribute($current-action-id, 'iteration-context-1', .)</xf:action>
+                           <!--Action Implementation Here-->
+                           <xf:action if="empty((level2))">
+                               <xf:dispatch name="fr-action-continuation-my-action-3-id" targetid="fr-form-model">
+                                   <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                               </xf:dispatch>
+                           </xf:action>
+                           <xf:action iterate="level2" context="xxf:get-document-attribute($current-action-id, 'iteration-context-1')">
+                               <xf:action if="exists(xxf:get-document-attribute($current-action-id, 'action-source'))">
+                                   <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-is-last-iteration-2', position() = last()), xxf:set-document-attribute($current-action-id, 'iteration-context-2', .)</xf:action>
+                                   <!--Action Implementation Here-->
+                                   <xf:dispatch if="xxf:get-document-attribute($current-action-id, 'action-continuation-is-last-iteration-2') = true()" name="fr-action-continuation-my-action-3-id" targetid="fr-form-model">
+                                       <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                                   </xf:dispatch>
+                               </xf:action>
+                           </xf:action>
+                       </xf:action>
+                   </xf:action>
+               </xf:action>
                 <xf:action
-                    observer="fr-form-model"
-                    event="fr-action-continuation-my-action-3-id"
-                    context="xxf:get-document-attribute('fr-action', 'iteration-context-1')">
-                    <!--Action Implementation Here-->
-                    <xf:dispatch if="xxf:get-document-attribute('fr-action', 'action-continuation-is-last-iteration-1') = true()"
-                        name="fr-action-continuation-my-action-4-id"
-                        targetid="fr-form-model"/>
-                </xf:action>
+                        observer="fr-form-model" event="fr-action-continuation-my-action-3-id"
+                        context="xxf:get-document-attribute(event('action-id'), 'iteration-context-1')">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+                   <xf:dispatch if="xxf:get-document-attribute($current-action-id, 'action-continuation-is-last-iteration-1') = true()" name="fr-action-continuation-my-action-4-id" targetid="fr-form-model">
+                       <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                   </xf:dispatch>
+               </xf:action>
                 <xf:action
-                    event="xforms-submit-error"
-                    observer="echo-submission"
-                    type="xpath">
-                    xxf:set-document-attribute('fr-action', 'action-error', true()),
-                    fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')
-                </xf:action>
-            </xf:model>
+                        event="xforms-submit-error" observer="echo-submission" type="xpath">xxf:remove-document-attributes(event('action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')</xf:action>
+                <xf:action
+                        event="xxforms-action-error" target="#observer" propagate="stop">
+                   <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
+                   <xf:message level="xxf:log-error" value="event('element')"/>
+                   <xf:action type="xpath" if="exists(event('action-id'))">xxf:remove-document-attributes(event('action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
+               </xf:action>
+           </xf:model>
         </output>
     </test>
 
@@ -684,96 +628,74 @@
         <input name="config" href="test-actions.xsl"/>
         <input name="data" href="/forms/tests/actions-format-20182-copy-content/form/form.xhtml"/>
         <output name="data">
-            <xf:model id="fr-form-model"
-                xxf:expose-xpath-types="true"
-                xxf:analysis.calculate="true">
+            <xf:model id="fr-form-model" xxf:expose-xpath-types="true"
+                      xxf:analysis.calculate="true">
                 <xf:action
-                    target="fr-form-model"
-                    event="fr-run-form-load-action-after-controls">
-                    <xf:dispatch name="fr-call-user-my-action-action"
-                        targetid="fr-form-model">
-                        <xf:property name="action-source"
-                            value="event('xxf:absolute-targetid')"/>
-                    </xf:dispatch>
-                </xf:action>
-                <xf:action observer="copy-data-button-control"
-                    target="#observer"
-                    event="DOMActivate">
-                    <xf:dispatch
-                        name="fr-call-user-my-action-action"
-                        targetid="fr-form-model">
-                        <xf:property name="action-source"
-                            value="event('xxf:absolute-targetid')"/>
-                    </xf:dispatch>
-                </xf:action>
-                <xf:action observer="copy-data-button-no-warning-control"
-                    target="#observer"
-                    event="DOMActivate">
-                    <xf:dispatch
-                        name="fr-call-user-my-action-no-warning-action"
-                        targetid="fr-form-model">
-                        <xf:property name="action-source"
-                            value="event('xxf:absolute-targetid')"/>
-                    </xf:dispatch>
-                </xf:action>
-                <xf:action
-                    id="my-action-binding"
-                    event="fr-call-user-my-action-action"
-                    target="fr-form-model">
-                    <xf:var name="new-action-id"
-                        value="'fr-action'"/>
-                    <xf:action type="xpath">
-                        xxf:set-document-attribute($new-action-id, 'action-source', event('action-source')),
-                        xxf:set-document-attribute($new-action-id, 'action-error', false())
-                    </xf:action>
-                    <!--Action Implementation Here-->
-                    <!--Action Implementation Here-->
-                    <xf:dispatch if="not($must-warn)"
-                        name="fr-action-continuation-my-action-2-id"
-                        targetid="fr-form-model"/>
-                </xf:action>
-                <xf:action
-                    observer="fr-form-model"
-                    event="fr-action-continuation-my-action-2-id"
-                    context="instance('fr-form-instance')">
-                    <!--Action Implementation Here-->
-                    <!--Action Implementation Here-->
-                    <!--Action Implementation Here-->
-                    <!--Action Implementation Here-->
-                </xf:action>
-                <xf:action
-                    id="my-action-no-warning-binding"
-                    event="fr-call-user-my-action-no-warning-action"
-                    target="fr-form-model">
-                    <xf:var name="new-action-id"
-                        value="'fr-action'"/>
-                    <xf:action type="xpath">
-                        xxf:set-document-attribute($new-action-id, 'action-source', event('action-source')),
-                        xxf:set-document-attribute($new-action-id, 'action-error', false())
-                    </xf:action>
-                    <!--Action Implementation Here-->
-                    <!--Action Implementation Here-->
-                    <!--Action Implementation Here-->
-                    <!--Action Implementation Here-->
-                </xf:action>
-                <xf:instance xxf:readonly="true"
-                   xxf:exclude-result-prefixes="#all"
-                   id="grid-1-template">
+                        target="fr-form-model" event="fr-run-form-load-action-after-controls">
+                   <xf:dispatch name="fr-call-user-my-action-action" targetid="fr-form-model">
+                       <xf:property xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" name="action-id"
+                                    value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true"/>
+                       <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                   </xf:dispatch>
+               </xf:action>
+                <xf:action observer="copy-data-button-control" target="#observer" event="DOMActivate">
+                   <xf:dispatch name="fr-call-user-my-action-action"
+                                targetid="fr-form-model">
+                       <xf:property xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" name="action-id"
+                                    value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true"/>
+                       <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                   </xf:dispatch>
+               </xf:action>
+                <xf:action observer="copy-data-button-no-warning-control" target="#observer" event="DOMActivate">
+                   <xf:dispatch
+                           name="fr-call-user-my-action-no-warning-action" targetid="fr-form-model">
+                       <xf:property xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" name="action-id"
+                                    value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true"/>
+                       <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                   </xf:dispatch>
+               </xf:action>
+                <xf:action id="my-action-binding"
+                           event="fr-call-user-my-action-action" target="fr-form-model">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+                   <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-source', event('action-source'))</xf:action>
+                   <!--Action Implementation Here-->
+                   <xf:dispatch if="not($must-warn)" name="fr-action-continuation-my-action-2-id" targetid="fr-form-model">
+                       <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+                   </xf:dispatch>
+               </xf:action>
+                <xf:action observer="fr-form-model"
+                           event="fr-action-continuation-my-action-2-id" context="instance('fr-form-instance')">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+               </xf:action>
+                <xf:action id="my-action-no-warning-binding"
+                           event="fr-call-user-my-action-no-warning-action" target="fr-form-model">
+                   <xf:var name="current-action-id" value="event('action-id')"/>
+                   <!--Action Implementation Here-->
+                   <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-source', event('action-source'))</xf:action>
+                   <!--Action Implementation Here-->
+               </xf:action>
+                <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-1-template">
                    <grid-1-iteration>
                        <control-1/>
                        <control-2/>
                    </grid-1-iteration>
                </xf:instance>
-               <xf:instance xxf:readonly="true"
-                   xxf:exclude-result-prefixes="#all"
-                   id="grid-2-template">
+                <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-2-template">
                    <grid-2-iteration>
                        <control-3/>
                        <control-4/>
                        <control-5/>
                    </grid-2-iteration>
                </xf:instance>
-            </xf:model>
+                <xf:action
+                        event="xxforms-action-error" target="#observer" propagate="stop">
+                   <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
+                   <xf:message level="xxf:log-error" value="event('element')"/>
+                   <xf:action type="xpath" if="exists(event('action-id'))">xxf:remove-document-attributes(event('action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
+               </xf:action>
+           </xf:model>å
         </output>
     </test>
 

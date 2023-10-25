@@ -561,12 +561,19 @@
                                 ORBEON.xforms.Controls.setConstraintLevel(documentElement, newLevel);
 
                             // Handle progress for upload controls
-                            if (progressState != null && progressState != "")
+                            // The attribute `progress-expected="…"` could be missing, even if we have a
+                            // progress-received="50591"` (see `expectedSize` which is an `Option` in `UploadProgress`),
+                            // in which case we don't have a "progress" to report to the progress bar.
+                            if (
+                                progressState    != null && progressState    != "" &&
+                                progressExpected != null && progressExpected != ""
+                            ) {
                                 ORBEON.xforms.Page.getUploadControl(documentElement).progress(
                                     progressState,
                                     progressReceived != null && progressReceived != "" ? parseInt(progressReceived) : null,
                                     progressExpected != null && progressExpected != "" ? parseInt(progressExpected) : null
                                 );
+                            }
 
                             // Handle visited flag
                             if (newVisited)

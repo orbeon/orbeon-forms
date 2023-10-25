@@ -441,7 +441,11 @@ class XFormsModelSubmission(
                 case Some(Right(connectResultF)) =>
                   containingDocument
                     .getAsynchronousSubmissionManager(create = true)
-                    .foreach(_.addAsynchronousSubmission(thisSubmission.getEffectiveId, connectResultF.map(_ -> p.actionProperties)))
+                    .foreach(_.addAsynchronousSubmission(
+                      thisSubmission.getEffectiveId,
+                      connectResultF.map(_ -> p.actionProperties),
+                      awaitInCurrentRequest = p2.responseMustAwait
+                    ))
                   None
                 case None =>
                   // Nothing to do here (case of `ClientGetAllSubmission`)

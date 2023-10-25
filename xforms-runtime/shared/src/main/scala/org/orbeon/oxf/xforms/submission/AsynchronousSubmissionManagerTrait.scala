@@ -21,8 +21,10 @@ trait AsynchronousSubmissionManagerTrait {
         properties        = Nil    // poll event doesn't need properties
       )
 
-  def addAsynchronousSubmission(submissionEffectiveId: String, future: Future[SubmissionResult]): Unit
+  def addAsynchronousSubmission(submissionEffectiveId: String, future: Future[SubmissionResult], awaitInCurrentRequest: Boolean): Unit
   def hasPendingAsynchronousSubmissions: Boolean
-  def processAllAsynchronousSubmissionsForJoin(containingDocument: XFormsContainingDocument): Unit
   def processCompletedAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit
+
+  def awaitAllAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit
+  def awaitAsynchronousSubmissionsForCurrentRequest(containingDocument: XFormsContainingDocument): Unit
 }

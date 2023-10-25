@@ -242,6 +242,10 @@
 
     <property as="xs:boolean" name="oxf.fr.detail.readonly.disable-calculate.*.*"               value="false"/>
 
+    <!-- Actions -->
+    <property as="xs:boolean" name="oxf.fr.detail.actions.async.*.*"                            value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.actions.response-must-await.*.*"              value="true"/>
+
     <property as="xs:string" name="oxf.fr.email.pdf.filename.*.*">
         concat(
             fr:form-title(),

@@ -138,7 +138,7 @@ class XFormsContainingDocument(
       // order to optimize events. Perform deferred updates only for `xforms-ready`.
       withOutermostActionHandler {
         initializeModels()
-        processCompletedAsynchronousSubmissions(skipDeferredEventHandling = true, addPollEvent = true)
+        processCompletedAsynchronousSubmissions(skipDeferredEventHandling = true, beforeResponse = true)
       }
 
       processDueDelayedEvents(submissionIdOpt = None)
@@ -242,14 +242,14 @@ class XFormsContainingDocument(
     this._responseForReplaceAll = responseForReplaceAll.some
 
     if (submissionIdOpt.isEmpty)
-      processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, addPollEvent = false)
+      processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, beforeResponse = false)
     processDueDelayedEvents(submissionIdOpt)
   }
 
   def afterExternalEvents(submissionIdOpt: Option[String]): Unit = {
 
     if (submissionIdOpt.isEmpty) {
-      processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, addPollEvent = true)
+      processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, beforeResponse = true)
       processDueDelayedEvents(submissionIdOpt = None)
     }
 
@@ -280,17 +280,18 @@ class XFormsContainingDocument(
       case None => None
     }
 
-  private def processCompletedAsynchronousSubmissions(skipDeferredEventHandling: Boolean, addPollEvent: Boolean): Unit =
+  private def processCompletedAsynchronousSubmissions(skipDeferredEventHandling: Boolean, beforeResponse: Boolean): Unit =
     getAsynchronousSubmissionManager(create = false)
       .filter(_.hasPendingAsynchronousSubmissions)
       .foreach { manager =>
-      maybeWithOutermostActionHandler(! skipDeferredEventHandling) {
-        manager.processCompletedAsynchronousSubmissions(this)
+        maybeWithOutermostActionHandler(! skipDeferredEventHandling) {
+          manager.processCompletedAsynchronousSubmissions(this)
+        }
+        if (beforeResponse) {
+          manager.awaitAsynchronousSubmissionsForCurrentRequest(this)
+          manager.addClientDelayEventIfNeeded(this)
+        }
       }
-      // Remember to send a poll event if needed
-      if (addPollEvent)
-        manager.addClientDelayEventIfNeeded(this)
-    }
 
   override def initializeNestedControls(): Unit = {
     // Call-back from super class models initialization

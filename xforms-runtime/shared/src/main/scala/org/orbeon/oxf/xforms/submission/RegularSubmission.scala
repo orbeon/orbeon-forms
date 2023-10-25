@@ -20,7 +20,8 @@ import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport}
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.net.URI
@@ -73,29 +74,28 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     val content = messageBody map
       (StreamedContent.fromBytes(_, firstItemIgnoreCase(headers, ContentType)))
 
-    def createConnectResult(cxr: ConnectionResult): ConnectResult = {
-      try {
-        ConnectResult(
-          submissionEffectiveId,
-          Success(submission.getReplacer(cxr, p)(submission.getIndentedLogger), cxr)
-        )
-      } catch {
-        case NonFatal(throwable) =>
-          // xxx need to close cxr in case of error also later after running deserialize()
-          IOUtils.runQuietly(cxr.close()) // close here as it's not passed through `ConnectResult`
-          ConnectResult(submissionEffectiveId, Failure(throwable))
-      } finally {
-        if (p2.isAsynchronous && timingLogger.debugEnabled) {
-          timingLogger.setDebugResults(
-            "id",
+    def createConnectResult(cxr: ConnectionResult)(implicit logger: IndentedLogger): ConnectResult =
+      withDebug("creating connect result") {
+        try {
+          ConnectResult(
             submissionEffectiveId,
-            "asynchronous",
-            p2.isAsynchronous.toString
+            Success(submission.getReplacer(cxr, p)(submission.getIndentedLogger), cxr)
           )
-          timingLogger.endHandleOperation()
+        } catch {
+          case NonFatal(throwable) =>
+            // xxx need to close cxr in case of error also later after running deserialize()
+            IOUtils.runQuietly(cxr.close()) // close here as it's not passed through `ConnectResult`
+            ConnectResult(submissionEffectiveId, Failure(throwable))
+        } finally {
+          if (p2.isAsynchronous)
+            debugResults(
+              List(
+                "id"           -> submissionEffectiveId,
+                "asynchronous" -> p2.isAsynchronous.toString
+              )
+            )
         }
       }
-    }
 
     Some(
       if (p2.isAsynchronous || p.isDeferredSubmissionSecondPass)
@@ -110,7 +110,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
             logBody         = BaseSubmission.isLogBody)(
             logger          = detailsLogger,
             externalContext = externalContext
-          ).map(createConnectResult)
+          ).map(createConnectResult(_)(timingLogger))
         )
       else
         Left(
@@ -127,7 +127,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
               logger          = detailsLogger,
               externalContext = externalContext
             )
-          )
+          )(timingLogger)
         )
     )
   }

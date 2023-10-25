@@ -313,11 +313,13 @@
         <xsl:variable name="model-id"    select="$model/@id/string()" as="xs:string"/>
         <xsl:variable name="action-name" select="@name/string()"  as="xs:string"/>
 
-        <!-- Create a document with a root element so that `preceding::` works -->
-        <xsl:variable name="content-with-markers" as="element(_)">
-            <_>
+        <!-- Create a document with a root element so that `preceding::` works. Also include attributes so actions can
+             search for settings on the ancestor `fr:action` -->
+        <xsl:variable name="content-with-markers" as="element(fr:action)">
+            <fr:action>
+                <xsl:copy-of select="@*"/>
                 <xsl:apply-templates select="fr:*" mode="within-action-2018.2-marking"/>
-            </_>
+            </fr:action>
         </xsl:variable>
 
         <xf:action id="{@name}-binding" event="fr-call-user-{@name}-action" target="{$model-id}">
@@ -574,9 +576,24 @@
         <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
         <xf:send submission="{$service-name}-submission">
             <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
-            <xsl:if test="exists(@async[. = ('true', 'false')])">
-                <xf:property name="fr-async" value="{@async}"/>
-            </xsl:if>
+            <xsl:variable
+                name="async"
+                as="xs:boolean"
+                select="
+                    ancestor::fr:action/@async = 'true' or (
+                        not(ancestor::fr:action/@async = 'false') and
+                        $actions-async
+                    )"/>
+            <xf:property name="fr-async" value="'{$async}'"/>
+            <xsl:variable
+                name="response-must-await"
+                as="xs:boolean"
+                select="
+                    ancestor::fr:action/@response-must-await = 'true' or (
+                        not(ancestor::fr:action/@response-must-await = 'false') and
+                        $actions-response-must-await
+                    )"/>
+            <xf:property name="fr-response-must-await" value="'{$response-must-await}'"/>
         </xf:send>
 
     </xsl:template>

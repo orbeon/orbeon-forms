@@ -75,6 +75,24 @@
 
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
 
+    <!-- Actions -->
+    <xsl:variable
+        name="actions-async"
+        as="xs:boolean"
+        select="
+            $fr-form-metadata/actions/async = 'true' or (
+                not($fr-form-metadata/actions/async = 'false') and
+                p:property(string-join(('oxf.fr.detail.actions.async', $app, $form), '.')) = true()
+            )"/>
+    <xsl:variable
+        name="actions-response-must-await"
+        as="xs:boolean"
+        select="
+            $fr-form-metadata/actions/response-must-await = 'true' or (
+                not($fr-form-metadata/actions/response-must-await = 'false') and
+                p:property(string-join(('oxf.fr.detail.actions.response-must-await', $app, $form), '.')) = true()
+            )"/>
+
     <!-- MIP filtering -->
     <xsl:variable
         name="disable-relevant-param-opt"

@@ -2514,4 +2514,75 @@ az4K</document>
             </xxf:event-response>
         </output>
     </test>
+
+    <test description="Chained async submission awaiting response" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model" xxf:allow-error-recovery-on-init="true">
+
+                        <xf:instance id="my-instance">
+                            <_>
+                                <result/>
+                                <result/>
+                            </_>
+                        </xf:instance>
+
+                        <xf:send
+                            event="xforms-model-construct-done"
+
+                            submission="my-submission">
+                            <xf:property name="q" value="123"/>
+                        </xf:send>
+
+                        <xf:action
+                            event="xforms-submit-done"
+                            observer="my-submission">
+
+                            <xf:setvalue
+                                ref="instance()/result[xxf:is-blank()]"
+                                value="xxf:json-to-xml(event('response-body'))//q"/>
+
+                            <xf:send
+                                if="exists(instance()/result[xxf:is-blank()])"
+                                submission="my-submission">
+                                <xf:property name="q" value="456"/>
+                            </xf:send>
+                        </xf:action>
+
+                        <xf:submission
+                            id="my-submission"
+                            resource="https://httpbin.org/delay/2?q={event('q')}"
+                            method="get"
+                            serialization="none"
+                            mode="asynchronous"
+                            xxf:response-must-await="true"
+                            replace="none"/>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+               <xxf:dynamic-state>
+                   <dynamic-state>
+                       <instances>
+                           <instance id="my-instance" model-id="model">
+                               <_>
+                                   <result>123</result>
+                                   <result>456</result>
+                               </_>
+                           </instance>
+                       </instances>
+                   </dynamic-state>
+               </xxf:dynamic-state>
+               <xxf:action>
+                   <xxf:control-values/>
+               </xxf:action>
+           </xxf:event-response>
+        </output>
+    </test>
 </group>

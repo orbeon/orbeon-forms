@@ -68,6 +68,7 @@ class Submission(
   val serializeOpt               = element.attributeValueOpt("serialize")
   val targetrefOpt               = element.attributeValueOpt("targetref") orElse element.attributeValueOpt(TARGET_QNAME) // `target`: backward compatibility
   val avtModeOpt                 = element.attributeValueOpt("mode")
+  val avtResponseMustAwaitOpt    = element.attributeValueOpt(XXFORMS_RESPONSE_MUST_AWAIT_QNAME)
 
   val avtVersionOpt              = element.attributeValueOpt("version")
   val avtIndentOpt               = element.attributeValueOpt("indent")

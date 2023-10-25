@@ -20,7 +20,7 @@ class AsynchronousSubmissionManager
   private val runningCount = new AtomicInteger(0)
   private val completionQueue = new ConcurrentLinkedQueue[(String, Try[SubmissionResult])]
 
-  def addAsynchronousSubmission(submissionEffectiveId: String, future: Future[SubmissionResult]): Unit = {
+  def addAsynchronousSubmission(submissionEffectiveId: String, future: Future[SubmissionResult], awaitInCurrentRequest: Boolean): Unit = {
     totalSubmittedCount += 1
     pendingCount += 1
     runningCount.incrementAndGet()
@@ -32,23 +32,6 @@ class AsynchronousSubmissionManager
 
   def hasPendingAsynchronousSubmissions: Boolean = pendingCount > 0
 
-  /**
-    * Process all pending asynchronous submissions if any. If processing of a particular submission causes new
-    * asynchronous submissions to be started, also wait for the completion of those.
-    *
-    * Submissions are processed in the order in which they are made available upon termination by the completion
-    * service.
-    */
-  def processAllAsynchronousSubmissionsForJoin(containingDocument: XFormsContainingDocument): Unit =
-    throw new UnsupportedOperationException("not implemented")
-
-  /**
-    * Process all completed asynchronous submissions if any. This method returns as soon as no completed submission is
-    * available.
-    *
-    * Submissions are processed in the order in which they are made available upon termination by the completion
-    * service.
-    */
   def processCompletedAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit = {
 
     implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
@@ -93,5 +76,15 @@ class AsynchronousSubmissionManager
         )
       )
     }
+  }
+
+  def awaitAllAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit = {
+    implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
+    info(s"skipping `awaitAllAsynchronousSubmissions()` as it's not implemented in the JS environment")
+  }
+
+  def awaitAsynchronousSubmissionsForCurrentRequest(containingDocument: XFormsContainingDocument): Unit = {
+    implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
+    info(s"skipping `awaitAsynchronousSubmissionsForCurrentRequest()` as it's not implemented in the JS environment")
   }
 }

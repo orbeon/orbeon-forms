@@ -506,8 +506,23 @@
                     <xsl:attribute name="replace">instance</xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
+            <!-- For now attribute on submission takes precedence over event. We could easily revert that. -->
             <xsl:if test="empty(@mode)">
-                <xsl:attribute name="mode">{(event('fr-async'), 'synchronous')[1]}</xsl:attribute>
+                <xsl:attribute name="mode">{
+                    (
+                        'asynchronous'[exists(event('fr-async')[. = 'true'])],
+                        'synchronous'
+                    )[1]
+                }</xsl:attribute>
+            </xsl:if>
+            <!-- For now attribute on submission takes precedence over event. We could easily revert that. -->
+            <xsl:if test="empty(@xxf:response-must-await)">
+                <xsl:attribute name="xxf:response-must-await">{
+                    (
+                        event('fr-response-must-await')[. = 'false'],
+                        'true'
+                    )[1]
+                }</xsl:attribute>
             </xsl:if>
             <!-- https://github.com/orbeon/orbeon-forms/issues/4606 -->
             <xsl:apply-templates select="xf:header"/>

@@ -7,7 +7,8 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
@@ -21,14 +22,30 @@ class AsynchronousSubmissionManager
 
   private var totalSubmittedCount = 0
   private var pendingCount = 0
-  private val runningCount = new AtomicInteger(0)
-  private val completionQueue = new ConcurrentLinkedQueue[(String, Try[SubmissionResult])]
 
-  def addAsynchronousSubmission(submissionEffectiveId: String, future: Future[SubmissionResult]): Unit = {
+  private val runningCount           = new AtomicInteger(0)
+  private val completionQueue        = new ConcurrentLinkedQueue[(String, Try[SubmissionResult])]
+  private var pendingList            = List.empty[Future[SubmissionResult]]
+
+  private val requestRunningCount    = new AtomicInteger(0)
+  private var requestPendingList     = List.empty[Future[SubmissionResult]]
+
+  def addAsynchronousSubmission(submissionEffectiveId: String, future: Future[SubmissionResult], awaitInCurrentRequest: Boolean): Unit = {
+
     totalSubmittedCount += 1
     pendingCount += 1
+
+    if (awaitInCurrentRequest) {
+      requestRunningCount.incrementAndGet()
+      requestPendingList ::= future
+    }
+
     runningCount.incrementAndGet()
+    pendingList ::= future
+
     future.onComplete { result =>
+      if (awaitInCurrentRequest)
+        requestRunningCount.decrementAndGet()
       runningCount.decrementAndGet()
       completionQueue.add(submissionEffectiveId -> result)
     }
@@ -36,23 +53,6 @@ class AsynchronousSubmissionManager
 
   def hasPendingAsynchronousSubmissions: Boolean = pendingCount > 0
 
-  /**
-    * Process all pending asynchronous submissions if any. If processing of a particular submission causes new
-    * asynchronous submissions to be started, also wait for the completion of those.
-    *
-    * Submissions are processed in the order in which they are made available upon termination by the completion
-    * service.
-    */
-  def processAllAsynchronousSubmissionsForJoin(containingDocument: XFormsContainingDocument): Unit =
-    throw new UnsupportedOperationException("not implemented")
-
-  /**
-    * Process all completed asynchronous submissions if any. This method returns as soon as no completed submission is
-    * available.
-    *
-    * Submissions are processed in the order in which they are made available upon termination by the completion
-    * service.
-    */
   def processCompletedAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit = {
 
     implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
@@ -60,6 +60,7 @@ class AsynchronousSubmissionManager
     withDebug("processing completed asynchronous submissions") {
       var processedCount = 0
       var failedCount = 0
+
       Iterator.continually(completionQueue.poll()).takeWhile(_ ne null).foreach {
         case (submissionEffectiveId, Success(result)) =>
 
@@ -90,12 +91,38 @@ class AsynchronousSubmissionManager
 
       debugResults(
         List(
-          "processed" -> processedCount.toString,
-          "failed"    -> failedCount.toString,
-          "pending"   -> pendingCount.toString,
-          "running"   -> runningCount.toString,
+          "processed"          -> processedCount.toString,
+          "failed"             -> failedCount.toString,
+          "total submitted"    -> totalSubmittedCount.toString,
+          "pending"            -> pendingCount.toString,
+          "running"            -> runningCount.toString,
+          "running in request" -> requestRunningCount.toString,
         )
       )
     }
   }
+
+  /**
+    * Await all pending asynchronous submissions if any. If processing of a particular submission causes new
+    * asynchronous submissions to be started, also wait for the completion of those.
+    */
+  def awaitAllAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit =
+    awaitPending(containingDocument, () => pendingList, () => pendingList = Nil)
+
+  /**
+   * Await all pending asynchronous submissions that have been specially marked and started in this current request.
+   */
+  def awaitAsynchronousSubmissionsForCurrentRequest(containingDocument: XFormsContainingDocument): Unit =
+    awaitPending(containingDocument, () => requestPendingList, () => requestPendingList = Nil)
+
+  private def awaitPending(containingDocument: XFormsContainingDocument, get: () => List[Future[SubmissionResult]], clear: () => Unit): Unit =
+    while (get().nonEmpty) {
+
+      val batch = get()
+      clear()
+
+      // TODO: It would be good to process submissions as soon as one is ready to be processed.
+      Await.result(Future.sequence(batch), Duration.Inf)
+      processCompletedAsynchronousSubmissions(containingDocument)
+    }
 }

@@ -15,18 +15,18 @@ package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{Column, FilterType, SearchRequest}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{Field, FilterType, SearchRequest}
 
 
 object columnFilterPart {
 
   def apply(request: SearchRequest): StatementPart =
-    if (! request.columns.exists(_.filterType != FilterType.None))
+    if (! request.fields.exists(_.filterType != FilterType.None))
         NilPart
     else
         StatementPart(
           sql =
-            request.columns
+            request.fields
               // Only consider column with a filter
               .filter(_.filterType != FilterType.None)
               // Add index, used to refer the appropriate tf table
@@ -51,7 +51,7 @@ object columnFilterPart {
               .mkString(" "),
           setters = {
             val values =
-              request.columns.flatMap { case Column(path, matchType) =>
+              request.fields.flatMap { case Field(path, matchType) =>
                 matchType match {
                   case FilterType.None              => List.empty
                   case FilterType.Exact(filter)     => path :: List(Provider.textEqualsParam  (request.provider, filter))

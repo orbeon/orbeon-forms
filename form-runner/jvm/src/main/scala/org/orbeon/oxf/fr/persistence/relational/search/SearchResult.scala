@@ -14,16 +14,16 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, SearchRequest}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{DocumentResult, FieldResult, SearchRequest}
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.scaxon.NodeConversions
 
 trait SearchResult extends SearchRequestParser {
 
-  def outputResult(
+  def outputDocumentResults(
     request   : SearchRequest,
-    documents : List[Document],
+    documents : List[DocumentResult],
     count     : Int,
     receiver  : XMLReceiver
   ): Unit = {
@@ -44,7 +44,7 @@ trait SearchResult extends SearchRequestParser {
             operations          ={doc.operations}>{
 
             <details>{
-              request.columns.map { requestColumn =>
+              request.fields.map { requestColumn =>
                   val columnValue = doc.values
                     // For all the value for the current doc, get the ones for the current column
                     .filter(_.control == requestColumn.path)
@@ -66,5 +66,30 @@ trait SearchResult extends SearchRequestParser {
       Logger.logDebug("search result", documentsElem.toString)
 
     NodeConversions.elemToSAX(documentsElem, receiver)
+  }
+
+  def outputFieldResults(
+    fields   : List[FieldResult],
+    receiver : XMLReceiver
+  ): Unit = {
+
+    // Produce XML result
+    val fieldsElems =
+      <fields>{
+        fields.map { field =>
+          <field path={field.path}>
+            <values>{
+              field.values.map { value =>
+                <value>{value}</value>
+              }
+            }</values>
+          </field>
+        }
+      }</fields>
+
+    if (Logger.debugEnabled)
+      Logger.logDebug("search result", fieldsElems.toString)
+
+    NodeConversions.elemToSAX(fieldsElems, receiver)
   }
 }

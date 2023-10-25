@@ -17,7 +17,7 @@ import org.orbeon.oxf.externalcontext.UserAndGroup
 
 import java.sql.Timestamp
 
-case class DocumentMetaData(
+case class DocumentMetadata(
   documentId       : String,
   draft            : Boolean,
   createdTime      : Timestamp,
@@ -29,14 +29,18 @@ case class DocumentMetaData(
 )
 
 case class DocumentValue(
-  control          : String,
-  pos              : Int,
-  value            : String
+  control : String,
+  pos     : Int,
+  value   : String
 )
 
-case class Document(
-  metadata         : DocumentMetaData,
-  operations       : String,
-  values           : List[DocumentValue]
+case class DocumentResult(
+  metadata   : DocumentMetadata,
+  operations : String,
+  values     : List[DocumentValue]
 )
 
+case class FieldResult(
+  path   : String,
+  values : Seq[String]
+)

@@ -70,6 +70,8 @@ object PersistenceMetadataSupport {
             encryptedFieldsPaths = Eval.later(FieldEncryption.getFieldsToEncrypt(formDefinitionDoc, appForm).map(_.path)),
             indexedFieldsXPaths  = Eval.later(Index.findIndexedControls(
               formDefinitionDoc,
+              appForm,
+              versionOpt = None,
               FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
               // We only need the fields XPaths, no need to evaluate settings against user roles
               forUserRoles = None

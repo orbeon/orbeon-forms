@@ -37,6 +37,7 @@
 
             <xf:var name="app"     value="$parameters/app/string()"/>
             <xf:var name="form"    value="$parameters/form/string()"/>
+
             <xf:var name="version" value="($parameters/form-version[xxf:non-blank()]/xs:integer(.), 1)[1]"/>
 
             <xf:var name="is-fb"        value="$app = 'orbeon' and $form = 'builder'"/>
@@ -427,7 +428,7 @@
 
                 <xf:insert
                     context="instance('fr-search-labels-instance')"
-                    origin="frf:findIndexedControlsAsXML(instance('fr-source-form-instance')/root(), $app, $form, fr:user-roles())"/>
+                    origin="frf:findIndexedControlsAsXML(instance('fr-source-form-instance')/root(), $app, $form, $version, fr:user-roles())"/>
 
                 <xf:insert
                     context="instance('fr-search-instance')"

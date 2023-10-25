@@ -15,11 +15,11 @@ package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchRequest
+import org.orbeon.oxf.fr.persistence.relational.search.adt.DocumentSearchRequest
 
 object freeTextFilterPart {
 
-  def apply(request: SearchRequest): StatementPart =
+  def apply(request: DocumentSearchRequest): StatementPart =
     request.freeTextSearch match {
 
       case None =>

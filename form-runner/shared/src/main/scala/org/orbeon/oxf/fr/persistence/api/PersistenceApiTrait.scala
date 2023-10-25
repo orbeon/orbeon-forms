@@ -25,6 +25,7 @@ import java.net.URI
 import java.time.Instant
 import java.{util => ju}
 import scala.util.Try
+import scala.xml.Elem
 
 
 // Provide a simple API to access the persistence layer from Scala
@@ -43,6 +44,8 @@ trait PersistenceApiTrait {
     isDraft     : Boolean
   )
 
+  case class FieldDetails(path: String, values: Seq[String])
+
   case class DataHistoryDetails(
     modifiedTime    : Instant,
     modifiedUsername: Option[String],
@@ -52,17 +55,40 @@ trait PersistenceApiTrait {
     isDeleted       : Boolean
   )
 
+  private def documentsXmlTry(
+    servicePath             : String,
+    queryXml                : Elem,
+    version                 : Int)(implicit
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  )  =
+    ConnectionResult.tryWithSuccessConnection(
+      connectPersistence(
+        method             = HttpMethod.POST,
+        path               = servicePath,
+        requestBodyContent = StreamedContent.fromBytes(queryXml.toString.getBytes(CharsetNames.Utf8), ContentTypes.XmlContentType.some).some,
+        formVersionOpt     = version.some
+      ),
+      closeOnSuccess = true
+    ) { is =>
+      XFormsCrossPlatformSupport.readTinyTree(
+        XPath.GlobalConfiguration,
+        is,
+        servicePath,
+        handleXInclude = false,
+        handleLexical = false
+      )
+    }
+
   def search(
-    appFormVersion: AppFormVersion
-  )(implicit
+    appFormVersion          : AppFormVersion)(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Iterator[DataDetails] = {
 
     debug(s"calling search for `$appFormVersion`")
 
-    val servicePath =
-      s"/fr/service/persistence/search/${appFormVersion._1.app}/${appFormVersion._1.form}"
+    val servicePath = s"/fr/service/persistence/search/${appFormVersion._1.app}/${appFormVersion._1.form}"
 
     def readPage(pageNumber: Int): Try[DocumentNodeInfoType] = {
 
@@ -75,26 +101,7 @@ trait PersistenceApiTrait {
             <page-number>{pageNumber}</page-number>
         </search>
 
-      val documentsXmlTry =
-        ConnectionResult.tryWithSuccessConnection(
-          connectPersistence(
-            method             = HttpMethod.POST,
-            path               = servicePath,
-            requestBodyContent = StreamedContent.fromBytes(queryXml.toString.getBytes(CharsetNames.Utf8), ContentTypes.XmlContentType.some).some,
-            formVersionOpt     = appFormVersion._2.some
-          ),
-          closeOnSuccess = true
-        ) { is =>
-          XFormsCrossPlatformSupport.readTinyTree(
-            XPath.GlobalConfiguration,
-            is,
-            servicePath,
-            handleXInclude = false,
-            handleLexical  = false
-          )
-        }
-
-      documentsXmlTry
+      documentsXmlTry(servicePath, queryXml, appFormVersion._2)
     }
 
     def pageToDataDetails(page: DocumentNodeInfoType): (Iterator[DataDetails], Int, Int) =
@@ -112,6 +119,34 @@ trait PersistenceApiTrait {
       )
 
     callPagedService(pageNumber => readPage(pageNumber).map(pageToDataDetails))
+  }
+
+  def fieldSearch(
+    appFormVersion          : AppFormVersion,
+    fields                  : Seq[String])(implicit
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Seq[FieldDetails] = {
+
+    debug(s"calling field search for `$appFormVersion`")
+
+    val servicePath = s"/fr/service/persistence/search/${appFormVersion._1.app}/${appFormVersion._1.form}"
+
+    val queryXml =
+      <search search-type="field">{
+        fields.map { field =>
+          <query path={field}/>
+        }
+      }</search>
+
+    val fieldsXml = documentsXmlTry(servicePath, queryXml, appFormVersion._2).get
+
+    (fieldsXml.rootElement / "field") map { fieldElem =>
+      FieldDetails(
+        path   = fieldElem.attValue("path"),
+        values = (fieldElem / "values" / "value").map(_.getStringValue)
+      )
+    }
   }
 
   def dataHistory(

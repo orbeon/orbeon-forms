@@ -73,9 +73,11 @@ trait FormRunnerSummary {
       .orNull
 
   //@XPathFunction
-  def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String, userRoles: java.util.List[String]): Seq[NodeInfo] =
+  def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String, version: Int, userRoles: java.util.List[String]): Seq[NodeInfo] =
     Index.findIndexedControls(
       formDoc,
+      AppForm(app, form),
+      Some(version),
       FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form)),
       forUserRoles = Some(userRoles.asScala.toList)
     ) map

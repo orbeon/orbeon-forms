@@ -20,18 +20,48 @@ import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Provider
 
 
-case class SearchRequest(
-  provider        : Provider,
-  appForm         : AppForm,
-  version         : SearchVersion,
-  credentials     : Option[Credentials],
-  pageSize        : Int,
-  pageNumber      : Int,
-  columns         : List[Column],
-  drafts          : Drafts,
-  freeTextSearch  : Option[String],
-  anyOfOperations : Option[Set[Operation]]
-)
+sealed trait SearchType
+object SearchType {
+  case object DocumentSearch extends SearchType
+  case object FieldSearch    extends SearchType
+
+  def fromString(s: String): SearchType = s match {
+    case "document" => DocumentSearch
+    case "field"    => FieldSearch
+    case other      => throw new IllegalArgumentException(s"Invalid search type: $other")
+  }
+}
+
+sealed trait SearchRequest {
+  def provider        : Provider
+  def appForm         : AppForm
+  def version         : SearchVersion
+  def credentials     : Option[Credentials]
+  def anyOfOperations : Option[Set[Operation]]
+  def fields          : List[Field]
+}
+
+case class DocumentSearchRequest(
+  override val provider        : Provider,
+  override val appForm         : AppForm,
+  override val version         : SearchVersion,
+  override val credentials     : Option[Credentials],
+  override val anyOfOperations : Option[Set[Operation]],
+  override val fields          : List[Field],
+  pageSize                     : Int,
+  pageNumber                   : Int,
+  drafts                       : Drafts,
+  freeTextSearch               : Option[String]
+) extends SearchRequest
+
+case class FieldSearchRequest(
+  override val provider        : Provider,
+  override val appForm         : AppForm,
+  override val version         : SearchVersion,
+  override val credentials     : Option[Credentials],
+  override val anyOfOperations : Option[Set[Operation]],
+  override val fields          : List[Field]
+) extends SearchRequest
 
 sealed trait FilterType
 
@@ -42,9 +72,9 @@ object FilterType {
   case class  Token     (filter: List[String]) extends FilterType
 }
 
-case class Column(
-  path           : String,
-  filterType     : FilterType
+case class Field(
+  path       : String,
+  filterType : FilterType
 )
 
 sealed trait Drafts

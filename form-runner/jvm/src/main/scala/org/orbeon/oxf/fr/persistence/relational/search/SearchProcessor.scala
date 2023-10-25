@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Version._
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{DocumentSearchRequest, FieldSearchRequest}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
@@ -49,11 +50,16 @@ class SearchProcessor
             getInputByName(ProcessorImpl.INPUT_DATA),
             XPath.GlobalConfiguration
           )
-          val request = parseRequest(searchDocument, version)
 
-          val (result, count) = doSearch(request)
+          parseRequest(searchDocument, version) match {
+            case documentSearchRequest: DocumentSearchRequest =>
+              val (documents, count) = doDocumentSearch(documentSearchRequest)
+              outputDocumentResults(documentSearchRequest, documents, count, xmlReceiver)
 
-          outputResult(request, result, count, xmlReceiver)
+            case fieldSearchRequest: FieldSearchRequest =>
+              val fields = doFieldSearch(fieldSearchRequest)
+              outputFieldResults(fields, xmlReceiver)
+          }
         }
       }
     )

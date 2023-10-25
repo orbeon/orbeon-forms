@@ -28,7 +28,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.SQLUtils._
 
-import java.sql.Timestamp
+import java.sql.{Connection, Timestamp}
 import scala.collection.mutable
 
 
@@ -53,7 +53,7 @@ trait SearchLogic extends SearchRequestParser {
     )
   }
 
-  def doSearch(request: SearchRequest): (List[Document], Int) = {
+  private def doSearch[T, R <: SearchRequest](request: R, noPermissionValue: T)(body: (R, Connection, List[StatementPart], SearchPermissions) => T): T = {
 
     val version          = PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(request.appForm, request.version)
     val permissions      = computePermissions(request, version)
@@ -65,19 +65,27 @@ trait SearchLogic extends SearchRequestParser {
 
     if (hasNoPermissions)
       // There is no chance we can access any data, no need to run any SQL
-      (Nil, 0)
+      noPermissionValue
     else
       RelationalUtils.withConnection { connection =>
 
         val commonParts = List(
           commonPart         (request, version),
-          draftsPart         (request),
-          permissionsPart    (permissions),
           columnFilterPart   (request),
-          freeTextFilterPart (request)
+          permissionsPart    (permissions)
         )
 
-        val innerSQL = buildQuery(commonParts)
+        body(request, connection, commonParts, permissions)
+      }
+    }
+
+  def doDocumentSearch(request: DocumentSearchRequest): (List[DocumentResult], Int) =
+    doSearch(request, noPermissionValue = (List[DocumentResult](), 0)) {
+      case (request: DocumentSearchRequest, connection: Connection, commonParts: List[StatementPart], permissions: SearchPermissions) =>
+
+        val statementParts = commonParts :+ draftsPart(request) :+ freeTextFilterPart(request)
+        val innerSQL       = buildQuery(statementParts)
+
         val searchCount = {
           val sql =
             s"""SELECT count(*)
@@ -87,7 +95,7 @@ trait SearchLogic extends SearchRequestParser {
              """.stripMargin
 
           Logger.logDebug("search total query", sql)
-          executeQuery(connection, sql, commonParts) { rs =>
+          executeQuery(connection, sql, statementParts) { rs =>
             rs.next()
             rs.getInt(1)
           }
@@ -142,12 +150,12 @@ trait SearchLogic extends SearchRequestParser {
         }
         Logger.logDebug("search items query", sql)
 
-        val documentsMetadataValues = executeQuery(connection, sql, commonParts) { documentsResultSet =>
+        val documentsMetadataValues = executeQuery(connection, sql, statementParts) { documentsResultSet =>
 
           Iterator.iterateWhile(
             cond = documentsResultSet.next(),
             elem = (
-                DocumentMetaData(
+                DocumentMetadata(
                   documentId       = documentsResultSet.getString                 ("document_id"),
                   draft            = documentsResultSet.getString                 ("draft") == "Y",
                   createdTime      = documentsResultSet.getTimestamp              ("created"),
@@ -180,9 +188,43 @@ trait SearchLogic extends SearchRequestParser {
             val organization              = metadata.organizationId.map(id => organizationsCache.getOrElseUpdate(id, readFromDatabase(id)))
             val check                     = CheckWithDataUser(metadata.createdBy, organization)
             val operations                = PermissionsAuthorization.authorizedOperations(permissions.formPermissions, request.credentials, check)
-            Document(metadata, Operations.serialize(operations, normalized = true).mkString(" "), values)
+            DocumentResult(metadata, Operations.serialize(operations, normalized = true).mkString(" "), values)
           }
+
         (documents, searchCount)
-      }
+    }
+
+  def doFieldSearch(request: FieldSearchRequest): List[FieldResult] =
+    doSearch(request, noPermissionValue = List[FieldResult]()) {
+      case (request: FieldSearchRequest, connection: Connection, commonParts: List[StatementPart], _: SearchPermissions) =>
+
+        val innerSQL = buildQuery(commonParts)
+
+        // Retrieve distinct values for all queried fields
+        request.fields.map { field =>
+
+          val sql =
+            s"""SELECT
+               |    DISTINCT t.val
+               |FROM
+               |    ($innerSQL) c
+               |LEFT JOIN
+               |    orbeon_i_control_text t
+               |    ON t.data_id = c.data_id
+               |WHERE
+               |    t.control = ?
+               |""".stripMargin
+
+          val controlPathPart = StatementPart("", List[Setter]((ps, i) => ps.setString(i, field.path)))
+
+          val values = executeQuery(connection, sql, commonParts :+ controlPathPart) { valuesResultSet =>
+            Iterator.iterateWhile(
+              cond = valuesResultSet.next(),
+              elem = valuesResultSet.getString("val")
+            ).toList
+          }
+
+          FieldResult(field.path, values)
+        }
     }
 }

@@ -14,10 +14,8 @@
 package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.FormDefinitionVersion
-
-import java.sql.Connection
 import org.orbeon.oxf.fr.persistence.relational.Statement.{Setter, StatementPart}
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{FilterType, SearchRequest}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{DocumentSearchRequest, FilterType, SearchRequest}
 import org.orbeon.oxf.util.CoreUtils._
 
 
@@ -30,18 +28,21 @@ object commonPart  {
 
     StatementPart(
       sql = {
-        val columnFilterTables =
-          request.columns
+        val fieldFilterTables =
+          request.fields
             .filter(_.filterType != FilterType.None)
             .zipWithIndex
             .map { case (_, i) => s", orbeon_i_control_text tf$i" }
             .mkString(" ")
-        val freeTextTable =
-          request.freeTextSearch.nonEmpty.string(", orbeon_form_data d")
+
+        val freeTextTable = request match {
+          case documentSearchRequest: DocumentSearchRequest => documentSearchRequest.freeTextSearch.nonEmpty.string(", orbeon_form_data d")
+          case _                                            => ""
+        }
 
         s"""|SELECT DISTINCT c.data_id
             |           FROM orbeon_i_current c
-            |                $columnFilterTables
+            |                $fieldFilterTables
             |                $freeTextTable
             |          WHERE     c.app          = ?
             |                AND c.form         = ?

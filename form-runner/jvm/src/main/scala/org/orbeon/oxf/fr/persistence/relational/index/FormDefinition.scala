@@ -13,15 +13,20 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunnerCommon._
+import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
+import org.orbeon.oxf.fr.persistence.api.PersistenceApiTrait
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SummarySettings}
-import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner, InDocFormRunnerDocContext}
+import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunner, InDocFormRunnerDocContext}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 
 
@@ -34,9 +39,44 @@ trait FormDefinition {
 
   private val ClassesPredicate = Set(FRIndex, FRSummaryShow, FRSummarySearch)
 
+  private          val logger                   = LoggerFactory.createLogger(classOf[FormDefinition])
+  private implicit val indentedLogger           = new IndentedLogger(logger)
+  private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+
+  private def withDynamicItems(
+    appFormVersion: AppFormVersion,
+    controlPaths  : Seq[String],
+    resources     : Seq[(String, NodeInfo)]
+  ): Map[String, Seq[(String, NodeInfo)]] = {
+    object PersistenceApi extends PersistenceApiTrait
+
+    PersistenceApi.fieldSearch(appFormVersion, controlPaths).map { fieldDetails =>
+      // Remove empty values as they're not allowed for dropdown values
+      val values = fieldDetails.values.filter(_.nonEmpty)
+
+      // Use values as labels
+      val items = values.map { value =>
+        <item>
+          <label>{value}</label>
+          <value>{value}</value>
+        </item>
+      }
+
+      // Inject items retrieved from database into resources
+      val updatedResources = for ((lang, resourceHolder) <- resources) yield {
+        val resourceElem = nodeInfoToElem(resourceHolder)
+        lang -> (resourceElem.copy(child = resourceElem.child.filterNot(_.label == "item") ++ items): NodeInfo)
+      }
+
+      fieldDetails.path -> updatedResources
+    }.toMap
+  }
+
   // Returns the controls that are searchable from a form definition
   def findIndexedControls(
     formDoc                   : DocumentNodeInfoType,
+    appForm                   : AppForm,
+    versionOpt                : Option[Int],
     databaseDataFormatVersion : DataFormatVersion,
     forUserRoles              : Option[List[String]]
   ): List[IndexedControl] = {
@@ -57,16 +97,27 @@ trait FormDefinition {
 
     indexedControlBindPathHolders map { case ControlBindPathHoldersResources(control, bind, path, _, resources) =>
       val controlName = FormRunner.getControlName(control)
+      val controlPath = path map (_.value) mkString "/"
+
+      // Is the control dynamic? If so, retrieve the items not from the resources, but from the database
+      val databoundControl =
+        Set[QName](FRDataboundSelect1QName, FRDataboundSelect1SearchQName).map(_.localName).contains(control.localname)
+
+      // TODO: call withDynamicItems only once
+      val resourcesWithDynamicItems = versionOpt match {
+        case Some(version) if databoundControl => withDynamicItems((appForm, version), Seq(controlPath), resources)(controlPath)
+        case _                                 => resources
+      }
 
       IndexedControl(
         name               = controlName,
-        xpath              = path map (_.value) mkString "/",
+        xpath              = controlPath,
         xsType             = (bind /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
         control            = control.localname,
         summarySettings    = summarySettings(control, forUserRoles),
         staticallyRequired = isBindRequired(bind),
         htmlLabel          = FormRunner.hasHTMLMediatype(control / (XF -> "label")),
-        resources          = resources.toList
+        resources          = resourcesWithDynamicItems.toList
       )
     }
   }

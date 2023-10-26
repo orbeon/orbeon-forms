@@ -15,7 +15,7 @@ package org.orbeon.scaxon
 
 import org.orbeon.dom.QName
 import org.orbeon.saxon.om._
-import org.orbeon.saxon.tree.iter.ListIterator
+import org.orbeon.saxon.tree.iter.{EmptyIterator, ListIterator}
 import org.orbeon.saxon.value._
 import org.orbeon.scaxon.SimplePath.URIQualifiedName
 
@@ -36,7 +36,6 @@ object Implicits {
 
 //  implicit def doubleToDoubleValue                 (v: Double)                   : DoubleValue        = new DoubleValue(v)
 //  implicit def itemToSequenceIterator              (v: Item)                     : SequenceIterator   = SingletonIterator.makeIterator(v)
-//  implicit def itemSeqOptToSequenceIterator        (v: Option[coll.Seq[Item]])   : SequenceIterator   = v map itemSeqToSequenceIterator   getOrElse EmptyIterator.getInstance
 //  implicit def stringSeqOptToSequenceIterator      (v: Option[coll.Seq[String]]) : SequenceIterator   = v map stringSeqToSequenceIterator getOrElse EmptyIterator.getInstance
 //  implicit def stringOptToStringValue              (v: Option[String])           : StringValue        = v map stringToStringValue   orNull
 //  implicit def booleanOptToBooleanValue            (v: Option[Boolean])          : BooleanValue       = v map booleanToBooleanValue orNull]
@@ -52,6 +51,7 @@ object Implicits {
 
   implicit def stringSeqToSequenceIterator         (v: coll.Seq[String])         : SequenceIterator   = new ListIterator (v map stringToStringValue asJava)
   implicit def itemSeqToSequenceIterator[T <: Item](v: coll.Seq[T])              : SequenceIterator   = new ListIterator (v.asJava)
+  implicit def itemSeqOptToSequenceIterator        (v: Option[coll.Seq[Item]])   : SequenceIterator   = v map itemSeqToSequenceIterator getOrElse EmptyIterator.getInstance
 
   implicit def nodeInfoToNodeInfoSeq               (v: NodeInfo)                 : coll.Seq[NodeInfo] = List(v ensuring (v ne null))
 

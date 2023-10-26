@@ -83,7 +83,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       targetControlName,
       followIndexes,
       libraryName.trimAllToOpt.map(Left.apply)
-    ).map(_.toList).orNull: List[Item] // https://github.com/orbeon/orbeon-forms/issues/6016
+    ).map(_.toList) // https://github.com/orbeon/orbeon-forms/issues/6016
 
   //@XPathFunction
   def resolveTargetRelativeToActionSourceFromBinds(
@@ -99,7 +99,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       functionContext.sourceEffectiveId,
       actionSourceAbsoluteId,
       targetControlName
-    ).map(_.toList).orNull: List[Item] // https://github.com/orbeon/orbeon-forms/issues/6016
+    ).map(_.toList) // https://github.com/orbeon/orbeon-forms/issues/6016
   }
 
   //@XPathFunction
@@ -112,7 +112,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       targetControlName       = targetControlName,
       followIndexes           = false,
       libraryOrSectionNameOpt = libraryName.trimAllToOpt.map(Left.apply)
-    ).map(_.toList).getOrElse(Nil): List[Item] // https://github.com/orbeon/orbeon-forms/issues/6016
+    ).map(_.toList) // https://github.com/orbeon/orbeon-forms/issues/6016
 
   def resolveTargetRelativeToActionSourceFromControlsUseSectionNameOpt(
     container              : XBLContainer,

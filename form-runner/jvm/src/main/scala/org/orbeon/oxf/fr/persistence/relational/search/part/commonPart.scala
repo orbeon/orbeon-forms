@@ -13,36 +13,35 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.part
 
-import org.orbeon.oxf.fr.FormDefinitionVersion
 import org.orbeon.oxf.fr.persistence.relational.Statement.{Setter, StatementPart}
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{DocumentSearchRequest, FilterType, SearchRequest}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{Control, FilterType}
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.util.CoreUtils._
 
 
 object commonPart  {
 
   def apply(
-    request: SearchRequest,
-    version: FormDefinitionVersion
+    appForm       : AppForm,
+    version       : FormDefinitionVersion,
+    controls      : List[Control],
+    freeTextSearch: Option[String]
   ): StatementPart = {
 
     StatementPart(
       sql = {
-        val fieldFilterTables =
-          request.fields
+        val controlFilterTables =
+          controls
             .filter(_.filterType != FilterType.None)
             .zipWithIndex
             .map { case (_, i) => s", orbeon_i_control_text tf$i" }
             .mkString(" ")
-
-        val freeTextTable = request match {
-          case documentSearchRequest: DocumentSearchRequest => documentSearchRequest.freeTextSearch.nonEmpty.string(", orbeon_form_data d")
-          case _                                            => ""
-        }
+        val freeTextTable =
+          freeTextSearch.nonEmpty.string(", orbeon_form_data d")
 
         s"""|SELECT DISTINCT c.data_id
             |           FROM orbeon_i_current c
-            |                $fieldFilterTables
+            |                $controlFilterTables
             |                $freeTextTable
             |          WHERE     c.app          = ?
             |                AND c.form         = ?
@@ -50,8 +49,8 @@ object commonPart  {
             |""".stripMargin
       },
       setters = {
-        val appSetter        :        Setter  = _.setString(_, request.appForm.app)
-        val formSetter       :        Setter  = _.setString(_, request.appForm.form)
+        val appSetter        :        Setter  = _.setString(_, appForm.app)
+        val formSetter       :        Setter  = _.setString(_, appForm.form)
         val versionSetterOpt : Option[Setter] = version match {
           case FormDefinitionVersion.Specific(v) => Some(_.setInt(_, v))
           case FormDefinitionVersion.Latest      => None

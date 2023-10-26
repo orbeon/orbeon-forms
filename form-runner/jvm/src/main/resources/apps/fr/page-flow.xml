@@ -27,6 +27,10 @@
     <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/search/([^/^.]+)/([^/^.]+)"
              view="persistence/relational/search.xpl"/>
 
+    <!-- Distinct control valus -->
+    <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver)/distinct-control-values/([^/^.]+)/([^/^.]+)"
+             view="persistence/relational/distinct-control-values.xpl"/>
+
     <!-- Deployed forms services -->
     <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/form(/([^/]+)(/([^/]+))?)?"
              default-submission="persistence/form-instance.xml"

@@ -13,16 +13,17 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.externalcontext.{Organization, UserAndGroup}
+import org.orbeon.oxf.externalcontext.{ExternalContext, Organization, UserAndGroup}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
+import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationId, OrganizationSupport}
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.fr.persistence.relational.search.part._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
+import org.orbeon.oxf.fr.persistence.{PersistenceMetadataSupport, SearchVersion}
 import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
@@ -32,14 +33,19 @@ import java.sql.{Connection, Timestamp}
 import scala.collection.mutable
 
 
-trait SearchLogic extends SearchRequestParser {
+object SearchLogic {
+  def searchVersion(httpRequest: ExternalContext.Request): SearchVersion = {
+    val formDefinitionVersionHeader = httpRequest.getFirstHeaderIgnoreCase(OrbeonFormDefinitionVersion)
+    SearchVersion(formDefinitionVersionHeader)
+  }
 
   private def computePermissions(
-    request: SearchRequest,
-    version: FormDefinitionVersion
+    request         : SearchRequestCommon,
+    anyOfOperations : Option[Set[Operation]],
+    version         : FormDefinitionVersion
   ): SearchPermissions = {
 
-    val searchOperations     = request.anyOfOperations.getOrElse(SearchOps.SearchOperations)
+    val searchOperations     = anyOfOperations.getOrElse(SearchOps.SearchOperations)
     val formPermissionsElOpt = PersistenceMetadataSupport.readFormPermissions(request.appForm, version)
     val formPermissions      = FormRunner.permissionsFromElemOrProperties(formPermissionsElOpt, request.appForm)
 
@@ -53,10 +59,17 @@ trait SearchLogic extends SearchRequestParser {
     )
   }
 
-  private def doSearch[T, R <: SearchRequest](request: R, noPermissionValue: T)(body: (R, Connection, List[StatementPart], SearchPermissions) => T): T = {
+  def doSearch[T, R <: SearchRequestCommon](
+    request           : R,
+    controls          : List[Control],
+    freeTextSearch    : Option[String],
+    anyOfOperations   : Option[Set[Operation]],
+    noPermissionValue : T)(
+    body              : (Connection, List[StatementPart], SearchPermissions) => T
+  ): T = {
 
     val version          = PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(request.appForm, request.version)
-    val permissions      = computePermissions(request, version)
+    val permissions      = computePermissions(request, anyOfOperations, version)
     val hasNoPermissions =
       ! permissions.authorizedBasedOnRoleOptimistic     &&
       permissions.authorizedIfUsername         .isEmpty &&
@@ -70,20 +83,33 @@ trait SearchLogic extends SearchRequestParser {
       RelationalUtils.withConnection { connection =>
 
         val commonParts = List(
-          commonPart         (request, version),
-          columnFilterPart   (request),
-          permissionsPart    (permissions)
+          commonPart     (request.appForm, version, controls, freeTextSearch),
+          permissionsPart(permissions)
         )
 
-        body(request, connection, commonParts, permissions)
+        body(connection, commonParts, permissions)
       }
     }
 
-  def doDocumentSearch(request: DocumentSearchRequest): (List[DocumentResult], Int) =
-    doSearch(request, noPermissionValue = (List[DocumentResult](), 0)) {
-      case (request: DocumentSearchRequest, connection: Connection, commonParts: List[StatementPart], permissions: SearchPermissions) =>
+}
 
-        val statementParts = commonParts :+ draftsPart(request) :+ freeTextFilterPart(request)
+trait SearchLogic extends SearchRequestParser {
+
+  def doSearch(request: SearchRequest): (List[Document], Int) =
+    SearchLogic.doSearch(
+      request           = request,
+      controls          = request.controls,
+      freeTextSearch    = request.freeTextSearch,
+      anyOfOperations   = request.anyOfOperations,
+      noPermissionValue = (List[Document](), 0)
+    ) {
+      case (connection: Connection, commonParts: List[StatementPart], permissions: SearchPermissions) =>
+
+        val statementParts = commonParts ++ List(
+          columnFilterPart  (request),
+          draftsPart        (request),
+          freeTextFilterPart(request)
+        )
         val innerSQL       = buildQuery(statementParts)
 
         val searchCount = {
@@ -188,43 +214,8 @@ trait SearchLogic extends SearchRequestParser {
             val organization              = metadata.organizationId.map(id => organizationsCache.getOrElseUpdate(id, readFromDatabase(id)))
             val check                     = CheckWithDataUser(metadata.createdBy, organization)
             val operations                = PermissionsAuthorization.authorizedOperations(permissions.formPermissions, request.credentials, check)
-            DocumentResult(metadata, Operations.serialize(operations, normalized = true).mkString(" "), values)
+            Document(metadata, Operations.serialize(operations, normalized = true).mkString(" "), values)
           }
-
         (documents, searchCount)
-    }
-
-  def doFieldSearch(request: FieldSearchRequest): List[FieldResult] =
-    doSearch(request, noPermissionValue = List[FieldResult]()) {
-      case (request: FieldSearchRequest, connection: Connection, commonParts: List[StatementPart], _: SearchPermissions) =>
-
-        val innerSQL = buildQuery(commonParts)
-
-        // Retrieve distinct values for all queried fields
-        request.fields.map { field =>
-
-          val sql =
-            s"""SELECT
-               |    DISTINCT t.val
-               |FROM
-               |    ($innerSQL) c
-               |LEFT JOIN
-               |    orbeon_i_control_text t
-               |    ON t.data_id = c.data_id
-               |WHERE
-               |    t.control = ?
-               |""".stripMargin
-
-          val controlPathPart = StatementPart("", List[Setter]((ps, i) => ps.setString(i, field.path)))
-
-          val values = executeQuery(connection, sql, commonParts :+ controlPathPart) { valuesResultSet =>
-            Iterator.iterateWhile(
-              cond = valuesResultSet.next(),
-              elem = valuesResultSet.getString("val")
-            ).toList
-          }
-
-          FieldResult(field.path, values)
-        }
     }
 }

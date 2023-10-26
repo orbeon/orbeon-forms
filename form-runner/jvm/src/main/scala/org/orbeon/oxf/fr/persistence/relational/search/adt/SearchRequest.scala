@@ -20,48 +20,25 @@ import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Provider
 
 
-sealed trait SearchType
-object SearchType {
-  case object DocumentSearch extends SearchType
-  case object FieldSearch    extends SearchType
-
-  def fromString(s: String): SearchType = s match {
-    case "document" => DocumentSearch
-    case "field"    => FieldSearch
-    case other      => throw new IllegalArgumentException(s"Invalid search type: $other")
-  }
-}
-
-sealed trait SearchRequest {
+trait SearchRequestCommon {
   def provider        : Provider
   def appForm         : AppForm
   def version         : SearchVersion
   def credentials     : Option[Credentials]
-  def anyOfOperations : Option[Set[Operation]]
-  def fields          : List[Field]
 }
 
-case class DocumentSearchRequest(
-  override val provider        : Provider,
-  override val appForm         : AppForm,
-  override val version         : SearchVersion,
-  override val credentials     : Option[Credentials],
-  override val anyOfOperations : Option[Set[Operation]],
-  override val fields          : List[Field],
-  pageSize                     : Int,
-  pageNumber                   : Int,
-  drafts                       : Drafts,
-  freeTextSearch               : Option[String]
-) extends SearchRequest
-
-case class FieldSearchRequest(
-  override val provider        : Provider,
-  override val appForm         : AppForm,
-  override val version         : SearchVersion,
-  override val credentials     : Option[Credentials],
-  override val anyOfOperations : Option[Set[Operation]],
-  override val fields          : List[Field]
-) extends SearchRequest
+case class SearchRequest(
+  provider        : Provider,
+  appForm         : AppForm,
+  version         : SearchVersion,
+  credentials     : Option[Credentials],
+  pageSize        : Int,
+  pageNumber      : Int,
+  controls        : List[Control],
+  drafts          : Drafts,
+  freeTextSearch  : Option[String],
+  anyOfOperations : Option[Set[Operation]],
+) extends SearchRequestCommon
 
 sealed trait FilterType
 
@@ -72,7 +49,7 @@ object FilterType {
   case class  Token     (filter: List[String]) extends FilterType
 }
 
-case class Field(
+case class Control(
   path       : String,
   filterType : FilterType
 )

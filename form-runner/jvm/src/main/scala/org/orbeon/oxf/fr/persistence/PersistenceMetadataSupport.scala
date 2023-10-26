@@ -20,8 +20,8 @@ import scala.util.{Success, Try}
 
 // This handles query the persistence layer for various metadata. including:
 //
-// - fields to encrypt
-// - fields to index
+// - controls to encrypt
+// - controls to index
 // - querying the form version
 //
 // To increase performance, especially when writing to the persistence layer, we cache the results of these queries with
@@ -67,13 +67,14 @@ object PersistenceMetadataSupport {
       withDebug("reading published form for indexing/encryption details") {
         PersistenceApi.readPublishedFormDefinition(appForm.app, appForm.form, version) map { case ((_, formDefinitionDoc), _)=>
           EncryptionAndIndexDetails(
-            encryptedFieldsPaths = Eval.later(FieldEncryption.getFieldsToEncrypt(formDefinitionDoc, appForm).map(_.path)),
-            indexedFieldsXPaths  = Eval.later(Index.findIndexedControls(
+            encryptedControlsPaths = Eval.later(FieldEncryption.getControlsToEncrypt(formDefinitionDoc, appForm).map(_.path)),
+            indexedControlsXPaths  = Eval.later(Index.findIndexedControls(
               formDefinitionDoc,
               appForm,
+              // We only need the controls XPaths, no need to specify the version (used to call the distinct control values API)
               versionOpt = None,
               FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
-              // We only need the fields XPaths, no need to evaluate settings against user roles
+              // We only need the controls XPaths, no need to evaluate settings against user roles
               forUserRoles = None
             ).map(_.xpath))
           )

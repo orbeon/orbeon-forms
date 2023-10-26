@@ -357,6 +357,8 @@ class IndexTest
         IndexedControl("in-repeat",  "my-section/repeat/repeat-iteration/in-repeat", "xs:string", "input", SummarySettings(search = true,  show = true,  edit = false), staticallyRequired = false, htmlLabel = false, resources = Nil)
       )
 
+    val appForm = AppForm("test", "index")
+
     for {
       (srcVersion, elem)     <- List(DataFormatVersion.V480 -> formElem48, DataFormatVersion.V20191 -> formElem20191)
       (dstVersion, expected) <- List(DataFormatVersion.V400 -> expected40, DataFormatVersion.V480 -> expected48, DataFormatVersion.V20191 -> expected20191)
@@ -365,9 +367,11 @@ class IndexTest
       it(s"must find the expected indexed controls for source ${srcVersion.entryName} and destination ${dstVersion.entryName}") {
         assert(
           expected == Index.findIndexedControls(
-            elemToDocumentInfo(elem),
-            dstVersion,
-            forUserRoles = None
+            formDoc                   = elemToDocumentInfo(elem),
+            appForm                   = appForm,
+            versionOpt                = None,
+            databaseDataFormatVersion = dstVersion,
+            forUserRoles              = None
           )
         )
       }
@@ -544,9 +548,11 @@ class IndexTest
     it("must find the expected indexed controls when using sub-elements instead of classes") {
       assert(
         expectedSummarySettings == Index.findIndexedControls(
-          elemToDocumentInfo(formWithSummarySettings),
-          FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm("test", "index")),
-          forUserRoles = None
+          formDoc                   = elemToDocumentInfo(formWithSummarySettings),
+          appForm                   = appForm,
+          versionOpt                = None,
+          databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
+          forUserRoles              = None
         )
       )
     }

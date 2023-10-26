@@ -56,7 +56,7 @@
                     if ($has-fb-roles) then
                         instance('fr-search-instance')/query[
                             contains(@path, 'application-name') and
-                            @summary-search-field = 'true'
+                            @summary-search = 'true'
                         ]
                     else
                         ()"/>
@@ -68,7 +68,7 @@
                     if ($app-query) then
                         instance('fr-search-instance')/query[
                             contains(@path, 'form-name') and
-                            @summary-search-field = 'true'
+                            @summary-search = 'true'
                         ]
                     else
                         ()"/>
@@ -263,7 +263,7 @@
 
             <xf:bind ref="instance('fr-search-instance')">
                 <!-- Don't send this to the server -->
-                <xf:bind ref="query/(@summary-search-field | @summary-show-field)" relevant=". = 'true'"/>
+                <xf:bind ref="query/(@summary-search | @summary-show)" relevant=". = 'true'"/>
                 <!-- Set types so the search fields display the proper controls -->
                 <xf:bind ref="query[ends-with(@type, ':date')]"     type="xf:date"/>
                 <xf:bind ref="query[ends-with(@type, ':time')]"     type="xf:time"/>
@@ -839,7 +839,7 @@
 
                             <xf:trigger
                                 appearance="full"
-                                ref="if (instance('fr-search-instance')/query[@path and @summary-search-field = 'true']) then $enabled else $disabled"
+                                ref="if (instance('fr-search-instance')/query[@path and @summary-search = 'true']) then $enabled else $disabled"
                                 class="fr-summary-search-show-button">
 
                                 <!-- Switch label depending on which case is shown -->
@@ -874,7 +874,7 @@
                                     <xf:trigger
                                         id="fr-bulk-edit-button"
                                         appearance="full"
-                                        ref="if (instance('fr-bulk-edit-instance')/query[@path and @summary-edit-field = 'true']) then $enabled else $disabled"
+                                        ref="if (instance('fr-bulk-edit-instance')/query[@path and @summary-edit = 'true']) then $enabled else $disabled"
                                         class="fr-summary-bulk-show-button">
 
                                         <xf:label
@@ -992,8 +992,8 @@
                                             <xf:dispatch event="xforms-value-changed" name="fr-reset-search" targetid="fr-form-model"/>
                                         </xf:select1>
                                     </xf:group>
-                                    <!-- Structured search over query terms that have summary-search-field set to 'true' -->
-                                    <xf:repeat ref="instance('fr-search-instance')/query[@path and @summary-search-field = 'true']" id="search-repeat">
+                                    <!-- Structured search over query terms that have summary-search set to 'true' -->
+                                    <xf:repeat ref="instance('fr-search-instance')/query[@path and @summary-search = 'true']" id="search-repeat">
                                         <xf:var name="control-path"    value="@path"/>
                                         <xf:var name="control-control" value="@control"/>
                                         <xf:var
@@ -1108,7 +1108,7 @@
                             <xf:case id="fr-bulk-edit-open">
                                 <xh:fieldset class="fr-bulk-edit">
                                     <xh:legend><xf:output ref="$fr-resources/summary/bulk-edit/bulk-edit"/></xh:legend>
-                                    <xf:repeat ref="instance('fr-bulk-edit-instance')/query[@path and @summary-edit-field = 'true']" id="bulk-repeat">
+                                    <xf:repeat ref="instance('fr-bulk-edit-instance')/query[@path and @summary-edit = 'true']" id="bulk-repeat">
                                         <xf:var name="control-path"     value="@path"/>
                                         <xf:var name="control-control"  value="@control"/>
                                         <xf:var name="control-required" value="@statically-required = 'true'"/>
@@ -1259,7 +1259,7 @@
                             <xf:var name="have-read-only" value="exists(document[not(xxf:split(@operations) = ('*', 'update'))])"/>
                             <xf:var name="labels-class" value="string-join(('fr-summary-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
                             <!-- One column for each detail -->
-                            <xf:var name="detail-positions" value="instance('fr-search-instance')/query[@name and @summary-show-field = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
+                            <xf:var name="detail-positions" value="instance('fr-search-instance')/query[@name and @summary-show = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
 
                             <xh:table class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
@@ -1295,7 +1295,7 @@
                                         <xf:group ref="''[empty($detail-positions)]">
                                             <xh:th/>
                                         </xf:group>
-                                        <xf:repeat ref="instance('fr-search-labels-instance')/query[@summary-show-field = 'true']" id="fr-summary-repeat-column-number">
+                                        <xf:repeat ref="instance('fr-search-labels-instance')/query[@summary-show = 'true']" id="fr-summary-repeat-column-number">
                                             <xh:th class="{if (@control = ('number', 'currency')) then 'fr-align-right' else ''}">
                                                 <!-- Output showing as the header of the column -->
                                                 <xf:output
@@ -1592,7 +1592,7 @@
                                     </xf:repeat>
                                     <xf:group ref=".[not(document)]">
                                         <xh:tr>
-                                            <xh:td colspan="{7 + count(instance('fr-search-instance')/*[@summary-show-field = 'true'])}">
+                                            <xh:td colspan="{7 + count(instance('fr-search-instance')/*[@summary-show = 'true'])}">
                                                 <xf:output id="fr-no-form-data" class="alert" mediatype="text/html" value="xxf:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
                                             </xh:td>
                                         </xh:tr>

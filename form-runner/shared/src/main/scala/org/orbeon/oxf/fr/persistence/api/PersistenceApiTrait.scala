@@ -44,7 +44,7 @@ trait PersistenceApiTrait {
     isDraft     : Boolean
   )
 
-  case class FieldDetails(path: String, values: Seq[String])
+  case class ControlDetails(path: String, distinctValues: Seq[String])
 
   case class DataHistoryDetails(
     modifiedTime    : Instant,
@@ -121,30 +121,30 @@ trait PersistenceApiTrait {
     callPagedService(pageNumber => readPage(pageNumber).map(pageToDataDetails))
   }
 
-  def fieldSearch(
+  def distinctControlValues(
     appFormVersion          : AppFormVersion,
-    fields                  : Seq[String])(implicit
+    controlPaths            : Seq[String])(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
-  ): Seq[FieldDetails] = {
+  ): Seq[ControlDetails] = {
 
-    debug(s"calling field search for `$appFormVersion`")
+    debug(s"calling distinct control values for `$appFormVersion`")
 
-    val servicePath = s"/fr/service/persistence/search/${appFormVersion._1.app}/${appFormVersion._1.form}"
+    val servicePath = s"/fr/service/persistence/distinct-control-values/${appFormVersion._1.app}/${appFormVersion._1.form}"
 
     val queryXml =
-      <search search-type="field">{
-        fields.map { field =>
-          <query path={field}/>
+      <distinct-control-values>{
+        controlPaths.map { controlPath =>
+          <control path={controlPath}/>
         }
-      }</search>
+      }</distinct-control-values>
 
-    val fieldsXml = documentsXmlTry(servicePath, queryXml, appFormVersion._2).get
+    val controlsXml = documentsXmlTry(servicePath, queryXml, appFormVersion._2).get
 
-    (fieldsXml.rootElement / "field") map { fieldElem =>
-      FieldDetails(
-        path   = fieldElem.attValue("path"),
-        values = (fieldElem / "values" / "value").map(_.getStringValue)
+    (controlsXml.rootElement / "control") map { controlElem =>
+      ControlDetails(
+        path           = controlElem.attValue("path"),
+        distinctValues = (controlElem / "values" / "value").map(_.getStringValue)
       )
     }
   }

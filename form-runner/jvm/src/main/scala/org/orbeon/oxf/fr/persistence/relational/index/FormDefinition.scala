@@ -21,9 +21,9 @@ import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
 import org.orbeon.oxf.fr.persistence.api.PersistenceApiTrait
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SummarySettings}
 import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunner, InDocFormRunnerDocContext}
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
@@ -50,9 +50,9 @@ trait FormDefinition {
   ): Map[String, Seq[(String, NodeInfo)]] = {
     object PersistenceApi extends PersistenceApiTrait
 
-    PersistenceApi.fieldSearch(appFormVersion, controlPaths).map { fieldDetails =>
+    PersistenceApi.distinctControlValues(appFormVersion, controlPaths).map { controlDetails =>
       // Remove empty values as they're not allowed for dropdown values
-      val values = fieldDetails.values.filter(_.nonEmpty)
+      val values = controlDetails.distinctValues.filter(_.nonEmpty)
 
       // Use values as labels
       val items = values.map { value =>
@@ -68,7 +68,7 @@ trait FormDefinition {
         lang -> (resourceElem.copy(child = resourceElem.child.filterNot(_.label == "item") ++ items): NodeInfo)
       }
 
-      fieldDetails.path -> updatedResources
+      controlDetails.path -> updatedResources
     }.toMap
   }
 
@@ -94,6 +94,8 @@ trait FormDefinition {
     val indexedControlBindPathHolders =
       FormRunner.searchControlsInFormBySubElement(subElements = Set("*:index"),   databaseDataFormatVersion) ++
       FormRunner.searchControlsInFormByClass     (classes     = ClassesPredicate, databaseDataFormatVersion)
+
+
 
     indexedControlBindPathHolders map { case ControlBindPathHoldersResources(control, bind, path, _, resources) =>
       val controlName = FormRunner.getControlName(control)
@@ -169,9 +171,9 @@ trait FormDefinition {
     control         : NodeInfo,
     forUserRolesOpt : Option[List[String]]
   ): SummarySettings = {
-    // Check the presence/absence of a given sub-element for a given field
-    def setting(field: NodeInfo, elementName: String, attOpt: Option[String] = None): Boolean =
-      (field / elementName).headOption match {
+    // Check the presence/absence of a given sub-element for a given control
+    def setting(control: NodeInfo, elementName: String, attOpt: Option[String] = None): Boolean =
+      (control / elementName).headOption match {
         // An optional attribute is checked (default value: true)
         case Some(element) if attOpt.forall(element.attValueNonBlankOpt(_).forall(_ == "true")) =>
           val rolesOpt      = element.attValueNonBlankOpt("require-role")
@@ -194,9 +196,9 @@ trait FormDefinition {
     (control / "*:index").headOption match {
       case Some(index) =>
         // Look for settings in control sub-elements (current and legacy format)
-        val show   = setting(index, "*:summary-show", Some("column"))
-        val search = setting(index, "*:summary-show", Some("search")) || setting(index, "*:summary-search")
-        val edit   = setting(index, "*:allow-bulk-edit", None       ) || setting(index, "*:summary-edit")
+        val show   = setting(index, "*:summary-show",    Some("column"))
+        val search = setting(index, "*:summary-show",    Some("search")) || setting(index, "*:summary-search")
+        val edit   = setting(index, "*:allow-bulk-edit", None          ) || setting(index, "*:summary-edit")
 
         SummarySettings(
           // #5994: keep show/search separate for now (for compatibility reasons), but we'd like to have a single setting ideally

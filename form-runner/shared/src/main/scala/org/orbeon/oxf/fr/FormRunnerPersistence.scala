@@ -133,6 +133,7 @@ object FormRunnerPersistence {
   val HistoryPath                         = """/fr/service/persistence(/history/([^/]+)/([^/]+)/([^/]+)(?:/([^/]+))?)""".r
   val ExportPath                          = """/fr/service/persistence/export(?:/([^/]+))?(?:/([^/]+))?(?:/([^/]+))?""".r
   val PurgePath                           = """/fr/service/persistence/purge(?:/([^/]+))?(?:/([^/]+))?(?:/([^/]+))?""".r
+  val DistinctControlValuesPath           = """/fr/service/persistence(/distinct-control-values/([^/]+)/([^/]+))""".r
   val ReindexPath                         =   "/fr/service/persistence/reindex"
   val ReEncryptStatusPath                 =   "/fr/service/persistence/reencrypt" // `GET` only
 

@@ -22,8 +22,8 @@ object StageHeader {
 
 // Only keep the information needed, also avoiding to point to underlying `NodeInfo`
 case class EncryptionAndIndexDetails(
-  encryptedFieldsPaths: Eval[List[List[PathElem]]],
-  indexedFieldsXPaths : Eval[List[String]]
+  encryptedControlsPaths: Eval[List[List[PathElem]]],
+  indexedControlsXPaths : Eval[List[String]]
 )
 
 sealed trait WhatToReindex
@@ -55,9 +55,9 @@ case class IndexedControl(
         path={xpath}
         type={xsType}
         control={control}
-        summary-show-field={summarySettings.show.toString}
-        summary-search-field={summarySettings.search.toString}
-        summary-edit-field={summarySettings.edit.toString}
+        summary-show={summarySettings.show.toString}
+        summary-search={summarySettings.search.toString}
+        summary-edit={summarySettings.edit.toString}
         statically-required={staticallyRequired.toString}
         match={matchForControl(control)}
         html-label={htmlLabel.toString}>{

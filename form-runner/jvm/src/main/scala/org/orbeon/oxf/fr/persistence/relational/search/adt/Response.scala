@@ -29,18 +29,13 @@ case class DocumentMetadata(
 )
 
 case class DocumentValue(
-  control : String,
-  pos     : Int,
-  value   : String
+  control          : String,
+  pos              : Int,
+  value            : String
 )
 
-case class DocumentResult(
-  metadata   : DocumentMetadata,
-  operations : String,
-  values     : List[DocumentValue]
-)
-
-case class FieldResult(
-  path   : String,
-  values : Seq[String]
+case class Document(
+  metadata         : DocumentMetadata,
+  operations       : String,
+  values           : List[DocumentValue]
 )

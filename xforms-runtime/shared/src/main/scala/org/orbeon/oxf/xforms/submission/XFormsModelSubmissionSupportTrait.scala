@@ -80,7 +80,7 @@ trait XFormsModelSubmissionSupportTrait {
                 name -> {
                   value.trimAllToOpt flatMap
                     (Extensions.resolveQName(namespaceContext.get, _, unprefixedIsNoNamespace = true)) getOrElse
-                    QName(name, XXFORMS_NAMESPACE_SHORT)
+                    xxfQName(name)
                 }
               case None =>
                 throw new IllegalArgumentException(s"invalid format for `xxf:annotate` value: `$annotateWith`")

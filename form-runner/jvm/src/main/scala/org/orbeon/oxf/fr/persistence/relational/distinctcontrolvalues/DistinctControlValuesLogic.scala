@@ -30,7 +30,6 @@ trait DistinctControlValuesLogic {
       request           = request,
       controls          = Nil,
       freeTextSearch    = None,
-      anyOfOperations   = None,
       noPermissionValue = List[ControlValues]()
     ) {
       case (connection: Connection, commonParts: List[StatementPart], _: SearchPermissions) =>

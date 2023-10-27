@@ -25,6 +25,7 @@ trait SearchRequestCommon {
   def appForm         : AppForm
   def version         : SearchVersion
   def credentials     : Option[Credentials]
+  def anyOfOperations : Option[Set[Operation]]
 }
 
 case class SearchRequest(

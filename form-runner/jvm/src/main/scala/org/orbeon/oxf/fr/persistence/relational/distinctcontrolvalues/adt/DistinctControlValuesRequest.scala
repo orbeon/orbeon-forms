@@ -15,14 +15,16 @@ package org.orbeon.oxf.fr.persistence.relational.distinctcontrolvalues.adt
 
 import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchRequestCommon
 
 case class DistinctControlValuesRequest(
- provider     : Provider,
- appForm      : AppForm,
- version      : SearchVersion,
- credentials  : Option[Credentials],
- controlPaths : List[String]
+ provider        : Provider,
+ appForm         : AppForm,
+ version         : SearchVersion,
+ credentials     : Option[Credentials],
+ anyOfOperations : Option[Set[Operation]],
+ controlPaths    : List[String]
 ) extends SearchRequestCommon

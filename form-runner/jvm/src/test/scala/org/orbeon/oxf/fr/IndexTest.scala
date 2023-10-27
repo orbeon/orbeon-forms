@@ -370,8 +370,7 @@ class IndexTest
             formDoc                   = elemToDocumentInfo(elem),
             appForm                   = appForm,
             versionOpt                = None,
-            databaseDataFormatVersion = dstVersion,
-            forUserRoles              = None
+            databaseDataFormatVersion = dstVersion
           )
         )
       }
@@ -551,8 +550,7 @@ class IndexTest
           formDoc                   = elemToDocumentInfo(formWithSummarySettings),
           appForm                   = appForm,
           versionOpt                = None,
-          databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
-          forUserRoles              = None
+          databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
         )
       )
     }

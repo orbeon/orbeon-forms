@@ -19,6 +19,7 @@ import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.distinctcontrolvalues.adt.DistinctControlValuesRequest
+import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SimplePath._
@@ -37,12 +38,15 @@ trait DistinctControlValuesRequestParser { this: DistinctControlValuesProcessor 
     httpRequest.getRequestPath match {
       case DistinctControlValuesPath(providerName, app, form) =>
 
+        val rootElement = document.rootElement
+
         DistinctControlValuesRequest(
-          provider     = Provider.withName(providerName),
-          appForm      = AppForm(app, form),
-          version      = version,
-          credentials  = PermissionsAuthorization.findCurrentCredentialsFromSession,
-          controlPaths = document.rootElement.child("control").flatMap(_.attValueOpt("path")).toList
+          provider        = Provider.withName(providerName),
+          appForm         = AppForm(app, form),
+          version         = version,
+          credentials     = PermissionsAuthorization.findCurrentCredentialsFromSession,
+          anyOfOperations = SearchLogic.anyOfOperations(rootElement),
+          controlPaths    = rootElement.rootElement.child("control").flatMap(_.attValueOpt("path")).toList
         )
     }
   }

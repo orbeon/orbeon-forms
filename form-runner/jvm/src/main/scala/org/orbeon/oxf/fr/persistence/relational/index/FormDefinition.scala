@@ -15,9 +15,10 @@ package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
+import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.api.PersistenceApiTrait
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SummarySettings}
 import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunner, InDocFormRunnerDocContext}
@@ -39,37 +40,30 @@ trait FormDefinition {
 
   private val ClassesPredicate = Set(FRIndex, FRSummaryShow, FRSummarySearch)
 
+  private val databoundControlLocalNames =
+    Set[QName](FRDataboundSelect1QName, FRDataboundSelect1SearchQName).map(_.localName)
+
   private          val logger                   = LoggerFactory.createLogger(classOf[FormDefinition])
   private implicit val indentedLogger           = new IndentedLogger(logger)
   private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
   private def withDynamicItems(
-    appFormVersion: AppFormVersion,
-    controlPaths  : Seq[String],
-    resources     : Seq[(String, NodeInfo)]
-  ): Map[String, Seq[(String, NodeInfo)]] = {
-    object PersistenceApi extends PersistenceApiTrait
+    resources     : Seq[(String, NodeInfo)],
+    distinctValues: Seq[String]
+  ): Seq[(String, NodeInfo)] = {
+    // Remove empty values as they're not allowed for dropdown values and use them as labels
+    val items = distinctValues.filter(_.nonEmpty).map { value =>
+      <item>
+        <label>{value}</label>
+        <value>{value}</value>
+      </item>
+    }
 
-    PersistenceApi.distinctControlValues(appFormVersion, controlPaths).map { controlDetails =>
-      // Remove empty values as they're not allowed for dropdown values
-      val values = controlDetails.distinctValues.filter(_.nonEmpty)
-
-      // Use values as labels
-      val items = values.map { value =>
-        <item>
-          <label>{value}</label>
-          <value>{value}</value>
-        </item>
-      }
-
-      // Inject items retrieved from database into resources
-      val updatedResources = for ((lang, resourceHolder) <- resources) yield {
-        val resourceElem = nodeInfoToElem(resourceHolder)
-        lang -> (resourceElem.copy(child = resourceElem.child.filterNot(_.label == "item") ++ items): NodeInfo)
-      }
-
-      controlDetails.path -> updatedResources
-    }.toMap
+    // Inject items retrieved from database into resources
+    for ((lang, resourceHolder) <- resources) yield {
+      val resourceElem = nodeInfoToElem(resourceHolder)
+      lang -> (resourceElem.copy(child = resourceElem.child.filterNot(_.label == "item") ++ items): NodeInfo)
+    }
   }
 
   // Returns the controls that are searchable from a form definition
@@ -77,8 +71,7 @@ trait FormDefinition {
     formDoc                   : DocumentNodeInfoType,
     appForm                   : AppForm,
     versionOpt                : Option[Int],
-    databaseDataFormatVersion : DataFormatVersion,
-    forUserRoles              : Option[List[String]]
+    databaseDataFormatVersion : DataFormatVersion
   ): List[IndexedControl] = {
 
     implicit val ctx = new InDocFormRunnerDocContext(formDoc) {
@@ -95,20 +88,34 @@ trait FormDefinition {
       FormRunner.searchControlsInFormBySubElement(subElements = Set("*:index"),   databaseDataFormatVersion) ++
       FormRunner.searchControlsInFormByClass     (classes     = ClassesPredicate, databaseDataFormatVersion)
 
+    def pathString(path: List[PathElem]) = path.map(_.value).mkString("/")
 
+    object PersistenceApi extends PersistenceApiTrait
+
+    val distinctValuesByControlPath = versionOpt.toSeq.flatMap { version =>
+      val dynamicControlPaths = indexedControlBindPathHolders.filter { controlInfo =>
+        // Is the control databound/dynamic?
+        databoundControlLocalNames.contains(controlInfo.control.localname)
+      }.map { controlInfo =>
+        pathString(controlInfo.path)
+      }
+
+      // TODO: should we use different sets of operations depending on the use of the values (e.g. search vs bulk edit)?
+      val anyOfOperationsOpt = Some(Set[Operation](Operation.Read))
+
+      // Retrieve distinct control values for all dynamic controls
+      PersistenceApi.distinctControlValues((appForm, version), dynamicControlPaths, anyOfOperationsOpt)
+    }.map { controlDetails =>
+      controlDetails.path -> controlDetails.distinctValues
+    }.toMap
 
     indexedControlBindPathHolders map { case ControlBindPathHoldersResources(control, bind, path, _, resources) =>
       val controlName = FormRunner.getControlName(control)
-      val controlPath = path map (_.value) mkString "/"
+      val controlPath = pathString(path)
 
-      // Is the control dynamic? If so, retrieve the items not from the resources, but from the database
-      val databoundControl =
-        Set[QName](FRDataboundSelect1QName, FRDataboundSelect1SearchQName).map(_.localName).contains(control.localname)
-
-      // TODO: call withDynamicItems only once
-      val resourcesWithDynamicItems = versionOpt match {
-        case Some(version) if databoundControl => withDynamicItems((appForm, version), Seq(controlPath), resources)(controlPath)
-        case _                                 => resources
+      val resourcesWithDynamicItems = distinctValuesByControlPath.get(controlPath) match {
+        case Some(distinctValues) => withDynamicItems(resources, distinctValues)
+        case None                 => resources
       }
 
       IndexedControl(
@@ -116,7 +123,7 @@ trait FormDefinition {
         xpath              = controlPath,
         xsType             = (bind /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
         control            = control.localname,
-        summarySettings    = summarySettings(control, forUserRoles),
+        summarySettings    = summarySettings(control),
         staticallyRequired = isBindRequired(bind),
         htmlLabel          = FormRunner.hasHTMLMediatype(control / (XF -> "label")),
         resources          = resourcesWithDynamicItems.toList
@@ -167,10 +174,14 @@ trait FormDefinition {
       }
   }
 
-  def summarySettings(
-    control         : NodeInfo,
-    forUserRolesOpt : Option[List[String]]
-  ): SummarySettings = {
+  def summarySettings(control: NodeInfo): SummarySettings = {
+
+    // Retrieve user roles from current session, if any
+    val currentUserRolesOpt =
+      Option(CoreCrossPlatformSupport.externalContext)
+        .map(_.getRequest.credentials)
+        .map(_.toList.flatMap(_.roles.map(_.roleName)))
+
     // Check the presence/absence of a given sub-element for a given control
     def setting(control: NodeInfo, elementName: String, attOpt: Option[String] = None): Boolean =
       (control / elementName).headOption match {
@@ -179,10 +190,10 @@ trait FormDefinition {
           val rolesOpt      = element.attValueNonBlankOpt("require-role")
           val constraintOpt = element.attValueNonBlankOpt("require-role-constraint")
 
-          forUserRolesOpt match {
-            case Some(forUserRoles) =>
+          currentUserRolesOpt match {
+            case Some(currentUserRoles) =>
               val simpleConstraint = SimpleConstraint(rolesOpt = rolesOpt, constraintOpt = constraintOpt)
-              simpleConstraint.satisfiedFor(forUserRoles)
+              simpleConstraint.satisfiedFor(currentUserRoles)
 
             case None =>
               // Current user roles not specified (see readPublishedFormEncryptionAndIndexDetails case and tests)

@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.AppForm
-import org.orbeon.oxf.fr.permission.{Operation, PermissionsAuthorization}
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.{Logger, parsePositiveIntParamOrThrow}
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
@@ -53,7 +53,6 @@ trait SearchRequestParser {
         val structuredSearchEls = queryEls.filter(_.hasAtt("path"))
         val draftsElOpt         = searchElement.child("drafts").headOption
         val credentials         = PermissionsAuthorization.findCurrentCredentialsFromSession
-        val operationsElOpt     = searchElement.child("operations").headOption
         val allControls         = searchElement.attValueOpt("return-all-indexed-fields").contains(true.toString)
 
         val specificControls =
@@ -146,8 +145,7 @@ trait SearchRequestParser {
                     }
                 }
             },
-          anyOfOperations =
-            operationsElOpt.map(_.attValue("any-of").splitTo[Set]().map(Operation.withName))
+          anyOfOperations = SearchLogic.anyOfOperations(searchElement)
         )
     }
   }

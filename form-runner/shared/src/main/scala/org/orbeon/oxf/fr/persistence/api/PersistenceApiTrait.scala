@@ -9,6 +9,7 @@ import org.orbeon.oxf.fr.FormRunner.createFormDataBasePath
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http._
@@ -123,7 +124,8 @@ trait PersistenceApiTrait {
 
   def distinctControlValues(
     appFormVersion          : AppFormVersion,
-    controlPaths            : Seq[String])(implicit
+    controlPaths            : Seq[String],
+    anyOfOperationsOpt      : Option[Set[Operation]])(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Seq[ControlDetails] = {
@@ -136,6 +138,10 @@ trait PersistenceApiTrait {
       <distinct-control-values>{
         controlPaths.map { controlPath =>
           <control path={controlPath}/>
+        } ++ {
+          anyOfOperationsOpt.filter(_.nonEmpty).toList.map { anyOfOperations =>
+            <operations any-of={anyOfOperations.toSeq.map(_.entryName).mkString(" ")}/>
+          }
         }
       }</distinct-control-values>
 

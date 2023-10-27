@@ -73,9 +73,7 @@ object PersistenceMetadataSupport {
               appForm,
               // We only need the controls XPaths, no need to specify the version (used to call the distinct control values API)
               versionOpt = None,
-              FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
-              // We only need the controls XPaths, no need to evaluate settings against user roles
-              forUserRoles = None
+              FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
             ).map(_.xpath))
           )
         }

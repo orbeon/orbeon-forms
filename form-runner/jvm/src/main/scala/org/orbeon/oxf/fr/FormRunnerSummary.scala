@@ -28,8 +28,6 @@ import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 
 import java.time.{LocalDateTime, ZoneId}
-
-import scala.collection.JavaConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
@@ -73,13 +71,12 @@ trait FormRunnerSummary {
       .orNull
 
   //@XPathFunction
-  def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String, version: Int, userRoles: java.util.List[String]): Seq[NodeInfo] =
+  def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String, version: Int): Seq[NodeInfo] =
     Index.findIndexedControls(
       formDoc,
       AppForm(app, form),
       Some(version),
-      FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form)),
-      forUserRoles = Some(userRoles.asScala.toList)
+      FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
     ) map
       (_.toXML)
 

@@ -28,24 +28,34 @@ import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.SQLUtils._
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.SimplePath.{Document => _, _}
 
 import java.sql.{Connection, Timestamp}
 import scala.collection.mutable
 
 
 object SearchLogic {
+
+  // TODO: The methods below are used by the search API, but also by the distinct control values API. Should we leave
+  //   them here, as they're more closely associated with the search API, or move them elsewhere (e.g. in the parent
+  //   package), in which case some classes/methods should be renamed (SearchVersion, SearchPermissions, doSearch, etc.)?
+
   def searchVersion(httpRequest: ExternalContext.Request): SearchVersion = {
     val formDefinitionVersionHeader = httpRequest.getFirstHeaderIgnoreCase(OrbeonFormDefinitionVersion)
     SearchVersion(formDefinitionVersionHeader)
   }
 
+  def anyOfOperations(rootElement: NodeInfo): Option[Set[Operation]] =
+    rootElement.child("operations").headOption.map(_.attValue("any-of").splitTo[Set]().map(Operation.withName))
+
   private def computePermissions(
     request         : SearchRequestCommon,
-    anyOfOperations : Option[Set[Operation]],
     version         : FormDefinitionVersion
   ): SearchPermissions = {
 
-    val searchOperations     = anyOfOperations.getOrElse(SearchOps.SearchOperations)
+    val searchOperations     = request.anyOfOperations.getOrElse(SearchOps.SearchOperations)
     val formPermissionsElOpt = PersistenceMetadataSupport.readFormPermissions(request.appForm, version)
     val formPermissions      = FormRunner.permissionsFromElemOrProperties(formPermissionsElOpt, request.appForm)
 
@@ -63,13 +73,12 @@ object SearchLogic {
     request           : R,
     controls          : List[Control],
     freeTextSearch    : Option[String],
-    anyOfOperations   : Option[Set[Operation]],
     noPermissionValue : T)(
     body              : (Connection, List[StatementPart], SearchPermissions) => T
   ): T = {
 
     val version          = PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(request.appForm, request.version)
-    val permissions      = computePermissions(request, anyOfOperations, version)
+    val permissions      = computePermissions(request, version)
     val hasNoPermissions =
       ! permissions.authorizedBasedOnRoleOptimistic     &&
       permissions.authorizedIfUsername         .isEmpty &&
@@ -100,7 +109,6 @@ trait SearchLogic extends SearchRequestParser {
       request           = request,
       controls          = request.controls,
       freeTextSearch    = request.freeTextSearch,
-      anyOfOperations   = request.anyOfOperations,
       noPermissionValue = (List[Document](), 0)
     ) {
       case (connection: Connection, commonParts: List[StatementPart], permissions: SearchPermissions) =>
@@ -137,6 +145,18 @@ trait SearchLogic extends SearchRequestParser {
             case Some(table) => table + ","
             case None        => ""
           }
+
+          /*
+          TODO: Is the INNER JOIN below really necessary? We end up doing it on orbeon_i_current only, i.e.
+                  SELECT c.*
+                  FROM   (SELECT DISTINCT c.data_id
+                          FROM   orbeon_i_current c
+                          WHERE  c.app = ?
+                                 AND c.form = ?
+                                 AND c.form_version = ?) s
+                         INNER JOIN orbeon_i_current c
+                                 ON c.data_id = s.data_id
+           */
 
           // Use `LEFT JOIN` instead of regular join, in case the form doesn't have any control marked
           // to be indexed, in which case there won't be anything for it in `orbeon_i_control_text`.

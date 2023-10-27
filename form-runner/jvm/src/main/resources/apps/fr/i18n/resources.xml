@@ -182,6 +182,7 @@
             <none>No errors on form</none>
             <unsaved>Unsaved changes</unsaved>
             <canvas-not-supported>To do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported>
+            <search>Error performing search</search>
         </errors>
         <email>
             <subject>Orbeon Forms Confirmation</subject>
@@ -801,6 +802,7 @@
             <none>Ce formulaire ne contient pas d'erreurs</none>
             <unsaved>Modifications non enregistrées</unsaved>
             <canvas-not-supported>Pour annoter des images, votre navigateur doit supporter le canvas HTML5</canvas-not-supported>
+            <search>Erreur lors de la recherche</search>
         </errors>
         <email>
             <subject>Orbeon Forms Confirmation</subject>
@@ -1410,6 +1412,7 @@
             <none>No hay errores en el formulario</none>
             <unsaved>Cambios sin salvar</unsaved>
             <canvas-not-supported>Para realizar anotaciones en imagenes, su explorador tiene que soportar HTML5</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Confirmación de formulario Orbeon</subject>
@@ -2022,6 +2025,7 @@
             <none>No hi ha errors al formulari</none>
             <unsaved>Canvis sense desar</unsaved>
             <canvas-not-supported>Per a realitzar anotacions a les imatges, el seu explorador ha de suportar HTML5</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Confirmació de formulari Orbeon</subject>
@@ -2657,6 +2661,7 @@
             <none>Ingen feil i skjema</none>
             <unsaved>Ulagrede endringer</unsaved>
             <canvas-not-supported todo="true">[To do image annotations, your browser needs to support the HTML5 canvas]</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon Forms Bekreftelse</subject>
@@ -3263,6 +3268,7 @@
             <none>Ошибок нет</none>
             <unsaved>Несохраненные изменения</unsaved>
             <canvas-not-supported todo="true">[To do image annotations, your browser needs to support the HTML5 canvas]</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Подтверждение формы</subject>
@@ -3874,6 +3880,7 @@
             <none>Non ci sono errori nel modulo</none>
             <unsaved>Modifiche non salvate</unsaved>
             <canvas-not-supported>Per usare le immagini modificabili, suo Browser deve avere il supporto per canvas di HTML5</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon Forms confermazione</subject>
@@ -4489,6 +4496,7 @@
             <none>Keine Fehler im Formular</none>
             <unsaved>Ungespeicherte Änderungen</unsaved>
             <canvas-not-supported>Um bearbeitbare Bilder zu verwenden, muss ihr Browser das Canvas-Element von HTML5 unterstützen</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon Forms: Bestätigung</subject>
@@ -5104,6 +5112,7 @@
             <none>Ei virheitä lomakkeessa</none>
             <unsaved>Tallentamattomat muutokset</unsaved>
             <canvas-not-supported>Voidakseni tehdä kuvakommentointia tulee selaimen tukea HTML5:n canvas-elementtiä</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon-lomakkeiden vahvistus</subject>
@@ -5719,6 +5728,7 @@
             <none>Inga fel i formuläret</none>
             <unsaved>Ej sparade ändringar</unsaved>
             <canvas-not-supported>För att kunna göra noteringar måste webbläsaren stödja HTML5 canvas</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon Forms bekräftelse</subject>
@@ -6334,6 +6344,7 @@
             <none>Geen fouten op form</none>
             <unsaved>Niet-bewaarde wijzigingen</unsaved>
             <canvas-not-supported>Voor annotaties op afbeeldingen, moet uw browser het HTML5 canvas ondersteunen</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon Forms bevestiging</subject>
@@ -6948,6 +6959,7 @@
             <none>Formulário sem erros</none>
             <unsaved>Alteração não guardadas</unsaved>
             <canvas-not-supported todo="true">[To do image annotations, your browser needs to support the HTML5 canvas]</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Confirmação Orbeon Forms</subject>
@@ -7556,6 +7568,7 @@
             <none>Ingen fejl i skema</none>
             <unsaved>Ugemte ændringer</unsaved>
             <canvas-not-supported>To do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon blanketbekræftigelse</subject>
@@ -8167,6 +8180,7 @@
             <none>Brak błędów w formularzu</none>
             <unsaved>Niezachowane zmiany</unsaved>
             <canvas-not-supported>Aby móc dodać adnotacje do pliku graficznego twoja przeglądarka musi wspierać HTML5 canvas</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Potwierdzenie formularza Orbeon Forms</subject>

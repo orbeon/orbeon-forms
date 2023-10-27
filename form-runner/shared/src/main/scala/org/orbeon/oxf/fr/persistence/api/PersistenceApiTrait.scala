@@ -125,7 +125,7 @@ trait PersistenceApiTrait {
   def distinctControlValues(
     appFormVersion          : AppFormVersion,
     controlPaths            : Seq[String],
-    anyOfOperationsOpt      : Option[Set[Operation]])(implicit
+    anyOfOperationsOpt      : Option[Set[Operation]] = None)(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Seq[ControlDetails] = {

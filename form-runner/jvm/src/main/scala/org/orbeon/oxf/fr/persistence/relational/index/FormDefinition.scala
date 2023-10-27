@@ -100,11 +100,8 @@ trait FormDefinition {
         pathString(controlInfo.path)
       }
 
-      // TODO: should we use different sets of operations depending on the use of the values (e.g. search vs bulk edit)?
-      val anyOfOperationsOpt = Some(Set[Operation](Operation.Read))
-
       // Retrieve distinct control values for all dynamic controls
-      PersistenceApi.distinctControlValues((appForm, version), dynamicControlPaths, anyOfOperationsOpt)
+      PersistenceApi.distinctControlValues((appForm, version), dynamicControlPaths)
     }.map { controlDetails =>
       controlDetails.path -> controlDetails.distinctValues
     }.toMap

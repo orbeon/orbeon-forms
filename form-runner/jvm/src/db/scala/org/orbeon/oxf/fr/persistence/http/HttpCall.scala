@@ -201,9 +201,10 @@ private[persistence] object HttpCall {
   }
 
   val DefaultFormName = "my-form"
-  def crudURLPrefix   (provider: Provider, formName: String = DefaultFormName) = s"crud/${provider.entryName}/$formName/"
-  def searchURLPrefix (provider: Provider, formName: String = DefaultFormName) = s"search/${provider.entryName}/$formName"
-  def metadataURL     (provider: Provider, formName: String = DefaultFormName) = s"form/${provider.entryName}/$formName"
+  def crudURLPrefix                (provider: Provider, formName: String = DefaultFormName) = s"crud/${provider.entryName}/$formName/"
+  def searchURLPrefix              (provider: Provider, formName: String = DefaultFormName) = s"search/${provider.entryName}/$formName"
+  def metadataURL                  (provider: Provider, formName: String = DefaultFormName) = s"form/${provider.entryName}/$formName"
+  def distinctControlValueURLPrefix(provider: Provider, formName: String = DefaultFormName) = s"distinct-control-values/${provider.entryName}/$formName"
 
   def post(
     url                      : String,

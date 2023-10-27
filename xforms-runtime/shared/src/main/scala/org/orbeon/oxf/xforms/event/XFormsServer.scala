@@ -1,9 +1,8 @@
 package org.orbeon.oxf.xforms.event
 
-import cats.Eval
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseWrapper}
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.{SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
@@ -17,13 +16,14 @@ import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{ConnectResult, XFormsModelSubmissionSupport}
-import org.orbeon.oxf.xforms.{CallbackInvocation, ScriptInvocation, XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.oxf.xml.{SAXStore, TeeXMLReceiver, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.xforms.XFormsNames.{XXFORMS_NAMESPACE_URI, XXFORMS_SHORT_PREFIX}
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget, WireAjaxEventWithoutTarget}
-import org.orbeon.xforms.{DelayedEvent, EventNames, Load, Message}
+import org.orbeon.xforms.runtime.DelayedEvent
+import org.orbeon.xforms.{EventNames, Load, Message}
 
 import java.{util => ju}
 import scala.concurrent.Future
@@ -421,7 +421,7 @@ object XFormsServer {
 
                 // `javascript:` loads only and regular scripts
                 containingDocument.getScriptsToRun foreach {
-                  case Left(load)                       => outputLoad(containingDocument, load)
+                  case Left(load)                       => outputLoad(load)
                   case Right(Left(scriptInvocation))    => outputScriptInvocation(containingDocument, scriptInvocation)
                   case Right(Right(callbackInvocation)) => outputCallbackInvocation(callbackInvocation)
                 }
@@ -464,7 +464,7 @@ object XFormsServer {
                 }
 
                 containingDocument.getNonJavaScriptLoadsToRun foreach { load =>
-                  outputLoad(containingDocument, load)
+                  outputLoad(load)
                 }
               }
             }
@@ -601,7 +601,6 @@ object XFormsServer {
         )
 
     def outputLoad(
-      doc         : XFormsContainingDocument,
       load        : Load)(implicit
       xmlReceiver : XMLReceiver)
     : Unit =

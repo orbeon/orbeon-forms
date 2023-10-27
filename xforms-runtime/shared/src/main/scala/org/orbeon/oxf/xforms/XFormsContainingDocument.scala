@@ -27,9 +27,9 @@ import org.orbeon.oxf.xforms.state.InstancesControls
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.xforms.runtime.XFormsObject
+import org.orbeon.xforms.DeploymentType
+import org.orbeon.xforms.runtime.{DelayedEvent, XFormsObject}
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{DelayedEvent, DeploymentType}
 
 import scala.collection.{Seq, immutable}
 

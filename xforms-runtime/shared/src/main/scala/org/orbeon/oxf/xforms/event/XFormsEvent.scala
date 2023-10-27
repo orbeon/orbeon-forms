@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import cats.syntax.option._
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
 import org.orbeon.oxf.xml.{SaxonUtils, SaxonUtilsDependsOnXPath}
 import org.orbeon.saxon.om._
-import org.orbeon.xforms.{SimplePropertyValue, XFormsId}
+import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.Phase
+import org.orbeon.xforms.runtime.SimplePropertyValue
 import shapeless.syntax.typeable._
 
 
@@ -160,13 +160,13 @@ object XFormsEvent {
     tunnel: Boolean = false
   )
 
-  class ActionPropertyGetter(props: List[PropertyValue]) extends PropertyGetter {
+  case class ActionPropertyGetter(props: List[PropertyValue]) extends PropertyGetter {
 
     def apply(name: String): Option[Any] = props.find(_.name == name).flatMap(_.value)
     def isDefinedAt(name: String): Boolean = props.exists(_.name == name)
 
     def tunnelProperties: TunnelProperties =
-      new ActionPropertyGetter(props.filter(_.tunnel))
+      ActionPropertyGetter(props.filter(_.tunnel))
 
     def simpleProperties: SimpleProperties =
       for {

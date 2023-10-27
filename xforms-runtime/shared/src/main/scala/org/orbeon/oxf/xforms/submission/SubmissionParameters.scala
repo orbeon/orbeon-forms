@@ -1,45 +1,33 @@
 package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.http.{BasicCredentials, HttpMethod}
 import org.orbeon.oxf.util.ContentTypes
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.util.XPathCache.XPathContext
-import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, SimpleProperties, TunnelProperties}
-import org.orbeon.oxf.xforms.event.XFormsEvents
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, TunnelProperties}
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 import org.orbeon.oxf.xml.dom.Extensions
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.DomElemOps
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.scaxon.SimplePath.NodeInfoOps
+import org.orbeon.xforms.XFormsNames.XFORMS_HEADER_QNAME
 import org.orbeon.xforms.{RelevanceHandling, UrlType, XFormsCrossPlatformSupport}
 
 
-// Subset of `SubmissionParameters`
 case class TwoPassSubmissionParameters(
-  submissionEffectiveId  : String,
-  showProgress           : Boolean,
-  target                 : Option[String],
-  isResponseResourceType : Boolean,
-  properties             : SimpleProperties
+  submissionEffectiveId: String,
+  submissionParameters : SubmissionParameters
 )
 
-object TwoPassSubmissionParameters {
-
-  def apply(submissionEffectiveId: String, p: SubmissionParameters): TwoPassSubmissionParameters =
-    TwoPassSubmissionParameters(
-      submissionEffectiveId  = submissionEffectiveId,
-      showProgress           = p.xxfShowProgress,
-      target                 = p.xxfTargetOpt,
-      isResponseResourceType = p.resolvedIsResponseResourceType,
-      properties             = p.actionProperties.map(_.simpleProperties).getOrElse(Nil)
-    )
-}
-
 case class SubmissionParameters(
-  refContext                     : RefContext,
+
+  // TODO: categorize?
   replaceType                    : ReplaceType,
   xformsMethod                   : String,
   httpMethod                     : HttpMethod,
@@ -54,14 +42,34 @@ case class SubmissionParameters(
   xxfAnnotate                    : Set[String],
   isHandlingClientGetAll         : Boolean,
   isDeferredSubmission           : Boolean,
-  isDeferredSubmissionFirstPass  : Boolean,
-  isDeferredSubmissionSecondPass : Boolean,
   urlNorewrite                   : Boolean,
   urlType                        : UrlType,
   resolvedIsResponseResourceType : Boolean,
   xxfTargetOpt                   : Option[String],
   xxfShowProgress                : Boolean,
-  actionProperties               : Option[ActionPropertyGetter]
+  actionProperties               : Option[ActionPropertyGetter],
+
+  actionOrResource               : String,
+  isAsynchronous                 : Boolean,
+  responseMustAwait              : Boolean,
+  credentialsOpt                 : Option[BasicCredentials],
+
+  // Serialization
+  separator                      : String,
+  encoding                       : String,
+
+  // XML serialization
+  versionOpt                     : Option[String],
+  indent                         : Boolean,
+  omitXmlDeclaration             : Boolean,
+  standaloneOpt                  : Option[Boolean],
+
+  // Response
+  isHandleXInclude               : Boolean,
+  isReadonly                     : Boolean,
+  applyDefaults                  : Boolean,
+  isCache                        : Boolean,
+  timeToLive                     : Long
 ) {
   def tunnelProperties: Option[TunnelProperties] =
     actionProperties.map(_.tunnelProperties)
@@ -69,23 +77,24 @@ case class SubmissionParameters(
 
 object SubmissionParameters {
 
-  def withUpdatedRefContext(
-    p                 : SubmissionParameters)(implicit
-    dynamicSubmission : XFormsModelSubmission
-  ): SubmissionParameters =
-    p.copy(refContext = createRefContext(dynamicSubmission))
+  private val DefaultSeparator = "&" // XForms 1.1 changes back the default to `&` as of February 2009
+  private val DefaultEncoding  = CharsetNames.Utf8
+  private val Asynchronous     = "asynchronous"
+  private val Application      = "application"
+  private val CacheableMethods = Set(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT): Set[HttpMethod]
+
+  val EventName = XFormsEvent.xxfName("submission-parameters")
 
   def apply(
-    eventNameOpt    : Option[String],
-    actionProperties: Option[ActionPropertyGetter]
+    dynamicSubmission: XFormsModelSubmission,
+    actionProperties : Option[ActionPropertyGetter]
   )(implicit
-    dynamicSubmission: XFormsModelSubmission
+    refContext: RefContext
   ): SubmissionParameters = {
 
     val staticSubmission = dynamicSubmission.staticSubmission
 
-    implicit val containingDocument = dynamicSubmission.containingDocument
-    implicit val refContext         = createRefContext(dynamicSubmission)
+    implicit val containingDocument: XFormsContainingDocument = dynamicSubmission.containingDocument
 
     if (refContext.refNodeInfo eq null)
       throw new XFormsSubmissionException(
@@ -126,7 +135,7 @@ object SubmissionParameters {
     }
 
     // TODO: We pass a Clark name, but we don't process this correctly!
-    val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(resolvedMethodClarkName, actionProperties)
+    val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(dynamicSubmission, resolvedMethodClarkName, actionProperties)
     val resolvedMediatypeOpt = staticSubmission.avtMediatypeOpt flatMap stringAvtTrimmedOpt
 
     val serializationOpt = staticSubmission.avtSerializationOpt flatMap stringAvtTrimmedOpt
@@ -237,24 +246,96 @@ object SubmissionParameters {
         )                                                                           && // can't let SOAP requests be handled by the browser
         staticSubmission.avtXxfUsernameOpt.isEmpty                                  && // can't optimize if there are authentication credentials
         staticSubmission.avtXxfTargetOpt.isEmpty                                    && // can't optimize if there is a target
-        staticSubmission.element.jElements(XFORMS_HEADER_QNAME).size == 0               // can't optimize if there are headers specified
+        staticSubmission.element.jElements(XFORMS_HEADER_QNAME).size == 0              // can't optimize if there are headers specified
 
-    // 2022-02-25: TODO: Check comments below.
     // TODO: use static for headers
-    // In "Ajax portlet" mode, there is no deferred submission process
-    // Also don't allow deferred submissions when the incoming method is a GET. This is an indirect way of
-    // allowing things like using the XForms engine to generate a PDF with an HTTP GET.
-    // NOTE: Method can be `null` e.g. in a portlet render request.
     val incomingMethod: HttpMethod = XFormsCrossPlatformSupport.externalContext.getRequest.getMethod
 
     val isAllowDeferredSubmission      = incomingMethod != HttpMethod.GET
     val isPossibleDeferredSubmission   = resolvedReplace == ReplaceType.All && ! isHandlingClientGetAll && ! containingDocument.initializing
     val isDeferredSubmission           = isAllowDeferredSubmission && isPossibleDeferredSubmission
-    val isDeferredSubmissionFirstPass  = isDeferredSubmission && eventNameOpt.contains(XFormsEvents.XFORMS_SUBMIT)
-    val isDeferredSubmissionSecondPass = isDeferredSubmission && ! isDeferredSubmissionFirstPass // must be `XXFORMS_SUBMIT`
+
+    // Maybe: See if we can resolve `xml:base` early to detect absolute URLs early as well.
+    // `actionOrResource = resolveXMLBase(containingDocument, getSubmissionElement(), NetUtils.encodeHRRI(temp, true)).toString`
+    val actionOrResource =
+      stringAvtTrimmedOpt(staticSubmission.avtActionOrResource) match {
+        case Some(resolved) =>
+          resolved.encodeHRRI(processSpace = true)
+        case None =>
+          throw new XFormsSubmissionException(
+            submission  = dynamicSubmission,
+            message     = s"xf:submission: mandatory `resource` or `action` evaluated to an empty sequence for attribute value: `${staticSubmission.avtActionOrResource}`",
+            description = "resolving resource URI"
+          )
+      }
+
+    val credentialsOpt =
+      staticSubmission.avtXxfUsernameOpt flatMap
+        stringAvtTrimmedOpt              map { username =>
+
+        BasicCredentials(
+          username       = username,
+          password       =    staticSubmission.avtXxfPasswordOpt       flatMap stringAvtTrimmedOpt,
+          preemptiveAuth = ! (staticSubmission.avtXxfPreemptiveAuthOpt flatMap stringAvtTrimmedOpt contains false.toString),
+          domain         =    staticSubmission.avtXxfDomainOpt         flatMap stringAvtTrimmedOpt
+        )
+      }
+
+    val isReadonly =
+      staticSubmission.avtXxfReadonlyOpt flatMap booleanAvtOpt getOrElse false
+
+    val isCache =
+      staticSubmission.avtXxfCacheOpt flatMap booleanAvtOpt getOrElse {
+        // For backward compatibility
+        staticSubmission.avtXxfSharedOpt flatMap stringAvtTrimmedOpt contains Application
+      }
+
+    // Check read-only and cache hints
+    if (isCache) {
+
+      if (! CacheableMethods(actualHttpMethod))
+        throw new XFormsSubmissionException(
+          submission  = dynamicSubmission,
+          message     = """xf:submission: `xxf:cache="true"` or `xxf:shared="application"` can be set only with `method="get|post|put"`.""",
+          description = "checking read-only and shared hints"
+        )
+
+      if (resolvedReplace != ReplaceType.Instance)
+        throw new XFormsSubmissionException(
+          submission  = dynamicSubmission,
+          message     = """xf:submission: `xxf:cache="true"` or `xxf:shared="application"` can be set only with `replace="instance"`.""",
+          description = "checking read-only and shared hints"
+        )
+
+    } else if (isReadonly && resolvedReplace != ReplaceType.Instance)
+      throw new XFormsSubmissionException(
+        submission  = dynamicSubmission,
+        message     = """xf:submission: `xxf:readonly="true"` can be `true` only with `replace="instance"`.""",
+        description = "checking read-only and shared hints"
+      )
+
+    // NOTE: XForms 1.1 default to async, but we don't fully support async so we default to sync instead
+    val isAsynchronous = {
+
+      val isRequestedAsynchronousMode =
+        staticSubmission.avtModeOpt flatMap stringAvtTrimmedOpt contains Asynchronous
+
+      // For now we don't support `replace="all"`
+      if (isRequestedAsynchronousMode && resolvedReplace == ReplaceType.All)
+        throw new XFormsSubmissionException(
+          submission  = dynamicSubmission,
+          message     = """xf:submission: `mode="asynchronous"` cannot be `true` with `replace="all"`.""",
+          description = "checking asynchronous mode"
+        )
+
+      resolvedReplace != ReplaceType.All && isRequestedAsynchronousMode
+    }
+
+    val responseMustAwait =
+      staticSubmission.avtResponseMustAwaitOpt flatMap booleanAvtOpt getOrElse false
 
     SubmissionParameters(
-      refContext                     = refContext,
+
       replaceType                    = resolvedReplace,
       xformsMethod                   = resolvedMethodClarkName,
       httpMethod                     = actualHttpMethod,
@@ -269,41 +350,35 @@ object SubmissionParameters {
       xxfAnnotate                    = resolvedXxfAnnotate,
       isHandlingClientGetAll         = isHandlingClientGetAll,
       isDeferredSubmission           = isDeferredSubmission,
-      isDeferredSubmissionFirstPass  = isDeferredSubmissionFirstPass,
-      isDeferredSubmissionSecondPass = isDeferredSubmissionSecondPass,
       urlNorewrite                   = resolvedUrlNorewrite,
       urlType                        = resolvedUrlType,
       resolvedIsResponseResourceType = resolvedIsResponseResourceType,
       xxfTargetOpt                   = resolvedXxfTargetOpt,
       xxfShowProgress                = resolvedXxfShowProgress,
-      actionProperties               = actionProperties
+      actionProperties               = actionProperties,
+
+      actionOrResource               = actionOrResource,
+      isAsynchronous                 = isAsynchronous,
+      responseMustAwait              = responseMustAwait,
+      credentialsOpt                 = credentialsOpt,
+
+      separator                      = staticSubmission.avtSeparatorOpt          flatMap stringAvtTrimmedOpt getOrElse DefaultSeparator,
+      encoding                       = staticSubmission.avtEncodingOpt           flatMap stringAvtTrimmedOpt getOrElse DefaultEncoding,
+
+      versionOpt                     = staticSubmission.avtVersionOpt            flatMap stringAvtTrimmedOpt,
+      indent                         = staticSubmission.avtIndentOpt             flatMap booleanAvtOpt       getOrElse false,
+      omitXmlDeclaration             = staticSubmission.avtOmitXmlDeclarationOpt flatMap booleanAvtOpt       getOrElse false,
+      standaloneOpt                  = staticSubmission.avtStandalone            flatMap booleanAvtOpt,
+
+      isHandleXInclude               = staticSubmission.avtXxfHandleXInclude     flatMap booleanAvtOpt       getOrElse false,
+      isReadonly                     = isReadonly,
+      applyDefaults                  = staticSubmission.avtXxfDefaultsOpt        flatMap booleanAvtOpt       getOrElse false,
+      isCache                        = isCache,
+      timeToLive                     = staticSubmission.timeToLive
     )
   }
 
-  private def actualHttpMethodFromXFormsMethodName(
-    methodName      : String,
-    actionProperties: Option[ActionPropertyGetter]
-  )(implicit
-    dynamicSubmission: XFormsModelSubmission
-  ): HttpMethod =
-    HttpMethod.withNameInsensitiveOption(methodName) getOrElse {
-      if (methodName.endsWith("-post"))
-        HttpMethod.POST
-      else
-        throw new XFormsSubmissionException(
-          submission       = dynamicSubmission,
-          message          = s"Invalid method name: `$methodName`",
-          description      = "getting submission method",
-          submitErrorEvent = new XFormsSubmitErrorEvent(
-            target           = dynamicSubmission,
-            errorType        = ErrorType.XXFormsMethodError,
-            cxrOpt           = None,
-            tunnelProperties = actionProperties.map(_.tunnelProperties)
-          )
-        )
-    }
-
-  private def createRefContext(dynamicSubmission: XFormsModelSubmission): RefContext = {
+  def createRefContext(dynamicSubmission: XFormsModelSubmission): RefContext = {
 
     val staticSubmission   = dynamicSubmission.staticSubmission
     val containingDocument = dynamicSubmission.containingDocument
@@ -331,4 +406,26 @@ object SubmissionParameters {
         )
     )
   }
+
+  private def actualHttpMethodFromXFormsMethodName(
+    dynamicSubmission: XFormsModelSubmission,
+    methodName       : String,
+    actionProperties : Option[ActionPropertyGetter]
+  ): HttpMethod =
+    HttpMethod.withNameInsensitiveOption(methodName) getOrElse {
+      if (methodName.endsWith("-post"))
+        HttpMethod.POST
+      else
+        throw new XFormsSubmissionException(
+          submission       = dynamicSubmission,
+          message          = s"Invalid method name: `$methodName`",
+          description      = "getting submission method",
+          submitErrorEvent = new XFormsSubmitErrorEvent(
+            target           = dynamicSubmission,
+            errorType        = ErrorType.XXFormsMethodError,
+            cxrOpt           = None,
+            tunnelProperties = actionProperties.map(_.tunnelProperties)
+          )
+        )
+    }
 }

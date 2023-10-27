@@ -26,20 +26,28 @@ import scala.concurrent.Future
 class ClientGetAllSubmission(submission: XFormsModelSubmission)
   extends BaseSubmission(submission) {
 
-  def getType = "get all"
+  val submissionType = "get all"
 
-  def isMatch(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Boolean =
-    p.isHandlingClientGetAll
+  def isMatch(
+    submissionParameters   : SubmissionParameters,
+    serializationParameters: SerializationParameters
+  ): Boolean =
+    submissionParameters.isHandlingClientGetAll
 
-  def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Option[ConnectResult Either Future[ConnectResult]] = {
+  def connect(
+    submissionParameters   : SubmissionParameters,
+    serializationParameters: SerializationParameters
+  )(implicit
+    refContext             : RefContext
+  ): Option[ConnectResult Either Future[ConnectResult]] = {
     XFormsLoadAction.resolveStoreLoadValue(
       containingDocument           = submission.containingDocument,
       currentElem                  = Option(submission.staticSubmission.element),
       doReplace                    = true,
-      value                        = PathUtils.appendQueryString(p2.actionOrResource, Option(sp.queryString) getOrElse ""),
+      value                        = PathUtils.appendQueryString(submissionParameters.actionOrResource, Option(serializationParameters.queryString) getOrElse ""),
       target                       = None,
       urlType                      = UrlType.Render,
-      urlNorewrite                 = p.urlNorewrite,
+      urlNorewrite                 = submissionParameters.urlNorewrite,
       isShowProgressOpt            = Some(submission.containingDocument.findTwoPassSubmitEvents forall (_.showProgress)),
       mustHonorDeferredUpdateFlags = true
     )

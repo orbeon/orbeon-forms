@@ -21,19 +21,19 @@ object NoneReplacer extends Replacer {
   type DeserializeType = Unit
 
   def deserialize(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters
   ): DeserializeType = ()
 
   // Just notify that processing is terminated by dispatching `xforms-submit-done`
   def replace(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters,
-    value     : DeserializeType
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters,
+    value               : DeserializeType
+  )(implicit
+    refContext          : RefContext
   ): ReplaceResult =
-    ReplaceResult.SendDone(cxr, p.tunnelProperties)
+    ReplaceResult.SendDone(cxr, submissionParameters.tunnelProperties)
 }

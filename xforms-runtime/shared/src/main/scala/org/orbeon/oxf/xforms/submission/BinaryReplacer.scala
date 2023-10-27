@@ -27,22 +27,22 @@ object BinaryReplacer extends Replacer {
   type DeserializeType = Option[URI]
 
   def deserialize(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters
   ): Option[URI] =
     XFormsCrossPlatformSupport.inputStreamToSessionUri(
       cxr.content.inputStream)(
-      submission.getDetailsLogger(p, p2)
+      submission.getDetailsLogger(submissionParameters)
     )
 
   def replace(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters,
-    value     : DeserializeType
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters,
+    value               : DeserializeType
+  )(implicit
+    refContext          : RefContext
   ): ReplaceResult = {
 
     def filenameFromValue  : Option[String] = None // MAYBE: `xxf:filenamevalue`
@@ -64,7 +64,7 @@ object BinaryReplacer extends Replacer {
         submission         = submission,
         containingDocument = submission.containingDocument,
         connectionResult   = cxr,
-        p                  = p,
+        submissionParameters                  = submissionParameters,
         value              = macValue
       )
     }
@@ -73,6 +73,6 @@ object BinaryReplacer extends Replacer {
     // MAYBE `xxf:mediatyperef` (also with other replacers!)
     // MAYBE `xxf:sizeref`      (also with other replacers!)
 
-    ReplaceResult.SendDone(cxr, p.tunnelProperties)
+    ReplaceResult.SendDone(cxr, submissionParameters.tunnelProperties)
   }
 }

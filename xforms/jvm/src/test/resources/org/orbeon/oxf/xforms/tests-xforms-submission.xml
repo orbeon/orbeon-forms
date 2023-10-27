@@ -2585,4 +2585,88 @@ az4K</document>
            </xxf:event-response>
         </output>
     </test>
+
+    <test description="Failing async submission dispatches error event" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+
+                        <xf:instance id="my-instance">
+                            <_>
+                                <result/>
+                                <result/>
+                            </_>
+                        </xf:instance>
+
+                        <xf:send
+                            event="xforms-model-construct-done"
+
+                            submission="my-submission">
+                            <xf:property name="p1" value="42"/>
+                            <xf:property name="p2" value="43"/>
+                            <xf:property name="p3" value="44" xxf:tunnel="true"/>
+                            <xf:property name="p4" value="45" xxf:tunnel="true"/>
+                        </xf:send>
+
+                        <xf:submission
+                            id="my-submission"
+                            resource="oxf:/org/orbeon/oxf/xforms/data/i-dont-exist.xml"
+                            method="get"
+                            serialization="none"
+                            mode="asynchronous"
+                            xxf:response-must-await="true"
+                            replace="none"/>
+
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events">
+                            <events/>
+                        </xf:instance>
+                        <xf:insert
+                            event="xforms-submit xforms-submit-done xforms-submit-error xxforms-action-error"
+
+                            context="instance('events')"
+                            ref="*"
+                            origin="
+                                xf:element(
+                                    'event',
+                                    (
+                                        xf:attribute('type', event('xxf:type')),
+                                        xf:attribute('target', event('xxf:targetid')),
+                                        for $c in event('error-type')
+                                        return xf:attribute('error-type', $c),
+                                        for $i in 1 to 4,
+                                            $p in concat('p', $i),
+                                            $v in event($p)
+                                        return
+                                            xf:attribute($p, $v)
+                                    )
+                                )"/>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+               <xxf:dynamic-state>
+                   <dynamic-state>
+                       <instances>
+                           <instance id="events" model-id="model">
+                               <events>
+                                   <event type="xforms-submit" target="my-submission" p1="42" p2="43" p3="44" p4="45"/>
+                                   <event type="xforms-submit-error" target="my-submission" error-type="xxforms-internal-error" p3="44" p4="45"/>
+                               </events>
+                           </instance>
+                       </instances>
+                   </dynamic-state>
+               </xxf:dynamic-state>
+               <xxf:action>
+                   <xxf:control-values/>
+               </xxf:action>
+           </xxf:event-response>
+        </output>
+    </test>
 </group>

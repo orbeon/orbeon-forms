@@ -21,18 +21,18 @@ trait Replacer {
   type DeserializeType
 
   def deserialize(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters
   ): DeserializeType
 
   // NOTE: This is allowed to throw exceptions, including `XFormsSubmissionException`.
   def replace(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters,
-    value     : DeserializeType
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters,
+    value               : DeserializeType
+  )(implicit
+    refContext          : RefContext
   ): ReplaceResult
 }

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import scala.concurrent.Future
 
 trait Submission {
-  def getType: String
-  def isMatch(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Boolean
-  def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Option[ConnectResult Either Future[ConnectResult]]
+  val submissionType: String
+  def isMatch(submissionParameters: SubmissionParameters, sp: SerializationParameters): Boolean
+  def connect(submissionParameters: SubmissionParameters, sp: SerializationParameters)(implicit refContext: RefContext): Option[ConnectResult Either Future[ConnectResult]]
 }

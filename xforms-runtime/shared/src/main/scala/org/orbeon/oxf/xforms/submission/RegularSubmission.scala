@@ -33,32 +33,46 @@ import scala.util.{Failure, Success}
 /**
   * Regular remote submission going through a protocol handler.
   */
-class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmission(submission) {
+class RegularSubmission(submission: XFormsModelSubmission)
+  extends BaseSubmission(submission) {
 
-  def getType = "regular"
-  def isMatch(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters) = true
+  val submissionType = "regular"
+
+  def isMatch(
+    submissionParameters   : SubmissionParameters,
+    serializationParameters: SerializationParameters
+  ) = true
 
   def connect(
-    p : SubmissionParameters,
-    p2: SecondPassParameters,
-    sp: SerializationParameters
+    submissionParameters   : SubmissionParameters,
+    serializationParameters: SerializationParameters
+  )(implicit
+    refContext          : RefContext
   ): Option[ConnectResult Either Future[ConnectResult]] = {
 
-    val absoluteResolvedURL = URI.create(getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, p.urlNorewrite, p.urlType))
+    val absoluteResolvedURL =
+      URI.create(
+        getAbsoluteSubmissionURL(
+          submissionParameters.actionOrResource,
+          serializationParameters.queryString,
+          submissionParameters.urlNorewrite,
+          submissionParameters.urlType
+        )
+      )
 
-    val timingLogger  = getTimingLogger(p, p2)
-    val detailsLogger = getDetailsLogger(p, p2)
+    val timingLogger  = getTimingLogger(submissionParameters)
+    val detailsLogger = getDetailsLogger(submissionParameters)
 
     val externalContext = XFormsCrossPlatformSupport.externalContext
 
     val headers =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
         url                      = absoluteResolvedURL,
-        method                   = p.httpMethod,
-        hasCredentials           = p2.credentialsOpt.isDefined,
-        mediatypeOpt             = sp.actualRequestMediatype.some,
-        encodingForSOAP          = p2.encoding,
-        customHeaders            = SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All),
+        method                   = submissionParameters.httpMethod,
+        hasCredentials           = submissionParameters.credentialsOpt.isDefined,
+        mediatypeOpt             = serializationParameters.actualRequestMediatype.some,
+        encodingForSOAP          = submissionParameters.encoding,
+        customHeaders            = SubmissionUtils.evaluateHeaders(submission, submissionParameters.replaceType == ReplaceType.All),
         headersToForward         = Connection.headersToForwardFromProperty,
         getHeader                = submission.containingDocument.headersGetter)(
         logger                   = detailsLogger,
@@ -69,7 +83,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     val submissionEffectiveId = submission.getEffectiveId
 
     val messageBody: Option[Array[Byte]] =
-      if (HttpMethodsWithRequestBody(p.httpMethod)) sp.messageBody orElse Some(Array.emptyByteArray) else None
+      if (HttpMethodsWithRequestBody(submissionParameters.httpMethod)) serializationParameters.messageBody orElse Some(Array.emptyByteArray) else None
 
     val content = messageBody map
       (StreamedContent.fromBytes(_, firstItemIgnoreCase(headers, ContentType)))
@@ -79,7 +93,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
         try {
           ConnectResult(
             submissionEffectiveId,
-            Success(submission.getReplacer(cxr, p)(submission.getIndentedLogger), cxr)
+            Success(submission.getReplacer(cxr, submissionParameters)(submission.getIndentedLogger), cxr)
           )
         } catch {
           case NonFatal(throwable) =>
@@ -87,23 +101,23 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
             IOUtils.runQuietly(cxr.close()) // close here as it's not passed through `ConnectResult`
             ConnectResult(submissionEffectiveId, Failure(throwable))
         } finally {
-          if (p2.isAsynchronous)
+          if (submissionParameters.isAsynchronous)
             debugResults(
               List(
                 "id"           -> submissionEffectiveId,
-                "asynchronous" -> p2.isAsynchronous.toString
+                "asynchronous" -> submissionParameters.isAsynchronous.toString
               )
             )
         }
       }
 
     Some(
-      if (p2.isAsynchronous || p.isDeferredSubmissionSecondPass)
+      if (submissionParameters.isAsynchronous || submissionParameters.isDeferredSubmission)
         Right(
           Connection.connectAsync(
-            method          = p.httpMethod,
+            method          = submissionParameters.httpMethod,
             url             = absoluteResolvedURL,
-            credentials     = p2.credentialsOpt,
+            credentials     = submissionParameters.credentialsOpt,
             content         = content,
             headers         = headers,
             loadState       = true,
@@ -116,9 +130,9 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
         Left(
           createConnectResult(
             Connection.connectNow(
-              method          = p.httpMethod,
+              method          = submissionParameters.httpMethod,
               url             = absoluteResolvedURL,
-              credentials     = p2.credentialsOpt,
+              credentials     = submissionParameters.credentialsOpt,
               content         = content,
               headers         = headers,
               loadState       = true,

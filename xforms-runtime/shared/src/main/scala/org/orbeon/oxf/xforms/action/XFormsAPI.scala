@@ -298,7 +298,7 @@ object XFormsAPI {
       SubmitEvents foreach (submission.addListener(_, listener))
 
       // Dispatch and make sure the listeners are removed
-      try Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, new ActionPropertyGetter(props)))
+      try Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, ActionPropertyGetter(props)))
       finally SubmitEvents foreach (submission.removeListener(_, Some(listener)))
 
       // - If the dispatch completed successfully and the submission started, it *should* have completed with either

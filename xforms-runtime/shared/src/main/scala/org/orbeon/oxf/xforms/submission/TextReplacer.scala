@@ -29,10 +29,9 @@ object TextReplacer extends Replacer {
   type DeserializeType = Option[String]
 
   def deserialize(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters
   ): DeserializeType =
     SubmissionUtils.readTextContent(cxr.content) match {
       case s @ Some(_) => s
@@ -61,28 +60,31 @@ object TextReplacer extends Replacer {
             target           = submission,
             errorType        = ErrorType.ResourceError,
             cxrOpt           = cxr.some,
-            tunnelProperties = p.tunnelProperties
+            tunnelProperties = submissionParameters.tunnelProperties
           )
         )
     }
 
   def replace(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters,
-    value     : DeserializeType
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters,
+    value               : DeserializeType
+  )(implicit
+    refContext          : RefContext
   ): ReplaceResult =
     value
-      .flatMap(replaceText(submission, submission.containingDocument, cxr, p, _))
-      .getOrElse(ReplaceResult.SendDone(cxr, p.tunnelProperties))
+      .flatMap(replaceText(submission, submission.containingDocument, cxr, submissionParameters, _))
+      .getOrElse(ReplaceResult.SendDone(cxr, submissionParameters.tunnelProperties))
 
   def replaceText (
-    submission         : XFormsModelSubmission,
-    containingDocument : XFormsContainingDocument,
-    connectionResult   : ConnectionResult,
-    p                  : SubmissionParameters,
-    value              : String
+    submission          : XFormsModelSubmission,
+    containingDocument  : XFormsContainingDocument,
+    connectionResult    : ConnectionResult,
+    submissionParameters: SubmissionParameters,
+    value               : String
+  )(implicit
+    refContext          : RefContext
   ): Option[ReplaceResult.SendError] = {
 
     // XForms 1.1: "If the processing of the `targetref` attribute fails, then submission processing ends after
@@ -96,7 +98,7 @@ object TextReplacer extends Replacer {
           target           = submission,
           errorType        = ErrorType.TargetError,
           cxrOpt           = connectionResult.some,
-          tunnelProperties = p.tunnelProperties
+          tunnelProperties = submissionParameters.tunnelProperties
         )
       )
 
@@ -119,9 +121,9 @@ object TextReplacer extends Replacer {
         throw newSubmissionException(
           reason match {
             case DisallowedNodeReason =>
-              s"""`targetref` attribute doesn't point to an element without children or to an attribute for `replace="${p.replaceType}"`."""
+              s"""`targetref` attribute doesn't point to an element without children or to an attribute for `replace="${submissionParameters.replaceType}"`."""
             case ReadonlyNodeReason   =>
-              s"""`targetref` attribute points to a readonly node for `replace="${p.replaceType}"`."""
+              s"""`targetref` attribute points to a readonly node for `replace="${submissionParameters.replaceType}"`."""
           }
         )
 
@@ -138,7 +140,7 @@ object TextReplacer extends Replacer {
           ReplaceResult.SendError(
             t,
             Left(connectionResult.some),
-            p.tunnelProperties
+            submissionParameters.tunnelProperties
           ).some
       }
     }
@@ -147,8 +149,8 @@ object TextReplacer extends Replacer {
     submission.staticSubmission.targetrefOpt match {
       case Some(targetRef) =>
         XPathCache.evaluateSingleWithContext(
-          xpathContext = p.refContext.xpathContext,
-          contextItem  = p.refContext.refNodeInfo,
+          xpathContext = refContext.xpathContext,
+          contextItem  = refContext.refNodeInfo,
           xpathString  = targetRef,
           reporter     = containingDocument.getRequestStats.addXPathStat
         ) match {
@@ -156,15 +158,15 @@ object TextReplacer extends Replacer {
             handleSetValue(destinationNodeInfo)
           case _ =>
             ReplaceResult.SendError(
-              newSubmissionException(s"""`targetref` attribute doesn't point to a node for `replace="${p.replaceType}"`."""),
+              newSubmissionException(s"""`targetref` attribute doesn't point to a node for `replace="${submissionParameters.replaceType}"`."""),
               Left(connectionResult.some),
-              p.tunnelProperties
+              submissionParameters.tunnelProperties
             ).some
         }
       case None =>
         // Use default destination
         handleSetValue(
-          submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt)
+          submission.findReplaceInstanceNoTargetref(refContext.refInstanceOpt)
             .getOrElse(throw new IllegalArgumentException).rootElement
         )
     }

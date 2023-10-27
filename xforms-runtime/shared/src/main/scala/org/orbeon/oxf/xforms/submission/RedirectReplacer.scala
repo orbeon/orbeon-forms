@@ -23,18 +23,18 @@ object RedirectReplacer extends Replacer {
   type DeserializeType = Unit
 
   def deserialize(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters
   ): DeserializeType = ()
 
   def replace(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters,
-    value     : DeserializeType
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters,
+    value               : DeserializeType
+  )(implicit
+    refContext          : RefContext
   ): ReplaceResult = {
     submission.containingDocument.setGotSubmissionRedirect()
     RedirectReplacer.updateResponse(cxr, XFormsCrossPlatformSupport.externalContext.getResponse)

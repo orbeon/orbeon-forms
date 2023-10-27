@@ -41,22 +41,23 @@ object SerializationParameters {
 
   def apply(
     submission              : XFormsModelSubmission,
-    p                       : SubmissionParameters,
-    p2                      : SecondPassParameters,
+    submissionParameters    : SubmissionParameters,
     requestedSerialization  : String,
     documentToSubmitOpt     : Option[URI Either Document],
     overriddenSerializedData: String
+  )(implicit
+    refContext          : RefContext
   ): SerializationParameters = {
 
     // Actual request mediatype: the one specified by `@mediatype`, or the default mediatype for the serialization otherwise
     def actualRequestMediatype(default: String): String =
-      p.mediatypeOpt getOrElse default
+      submissionParameters.mediatypeOpt getOrElse default
 
     documentToSubmitOpt match {
       case Some(Left(uri)) =>
         requestedSerialization match {
           case serialization @ "application/octet-stream" =>
-            InstanceData.getType(p.refContext.refNodeInfo) match {
+            InstanceData.getType(refContext.refNodeInfo) match {
               case XMLConstants.XS_BASE64BINARY_QNAME =>
                 // TODO
                 throw new XFormsSubmissionException(
@@ -110,7 +111,7 @@ object SerializationParameters {
         requestedSerialization match {
           case _ if (overriddenSerializedData ne null) && overriddenSerializedData != "" =>
             // Form author set data to serialize
-            if (HttpMethodsWithRequestBody(p.httpMethod)) {
+            if (HttpMethodsWithRequestBody(submissionParameters.httpMethod)) {
               SerializationParameters(
                 messageBody            = overriddenSerializedData.getBytes(CharsetNames.Utf8).some,
                 queryString            = null,
@@ -124,16 +125,16 @@ object SerializationParameters {
               )
             }
           case serialization @ "application/x-www-form-urlencoded" =>
-            if (HttpMethodsWithRequestBody(p.httpMethod)) {
+            if (HttpMethodsWithRequestBody(submissionParameters.httpMethod)) {
               SerializationParameters(
-                messageBody            = SubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes(CharsetNames.Utf8).some,
+                messageBody            = SubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, submissionParameters.separator).getBytes(CharsetNames.Utf8).some,
                 queryString            = null,
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )
             } else {
               SerializationParameters(
                 messageBody            = None,
-                queryString            = SubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator),
+                queryString            = SubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, submissionParameters.separator),
                 actualRequestMediatype = actualRequestMediatype(null)
               )
             }
@@ -144,11 +145,11 @@ object SerializationParameters {
                 XFormsCrossPlatformSupport.serializeToByteArray(
                   documentToSubmit,
                   "xml",
-                  p2.encoding,
-                  p2.versionOpt,
-                  p2.indent,
-                  p2.omitXmlDeclaration,
-                  p2.standaloneOpt
+                  submissionParameters.encoding,
+                  submissionParameters.versionOpt,
+                  submissionParameters.indent,
+                  submissionParameters.omitXmlDeclaration,
+                  submissionParameters.standaloneOpt
                 )
 
               SerializationParameters(
@@ -173,7 +174,7 @@ object SerializationParameters {
             )
 
             SerializationParameters(
-                messageBody            = result.getBytes(p2.encoding).some,
+                messageBody            = result.getBytes(submissionParameters.encoding).some,
                 queryString            = null,
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )
@@ -210,11 +211,11 @@ object SerializationParameters {
                 XFormsCrossPlatformSupport.serializeToByteArray(
                   documentToSubmit,
                   if (serialization == ContentTypes.HtmlContentType) "html" else "xhtml",
-                  p2.encoding,
-                  p2.versionOpt,
-                  p2.indent,
-                  p2.omitXmlDeclaration,
-                  p2.standaloneOpt
+                  submissionParameters.encoding,
+                  submissionParameters.versionOpt,
+                  submissionParameters.indent,
+                  submissionParameters.omitXmlDeclaration,
+                  submissionParameters.standaloneOpt
                 )
 
               SerializationParameters(
@@ -238,7 +239,7 @@ object SerializationParameters {
                 XFormsCrossPlatformSupport.serializeToByteArray(
                   documentToSubmit,
                   "text",
-                  p2.encoding,
+                  submissionParameters.encoding,
                   None,
                   indent = false,
                   omitXmlDeclaration = true,

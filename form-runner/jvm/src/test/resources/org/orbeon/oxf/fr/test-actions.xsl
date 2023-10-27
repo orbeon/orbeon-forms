@@ -36,6 +36,16 @@
         name="candidate-action-models-ids"
         select="$fr-form-model-id"/>
 
+    <!-- Scope this variable as it is used by actions-20182.xsl -->
+    <xsl:variable
+        name="actions-async"
+        select="false()"/>
+
+    <!-- Scope this variable as it is used by actions-20182.xsl -->
+    <xsl:variable
+        name="actions-response-must-await"
+        select="false()"/>
+
     <xsl:template match="/">
         <xsl:for-each select="$fr-form-model">
             <xsl:copy>

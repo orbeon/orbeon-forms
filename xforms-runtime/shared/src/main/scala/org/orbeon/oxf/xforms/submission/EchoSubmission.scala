@@ -24,24 +24,25 @@ import scala.concurrent.Future
 import scala.util.Success
 
 
-class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(submission) {
+class EchoSubmission(submission: XFormsModelSubmission)
+  extends BaseSubmission(submission) {
 
-  def getType = "echo"
+  val submissionType = "echo"
 
   def isMatch(
-    p : SubmissionParameters,
-    p2: SecondPassParameters,
-    sp: SerializationParameters
+    submissionParameters   : SubmissionParameters,
+    serializationParameters: SerializationParameters
   ): Boolean =
-    p2.actionOrResource.startsWith("test:") || p2.actionOrResource.startsWith("echo:")
+    submissionParameters.actionOrResource.startsWith("test:") || submissionParameters.actionOrResource.startsWith("echo:")
 
   def connect(
-    p : SubmissionParameters,
-    p2: SecondPassParameters,
-    sp: SerializationParameters
+    submissionParameters   : SubmissionParameters,
+    serializationParameters: SerializationParameters
+  )(implicit
+    refContext             : RefContext
   ): Option[ConnectResult Either Future[ConnectResult]] = {
 
-    sp.messageBody match {
+    serializationParameters.messageBody match {
       case None =>
         // Not sure when this can happen, but it can't be good
         throw new XFormsSubmissionException(
@@ -51,17 +52,17 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
         )
       case Some(messageBody) =>
         // Log message body for debugging purposes
-        val indentedLogger = getDetailsLogger(p, p2)
+        val indentedLogger = getDetailsLogger(submissionParameters)
         if (indentedLogger.debugEnabled && BaseSubmission.isLogBody)
-          SubmissionUtils.logRequestBody(sp.actualRequestMediatype, messageBody)(indentedLogger)
+          SubmissionUtils.logRequestBody(serializationParameters.actualRequestMediatype, messageBody)(indentedLogger)
     }
 
-    val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All)
+    val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, submissionParameters.replaceType == ReplaceType.All)
 
     // Just a scheme is not a valid URI, so add a scheme-specific part if needed
     val url =
       URI.create(
-        p2.actionOrResource match {
+        submissionParameters.actionOrResource match {
           case "echo:" | "test:" => "echo:/"
           case other             => other
         }
@@ -69,27 +70,27 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
 
     val headers = Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
       url                      = url,
-      method                   = p.httpMethod,
-      hasCredentials           = p2.credentialsOpt.isDefined,
-      mediatypeOpt             = sp.actualRequestMediatype.some,
-      encodingForSOAP          = p2.encoding,
+      method                   = submissionParameters.httpMethod,
+      hasCredentials           = submissionParameters.credentialsOpt.isDefined,
+      mediatypeOpt             = serializationParameters.actualRequestMediatype.some,
+      encodingForSOAP          = submissionParameters.encoding,
       customHeaders            = customHeaderNameValues,
       headersToForward         = Connection.headersToForwardFromProperty,
       getHeader                = submission.containingDocument.headersGetter)(
-      logger                   = getDetailsLogger(p, p2),
+      logger                   = getDetailsLogger(submissionParameters),
       externalContext          = XFormsCrossPlatformSupport.externalContext,
       coreCrossPlatformSupport = CoreCrossPlatformSupport
     )
 
     // Do as if we are receiving a regular XML response
     val cxr = ConnectionResult(
-      url                 = p2.actionOrResource,
+      url                 = submissionParameters.actionOrResource,
       statusCode          = 200,
       headers             = headers,
       content             = StreamedContent(
-        inputStream     = new ByteArrayInputStream(sp.messageBody getOrElse Array.emptyByteArray),
+        inputStream     = new ByteArrayInputStream(serializationParameters.messageBody getOrElse Array.emptyByteArray),
         contentType     = Headers.firstItemIgnoreCase(headers, Headers.ContentType),
-        contentLength   = Some(sp.messageBody map (_.length.toLong) getOrElse 0L),
+        contentLength   = Some(serializationParameters.messageBody map (_.length.toLong) getOrElse 0L),
         title           = None
       )
     )
@@ -97,7 +98,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     Left(
       ConnectResult(
         submission.getEffectiveId,
-        Success((submission.getReplacer(cxr, p)(submission.getIndentedLogger), cxr)))
+        Success((submission.getReplacer(cxr, submissionParameters)(submission.getIndentedLogger), cxr)))
     ).some
   }
 }

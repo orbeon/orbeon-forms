@@ -15,7 +15,6 @@ package org.orbeon.xforms
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.dom
 
 
 sealed trait RelevanceHandling extends EnumEntry
@@ -75,11 +74,6 @@ trait XFormsDocumentLifecycle[Response] {
   }
 }
 
-case class ErrorInfo(
-  element : dom.Element,
-  message : String
-)
-
 case class Message(
   message : String,
   level   : String
@@ -94,22 +88,3 @@ case class Load(
 ) {
   def isJavaScript: Boolean = resource.trim.startsWith("javascript:")
 }
-
-case class SimplePropertyValue(
-  name  : String,
-  value : String,
-  tunnel: Boolean
-)
-
-case class DelayedEvent(
-  eventName              : String,
-  targetEffectiveId      : String,
-  bubbles                : Boolean,
-  cancelable             : Boolean,
-  time                   : Option[Long],
-  showProgress           : Boolean,        // whether to show the progress indicator when submitting the event
-  browserTarget          : Option[String], // optional browser target for submit events
-  submissionId           : Option[String],
-  isResponseResourceType : Boolean,
-  properties             : List[SimplePropertyValue]
-)

@@ -179,6 +179,6 @@ object XFormsAction {
       } yield
         PropertyValue(name, Option(value), tunnel)
 
-    new ActionPropertyGetter(propertyValues)
+    ActionPropertyGetter(propertyValues)
   }
 }

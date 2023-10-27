@@ -25,7 +25,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceCaching, InstanceDataOps, XFormsInstance}
-import org.orbeon.oxf.xforms.submission.InstanceReplacer.DeserializeType
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
@@ -35,21 +34,21 @@ class DirectInstanceReplacer(value: (DocumentNodeInfoType, InstanceCaching)) ext
   type DeserializeType = Either[InstanceDocument, (DocumentNodeInfoType, InstanceCaching)]
 
   def deserialize(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters
   ): DeserializeType =
     Right(value)
 
   def replace(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters,
-    value     : DeserializeType
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters,
+    value               : DeserializeType
+  )(implicit
+    refContext          : RefContext
   ): ReplaceResult =
-    InstanceReplacer.replace(submission, cxr, p, p2, value)
+    InstanceReplacer.replace(submission, cxr, submissionParameters, value)
 }
 
 object InstanceReplacer extends Replacer {
@@ -57,24 +56,23 @@ object InstanceReplacer extends Replacer {
   type DeserializeType = Either[InstanceDocument, (DocumentNodeInfoType, InstanceCaching)]
 
   def deserialize(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters
   ): DeserializeType = {
     // Deserialize here so it can run in parallel
     val contentType = cxr.mediatypeOrDefault(ContentTypes.XmlContentType)
     val isJSON = ContentTypes.isJSONContentType(contentType)
     if (ContentTypes.isXMLContentType(contentType) || isJSON) {
-      implicit val detailsLogger: IndentedLogger = submission.getDetailsLogger(p, p2)
+      implicit val detailsLogger: IndentedLogger = submission.getDetailsLogger(submissionParameters)
       Left(
         deserializeInstance(
           submission       = submission,
-          isReadonly       = p2.isReadonly,
-          isHandleXInclude = p2.isHandleXInclude,
+          isReadonly       = submissionParameters.isReadonly,
+          isHandleXInclude = submissionParameters.isHandleXInclude,
           isJSON           = isJSON,
           connectionResult = cxr,
-          tunnelProperties = p.tunnelProperties
+          tunnelProperties = submissionParameters.tunnelProperties
         )
       )
     } else {
@@ -87,20 +85,21 @@ object InstanceReplacer extends Replacer {
           submission,
           ErrorType.ResourceError,
           cxr.some,
-          p.tunnelProperties
+          submissionParameters.tunnelProperties
         )
       )
     }
   }
 
   def replace(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters,
-    value     : DeserializeType
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters,
+    value               : DeserializeType
+  )(implicit
+    refContext          : RefContext
   ): ReplaceResult =
-    submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt) match {
+    submission.findReplaceInstanceNoTargetref(refContext.refInstanceOpt) match {
       case None =>
 
         // Replacement instance or node was specified but not found
@@ -121,20 +120,20 @@ object InstanceReplacer extends Replacer {
               target    = submission,
               errorType = ErrorType.TargetError,
               cxrOpt    = cxr.some,
-              tunnelProperties = p.tunnelProperties
+              tunnelProperties = submissionParameters.tunnelProperties
             )
           ),
           Left(cxr.some),
-          p.tunnelProperties
+          submissionParameters.tunnelProperties
         )
 
       case Some(replaceInstanceNoTargetref) =>
 
         val destinationNodeInfoOpt =
           submission.evaluateTargetRef(
-            p.refContext.xpathContext,
+            refContext.xpathContext,
             replaceInstanceNoTargetref,
-            p.refContext.submissionElementContextItem
+            refContext.submissionElementContextItem
           )
 
         destinationNodeInfoOpt match {
@@ -151,11 +150,11 @@ object InstanceReplacer extends Replacer {
                   target           = submission,
                   errorType        = ErrorType.TargetError,
                   cxrOpt           = cxr.some,
-                  tunnelProperties = p.tunnelProperties
+                  tunnelProperties = submissionParameters.tunnelProperties
                 )
               ),
               Left(cxr.some),
-              p.tunnelProperties
+              submissionParameters.tunnelProperties
             )
           case Some(destinationNodeInfo) =>
             // This is the instance which is effectively going to be updated
@@ -170,16 +169,16 @@ object InstanceReplacer extends Replacer {
                       target           = submission,
                       errorType        = ErrorType.TargetError,
                       cxrOpt           = cxr.some,
-                      tunnelProperties = p.tunnelProperties
+                      tunnelProperties = submissionParameters.tunnelProperties
                     )
                   ),
                   Left(cxr.some),
-                  p.tunnelProperties
+                  submissionParameters.tunnelProperties
                 )
               case Some(instanceToUpdate) =>
                 // Whether the destination node is the root element of an instance
                 val isDestinationRootElement = instanceToUpdate.rootElement.isSameNodeInfo(destinationNodeInfo)
-                if (p2.isReadonly && ! isDestinationRootElement) {
+                if (submissionParameters.isReadonly && ! isDestinationRootElement) {
                   // Only support replacing the root element of an instance when using a shared instance
                   ReplaceResult.SendError(
                     new XFormsSubmissionException(
@@ -190,20 +189,20 @@ object InstanceReplacer extends Replacer {
                         target           = submission,
                         errorType        = ErrorType.TargetError,
                         cxrOpt           = cxr.some,
-                        tunnelProperties = p.tunnelProperties
+                        tunnelProperties = submissionParameters.tunnelProperties
                       )
                     ),
                     Left(cxr.some),
-                    p.tunnelProperties
+                    submissionParameters.tunnelProperties
                   )
                 } else {
-                  implicit val detailsLogger  = submission.getDetailsLogger(p, p2)
+                  implicit val detailsLogger  = submission.getDetailsLogger(submissionParameters)
 
                   // Obtain root element to insert
                   if (detailsLogger.debugEnabled)
                     detailsLogger.logDebug(
                       "",
-                      if (p2.isReadonly)
+                      if (submissionParameters.isReadonly)
                         "replacing instance with read-only instance"
                       else
                         "replacing instance with mutable instance",
@@ -230,7 +229,7 @@ object InstanceReplacer extends Replacer {
                         documentNodeInfo
                     }
 
-                  val applyDefaults = p2.applyDefaults
+                  val applyDefaults = submissionParameters.applyDefaults
                   if (isDestinationRootElement) {
                     // Optimized insertion for instance root element replacement
                     if (applyDefaults)
@@ -244,7 +243,7 @@ object InstanceReplacer extends Replacer {
                       newDocumentInfo = newDocumentInfo,
                       dispatch        = true,
                       instanceCaching = value.toOption.map(_._2),
-                      isReadonly      = p2.isReadonly,
+                      isReadonly      = submissionParameters.isReadonly,
                       applyDefaults   = applyDefaults
                     )
                   } else {
@@ -283,7 +282,7 @@ object InstanceReplacer extends Replacer {
                     // - doDelete() does as well
                     // Does this mean that we should check that the node is still where it should be?
                   }
-                  ReplaceResult.SendDone(cxr, p.tunnelProperties)
+                  ReplaceResult.SendDone(cxr, submissionParameters.tunnelProperties)
                 }
             }
         }

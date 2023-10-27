@@ -26,7 +26,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SAXStoreBinaryFormat._
 import org.orbeon.oxf.xml.SBinaryDefaultFormats._
 import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
-import org.orbeon.xforms.{DelayedEvent, XFormsId}
+import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.runtime.DelayedEvent
 import sbinary.Operations._
 
 import scala.collection.immutable

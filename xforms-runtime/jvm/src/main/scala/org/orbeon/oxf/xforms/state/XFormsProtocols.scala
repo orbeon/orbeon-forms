@@ -21,7 +21,7 @@ import org.orbeon.oxf.xml.SBinaryDefaultFormats._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.LocationDocumentSource
 import org.orbeon.saxon.om.DocumentInfo
-import org.orbeon.xforms.{DelayedEvent, SimplePropertyValue}
+import org.orbeon.xforms.runtime.{DelayedEvent, SimplePropertyValue}
 import sbinary.Operations._
 import sbinary._
 
@@ -99,6 +99,8 @@ object XFormsProtocols {
       write(output, delayedEvent.submissionId)
       write(output, delayedEvent.isResponseResourceType)
       write(output, delayedEvent.properties)
+      // Explicitly don't write `submissionParameters` here, as it's used only for two-pass submissions, and we don't
+      // expect serialization to happen between the two passes.
     }
 
     def reads(input: Input): DelayedEvent =
@@ -112,7 +114,8 @@ object XFormsProtocols {
         read[Option[String]](input),
         read[Option[String]](input),
         read[Boolean](input),
-        read[List[SimplePropertyValue]](input)
+        read[List[SimplePropertyValue]](input),
+        submissionParameters = None // see comment in `writes()`
       )
   }
 

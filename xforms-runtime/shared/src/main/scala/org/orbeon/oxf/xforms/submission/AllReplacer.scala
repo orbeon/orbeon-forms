@@ -26,18 +26,18 @@ object AllReplacer extends Replacer {
   type DeserializeType = Unit
 
   def deserialize(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters
   ): DeserializeType = ()
 
   def replace(
-    submission: XFormsModelSubmission,
-    cxr       : ConnectionResult,
-    p         : SubmissionParameters,
-    p2        : SecondPassParameters,
-    value     : DeserializeType
+    submission          : XFormsModelSubmission,
+    cxr                 : ConnectionResult,
+    submissionParameters: SubmissionParameters,
+    value               : DeserializeType
+  )(implicit
+    refContext          : RefContext
   ): ReplaceResult = {
 
     // When we get here, we are in a mode where we need to send the reply directly to an external context, if any.
@@ -54,7 +54,7 @@ object AllReplacer extends Replacer {
     // Error: "either the document is replaced with an implementation-specific indication of an error or submission
     // processing concludes after dispatching `xforms-submit-error` with appropriate context information, including an
     // `error-type` of `resource-error`"
-    if (! p.isDeferredSubmissionSecondPass) {
+    if (! submissionParameters.isDeferredSubmission) {
       if (StatusCode.isSuccessCode(cxr.statusCode))
         ReplaceResult.SendDone(cxr, None)
       else
@@ -70,11 +70,11 @@ object AllReplacer extends Replacer {
               target           = submission,
               errorType        = ErrorType.ResourceError,
               cxrOpt           = cxr.some,
-              tunnelProperties = p.tunnelProperties
+              tunnelProperties = submissionParameters.tunnelProperties
             )
           ),
           Left(cxr.some),
-          p.tunnelProperties
+          submissionParameters.tunnelProperties
         )
     } else {
       // Two reasons:

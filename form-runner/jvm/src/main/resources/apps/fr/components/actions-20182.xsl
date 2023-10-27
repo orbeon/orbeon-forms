@@ -456,7 +456,7 @@
                                     if (exists($context-changing-elem-opt/self::fr:service-call)) then
                                         'xxf:instance(''fr-service-response-instance'')'
                                     else if (exists($context-changing-elem-opt/self::fr:data-iterate)) then
-                                        concat('xxf:get-document-attribute(event(''action-id''), ''', fr:build-context-param($context-changing-elem-opt), ''')')
+                                        concat('xxf:get-document-attribute(event(''fr-action-id''), ''', fr:build-context-param($context-changing-elem-opt), ''')')
                                     else
                                         'instance(''fr-form-instance'')'
                                 "/>

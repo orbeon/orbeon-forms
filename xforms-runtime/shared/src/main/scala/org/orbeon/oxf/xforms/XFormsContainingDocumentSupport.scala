@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms
 
-import cats.Eval
 import cats.syntax.option._
 import org.log4s
 import org.log4s.LogLevel
@@ -41,13 +40,13 @@ import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.state.{LockResponse, RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{ConnectResult, TwoPassSubmissionParameters}
+import org.orbeon.oxf.xforms.submission.{ConnectResult, SubmissionParameters, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.Constants.FormId
 import org.orbeon.xforms._
-import org.orbeon.xforms.runtime.XFormsObject
+import org.orbeon.xforms.runtime.{DelayedEvent, SimplePropertyValue, XFormsObject}
 import shapeless.syntax.typeable._
 
 import java.net.URI
@@ -688,16 +687,17 @@ trait ContainingDocumentDelayedEvents {
 
   def addTwoPassSubmitEvent(p: TwoPassSubmissionParameters): Unit =
     _delayedEvents += DelayedEvent(
-      eventName              = XFormsEvents.XXFORMS_SUBMIT,               // for dispatch
-      targetEffectiveId      = p.submissionEffectiveId,                   // for dispatch
-      bubbles                = true,                                      // for dispatch
-      cancelable             = false,                                     // for dispatch
-      time                   = None,                                      // for scheduling
-      showProgress           = p.showProgress,                            // for XHR response
-      browserTarget          = p.target,                                  // for XHR response
-      submissionId           = CoreCrossPlatformSupport.randomHexId.some, // for XHR response
-      isResponseResourceType = p.isResponseResourceType,                  // for XHR response
-      properties             = p.properties                               // for dispatch
+      eventName              = XFormsEvents.XXFORMS_SUBMIT,
+      targetEffectiveId      = p.submissionEffectiveId,
+      bubbles                = true,
+      cancelable             = false,
+      time                   = None,
+      showProgress           = p.submissionParameters.xxfShowProgress,
+      browserTarget          = p.submissionParameters.xxfTargetOpt,
+      submissionId           = CoreCrossPlatformSupport.randomHexId.some,
+      isResponseResourceType = p.submissionParameters.resolvedIsResponseResourceType,
+      properties             = Nil, // no properties needed during second pass
+      submissionParameters   = p.submissionParameters.some
     )
 
   def findTwoPassSubmitEvents: List[DelayedEvent] =
@@ -736,7 +736,8 @@ trait ContainingDocumentDelayedEvents {
         browserTarget          = None,
         submissionId           = None,
         isResponseResourceType = false,
-        properties             = properties
+        properties             = properties,
+        submissionParameters   = None
       )
   }
 
@@ -783,8 +784,14 @@ trait ContainingDocumentDelayedEvents {
                     eventName  = dueEvent.eventName,
                     target     = eventTarget,
                     properties = new PartialFunction[String, Option[Any]] {
-                      def isDefinedAt(key: String): Boolean = dueEvent.properties.exists(_.name == key)
-                      def apply(key: String): Option[Any] = dueEvent.properties.collectFirst { case SimplePropertyValue(`key`, value, _) => value }
+                      def isDefinedAt(key: String): Boolean = key match {
+                        case SubmissionParameters.EventName => dueEvent.submissionParameters.isDefined
+                        case key                            => dueEvent.properties.exists(_.name == key)
+                      }
+                      def apply(key: String): Option[Any] = key match {
+                        case SubmissionParameters.EventName => dueEvent.submissionParameters
+                        case key                            => dueEvent.properties.collectFirst { case SimplePropertyValue(`key`, value, _) => value }
+                      }
                     },
                     bubbles    = dueEvent.bubbles,
                     cancelable = dueEvent.cancelable

@@ -59,10 +59,6 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   private var _connectionResult: Option[ConnectionResult] = None
   def connectionResult: Option[ConnectionResult] = _connectionResult
 
-  def logThrowable(throwable: Throwable): Unit =
-    if (errorType != ErrorType.ValidationError)
-      indentedLogger.logError("xforms-submit-error", "setting throwable", "throwable", OrbeonFormatter.format(throwable))
-
   def logMessage(throwable: Throwable): Unit =
     if (errorType != ErrorType.ValidationError)
       indentedLogger.logError("xforms-submit-error", OrbeonFormatter.message(throwable))

@@ -76,6 +76,11 @@
 <!--                    <xsl:attribute name="incremental" select="'true'"/>-->
                     <xsl:attribute name="appearance"  select="tokenize(/*/@appearance, '\s+')[. != 'clipboard-copy']"/>
                     <xsl:copy-of select="/*/@mediatype"/>
+                    <xsl:if test="/*/@autocomplete">
+                        <xsl:attribute name="autocomplete">
+                            <xsl:value-of select="/*/@autocomplete"/>
+                        </xsl:attribute>
+                    </xsl:if>
                 </xsl:element>
 
                 <xh:button class="fr-clipboard-copy-button">

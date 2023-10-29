@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.persistence.test
 
 import org.orbeon.dom
 import org.orbeon.dom.Document
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.permission._
@@ -23,10 +24,11 @@ import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
-import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.http.{HttpRange, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Logging}
@@ -36,7 +38,6 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.ByteArrayInputStream
 import java.nio.file.{Files, Path, Paths}
-import java.util.Comparator
 import scala.util.Random
 
 
@@ -159,7 +160,10 @@ class RestApiTest
           val dataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
           val data    = HttpCall.XML(<gaga1/>.toDocument)
 
-          HttpAssert.put(dataURL, Specific(1), data, StatusCode.NotFound) // TODO: return `StatusCode.Forbidden` instead as reason is missing permissions!
+          // In PE, encryptDataIfNecessary is implemented and tries to access the form definition, which causes
+          // StatusCode.NotFound. In CE, encryptDataIfNecessary is not implemented, so StatusCode.Created is returned.
+          HttpAssert.put(dataURL, Specific(1), data, if (Version.isPE) StatusCode.NotFound else StatusCode.Created)
+          // TODO: return `StatusCode.Forbidden` instead as reason if missing permissions!
 
           // 2023-04-18: Following changes to the persistence proxy: `PUT`ting data for a non-existing form definition
           // used to not fail, for some reason. Now we enforce the existence of a form definition so we can check
@@ -168,7 +172,10 @@ class RestApiTest
 
           // Storing for specific form version
           val myStage = Some(Stage("my-stage", ""))
-          HttpAssert.put(dataURL, Specific(1), data, StatusCode.Created)
+          // During the previous PUT, in PE, encryptDataIfNecessary didn't find the form definition and didn't store the
+          // form data, so this time the PUT returns Created. In CE, encryptDataIfNecessary didn't fail (no
+          // implementation) and the form data was stored, so the current PUT returns NoContent.
+          HttpAssert.put(dataURL, Specific(1), data, if (Version.isPE) StatusCode.Created else StatusCode.NoContent)
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1)))
           HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent, stage = myStage)
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1), stage = myStage))
@@ -348,11 +355,107 @@ class RestApiTest
 
           createForm(provider, formName)
 
-          for ((size, position) <- Seq(0, 1, 1024, 1024 * 1024).zipWithIndex) {
-            val bytes = new Array[Byte](size) |!> Random.nextBytes |> HttpCall.Binary
-            val dataUrl = HttpCall.crudURLPrefix(provider, formName) + s"data/123/file$position"
-            HttpAssert.put(dataUrl, Specific(1), bytes, StatusCode.Created)
-            HttpAssert.get(dataUrl, Unspecified, HttpAssert.ExpectedBody(bytes, AnyOperation, Some(1)))
+          val MiB = 1024 * 1024
+
+          val largestWorkingSize =
+            if (formName == FilesystemAttachmentsFormName) {
+              // Filesystem attachment
+              256 * MiB
+            } else {
+              // Database attachment
+              provider match {
+                // Some of these sizes could probably be made higher by changing the default database configurations
+                case MySQL      =>   2 * MiB - 256
+                case PostgreSQL => 247 * MiB
+              }
+            }
+
+          // To avoid OutOfMemoryError exceptions without changing the default memory configuration
+          val largestSize = math.min(128 * MiB, largestWorkingSize)
+
+          for ((size, position) <- Seq(0, 1, 1024, largestSize).zipWithIndex) {
+            val bodyArray = new Array[Byte](size) |!> Random.nextBytes
+            val body      = bodyArray |> HttpCall.Binary
+            val url       = HttpCall.crudURLPrefix(provider, formName) + s"data/123/file$position"
+
+            HttpAssert.put(url, Specific(1), body, StatusCode.Created)
+
+            // No range request
+            HttpAssert.get(
+              url       = url,
+              version   = Unspecified,
+              httpRange = None,
+              expected  = HttpAssert.ExpectedBody(
+                body        = body,
+                operations  = AnyOperation,
+                formVersion = Some(1),
+                statusCode  = StatusCode.Ok
+              )
+            )
+
+            if (size > 2) {
+              // Fully-defined range request
+              HttpAssert.get(
+                url       = url,
+                version   = Unspecified,
+                httpRange = Some(HttpRange(0, Some(1))),
+                expected  = HttpAssert.ExpectedBody(
+                  body               = HttpCall.Binary(bodyArray.slice(0, 2)),
+                  operations         = AnyOperation,
+                  formVersion        = Some(1),
+                  contentRangeHeader = Some(s"bytes 0-1/$size"),
+                  statusCode         = StatusCode.PartialContent
+                )
+              )
+            }
+
+            if (size > 128) {
+              // Range request with only start offset
+              HttpAssert.get(
+                url       = url,
+                version   = Unspecified,
+                httpRange = Some(HttpRange(128, None)),
+                expected  = HttpAssert.ExpectedBody(
+                  body               = HttpCall.Binary(bodyArray.drop(128)),
+                  operations         = AnyOperation,
+                  formVersion        = Some(1),
+                  contentRangeHeader = Some(s"bytes 128-${size-1}/$size"),
+                  statusCode         = StatusCode.PartialContent
+                )
+              )
+            }
+
+            if (size > 32770) {
+              // Large range (1)
+              HttpAssert.get(
+                url = url,
+                version = Unspecified,
+                httpRange = Some(HttpRange(1, Some(32770))),
+                expected = HttpAssert.ExpectedBody(
+                  body = HttpCall.Binary(bodyArray.slice(1, 32771)),
+                  operations = AnyOperation,
+                  formVersion = Some(1),
+                  contentRangeHeader = Some(s"bytes 1-32770/$size"),
+                  statusCode = StatusCode.PartialContent
+                )
+              )
+            }
+
+            if (size > 65538) {
+              // Large range (2)
+              HttpAssert.get(
+                url = url,
+                version = Unspecified,
+                httpRange = Some(HttpRange(1, Some(65540))),
+                expected = HttpAssert.ExpectedBody(
+                  body = HttpCall.Binary(bodyArray.slice(1, 65541)),
+                  operations = AnyOperation,
+                  formVersion = Some(1),
+                  contentRangeHeader = Some(s"bytes 1-65540/$size"),
+                  statusCode = StatusCode.PartialContent
+                )
+              )
+            }
           }
 
           postTest(appForm, formOrData)
@@ -402,7 +505,7 @@ class RestApiTest
         // Delete the base directory only if it was created by the test
         directoryToCleanAfterTest.foreach { directory =>
           // Delete all sub-directories and files in reverse order, so that children are deleted before parents
-          Files.walk(directory).sorted(java.util.Comparator.reverseOrder()).forEach(Files.delete)
+          Files.walk(directory).sorted(java.util.Comparator.reverseOrder()).forEach(Files.delete(_))
         }
       }
     }

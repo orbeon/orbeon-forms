@@ -25,6 +25,7 @@
     <p:param type="output" name="data"/>
 
     <!-- If data is posted, store as request attribute so that persistence-model.xml picks it up -->
+    <!-- 2023-07-25: We don't run XForms here after this, do we? Do we need this then? -->
     <p:choose href="#instance">
         <p:when test="not(/null/@xsi:nil = 'true')">
             <p:processor name="oxf:scope-serializer">
@@ -39,7 +40,6 @@
         </p:when>
     </p:choose>
 
-    <!-- Extract page detail (app, form, document, and mode) from URL -->
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
@@ -64,16 +64,25 @@
     </p:processor>
 
     <!-- Retrieve Form Runner resources -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" transform="oxf:unsafe-xslt" href="#parameters-with-version">
-            <config xsl:version="2.0">
-                <url>
-                    <xsl:value-of select="p:rewrite-service-uri(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())"/>
-                </url>
-                <always-return-status-code>false</always-return-status-code>
-            </config>
+    <!-- 2023-07-26: Use `oxf:xforms-submission` so we can do a POST of the form metadata to handle resources overrides.
+         See https://github.com/orbeon/orbeon-forms/issues/5833 -->
+    <p:processor name="oxf:xforms-submission">
+        <p:input name="submission" transform="oxf:unsafe-xslt" href="#parameters-with-version">
+            <xf:submission
+                xsl:version="2.0"
+                xmlns:xf="http://www.w3.org/2002/xforms"
+                serialization="application/xml"
+                method="post"
+                resource="{p:rewrite-service-uri(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())}"/>
         </p:input>
-        <p:output name="data" id="fr-resources"/>
+        <p:input name="request" transform="oxf:unsafe-xslt" href="#xhtml-fr-xforms">
+            <xsl:stylesheet version="2.0">
+                <xsl:template match="/">
+                    <xsl:copy-of select="frf:metadataInstanceRootOpt(/*)"/>
+                </xsl:template>
+            </xsl:stylesheet>
+        </p:input>
+        <p:output name="response" id="fr-resources"/>
     </p:processor>
 
     <!-- Obtain attachment information -->
@@ -185,9 +194,52 @@
         <p:output name="data" id="form-tiff"/>
     </p:processor>
 
-    <!-- Convert form data for attachment -->
+    <!-- Migrate form data for XML attachment -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input  name="data"       href="#instance"/>
+        <p:input  name="xhtml"      href="#xhtml-fr-xforms"/>
+        <p:input  name="request"    href="#request"/>
+        <p:input  name="parameters" href="#parameters-with-version"/>
+        <p:input  name="config">
+            <xsl:stylesheet version="2.0">
+                <xsl:variable name="data"          select="/*"                                  as="element()"/>
+                <xsl:variable name="xhtml"         select="doc('input:xhtml')/*"                as="element(xh:html)"/>
+                <xsl:variable name="request"       select="doc('input:request')/*"              as="element(request)"/>
+                <xsl:variable name="app"           select="doc('input:parameters')/*/app"       as="xs:string"/>
+                <xsl:variable name="form"          select="doc('input:parameters')/*/form"      as="xs:string"/>
+                <xsl:variable name="metadata-elem" select="frf:metadataInstanceRootOpt($xhtml)" as="element(metadata)"/>
+
+                <xsl:variable
+                    name="data-format-version-opt"
+                    select="$request/parameters/parameter[name = 'email-data-format-version']/value[p:non-blank()]"
+                    as="xs:string?"/>
+
+                <xsl:variable
+                    name="prune-metadata-opt"
+                    select="$request/parameters/parameter[name = 'prune-metadata']/value[. = ('true', 'false')] = 'true'"
+                    as="xs:boolean?"/>
+
+                <xsl:template match="/">
+                    <xsl:copy-of
+                        xmlns:grid-migration="java:org.orbeon.oxf.fr.GridDataMigration"
+                        select="
+                            grid-migration:dataMaybeMigratedFromEdge(
+                               $app,
+                               $form,
+                               $data/root(),
+                               p:mutable-document($metadata-elem),
+                               ($data-format-version-opt, '4.0.0')[1],
+                               ($prune-metadata-opt,      false())[1]
+                           )"/>
+                </xsl:template>
+            </xsl:stylesheet>
+        </p:input>
+        <p:output name="data" id="migrated-instance"/>
+    </p:processor>
+
+    <!-- Serialize form data for attachment -->
     <p:processor name="oxf:xml-converter">
-        <p:input name="data" href="#instance"/>
+        <p:input name="data" href="#migrated-instance"/>
         <p:input name="config"><config/></p:input>
         <p:output name="data" id="form-xml"/>
     </p:processor>

@@ -282,11 +282,17 @@
         <classes>
             <label>Custom CSS classes</label>
         </classes>
-        <default-always-never>
-            <item id="0">Use property</item>
-            <item id="1">Always</item>
-            <item id="2">Never</item>
-        </default-always-never>
+        <autocomplete>
+            <label>Autocomplete attribute</label>
+            <groups>
+                <general>General</general>
+                <name>Name and Title</name>
+                <credentials>Credentials</credentials>
+                <address>Address</address>
+                <contact>Contact</contact>
+                <payment>Payment</payment>
+            </groups>
+        </autocomplete>
         <!-- Dialogs -->
         <continue>
             <label>Continue</label>
@@ -418,6 +424,9 @@
             <hints>
                 <label>Appearance of Control Hints</label>
             </hints>
+            <automatic-hints>
+                <label>Use automatic hints</label>
+            </automatic-hints>
             <appearances>
                 <item id="0">Use property</item>
                 <item id="1">Inline</item>
@@ -478,6 +487,11 @@
             <current-version>Current Version</current-version>
             <created-with-version>Created with Version</created-with-version>
             <updated-with-versions>Updated with Versions</updated-with-versions>
+            <property-yes-no>
+                <item id="0">Use property</item>
+                <item id="1">Yes</item>
+                <item id="2">No</item>
+            </property-yes-no>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Control Settings</label>
@@ -505,19 +519,28 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Show in search</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label>Show in bulk edit</label>
-                    <value>fr-summary-edit</value>
+                    <label>Allow bulk edit</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label>Encrypt data at rest</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <restrict-role>Restrict to role</restrict-role>
+            <summary-show>
+                <do-not-show>Don't show on Summary page</do-not-show>
+                <show>Show on Summary page</show>
+                <column-only>Show column only</column-only>
+                <search-only>Show search only</search-only>
+            </summary-show>
+            <role>
+                <restrict>Restrict to role</restrict>
+                <all>All</all>
+                <any>Any</any>
+                <of-the-following>of the following:</of-the-following>
+                <empty>Empty role</empty>
+                <duplicate>Duplicate role</duplicate>
+            </role>
             <control-appearance>
                 <label>Control Appearance</label>
             </control-appearance>
@@ -698,6 +721,15 @@
             <level><label>Level</label></level>
             <use-html>Use HTML</use-html>
             <parameters>Template Parameters</parameters>
+            <automatic-hint>
+                <label>Use automatic hint</label>
+                <hint>Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab</hint>
+            </automatic-hint>
+            <default-yes-no>
+                <item id="0">Use default</item>
+                <item id="1">Yes</item>
+                <item id="2">No</item>
+            </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
             <label>Section/Grid Settings</label>
@@ -1211,6 +1243,7 @@
             <disable-relevant>Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints>Show controls hints</show-hints>
             <show-alerts>Show invalid controls alerts</show-alerts>
+            <show-required>Style required controls</show-required>
             <use-pdf-template>Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -1636,11 +1669,17 @@
         <classes>
             <label>Classes CSS personalisées</label>
         </classes>
-        <default-always-never>
-            <item id="0">Utiliser la propriété</item>
-            <item id="1">Toujours</item>
-            <item id="2">Jamais</item>
-        </default-always-never>
+        <autocomplete>
+            <label>Attribut autocomplete</label>
+            <groups>
+                <general>Général</general>
+                <name>Nom et titre</name>
+                <credentials>Identifiants</credentials>
+                <address>Adresse</address>
+                <contact>Contact</contact>
+                <payment>Paiement</payment>
+            </groups>
+        </autocomplete>
         <!-- Dialogs -->
         <continue>
             <label>Continuer</label>
@@ -1772,6 +1811,9 @@
             <hints>
                 <label>Apparence des suggestions</label>
             </hints>
+            <automatic-hints>
+                <label>Suggestions automatiques</label>
+            </automatic-hints>
             <appearances>
                 <item id="0">Utiliser la propriété</item>
                 <item id="1">En ligne</item>
@@ -1832,6 +1874,11 @@
             <current-version>Version courante</current-version>
             <created-with-version>Créé avec la version</created-with-version>
             <updated-with-versions>Mis à jour avec les versions</updated-with-versions>
+            <property-yes-no>
+                <item id="0">Utiliser la propriété</item>
+                <item id="1">Oui</item>
+                <item id="2">Non</item>
+            </property-yes-no>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Paramètres du contrôle</label>
@@ -1859,19 +1906,28 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Inclure dans la recherche</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label>Inclure dans la modification groupée</label>
-                    <value>fr-summary-edit</value>
+                    <label>Permettre la modification groupée</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label>Crypter les données au repos</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <restrict-role>Restreindre au rôle</restrict-role>
+            <summary-show>
+                <do-not-show>Ne pas inclure dans le sommaire</do-not-show>
+                <show>Inclure dans le sommaire</show>
+                <column-only>Afficher la colonne uniquement</column-only>
+                <search-only>Afficher la recherche uniquement</search-only>
+            </summary-show>
+            <role>
+                <restrict>Restreindre au rôle</restrict>
+                <all>Tous les</all>
+                <any>Au moins un des</any>
+                <of-the-following>rôles suivants:</of-the-following>
+                <empty>Rôle vide</empty>
+                <duplicate>Rôle à double</duplicate>
+            </role>
             <control-appearance>
                 <label>Apparence du contrôle</label>
             </control-appearance>
@@ -2052,6 +2108,15 @@
             <level><label>Niveau</label></level>
             <use-html>En HTML</use-html>
             <parameters>Paramètres du modèle</parameters>
+            <automatic-hint>
+                <label>Utiliser une suggestion automatique</label>
+                <hint>Ajoute une suggestion en fonction de la Taille Maximale et des Types de fichiers pris en charge que vous pourriez avoir spécifiés dans l'onglet Validations et alertes</hint>
+            </automatic-hint>
+            <default-yes-no>
+                <item id="0">Utiliser le défaut</item>
+                <item id="1">Oui</item>
+                <item id="2">Non</item>
+            </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
             <label>Paramètres de la section/grille</label>
@@ -2566,6 +2631,7 @@
             <disable-relevant>Montrer les contrôles, grilles, et sections avec visibilité dynamique</disable-relevant>
             <show-hints>Montrer les suggestions des contrôles</show-hints>
             <show-alerts>Montrer les erreurs pour les contrôles invalides</show-alerts>
+            <show-required>Styler les contrôles requis</show-required>
             <use-pdf-template>Utiliser le modèle PDF</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -2973,11 +3039,17 @@
         <classes>
             <label todo="true">[Custom CSS classes]</label>
         </classes>
-        <default-always-never>
-            <item todo="true" id="0">[Use property]</item>
-            <item todo="true" id="1">[Always]</item>
-            <item todo="true" id="2">[Never]</item>
-        </default-always-never>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+            </groups>
+        </autocomplete>
         <!-- Dialogs -->
         <continue>
             <label>Fortsett</label>
@@ -3057,7 +3129,6 @@
             <section-templates todo="true">[Section templates]</section-templates>
             <controls todo="true">[Controls]</controls>
             <all todo="true">[All]</all>
-            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
@@ -3110,6 +3181,9 @@
             <hints>
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
+            <automatic-hints>
+                <label todo="true">[Use automatic hints]</label>
+            </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
@@ -3170,6 +3244,11 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+            <property-yes-no>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </property-yes-no>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Rediger elementdetaljer</label>
@@ -3197,19 +3276,28 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Vis i søk</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <restrict-role todo="true">[Restrict to role]</restrict-role>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
+            <role>
+                <restrict todo="true">[Restrict to role]</restrict>
+                <all todo="true">[All]</all>
+                <any todo="true">[Any]</any>
+                <of-the-following todo="true">[of the following:]</of-the-following>
+                <empty todo="true">[Empty role]</empty>
+                <duplicate todo="true">[Duplicate role]</duplicate>
+            </role>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -3391,6 +3479,15 @@
             <level><label todo="true">[Level]</label></level>
             <use-html todo="true">[Use HTML]</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
+            <automatic-hint>
+                <label todo="true">[Use automatic hint]</label>
+                <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+            </automatic-hint>
+            <default-yes-no>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
             <label todo="true">Rediger seksjonsdetaljer</label>
@@ -3932,6 +4029,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todo="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -4339,11 +4437,17 @@
         <classes>
             <label todo="true">[Custom CSS classes]</label>
         </classes>
-        <default-always-never>
-            <item todo="true" id="0">[Use property]</item>
-            <item todo="true" id="1">[Always]</item>
-            <item todo="true" id="2">[Never]</item>
-        </default-always-never>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+            </groups>
+        </autocomplete>
         <!-- Dialogs -->
         <continue>
             <label>Далее</label>
@@ -4423,7 +4527,6 @@
             <section-templates todo="true">[Section templates]</section-templates>
             <controls todo="true">[Controls]</controls>
             <all todo="true">[All]</all>
-            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
@@ -4476,6 +4579,9 @@
             <hints>
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
+            <automatic-hints>
+                <label todo="true">[Use automatic hints]</label>
+            </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
@@ -4536,6 +4642,11 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+            <property-yes-no>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </property-yes-no>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Настройки элемента</label>
@@ -4563,19 +4674,28 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Показывать в поиске</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <restrict-role todo="true">[Restrict to role]</restrict-role>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
+            <role>
+                <restrict todo="true">[Restrict to role]</restrict>
+                <all todo="true">[All]</all>
+                <any todo="true">[Any]</any>
+                <of-the-following todo="true">[of the following:]</of-the-following>
+                <empty todo="true">[Empty role]</empty>
+                <duplicate todo="true">[Duplicate role]</duplicate>
+            </role>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -4756,6 +4876,15 @@
             <level><label todo="true">[Level]</label></level>
             <use-html todo="true">[Use HTML]</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
+            <automatic-hint>
+                <label todo="true">[Use automatic hint]</label>
+                <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+            </automatic-hint>
+            <default-yes-no>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
             <label todo="true">Настройки раздела</label>
@@ -5297,6 +5426,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -5705,11 +5835,17 @@
         <classes>
             <label>Classi CSS personalizzati</label>
         </classes>
-        <default-always-never>
-            <item todo="true" id="0">[Use property]</item>
-            <item todo="true" id="1">[Always]</item>
-            <item todo="true" id="2">[Never]</item>
-        </default-always-never>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+            </groups>
+        </autocomplete>
         <!-- Dialogs -->
         <continue>
             <label>Continua</label>
@@ -5841,6 +5977,9 @@
             <hints>
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
+            <automatic-hints>
+                <label todo="true">[Use automatic hints]</label>
+            </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
@@ -5901,6 +6040,11 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+            <property-yes-no>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </property-yes-no>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Impostazioni di controllo</label>
@@ -5928,19 +6072,28 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Mostra in cerca</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <restrict-role todo="true">[Restrict to role]</restrict-role>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
+            <role>
+                <restrict todo="true">[Restrict to role]</restrict>
+                <all todo="true">[All]</all>
+                <any todo="true">[Any]</any>
+                <of-the-following todo="true">[of the following:]</of-the-following>
+                <empty todo="true">[Empty role]</empty>
+                <duplicate todo="true">[Duplicate role]</duplicate>
+            </role>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -6121,6 +6274,15 @@
             <level><label>Livello</label></level>
             <use-html>Usa HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
+            <automatic-hint>
+                <label todo="true">[Use automatic hint]</label>
+                <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+            </automatic-hint>
+            <default-yes-no>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
             <label>Impostazioni sezione/griglia</label>
@@ -6626,6 +6788,7 @@
             <disable-relevant>Mostrare i controlli, le griglie e le sezioni con visibilità dinamica</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -7034,11 +7197,17 @@
         <classes>
             <label>Benutzerdefinierte CSS-Klassen</label>
         </classes>
-        <default-always-never>
-            <item id="0">Standard verwenden</item>
-            <item id="1">Immer</item>
-            <item id="2">Nie</item>
-        </default-always-never>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+            </groups>
+        </autocomplete>
         <!-- Dialogs -->
         <continue>
             <label>Weiter</label>
@@ -7170,6 +7339,9 @@
             <hints>
                 <label>Anzeige der Steuerelement-Hinweise</label>
             </hints>
+            <automatic-hints>
+                <label todo="true">[Use automatic hints]</label>
+            </automatic-hints>
             <appearances>
                 <item id="0">Standard-Einstellung</item>
                 <item id="1">Inline</item>
@@ -7230,6 +7402,11 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+            <property-yes-no>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </property-yes-no>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Einstellungen Steuerelemente</label>
@@ -7257,19 +7434,28 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>In Suche anzeigen</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label>Daten in der Datenbank verschlüsseln</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <restrict-role todo="true">[Restrict to role]</restrict-role>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
+            <role>
+                <restrict todo="true">[Restrict to role]</restrict>
+                <all todo="true">[All]</all>
+                <any todo="true">[Any]</any>
+                <of-the-following todo="true">[of the following:]</of-the-following>
+                <empty todo="true">[Empty role]</empty>
+                <duplicate todo="true">[Duplicate role]</duplicate>
+            </role>
             <control-appearance>
                 <label>Erscheinungsbild der Steuerelemente</label>
             </control-appearance>
@@ -7450,6 +7636,15 @@
             <level><label>Level</label></level>
             <use-html>HTML verwenden</use-html>
             <parameters>Vorlagen-Parameter</parameters>
+            <automatic-hint>
+                <label todo="true">[Use automatic hint]</label>
+                <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+            </automatic-hint>
+            <default-yes-no>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
             <label>Abschnitteigenschaften/Tabelleneigenschaften</label>
@@ -7956,6 +8151,7 @@
             <disable-relevant>Steuerelemente, Raster und Abschnitte mit dynamischer Sichtbarkeit anzeigen</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -8366,11 +8562,17 @@
         <classes>
             <label>Mukautetut CSS luokat</label>
         </classes>
-        <default-always-never>
-            <item todo="true" id="0">[Use property]</item>
-            <item todo="true" id="1">[Always]</item>
-            <item todo="true" id="2">[Never]</item>
-        </default-always-never>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+            </groups>
+        </autocomplete>
         <!-- Dialogs -->
         <continue>
             <label>Jatka</label>
@@ -8502,6 +8704,9 @@
             <hints>
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
+            <automatic-hints>
+                <label todo="true">[Use automatic hints]</label>
+            </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
@@ -8562,6 +8767,11 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+            <property-yes-no>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </property-yes-no>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Kontrolliyksityiskohdat</label>
@@ -8589,19 +8799,28 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Näytä haussa</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <restrict-role todo="true">[Restrict to role]</restrict-role>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
+            <role>
+                <restrict todo="true">[Restrict to role]</restrict>
+                <all todo="true">[All]</all>
+                <any todo="true">[Any]</any>
+                <of-the-following todo="true">[of the following:]</of-the-following>
+                <empty todo="true">[Empty role]</empty>
+                <duplicate todo="true">[Duplicate role]</duplicate>
+            </role>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -8782,6 +9001,15 @@
             <level><label>Taso</label></level>
             <use-html>Käytä HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
+            <automatic-hint>
+                <label todo="true">[Use automatic hint]</label>
+                <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+            </automatic-hint>
+            <default-yes-no>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
             <label todo="true">Lohkon yksityiskohdat</label>
@@ -9316,6 +9544,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -9723,11 +9952,17 @@
         <classes>
             <label>Classes CSS customizadas</label>
         </classes>
-        <default-always-never>
-            <item todo="true" id="0">[Use property]</item>
-            <item todo="true" id="1">[Always]</item>
-            <item todo="true" id="2">[Never]</item>
-        </default-always-never>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+            </groups>
+        </autocomplete>
         <!-- Dialogs -->
         <continue>
             <label>Continuar</label>
@@ -9859,6 +10094,9 @@
             <hints>
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
+            <automatic-hints>
+                <label todo="true">[Use automatic hints]</label>
+            </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
@@ -9919,6 +10157,11 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+            <property-yes-no>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </property-yes-no>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Configuración de Controles</label>
@@ -9946,19 +10189,28 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Mostrar en Búsquedas</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <restrict-role todo="true">[Restrict to role]</restrict-role>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
+            <role>
+                <restrict todo="true">[Restrict to role]</restrict>
+                <all todo="true">[All]</all>
+                <any todo="true">[Any]</any>
+                <of-the-following todo="true">[of the following:]</of-the-following>
+                <empty todo="true">[Empty role]</empty>
+                <duplicate todo="true">[Duplicate role]</duplicate>
+            </role>
             <control-appearance>
                 <label>Presentación del Control</label>
             </control-appearance>
@@ -10139,6 +10391,15 @@
             <level><label>Nivel</label></level>
             <use-html>Usa HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
+            <automatic-hint>
+                <label todo="true">[Use automatic hint]</label>
+                <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+            </automatic-hint>
+            <default-yes-no>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
             <label>Detalles de Sección/Grilla</label>
@@ -10673,6 +10934,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -11081,11 +11343,17 @@
         <classes>
             <label>Aangepaste CSS classes</label>
         </classes>
-        <default-always-never>
-            <item id="0">Gebruik standaard</item>
-            <item id="1">Altijd</item>
-            <item id="2">Nooit</item>
-        </default-always-never>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+            </groups>
+        </autocomplete>
         <!-- Dialogs -->
         <continue>
             <label>Doorgaan</label>
@@ -11217,6 +11485,9 @@
             <hints>
                 <label>Weergave van control-hints</label>
             </hints>
+            <automatic-hints>
+                <label todo="true">[Use automatic hints]</label>
+            </automatic-hints>
             <appearances>
                 <item id="0">Gebruik standaard</item>
                 <item id="1">Inline</item>
@@ -11277,6 +11548,11 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+            <property-yes-no>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </property-yes-no>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Control-instellingen</label>
@@ -11304,19 +11580,28 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Toon in zoeken</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label>Encrypt gegevens in rust</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <restrict-role todo="true">[Restrict to role]</restrict-role>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
+            <role>
+                <restrict todo="true">[Restrict to role]</restrict>
+                <all todo="true">[All]</all>
+                <any todo="true">[Any]</any>
+                <of-the-following todo="true">[of the following:]</of-the-following>
+                <empty todo="true">[Empty role]</empty>
+                <duplicate todo="true">[Duplicate role]</duplicate>
+            </role>
             <control-appearance>
                 <label>Control weergave</label>
             </control-appearance>
@@ -11497,6 +11782,15 @@
             <level><label>Niveau</label></level>
             <use-html>Gebruik HTML</use-html>
             <parameters>Templateparameters</parameters>
+            <automatic-hint>
+                <label todo="true">[Use automatic hint]</label>
+                <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+            </automatic-hint>
+            <default-yes-no>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
             <label>Sectie/grid instellingen</label>
@@ -12010,6 +12304,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -12418,11 +12713,17 @@
         <classes>
             <label>Classes CSS Personalizadas</label>
         </classes>
-        <default-always-never>
-            <item todo="true" id="0">[Use property]</item>
-            <item todo="true" id="1">[Always]</item>
-            <item todo="true" id="2">[Never]</item>
-        </default-always-never>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+            </groups>
+        </autocomplete>
         <!-- Dialogs -->
         <continue>
             <label>Continuar</label>
@@ -12554,6 +12855,9 @@
             <hints>
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
+            <automatic-hints>
+                <label todo="true">[Use automatic hints]</label>
+            </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
@@ -12614,6 +12918,11 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+            <property-yes-no>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </property-yes-no>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Configurações do Controlo</label>
@@ -12641,19 +12950,28 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Mostrar na Pesquisa</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <restrict-role todo="true">[Restrict to role]</restrict-role>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
+            <role>
+                <restrict todo="true">[Restrict to role]</restrict>
+                <all todo="true">[All]</all>
+                <any todo="true">[Any]</any>
+                <of-the-following todo="true">[of the following:]</of-the-following>
+                <empty todo="true">[Empty role]</empty>
+                <duplicate todo="true">[Duplicate role]</duplicate>
+            </role>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -12834,6 +13152,15 @@
             <level><label>Nível</label></level>
             <use-html>Usar HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
+            <automatic-hint>
+                <label todo="true">[Use automatic hint]</label>
+                <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+            </automatic-hint>
+            <default-yes-no>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
             <label>Configurações da Secção/Grelha</label>
@@ -13374,6 +13701,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -13782,11 +14110,17 @@
         <classes>
             <label>Anpassade CSS-klasser</label>
         </classes>
-        <default-always-never>
-            <item todo="true" id="0">[Use property]</item>
-            <item todo="true" id="1">[Always]</item>
-            <item todo="true" id="2">[Never]</item>
-        </default-always-never>
+        <autocomplete>
+            <label todo="true">[Autocomplete attribute]</label>
+            <groups>
+                <general todo="true">[General]</general>
+                <name todo="true">[Name and Title]</name>
+                <credentials todo="true">[Credentials]</credentials>
+                <address todo="true">[Address]</address>
+                <contact todo="true">[Contact]</contact>
+                <payment todo="true">[Payment]</payment>
+            </groups>
+        </autocomplete>
         <!-- Dialogs -->
         <continue>
             <label>Fortsätt</label>
@@ -13918,6 +14252,9 @@
             <hints>
                 <label todo="true">[Appearance of Control Hints]</label>
             </hints>
+            <automatic-hints>
+                <label todo="true">[Use automatic hints]</label>
+            </automatic-hints>
             <appearances>
                 <item todo="true" id="0">[Use property]</item>
                 <item todo="true" id="1">[Inline]</item>
@@ -13978,6 +14315,11 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+            <property-yes-no>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </property-yes-no>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Inställningar för kontroll</label>
@@ -14005,19 +14347,28 @@
                     <value>fr-summary-show</value>
                 </item>
                 <item>
-                    <label>Visa i sökning</label>
-                    <value>fr-summary-search</value>
-                </item>
-                <item>
-                    <label todo="true">[Show in bulk edit]</label>
-                    <value>fr-summary-edit</value>
+                    <label todo="true">[Allow bulk edit]</label>
+                    <value>fr-allow-bulk-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <restrict-role todo="true">[Restrict to role]</restrict-role>
+            <summary-show>
+                <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
+                <show todo="true">[Show on Summary page]</show>
+                <column-only todo="true">[Show column only]</column-only>
+                <search-only todo="true">[Show search only]</search-only>
+            </summary-show>
+            <role>
+                <restrict todo="true">[Restrict to role]</restrict>
+                <all todo="true">[All]</all>
+                <any todo="true">[Any]</any>
+                <of-the-following todo="true">[of the following:]</of-the-following>
+                <empty todo="true">[Empty role]</empty>
+                <duplicate todo="true">[Duplicate role]</duplicate>
+            </role>
             <control-appearance>
                 <label>Kontrollens utseende</label>
             </control-appearance>
@@ -14198,6 +14549,15 @@
             <level><label>Nivå</label></level>
             <use-html>Använd HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
+            <automatic-hint>
+                <label todo="true">[Use automatic hint]</label>
+                <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+            </automatic-hint>
+            <default-yes-no>
+                <item id="0" todo="true">[Use default]</item>
+                <item id="1" todo="true">[Yes]</item>
+                <item id="2" todo="true">[No]</item>
+            </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
             <label>Sektions-/rutnätsinställningar</label>
@@ -14739,6 +15099,7 @@
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
             <show-hints todo="true">Show controls hints</show-hints>
             <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <show-required todo="true">Style required controls</show-required>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>

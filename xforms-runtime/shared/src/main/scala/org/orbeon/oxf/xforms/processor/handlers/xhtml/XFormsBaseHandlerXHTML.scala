@@ -423,7 +423,7 @@ object XFormsBaseHandlerXHTML {
   ): Unit = {
 
     // Replace id attribute to be foo-label, foo-hint, foo-help, or foo-alert
-    val newAttribute =
+    val newAttributes =
       controlEffectiveIdOpt match {
         case Some(controlEffectiveId) =>
           // Add or replace existing id attribute
@@ -445,13 +445,17 @@ object XFormsBaseHandlerXHTML {
     // Add @for attribute if specified and element is a label
     if (elementName == "label")
       forEffectiveIdWithNs foreach
-        (newAttribute.addOrReplace("for", _))
+        (newAttributes.addOrReplace("for", _))
+
+    // If a button, add `type="button"` as this is not a button to submit the form
+    if (elementName == "button")
+      newAttributes.addOrReplace("type", "button")
 
     val xhtmlPrefix    = handlerContext.findXHTMLPrefix
     val labelQName     = XMLUtils.buildQName(xhtmlPrefix, elementName)
     val contentHandler = handlerContext.controller.output
 
-    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName, newAttribute)
+    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName, newAttributes)
   }
 
   def outputLabelForEnd(handlerContext: HandlerContext, elementName: String): Unit = {

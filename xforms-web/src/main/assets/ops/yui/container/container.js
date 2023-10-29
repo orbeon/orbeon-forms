@@ -5866,9 +5866,11 @@ version: 2.8.1
                     doc = document.documentElement,
                     insideDoc = (target !== doc && target !== window);
 
+                var isMceToolbarOrSelect2 = target.closest(".tox-tinymce, .select2-container") !== null;
+
                 // mask and documentElement checks added for IE, which focuses on the mask when it's clicked on, and focuses on
                 // the documentElement, when the document scrollbars are clicked on
-                if (insideDoc && target !== this.element && target !== this.mask && !Dom.isAncestor(this.element, target)) {
+                if (insideDoc && target !== this.element && target !== this.mask && !Dom.isAncestor(this.element, target) && ! isMceToolbarOrSelect2) {
                     try {
                         if (this.firstElement) {
                             this.firstElement.focus();

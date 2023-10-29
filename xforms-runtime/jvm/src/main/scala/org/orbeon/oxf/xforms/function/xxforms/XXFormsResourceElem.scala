@@ -19,6 +19,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.Implicits._
 
+
 class XXFormsResourceElem extends XFormsFunction {
 
   import XXFormsResourceSupport._
@@ -35,14 +36,20 @@ class XXFormsResourceElem extends XFormsFunction {
       XFormsFunction.resolveOrFindByStaticOrAbsoluteId(instanceArgumentOpt getOrElse "fr-form-resources") collect
         { case instance: XFormsInstance => instance.rootElement }
 
-    for {
-      elementAnalysis <- XFormsFunction.elementAnalysisForSource.iterator
-      resources       <- findResourcesElement.iterator
-      requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(XFormsFunction.getContainingDocument, elementAnalysis).iterator
-      resourceRoot    <- findResourceElementForLang(resources, requestedLang).iterator
-      leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument)).iterator
-    } yield
-      leaf
+    val resourceRootOpt =
+      for {
+        elementAnalysis <- XFormsFunction.elementAnalysisForSource
+        resources       <- findResourcesElement
+        requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(XFormsFunction.getContainingDocument, elementAnalysis)
+        resourceRoot    <- findResourceElementForLang(resources, requestedLang)
+      } yield
+        resourceRoot
+
+    // https://github.com/orbeon/orbeon-forms/issues/6016
+    resourceRootOpt match {
+      case Some(resourceRoot) => pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument))
+      case None               => Nil: List[NodeInfo] // help with the conversion to `SequenceIterator`
+    }
   }
 
   // TODO

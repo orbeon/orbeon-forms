@@ -21,7 +21,8 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
     <xh:head>
         <xi:include href="oxf:/apps/fr/includes/permissions-model.xml"      xxi:omit-xml-base="true"/>
         <xi:include href="oxf:/forms/orbeon/builder/form/model.xml"         xxi:omit-xml-base="true"/>
@@ -36,28 +37,24 @@
                 <xf:label ref="$form-resources/application-name/label"/>
                 <fr:index>
                     <fr:summary-show/>
-                    <fr:summary-search/>
                 </fr:index>
             </xf:output>
             <xf:output id="form-name-control" bind="form-name-bind">
                 <xf:label ref="$form-resources/form-name/label"/>
                 <fr:index>
                     <fr:summary-show/>
-                    <fr:summary-search/>
                 </fr:index>
             </xf:output>
             <xf:output id="title-control" bind="title-bind">
                 <xf:label ref="$form-resources/title/label"/>
                 <fr:index>
                     <fr:summary-show/>
-                    <fr:summary-search/>
                 </fr:index>
             </xf:output>
             <xf:output id="description-control" bind="description-bind">
                 <xf:label ref="$form-resources/description/label"/>
                 <fr:index>
                     <fr:summary-show/>
-                    <fr:summary-search/>
                 </fr:index>
             </xf:output>
             <!-- Expose property -->
@@ -329,10 +326,9 @@
                             <xf:dispatch if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o e" name="DOMActivate" targetid="open-email-settings-trigger"/>
                             <xf:dispatch if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o s" name="DOMActivate" targetid="open-edit-source-trigger"/>
                             <xf:dispatch if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o p" name="DOMActivate" targetid="open-permissions-trigger"/>
-
-<!--                            <xf:action type="xpath" if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command option" xxf:text="t">-->
-<!--                                fr:run-process-by-name('oxf.fr.detail.process', 'test')-->
-<!--                            </xf:action>-->
+                            <xf:action   if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o t" type="xpath" >
+                                fr:run-process-by-name('oxf.fr.detail.process', 'test')
+                            </xf:action>
 
 <!--                            <xf:action type="xpath" if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command option" xxf:text="p">-->
 <!--                                fr:run-process-by-name('oxf.fr.detail.process', 'publish')-->
@@ -652,6 +648,14 @@
                                             origin="xf:attribute('xxf:hint.appearance', event('hints'))"/>
 
                                         <xf:delete
+                                            bind="automatic-hints-bind"/>
+                                        <xf:insert
+                                            if="event('automatic-hints') = ('true', 'false')"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="xf:element('automatic-hints', event('automatic-hints'))"/>
+
+                                        <xf:delete
                                             bind="data-migration-bind"/>
                                         <xf:insert
                                             if="event('data-migration') = ('enabled', 'disabled', 'error')"
@@ -827,6 +831,7 @@
                                         <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-relevant"     value="event('disable-relevant')"/>
                                         <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-show-hints"    value="event('show-hints')"/>
                                         <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-show-alerts"   value="event('show-alerts')"/>
+                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-show-required" value="event('show-required')"/>
                                         <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-use-pdf-template"  value="event('use-pdf-template')"/>
                                         <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-template-name" value="event('pdf-template-name')"/>
                                         <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-template-lang" value="event('pdf-template-lang')"/>
@@ -844,9 +849,11 @@
                                                     name="useFormData"
                                                     value="event('use-form-data')"/>
                                                 <xf:body>
-                                                    window.document.querySelector("iframe.fb-test-iframe").contentWindow.ORBEON.xforms.Document.dispatchEvent(
+                                                    const contentWindow = window.document.querySelector("iframe.fb-test-iframe").contentWindow;
+                                                    contentWindow.ORBEON.xforms.Document.dispatchEvent(
                                                         {
                                                             targetId:  'fr-form-model',
+                                                            form: contentWindow.document.querySelector('form'),
                                                             eventName: 'fb-test-pdf-prepare-data',
                                                             properties: { 'use-form-data': useFormData }
                                                         }
@@ -857,8 +864,9 @@
                                         <xf:action if="not($for-form-being-tested)">
                                             <!-- Run directly -->
                                             <xf:send submission="fb-test-pdf-submission">
-                                                <xf:property name="fr-form-data" value="''"/>
-                                                <xf:property name="language"     value="$fb-lang"/>
+                                                <xf:property name="fr-form-data"         value="''"/>
+                                                <xf:property name="language"             value="$fb-lang"/>
+                                                <xf:property name="fr-rendered-filename" value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'pdf')"/>
                                             </xf:send>
                                         </xf:action>
                                     </xf:action>
@@ -948,91 +956,97 @@
                             </xh:div>
 
                             <xh:div class="fb-control-editor-left">
-                                <xh:i
-                                    class="fb-x-merge fa fa-long-arrow-right fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/merge-right-icon/label}"/>
-                                <xh:i
-                                    class="fb-x-split fa fa-unlink fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/split-horizontally-icon/label}"/>
-                                <xh:i
-                                    class="fb-y-merge fa fa-long-arrow-down fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/merge-below-icon/label}"/>
-                                <xh:i
-                                    class="fb-y-split fa fa-unlink fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/split-vertically-icon/label}"/>
+                                <xh:div>
+                                    <xh:i
+                                        class="fb-x-merge fa fa-long-arrow-right fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/merge-right-icon/label}"/>
+                                    <xh:i
+                                        class="fb-x-split fa fa-unlink fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/split-horizontally-icon/label}"/>
+                                    <xh:i
+                                        class="fb-y-merge fa fa-long-arrow-down fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/merge-below-icon/label}"/>
+                                    <xh:i
+                                        class="fb-y-split fa fa-unlink fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/split-vertically-icon/label}"/>
+                                </xh:div>
                             </xh:div>
 
                             <xh:div class="fb-control-editor-right">
-                                <xh:i
-                                    class="fb-control-handle fa fa-arrows fa-fw"
-                                    draggable="true"
-                                    title="{$fb-resources/move-icon/label}"/>
-                                <xh:i
-                                    class="fb-control-edit-details fa fa-cogs fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/control-settings-icon/label}"/>
-                                <xh:i
-                                    class="fb-control-delete fa fa-minus-circle fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/delete-control-icon/label}"/>
-                                <xh:i
-                                    class="fb-control-edit-items fa fa-th-list fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/edit-items/label}"/>
+                                <xh:div>
+                                    <xh:i
+                                        class="fb-control-handle fa fa-arrows fa-fw"
+                                        draggable="true"
+                                        title="{$fb-resources/move-icon/label}"/>
+                                    <xh:i
+                                        class="fb-control-edit-details fa fa-cogs fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/control-settings-icon/label}"/>
+                                    <xh:i
+                                        class="fb-control-delete fa fa-minus-circle fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/delete-control-icon/label}"/>
+                                    <xh:i
+                                        class="fb-control-edit-items fa fa-th-list fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/edit-items/label}"/>
 
-                                <!-- Used by the button/link editor, see the placeholders.coffee which uses a state machine -->
-                                <!--<xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">-->
-                                    <!--<xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = frf:controlNameFromId($control-id)]/label">-->
-                                        <!--<xf:label appearance="minimal" ref="$form-resources/type-label/label"/>-->
-                                    <!--</xf:input>-->
-                                <!--</xf:group>-->
+                                    <!-- Used by the button/link editor, see the placeholders.coffee which uses a state machine -->
+                                    <!--<xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">-->
+                                        <!--<xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = frf:controlNameFromId($control-id)]/label">-->
+                                            <!--<xf:label appearance="minimal" ref="$form-resources/type-label/label"/>-->
+                                        <!--</xf:input>-->
+                                    <!--</xf:group>-->
+                                </xh:div>
 
                             </xh:div>
 
                             <xh:div class="fb-section-grid-editor">
                                 <xf:output class="fb-enter-section-title-label xforms-hidden" ref="$form-resources/enter-section-title/label"/>
                                 <xf:output class="fb-type-section-title-label xforms-hidden"  ref="$form-resources/type-section-title/label"/>
-                                <xh:i
-                                    class="fb-container-edit-details fa fa-cogs fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/section-details-icon/label}"/>
-                                <xh:i
-                                    class="fb-container-delete fa fa-minus-circle fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/delete-container-icon/label}"/>
-                                <xh:i
-                                    class="fb-container-move-up fa fa-arrow-up fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/move-up-icon/label}"/>
-                                <xh:i
-                                    class="fb-container-move-down fa fa-arrow-down fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/move-down-icon/label}"/>
-                                <xh:i
-                                    class="fb-container-move-right fa fa-arrow-right fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/move-right-icon/label}"/>
-                                <xh:i
-                                    class="fb-container-move-left fa fa-arrow-left fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/move-left-icon/label}"/>
-                                <xh:i
-                                    class="fb-container-cut fa fa-cut fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/cut/label}"/>
-                                <xh:i
-                                    class="fb-container-copy fa fa-copy fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/copy/label}"/>
-                                <!-- MAYBE: Paste icon if allowed? -->
-                                <xh:i
-                                    class="fb-container-merge fa fa-share-alt fa-fw"
-                                    role="button"
-                                    title="{$fb-resources/merge-section/label}"/>
+                                <xh:div>
+                                    <xh:i
+                                        class="fb-container-edit-details fa fa-cogs fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/section-details-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-delete fa fa-minus-circle fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/delete-container-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-move-up fa fa-arrow-up fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/move-up-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-move-down fa fa-arrow-down fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/move-down-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-move-right fa fa-arrow-right fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/move-right-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-move-left fa fa-arrow-left fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/move-left-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-cut fa fa-cut fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/cut/label}"/>
+                                    <xh:i
+                                        class="fb-container-copy fa fa-copy fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/copy/label}"/>
+                                    <!-- MAYBE: Paste icon if allowed? -->
+                                    <xh:i
+                                        class="fb-container-merge fa fa-share-alt fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/merge-section/label}"/>
+                                </xh:div>
                             </xh:div>
 
                             <xh:div class="fb-row-editor">

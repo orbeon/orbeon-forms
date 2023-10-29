@@ -54,6 +54,8 @@ trait XFormsStaticStateStaticProperties {
   def isXPathAnalysis                     : Boolean
   def isCalculateDependencies             : Boolean
 
+  def allowErrorRecoveryOnInit            : Boolean
+
   def isInlineResources                   : Boolean
 
   def uploadMaxSize                       : MaximumSize

@@ -39,15 +39,23 @@
         }
 
         // Center checkboxes/radios
-        .fb-itemset-selected {
-            text-align: center;
+        .xbl-fr-grid .fr-grid {
+            .fr-grid-td.fb-itemset-selected {
+                text-align: center;
+                vertical-align: middle;
 
-            .checkbox, .radio {
-                margin: 0;
-            }
+                .xforms-selected, .xforms-deselected {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
 
-            .checkbox > span, .radio > span {
-                display: none;
+                .checkbox, .radio {
+                    margin: 5px;
+                }
+
+                .checkbox > span, .radio > span {
+                    display: none;
+                }
             }
         }
     }

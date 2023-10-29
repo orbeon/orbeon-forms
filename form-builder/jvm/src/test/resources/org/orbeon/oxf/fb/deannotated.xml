@@ -418,16 +418,16 @@
                                 <xf:hint ref="$form-resources/control-27/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
-                                    <fr:summary-show/>
+                                    <fr:summary-show search="false"/>
                                 </fr:index>
                                 <fr:encrypt/>
                             </xf:input>
-                            <xf:input id="control-28-control" bind="control-28-bind" class="custom1 custom2">
+                            <xf:input id="control-28-control" bind="control-28-bind" class="custom1 custom2 fr-email-subject">
                                 <xf:label ref="$form-resources/control-28/label"/>
                                 <xf:hint ref="$form-resources/control-28/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
-                                    <fr:summary-search/>
+                                    <fr:summary-show column="false"/>
                                 </fr:index>
                                 <fr:encrypt/>
                             </xf:input>
@@ -440,7 +440,7 @@
                                     service-performs-search="true"
                                     service-supports-paging="false"
                                     is-last-page=""
-                                    class="custom1 custom2">
+                                    class="custom1 custom2 fr-email-subject">
                                 <xf:label>Country code:</xf:label>
                                 <xf:itemset ref="/countries/country">
                                     <xf:label ref="name"/>
@@ -448,7 +448,7 @@
                                 </xf:itemset>
                                 <xf:alert>Value is mandatory</xf:alert>
                                 <fr:index>
-                                    <fr:summary-search/>
+                                    <fr:summary-show/>
                                 </fr:index>
                                 <fr:encrypt/>
                             </fr:databound-select1>
@@ -457,7 +457,7 @@
                                 <xf:hint ref="$form-resources/control-30/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
-                                    <fr:summary-show/>
+                                    <fr:summary-show search="false"/>
                                 </fr:index>
                             </fr:time>
                             <fr:date id="control-31-control" bind="control-31-bind" class="custom1 custom2">
@@ -471,7 +471,7 @@
                                 <xf:hint ref="$form-resources/control-32/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
-                                    <fr:summary-search/>
+                                    <fr:summary-show column="false"/>
                                 </fr:index>
                             </fr:dropdown-select1>
                         </fr:c>

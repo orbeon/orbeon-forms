@@ -61,10 +61,13 @@
     <!-- XPath analysis (PE) -->
     <property as="xs:boolean" name="oxf.xforms.xpath-analysis"                          value="false"/>
 
+    <property as="xs:boolean" name="oxf.xforms.allow-error-recovery-on-init"            value="false"/>
+
     <!-- XForms cache configuration -->
     <property as="xs:string"  name="oxf.xforms.cache.provider"                          value="ehcache2"/> <!-- ehcache2 | jcache -->
-    <property as="xs:string"  name="oxf.xforms.cache.resource"                          value=""/>
-    <property as="xs:string"  name="oxf.xforms.cache.uri"                               value=""/>
+    <property as="xs:string"  name="oxf.xforms.cache.jcache.resource"                   value=""/>
+    <property as="xs:string"  name="oxf.xforms.cache.jcache.uri"                        value=""/>
+    <property as="xs:string"  name="oxf.xforms.cache.jcache.classname"                  value=""/>
     <property as="xs:integer" name="oxf.xforms.cache.documents.size"                    value="50"/>
     <property as="xs:integer" name="oxf.xforms.cache.static-state.size"                 value="50"/>
     <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"             value="50"/>
@@ -118,6 +121,8 @@
 
     <property as="xs:boolean" name="oxf.xforms.expose-xpath-types"                          value="false"/>
     <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                           value="true"/>
+    <property as="xs:integer" name="oxf.xforms.session-expiration.trigger"                  value="80"/>
+    <property as="xs:integer" name="oxf.xforms.session-expiration.margin"                   value="10"/>
     <property as="xs:boolean" name="oxf.xforms.host-language-avts"                          value="true"/>
     <!-- Space-separated list of element namespaces that can contain avts in their attributes1 -->
     <property as="xs:string"  name="oxf.xforms.additional-avt-element-namespaces"           value=""/>
@@ -179,10 +184,12 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-align"                   value=""/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.date.field-width"                     value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.date.native-picker"                   value="ios"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.time.field-width"                     value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.datetime.field-width"                 value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.us-phone.field-width"                 value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:integer" name="oxf.xforms.xbl.fr.error-summary.page-size"              value="20"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.error-summary.visit-value-changed"    value="true"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.start-year"             value="1970"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.end-year">
@@ -236,7 +243,8 @@
             { "full": "/ops/yui/container/assets/skins/sam/container.css",                   "min": false },
             { "full": "/apps/fr/style/bootstrap/css/bootstrap.css",                          "min": true  },
             { "full": "/apps/fr/style/form-runner-bootstrap-override.css",                   "min": false },
-            { "full": "/apps/fr/style/font-awesome/css/font-awesome.css",                    "min": true  },
+            { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/all.css",               "min": true  },
+            { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/v4-shims.css",          "min": true  },
             { "full": "/config/theme/xforms.css",                                            "min": false },
             { "full": "/config/theme/error.css",                                             "min": false },
             { "full": "/ops/nprogress-0.2.0/nprogress.css",                                  "min": false },

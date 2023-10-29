@@ -16,10 +16,12 @@ package org.orbeon.oxf.fr.persistence.attachments
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
-import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.http.{HttpMethod, HttpRanges, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
+
+import scala.util.{Failure, Success}
 
 class CRUD extends ProcessorImpl {
   private val logger = LoggerFactory.createLogger(classOf[CRUD])
@@ -33,12 +35,19 @@ class CRUD extends ProcessorImpl {
 
       val (provider, attachmentInformation) = CRUD.providerAndAttachmentInformation(httpRequest)
 
-      httpRequest.getMethod match {
-        case HttpMethod.HEAD   => provider.head  (attachmentInformation)
-        case HttpMethod.GET    => provider.get   (attachmentInformation)
-        case HttpMethod.PUT    => provider.put   (attachmentInformation)
-        case HttpMethod.DELETE => provider.delete(attachmentInformation)
-        case _                 => httpResponse.setStatus(StatusCode.MethodNotAllowed)
+      HttpRanges(httpRequest) match {
+        case Success(ranges) =>
+          httpRequest.getMethod match {
+            case HttpMethod.HEAD   => provider.head  (attachmentInformation, ranges)
+            case HttpMethod.GET    => provider.get   (attachmentInformation, ranges)
+            case HttpMethod.PUT    => provider.put   (attachmentInformation)
+            case HttpMethod.DELETE => provider.delete(attachmentInformation)
+            case _                 => httpResponse.setStatus(StatusCode.MethodNotAllowed)
+          }
+
+        case Failure(throwable) =>
+          logger.error(throwable)(s"Error while processing request ${httpRequest.getRequestPath}")
+          httpResponse.setStatus(StatusCode.BadRequest)
       }
     } catch {
       case e: HttpStatusCodeException =>

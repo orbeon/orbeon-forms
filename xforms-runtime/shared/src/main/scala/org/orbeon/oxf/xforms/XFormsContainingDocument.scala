@@ -77,7 +77,7 @@ class XFormsContainingDocument(
   // Aggregate other things
   val controls: XFormsControls = new XFormsControls(this)
 
-  private var asynchronousSubmissionManager: AsynchronousSubmissionManager = null
+  private var asynchronousSubmissionManager: Option[AsynchronousSubmissionManager] = None
 
  // Misc state
   private var _sequence = 1L // sequence number of changes to this document
@@ -98,6 +98,9 @@ class XFormsContainingDocument(
 
   private var _initializing = false
   def initializing: Boolean = _initializing
+
+  def allowErrorRecoveryOnInit: Boolean =
+    staticState.allowErrorRecoveryOnInit
 
   /**
    * Whether the document is currently in a mode where it must remember differences. This is the case when:
@@ -135,7 +138,7 @@ class XFormsContainingDocument(
       // order to optimize events. Perform deferred updates only for `xforms-ready`.
       withOutermostActionHandler {
         initializeModels()
-        processCompletedAsynchronousSubmissions(skipDeferredEventHandling = true, addPollEvent = true)
+        processCompletedAsynchronousSubmissions(skipDeferredEventHandling = true, beforeResponse = true)
       }
 
       processDueDelayedEvents(submissionIdOpt = None)
@@ -239,14 +242,14 @@ class XFormsContainingDocument(
     this._responseForReplaceAll = responseForReplaceAll.some
 
     if (submissionIdOpt.isEmpty)
-      processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, addPollEvent = false)
+      processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, beforeResponse = false)
     processDueDelayedEvents(submissionIdOpt)
   }
 
   def afterExternalEvents(submissionIdOpt: Option[String]): Unit = {
 
     if (submissionIdOpt.isEmpty) {
-      processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, addPollEvent = true)
+      processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, beforeResponse = true)
       processDueDelayedEvents(submissionIdOpt = None)
     }
 
@@ -268,25 +271,27 @@ class XFormsContainingDocument(
   def rememberLastAjaxResponse(response: SAXStore): Unit =
     _lastAjaxResponse = response.some
 
-  def getAsynchronousSubmissionManager(create: Boolean): AsynchronousSubmissionManager = {
-    if (asynchronousSubmissionManager == null && create)
-      asynchronousSubmissionManager = new AsynchronousSubmissionManager(this)
-    asynchronousSubmissionManager
-  }
-
-  private def processCompletedAsynchronousSubmissions(skipDeferredEventHandling: Boolean, addPollEvent: Boolean): Unit = {
-    val manager = getAsynchronousSubmissionManager(false)
-    if (manager != null && manager.hasPendingAsynchronousSubmissions) {
-
-      maybeWithOutermostActionHandler(! skipDeferredEventHandling) {
-        manager.processCompletedAsynchronousSubmissions()
-      }
-
-      // Remember to send a poll event if needed
-      if (addPollEvent)
-        manager.addClientDelayEventIfNeeded()
+  def getAsynchronousSubmissionManager(create: Boolean): Option[AsynchronousSubmissionManager] =
+    asynchronousSubmissionManager match {
+      case some @ Some(_) => some
+      case None if create =>
+        asynchronousSubmissionManager = Some(new AsynchronousSubmissionManager)
+        asynchronousSubmissionManager
+      case None => None
     }
-  }
+
+  private def processCompletedAsynchronousSubmissions(skipDeferredEventHandling: Boolean, beforeResponse: Boolean): Unit =
+    getAsynchronousSubmissionManager(create = false)
+      .filter(_.hasPendingAsynchronousSubmissions)
+      .foreach { manager =>
+        maybeWithOutermostActionHandler(! skipDeferredEventHandling) {
+          manager.processCompletedAsynchronousSubmissions(this)
+        }
+        if (beforeResponse) {
+          manager.awaitAsynchronousSubmissionsForCurrentRequest(this)
+          manager.addClientDelayEventIfNeeded(this)
+        }
+      }
 
   override def initializeNestedControls(): Unit = {
     // Call-back from super class models initialization

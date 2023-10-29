@@ -479,6 +479,7 @@
                     <xf:bind id="wizard-separate-toc-bind"        ref="wizard-separate-toc"/>
                     <xf:bind id="wizard-section-status-bind"      ref="wizard-section-status"/>
                     <xf:bind id="email-bind"                      ref="email"/>
+                    <xf:bind id="automatic-hints-bind"            ref="automatic-hints"/>
                     <xf:bind id="data-migration-bind"             ref="data-migration"/>
                     <xf:bind id="grid-tab-order-bind"             ref="grid-tab-order"/>
                     <xf:bind id="rendered-page-orientation-bind"  ref="rendered-page-orientation"/>
@@ -747,12 +748,15 @@
             disable-calculate=""
             disable-relevant=""
 
+            fr-rendered-filename=""
+
             fr-use-pdf-template=""
             fr-pdf-template-name=""
             fr-pdf-template-lang=""
 
             fr-pdf-show-hints=""
             fr-pdf-show-alerts=""
+            fr-pdf-show-required=""
 
             fr-form-data=""
             fr-language=""
@@ -763,7 +767,11 @@
         <!-- Only change parameters that are passed -->
         <xf:setvalue
             iterate="instance('fb-test-pdf-submission-params')/@*"
-            if="starts-with(name(context()), 'disable-') and exists(event(name(context())))"
+            if="
+                (
+                    starts-with(name(context()), 'disable-') or
+                    name(context()) = ('fr-rendered-filename')
+                ) and exists(event(name(context())))"
             ref="."
             value="event(name(context()))"/>
         <!-- But always update the data -->
@@ -884,8 +892,9 @@
     <!-- Dispatched from the client -->
     <xf:action event="fb-test-pdf-with-data">
         <xf:send submission="fb-test-pdf-submission">
-            <xf:property name="fr-form-data" value="event('fr-form-data')"/>
-            <xf:property name="language"     value="event('language')"/>
+            <xf:property name="fr-form-data"         value="event('fr-form-data')"/>
+            <xf:property name="language"             value="event('language')"/>
+            <xf:property name="fr-rendered-filename" value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'pdf')"/>
         </xf:send>
     </xf:action>
 
@@ -984,7 +993,7 @@
             }&amp;repeats-at-least={
                 5 (: TODO: use configuration property :)
             }&amp;export-format={
-                instance('fb-export-submission-params')/@export-format
+                event('export-format')
             }"
         replace="all"/>
 
@@ -1008,17 +1017,6 @@
             <xf:value value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'form-definition-xhtml')"/>
         </xf:header>
     </xf:submission>
-
-    <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
-    <xf:instance id="fb-export-submission-params">
-        <params export-format=""/>
-    </xf:instance>
-    <xf:action event="xforms-submit" observer="fb-export-submission">
-        <xf:setvalue
-            iterate="instance('fb-export-submission-params')/@*"
-            ref="."
-            value="event(name(context()))"/>
-    </xf:action>
 
     <xf:action observer="fb-publish-submission" event="xforms-submit-done">
 

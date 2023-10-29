@@ -206,14 +206,12 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
                 // Rewrite elements / add appearances
                 if (inTitle && "output".equals(localname)) {
-                    // Special case of xf:output within title, which produces an xxf:text control
+                    // Special case of `xf:output` within title, which produces an `xxf:text` control
                     attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
                     startPrefixMapping2("xxf", XFormsNames.XXFORMS_NAMESPACE_URI());
                     stackElement.startElement(XFormsNames.XXFORMS_NAMESPACE_URI(), "text", "xxf:text", attributes);
                 } else if (("group".equals(localname) || "switch".equals(localname)) && doesClosestXHTMLRequireSeparatorAppearance()) {
-                    // Closest xhtml:* ancestor is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
-
-                    // Append the new xxf:separator appearance
+                    // Append the `xxf:separator` appearance
                     final String existingAppearance = attributes.getValue("appearance");
                     // See: https://github.com/orbeon/orbeon-forms/issues/418
                     attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", XFormsNames.APPEARANCE_QNAME().localName(),
@@ -277,9 +275,9 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 if ("true".equals(attributes.getValue(XFormsNames.XXFORMS_NAMESPACE_URI(), "control"))) {
                     // Non-XForms element which we want to turn into a control (specifically, into a group)
 
-                    // Create a new xf:group control which specifies the element name to use. Namespace mappings for the
-                    // given QName must be in scope as that QName is the original element name.
                     final AttributesImpl newAttributes = new AttributesImpl(getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex));
+                    // Create a new `xf:group` control which specifies the element name to use. Namespace mappings for the
+                    // given `QName` must be in scope as that `QName` is the original element name.
                     newAttributes.addAttribute(XFormsNames.XXFORMS_NAMESPACE_URI(), "element", "xxf:element", XMLReceiverHelper.CDATA(), qName);
 
                     startPrefixMapping2("xxf", XFormsNames.XXFORMS_NAMESPACE_URI());
@@ -493,7 +491,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         if (isGenerateIds) {
             // Process ids
             if (idIndex == -1) {
-                // Create a new "id" attribute, prefixing if needed
+                // Create a new `id` attribute, prefixing if needed
                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
                 rawId = metadata.idGenerator().nextId();
                 newAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA(), rawId);

@@ -18,7 +18,7 @@ import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.GET
-import org.orbeon.oxf.http.{Headers, SessionExpiredException, StatusCode}
+import org.orbeon.oxf.http.{Headers, HttpRanges, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
 import org.orbeon.oxf.util.PathUtils._
@@ -154,7 +154,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
                   }
                 case None =>
                   info(s"document not found in store while building dynamic form initialization")
-                  response.setStatus(StatusCode.Forbidden)
+                  response.setStatus(StatusCode.LoginTimeOut)
               }
             }
         }
@@ -241,13 +241,16 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
               url         = resource.uri,
               credentials = None,
               content     = None,
-              headers     = resource.headers,
+              // Forward HTTP range headers to server
+              headers     = resource.headers ++ HttpRanges.rangeHeadersFromRequest(externalContext.getRequest),
               loadState   = true,
               saveState   = true,
               logBody     = false
             )
 
-          // TODO: handle 404, etc. and set response parameters *after* we know that we have a successful response code.
+          // Forward HTTP range headers and status to client
+          HttpRanges.forwardRangeHeaders(cxr, response)
+          response.setStatus(cxr.statusCode)
 
           IOUtils.copyStreamAndClose(cxr.content.inputStream, response.getOutputStream)
         } catch {

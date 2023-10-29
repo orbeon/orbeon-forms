@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, PropertyValue}
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.scaxon.Implicits._
@@ -42,7 +43,7 @@ import scala.util.Try
 
 trait FormRunnerActions extends FormRunnerActionsCommon {
 
-  self =>
+  self: XFormsActions => // for `tryCallback`
 
   import FormRunnerRenderedFormat._
 
@@ -82,10 +83,18 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         } yield
           renderedFormat.entryName -> uri.toString
 
+      // https://github.com/orbeon/orbeon-forms/issues/5911
+      val emailDataFormatVersion =
+        paramByName(params, DataFormatVersionName).map(DataFormatVersion.withName).getOrElse(DataFormatVersion.V400)
+
+      val emailParam =
+        (s"email-$DataFormatVersionName" -> emailDataFormatVersion.entryName)
+
       val path =
         recombineQuery(
           s"/fr/service/$app/$form/email/$document",
-          pdfTiffParams :::
+          emailParam     ::
+          pdfTiffParams  :::
           createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
         )
 
@@ -224,12 +233,12 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
             def maybeMigrateData(originalData: DocumentNodeInfoType): DocumentNodeInfoType =
               GridDataMigration.dataMaybeMigratedFromEdge(
-                app                     = currentApp,
-                form                    = currentForm,
-                data                    = originalData,
-                metadataOpt             = frc.metadataInstance.map(_.root),
-                dataFormatVersionString = FormRunnerPersistence.providerDataFormatVersionOrThrow(formRunnerParams.appForm).entryName,
-                pruneMetadata           = evaluatedSendProperties.get(PruneMetadataName).flatten.contains(true.toString),
+                app                        = currentApp,
+                form                       = currentForm,
+                data                       = originalData,
+                metadataOpt                = frc.metadataInstance.map(_.root),
+                dstDataFormatVersionString = FormRunnerPersistence.providerDataFormatVersionOrThrow(formRunnerParams.appForm).entryName,
+                pruneMetadata              = evaluatedSendProperties.get(PruneMetadataName).flatten.contains(true.toString),
               )
 
             val basePath =
@@ -281,7 +290,10 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       debug(s"`send` action sending submission", evaluatedSendPropertiesWithUpdates.iterator collect { case (k, Some(v)) => k -> v } toList)
 
-      sendThrowOnError(s"fr-send-submission", evaluatedSendPropertiesWithUpdates)
+      sendThrowOnError(
+        s"fr-send-submission",
+        evaluatedSendPropertiesWithUpdates.map{ case (k, v) => PropertyValue(k, v) }.toList
+      )
     }
 
   private def tryChangeMode(
@@ -295,17 +307,17 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     Try {
       val params: List[Option[(Option[String], String)]] =
         List(
-          Some(             Some("uri")                   -> prependUserAndStandardParamsForModeChange(propagateDataPermissions = true, prependCommonFormRunnerParameters(path, forNavigate = false))),
-          Some(             Some("method")                -> HttpMethod.POST.entryName.toLowerCase),
-          Some(             Some(NonRelevantName)         -> RelevanceHandling.Keep.entryName.toLowerCase),
-          Some(             Some("replace")               -> replace),
-          Some(             Some(ShowProgressName)        -> showProgress.toString),
-          Some(             Some("content")               -> "xml"),
-          Some(             Some(DataFormatVersionName)   -> DataFormatVersion.Edge.entryName),
-          Some(             Some(PruneMetadataName)       -> false.toString),
-          Some(             Some("parameters")            -> s"$FormVersionParam $DataFormatVersionName"),
-          formTargetOpt.map(Some(FormTargetName)          -> _),
-          Some(             Some("response-is-resource")  -> responseIsResource.toString)
+          Some(             Some("uri")                  -> prependUserAndStandardParamsForModeChange(propagateInternalState = true, prependCommonFormRunnerParameters(path, forNavigate = false))),
+          Some(             Some("method")               -> HttpMethod.POST.entryName.toLowerCase),
+          Some(             Some(NonRelevantName)        -> RelevanceHandling.Keep.entryName.toLowerCase),
+          Some(             Some("replace")              -> replace),
+          Some(             Some(ShowProgressName)       -> showProgress.toString),
+          Some(             Some("content")              -> "xml"),
+          Some(             Some(DataFormatVersionName)  -> getOrGuessFormDataFormatVersion(frc.metadataInstance.map(_.rootElement)).entryName), // use the form's current internal data format version, not `Edge`
+          Some(             Some(PruneMetadataName)      -> false.toString),
+          Some(             Some("parameters")           -> s"$FormVersionParam $DataFormatVersionName"),
+          formTargetOpt.map(Some(FormTargetName)         -> _),
+          Some(             Some("response-is-resource") -> responseIsResource.toString)
         )
       params.flatten.toMap
     } flatMap
@@ -408,7 +420,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     "prune" // for backward compatibility,
   ) ++ DefaultSendParameters.keys
 
-  private def prependUserAndStandardParamsForModeChange(propagateDataPermissions: Boolean, pathQuery: String) = {
+  private def prependUserAndStandardParamsForModeChange(propagateInternalState: Boolean, pathQuery: String) = {
 
     val (path, params) = splitQueryDecodeParams(pathQuery)
 
@@ -417,10 +429,11 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
     // https://github.com/orbeon/orbeon-forms/issues/2999
     // https://github.com/orbeon/orbeon-forms/issues/5437
-    val internalAuthorizedOperationsParam =
-      propagateDataPermissions flatList {
+    val internalParams =
+      propagateInternalState flatList {
         val ops = authorizedOperations
-        ops.nonEmpty list (InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(ops))
+        (ops.nonEmpty list (InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(ops))) :::
+        FormRunner.documentWorkflowStage.toList.map(stage => InternalWorkflowStageParam -> FormRunnerOperationsEncryption.encryptString(stage))
       }
 
     val userParams =
@@ -431,7 +444,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       } yield
         name -> value
 
-    recombineQuery(path, dataMigrationParam :: internalAuthorizedOperationsParam ::: userParams ::: params)
+    recombineQuery(path, dataMigrationParam :: internalParams ::: userParams ::: params)
   }
 
   private def buildRenderedFormatPath(

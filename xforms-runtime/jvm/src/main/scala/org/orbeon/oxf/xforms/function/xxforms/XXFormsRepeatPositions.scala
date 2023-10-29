@@ -9,8 +9,6 @@ import org.orbeon.scaxon.Implicits._
 
 
 class XXFormsRepeatPositions extends XFormsFunction {
-  override def iterate(xpathContext: XPathContext): SequenceIterator = {
-    implicit val ctx = xpathContext
-    bindingContext.repeatPositions map (new Int64Value(_))
-  }
+  override def iterate(xpathContext: XPathContext): SequenceIterator =
+    bindingContext.repeatPositions.map(new Int64Value(_)).toList // https://github.com/orbeon/orbeon-forms/issues/6016
 }

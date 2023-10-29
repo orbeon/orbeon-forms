@@ -52,6 +52,7 @@ install:
   sudo ln -s $HOME/sbt/bin/sbt /usr/local/bin/sbt
 before_script:
 - sudo /etc/init.d/mysql stop # We use MySQL through Docker, so avoid conflict with port 3306
+- if [ "$TARGET" == "test-unit"                              ]; then docker pull tomcat:8.5-jdk8-openjdk-slim; fi
 - if [ "$TARGET" == "test-db"                                ]; then echo $DOCKER_PASSWORD | docker login -u orbeon --password-stdin; fi
 - if [ "$TARGET" == "test-db"   ] && [ "$DB" == "mysql"      ]; then docker run -d --name mysql -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes mysql:5.7 --sql-mode=ALLOW_INVALID_DATES --character-set-server=utf8mb4 --collation-server=utf8mb4_bin; fi
 - if [ "$TARGET" == "test-db"   ] && [ "$DB" == "postgresql" ]; then createuser --superuser orbeon; fi

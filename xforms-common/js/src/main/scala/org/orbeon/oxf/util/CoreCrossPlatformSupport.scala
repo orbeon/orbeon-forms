@@ -18,12 +18,16 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.properties.PropertySet
 import org.scalajs.dom.crypto.GlobalCrypto
 
+import scala.concurrent.ExecutionContext
 import scala.scalajs.js.typedarray.Uint8Array
 
 
 object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
   type FileItemType = Unit // TODO
+
+  implicit def executionContext: ExecutionContext =
+    org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
   def isPE: Boolean = true
   def isJsEnv: Boolean = true

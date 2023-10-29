@@ -15,15 +15,14 @@ package org.orbeon.xforms
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.xforms
 import org.orbeon.xforms.facade.AjaxServer
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.xforms
-
-import scala.concurrent.{Future, Promise}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 
@@ -41,7 +40,7 @@ object UploaderClient {
 
   // Once we are done processing the events (either because the uploads have been completed or canceled), handle the
   // remaining events.
-  def continueWithRemainingEvents(): Unit = {
+  private def continueWithRemainingEvents(): Unit = {
     currentEventOpt foreach (_.upload.uploadDone())
     currentEventOpt = None
     currentAbortControllerOpt = None
@@ -59,7 +58,7 @@ object UploaderClient {
   // the status of the upload. Initially, it is called by `UploadServer` when it sends the file. Then, it is called
   // by the upload control, when it receives a progress update, as we only want to ask for an updated progress after
   // we get an answer from the server.
-  def askForProgressUpdate(currentForm: xforms.Form): Unit =
+  private def askForProgressUpdate(currentForm: xforms.Form): Unit =
     // Keep asking for progress update at regular interval until there is no upload in progress
     js.timers.setTimeout(currentForm.configuration.delayBeforeUploadProgressRefresh) {
       currentEventOpt foreach { processingEvent =>
@@ -121,8 +120,7 @@ object UploaderClient {
 
       val formData = extractFormData(currentEvent)
 
-      val requestFormId = currentEvent.upload.getAncestorForm.id
-      val currentForm   = Page.getForm(requestFormId)
+      val currentForm = currentEvent.upload.getAncestorForm
 
       currentEventOpt = currentEvent.some
       remainingEvents = events.tail
@@ -159,17 +157,17 @@ object UploaderClient {
           // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
           currentEvent.upload.clear()
           // The Ajax response only contains "server events"
-          AjaxServer.handleResponseDom(responseXml, requestFormId, ignoreErrors = false)
+          AjaxServer.handleResponseDom(responseXml, currentForm.namespacedFormId, ignoreErrors = false)
           // Are we done, or do we still need to handle events for other forms?
           continueWithRemainingEvents()
         case Success((_, responseText, responseXmlOpt)) =>
           // Here we can at least get 413, 409, and 500 status codes at least as those are explicitly set by the server
           cancel(doAbort = false, EventNames.XXFormsUploadError)
-          AjaxClient.handleFailure(responseXmlOpt.toRight(responseText), requestFormId, ignoreErrors = false)
+          AjaxClient.handleFailure(responseXmlOpt.toRight(responseText), currentForm.namespacedFormId, ignoreErrors = false)
         case Failure(_) =>
           // NOTE: can be an `AbortError` (to verify)
           cancel(doAbort = false, EventNames.XXFormsUploadError)
-          AjaxClient.logAndShowError(_, requestFormId, ignoreErrors = false)
+          AjaxClient.logAndShowError(_, currentForm.namespacedFormId, ignoreErrors = false)
       }
     }
 
@@ -177,7 +175,7 @@ object UploaderClient {
       new dom.FormData |!> (
         _.append(
           Constants.UuidFieldName,
-          Page.getForm(uploadEvent.upload.getAncestorForm.id).uuid
+          uploadEvent.upload.getAncestorForm.uuid
         )
       ) |!> (
         _.append(

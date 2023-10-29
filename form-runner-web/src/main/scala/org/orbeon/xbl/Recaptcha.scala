@@ -53,7 +53,7 @@ object Recaptcha {
         js.isUndefined(grecaptcha.render)
 
       if (reCaptchaNotFullyLoaded) {
-        val shortDelay = Page.getFormFromElemOrThrow(containerElem).configuration.internalShortDelay
+        val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
         js.timers.setTimeout(shortDelay)(renderRecaptcha(publicKey, theme))
       } else {
         val successfulResponse: js.Function1[String, Unit] = (response: String) => {

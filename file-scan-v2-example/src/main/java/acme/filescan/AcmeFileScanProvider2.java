@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Map;
 
 /**
@@ -42,7 +43,10 @@ public class AcmeFileScanProvider2 implements FileScanProvider2 {
         }
 
         public FileScanResult complete(File file) {
-            logger.info("Completing scan for " + this.filename);
+
+            final URI requestUri = (URI) extension.get("request.uri");
+
+            logger.info("Completing scan for file `" + this.filename + "` for request URI `" + requestUri + "`");
 
             if (this.filename.contains("virus"))
                 return new FileScanResult.FileScanRejectResult(

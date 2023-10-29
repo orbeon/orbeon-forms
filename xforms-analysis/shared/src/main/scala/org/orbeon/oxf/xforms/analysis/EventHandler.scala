@@ -252,7 +252,8 @@ object EventHandler {
           xxformsQName("invalidate-instances"),
           xxformsQName("join-submissions"),
           xxformsQName("setvisited"),
-          xxformsQName("update-validity")
+          xxformsQName("update-validity"),
+          xxformsQName("log")
         )
   }
 }

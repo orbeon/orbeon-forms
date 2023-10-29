@@ -7,7 +7,7 @@
     "url": "https://github.com/orbeon/orbeon-forms/"
   },
   "dependencies": {
-    "jsdom": "15.2.1",
+    "jsdom": "22.1.0",
     "node-fetch": "2.6.7"
   },
   "license": "LGPL-2.1"

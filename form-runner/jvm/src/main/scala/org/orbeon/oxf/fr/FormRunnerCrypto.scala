@@ -41,4 +41,21 @@ object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrai
         CharsetNames.Utf8
       ))
     )
+
+  def encryptString(value: String): String =
+    SecureUtils.encrypt(
+      keyUsage = SecureUtils.KeyUsage.General,
+      bytes    = value.getBytes(CharsetNames.Utf8)
+    )
+
+  def decryptString(value: String): Option[String] =
+    value.trimAllToOpt.map(nonBlankValue =>
+      new String(
+        SecureUtils.decrypt(
+          keyUsage = SecureUtils.KeyUsage.General,
+          text     = nonBlankValue
+        ),
+        CharsetNames.Utf8
+      )
+    )
 }

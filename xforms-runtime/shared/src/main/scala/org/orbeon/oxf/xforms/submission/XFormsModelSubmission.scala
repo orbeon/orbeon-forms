@@ -18,8 +18,10 @@ import org.log4s.Logger
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, TunnelProperties}
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
@@ -83,7 +85,7 @@ class XFormsModelSubmission(
   val containingDocument: XFormsContainingDocument = container.getContainingDocument
 
   // All the submission types in the order they must be checked
-  val submissions =
+  val submissions: List[BaseSubmission] =
     List(
       new EchoSubmission(thisSubmission),
       new ClientGetAllSubmission(thisSubmission),
@@ -109,9 +111,13 @@ class XFormsModelSubmission(
     }
 
   private[submission]
-  def processAsyncSubmissionResponse(submissionResult: ConnectResult)(implicit logger: IndentedLogger): Unit = {
+  def processAsyncSubmissionResponse(
+    submissionResult: ConnectResult,
+    tunnelProperties: Option[ActionPropertyGetter])(implicit
+    logger          : IndentedLogger
+  ): Unit = {
 
-    val p  = SubmissionParameters(None)(thisSubmission)
+    val p  = SubmissionParameters(None, tunnelProperties)(thisSubmission)
     val p2 = SecondPassParameters(p)(thisSubmission)
 
     (processReplaceResultAndCloseConnection _).tupled(
@@ -129,22 +135,22 @@ class XFormsModelSubmission(
     // Handle response
     if (cxr.dontHandleResponse) {
       // Always return a replacer even if it does nothing, this way we don't have to deal with null
-      new NoneReplacer(thisSubmission)
+      NoneReplacer
     } else if (StatusCode.isSuccessCode(cxr.statusCode)) {
       // Successful response
       if (cxr.hasContent) {
         // There is a body
         // Get replacer
         if (p.replaceType == ReplaceType.All)
-          new AllReplacer(thisSubmission, containingDocument)
+          AllReplacer
         else if (p.replaceType == ReplaceType.Instance)
-          new InstanceReplacer(thisSubmission, containingDocument)
+          InstanceReplacer
         else if (p.replaceType == ReplaceType.Text)
-          new TextReplacer(thisSubmission, containingDocument)
+          TextReplacer
         else if (p.replaceType == ReplaceType.None)
-          new NoneReplacer(thisSubmission)
+          NoneReplacer
         else if (p.replaceType == ReplaceType.Binary)
-          new BinaryReplacer(thisSubmission, containingDocument)
+          BinaryReplacer
         else
           throw new XFormsSubmissionException(
             thisSubmission,
@@ -152,9 +158,10 @@ class XFormsModelSubmission(
             "processing instance replacement",
             null,
             new XFormsSubmitErrorEvent(
-              target    = thisSubmission,
-              errorType = ErrorType.XXFormsInternalError,
-              cxrOpt    = cxr.some
+              target           = thisSubmission,
+              errorType        = ErrorType.XXFormsInternalError,
+              cxrOpt           = cxr.some,
+              tunnelProperties = p.tunnelProperties
             )
           )
       } else {
@@ -171,7 +178,7 @@ class XFormsModelSubmission(
         }
         // "For a success response not including a body, submission processing concludes after dispatching
         // xforms-submit-done"
-        new NoneReplacer(thisSubmission)
+        NoneReplacer
       }
     } else if (StatusCode.isRedirectCode(cxr.statusCode)) {
       // Got a redirect
@@ -184,17 +191,18 @@ class XFormsModelSubmission(
           "processing submission response",
           null,
           new XFormsSubmitErrorEvent(
-            target    = thisSubmission,
-            errorType = ErrorType.ResourceError,
-            cxrOpt    = cxr.some
+            target           = thisSubmission,
+            errorType        = ErrorType.ResourceError,
+            cxrOpt           = cxr.some,
+            tunnelProperties = p.tunnelProperties
           )
         )
-      new RedirectReplacer(containingDocument)
+      RedirectReplacer
     } else {
       // Error code received
       if (p.replaceType == ReplaceType.All && cxr.hasContent) {
         // For `replace="all"`, if we received content, which might be an error page, we still want to serve it
-        new AllReplacer(thisSubmission, containingDocument)
+        AllReplacer
       } else
         throw new XFormsSubmissionException(
           thisSubmission,
@@ -202,9 +210,10 @@ class XFormsModelSubmission(
           "processing submission response",
           null,
           new XFormsSubmitErrorEvent(
-            target    = thisSubmission,
-            errorType = ErrorType.ResourceError,
-            cxrOpt    = cxr.some
+            target           = thisSubmission,
+            errorType        = ErrorType.ResourceError,
+            cxrOpt           = cxr.some,
+            tunnelProperties = p.tunnelProperties
           )
         )
     }
@@ -277,10 +286,10 @@ class XFormsModelSubmission(
       // Create the big bag of initial runtime parameters, which can throw
       val p =
         try
-          SubmissionParameters(event.name.some)(thisSubmission)
+          SubmissionParameters(event.name.some, event.actionProperties)(thisSubmission)
         catch {
           case t: Throwable =>
-            sendSubmitError(t, Right(None))
+            sendSubmitError(t, Right(None), event.tunnelProperties)
             return
         }
 
@@ -310,9 +319,10 @@ class XFormsModelSubmission(
                 "checking pending uploads",
                 null,
                 new XFormsSubmitErrorEvent(
-                  target    = thisSubmission,
-                  errorType = ErrorType.XXFormsPendingUploads,
-                  cxrOpt    = None
+                  target           = thisSubmission,
+                  errorType        = ErrorType.XXFormsPendingUploads,
+                  cxrOpt           = None,
+                  tunnelProperties = event.tunnelProperties
                 )
               )
 
@@ -348,7 +358,7 @@ class XFormsModelSubmission(
               return
             }
 
-            /* ***** Submission second pass ************************************************************************* */
+            /* ***** Submission second pass or single-pass submission *********************************************** */
 
             // Compute parameters only needed during second pass
             val p2 = SecondPassParameters(p)(thisSubmission)
@@ -406,7 +416,7 @@ class XFormsModelSubmission(
 
               // Result information
               val connectResultOpt =
-                submissions find (_.isMatch(p, p2, sp)) flatMap { submission =>
+                submissions.find(_.isMatch(p, p2, sp)).flatMap { submission =>
                   withDebug("connecting", List("type" -> submission.getType)) {
                     submission.connect(p, p2, sp)
                   }
@@ -414,14 +424,32 @@ class XFormsModelSubmission(
 
               /* ***** Submission result processing ******************************************************************* */
 
-              // `None` in case the submission is running asynchronously, AND when ???
-              connectResultOpt map { connectResult =>
-                handleConnectResult(
-                  p                      = p,
-                  p2                     = p2,
-                  connectResult          = connectResult,
-                  initializeXPathContext = true // function context might have changed
-                )
+              connectResultOpt match {
+                case Some(Left(connectResult)) =>
+                  Some(
+                    handleConnectResult(
+                      p                      = p,
+                      p2                     = p2,
+                      connectResult          = connectResult,
+                      initializeXPathContext = true // function context might have changed
+                    )
+                  )
+                case Some(Right(connectResultF)) if p.isDeferredSubmissionSecondPass =>
+                  // xxx might need to modify for tunnel properties for 2-pass submission
+                  containingDocument.setReplaceAllFuture(connectResultF)
+                  None
+                case Some(Right(connectResultF)) =>
+                  containingDocument
+                    .getAsynchronousSubmissionManager(create = true)
+                    .foreach(_.addAsynchronousSubmission(
+                      thisSubmission.getEffectiveId,
+                      connectResultF.map(_ -> p.actionProperties),
+                      awaitInCurrentRequest = p2.responseMustAwait
+                    ))
+                  None
+                case None =>
+                  // Nothing to do here (case of `ClientGetAllSubmission`)
+                  None
               }
             }
           } catch {
@@ -439,7 +467,7 @@ class XFormsModelSubmission(
                     )
                   )
                 else
-                  ReplaceResult.SendError(throwable, Right(resolvedActionOrResourceOpt)),
+                  ReplaceResult.SendError(throwable, Right(resolvedActionOrResourceOpt), event.tunnelProperties),
                 None
               ).some
           }
@@ -458,31 +486,31 @@ class XFormsModelSubmission(
     ): Unit =
       try {
         replaceResult match {
-          case ReplaceResult.None              => ()
-          case ReplaceResult.SendDone (cxr)    => sendSubmitDone(cxr)
-          case ReplaceResult.SendError(t, ctx) => sendSubmitError(t, ctx)
-          case ReplaceResult.Throw    (t)      => throw t
+          case ReplaceResult.None                                => ()
+          case ReplaceResult.SendDone (cxr, tunnelProperties)    => sendSubmitDone(cxr, tunnelProperties)
+          case ReplaceResult.SendError(t, ctx, tunnelProperties) => sendSubmitError(t, ctx, tunnelProperties)
+          case ReplaceResult.Throw    (t)                        => throw t
         }
       } finally {
         // https://github.com/orbeon/orbeon-forms/issues/5224
         cxrOpt foreach (_.close())
       }
 
-    def sendSubmitDone(cxr: ConnectionResult): Unit = {
+    private def sendSubmitDone(cxr: ConnectionResult, tunnelProperties: Option[TunnelProperties]): Unit = {
       model.resetAndEvaluateVariables() // after a submission, the context might have changed
-      Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, cxr))
+      Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, cxr, tunnelProperties))
     }
 
-    def sendSubmitError(t: Throwable, ctx: Either[Option[ConnectionResult], Option[String]]): Unit =
+    private def sendSubmitError(t: Throwable, ctx: Either[Option[ConnectionResult], Option[String]], tunnelProperties: Option[TunnelProperties]): Unit =
       sendSubmitErrorWithDefault(
         t,
-        ctx match {
-          case Left(v)  => new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, v)
-          case Right(v) => new XFormsSubmitErrorEvent(thisSubmission, v, ErrorType.XXFormsInternalError, 0)
+        default = ctx match {
+          case Left(v)  => new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, v, tunnelProperties)
+          case Right(v) => new XFormsSubmitErrorEvent(thisSubmission, v, ErrorType.XXFormsInternalError, 0, tunnelProperties)
         }
       )
 
-    def sendSubmitErrorWithDefault(t: Throwable, default: => XFormsSubmitErrorEvent): Unit = {
+    private def sendSubmitErrorWithDefault(t: Throwable, default: => XFormsSubmitErrorEvent): Unit = {
 
       // After a submission, the context might have changed
       model.resetAndEvaluateVariables()
@@ -496,9 +524,10 @@ class XFormsModelSubmission(
       Dispatch.dispatchEvent(submitErrorEvent)
     }
 
-    def createUriOrDocumentToSubmit(
-      p: SubmissionParameters)(implicit
-      indentedLogger    : IndentedLogger
+    private def createUriOrDocumentToSubmit(
+      p             : SubmissionParameters
+    )(implicit
+      indentedLogger: IndentedLogger
     ): URI Either Document =
       if (requestedSerialization(p.serializationOpt, p.xformsMethod, p.httpMethod).contains(ContentTypes.OctetStreamContentType))
         Left(
@@ -512,17 +541,20 @@ class XFormsModelSubmission(
             p.validate,
             p.relevanceHandling,
             p.xxfAnnotate,
-            p.xxfRelevantAttOpt
+            p.xxfRelevantAttOpt,
+            p.tunnelProperties
           )
         )
 
-    def createDocumentToSubmit(
+    private def createDocumentToSubmit(
       currentNodeInfo   : om.NodeInfo,
       currentInstance   : Option[XFormsInstance],
       validate          : Boolean,
       relevanceHandling : RelevanceHandling,
       annotateWith      : Set[String],
-      relevantAttOpt    : Option[QName])(implicit
+      relevantAttOpt    : Option[QName],
+      tunnelProperties  : Option[TunnelProperties]
+    )(implicit
       indentedLogger    : IndentedLogger
     ): Document = {
 
@@ -565,7 +597,7 @@ class XFormsModelSubmission(
           submission       = thisSubmission,
           message          = "xf:submission: instance to submit does not satisfy valid and/or required model item properties.",
           description      = "checking instance validity",
-          submitErrorEvent = new XFormsSubmitErrorEvent(thisSubmission, ErrorType.ValidationError, None)
+          submitErrorEvent = new XFormsSubmitErrorEvent(thisSubmission, ErrorType.ValidationError, None, tunnelProperties)
         )
       }
 
@@ -594,14 +626,14 @@ class XFormsModelSubmission(
                 p
 
           connectResult.result match {
-            case Success((replacer, cxr)) => (replacer.replace(cxr, updatedP, p2),             cxr.some)
-            case Failure(throwable)       => (ReplaceResult.SendError(throwable, Left(None)),  None)
+            case Success((replacer, cxr)) => (replacer.replace(thisSubmission, cxr, updatedP, p2, replacer.deserialize(thisSubmission, cxr, updatedP, p2)), cxr.some)
+            case Failure(throwable)       => (ReplaceResult.SendError(throwable, Left(None), p.tunnelProperties),             None)
           }
         }
       } catch {
         case NonFatal(throwable) =>
           val cxrOpt = connectResult.result.toOption.map(_._2)
-          (ReplaceResult.SendError(throwable, Left(cxrOpt)), cxrOpt)
+          (ReplaceResult.SendError(throwable, Left(cxrOpt), p.tunnelProperties), cxrOpt)
       }
     }
   }

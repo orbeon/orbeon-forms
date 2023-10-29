@@ -51,7 +51,6 @@ object XFormsApp extends App {
     xformsDyn.Message                = js.Dynamic.global.OrbeonMessage
     xformsDyn.Page                   = js.Dynamic.global.OrbeonPage
     xformsDyn.ServerValueStore       = js.Dynamic.global.OrbeonServerValueStore
-    xformsDyn.ServerApi              = js.Dynamic.global.OrbeonServerApi
     xformsDyn.AjaxEvent              = js.Dynamic.global.OrbeonAjaxEvent
     xformsDyn.Language               = js.Dynamic.global.OrbeonLanguage
     xformsDyn.AjaxClient             = js.Dynamic.global.OrbeonAjaxClient

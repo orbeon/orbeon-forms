@@ -57,6 +57,7 @@
     <xf:var
         name="is-export"
         value="
+            not(fr:mode() = ('pdf', 'tiff')) and (: these are technically exports but they behave differently :)
             matches(
                 xxf:get-request-path(),
                 '^/fr/(service/)?([^/]+)/([^/]+)/(excel-export|export)(/([^/]+))?$'
@@ -259,6 +260,26 @@
                 <xf:setvalue
                     if="$mode = 'edit'"
                     ref="$persistence-instance/initial-data-status">dirty</xf:setvalue>
+
+                <!-- https://github.com/orbeon/orbeon-forms/issues/5437 -->
+                <xf:setvalue
+                    ref="instance('fr-authorized-operations')"
+                    value="
+                        frf:authorizedOperationsForDetailModeOrThrow(
+                            '', (: No permissions from data :)
+                            xxf:get-request-parameter(frf:InternalAuthorizedOperationsParam())[1],
+                            xxf:instance('fr-form-metadata')/permissions,
+                            true()
+                        )"/>
+
+                <!-- https://github.com/orbeon/orbeon-forms/issues/5984 -->
+                <xf:setvalue
+                    ref="instance('fr-document-metadata')/@workflow-stage"
+                    value="
+                        frf:decryptWorkflowStageIfNeeded(
+                            xxf:get-request-parameter(frf:InternalWorkflowStageParam())[1]
+                        )"/>
+
             </xf:action>
 
             <!-- In 'new' mode only, after an external document has been set, recalculate defaults (and rebuild so the refs
@@ -879,7 +900,7 @@
     </xf:instance>
 
     <xf:instance id="fr-persistence-instance" xxf:exclude-result-prefixes="#all">
-        <save xmlns="">
+        <_ xmlns="">
             <!-- Dialog to show upon xforms-ready for handling drafts -->
             <found-document-message-to-show/>
             <!-- Initial data status -->
@@ -910,7 +931,7 @@
             <lease-start-time/>
             <lease-end-time/>
             <lease-owned-by-current-user/>
-        </save>
+        </_>
     </xf:instance>
 
     <!-- Watch data-status and dispatch fr-data-status-changed -->

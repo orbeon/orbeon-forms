@@ -41,6 +41,12 @@ trait StaticLHHASupport extends ElementAnalysis {
   def alerts               : List[LHHAAnalysis]   = _alerts
   def alertsBy             : List[LHHAAnalysis]   = _alertsBy
 
+  def anyByOpt(lhhaType: LHHA): Option[LHHAAnalysis] =
+    lhhaType match {
+      case LHHA.Alert => alertsBy.headOption orElse alerts.headOption
+      case _          => lhhBy(lhhaType)     orElse lhh(lhhaType)
+    }
+
   def firstLhha(lhhaType: LHHA): Option[LHHAAnalysis] =
     if (lhhaType == LHHA.Alert)
       alerts.headOption // for alerts, take the first one, but does this make sense?

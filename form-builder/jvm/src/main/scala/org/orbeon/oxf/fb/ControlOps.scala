@@ -495,7 +495,7 @@ trait ControlOps extends ResourcesOps {
   def lhhatChildrenParams(lhhatNodes: Seq[NodeInfo]): Seq[NodeInfo] =
     lhhatNodes child FRParamTest
 
-  private def setControlLHHATParams(
+  def setControlLHHATParams(
     controlName : String,
     lhha        : String,
     params      : Seq[NodeInfo])(implicit
@@ -535,6 +535,12 @@ trait ControlOps extends ResourcesOps {
   def isControlLhhatHtmlMediatype(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Boolean =
     hasHTMLMediatype(getControlLhhat(controlName, lhha))
 
+  def isControlLhhatAutomatic(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Option[Boolean] = {
+    val lhhat             = getControlLhhat(controlName, lhha)
+    val automaticValueOpt = lhhat.flatMap(_.attValueOpt(FRAutomaticQName)).headOption
+    automaticValueOpt.flatMap(_.toBooleanOption)
+  }
+
   // For a given control and LHHA type, set the mediatype on the LHHA to be HTML or plain text
   def setControlLhhatMediatype(controlName: String, lhha: String, isHTML: Boolean)(implicit ctx: FormBuilderDocContext): Boolean = {
 
@@ -556,6 +562,14 @@ trait ControlOps extends ResourcesOps {
         insert(into = lhhaElem, origin = attributeInfo("mediatype", "text/html"))
       else
         delete(lhhaElem /@ "mediatype")
+    }
+
+  def setAutomatic(lhhaElems: Iterable[NodeInfo], isAutomaticOpt: Option[Boolean]): Unit =
+    lhhaElems foreach { lhhaElem =>
+      isAutomaticOpt match {
+        case Some(value) => insert(into = lhhaElem, origin = attributeInfo(FRAutomaticQName, value.toString))
+        case None        => delete(lhhaElem /@ FRAutomaticQName)
+      }
     }
 
   def ensureCleanLHHAElements(

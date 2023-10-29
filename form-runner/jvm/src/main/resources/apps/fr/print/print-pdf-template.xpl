@@ -104,14 +104,14 @@
     <p:processor name="oxf:url-generator">
         <!-- NOTE: Depend on #request for request parameters to avoid caching issues -->
         <p:input name="config" href="aggregate('root', #form-document, #parameters, #request)" transform="oxf:unsafe-xslt">
-            <config xsl:version="2.0">
+            <config xsl:version="2.0" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
                 <xsl:variable name="form"   select="/*/*[1]"/>
                 <xsl:variable name="params" select="/*/*[2]"/>
 
-                <xsl:variable name="format"            select="$params/mode"/>
-                <xsl:variable name="pdf-template-name" select="p:get-request-parameter('fr-pdf-template-name')"/>
-                <xsl:variable name="pdf-template-lang" select="p:get-request-parameter('fr-pdf-template-lang')"/>
+                <xsl:variable name="format"                select="$params/mode"/>
+                <xsl:variable name="pdf-template-name-opt" select="p:get-request-parameter('fr-pdf-template-name')[frf:isServicePath(p:get-request-path()) or p:get-request-method() = 'POST']"/>
+                <xsl:variable name="pdf-template-lang-opt" select="p:get-request-parameter('fr-pdf-template-lang')[frf:isServicePath(p:get-request-path()) or p:get-request-method() = 'POST']"/>
 
                 <xsl:variable name="attach" select="$form//xf:instance[@id = 'fr-form-attachments']/*"/>
 
@@ -123,8 +123,8 @@
                                 rendered-format:findTemplatePath(
                                     $attach,
                                     $format,
-                                    $pdf-template-name,
-                                    $pdf-template-lang
+                                    $pdf-template-name-opt,
+                                    $pdf-template-lang-opt
                                 ),
                                 true()
                             )"/>

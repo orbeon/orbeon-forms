@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.net.URI
-import java.util.concurrent.locks.Lock
 import cats.Eval
 import cats.syntax.option._
+import org.log4s
+import org.log4s.LogLevel
 import org.orbeon.datatypes.{LocationData, MaximumSize}
 import org.orbeon.dom.Element
 import org.orbeon.oxf.cache.Cacheable
@@ -25,10 +25,11 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.xforms.action.actions.XFormsDispatchAction
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
@@ -44,13 +45,16 @@ import org.orbeon.oxf.xforms.submission.{ConnectResult, TwoPassSubmissionParamet
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.xforms.Constants.FormId
 import org.orbeon.xforms._
 import org.orbeon.xforms.runtime.XFormsObject
 import shapeless.syntax.typeable._
 
+import java.net.URI
+import java.util.concurrent.locks.Lock
 import scala.annotation.tailrec
-import scala.jdk.CollectionConverters._
 import scala.collection.{immutable, mutable}
+import scala.concurrent.Future
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
@@ -164,9 +168,9 @@ trait ContainingDocumentTransientState {
     var byName                   : Map[String, Any] = Map.empty[String, Any]
 
     var nonJavaScriptLoadsToRun  : Vector[Load] = Vector.empty
-    var scriptsToRun             : Vector[Load Either ScriptInvocation] = Vector.empty
+    var scriptsToRun             : Vector[Either[Load, Either[ScriptInvocation, CallbackInvocation]]] = Vector.empty
 
-    var replaceAllEval           : Option[Eval[ConnectResult]] = None
+    var replaceAllFuture         : Option[Future[ConnectResult]] = None
     var gotSubmissionReplaceAll  : Boolean = false
     var gotSubmissionRedirect    : Boolean = false
 
@@ -191,9 +195,12 @@ trait ContainingDocumentTransientState {
     transientState = new TransientState
 
   def addScriptToRun(scriptInvocation: ScriptInvocation): Unit =
-    transientState.scriptsToRun :+= Right(scriptInvocation)
+    transientState.scriptsToRun :+= Right(Left(scriptInvocation))
 
-  def getScriptsToRun: immutable.Seq[Load Either ScriptInvocation] = transientState.scriptsToRun
+  def addCallbackToRun(scriptInvocation: CallbackInvocation): Unit =
+    transientState.scriptsToRun :+= Right(Right(scriptInvocation))
+
+  def getScriptsToRun: immutable.Seq[Either[Load, Either[ScriptInvocation, CallbackInvocation]]] = transientState.scriptsToRun
 
   def addLoadToRun(load: Load): Unit =
     findTwoPassSubmitEvents match {
@@ -208,10 +215,10 @@ trait ContainingDocumentTransientState {
 
   def getNonJavaScriptLoadsToRun: immutable.Seq[Load] = transientState.nonJavaScriptLoadsToRun
 
-  def getReplaceAllEval: Option[Eval[ConnectResult]] = transientState.replaceAllEval
+  def getReplaceAllEval: Option[Future[ConnectResult]] = transientState.replaceAllFuture
 
-  def setReplaceAllEval(eval: Eval[ConnectResult]): Unit =
-    transientState.replaceAllEval = Some(eval ensuring (_ ne null))
+  def setReplaceAllFuture(eval: Future[ConnectResult]): Unit =
+    transientState.replaceAllFuture = Some(eval.ensuring(_ ne null))
 
   def setGotSubmissionReplaceAll(): Unit = {
     if (transientState.gotSubmissionReplaceAll)
@@ -536,11 +543,13 @@ private object ContainingDocumentProperties {
 
 trait ContainingDocumentLogging {
 
-  private final val indentation = new IndentedLogger.Indentation
-  private final val loggersMap = mutable.HashMap[String, IndentedLogger]()
+  self: XBLContainer =>
+
+  private final val indentation        = new IndentedLogger.Indentation
+  private final val indentedLoggersMap = mutable.HashMap[String, IndentedLogger]()
 
   def getIndentedLogger(loggingCategory: String): IndentedLogger =
-    loggersMap.getOrElseUpdate(loggingCategory,
+    indentedLoggersMap.getOrElseUpdate(loggingCategory,
       new IndentedLogger(
         Loggers.logger,
         Loggers.logger.isDebugEnabled && XFormsGlobalProperties.getDebugLogging.contains(loggingCategory),
@@ -549,6 +558,37 @@ trait ContainingDocumentLogging {
     )
 
   val indentedLogger = getIndentedLogger("document")
+
+  val loggersMap = mutable.HashMap[String, log4s.Logger]()
+
+  def logMessage(name: String, level: LogLevel, message: String): Unit = {
+
+    val logger = loggersMap.getOrElseUpdate(name, LoggerFactory.createLogger(name))
+
+    level match {
+      case log4s.Trace => logger.trace(message)
+      case log4s.Debug => logger.debug(message)
+      case log4s.Info  => logger.info(message)
+      case log4s.Warn  => logger.warn(message)
+      case log4s.Error => logger.error(message)
+    }
+
+    self.findObjectByEffectiveId("orbeon-inspector") foreach { inspector =>
+      XFormsDispatchAction.dispatch(
+        eventName       = "xxforms-log",
+        target          = inspector.asInstanceOf[XFormsEventTarget],
+        bubbles         = false,
+        cancelable      = false,
+        properties      = Map(
+          "level"   -> level.toString.some,
+          "message" -> message.some
+        ),
+        delayOpt        = None,
+        showProgress    = false,
+        allowDuplicates = false
+      )
+    }
+  }
 }
 
 trait ContainingDocumentRequestStats {
@@ -575,6 +615,11 @@ trait ContainingDocumentRequest {
   def getContainerType         = _requestInformation.containerType
   def getContainerNamespace    = _requestInformation.containerNamespace // always "" for servlets.
   def getVersionedPathMatchers = _requestInformation.versionedPathMatchers
+
+  def getRequestUri: URI = {
+    val queryString = PathUtils.encodeSimpleQuery(getRequestParameters.iterator.flatMap { case (k, v) => v.iterator.map(k -> _) })
+    new URI(null, null, getRequestPath, queryString, null)
+  }
 
   def headersGetter: String => Option[List[String]] = getRequestHeaders.get
 
@@ -609,7 +654,7 @@ trait ContainingDocumentRequest {
   }
 
   def getNamespacedFormId: String =
-    namespaceId("xforms-form")
+    namespaceId(FormId)
 
   /**
    * Resolve a URI string against an element, taking into account ancestor xml:base attributes for
@@ -643,15 +688,16 @@ trait ContainingDocumentDelayedEvents {
 
   def addTwoPassSubmitEvent(p: TwoPassSubmissionParameters): Unit =
     _delayedEvents += DelayedEvent(
-      eventName              = XFormsEvents.XXFORMS_SUBMIT,
-      targetEffectiveId      = p.submissionEffectiveId,
-      bubbles                = true,
-      cancelable             = false,
-      time                   = None,
-      showProgress           = p.showProgress,
-      browserTarget          = p.target,
-      submissionId           = CoreCrossPlatformSupport.randomHexId.some,
-      isResponseResourceType = p.isResponseResourceType
+      eventName              = XFormsEvents.XXFORMS_SUBMIT,               // for dispatch
+      targetEffectiveId      = p.submissionEffectiveId,                   // for dispatch
+      bubbles                = true,                                      // for dispatch
+      cancelable             = false,                                     // for dispatch
+      time                   = None,                                      // for scheduling
+      showProgress           = p.showProgress,                            // for XHR response
+      browserTarget          = p.target,                                  // for XHR response
+      submissionId           = CoreCrossPlatformSupport.randomHexId.some, // for XHR response
+      isResponseResourceType = p.isResponseResourceType,                  // for XHR response
+      properties             = p.properties                               // for dispatch
     )
 
   def findTwoPassSubmitEvents: List[DelayedEvent] =
@@ -669,7 +715,8 @@ trait ContainingDocumentDelayedEvents {
     cancelable        : Boolean,
     time              : Long,
     showProgress      : Boolean,
-    allowDuplicates   : Boolean // 2020-07-24: used by `xf:dispatch` and `false` for `xxforms-poll`
+    allowDuplicates   : Boolean, // 2020-07-24: used by `xf:dispatch` and `false` for `xxforms-poll`
+    properties        : SimpleProperties
   ): Unit = {
 
     // For `xxforms-poll`, we *could* attempt to preserve the earlier time. But currently,
@@ -688,7 +735,8 @@ trait ContainingDocumentDelayedEvents {
         showProgress           = showProgress,
         browserTarget          = None,
         submissionId           = None,
-        isResponseResourceType = false
+        isResponseResourceType = false,
+        properties             = properties
       )
   }
 
@@ -734,7 +782,10 @@ trait ContainingDocumentDelayedEvents {
                   XFormsEventFactory.createEvent(
                     eventName  = dueEvent.eventName,
                     target     = eventTarget,
-                    properties = EmptyGetter, // NOTE: We don't support properties for delayed events yet.
+                    properties = new PartialFunction[String, Option[Any]] {
+                      def isDefinedAt(key: String): Boolean = dueEvent.properties.exists(_.name == key)
+                      def apply(key: String): Option[Any] = dueEvent.properties.collectFirst { case SimplePropertyValue(`key`, value, _) => value }
+                    },
                     bubbles    = dueEvent.bubbles,
                     cancelable = dueEvent.cancelable
                   )
@@ -783,12 +834,13 @@ trait ContainingDocumentClientState {
 
     val jsonInitializationData =
       ScriptBuilder.buildJsonInitializationData(
-        containingDocument   = this,
-        rewriteResource      = response.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
-        rewriteAction        = response.rewriteActionURL,
-        controlsToInitialize = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
-        versionedResources   = URLRewriterUtils.isResourcesVersioned,
-        heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(this, externalContext)
+        containingDocument        = this,
+        rewriteResource           = response.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
+        rewriteAction             = response.rewriteActionURL,
+        controlsToInitialize      = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
+        versionedResources        = URLRewriterUtils.isResourcesVersioned,
+        maxInactiveIntervalMillis = XFormsStateManager.getMaxInactiveIntervalMillis(this, externalContext),
+        sessionId                 = externalContext.getSessionOpt(create = false).map(_.getId).getOrElse("")
       )
 
     _initializationData = (initializationScripts, jsonInitializationData).some

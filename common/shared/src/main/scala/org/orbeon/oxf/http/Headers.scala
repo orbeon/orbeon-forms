@@ -28,6 +28,9 @@ object Headers {
   val OrbeonRoles             = "Orbeon-Roles"
   val OrbeonCredentials       = "Orbeon-Credentials"
 
+  val OrbeonCreated           = "Orbeon-Created"
+  val OrbeonLastModified      = "Orbeon-Last-Modified"
+
   val OrbeonRemoteAddress     = "Orbeon-Remote-Address"
 
   val ContentType             = "Content-Type"
@@ -45,6 +48,11 @@ object Headers {
   val SOAPAction              = "SOAPAction"
   val Timeout                 = "Timeout"
   val TimeoutValuePrefix      = "Second-"
+
+  val Range                   = "Range"
+  val IfRange                 = "If-Range"
+  val AcceptRanges            = "Accept-Ranges"
+  val ContentRange            = "Content-Range"
 
   val OrbeonTokenLower        = OrbeonToken.toLowerCase
   val OrbeonUsernameLower     = OrbeonUsername.toLowerCase

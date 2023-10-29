@@ -27,25 +27,27 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
 
   // 1 caller
   // Event can be dispatched before the resource URI is resolved so the resource URI is optional
-  def this(target: XFormsEventTarget, resourceURI: Option[String], errorType: ErrorType, statusCode: Int) = {
+  def this(target: XFormsEventTarget, resourceURI: Option[String], errorType: ErrorType, statusCode: Int, tunnelProperties: Option[TunnelProperties]) = {
     this(
       target     = target,
       properties = Map(
         "error-type"           -> Some(errorType.entryName),
         "resource-uri"         -> resourceURI,
         "response-status-code" -> Some(statusCode)
-      )
+      ) orElse
+        tunnelProperties.getOrElse(EmptyGetter)
     )
     _errorType = errorType
   }
 
   // 20 callers
-  def this(target: XFormsEventTarget, errorType: ErrorType, cxrOpt: Option[ConnectionResult]) = {
+  def this(target: XFormsEventTarget, errorType: ErrorType, cxrOpt: Option[ConnectionResult], tunnelProperties: Option[TunnelProperties]) = {
     this(
       target     = target,
       properties = Map(
         "error-type" -> Some(errorType.entryName)
-      )
+      ) orElse
+        tunnelProperties.getOrElse(EmptyGetter)
     )
     _errorType = errorType
     _connectionResult = cxrOpt

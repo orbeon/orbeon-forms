@@ -16,20 +16,21 @@ package org.orbeon.xbl
 import cats.syntax.option._
 import org.log4s.Logger
 import org.orbeon.date.JSDateUtils
+import org.orbeon.facades.DatePicker._
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
-import org.orbeon.facades.DatePicker._
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.xforms.Constants.XFormsIosClass
-import org.orbeon.xforms.facade.XBL
 import org.orbeon.xforms._
+import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQuery
+import org.scalajs.jquery.JQueryPromise
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.{Promise, UndefOr, |}
 
 
 object Date {
@@ -50,9 +51,8 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
   val stateEncoder: Encoder[State] = implicitly[Encoder[State]]
   val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
 
-  def inputHtmlEl   : dom.html.Input = containerElem.querySelector("input").asInstanceOf[dom.html.Input]
-  def iOS           : Boolean        = dom.document.body.classList.contains(XFormsIosClass)
-  var datePicker    : DatePicker     = _
+  private def inputHtmlEl   : dom.html.Input = containerElem.querySelector("input").asInstanceOf[dom.html.Input]
+  private var datePicker    : DatePicker     = _
 
   override def init(): Unit = {
 
@@ -62,9 +62,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
     val isReadonly = containerElem.classList.contains("xforms-readonly")
     updateReadonly(isReadonly)
 
-    if (iOS) {
-
-      // On iOS, use native date picker
+    if (isNativePicker) {
       inputHtmlEl.`type` = "date"
       EventSupport.addListener(inputHtmlEl, DomEventNames.Change, (_: dom.raw.Event) => onDateSelectedUpdateStateAndSendValueToServer())
 
@@ -82,8 +80,11 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
     destroyImpl()
   }
 
+  override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise] =
+    updateStateAndSendValueToServer(newValue)
+
   private def destroyImpl(): Unit =
-    if (iOS) {
+    if (isNativePicker) {
       EventSupport.clearAllListeners()
     } else {
       Language.offLangChange(containerElem.id)
@@ -97,7 +98,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
 
     logger.debug(s"updateWithServerValues: `$newValue`, `$newFormat`, `$newExcludedDates`, `$newWeekStart`")
 
-    if (iOS) {
+    if (isNativePicker) {
       if (! (previousStateOpt map (_.value) contains newValue))
         inputHtmlEl.value = newValue
     } else {
@@ -210,6 +211,12 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
 
   private object EventSupport extends EventListenerSupport
 
+  private def isNativePicker: Boolean = {
+    val always  = containerElem.querySelector(":scope > .fr-native-picker-always") != null
+    val iOS     = dom.document.body.classList.contains(XFormsIosClass)
+    always || iOS
+  }
+
   private def enableDatePickerChangeListener(): Unit =
     datePicker.onChangeDate(        ()                     => onDateSelectedUpdateStateAndSendValueToServer())
 
@@ -221,7 +228,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
 
   private def updateReadonly(readonly: Boolean): Unit = {
     inputHtmlEl.readOnly = readonly
-    if (iOS)
+    if (isNativePicker)
       // Also set `disabled` on iOS (see #5376)
       inputHtmlEl.disabled = readonly
   }
@@ -231,7 +238,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
     stateOpt foreach { state =>
 
       val valueFromUIOpt =
-        if (iOS) {
+        if (isNativePicker) {
           Some(getInputFieldValue)
         } else {
           Option(datePicker.getDate) match {
@@ -244,12 +251,15 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
           }
         }
 
-      valueFromUIOpt.foreach { valueFromUI =>
-        updateStateAndSendValueToServerIfNeeded(
-          newState = state.copy(value = valueFromUI),
-          valueFromState = _.value
-        )
-      }
+      valueFromUIOpt.foreach(updateStateAndSendValueToServer)
+    }
+
+  private def updateStateAndSendValueToServer(newValue: String): Unit =
+    stateOpt foreach { state =>
+      updateStateAndSendValueToServerIfNeeded(
+        newState       = state.copy(value = newValue),
+        valueFromState = _.value
+      )
     }
 
   // Force an update of the date picker if we have a valid date, so when users type "1/2", the value
@@ -279,4 +289,3 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
       datePicker.showDatepicker()
     }
 }
-

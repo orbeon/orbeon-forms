@@ -54,6 +54,23 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <currency-right>10.99</currency-right>
                             <number-right>299792458</number-right>
                         </grid-3>
+                        <items-grid>
+                            <items-grid-iteration>
+                                <item-description>Anvil</item-description>
+                                <item-price>4.99</item-price>
+                            </items-grid-iteration>
+                            <items-grid-iteration>
+                                <item-price>0.99</item-price>
+                                <item-description>Aspirin</item-description>
+                            </items-grid-iteration>
+                            <items-grid-iteration>
+                                <item-price>49.99</item-price>
+                                <item-description>Giant Mouse Trap</item-description>
+                            </items-grid-iteration>
+                        </items-grid>
+                        <items-total-grid>
+                            <items-total/>
+                        </items-total-grid>
                     </typed-controls>
                     <date-time-controls>
                         <grid-4>
@@ -243,6 +260,21 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                                  name="currency-right"/>
                         <xf:bind ref="number-right" id="number-right-bind" name="number-right" type="xf:decimal"/>
                     </xf:bind>
+                    <xf:bind id="items-grid-bind" ref="items-grid" name="items-grid">
+                        <xf:bind id="items-grid-iteration-bind" ref="items-grid-iteration"
+                                 name="items-grid-iteration">
+                            <xf:bind id="item-price-bind" ref="item-price" name="item-price" type="xf:decimal"
+                                     constraint="xxf:fraction-digits(2)"/>
+                            <xf:bind id="item-description-bind" ref="item-description" name="item-description"
+                                     xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="items-total-grid-bind" ref="items-total-grid" name="items-total-grid">
+                        <xf:bind id="items-total-bind" ref="items-total" name="items-total" type="xf:decimal"
+                                 constraint="xxf:fraction-digits(2)"
+                                 calculate="sum($item-price[. castable as xs:decimal], 0.0)"
+                                 readonly="false()"/>
+                    </xf:bind>
                 </xf:bind>
                 <xf:bind name="us-address" id="us-address-bind" ref="us-address"/>
                 <xf:bind id="utility-controls-bind" ref="utility-controls" name="utility-controls">
@@ -283,6 +315,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
             <xf:instance xxf:readonly="true" id="fr-form-resources">
                 <resources>
                     <resource xml:lang="en">
+                        <items-total>
+                            <label>Items total</label>
+                            <hint/>
+                        </items-total>
+                        <item-description>
+                            <label>Description</label>
+                            <hint/>
+                        </item-description>
+                        <item-price>
+                            <label>Price</label>
+                            <hint/>
+                        </item-price>
                         <explanatory-text>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
                                   xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;This is an explanatory text:&lt;/strong&gt;&lt;/div&gt;
@@ -681,6 +725,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                         </attachment-controls>
                     </resource>
                     <resource xml:lang="fr">
+                        <items-total>
+                            <label>Prix total</label>
+                            <hint/>
+                        </items-total>
+                        <item-description>
+                            <label>Description</label>
+                            <hint/>
+                        </item-description>
+                        <item-price>
+                            <label>Prix</label>
+                            <hint/>
+                        </item-price>
                         <explanatory-text>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
                                   xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;
@@ -1261,6 +1317,51 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             </fr:number>
                         </fr:c>
                         <fr:c x="9" y="3" w="4"/>
+                    </fr:grid>
+                    <fr:grid id="items-grid-grid" bind="items-grid-bind" repeat="content" min="1"
+                             template="instance('items-grid-template')"
+                             apply-defaults="true"
+                             fb:initial-iterations="first">
+                        <fr:c x="1" y="1" w="9">
+                            <xf:input id="item-description-control" bind="item-description-bind">
+                                <xf:label ref="$form-resources/item-description/label"/>
+                                <xf:hint ref="$form-resources/item-description/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="10" y="1" w="3">
+                            <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                         xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava"
+                                         id="item-price-control"
+                                         bind="item-price-bind"
+                                         field-align="right">
+                                <xf:label ref="$form-resources/item-price/label"/>
+                                <xf:hint ref="$form-resources/item-price/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:currency>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="items-total-grid-grid" bind="items-total-grid-bind">
+                        <fr:c x="1" y="1" w="9"/>
+                        <fr:c x="10" y="1" w="3">
+                            <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                         xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava"
+                                         id="items-total-control"
+                                         bind="items-total-bind"
+                                         field-align="right">
+                                <xf:label ref="$form-resources/items-total/label"/>
+                                <xf:hint ref="$form-resources/items-total/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:currency>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="date-time-controls-section" bind="date-time-controls-bind">

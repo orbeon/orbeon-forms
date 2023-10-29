@@ -44,10 +44,10 @@ val Parboiled1Version             = "1.3.1"
 
 // Shared Scala libraries
 val CatsVersion                   = "2.7.0"
-val ScalaTestVersion              = "3.2.16"
+val ScalaTestVersion              = "3.2.17"
 val CirceVersion                  = "0.14.5"
-val EnumeratumVersion             = "1.7.2"
-val EnumeratumCirceVersion        = "1.7.2"
+val EnumeratumVersion             = "1.7.3"
+val EnumeratumCirceVersion        = "1.7.3"
 val ShapelessVersion              = "2.3.7"
 val ScalaXmlVersion               = "2.0.1"  // see https://github.com/orbeon/orbeon-forms/issues/4927
 val ScalaAsyncVersion             = "0.10.0" // "1.0.0" with `-Xasync` causes issues
@@ -62,7 +62,7 @@ val ScalaCollectionCompatVersion  = "2.11.0"
 // Java libraries
 val SaxonJvmVersion               = "9.1.0.8.3"
 val JUnitInterfaceVersion         = "0.13.3"
-val Slf4jVersion                  = "2.0.6"
+val Slf4jVersion                  = "2.0.9"
 val HttpComponentsVersion         = "4.5.13"
 val Log4j2Version                 = "2.19.0"
 val CommonsIoVersion              = "2.11.0"
@@ -175,7 +175,7 @@ val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version fr
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 
 lazy val scala212 = "2.12.18"
-lazy val scala213 = "2.13.11"
+lazy val scala213 = "2.13.12"
 lazy val supportedScalaVersions = List(scala212, scala213)
 
 // "ThisBuild is a Scope encompassing all projects"

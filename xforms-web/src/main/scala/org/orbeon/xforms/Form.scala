@@ -43,6 +43,8 @@ class Form(
   private var discardableTimerIds: List[SetTimeoutHandle] = Nil
   private var dialogTimerIds: Map[String, Int] = Map.empty
 
+  private var callbacks: Map[String, List[js.Function]] = Map.empty
+
   val namespacedFormId: String = ns + Constants.FormClass
   val transform: (String, String) => String = InitSupport.getResponseTransform(contextAndNamespaceOpt)
 
@@ -53,7 +55,21 @@ class Form(
     eventSupport.clearAllListeners()
     xblInstances.foreach(_.destroy())
     xblInstances.clear()
+    InitSupport.removeNamespacePromise(ns)
   }
+
+  def addCallback(name: String, fn: js.Function): Unit =
+    callbacks += name -> (callbacks.getOrElse(name, Nil) :+ fn)
+
+  def removeCallback(name: String, fn: js.Function): Unit = {
+    callbacks += name -> callbacks.getOrElse(name, Nil).filterNot(_ eq fn)
+
+    if (callbacks.get(name).exists(_.isEmpty))
+      callbacks -= name
+  }
+
+  def getCallbacks(name: String): List[js.Function] =
+    callbacks.getOrElse(name, Nil)
 
   lazy val errorPanel: js.Object =
     ErrorPanel.initializeErrorPanel(elem) getOrElse

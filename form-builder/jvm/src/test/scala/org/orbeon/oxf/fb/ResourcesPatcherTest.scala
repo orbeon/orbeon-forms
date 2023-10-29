@@ -100,6 +100,17 @@ class ResourcesPatcherTest
               </labels>
             </detail>
           </resource>
+          <resource xml:lang="de">
+            <buttons>
+              <acme>OVERRIDE ME</acme>
+              <existing>Vorhanden</existing>
+            </buttons>
+            <detail>
+              <labels>
+                <missing>Vermisst</missing>
+              </labels>
+            </detail>
+          </resource>
         </resources>.toDocument
 
       val initial = newDoc

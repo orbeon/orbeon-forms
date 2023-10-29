@@ -15,39 +15,47 @@ package org.orbeon.scaxon
 
 import org.orbeon.dom.QName
 import org.orbeon.saxon.om._
-import org.orbeon.saxon.tree.iter.{ArrayIterator, EmptyIterator, ListIterator, SingletonIterator}
+import org.orbeon.saxon.tree.iter.{EmptyIterator, ListIterator}
 import org.orbeon.saxon.value._
 import org.orbeon.scaxon.SimplePath.URIQualifiedName
 
-import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 import scala.{collection => coll}
 
+
 object Implicits {
+
+  // 2023-10-12: The following implicit conversions are commented out because they are unused. However, we are leaving
+  // them here for now in case we need them for the move to Saxon 11 on the JVM side. See also:
+  //
+  // - https://github.com/orbeon/orbeon-forms/issues/5107
+  // - https://github.com/orbeon/orbeon-forms/issues/6016
+  //
+  // More of those might be unneeded once the move to Saxon 11 is complete, and all the conversions can be done in
+  // the code that handles the macro annotation.
+
+//  implicit def doubleToDoubleValue                 (v: Double)                   : DoubleValue        = new DoubleValue(v)
+//  implicit def itemToSequenceIterator              (v: Item)                     : SequenceIterator   = SingletonIterator.makeIterator(v)
+//  implicit def stringSeqOptToSequenceIterator      (v: Option[coll.Seq[String]]) : SequenceIterator   = v map stringSeqToSequenceIterator getOrElse EmptyIterator.getInstance
+//  implicit def stringOptToStringValue              (v: Option[String])           : StringValue        = v map stringToStringValue   orNull
+//  implicit def booleanOptToBooleanValue            (v: Option[Boolean])          : BooleanValue       = v map booleanToBooleanValue orNull]
+//  implicit def stringArrayToSequenceIterator       (v: Array[String])            : SequenceIterator   = new ArrayIterator(v map stringToStringValue)
 
   implicit def stringToQName                       (v: String)                   : QName              = QName(v ensuring ! v.contains(':'))
   implicit def tupleToQName                        (v: (String, String))         : QName              = QName(v._2, "", v._1)
   implicit def uriQualifiedNameToQName             (v: URIQualifiedName)         : QName              = QName(v.localName, "", v.uri)
 
   implicit def intToIntegerValue                   (v: Int)                      : IntegerValue       = Int64Value.makeIntegerValue(v)
-  implicit def doubleToDoubleValue                 (v: Double)                   : DoubleValue        = new DoubleValue(v)
   implicit def stringToStringValue                 (v: String)                   : StringValue        = StringValue.makeStringValue(v)
   implicit def booleanToBooleanValue               (v: Boolean)                  : BooleanValue       = BooleanValue.get(v)
 
-  implicit def itemToSequenceIterator              (v: Item)                     : SequenceIterator   = SingletonIterator.makeIterator(v)
-  implicit def stringIteratorToSequenceIterator    (v: coll.Iterator[String])    : SequenceIterator   = v map stringToStringValue
   implicit def stringSeqToSequenceIterator         (v: coll.Seq[String])         : SequenceIterator   = new ListIterator (v map stringToStringValue asJava)
-  implicit def stringArrayToSequenceIterator       (v: Array[String])            : SequenceIterator   = new ArrayIterator(v map stringToStringValue)
   implicit def itemSeqToSequenceIterator[T <: Item](v: coll.Seq[T])              : SequenceIterator   = new ListIterator (v.asJava)
-  implicit def itemSeqOptToSequenceIterator        (v: Option[coll.Seq[Item]])   : SequenceIterator   = v map itemSeqToSequenceIterator   getOrElse EmptyIterator.getInstance
-  implicit def stringSeqOptToSequenceIterator      (v: Option[coll.Seq[String]]) : SequenceIterator   = v map stringSeqToSequenceIterator getOrElse EmptyIterator.getInstance
-
-  implicit def stringOptToStringValue              (v: Option[String])           : StringValue        = v map stringToStringValue   orNull
-  implicit def booleanOptToBooleanValue            (v: Option[Boolean])          : BooleanValue       = v map booleanToBooleanValue orNull
+  implicit def itemSeqOptToSequenceIterator        (v: Option[coll.Seq[Item]])   : SequenceIterator   = v map itemSeqToSequenceIterator getOrElse EmptyIterator.getInstance
 
   implicit def nodeInfoToNodeInfoSeq               (v: NodeInfo)                 : coll.Seq[NodeInfo] = List(v ensuring (v ne null))
 
-  implicit def asSequenceIterator                  (i: coll.Iterator[Item])      : SequenceIterator   = new SequenceIterator {
+  def asSequenceIterator(i: coll.Iterator[Item]): SequenceIterator = new SequenceIterator {
 
     private var currentItem: Item = _
     private var _position = 0
@@ -65,7 +73,7 @@ object Implicits {
     }
   }
 
-  implicit def asScalaIterator(i: SequenceIterator): coll.Iterator[Item] = new coll.Iterator[Item] {
+  def asScalaIterator(i: SequenceIterator): coll.Iterator[Item] = new coll.Iterator[Item] {
 
     private var current = i.next()
 
@@ -77,6 +85,4 @@ object Implicits {
 
     def hasNext: Boolean = current ne null
   }
-
-  def asScalaSeq(i: SequenceIterator): Seq[Item] = asScalaIterator(i).to(List)
 }

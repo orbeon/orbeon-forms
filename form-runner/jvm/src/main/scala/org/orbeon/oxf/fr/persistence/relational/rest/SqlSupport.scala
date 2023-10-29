@@ -82,13 +82,13 @@ object SqlSupport {
     existingRowOpt         : Option[Row], // used to copy username, groupname, organization, created
     delete                 : Boolean,
     versionToSet           : Int,
+    currentTimestamp       : Timestamp,
     currentUserOrganization: => Option[OrganizationId]
   ): List[Col]  = {
 
     val xmlCol = Provider.xmlColUpdate(req.provider)
     val xmlVal = Provider.xmlValUpdate(req.provider)
-    val isFormDefinition = req.forForm && !req.forAttachment
-    val now = new Timestamp(System.currentTimeMillis())
+    val isFormDefinition = req.forForm && ! req.forAttachment
     val organizationToSet = req.forData match {
       case false => None
       case true  => existingRowOpt match {
@@ -120,14 +120,14 @@ object SqlSupport {
         name          = "created",
         value         = DynamicColValue(
           placeholder = "?",
-          paramSetter = param(_.setTimestamp, existingRowOpt.map(_.createdTime).getOrElse(now))
+          paramSetter = param(_.setTimestamp, existingRowOpt.map(_.createdTime).getOrElse(currentTimestamp))
         )
       ),
       Col(
         name          = "last_modified_time",
         value         = DynamicColValue(
           placeholder = "?",
-          paramSetter = param(_.setTimestamp, now)
+          paramSetter = param(_.setTimestamp, currentTimestamp)
         )
       ),
       Col(

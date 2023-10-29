@@ -166,8 +166,7 @@
 <!--                    <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>-->
                 </xf:action>
                 <xf:action event="xforms-submit-error">
-                    <!-- TODO: i18n -->
-                    <xf:message>Error performing search.</xf:message>
+                    <xf:message ref="$fr-resources/errors/search"/>
                 </xf:action>
             </xf:submission>
 

@@ -13,28 +13,26 @@
  */
 package org.orbeon.oxf.fr.persistence.http
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
-import java.net.URI
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
-import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.Version.Unspecified
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.http.HttpMethod._
-import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.test.TestHttpClient
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Connection, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger}
 import org.orbeon.oxf.xml.dom.{Comparator, IOSupport}
 import org.scalatest.Assertions._
 
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import java.net.URI
 import scala.util.Try
 
 private[persistence] object HttpCall {
@@ -46,13 +44,14 @@ private[persistence] object HttpCall {
   case class Binary(file: Array[Byte]) extends Body
 
   case class SolicitedRequest(
-    path        : String,
-    method      : HttpMethod,
-    version     : Version             = Unspecified,
-    stage       : Option[Stage]       = None,
-    body        : Option[Body]        = None,
-    credentials : Option[Credentials] = None,
-    timeout     : Option[Int]         = None
+    path              : String,
+    method            : HttpMethod,
+    version           : Version                      = Unspecified,
+    stage             : Option[Stage]                = None,
+    body              : Option[Body]                 = None,
+    credentials       : Option[Credentials]          = None,
+    timeout           : Option[Int]                  = None,
+    xmlResponseFilter : Option[Document => Document] = None
   )
 
   case class ExpectedResponse(
@@ -103,14 +102,22 @@ private[persistence] object HttpCall {
           IOUtils.copyStreamAndClose(actualResponse.content.inputStream, outputStream)
           outputStream.toByteArray
         }
+
         expectedBody match {
-          case HttpCall.XML(expectedDoc) =>
-            val resultDoc  = IOSupport.readOrbeonDom(new ByteArrayInputStream(actualBody))
+          case HttpCall.XML(originalExpectedDoc) =>
+            val originalResultDoc  = IOSupport.readOrbeonDom(new ByteArrayInputStream(actualBody))
+
+            val (resultDoc, expectedDoc) = actualRequest.xmlResponseFilter match {
+              case None         => (       originalResultDoc,         originalExpectedDoc)
+              case Some(filter) => (filter(originalResultDoc), filter(originalExpectedDoc))
+            }
+
             if (! Comparator.compareDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc))
               assert(
                 resultDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===
                   expectedDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat)
               )
+
           case HttpCall.Binary(expectedFile) =>
             assert(actualBody == expectedFile)
         }
@@ -125,6 +132,7 @@ private[persistence] object HttpCall {
     stage                    : Option[Stage],
     body                     : Option[Body],
     credentials              : Option[Credentials],
+    httpRange                : Option[HttpRange] = None,
     timeout                  : Option[Int] = None)(implicit
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
@@ -137,7 +145,7 @@ private[persistence] object HttpCall {
 
       import Version._
 
-      val timeoutHeader = timeout.map(t => Headers.Timeout -> List(Headers.TimeoutValuePrefix + t.toString))
+      val timeoutHeader  = timeout.map(t => Headers.Timeout -> List(Headers.TimeoutValuePrefix + t.toString))
       val versionHeaders = version match {
         case Unspecified                      => Nil
         case Next                             => List(OrbeonFormDefinitionVersion -> List("next"))
@@ -145,8 +153,9 @@ private[persistence] object HttpCall {
         case ForDocument(documentId, isDraft) => List(OrbeonForDocumentId         -> List(documentId),
                                                       OrbeonForDocumentIsDraft    -> List(isDraft.toString))
       }
-      val stageHeader   = stage.map(_.name).map(StageHeader.HeaderName -> List(_))
-      val headers = (timeoutHeader.toList ++ versionHeaders ++ stageHeader.toList).toMap
+      val stageHeader      = stage.map(_.name).map(StageHeader.HeaderName -> List(_))
+      val httpRangeHeaders = httpRange.map(_.requestHeaders).getOrElse(Map.empty)
+      val headers          = (timeoutHeader.toList ++ versionHeaders ++ stageHeader.toList).toMap ++ httpRangeHeaders
 
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
         url              = URI.create(documentURL),
@@ -230,12 +239,13 @@ private[persistence] object HttpCall {
   def get(
     url                      : String,
     version                  : Version,
-    credentials              : Option[Credentials] = None)(implicit
+    credentials              : Option[Credentials] = None,
+    httpRange                : Option[HttpRange] = None)(implicit
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): (Int, Map[String, List[String]], Try[Array[Byte]]) =
-    useAndClose(request(url, GET, version, None, None, credentials)) { chr =>
+    useAndClose(request(url, GET, version, None, None, credentials, httpRange)) { chr =>
 
       val httpResponse = chr.httpResponse
       val statusCode   = httpResponse.statusCode
@@ -281,7 +291,7 @@ private[persistence] object HttpCall {
       coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
     ): Int = {
       val body = Some(XML(LockInfo.toOrbeonDom(lockInfo)))
-      useAndClose(request(url, method, Version.Unspecified, None, body, None, timeout))(_.httpResponse.statusCode)
+      useAndClose(request(url, method, Version.Unspecified, None, body, None, None, timeout))(_.httpResponse.statusCode)
     }
   }
 }

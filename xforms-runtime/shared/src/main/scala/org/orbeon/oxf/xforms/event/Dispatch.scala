@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, PartEventH
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{PartGlobalOps, XFormsContainingDocument, XFormsContextStack}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContextStack}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
@@ -62,7 +62,12 @@ object Dispatch extends Logging {
       var statHandleEvent = 0
       var statNativeHandlers = 0
 
-      def eventLogging = Seq("name" -> event.name, "target" -> target.getEffectiveId, "location" -> (Option(event.locationData) map (_.toString) orNull))
+      def eventLogging =
+        List(
+          "name"     -> event.name,
+          "target"   -> target.getEffectiveId,
+          "location" -> Option(event.locationData).map(_.toString).orNull
+        )
 
       // Ask the target for the handlers associated with the event name
       val (performDefaultAction, handlers) = {
@@ -113,7 +118,7 @@ object Dispatch extends Logging {
             // All ancestor observers (not filtered by scope) gathered lazily so that if there is nothing
             // to do for capture and bubbling, we don't compute them.
             lazy val ancestorObservers =
-              Iterator.iterate(target.parentEventObserver)(_.parentEventObserver) takeWhile (_ ne null) toList
+              Iterator.iterate(target.parentEventObserver)(_.parentEventObserver).takeWhile(_ ne null).toList
 
             // Capture phase
             handlers.get(Phase.Capture) foreach (doPhase(ancestorObservers.reverse, _, Phase.Capture))
@@ -204,7 +209,7 @@ object Dispatch extends Logging {
     replaceIdSuffix(result.getEffectiveId, newSuffix)
   }
 
-  def handleEvent(
+  private def handleEvent(
     eventHandler   : EventHandler,
     eventObserver  : XFormsEventTarget,
     event          : XFormsEvent)(implicit
@@ -287,13 +292,12 @@ object Dispatch extends Logging {
         }
       } catch {
         case NonFatal(t) =>
-          // Something bad happened while running the action: dispatch error event to the root of the current scope
-          // NOTE: We used to dispatch the event to XFormsContainingDocument, but that is no longer a event
+          // NOTE: We used to dispatch the event to `XFormsContainingDocument`, but that is no longer an event
           // target. We thought about dispatching to the root control of the current scope, BUT in case the action
           // is running within a model before controls are created, that won't be available. SO the answer is to
           // dispatch to what we know exists, and that is the current observer or the target. The observer is
           // "closer" from the action, so we dispatch to that.
-          Dispatch.dispatchEvent(new XXFormsActionErrorEvent(eventObserver, t))
+          Dispatch.dispatchEvent(new XXFormsActionErrorEvent(eventObserver, t, event.tunnelProperties))
       }
     } else {
       debug("skipping non-relevant handler", List(

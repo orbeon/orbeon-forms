@@ -168,12 +168,13 @@
                 xxbl:keep-if-function-unavailable="fr:mode"
                 name="view"
                 value="false()"/>
-            <xf:var
-                name="field-width"
-                value="fr:component-param-value('field-width')"/>
 
-            <xf:group ref="$binding[not($view)]">
-                <xh:div class="input-append date fr-field-width-{$field-width}">
+            <xf:var name="class-field-width"   value="concat('fr-field-width-'  , fr:component-param-value('field-width'))"/>
+            <xf:var name="class-native-picker" value="concat('fr-native-picker-', fr:component-param-value('native-picker'))"/>
+
+            <xf:group class="{$class-field-width} {$class-native-picker}">
+
+                <xf:group ref="$binding[not($view)]" class="input-append date">
                     <!-- Create placeholder from Orbeon Forms input format
                          https://doc.orbeon.com/configuration/properties/xforms#for-xf-input -->
                     <xf:var
@@ -191,15 +192,22 @@
                             return
                                 $translated
                         "/>
-                    <xh:input xh:type="text" placeholder="{$placeholder}" id="input" xxf:control="true" role="textbox"/>
+                    <xh:input
+                        xh:type="text"
+                        placeholder="{$placeholder}"
+                        id="input"
+                        xxf:control="true"
+                        role="textbox"
+                        xbl:attr="autocomplete"/>
                     <xh:span class="add-on" tabindex="0">
                         <xh:i class="fa fa-fw fa-calendar"/>
                     </xh:span>
-                </xh:div>
-            </xf:group>
+                </xf:group>
 
-            <!-- Static readonly mode -->
-            <xf:input ref="$binding[$view]"/>
+                <!-- Static readonly mode -->
+                <xf:input ref="$binding[$view]"/>
+
+            </xf:group>
 
         </xbl:template>
     </xbl:binding>

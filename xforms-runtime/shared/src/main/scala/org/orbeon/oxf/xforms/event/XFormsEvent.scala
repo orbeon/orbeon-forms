@@ -13,17 +13,18 @@
  */
 package org.orbeon.oxf.xforms.event
 
+import cats.syntax.option._
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xml.{SaxonUtils, SaxonUtilsDependsOnXPath}
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
+import org.orbeon.oxf.xml.{SaxonUtils, SaxonUtilsDependsOnXPath}
 import org.orbeon.saxon.om._
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{SimplePropertyValue, XFormsId}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.Phase
+import shapeless.syntax.typeable._
 
-import scala.jdk.CollectionConverters._
 
 /**
  * Base class for all DOM events.
@@ -73,6 +74,12 @@ abstract class XFormsEvent(
   private lazy val allProperties = getters(this, XFormsEvent.Getters) orElse lazyProperties orElse properties
   def lazyProperties: PropertyGetter = EmptyGetter
 
+  def actionProperties: Option[ActionPropertyGetter] =
+    properties.narrowTo[ActionPropertyGetter]
+
+  def tunnelProperties: Option[TunnelProperties] =
+    actionProperties.map(_.tunnelProperties)
+
   // Mutable phase and observer as the event is being dispatched
   private var _currentPhase: Phase = _
   private var _currentObserver: XFormsEventTarget = _
@@ -86,7 +93,7 @@ abstract class XFormsEvent(
   // Return a property of the given type
   // WARNING: Remember that type erasure takes place! Property[T[U1]] will work even if the underlying type was T[U2]!
   //
-  // Return None if:
+  // Return `None` if:
   // - the property is not supported
   // - it is supported but no value is available for it
   final def property[T](name: String): Option[T] =
@@ -142,7 +149,36 @@ object XFormsEvent {
 
   // PropertyGetter is more general than `Map`, but a `Map` is automatically a `PropertyGetter`
   type PropertyGetter = PartialFunction[String, Option[Any]]
-  val EmptyGetter: PropertyGetter = Map()
+  val EmptyGetter: PropertyGetter = Map.empty
+
+  type TunnelProperties = PropertyGetter
+  type SimpleProperties = List[SimplePropertyValue]
+
+  case class PropertyValue(
+    name  : String,
+    value : Option[Any],
+    tunnel: Boolean = false
+  )
+
+  class ActionPropertyGetter(props: List[PropertyValue]) extends PropertyGetter {
+
+    def apply(name: String): Option[Any] = props.find(_.name == name).flatMap(_.value)
+    def isDefinedAt(name: String): Boolean = props.exists(_.name == name)
+
+    def tunnelProperties: TunnelProperties =
+      new ActionPropertyGetter(props.filter(_.tunnel))
+
+    def simpleProperties: SimpleProperties =
+      for {
+        p <- props
+        v <- p.value
+        s <- v match {
+          case s: String => Some(s)
+          case _         => None
+        }
+      } yield
+        SimplePropertyValue(p.name, s, p.tunnel)
+  }
 
   // Can we benefit from Scala 2.10's applyOrElse here?
   def getters[E <: XFormsEvent](e: E, m: Map[String, E => Option[Any]]): PropertyGetter = new PropertyGetter {

@@ -123,6 +123,9 @@ trait FormRunnerBaseOps {
   //@XPathFunction
   val InternalAuthorizedOperationsParam = "fr-internal-authorized-operations"
 
+  //@XPathFunction
+  val InternalWorkflowStageParam = "fr-internal-workflow-stage"
+
   val LiferayLanguageHeader  = "orbeon-liferay-language"
 
   val DefaultIterationSuffix = "-iteration"
@@ -429,10 +432,16 @@ trait FormRunnerBaseOps {
       case None                                       => inScopeContainingDocument.isEmbeddedFromHeaderOrUrlParam
     }
 
+  def isServicePath(path: String): Boolean =
+    path.startsWith("/fr/service/")
+
+  def isServicePath(implicit xfc: XFormsFunction.Context): Boolean =
+    isServicePath(xfc.containingDocument.getRequestPath)
+
   // For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
   // probably, as they also need to send an XML response back.
   def isBackground(implicit xfc: XFormsFunction.Context, p: FormRunnerParams): Boolean =
-    xfc.containingDocument.getRequestPath.startsWith("/fr/service/") && (p.mode == "new" || p.mode == "edit")
+    isServicePath && (p.mode == "new" || p.mode == "edit")
 
   // Display a success message
   // TODO: support `dialog` appearance, for symmetry with `error-message`
@@ -451,7 +460,7 @@ trait FormRunnerBaseOps {
         dispatch(
           name       = "fr-show",
           targetId   = "fr-error-dialog",
-          properties = Map("message" -> Some(message))
+          properties = Map("message" -> Some(message), "message-is-html" -> Some("true"))
         )
       case MessageAppearance.Ephemeral =>
         setvalue(persistenceInstance.rootElement / "message", message)

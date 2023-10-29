@@ -619,12 +619,14 @@ object XFormsStaticStateDeserializer {
               val output =
                 for {
                   isImageMediatype     <- c.getOrElse[Boolean]("isImageMediatype")(false)
+                  isVideoMediatype     <- c.getOrElse[Boolean]("isVideoMediatype")(false)
                   isHtmlMediatype      <- c.getOrElse[Boolean]("isHtmlMediatype")(false)
                   isDownloadAppearance <- c.getOrElse[Boolean]("isDownloadAppearance")(false)
                   staticValue          <- c.getOrElse[Option[String]]("staticValue")(None)
                 } yield
                   new OutputControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
                     isImageMediatype,
+                    isVideoMediatype,
                     isHtmlMediatype,
                     isDownloadAppearance,
                     staticValue
@@ -718,7 +720,7 @@ object XFormsStaticStateDeserializer {
                           isIfNonRelevant,
                           isXBLHandler
                         ) with WithChildrenTrait
-                      } else if (element.getQName == XFORMS_MESSAGE_QNAME)
+                      } else if (element.getQName == XFORMS_MESSAGE_QNAME || element.getQName == XXFORMS_LOG_QNAME)
                         new EventHandler(
                           index,
                           element,
@@ -779,7 +781,7 @@ object XFormsStaticStateDeserializer {
               } else {
                 if (EventHandler.isContainerAction(element.getQName))
                   new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait with WithChildrenTrait
-                else if (element.getQName == XFORMS_MESSAGE_QNAME)
+                else if (element.getQName == XFORMS_MESSAGE_QNAME || element.getQName == XXFORMS_LOG_QNAME)
                   new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait with WithExpressionOrConstantTrait {
                     val expressionOrConstant: Either[String, String] = c.get[Either[String, String]]("expressionOrConstant").getOrElse(throw new NoSuchElementException) // XXX TODO
                   }
@@ -1028,6 +1030,7 @@ object XFormsStaticStateImpl {
       def isServerStateHandling               : Boolean          = staticProperties.isServerStateHandling
       def isXPathAnalysis                     : Boolean          = staticProperties.isXPathAnalysis
       def isCalculateDependencies             : Boolean          = staticProperties.isCalculateDependencies
+      def allowErrorRecoveryOnInit            : Boolean          = staticProperties.allowErrorRecoveryOnInit
       def isInlineResources                   : Boolean          = staticProperties.isInlineResources
       def uploadMaxSize                       : MaximumSize      = staticProperties.uploadMaxSize
       def uploadMaxSizeAggregate              : MaximumSize      = staticProperties.uploadMaxSizeAggregate

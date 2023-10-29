@@ -37,13 +37,13 @@ import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.SequenceExtent
-import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId, XFormsNames}
 
 import java.net.URI
 import java.{util => ju}
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 
@@ -316,7 +316,7 @@ trait XFormsModelVariables {
             modelBinds          = modelBindsOpt.get, // TODO XXX
             contextBindNodeOpt  = XFormsFunction.context.data.asInstanceOf[Option[BindNode]],
             targetStaticBind    = targetStaticBind
-          ) map (new SequenceExtent(_)) getOrElse
+          ) map (itemsIt => new SequenceExtent(itemsIt.toList.asJava)) getOrElse // https://github.com/orbeon/orbeon-forms/issues/6016
             (throw new IllegalStateException)
         case None =>
           // Try top-level model variables

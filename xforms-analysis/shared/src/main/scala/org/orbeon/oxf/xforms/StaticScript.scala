@@ -40,3 +40,8 @@ case class ScriptInvocation(
   observerEffectiveId : String,
   paramValues         : List[String]
 )
+
+case class CallbackInvocation(
+  name  : String,
+  params: List[(String, String)]
+)

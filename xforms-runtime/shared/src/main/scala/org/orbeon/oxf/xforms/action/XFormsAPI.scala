@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import java.util.{List => JList}
-
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.QName
@@ -37,6 +35,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.{Constants, UrlType}
 import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
+import java.util.{List => JList}
 import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
 import scala.util.Try
@@ -263,7 +262,7 @@ object XFormsAPI {
     targetId        : String,
     bubbles         : Boolean                    = true,
     cancelable      : Boolean                    = true,
-    properties      : XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
+    properties      : XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter, // todo: handle tunnel params
     delay           : Option[Int]                = None,
     showProgress    : Boolean                    = true,
     allowDuplicates : Boolean                    = false
@@ -285,7 +284,7 @@ object XFormsAPI {
 
   // xf:send
   // Send the given submission and applies the body with the resulting event if the submission completed
-  def send[T](submissionId: String, properties: PropertyGetter = EmptyGetter)(body: XFormsEvent => T): Option[T] = {
+  private def send[T](submissionId: String, props: List[PropertyValue])(body: XFormsEvent => T): Option[T] = {
     resolveAs[XFormsModelSubmission](submissionId) flatMap { submission =>
 
       var result: Option[Try[T]] = None
@@ -299,7 +298,7 @@ object XFormsAPI {
       SubmitEvents foreach (submission.addListener(_, listener))
 
       // Dispatch and make sure the listeners are removed
-      try Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, properties))
+      try Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, new ActionPropertyGetter(props)))
       finally SubmitEvents foreach (submission.removeListener(_, Some(listener)))
 
       // - If the dispatch completed successfully and the submission started, it *should* have completed with either
@@ -316,8 +315,8 @@ object XFormsAPI {
   class SubmitException(e: XFormsSubmitErrorEvent) extends RuntimeException
 
   // xf:send which throws a SubmitException in case of error
-  def sendThrowOnError(submissionId: String, properties: PropertyGetter = EmptyGetter): Option[XFormsSubmitDoneEvent] =
-    send(submissionId, properties) {
+  def sendThrowOnError(submissionId: String, props: List[PropertyValue] = Nil): Option[XFormsSubmitDoneEvent] =
+    send(submissionId, props) {
       case done:  XFormsSubmitDoneEvent  => done
       case error: XFormsSubmitErrorEvent => throw new SubmitException(error)
     }

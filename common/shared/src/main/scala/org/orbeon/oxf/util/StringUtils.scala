@@ -24,6 +24,10 @@ import scala.util.Try
 @JSExportTopLevel("OrbeonStringUtils")
 object StringUtils {
 
+  object NonAllBlank {
+    def unapply(s: String): Option[String] = s.trimAllToOpt
+  }
+
   // TODO: Move to StringOps.
   def stringOptionToSet(s: Option[String]): Set[String] = s map (_.tokenizeToSet) getOrElse Set.empty[String]
 
@@ -237,6 +241,16 @@ object StringUtils {
         case           a :: tail                                        => recurse(accDone :+ a,                  tail)
       }
       recurse(Nil, s.toList).mkString.toLowerCase
+    }
+
+    def escaped(stringsToEscape: Iterable[String], escapeString: String): String = {
+      @tailrec
+      def escaped(stringsToEscape: List[String], acc: String): String = stringsToEscape match {
+        case Nil          => acc
+        case head :: tail => escaped(tail, acc.replace(head, escapeString + head))
+      }
+
+      escaped(stringsToEscape.toList, s)
     }
   }
 

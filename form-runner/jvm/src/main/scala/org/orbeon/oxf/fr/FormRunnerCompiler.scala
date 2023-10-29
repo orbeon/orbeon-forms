@@ -3,17 +3,15 @@ package org.orbeon.oxf.fr
 import cats.syntax.option._
 import io.circe.generic.auto._
 import io.circe.syntax._
-import org.orbeon.io.{CharsetNames, IOUtils}
-import org.orbeon.oxf.externalcontext.UrlRewriteMode
+import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.fr.FormRunnerPersistence.{DataPath, FormPath}
 import org.orbeon.oxf.fr.Names.{FormInstance, FormResources, MetadataInstance}
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
-import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
+import org.orbeon.oxf.fr.persistence.proxy.Export
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorOutput}
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Submission}
@@ -25,13 +23,14 @@ import org.orbeon.xforms.ManifestEntry
 
 import java.net.URI
 import java.util.zip.{ZipEntry, ZipOutputStream}
-import scala.util.{Failure, Success}
 
 
 class FormRunnerCompiler extends ProcessorImpl {
 
   private val Logger = LoggerFactory.createLogger(classOf[FormRunnerCompiler])
   private implicit val indentedLogger: IndentedLogger = new IndentedLogger(Logger)
+
+  private val FRAppFormResourcesSubmissionPath = "/fr/service/i18n/fr-resources/{$app}/{$form}"
 
   override def createOutput(outputName: String): ProcessorOutput =
     addOutput(
@@ -40,7 +39,6 @@ class FormRunnerCompiler extends ProcessorImpl {
         def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
           implicit val rcv                      = xmlReceiver
-          implicit val ec                       = CoreCrossPlatformSupport.externalContext
           implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
           val params       = readCacheInputAsOrbeonDom(pipelineContext, "instance")
@@ -70,14 +68,13 @@ class FormRunnerCompiler extends ProcessorImpl {
                      instance.cache    &&
                      instance.dependencyURL.isDefined =>
                   instance.dependencyURL
+                case submission: Submission if submission.avtActionOrResource == FRAppFormResourcesSubmissionPath =>
+                  // TODO: Following #5833 we should do a `POST` to retrieve this resource
+                  PathUtils.recombineQuery("/fr/service/i18n/fr-resources/orbeon/offline", usedLangsOpt.map("langs" ->)).some
                 case submission: Submission
                   if submission.avtXxfReadonlyOpt.contains("true") &&
-                     submission.avtXxfCacheOpt.contains("true")    &&
-                     submission.avtMethod.exists(s => HttpMethod.withNameInsensitiveOption(s).contains(HttpMethod.GET)) =>
-
-                  if (submission.avtActionOrResource == "/fr/service/i18n/fr-resources/{$app}/{$form}")
-                    PathUtils.recombineQuery("/fr/service/i18n/fr-resources/orbeon/offline", usedLangsOpt.map("langs" ->)).some
-                  else
+                      submission.avtXxfCacheOpt.contains("true")   &&
+                      submission.avtMethod.exists(s => HttpMethod.withNameInsensitiveOption(s).contains(HttpMethod.GET)) =>
                     submission.avtActionOrResource.some
               }
 
@@ -151,7 +148,7 @@ class FormRunnerCompiler extends ProcessorImpl {
             (formDataAndDatasetInstanceAttachmentManifests ::: cacheableResourcesToIncludeManifests).keepDistinctBy(_.zipPath)
 
           val useZipFormat =
-            ec.getRequest.getFirstParamAsString("format").contains("zip")
+            coreCrossPlatformSupport.externalContext.getRequest.getFirstParamAsString("format").contains("zip")
 
           if (useZipFormat) {
             val chos = new ContentHandlerOutputStream(xmlReceiver, true)
@@ -181,63 +178,21 @@ class FormRunnerCompiler extends ProcessorImpl {
               zos.write(jsonString.getBytes(CharsetNames.Utf8))
             }
 
-            def connect(path: String): ConnectionResult = {
-
-              val resolvedUri =
-                URI.create(
-                  URLRewriterUtils.rewriteServiceURL(
-                    ec.getRequest,
-                    path,
-                    UrlRewriteMode.Absolute
-                  )
-                )
-
-              import FormRunnerPersistence._
-
-              val attachmentVersionOpt =
-                path match {
-                  case FormPath(_, Names.GlobalLibraryAppName, Names.LibraryFormName, _)                => orbeonLibraryVersionOpt
-                  case FormPath(_, _,                          Names.LibraryFormName, _)                => appLibraryVersionOpt
-                  case DataPath(_, AppForm.FormBuilder.app,    AppForm.FormBuilder.form, "data", _, _)  => formVersion.toInt.some
-                  case _                                                                                => None
-                }
-
-              val allHeaders =
-                Connection.buildConnectionHeadersCapitalizedIfNeeded(
-                  url              = resolvedUri,
-                  hasCredentials   = false,
-                  customHeaders    = Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*),
-                  headersToForward = Set.empty,
-                  cookiesToForward = Connection.cookiesToForwardFromProperty,
-                  getHeader        = Connection.getHeaderFromRequest(ec.getRequest)
-                )
-
-              Connection.connectNow(
-                method      = GET,
-                url         = resolvedUri,
-                credentials = None,
-                content     = None,
-                headers     = allHeaders,
-                loadState   = true,
-                saveState   = true,
-                logBody     = false
-              )
-            }
-
             // Write static attachments and other resources
             distinctResources.iterator foreach { manifestEntry =>
-
-              val entryResult =
-                ConnectionResult.tryWithSuccessConnection(connect(manifestEntry.uri), closeOnSuccess = true) { is =>
-                  val entry = new ZipEntry(manifestEntry.zipPath)
-                  zos.putNextEntry(entry)
-                  IOUtils.copyStreamAndClose(is, zos, doCloseOut = false)
-                }
-
-              entryResult match {
-                case Success(_) => debug(s"success retrieving attachment when compiling form `${manifestEntry.uri}`")
-                case Failure(_) => warn (s"failure retrieving attachment when compiling form `${manifestEntry.uri}`")
-              }
+              Export.processAttachment(
+                ctx            = zos,
+                formVersionOpt =
+                  manifestEntry.uri match {
+                    case FormPath(_, Names.GlobalLibraryAppName, Names.LibraryFormName, _)               => orbeonLibraryVersionOpt
+                    case FormPath(_, _,                          Names.LibraryFormName, _)               => appLibraryVersionOpt
+                    case DataPath(_, AppForm.FormBuilder.app,    AppForm.FormBuilder.form, "data", _, _) => formVersion.toInt.some
+                    case _                                                                               => None
+                  },
+                fromPath    = manifestEntry.uri,
+                toPath      = manifestEntry.zipPath,
+                debugAction = "compiling"
+              )
             }
 
             zos.close()

@@ -9,6 +9,7 @@ case class SecondPassParameters(
 
   actionOrResource   : String,
   isAsynchronous     : Boolean,
+  responseMustAwait  : Boolean,
   credentialsOpt     : Option[BasicCredentials],
 
   // Serialization
@@ -109,7 +110,7 @@ object SecondPassParameters {
       val isRequestedAsynchronousMode =
         staticSubmission.avtModeOpt flatMap stringAvtTrimmedOpt contains Asynchronous
 
-      // For now we don't support replace="all"
+      // For now we don't support `replace="all"`
       if (isRequestedAsynchronousMode && p.replaceType == ReplaceType.All)
         throw new XFormsSubmissionException(
           submission  = dynamicSubmission,
@@ -120,10 +121,14 @@ object SecondPassParameters {
       p.replaceType != ReplaceType.All && isRequestedAsynchronousMode
     }
 
+    val responseMustAwait =
+      staticSubmission.avtResponseMustAwaitOpt flatMap booleanAvtOpt getOrElse false
+
     SecondPassParameters(
 
       actionOrResource   = actionOrResource,
       isAsynchronous     = isAsynchronous,
+      responseMustAwait  = responseMustAwait,
       credentialsOpt     = credentialsOpt,
 
       separator          = staticSubmission.avtSeparatorOpt          flatMap stringAvtTrimmedOpt getOrElse DefaultSeparator,

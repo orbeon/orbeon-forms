@@ -65,7 +65,7 @@
         <xbl:template>
             <!-- NOTE: We copy the class so that classes like fr-width-10em apply to the select, but it's not great as
                  the class will also be on the XBL element. -->
-            <xf:select1 appearance="minimal" ref="xxf:binding('fr-us-state-binding')" xbl:attr="appearance class" id="select1">
+            <xf:select1 appearance="minimal" ref="xxf:binding('fr-us-state-binding')" xbl:attr="appearance class autocomplete" id="select1">
                 <xf:item>
                     <xf:label/>
                     <xf:value/>

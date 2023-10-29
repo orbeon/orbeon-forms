@@ -20,6 +20,7 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.orbeon.polyfills.HTMLPolyfills._
 
 import scala.concurrent.Promise
 import scala.scalajs.js
@@ -65,7 +66,6 @@ object TinyMCE {
         // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
         // TinyMCE tried to load `silver/theme.js`, which doesn't exist
         tinyMceConfig.suffix      = ".min"
-        // Don't set `tinyMceConfig.content_css` now that we are using the inline mode
 
         val tinyMceDiv = containerElem.querySelector(".xbl-fr-tinymce-div")
         val tinyMceObject = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, GlobalTinyMce.EditorManager)
@@ -91,7 +91,7 @@ object TinyMCE {
           if ($(tinyMceDiv).is(":visible")) {
             tinyMceObject.render()
           } else {
-            val shortDelay = Page.getFormFromElemOrThrow(containerElem).configuration.internalShortDelay
+            val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
             js.timers.setTimeout(shortDelay)(renderIfVisible())
           }
         }
@@ -107,10 +107,13 @@ object TinyMCE {
     // Send value in MCE to server
     private def clientToServer(): Unit =
       tinyMceObjectOpt foreach { tinyMceObject =>
-        val rawContent = tinyMceObject.getContent()
-        // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
-        val cleanedContent = if (rawContent == "<div>\u00a0</div>") "" else rawContent
-        DocumentAPI.setValue(containerElem, cleanedContent)
+        // https://github.com/orbeon/orbeon-forms/issues/5963
+        if (containerElem.closest("form").isDefined) {
+          val rawContent = tinyMceObject.getContent()
+          // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
+          val cleanedContent = if (rawContent == "<div>\u00a0</div>") "" else rawContent
+          DocumentAPI.setValue(containerElem, cleanedContent)
+        }
       }
 
     // TinyMCE got the focus

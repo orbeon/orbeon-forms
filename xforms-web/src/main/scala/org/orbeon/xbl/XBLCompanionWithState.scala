@@ -16,14 +16,13 @@ package org.orbeon.xbl
 import io.circe.{Decoder, Encoder, parser}
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.xforms.DocumentAPI
 import org.orbeon.xforms.facade.XBLCompanion
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, EventNames}
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQueryPromise
 
 import scala.scalajs.js
-import scala.scalajs.js.|
 import scala.util.{Failure, Success, Try}
+
 
 object XBLCompanionWithState {
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.XBLCompanionWithState")
@@ -73,7 +72,18 @@ abstract class XBLCompanionWithState(containerElem: html.Element) extends XBLCom
       stateOpt = Some(newState)
       val encodedState = encode(newState)
       logger.debug(s"encodedState = `$encodedState`")
-      DocumentAPI.setValue(containerElem, encodedState)
+
+      // We used to call `DocumentAPI.setValue(containerElem, encodedState)`, but that can be simplified to the
+      // following, which is easier to understand.
+      xformsUpdateValue(encodedState)
+
+      AjaxClient.fireEvent(
+        AjaxEvent(
+          eventName  = EventNames.XXFormsValue,
+          targetId   = containerElem.id,
+          properties = Map("value" -> encodedState)
+        )
+      )
     }
 
     mustUpdateStateAndSendValue

@@ -208,6 +208,56 @@
         </xsl:copy>
     </xsl:template>
 
+    <xsl:template match="fr:attachment/xf:hint[exists(@ref) and empty(text())]" mode="within-controls">
+        <xsl:param name="binds-root" tunnel="yes"/>
+        <xsl:copy>
+            <xsl:apply-templates select="@* except (@ref, @fr:automatic)"/>
+            <xsl:variable name="control" select=".."/>
+            <xsl:variable name="bind-id" select="$control/@bind"/>
+            <xsl:variable name="bind"    select="$binds-root//xf:bind[@id = $bind-id]"/>
+            <xsl:variable name="xpaths"  select="$bind/@constraint, $bind/xf:constraint/@value"/>
+
+            <xsl:variable
+                name="automatic-hint-enabled"
+                as="xs:boolean"
+                select="
+                    @fr:automatic = 'true' or
+                    (
+                        not(@fr:automatic = 'false') and
+                        (
+                            $fr-form-metadata/automatic-hints = 'true' or (
+                                not($fr-form-metadata/automatic-hints = 'false') and
+                                p:property(string-join(('oxf.fr.detail.hint.automatic', $app, $form), '.')) = true()
+                            )
+                        )
+                    )"/>
+
+            <!-- XPath for the automatic hint, or empty string if it shouldn't be used  -->
+            <xsl:variable
+                name="automatic-hint-xpath"
+                as="xs:string"
+                select="
+                    if   ($automatic-hint-enabled)
+                    then frf:knownConstraintsToAutomaticHint($xpaths)
+                    else ''"/>
+
+            <!-- Generate `@ref` possibly combining form author provided hint with automatic hint -->
+            <xsl:attribute
+                name="ref"
+                select="
+                    if   (p:non-blank($automatic-hint-xpath))
+                    then
+                        concat(
+                            'string-join((',
+                            $automatic-hint-xpath,
+                            ', ',
+                            @ref,
+                            '), '' '')'
+                        )
+                    else @ref"/>
+        </xsl:copy>
+    </xsl:template>
+
     <xsl:function name="fr:build-template-param-map">
         <xsl:param name="params"                                as="element(*)*"/>
         <xsl:param name="library-name"                          as="xs:string?"/>

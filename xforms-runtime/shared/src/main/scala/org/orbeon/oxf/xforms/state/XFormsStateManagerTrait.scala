@@ -102,12 +102,11 @@ trait XFormsStateManagerTrait extends XFormsStateLifecycle {
     *
     * @return delay in ms, or -1 is not applicable
     */
-  def getHeartbeatDelay(containingDocument: XFormsContainingDocument, externalContext: ExternalContext): Long =
-    if (containingDocument.staticState.isClientStateHandling || ! containingDocument.isSessionHeartbeat) {
+  def getMaxInactiveIntervalMillis(containingDocument: XFormsContainingDocument, externalContext: ExternalContext): Long =
+    if (containingDocument.staticState.isClientStateHandling) {
       -1L
     } else {
-      // 80% of session expiration time, in ms
-      externalContext.getRequest.getSession(ForceSessionCreation).getMaxInactiveInterval * 800
+      externalContext.getRequest.getSession(ForceSessionCreation).getMaxInactiveInterval * 1000
     }
 
   // Ideally we wouldn't want to force session creation, but it's hard to implement the more elaborate expiration

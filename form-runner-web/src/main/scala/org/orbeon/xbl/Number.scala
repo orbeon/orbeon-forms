@@ -21,12 +21,12 @@ import org.orbeon.xforms.facade.XBL
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants}
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQueryEventObject
+import org.scalajs.jquery.{JQueryEventObject, JQueryPromise}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import scala.concurrent.duration._
 import scala.scalajs.js
-import scala.scalajs.js.timers
+import scala.scalajs.js.{Promise, UndefOr, timers, |}
 
 
 object Number {
@@ -84,7 +84,7 @@ object Number {
           if (! isMarkedReadonly) {
             logger.debug(s"reacting to event ${e.`type`}")
 
-            updateStateAndSendValueToServer()
+            updateStateAndSendValueToServer(readValue)
             setInputTypeIfNeeded("text")
 
             // Always update visible value with XForms value:
@@ -118,7 +118,7 @@ object Number {
 
             if (Set(10, 13)(e.which)) {
               e.preventDefault()
-              updateStateAndSendValueToServer()
+              updateStateAndSendValueToServer(readValue)
               AjaxClient.fireEvent(
                 AjaxEvent(
                   eventName = DomEventNames.DOMActivate,
@@ -164,6 +164,9 @@ object Number {
       companion.visibleInputElemOpt foreach (_.focus())
     }
 
+    override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise] =
+      updateStateAndSendValueToServer((_, _) => newValue)
+
     private object Private {
 
       private val hasToLocaleString =
@@ -182,11 +185,11 @@ object Number {
             visibleInputElem.removeAttribute("readonly")
         }
 
-      def updateStateAndSendValueToServer(): Unit =
+      def updateStateAndSendValueToServer(read: (html.Input, Char) => String): Unit =
         visibleInputElemOpt foreach { visibleInputElem =>
           stateOpt foreach { state =>
 
-            val visibleInputElemValue = readValue(visibleInputElem, state.decimalSeparator)
+            val visibleInputElemValue = read(visibleInputElem, state.decimalSeparator)
 
             val stateUpdated =
               updateStateAndSendValueToServerIfNeeded(

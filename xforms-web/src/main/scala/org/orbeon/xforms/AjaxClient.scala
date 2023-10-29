@@ -27,12 +27,11 @@ import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
-
-import scala.concurrent.duration._
-import scala.concurrent.{Future, Promise}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import scala.collection.mutable
+import scala.concurrent.duration._
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -113,14 +112,14 @@ object AjaxClient {
   //
   // Public for `UploaderClient`
   def handleFailure(
-    response     : String Either dom.Document,
-    formId       : String,
-    ignoreErrors : Boolean
+    response        : String Either dom.Document,
+    namespacedFormId: String,
+    ignoreErrors    : Boolean
   ): Boolean = {
 
     object LoginRegexpMatcher {
       def unapply(s: String): Boolean = {
-        val loginRegexp = Page.getForm(formId).configuration.loginPageDetectionRegexp
+        val loginRegexp = Page.getXFormsFormFromNamespacedIdOrThrow(namespacedFormId).configuration.loginPageDetectionRegexp
         loginRegexp.exists(re => new js.RegExp(re).test(s))
       }
     }
@@ -138,48 +137,49 @@ object AjaxClient {
         val title = responseXml.getElementsByTagName("title") map (_.textContent) mkString ""
         val body  = responseXml.getElementsByTagName("body")  map (_.textContent) mkString ""
 
-        showError(title, body, formId, ignoreErrors)
+        showError(title, body, namespacedFormId, ignoreErrors)
 
         true
 
       case Left(LoginRegexpMatcher()) =>
-
-         // It seems we got a login page back, so display dialog and reload form
-        val dialogEl = $(s"#$formId .xforms-login-detected-dialog")
-
-        def getUniqueId(prefix: String): String = {
-          var i = 0
-          var r: String = null
-          do {
-            r = prefix + i
-            i += 1
-          } while (dom.document.getElementById(r) ne null)
-          r
-        }
-
-        // Link dialog with title for ARIA
-        val title = dialogEl.find("h4")
-        if (title.attr("id").isEmpty) {
-            val titleId = getUniqueId("xf-aria-dialog-title-")
-            title.attr("id", titleId)
-            dialogEl.attr("aria-labelledby", titleId)
-        }
-
-        dialogEl.find("button").one("click.xf", ((_: JQueryEventObject) => {
-          // Reloading the page will redirect us to the login page if necessary
-          dom.window.location.href = dom.window.location.href
-        }): js.Function1[JQueryEventObject, js.Any])
-        dialogEl.asInstanceOf[js.Dynamic].modal(new js.Object {
-          val backdrop = "static" // Click on the background doesn't hide dialog
-          val keyboard = false    // Can't use esc to close the dialog
-        })
-
+        showLoginDetectedDialog(namespacedFormId)
         true
-
       case _ =>
         // This will cause a retry for event requests (but not uploads)
         false
     }
+  }
+
+  def showLoginDetectedDialog(formId: String): Unit = {
+    // It seems we got a login page back, so display dialog and reload form
+      val dialogEl = $(s"#$formId .xforms-login-detected-dialog")
+
+      def getUniqueId(prefix: String): String = {
+        var i = 0
+        var r: String = null
+        do {
+          r = prefix + i
+          i += 1
+        } while (dom.document.getElementById(r) ne null)
+        r
+      }
+
+      // Link dialog with title for ARIA
+      val title = dialogEl.find("h4")
+      if (title.attr("id").isEmpty) {
+          val titleId = getUniqueId("xf-aria-dialog-title-")
+          title.attr("id", titleId)
+          dialogEl.attr("aria-labelledby", titleId)
+      }
+
+      dialogEl.find("button").one("click.xf", ((_: JQueryEventObject) => {
+        // Reloading the page will redirect us to the login page if necessary
+        dom.window.location.href = dom.window.location.href
+      }): js.Function1[JQueryEventObject, js.Any])
+      dialogEl.asInstanceOf[js.Dynamic].modal(new js.Object {
+        val backdrop = "static" // Click on the background doesn't hide dialog
+        val keyboard = false    // Can't use esc to close the dialog
+      })
   }
 
   // Create a timer which after the specified delay will fire a server event
@@ -193,7 +193,7 @@ object AjaxClient {
     formId       : String
   ): Unit = {
 
-    val form = Page.getForm(formId)
+    val form = Page.getXFormsFormFromNamespacedIdOrThrow(formId)
 
     val timerId = timers.setTimeout(delay) {
       fireEvent(
@@ -222,7 +222,7 @@ object AjaxClient {
         AjaxEvent(
           eventName = EventNames.XXFormsPoll,
           targetId  = Constants.DocumentId,
-          form      = Page.getForm(formId).elem.some
+          form      = Page.getXFormsFormFromNamespacedIdOrThrow(formId).elem.some
         )
       )
     }
@@ -284,20 +284,24 @@ object AjaxClient {
         val details: String = detailsString
       }
     )
-    if (! ignoreErrors && Page.getForm(formId).configuration.showErrorDialog)
-      ErrorPanel.showError(Page.getForm(formId), detailsString)
+    if (! ignoreErrors && Page.getXFormsFormFromNamespacedIdOrThrow(formId).configuration.showErrorDialog)
+      ErrorPanel.showError(Page.getXFormsFormFromNamespacedIdOrThrow(formId), detailsString)
   }
+
+  def pause(): Unit         = EventQueue.pause()
+  def unpause(): Unit       = EventQueue.unpause()
+
+  def newestEventTime: Long = EventQueue.newestEventTime
 
   // Sending a heartbeat event if no event has been sent to server in the last time interval
   // determined by the `session-heartbeat-delay` property.
-  def sendHeartBeatIfNeeded(heartBeatDelay: Long): Unit =
-    if ((System.currentTimeMillis() - EventQueue.newestEventTime) >= heartBeatDelay)
-      AjaxClient.fireEvent(
-        AjaxEvent(
-          eventName = EventNames.XXFormsSessionHeartbeat,
-          form      = Support.getFirstForm
-        )
+  def sendHeartBeat(): Unit =
+    AjaxClient.fireEvent(
+      AjaxEvent(
+        eventName = EventNames.XXFormsSessionHeartbeat,
+        form      = Support.allFormElems.headOption.getOrElse(throw new IllegalStateException("no form found"))
       )
+    )
 
   private object EventQueue extends AjaxEventQueue[AjaxEvent] {
 
@@ -307,12 +311,29 @@ object AjaxClient {
           processEvents(currentForm, eventsForCurrentForm.reverse)
       }
 
-    def canSendEvents: Boolean = ! EventQueue.ajaxRequestInProgress
+    def canSendEvents: Boolean = ! ajaxRequestInProgress && ! paused
 
     var shortDelay       : FiniteDuration = _
     var incrementalDelay : FiniteDuration = _
 
     var ajaxRequestInProgress: Boolean = false // actual Ajax request has started and not yet successfully completed including response processing
+
+    private var paused                     : Boolean = false
+    private var newestEventTimeBeforePause : Long    = 0L
+
+    override def newestEventTime: Long = if (paused) newestEventTimeBeforePause else super.newestEventTime
+
+    def pause(): Unit = {
+      if (! paused) {
+        newestEventTimeBeforePause = EventQueue.newestEventTime
+        paused = true
+      }
+    }
+
+    def unpause(): Unit = {
+      paused = false
+      EventQueue.updateQueueSchedule()
+    }
   }
 
   private object Private {
@@ -343,7 +364,7 @@ object AjaxClient {
       result.future
     }
 
-    def handleResponse(
+    private def handleResponse(
       responseXML        : dom.Document,
       currentForm        : xforms.Form,
       requestSequenceOpt : Option[Int],
@@ -458,7 +479,7 @@ object AjaxClient {
 
       val eventsAsList  = events.toList
       val currentFormId = currentHtmlForm.id
-      val currentForm   = Page.getForm(currentFormId)
+      val currentForm   = Page.getXFormsFormFromNamespacedIdOrThrow(currentFormId)
 
       currentForm.ajaxFieldChangeTracker.beforeRequestSent(eventsAsList)
 

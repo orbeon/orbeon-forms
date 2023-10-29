@@ -1,10 +1,10 @@
 package org.orbeon.dom
 
+import org.orbeon.dom.tree.AbstractNode
+
 import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
-import java.{util => ju}
 
-import org.orbeon.dom.tree.AbstractNode
 
 object Namespace {
 
@@ -21,40 +21,30 @@ object Namespace {
     require(prefix ne null)
     require(uri ne null)
 
-    val uriCache = getURICache(uri)
-    var ref = uriCache.get(prefix)
-    var answer: Namespace = null
-    if (ref ne null) {
-      answer = ref.get
-    }
-    if (answer eq null) {
-      uriCache.synchronized {
-        ref = uriCache.get(prefix)
-        if (ref ne null) {
-          answer = ref.get
-        }
-        if (answer eq null) {
-          answer = new Namespace(prefix, uri) {}
-          uriCache.put(prefix, new WeakReference[Namespace](answer))
-        }
-      }
-    }
-    answer
-  }
+    val uriCache =
+      cache.computeIfAbsent(
+        uri,
+        _ => new ConcurrentHashMap[String, WeakReference[Namespace]]()
+      )
 
-  // Return the cache for the given namespace URI. If one does not currently exist it is created.
-  private def getURICache(uri: String): ju.Map[String, WeakReference[Namespace]] = {
-    var answer = cache.get(uri)
-    if (answer eq null) {
-      cache.synchronized {
-        answer = cache.get(uri)
-        if (answer eq null) {
-          answer = new ConcurrentHashMap[String, WeakReference[Namespace]]()
-          cache.put(uri, answer)
-        }
-      }
+    val namespaceRef =
+      uriCache.computeIfAbsent(
+        prefix,
+        _ => new WeakReference[Namespace](new Namespace(prefix, uri) {})
+      )
+
+    val namespaceOrNull = namespaceRef.get
+    if (namespaceOrNull ne null) {
+      namespaceOrNull
+    } else {
+      // Weak reference was cleared so we need to create a new instance and mapping
+      val newNamespace = new Namespace(prefix, uri) {}
+      uriCache.put(
+        prefix,
+        new WeakReference[Namespace](newNamespace)
+      )
+      newNamespace
     }
-    answer
   }
 }
 

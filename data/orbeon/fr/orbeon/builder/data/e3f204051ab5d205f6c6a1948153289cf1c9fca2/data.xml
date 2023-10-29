@@ -566,7 +566,6 @@
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
                                     <fr:summary-show/>
-                                    <fr:summary-search/>
                                 </fr:index>
                             </xf:input>
                         </fr:c>
@@ -577,7 +576,6 @@
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
                                     <fr:summary-show/>
-                                    <fr:summary-search/>
                                 </fr:index>
                             </xf:input>
                         </fr:c>
@@ -597,7 +595,6 @@
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
                                     <fr:summary-show/>
-                                    <fr:summary-search/>
                                 </fr:index>
                             </xf:input>
                         </fr:c>
@@ -609,7 +606,6 @@
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
                                     <fr:summary-show/>
-                                    <fr:summary-search/>
                                 </fr:index>
                             </fr:date>
                         </fr:c>

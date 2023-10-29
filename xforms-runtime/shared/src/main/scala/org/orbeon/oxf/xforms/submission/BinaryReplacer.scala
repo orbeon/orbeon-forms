@@ -13,36 +13,36 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import java.net.URI
-
 import org.orbeon.io.FileUtils
 import org.orbeon.oxf.util.ConnectionResult
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.hmacURL
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
-// Handle replace="xxf:binary"
-class BinaryReplacer(
-  submission         : XFormsModelSubmission,
-  containingDocument : XFormsContainingDocument
-) extends Replacer {
+import java.net.URI
 
-  private var contentUrlOpt: Option[URI] = None
+
+// Handle `replace="xxf:binary"`
+object BinaryReplacer extends Replacer {
+
+  type DeserializeType = Option[URI]
 
   def deserialize(
-    cxr: ConnectionResult,
-    p  : SubmissionParameters,
-    p2 : SecondPassParameters
-  ): Unit =
-    contentUrlOpt = XFormsCrossPlatformSupport.inputStreamToSessionUri(
+    submission: XFormsModelSubmission,
+    cxr       : ConnectionResult,
+    p         : SubmissionParameters,
+    p2        : SecondPassParameters
+  ): Option[URI] =
+    XFormsCrossPlatformSupport.inputStreamToSessionUri(
       cxr.content.inputStream)(
       submission.getDetailsLogger(p, p2)
     )
 
   def replace(
-    cxr: ConnectionResult,
-    p  : SubmissionParameters,
-    p2 : SecondPassParameters
+    submission: XFormsModelSubmission,
+    cxr       : ConnectionResult,
+    p         : SubmissionParameters,
+    p2        : SecondPassParameters,
+    value     : DeserializeType
   ): ReplaceResult = {
 
     def filenameFromValue  : Option[String] = None // MAYBE: `xxf:filenamevalue`
@@ -54,7 +54,7 @@ class BinaryReplacer(
     val filenameOpt  = filenameFromValue  orElse filenameFromHeader
     val mediatypeOpt = mediatypeFromValue orElse mediatypeFromHeader
 
-    contentUrlOpt foreach { contentUrl =>
+    value foreach { contentUrl =>
 
       val sizeFromContentOpt = FileUtils.findFileUriPath(contentUrl) map XFormsCrossPlatformSupport.tempFileSize
 
@@ -62,7 +62,7 @@ class BinaryReplacer(
 
       TextReplacer.replaceText(
         submission         = submission,
-        containingDocument = containingDocument,
+        containingDocument = submission.containingDocument,
         connectionResult   = cxr,
         p                  = p,
         value              = macValue
@@ -73,6 +73,6 @@ class BinaryReplacer(
     // MAYBE `xxf:mediatyperef` (also with other replacers!)
     // MAYBE `xxf:sizeref`      (also with other replacers!)
 
-    ReplaceResult.SendDone(cxr)
+    ReplaceResult.SendDone(cxr, p.tunnelProperties)
   }
 }

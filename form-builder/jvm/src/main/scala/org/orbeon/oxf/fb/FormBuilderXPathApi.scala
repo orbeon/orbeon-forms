@@ -21,7 +21,7 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr
-import org.orbeon.oxf.fr.FormRunner.{findControlByName, formRunnerProperty}
+import org.orbeon.oxf.fr.FormRunner.{allLangs, findControlByName, formRunnerProperty}
 import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames.{FRServiceCallTest, XFSendTest}
@@ -217,32 +217,29 @@ object FormBuilderXPathApi {
   def setControlLHHAMediatype(controlName: String, lhha: String, isHTML: Boolean): Unit =
     FormBuilder.setControlLhhatMediatype(controlName, lhha, isHTML)(FormBuilderDocContext())
 
-  //@XPathFunction
-  def setControlLabelHintHelpOrText(
-    controlName : String,
-    lhht        : String,
-    value       : String,
-    params      : Array[NodeInfo],
-    isHTML      : Boolean
-  ): Unit = {
-
-    implicit val ctx = FormBuilderDocContext()
+  // Do the pre/post insertions/deletions needed for optional LHHT elements
+  private def settingControlLabelHintHelpOrText[T](
+    controlName: String,
+    lhht: String)(
+    controlSetter: FormBuilderDocContext => T
+  ): T = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
     val isOptionalLHHAT =
       lhht == LHHA.Help.entryName ||
-      lhht == fr.XMLNames.FRShortLabelQName.localName ||
-      lhht == fr.XMLNames.FRIterationLabelQName.localName ||
-      lhht == fr.XMLNames.FRAddIterationLabelQName.localName
+        lhht == fr.XMLNames.FRShortLabelQName.localName ||
+        lhht == fr.XMLNames.FRIterationLabelQName.localName ||
+        lhht == fr.XMLNames.FRAddIterationLabelQName.localName
 
     // Make sure an optional element is present while we set content or attributes
-    if (isOptionalLHHAT)
+    if (isOptionalLHHAT) {
       FormBuilder.ensureCleanLHHAElements(controlName, lhht, count = 1, replace = true)
+    }
 
-    FormBuilder.setControlLabelHintHelpOrText(controlName, lhht, value, Some(params), isHTML)
+    val t = controlSetter(ctx)
 
     // If an optional element turns out to be empty, then remove it
     if (isOptionalLHHAT) {
-
       val (doDelete, holders) =
         holdersToRemoveIfHasBlankOrMissingLHHAForAllLangs(controlName, FormBuilder.getControlLhhat(controlName, lhht).toList, lhht)
 
@@ -251,6 +248,43 @@ object FormBuilderXPathApi {
         delete(findControlByName(controlName).toList child controlLHHATQName(lhht))
       }
     }
+
+    t
+  }
+
+  //@XPathFunction
+  def setControlLabelHintHelpOrText(
+    controlName : String,
+    lhht        : String,
+    value       : String,
+    params      : Array[NodeInfo],
+    isHTML      : Boolean
+  ): Unit = settingControlLabelHintHelpOrText(controlName, lhht) { implicit ctx: FormBuilderDocContext =>
+
+    FormBuilder.setControlLabelHintHelpOrText(controlName, lhht, value, Some(params), isHTML)
+  }
+
+  //@XPathFunction
+  def setControlLabelHintHelpOrTextForAllLangs(
+    controlName : String,
+    lhht        : String,
+    values      : Array[NodeInfo],
+    params      : Array[NodeInfo],
+    isHTML      : Boolean,
+    automatic   : String
+  ): Unit = settingControlLabelHintHelpOrText(controlName, lhht) { implicit ctx: FormBuilderDocContext =>
+
+    val langValues = values.map { nodeInfo =>
+      val lang = nodeInfo.attValue("lang")
+      val value = nodeInfo.getStringValue
+      lang -> Seq(value)
+    }
+
+    FormBuilder.setControlResourcesWithLang(controlName, lhht, langValues)
+    setControlLHHATParams(controlName, lhht, params)
+    val lhhaElems = getControlLhhat(controlName, lhht)
+    setHTMLMediatype(lhhaElems, isHTML)
+    setAutomatic(lhhaElems, automatic.toBooleanOption)
   }
 
   // Set the control's items for all languages
@@ -392,9 +426,9 @@ object FormBuilderXPathApi {
     FormBuilder.getNormalizedMax(doc, gridName)(new InDocFormRunnerDocContext(doc)).orNull
 
   //@XPathFunction
-  def getAllNamesInUse: SequenceIterator = {
+  def getAllNamesInUseAsString: String = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.getAllNamesInUse.iterator map stringToStringValue
+    FormBuilder.getAllNamesInUse.mkString(" ")
   }
 
   //@XPathFunction
@@ -431,10 +465,9 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    AlertDetails.fromForm(controlName)(FormBuilderDocContext())             find
-      (_.default)                                                           getOrElse
-      AlertDetails(None, List(FormBuilder.currentLang -> ""), global = true) toXML
-      FormBuilder.currentLang
+    AlertDetails.fromForm(controlName)(FormBuilderDocContext())              find
+      (_.default)                                                            getOrElse
+      AlertDetails(None, Nil, global = true) toXML
   }
 
   // Return all validations as XML for the given control
@@ -447,12 +480,38 @@ object FormBuilderXPathApi {
     FormBuilder.getControlResourceOrEmpty(controlName, lhh)(FormBuilderDocContext())
 
   //@XPathFunction
+  def getControlLhhValuesForAllLangs(controlName: String, lhh: String): Iterable[NodeInfo] = {
+
+    val langs = allLangs(resourcesRoot)
+
+    val valuesForExistingLangs = for {
+      (lang, nodeInfos) <- FormBuilder.getControlResourcesWithLang(controlName, lhh, langs)(FormBuilderDocContext())
+      nodeInfo <- nodeInfos.headOption
+    } yield lang -> nodeInfo.getStringValue
+
+    val existingLangs = valuesForExistingLangs.map(_._1).toSet
+
+    val valuesForMissingLangs = langs.filterNot(existingLangs).map(lang => lang -> "")
+
+    for {
+      (lang, value) <- valuesForExistingLangs ++ valuesForMissingLangs
+    } yield NodeConversions.elemToNodeInfo(<value lang={ lang }>{ value }</value>)
+  }
+
+  //@XPathFunction
   def getControlLhhtParams(controlName: String, lhh: String): Iterable[NodeInfo] =
     lhhatChildrenParams(FormBuilder.getControlLhhat(controlName, lhh)(FormBuilderDocContext()))
 
   //@XPathFunction
   def isControlLhhatHtmlMediatype(controlName: String, lhha: String): Boolean =
     FormBuilder.isControlLhhatHtmlMediatype(controlName, lhha)(FormBuilderDocContext())
+
+  //@XPathFunction
+  def controlLhhatAutomatic(controlName: String, lhha: String): String =
+    FormBuilder.isControlLhhatAutomatic(controlName, lhha)(FormBuilderDocContext()) match {
+      case Some(value) => value.toString
+      case None        => "default"
+    }
 
   //@XPathFunction
   def findNextControlId(controlName: String, previousOrNext: String): Option[String] = {
@@ -645,7 +704,7 @@ object FormBuilderXPathApi {
     lang              : String,
     resourcesRootElem : NodeInfo
   ): SequenceIterator =
-    FormBuilder.iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
+    FormBuilder.iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem).toList // https://github.com/orbeon/orbeon-forms/issues/6016
 
    // Return all classes that need to be added to an editable grid
   // TODO: Consider whether the client can test for grid deletion directly so we don't have to place CSS classes.
@@ -936,12 +995,12 @@ object FormBuilderXPathApi {
     FormBuilder.findGridColumnMigrationType(gridElem, from, to).isDefined
 
   //@XPathFunction
-  def findUnresolvedVariableReferences(
+  def hasUnresolvedVariableReferences(
     elemOrAtt   : NodeInfo,
     avt         : Boolean,
     originalName: String,
     newName     : String
-  ): SequenceIterator =
+  ): Boolean =
     if (elemOrAtt.stringValue.trimAllToOpt.nonEmpty)
       Try(
         FormRunnerRename.findUnresolvedVariableReferences(
@@ -950,16 +1009,21 @@ object FormBuilderXPathApi {
           validBindNames = (
             FormBuilder.iterateNamesInUseCtx(FormBuilderDocContext())
               .filterNot(_ == originalName)
-                ++ Iterator(newName)
+              ++
+              Iterator(
+                newName,
+                "form-resources" // https://github.com/orbeon/orbeon-forms/issues/5909
+              )
           ).toSet
         )
       ) match {
-        case Success(it) => it
-        case Failure(_)  => EmptyIterator.getInstance // The user expression can be incorrect in the UI. We ignore it
-                                                      // here and UI validation should inform the user.
+        case Success(it) if it.nonEmpty => true
+        case Success(_)                 => false
+        case Failure(_)                 => false // The user expression can be incorrect in the UI. We ignore it
+                                                 // here and UI validation should inform the user.
       }
     else
-      EmptyIterator.getInstance
+      false
 
   //@XPathFunction
   def renameControlReferences(

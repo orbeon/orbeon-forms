@@ -27,7 +27,7 @@
             <comment/>
         </detail-section-iteration>
     </detail-section>
-    <section-1 fr:section-status="">
-        <control-1/>
-    </section-1>
+    <confirmation fr:section-status="">
+        <confirmation-message/>
+    </confirmation>
 </form>

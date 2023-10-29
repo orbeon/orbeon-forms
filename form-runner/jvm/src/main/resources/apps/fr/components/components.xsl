@@ -47,10 +47,16 @@
         name="is-readonly-mode"
         select="$mode = ('view', 'pdf', 'tiff', 'test-pdf', 'email', 'controls')" as="xs:boolean"/>
 
+    <!-- Same logic as `fr:is-service-path()` -->
+    <xsl:variable
+        name="is-service-path"
+        select="starts-with(doc('input:request')/*/request-path, '/fr/service/')"
+        as="xs:boolean"/>
+
     <!-- Same logic as in `fr:is-background()` -->
     <xsl:variable
         name="is-background"
-        select="starts-with(doc('input:request')/*/request-path, '/fr/service/') and $mode = ('new', 'edit', 'export')"
+        select="$is-service-path and $mode = ('new', 'edit', 'export')"
         as="xs:boolean"/>
 
     <!-- Either the model with id fr-form-model, or the first model -->
@@ -69,13 +75,31 @@
 
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
 
+    <!-- Actions -->
+    <xsl:variable
+        name="actions-async"
+        as="xs:boolean"
+        select="
+            $fr-form-metadata/actions/async = 'true' or (
+                not($fr-form-metadata/actions/async = 'false') and
+                p:property(string-join(('oxf.fr.detail.actions.async', $app, $form), '.')) = true()
+            )"/>
+    <xsl:variable
+        name="actions-response-must-await"
+        as="xs:boolean"
+        select="
+            $fr-form-metadata/actions/response-must-await = 'true' or (
+                not($fr-form-metadata/actions/response-must-await = 'false') and
+                p:property(string-join(('oxf.fr.detail.actions.response-must-await', $app, $form), '.')) = true()
+            )"/>
+
     <!-- MIP filtering -->
     <xsl:variable
         name="disable-relevant-param-opt"
         as="xs:boolean?"
         select="
             doc('input:request')/*/parameters/parameter[
-                name  = 'disable-relevant' and
+                name  = ('disable-relevant', 'fr-disable-relevant') and
                 value = ('true', 'false')
             ]/value/xs:boolean(.)"/>
 
@@ -84,7 +108,7 @@
         as="xs:boolean?"
         select="
             doc('input:request')/*/parameters/parameter[
-                name  = 'disable-default' and
+                name  = ('disable-default', 'fr-disable-default') and
                 value = ('true', 'false')
             ]/value/xs:boolean(.)"/>
 
@@ -99,12 +123,12 @@
 
     <xsl:variable
         name="disable-relevant"
-        select="($is-background or $mode = 'test-pdf') and $disable-relevant-param-opt"
+        select="($is-service-path or $mode = 'test-pdf') and $disable-relevant-param-opt"
         as="xs:boolean"/>
 
     <xsl:variable
         name="disable-default"
-        select="($is-background or $mode = 'test-pdf') and $disable-default-param-opt"
+        select="($is-service-path or $mode = 'test-pdf') and $disable-default-param-opt"
         as="xs:boolean"/>
 
     <xsl:variable
@@ -112,7 +136,7 @@
         as="xs:boolean?"
         select="
             doc('input:request')/*/parameters/parameter[
-                name  = ('disable-calculations', 'disable-calculate') and
+                name  = ('disable-calculations', 'disable-calculate', 'fr-disable-calculate') and
                 value = ('true', 'false')
             ]/value/xs:boolean(.)"/>
 
@@ -120,7 +144,7 @@
         name="disable-calculate"
         select="
             (: The parameter takes precedence :)
-            if (($is-background or $mode = 'test-pdf') and exists($disable-calculate-param-opt)) then
+            if (($is-service-path or $mode = 'test-pdf') and exists($disable-calculate-param-opt)) then
                 $disable-calculate-param-opt
             else
                 $is-readonly-mode and
@@ -134,8 +158,70 @@
         select="version:versionStringIfAllowedOrEmpty()"
         xmlns:version="java:org.orbeon.oxf.common.Version"/>
 
-    <xsl:variable name="min-toc"              select="(p:property(string-join(('oxf.fr.detail.toc', $app, $form), '.')), -1)[1]"                       as="xs:integer"/>
-    <xsl:variable name="has-toc"              select="$min-toc ge 0"                                                                                   as="xs:boolean"/>
+    <!-- TOC properties -->
+    <xsl:variable
+        name="toc-min-sections"
+        as="xs:integer"
+        select="
+            (
+                $fr-form-metadata/xbl/fr:toc/@min-sections[p:non-blank()],
+                (: Use `-2` as internal magic value to indicate that the property is not set :)
+                p:property(string-join(('oxf.fr.detail.toc',              $app, $form), '.'))[. != -2],
+                p:property(string-join(('oxf.fr.detail.toc.min-sections', $app, $form), '.'))[. != -2],
+                -1
+            )[1]"/>
+
+    <xsl:variable
+        name="toc-position-raw-opt"
+        as="xs:string?"
+        select="
+            (
+                $fr-form-metadata/xbl/fr:toc/@position[p:non-blank()],
+                p:property(string-join(('oxf.fr.detail.toc.position', $app, $form), '.'))[p:non-blank()],
+                'top'
+            )[1][
+                . = ('top', 'left') (: `none` is allowed to be explicit and is the same as blank :)
+            ]"/>
+
+    <xsl:variable
+        name="toc-position-opt"
+        as="xs:string?"
+        select="
+            (: Normalize TOC position for PDF :)
+            if (exists($toc-position-raw-opt) and $mode = ('pdf', 'tiff', 'test-pdf')) then
+                'top'
+            else
+                $toc-position-raw-opt"/>
+
+    <xsl:variable
+        name="toc-modes"
+        as="xs:string*"
+        select="
+            p:split(
+                (
+                    $fr-form-metadata/xbl/fr:toc/@modes[p:non-blank()],
+                    p:property(string-join(('oxf.fr.detail.toc.modes', $app, $form), '.'))[p:non-blank()],
+                    'new edit'
+                )[1]
+            )[
+                . = ('new', 'edit', 'view', 'pdf', 'tiff')
+            ]"/>
+
+    <xsl:variable
+        name="has-toc"
+        as="xs:boolean"
+        select="
+            not($is-form-builder)     and                 (: Form Builder never has a TOC               :)
+            not(
+                $use-view-appearance and
+                $view-appearance = 'wizard'
+            )                         and                 (: Wizard view never has a separate TOC       :)
+            $toc-min-sections ge 0    and                 (: negative value disables the TOC            :)
+            exists($toc-position-opt) and                 (: missing position disables the TOC          :)
+            $mode = $toc-modes        and                 (: mode must match                            :)
+            count($body//fr:section) ge $toc-min-sections (: meet constraint on number of form sections :)
+        "/>
+
     <xsl:variable name="error-summary"        select="p:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))"                      as="xs:string?"/>
     <xsl:variable name="default-logo-uri"     select="p:trim(p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.')))[p:non-blank()]"   as="xs:string?"/>
     <xsl:variable name="hide-logo"            select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))"                          as="xs:boolean?"/>
@@ -507,8 +593,7 @@
         name="allow-revision-history"
         as="xs:boolean"
         select="
-            not($is-readonly-mode) and
-            $is-detail             and
+            $is-detail and
             p:property(string-join(('oxf.fr.navbar.revision-history.enable', $app, $form), '.'))"/>
 
     <xsl:template match="/xh:html">
@@ -612,11 +697,7 @@
                 return
                     if (
                         $mode = 'view' or (
-                            $mode = ('pdf', 'test-pdf', 'email') and (
-                                (: TODO: Consider `fr:use-pdf-template()` function :)
-                                xxf:get-request-parameter('fr-use-pdf-template') = 'false' or
-                                not(xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '')
-                            )
+                            $mode = ('pdf', 'test-pdf', 'email') and not(fr:use-pdf-template())
                         )
                     ) then
                         'static'
@@ -627,9 +708,7 @@
                 for $mode in fr:mode()
                 return not(
                     $mode = ('pdf', 'test-pdf', 'email') and
-                    (: TODO: Consider `fr:use-pdf-template()` function :)
-                    xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '' and
-                    not(xxf:get-request-parameter('fr-use-pdf-template') = 'false')
+                    fr:use-pdf-template()
                 )
             }}"
             xxf:order="{{
@@ -655,11 +734,17 @@
             xxf:no-updates="{{
                 (:
                     This covers at least: 'email', 'pdf', 'test-pdf', 'tiff', 'controls', 'validate', 'import',
-                    'schema', 'duplicate', 'attachments', 'publish', but also 'new' and 'edit' when
-                    used in background mode, see https://github.com/orbeon/orbeon-forms/issues/3318.
-                    The idea is that all services are non-interactive.
+                    'schema', 'duplicate', 'attachments', 'publish', but also 'new' and 'edit' when used in background
+                    mode, see https://github.com/orbeon/orbeon-forms/issues/3318, as well as exports.
+                    The idea is that all services and exports are non-interactive.
                 :)
-                starts-with(xxf:get-request-path(), '/fr/service/')
+                fr:is-service-path() or
+                fr:mode() = ('pdf', 'tiff') or (: 'tiff' shouldn't be needed due to mode normalization :)
+                (: TODO: logic duplicated with `is-export` in `persistence-model.xml` :)
+                matches(
+                    xxf:get-request-path(),
+                    '^/fr/(service/)?([^/]+)/([^/]+)/(excel-export|export)(/([^/]+))?$'
+                )
             }}"
             xxf:external-events="{
                 string-join(
@@ -691,28 +776,17 @@
             xxf:static-readonly-hint="{
                 if ($mode = 'test-pdf') then
                     '{
-                        let $use-pdf-template :=
-                            (
-                                (: TODO: Consider `fr:use-pdf-template()` function :)
-                                xxf:instance(''fr-form-attachments'')/pdf/xxf:trim() != '''' and
-                                not(xxf:get-request-parameter(''fr-use-pdf-template'') = ''false'')
-                            )
+                        let $use-pdf-template := fr:use-pdf-template()
                         return
                             if ($use-pdf-template) then
                                 false()
                             else
-                                xxf:get-request-parameter(''fr-pdf-show-hints'') = ''true''
+                                (fr:is-service-path() or xxf:get-request-method() = ''POST'') and xxf:get-request-parameter(''fr-pdf-show-hints'') = ''true''
                     }'
                 else
                     '{
                         let $mode := fr:mode(),
-                            $use-pdf-template :=
-                                (
-                                    $mode = (''pdf'', ''email'') and
-                                    (: TODO: Consider `fr:use-pdf-template()` function :)
-                                    xxf:instance(''fr-form-attachments'')/pdf/xxf:trim() != '''' and
-                                    not(xxf:get-request-parameter(''fr-use-pdf-template'') = ''false'')
-                                ),
+                            $use-pdf-template := $mode = (''pdf'', ''email'') and fr:use-pdf-template(),
                             $p :=
                                 xxf:property(
                                     string-join(
@@ -724,7 +798,7 @@
                                         ''.''
                                     )
                                 ),
-                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-hints'')[. = (''false'', ''true'')]
+                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-hints'')[(fr:is-service-path() or xxf:get-request-method() = ''POST'') and . = (''false'', ''true'')]
                         return
                             if ($use-pdf-template) then
                                 false()
@@ -739,28 +813,17 @@
             xxf:static-readonly-alert="{
                 if ($mode = 'test-pdf') then
                     '{
-                        let $use-pdf-template :=
-                            (
-                                (: TODO: Consider `fr:use-pdf-template()` function :)
-                                xxf:instance(''fr-form-attachments'')/pdf/xxf:trim() != '''' and
-                                not(xxf:get-request-parameter(''fr-use-pdf-template'') = ''false'')
-                            )
+                        let $use-pdf-template := fr:use-pdf-template()
                         return
                             if ($use-pdf-template) then
                                 false()
                             else
-                                xxf:get-request-parameter(''fr-pdf-show-alerts'') = ''true''
+                                (fr:is-service-path() or xxf:get-request-method() = ''POST'') and xxf:get-request-parameter(''fr-pdf-show-alerts'') = ''true''
                     }'
                 else
                     '{
                         let $mode := fr:mode(),
-                            $use-pdf-template :=
-                                (
-                                    $mode = (''pdf'', ''email'') and
-                                    (: TODO: Consider `fr:use-pdf-template()` function :)
-                                    xxf:instance(''fr-form-attachments'')/pdf/xxf:trim() != '''' and
-                                    not(xxf:get-request-parameter(''fr-use-pdf-template'') = ''false'')
-                                ),
+                            $use-pdf-template := $mode = (''pdf'', ''email'') and fr:use-pdf-template(),
                             $p :=
                                 xxf:property(
                                     string-join(
@@ -772,7 +835,7 @@
                                         ''.''
                                     )
                                 ),
-                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-alerts'')[. = (''false'', ''true'')]
+                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-alerts'')[(fr:is-service-path() or xxf:get-request-method() = ''POST'') and . = (''false'', ''true'')]
                         return
                             if ($use-pdf-template) then
                                 false()
@@ -827,9 +890,9 @@
             </xsl:choose>
 
             <!-- Parameters passed to this page -->
-            <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->
+            <!-- NOTE: the `<document>` and `mode` elements may be modified, so we don't set this as read-only -->
             <xf:instance id="fr-parameters-instance" src="input:instance"/>
-            <!-- Internally, at the XForms level, reduce modes so as to avoid checking everywhere for a new mode -->
+            <!-- Internally, at the XForms level, normalize modes so as to avoid checking everywhere for a new mode -->
             <xf:bind
                 ref="instance('fr-parameters-instance')/mode"
                 xxf:default="
@@ -1001,6 +1064,17 @@
             <xsl:copy-of select="fr:common-dataset-actions-impl(.)"/>
             <xsl:copy-of select="fr:common-service-actions-impl(.)"/>
 
+            <!-- Show relevant errors if requested and allowed
+                 https://github.com/orbeon/orbeon-forms/issues/5722 -->
+            <xf:action
+                type="xpath"
+                event="xforms-ready"
+                if="(fr:is-service-path() or xxf:get-request-method() = 'POST') and
+                    fr:mode() = ('new', 'edit')                                 and
+                    xxf:get-request-parameter('fr-show-relevant-errors') = 'true'">
+                fr:run-process('oxf.fr.detail.process', 'show-relevant-errors')
+            </xf:action>
+
             <!-- Helper for Form Builder test only -->
             <xf:action
                 event="fb-test-pdf-prepare-data"
@@ -1016,6 +1090,7 @@
                     window.parent.ORBEON.xforms.Document.dispatchEvent(
                         {
                             targetId:   'fr-form-model',
+                            form: window.parent.document.querySelector('form'),
                             eventName:  'fb-test-pdf-with-data',
                             properties: { 'fr-form-data': data, 'language': lang }
                         }

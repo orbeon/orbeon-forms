@@ -217,6 +217,30 @@
                 <xf:load resource="/fr/{$app}/{$form}/view/{$selection-document-id}{if (exists($params)) then concat('?', string-join($params, '&amp;')) else ()}"/>
             </xf:action>
 
+            <xf:action event="fr-summary-duplicate">
+                <xf:action iterate="xxf:split(instance('fr-selection-instance'))">
+                    <xf:send submission="call-duplicate-service">
+                        <xf:property name="document" value="substring-after(., '/')"/>
+                    </xf:send>
+                </xf:action>
+                <!-- Reset search selection and navigation -->
+                <xf:dispatch name="fr-reset-search" targetid="fr-form-model"/>
+            </xf:action>
+
+            <xf:action event="fr-summary-export">
+                <xf:load
+                    resource="{
+                        frf:buildSummaryLinkButton(
+                            $app,
+                            $form,
+                            event('fr-export-format'),
+                            $selection-document-id,
+                            xxf:instance('fr-language-instance')
+                        )
+                    }"
+                    show="new"/>
+            </xf:action>
+
             <!-- Instance to track search results and paging -->
             <!-- NOTE: As of 2011-11-28, `app` and `form` are not set by us. We leave them in for now because the
                  built-in eXist, Oracle and MySQL implementations rely on them in the Form Runner page flow. -->
@@ -485,6 +509,91 @@
                 </documents>
             </xf:instance>
 
+            <!-- These are the permissions granted to the current user based on the current roles. Because we
+                 are not the Detail page, fr-authorized-operations does not contain permissions from the
+                 persistence layer. -->
+            <xf:var
+                name="global-operations"
+                value="xxf:split(xxf:instance('fr-authorized-operations'))"/>
+
+            <xf:var
+                name="documents-selected"
+                value="
+                    instance('fr-search-results-instance')/
+                        document[
+                            concat(
+                                if (@draft = 'true') then 'draft' else 'data',
+                                '/',
+                                @name
+                            ) = xxf:split(instance('fr-selection-instance'))
+                        ]"/>
+
+            <!-- Take into account the global operations but also the operations returned by the persistence
+                 layer for each selected form. This can only add to permissions, for example if the user is the
+                 document owner. -->
+            <!-- TODO: If the user pages, then the `<document>` for the given selection is no longer there, and
+                  therefore the operations not available. Should store the operations associated with each
+                  selected document too, otherwise less documents might be found. -->
+            <xf:var name="documents-can-view"      value="empty($documents-selected[not(distinct-values(($global-operations, xxf:split(@operations))) = ('*', 'read'))])"/>
+            <xf:var name="documents-can-delete"    value="empty($documents-selected[not(distinct-values(($global-operations, xxf:split(@operations))) = ('*', 'delete'))])"/>
+            <xf:var name="doc-count"               value="count(instance('fr-search-results-instance')/document)"/>
+            <xf:var name="is-singleton"            value="$source-form-metadata/singleton = 'true'"/>
+            <xf:var name="singleton-limit-reached" value="$is-singleton and $doc-count > 0"/>
+
+            <xf:var name="new-visible"             value="$global-operations = ('*', 'create') and not($singleton-limit-reached)"/>
+            <xf:var name="view-enabled"            value="count($documents-selected)  = 1 and $documents-can-view"/>
+            <xf:var name="delete-enabled"          value="count($documents-selected) != 0 and $documents-can-delete"/>
+            <xf:var name="duplicate-enabled"       value="count($documents-selected) != 0 and
+                                                          $documents-can-view             and
+                                                          $new-visible                    and
+                                                          (: None of the selected documents is auto-saved :)
+                                                          count (
+                                                              for $selection in xxf:split(instance('fr-selection-instance'))
+                                                              return if (substring-before($selection, '/') = 'draft') then 1 else ()
+                                                          ) = 0"/>
+
+            <xf:instance id="fr-buttons-logic-instance" xxf:exclude-result-prefixes="#all">
+                <_>
+                    <home/>
+                    <print/>
+                    <review/>
+                    <pdf/>
+                    <tiff/>
+                    <excel-export/>
+                    <xml-export/>
+                    <delete/>
+                    <import/>
+                    <duplicate/>
+                    <new/>
+                </_>
+            </xf:instance>
+
+            <xf:bind ref="instance('fr-buttons-logic-instance')">
+
+                <xf:bind
+                    ref="print | review"
+                    readonly="not($view-enabled)"/>
+                <!-- Not sure if it makes sense to create a PDF for a draft and the PDF functionality right now doesn't
+                     support creating a PDF for a draft anyway -->
+                <xf:bind
+                    ref="pdf"
+                    readonly="not($view-enabled and $selection-data-or-draft = 'data')"
+                    relevant="fr:is-pe() or not($has-pdf-template)"/>
+                <xf:bind
+                    ref="tiff | excel-export | xml-export"
+                    readonly="not($view-enabled and $selection-data-or-draft = 'data')"
+                    relevant="fr:is-pe()"/>
+                <xf:bind
+                    ref="delete"
+                    readonly="not($delete-enabled)"/>
+                <xf:bind
+                    ref="duplicate"
+                    readonly="not($duplicate-enabled)"/>
+                <xf:bind
+                    ref="new | import"
+                    relevant="$new-visible"/>
+            </xf:bind>
+
             <!-- This submission doesn't validate as we allow sending incomplete date, time and dateTime -->
             <xf:submission
                 id="fr-summary-search-submission"
@@ -507,8 +616,7 @@
                     <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
                 </xf:action>
                 <xf:action event="xforms-submit-error">
-                    <!-- TODO: i18n -->
-                    <xf:message>Error performing search.</xf:message>
+                    <xf:message ref="$fr-resources/errors/search"/>
                 </xf:action>
             </xf:submission>
 
@@ -552,12 +660,6 @@
         <fr:view fluid="true">
             <fr:navbar/>
 
-            <!-- These are the permissions granted to the current user based on the current roles. Because we
-                 are not the Detail page, fr-authorized-operations does not contain permissions from the
-                 persistence layer. -->
-            <xf:var
-                name="global-operations"
-                value="xxf:split(xxf:instance('fr-authorized-operations'))"/>
 
             <xf:var name="enabled"  value="instance('fr-summary-triggers-instance')/enabled"/>
             <xf:var name="disabled" value="instance('fr-summary-triggers-instance')/disabled"/>
@@ -1505,133 +1607,9 @@
 
             <fr:buttons>
                 <xf:group model="fr-form-model" class="fr-buttons">
-
-                    <xf:var
-                        name="documents-selected"
-                        value="instance('fr-search-results-instance')/document[concat(if (@draft = 'true') then 'draft' else 'data', '/', @name) = xxf:split(instance('fr-selection-instance'))]"/>
-
-                    <!-- Take into account the global operations but also the operations returned by the persistence
-                         layer for each selected form. This can only add to permissions, for example if the user is the
-                         document owner. -->
-                    <!-- TODO: If the user pages, then the <document> for the given selection is no longer there, and
-                         therefore the operations not available. Should store the operations associated with each
-                         selected document too, otherwise less documents might be found. -->
-                    <xf:var name="documents-can-view"      value="empty($documents-selected[not(distinct-values(($global-operations, xxf:split(@operations))) = ('*', 'read'))])"/>
-                    <xf:var name="documents-can-delete"    value="empty($documents-selected[not(distinct-values(($global-operations, xxf:split(@operations))) = ('*', 'delete'))])"/>
-
-                    <xf:var name="doc-count"               value="count(instance('fr-search-results-instance')/document)"/>
-                    <xf:var name="is-singleton"            value="$source-form-metadata/singleton = 'true'"/>
-                    <xf:var name="singleton-limit-reached" value="$is-singleton and $doc-count > 0"/>
-                    <xf:var name="new-visible"             value="$global-operations = ('*', 'create') and not($singleton-limit-reached)"/>
-                    <xf:var name="view-enabled"            value="count($documents-selected)  = 1 and $documents-can-view"/>
-                    <xf:var name="delete-enabled"          value="count($documents-selected) != 0 and $documents-can-delete"/>
-                    <xf:var name="duplicate-enabled"       value="count($documents-selected) != 0 and
-                                                                  $documents-can-view             and
-                                                                  $new-visible                    and
-                                                                  (: None of the selected documents is auto-saved :)
-                                                                  count (
-                                                                      for $selection in xxf:split(instance('fr-selection-instance'))
-                                                                      return if (substring-before($selection, '/') = 'draft') then 1 else ()
-                                                                  ) = 0
-                                                                  "/>
-
-                    <!-- Directly iterate over the tokenized property -->
-                    <xf:repeat ref="xxf:split(xxf:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')))">
-                        <xf:var name="button-name" value="."/>
-                        <xh:span>
-                            <!-- Home -->
-                            <xf:group ref="if ($button-name = 'home') then $enabled else ()">
-                                <xf:trigger ref="." class="fr-{$button-name}-button">
-                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/home"/>
-                                    <xf:load event="DOMActivate" resource="/fr/"/>
-                                </xf:trigger>
-                            </xf:group>
-                            <!-- Print/review button -->
-                            <xf:group ref="if ($button-name = ('print', 'review')) then if ($view-enabled) then $enabled else $disabled else ()">
-                                <xf:trigger ref="." class="fr-{$button-name}-button">
-                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/review"/>
-                                    <xf:action event="DOMActivate">
-                                        <!-- FIXME: assert(only one document selected) -->
-                                        <xf:dispatch targetid="fr-form-model" name="fr-summary-view"/>
-                                    </xf:action>
-                                </xf:trigger>
-                            </xf:group>
-                            <!-- Export buttons -->
-                            <xf:group
-                                ref="
-                                    for $b in $button-name[. = ('pdf', 'tiff', 'excel-export', 'xml-export')]
-                                    return
-                                        let $disallowed :=
-                                            (
-                                                $button-name = ('tiff', 'excel-export', 'xml-export') or
-                                                $button-name = 'pdf' and $has-pdf-template
-                                            ) and
-                                                not(fr:is-pe())
-                                        return
-                                            if ($disallowed) then
-                                                (: If CE then don't show buttons for PE feature :)
-                                                ()
-                                            else if ($view-enabled and $selection-data-or-draft = 'data') then
-                                                $enabled
-                                            else
-                                                (: Not sure it makes sense to create a PDF for a draft and the PDF
-                                                   functionality right now doesn't support creating a PDF for a draft :)
-                                                $disabled">
-                                <fr:href-button
-                                        ref="."
-                                        href="{frf:buildSummaryLinkButton($app, $form, $button-name, $selection-document-id, xxf:instance('fr-language-instance'))}"
-                                        class="fr-{$button-name}-button">
-                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/*[name() = $button-name]"/>
-                                </fr:href-button>
-                            </xf:group>
-                            <!-- Test button -->
-                            <xf:group ref="if ($button-name = 'test') then if ($view-enabled) then $enabled else $disabled else ()">
-                                <fr:href-button
-                                        ref="."
-                                        href="/fr/{$app}/{$form}/test/{normalize-space(instance('fr-selection-instance'))}"
-                                        class="fr-{$button-name}-button">
-                                    <xf:label mediatype="text/html" value="'Test'"/><!-- TODO: i18n -->
-                                </fr:href-button>
-                            </xf:group>
-                            <!-- Delete button -->
-                            <xf:group ref="if ($button-name = 'delete') then if ($delete-enabled) then $enabled else $disabled else ()">
-                                <xf:trigger ref="." class="fr-{$button-name}-button">
-                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/delete"/>
-                                    <!-- Open delete confirmation dialog -->
-                                    <xf:dispatch event="DOMActivate" name="fr-show" targetid="delete-confirmation-dialog"/>
-                                </xf:trigger>
-                            </xf:group>
-                            <!-- Import button -->
-                            <xf:group ref="if ($button-name = 'import' and $new-visible) then $enabled else ()">
-                                <xf:trigger ref="." class="fr-{$button-name}-button">
-                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/import"/>
-                                    <xf:load event="DOMActivate" resource="/fr/{$app}/{$form}/import"/>
-                                </xf:trigger>
-                            </xf:group>
-                            <!-- New button -->
-                            <xf:group ref="if ($button-name = 'new' and $new-visible) then $enabled else ()">
-                                <xf:trigger ref="." appearance="xxf:primary" class="fr-{$button-name}-button">
-                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/new"/>
-                                    <xf:dispatch event="DOMActivate" targetid="fr-form-model" name="fr-summary-create"/>
-                                </xf:trigger>
-                            </xf:group>
-                            <!-- Duplicate button -->
-                            <xf:group ref="if ($button-name = 'duplicate') then if ($duplicate-enabled) then $enabled else $disabled else ()">
-                                <xf:trigger ref="." class="fr-{$button-name}-button">
-                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/duplicate"/>
-                                    <xf:action event="DOMActivate">
-                                        <xf:action iterate="xxf:split(instance('fr-selection-instance'))">
-                                            <xf:send submission="call-duplicate-service">
-                                                <xf:property name="document" value="substring-after(., '/')"/>
-                                            </xf:send>
-                                        </xf:action>
-                                        <!-- Reset search selection and navigation -->
-                                        <xf:dispatch name="fr-reset-search" targetid="fr-form-model"/>
-                                    </xf:action>
-                                </xf:trigger>
-                            </xf:group>
-                        </xh:span>
-                    </xf:repeat>
+                    <fr:buttons-bar
+                        buttons-property="oxf.fr.summary.buttons"
+                        visibility-property="oxf.fr.summary.button"/>
                 </xf:group>
             </fr:buttons>
 

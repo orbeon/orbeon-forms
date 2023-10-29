@@ -16,16 +16,24 @@ package org.orbeon.oxf.xforms.submission
 import org.orbeon.oxf.util.ConnectionResult
 
 
-class NoneReplacer(submission: XFormsModelSubmission) extends Replacer {
+object NoneReplacer extends Replacer {
 
-  // NOP
-  def deserialize(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
+  type DeserializeType = Unit
 
-  // Just notify that processing is terminated by dispatching xforms-submit-done
+  def deserialize(
+    submission: XFormsModelSubmission,
+    cxr       : ConnectionResult,
+    p         : SubmissionParameters,
+    p2        : SecondPassParameters
+  ): DeserializeType = ()
+
+  // Just notify that processing is terminated by dispatching `xforms-submit-done`
   def replace(
-    cxr: ConnectionResult,
-    p  : SubmissionParameters,
-    p2 : SecondPassParameters
+    submission: XFormsModelSubmission,
+    cxr       : ConnectionResult,
+    p         : SubmissionParameters,
+    p2        : SecondPassParameters,
+    value     : DeserializeType
   ): ReplaceResult =
-    ReplaceResult.SendDone(cxr)
+    ReplaceResult.SendDone(cxr, p.tunnelProperties)
 }

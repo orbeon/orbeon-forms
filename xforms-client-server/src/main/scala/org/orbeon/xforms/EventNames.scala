@@ -42,6 +42,7 @@ object EventNames {
   val KeyDown                  = "keydown"
   val KeyUp                    = "keyup"
   val Resize                   = "resize"
+  val DOMActivate              = "DOMActivate"
 
   val KeyboardEvents: Set[String] = Set(KeyPress, KeyDown, KeyUp)
 

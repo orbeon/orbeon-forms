@@ -463,7 +463,7 @@
                             ''
                     }"
                     maxlength="{xs:integer(xxf:custom-mip($binding, 'max-length')[. castable as xs:integer])}"
-                    xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength pattern=xxf:pattern"/>
+                    xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength pattern=xxf:pattern autocomplete"/>
                 <xf:group fr:keep-if-param-non-blank="suffix" class="add-on" ref=".[xxf:non-blank($suffix)]">
                     <xf:output id="suffix" value="$suffix"/>
                 </xf:group>

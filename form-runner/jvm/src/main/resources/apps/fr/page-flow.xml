@@ -59,8 +59,9 @@
     <!-- ==== Internationalization ================================================================================= -->
 
     <!-- Service putting together Form Runner resources -->
+    <!-- 2023-07-26: Keep `GET` for `FormRunnerCompiler`, see https://github.com/orbeon/orbeon-forms/issues/5833 -->
     <service path="/fr/service/i18n/fr-resources/([^/^.]+)/([^/^.]+)"
-             methods="POST"
+             methods="GET POST"
              model="i18n/fr-resources-model.xpl"
              view="i18n/fr-resources.xpl"/>
 

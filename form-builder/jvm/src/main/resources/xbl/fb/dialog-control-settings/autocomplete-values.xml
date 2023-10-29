@@ -1,0 +1,95 @@
+<!--
+  Copyright (C) 2023 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<autocomplete-values>
+    <group name="autocomplete.groups.general">
+        <autocomplete value="off"/>
+        <autocomplete value="on"                             disabled="true"/>
+        <autocomplete value="language"/>
+        <autocomplete value="bday"/>
+        <autocomplete value="bday-day"   sub-value-of="bday" disabled="true"/>
+        <autocomplete value="bday-month" sub-value-of="bday" disabled="true"/>
+        <autocomplete value="bday-year"  sub-value-of="bday" disabled="true"/>
+        <autocomplete value="sex"/>
+        <autocomplete value="photo"                          disabled="true"/>
+    </group>
+    <group name="autocomplete.groups.name">
+        <autocomplete value="name"/>
+        <autocomplete value="honorific-prefix" sub-value-of="name"/>
+        <autocomplete value="given-name"       sub-value-of="name"/>
+        <autocomplete value="additional-name"  sub-value-of="name"/>
+        <autocomplete value="family-name"      sub-value-of="name"/>
+        <autocomplete value="honorific-suffix" sub-value-of="name"/>
+        <autocomplete value="nickname"/>
+        <autocomplete value="organization-title"/>
+    </group>
+    <group name="autocomplete.groups.credentials" disabled="true">
+        <autocomplete value="username"            disabled="true"/>
+        <autocomplete value="new-password"        disabled="true"/>
+        <autocomplete value="current-password"    disabled="true"/>
+        <autocomplete value="one-time-code"       disabled="true"/>
+    </group>
+    <group name="autocomplete.groups.address">
+        <autocomplete value="organization"/>
+        <autocomplete value="street-address"/>
+        <autocomplete value="address-line1" sub-value-of="street-address"/>
+        <autocomplete value="address-line2" sub-value-of="street-address"/>
+        <autocomplete value="address-line3" sub-value-of="street-address"/>
+        <autocomplete value="address-level4"/>
+        <autocomplete value="address-level3"/>
+        <autocomplete value="address-level2"/>
+        <autocomplete value="address-level1"/>
+        <autocomplete value="country"/>
+        <autocomplete value="country-name"/>
+        <autocomplete value="postal-code"/>
+    </group>
+    <group name="autocomplete.groups.contact">
+        <autocomplete value="tel"/>
+        <autocomplete value="tel-country-code" sub-value-of="tel"          disabled="true"/>
+        <autocomplete value="tel-national"     sub-value-of="tel"          disabled="true"/>
+        <autocomplete value="tel-area-code"    sub-value-of="tel-national" disabled="true"/>
+        <autocomplete value="tel-local"        sub-value-of="tel-national" disabled="true"/>
+        <autocomplete value="tel-local-prefix" sub-value-of="tel-local"    disabled="true"/>
+        <autocomplete value="tel-local-suffix" sub-value-of="tel-local"    disabled="true"/>
+        <autocomplete value="tel-extension"/>
+        <autocomplete value="email"/>
+        <autocomplete value="url"/>
+        <autocomplete value="impp"                                         disabled="true"/>
+    </group>
+    <group name="autocomplete.groups.payment"                           disabled="true">
+        <autocomplete value="cc-name"                                   disabled="true"/>
+        <autocomplete value="cc-given-name"      sub-value-of="cc-name" disabled="true"/>
+        <autocomplete value="cc-additional-name" sub-value-of="cc-name" disabled="true"/>
+        <autocomplete value="cc-family-name"     sub-value-of="cc-name" disabled="true"/>
+        <autocomplete value="cc-number"                                 disabled="true"/>
+        <autocomplete value="cc-exp"                                    disabled="true"/>
+        <autocomplete value="cc-exp-month"       sub-value-of="cc-exp"  disabled="true"/>
+        <autocomplete value="cc-exp-year"        sub-value-of="cc-exp"  disabled="true"/>
+        <autocomplete value="cc-csc"                                    disabled="true"/>
+        <autocomplete value="cc-type"                                   disabled="true"/>
+        <autocomplete value="transaction-currency"                      disabled="true"/>
+        <autocomplete value="transaction-amount"                        disabled="true"/>
+    </group>
+    <!--
+    shipping
+    billing
+
+    home
+    work
+    mobile
+    fax
+    pager
+
+    webauthn
+    -->
+</autocomplete-values>

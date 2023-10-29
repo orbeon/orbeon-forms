@@ -367,7 +367,6 @@
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
                                     <fr:summary-show/>
-                                    <fr:summary-search/>
                                 </fr:index>
 
 
@@ -380,7 +379,6 @@
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
                                     <fr:summary-show/>
-                                    <fr:summary-search/>
                                 </fr:index>
 
 
@@ -393,7 +391,6 @@
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
                                     <fr:summary-show/>
-                                    <fr:summary-search/>
                                 </fr:index>
 
 
@@ -425,7 +422,6 @@
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
                                     <fr:summary-show/>
-                                    <fr:summary-search/>
                                 </fr:index>
 
 
@@ -438,6 +434,7 @@
                                          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                          xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava"
                                          id="per-capita-dues-control"
+                                         field-align="right"
                                          bind="per-capita-dues-bind">
                                 <xf:label ref="$form-resources/per-capita-dues/label"/>
                                 <xf:hint ref="$form-resources/per-capita-dues/hint"/>
@@ -453,6 +450,7 @@
                                          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                          xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava"
                                          id="member-dues-control"
+                                         field-align="right"
                                          bind="member-dues-bind">
                                 <xf:label ref="$form-resources/member-dues/label"/>
                                 <xf:hint ref="$form-resources/member-dues/hint"/>
@@ -486,6 +484,7 @@
                                          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                          xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava"
                                          id="annual-dues-control"
+                                         field-align="right"
                                          bind="annual-dues-bind">
                                 <xf:label ref="$form-resources/annual-dues/label"/>
                                 <xf:hint ref="$form-resources/annual-dues/hint"/>
@@ -499,6 +498,7 @@
                             <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder"
                                          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                          id="annual-council-dues-control"
+                                         field-align="right"
                                          bind="annual-council-dues-bind">
                                 <xf:label ref="$form-resources/annual-council-dues/label"/>
                                 <xf:hint ref="$form-resources/annual-council-dues/hint"/>
@@ -521,6 +521,7 @@
                             <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder"
                                          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                          id="parent-education-donation-control"
+                                         field-align="right"
                                          bind="parent-education-donation-bind">
                                 <xf:label ref="$form-resources/parent-education-donation/label"/>
                                 <xf:hint ref="$form-resources/parent-education-donation/hint"/>
@@ -536,13 +537,13 @@
                             <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder"
                                          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                          id="total-check-amount-control"
+                                         field-align="right"
                                          bind="total-check-amount-bind">
                                 <xf:label ref="$form-resources/total-check-amount/label"/>
                                 <xf:hint ref="$form-resources/total-check-amount/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <fr:index>
                                     <fr:summary-show/>
-                                    <fr:summary-search/>
                                 </fr:index>
 
 

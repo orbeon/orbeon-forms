@@ -75,11 +75,8 @@ abstract class XFormsControlLifecycleHandler(
     if (isMustOutputControl(currentControl)) {
 
       // Open control element, usually `<span>`
-      if (isMustOutputContainerElement)
-        handlerContext.controller.output.startElement(
-          XMLConstants.XHTML_NAMESPACE_URI,
-          getContainingElementName,
-          getContainingElementQName,
+      if (isMustOutputContainerElement) {
+        val containerAttributes =
           getContainerAttributes(
             uri,
             localname,
@@ -89,7 +86,21 @@ abstract class XFormsControlLifecycleHandler(
             currentControl,
             lhhaIfLocal(LHHA.Label)
           )
+
+        // Remove autocomplete attribute if it doesn't make sense on this element
+        val filteredContainerAttributes =
+          if (XFormsBaseHandler.canHaveAutocompleteAttribute(attributes, getContainingElementName, containerAttributes))
+            containerAttributes
+          else
+            containerAttributes.remove("", "autocomplete")
+
+        handlerContext.controller.output.startElement(
+          XMLConstants.XHTML_NAMESPACE_URI,
+          getContainingElementName,
+          getContainingElementQName,
+          filteredContainerAttributes
         )
+      }
 
       // Process everything up to and including the control
       for (current <- beforeAfterTokens._1)

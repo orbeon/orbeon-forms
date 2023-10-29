@@ -28,7 +28,8 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/yui/container/assets/skins/sam/container.css",                   "min": false },
           { "full": "/apps/fr/style/bootstrap/css/bootstrap.css",                          "min": true  },
           { "full": "/apps/fr/style/form-runner-bootstrap-override.css",                   "min": false },
-          { "full": "/apps/fr/style/font-awesome/css/font-awesome.css",                    "min": true  },
+          { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/all.css",               "min": true  },
+          { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/v4-shims.css",          "min": true  },
           { "full": "/config/theme/xforms.css",                                            "min": false },
           { "full": "/config/theme/error.css",                                             "min": false },
           { "full": "/ops/nprogress-0.2.0/nprogress.css",                                  "min": false }
@@ -67,7 +68,8 @@ class XFormsAssetsTest extends AnyFunSpec{
         "css": [
           { "full": "/apps/fr/style/bootstrap/css/bootstrap.css",                          "min": true  },
           { "full": "/apps/fr/style/form-runner-bootstrap-override.css",                   "min": false },
-          { "full": "/apps/fr/style/font-awesome/css/font-awesome.css",                    "min": true  },
+          { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/all.css",               "min": true  },
+          { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/v4-shims.css",          "min": true  },
           { "full": "/config/theme/xforms.css",                                            "min": false },
           { "full": "/config/theme/error.css",                                             "min": false },
           { "full": "/ops/nprogress-0.2.0/nprogress.css",                                  "min": false },

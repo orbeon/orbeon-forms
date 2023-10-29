@@ -340,6 +340,10 @@ class XFormsSelect1Control(
     val hasNestedContent =
       mustSendItemsetUpdate(previousControl map (_.asInstanceOf[XFormsSelect1Control]) orNull)
 
+    // Make sure the external value is up-to-date, as it might have changed due to the itemset changing
+    if (hasNestedContent)
+      markExternalValueDirty()
+
     val outputNestedContent = (ch: XMLReceiverHelper) => {
 
       val atts =

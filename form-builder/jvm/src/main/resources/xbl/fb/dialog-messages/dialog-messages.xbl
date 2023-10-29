@@ -13,6 +13,7 @@
   -->
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
@@ -30,12 +31,13 @@
                 <xf:delete ref="$i/*"/>
 
                 <!-- Copy messages from form metadata to instance (and flatten them) -->
-                <xf:action iterate="$metadata-resources/resource">
+                <xf:action iterate="$metadata/resources/resource">
                     <xf:var name="lang" value="@xml:lang"/>
 
                     <!-- Do not support 'all languages' (*) for now -->
                     <xf:action if="$lang = $available-languages" iterate="messages/message">
                         <xf:var name="name"  value="@name"/>
+                        <xf:var name="html"  value="if (exists(@html)) then @html else false()"/>
                         <xf:var name="value" value="string()"/>
 
                         <xf:insert
@@ -43,10 +45,20 @@
                             ref="*"
                             origin="xf:element(
                                 'message',
-                                ($value, xf:attribute('xml:lang', $lang), xf:attribute('name', $name))
+                                ($value, xf:attribute('xml:lang', $lang), xf:attribute('name', $name), xf:attribute('html', $html))
                             )"/>
                     </xf:action>
                 </xf:action>
+
+                <!-- Add empty message if no message defined yet -->
+                <xf:insert
+                    if="count($i/message) = 0"
+                    context="$i"
+                    ref="*"
+                    origin="xf:element(
+                            'message',
+                            ('', xf:attribute('xml:lang', $available-languages[1]), xf:attribute('name', ''), xf:attribute('html', false()))
+                        )"/>
 
                 <!-- Update template with default language -->
                 <xf:setvalue ref="$ti/message/@xml:lang" value="$available-languages[1]"/>
@@ -55,7 +67,7 @@
             </xbl:handler>
 
             <xbl:handler event="xxforms-dialog-open" observer="dialog">
-                <xf:setfocus control="fb-messages-name-select"/>
+                <xf:setfocus control="fb-messages-language-select"/>
             </xbl:handler>
 
             <xbl:handler if="not(valid($i))" event="DOMActivate" observer="fb-save-trigger">
@@ -63,16 +75,22 @@
             </xbl:handler>
 
             <xbl:handler if="valid($i)" event="DOMActivate" observer="fb-save-trigger">
-                <xf:delete ref="$metadata-resources/resource[@xml:lang = $available-languages]/messages"/>
-                <xf:delete ref="$metadata-resources/resource[count(*) = 0]"/>
+                <xf:delete ref="$metadata/resources/resource[@xml:lang = $available-languages]/messages"/>
+                <xf:delete ref="$metadata/resources/resource[count(*) = 0]"/>
 
                 <!-- Copy messages from instance to form metadata -->
                 <xf:action iterate="distinct-values($i/message/@xml:lang)">
                     <xf:var name="lang" value="."/>
 
                     <xf:insert
-                        if="count($metadata-resources/resource[@xml:lang = $lang]) = 0"
-                        context="$metadata-resources"
+                        if="count($metadata/resources) = 0"
+                        context="$metadata"
+                        ref="*"
+                        origin="xf:element('resources')"/>
+
+                    <xf:insert
+                        if="count($metadata/resources/resource[@xml:lang = $lang]) = 0"
+                        context="$metadata/resources"
                         ref="*"
                         origin="xf:element(
                             'resource',
@@ -80,21 +98,22 @@
                         )"/>
 
                     <xf:insert
-                        if="count($metadata-resources/resource[@xml:lang = $lang]/messages) = 0"
-                        context="$metadata-resources/resource[@xml:lang = $lang]"
+                        if="count($metadata/resources/resource[@xml:lang = $lang]/messages) = 0"
+                        context="$metadata/resources/resource[@xml:lang = $lang]"
                         ref="*"
                         origin="xf:element('messages')"/>
 
                     <xf:action iterate="$i/message[@xml:lang = $lang]">
                         <xf:var name="name"  value="@name"/>
+                        <xf:var name="html"  value="@html"/>
                         <xf:var name="value" value="string()"/>
 
                         <xf:insert
-                            context="$metadata-resources/resource[@xml:lang = $lang]/messages"
+                            context="$metadata/resources/resource[@xml:lang = $lang]/messages"
                             ref="*"
                             origin="xf:element(
                                 'message',
-                                ($value, xf:attribute('name', $name))
+                                ($value, xf:attribute('name', $name), xf:attribute('html', $html))
                             )"/>
                     </xf:action>
                 </xf:action>
@@ -111,7 +130,7 @@
 
                 <xf:instance id="fb-dialog-messages-template-instance">
                     <_>
-                        <message xml:lang="" name=""/>
+                        <message xml:lang="" name="" html="false"/>
                     </_>
                 </xf:instance>
 
@@ -120,15 +139,20 @@
 
                 <xf:var name="available-languages" value="frf:allLangs(fbf:resourcesRoot())"/>
 
-                <xf:var name="metadata-resources"  value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/resources"/>
+                <xf:var name="metadata"            value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*[1]"/>
 
                 <xf:bind ref="$i/message">
-                    <xf:bind ref="@name, ." xxf:whitespace="trim" readonly="false()" constraint=". != ''"/>
+                    <xf:bind ref="@xml:lang" readonly="count($available-languages) &lt;= 1"/>
+                    <xf:bind ref="@name, ." xxf:whitespace="trim"  readonly="false()" constraint=". != ''"/>
 
                     <!-- No duplicate message names for a given language -->
                     <xf:bind ref="@name" constraint="for $l in string(../@xml:lang) return
                                                      not(($i/message[@xml:lang = $l]/@name except .) = .)"/>
+
+                    <xf:bind ref="@html" type="xs:boolean"/>
                 </xf:bind>
+
+                <xf:bind ref="$ti/message" readonly="true()"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -140,18 +164,11 @@
                 <xxf:dialog id="dialog" class="fb-dialog-messages" appearance="full" model="model" level="modal">
                     <xf:label ref="$resources/dialog-messages/label"/>
                     <xh:div class="fb-dialog-body fb-hide-alert">
-                        <!-- Only allow HTML for full appearance -->
-                        <!--
-                        <fr:checkbox-input ref="$i/html[../appearance = 'full']" class="fb-html-checkbox">
-                            <xf:label ref="$resources/messages/lhha-checkbox"/>
-                        </fr:checkbox-input>
-                        -->
-
                         <xf:group ref="$i">
                             <fr:grid id="fb-messages-repeat" repeat="true" ref="message" template="$ti/message">
                                 <xh:tr>
                                     <xh:td class="fb-messages-language-column">
-                                        <xf:select1 ref="@xml:lang[count($available-languages) > 1]">
+                                        <xf:select1 id="fb-messages-language-select" ref="@xml:lang">
                                             <xf:label ref="$resources/dialog-messages/language-header"/>
 
                                             <xf:itemset ref="$available-languages">
@@ -175,10 +192,19 @@
                                             </xf:itemset>
                                         </fr:open-select1>
                                     </xh:td>
-                                    <xh:td>
-                                        <xf:input id="fb-messages-value-input"  ref=".">
+                                    <xh:td class="fb-messages-html-column">
+                                        <fr:checkbox-input id="fb-messages-html" ref="@html">
+                                            <xf:label ref="$resources/dialog-control-settings/use-html"/>
+                                        </fr:checkbox-input>
+                                    </xh:td>
+                                    <xh:td class="fb-messages-value-column">
+                                        <xf:var name="text" value="."/>
+                                        <xf:input id="fb-messages-value-input" ref="$text[@html = false()]" class="fb-messages-value-input">
                                             <xf:label ref="$resources/dialog-messages/value-header"/>
                                         </xf:input>
+                                        <xf:textarea id="fb-messages-value-textarea"  ref="$text[@html = true()]" mediatype="text/html" class="fb-messages-value-textarea">
+                                            <xf:label ref="$resources/dialog-messages/value-header"/>
+                                        </xf:textarea>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

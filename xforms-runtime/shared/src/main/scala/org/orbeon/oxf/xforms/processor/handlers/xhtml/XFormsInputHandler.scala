@@ -17,9 +17,7 @@ import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
-import org.orbeon.oxf.xforms.control.ControlAjaxSupport
-import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaReadonlyQName
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
@@ -27,7 +25,6 @@ import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsNames._
@@ -166,6 +163,8 @@ class XFormsInputHandler(
           if (isXFormsReadonlyButNotStaticReadonly(inputControl))
             outputReadonlyAttribute(atts)
           handleAriaAttributes(inputControl.isRequired, inputControl.isValid, inputControl.visited, atts)
+
+          forwardAutocompleteAttribute(attributes, "input", atts)
 
           xmlReceiver.startElement(XHTML_NAMESPACE_URI, "input", inputQName, atts)
           xmlReceiver.endElement(XHTML_NAMESPACE_URI, "input", inputQName)

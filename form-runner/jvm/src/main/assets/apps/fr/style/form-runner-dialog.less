@@ -31,10 +31,14 @@
 
         .fr-dialog-icon {
             float: left;
-            font-size: 50px;
-            color: #B94A48; // @error
+            color: @error;
             padding-right: 10px;
             padding-bottom: 10px;
+            width: auto; // otherwise the icon appears under the dialog text
+
+            &::before {
+                font-size: 50px;
+            }
         }
 
         .fr-dialog-buttons {
@@ -123,6 +127,14 @@
     .fr-dialog-share {
         .xbl-fr-grid .fr-grid .xforms-label-appearance-minimal {
             display: none;
+        }
+    }
+
+    .fr-session-expiration-dialog {
+        z-index: 3000;
+
+        .modal-footer {
+            text-align: right;
         }
     }
 }

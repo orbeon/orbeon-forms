@@ -14,7 +14,6 @@
 package org.orbeon.oxf.util
 
 import java.net.URI
-
 import cats.Eval
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -24,6 +23,7 @@ import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StreamedContent}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging.debug
 
+import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
 
 
@@ -42,7 +42,7 @@ trait ConnectionTrait {
     externalContext : ExternalContext
   ): ConnectionResult
 
-  def connectLater(
+  def connectAsync(
     method          : HttpMethod,
     url             : URI,
     credentials     : Option[BasicCredentials],
@@ -52,14 +52,14 @@ trait ConnectionTrait {
     logBody         : Boolean)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Eval[ConnectionResult]
+  ): Future[ConnectionResult]
 
   def isInternalPath(path: String): Boolean
 
   def findInternalUrl(
     normalizedUrl : URI,
     filter        : String => Boolean)(implicit
-    ec            : ExternalContext
+    request       : ExternalContext.Request
   ): Option[String]
 
   def buildConnectionHeadersCapitalizedIfNeeded(
@@ -228,7 +228,7 @@ trait ConnectionTrait {
 
     // 4. Authorization token only for internal connections
     // https://github.com/orbeon/orbeon-forms/issues/4388
-    val tokenHeaderCapitalized = findInternalUrl(normalizedUrl, _ => true).isDefined list {
+    val tokenHeaderCapitalized = findInternalUrl(normalizedUrl, _ => true)(externalContext.getRequest).isDefined list {
 
       // Get token from web app scope
       val token =

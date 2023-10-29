@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.PageSizeUnits
-import com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder
+import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.{FSFontUseCase, FontStyle, PageSizeUnits}
+import com.openhtmltopdf.pdfboxout.{CustomPdfRendererBuilder, PdfRendererBuilder}
 import com.openhtmltopdf.util.XRLog
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -22,12 +22,12 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.serializer.HttpSerializerBase
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
-import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 
-import java.io.{File, OutputStream}
+import java.io.{FileInputStream, OutputStream}
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -36,6 +36,10 @@ import scala.util.control.NonFatal
 private object XHTMLToPDFProcessor {
 
   val logger = LoggerFactory.createLogger(classOf[XHTMLToPDFProcessor])
+
+  val DefaultFontFamily = "Inter"
+  val DefaultFontPath   = "/apps/fr/print/Inter-Medium.ttf"
+  val DefaultFontWeight = 500
 
   val PdfFontPropertyPrefix       = "oxf.fr.pdf.font."
   val PdfFontPathProperty         = PdfFontPropertyPrefix + "path"
@@ -46,32 +50,40 @@ private object XHTMLToPDFProcessor {
   var DefaultContentType  = ContentTypes.PdfContentType
   val DefaultDotsPerPixel = 14 // default is 20, and makes things larger
 
-  def embedFontsConfiguredInProperties(pdfRendererBuilder: CustomPdfRendererBuilder): Unit = {
-    val props = Properties.instance.getPropertySet
-
+  def embedFontsConfiguredInProperties(pdfRendererBuilder: CustomPdfRendererBuilder, propertySet: PropertySet): Unit =
     for {
-      propName <- props.propertiesStartsWith(PdfFontPathProperty) ++ props.propertiesStartsWith(PdfFontResourceProperty)
-      path     <- props.getNonBlankString(propName)
+      propName <- propertySet.propertiesStartsWith(PdfFontPathProperty) ++ propertySet.propertiesStartsWith(PdfFontResourceProperty)
+      path     <- propertySet.getNonBlankString(propName)
       _ :: _ :: _ :: _ :: pathOrResource :: name :: Nil = propName.splitTo[List](".")
-    } {
+    } locally {
       try {
-
-        val familyOpt = props.getNonBlankString(s"$PdfFontFamilyPropertyPrefix$name")
-
-        val absolutePath =
-          pathOrResource match {
-            case "path"     => path
-            case "resource" => ResourceManagerWrapper.instance.getRealPath(path)
+        pdfRendererBuilder.useFont(
+          () => pathOrResource match {
+            case "path"     => new FileInputStream(path)
+            case "resource" => ResourceManagerWrapper.instance.getContentAsStream(path)
             case _          => throw new IllegalStateException
-          }
-
-        pdfRendererBuilder.useFont(new File(absolutePath), familyOpt.orNull)
+          },
+          propertySet.getNonBlankString(s"$PdfFontFamilyPropertyPrefix$name").orNull,
+          400,
+          FontStyle.NORMAL,
+          true, // `subset`
+          java.util.EnumSet.of(FSFontUseCase.DOCUMENT)
+        )
       } catch {
-        case NonFatal(_) =>
-          logger.warn(s"Failed to load font by path: `$path` specified with property `$propName`")
+        case NonFatal(t) =>
+          logger.warn(t)(s"Failed to load font with property `$propName` of value `$path`")
       }
     }
-  }
+
+  def embedDefaultFont(pdfRendererBuilder: CustomPdfRendererBuilder): Unit =
+    pdfRendererBuilder.useFont(
+      () => ResourceManagerWrapper.instance.getContentAsStream(DefaultFontPath),
+      DefaultFontFamily,
+      DefaultFontWeight,
+      FontStyle.NORMAL,
+      true, // `subset`
+      java.util.EnumSet.of(FSFontUseCase.FALLBACK_PRE)
+    )
 
   // NOTE: Default compression level is 0.75:
   // https://docs.oracle.com/javase/8/docs/api/javax/imageio/plugins/jpeg/JPEGImageWriteParam.html#JPEGImageWriteParam-java.util.Locale-
@@ -108,10 +120,27 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
 
     pdfRendererBuilder.useDefaultPageSize(8.5f, 11f, PageSizeUnits.INCHES)
 
-//    pdfRendererBuilder.usePdfUaAccessbility(true) // java.lang.IndexOutOfBoundsException if uncomment
-//    pdfRendererBuilder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_U)
+    val propertySet = Properties.instance.getPropertySet
 
-    embedFontsConfiguredInProperties(pdfRendererBuilder)
+    pdfRendererBuilder.usePdfUaAccessbility(propertySet.getBoolean("oxf.fr.pdf.accessibility", default = false))
+
+    pdfRendererBuilder.usePdfAConformance(
+      propertySet.getString("oxf.fr.pdf.pdf/a", default = "none") match {
+        case "none" => PdfRendererBuilder.PdfAConformance.NONE
+        case "1a"   => PdfRendererBuilder.PdfAConformance.PDFA_1_A
+        case "1b"   => PdfRendererBuilder.PdfAConformance.PDFA_1_B
+        case "2a"   => PdfRendererBuilder.PdfAConformance.PDFA_2_A
+        case "2b"   => PdfRendererBuilder.PdfAConformance.PDFA_2_B
+        case "2u"   => PdfRendererBuilder.PdfAConformance.PDFA_2_U
+        case "3a"   => PdfRendererBuilder.PdfAConformance.PDFA_3_A
+        case "3b"   => PdfRendererBuilder.PdfAConformance.PDFA_3_B
+        case "3u"   => PdfRendererBuilder.PdfAConformance.PDFA_3_U
+        case other  => throw new IllegalArgumentException(s"Invalid PDF/A conformance: `$other`")
+      }
+    )
+
+    embedFontsConfiguredInProperties(pdfRendererBuilder, propertySet)
+    embedDefaultFont(pdfRendererBuilder)
 
     IOUtils.useAndClose(outputStream) { os =>
 

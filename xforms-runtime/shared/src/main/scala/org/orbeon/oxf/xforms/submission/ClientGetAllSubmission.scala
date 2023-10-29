@@ -17,6 +17,9 @@ import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
 import org.orbeon.xforms.UrlType
 
+import scala.concurrent.Future
+
+
 /**
   * Client-side GET all submission. It stores the resulting location directly into the containing document.
   */
@@ -28,16 +31,16 @@ class ClientGetAllSubmission(submission: XFormsModelSubmission)
   def isMatch(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Boolean =
     p.isHandlingClientGetAll
 
-  def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Option[ConnectResult] = {
+  def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Option[ConnectResult Either Future[ConnectResult]] = {
     XFormsLoadAction.resolveStoreLoadValue(
-      containingDocument           = containingDocument,
+      containingDocument           = submission.containingDocument,
       currentElem                  = Option(submission.staticSubmission.element),
       doReplace                    = true,
       value                        = PathUtils.appendQueryString(p2.actionOrResource, Option(sp.queryString) getOrElse ""),
       target                       = None,
       urlType                      = UrlType.Render,
       urlNorewrite                 = p.urlNorewrite,
-      isShowProgressOpt            = Some(containingDocument.findTwoPassSubmitEvents forall (_.showProgress)),
+      isShowProgressOpt            = Some(submission.containingDocument.findTwoPassSubmitEvents forall (_.showProgress)),
       mustHonorDeferredUpdateFlags = true
     )
     None

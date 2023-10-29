@@ -23,22 +23,19 @@ import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.model.StaticDataModel._
 import org.orbeon.saxon.om
 
-/**
- * Handle replace="text".
- */
-class TextReplacer(submission: XFormsModelSubmission, containingDocument: XFormsContainingDocument)
-  extends Replacer {
 
-  private var responseBodyOpt: Option[String] = None
+object TextReplacer extends Replacer {
+
+  type DeserializeType = Option[String]
 
   def deserialize(
-    cxr: ConnectionResult,
-    p  : SubmissionParameters,
-    p2 : SecondPassParameters
-  ): Unit =
+    submission: XFormsModelSubmission,
+    cxr       : ConnectionResult,
+    p         : SubmissionParameters,
+    p2        : SecondPassParameters
+  ): DeserializeType =
     SubmissionUtils.readTextContent(cxr.content) match {
-      case s @ Some(_) =>
-        this.responseBodyOpt = s
+      case s @ Some(_) => s
       case None =>
         // Non-text/non-XML result
 
@@ -61,24 +58,24 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
           message          = message,
           description      = "reading response body",
           submitErrorEvent = new XFormsSubmitErrorEvent(
-            target    = submission,
-            errorType = ErrorType.ResourceError,
-            cxrOpt    = cxr.some
+            target           = submission,
+            errorType        = ErrorType.ResourceError,
+            cxrOpt           = cxr.some,
+            tunnelProperties = p.tunnelProperties
           )
         )
     }
 
   def replace(
-    cxr: ConnectionResult,
-    p  : SubmissionParameters,
-    p2 : SecondPassParameters
+    submission: XFormsModelSubmission,
+    cxr       : ConnectionResult,
+    p         : SubmissionParameters,
+    p2        : SecondPassParameters,
+    value     : DeserializeType
   ): ReplaceResult =
-    responseBodyOpt flatMap (TextReplacer.replaceText(submission, containingDocument, cxr, p, _)) getOrElse
-      ReplaceResult.SendDone(cxr)
-}
-
-
-object TextReplacer {
+    value
+      .flatMap(replaceText(submission, submission.containingDocument, cxr, p, _))
+      .getOrElse(ReplaceResult.SendDone(cxr, p.tunnelProperties))
 
   def replaceText (
     submission         : XFormsModelSubmission,
@@ -96,9 +93,10 @@ object TextReplacer {
         message          = message,
         description      = "processing `targetref` attribute",
         submitErrorEvent = new XFormsSubmitErrorEvent(
-          target    = submission,
-          errorType = ErrorType.TargetError,
-          cxrOpt    = connectionResult.some
+          target           = submission,
+          errorType        = ErrorType.TargetError,
+          cxrOpt           = connectionResult.some,
+          tunnelProperties = p.tunnelProperties
         )
       )
 
@@ -139,7 +137,8 @@ object TextReplacer {
         case t: XFormsSubmissionException =>
           ReplaceResult.SendError(
             t,
-            Left(connectionResult.some)
+            Left(connectionResult.some),
+            p.tunnelProperties
           ).some
       }
     }
@@ -158,7 +157,8 @@ object TextReplacer {
           case _ =>
             ReplaceResult.SendError(
               newSubmissionException(s"""`targetref` attribute doesn't point to a node for `replace="${p.replaceType}"`."""),
-              Left(connectionResult.some)
+              Left(connectionResult.some),
+              p.tunnelProperties
             ).some
         }
       case None =>

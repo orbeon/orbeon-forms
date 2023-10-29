@@ -145,8 +145,7 @@
 
     .fr-wizard-toc-inner {
         position: sticky;
-        position: -webkit-sticky;
-        top: 0;
+        top: 60px;
     }
 
     .fr-wizard-body {
@@ -195,6 +194,36 @@
         // See `section.less`
         padding-left:  @frSectionTitleLeftPadding - @frGridCellPadding;
         padding-right: @frSectionTitleLeftPadding - @frGridCellPadding;
+    }
+
+    .fr-wizard-debugger {
+
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 300px;
+        height: 100vh;
+
+        box-sizing: border-box;
+        padding: 60px 1em 1em;
+        z-index: 10000;
+
+        border-right: 4px solid @wellBackground;
+
+        background: repeating-linear-gradient(
+          -45deg,
+          @wellBackground,
+          @wellBackground 5px,
+          @inputBackground 5px,
+          @inputBackground 10px
+        );
+
+        overflow-y: scroll;
+
+        legend {
+            position: relative;
+            top: 60px;
+        }
     }
 
     @media (max-width: 980px) {

@@ -1,0 +1,23 @@
+.fr-grid-td {
+
+  // Hidden by default
+  .xbl-fr-video .xforms-upload { visibility: hidden }
+
+  // Shown on mouseover the cell or when an upload is in progress
+  &:hover .fb-upload .xforms-upload,
+  .xbl-fr-video .xforms-upload.xforms-upload-state-progress
+  { visibility: visible }
+
+  // Never show download link
+  .xbl-fr-video .xforms-output-appearance-xxforms-download { display: none }
+
+  video.xforms-output-output {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  video.xforms-output-output.empty-source {
+    display: none;
+  }
+}

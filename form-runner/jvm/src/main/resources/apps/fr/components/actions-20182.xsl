@@ -24,8 +24,6 @@
 
     <xsl:import href="oxf:/apps/fr/components/actions-common.xsl"/>
 
-    <!-- TODO: store document attributes by action id -->
-    <xsl:variable name="action-document-att-ns">fr-action</xsl:variable>
     <xsl:variable name="continuation-event-prefix">fr-action-continuation-</xsl:variable>
 
     <xsl:function name="fr:build-iterate-att" as="attribute(iterate)">
@@ -63,9 +61,7 @@
                     name="iterate"
                     select="
                         concat(
-                            'frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute(''',
-                            $action-document-att-ns,
-                            ''', ''action-source''), ''',
+                            'frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute($current-action-id, ''action-source''), ''',
                             $to-control-name,
                             ''', true(),',
                             if (exists($library-name)) then concat('''', $library-name, '''') else '()',
@@ -81,7 +77,7 @@
         <xsl:param name="context" as="xs:string?"/>
 
          <xsl:if test="$context = 'current-iteration'">
-             <xsl:attribute name="context">xxf:get-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', '<xsl:value-of select="fr:build-context-param($elem/..)"/>')</xsl:attribute>
+             <xsl:attribute name="context">xxf:get-document-attribute($current-action-id, '<xsl:value-of select="fr:build-context-param($elem/..)"/>')</xsl:attribute>
          </xsl:if>
     </xsl:function>
 
@@ -160,6 +156,7 @@
 
                 <xsl:for-each select="$actions">
                     <xf:dispatch name="fr-call-user-{.}-action" targetid="{$model-id}">
+                        <xf:property name="action-id"     value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true" xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"/>
                         <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
                     </xf:dispatch>
                 </xsl:for-each>
@@ -227,6 +224,7 @@
                         <xsl:if test="$is-outer">
                             <xsl:attribute name="xxbl:scope" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">inner</xsl:attribute>
                         </xsl:if>
+                        <xf:property name="action-id"     value="concat('fr-action-', secure:randomHexId())" xxf:tunnel="true" xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"/>
                         <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
                     </xf:dispatch>
                 </xsl:for-each>
@@ -278,9 +276,10 @@
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
 
         <xf:dispatch
-            if="xxf:get-document-attribute('{$action-document-att-ns}', '{fr:build-is-last-iteration-param(.)}') = true()"
+            if="xxf:get-document-attribute($current-action-id, '{fr:build-is-last-iteration-param(.)}') = true()"
             name="{$continuation-event-prefix}{fr:continuation-id($action-name, $continuation-position + 1)}"
             targetid="fr-form-model">
+            <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
         </xf:dispatch>
 
     </xsl:template>
@@ -294,6 +293,7 @@
         <xf:dispatch
             name="{$continuation-event-prefix}{fr:continuation-id($action-name, $continuation-position + 1)}"
             targetid="fr-form-model">
+            <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
         </xf:dispatch>
 
     </xsl:template>
@@ -313,30 +313,36 @@
         <xsl:variable name="model-id"    select="$model/@id/string()" as="xs:string"/>
         <xsl:variable name="action-name" select="@name/string()"  as="xs:string"/>
 
-        <!-- Create a document with a root element so that `preceding::` works -->
-        <xsl:variable name="content-with-markers" as="element(_)">
-            <_>
+        <!-- Create a document with a root element so that `preceding::` works. Also include attributes so actions can
+             search for settings on the ancestor `fr:action` -->
+        <xsl:variable name="content-with-markers" as="element(fr:action)">
+            <fr:action>
+                <xsl:copy-of select="@*"/>
                 <xsl:apply-templates select="fr:*" mode="within-action-2018.2-marking"/>
-            </_>
+            </fr:action>
         </xsl:variable>
 
         <xf:action id="{@name}-binding" event="fr-call-user-{@name}-action" target="{$model-id}">
 
             <!-- TODO: Consider handling `iterate-control-name` per https://github.com/orbeon/orbeon-forms/issues/1833 -->
 
-<!--            <xf:var-->
-<!--                xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"-->
-<!--                name="new-action-id"-->
-<!--                value="concat('fr-action-', secure:randomHexId())"/>-->
             <xf:var
-                xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-                name="new-action-id"
-                value="'{$action-document-att-ns}'"/>
+                name="current-action-id"
+                value="event('action-id')"/>
+
+            <xxf:log
+                class="fr-action-impl"
+                name="orbeon.action"
+                level="info"
+                value="'Starting new top-level action'">
+                <xf:property name="action-name"   value="'{@name}'"/>
+                <xf:property name="action-id"     value="$current-action-id"/>
+                <xf:property name="action-source" value="event('action-source')"/>
+            </xxf:log>
 
             <!-- Initialize action state -->
             <xf:action type="xpath">
-                xxf:set-document-attribute($new-action-id, 'action-source', event('action-source')),
-                xxf:set-document-attribute($new-action-id, 'action-error',  false())
+                xxf:set-document-attribute($current-action-id, 'action-source', event('action-source'))
             </xf:action>
 
             <!-- TODO: clean action state in case of success AND error (but will need action id!) -->
@@ -411,7 +417,11 @@
                             observer="{$preceding-service-name-opt}-submission"
                             event="xforms-submit-done"
                             context="xxf:instance('fr-service-response-instance')"
-                            if="xxf:get-document-attribute('{$action-document-att-ns}', 'action-continuation-id') = '{$current-continuation-id}'">
+                            if="xxf:get-document-attribute(event('action-id'), 'action-continuation-id') = '{$current-continuation-id}'">
+
+                            <xf:var
+                                name="current-action-id"
+                                value="event('action-id')"/>
 
                             <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
                                 <xsl:with-param tunnel="yes" name="view-elem"             select="$view-elem"/>
@@ -446,10 +456,14 @@
                                     if (exists($context-changing-elem-opt/self::fr:service-call)) then
                                         'xxf:instance(''fr-service-response-instance'')'
                                     else if (exists($context-changing-elem-opt/self::fr:data-iterate)) then
-                                        concat('xxf:get-document-attribute(''', $action-document-att-ns, ''', ''', fr:build-context-param($context-changing-elem-opt), ''')')
+                                        concat('xxf:get-document-attribute(event(''action-id''), ''', fr:build-context-param($context-changing-elem-opt), ''')')
                                     else
                                         'instance(''fr-form-instance'')'
                                 "/>
+
+                            <xf:var
+                                name="current-action-id"
+                                value="event('action-id')"/>
 
                             <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
                                 <xsl:with-param tunnel="yes" name="view-elem"             select="$view-elem"/>
@@ -474,6 +488,16 @@
 
         <xsl:variable name="service-name" select="@service/string()"/>
 
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"    value="$current-action-id"/>
+            <xf:property name="action-type"  value="'{name(.)}'"/>
+            <xf:property name="service-name" value="'{$service-name}'"/>
+        </xxf:log>
+
         <xf:insert
             ref="xxf:instance('fr-service-request-instance')"
             origin="xf:parse(xxf:instance('{$service-name}-instance'))"/>
@@ -496,7 +520,7 @@
                                 <xsl:variable name="control" select="@control/string()" as="xs:string"/>
                                 <xf:var
                                     name="value"
-                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute('{$action-document-att-ns}', 'action-source'), '{$control}', true(), {if (exists($library-name)) then concat('''', $library-name, '''') else '()'})"/>
+                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute($current-action-id, 'action-source'), '{$control}', true(), {if (exists($library-name)) then concat('''', $library-name, '''') else '()'})"/>
                             </xsl:when>
                             <xsl:when test="exists(@value)">
                                 <xsl:variable name="value" select="@value/string()" as="xs:string"/>
@@ -546,11 +570,31 @@
         </xsl:if>
 
         <xf:action type="xpath">
-            xxf:set-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', 'action-continuation-id', '<xsl:value-of select="fr:continuation-id($action-name, $continuation-position + 1)"/>')
+            xxf:set-document-attribute($current-action-id, 'action-continuation-id', '<xsl:value-of select="fr:continuation-id($action-name, $continuation-position + 1)"/>')
         </xf:action>
 
         <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
-        <xf:send submission="{$service-name}-submission"/>
+        <xf:send submission="{$service-name}-submission">
+            <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+            <xsl:variable
+                name="async"
+                as="xs:boolean"
+                select="
+                    ancestor::fr:action/@async = 'true' or (
+                        not(ancestor::fr:action/@async = 'false') and
+                        $actions-async
+                    )"/>
+            <xf:property name="fr-async" value="'{$async}'"/>
+            <xsl:variable
+                name="response-must-await"
+                as="xs:boolean"
+                select="
+                    ancestor::fr:action/@response-must-await = 'true' or (
+                        not(ancestor::fr:action/@response-must-await = 'false') and
+                        $actions-response-must-await
+                    )"/>
+            <xf:property name="fr-response-must-await" value="'{$response-must-await}'"/>
+        </xf:send>
 
     </xsl:template>
 
@@ -561,10 +605,21 @@
 
         <xsl:variable name="data-iterate-elem" select="."/>
 
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
+
         <xf:action if="empty(({@ref}))">
             <xf:dispatch
                 name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
-                targetid="fr-form-model"/>
+                targetid="fr-form-model">
+                <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+            </xf:dispatch>
         </xf:action>
         <xf:action iterate="{frf:replaceVarReferencesWithFunctionCalls(. , @ref, false(), $library-name, ())}">
             <xsl:copy-of select="fr:build-context-att($data-iterate-elem, @expression-context)"/>
@@ -576,10 +631,11 @@
 
                 <xsl:variable name="group-position" select="position()"/>
                 <xsl:if test="$group-position = 1">
-                    <xf:action if="not(xxf:get-document-attribute('{$action-document-att-ns}', 'action-error') = true())">
+                    <!-- 2023-10-16: In case of error, we now remove all document attributes for the action. -->
+                    <xf:action if="exists(xxf:get-document-attribute($current-action-id, 'action-source'))">
                         <xf:action type="xpath">
-                            xxf:set-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', '<xsl:value-of select="fr:build-is-last-iteration-param($data-iterate-elem)"/>', position() = last()),
-                            xxf:set-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', '<xsl:value-of select="fr:build-context-param($data-iterate-elem)"/>', .)
+                            xxf:set-document-attribute($current-action-id, '<xsl:value-of select="fr:build-is-last-iteration-param($data-iterate-elem)"/>', position() = last()),
+                            xxf:set-document-attribute($current-action-id, '<xsl:value-of select="fr:build-context-param($data-iterate-elem)"/>', .)
                         </xf:action>
                         <xsl:apply-templates select="current-group()" mode="within-action-2018.2"/>
                     </xf:action>
@@ -600,6 +656,15 @@
         <xsl:variable name="if-position-within-block" select="count(preceding-sibling::fr:if)"/>
         <xsl:variable name="var-name"                 select="concat('cond', $if-position-within-block + 1)"/>
 
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
+
         <xf:var name="{$var-name}" value="{frf:replaceVarReferencesWithFunctionCalls(. , @condition, false(), $library-name, ())}">
             <xsl:copy-of select="fr:build-context-att(., @expression-context)"/>
         </xf:var>
@@ -618,6 +683,7 @@
             <xf:dispatch
                 name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
                 targetid="fr-form-model">
+                <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
             </xf:dispatch>
         </xf:action>
     </xsl:template>
@@ -626,6 +692,16 @@
 
         <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
         <xsl:variable name="at"          select="@at/string()"     as="xs:string?"/>
+
+         <xxf:log
+             class="fr-action-impl"
+             name="orbeon.action"
+             level="info"
+             value="'Starting action'">
+             <xf:property name="action-id"   value="$current-action-id"/>
+             <xf:property name="action-type" value="'{name(.)}'"/>
+             <xf:property name="repeat-name" value="'{$repeat-name}'"/>
+         </xxf:log>
 
         <xf:action type="xpath" class="fr-action-impl">
             frf:repeatClear('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, true())"/>')
@@ -644,6 +720,16 @@
         <!-- NOTE: We might like to support `after-current | before-current`, for for that we need the `index()` function which
              needs a repeat id, and we don't have it right now. -->
 
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="{name(.)}"/>
+            <xf:property name="repeat-name" value="'{$repeat-name}'"/>
+        </xxf:log>
+
         <xf:action type="xpath" class="fr-action-impl">
             frf:repeatAddIteration('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, false())"/>', <xsl:value-of select="$apply-defaults"/>())
         </xf:action>
@@ -654,6 +740,16 @@
 
         <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
         <xsl:variable name="at"          select="@at/string()"     as="xs:string?"/>
+
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="{name(.)}"/>
+            <xf:property name="repeat-name" value="'{$repeat-name}'"/>
+        </xxf:log>
 
         <xf:action type="xpath" class="fr-action-impl">
             frf:repeatRemoveIteration('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, false())"/>')
@@ -669,6 +765,15 @@
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
 
         <xf:action class="fr-action-impl">
             <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name, ())}"/>
@@ -693,6 +798,15 @@
 
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
 
         <xf:action class="fr-action-impl">
 
@@ -723,6 +837,15 @@
 <!--        <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>-->
         <xsl:variable name="visited"         select="@visited/string()" as="xs:string?"/>
 
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
+
         <xxf:setvisited
             class="fr-action-impl"
             control="{frf:findControlByNameUnderXPath($to-control-name, $view-elem)/@id}"
@@ -736,6 +859,15 @@
         <xsl:param tunnel="yes" name="view-elem"    as="element()"/>
 
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
+
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
 
         <xf:setfocus
             class="fr-action-impl"
@@ -757,6 +889,15 @@
         <xsl:variable name="value-expr"      select="$elem/@value/string()"              as="xs:string"/>
         <xsl:variable name="at"              select="$elem/@at/string()"                 as="xs:string?"/>
         <xsl:variable name="context"         select="$elem/@expression-context/string()" as="xs:string?"/>
+
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
 
         <xf:action class="fr-action-impl">
 
@@ -844,7 +985,7 @@
                  2021-02-02: Q: The offline `xxf:evaluate()` scopes variables. Maybe the older implementation doesn't?
             -->
             <xf:dispatch name="fr-call-itemset-action" targetid="fr-form-instance">
-                <xf:property name="action-source"      value="xxf:get-document-attribute('{$action-document-att-ns}', 'action-source')"/>
+                <xf:property name="action-source"      value="xxf:get-document-attribute($current-action-id, 'action-source')"/>
                 <xf:property name="control-name"       value="'{$to-control-name}'"/>
                 <xf:property name="new-itemset-id"     value="$new-itemset-id"/>
                 <xf:property name="new-itemset-holder" value="$new-itemset-holder"/>
@@ -861,6 +1002,15 @@
 
         <xsl:variable name="dataset-name" select="@name/string()" as="xs:string"/>
 
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
+
         <xf:action class="fr-action-impl">
             <xf:var name="value" value="."/>
             <xf:insert
@@ -875,6 +1025,15 @@
 
         <xsl:variable name="dataset-name" select="@name/string()" as="xs:string"/>
 
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
+
         <xf:action class="fr-action-impl">
             <xf:insert
                 ref="instance('fr-dataset-{$dataset-name}')"
@@ -888,6 +1047,15 @@
         <xsl:variable name="process-scope" select="@scope/string()" as="xs:string"/>
         <xsl:variable name="process-name"  select="@name/string()"  as="xs:string"/>
 
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
+
         <xf:action type="xpath" class="fr-action-impl">
             fr:run-process-by-name('<xsl:value-of select="$process-scope"/>', '<xsl:value-of select="$process-name"/>')
         </xf:action>
@@ -898,6 +1066,15 @@
 
         <xsl:variable name="location" select="@location/string()" as="xs:string"/>
         <xsl:variable name="target"   select="@target/string()"   as="xs:string?"/>
+
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
 
         <!-- Prefer `<xf:load>` to `fr:run-process(…, 'navigate(…))`, as the latter builds a process (string) with
              XPath, which requires escaping, and is thus more error prone -->
@@ -916,6 +1093,15 @@
 
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
 
         <xf:action class="fr-action-impl">
             <xf:var name="value"     value="xxf:instance('fr-service-response-instance')/string()"/>
@@ -956,6 +1142,15 @@
         <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
 
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
+
         <xf:action class="fr-action-impl">
             <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name, ())}"/>
 
@@ -983,6 +1178,14 @@
     </xsl:template>
 
     <xsl:template match="fr:alert" mode="within-action-2018.2">
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
         <xf:action class="fr-action-impl">
             <xf:var name="message"><xsl:value-of select="@message"/></xf:var>
             <xf:message value="xxf:evaluate-avt($message)"/>
@@ -1039,6 +1242,15 @@
             </xsl:message>
         </xsl:if>
 
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
+
         <xf:var class="fr-action-impl" name="must-warn" value="
             (: TODO: It's not good that we have to replicate the copy logic here. Can we find a better solution? :)
             let $left-names         := ({concat('''', string-join($left-names,         ''','''), '''')}),
@@ -1091,13 +1303,24 @@
                                 error()
                         )"/>
 
+        <xxf:log
+            class="fr-action-impl"
+            if="$must-warn"
+            name="orbeon.action"
+            level="info"
+            value="'Pausing action to show warning message'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="{name(.)}"/>
+        </xxf:log>
+
         <xxf:show if="$must-warn" dialog="fr-action-continuation-dialog" class="fr-action-impl">
             <xf:property
                 name="message"
                 value="xxf:r('detail.messages.confirmation-dialog-message-overwrite', '|fr-fr-resources|')"/>
+            <!-- Context is a `|`-separated tuple as we need more than one piece of information -->
             <xf:property
                 name="context"
-                value="'{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}'"/>
+                value="concat($current-action-id, '|{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}')"/>
             <xf:property
                 name="positive-targetid"
                 value="xxf:absolute-id('fr-actions-model')"/>
@@ -1108,7 +1331,9 @@
         <xf:dispatch
             if="not($must-warn)"
             name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
-            targetid="{$model-id}"/>
+            targetid="{$model-id}">
+            <xf:property name="action-id" value="$current-action-id" xxf:tunnel="true"/>
+        </xf:dispatch>
 
     </xsl:template>
 
@@ -1121,6 +1346,15 @@
 <!--        <xsl:variable name="action-sync-iterations"  select="@sync-iterations  = 'true'" as="xs:boolean"/>-->
 <!--        <xsl:variable name="action-left-iterations"  select="@left-iterations"           as="xs:string?"/>-->
         <xsl:variable name="action-right-at" select="@right-at/string()" as="xs:string?"/>
+
+        <xxf:log
+            class="fr-action-impl"
+            name="orbeon.action"
+            level="info"
+            value="'Starting action'">
+            <xf:property name="action-id"   value="$current-action-id"/>
+            <xf:property name="action-type" value="'{name(.)}'"/>
+        </xxf:log>
 
         <!-- TODO: improve by grouping all source/destination controls within the same source/destination repeats, and
               adjust the iterations once only. -->

@@ -77,6 +77,8 @@ object XFormsProperties {
   val LoginPageDetectionRegexpProperty          = "login-page-detection-regexp"
 
   val SessionHeartbeatProperty                  = "session-heartbeat"
+  val SessionExpirationTriggerProperty          = "session-expiration.trigger"
+  val SessionExpirationMarginProperty           = "session-expiration.margin"
 
   val DelayBeforeIncrementalRequestProperty     = "delay-before-incremental-request"
   val InternalShortDelayProperty                = "internal-short-delay"
@@ -101,6 +103,7 @@ object XFormsProperties {
   val EncryptItemValuesProperty                 = "encrypt-item-values"
   val XpathAnalysisProperty                     = "xpath-analysis"
   val CalculateAnalysisProperty                 = "analysis.calculate"
+  val AllowErrorRecoveryOnInit                  = "allow-error-recovery-on-init"
 
   val SanitizeProperty                          = "sanitize"
 
@@ -201,6 +204,7 @@ object XFormsProperties {
       PropertyDefinition(Xforms11SwitchProperty,                    false,                       propagateToClient = false),
       PropertyDefinition(XpathAnalysisProperty,                     false,                       propagateToClient = false),
       PropertyDefinition(CalculateAnalysisProperty,                 false,                       propagateToClient = false),
+      PropertyDefinition(AllowErrorRecoveryOnInit,                  false,                       propagateToClient = false),
       PropertyDefinition(SanitizeProperty,                          "",                          propagateToClient = false),
       PropertyDefinition(AssetsBaselineExcludesProperty,            "",                          propagateToClient = false),
       PropertyDefinition(AssetsBaselineUpdatesProperty,             "",                          propagateToClient = false),
@@ -208,6 +212,8 @@ object XFormsProperties {
 
       PropertyDefinition(UseAriaProperty,                           false,                       propagateToClient = true),
       PropertyDefinition(SessionHeartbeatProperty,                  true,                        propagateToClient = true),
+      PropertyDefinition(SessionExpirationTriggerProperty,          80,                          propagateToClient = true),
+      PropertyDefinition(SessionExpirationMarginProperty,           10,                          propagateToClient = true),
       PropertyDefinition(DelayBeforeIncrementalRequestProperty,     500,                         propagateToClient = true),
       PropertyDefinition(InternalShortDelayProperty,                100,                         propagateToClient = true),
       PropertyDefinition(DelayBeforeDisplayLoadingProperty,         500,                         propagateToClient = true),

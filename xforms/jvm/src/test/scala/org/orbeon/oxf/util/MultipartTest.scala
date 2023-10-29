@@ -33,6 +33,7 @@ import org.scalactic.Equality
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.ByteArrayInputStream
+import java.net.URI
 import scala.collection.{mutable => m}
 import scala.util.{Success, Try}
 
@@ -83,8 +84,8 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
         uploadContext,
         Some(
           new UploadProgressMultipartLifecycle(Some(body.length.toLong), None, uploadContext.getInputStream, session) {
-            def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)] =
-              Success(MaximumSize.unapply(maxSize.toString).get -> AllowedAnyMediatype)
+            def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
+              Success(MaximumSize.unapply(maxSize.toString).get -> AllowedAnyMediatype -> URI.create("/acme/sales/new"))
           }
         ),
         MaximumSize.unapply(maxSize.toString) getOrElse LimitedSize(0L),

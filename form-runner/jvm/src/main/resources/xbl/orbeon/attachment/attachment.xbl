@@ -205,11 +205,11 @@
                             <remove>Remove Attachment</remove>
                         </resource>
                         <resource xml:lang="es">
-                            <drag-single todo="true">[Drag file here or {0}select file{1}.]</drag-single>
-                            <drag-multiple todo="true">[Drag files here or {0}select files{1}.]</drag-multiple>
-                            <download>Bajar Archivo</download>
-                            <empty todo="true">[No attachment.]</empty>
-                            <remove todo="true">[Remove Attachment]</remove>
+                            <drag-single>Arrastra el archivo aquí o {0}selecciona el archivo{1}.</drag-single>
+                            <drag-multiple>Arrastra los archivos aquí o {0}selecciona los archivos{1}.</drag-multiple>
+                            <download>Descargar</download>
+                            <empty>No hay adjunto</empty>
+                            <remove>Quitar archivo adjunto</remove>
                         </resource>
                         <resource xml:lang="fi">
                             <drag-single todo="true">[Drag file here or {0}select file{1}.]</drag-single>
@@ -341,14 +341,18 @@
                                     'fa-file-o'
                         }"/>
 
+                        <xf:var
+                            name="disable-download"
+                            value="fr:component-param-value('allow-download') = 'false' or fr:mode() = ('pdf', 'email')"/>
+
                         <xf:output
-                            ref=".[fr:component-param-value('allow-download') = 'false']"
+                            ref=".[$disable-download]"
                             value="@filename"
                             class="fr-attachment-filename"/>
 
                         <xf:output
                             appearance="xxf:download"
-                            ref=".[not(fr:component-param-value('allow-download') = 'false')]"
+                            ref=".[not($disable-download)]"
                             class="fr-attachment-filename">
 
                             <xf:label ref="@filename"/>

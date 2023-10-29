@@ -253,7 +253,7 @@ trait FormRunnerHome {
       }
     }
 
-    combinedIndexIterator map createNode
+    (combinedIndexIterator map createNode).toList // https://github.com/orbeon/orbeon-forms/issues/6016
   }
 
   // Return remote servers information:

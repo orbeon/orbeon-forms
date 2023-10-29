@@ -53,7 +53,8 @@ object XFormsExtractor {
       "size", //xf:upload/xxf:size
       "dynamic",
       "param",
-      "body"
+      "body",
+      "log"
     )
 
   private val AllowedEXFormElements =

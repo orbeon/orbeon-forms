@@ -21,7 +21,7 @@ import org.orbeon.oxf.xml.SBinaryDefaultFormats._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.LocationDocumentSource
 import org.orbeon.saxon.om.DocumentInfo
-import org.orbeon.xforms.DelayedEvent
+import org.orbeon.xforms.{DelayedEvent, SimplePropertyValue}
 import sbinary.Operations._
 import sbinary._
 
@@ -70,6 +70,22 @@ object XFormsProtocols {
       ControlState(read[String](input), read[Boolean](input), read[Map[String, String]](input))
   }
 
+  implicit object SimplePropertyValueFormat extends Format[SimplePropertyValue] {
+
+    def writes(output: Output, value: SimplePropertyValue): Unit = {
+      write(output, value.name)
+      write(output, value.value)
+      write(output, value.tunnel)
+    }
+
+    def reads(input: Input): SimplePropertyValue =
+      SimplePropertyValue(
+        read[String](input),
+        read[String](input),
+        read[Boolean](input)
+      )
+  }
+
   implicit object DelayedEventFormat extends Format[DelayedEvent] {
 
     def writes(output: Output, delayedEvent: DelayedEvent): Unit = {
@@ -82,6 +98,7 @@ object XFormsProtocols {
       write(output, delayedEvent.browserTarget)
       write(output, delayedEvent.submissionId)
       write(output, delayedEvent.isResponseResourceType)
+      write(output, delayedEvent.properties)
     }
 
     def reads(input: Input): DelayedEvent =
@@ -94,7 +111,8 @@ object XFormsProtocols {
         read[Boolean](input),
         read[Option[String]](input),
         read[Option[String]](input),
-        read[Boolean](input)
+        read[Boolean](input),
+        read[List[SimplePropertyValue]](input)
       )
   }
 

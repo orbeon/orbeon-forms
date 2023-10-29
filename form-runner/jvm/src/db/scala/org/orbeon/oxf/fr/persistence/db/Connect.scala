@@ -90,8 +90,8 @@ private[persistence] object Connect {
     } finally {
       Logging.withDebug(s"drop `$TestDatabaseName` objects") {
         provider match {
-          case MySQL      => runStatements(datasourceDescriptor, List(s"DROP DATABASE $TestDatabaseName"))
-          case PostgreSQL => runStatements(datasourceDescriptor, List(s"DROP SCHEMA   $TestDatabaseName    CASCADE"))
+          case MySQL      => runStatements(datasourceDescriptor, List(s"DROP DATABASE  $TestDatabaseName"))
+          case PostgreSQL => runStatements(datasourceDescriptor, List(s"DROP SCHEMA    $TestDatabaseName    CASCADE"))
         }
       }
     }

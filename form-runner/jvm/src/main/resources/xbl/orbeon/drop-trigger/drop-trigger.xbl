@@ -37,7 +37,7 @@
             <!-- Bootstrap dropdown/dropup layout -->
             <!-- TODO: configurable dropup/dropdown -->
             <xh:div class="btn-group dropup">
-              <xh:button class="btn" data-orbeon-value="{$items[1]/value}">
+              <xh:button class="btn fr-{$items[1]/value}-button" data-orbeon-value="{$items[1]/value}">
                   <xf:output value="$items[1]/label" mediatype="text/html"/>
               </xh:button>
               <xh:button class="btn dropdown-toggle" data-toggle="dropdown">
@@ -45,7 +45,7 @@
               </xh:button>
               <xh:ul class="dropdown-menu">
                   <xf:repeat ref="$items[position() gt 1]">
-                      <xh:li><xh:a href="#" data-orbeon-value="{value}"><xf:output value="label" mediatype="text/html"/></xh:a></xh:li>
+                      <xh:li><xh:a href="#" data-orbeon-value="{value}" class="fr-{value}-button"><xf:output value="label" mediatype="text/html"/></xh:a></xh:li>
                   </xf:repeat>
               </xh:ul>
             </xh:div>

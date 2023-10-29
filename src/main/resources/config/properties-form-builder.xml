@@ -73,6 +73,7 @@
         oxf:/forms/orbeon/builder/xbl/attachment-multiple.xbl
         oxf:/xbl/orbeon/image-attachment/image-attachment.xbl
         oxf:/xbl/orbeon/image/image.xbl
+        oxf:/xbl/orbeon/video/video.xbl
         oxf:/xbl/orbeon/wpaint/wpaint.xbl
     </property>
 
@@ -202,6 +203,17 @@
             (title[@xml:lang = fr:lang()], title)[1],
             '.xhtml'
         )
+    </property>
+
+    <property as="xs:string" name="oxf.fr.detail.pdf.filename.orbeon.builder">
+        let $fb-lang := xxf:instance('fb-language-instance')
+        return
+            concat(
+                (title[@xml:lang = $fb-lang], title)[1],
+                ' (',
+                $fb-lang,
+                ').pdf'
+            )
     </property>
 
 </properties>

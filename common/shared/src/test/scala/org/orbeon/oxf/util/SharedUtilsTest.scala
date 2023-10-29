@@ -262,6 +262,28 @@ class SharedUtilsTest extends AnyFunSpec {
 
   }
 
+  describe("The `escape` function") {
+
+    val expected = Seq(
+      ("",       Seq(),         "",   ""),
+      ("abcdef", Seq(),         "",   "abcdef"),
+      ("abcdef", Seq(),         "\\", "abcdef"),
+      ("abcdef", Seq("c"),      "",   "abcdef"),
+      ("abcdef", Seq("c"),      "\\", "ab\\cdef"),
+      ("abcdef", Seq("b", "d"), "\\", "a\\bc\\def"),
+      ("abcdbf", Seq("b", "d"), "\\", "a\\bc\\d\\bf"),
+      ("abcdef", Seq("g", "h"), "\\", "abcdef"),
+      ("abadaf", Seq("a", "h"), "\\", "\\ab\\ad\\af"),
+      ("ahahah", Seq("a", "h"), "\\", "\\a\\h\\a\\h\\a\\h")
+    )
+
+    for ((s, stringsToEscape, escapeString, expected) <- expected)
+      it(s"must pass with `$s`/`$stringsToEscape`/`$escapeString`") {
+        assert(expected === s.escaped(stringsToEscape, escapeString))
+      }
+
+  }
+
   describe("The `escapeXMLMinimal` and `unescapeXMLMinimal` functions") {
 
     val expected = Seq(

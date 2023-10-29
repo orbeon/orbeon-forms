@@ -37,6 +37,7 @@ object XFormsNames {
   // document.
   // https://github.com/orbeon/orbeon-forms/issues/5812
   def xfQName       (name: String): QName = QName(name, XFORMS_NAMESPACE_SHORT)
+  def xxfQName      (name: String): QName = QName(name, XXFORMS_NAMESPACE_SHORT)
 
   val XFORMS_PREFIX           = "xforms" // TODO: remove
   val XFORMS_SHORT_PREFIX     = "xf"
@@ -254,6 +255,8 @@ object XFormsNames {
 
   val XFORMS_MESSAGE_QNAME                = xformsQName("message")
 
+  val XXFORMS_LOG_QNAME                   = xxformsQName("log")
+
   val XFORMS_SUBMIT_REPLACE_ALL      = "all"
   val XFORMS_SUBMIT_REPLACE_INSTANCE = "instance"
   val XFORMS_SUBMIT_REPLACE_TEXT     = "text"
@@ -309,7 +312,8 @@ object XFormsNames {
   val XXFORMS_EXCLUDE_RESULT_PREFIXES         = xxformsQName("exclude-result-prefixes")
   val XXFORMS_CUSTOM_MIPS_QNAME               = xxformsQName("custom-mips")
   val XXFORMS_RELEVANT_ATTRIBUTE_QNAME        = xxformsQName("relevant-attribute")
-  val XXFORMS_ANNOTATE_QNAME                  = QName("annotate", XXFORMS_NAMESPACE_SHORT)
+  val XXFORMS_ANNOTATE_QNAME                  = xxfQName("annotate")
+  val XXFORMS_RESPONSE_MUST_AWAIT_QNAME       = xxfQName("response-must-await")
 
   val XXFORMS_INSTANCE_QNAME                  = xxformsQName("instance")
   val XXFORMS_SHOW_PROGRESS_QNAME             = xxformsQName("show-progress")

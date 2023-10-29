@@ -14,16 +14,19 @@
 package org.orbeon.fr
 
 import org.orbeon.facades.ResizeObserver
+import org.orbeon.web.DomEventNames
 import org.orbeon.xbl
+import org.orbeon.xforms.Session.SessionUpdate
+import org.orbeon.xforms._
 import org.orbeon.xforms.facade.Events
-import org.orbeon.xforms.{App, XFormsApp}
 import org.scalajs.dom
-import org.scalajs.dom.{document, html, raw, window}
+import org.scalajs.dom._
 import org.scalajs.dom.raw.HTMLElement
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
-import org.scalajs.dom.ext._
+import scala.scalajs.js.timers
+import scala.util.Try
 
 
 // Scala.js starting point for Form Runner
@@ -73,10 +76,10 @@ object FormRunnerApp extends App {
     xbl.Recaptcha
     xbl.ClipboardCopy
 
-    // Add `scroll-padding-top` and `scroll-padding-bottom` to prevent the focused form field from being below the top navbar or button bar
     // TODO: with embedding, unobserve when the form is destroyed
     Events.orbeonLoadedEvent.subscribe(() => {
 
+      // Add `scroll-padding-top` and `scroll-padding-bottom` to prevent the focused form field from being below the top navbar or button bar
       def addScrollPadding(rawElement: raw.Element, cssClass: String): Unit = {
         val htmlElement = rawElement.asInstanceOf[HTMLElement]
         val position    = window.getComputedStyle(htmlElement).position
@@ -93,9 +96,126 @@ object FormRunnerApp extends App {
       Option(document.querySelector(".orbeon .navbar-fixed-top")).foreach(addScrollPadding(_, "scroll-padding-top"))
       Option(document.querySelector(".orbeon .fr-buttons"      )).foreach(addScrollPadding(_, "scroll-padding-bottom"))
 
+      initSessionExpirationDialog()
     })
-
   }
+
+  private def initSessionExpirationDialog(): Unit =
+    Option(document.querySelector(".fr-session-expiration-dialog")) foreach { dialog =>
+
+      val modalConfiguration: js.Object = new js.Object {
+        val backdrop = "static" // Click on the background doesn't hide dialog
+        val keyboard = false    // Can't use esc to close the dialog
+      }
+
+      val bootstrapFiveModalOpt = Try(js.Dynamic.global.bootstrap).toOption.map { bootstrap =>
+        // Bootstrap 5 modal dialog
+        js.Dynamic.newInstance(bootstrap.Modal)(dialog, modalConfiguration)
+      }
+
+      // Detecting whether the dialog is shown or not by retrieving its CSS classes is not reliable when aboutToExpire
+      // is called multiple times in a row (e.g. locally and because of a message from another page), so we keep track
+      // of it ourselves.
+      var dialogShown: Boolean = false
+      var didExpireTimerOpt: Option[timers.SetTimeoutHandle] = None
+
+      if (dialog.classList.contains("fr-feature-enabled")) {
+        val renewSessionButton = dialog.querySelector("button").asInstanceOf[html.Element]
+        GlobalEventListenerSupport.addListener(renewSessionButton, DomEventNames.Click, (event: dom.raw.EventTarget) => {
+          renewSession()
+
+          // Since we sent a heartbeat when the session was renewed, the local newest event time has been updated and
+          // will be broadcast to other pages.
+          Session.updateWithLocalNewestEventTime()
+        })
+
+        Session.addSessionUpdateListener(sessionUpdate)
+      }
+
+      def sessionUpdate(sessionUpdate: SessionUpdate): Unit =
+        if (! sessionUpdate.sessionHeartbeatEnabled) {
+          sessionUpdate.sessionStatus match {
+            case Session.SessionActive if dialogShown && ! Session.expired =>
+              renewSession()
+
+            case Session.SessionAboutToExpire =>
+              aboutToExpire(sessionUpdate.approxSessionExpiredTimeMillis)
+
+            case Session.SessionExpired =>
+              sessionExpired()
+
+            case _ =>
+              // Nothing to do
+          }
+        }
+
+      def aboutToExpire(approxSessionExpiredTimeMillis: Long): Unit =
+        if (! dialogShown) {
+          AjaxClient.pause()
+          updateDialog()
+          showDialog()
+
+          val timeToExpiration = approxSessionExpiredTimeMillis - System.currentTimeMillis()
+          didExpireTimerOpt.foreach(timers.clearTimeout)
+          didExpireTimerOpt = Some(timers.setTimeout(timeToExpiration) {
+            Session.sessionHasExpired()
+            updateDialog()
+          })
+        }
+
+      def sessionExpired(): Unit =
+        if (! dialogShown) {
+          AjaxClient.pause()
+          updateDialog()
+          showDialog()
+        } else {
+          updateDialog()
+        }
+
+      def updateDialog(): Unit = {
+        val headerContainer = dialog.querySelector(".modal-header")
+        val bodyContainer   = dialog.querySelector(".modal-body")
+        val footer          = dialog.querySelector(".modal-footer")
+
+        val visibleWhenExpiring = List(headerContainer.firstElementChild, bodyContainer.firstElementChild, footer)
+        val visibleWhenExpired  = List(headerContainer.lastElementChild,  bodyContainer.lastElementChild)
+
+        def setDisplay(elements: List[Element], display: String): Unit =
+          elements.foreach(_.asInstanceOf[html.Element].style.display = display)
+
+        val (toShow, toHide) = if (Session.expired)
+          (visibleWhenExpired , visibleWhenExpiring) else
+          (visibleWhenExpiring, visibleWhenExpired )
+        setDisplay(toShow, "block")
+        setDisplay(toHide, "none")
+      }
+
+      def renewSession(): Unit = {
+        didExpireTimerOpt.foreach(timers.clearTimeout)
+        didExpireTimerOpt = None
+        AjaxClient.sendHeartBeat()
+        AjaxClient.unpause()
+        hideDialog()
+      }
+
+      def showDialog(): Unit = {
+        bootstrapFiveModalOpt match {
+          case Some(bootstrapFiveModal) => bootstrapFiveModal.show()
+          case None                     => $(dialog).asInstanceOf[js.Dynamic].modal(modalConfiguration)
+        }
+
+        dialogShown = true
+      }
+
+      def hideDialog(): Unit = {
+        bootstrapFiveModalOpt match {
+          case Some(bootstrapFiveModal) => bootstrapFiveModal.hide()
+          case None                     => $(dialog).asInstanceOf[js.Dynamic].modal("hide")
+        }
+
+        dialogShown = false
+      }
+    }
 
   def onPageContainsFormsMarkup(): Unit =
     XFormsApp.onPageContainsFormsMarkup()

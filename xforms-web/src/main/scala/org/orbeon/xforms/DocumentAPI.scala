@@ -13,7 +13,7 @@
   */
 package org.orbeon.xforms
 
-import org.orbeon.xforms.facade.Controls
+import org.orbeon.xforms.facade.{Controls, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
@@ -88,22 +88,39 @@ object DocumentAPI extends js.Object {
       s"Cannot set the value of an output or upload control for id `${control.id}`"
     )
 
-    def fireValueEvent(): Unit = {
+    def fireValueEvent(): Unit =
       Controls.getCurrentValue(control).foreach { newValue =>
         // Use the value from the control, not the one received (2023-05-18 why?)
         AjaxClient.fireEvent(
           AjaxEvent(
-            eventName = EventNames.XXFormsValue,
-            targetId = control.id,
+            eventName  = EventNames.XXFormsValue,
+            targetId   = control.id,
             properties = Map("value" -> newValue)
           )
         )
       }
-    }
 
     // Directly change the value in the UI without waiting for an Ajax response; for an XBL component, this calls
     // `xformsUpdateValue()` on the companion object if supported, which doesn't dispatch an event (at least not directly)
-    val undefOrPromiseOrFuture = Controls.setCurrentValue(control, newStringValue, force = false)
+    val undefOrPromiseOrFuture =
+      if (XFormsXbl.isJavaScriptLifecycle(control)) {
+        // Handle XBL components with JavaScript lifecycle
+
+        val companion = XBL.instanceForControl(control)
+
+        val hasXformsUpdateValue = XFormsXbl.isObjectWithMethod(companion, "xformsUpdateValue")
+        val hasSetUserValue      = XFormsXbl.isObjectWithMethod(companion, "setUserValue")
+
+        if (hasSetUserValue)
+          companion.setUserValue(newStringValue) // https://github.com/orbeon/orbeon-forms/issues/5383
+        else if (hasXformsUpdateValue)
+          companion.xformsUpdateValue(newStringValue)
+        else
+          js.undefined
+      } else {
+        // This handles the native XForms controls
+        Controls.setCurrentValue(control, newStringValue, force = false)
+      }
 
     // If setting the value was synchronous, fire the event right away
     if (js.isUndefined(undefOrPromiseOrFuture)) {

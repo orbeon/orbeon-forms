@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{ConnectResult, XFormsModelSubmissionSupport}
-import org.orbeon.oxf.xforms.{ScriptInvocation, XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
+import org.orbeon.oxf.xforms.{CallbackInvocation, ScriptInvocation, XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.oxf.xml.{SAXStore, TeeXMLReceiver, XMLReceiver, XMLReceiverHelper}
@@ -26,6 +26,7 @@ import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget, WireAjaxEv
 import org.orbeon.xforms.{DelayedEvent, EventNames, Load, Message}
 
 import java.{util => ju}
+import scala.concurrent.Future
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
@@ -78,7 +79,7 @@ object XFormsServer {
     // - https://github.com/orbeon/orbeon-forms/issues/2071
     // - https://github.com/orbeon/orbeon-forms/issues/1984
     // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
-    val lockResult: Try[Try[Option[Eval[ConnectResult]]]] =
+    val lockResult: Try[Try[Option[Future[ConnectResult]]]] =
       withLock(requestParameters, timeout = if (isAjaxRequest) 0L else XFormsGlobalProperties.getAjaxTimeout) {
         case Some(containingDocument) =>
 
@@ -282,12 +283,12 @@ object XFormsServer {
         // TODO: Unclear is this can happen for replace="all" where `xmlReceiverOpt == None`.
         val xmlReceiver = xmlReceiverOpt getOrElse (throw new IllegalStateException)
         ClientEvents.errorResponse(StatusCode.InternalServerError)(xmlReceiver)
-      case Success(Success(Some(replaceAllEval))) =>
+      case Success(Success(Some(replaceAllFuture))) =>
         // Check and run submission with `replace="all"`
         // - Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
         //   hit the document.
         // - No need to output a null document here, `xmlReceiver` is absent anyway.
-        XFormsModelSubmissionSupport.runDeferredSubmission(replaceAllEval, responseForReplaceAll)
+        XFormsModelSubmissionSupport.runDeferredSubmission(replaceAllFuture, responseForReplaceAll)
       case Success(Success(None)) =>
       case Success(Failure(t))    => throw t
     }
@@ -310,7 +311,7 @@ object XFormsServer {
     allEvents option XFormsStateManager.createInitialDocumentFromStore(requestParametersForAll) match {
       case Some(None) =>
         info(s"document not found in store while computing all initialization events")
-        ClientEvents.errorResponse(StatusCode.Forbidden) // status code debatable
+        ClientEvents.errorResponse(StatusCode.LoginTimeOut) // status code debatable
       case initialContainingDocumentOptOpt =>
         withDocument {
           xmlReceiver.startPrefixMapping(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI)
@@ -420,8 +421,9 @@ object XFormsServer {
 
                 // `javascript:` loads only and regular scripts
                 containingDocument.getScriptsToRun foreach {
-                  case Left(load)              => outputLoad(containingDocument, load)
-                  case Right(scriptInvocation) => outputScriptInvocation(containingDocument, scriptInvocation)
+                  case Left(load)                       => outputLoad(containingDocument, load)
+                  case Right(Left(scriptInvocation))    => outputScriptInvocation(containingDocument, scriptInvocation)
+                  case Right(Right(callbackInvocation)) => outputCallbackInvocation(callbackInvocation)
                 }
 
                 // Output focus instruction
@@ -640,6 +642,17 @@ object XFormsServer {
           )
         }
       }
+
+    def outputCallbackInvocation(
+      callbackInvocation: CallbackInvocation)(implicit
+      receiver          : XMLReceiver
+    ): Unit =
+      element(
+        "callback",
+        prefix = XXFORMS_SHORT_PREFIX,
+        uri    = XXFORMS_NAMESPACE_URI,
+        atts   = List("name" -> callbackInvocation.name)
+      )
 
     def outputFocusInfo(
       containingDocument      : XFormsContainingDocument,

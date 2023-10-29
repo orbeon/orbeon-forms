@@ -155,6 +155,9 @@ class IndentedLogger(val logger: log4s.Logger, val debugEnabled: Boolean, val in
   def logError(`type`: String, message: String, parameters: String*): Unit =
     log(log4s.Error, indentation.indentation, `type`, message, parameters: _*)
 
+  def logError(`type`: String, message: String, throwable: Throwable): Unit =
+    log(log4s.Error, indentation.indentation, `type`, message, "throwable", OrbeonFormatter.format(throwable))
+
   // Handle DEBUG level locally, everything else goes through
   private def log(level: log4s.LogLevel, indentLevel: Int, `type`: String, message: String, parameters: String*): Unit =
     if (! ((level eq log4s.Debug) && ! debugEnabled))

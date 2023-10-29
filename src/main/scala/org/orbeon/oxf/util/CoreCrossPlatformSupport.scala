@@ -19,10 +19,14 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 
+import scala.concurrent.ExecutionContext
+
 
 object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
   type FileItemType = DiskFileItem
+
+  implicit def executionContext: ExecutionContext = ExecutionContext.global
 
   def isPE: Boolean = Version.isPE
   def isJsEnv: Boolean = false

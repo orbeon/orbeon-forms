@@ -287,14 +287,23 @@
                 event="xforms-submit-error"
                 observer="{string-join(for $n in $all-service-names return concat($n, '-submission'), ' ')}"
                 type="xpath">
-
-                xxf:set-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', 'action-error', true()),
+                xxf:remove-document-attributes(event('action-id')),
                 fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')
             </xf:action>
         </xsl:if>
 
-    </xsl:function>
+        <xsl:if test="exists($actions-20182)">
+            <xf:action event="xxforms-action-error" target="#observer" propagate="stop">
+                <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
+                <xf:message level="xxf:log-error" value="event('element')"/>
+                <xf:action type="xpath" if="exists(event('action-id'))">
+                    xxf:remove-document-attributes(event('action-id')),
+                    fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')
+                </xf:action>
+            </xf:action>
+        </xsl:if>
 
+    </xsl:function>
 
     <!--
         Update actions so that the implementation of the actions is up to date. Forms generated with Form Builder
@@ -497,6 +506,24 @@
                     <xsl:attribute name="replace">instance</xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
+            <!-- For now attribute on submission takes precedence over event. We could easily revert that. -->
+            <xsl:if test="empty(@mode)">
+                <xsl:attribute name="mode">{
+                    (
+                        'asynchronous'[exists(event('fr-async')[. = 'true'])],
+                        'synchronous'
+                    )[1]
+                }</xsl:attribute>
+            </xsl:if>
+            <!-- For now attribute on submission takes precedence over event. We could easily revert that. -->
+            <xsl:if test="empty(@xxf:response-must-await)">
+                <xsl:attribute name="xxf:response-must-await">{
+                    (
+                        event('fr-response-must-await')[. = 'false'],
+                        'true'
+                    )[1]
+                }</xsl:attribute>
+            </xsl:if>
             <!-- https://github.com/orbeon/orbeon-forms/issues/4606 -->
             <xsl:apply-templates select="xf:header"/>
         </xsl:copy>
@@ -526,10 +553,18 @@
                 <xsl:copy>
                     <xsl:copy-of select="$action/@*"/>
 
-                    <!-- https://github.com/orbeon/orbeon-forms/issues/3685 -->
-                    <xsl:if test="$action/@if = '$fr-mode=''new'''">
-                        <xsl:attribute name="if">fr:mode()='new'</xsl:attribute>
-                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="$action/@if = '$fr-mode=''new'''">
+                            <!-- https://github.com/orbeon/orbeon-forms/issues/3685 -->
+                            <xsl:attribute name="if">fr:mode()='new'</xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="exists($action/@if)">
+                            <!-- https://github.com/orbeon/orbeon-forms/issues/5919 -->
+                            <xsl:attribute
+                                name="if"
+                                select="frf:replaceVarReferencesWithFunctionCalls($action/@if, $action/@if, false(), (), $library-name)"/>
+                        </xsl:when>
+                    </xsl:choose>
 
                     <!-- 1. Choose to iterate or not on `$iterate-control-name`.
                          2. Also store the absolute id of the action source in the request.
@@ -881,12 +916,14 @@
         <!-- For "continue action" confirmation dialog -->
         <xf:action event="fr-positive" target="#observer">
             <xf:dispatch
-                name="{{event('context')}}"
-                targetid="{$model/@id}"/>
+                name="{{substring-after(event('context'), '|')}}"
+                targetid="{$model/@id}">
+                <xf:property name="action-id" value="substring-before(event('context'), '|')"/>
+            </xf:dispatch>
         </xf:action>
 
         <xf:action event="fr-negative" target="#observer" type="xpath">
-            xxf:remove-document-attributes('<xsl:value-of select="$action-document-att-ns"/>')
+            xxf:remove-document-attributes(substring-before(event('context'), '|'))
         </xf:action>
 
     </xsl:template>

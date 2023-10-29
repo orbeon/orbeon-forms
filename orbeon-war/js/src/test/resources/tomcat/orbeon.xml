@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context
+    docBase="/usr/local/tomcat/webapps/orbeon"
+    path="/orbeon"
+    allowLinking="true">
+
+    <Resources allowLinking="true"/>
+
+    <Parameter
+        override="false"
+        name="oxf.resources.priority.0"
+        value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
+    <Parameter
+        override="false"
+        name="oxf.resources.priority.0.oxf.resources.filesystem.sandbox-directory"
+        value="/usr/local/tomcat/webapps/orbeon/WEB-INF/test-resources"/>
+
+</Context>

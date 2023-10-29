@@ -287,7 +287,6 @@ object ControlLabelHintTextEditor {
         tinyMceConfig.autoresize_min_height    =  100.0          // Min height of 100px
         tinyMceConfig.autoresize_bottom_margin =  16.0           // Default padding for autoresize adds too much empty space at the bottom
         tinyMceConfig.suffix                   =  ".min"
-        // Don't set `tinyMceConfig.content_css` now that we are using the inline mode
 
         val tinyMceObject = new TinyMceEditor(anchorId, tinyMceConfig, GlobalTinyMce.EditorManager)
         tinyMceObjectOpt = Some(tinyMceObject)

@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-  <resources>
+ <resources>
     <resource xml:lang="en">
         <common>
             <formats>
@@ -182,6 +182,7 @@
             <none>No errors on form</none>
             <unsaved>Unsaved changes</unsaved>
             <canvas-not-supported>To do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported>
+            <search>Error performing search</search>
         </errors>
         <email>
             <subject>Orbeon Forms Confirmation</subject>
@@ -275,6 +276,7 @@
                 <form-validation-error>There are validation errors. Please retry once all fields have been properly filled-out.</form-validation-error>
                 <database-error>There was an error communicating with the database. Please contact the application administrator.</database-error>
                 <service-error>There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error>There was an error communicating with a backend service. Please contact the application administrator.</action-error>
                 <process-error>There was an error running the process. Please contact the application administrator.</process-error>
                 <wizard-prev-error>Please fix errors before moving backward</wizard-prev-error>
                 <wizard-next-error>Please fix errors before moving forward</wizard-next-error>
@@ -289,9 +291,13 @@
                 <validation-dialog-message>Your form {1,choice,
                     0#does not contain any messages|
                     1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|
-                    1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. You can choose to review {1,choice,1#it|1&lt;them} first or to ignore {1,choice,1#it|1&lt;them} and continue with the operation.</validation-dialog-message>
+                    1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
+                    {0,choice,
+                        0#Please retry once all fields have been properly filled-out|
+                        0&lt;You can choose to review '{1,choice,1#it|1&lt;them}' first or to ignore '{1,choice,1#it|1&lt;them}' and continue with the operation}.
+                </validation-dialog-message>
                 <buttons-message/>
-                <saved-locally-open>Click here to open the document. The information you entered will be displayed on the tool as it was in the moment you saved your work.</saved-locally-open>
+                <saved-locally-open>Click here to open the document. The data you entered will be shown as it was at the time you saved your work.</saved-locally-open>
                 <upload-in-progress>There are file uploads in progress. Please retry once the file upload has completed or has been canceled.</upload-in-progress>
                 <upload-start>Upload started</upload-start>
                 <upload-cancel>Upload canceled by the user</upload-cancel>
@@ -327,6 +333,13 @@
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>Please check your answer to the CAPTCHA challenge</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size>Files must be under {0}.</upload-max-size>
+                <upload-mediatypes>Only {0} files are accepted.</upload-mediatypes>
+                <upload-image>image</upload-image>
+                <upload-video>video</upload-video>
+                <upload-audio>audio</upload-audio>`
+            </hints>
             <view>
                 <explanation>
                     This is a read-only view of your data.
@@ -344,6 +357,23 @@
                 <try-acquire>Try to acquire lease</try-acquire>
                 <show-in-view-mode>Show in read-only mode</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring>Session About To Expire</expiring>
+                    <expired>Session Expired</expired>
+                </title>
+                <message>
+                    <expiring>Your session is about to expire. Click the button below if you wish to continue using this page.</expiring>
+                    <expired>Your session has expired.</expired>
+                </message>
+                <renew-button>Renew Session</renew-button>
+            </session-expiration>
+            <available-from>
+                <message>This form isn't available yet</message>
+            </available-from>
+            <available-to>
+                <message>This form isn't available anymore</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Save Locally</dialog-title>
@@ -772,6 +802,7 @@
             <none>Ce formulaire ne contient pas d'erreurs</none>
             <unsaved>Modifications non enregistrées</unsaved>
             <canvas-not-supported>Pour annoter des images, votre navigateur doit supporter le canvas HTML5</canvas-not-supported>
+            <search>Erreur lors de la recherche</search>
         </errors>
         <email>
             <subject>Orbeon Forms Confirmation</subject>
@@ -864,6 +895,7 @@
                 <form-validation-error>Le document contient des erreurs de validation. Veuillez ressayer après les avoir corrigées.</form-validation-error>
                 <database-error>Une erreur s'est produite en communiquant avec la base de données. Veuillez contacter votre administrateur système.</database-error>
                 <service-error>Une erreur s'est produite en communiquant avec un service. Veuillez contacter votre administrateur système.</service-error>
+                <action-error>Une erreur s'est produite en exécutant une action. Veuillez contacter votre administrateur système.</action-error>
                 <process-error>Une erreur s'est produite en exécutant le processus. Veuillez contacter votre administrateur système.</process-error>
                 <wizard-prev-error>Veuillez corriger les erreurs avant de revenir en arrière</wizard-prev-error>
                 <wizard-next-error>Veuillez corriger les erreurs avant d'avancer</wizard-next-error>
@@ -878,7 +910,11 @@
                 <validation-dialog-message>Votre formulaire {1,choice,
                     0#ne contient aucun message|
                     1#contient '{0,choice,0#une erreur|1#un avertissement|2#un message d''''information|3#un message}'|
-                    1&lt;contient {1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}'}. Vous pouvez choisir de {1,choice,1#le|1&lt;les} passer en revue ou de {1,choice,1#l''ignorer|1&lt;les ignorer} et de poursuivre l''opération.</validation-dialog-message>
+                    1&lt;contient {1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}'}.
+                    {0,choice,
+                        0#Veuillez ressayer après avoir corrigé les problèmes|
+                        0&lt;Vous pouvez choisir de {1,choice,1#le|1&lt;les} passer en revue ou de {1,choice,1#l''ignorer|1&lt;les ignorer} et de poursuivre l''opération}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été enregistrées.</saved-locally-open>
                 <upload-in-progress>Des téléchargement de fichiers sont en cours. Veuillez ressayer une fois que les transferts sont terminés ou annulés.</upload-in-progress>
@@ -916,6 +952,13 @@
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>Veuillez vérifier votre réponse au défi CAPTCHA</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size>La taille des fichiers doit être inférieurs à {0}.</upload-max-size>
+                <upload-mediatypes>Seuls les {0} sont acceptés.</upload-mediatypes>
+                <upload-image>image</upload-image>
+                <upload-video>vidéo</upload-video>
+                <upload-audio>audio</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Ceci est une vue en lecture seule de vos données.
@@ -933,6 +976,23 @@
                 <try-acquire>Essayer d'obtenir le bail</try-acquire>
                 <show-in-view-mode>Visualiser en lecture seule</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message>Ce formulaire n'est pas encore disponible</message>
+            </available-from>
+            <available-to>
+                <message>Ce formulaire n'est plus disponible</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Enregistrer Localement</dialog-title>
@@ -1352,6 +1412,7 @@
             <none>No hay errores en el formulario</none>
             <unsaved>Cambios sin salvar</unsaved>
             <canvas-not-supported>Para realizar anotaciones en imagenes, su explorador tiene que soportar HTML5</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Confirmación de formulario Orbeon</subject>
@@ -1442,9 +1503,10 @@
                 <save-draft-success todo="true">Borrador guardado correctamente!</save-draft-success>
                 <save-progress-success todo="true">Borrador guardado correctamente!</save-progress-success>
                 <email-success>Email enviado correctamente!</email-success>
-                <form-validation-error>Hay errores de validación. Corrija los errores e intente nuevamente</form-validation-error>
+                <form-validation-error>Hay errores de validación. Corrija los errores e intente nuevamente.</form-validation-error>
                 <database-error>Error de comunicación con la base de datos. Contacte al adminstrador de la aplicación.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Error corriendo el proceso. Contacte al adminstrador de la aplicación.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -1456,7 +1518,14 @@
                 <submit-dialog-title>Formulario Enviado</submit-dialog-title>
                 <submit-dialog-message>Su información ha sido enviada.</submit-dialog-message>
                 <validation-dialog-title>Revisar mensajes de validación del Formulario</validation-dialog-title>
-                <validation-dialog-message>Su formulario {1,choice,0#no tiene ningún mensaje|1#tiene un '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;tiene {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. Pueder optar por revisarlos {1,choice,1#it|1&lt;them} primero o ignorar {1,choice,1#it|1&lt;them} y continuar la opración.</validation-dialog-message>
+                <validation-dialog-message>Su formulario {1,choice,
+                    0#no tiene ningún mensaje|
+                    1#tiene un '{0,choice,0#error|1#warning|2#informational message|3#message}'|
+                    1&lt;tiene {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
+                    {0,choice,
+                        0#Corrija los errores e intente nuevamente|
+                        0&lt;Pueder optar por revisarlos {1,choice,1#it|1&lt;them} primero o ignorar {1,choice,1#it|1&lt;them} y continuar la opración}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Haga click aquí para abrir el documento. La información ingresada será mostrada por la herramienta de la misma forma que cuando se guardo.</saved-locally-open>
                 <upload-in-progress>Hay subida de archivos en progreso. Por favor, intente nuevamente cuando la subida de archivos haya sido completada o cancelada.</upload-in-progress>
@@ -1494,6 +1563,13 @@
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>El valor ingresado es diferente a la imagen, intentelo nuevamente</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Vista de lectura solamente.
@@ -1511,6 +1587,23 @@
                 <try-acquire>Intentar adquirir Bloqueo</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Guardar Localmente</dialog-title>
@@ -1932,6 +2025,7 @@
             <none>No hi ha errors al formulari</none>
             <unsaved>Canvis sense desar</unsaved>
             <canvas-not-supported>Per a realitzar anotacions a les imatges, el seu explorador ha de suportar HTML5</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Confirmació de formulari Orbeon</subject>
@@ -2023,12 +2117,12 @@
                 <save-draft-success todo="true">Esborrany guardat correctament!</save-draft-success>
                 <save-progress-success todo="true">Esborrany guardat correctament!</save-progress-success>
                 <email-success>Correu enviat correctament!</email-success>
-                <form-validation-error>Hi ha errors de validació. Corregeixi els errors i intenti
-                    novament</form-validation-error>
+                <form-validation-error>Hi ha errors de validació. Corregeixi els errors i intenti novament.</form-validation-error>
                 <database-error>Error de comunicació amb la base de dades. Contacti amb els
                     administradors de la aplicació.</database-error>
                 <service-error todo="true">Error de comunicació amb el servei. Contacti amb els
                     administradors de la aplicació.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Error amb el procés. Contacti amb els administradors de la aplicació.</process-error>
                 <wizard-prev-error todo="true">Per favor, corregeix els errors abans d'anar enrere</wizard-prev-error>
                 <wizard-next-error todo="true">Per favor, corregeix els errors abans d'anar endavant</wizard-next-error>
@@ -2041,11 +2135,14 @@
                 <submit-dialog-title>Formulari enviat</submit-dialog-title>
                 <submit-dialog-message>La seva informació he estat enviada.</submit-dialog-message>
                 <validation-dialog-title>Revisi els missatges de validació del seu Formualri</validation-dialog-title>
-                <validation-dialog-message>El seu formulari {1,choice,0#no té cap missatge|1#té un
-                    '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;té
-                    {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational
-                    messages|3#messages}'}. Pot revisar-los si vol {1,choice,1#it|1&lt;them} primer o
-                    ingorar-los {1,choice,1#it|1&lt;them} i continuar amb l'operació.</validation-dialog-message>
+                <validation-dialog-message>El seu formulari {1,choice,
+                    0#no té cap missatge|
+                    1#té un '{0,choice,0#error|1#warning|2#informational message|3#message}'|
+                    1&lt;té {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
+                    {0,choice,
+                        0#Corregeixi els errors i intenti novament|
+                        0&lt;Pot revisar-los si vol {1,choice,1#it|1&lt;them} primer o ingorar-los {1,choice,1#it|1&lt;them} i continuar amb l'operació}.
+                </validation-dialog-message>
                 <buttons-message />
                 <saved-locally-open> Fes click aquí per obrir el document. La informació ingressada és
                     mostrarà per la eina de la mateixa forma com va ser guardada.</saved-locally-open>
@@ -2094,6 +2191,13 @@
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>El valor ingressat és diferent de la imatge, torni a intentar-lo</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Vista de només lectura.
@@ -2111,6 +2215,17 @@
                 <try-acquire>Intentar adquirir Bloqueig</try-acquire>
                 <show-in-view-mode todo="true">Mostrar-lo en només lectura</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
             <available-from>
                 <message todo="true">This form isn't available yet</message>
             </available-from>
@@ -2546,6 +2661,7 @@
             <none>Ingen feil i skjema</none>
             <unsaved>Ulagrede endringer</unsaved>
             <canvas-not-supported todo="true">[To do image annotations, your browser needs to support the HTML5 canvas]</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon Forms Bekreftelse</subject>
@@ -2639,6 +2755,7 @@
                 <form-validation-error>Skjemaet er ikke innsendt. Vennligst rett opp feilene i skjemaet før du sender inn på nytt.</form-validation-error>
                 <database-error>Feil i kommunikasjon med tjener. Vennligst kontakt din systemadministrator.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error todo="true">[There was an error running the process. Please contact the application administrator.]</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -2650,7 +2767,14 @@
                 <submit-dialog-title>Skjemaet er innsendt</submit-dialog-title>
                 <submit-dialog-message>Takk, informasjonen er innsendt.</submit-dialog-message>
                 <validation-dialog-title todo="true">[Review Form Validation Messages]</validation-dialog-title>
-                <validation-dialog-message todo="true">[Your form {1,choice,0#does not contain any messages|1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. You can choose to review {1,choice,1#it|1&lt;them} first or to ignore {1,choice,1#it|1&lt;them} and continue with the operation.]</validation-dialog-message>
+                <validation-dialog-message todo="true">[Your form {1,choice,
+                    0#does not contain any messages|
+                    1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|
+                    1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
+                    {0,choice,
+                        0#Please retry once all fields have been properly filled-out|
+                        0&lt;You can choose to review '{1,choice,1#it|1&lt;them}' first or to ignore '{1,choice,1#it|1&lt;them}' and continue with the operation}.]
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klikk her for å åpne dokumentet. Informasjonen du skrev inn, vil bli vist i verktøyet slik det var da det ble lagret.</saved-locally-open>
                 <upload-in-progress todo="true">[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
@@ -2689,6 +2813,13 @@
                 <captcha-label todo="true">[Captcha]</captcha-label>
                 <captcha-alert todo="true">[The value you entered didn't match the image, please try again]</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Dette er en skrivebeskyttet versjon av dine data.
@@ -2706,6 +2837,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Lagre</dialog-title>
@@ -3120,6 +3268,7 @@
             <none>Ошибок нет</none>
             <unsaved>Несохраненные изменения</unsaved>
             <canvas-not-supported todo="true">[To do image annotations, your browser needs to support the HTML5 canvas]</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Подтверждение формы</subject>
@@ -3213,6 +3362,7 @@
                 <form-validation-error>Документ не сохранен! Пожалуйста, исправьте ошибки в форме и сохраните еще раз.</form-validation-error>
                 <database-error>Нет соединения с базой данных. Свяжитесь с системным администратором.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error todo="true">[There was an error running the process. Please contact the application administrator.]</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -3224,7 +3374,14 @@
                 <submit-dialog-title>Форма отправлена</submit-dialog-title>
                 <submit-dialog-message>Информация успешно отправлена, спасибо!</submit-dialog-message>
                 <validation-dialog-title todo="true">[Review Form Validation Messages]</validation-dialog-title>
-                <validation-dialog-message todo="true">[Your form {1,choice,0#does not contain any messages|1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. You can choose to review {1,choice,1#it|1&lt;them} first or to ignore {1,choice,1#it|1&lt;them} and continue with the operation.]</validation-dialog-message>
+                <validation-dialog-message todo="true">[Your form {1,choice,
+                    0#does not contain any messages|
+                    1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|
+                    1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
+                    {0,choice,
+                        0#Please retry once all fields have been properly filled-out|
+                        0&lt;You can choose to review '{1,choice,1#it|1&lt;them}' first or to ignore '{1,choice,1#it|1&lt;them}' and continue with the operation}.]
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Нажмите для открытия документа. Вся введенная информация будет доступна в том виде, в котором она была при сохранении.</saved-locally-open>
                 <upload-in-progress>Повторите попытку после окончания загрузки файла.</upload-in-progress>
@@ -3263,6 +3420,13 @@
                 <captcha-label>Защита от спама</captcha-label>
                 <captcha-alert todo="true">Введенное значение не совпадает с картинкой. Попробуйте еще раз.</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Это версия только для чтения.
@@ -3280,6 +3444,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Сохранить</dialog-title>
@@ -3699,6 +3880,7 @@
             <none>Non ci sono errori nel modulo</none>
             <unsaved>Modifiche non salvate</unsaved>
             <canvas-not-supported>Per usare le immagini modificabili, suo Browser deve avere il supporto per canvas di HTML5</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon Forms confermazione</subject>
@@ -3792,6 +3974,7 @@
                 <form-validation-error>Ci sono errori di validazione. Prego controllare che tutti i spazi sono compilati in modo corretto.</form-validation-error>
                 <database-error>Nella communicazione con la database è apparso un errore. Si prega di contattare l'amministratore.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>È apparso un errore durante l'esecuzione del processo. Si prega di contattare l'amministratore.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -3806,7 +3989,11 @@
                 <validation-dialog-message>Il tuo modulo {1,choice,
                     0#non contiene avvisi|
                     1#'{0,choice,0#contiene un errore|1#contiene un avvertimento|2#contiene un avviso|3#contiene un avviso}'|
-                    1&lt;contiene {1,number,integer} '{0,choice,0#errori|1#avvertimenti|2#avvisi|3#avvisi}'}. È possibile ricontrollare il modulo oppure procedere.</validation-dialog-message>
+                    1&lt;contiene {1,number,integer} '{0,choice,0#errori|1#avvertimenti|2#avvisi|3#avvisi}'}.
+                    {0,choice,
+                        0#Prego controllare che tutti i spazi sono compilati in modo corretto|
+                        0&lt;È possibile ricontrollare il modulo oppure procedere}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Clicca qui per aprire il documento. Le informazioni immesse veranno visualizzate sullo strumento, come era nel momento in cui é stato salvato il tuo lavoro.</saved-locally-open>
                 <upload-in-progress>Ci sono operazioni di caricamento in corso. Si prega di riprovalo una volta che il caricamento del file è stato completato o annullato.</upload-in-progress>
@@ -3845,6 +4032,13 @@
                 <captcha-label>Codice di sicurezza</captcha-label>
                 <captcha-alert todo="true">Il valore inserito no è uguale a quello visualizzato nell'immagine</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Questa è una vista di sola lettura dei dati.
@@ -3862,6 +4056,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Salva localmente</dialog-title>
@@ -4285,6 +4496,7 @@
             <none>Keine Fehler im Formular</none>
             <unsaved>Ungespeicherte Änderungen</unsaved>
             <canvas-not-supported>Um bearbeitbare Bilder zu verwenden, muss ihr Browser das Canvas-Element von HTML5 unterstützen</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon Forms: Bestätigung</subject>
@@ -4378,6 +4590,7 @@
                 <form-validation-error>Validierungsfehler! Bitte füllen Sie alle Felder richtig aus und versuchen Sie es erneut.</form-validation-error>
                 <database-error>Bei der Kommunikation mit der Datenbank ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Beim Ausführen dieses Prozesses ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -4392,7 +4605,11 @@
                 <validation-dialog-message>Ihr Formular enthält {1,choice,
                     0#keine Meldungen|
                     1#'{0,choice,0#einen Fehler|1#eine Warnung|2#eine Informationsmeldung|3#einen Hinweis}'|
-                    1&lt; {1,number,integer} '{0,choice,0#Fehler|1#Warnungen|2#Informationsmeldungen|3#Hinweise}'}. Sie können das Formular nochmals überprüfen, oder fortfahren.</validation-dialog-message>
+                    1&lt; {1,number,integer} '{0,choice,0#Fehler|1#Warnungen|2#Informationsmeldungen|3#Hinweise}'}.
+                    {0,choice,
+                        0#Bitte füllen Sie alle Felder richtig aus und versuchen Sie es erneut|
+                        0&lt;Sie können das Formular nochmals überprüfen, oder fortfahren}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klicken Sie hier, um das Dokument zu öffnen. Die Inhalte werden so angezeigt, wie sie im Moment der Speicherung Ihrer Arbeit waren.</saved-locally-open>
                 <upload-in-progress>Es werden im Moment schon Dateien hochgeladen. Bitte versuchen Sie es erneut, sobald die Dateien erfolgreich hochgeladen oder das Hochladen abgebrochen wurde.</upload-in-progress>
@@ -4431,6 +4648,13 @@
                 <captcha-label>Sicherheitscode</captcha-label>
                 <captcha-alert todo="true">Der eingegebene Wert entspricht nicht dem auf dem Bild. Bitte versuchen Sie es erneut!</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Dies ist eine schreibgeschützte Ansicht Ihrer Daten.
@@ -4448,6 +4672,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Lokal speichern</dialog-title>
@@ -4871,6 +5112,7 @@
             <none>Ei virheitä lomakkeessa</none>
             <unsaved>Tallentamattomat muutokset</unsaved>
             <canvas-not-supported>Voidakseni tehdä kuvakommentointia tulee selaimen tukea HTML5:n canvas-elementtiä</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon-lomakkeiden vahvistus</subject>
@@ -4964,6 +5206,7 @@
                 <form-validation-error>Löytyi virheitä. Yritä uudelleen kun kaikki kentät on täytetty asianmukaisesti.</form-validation-error>
                 <database-error>Virhe tietokannan kanssa kommunikoinnissa. Ole hyvä ja ota yhteyttä järjestelmänvalvojaan.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Virhetilanne ajettaessa prosessia. Ota yhteyttä ohjelmiston ylläpitäjään.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -4978,7 +5221,11 @@
                 <validation-dialog-message>Lomakkeesi {1,choice,
                     0#ei sisällä yhtään viestiä|
                     1#sisältää '{0,choice,0#virheen|1#varoituksen|2#tiedottavan viestin|3#viestin}'|
-                    1&lt;sisältää {1,number,integer} '{0,choice,0#virhettä|1#varoitusta|2#tiedottavaa viestiä|3#viestiä}'}. Voit valita käytkö läpi {1,choice,1#sen|1&lt;ne} ensin vai sivuutatko {1,choice,1#sen|1&lt;ne} ja jatkat operaatiota.</validation-dialog-message>
+                    1&lt;sisältää {1,number,integer} '{0,choice,0#virhettä|1#varoitusta|2#tiedottavaa viestiä|3#viestiä}'}.
+                    {0,choice,
+                        0#Yritä uudelleen kun kaikki kentät on täytetty asianmukaisesti|
+                        0&lt;Voit valita käytkö läpi {1,choice,1#sen|1&lt;ne} ensin vai sivuutatko {1,choice,1#sen|1&lt;ne} ja jatkat operaatiota}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klikkaa tästä dokumentin avataksesi. Syöttämäsi tiedot näytetään siten, kuin ne olivat tallentaessasi työsi.</saved-locally-open>
                 <upload-in-progress>Tiedoston lataaminen käynnissä. Ole hyvä ja yritä latausten päätyttyä tai keskeytettyä uudelleen.</upload-in-progress>
@@ -5017,6 +5264,13 @@
                 <captcha-label>Kuvavarmenne</captcha-label>
                 <captcha-alert todo="true">Antamasi arvo ei täsmännyt kuvan kanssa, ole hyvä ja yritä uudelleen</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Tämä on kirjoitussuojattu näkymä tiedoistasi.
@@ -5034,6 +5288,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Tallenna paikallisesti</dialog-title>
@@ -5457,6 +5728,7 @@
             <none>Inga fel i formuläret</none>
             <unsaved>Ej sparade ändringar</unsaved>
             <canvas-not-supported>För att kunna göra noteringar måste webbläsaren stödja HTML5 canvas</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon Forms bekräftelse</subject>
@@ -5550,6 +5822,7 @@
                 <form-validation-error>Alla värden är inte giltiga. Gå igenom ifyllda värden och försök igen.</form-validation-error>
                 <database-error>Databasfel. Vänligen kontakta administratör.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Processen kunde inte köras. Vänligen kontakta administratör.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -5564,7 +5837,11 @@
                 <validation-dialog-message>Formuläret {1,choice,
                     0#är fritt från felmeddelanden|
                     1#innehåller '{0,choice,0#ett fel|1#en varning|2#en upplysning|3#ett meddelande}'|
-                    1&lt;innehåller {1,number,integer} '{0,choice,0#fel|1#varningar|2#upplysningar|3#meddelanden}'}. Du kan granska detta nu eller senare.</validation-dialog-message>
+                    1&lt;innehåller {1,number,integer} '{0,choice,0#fel|1#varningar|2#upplysningar|3#meddelanden}'}.
+                    {0,choice,
+                        0#Gå igenom ifyllda värden och försök igen|
+                        0&lt;Du kan granska detta nu eller senare}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klicka för att öppna ett formulär.</saved-locally-open>
                 <upload-in-progress>Filer håller på att överföras. Försök igen när överföringen är avslutad.</upload-in-progress>
@@ -5603,6 +5880,13 @@
                 <captcha-label>Robotfilter</captcha-label>
                 <captcha-alert todo="true">Inmatningen motsvarade inte bilden. Vänligen försök igen.</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Detta är en skrivskyddad visning av data
@@ -5620,6 +5904,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Spara lokalt</dialog-title>
@@ -6043,6 +6344,7 @@
             <none>Geen fouten op form</none>
             <unsaved>Niet-bewaarde wijzigingen</unsaved>
             <canvas-not-supported>Voor annotaties op afbeeldingen, moet uw browser het HTML5 canvas ondersteunen</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon Forms bevestiging</subject>
@@ -6136,6 +6438,7 @@
                 <form-validation-error>Er waren validatieproblemen. Probeer het opnieuw als alle velden correct zijn gevuld.</form-validation-error>
                 <database-error>Er was een probleem in de databasecommunicatie. Neem contact op met de databasebeheerder.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Er was een probleem bij het starten van het proces. Neem contact op met de databasebeheerder.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -6150,7 +6453,11 @@
                 <validation-dialog-message>Uw form {1,choice,
                     0#bevat geen meldingen|
                     1#bevat één '{0,choice,0#fout|1#waarschuwing|2#melding ter info|3#melding}'|
-                    1&lt;bevat {1,number,integer} '{0,choice,0#fouten|1#waarschuwingen|2#meldingen ter info|3#meldingen}'}. U kunt {1,choice,1#deze|1&lt;deze} eerst bekijken of negerenen doorgaan met de bewerking.</validation-dialog-message>
+                    1&lt;bevat {1,number,integer} '{0,choice,0#fouten|1#waarschuwingen|2#meldingen ter info|3#meldingen}'}.
+                    {0,choice,
+                        0#Probeer het opnieuw als alle velden correct zijn gevuld|
+                        0&lt;U kunt {1,choice,1#deze|1&lt;deze} eerst bekijken of negerenen doorgaan met de bewerking}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klik hier om het document te openen. De informatie die u hebt ingevoerd wordt weergegeven zoals deze was toen u uw werk heeft opgeslagen.</saved-locally-open>
                 <upload-in-progress>Er zijn bestanduploads bezig. Probeer opnieuw als de bestandupload is voltooid of geannuleerd.</upload-in-progress>
@@ -6188,6 +6495,13 @@
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>De ingevoerde waarde komt niet overeen met de afbeelding, probeer opnieuw</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Dit is een alleen-lezen weergave van uw gegevens.
@@ -6205,6 +6519,23 @@
                 <try-acquire>Lease proberen te krijgen</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Lokaal opslaan</dialog-title>
@@ -6628,6 +6959,7 @@
             <none>Formulário sem erros</none>
             <unsaved>Alteração não guardadas</unsaved>
             <canvas-not-supported todo="true">[To do image annotations, your browser needs to support the HTML5 canvas]</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Confirmação Orbeon Forms</subject>
@@ -6721,6 +7053,7 @@
                 <form-validation-error>Existem erros de validação. Por favor, tente novamente quando todos os campos forem devidamente preenchidos.</form-validation-error>
                 <database-error>Houve um erro na comunicação com a base de dados. Entre em contacto com o administrador do aplicação.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Houve um erro na execução do processo. Entre em contacto com administrador da aplicação.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -6735,7 +7068,11 @@
                 <validation-dialog-message>O seu formulário {1,choice,
                     0#não contém quaisquer mensagens|
                     1#contém um(a) '{0,choice,0#erro|1#aviso|2#mensagem informativa|3#mensagem}'|
-                    1&lt;contém {1,number,integer} '{0,choice,0#erros|1#avisos|2#mensagens informativas|3#mensagens}'}. Pode optar por revê-{1,choice,1#lo(a)|1&lt;los(as)} primeiro ou ignorá-{1,choice,1#lo(a)|1&lt;los(as)} e continuar com a operação.</validation-dialog-message>
+                    1&lt;contém {1,number,integer} '{0,choice,0#erros|1#avisos|2#mensagens informativas|3#mensagens}'}.
+                    {0,choice,
+                        0#Por favor, tente novamente quando todos os campos forem devidamente preenchidos|
+                        0&lt;Pode optar por revê-{1,choice,1#lo(a)|1&lt;los(as)} primeiro ou ignorá-{1,choice,1#lo(a)|1&lt;los(as)} e continuar com a operação}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Clique aqui para abrir o documento. A informação que introduziu será exibida na ferramenta como estava no momento em que guardou o seu trabalho.</saved-locally-open>
                 <upload-in-progress>Existem documentos a serem carregados. Por favor, tente novamente quando o carregamento dos documentos for concluído ou cancelado.</upload-in-progress>
@@ -6773,6 +7110,13 @@
                 <captcha-label>Veuillez vérifier votre réponse au défi CAPTCHA</captcha-label>
                 <captcha-alert todo="true">O valor inserido não corresponde à imagem, por favor, tente novamente</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Esta é uma vista só de leitura dos seus dados.
@@ -6790,6 +7134,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Guardar Localmente</dialog-title>
@@ -7207,6 +7568,7 @@
             <none>Ingen fejl i skema</none>
             <unsaved>Ugemte ændringer</unsaved>
             <canvas-not-supported>To do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Orbeon blanketbekræftigelse</subject>
@@ -7300,6 +7662,7 @@
                 <form-validation-error>Blanketten er ikke sendt. Ret venligst fejlene før du prøver at sende igen.</form-validation-error>
                 <database-error>Fejl i forbindelse til server. Kontakt systemadministrator.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>Der var en fejl i afvikling af programmer. Kontakt systemadministrator.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -7311,7 +7674,14 @@
                 <submit-dialog-title>Blanket er sendt ind</submit-dialog-title>
                 <submit-dialog-message>Tak, informationen er sendt ind.</submit-dialog-message>
                 <validation-dialog-title>Check blanketvalideringer</validation-dialog-title>
-                <validation-dialog-message>Din blanket {1,choice,0#indeholder ingen beskeder|1#indeholder en '{0,choice,0#fejl|1#advarsel|2#information|3#besked}'|1&lt;indehoder {1,number,integer} '{0,choice,0#fejl|1#advarsler|2#informationer|3#beskeder}'}. Du kan vælge at checke {1,choice,1#den|1&lt;dem} først eller ignorere {1,choice,1#den|1&lt;dem} og fortsætte.</validation-dialog-message>
+                <validation-dialog-message>Din blanket {1,choice,
+                    0#indeholder ingen beskeder|
+                    1#indeholder en '{0,choice,0#fejl|1#advarsel|2#information|3#besked}'|
+                    1&lt;indehoder {1,number,integer} '{0,choice,0#fejl|1#advarsler|2#informationer|3#beskeder}'}.
+                    {0,choice,
+                        0#Ret venligst fejlene før du prøver at sende igen|
+                        0&lt;Du kan vælge at checke {1,choice,1#den|1&lt;dem} først eller ignorere {1,choice,1#den|1&lt;dem} og fortsætte}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klik her for at åbne dokument. Informationer du har skrevet i blanketten vil blive vist som da den blev gemt.</saved-locally-open>
                 <upload-in-progress>Prøv igen når fil-indlæsningen er færdig eller blevet afbrudt.</upload-in-progress>
@@ -7349,6 +7719,13 @@
                 <captcha-label>Captcha</captcha-label>
                 <captcha-alert>De tegn du indtastede passede ikke med billedet - prøv igen</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     Dette er en skrivebeskyttet version af dine data.
@@ -7366,6 +7743,23 @@
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Gem lokalt</dialog-title>
@@ -7786,6 +8180,7 @@
             <none>Brak błędów w formularzu</none>
             <unsaved>Niezachowane zmiany</unsaved>
             <canvas-not-supported>Aby móc dodać adnotacje do pliku graficznego twoja przeglądarka musi wspierać HTML5 canvas</canvas-not-supported>
+            <search todo="true">[Error performing search]</search>
         </errors>
         <email>
             <subject>Potwierdzenie formularza Orbeon Forms</subject>
@@ -7879,6 +8274,7 @@
                 <form-validation-error>Występują błędy walidacji. Proszę sprawdzić, czy wszystkie pola zostały wypełnione poprawnie.</form-validation-error>
                 <database-error>Wystąpił błąd komunikacji z bazą danych. Skontaktuj się się z administratorem aplikacji.</database-error>
                 <service-error>Wystąpił błąd komunikacji z serwisem. Skontaktuj się się z administratorem aplikacji.</service-error>
+                <action-error todo="true">[There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
                 <process-error>W trakcie wykonywania procesu wystąpił błąd. Skontaktuj się się z administratorem aplikacji.</process-error>
                 <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
                 <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
@@ -7893,7 +8289,11 @@
                 <validation-dialog-message>Twój formularz {1,choice,
                     0#nie zawiera błędów|
                     1#zawiera 1 lub więcej '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'|
-                    1&lt;contains {1,number,integer} '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'}. Możesz dokonać przeglądu {1,choice,1#it|1&lt;them} najpierw lub zignoruj {1,choice,1#it|1&lt;them} i kontynuuj uzupełnianie.</validation-dialog-message>
+                    1&lt;contains {1,number,integer} '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'}.
+                    {0,choice,
+                        0#Proszę sprawdzić, czy wszystkie pola zostały wypełnione poprawnie|
+                        0&lt;Możesz dokonać przeglądu {1,choice,1#it|1&lt;them} najpierw lub zignoruj {1,choice,1#it|1&lt;them} i kontynuuj uzupełnianie}.
+                </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Kliknij tutaj, by otworzyć dokument. Dane wprowadzone przez Ciebie będą zaprezentowane w takiej formie, w jakiej je zapisałeś.</saved-locally-open>
                 <upload-in-progress>Trwa wgrywanie plików. Spróbuj ponownie, gdy wgrywanie plików zakończy się lub zostanie anulowane.</upload-in-progress>
@@ -7931,6 +8331,13 @@
                 <captcha-label>Captcha</captcha-label>
                 <captcha-alert>Wprowadzona wartość nie zgadza się z obrazem, spróbuj ponownie.</captcha-alert>
             </labels>
+            <hints>
+                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
+                <upload-image todo="true">[image]</upload-image>
+                <upload-video todo="true">[video]</upload-video>
+                <upload-audio todo="true">[audio]</upload-audio>
+            </hints>
             <view>
                 <explanation>
                     To jest podgląd Twoich danych w trybie tylko do odczytu.
@@ -7948,6 +8355,23 @@
                 <try-acquire>Spróbuj uzyskać prawo do edycji dokumentu.</try-acquire>
                 <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
+            <session-expiration>
+                <title>
+                    <expiring todo="true">[Session About To Expire]</expiring>
+                    <expired todo="true">[Session Expired]</expired>
+                </title>
+                <message>
+                    <expiring todo="true">[Your session is about to expire. Click the button below if you wish to continue using this page.]</expiring>
+                    <expired todo="true">[Your session has expired.]</expired>
+                </message>
+                <renew-button todo="true">[Renew Session]</renew-button>
+            </session-expiration>
+            <available-from>
+                <message todo="true">[This form isn't available yet]</message>
+            </available-from>
+            <available-to>
+                <message todo="true">[This form isn't available anymore]</message>
+            </available-to>
         </detail>
         <save-locally>
             <dialog-title>Zapisz lokalnie</dialog-title>

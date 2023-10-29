@@ -7,6 +7,7 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.funspec.AnyFunSpecLike
 
+
 class IndexTest
   extends DocumentTestBase
      with ResourceManagerSupport
@@ -470,7 +471,7 @@ class IndexTest
                   <fr:c y="1" x="7" w="6">
                     <xf:input id="control-2-control" bind="control-2-bind">
                       <fr:index>
-                        <fr:summary-show/>
+                        <fr:summary-show search="false"/>
                       </fr:index>
                       <xf:label ref="$form-resources/control-2/label"/>
                       <xf:hint ref="$form-resources/control-2/hint"/>
@@ -480,7 +481,7 @@ class IndexTest
                   <fr:c x="1" y="2" w="6">
                     <xf:input id="control-3-control" bind="control-3-bind">
                       <fr:index>
-                        <fr:summary-search/>
+                        <fr:summary-show column="false"/>
                       </fr:index>
                       <xf:label ref="$form-resources/control-3/label"/>
                       <xf:hint ref="$form-resources/control-3/hint"/>
@@ -490,7 +491,7 @@ class IndexTest
                   <fr:c x="7" y="2" w="6">
                     <xf:input id="control-4-control" bind="control-4-bind">
                       <fr:index>
-                        <fr:summary-edit/>
+                        <fr:allow-bulk-edit/>
                       </fr:index>
                       <xf:label ref="$form-resources/control-4/label"/>
                       <xf:hint ref="$form-resources/control-4/hint"/>
@@ -500,9 +501,8 @@ class IndexTest
                   <fr:c x="1" y="3" w="6">
                     <xf:input id="control-5-control" bind="control-5-bind">
                       <fr:index>
-                        <fr:summary-edit/>
-                        <fr:summary-search/>
                         <fr:summary-show/>
+                        <fr:allow-bulk-edit/>
                       </fr:index>
                       <xf:label ref="$form-resources/control-5/label"/>
                       <xf:hint ref="$form-resources/control-5/hint"/>
@@ -537,7 +537,7 @@ class IndexTest
         IndexedControl("control-1", "section-1/grid-1/control-1", "xs:string", "input", SummarySettings(show = false, search = false,  edit = false), staticallyRequired = false, htmlLabel = false, resources = Nil),
         IndexedControl("control-2", "section-1/grid-1/control-2", "xs:string", "input", SummarySettings(show = true,  search = false,  edit = false), staticallyRequired = false, htmlLabel = false, resources = Nil),
         IndexedControl("control-3", "section-1/grid-1/control-3", "xs:string", "input", SummarySettings(show = false, search = true,   edit = false), staticallyRequired = false, htmlLabel = false, resources = Nil),
-        IndexedControl("control-4", "section-1/grid-1/control-4", "xs:string", "input", SummarySettings(show = false, search = false,  edit = true),  staticallyRequired = false, htmlLabel = false, resources = Nil),
+        IndexedControl("control-4", "section-1/grid-1/control-4", "xs:string", "input", SummarySettings(show = false, search = false,  edit = false),  staticallyRequired = false, htmlLabel = false, resources = Nil),
         IndexedControl("control-5", "section-1/grid-1/control-5", "xs:string", "input", SummarySettings(show = true,  search = true,   edit = true),  staticallyRequired = false, htmlLabel = false, resources = Nil)
       )
 

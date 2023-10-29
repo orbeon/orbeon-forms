@@ -133,10 +133,17 @@
     <property as="xs:string"  name="oxf.fr.detail.lhha-order.*.*"                               value="help label control alert hint"/>
     <property as="xs:boolean" name="oxf.fr.detail.static-readonly-hint.*.*"                     value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.static-readonly-alert.*.*"                    value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.static-readonly-required.*.*"                 value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.label.appearance.*.*"                         value="full"/>
     <property as="xs:string"  name="oxf.fr.detail.hint.appearance.*.*"                          value="full"/>
-    <!-- TOC disabled by default -->
-    <property as="xs:integer" name="oxf.fr.detail.toc.*.*"                                      value="-1"/>
+    <property as="xs:boolean" name="oxf.fr.detail.hint.automatic.*.*"                           value="false"/>
+
+    <!-- Table of Contents -->
+    <property as="xs:integer" name="oxf.fr.detail.toc.*.*"                                      value="-2"/><!-- legacy property     -->
+    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.*.*"                         value="-2"/><!-- disabled by default -->
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.*.*"                             value="top"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.modes.*.*"                                value="new edit view"/>
+
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                            value="bottom"/>
 
     <property as="xs:boolean" name="oxf.fr.detail.new.service.enable.*.*"                       value="false"/>
@@ -235,6 +242,10 @@
 
     <property as="xs:boolean" name="oxf.fr.detail.readonly.disable-calculate.*.*"               value="false"/>
 
+    <!-- Actions -->
+    <property as="xs:boolean" name="oxf.fr.detail.actions.async.*.*"                            value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.actions.response-must-await.*.*"              value="true"/>
+
     <property as="xs:string" name="oxf.fr.email.pdf.filename.*.*">
         concat(
             fr:form-title(),
@@ -273,6 +284,8 @@
     <property as="xs:integer" name="oxf.fr.detail.lease.duration.*.*.*"                         value="10"/>
     <property as="xs:integer" name="oxf.fr.detail.lease.renew-threshold.*.*"                    value="1"/>
     <property as="xs:integer" name="oxf.fr.detail.lease.alert-threshold.*.*"                    value="2"/>
+    <property as="xs:boolean" name="oxf.fr.detail.session-expiration-dialog.enabled.*.*"        value="false"/>
+
 
     <property as="xs:integer" name="oxf.fr.access-token.validity.*.*"                           value="0"/>
     <property as="xs:string"  name="oxf.fr.access-token.password"                               value=""/>
@@ -293,6 +306,10 @@
 
     <!-- Automatic PDF JPEG compression level for image attachments that needs reencoding -->
     <property as="xs:string"  name="oxf.fr.pdf.jpeg.compression"                                value="0.9"/>
+
+    <!-- Automatic PDF accessibility and PDF/A level -->
+    <property as="xs:boolean" name="oxf.fr.pdf.accessibility"                                   value="false"/>
+    <property as="xs:string"  name="oxf.fr.pdf.pdf/a"                                           value="none"/>
 
     <!-- Email configuration -->
     <property as="xs:string"  name="oxf.fr.email.smtp.host.*.*"                                 value=""/>
@@ -332,7 +349,6 @@
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.controls"              value="wizard"/>
-    <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.controls"                          value="-1"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.dmv-14">
         home summary clear save-final review
@@ -342,7 +358,6 @@
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.dmv-14"                value="wizard"/>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.w9"                    value="wizard"/>
-    <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.w9"                                value="-1"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.w9.xforms-select1.*"                  value="select-value"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w9"/>
@@ -382,6 +397,14 @@
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.pta-remittance">
         home summary clear pdf|tiff save-final review
     </property>
+
+    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.orbeon.*"             value="2"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.*"                 value="none"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.modes.orbeon.*"                    value="new edit view"/>
+
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.controls"          value="left"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.dmv-14"            value="left"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.w9"                value="left"/>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>
 
@@ -504,6 +527,10 @@
         error-message("service-error")
     </property>
 
+    <property as="xs:string"  name="oxf.fr.detail.process.action-action-error.*.*">
+        error-message("action-error")
+    </property>
+
     <!-- Default send parameters -->
     <property as="xs:string"  name="oxf.fr.detail.send.success.replace.*.*"                     value="all"/>
     <property as="xs:string"  name="oxf.fr.detail.send.success.method.*.*"                      value="post"/>
@@ -558,6 +585,7 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.subsections-toc.*.*"               value="active"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.lazy-section-relevance.*.*"        value="false"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.full-update.*.*"                   value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.allow-url-param.*.*"               value="true"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"                value="lax"/>
 

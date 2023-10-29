@@ -58,6 +58,11 @@
     </xsl:template>
 
     <xsl:template
+        match="*[p:has-class('fr-action-impl') and exists(preceding-sibling::*[1][p:has-class('fr-action-impl')])]"
+        mode="filter-out-action-implementation"
+        priority="100"/>
+
+    <xsl:template
         match="_/xf:instance[@id = ('fr-form-instance', 'fr-form-resources', 'fr-form-metadata', 'fr-form-attachments')] | xf:bind"
         mode="filter-out-action-implementation"/>
 

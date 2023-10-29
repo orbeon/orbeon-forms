@@ -43,6 +43,31 @@ abstract class XFormsBaseHandler protected (
 
 object XFormsBaseHandler {
 
+  def forwardAutocompleteAttribute(srcAttributes: Attributes, localName: String, dstAttributes: AttributesImpl): Unit = {
+    if (canHaveAutocompleteAttribute(srcAttributes, localName, dstAttributes)) {
+      Option(srcAttributes.getValue("autocomplete")).foreach { autocomplete =>
+        dstAttributes.addOrReplace("autocomplete", autocomplete)
+      }
+    }
+  }
+
+  def canHaveAutocompleteAttribute(srcAttributes: Attributes, localName: String, dstAttributes: Attributes): Boolean = {
+    val typeOpt =
+      Option(dstAttributes.getValue("type")) orElse
+      Option(srcAttributes.getValue("type"))
+
+    val supportedInputTypes = Set(
+      "color", "date", "datetime-local", "email", "month", "number", "password",
+      "range", "search", "tel", "text", "time", "url", "week"
+    )
+
+    localName match {
+      case "form" | "select" | "textarea"                 => true
+      case "input" if typeOpt.forall(supportedInputTypes) => true
+      case _                                              => false
+    }
+  }
+
   def forwardAccessibilityAttributes(srcAttributes: Attributes, destAttributes: AttributesImpl): Unit = {
 
     // Handle "tabindex"

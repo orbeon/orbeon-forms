@@ -55,11 +55,12 @@ object OutputControlBuilder {
 
     // Control-specific
     val isImageMediatype    : Boolean = element.attributeValueOpt("mediatype") exists (_.startsWith("image/"))
+    val isVideoMediatype    : Boolean = element.attributeValueOpt("mediatype") exists (_.startsWith("video/"))
     val isHtmlMediatype     : Boolean = element.attributeValueOpt("mediatype") contains "text/html"
     val isDownloadAppearance: Boolean = appearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME)
 
     val staticValue: Option[String] =
-      (! isImageMediatype && ! isDownloadAppearance && ElementAnalysisTreeBuilder.hasStaticValue(element)) option
+      (! isImageMediatype && ! isVideoMediatype && ! isDownloadAppearance && ElementAnalysisTreeBuilder.hasStaticValue(element)) option
         XFormsStaticElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, acceptHTML = true, null)
 
     new OutputControl(
@@ -73,6 +74,7 @@ object OutputControlBuilder {
       scope,
       containerScope,
       isImageMediatype,
+      isVideoMediatype,
       isHtmlMediatype,
       isDownloadAppearance,
       staticValue

@@ -18,7 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
 import org.orbeon.oxf.fr.{AppForm, FormOrData, FormRunnerPersistence}
-import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.http.{HttpRanges, StatusCode}
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary
 import org.orbeon.oxf.util.{LoggerFactory, XPathCache}
 import org.orbeon.saxon.function.{EnvironmentVariable, EnvironmentVariableAlwaysEnabled}
@@ -26,27 +26,42 @@ import org.orbeon.xml.NamespaceMapping
 
 import java.io._
 import java.nio.file.{Files, Path, Paths}
+import scala.util.{Failure, Success}
 
 trait FilesystemCRUD extends CRUDMethods {
   private val logger = LoggerFactory.createLogger(classOf[FilesystemCRUD])
 
   override def head(
-    attachmentInformation : AttachmentInformation)(implicit
+    attachmentInformation : AttachmentInformation,
+    httpRanges            : HttpRanges)(implicit
     httpRequest           : Request,
     httpResponse          : Response
   ): Unit = withFile(attachmentInformation, httpRequest, httpResponse) { fileToAccess =>
-    ()
+    if (fileToAccess.exists()) {
+      httpResponse.addHeaders(HttpRanges.acceptRangesHeader(fileToAccess.length()))
+      httpResponse.setStatus(StatusCode.Ok)
+    } else {
+      httpResponse.setStatus(StatusCode.NotFound)
+    }
   }
 
   override def get(
-    attachmentInformation : AttachmentInformation)(implicit
+    attachmentInformation : AttachmentInformation,
+    httpRanges            : HttpRanges)(implicit
     httpRequest           : Request,
     httpResponse          : Response
   ): Unit = withFile(attachmentInformation, httpRequest, httpResponse) { fileToRead =>
-    val fileInputStream = new FileInputStream(fileToRead)
-    val outputStream = httpResponse.getOutputStream
+    httpRanges.streamedFile(fileToRead, new FileInputStream(fileToRead)) match {
+      case Success(streamedFile) =>
+        IOUtils.copyStreamAndClose(streamedFile.inputStream, httpResponse.getOutputStream)
 
-    IOUtils.copyStreamAndClose(fileInputStream, outputStream)
+        httpResponse.addHeaders(streamedFile.headers)
+        httpResponse.setStatus(streamedFile.statusCode)
+
+      case Failure(throwable) =>
+        logger.error(throwable)(s"Error while processing request ${httpRequest.getRequestPath}")
+        httpResponse.setStatus(StatusCode.InternalServerError)
+    }
   }
 
   override def put(

@@ -13,19 +13,17 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import java.io.ByteArrayInputStream
-import java.net.URI
-
 import cats.syntax.option._
 import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+import java.io.ByteArrayInputStream
+import java.net.URI
+import scala.concurrent.Future
 import scala.util.Success
 
-/**
- * Test submission which just echoes the incoming document.
- */
+
 class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(submission) {
 
   def getType = "echo"
@@ -41,7 +39,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     p : SubmissionParameters,
     p2: SecondPassParameters,
     sp: SerializationParameters
-  ): Option[ConnectResult] = {
+  ): Option[ConnectResult Either Future[ConnectResult]] = {
 
     sp.messageBody match {
       case None =>
@@ -77,14 +75,14 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
       encodingForSOAP          = p2.encoding,
       customHeaders            = customHeaderNameValues,
       headersToForward         = Connection.headersToForwardFromProperty,
-      getHeader                = containingDocument.headersGetter)(
+      getHeader                = submission.containingDocument.headersGetter)(
       logger                   = getDetailsLogger(p, p2),
       externalContext          = XFormsCrossPlatformSupport.externalContext,
       coreCrossPlatformSupport = CoreCrossPlatformSupport
     )
 
     // Do as if we are receiving a regular XML response
-    val connectionResult = ConnectionResult(
+    val cxr = ConnectionResult(
       url                 = p2.actionOrResource,
       statusCode          = 200,
       headers             = headers,
@@ -95,11 +93,11 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
         title           = None
       )
     )
-    val replacer = submission.getReplacer(connectionResult, p)(submission.getIndentedLogger)
 
-    // Deserialize here so it can run in parallel
-    replacer.deserialize(connectionResult, p, p2)
-
-    ConnectResult(submission.getEffectiveId, Success((replacer, connectionResult))).some
+    Left(
+      ConnectResult(
+        submission.getEffectiveId,
+        Success((submission.getReplacer(cxr, p)(submission.getIndentedLogger), cxr)))
+    ).some
   }
 }

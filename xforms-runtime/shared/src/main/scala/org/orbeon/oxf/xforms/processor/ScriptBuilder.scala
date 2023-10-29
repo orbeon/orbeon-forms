@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsCo
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ShareableScript, XFormsContainingDocument}
 import org.orbeon.xforms._
-import org.orbeon.xforms.rpc.ConfigurationProperties
 
 import java.{lang => jl}
 import scala.collection.mutable
@@ -87,10 +86,11 @@ object ScriptBuilder {
   }
 
   private def findConfigurationProperties(
-    containingDocument : XFormsContainingDocument,
-    versionedResources : Boolean,
-    heartbeatDelay     : Long
-  ): ConfigurationProperties = {
+    containingDocument        : XFormsContainingDocument,
+    versionedResources        : Boolean,
+    maxInactiveIntervalMillis : Long,
+    sessionId                 : String
+  ): rpc.ConfigurationProperties = {
 
     val staticState = containingDocument.staticState
 
@@ -103,36 +103,40 @@ object ScriptBuilder {
     def resourcesVersionOpt =
       versionedResources flatOption CoreCrossPlatformSupport.getApplicationResourceVersion
 
-    ConfigurationProperties(
-      sessionHeartbeat                 = staticState.staticBooleanProperty(SessionHeartbeatProperty),                     // static
-      sessionHeartbeatDelay            = heartbeatDelay,                                                                  // dynamic
-      revisitHandling                  = staticState.staticStringProperty(RevisitHandlingProperty),                       // static
-      delayBeforeIncrementalRequest    = staticState.staticIntProperty(DelayBeforeIncrementalRequestProperty),            // static
-      delayBeforeAjaxTimeout           = getAjaxTimeout,                                                                  // global
-      internalShortDelay               = staticState.staticIntProperty(InternalShortDelayProperty),                       // static
-      delayBeforeDisplayLoading        = staticState.staticIntProperty(DelayBeforeDisplayLoadingProperty),                // static
-      delayBeforeUploadProgressRefresh = staticState.staticIntProperty(DelayBeforeUploadProgressRefreshProperty),         // static
-      helpHandler                      = helpHandler,                                                                     // dynamic
-      resourcesVersioned               = versionedResources,                                                              // dynamic
-      resourcesVersionNumber           = resourcesVersionOpt,                                                             // dynamic
-      helpTooltip                      = staticState.staticBooleanProperty(HelpTooltipProperty),                          // static
-      showErrorDialog                  = staticState.staticBooleanProperty(ShowErrorDialogProperty),                      // static
-      loginPageDetectionRegexp         = staticState.staticStringProperty(LoginPageDetectionRegexpProperty).trimAllToOpt, // static
-      retryDelayIncrement              = getRetryDelayIncrement,                                                          // global
-      retryMaxDelay                    = getRetryMaxDelay,                                                                // global
-      useAria                          = staticState.staticBooleanProperty(UseAriaProperty),                              // static
-      dateFormatInput                  = staticState.staticStringProperty(DateFormatInputProperty),                       // static
-      timeFormatInput                  = staticState.staticStringProperty(TimeFormatInputProperty),                       // static
+    rpc.ConfigurationProperties(
+      sessionHeartbeatEnabled            = staticState.staticBooleanProperty(SessionHeartbeatProperty),                     // static
+      maxInactiveIntervalMillis          = maxInactiveIntervalMillis,                                                       // dynamic
+      sessionExpirationTriggerPercentage = staticState.staticIntProperty(SessionExpirationTriggerProperty),                 // static
+      sessionExpirationMarginMillis      = staticState.staticIntProperty(SessionExpirationMarginProperty) * 1000L,          // static
+      sessionId                          = sessionId,                                                                       // dynamic
+      revisitHandling                    = staticState.staticStringProperty(RevisitHandlingProperty),                       // static
+      delayBeforeIncrementalRequest      = staticState.staticIntProperty(DelayBeforeIncrementalRequestProperty),            // static
+      delayBeforeAjaxTimeout             = getAjaxTimeout,                                                                  // global
+      internalShortDelay                 = staticState.staticIntProperty(InternalShortDelayProperty),                       // static
+      delayBeforeDisplayLoading          = staticState.staticIntProperty(DelayBeforeDisplayLoadingProperty),                // static
+      delayBeforeUploadProgressRefresh   = staticState.staticIntProperty(DelayBeforeUploadProgressRefreshProperty),         // static
+      helpHandler                        = helpHandler,                                                                     // dynamic
+      resourcesVersioned                 = versionedResources,                                                              // dynamic
+      resourcesVersionNumber             = resourcesVersionOpt,                                                             // dynamic
+      helpTooltip                        = staticState.staticBooleanProperty(HelpTooltipProperty),                          // static
+      showErrorDialog                    = staticState.staticBooleanProperty(ShowErrorDialogProperty),                      // static
+      loginPageDetectionRegexp           = staticState.staticStringProperty(LoginPageDetectionRegexpProperty).trimAllToOpt, // static
+      retryDelayIncrement                = getRetryDelayIncrement,                                                          // global
+      retryMaxDelay                      = getRetryMaxDelay,                                                                // global
+      useAria                            = staticState.staticBooleanProperty(UseAriaProperty),                              // static
+      dateFormatInput                    = staticState.staticStringProperty(DateFormatInputProperty),                       // static
+      timeFormatInput                    = staticState.staticStringProperty(TimeFormatInputProperty),                       // static
     )
   }
 
   def buildJsonInitializationData(
-    containingDocument   : XFormsContainingDocument,
-    rewriteResource      : String => String,
-    rewriteAction        : String => String,
-    controlsToInitialize : List[(String, Option[String])],
-    versionedResources   : Boolean,
-    heartbeatDelay       : Long
+    containingDocument        : XFormsContainingDocument,
+    rewriteResource           : String => String,
+    rewriteAction             : String => String,
+    controlsToInitialize      : List[(String, Option[String])],
+    versionedResources        : Boolean,
+    maxInactiveIntervalMillis : Long,
+    sessionId                 : String
   ): String = {
 
     val currentTime = System.currentTimeMillis
@@ -173,7 +177,7 @@ object ScriptBuilder {
         } yield
           rpc.PollEvent(time - currentTime),
       userScripts =
-        for (script <- containingDocument.getScriptsToRun.toList collect { case Right(s) => s })
+        for (script <- containingDocument.getScriptsToRun.toList collect { case Right(Left(s)) => s })
         yield
           rpc.UserScript(
             functionName = script.script.shared.clientName,
@@ -204,7 +208,7 @@ object ScriptBuilder {
             formId  = containingDocument.getNamespacedFormId
           ),
       configuration =
-        findConfigurationProperties(containingDocument, versionedResources, heartbeatDelay),
+        findConfigurationProperties(containingDocument, versionedResources, maxInactiveIntervalMillis, sessionId),
     ).asJson.noSpaces
   }
 

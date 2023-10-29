@@ -339,14 +339,14 @@
                 ref="bind('validate-bind')/stats/form"
                 method="post"
                 serialization="application/xml"
-                action="/fr/{$app}/{$form}/edit{
+                action="/fr/{$app}/{$form}/new{
                     let $doc := xxf:get-request-parameter('document-id')
                     return
                         if (xxf:non-blank($doc)) then
                             concat('/', xxf:trim($doc))
                         else
                             ''
-                }?data-format-version=edge{
+                }?data-format-version=edge&amp;fr-show-relevant-errors=true{
                     let $prop   := xxf:property(string-join(('oxf.fr.import.forward-parameters', $app, $form), '.')),
                         $params := xxf:split($prop),
                         $tuples :=

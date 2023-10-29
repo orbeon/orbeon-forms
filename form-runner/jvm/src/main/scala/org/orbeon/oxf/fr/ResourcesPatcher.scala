@@ -15,6 +15,8 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.fr.process.FormRunnerActionsCommon
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.SimpleProcessor
 import org.orbeon.oxf.properties.{Properties, PropertySet}
@@ -76,29 +78,47 @@ object ResourcesPatcher {
         (_.detach())
     }
 
-    val resourceElems = new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration).rootElement / "resource"
+    def resourceElems: Seq[NodeInfo] =
+      new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration).rootElement / "resource"
+
+    val originalResourceElems = resourceElems
 
     // All languages remaining in the resources document
-    // For now we don't support creating new top-level resource elements for new languages
-    val allLanguages = resourceElems attValue XMLNames.XMLLangQName
+    val allLanguages = originalResourceElems attValue XMLNames.XMLLangQName
 
+    // Retrieve resources from properties and form metadata, and expand wildcards into concrete languages
     val propertyResources = resourcesWithConcreteLanguage(allLanguages, resourcesFromProperties(properties, appForm))
     val metadataResources = resourcesWithConcreteLanguage(allLanguages, resourcesFromMetadata(formMetadataDocument))
 
     // Merge resources from properties and form metadata, giving higher priority to form metadata
     val mergedExtraResources  = mergedResources(resourcesGroups = Seq(metadataResources, propertyResources))
 
+    // At the moment, wildcards in form metadata have a higher priority than specific languages in properties; this can
+    // be changed if needed (by merging the resources first and then only expanding wildcards into specific languages)
+
+    // Languages missing in the resources document, but present in the properties and/or form metadata
+    val extraResourceLanguages = mergedExtraResources.map(_.lang).toSet
+    val missingLanguagesInResources = (extraResourceLanguages -- allLanguages.toSet).intersect(langsOpt.getOrElse(extraResourceLanguages))
+
+    addMissingLanguages(resourcesDocument, appForm, missingLanguagesInResources)
+
+    val updatedResourceElems = resourceElems
+
     def resourceElemsForLang(lang: String) =
-      resourceElems filter (_.attValueOpt(XMLNames.XMLLangQName) contains lang) map unsafeUnwrapElement
+      updatedResourceElems filter (_.attValueOpt(XMLNames.XMLLangQName) contains lang) map unsafeUnwrapElement
 
     // Update or create elements and set values
     for {
-      Resource(lang, path, value) <- mergedExtraResources
-      rootForLang                 <- resourceElemsForLang(lang)
+      Resource(lang, path, value, isHtml) <- mergedExtraResources
+      rootForLang                         <- resourceElemsForLang(lang)
     } locally {
       val elem = Support.ensurePath(rootForLang, path map dom.QName.apply)
       elem.attributeOpt("todo") foreach elem.remove
       elem.setText(value)
+      if (isHtml) {
+        // Only add attribute if true, false by default (see FormRunnerActionsCommon.isMessageInHtml)
+        elem.addAttribute("html", "true")
+      }
     }
 
     def hasTodo(e: NodeInfo) =
@@ -109,7 +129,7 @@ object ResourcesPatcher {
 
     // Add missing brackets for resources marked with "todo"
     for {
-      e <- resourceElems descendant *
+      e <- updatedResourceElems descendant *
       if ! e.hasChildElement && hasTodo(e) && ! isBracketed(e.stringValue)
       elem = unsafeUnwrapElement(e)
     } locally {
@@ -118,14 +138,38 @@ object ResourcesPatcher {
     }
   }
 
+  def addMissingLanguages(
+    resourcesDocument : dom.Document,
+    appForm           : AppForm,
+    missingLanguages  : Set[String]
+  ): Unit = {
+    val defaultLang = FormRunnerCommon.frc.getDefaultLang(Some(appForm))
+
+    def resourceForLang(lang: String): Option[dom.Element] =
+      resourcesDocument.getRootElement.elements.find(_.attributeValue(XMLNames.XMLLangQName) == lang)
+
+    val resourceToCopy = resourceForLang(defaultLang) orElse resourceForLang("en") getOrElse {
+      throw new OXFException(s"Could not find resource for default language $defaultLang or English")
+    }
+
+    missingLanguages.foreach { missingLanguage =>
+      val newResource = resourceToCopy.deepCopy
+      newResource.attribute(XMLNames.XMLLangQName).setValue(missingLanguage)
+      resourcesDocument.getRootElement.add(newResource)
+    }
+  }
+
   case class ResourceKey(lang: String, path: Seq[String])
-  case class Resource   (lang: String, path: Seq[String], value: String) {
+  case class Resource   (lang: String, path: Seq[String], value: String, isHtml: Boolean) {
     def key: ResourceKey = ResourceKey(lang, path)
   }
 
   def resourcesFromProperties(properties: PropertySet, appForm: AppForm): Seq[Resource] = {
 
-    val propertyNames = properties.propertiesStartsWith((Prefix :: appForm.toList).mkString("."))
+    val propertyNames =
+      properties
+        .propertiesStartsWith((Prefix :: appForm.toList).mkString("."))
+        .filterNot(_.endsWith(".html"))
 
     // In 4.6 summary/detail buttons are at the top level
     def filterPathForBackwardCompatibility(path: List[String]): List[String] = path match {
@@ -143,7 +187,11 @@ object ResourcesPatcher {
       // Had a case where value was null (more details would be useful)
       val value = properties.getNonBlankString(expandedPropertyName)
 
-      value.map(Resource(lang, filterPathForBackwardCompatibility(resourceTokens), _))
+      // TODO: this doesn't work, as the base (i.e. suffix-less) property doesn't seem to be listed by
+      //  propertiesStartsWith if a property with the .html suffix exists
+      val isHtml = properties.getBoolean(expandedPropertyName + ".html", default = false)
+
+      value.map(Resource(lang, filterPathForBackwardCompatibility(resourceTokens), _, isHtml))
     }
   }
 
@@ -156,9 +204,10 @@ object ResourcesPatcher {
       message   <- messages / "message"
     } yield
       Resource(
-        lang  = lang,
-        path  = "detail" :: "messages" :: message.attValue("name") :: Nil,
-        value = message.getStringValue
+        lang   = lang,
+        path   = "detail" :: "messages" :: message.attValue("name") :: Nil,
+        value  = message.getStringValue,
+        isHtml = FormRunnerActionsCommon.isMessageInHtml(message)
       )
 
   def resourcesWithConcreteLanguage(allLanguages: Seq[String], resources: Seq[Resource]): Map[ResourceKey, Resource] = {

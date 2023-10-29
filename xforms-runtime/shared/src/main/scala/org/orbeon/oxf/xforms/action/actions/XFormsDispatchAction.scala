@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAPI, XFormsActi
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEventFactory.createEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventTarget}
+import shapeless.syntax.typeable._
 
 import scala.util.Try
 
@@ -120,9 +121,8 @@ object XFormsDispatchAction {
         // contain more than one event with the same name and target IDREF. It is the name and the target run-time
         // element that must be unique."
 
-        // TODO: We should either handle properties or throw an exception. We could handle atomic value but not nodes.
-        // However, we cannot implement this as is because `PropertyGetter` does not provide a way to enumerate the
-        // properties. So we cannot check whether they are empty or whether we support their type.
+        // 2023-10-16: We now pass properties, but only `String` properties. We could pass other atomic types in the
+        // future.
 
         XFormsAPI.inScopeContainingDocument.addDelayedEvent(
           eventName         = eventName,
@@ -131,7 +131,8 @@ object XFormsDispatchAction {
           cancelable        = cancelable,
           time              = System.currentTimeMillis + delay,
           showProgress      = showProgress,
-          allowDuplicates   = allowDuplicates
+          allowDuplicates   = allowDuplicates,
+          properties        = properties.narrowTo[ActionPropertyGetter].map(_.simpleProperties).getOrElse(Nil)
         )
       case _ =>
         // Event is dispatched immediately

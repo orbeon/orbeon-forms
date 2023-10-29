@@ -63,16 +63,25 @@ object Provider extends Enum[Provider] {
       case _          => "?"
     }
 
+  // We would like this search to be case-insensitive, but it is not on all databases:
+  // - Oracle and SQL Server: based on the database collation
+  // - MySQL: case-insensitive, as we set a case-insensitive collation on the `xml` column
+  // - PostgreSQL: case-insensitive, as use ILIKE
   def xmlContains(provider: Provider): String =
     provider match {
-      case MySQL      => "xml like ?"
+      case MySQL      => "instr(xml, ?) > 0"
       case PostgreSQL => "xml::text ilike ?"
     }
 
+  private def paramForLike(param: String, surroundingPercents: Boolean): String = {
+    val escapedParam = param.escaped(Seq("\\", "%", "_"), "\\")
+     if (surroundingPercents) s"%$escapedParam%" else escapedParam
+  }
+
   def xmlContainsParam(provider: Provider, param: String): String =
     provider match {
-      case MySQL | PostgreSQL => s"%$param%"
-      case _                  => param
+      case PostgreSQL => paramForLike(param, surroundingPercents = true)
+      case _          => param
     }
 
   def textContains(provider: Provider, colName: String): String =
@@ -85,8 +94,20 @@ object Provider extends Enum[Provider] {
         s"$colName ILIKE ?"
     }
 
+  def textContainsParam(provider: Provider, param: String): String =
+    paramForLike(param, surroundingPercents = true)
+
   def textEquals(provider: Provider, colName: String): String =
-    s"$colName = ?"
+    provider match {
+      // SQL Server doesn't support the `=` operator on `ntext`
+      // Oracle requires `LIKE` to avoid "ORA-00932: inconsistent datatypes: expected - got CLOB"
+      case _                  => s"$colName =    ?"
+    }
+
+  def textEqualsParam(provider: Provider, param: String): String =
+    provider match {
+      case _                  => param
+    }
 
   def readXmlColumn(
     provider              : Provider,
@@ -278,5 +299,26 @@ object Provider extends Enum[Provider] {
   def idColGetter(provider: Provider): Option[String] =
     provider match {
       case _      => None
+    }
+
+  def concat(provider: Provider, args: String*): String =
+    provider match {
+      case _ =>
+        s"concat(${args.mkString(", ")})"
+    }
+
+  def partialBinaryMaxLength(provider: Provider): Int =
+    provider match {
+      case _      => Int.MaxValue
+    }
+
+  def partialBinary(provider: Provider, columnName: String, alias: String, offset: Long, length: Option[Long]): String =
+    provider match {
+      case _         => s"substring($columnName, ${offset + 1}${length.map(l => s", $l").getOrElse("")}) as $alias"
+    }
+
+  def binarySize(provider: Provider, columnName: String, alias: String): String =
+    provider match {
+      case _         => s"length($columnName) as $alias"
     }
 }

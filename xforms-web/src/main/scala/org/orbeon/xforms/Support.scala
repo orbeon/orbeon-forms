@@ -17,14 +17,13 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
+import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom
+import org.scalajs.dom._
 import org.scalajs.dom.experimental._
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
-import org.scalajs.dom.{Element, EventTarget, FocusEvent, FormData, html}
 
-import scala.concurrent.Future
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
-
+import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
 import scala.scalajs.js.|
 import scala.util.control.NonFatal
@@ -32,25 +31,27 @@ import scala.util.control.NonFatal
 
 object Support {
 
-  def formElemOrDefaultForm(formElem: js.UndefOr[html.Form]): html.Form =
-    formElem getOrElse getFirstForm
+  import org.scalajs.dom.ext._
 
-  def getFirstForm: html.Form =
-    $(dom.document.forms).filter(".xforms-form")(0).asInstanceOf[html.Form]
+  def allFormElems: Iterable[html.Form] =
+    dom.document.forms collect { case f: html.Form if isXFormsFormElem(f) => f }
+
+  def isXFormsFormElem(formElem: html.Form): Boolean =
+    formElem.classList.contains(FormClass) && formElem.id.nonAllBlank
 
   def adjustIdNamespace(
-    formElem : js.UndefOr[html.Form],
-    targetId : String
+    elem    : js.UndefOr[html.Element],
+    targetId: String
   ): (html.Element, String) = {
 
-    val form   = Support.formElemOrDefaultForm(formElem)
+    val form   = Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(elem).getOrElse(throw new IllegalArgumentException("form not found"))
     val formId = form.id
 
     // See comment on `namespaceIdIfNeeded`
     form -> Page.namespaceIdIfNeeded(formId, targetId)
   }
 
-  def parseStringAsXml(xmlString: String): Option[dom.Document] =
+  private def parseStringAsXml(xmlString: String): Option[dom.Document] =
     try {
       Option((new DOMParser).parseFromString(xmlString, SupportedType.`application/xml`)) filter
         (_.documentElement.getElementsByTagName("parsererror").length == 0)
@@ -74,7 +75,8 @@ object Support {
     contentType : Option[String],
     acceptLang  : Option[String],
     transform   : (String, String) => String,
-    abortSignal : Option[AbortSignal]
+    abortSignal : Option[AbortSignal])(implicit
+    executor    : ExecutionContext
   ): Future[(Int, String, Option[dom.Document])] = {
 
     val customHeaders = js.Dictionary[String]()
@@ -91,12 +93,12 @@ object Support {
           referrer       = js.undefined
           referrerPolicy = js.undefined
           mode           = js.undefined
-          credentials    = js.undefined
+          credentials    = RequestCredentials.include
           cache          = js.undefined
           redirect       = RequestRedirect.follow // only one supported with the polyfill
           integrity      = js.undefined
           keepalive      = js.undefined
-          signal         = abortSignal map (js.defined.apply) getOrElse js.undefined
+          signal         = abortSignal map js.defined.apply getOrElse js.undefined
           window         = null
         }
       )
@@ -114,13 +116,13 @@ object Support {
   }
 
   def stopFocusOutPropagation(
-    element     : Element,
-    eventTarget : FocusEvent => EventTarget,
-    targetClass : String
+    element       : Element,
+    eventToTarget : FocusEvent => EventTarget,
+    targetClass   : String
   ): Unit =
     element.addEventListener(
       DomEventNames.FocusOut,
-      focusFunction(eventTarget, targetClass),
+      focusFunction(eventToTarget, targetClass),
       useCapture = true
     )
 
@@ -138,13 +140,13 @@ object Support {
     )
 
   private def focusFunction(
-    eventTarget : FocusEvent => EventTarget,
-    targetClass : String
+    eventToTarget : FocusEvent => EventTarget,
+    targetClass   : String
   ): FocusEvent => Unit =
     (event: FocusEvent) => {
       // 2020-12-22: Noted that `relatedTarget` can be `null` in plain XForms.
       // Not sure why, but protecting against crash here with pattern match.
-      eventTarget(event) match {
+      eventToTarget(event) match {
         case relatedTarget: dom.html.Element =>
           if (relatedTarget.classList.contains(targetClass))
             event.stopPropagation()

@@ -13,37 +13,40 @@
   */
 package org.orbeon.fr
 
-import org.orbeon.oxf.fr.{ControlOps, Names}
+import org.orbeon.oxf.fr.Names
 import org.orbeon.xforms._
-import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.|
 
 
 object FormRunnerAPI extends FormRunnerEmbeddingAPI {
 
+  @deprecated("use `getForm().findControlsByName()`", "Orbeon Forms 2023.1")
   def findControlsByName(
-    controlName : String,
-    formElem    : js.UndefOr[html.Form] = js.undefined
-  ): js.Array[html.Element] = {
+    controlName: String,
+    elem       : js.UndefOr[html.Element | String] = js.undefined
+  ): js.Array[html.Element] =
+    getForm(elem) match {
+      case null => throw new IllegalArgumentException(s"form not found")
+      case form => form.findControlsByName(controlName)
+    }
 
-    $(Support.formElemOrDefaultForm(formElem))
-      .find(s".xforms-control[id *= '$controlName-control'], .xbl-component[id *= '$controlName-control']")
-      .toArray() collect {
-      // The result must be an `html.Element` already
-      case e: html.Element => e
-    } filter {
-      // Check the id matches the requested name
-      e => (e.id ne null) && (ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)) contains controlName)
-    } toJSArray
-  }
+  @deprecated("use `getForm().isFormDataSafe()`", "Orbeon Forms 2023.1")
+  def isFormDataSafe(elem: js.UndefOr[html.Form] = js.undefined): Boolean =
+    getForm(elem) match {
+      case null => throw new IllegalArgumentException(s"form not found")
+      case form => form.isFormDataSafe()
+    }
 
-  def isFormDataSafe(
-    formElem    : js.UndefOr[html.Form] = js.undefined
-  ): Boolean =
-    Page.getForm(Support.formElemOrDefaultForm(formElem).id).isFormDataSafe
+  // Returns `null` if:
+  // - a `String` is passed and it is not a valid namespaced id
+  // - an `html.Element` is passed and the form is not found
+  // - no `html.Element` is passed and no default form is found
+  def getForm(elemOrNamespacedId: js.UndefOr[html.Element | String]): FormRunnerForm =
+    Page.findXFormsForm(elemOrNamespacedId).map(new FormRunnerForm(_)).orNull
 
   val wizard      : FormRunnerWizardAPI.type       = FormRunnerWizardAPI
   val errorSummary: FormRunnerErrorSummaryAPI.type = FormRunnerErrorSummaryAPI
@@ -101,8 +104,9 @@ object FormRunnerErrorSummaryAPI extends js.Object {
 object FormRunnerWizardAPI extends js.Object {
 
   def focus(
-    controlName   : String,
-    repeatIndexes : js.UndefOr[js.Array[Int]] = js.undefined
+    controlName       : String,
+    repeatIndexes     : js.UndefOr[js.Array[Int]] = js.undefined,
+    elemOrNamespacedId: js.UndefOr[html.Element | String] = js.undefined
   ): Unit = {
 
     // Separate variable due to type inference fail when put inline below
@@ -112,6 +116,7 @@ object FormRunnerWizardAPI extends js.Object {
       AjaxEvent(
         eventName  = "fr-wizard-focus",
         targetId   = Names.ViewComponent,
+        form       = Page.findXFormsForm(elemOrNamespacedId).map(_.elem),
         properties = Map(
           "fr-control-name"   -> controlName,
           "fr-repeat-indexes" -> indexesString

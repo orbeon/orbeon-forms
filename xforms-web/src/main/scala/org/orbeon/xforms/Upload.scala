@@ -15,6 +15,7 @@ package org.orbeon.xforms
 
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.xforms
 import org.orbeon.xforms.EventNames._
 import org.orbeon.xforms.controls.Upload._
 import org.scalajs.dom.html
@@ -87,7 +88,7 @@ class Upload {
     for (i <- 0 until files.length) {
       UploaderClient.uploadEventQueue.add(
         event    = UploadEvent(self, files(i)),
-        wait     = Page.getFormFromElemOrThrow(self.container).configuration.delayBeforeIncrementalRequest.millis,
+        wait     = Page.getXFormsFormFromHtmlElemOrThrow(self.container).configuration.delayBeforeIncrementalRequest.millis,
         waitType = ExecutionWait.MinWait
       )
     }
@@ -153,8 +154,9 @@ class Upload {
     getInput.value = "" // this should now work from IE11 up
   }
 
-  def getAncestorForm: html.Form =
-    $(_container).parents("form")(0).asInstanceOf[html.Form]
+  def getAncestorForm: xforms.Form =
+    Page.findXFormsFormFromHtmlElem(_container)
+      .getOrElse(throw new IllegalStateException)
 
   def getInput: html.Input =
     findDescendantElem(UploadSelectClass) map

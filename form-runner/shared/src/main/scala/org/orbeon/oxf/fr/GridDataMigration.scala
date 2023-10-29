@@ -90,16 +90,16 @@ object GridDataMigration {
   // Used by background process in `persistence-model.xml`, `send`, and save to database.
   //@XPathFunction
   def dataMaybeMigratedFromEdge(
-    app                     : String,
-    form                    : String,
-    data                    : DocumentNodeInfoType,
-    metadataOpt             : Option[DocumentNodeInfoType],
-    dataFormatVersionString : String,
-    pruneMetadata           : Boolean
+    app                       : String,
+    form                      : String,
+    data                      : DocumentNodeInfoType,
+    metadataOpt               : Option[DocumentNodeInfoType],
+    dstDataFormatVersionString: String,
+    pruneMetadata             : Boolean
   ): DocumentNodeInfoType = {
 
     val appForm              = AppForm(app, form)
-    val dstDataFormatVersion = DataFormatVersion.withNameIncludeEdge(dataFormatVersionString)
+    val dstDataFormatVersion = DataFormatVersion.withNameIncludeEdge(dstDataFormatVersionString)
 
     val migratedOrDuplicatedData =
       MigrationSupport.migrateDataWithFormMetadataMigrations(

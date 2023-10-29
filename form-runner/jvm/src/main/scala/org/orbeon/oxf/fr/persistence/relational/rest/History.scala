@@ -7,7 +7,7 @@ import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, DateUtils, NetUtils, XPath}
 import org.orbeon.oxf.xml.{DeferredXMLReceiver, DeferredXMLReceiverImpl, TransformerUtils}
@@ -30,13 +30,14 @@ class History extends ProcessorImpl {
       require(httpRequest.getMethod == HttpMethod.GET)
 
       httpRequest.getRequestPath match {
-        case ServicePathRe(provider, app, form, documentId) =>
+        case ServicePathRe(provider, app, form, documentId, filenameOrNull) =>
           httpResponse.setContentType(ContentTypes.XmlContentType)
           returnHistory(
             Request(httpRequest.getFirstParamAsString, provider),
             app,
             form,
             documentId,
+            Option(filenameOrNull),
             httpResponse.getOutputStream
           )
         case _ =>
@@ -68,13 +69,14 @@ object History {
       )
   }
 
-  val ServicePathRe: Regex = "/fr/service/([^/]+)/history/([^/]+)/([^/]+)/([^/^.]+)".r
+  val ServicePathRe: Regex = "/fr/service/([^/]+)/history/([^/]+)/([^/]+)/([^/^.]+)(?:/([^/]+))?".r
 
   def returnHistory(
     request      : Request,
     app          : String,
     form         : String,
     documentId   : String,
+    filenameOpt  : Option[String],
     outputStream : OutputStream
   ): Unit = {
     RelationalUtils.withConnection { connection =>
@@ -88,15 +90,26 @@ object History {
         case None        => ""
       }
 
+      val tableName =
+        filenameOpt match {
+          case None                 => "orbeon_form_data"
+          case Some(NonAllBlank(_)) => "orbeon_form_data_attach" // TODO: use constants for table names
+          case Some(_)              => throw HttpStatusCodeException(StatusCode.BadRequest)
+        }
+
+      val hasStage = filenameOpt.isDefined
+
       val innerSQL =
         s"""|SELECT  t.last_modified_time, t.last_modified_by, t.created
             |        , t.username, t.groupname, t.organization_id
-            |        , t.stage, t.form_version, t.deleted
-            |FROM    orbeon_form_data t
+            |        ${if (hasStage) ", t.stage" else ""}
+            |        , t.form_version, t.deleted
+            |FROM    $tableName t
             |WHERE   t.app  = ?
             |        and t.form = ?
             |        and t.document_id = ?
             |        and t.draft = ?
+            |        ${if (filenameOpt.isDefined) "and t.file_name = ?" else ""}
             |ORDER BY last_modified_time DESC
             |""".stripMargin
 
@@ -122,12 +135,16 @@ object History {
            |        AND     ${startOffsetZeroBased + request.pageSize}
            |""".stripMargin
 
-      val setters = List[Setter](
-        (ps, i) => ps.setString(i, app),
-        (ps, i) => ps.setString(i, form),
-        (ps, i) => ps.setString(i, documentId),
-        (ps, i) => ps.setString(i, "N"),
-      )
+      val setters =
+        List[Setter](
+          (ps, i) => ps.setString(i, app),
+          (ps, i) => ps.setString(i, form),
+          (ps, i) => ps.setString(i, documentId),
+          (ps, i) => ps.setString(i, "N"),
+        ) :::
+        filenameOpt.toList.map { filename =>
+          ((ps, i) => ps.setString(i, filename)): Setter
+        }
 
       val searchCount = {
 
@@ -195,14 +212,15 @@ object History {
 
               element(
                 "document",
-                atts = List(
-                  "modified-time"     -> DateUtils.formatIsoDateTimeUtc(rs.getTimestamp("last_modified_time").getTime),
-                  "modified-username" -> rs.getString("last_modified_by").trimAllToEmpty,
-                  "owner-username"    -> userAndGroup.map(_.username).getOrElse(""),
-                  "owner-group"       -> userAndGroup.flatMap(_.groupname).getOrElse(""),
-                  "stage"             -> rs.getString("stage").trimAllToEmpty,
-                  "deleted"           -> (rs.getString("deleted") == "Y").toString,
-                )
+                atts =
+                  (hasStage list ("stage" -> rs.getString("stage").trimAllToEmpty)) :::
+                  List(
+                    "modified-time"     -> DateUtils.formatIsoDateTimeUtc(rs.getTimestamp("last_modified_time").getTime),
+                    "modified-username" -> rs.getString("last_modified_by").trimAllToEmpty,
+                    "owner-username"    -> userAndGroup.map(_.username).getOrElse(""),
+                    "owner-group"       -> userAndGroup.flatMap(_.groupname).getOrElse(""),
+                    "deleted"           -> (rs.getString("deleted") == "Y").toString,
+                  )
               )
 
               position += 1

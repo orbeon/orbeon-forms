@@ -4,6 +4,7 @@ import cats.syntax.option._
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
 import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
@@ -61,7 +62,7 @@ object Transforms {
       resolvedAbsoluteUrl = URI.create(
         URLRewriterUtils.rewriteServiceURL(
           externalContext.getRequest,
-          FormRunner.createFormDataBasePath(appForm.app, appForm.form, isDraft = false, documentId) + PersistenceProxyProcessor.XmlFormDataFilename,
+          FormRunner.createFormDataBasePath(appForm.app, appForm.form, isDraft = false, documentId) + DataXml,
           UrlRewriteMode.Absolute
         )
       ),

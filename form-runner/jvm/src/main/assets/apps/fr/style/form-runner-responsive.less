@@ -38,6 +38,26 @@
                 font-size: 16px;
             }
         }
+
+        .fr-toc-with-body {
+            &.fr-toc-position-top {
+            }
+
+            &.fr-toc-position-left {
+                & > * { // .span12
+                    display: flex;
+
+                    flex-direction: column;
+                    row-gap: 10px;
+
+                    .fr-toc {
+                        max-width: none;
+                        width: 100%;
+                        box-sizing: border-box;
+                    }
+                }
+            }
+        }
     }
 
     // For phones, use 1 column

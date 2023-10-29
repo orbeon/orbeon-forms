@@ -32,6 +32,12 @@ object SectionGridEditor {
   lazy val sectionGridEditorContainer : JQuery        = $(".fb-section-grid-editor")
   var currentSectionGridOpt           : Option[Block] = None
 
+  private def allIcons =
+    sectionGridEditorContainer.find(".fa")
+
+  private def allIconsWith(selector: String) =
+    sectionGridEditorContainer.find(selector)
+
   locally {
 
     sealed trait ContainerEditor extends EnumEntry with Hyphencase {
@@ -81,14 +87,14 @@ object SectionGridEditor {
         )
 
         // Start by hiding all the icons
-        sectionGridEditorContainer.children().hide()
+        allIcons.hide()
 
         def showContainerIcons(container: JQuery): Unit = {
 
            Direction.values foreach { direction =>
 
             val relevant = container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
-            val trigger  = sectionGridEditorContainer.children(".fb-container-move-" + direction.entryName.toLowerCase)
+            val trigger  = allIconsWith(".fb-container-move-" + direction.entryName.toLowerCase)
 
             if (relevant)
               trigger.show()
@@ -97,12 +103,12 @@ object SectionGridEditor {
           if (container.is(".fb-can-delete"))
             Set(ContainerDelete, ContainerCut)
               .map(_.className)
-              .map(sectionGridEditorContainer.children(_))
+              .map(allIconsWith)
               .foreach(_.show())
         }
 
         // Icons which are always visible
-        sectionGridEditorContainer.children(SectionGridAlwaysVisibleIcons map (_.className) mkString ",").show()
+        allIconsWith(SectionGridAlwaysVisibleIcons map (_.className) mkString ",").show()
 
         // Sections
         if (sectionGridBody.el.is(BlockCache.SectionSelector)) {
@@ -112,7 +118,7 @@ object SectionGridEditor {
           showContainerIcons(container)
 
           if (container.find(".fr-section-component").length > 0)
-            sectionGridEditorContainer.children(ContainerMerge.className).show()
+            allIconsWith(ContainerMerge.className).show()
         }
 
         // Grids
@@ -134,7 +140,7 @@ object SectionGridEditor {
     // Register listener on editor icons
     ContainerEditor.values foreach { editor =>
 
-      val iconEl = sectionGridEditorContainer.children(s".fb-${editor.entryName}")
+      val iconEl = allIconsWith(s".fb-${editor.entryName}")
 
       iconEl.on("click.orbeon.builder.section-grid-editor", () => asUnit {
         currentSectionGridOpt foreach { currentSectionGrid =>

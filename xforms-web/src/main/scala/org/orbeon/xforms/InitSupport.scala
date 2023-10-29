@@ -25,12 +25,12 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, LoggerFactory, PathUtils}
 import org.orbeon.web.DomEventNames
 import org.orbeon.wsrp.WSRPSupport
+import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
 import org.orbeon.xforms.StateHandling.StateResult
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.Initializations
 import org.scalajs.dom
-import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
@@ -52,6 +52,18 @@ object InitSupport {
 
   def pageContainsFormsMarkup(): Unit =
     pageContainsFormsMarkupPromise.success(())
+
+  def mapNamespacePromise(namespace: String): Future[xforms.Form] = {
+    val promise = Promise[xforms.Form]()
+    formNamespacesToPromise += namespace -> promise
+    promise.future
+  }
+
+  def completeNamespacePromise(namespace: String, form: xforms.Form): Unit =
+    formNamespacesToPromise.get(namespace).foreach(_.success(form))
+
+  def removeNamespacePromise(namespace: String): Unit =
+    formNamespacesToPromise -= namespace
 
   private var initTimestampBeforeMs: Long = -1
 
@@ -119,10 +131,17 @@ object InitSupport {
 
     pageContainsFormsMarkupF foreach { _ =>
 
-      initializeForm(initializations, contextAndNamespaceOpt)
-      initializeHeartBeatIfNeeded(initializations.configuration)
+      for {
+        form      <- initializeForm(initializations, contextAndNamespaceOpt)
+        namespace <- namespaceOrUndef
+      } locally {
+        // https://github.com/orbeon/orbeon-forms/issues/5913
+        completeNamespacePromise(namespace, form)
+      }
 
-      if (Page.countInitializedForms == allFormElems.size) {
+      initializeReactWhenSessionAboutToExpire(initializations.configuration)
+
+      if (Page.countInitializedForms == Support.allFormElems.size) {
         logger.info(s"all forms are loaded; total time for client-side web app initialization: ${System.currentTimeMillis() - initTimestampBeforeMs} ms")
         scheduleOrbeonLoadedEventIfNeeded(initializations.configuration)
       }
@@ -177,7 +196,7 @@ object InitSupport {
     val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
       processRepeatHierarchy(repeatTreeString)
 
-    val form = Page.getForm(formId)
+    val form = Page.getXFormsFormFromNamespacedIdOrThrow(formId)
 
     form.repeatTreeChildToParent       = repeatTreeChildToParent
     form.repeatTreeParentToAllChildren = repeatTreeParentToAllChildren
@@ -187,9 +206,11 @@ object InitSupport {
 
     val pageContainsFormsMarkupPromise = Promise[Unit]()
 
-    private var topLevelListenerRegistered = false
-    private var heartBeatInitialized       = false
-    private var orbeonLoadedEventScheduled = false
+    private var topLevelListenerRegistered               = false
+    private var reactWhenSessionAboutToExpireInitialized = false
+    private var orbeonLoadedEventScheduled               = false
+
+    var formNamespacesToPromise : Map[String, Promise[xforms.Form]] = Map.empty
 
     def initializeForm(initializations: Initializations, contextAndNamespaceOpt: Option[(String, String)]): Option[Form] = {
 
@@ -216,7 +237,6 @@ object InitSupport {
             dom.window.location.reload(flag = true)
             return None
         }
-
 
       val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
         processRepeatHierarchy(initializations.repeatTree)
@@ -296,20 +316,19 @@ object InitSupport {
     }
 
     // The heartbeat is per servlet session and we only need one. But see https://github.com/orbeon/orbeon-forms/issues/2014.
-    def initializeHeartBeatIfNeeded(configuration: rpc.ConfigurationProperties): Unit =
-      if (! heartBeatInitialized) {
-        if (configuration.sessionHeartbeat) {
-          // Say session is 60 minutes: heartbeat must come after 48 minutes and we check every 4.8 minutes
-          val heartBeatDelay      = configuration.sessionHeartbeatDelay
-          val heartBeatCheckDelay = heartBeatDelay / 10
-          if (heartBeatCheckDelay > 0) {
-            logger.debug(s"setting heartbeat check every $heartBeatCheckDelay ms")
-            js.timers.setInterval(heartBeatCheckDelay) {
-              AjaxClient.sendHeartBeatIfNeeded(heartBeatDelay)
-            }
-          }
+    def initializeReactWhenSessionAboutToExpire(configuration: rpc.ConfigurationProperties): Unit =
+      if (! reactWhenSessionAboutToExpireInitialized) {
+        // Say session is 60 minutes and percentage is 80%: heartbeat must come after 48 minutes and we check every 4.8 minutes
+        val reactAfterMillis = (configuration.maxInactiveIntervalMillis * (configuration.sessionExpirationTriggerPercentage.toDouble / 100.0)).toLong
+
+        Session.initialize(configuration, reactAfterMillis)
+
+        val checkEveryMillis = reactAfterMillis / 10
+        if (checkEveryMillis > 0) {
+          logger.debug(s"checking if getting close to session expiration every $checkEveryMillis ms")
+          js.timers.setInterval(checkEveryMillis)(Session.updateWithLocalNewestEventTime())
         }
-        heartBeatInitialized = true
+        reactWhenSessionAboutToExpireInitialized = true
       }
 
     def scheduleOrbeonLoadedEventIfNeeded(configuration: rpc.ConfigurationProperties): Unit =
@@ -329,17 +348,14 @@ object InitSupport {
     def pageContainsFormsMarkupF: Future[Unit] =
       pageContainsFormsMarkupPromise.future
 
-    def allFormElems: Iterable[html.Form] =
-      dom.document.forms filter (_.classList.contains(Constants.FormClass)) collect { case f: html.Form => f }
-
-    def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
+    private def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
       for {
         repeatIndexes <- repeatIndexesString.splitTo[List](",")
         repeatInfos   = repeatIndexes.splitTo[List]() // must be of the form "a b"
       } yield
         repeatInfos.head -> repeatInfos.last
 
-    def parseRepeatTree(repeatTreeString: String): List[(String, String)] =
+    private def parseRepeatTree(repeatTreeString: String): List[(String, String)] =
       for {
        repeatTree  <- repeatTreeString.splitTo[List](",")
        repeatInfos = repeatTree.splitTo[List]() // must be of the form "a b"
@@ -347,7 +363,7 @@ object InitSupport {
      } yield
        repeatInfos.head -> repeatInfos.last
 
-    def createParentToChildrenMap(childToParentMap: Map[String, String]): collection.Map[String, js.Array[String]] = {
+    private def createParentToChildrenMap(childToParentMap: Map[String, String]): collection.Map[String, js.Array[String]] = {
 
       val parentToChildren = m.Map[String, js.Array[String]]()
 
@@ -368,10 +384,10 @@ object InitSupport {
       (childToParentMap.toJSDictionary, createParentToChildrenMap(childToParentMap).toJSDictionary)
     }
 
-    def processRepeatIndexes(repeatIndexesString: String): Dictionary[String] =
+    private def processRepeatIndexes(repeatIndexesString: String): Dictionary[String] =
       parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
 
-    def initializeGlobalEventListenersIfNeeded(): Unit =
+    private def initializeGlobalEventListenersIfNeeded(): Unit =
       if (! topLevelListenerRegistered) {
         // We are using jQuery for `change` because the Select2 component, used for the dropdowns with search, dispatches that jQuery
         // event, and if just using the DOM API our code handling `change` in `xforms.js` isn't being notified, and the value isn't
@@ -389,6 +405,13 @@ object InitSupport {
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOver, Events.mouseover)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOut,  Events.mouseout)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Click,     Events.click)
+
+        // Catch logout link clicks to inform other pages on the same session that it is going to be invalidated
+        $(".fr-logout-link").get.foreach { logoutAnchor =>
+          GlobalEventListenerSupport.addJsListener(logoutAnchor, DomEventNames.Click, (_: dom.raw.Event) => {
+            Session.logout()
+          })
+        }
 
         // We could do this on `pageshow` or `pagehide`
         // https://github.com/orbeon/orbeon-forms/issues/4552
@@ -438,7 +461,7 @@ object InitSupport {
 
     private val KeysForWhichToPreventDefault = Set("up", "down", "left", "right")
 
-    def initializeKeyListeners(listeners: List[rpc.KeyListener], formElem: html.Form): Unit =
+    private def initializeKeyListeners(listeners: List[rpc.KeyListener], formElem: html.Form): Unit =
       listeners foreach { case rpc.KeyListener(eventNames, observer, keyText, modifiers) =>
 
         // NOTE: 2019-01-07: We don't handle dialogs yet.
@@ -465,9 +488,10 @@ object InitSupport {
 
           AjaxClient.fireEvent(
             AjaxEvent(
-              eventName   = e.`type`,
-              targetId    = observer,
-              properties  = properties
+              eventName  = e.`type`,
+              targetId   = observer,
+              properties = properties,
+              form       = Some(formElem)
             )
           )
 
@@ -484,7 +508,7 @@ object InitSupport {
         }
       }
 
-    def dispatchInitialServerEvents(events: Option[rpc.PollEvent], formId: String): Unit =
+    private def dispatchInitialServerEvents(events: Option[rpc.PollEvent], formId: String): Unit =
       events foreach { case rpc.PollEvent(delay) =>
         AjaxClient.createDelayedPollEvent(
           delay  = delay.toDouble,

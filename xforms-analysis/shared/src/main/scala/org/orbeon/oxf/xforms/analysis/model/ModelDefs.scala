@@ -21,9 +21,9 @@ import org.orbeon.xforms.XFormsNames._
 object ModelDefs {
 
   // MIP enumeration
-  sealed trait MIP         { def name: String; val aName: QName;                                 val eName: QName }
-  sealed trait StdMIP extends MIP { val name: String; val aName = QName(name);                          val eName = QName(name, XFORMS_NAMESPACE_SHORT) }
-  sealed trait ExtMIP extends MIP { val name: String; val aName = QName(name, XXFORMS_NAMESPACE_SHORT); val eName = QName(name, XXFORMS_NAMESPACE_SHORT) }
+  sealed trait MIP         { def name: String; val aName: QName;                  val eName: QName }
+  sealed trait StdMIP extends MIP { val name: String; val aName = QName(name);    val eName = xfQName(name) }
+  sealed trait ExtMIP extends MIP { val name: String; val aName = xxfQName(name); val eName = xxfQName(name) }
 
   sealed trait ComputedMIP extends MIP
   sealed trait ValidateMIP extends MIP

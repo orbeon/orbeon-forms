@@ -1,4 +1,4 @@
-/**
+ /**
  * Copyright (C) 2013 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -38,6 +38,7 @@ import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.StringValue
@@ -59,6 +60,7 @@ sealed trait FormOrData extends EnumEntry with Lowercase
 object FormOrData extends Enum[FormOrData] {
 
   val values = findValues
+  val valuesSet: Set[FormOrData] = values.toSet
 
   case object Form extends FormOrData
   case object Data extends FormOrData
@@ -106,10 +108,14 @@ object FormRunnerPersistence {
   val SearchPath                          = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
   val ReEncryptAppFormPath                = """/fr/service/persistence(/reencrypt/([^/]+)/([^/]+))""".r // `POST` only
   val PublishedFormsMetadataPath          = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
-  val HistoryPath                         = """/fr/service/persistence(/history/([^/]+)/([^/]+)/([^/]+))""".r
+  val HistoryPath                         = """/fr/service/persistence(/history/([^/]+)/([^/]+)/([^/]+)(?:/([^/]+))?)""".r
+  val ExportPath                          = """/fr/service/persistence/export(?:/([^/]+))?(?:/([^/]+))?(?:/([^/]+))?""".r
+  val PurgePath                           = """/fr/service/persistence/purge(?:/([^/]+))?(?:/([^/]+))?(?:/([^/]+))?""".r
   val ReindexPath                         =   "/fr/service/persistence/reindex"
   val ReEncryptStatusPath                 =   "/fr/service/persistence/reencrypt" // `GET` only
 
+  val DataXml                             = "data.xml"
+  val FormXhtml                           = "form.xhtml"
   val DataFormatVersionName               = "data-format-version"
   val DataMigrationBehaviorName           = "data-migration-behavior"
   val FormDefinitionFormatVersionName     = "form-definition-format-version"
@@ -334,15 +340,36 @@ trait FormRunnerPersistence {
   // `documentIdOrEmpty` can be empty and if so won't be included. Ideally should be `Option[String]`.
   //@XPathFunction
   def createFormDataBasePath(app: String, form: String, isDraft: Boolean, documentIdOrEmpty: String): String =
-    CRUDBasePath :: createFormDataBasePathNoPrefix(AppForm(app, form), isDraft, documentIdOrEmpty.trimAllToOpt) :: "" :: Nil mkString "/"
+    CRUDBasePath ::
+    createFormDataBasePathNoPrefix(
+      AppForm(app, form),
+      None,
+      isDraft,
+      documentIdOrEmpty.trimAllToOpt
+    ) ::
+    "" ::
+    Nil mkString "/"
 
   // Path neither starts nor ends with with `/`
-  def createFormDataBasePathNoPrefix(appForm: AppForm, isDraft: Boolean, documentIdOpt: Option[String]): String =
-    appForm.app :: appForm.form :: (if (isDraft) "draft" else "data") :: documentIdOpt.toList ::: Nil mkString "/"
+  def createFormDataBasePathNoPrefix(
+    appForm      : AppForm,
+    version      : Option[Int],
+    isDraft      : Boolean,
+    documentIdOpt: Option[String]
+  ): String =
+    appForm.app                                           ::
+    appForm.form                                          ::
+    version.map(_.toString).toList                        :::
+    (if (isDraft) "draft" else FormOrData.Data.entryName) ::
+    documentIdOpt.toList                                  :::
+    Nil mkString "/"
 
   //@XPathFunction
   def createFormDefinitionBasePath(app: String, form: String): String =
-    CRUDBasePath :: app :: form :: FormOrData.Form.entryName :: "" :: Nil mkString "/"
+    CRUDBasePath :: createFormDefinitionBasePathNoPrefix(AppForm(app, form), None) :: "" :: Nil mkString "/"
+
+  def createFormDefinitionBasePathNoPrefix(appForm: AppForm, version: Option[Int]): String =
+    appForm.app :: appForm.form :: version.map(_.toString).toList ::: FormOrData.Form.entryName :: Nil mkString "/"
 
   //@XPathFunction
   def createFormMetadataPathAndQuery(app: String, form: String, allVersions: Boolean, allForms: Boolean): String =
@@ -665,13 +692,13 @@ trait FormRunnerPersistence {
       }
 
     def saveXmlData(migratedData: DocumentNodeInfoType) =
-      sendThrowOnError("fr-create-update-submission", Map(
-        "holder"         -> Some(migratedData.rootElement),
-        "resource"       -> Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
-        "username"       -> username,
-        "password"       -> password,
-        "form-version"   -> formVersion,
-        "workflow-stage" -> workflowStage
+      sendThrowOnError("fr-create-update-submission", List(
+        PropertyValue("holder"        , Some(migratedData.rootElement)),
+        PropertyValue("resource"      , Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString))),
+        PropertyValue("username"      , username),
+        PropertyValue("password"      , password),
+        PropertyValue("form-version"  , formVersion),
+        PropertyValue("workflow-stage", workflowStage),
       ))
 
     // First upload the attachments

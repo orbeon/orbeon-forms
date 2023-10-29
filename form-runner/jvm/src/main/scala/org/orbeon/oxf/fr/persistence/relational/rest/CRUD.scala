@@ -13,17 +13,20 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
+import org.orbeon.oxf.controller.Authorizer
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.Logger
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
-import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
 
 import java.time.Instant
+import scala.util.{Failure, Success}
 
 
 class CRUD
@@ -31,6 +34,8 @@ class CRUD
     with Read
     with CreateUpdateDelete
     with LockUnlock {
+
+  private val logger = LoggerFactory.createLogger(classOf[CRUD])
 
   import CRUD._
 
@@ -72,7 +77,7 @@ private object CRUD {
   def getLockUnlockRequest(requestPath: String)(implicit httpRequest: ExternalContext.Request): LockUnlockRequest =
     requestPath match {
       case CrudDataPath(provider, _, _, dataOrDraft, documentId, _) =>
-        val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage)
+        val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage, forceDelete = false)
         LockUnlockRequest(Provider.withName(provider), dataPart)
       case _ =>
         throw HttpStatusCodeException(StatusCode.BadRequest)
@@ -91,38 +96,59 @@ private object CRUD {
     val requestGroup    = headerValueIgnoreCase(Headers.OrbeonGroup)
     val requestFlatView = headerValueIgnoreCase("orbeon-create-flat-view").contains("true")
 
+    val ranges = HttpRanges(httpRequest) match {
+      case Success(ranges) => ranges
+      case Failure(t)      => throw HttpStatusCodeException(StatusCode.BadRequest, throwable = Some(t))
+    }
+
     requestPath match {
       case CrudFormPath(provider, app, form, filename) =>
-        val file = if (filename == "form.xhtml") None else Some(filename)
+        val filenameOpt = if (filename == FormXhtml) None else Some(filename)
         CrudRequest(
           Provider.withName(provider),
           AppForm(app, form),
           incomingVersion,
-          file,
+          filenameOpt,
           None,
           None,
           requestUsername,
           requestGroup,
           requestFlatView,
           httpRequest.credentials,
-          requestWorkflowStage
+          requestWorkflowStage,
+          ranges
         )
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
-        val file            = if (filename == "data.xml") None else Some(filename)
-        val dataPart        = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage)
+
+        val filenameOpt     = if (filename == DataXml) None else Some(filename)
         val lastModifiedOpt = httpRequest.getFirstParamAsString("last-modified-time").flatMap(_.trimAllToOpt).map(Instant.parse) // xxx TODO constant
+
+        val forceDelete =
+          httpRequest.getMethod == HttpMethod.DELETE &&
+            httpRequest.getFirstParamAsString("force-delete").flatMap(_.trimAllToOpt).contains(true.toString)
+
+        if (forceDelete && (
+          ! Authorizer.authorizedWithToken(NetUtils.getExternalContext) || // force `DELETE` from internal callers only
+          filenameOpt.isEmpty && lastModifiedOpt.isEmpty                || // and only for historical data
+          filenameOpt.isDefined && lastModifiedOpt.isDefined               // or for attachments
+          )
+        ) {
+          throw HttpStatusCodeException(throw HttpStatusCodeException(StatusCode.BadRequest))
+        }
+
         CrudRequest(
           Provider.withName(provider),
           AppForm(app, form),
           incomingVersion,
-          file,
-          Some(dataPart),
+          filenameOpt,
+          Some(DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage, forceDelete = forceDelete)),
           lastModifiedOpt,
           requestUsername,
           requestGroup,
           requestFlatView,
           httpRequest.credentials,
-          requestWorkflowStage
+          requestWorkflowStage,
+          ranges
         )
       case _ =>
         throw HttpStatusCodeException(StatusCode.BadRequest)

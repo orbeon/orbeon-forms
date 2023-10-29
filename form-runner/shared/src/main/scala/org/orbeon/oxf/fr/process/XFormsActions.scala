@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
+import org.orbeon.oxf.xforms.CallbackInvocation
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
@@ -32,7 +33,8 @@ trait XFormsActions {
     "xf:hide"     -> tryHideDialog,
     "xf:setvalue" -> trySetvalue,
     "xf:insert"   -> tryInsert,
-    "xf:delete"   -> tryDelete
+    "xf:delete"   -> tryDelete,
+    "xf:callback" -> tryCallback,
   )
 
   def tryXFormsSend(params: ActionParams): Try[Any] =
@@ -110,5 +112,13 @@ trait XFormsActions {
     Try {
       val refParam = requiredParamByName(params, "delete", "ref")
       delete(ref = evaluate(refParam) collect { case n: om.NodeInfo => n })
+    }
+
+  // callback(name = "foo", params = Map("bar" -> "baz"))
+  def tryCallback(params: ActionParams): Try[Any] =
+    Try {
+      // TODO: callback parameters, see https://github.com/orbeon/orbeon-forms/issues/5913
+      inScopeContainingDocument
+        .addCallbackToRun(CallbackInvocation(requiredParamByName(params, "callback", "name"), Nil))
     }
 }

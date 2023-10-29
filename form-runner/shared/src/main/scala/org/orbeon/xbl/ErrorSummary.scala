@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.xforms.control.{VisitableTrait, XFormsComponentControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent.xxfName
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.model.InstanceData
@@ -37,9 +37,9 @@ import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
 import scala.annotation.tailrec
-import scala.collection.compat._
 import scala.collection.Searching._
 import scala.collection.SeqLike
+import scala.collection.compat._
 import scala.collection.generic.IsSeqLike
 
 
@@ -115,7 +115,8 @@ object ErrorSummary {
   //@XPathFunction
   def removeUpdateOrInsertError(
     errorsInstanceDoc : DocumentNodeInfoType,
-    stateInstanceDoc  : DocumentNodeInfoType
+    stateInstanceDoc  : DocumentNodeInfoType,
+    visitValueChanged : Boolean
   ): Unit = {
 
     // This can happen if the caller receives `xforms-disabled` when the dialog is closing, which causes
@@ -176,15 +177,26 @@ object ErrorSummary {
         ! (errorsInstanceDoc.rootElement / * exists (_.attValue(LevelAttName) == ValidationLevel.ErrorLevel.entryName))
       )
 
+    // https://github.com/orbeon/orbeon-forms/issues/5934
+    def updateFieldVisitedStatus(): Unit =
+      if (visitValueChanged)
+        event.targetObject match {
+          case valueControl: XFormsValueControl with VisitableTrait
+            if valueControl.visible => valueControl.visited = true
+          case _ =>
+        }
+
     (event, currentErrorOpt, eventLevelOpt, alertOpt) match {
       case (_: XFormsValueChangedEvent, Some(currentError), _, Some(alert)) =>
 
         // Just update the alert
         XFormsAPI.setvalue(currentError /@ AlertAttName        , alert)
 
+        updateFieldVisitedStatus()
+
       case (_: XFormsValueChangedEvent, _, _, _) =>
 
-        // NOP
+        updateFieldVisitedStatus()
 
       case (_, Some(currentError), Some(actualEventLevel), Some(alert)) =>
 
@@ -305,7 +317,7 @@ object ErrorSummary {
 
   //@XPathFunction
   def ancestorSectionNames(controlAbsoluteId: String): SequenceIterator =
-    ancestorSectionNamesUseDocument(controlAbsoluteId, inScopeContainingDocument)
+    ancestorSectionNamesUseDocument(controlAbsoluteId, inScopeContainingDocument).toList // https://github.com/orbeon/orbeon-forms/issues/6016
 
   def ancestorSectionNamesUseDocument(controlAbsoluteId: String, xfcd: XFormsContainingDocument): Iterator[String] =
     xfcd.controls.getCurrentControlTree

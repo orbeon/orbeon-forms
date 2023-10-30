@@ -157,10 +157,13 @@
         name="validate-static-selection-controls-param-opt"
         as="xs:boolean?"
         select="
-            doc('input:request')/*/parameters/parameter[
-                name  = ('fr-validate-static-selection-controls') and
-                value = ('true', 'false')
-            ]/value/xs:boolean(.)"/>
+            xs:boolean(
+                doc('input:request')/*/parameters/parameter[
+                    name = 'fr-internal-validate-static-selection-controls'
+                ][1]/value/frf:decryptParameterIfNeeded(.)[
+                    . = ('true', 'false')
+                ]
+            )"/>
 
     <xsl:variable
         name="validate-static-selection-controls"

@@ -42,6 +42,7 @@ object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrai
       ))
     )
 
+  // TODO: Find a better location for these methods as they are not specific to operations.
   def encryptString(value: String): String =
     SecureUtils.encrypt(
       keyUsage = SecureUtils.KeyUsage.General,

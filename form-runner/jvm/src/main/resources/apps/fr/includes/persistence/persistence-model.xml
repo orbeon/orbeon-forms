@@ -273,10 +273,12 @@
                         )"/>
 
                 <!-- https://github.com/orbeon/orbeon-forms/issues/5984 -->
+                <!-- In the JS runtime, there is currently no need to encrypt or decrypt parameters. -->
                 <xf:setvalue
+                    if="not(fr:is-browser-environment())"
                     ref="instance('fr-document-metadata')/@workflow-stage"
                     value="
-                        frf:decryptWorkflowStageIfNeeded(
+                        frf:decryptParameterIfNeeded(
                             xxf:get-request-parameter(frf:InternalWorkflowStageParam())[1]
                         )"/>
 

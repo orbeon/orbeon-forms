@@ -56,6 +56,51 @@
         name="controls-to-check-for-pdf-appearance-ids"
         select="$controls-to-check-for-pdf-appearance/generate-id()"/>
 
+    <!-- Static selection control validation -->
+    <!-- https://github.com/orbeon/orbeon-forms/issues/6008 -->
+    <xsl:variable
+        name="static-selection-control-names"
+        select="
+            if ($validate-static-selection-controls) then
+                $fr-form-resources/*[1]/*[exists(item)]/local-name() (: No section template support yet :)
+            else
+                ()"/>
+
+    <xsl:variable
+        name="controls-roots-for-static-selection-controls"
+        select="
+            if ($validate-static-selection-controls) then
+                $body (: No section template support yet :)
+            else
+                ()"/>
+
+    <xsl:variable
+        name="static-single-selection-control-names"
+        select="
+            if ($validate-static-selection-controls) then
+                $controls-roots-for-static-selection-controls//*[
+                    exists(@id) and
+                    frf:isSingleSelectionControl(local-name()) and
+                    not(exists(self::fr:open-select1))
+                ]/frf:controlNameFromId(@id)[
+                    . = $static-selection-control-names
+                ]
+            else
+                ()"/>
+
+    <xsl:variable
+        name="static-multiple-selection-control-names"
+        select="
+            if ($validate-static-selection-controls) then
+                $controls-roots-for-static-selection-controls//*[
+                    exists(@id) and
+                    frf:isMultipleSelectionControl(local-name())
+                ]/frf:controlNameFromId(@id)[
+                    . = $static-selection-control-names
+                ]
+            else
+                ()"/>
+
     <!-- Convert `xf:input` of type `date` and `time` to `fr:date` and `fr:time` -->
     <xsl:template
         mode="within-controls"
@@ -113,6 +158,32 @@
             <xsl:attribute name="appearance" select="(@fr:pdf-appearance, map:get($select1-pdf-appearances, fr:direct-name-for-select1-element(.)))[1]"/>
             <xsl:apply-templates select="node()" mode="#current"/>
         </xsl:element>
+    </xsl:template>
+
+    <!-- https://github.com/orbeon/orbeon-forms/issues/6008 -->
+    <!-- This should not conflict with other rules, which apply to 1. PDF modes and 2. dynamic selection controls -->
+    <xsl:template
+        mode="within-controls"
+        match="*[
+            $validate-static-selection-controls and
+            frf:controlNameFromId(@id) = ($static-single-selection-control-names, $static-multiple-selection-control-names)
+        ]">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
+            <xf:alert
+                ref="
+                    xxf:format-message(
+                        xxf:r('detail.labels.alert-out-of-range', '|fr-fr-resources|'),
+                        (
+                            string(.),
+                            string-join(
+                                instance('fr-form-resources')/*[1]/{frf:controlNameFromId(@id)}/item/value/string(),
+                                ', '
+                            )
+                        )
+                    )"
+                validation="{frf:controlNameFromId(@id)}-choice-constraint"/>
+        </xsl:copy>
     </xsl:template>
 
     <xsl:template

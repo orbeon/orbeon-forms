@@ -64,6 +64,7 @@
     <xsl:variable name="fr-form-model-id" select="generate-id($fr-form-model)"/>
 
     <xsl:variable name="fr-form-metadata" select="($fr-form-model/xf:instance[@id = 'fr-form-metadata']/*)[1]"/>
+    <xsl:variable name="fr-form-resources" select="($fr-form-model/xf:instance[@id = 'fr-form-resources']/*)[1]"/>
 
     <xsl:variable name="is-detail"           select="not($mode = ('summary', 'home', 'landing', ''))" as="xs:boolean"/>
     <xsl:variable name="is-summary"          select="$mode = 'summary'"                               as="xs:boolean"/>
@@ -149,6 +150,25 @@
             else
                 $is-readonly-mode and
                 $disable-calculate-in-readonly-modes"
+        as="xs:boolean"/>
+
+    <!-- Itemset validation -->
+    <xsl:variable
+        name="validate-static-selection-controls-param-opt"
+        as="xs:boolean?"
+        select="
+            doc('input:request')/*/parameters/parameter[
+                name  = ('fr-validate-static-selection-controls') and
+                value = ('true', 'false')
+            ]/value/xs:boolean(.)"/>
+
+    <xsl:variable
+        name="validate-static-selection-controls"
+        select="
+            if (not($is-readonly-mode) and exists($validate-static-selection-controls-param-opt)) then
+                $validate-static-selection-controls-param-opt
+            else
+                false()"
         as="xs:boolean"/>
 
     <!-- Properties -->
@@ -1184,12 +1204,39 @@
                 <xsl:when test="$disable-relevant or $disable-default or $disable-calculate">
                     <xsl:apply-templates select="node()" mode="filter-mips"/>
                 </xsl:when>
+                <xsl:when test="$validate-static-selection-controls">
+                    <xsl:apply-templates select="node()" mode="augment-mips"/>
+                </xsl:when>
                 <xsl:otherwise>
                     <xsl:apply-templates select="node()"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:copy>
 
+    </xsl:template>
+
+    <!-- Static selection control validation -->
+    <!-- https://github.com/orbeon/orbeon-forms/issues/6008 -->
+    <xsl:template
+        match="xf:bind[@name = $static-multiple-selection-control-names]"
+        mode="filter-mips augment-mips">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()"/>
+            <xf:constraint
+                id="{@name}-choice-constraint"
+                value="xxf:is-blank() or (every $v in xxf:split(.) satisfies $v = instance('fr-form-resources')/*[1]/{@name}/item/value/string())"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template
+        match="xf:bind[@name = $static-single-selection-control-names]"
+        mode="filter-mips augment-mips">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()"/>
+            <xf:constraint
+                id="{@name}-choice-constraint"
+                value="xxf:is-blank() or (. = instance('fr-form-resources')/*[1]/{@name}/item/value/string())"/>
+        </xsl:copy>
     </xsl:template>
 
 </xsl:stylesheet>

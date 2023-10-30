@@ -330,6 +330,7 @@
                 <error-details>View error details</error-details>
                 <confirm>Confirm</confirm>
                 <alert>Missing or incorrect value</alert>
+                <alert-out-of-range>Out of range value: `{0}` provided, one of `{1}` expected</alert-out-of-range>
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>Please check your answer to the CAPTCHA challenge</captcha-alert>
             </labels>
@@ -949,6 +950,7 @@
                 <error-details>Détail des erreurs</error-details>
                 <confirm>Confirmer</confirm>
                 <alert>Valeur manquante ou incorrecte</alert>
+                <alert-out-of-range>Valeur hors plage: valeur fournie `{0}`, valeurs attendues `{1}`</alert-out-of-range>
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>Veuillez vérifier votre réponse au défi CAPTCHA</captcha-alert>
             </labels>
@@ -1560,6 +1562,7 @@
                 <error-details>Ver detalle de los errores</error-details>
                 <confirm>Confirmar</confirm>
                 <alert>Valor ausente o incorrecto</alert>
+                <alert-out-of-range todo="true">[Out of range value: `{0}` provided, one of `{1}` expected]</alert-out-of-range>
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>El valor ingresado es diferente a la imagen, intentelo nuevamente</captcha-alert>
             </labels>
@@ -2188,6 +2191,7 @@
                 <error-details>Veure detall de les errades</error-details>
                 <confirm>Confirmar</confirm>
                 <alert>Valor no informat o incorrecte</alert>
+                <alert-out-of-range todo="true">[Out of range value: `{0}` provided, one of `{1}` expected]</alert-out-of-range>
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>El valor ingressat és diferent de la imatge, torni a intentar-lo</captcha-alert>
             </labels>
@@ -2809,7 +2813,7 @@
                 <error-details>Vis feilmeldingsdetaljer</error-details>
                 <confirm>Bekreft</confirm>
                 <alert>Manglende eller ugyldig svar</alert>
-
+                <alert-out-of-range todo="true">[Out of range value: `{0}` provided, one of `{1}` expected]</alert-out-of-range>
                 <captcha-label todo="true">[Captcha]</captcha-label>
                 <captcha-alert todo="true">[The value you entered didn't match the image, please try again]</captcha-alert>
             </labels>
@@ -3416,7 +3420,7 @@
                 <error-details>Подробности об ошибках</error-details>
                 <confirm>Подтвердить</confirm>
                 <alert>Значение неверное или отсутствует</alert>
-
+                <alert-out-of-range todo="true">[Out of range value: `{0}` provided, one of `{1}` expected]</alert-out-of-range>
                 <captcha-label>Защита от спама</captcha-label>
                 <captcha-alert todo="true">Введенное значение не совпадает с картинкой. Попробуйте еще раз.</captcha-alert>
             </labels>
@@ -4028,7 +4032,7 @@
                 <error-details>Visualizza i dettagli di errore</error-details>
                 <confirm>Conferma</confirm>
                 <alert>Campo obbligatorio o valore errato</alert>
-
+                <alert-out-of-range todo="true">[Out of range value: `{0}` provided, one of `{1}` expected]</alert-out-of-range>
                 <captcha-label>Codice di sicurezza</captcha-label>
                 <captcha-alert todo="true">Il valore inserito no è uguale a quello visualizzato nell'immagine</captcha-alert>
             </labels>
@@ -4644,7 +4648,7 @@
                 <error-details>Fehlerdetails anzeigen</error-details>
                 <confirm>Bestätigen</confirm>
                 <alert>Pflichtfeld oder fehlerhafter Wert</alert>
-
+                <alert-out-of-range todo="true">[Out of range value: `{0}` provided, one of `{1}` expected]</alert-out-of-range>
                 <captcha-label>Sicherheitscode</captcha-label>
                 <captcha-alert todo="true">Der eingegebene Wert entspricht nicht dem auf dem Bild. Bitte versuchen Sie es erneut!</captcha-alert>
             </labels>
@@ -5260,7 +5264,7 @@
                 <error-details>Näytä virhetiedot</error-details>
                 <confirm>Vahvista</confirm>
                 <alert>Puuttuva tai virheellinen arvo</alert>
-
+                <alert-out-of-range todo="true">[Out of range value: `{0}` provided, one of `{1}` expected]</alert-out-of-range>
                 <captcha-label>Kuvavarmenne</captcha-label>
                 <captcha-alert todo="true">Antamasi arvo ei täsmännyt kuvan kanssa, ole hyvä ja yritä uudelleen</captcha-alert>
             </labels>
@@ -5876,7 +5880,7 @@
                 <error-details>Visa fel</error-details>
                 <confirm>Bekräfta</confirm>
                 <alert>Utelämnat eller felaktigt värde</alert>
-
+                <alert-out-of-range todo="true">[Out of range value: `{0}` provided, one of `{1}` expected]</alert-out-of-range>
                 <captcha-label>Robotfilter</captcha-label>
                 <captcha-alert todo="true">Inmatningen motsvarade inte bilden. Vänligen försök igen.</captcha-alert>
             </labels>
@@ -6492,6 +6496,7 @@
                 <error-details>Toon foutdetails</error-details>
                 <confirm>Bevestigen</confirm>
                 <alert>Ontbrekende of incorrecte waarde</alert>
+                <alert-out-of-range todo="true">[Out of range value: `{0}` provided, one of `{1}` expected]</alert-out-of-range>
                 <captcha-label>CAPTCHA</captcha-label>
                 <captcha-alert>De ingevoerde waarde komt niet overeen met de afbeelding, probeer opnieuw</captcha-alert>
             </labels>
@@ -7107,6 +7112,7 @@
                 <error-details>Ver detalhes de erros</error-details>
                 <confirm>Confirmar</confirm>
                 <alert>Valor em falta ou incorrecto</alert>
+                <alert-out-of-range todo="true">[Out of range value: `{0}` provided, one of `{1}` expected]</alert-out-of-range>
                 <captcha-label>Veuillez vérifier votre réponse au défi CAPTCHA</captcha-label>
                 <captcha-alert todo="true">O valor inserido não corresponde à imagem, por favor, tente novamente</captcha-alert>
             </labels>
@@ -7716,6 +7722,7 @@
                 <error-details>Vis fejlspecifikation</error-details>
                 <confirm>Bekræft</confirm>
                 <alert>Manglende eller ugyldig svar</alert>
+                <alert-out-of-range todo="true">[Out of range value: `{0}` provided, one of `{1}` expected]</alert-out-of-range>
                 <captcha-label>Captcha</captcha-label>
                 <captcha-alert>De tegn du indtastede passede ikke med billedet - prøv igen</captcha-alert>
             </labels>
@@ -8328,6 +8335,7 @@
                 <error-details>Podgląd szczegółów błędu</error-details>
                 <confirm>Potwierdź</confirm>
                 <alert>Brakująca lub niepoprawna wartość</alert>
+                <alert-out-of-range todo="true">[Out of range value: `{0}` provided, one of `{1}` expected]</alert-out-of-range>
                 <captcha-label>Captcha</captcha-label>
                 <captcha-alert>Wprowadzona wartość nie zgadza się z obrazem, spróbuj ponownie.</captcha-alert>
             </labels>

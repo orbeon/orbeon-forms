@@ -67,7 +67,7 @@
             <xf:bind id="fr-form-binds" ref=".">
                 <xf:bind id="personal-information-bind" ref="personal-information"
                          name="personal-information">
-                    <xf:bind id="birth-date-bind" ref="birth-date" type="xs:date" required="true()">
+                    <xf:bind id="birth-date-bind" ref="birth-date" name="birth-date" type="xs:date" required="true()">
                         <xf:constraint id="validation-6-validation" value=". lt current-date()"/>
                     </xf:bind>
                     <xf:bind id="voter-address-change-bind" ref="voter-address-change"

@@ -100,7 +100,7 @@ object ComponentParamSupport {
 
     // NOTE: We currently don't have a way, besides removing a property entirely, to indicate that a property is
     // `null` or `None`. For properties like `number.digits-after-decimal`, `number.prefix`, etc., we do need
-    // such a way. So if the value is a blank string (which means the value is actually a blank `xs:string` or maybe
+    // such a way. So if the value is an empty string (which means the value is actually an empty `xs:string` or maybe
     // `xs:anyURI`), consider the property missing. We could revise this in the future to make a distinction between
     // a blank or empty string and a missing property.
     propertyNameOpt flatMap property filter (_.getStringValue.nonEmpty)

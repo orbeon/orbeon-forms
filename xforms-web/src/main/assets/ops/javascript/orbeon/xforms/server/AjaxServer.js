@@ -570,8 +570,8 @@
                             ) {
                                 ORBEON.xforms.Page.getUploadControl(documentElement).progress(
                                     progressState,
-                                    progressReceived != null && progressReceived != "" ? parseInt(progressReceived) : null,
-                                    progressExpected != null && progressExpected != "" ? parseInt(progressExpected) : null
+                                    parseInt(progressReceived),
+                                    parseInt(progressExpected)
                                 );
                             }
 

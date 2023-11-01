@@ -287,7 +287,7 @@
                 event="xforms-submit-error"
                 observer="{string-join(for $n in $all-service-names return concat($n, '-submission'), ' ')}"
                 type="xpath">
-                xxf:remove-document-attributes(event('action-id')),
+                xxf:remove-document-attributes(event('fr-action-id')),
                 fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')
             </xf:action>
         </xsl:if>
@@ -296,8 +296,8 @@
             <xf:action event="xxforms-action-error" target="#observer" propagate="stop">
                 <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
                 <xf:message level="xxf:log-error" value="event('element')"/>
-                <xf:action type="xpath" if="exists(event('action-id'))">
-                    xxf:remove-document-attributes(event('action-id')),
+                <xf:action type="xpath" if="exists(event('fr-action-id'))">
+                    xxf:remove-document-attributes(event('fr-action-id')),
                     fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')
                 </xf:action>
             </xf:action>
@@ -918,7 +918,7 @@
             <xf:dispatch
                 name="{{substring-after(event('context'), '|')}}"
                 targetid="{$model/@id}">
-                <xf:property name="action-id" value="substring-before(event('context'), '|')"/>
+                <xf:property name="fr-action-id" value="substring-before(event('context'), '|')"/>
             </xf:dispatch>
         </xf:action>
 

@@ -492,6 +492,11 @@
                 <item id="1">Yes</item>
                 <item id="2">No</item>
             </property-yes-no>
+            <property-always-never>
+                <item id="0">Use property</item>
+                <item id="1">Always</item>
+                <item id="2">Never</item>
+            </property-always-never>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Control Settings</label>
@@ -1879,6 +1884,11 @@
                 <item id="1">Oui</item>
                 <item id="2">Non</item>
             </property-yes-no>
+            <property-always-never>
+                <item id="0">Utiliser la propriété</item>
+                <item id="1">Toujours</item>
+                <item id="2">Jamais</item>
+            </property-always-never>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Paramètres du contrôle</label>
@@ -3249,6 +3259,11 @@
                 <item id="1" todo="true">[Yes]</item>
                 <item id="2" todo="true">[No]</item>
             </property-yes-no>
+            <property-always-never>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Always]</item>
+                <item id="2" todo="true">[Never]</item>
+            </property-always-never>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Rediger elementdetaljer</label>
@@ -4647,6 +4662,11 @@
                 <item id="1" todo="true">[Yes]</item>
                 <item id="2" todo="true">[No]</item>
             </property-yes-no>
+            <property-always-never>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Always]</item>
+                <item id="2" todo="true">[Never]</item>
+            </property-always-never>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Настройки элемента</label>
@@ -6045,6 +6065,11 @@
                 <item id="1" todo="true">[Yes]</item>
                 <item id="2" todo="true">[No]</item>
             </property-yes-no>
+            <property-always-never>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Always]</item>
+                <item id="2" todo="true">[Never]</item>
+            </property-always-never>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Impostazioni di controllo</label>
@@ -7407,6 +7432,11 @@
                 <item id="1" todo="true">[Yes]</item>
                 <item id="2" todo="true">[No]</item>
             </property-yes-no>
+            <property-always-never>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Always]</item>
+                <item id="2" todo="true">[Never]</item>
+            </property-always-never>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Einstellungen Steuerelemente</label>
@@ -8772,6 +8802,11 @@
                 <item id="1" todo="true">[Yes]</item>
                 <item id="2" todo="true">[No]</item>
             </property-yes-no>
+            <property-always-never>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Always]</item>
+                <item id="2" todo="true">[Never]</item>
+            </property-always-never>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Kontrolliyksityiskohdat</label>
@@ -10162,6 +10197,11 @@
                 <item id="1" todo="true">[Yes]</item>
                 <item id="2" todo="true">[No]</item>
             </property-yes-no>
+            <property-always-never>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Always]</item>
+                <item id="2" todo="true">[Never]</item>
+            </property-always-never>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Configuración de Controles</label>
@@ -11553,6 +11593,11 @@
                 <item id="1" todo="true">[Yes]</item>
                 <item id="2" todo="true">[No]</item>
             </property-yes-no>
+            <property-always-never>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Always]</item>
+                <item id="2" todo="true">[Never]</item>
+            </property-always-never>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Control-instellingen</label>
@@ -12923,6 +12968,11 @@
                 <item id="1" todo="true">[Yes]</item>
                 <item id="2" todo="true">[No]</item>
             </property-yes-no>
+            <property-always-never>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Always]</item>
+                <item id="2" todo="true">[Never]</item>
+            </property-always-never>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Configurações do Controlo</label>
@@ -14320,6 +14370,11 @@
                 <item id="1" todo="true">[Yes]</item>
                 <item id="2" todo="true">[No]</item>
             </property-yes-no>
+            <property-always-never>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Always]</item>
+                <item id="2" todo="true">[Never]</item>
+            </property-always-never>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Inställningar för kontroll</label>

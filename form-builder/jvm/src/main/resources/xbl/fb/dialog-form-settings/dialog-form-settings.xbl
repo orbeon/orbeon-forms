@@ -707,7 +707,7 @@
 
                                                 <xf:label ref="$resources/dialog-form-settings/attachment-max-size/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/attachment-max-size/hint"/>
-                                                <xf:itemset ref="$resources/default-always-never/item[@id = 0]">
+                                                <xf:itemset ref="$resources/dialog-form-settings/property-yes-no/item[@id = 0]">
                                                     <xf:label ref="."/>
                                                     <xf:value>-2</xf:value>
                                                 </xf:itemset>
@@ -723,7 +723,7 @@
 
                                                 <xf:label ref="$resources/dialog-form-settings/attachment-max-size-aggregate/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/attachment-max-size-aggregate/hint"/>
-                                                <xf:itemset ref="$resources/default-always-never/item[@id = 0]">
+                                                <xf:itemset ref="$resources/dialog-form-settings/property-yes-no/item[@id = 0]">
                                                     <xf:label ref="."/>
                                                     <xf:value>-2</xf:value>
                                                 </xf:itemset>
@@ -739,7 +739,7 @@
 
                                                 <xf:label ref="$resources/dialog-form-settings/attachment-mediatypes/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/attachment-mediatypes/hint"/>
-                                                <xf:itemset ref="$resources/default-always-never/item[@id = 0]">
+                                                <xf:itemset ref="$resources/dialog-form-settings/property-yes-no/item[@id = 0]">
                                                     <xf:label ref="."/>
                                                     <xf:value value="$unlikely-mediatype"/>
                                                 </xf:itemset>
@@ -905,7 +905,7 @@
                                             <xf:select1 ref="wizard" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/wizard/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/wizard/hint"/>
-                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                <xf:itemset ref="$resources/dialog-form-settings/property-yes-no/item">
                                                     <xf:label ref="."/>
                                                     <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
                                                 </xf:itemset>
@@ -931,7 +931,7 @@
                                             <xf:select1 ref="wizard-subsections-nav" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/wizard-subsections-nav/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/wizard-subsections-nav/hint"/>
-                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                <xf:itemset ref="$resources/dialog-form-settings/property-always-never/item">
                                                     <xf:label ref="."/>
                                                     <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
                                                 </xf:itemset>
@@ -957,7 +957,7 @@
                                             <xf:select1 ref="wizard-separate-toc" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/wizard-separate-toc/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/wizard-separate-toc/hint"/>
-                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                <xf:itemset ref="$resources/dialog-form-settings/property-always-never/item">
                                                     <xf:label ref="."/>
                                                     <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
                                                 </xf:itemset>
@@ -969,7 +969,7 @@
                                             <xf:select1 ref="wizard-section-status" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/wizard-section-status/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/wizard-section-status/hint"/>
-                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                <xf:itemset ref="$resources/dialog-form-settings/property-always-never/item">
                                                     <xf:label ref="."/>
                                                     <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
                                                 </xf:itemset>
@@ -1045,7 +1045,7 @@
                                             <xf:select1 ref="analysis-calculate" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/analysis-calculate/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/analysis-calculate/hint"/>
-                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                <xf:itemset ref="$resources/dialog-form-settings/property-always-never/item">
                                                     <xf:label ref="."/>
                                                     <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
                                                 </xf:itemset>

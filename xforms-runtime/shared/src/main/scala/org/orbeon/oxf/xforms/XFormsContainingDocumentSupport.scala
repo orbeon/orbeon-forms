@@ -40,13 +40,13 @@ import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.state.{LockResponse, RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{ConnectResult, SubmissionParameters, TwoPassSubmissionParameters}
+import org.orbeon.oxf.xforms.submission.{ConnectResult, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.Constants.FormId
 import org.orbeon.xforms._
-import org.orbeon.xforms.runtime.{DelayedEvent, SimplePropertyValue, XFormsObject}
+import org.orbeon.xforms.runtime.{DelayedEvent, XFormsObject}
 import shapeless.syntax.typeable._
 
 import java.net.URI
@@ -696,7 +696,7 @@ trait ContainingDocumentDelayedEvents {
       browserTarget          = p.submissionParameters.xxfTargetOpt,
       submissionId           = CoreCrossPlatformSupport.randomHexId.some,
       isResponseResourceType = p.submissionParameters.resolvedIsResponseResourceType,
-      properties             = Nil, // no properties needed during second pass
+      stringProperties       = Nil, // `submissionParameters` is used instead
       submissionParameters   = p.submissionParameters.some
     )
 
@@ -736,7 +736,7 @@ trait ContainingDocumentDelayedEvents {
         browserTarget          = None,
         submissionId           = None,
         isResponseResourceType = false,
-        properties             = properties,
+        stringProperties       = properties,
         submissionParameters   = None
       )
   }
@@ -783,16 +783,7 @@ trait ContainingDocumentDelayedEvents {
                   XFormsEventFactory.createEvent(
                     eventName  = dueEvent.eventName,
                     target     = eventTarget,
-                    properties = new PartialFunction[String, Option[Any]] {
-                      def isDefinedAt(key: String): Boolean = key match {
-                        case SubmissionParameters.EventName => dueEvent.submissionParameters.isDefined
-                        case key                            => dueEvent.properties.exists(_.name == key)
-                      }
-                      def apply(key: String): Option[Any] = key match {
-                        case SubmissionParameters.EventName => dueEvent.submissionParameters
-                        case key                            => dueEvent.properties.collectFirst { case SimplePropertyValue(`key`, value, _) => value }
-                      }
-                    },
+                    properties = dueEvent.properties,
                     bubbles    = dueEvent.bubbles,
                     cancelable = dueEvent.cancelable
                   )

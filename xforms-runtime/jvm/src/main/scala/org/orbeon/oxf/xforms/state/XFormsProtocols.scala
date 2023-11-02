@@ -98,7 +98,7 @@ object XFormsProtocols {
       write(output, delayedEvent.browserTarget)
       write(output, delayedEvent.submissionId)
       write(output, delayedEvent.isResponseResourceType)
-      write(output, delayedEvent.properties)
+      write(output, delayedEvent.stringProperties)
       // Explicitly don't write `submissionParameters` here, as it's used only for two-pass submissions, and we don't
       // expect serialization to happen between the two passes.
     }

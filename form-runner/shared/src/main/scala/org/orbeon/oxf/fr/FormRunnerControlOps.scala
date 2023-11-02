@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI.insert
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
-import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
+import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._

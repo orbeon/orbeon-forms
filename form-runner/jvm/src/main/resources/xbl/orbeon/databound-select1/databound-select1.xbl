@@ -136,7 +136,14 @@
                 <xf:instance id="itemset"><_/></xf:instance>
                 <xf:instance id="submission-ran"><_>0</_></xf:instance>
                 <!-- What do when doing a refresh -->
-                <xf:submission id="get-itemset" method="get" resource="{event('resource')}" replace="instance" serialization="none">
+                <xf:submission
+                    id="get-itemset"
+                    method="get"
+                    resource="{event('resource')}"
+                    replace="instance"
+                    serialization="none"
+                    mode="{if (fr:is-browser-environment()) then 'asynchronous' else 'synchronous'}">
+                    <!-- TODO: async should also be a configuration -->
                     <xf:setvalue ev:event="xforms-submit-done" ref="instance('submission-ran')" value=". + 1"/>
                     <xf:action ev:event="xforms-submit-error">
                         <xf:insert ref="instance('itemset')" origin="xf:element('_')"/>

@@ -82,10 +82,10 @@ trait FormRunnerPermissionsOps {
 
   //@XPathFunction
   def authorizedOperationsForDetailModeOrThrow(
-    currentAuthorizedOperations      : String,
-    encryptedOperationsFromDataOrNull: String,
-    permissionsElemOrNull            : NodeInfo,
-    isSubmit                         : Boolean
+    operationsFromPersistence              : String,
+    encryptedOperationsFromModeChangeOrNull: String,
+    permissionsElemOrNull                  : NodeInfo,
+    isSubmit                               : Boolean
   ): String = {
 
     // Same logger that was used for the `xf:message` action before (could use something else)
@@ -101,10 +101,17 @@ trait FormRunnerPermissionsOps {
       formRunnerParams.modeType match {
         case modeType @ (ModeType.Edition | ModeType.Readonly) =>
           val ops =
-            Operations.parseFromString(currentAuthorizedOperations)
+            Operations.parseFromString(operationsFromPersistence)
               .orElse(
                 if (isSubmit)
-                  encryptedOperationsFromDataOrNull.trimAllToOpt.flatMap(FormRunnerOperationsEncryption.decryptOperations)
+                  encryptedOperationsFromModeChangeOrNull.trimAllToOpt match {
+                    case Some(encrypted) =>
+                      FormRunnerOperationsEncryption.decryptOperations(encrypted)
+                    case None if modeType == ModeType.Readonly =>
+                      Some(SpecificOperations(Set(Operation.Read))) // case of a `POST` to `view` mode!
+                    case _ =>
+                      None
+                  }
                 else
                   None
               )

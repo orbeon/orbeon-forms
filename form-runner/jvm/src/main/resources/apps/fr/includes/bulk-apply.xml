@@ -25,7 +25,12 @@
         resource      = "{event('url')}"
         ref           = "instance('fr-bulk-edit-form-data')"
         replace       = "{event('replace')}"
-        instance      = "fr-bulk-edit-form-data">
+        instance      = "fr-bulk-edit-form-data"
+    >
+        <xf:header ref="event('workflow-stage')">
+            <xf:name>Orbeon-Workflow-Stage</xf:name>
+            <xf:value value="."/>
+        </xf:header>
     </xf:submission>
 
     <xf:action event="apply">
@@ -62,10 +67,11 @@
 
         <!-- Update form data -->
         <xf:send submission="form-data">
-            <xf:property name="url"           value="event('resource-uri')"/>
-            <xf:property name="method"        value="'put'"/>
-            <xf:property name="serialization" value="'application/xml'"/>
-            <xf:property name="replace"       value="'none'"/>
+            <xf:property name="url"            value="event('resource-uri')"/>
+            <xf:property name="method"         value="'put'"/>
+            <xf:property name="serialization"  value="'application/xml'"/>
+            <xf:property name="replace"        value="'none'"/>
+            <xf:property name="workflow-stage" value="event('response-headers')[lower-case(name) = 'orbeon-workflow-stage']/value"/>
         </xf:send>
     </xf:action>
 

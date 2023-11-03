@@ -160,7 +160,7 @@
                         false()
                     )"/>
 
-        </xf:action>
+        </xf:action> <!-- `$mode = 'new'` -->
 
         <xf:dispatch
             if="xxf:is-blank(instance('fr-persistence-instance')/found-document-message-to-show)"
@@ -282,7 +282,7 @@
                             xxf:get-request-parameter(frf:InternalWorkflowStageParam())[1]
                         )"/>
 
-            </xf:action>
+            </xf:action> <!-- `$is-submit` -->
 
             <!-- In 'new' mode only, after an external document has been set, recalculate defaults (and rebuild so the refs
                  in the binds are updated). -->

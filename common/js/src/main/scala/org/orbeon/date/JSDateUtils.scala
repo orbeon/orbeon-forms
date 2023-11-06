@@ -28,7 +28,7 @@ object JSDateUtils {
     // Use `substring` to trim potential timezone
     val beforeChrist = dateString.startsWith("-")
     val dateLength   = if (beforeChrist) 11 else 10
-    val dateTrimmed  = dateString.substring(0, dateLength)
+    val dateTrimmed  = dateString.take(dateLength)
 
     Try {
       val List(yearPart, monthPart, dayPart) = dateTrimmed.splitTo[List]("-")

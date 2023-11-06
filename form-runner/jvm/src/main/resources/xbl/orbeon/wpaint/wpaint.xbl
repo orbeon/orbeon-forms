@@ -134,7 +134,18 @@
                 <xh:canvas class="fr-wpaint-no-canvas"><xf:output value="xxf:r('errors.canvas-not-supported', '|fr-fr-resources|')"/></xh:canvas>
 
                 <!-- Block in which wPaint renders its canvas -->
-                <xh:div class="fr-wpaint-container-a">
+                <xf:var
+                    name="start-stroke-color-class"
+                    value="
+                        for $start-stroke-color in fr:component-param-value('start-stroke-color')
+                        return
+                            concat(
+                                'fr-wpaint-start-stroke-color-',
+                                if (contains($start-stroke-color, '#'))
+                                then substring-after($start-stroke-color, '#')
+                                else $start-stroke-color
+                            )"/>
+                <xh:div class="fr-wpaint-container-a{ for $c in $start-stroke-color-class return concat(' ', $c) }">
                     <xh:div class="fr-wpaint-container-b"/>
                 </xh:div>
 

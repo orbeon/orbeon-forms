@@ -13,6 +13,7 @@
  */
 package org.orbeon.xbl
 
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
@@ -22,6 +23,7 @@ import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic
+import scala.scalajs.js.JSConverters.JSRichOption
 
 
 object WPaint {
@@ -57,28 +59,35 @@ object WPaint {
 
     private def backgroundImageChanged(): Unit = {
       if (imageEl.attr("src") contains DUMMY_IMAGE_URI) {
-          wpaintElA.addClass("xforms-hidden")
-          if (wpaintElC != null) {
-              wpaintElC.detach()
-              wpaintElC = null
-          }
+        wpaintElA.addClass("xforms-hidden")
+        if (wpaintElC != null) {
+            wpaintElC.detach()
+            wpaintElC = null
+        }
       } else {
-          wpaintElA.removeClass("xforms-hidden")
-          wpaintElA.css("width" , imageEl.width().toString + "px")
-          wpaintElB.css("padding-top", (imageEl.height() / imageEl.width() * 100).toString + "%")
-          // tabindex="-1" allows div to have the focus, used to send change on blur
-          wpaintElC = $("""<div class="fr-wpaint-container-c" tabindex="-1"/>""")
-          wpaintElB.append(wpaintElC)
-          // When looses focus, send drawing to the server right away (incremental)
-          wpaintElC.on(DomEventNames.FocusOut, sendAnnotationToServer _)
-          wpaintElC.css("width",  imageEl.width() )
-          wpaintElC.css("height", imageEl.height())
-          val annotation = annotationEl.attr("src").get
-          wpaintElC.asInstanceOf[Dynamic].wPaint(new js.Object {
-            val drawDown: js.Function = () => wpaintElC.focus()
-            val imageBg               = imageEl.attr("src")
-            val image                 = if (annotation == "") null else annotation
-          })
+        wpaintElA.removeClass("xforms-hidden")
+        wpaintElA.css("width" , imageEl.width().toString + "px")
+        wpaintElB.css("padding-top", (imageEl.height() / imageEl.width() * 100).toString + "%")
+        // tabindex="-1" allows div to have the focus, used to send change on blur
+        wpaintElC = $("""<div class="fr-wpaint-container-c" tabindex="-1"/>""")
+        wpaintElB.append(wpaintElC)
+        // When looses focus, send drawing to the server right away (incremental)
+        wpaintElC.on(DomEventNames.FocusOut, sendAnnotationToServer _)
+        wpaintElC.css("width",  imageEl.width() )
+        wpaintElC.css("height", imageEl.height())
+        val annotation = annotationEl.attr("src").get
+        val startStrokeColor = {
+          val classes = wpaintElA.get(0).classList.asInstanceOf[js.Array[String]]
+          val ClassPrefix = "fr-wpaint-start-stroke-color-"
+          val colorOpt = classes.toList.find(_.startsWith(ClassPrefix)).map(_.substringAfter(ClassPrefix))
+          colorOpt.map("#" + _).orUndefined
+        }
+        wpaintElC.asInstanceOf[Dynamic].wPaint(new js.Object {
+          val drawDown: js.Function = () => wpaintElC.focus()
+          val imageBg               = imageEl.attr("src")
+          val image                 = if (annotation == "") null else annotation
+          val strokeStyle           = startStrokeColor
+        })
       }
 
       // Re-register listener, as imagesLoaded() calls listener only once

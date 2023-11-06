@@ -29,6 +29,8 @@
         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
         xmlns:d="DAV:">
 
+    <xsl:import href="toc.xsl"/>
+
     <xsl:variable name="metadata"       select="if ($is-detail) then frf:metadataInstanceRootOpt($fr-form-model) else ()"/>
     <xsl:variable name="page-layout"    select="if ($is-detail) then frf:optionFromMetadataOrPropertiesXPath($metadata, 'html-page-layout', $app, $form, $mode) else ()"/>
 
@@ -1469,47 +1471,6 @@
             </xf:group>
         </xsl:if>
 
-    </xsl:template>
-
-    <!-- TOC: Top-level -->
-    <xsl:template match="fr:toc[$has-toc]" name="fr-toc">
-        <!-- This is statically built in XSLT instead of using XForms -->
-        <xh:div class="fr-toc well sidebar-nav">
-            <xh:ul class="nav nav-list">
-                <xh:li class="nav-header"><xf:output ref="$fr-resources/summary/titles/toc"/></xh:li>
-                <xsl:apply-templates select="$body" mode="fr-toc-sections"/>
-            </xh:ul>
-        </xh:div>
-    </xsl:template>
-
-    <!-- TOC: Swallow unneeded nodes -->
-    <xsl:template match="text()" mode="fr-toc-sections"/>
-
-    <xsl:template match="*" mode="fr-toc-sections">
-        <xsl:apply-templates mode="fr-toc-sections"/>
-    </xsl:template>
-
-    <!-- TOC: handle section -->
-    <xsl:template match="fr:section" mode="fr-toc-sections">
-        <xh:li xxf:control="true">
-            <!-- Propagate binding so that entry for section disappears if the section is non-relevant -->
-            <xsl:copy-of select="@model | @context | @bind | @ref"/>
-            <!-- Clicking sets the focus -->
-            <xf:trigger appearance="minimal">
-                <xf:label value="xxf:label('{@id}')"/>
-                <xf:setfocus
-                    event="DOMActivate"
-                    control="{@id}"
-                    includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
-                    excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
-            </xf:trigger>
-            <!-- Sub-sections if any -->
-            <xsl:if test="exists(fr:section)">
-                <xh:ol>
-                    <xsl:apply-templates mode="fr-toc-sections"/>
-                </xh:ol>
-            </xsl:if>
-        </xh:li>
     </xsl:template>
 
     <xsl:function name="fr:maybe-replace" as="xs:string?">

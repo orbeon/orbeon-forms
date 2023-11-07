@@ -159,7 +159,6 @@
                        <xf:send submission="my-service-gaga-submission">
                            <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                            <xf:property name="fr-async" value="'false'"/>
-                           <xf:property name="fr-response-must-await" value="'false'"/>
                        </xf:send>
                    </xf:action>
                    <xf:action observer="my-service-gaga-submission"
@@ -175,7 +174,6 @@
                        <xf:send submission="my-service-toto-submission">
                            <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                            <xf:property name="fr-async" value="'false'"/>
-                           <xf:property name="fr-response-must-await" value="'false'"/>
                        </xf:send>
                    </xf:action>
                    <xf:action observer="my-service-toto-submission"
@@ -236,7 +234,6 @@
                                <xf:send submission="my-service-get-attachment-submission">
                                    <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                                    <xf:property name="fr-async" value="'false'"/>
-                                   <xf:property name="fr-response-must-await" value="'false'"/>
                                </xf:send>
                            </xf:action>
                        </xf:action>
@@ -402,7 +399,6 @@
                    <xf:send submission="my-service-1-submission">
                        <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                        <xf:property name="fr-async" value="'false'"/>
-                       <xf:property name="fr-response-must-await" value="'false'"/>
                    </xf:send>
                </xf:action>
                 <xf:action
@@ -426,7 +422,6 @@
                            <xf:send submission="my-service-2-submission">
                                <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                                <xf:property name="fr-async" value="'false'"/>
-                               <xf:property name="fr-response-must-await" value="'false'"/>
                            </xf:send>
                        </xf:action>
                    </xf:action>
@@ -448,7 +443,6 @@
                        <xf:send submission="my-service-3-submission">
                            <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                            <xf:property name="fr-async" value="'false'"/>
-                           <xf:property name="fr-response-must-await" value="'false'"/>
                        </xf:send>
                    </xf:action>
                    <xf:action if="not($cond1)">
@@ -487,7 +481,6 @@
                    <xf:send submission="my-service-4-submission">
                        <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                        <xf:property name="fr-async" value="'false'"/>
-                       <xf:property name="fr-response-must-await" value="'false'"/>
                    </xf:send>
                </xf:action>
                 <xf:action
@@ -584,7 +577,6 @@
                    <xf:send submission="echo-submission">
                        <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                        <xf:property name="fr-async" value="'false'"/>
-                       <xf:property name="fr-response-must-await" value="'false'"/>
                    </xf:send>
                </xf:action>
                 <xf:action

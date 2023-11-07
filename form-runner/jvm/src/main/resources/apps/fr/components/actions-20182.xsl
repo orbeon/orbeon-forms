@@ -586,14 +586,16 @@
                     )"/>
             <xf:property name="fr-async" value="'{$async}'"/>
             <xsl:variable
-                name="response-must-await"
-                as="xs:boolean"
+                name="response-must-await-opt"
+                as="xs:string?"
                 select="
-                    ancestor::fr:action/@response-must-await = 'true' or (
-                        not(ancestor::fr:action/@response-must-await = 'false') and
-                        $actions-response-must-await
-                    )"/>
-            <xf:property name="fr-response-must-await" value="'{$response-must-await}'"/>
+                    (
+                        ancestor::fr:action/@response-must-await/xs:string(.)[p:non-blank()],
+                        $actions-response-must-await-opt
+                    )[1]"/>
+            <xsl:if test="exists($response-must-await-opt)">
+                <xf:property name="fr-response-must-await" value="'{$response-must-await-opt}'"/>
+            </xsl:if>
         </xf:send>
 
     </xsl:template>

@@ -5,6 +5,7 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 import scala.concurrent.Future
+import scala.concurrent.duration.Duration
 
 
 class AsynchronousSubmissionManager
@@ -12,7 +13,7 @@ class AsynchronousSubmissionManager
 
   protected def awaitPending(
     containingDocument: XFormsContainingDocument,
-    get               : () => List[Future[ConnectResult]],
+    get               : () => List[(Future[ConnectResult], Duration)],
     clear             : () => Unit
   )(implicit
     logger            : IndentedLogger

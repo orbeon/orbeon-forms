@@ -43,8 +43,8 @@
 
     <!-- Scope this variable as it is used by actions-20182.xsl -->
     <xsl:variable
-        name="actions-response-must-await"
-        select="false()"/>
+        name="actions-response-must-await-opt"
+        select="()"/>
 
     <xsl:template match="/">
         <xsl:for-each select="$fr-form-model">

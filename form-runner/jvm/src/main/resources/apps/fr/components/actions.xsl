@@ -519,8 +519,8 @@
             <xsl:if test="empty(@xxf:response-must-await)">
                 <xsl:attribute name="xxf:response-must-await">{
                     (
-                        event('fr-response-must-await')[. = 'false'],
-                        'true'
+                        event('fr-response-must-await'),
+                        'Inf'
                     )[1]
                 }</xsl:attribute>
             </xsl:if>

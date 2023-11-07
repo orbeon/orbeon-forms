@@ -2557,7 +2557,7 @@ az4K</document>
                             method="get"
                             serialization="none"
                             mode="asynchronous"
-                            xxf:response-must-await="true"
+                            xxf:response-must-await="Inf"
                             replace="none"/>
 
                     </xf:model>
@@ -2616,7 +2616,7 @@ az4K</document>
                             method="get"
                             serialization="none"
                             mode="asynchronous"
-                            xxf:response-must-await="true"
+                            xxf:response-must-await="Inf"
                             replace="none"/>
 
                         <!-- TEST: Events to gather -->

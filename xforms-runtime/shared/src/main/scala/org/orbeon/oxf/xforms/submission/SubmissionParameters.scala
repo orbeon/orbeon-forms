@@ -19,6 +19,8 @@ import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xforms.XFormsNames.XFORMS_HEADER_QNAME
 import org.orbeon.xforms.{RelevanceHandling, UrlType, XFormsCrossPlatformSupport}
 
+import scala.concurrent.duration.Duration
+
 
 case class TwoPassSubmissionParameters(
   submissionEffectiveId: String,
@@ -51,7 +53,7 @@ case class SubmissionParameters(
 
   actionOrResource               : String,
   isAsynchronous                 : Boolean,
-  responseMustAwait              : Boolean,
+  responseMustAwait              : Option[Duration],
   credentialsOpt                 : Option[BasicCredentials],
 
   // Serialization
@@ -332,7 +334,7 @@ object SubmissionParameters {
     }
 
     val responseMustAwait =
-      staticSubmission.avtResponseMustAwaitOpt flatMap booleanAvtOpt getOrElse false
+      staticSubmission.avtResponseMustAwaitOpt flatMap stringAvtTrimmedOpt map Duration.apply
 
     SubmissionParameters(
 

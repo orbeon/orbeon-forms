@@ -9,6 +9,7 @@ import org.orbeon.xforms.EventNames
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 import scala.concurrent.Future
+import scala.concurrent.duration.Duration
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -27,7 +28,7 @@ trait AsynchronousSubmissionManagerTrait {
   private var pendingList            = List.empty[Future[ConnectResult]]
 
   private val requestRunningCount    = new AtomicInteger(0)
-  private var requestPendingList     = List.empty[Future[ConnectResult]]
+  private var requestPendingList     = List.empty[(Future[ConnectResult], Duration)]
 
   def addClientDelayEventIfNeeded(containingDocument: XFormsContainingDocument): Unit =
     if (hasPendingAsynchronousSubmissions)
@@ -46,22 +47,26 @@ trait AsynchronousSubmissionManagerTrait {
     submissionEffectiveId: String,
     future               : Future[ConnectResult],
     submissionParameters : SubmissionParameters,
-    awaitInCurrentRequest: Boolean
+    awaitInCurrentRequest: Option[Duration]
   ): Unit = {
 
     totalSubmittedCount += 1
     pendingCount += 1
 
-    if (awaitInCurrentRequest) {
-      requestRunningCount.incrementAndGet()
-      requestPendingList ::= future
+    val mustWait = awaitInCurrentRequest match {
+      case Some(duration) if duration.gt(Duration.Zero) =>
+        requestRunningCount.incrementAndGet()
+        requestPendingList ::= future -> duration
+        true
+      case None =>
+        false
     }
 
     runningCount.incrementAndGet()
     pendingList ::= future
 
     future.onComplete { result =>
-      if (awaitInCurrentRequest)
+      if (mustWait)
         requestRunningCount.decrementAndGet()
 
       runningCount.decrementAndGet()
@@ -120,7 +125,7 @@ trait AsynchronousSubmissionManagerTrait {
   def awaitAllAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit = {
     implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
     debug("awaiting all pending asynchronous submissions")
-    awaitPending(containingDocument, () => pendingList, () => pendingList = Nil)
+    awaitPending(containingDocument, () => pendingList.map(_ -> Duration.Inf), () => pendingList = Nil)
   }
 
   /**
@@ -134,7 +139,7 @@ trait AsynchronousSubmissionManagerTrait {
 
   protected def awaitPending(
     containingDocument: XFormsContainingDocument,
-    get               : () => List[Future[ConnectResult]],
+    get               : () => List[(Future[ConnectResult], Duration)],
     clear             : () => Unit
   )(implicit
     logger            : IndentedLogger

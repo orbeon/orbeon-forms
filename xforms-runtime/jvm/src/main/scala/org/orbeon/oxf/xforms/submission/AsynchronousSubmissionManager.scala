@@ -14,7 +14,7 @@ class AsynchronousSubmissionManager
 
   protected def awaitPending(
     containingDocument: XFormsContainingDocument,
-    get               : () => List[Future[ConnectResult]],
+    get               : () => List[(Future[ConnectResult], Duration)],
     clear             : () => Unit
   )(implicit
     logger            : IndentedLogger
@@ -24,10 +24,12 @@ class AsynchronousSubmissionManager
       val batch = get()
       clear()
 
-      debug(s"awaiting ${batch.size} pending asynchronous submissions")
+      val maxDuration = batch.map(_._2).max
+
+      debug(s"awaiting ${batch.size} pending asynchronous submissions for a maximum of $maxDuration")
 
       // TODO: It would be good to process submissions as soon as one is ready to be processed.
-      Await.ready(Future.sequence(batch), Duration.Inf)
+      Await.ready(Future.sequence(batch.map(_._1)), maxDuration)
       processCompletedAsynchronousSubmissions(containingDocument)
     }
 }

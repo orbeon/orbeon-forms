@@ -86,13 +86,13 @@
                 p:property(string-join(('oxf.fr.detail.actions.async', $app, $form), '.')) = true()
             )"/>
     <xsl:variable
-        name="actions-response-must-await"
-        as="xs:boolean"
+        name="actions-response-must-await-opt"
+        as="xs:string?"
         select="
-            $fr-form-metadata/actions/response-must-await = 'true' or (
-                not($fr-form-metadata/actions/response-must-await = 'false') and
-                p:property(string-join(('oxf.fr.detail.actions.response-must-await', $app, $form), '.')) = true()
-            )"/>
+            (
+                $fr-form-metadata/actions/response-must-await/xs:string(.)[p:non-blank()],
+                p:property(string-join(('oxf.fr.detail.actions.response-must-await', $app, $form), '.'))[p:non-blank()]
+            )[1]"/>
 
     <!-- MIP filtering -->
     <xsl:variable

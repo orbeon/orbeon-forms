@@ -311,16 +311,18 @@
                                 <!-- Remember where we are toggling to, toggle... -->
                                 <xf:toggle
                                     case="{$static-nav-section-id}-case"/>
+                            </xsl:if>
 
-                                <xsl:if test="$use-paging">
-                                    <xf:var name="new-index" value="xxf:repeat-position()"/>
+                            <xsl:if test="$use-paging">
+                                <xf:var name="new-index" value="xxf:repeat-position()"/>
+                                <xsl:if test="$is-wizard">
                                     <xf:setvalue
                                         ref="xxf:instance('local')/current-index"
                                         value="$new-index"/>
-                                    <xf:setindex
-                                        repeat="{$static-section-id}-repeater-repeat"
-                                        index="$new-index"/>
                                 </xsl:if>
+                                <xf:setindex
+                                    repeat="{$static-section-id}-repeater-repeat"
+                                    index="$new-index"/>
                             </xsl:if>
 
                             <!-- ...and focus on specific sub-section -->

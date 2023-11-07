@@ -182,7 +182,7 @@
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
-                <xsl:import href="wizard-toc.xsl"/>
+                <xsl:import href="oxf:/apps/fr/components/toc.xsl"/>
 
                 <!-- `app` and `form` must be passed as attributes (see view.xsl) -->
                 <xsl:variable name="static-app"             select="/*/@app/string()"/>
@@ -934,7 +934,13 @@
 
                                 <xh:div role="navigation">
                                     <xh:ul class="nav nav-list">
-                                        <xsl:apply-templates mode="toc-sections"/>
+                                        <xsl:apply-templates mode="fr-toc-sections">
+                                            <xsl:with-param name="is-wizard"              select="true()"                  tunnel="yes"/>
+                                            <xsl:with-param name="static-app"             select="$static-app"             tunnel="yes"/>
+                                            <xsl:with-param name="static-form"            select="$static-form"            tunnel="yes"/>
+                                            <xsl:with-param name="static-subsections-nav" select="$static-subsections-nav" tunnel="yes"/>
+                                            <xsl:with-param name="static-subsections-toc" select="$static-subsections-toc" tunnel="yes"/>
+                                        </xsl:apply-templates>
                                     </xh:ul>
                                 </xh:div>
 

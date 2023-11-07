@@ -1473,6 +1473,22 @@
 
     </xsl:template>
 
+    <xsl:template match="fr:toc[$has-toc]" name="fr-toc">
+        <!-- This is statically built in XSLT instead of using XForms -->
+        <xh:div class="fr-toc well sidebar-nav">
+            <xh:ul class="nav nav-list">
+                <xh:li class="nav-header"><xf:output ref="$fr-resources/summary/titles/toc"/></xh:li>
+                <xsl:apply-templates select="$body" mode="fr-toc-sections">
+                    <xsl:with-param name="is-wizard"              select="false()" tunnel="yes"/>
+                    <xsl:with-param name="static-app"             select="$app"    tunnel="yes"/>
+                    <xsl:with-param name="static-form"            select="$form"   tunnel="yes"/>
+                    <xsl:with-param name="static-subsections-nav" select="true()"  tunnel="yes"/>
+                    <xsl:with-param name="static-subsections-toc" select="'all'"   tunnel="yes"/>
+                </xsl:apply-templates>
+            </xh:ul>
+        </xh:div>
+    </xsl:template>
+
     <xsl:function name="fr:maybe-replace" as="xs:string?">
         <xsl:param name="content" as="xs:string?"/>
         <xsl:param name="replace" as="xs:boolean"/>

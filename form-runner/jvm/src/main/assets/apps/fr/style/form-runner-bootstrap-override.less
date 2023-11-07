@@ -624,6 +624,10 @@ body.orbeon {
         text-decoration: underline;
         font-size: inherit;
         padding: 0 0 2px 0;
+
+        text-decoration-thickness: from-font; // this tends to make the line thinner
+        text-underline-offset: 0.2rem;        // otherwise the line touches the bottom of the characters
+        text-decoration-skip-ink: auto;       // `auto` is the default, but we want to be explicit
     }
 }
 

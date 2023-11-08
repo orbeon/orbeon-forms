@@ -12,24 +12,18 @@
     xmlns:map="http://www.w3.org/2005/xpath-functions/map"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array">
 
+    <xsl:import href="functions.xsl"/>
+
     <xsl:variable
         name="controls-roots-for-pdf-appearance"
         select="
             if ($mode = ('pdf', 'test-pdf')) then
-                ($body, /xh:html/xh:head/xbl:xbl/xbl:binding[p:has-class('fr-section-component')]/xbl:template)
+                (
+                    $body,
+                    /xh:html/xh:head/xbl:xbl/xbl:binding[p:has-class('fr-section-component')]/xbl:template
+                )
             else
                 ()"/>
-
-    <xsl:function name="fr:direct-name-for-select1-element" as="xs:string">
-        <xsl:param name="elem" as="element()"/>
-        <xsl:value-of select="
-            if (local-name($elem) = 'select1' and $elem/@appearance = 'dropdown') then
-                'dropdown-select1'
-            else if (local-name($elem) = 'select1' and $elem/@appearance = 'search') then
-                'dropdown-select1-search'
-            else
-                local-name($elem)"/>
-    </xsl:function>
 
     <!-- For now only support `xf:select1[appearance ~= dropdown]` and `xf:select1[appearance ~= search]`. The databound
          controls (`fr:databound-select1` and `fr:databound-select1-search`) don't currently have an `xf:select1`
@@ -55,51 +49,6 @@
     <xsl:variable
         name="controls-to-check-for-pdf-appearance-ids"
         select="$controls-to-check-for-pdf-appearance/generate-id()"/>
-
-    <!-- Static selection control validation -->
-    <!-- https://github.com/orbeon/orbeon-forms/issues/6008 -->
-    <xsl:variable
-        name="static-selection-control-names"
-        select="
-            if ($validate-static-selection-controls) then
-                $fr-form-resources/*[1]/*[exists(item)]/local-name() (: No section template support yet :)
-            else
-                ()"/>
-
-    <xsl:variable
-        name="controls-roots-for-static-selection-controls"
-        select="
-            if ($validate-static-selection-controls) then
-                $body (: No section template support yet :)
-            else
-                ()"/>
-
-    <xsl:variable
-        name="static-single-selection-control-names"
-        select="
-            if ($validate-static-selection-controls) then
-                $controls-roots-for-static-selection-controls//*[
-                    exists(@id) and
-                    frf:isSingleSelectionControl(local-name()) and
-                    not(exists(self::fr:open-select1))
-                ]/frf:controlNameFromId(@id)[
-                    . = $static-selection-control-names
-                ]
-            else
-                ()"/>
-
-    <xsl:variable
-        name="static-multiple-selection-control-names"
-        select="
-            if ($validate-static-selection-controls) then
-                $controls-roots-for-static-selection-controls//*[
-                    exists(@id) and
-                    frf:isMultipleSelectionControl(local-name())
-                ]/frf:controlNameFromId(@id)[
-                    . = $static-selection-control-names
-                ]
-            else
-                ()"/>
 
     <!-- Convert `xf:input` of type `date` and `time` to `fr:date` and `fr:time` -->
     <xsl:template
@@ -160,30 +109,44 @@
         </xsl:element>
     </xsl:template>
 
-    <!-- https://github.com/orbeon/orbeon-forms/issues/6008 -->
-    <!-- This should not conflict with other rules, which apply to 1. PDF modes and 2. dynamic selection controls -->
+    <!--
+        This should not conflict with other rules, which apply to:
+
+        1. PDF modes and
+        2. dynamic selection controls
+
+        We add an alert, and we need to target:
+
+        - controls with static items but that are NOT open selection
+        - controls that can be the target of itemset actions, INCLUDING open selection
+
+        The combination of those is included in `$choice-validation-selection-control-names`.
+
+        See https://github.com/orbeon/orbeon-forms/issues/6008
+     -->
     <xsl:template
         mode="within-controls"
-        match="*[
-            $validate-static-selection-controls and
-            frf:controlNameFromId(@id) = ($static-single-selection-control-names, $static-multiple-selection-control-names)
-        ]">
-        <xsl:copy>
-            <xsl:apply-templates select="@* | node()" mode="#current"/>
-            <xf:alert
-                ref="
-                    xxf:format-message(
-                        xxf:r('detail.labels.alert-out-of-range', '|fr-fr-resources|'),
-                        (
-                            string(.),
-                            string-join(
-                                instance('fr-form-resources')/*[1]/{frf:controlNameFromId(@id)}/item/value/string(),
-                                ', '
-                            )
-                        )
-                    )"
-                validation="{frf:controlNameFromId(@id)}-choice-constraint"/>
-        </xsl:copy>
+        match="*[$validate-selection-controls-choices and frf:isSelectionControl(.)]">
+        <xsl:param name="choice-validation-selection-control-names" tunnel="yes"/>
+        <xsl:choose>
+            <xsl:when test="frf:controlNameFromId(@id) = $choice-validation-selection-control-names">
+                <xsl:copy>
+                    <xsl:apply-templates select="@* | node()" mode="#current"/>
+                        <xf:alert
+                            ref="
+                                xxf:format-message(
+                                    xxf:r('detail.labels.alert-out-of-range', '|fr-fr-resources|'),
+                                    (
+                                        string(.)
+                                    )
+                                )"
+                            validation="{frf:controlNameFromId(@id)}-choice-constraint"/>
+                </xsl:copy>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:next-match/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template
@@ -328,129 +291,5 @@
                     else @ref"/>
         </xsl:copy>
     </xsl:template>
-
-    <xsl:function name="fr:build-template-param-map">
-        <xsl:param name="params"                                as="element(*)*"/>
-        <xsl:param name="library-name"                          as="xs:string?"/>
-        <xsl:param name="for-pdf"                               as="xs:boolean"/>
-        <xsl:param name="custom-css-class-to-control-names-map" as="element(_)?"/>
-
-        <xsl:value-of
-            select="
-                concat(
-                    'map:merge((',
-                        string-join(
-                            for $p in $params
-                                return for $name in ($p/*:name, name($p))[1][p:non-blank()]
-                                    return for $type in ($p/*:type, $p/@type)[1] (: element first as attribute can also exist with for example value `object` :)
-                            return
-                                concat(
-                                    'map:entry(''',
-                                        $name,
-                                        ''',',
-                                        if ($type = ('ExpressionParam', 'formula')) then
-                                            fr:maybe-replace(
-                                                concat(
-                                                    'string((',
-                                                    frf:replaceVarReferencesWithFunctionCalls(
-                                                        $p/(*:expr, *:value)[1],
-                                                        $p/(*:expr, *:value)[1],
-                                                        false(),
-                                                        $library-name,
-                                                        ()
-                                                    ),
-                                                    ')[1])'
-                                                ),
-                                                $for-pdf
-                                            )
-                                        else if ($type = ('ControlValueParam', 'control-value')) then
-                                            fr:maybe-replace(
-                                                concat(
-                                                    'string((',
-                                                    frf:replaceVarReferencesWithFunctionCalls(
-                                                        $p/(*:controlName, *:control-name, *:controlCssClass, *:control-css-class)[1],
-                                                        if (exists($p/(*:controlName, *:control-name))) then
-                                                            concat('$', $p/(*:controlName, *:control-name)[1])
-                                                        else if (exists($p/(*:controlCssClass, *:control-css-class))) then
-                                                            (
-                                                                $custom-css-class-to-control-names-map/
-                                                                    entry[
-                                                                        @class = $p/(*:controlCssClass, *:control-css-class)
-                                                                    ]/*/concat('$', name(.)),
-                                                                ''''''
-                                                            )[1]
-                                                        else
-                                                            error(),
-                                                        false(),
-                                                        $library-name,
-                                                        ()
-                                                    ),
-                                                    ')[1])'
-                                                ),
-                                                $for-pdf
-                                            )
-                                        else if (
-                                            $type = (
-                                                ('LinkToEditPageParam',    'link-to-edit-page'),
-                                                ('LinkToViewPageParam',    'link-to-view-page'),
-                                                ('LinkToNewPageParam',     'link-to-new-page'),
-                                                ('LinkToSummaryPageParam', 'link-to-summary-page'),
-                                                ('LinkToHomePageParam',    'link-to-home-page'),
-                                                ('LinkToFormsPageParam',   'link-to-forms-page'),
-                                                ('LinkToAdminPageParam',   'link-to-admin-page'),
-                                                ('LinkToPdfParam',         'link-to-pdf')
-                                            )
-                                        ) then
-                                            fr:maybe-replace(
-                                                concat(
-                                                    'frf:buildLinkBackToFormRunner(''',
-                                                    $type,
-                                                    ''', ',
-                                                    if ($p/*:token = 'true') then 'true()' else 'false()',
-                                                    ')'
-                                                ),
-                                                $for-pdf
-                                            )
-                                        else if ($for-pdf and $type = (('PageNumberParam', 'page-number'), ('PageCountParam', 'page-count'))) then
-                                            string-join(
-                                                (
-                                                    '''',
-                                                    '&quot; counter(',
-                                                    if ($type = ('PageNumberParam', 'page-number')) then 'page' else 'pages',
-                                                    ', ',
-                                                    ($p/*:format, 'decimal')[1],
-                                                    ') &quot;',
-                                                    ''''
-                                                ),
-                                                ''
-                                            )
-                                        else if ($for-pdf and $type = ('FormTitleParam', 'form-title')) then
-                                            fr:maybe-replace('fr:form-title()', $for-pdf)
-                                        else if ($for-pdf and $type = ('ImageParam', 'image')) then
-                                            (: TODO: `*:url` :)
-                                            if (exists($p/*:visible)) then
-                                                concat(
-                                                    'if (',
-                                                    frf:replaceVarReferencesWithFunctionCalls(
-                                                        $p/*:visible,
-                                                        $p/*:visible,
-                                                        false(),
-                                                        $library-name,
-                                                        ()
-                                                    ),
-                                                    ') then ''&quot; element(logo) &quot;'' else '''''
-                                                )
-                                            else
-                                                '''&quot; element(logo) &quot;'''
-                                        else
-                                            error(),
-                                    ')'
-                                ),
-                            ','
-                        ),
-                '))'
-            )"/>
-
-    </xsl:function>
 
 </xsl:stylesheet>

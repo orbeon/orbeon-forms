@@ -299,17 +299,16 @@
     </xsl:template>
 
     <!-- Match and modify `fr:action`s -->
+    <!-- NOTE: Can't use `fr:action-bindings-2018.2(.)` in pattern. -->
     <xsl:template
         match="
             /xh:html/xh:head//
                 xf:model[
                     generate-id() = $candidate-action-models-ids
-                ]/fr:action[
-                    @version = '2018.2'
-                ]">
+                ]/fr:action[@version = '2018.2']">
 
-        <xsl:variable name="model"       select=".." as="element(xf:model)"/>
-        <xsl:variable name="view-elem"   select="if (exists($model/parent::xbl:implementation)) then $model/../../xbl:template else /xh:html/xh:body" as="element()" xmlns:xbl="http://www.w3.org/ns/xbl"/>
+        <xsl:variable name="model"       select="parent::xf:model" as="element(xf:model)"/>
+        <xsl:variable name="view-elem"   select="fr:find-view-for-model($model, $body)" as="element()"/>
         <xsl:variable name="model-id"    select="$model/@id/string()" as="xs:string"/>
         <xsl:variable name="action-name" select="@name/string()"  as="xs:string"/>
 

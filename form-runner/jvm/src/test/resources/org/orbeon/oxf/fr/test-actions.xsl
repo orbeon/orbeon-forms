@@ -23,6 +23,7 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
     <xsl:import href="oxf:/apps/fr/components/actions.xsl"/>
     <xsl:import href="oxf:/apps/fr/components/actions-20182.xsl"/>
+    <xsl:import href="oxf:/apps/fr/components/functions.xsl"/>
 
     <xsl:variable
         name="fr-form-model"
@@ -36,12 +37,16 @@
         name="candidate-action-models-ids"
         select="$fr-form-model-id"/>
 
-    <!-- Scope this variable as it is used by actions-20182.xsl -->
+    <!-- Used by actions-20182.xsl -->
+    <xsl:variable name="view" select="(/xh:html/xh:body/fr:view)[1]" as="element(fr:view)?"/>
+    <xsl:variable name="body" select="($view/fr:body, $view)[1]"     as="element()?"/>
+
+    <!-- Used by actions-20182.xsl -->
     <xsl:variable
         name="actions-async"
         select="false()"/>
 
-    <!-- Scope this variable as it is used by actions-20182.xsl -->
+    <!-- Used by actions-20182.xsl -->
     <xsl:variable
         name="actions-response-must-await-opt"
         select="()"/>

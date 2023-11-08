@@ -28,6 +28,26 @@
     <xsl:import href="actions-common.xsl"/>
     <xsl:import href="synchronize-repeated-content.xsl"/>
 
+    <xsl:function name="fr:action-bindings" as="element(xf:action)*">
+        <xsl:param name="model" as="element(xf:model)"/>
+        <xsl:sequence select="$model/xf:action[ends-with(@id, '-binding')]"/>
+    </xsl:function>
+
+    <xsl:function name="fr:itemset-actions-elements" as="element(xf:action)*">
+        <xsl:param name="action-binding" as="element(xf:action)"/>
+        <xsl:sequence select="$action-binding//xf:action[p:has-class('fr-itemset-action')]"/>
+    </xsl:function>
+
+    <xsl:function name="fr:action-bindings-2018.2" as="element(fr:action)*">
+        <xsl:param name="model" as="element(xf:model)"/>
+        <xsl:sequence select="$model/fr:action[@version = '2018.2']"/>
+    </xsl:function>
+
+    <xsl:function name="fr:itemset-actions-elements-2018.2" as="element(fr:control-setitems)*">
+        <xsl:param name="action-binding" as="element(fr:action)"/>
+        <xsl:sequence select="$action-binding//fr:control-setitems"/>
+    </xsl:function>
+
     <xsl:function name="fr:has-known-action-event" as="xs:boolean">
         <xsl:param name="elem" as="element()"/>
         <xsl:sequence
@@ -55,9 +75,8 @@
         <xsl:sequence
             select="
                 exists(
-                    $model/xf:action[
-                        ends-with(@id, '-binding')
-                    ]/
+                    $model/
+                    fr:action-bindings(.)/
                     xf:action[
                         p:split((@event, @ev:event)[1]) = $action-name
                     ]
@@ -207,11 +226,7 @@
 
         <xsl:variable
             name="action-bindings"
-            select="
-                $model/
-                    xf:action[
-                        ends-with(@id, '-binding')
-                    ]"/>
+            select="$model/fr:action-bindings(.)"/>
 
         <xsl:variable
             name="dataset-names"
@@ -226,11 +241,7 @@
 
         <xsl:variable
             name="actions-20182"
-            select="
-                $model/
-                    fr:action[
-                        @version = '2018.2'
-                    ]"/>
+            select="$model/fr:action-bindings-2018.2(.)"/>
 
         <xsl:variable
             name="dataset-names-20182"
@@ -251,11 +262,7 @@
 
         <xsl:variable
             name="action-bindings"
-            select="
-                $model/
-                    xf:action[
-                        ends-with(@id, '-binding')
-                    ]"/>
+            select="$model/fr:action-bindings(.)"/>
 
         <xsl:variable
             name="service-names"
@@ -268,11 +275,7 @@
 
         <xsl:variable
             name="actions-20182"
-            select="
-                $model/
-                    fr:action[
-                        @version = '2018.2'
-                    ]"/>
+            select="$model/fr:action-bindings-2018.2(.)"/>
 
         <xsl:variable
             name="service-names-20182"
@@ -348,11 +351,7 @@
 
     <xsl:variable
         name="action-bindings"
-        select="
-            $candidate-action-models/
-                xf:action[
-                    ends-with(@id, '-binding')
-                ]"/>
+        select="$candidate-action-models/fr:action-bindings(.)"/>
 
     <xsl:variable
         name="action-bindings-ids"
@@ -360,11 +359,7 @@
 
     <xsl:variable
         name="action-bindings-2018.2"
-        select="
-            $candidate-action-models/
-                fr:action[
-                    @version = '2018.2'
-                ]"/>
+        select="$candidate-action-models/fr:action-bindings-2018.2(.)"/>
 
     <xsl:variable
         name="action-bindings-ids-2018.2"
@@ -401,15 +396,11 @@
 
     <xsl:variable
         name="itemset-actions-elements"
-        select="
-            $action-bindings//
-                xf:action[
-                    p:has-class('fr-itemset-action')
-                ]"/>
+        select="$action-bindings/fr:itemset-actions-elements(.)"/>
 
     <xsl:variable
         name="itemset-actions-elements-2018.2"
-        select="$action-bindings-2018.2//fr:control-setitems"/>
+        select="$action-bindings-2018.2/fr:itemset-actions-elements-2018.2(.)"/>
 
     <xsl:variable
         name="models-with-itemset-actions-models-ids"
@@ -419,17 +410,6 @@
                     (ancestor::xf:model[1])/
                     generate-id()
             )"/>
-
-    <xsl:variable
-        name="itemset-actions-control-ids"
-        select="
-            for $e in $itemset-actions-elements
-            return
-                replace($e/(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1], '^''(.+)''$', '$1-control'),
-            for $e in $itemset-actions-elements-2018.2
-            return
-                concat($e/@control, '-control')
-        "/>
 
     <!-- Remove service `xf:instance`s (they will be placed in `fr-actions-model`) and existing Form Runner service instances if any -->
     <xsl:template
@@ -837,25 +817,33 @@
     </xsl:template>
 
     <!-- Match itemsets of controls which can be the target of an itemset action -->
-    <xsl:template match="xf:itemset[../@id = $itemset-actions-control-ids]" mode="within-controls">
-        <xsl:copy>
-            <!-- Update `@ref` attribute to disable the default itemset if an `@fr:itemsetid` attribute is present -->
-            <xsl:if test="@ref">
-                <xsl:attribute
-                    name="ref"
-                    select="concat('if (empty(@fr:itemsetid)) then ', @ref, ' else ()')"/>
-           </xsl:if>
-            <xsl:apply-templates select="@* except @ref | node()"/>
-        </xsl:copy>
-        <!-- Add new itemset which kicks in if an `@fr:itemsetid` attribute is present -->
-        <xf:itemset ref="id(@fr:itemsetid)[1]/(choices[@xml:lang = xxf:lang()], choices)[1]/item">
-            <xf:label ref="label">
-                <!-- Keep mediatype in case it is present so that service can return HTML labels -->
-                <xsl:copy-of select="xf:label/@mediatype"/>
-            </xf:label>
-            <xf:value ref="value"/>
-            <xf:hint ref="hint"/>
-        </xf:itemset>
+    <xsl:template match="xf:itemset" mode="within-controls">
+        <xsl:param name="itemset-action-control-names" tunnel="yes"/>
+        <xsl:choose>
+            <xsl:when test="frf:controlNameFromId(../@id) = $itemset-action-control-names">
+                <xsl:copy>
+                    <!-- Update `@ref` attribute to disable the default itemset if an `@fr:itemsetid` attribute is present -->
+                    <xsl:if test="@ref">
+                        <xsl:attribute
+                            name="ref"
+                            select="concat('if (empty(@fr:itemsetid)) then ', @ref, ' else ()')"/>
+                   </xsl:if>
+                    <xsl:apply-templates select="@* except @ref | node()"/>
+                </xsl:copy>
+                <!-- Add new itemset which kicks in if an `@fr:itemsetid` attribute is present -->
+                <xf:itemset ref="id(@fr:itemsetid)[1]/(choices[@xml:lang = xxf:lang()], choices)[1]/item">
+                    <xf:label ref="label">
+                        <!-- Keep mediatype in case it is present so that service can return HTML labels -->
+                        <xsl:copy-of select="xf:label/@mediatype"/>
+                    </xf:label>
+                    <xf:value ref="value"/>
+                    <xf:hint ref="hint"/>
+                </xf:itemset>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:next-match/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <!-- Match models with at least one action -->

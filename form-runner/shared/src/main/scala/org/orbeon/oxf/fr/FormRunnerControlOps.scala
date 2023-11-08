@@ -189,6 +189,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def isMultipleSelectionControl(localName: String): Boolean =
     localName == "select" || localName.endsWith("-select")
 
+  //@XPathFunction
   def isSelectionControl(controlElem: NodeInfo): Boolean = {
     val localname = controlElem.localname
     isSingleSelectionControl(localname)     ||

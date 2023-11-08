@@ -260,7 +260,7 @@
                         $app
                     }/{
                         $form
-                    }/validate?fr-internal-validate-static-selection-controls={
+                    }/validate?fr-internal-validate-selection-controls-choices={
                         encode-for-uri(frf:encryptParameterIfNeeded('true'))
                     }&amp;form-version={
                         instance('fr-form-instance')/version/selected-version
@@ -348,7 +348,7 @@
                             concat('/', xxf:trim($doc))
                         else
                             ''
-                }?data-format-version=edge&amp;fr-internal-validate-static-selection-controls={
+                }?data-format-version=edge&amp;fr-internal-validate-selection-controls-choices={
                     encode-for-uri(frf:encryptParameterIfNeeded('true'))
                 }&amp;fr-show-relevant-errors=true{
                     let $prop   := xxf:property(string-join(('oxf.fr.import.forward-parameters', $app, $form), '.')),

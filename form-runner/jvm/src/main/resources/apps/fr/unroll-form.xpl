@@ -67,7 +67,7 @@
                         'fr-disable-calculate',
                         'fr-disable-default',
                         'fr-disable-relevant',
-                        'fr-internal-validate-static-selection-controls'
+                        'fr-internal-validate-selection-controls-choices'
                     )]</include>
             </config>
         </p:input>

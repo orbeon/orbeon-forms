@@ -288,7 +288,11 @@
                     </xf:model>
                 </xh:head>
                 <!-- Keep for actions-20182.xsl -->
-                <xh:body/>
+                <xh:body>
+                    <fr:view>
+                        <fr:body/>
+                    </fr:view>
+                </xh:body>
             </xh:html>
         </input>
         <output name="data">
@@ -374,7 +378,11 @@
                     </xf:model>
                 </xh:head>
                 <!-- Keep for actions-20182.xsl -->
-                <xh:body/>
+                <xh:body>
+                    <fr:view>
+                        <fr:body/>
+                    </fr:view>
+                </xh:body>
             </xh:html>
         </input>
         <output name="data">

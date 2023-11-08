@@ -400,10 +400,26 @@
                 <xsl:apply-templates
                     select="$body/(node() except fr:buttons)"
                     mode="within-controls">
-                    <!-- Unclear if useful for `not($is-detail)` -->
+                    <xsl:with-param
+                        name="choice-validation-selection-control-names"
+                        select="()"
+                        tunnel="yes"/>
+                    <xsl:with-param
+                        name="itemset-action-control-names"
+                        select="()"
+                        tunnel="yes"/>
+                    <!--
+                        As of 2023-11-08, `$binds-root` is used for:
+
+                        - converting legacy date/time controls
+                        - adding automatic hints to attachment controls
+
+                        This is probably not needed for `not($is-detail)`, but if we need it at
+                        some point we could pass relevant information here.
+                    -->
                     <xsl:with-param
                         name="binds-root"
-                        select="$fr-form-model/xf:bind[@id = 'fr-form-binds']"
+                        select="()"
                         tunnel="yes"/>
                 </xsl:apply-templates>
 
@@ -431,15 +447,43 @@
                 <xsl:attribute name="xxf:update">full</xsl:attribute>
             </xsl:if>
 
+            <xsl:variable
+                name="itemset-action-control-names"
+                select="
+                    if (not($is-form-builder)) then
+                        fr:choices-validation-selection-control-names($body, $fr-form-model, false())
+                    else
+                        ()"/>
+
+            <xsl:variable
+                name="choice-validation-selection-control-names"
+                select="
+                    if ($validate-selection-controls-choices) then
+                        distinct-values(
+                            (
+                                fr:choices-validation-selection-control-names($body, $fr-form-model, true()),
+                                $itemset-action-control-names
+                            )
+                        )
+                    else
+                        ()"/>
+
             <!-- FIXME: `<a name>` is deprecated in favor of `id`. -->
             <xh:a name="fr-form"/>
             <xsl:choose>
                 <xsl:when test="not($use-view-appearance)">
                     <xf:group id="fr-view-component" class="fr-view-appearance-full">
-
                         <xsl:apply-templates
                             select="if ($body) then $body/(node() except fr:buttons) else node()"
                             mode="within-controls">
+                            <xsl:with-param
+                                name="choice-validation-selection-control-names"
+                                select="$choice-validation-selection-control-names"
+                                tunnel="yes"/>
+                            <xsl:with-param
+                                name="itemset-action-control-names"
+                                select="$itemset-action-control-names"
+                                tunnel="yes"/>
                             <xsl:with-param
                                 name="binds-root"
                                 select="$fr-form-model/xf:bind[@id = 'fr-form-binds']"
@@ -505,6 +549,14 @@
                         <xsl:apply-templates
                             select="if ($body) then $body/(node() except fr:buttons) else node()"
                             mode="within-controls">
+                            <xsl:with-param
+                                name="choice-validation-selection-control-names"
+                                select="$choice-validation-selection-control-names"
+                                tunnel="yes"/>
+                            <xsl:with-param
+                                name="itemset-action-control-names"
+                                select="$itemset-action-control-names"
+                                tunnel="yes"/>
                             <xsl:with-param
                                 name="binds-root"
                                 select="$fr-form-model/xf:bind[@id = 'fr-form-binds']"
@@ -1488,22 +1540,5 @@
             </xh:ul>
         </xh:div>
     </xsl:template>
-
-    <xsl:function name="fr:maybe-replace" as="xs:string?">
-        <xsl:param name="content" as="xs:string?"/>
-        <xsl:param name="replace" as="xs:boolean"/>
-        <xsl:value-of select="
-            if (exists($content)) then
-                if ($replace) then
-                    replace(
-                        $content,
-                        '&quot;',
-                        '\\&quot;'
-                    )
-                else
-                    $content
-            else
-                ()"/>
-    </xsl:function>
 
 </xsl:stylesheet>

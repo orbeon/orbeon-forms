@@ -74,14 +74,37 @@ object XFormsProtocols {
 
     def writes(output: Output, value: SimplePropertyValue): Unit = {
       write(output, value.name)
-      write(output, value.value)
+      (value.value: Any) match {
+        // These are simple serializable types we support from `evaluateKeepNodeInfo()`
+        case v: String         => write[Byte](output, 0); write(output, v)
+        case v: Boolean        => write[Byte](output, 1); write(output, v)
+        case v: BigDecimal     => write[Byte](output, 2); write(output, v)
+        case v: Long           => write[Byte](output, 3); write(output, v)
+        case v: Double         => write[Byte](output, 4); write(output, v)
+        case v: Float          => write[Byte](output, 5); write(output, v)
+        case v: java.util.Date => write[Byte](output, 6); write(output, v.getTime)
+        case v: Array[Byte]    => write[Byte](output, 7); write(output, v)
+        case v                 => throw new IllegalArgumentException(s"Unsupported property type: ${v.getClass.getName}")
+      }
       write(output, value.tunnel)
     }
 
     def reads(input: Input): SimplePropertyValue =
       SimplePropertyValue(
         read[String](input),
-        read[String](input),
+        {
+          read[Byte](input) match {
+            case 0 => read[String](input)
+            case 1 => read[Boolean](input)
+            case 2 => read[BigDecimal](input)
+            case 3 => read[Long](input)
+            case 4 => read[Double](input)
+            case 5 => read[Float](input)
+            case 6 => new java.util.Date(read[Long](input))
+            case 7 => read[Array[Byte]](input)
+            case _ => throw new IllegalArgumentException("Unsupported property type")
+          }
+        },
         read[Boolean](input)
       )
   }

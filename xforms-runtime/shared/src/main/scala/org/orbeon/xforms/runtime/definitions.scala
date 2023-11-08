@@ -18,7 +18,7 @@ trait XFormsObject {
 
 case class SimplePropertyValue(
   name  : String,
-  value : String,
+  value : java.io.Serializable, // simple serializable types returned by `evaluateKeepNodeInfo()`
   tunnel: Boolean
 )
 

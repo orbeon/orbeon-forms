@@ -172,9 +172,17 @@ object XFormsEvent {
       for {
         p <- props
         v <- p.value
-        s <- v match {
-          case s: String => Some(s)
-          case _         => None
+        s = v match {
+          // These are simple serializable types we support from `evaluateKeepNodeInfo()`
+          case v: String         => v
+          case v: Boolean        => v
+          case v: BigDecimal     => v
+          case v: Long           => v
+          case v: Double         => v
+          case v: Float          => v
+          case v: java.util.Date => v
+          case v: Array[Byte]    => v
+          case v                 => throw new IllegalArgumentException(s"Unsupported property type: ${v.getClass.getName}")
         }
       } yield
         SimplePropertyValue(p.name, s, p.tunnel)

@@ -49,8 +49,22 @@ object XPathCache extends XPathCacheTrait {
     case _ => false
   }
 
-  // Evaluate an XPath expression on the document and return a `List` of native Java objects (i.e. `String`, `Boolean`,
-  // etc.), but `NodeInfo` wrappers are preserved.
+  // Evaluate an XPath expression on the document and return a `List` of native Java objects, but `NodeInfo` wrappers
+  // are preserved.
+  //
+  // The result can contain the following types:
+  //
+  // - NodeInfo       // for nodes
+  // - ObjectValue    // for array, map
+  // - String
+  // - Boolean
+  // - BigDecimal
+  // - Long
+  // - Double
+  // - Float
+  // - Date
+  // - byte[]
+  // - Item           // can this happen?
   // 2 external usages
   def evaluate(
     contextItems       : JList[Item],

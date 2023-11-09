@@ -1157,7 +1157,7 @@
                 name="itemset-action-control-names"
                 select="
                     if (not($is-form-builder)) then
-                        fr:choices-validation-selection-control-names(., ../xbl:implementation/xf:model, false())
+                        fr:choices-validation-selection-controls(., ../xbl:implementation/xf:model, false())/frf:controlNameFromId(@id)
                     else
                         ()"/>
             <xsl:variable
@@ -1166,7 +1166,7 @@
                     if ($validate-selection-controls-choices) then
                         distinct-values(
                             (
-                                fr:choices-validation-selection-control-names(., ../xbl:implementation/xf:model, true()),
+                                fr:choices-validation-selection-controls(., ../xbl:implementation/xf:model, true())/frf:controlNameFromId(@id),
                                 $itemset-action-control-names
                             )
                         )
@@ -1241,27 +1241,22 @@
                 name="itemset-action-control-names"
                 select="
                     if (not($is-form-builder)) then
-                        fr:choices-validation-selection-control-names(
+                        fr:choices-validation-selection-controls(
                             $controls-root,
                             parent::xf:model,
                             false()
-                        )
+                        )/frf:controlNameFromId(@id)
                     else
                         ()"/>
 
             <xsl:variable
-                name="choice-validation-selection-control-names"
+                name="static-choice-validation-selection-controls"
                 select="
                     if ($validate-selection-controls-choices) then
-                        distinct-values(
-                            (
-                                fr:choices-validation-selection-control-names(
-                                    $controls-root,
-                                    parent::xf:model,
-                                    true()
-                                ),
-                                $itemset-action-control-names
-                            )
+                        fr:choices-validation-selection-controls(
+                            $controls-root,
+                            parent::xf:model,
+                            true()
                         )
                     else
                         ()"/>
@@ -1270,8 +1265,8 @@
                 <xsl:when test="$disable-relevant or $disable-default or $disable-calculate">
                     <xsl:apply-templates select="node()" mode="filter-mips">
                         <xsl:with-param
-                            name="choice-validation-selection-control-names"
-                            select="$choice-validation-selection-control-names"
+                            name="static-choice-validation-selection-controls"
+                            select="$static-choice-validation-selection-controls"
                             tunnel="yes"/>
                         <xsl:with-param
                             name="itemset-action-control-names"
@@ -1280,18 +1275,18 @@
                         <xsl:with-param
                             name="single-selection-control-names"
                             select="
-                                fr:find-single-selection-control-names(
+                                fr:find-single-selection-controls(
                                     $controls-root,
                                     true()
-                                )"
+                                )/frf:controlNameFromId(@id)"
                             tunnel="yes"/>
                     </xsl:apply-templates>
                 </xsl:when>
                 <xsl:when test="$validate-selection-controls-choices">
                     <xsl:apply-templates select="node()" mode="augment-mips">
                         <xsl:with-param
-                            name="choice-validation-selection-control-names"
-                            select="$choice-validation-selection-control-names"
+                            name="static-choice-validation-selection-controls"
+                            select="$static-choice-validation-selection-controls"
                             tunnel="yes"/>
                         <xsl:with-param
                             name="itemset-action-control-names"
@@ -1300,10 +1295,10 @@
                         <xsl:with-param
                             name="single-selection-control-names"
                             select="
-                                fr:find-single-selection-control-names(
+                                fr:find-single-selection-controls(
                                     $controls-root,
                                     true()
-                                )"
+                                )/frf:controlNameFromId(@id)"
                             tunnel="yes"/>
                     </xsl:apply-templates>
                 </xsl:when>
@@ -1321,21 +1316,56 @@
         match="xf:bind[$validate-selection-controls-choices]"
         mode="filter-mips augment-mips">
 
-        <xsl:param name="itemset-action-control-names"              as="xs:string*" tunnel="yes"/>
-        <xsl:param name="choice-validation-selection-control-names" as="xs:string*" tunnel="yes"/>
-        <xsl:param name="single-selection-control-names"            as="xs:string*" tunnel="yes"/>
+        <xsl:param name="itemset-action-control-names"                as="xs:string*" tunnel="yes"/>
+        <xsl:param name="static-choice-validation-selection-controls" as="element()*" tunnel="yes"/>
+        <xsl:param name="single-selection-control-names"              as="xs:string*" tunnel="yes"/>
+
+        <xsl:variable
+            name="bind-name"
+            select="@name"/>
+
+        <xsl:variable
+            name="static-choice-validation-selection-control"
+            select="$static-choice-validation-selection-controls[frf:controlNameFromId(@id) = $bind-name]"/>
+
+        <xsl:variable
+            name="matches-itemset-action-control"
+            select="$bind-name = $itemset-action-control-names"/>
 
         <xsl:variable
             name="must-validate-choices"
-            select="@name = $choice-validation-selection-control-names"/>
+            select="exists($static-choice-validation-selection-control) or $matches-itemset-action-control"/>
 
         <xsl:variable
             name="is-for-itemset-action"
-            select="$must-validate-choices and @name = $itemset-action-control-names"/>
+            select="$must-validate-choices and $matches-itemset-action-control"/>
 
         <xsl:variable
             name="is-for-single-selection-control"
-            select="$must-validate-choices and @name = $single-selection-control-names"/>
+            select="$must-validate-choices and $bind-name = $single-selection-control-names"/>
+
+        <!-- Real life scenario: itemset points to shared set of items in resources. So we use the
+             name as extracted from the itemset ref. -->
+
+        <xsl:variable
+            name="itemset-resource-name"
+            select="$static-choice-validation-selection-control/frf:findItemsetResourceName(.)"/>
+
+        <xsl:if test="@name = 'control-1'">
+            <xsl:message>
+                xxx
+                itemset-action-control-names:
+                <xsl:copy-of select="$itemset-action-control-names"/>
+                static-choice-validation-selection-controls:
+                <xsl:copy-of select="$static-choice-validation-selection-controls"/>
+                static-choice-validation-selection-control:
+                <xsl:copy-of select="$static-choice-validation-selection-control"/>
+                single-selection-control-names:
+                <xsl:copy-of select="$single-selection-control-names"/>
+                itemset-resource-name:
+                <xsl:copy-of select="$itemset-resource-name"/>
+            </xsl:message>
+        </xsl:if>
 
         <xsl:choose>
             <xsl:when test="$must-validate-choices and $is-for-itemset-action and $is-for-single-selection-control">
@@ -1343,12 +1373,12 @@
                 <xsl:copy>
                     <xsl:apply-templates select="@* | node()"/>
                     <xf:constraint
-                        id="{@name}-choice-constraint"
+                        id="{$bind-name}-choice-constraint"
                         value="
                             xxf:is-blank() or (
                                 let $values :=
                                     if (empty(@fr:itemsetid)) then
-                                        instance('fr-form-resources')/*[1]/{@name}/item/value/string()
+                                        instance('fr-form-resources')/*[1]/{$itemset-resource-name}/item/value/string()
                                     else
                                         id(@fr:itemsetid)[1]/choices[1]/item/value/string()
                                 return
@@ -1361,11 +1391,11 @@
                 <xsl:copy>
                     <xsl:apply-templates select="@* | node()"/>
                     <xf:constraint
-                        id="{@name}-choice-constraint"
+                        id="{$bind-name}-choice-constraint"
                         value="
                             xxf:is-blank() or (
                                 let $values :=
-                                    instance('fr-form-resources')/*[1]/{@name}/item/value/string()
+                                    instance('fr-form-resources')/*[1]/{$itemset-resource-name}/item/value/string()
                                 return
                                     . = $values
                             )"/>
@@ -1376,12 +1406,12 @@
                 <xsl:copy>
                     <xsl:apply-templates select="@* | node()"/>
                     <xf:constraint
-                        id="{@name}-choice-constraint"
+                        id="{$bind-name}-choice-constraint"
                         value="
                             xxf:is-blank() or (
                                 let $values :=
                                     if (empty(@fr:itemsetid)) then
-                                        instance('fr-form-resources')/*[1]/{@name}/item/value/string()
+                                        instance('fr-form-resources')/*[1]/{$itemset-resource-name}/item/value/string()
                                     else
                                         id(@fr:itemsetid)[1]/choices[1]/item/value/string()
                                 return
@@ -1394,11 +1424,11 @@
                 <xsl:copy>
                     <xsl:apply-templates select="@* | node()"/>
                     <xf:constraint
-                        id="{@name}-choice-constraint"
+                        id="{$bind-name}-choice-constraint"
                         value="
                             xxf:is-blank() or (
                                 let $values :=
-                                    instance('fr-form-resources')/*[1]/{@name}/item/value/string()
+                                    instance('fr-form-resources')/*[1]/{$itemset-resource-name}/item/value/string()
                                 return
                                     (every $v in xxf:split(.) satisfies $v = $values)
                             )"/>

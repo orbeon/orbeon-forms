@@ -45,6 +45,17 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   val TrueExpr : String = "true()"
   val FalseExpr: String = "false()"
 
+  private val ItemsetRefMatcher = """\$form-resources/([^/]+)/item""".r
+
+  //@XPathFunction
+  def findItemsetResourceName(control: NodeInfo): String =
+    control
+      .firstChildOpt(XFormsNames.XFORMS_ITEMSET_QNAME)
+      .flatMap(_.attValueOpt(XFormsNames.REF_QNAME)) match {
+      case Some(ItemsetRefMatcher(controlName)) => controlName
+      case _                                    => null
+    }
+
   val StandardCassNames: Set[String] = Set(
     "fr-attachment",
     "fr-static-attachment"

@@ -63,7 +63,7 @@
             select="distinct-values($resources-root/*[1]/*[exists(item)]/local-name())"/>
     </xsl:function>
 
-    <xsl:function name="fr:find-single-selection-control-names" as="xs:string*">
+    <xsl:function name="fr:find-single-selection-controls" as="element()*">
         <xsl:param name="controls-root"          as="element()"/>
         <xsl:param name="include-open-selection" as="xs:boolean"/>
 
@@ -73,10 +73,10 @@
                     exists(@id) and
                     frf:isSingleSelectionControl(local-name()) and
                     ($include-open-selection or not(exists(self::fr:open-select1)))
-                ]/frf:controlNameFromId(@id)"/>
+                ]"/>
     </xsl:function>
 
-    <xsl:function name="fr:find-multiple-selection-control-names" as="xs:string*">
+    <xsl:function name="fr:find-multiple-selection-controls" as="element()*">
         <xsl:param name="controls-root"          as="element()"/>
         <xsl:param name="include-open-selection" as="xs:boolean"/>
 
@@ -86,10 +86,10 @@
                     exists(@id) and
                     frf:isMultipleSelectionControl(local-name()) and
                     ($include-open-selection or not(exists(self::fr:open-select))) (: doesn't exist yet but just in case we cover it :)
-                ]/frf:controlNameFromId(@id)"/>
+                ]"/>
     </xsl:function>
 
-    <xsl:function name="fr:choices-validation-selection-control-names" as="xs:string*">
+    <xsl:function name="fr:choices-validation-selection-controls" as="element()*">
         <xsl:param name="controls-root"        as="element()"/>
         <xsl:param name="model"                as="element(xf:model)"/>
         <xsl:param name="for-static-selection" as="xs:boolean"/> <!-- vs. for itemset actions -->
@@ -99,21 +99,19 @@
                 (: Shouldn't need `distinct-values()` as single and multiple selection controls are exclusive, and
                    control names should be unique under a given controls root :)
                 (
-                    fr:find-single-selection-control-names(
+                    fr:find-single-selection-controls(
                         $controls-root,
                         not($for-static-selection)
                     ),
-                    fr:find-multiple-selection-control-names(
+                    fr:find-multiple-selection-controls(
                         $controls-root,
                         not($for-static-selection)
                     )
                 )[
-                    . = (
-                        if ($for-static-selection) then
-                            fr:find-static-selection-control-names($model)
-                        else
-                            fr:find-itemset-actions-control-names($model)
-                    )
+                    if ($for-static-selection) then
+                        frf:controlNameFromId(@id) = fr:find-static-selection-control-names($model)
+                    else
+                        frf:controlNameFromId(@id) = fr:find-itemset-actions-control-names($model)
                 ]"/>
     </xsl:function>
 

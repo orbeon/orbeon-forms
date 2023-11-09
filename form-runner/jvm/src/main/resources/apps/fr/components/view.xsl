@@ -451,7 +451,7 @@
                 name="itemset-action-control-names"
                 select="
                     if (not($is-form-builder)) then
-                        fr:choices-validation-selection-control-names($body, $fr-form-model, false())
+                        fr:choices-validation-selection-controls($body, $fr-form-model, false())/frf:controlNameFromId(@id)
                     else
                         ()"/>
 
@@ -461,7 +461,7 @@
                     if ($validate-selection-controls-choices) then
                         distinct-values(
                             (
-                                fr:choices-validation-selection-control-names($body, $fr-form-model, true()),
+                                fr:choices-validation-selection-controls($body, $fr-form-model, true())/frf:controlNameFromId(@id),
                                 $itemset-action-control-names
                             )
                         )

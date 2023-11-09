@@ -66,11 +66,11 @@ object Provider extends Enum[Provider] {
   // We would like this search to be case-insensitive, but it is not on all databases:
   // - Oracle and SQL Server: based on the database collation
   // - MySQL: case-insensitive, as we set a case-insensitive collation on the `xml` column
-  // - PostgreSQL: case-insensitive, as use ILIKE
+  // - PostgreSQL: case-insensitive in testing (`LC_CTYPE` being `en_US.utf8`)
   def xmlContains(provider: Provider): String =
     provider match {
       case MySQL      => "instr(xml, ?) > 0"
-      case PostgreSQL => "xml::text ilike ?"
+      case PostgreSQL => "to_tsvector('simple', xml::text) @@ plainto_tsquery('simple', ?)"
     }
 
   private def paramForLike(param: String, surroundingPercents: Boolean): String = {
@@ -78,11 +78,7 @@ object Provider extends Enum[Provider] {
      if (surroundingPercents) s"%$escapedParam%" else escapedParam
   }
 
-  def xmlContainsParam(provider: Provider, param: String): String =
-    provider match {
-      case PostgreSQL => paramForLike(param, surroundingPercents = true)
-      case _          => param
-    }
+  def xmlContainsParam(provider: Provider, param: String): String = param
 
   def textContains(provider: Provider, colName: String): String =
     provider match {

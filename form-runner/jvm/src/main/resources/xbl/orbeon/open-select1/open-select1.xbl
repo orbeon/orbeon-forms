@@ -35,7 +35,7 @@
         id="fr-open-select1"
         element="fr|open-select1[appearance ~= full], fr|open-select1"
         xxbl:container="span"
-        xxbl:mode="lhha binding value"
+        xxbl:mode="lhha binding value selection"
         xxbl:label-for="fr-open-select1-elem">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

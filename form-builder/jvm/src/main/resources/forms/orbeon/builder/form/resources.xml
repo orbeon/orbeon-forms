@@ -730,6 +730,10 @@
                 <label>Use automatic hint</label>
                 <hint>Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab</hint>
             </automatic-hint>
+            <open-selection>
+                <label>Open selection</label>
+                <hint>If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)</hint>
+            </open-selection>
             <default-yes-no>
                 <item id="0">Use default</item>
                 <item id="1">Yes</item>
@@ -2122,6 +2126,10 @@
                 <label>Utiliser une suggestion automatique</label>
                 <hint>Ajoute une suggestion en fonction de la Taille Maximale et des Types de fichiers pris en charge que vous pourriez avoir spécifiés dans l'onglet Validations et alertes</hint>
             </automatic-hint>
+            <open-selection>
+                <label>Sélection libre</label>
+                <hint>Si cette option est activée, les utilisateurs peuvent saisir leur propre valeur, et la valeur (texte stocké dans les données) est également utilisée comme libellé (texte affiché dans la liste déroulante)</hint>
+            </open-selection>
             <default-yes-no>
                 <item id="0">Utiliser le défaut</item>
                 <item id="1">Oui</item>
@@ -3498,6 +3506,10 @@
                 <label todo="true">[Use automatic hint]</label>
                 <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
             </automatic-hint>
+            <open-selection>
+                <label todo="true">[Open selection]</label>
+                <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+            </open-selection>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -4900,6 +4912,10 @@
                 <label todo="true">[Use automatic hint]</label>
                 <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
             </automatic-hint>
+            <open-selection>
+                <label todo="true">[Open selection]</label>
+                <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+            </open-selection>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -6303,6 +6319,10 @@
                 <label todo="true">[Use automatic hint]</label>
                 <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
             </automatic-hint>
+            <open-selection>
+                <label todo="true">[Open selection]</label>
+                <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+            </open-selection>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -7670,6 +7690,10 @@
                 <label todo="true">[Use automatic hint]</label>
                 <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
             </automatic-hint>
+            <open-selection>
+                <label todo="true">[Open selection]</label>
+                <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+            </open-selection>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -9040,6 +9064,10 @@
                 <label todo="true">[Use automatic hint]</label>
                 <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
             </automatic-hint>
+            <open-selection>
+                <label todo="true">[Open selection]</label>
+                <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+            </open-selection>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -10435,6 +10463,10 @@
                 <label todo="true">[Use automatic hint]</label>
                 <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
             </automatic-hint>
+            <open-selection>
+                <label todo="true">[Open selection]</label>
+                <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+            </open-selection>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -11831,6 +11863,10 @@
                 <label todo="true">[Use automatic hint]</label>
                 <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
             </automatic-hint>
+            <open-selection>
+                <label todo="true">[Open selection]</label>
+                <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+            </open-selection>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -13206,6 +13242,10 @@
                 <label todo="true">[Use automatic hint]</label>
                 <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
             </automatic-hint>
+            <open-selection>
+                <label todo="true">[Open selection]</label>
+                <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+            </open-selection>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>
@@ -14608,6 +14648,10 @@
                 <label todo="true">[Use automatic hint]</label>
                 <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
             </automatic-hint>
+            <open-selection>
+                <label todo="true">[Open selection]</label>
+                <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+            </open-selection>
             <default-yes-no>
                 <item id="0" todo="true">[Use default]</item>
                 <item id="1" todo="true">[Yes]</item>

@@ -83,6 +83,7 @@
             </templates>
             <control-details>
                 <xf:model>
+                    <xf:var name="control" value="."/>
                     <xf:bind
                         ref="@service-performs-search"
                         type="xs:boolean"/>
@@ -105,6 +106,10 @@
                             ref="@ref | xf:label/@ref | xf:value/@ref | xf:hint/@ref"
                             type="xxf:XPath2"
                             required="true()"/>
+                        <xf:bind
+                            ref="xf:label/@ref"
+                            readonly="$control/@selection = 'open'"
+                            calculate="if ($control/@selection = 'open') then ../../xf:value/@ref else ."/>
                     </xf:bind>
                 </xf:model>
                 <fr:grid>
@@ -118,12 +123,24 @@
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
-                        <xh:td colspan="1">
+                        <xh:td colspan="2">
+                            <fr:yesno-input ref="xf:element('_', if (@selection = 'open') then 'true' else 'false')" id="fb-open-selection">
+                                <xf:label ref="xxf:r('dialog-control-settings.open-selection.label', '|fr-form-resources|')"/>
+                                <xf:hint  ref="xxf:r('dialog-control-settings.open-selection.hint',  '|fr-form-resources|')"/>
+                                <xf:action event="xforms-select">
+                                    <xf:delete ref="$control/@selection"/>
+                                    <xf:insert if="event('xxf:item-value') = 'true'" context="$control" origin="xf:attribute('selection', 'open')"/>
+                                </xf:action>
+                            </fr:yesno-input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td>
                             <fr:yesno-input ref="@service-performs-search">
                                 <xf:label ref="xxf:r('dialog-http-services.service-performs-search.label', '|fr-form-resources|')"/>
                             </fr:yesno-input>
                         </xh:td>
-                        <xh:td colspan="1">
+                        <xh:td>
                             <fr:yesno-input ref="@service-supports-paging">
                                 <xf:label ref="xxf:r('dialog-http-services.service-supports-paging.label', '|fr-form-resources|')"/>
                             </fr:yesno-input>

@@ -60,11 +60,12 @@ object FormRunnerXblSupport extends XBLSupport {
         case None => true
       }
 
+    // Design time = we are in the `<xxf:dynamic>` used by Form Builder to render the form.
+    // We test on `<xxf:dynamic>` being the one with `id="fb"` to exclude the `<xxf:dynamic>` used in the
+    // Control Settings dialog for XBL custom properties.
     def isDesignTime =
-      partAnalysisCtx.ancestorIterator.lastOption()          flatMap
-        FRComponentParamSupport.findConstantMetadataRootElem flatMap
-        FRComponentParamSupport.appFormFromMetadata          contains
-        AppForm.FormBuilder
+      ! partAnalysisCtx.isTopLevelPart &&
+        partAnalysisCtx.startScope.scopeId == "fb"
 
     def keepIfDesignTime: Boolean =
       elem.attributeValueOpt(FRKeepIfDesignTimeQName) match {

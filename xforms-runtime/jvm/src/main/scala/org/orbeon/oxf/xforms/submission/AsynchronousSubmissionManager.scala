@@ -6,7 +6,7 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, Future, TimeoutException}
 
 
 class AsynchronousSubmissionManager
@@ -29,7 +29,11 @@ class AsynchronousSubmissionManager
       debug(s"awaiting ${batch.size} pending asynchronous submissions for a maximum of $maxDuration")
 
       // TODO: It would be good to process submissions as soon as one is ready to be processed.
-      Await.ready(Future.sequence(batch.map(_._1)), maxDuration)
+      try {
+        Await.ready(Future.sequence(batch.map(_._1)), maxDuration)
+      } catch {
+        case _: TimeoutException => // just continue
+      }
       processCompletedAsynchronousSubmissions(containingDocument)
     }
 }

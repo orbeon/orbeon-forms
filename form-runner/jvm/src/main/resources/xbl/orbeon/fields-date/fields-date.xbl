@@ -111,7 +111,7 @@
                         <xf:action iterate="tokenize($value, '-')">
                             <xf:var name="position" value="position()" as="xs:integer"/>
                             <xf:setvalue ref="instance('i')/*[$position]"
-                                             value="if (context() castable as xs:integer) then xs:integer(context()) else ''"/>
+                                         value="if (context() castable as xs:integer) then xs:integer(context()) else ''"/>
                         </xf:action>
                     </xf:action>
                 </xf:action>

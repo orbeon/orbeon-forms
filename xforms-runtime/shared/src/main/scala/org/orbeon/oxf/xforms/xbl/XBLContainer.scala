@@ -187,8 +187,8 @@ trait ModelContainer {
       } yield
         new XFormsModel(self, modelEffectiveId, model)
 
-  def initializeModels(eventsToDispatch: immutable.Seq[String]): Unit =
-    for (eventName <- eventsToDispatch){
+  def initializeModels(eventsToDispatch: List[String]): Unit =
+    for (eventName <- eventsToDispatch) {
       if (eventName == XFORMS_READY) {
         initializeNestedControls()
         requireRefresh()

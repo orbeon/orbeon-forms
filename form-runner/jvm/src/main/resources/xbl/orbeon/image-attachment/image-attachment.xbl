@@ -261,7 +261,7 @@
                         name="new-value"
                         value="
                             let $binding := event('xxf:binding'),
-                                $v       := xxf:value('fr-image-attachment'),
+                                $v       := $binding/string(),
                                 $default := $binding/@default/string()
                             return
                                 if ($v = '-1') then

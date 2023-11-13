@@ -104,13 +104,12 @@ object AttachmentMultiple {
               ev.preventDefault()
 
               val files = ev.dataTransfer.files
-              for (i <- 0 until files.length) {
-                UploaderClient.uploadEventQueue.add(
-                  event    = UploadEvent(Page.getUploadControl(uploadControlElem), files(i)),
-                  wait     = Page.getXFormsFormFromHtmlElemOrThrow(companion.containerElem).configuration.delayBeforeIncrementalRequest.millis,
-                  waitType = ExecutionWait.MinWait
+              for (i <- 0 until files.length)
+                UploaderClient.addFile(
+                  Page.getUploadControl(uploadControlElem),
+                  files(i),
+                  Page.getXFormsFormFromHtmlElemOrThrow(companion.containerElem).configuration.delayBeforeIncrementalRequest.millis
                 )
-              }
             }
           }
         )

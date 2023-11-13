@@ -22,56 +22,24 @@ import org.scalajs.dom
 import org.scalajs.dom.experimental._
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Promise
+import scala.concurrent.duration.FiniteDuration
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 case class UploadEvent(upload: Upload, file: dom.raw.File)
 
 
-// - Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
-// - Other enhancements are listed here: https://github.com/orbeon/orbeon-forms/issues/3150
 object UploaderClient {
 
   import Private._
 
-  // Used by `Upload`
-  val uploadEventQueue = new ExecutionQueue[UploadEvent](asyncUploadRequestSetPromise)
-
-  // Once we are done processing the events (either because the uploads have been completed or canceled), handle the
-  // remaining events.
-  private def continueWithRemainingEvents(): Unit = {
-    currentEventOpt foreach (_.upload.uploadDone())
-    currentEventOpt = None
-    currentAbortControllerOpt = None
-
-    NonEmptyList.fromList(remainingEvents) match {
-      case Some(nel) =>
-        asyncUploadRequest(nel)
-      case None =>
-        executionQueuePromiseOpt.foreach (_.success(()))
-        executionQueuePromiseOpt = None
-    }
-  }
-
-  // While there is a file upload going, this method runs at a regular interval and keeps asking the server for
-  // the status of the upload. Initially, it is called by `UploadServer` when it sends the file. Then, it is called
-  // by the upload control, when it receives a progress update, as we only want to ask for an updated progress after
-  // we get an answer from the server.
-  private def askForProgressUpdate(currentForm: xforms.Form): Unit =
-    // Keep asking for progress update at regular interval until there is no upload in progress
-    js.timers.setTimeout(currentForm.configuration.delayBeforeUploadProgressRefresh) {
-      currentEventOpt foreach { processingEvent =>
-        AjaxClient.fireEvent(
-          AjaxEvent(
-            eventName    = EventNames.XXFormsUploadProgress,
-            targetId     = processingEvent.upload.container.id,
-            showProgress = false
-          )
-        )
-        askForProgressUpdate(currentForm)
-      }
-    }
+  def addFile(upload: Upload, file: dom.raw.File, wait: FiniteDuration): Unit =
+    uploadEventQueue.add(
+      event    = UploadEvent(upload, file),
+      wait     = wait,
+      waitType = ExecutionWait.MinWait
+    )
 
   // Cancel the uploads currently in process. This can be called by the control, which delegates canceling to
   // `UploadServer` as it can't know about other controls being "uploaded" at the same time. Indeed, we can have
@@ -105,16 +73,18 @@ object UploaderClient {
 
     var executionQueuePromiseOpt : Option[Promise[Unit]] = None // promise to complete when we are done processing all events
 
-    def asyncUploadRequestSetPromise(events: NonEmptyList[UploadEvent]): Future[Unit] = {
-      val promise = Promise[Unit]()
-      executionQueuePromiseOpt = promise.some
-      asyncUploadRequest(events)
-      promise.future
-    }
+    val uploadEventQueue = new ExecutionQueue[UploadEvent](
+      (events: NonEmptyList[UploadEvent]) => {
+        val promise = Promise[Unit]()
+        executionQueuePromiseOpt = promise.some
+        asyncUploadRequest(events)
+        promise.future
+      }
+    )
 
     // Run background form post do to the upload. This method is called by the ExecutionQueue when it determines that
     // the upload can be done.
-    def asyncUploadRequest(events: NonEmptyList[UploadEvent]): Unit = {
+    private def asyncUploadRequest(events: NonEmptyList[UploadEvent]): Unit = {
 
       val currentEvent = events.head
 
@@ -183,5 +153,40 @@ object UploaderClient {
           uploadEvent.file
         )
       )
+
+    // Once we are done processing the events (either because the uploads have been completed or canceled), handle the
+    // remaining events.
+    def continueWithRemainingEvents(): Unit = {
+      currentEventOpt foreach (_.upload.uploadDone())
+      currentEventOpt = None
+      currentAbortControllerOpt = None
+
+      NonEmptyList.fromList(remainingEvents) match {
+        case Some(nel) =>
+          asyncUploadRequest(nel)
+        case None =>
+          executionQueuePromiseOpt.foreach (_.success(()))
+          executionQueuePromiseOpt = None
+      }
+    }
+
+    // While there is a file upload going, this method runs at a regular interval and keeps asking the server for
+    // the status of the upload. Initially, it is called by `UploadServer` when it sends the file. Then, it is called
+    // by the upload control, when it receives a progress update, as we only want to ask for an updated progress after
+    // we get an answer from the server.
+    private def askForProgressUpdate(currentForm: xforms.Form): Unit =
+      // Keep asking for progress update at regular interval until there is no upload in progress
+      js.timers.setTimeout(currentForm.configuration.delayBeforeUploadProgressRefresh) {
+        currentEventOpt foreach { processingEvent =>
+          AjaxClient.fireEvent(
+            AjaxEvent(
+              eventName    = EventNames.XXFormsUploadProgress,
+              targetId     = processingEvent.upload.container.id,
+              showProgress = false
+            )
+          )
+          askForProgressUpdate(currentForm)
+        }
+      }
   }
 }

@@ -85,13 +85,12 @@ class Upload {
   def change(): Unit = {
     logger.debug("change -> queueing")
     val files = getInput.files
-    for (i <- 0 until files.length) {
-      UploaderClient.uploadEventQueue.add(
-        event    = UploadEvent(self, files(i)),
-        wait     = Page.getXFormsFormFromHtmlElemOrThrow(self.container).configuration.delayBeforeIncrementalRequest.millis,
-        waitType = ExecutionWait.MinWait
+    for (i <- 0 until files.length)
+      UploaderClient.addFile(
+        self,
+        files(i),
+        Page.getXFormsFormFromHtmlElemOrThrow(self.container).configuration.delayBeforeIncrementalRequest.millis
       )
-    }
   }
 
   // This method is called when the server sends us a progress update for this upload control. If the upload was

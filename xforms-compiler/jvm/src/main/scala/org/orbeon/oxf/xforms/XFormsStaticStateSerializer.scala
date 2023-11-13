@@ -543,6 +543,7 @@ object XFormsStaticStateSerializer {
             b += "isDownloadAppearance" -> Json.fromBoolean(c.isDownloadAppearance)
           if (c.staticValue.isDefined)
             b += "staticValue"          -> c.staticValue.asJson
+          withFileMetadata(c, b)
         case c: LHHAAnalysis  =>
           b += "expressionOrConstant"      -> c.expressionOrConstant.asJson
           if (c.isPlaceholder)
@@ -610,7 +611,10 @@ object XFormsStaticStateSerializer {
           }
         case c: WithExpressionOrConstantTrait => // includes `NestedNameOrValueControl` and `xf:message` action
           b += "expressionOrConstant" -> c.expressionOrConstant.asJson
-//        case _: UploadControl          =>
+        case c: UploadControl          =>
+          b += "multiple" -> c.multiple.asJson
+          withFileMetadata(c, b)
+
 //        case _: SwitchControl          =>
 //        case _: GroupControl           =>
 //        case _: DialogControl          =>
@@ -623,6 +627,15 @@ object XFormsStaticStateSerializer {
 //        case _: SecretControl          => // ok
         case _                         =>
       }
+
+    def withFileMetadata(c: WithFileMetadata, b: ListBuffer[(String, Json)]) = {
+      if (c.mediatypeBinding.isDefined)
+        b += "mediatypeBinding" -> c.mediatypeBinding.asJson
+      if (c.filenameBinding.isDefined)
+        b += "filenameBinding"  -> c.filenameBinding.asJson
+      if (c.sizeBinding.isDefined)
+        b += "sizeBinding"      -> c.sizeBinding.asJson
+    }
 
     implicit lazy val encodeMapSet: Encoder[MapSet[String, String]] = (a: MapSet[String, String]) =>
       convertMapSet(a).asJson

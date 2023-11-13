@@ -217,7 +217,8 @@ class XFormsServerProcessor extends ProcessorImpl {
       xmlReceiverOpt          = xmlReceiverOpt,
       responseForReplaceAll   = PipelineResponse.getResponse(xmlReceiverOpt, externalContext),
       beforeProcessRequest    = beforeProcessRequest,
-      extractWireEvents       = s => extractWireEvents(EncodeDecode.decodeXML(s, forceEncryption = true).getRootElement)
+      extractWireEvents       = s => extractWireEvents(EncodeDecode.decodeXML(s, forceEncryption = true).getRootElement),
+      trustEvents             = false
     )
   }
 }

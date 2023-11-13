@@ -27,8 +27,6 @@ import scala.concurrent.duration.FiniteDuration
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 
-case class UploadEvent(upload: Upload, file: dom.raw.File)
-
 
 object UploaderClient {
 
@@ -65,6 +63,8 @@ object UploaderClient {
   }
 
   private object Private {
+
+    case class UploadEvent(upload: Upload, file: dom.raw.File)
 
     // While an upload is in progress:
     var currentEventOpt          : Option[UploadEvent]     = None // event for the field being uploaded

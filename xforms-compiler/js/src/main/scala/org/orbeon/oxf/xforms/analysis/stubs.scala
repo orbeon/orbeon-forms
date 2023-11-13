@@ -15,7 +15,7 @@ trait NestedPartAnalysis extends PartAnalysis
 object ElementAnalysisTreeBuilder {
 
   private[analysis] def throwError(): Nothing =
-    throw new UnsupportedOperationException("xxf:dynamic is not supported in offline mode")
+    throw new UnsupportedOperationException("`xxf:dynamic` is not supported in the JavaScript environment")
 
   def createOrUpdateStaticShadowTree(
     partAnalysisCtx   : NestedPartAnalysis,

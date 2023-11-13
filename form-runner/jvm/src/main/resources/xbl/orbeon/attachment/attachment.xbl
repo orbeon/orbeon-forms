@@ -445,7 +445,6 @@
                                 "/>
 
                             <xf:action if="not($multiple)">
-                                <!-- TODO: move to function library for offline -->
                                 <xf:action type="xpath" xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl">
                                     upload:deleteFileIfPossible(string($binding))
                                 </xf:action>

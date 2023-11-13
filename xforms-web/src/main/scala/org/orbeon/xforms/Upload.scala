@@ -86,7 +86,7 @@ class Upload {
     logger.debug("change -> queueing")
     val files = getInput.files
     for (i <- 0 until files.length)
-      UploaderClient.addFile(
+      XFormsApp.clientServerChannel.addFile(
         self,
         files(i),
         Page.getXFormsFormFromHtmlElemOrThrow(self.container).configuration.delayBeforeIncrementalRequest.millis
@@ -101,7 +101,7 @@ class Upload {
   def progress(state: String, received: Int, expected: Int): Unit =
     state match {
       case "interrupted"                     =>
-        UploaderClient.cancel(doAbort = true, XXFormsUploadError)
+        XFormsApp.clientServerChannel.cancel(doAbort = true, XXFormsUploadError)
         logger.debug("cancel")
       case _ =>
         findProgressBar foreach { bar =>
@@ -166,7 +166,7 @@ class Upload {
   private def cancelButtonActivated(event: JQueryEventObject): Unit = {
     logger.debug("cancel button activated")
     event.preventDefault()
-    UploaderClient.cancel(doAbort = true, XXFormsUploadCancel)
+    XFormsApp.clientServerChannel.cancel(doAbort = true, XXFormsUploadCancel)
   }
 
   private def findDescendantElem(className: String): Option[html.Element] =

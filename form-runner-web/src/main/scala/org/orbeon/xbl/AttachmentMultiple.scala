@@ -105,7 +105,7 @@ object AttachmentMultiple {
 
               val files = ev.dataTransfer.files
               for (i <- 0 until files.length)
-                UploaderClient.addFile(
+                XFormsApp.clientServerChannel.addFile(
                   Page.getUploadControl(uploadControlElem),
                   files(i),
                   Page.getXFormsFormFromHtmlElemOrThrow(companion.containerElem).configuration.delayBeforeIncrementalRequest.millis

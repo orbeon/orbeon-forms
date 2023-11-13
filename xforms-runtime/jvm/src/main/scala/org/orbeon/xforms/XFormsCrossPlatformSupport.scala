@@ -267,7 +267,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def hmacStringToHexShort(text: String): String =
     SecureUtils.hmacStringToHexShort(SecureUtils.KeyUsage.General, text)
 
-  def hmacString(text: String, encoding: ByteEncoding): String =
+  def hmacStringForUpload(text: String, encoding: ByteEncoding): String =
     SecureUtils.hmacString(SecureUtils.KeyUsage.General, text, encoding)
 
   def digestBytes(bytes: Array[Byte], encoding: ByteEncoding): String =

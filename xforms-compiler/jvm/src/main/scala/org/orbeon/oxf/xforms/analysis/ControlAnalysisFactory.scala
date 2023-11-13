@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.analysis.EventHandler.{isAction, isContainerAction,
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Model, Submission}
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.XFormsNames.{XXFORMS_VALUE_QNAME, _}
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
@@ -46,6 +46,7 @@ object ControlAnalysisFactory {
     // Core value controls
     XXFORMS_TEXT_QNAME            -> (OutputControlBuilder(_, _, _, _, _, _, _, _, _, _)),// TODO: don't accept any external events
     XFORMS_OUTPUT_QNAME           -> (OutputControlBuilder(_, _, _, _, _, _, _, _, _, _)),
+    XFORMS_UPLOAD_QNAME           -> (UploadControlBuilder(_, _, _, _, _, _, _, _, _, _)),
     // Selection controls
     XFORMS_SELECT_QNAME           -> (SelectionControlBuilder(_, _, _, _, _, _, _, _, _, _)),
     XFORMS_SELECT1_QNAME          -> (SelectionControlBuilder(_, _, _, _, _, _, _, _, _, _)),
@@ -68,7 +69,6 @@ object ControlAnalysisFactory {
     XFORMS_INPUT_QNAME            -> (new InputControl(_, _, _, _, _, _, _, _, _)),
     XFORMS_SECRET_QNAME           -> (new SecretControl(_, _, _, _, _, _, _, _, _)),
     XFORMS_TEXTAREA_QNAME         -> (new TextareaControl(_, _, _, _, _, _, _, _, _)),
-    XFORMS_UPLOAD_QNAME           -> (new UploadControl(_, _, _, _, _, _, _, _, _)),
     // Core controls
     XFORMS_TRIGGER_QNAME          -> (new TriggerControl(_, _, _, _, _, _, _, _, _)),
     XFORMS_SUBMIT_QNAME           -> (new TriggerControl(_, _, _, _, _, _, _, _, _)),

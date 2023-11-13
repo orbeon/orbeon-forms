@@ -128,7 +128,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Improvement-to-client-side-server-s
   def getUploadUniqueId: String = getEffectiveId
 
-  def handleUploadedFile(value: String, filename: Option[String], mediatype: Option[String], size: Option[String]): Unit =
+  private def handleUploadedFile(value: String, filename: Option[String], mediatype: Option[String], size: Option[String]): Unit =
     if (size.exists(_ != "0") || filename.exists(_ != ""))
       storeExternalValueAndMetadata(value, filename, mediatype, size)
 
@@ -274,9 +274,8 @@ object XFormsUploadControl {
     PathUtils.appendQueryString(urlWithQuery, MacParamName + '=' + hmac(urlWithQuery))
   }
 
-  // Get the MAC for a given string
   def hmac(value: String): String =
-    XFormsCrossPlatformSupport.hmacString(value, ByteEncoding.Hex)
+    XFormsCrossPlatformSupport.hmacStringForUpload(value, ByteEncoding.Hex)
 
   // Remove the MAC from the URL
   def removeMAC(url: String): String = {
@@ -310,7 +309,7 @@ object XFormsUploadControl {
    *
    * The URI has to be a URL. It is read entirely
    */
-  def anyURIToBase64Binary(value: URI): String = {
+  private def anyURIToBase64Binary(value: URI): String = {
 
     val sb = new StringBuilder
 
@@ -325,7 +324,7 @@ object XFormsUploadControl {
     sb.toString
   }
 
-  def normalizeAndCheckRawValue(rawNewValue: String): Option[URI] =
+  private def normalizeAndCheckRawValue(rawNewValue: String): Option[URI] =
     rawNewValue.trimAllToOpt map (URI.create(_).normalize()) match {
       case someNewValueUri @ Some(newValueUri) if FileUtils.isTemporaryFileUri(newValueUri) =>
         someNewValueUri
@@ -337,7 +336,7 @@ object XFormsUploadControl {
 
   private val Base64BinaryQNames = Set(XS_BASE64BINARY_QNAME, XFORMS_BASE64BINARY_QNAME)
 
-  def prepareValueAsBase64OrUri(
+  private def prepareValueAsBase64OrUri(
     newValueUri : URI,
     filename    : Option[String],
     mediatype   : Option[String],

@@ -199,7 +199,7 @@ trait XFormsCrossPlatformSupportTrait {
   ): dom.Document
 
   def hmacStringToHexShort(text: String): String
-  def hmacString(text: String, encoding: ByteEncoding): String
+  def hmacStringForUpload(text: String, encoding: ByteEncoding): String
   def digestBytes(bytes: Array[Byte], encoding: ByteEncoding): String
 
   def openUrlStream(url: URI): InputStream

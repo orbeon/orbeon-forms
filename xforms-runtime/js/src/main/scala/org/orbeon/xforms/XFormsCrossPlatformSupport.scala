@@ -43,7 +43,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def externalContext: ExternalContext = CoreCrossPlatformSupport.externalContext
 
-  // TODO
+  // We have no notion of upload progress in the JavaScript environment as we just pass a `File` object.
   def getUploadProgress(
     request   : ExternalContext.Request,
     uuid      : String,
@@ -51,9 +51,11 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   ): Option[UploadProgress[Unit]] =
     None
 
-  def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit =
-    throw new NotImplementedError("removeUploadProgress")
+  // We have no notion of upload progress in the JavaScript environment as we just pass a `File` object.
+  def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit = ()
 
+  // TODO, although this is probably not called in the JavaScript environment, as that is only called
+  // upon `xxforms-state-restored`.
   def attachmentFileExists(holderValue: String): Boolean =
     throw new NotImplementedError("attachmentFileExists")
 
@@ -164,8 +166,9 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def renameAndExpireWithSession(
     existingFileURI  : URI)(implicit
     logger           : IndentedLogger
-  ): URI =
-    throw new NotImplementedError("renameAndExpireWithSession")
+  ): URI = {
+    existingFileURI
+  }
 
   def inputStreamToRequestUri(
     inputStream      : InputStream)(implicit
@@ -275,8 +278,13 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     result()
   }
 
+  // For `SubmissionUtils.dataNodeHash()` only
   def hmacStringToHexShort(text: String): String = throw new NotImplementedError("hmacStringToHexShort")
-  def hmacString(text: String, encoding: ByteEncoding): String = throw new NotImplementedError("hmacString")
+
+  // This is unnecessary in the JavaScript environment
+  def hmacStringForUpload(text: String, encoding: ByteEncoding): String = ""
+
+  // Used by `CacheableSubmission` for `requestBodyHash`
   def digestBytes(bytes: Array[Byte], encoding: ByteEncoding): String = throw new NotImplementedError("digestBytes")
 
   def openUrlStream(url: URI): InputStream = throw new NotImplementedError("openUrlStream")
@@ -288,7 +296,9 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def tempFileSize(filePath: String): Long = throw new NotImplementedError("tempFileSize")
 
-  def deleteFileIfPossible(urlString: String): Unit = throw new NotImplementedError("deleteFileIfPossible")
+  def deleteFileIfPossible(urlString: String): Unit = {
+    // TODO
+  }
 
   protected def getIdentityTransformer: Transformer =
     new SaxonTransformerFactory(GlobalConfiguration).newTransformer

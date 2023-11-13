@@ -37,6 +37,8 @@ import scala.util.Try
 
 object OutputControlBuilder {
 
+  import UploadControlBuilder._
+
   def apply(
     partAnalysisCtx   : PartAnalysisContextForTree,
     index             : Int,
@@ -72,12 +74,16 @@ object OutputControlBuilder {
       prefixedId,
       namespaceMapping,
       scope,
-      containerScope,
-      isImageMediatype,
-      isVideoMediatype,
-      isHtmlMediatype,
-      isDownloadAppearance,
-      staticValue
+      containerScope
+    )(
+      isImageMediatype     = isImageMediatype,
+      isVideoMediatype     = isVideoMediatype,
+      isHtmlMediatype      = isHtmlMediatype,
+      isDownloadAppearance = isDownloadAppearance,
+      staticValue          = staticValue,
+      mediatypeBinding     = element.elementOpt(XFORMS_MEDIATYPE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
+      filenameBinding      = element.elementOpt(XFORMS_FILENAME_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
+      sizeBinding          = element.elementOpt(XXFORMS_SIZE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _))
     )
   }
 }
@@ -272,7 +278,8 @@ object SelectionControlBuilder {
       prefixedId,
       namespaceMapping,
       scope,
-      containerScope,
+      containerScope
+    )(
       staticItemset,
       useCopy,
       mustEncodeValues
@@ -468,6 +475,73 @@ object CaseControlBuilder {
       valueExpression,
       valueLiteral
     )
+  }
+}
+
+object UploadControlBuilder {
+
+  def apply(
+    partAnalysisCtx  : PartAnalysisContextForTree,
+    index            : Int,
+    element          : Element,
+    parent           : Option[ElementAnalysis],
+    preceding        : Option[ElementAnalysis],
+    staticId         : String,
+    prefixedId       : String,
+    namespaceMapping : NamespaceMapping,
+    scope            : Scope,
+    containerScope   : Scope
+  ): UploadControl =
+    new UploadControl(
+      index,
+      element,
+      parent,
+      preceding,
+      staticId,
+      prefixedId,
+      namespaceMapping,
+      scope,
+      containerScope
+    )(
+      multiple         = element.attributeValueOpt(XXFORMS_MULTIPLE_QNAME).contains("true"),
+      mediatypeBinding = element.elementOpt(XFORMS_MEDIATYPE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
+      filenameBinding  = element.elementOpt(XFORMS_FILENAME_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _)),
+      sizeBinding      = element.elementOpt(XXFORMS_SIZE_QNAME).map(makeSingleItemBinding(partAnalysisCtx, containerScope, _))
+    )
+
+  def makeSingleItemBinding(
+    partAnalysisCtx  : PartAnalysisContextForTree,
+    containerScope   : Scope,
+    elem             : Element
+  ): SingleItemBinding = {
+
+    val childPrefixedId = containerScope.fullPrefix + elem.idOrThrow
+    val childScope      = partAnalysisCtx.scopeForPrefixedId(childPrefixedId)
+
+    elem.attributeValueOpt(BIND_QNAME) match {
+      case Some(bind) =>
+        BindSingleItemBinding(
+          scope = childScope,
+          model = elem.attributeValueOpt(MODEL_QNAME),
+          bind  = bind
+        )
+      case None =>
+        ElementAnalysis.getBindingExpression(elem) match {
+          case Some(ref) =>
+            RefSingleItemBinding(
+              scope   = childScope,
+              model   = elem.attributeValueOpt(MODEL_QNAME),
+              context = elem.attributeValueOpt(CONTEXT_QNAME),
+              ns      = partAnalysisCtx.getNamespaceMapping(childPrefixedId).getOrElse(throw new IllegalStateException),
+              ref     = ref
+            )
+          case None =>
+            throw new ValidationException(
+              s"`${elem.getName}` must have either a `bind` or a `ref` attribute.",
+              ElementAnalysis.createLocationData(elem)
+            )
+        }
+    }
   }
 }
 
@@ -976,6 +1050,7 @@ object VariableAnalysisBuilder {
       )
   }
 }
+
 object NestedNameOrValueControlBuilder {
 
   def apply(

@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FileUtils, UploadProgress}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FileUtils, IndentedLogger, UploadProgress}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.SingleItemBinding
+import org.orbeon.oxf.xforms.analysis.controls.WithFileMetadata
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty, MutableControlProperty}
 import org.orbeon.oxf.xforms.control.controls.FileMetadata._
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl, XFormsValueControl}
@@ -25,6 +26,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.helpers.AttributesImpl
+import shapeless.syntax.typeable.typeableOps
 
 import scala.util.control.NonFatal
 
@@ -34,24 +36,21 @@ trait FileMetadata extends XFormsValueControl {
 
   self: XFormsControl =>
 
-  // Children elements
-  // TODO: Don't deal with elements here, this should be part of the ElementAnalysis
-  private val mediatypeElement = Option(self.element.element(XFORMS_MEDIATYPE_QNAME))
-  private val filenameElement  = Option(self.element.element(XFORMS_FILENAME_QNAME))
-  private val sizeElement      = Option(self.element.element(XXFORMS_SIZE_QNAME))
+  def staticFileMetadata: Option[WithFileMetadata] =
+    self.staticControl.cast[WithFileMetadata]
 
   private class FileMetadataProperty(evaluator: Evaluator) extends MutableControlProperty[String] {
 
-    protected def evaluateValue() = evaluator.evaluate(self)
-    override protected def nonRelevantValue = evaluator.default
+    protected def evaluateValue(): String = evaluator.evaluate(self)
+    override protected def nonRelevantValue: String = evaluator.default
 
-    protected def isRelevant = self.isRelevant
-    protected def wasRelevant = self.wasRelevant
+    protected def isRelevant: Boolean = self.isRelevant
+    protected def wasRelevant: Boolean = self.wasRelevant
 
     // No dependencies yet
     protected def requireUpdate = true
-    protected def notifyCompute() = ()
-    protected def notifyOptimized() = ()
+    protected def notifyCompute(): Unit = ()
+    protected def notifyOptimized(): Unit = ()
   }
 
   // Supported file metadata properties
@@ -66,34 +65,35 @@ trait FileMetadata extends XFormsValueControl {
     props.values foreach (_.value)
 
   // Mark all properties dirty
-  def markFileMetadataDirty() =
+  def markFileMetadataDirty(): Unit =
     props.values foreach (_.handleMarkDirty())
 
   // Getters
-  def state                 = props("state")    .value
-  def fileMediatype         = props("mediatype").value.trimAllToOpt
-  def filename              = props("filename") .value.trimAllToOpt
-  def fileSize              = props("size")     .value.trimAllToOpt
+  def state        : String         = props("state")    .value
+  def fileMediatype: Option[String] = props("mediatype").value.trimAllToOpt
+  def filename     : Option[String] = props("filename") .value.trimAllToOpt
+  def fileSize     : Option[String] = props("size")     .value.trimAllToOpt
 
-  def iterateProperties = props.iterator map {
+  def iterateProperties: Iterator[(String, Option[String])] = props.iterator map {
     case (k, v) => k -> Option(v.value)
   }
 
-  def humanReadableFileSize = fileSize filter (_.nonAllBlank) map humanReadableBytes
+  def humanReadableFileSize: Option[String] =
+    fileSize filter (_.nonAllBlank) map humanReadableBytes
 
   // "Instant" evaluators which go straight to the bound nodes if possible
-  def boundFileMediatype  = Evaluators("mediatype").evaluate(self)
-  def boundFilename       = Evaluators("filename").evaluate(self)
+  def boundFileMediatype: String = Evaluators("mediatype").evaluate(self)
+  def boundFilename: String = Evaluators("filename").evaluate(self)
 
   // Setters
   def setFileMediatype(mediatype: String): Unit =
-    setInfoValue(mediatypeElement, mediatype)
+    staticFileMetadata.flatMap(_.mediatypeBinding).foreach(setMetadataValue(self, _, mediatype))
 
   def setFilename(filename: String): Unit =
-    setInfoValue(filenameElement, filename)
+    staticFileMetadata.flatMap(_.filenameBinding).foreach(setMetadataValue(self, _, filename))
 
   def setFileSize(size: String): Unit =
-    setInfoValue(sizeElement, size)
+    staticFileMetadata.flatMap(_.sizeBinding).foreach(setMetadataValue(self, _, size))
 
   def addFileMetadataAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[FileMetadata]): Boolean = {
 
@@ -121,36 +121,12 @@ trait FileMetadata extends XFormsValueControl {
   }
 
   // True if all metadata is the same (NOTE: the names must match)
-  def compareFileMetadata(other: FileMetadata) =
+  def compareFileMetadata(other: FileMetadata): Boolean =
     props.size == other.props.size && (props forall { case (name, prop) => prop.value == other.props(name).value })
 
   // Update other with an immutable version of the metadata
-  def updateFileMetadataCopy(other: FileMetadata) =
+  def updateFileMetadataCopy(other: FileMetadata): Unit =
     other.props = props map { case (name, prop) => name -> new ImmutableControlProperty(prop.value) }
-
-  private def setInfoValue(element: Option[Element], value: String) =
-    if (value ne null)
-      element foreach { e =>
-        val contextStack = self.getContextStack
-        contextStack.setBinding(self.bindingContext)
-        contextStack.pushBinding(e, self.getEffectiveId, self.getChildElementScope(e))
-
-        contextStack.getCurrentBindingContext.singleNodeOpt foreach { currentSingleNode =>
-            DataModel.setValueIfChanged(
-              nodeInfo  = currentSingleNode,
-              newValue  = value,
-              onSuccess = oldValue => DataModel.logAndNotifyValueChange(
-                source             = "file metadata",
-                nodeInfo           = currentSingleNode,
-                oldValue           = oldValue,
-                newValue           = value,
-                isCalculate        = false,
-                collector          = Dispatch.dispatchEvent
-              ),
-              reason => Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(self, self.getLocationData, reason))
-            )
-        }
-      }
 }
 
 object FileMetadata {
@@ -160,9 +136,11 @@ object FileMetadata {
   // How to evaluate each property and default values used when control is non-relevant
   private val Evaluators = Map[String, Evaluator](
     "state"             -> Evaluator(m => if (m.getValue.isAllBlank) "empty" else "file", "empty"),
-    "mediatype"         -> Evaluator(m => m.mediatypeElement map     (childMetadataValue(m, _))        orNull, null),
-    "filename"          -> Evaluator(m => m.filenameElement  map     (childMetadataValue(m, _))        orNull, null),
-    "size"              -> Evaluator(m => m.sizeElement      map     (childMetadataValue(m, _))        orNull, null),
+
+    "mediatype"         -> Evaluator(m => m.staticFileMetadata.flatMap(_.mediatypeBinding).map(getMetadataValue(m, _)).orNull, null),
+    "filename"          -> Evaluator(m => m.staticFileMetadata.flatMap(_.filenameBinding) .map(getMetadataValue(m, _)).orNull, null),
+    "size"              -> Evaluator(m => m.staticFileMetadata.flatMap(_.sizeBinding)     .map(getMetadataValue(m, _)).orNull, null),
+
     "progress-state"    -> Evaluator(m => progress(m)        map     (_.state.name)                    orNull, null),
     "progress-received" -> Evaluator(m => progress(m)        map     (_.receivedSize.toString)         orNull, null),
     "progress-expected" -> Evaluator(m => progress(m)        flatMap (_.expectedSize) map (_.toString) orNull, null)
@@ -180,11 +158,46 @@ object FileMetadata {
     ) filter
       (_.fieldName == metadata.getEffectiveId)
 
-  private def childMetadataValue(m: FileMetadata, element: Element): String = {
+  private def getMetadataValue(
+    m                : FileMetadata,
+    singleItemBinding: SingleItemBinding
+  ): String = {
     val contextStack = m.getContextStack
     contextStack.setBinding(m.bindingContext)
-    contextStack.pushBinding(element, m.getEffectiveId, m.getChildElementScope(element))
+    contextStack.pushBinding(singleItemBinding, m.getEffectiveId)
     DataModel.getValue(contextStack.getCurrentBindingContext.getSingleItemOrNull)
+  }
+
+  private def setMetadataValue(
+    m                : FileMetadata,
+    singleItemBinding: SingleItemBinding,
+    value            : String
+  )(implicit
+    containingDocument: XFormsContainingDocument,
+    logger            : IndentedLogger
+  ): Unit = {
+
+    println(s"xxx setInfoValue: $singleItemBinding, $value")
+
+    val contextStack = m.getContextStack
+    contextStack.setBinding(m.bindingContext)
+    contextStack.pushBinding(singleItemBinding, m.getEffectiveId)
+
+    contextStack.getCurrentBindingContext.singleNodeOpt foreach { currentSingleNode =>
+      DataModel.setValueIfChanged(
+        nodeInfo  = currentSingleNode,
+        newValue  = value,
+        onSuccess = oldValue => DataModel.logAndNotifyValueChange(
+          source             = "file metadata",
+          nodeInfo           = currentSingleNode,
+          oldValue           = oldValue,
+          newValue           = value,
+          isCalculate        = false,
+          collector          = Dispatch.dispatchEvent
+        ),
+        reason => Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(m, m.getLocationData, reason))
+      )
+    }
   }
 
   // Format a string containing a number of bytes to a human-readable string

@@ -19,7 +19,7 @@ import org.orbeon.oxf.http.StatusCode.{LoginTimeOut, ServiceUnavailable}
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.xforms
 import org.orbeon.xforms.AjaxClient.handleFailure
-import org.orbeon.xforms.{AjaxClient, AjaxRequest, Page, Support}
+import org.orbeon.xforms._
 import org.scalajs.dom
 import org.scalajs.dom.FormData
 import org.scalajs.dom.experimental.AbortController
@@ -55,6 +55,19 @@ object RemoteClientServerChannel extends ClientServerChannel {
       ignoreErrors
     )
   }
+
+  def addFile(
+    upload: Upload,
+    file  : dom.raw.File,
+    wait  : FiniteDuration
+  ): Unit =
+    UploaderClient.addFile(upload, file, wait)
+
+  def cancel(
+    doAbort  : Boolean,
+    eventName: String
+  ): Unit =
+    UploaderClient.cancel(doAbort, eventName)
 
   object Private {
 

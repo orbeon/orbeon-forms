@@ -43,7 +43,8 @@ object XFormsServer {
     xmlReceiverOpt          : Option[XMLReceiver],
     responseForReplaceAll   : ExternalContext.Response,
     beforeProcessRequest    : XFormsContainingDocument => Unit,
-    extractWireEvents       : String => List[WireAjaxEvent]
+    extractWireEvents       : String => List[WireAjaxEvent],
+    trustEvents             : Boolean
   )(implicit
     indentedLogger          : IndentedLogger,
     externalContext         : ExternalContext
@@ -123,10 +124,14 @@ object XFormsServer {
                                 e.valueOpt.toList flatMap (v =>
                                   extractWireEvents(v)
                                 ) collect {
-                                  case e: WireAjaxEventWithTarget => e -> true
+                                  case e: WireAjaxEventWithTarget =>
+                                    // Server events are trusted
+                                    e -> true
                                 }
                               case e: WireAjaxEventWithTarget =>
-                                List(e -> false)
+                                // Server events are not trusted by default but this can be overridden by the caller
+                                // for the offline mode
+                                List(e -> trustEvents)
                               case _ =>
                                 Nil
                             }

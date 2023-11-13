@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SingleItemBinding}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.saxon.om
@@ -32,14 +32,19 @@ class OutputControl(
   prefixedId              : String,
   namespaceMapping        : NamespaceMapping,
   scope                   : Scope,
-  containerScope          : Scope,
+  containerScope          : Scope
+)(
   val isImageMediatype    : Boolean,
   val isVideoMediatype    : Boolean,
   val isHtmlMediatype     : Boolean,
   val isDownloadAppearance: Boolean,
-  val staticValue         : Option[String] // TODO: `expressionOrConstant`
+  val staticValue         : Option[String], // TODO: `expressionOrConstant`
+  val mediatypeBinding    : Option[SingleItemBinding],
+  val filenameBinding     : Option[SingleItemBinding],
+  val sizeBinding         : Option[SingleItemBinding],
 ) extends ValueControl(index, element, parent, preceding, staticId, prefixedId,  namespaceMapping,  scope,  containerScope)
-     with OptionalSingleNode {
+     with OptionalSingleNode
+     with WithFileMetadata {
 
   // Unlike other value controls, don't restrict to simple content (even though the spec says it should!)
   override def isAllowedBoundItem(item: om.Item): Boolean = StaticDataModel.isAllowedBoundItem(item)

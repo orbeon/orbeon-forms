@@ -2,8 +2,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.controls.ExternalEvents._
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, WithChildrenTrait}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SingleItemBinding, WithChildrenTrait}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.xforms.EventNames
@@ -11,21 +10,6 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
-
-private object ExternalEvents {
-
-  val TriggerExternalEvents = Set(XFORMS_FOCUS, XXFORMS_BLUR, XFORMS_HELP, DOM_ACTIVATE)
-  val ValueExternalEvents   = TriggerExternalEvents + EventNames.XXFormsValue
-
-  // NOTE: `xxforms-upload-done` is a trusted server event so doesn't need to be listed here
-  val UploadExternalEvents  = Set(
-    XFORMS_SELECT,
-    EventNames.XXFormsUploadStart,
-    EventNames.XXFormsUploadProgress,
-    EventNames.XXFormsUploadCancel,
-    EventNames.XXFormsUploadError
-  )
-}
 
 abstract class CoreControl(
   index            : Int,
@@ -68,8 +52,13 @@ class InputValueControl(
   containerScope   : Scope
 ) extends ValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with RequiredSingleNode {
-  override protected def externalEventsDef = super.externalEventsDef ++ ValueExternalEvents
+  override protected def externalEventsDef: Set[String] = super.externalEventsDef ++ InputValueControl.ExternalEvents
   override val externalEvents = externalEventsDef
+}
+
+private object InputValueControl {
+  val ExternalEvents: Set[String] =
+    TriggerControl.ExternalEvents + EventNames.XXFormsValue
 }
 
 class SelectionControl(
@@ -81,7 +70,8 @@ class SelectionControl(
   prefixedId           : String,
   namespaceMapping     : NamespaceMapping,
   scope                : Scope,
-  containerScope       : Scope,
+  containerScope       : Scope
+)(
   val staticItemset    : Option[Itemset],
   val useCopy          : Boolean,
   val mustEncodeValues : Option[Boolean]
@@ -105,10 +95,28 @@ class TriggerControl(
      with OptionalSingleNode
      with TriggerAppearanceTrait
      with WithChildrenTrait {
-  override protected def externalEventsDef = super.externalEventsDef ++ TriggerExternalEvents
+  override protected def externalEventsDef: Set[String] = super.externalEventsDef ++ TriggerControl.ExternalEvents
   override val externalEvents              = externalEventsDef
 
   override protected val allowedExtensionAttributes = appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) set XXFORMS_TITLE_QNAME
+}
+
+private object TriggerControl {
+  val ExternalEvents: Set[String] =
+    Set(
+      XFORMS_FOCUS,
+      XXFORMS_BLUR,
+      XFORMS_HELP,
+      DOM_ACTIVATE
+    )
+}
+
+trait WithFileMetadata extends ElementAnalysis{
+  self: ElementAnalysis =>
+
+  val mediatypeBinding: Option[SingleItemBinding]
+  val filenameBinding : Option[SingleItemBinding]
+  val sizeBinding     : Option[SingleItemBinding]
 }
 
 class UploadControl(
@@ -121,14 +129,37 @@ class UploadControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
+)(
+  val multiple        : Boolean,
+  val mediatypeBinding: Option[SingleItemBinding],
+  val filenameBinding : Option[SingleItemBinding],
+  val sizeBinding     : Option[SingleItemBinding],
+) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) with WithFileMetadata {
 
-  val multiple: Boolean = element.attributeValueOpt(XXFORMS_MULTIPLE_QNAME) contains "true"
-
-  override protected def externalEventsDef = super.externalEventsDef ++ UploadExternalEvents
+  override protected def externalEventsDef: Set[String] = super.externalEventsDef ++ UploadControl.ExternalEvents
   override val externalEvents = externalEventsDef
 
-  override protected val allowedExtensionAttributes = Set(ACCEPT_QNAME, MEDIATYPE_QNAME, XXFORMS_TITLE_QNAME)
+  override protected def allowedExtensionAttributes: Set[QName] = UploadControl.AllowedExtensionAttributes
+}
+
+private object UploadControl {
+
+  // NOTE: `xxforms-upload-done` is a trusted server event so doesn't need to be listed here
+  val ExternalEvents: Set[String] =
+    Set(
+      XFORMS_SELECT,
+      EventNames.XXFormsUploadStart,
+      EventNames.XXFormsUploadProgress,
+      EventNames.XXFormsUploadCancel,
+      EventNames.XXFormsUploadError
+    )
+
+  val AllowedExtensionAttributes: Set[QName] =
+    Set(
+      ACCEPT_QNAME,
+      MEDIATYPE_QNAME,
+      XXFORMS_TITLE_QNAME
+    )
 }
 
 class InputControl(
@@ -142,13 +173,18 @@ class InputControl(
   scope            : Scope,
   containerScope   : Scope
 ) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
-  override protected val allowedExtensionAttributes = Set(
-    XXFORMS_SIZE_QNAME,
-    XXFORMS_MAXLENGTH_QNAME,
-    XXFORMS_AUTOCOMPLETE_QNAME,
-    XXFORMS_TITLE_QNAME,
-    XXFORMS_PATTERN_QNAME,
-  )
+  override protected def allowedExtensionAttributes: Set[QName] = InputControl.AllowedExtensionAttributes
+}
+
+private object InputControl {
+  val AllowedExtensionAttributes: Set[QName] =
+    Set(
+      XXFORMS_SIZE_QNAME,
+      XXFORMS_MAXLENGTH_QNAME,
+      XXFORMS_AUTOCOMPLETE_QNAME,
+      XXFORMS_TITLE_QNAME,
+      XXFORMS_PATTERN_QNAME,
+    )
 }
 
 class SecretControl(
@@ -162,11 +198,16 @@ class SecretControl(
   scope            : Scope,
   containerScope   : Scope
 ) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
-  override protected val allowedExtensionAttributes = Set(
-    XXFORMS_SIZE_QNAME,
-    XXFORMS_MAXLENGTH_QNAME,
-    XXFORMS_AUTOCOMPLETE_QNAME
-  )
+  override protected def allowedExtensionAttributes: Set[QName] = SecretControl.AllowedExtensionAttributes
+}
+
+private object SecretControl {
+  val AllowedExtensionAttributes: Set[QName] =
+    Set(
+      XXFORMS_SIZE_QNAME,
+      XXFORMS_MAXLENGTH_QNAME,
+      XXFORMS_AUTOCOMPLETE_QNAME
+    )
 }
 
 class TextareaControl(
@@ -180,11 +221,16 @@ class TextareaControl(
   scope            : Scope,
   containerScope   : Scope
 ) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
-  override protected val allowedExtensionAttributes = Set(
-    XXFORMS_MAXLENGTH_QNAME,
-    XXFORMS_COLS_QNAME,
-    XXFORMS_ROWS_QNAME
-  )
+  override protected def allowedExtensionAttributes: Set[QName] = TextareaControl.AllowedExtensionAttributes
+}
+
+private object TextareaControl {
+  val AllowedExtensionAttributes: Set[QName] =
+    Set(
+      XXFORMS_MAXLENGTH_QNAME,
+      XXFORMS_COLS_QNAME,
+      XXFORMS_ROWS_QNAME
+    )
 }
 
 class SwitchControl(
@@ -243,7 +289,7 @@ class GroupControl(
      with StaticLHHASupport {
 
   // Extension attributes depend on the name of the element
-  override protected val allowedExtensionAttributes =
+  override protected val allowedExtensionAttributes: Set[QName] =
     elementQName match {
       case Some(elementQName) if Set("td", "th")(elementQName.localName) =>
         Set(QName("rowspan"), QName("colspan"))
@@ -253,7 +299,7 @@ class GroupControl(
         Set.empty
     }
 
-  override val externalEvents = super.externalEvents + DOM_ACTIVATE // allow DOMActivate
+  override val externalEvents = super.externalEvents + DOM_ACTIVATE
 }
 
 class DialogControl(

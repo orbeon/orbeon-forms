@@ -13,15 +13,13 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.util
-import java.util.Collections
-
 import cats.syntax.option._
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
-import org.orbeon.oxf.util.{FunctionContext, StaticXPath, XPathCache}
+import org.orbeon.oxf.util.{StaticXPath, XPathCache}
+import org.orbeon.oxf.xforms.analysis.{BindSingleItemBinding, RefSingleItemBinding, SingleItemBinding}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}
@@ -33,6 +31,8 @@ import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
+import java.util
+import java.util.Collections
 import scala.util.control.NonFatal
 
 
@@ -257,6 +257,36 @@ class XFormsContextStack {
     this.head
   }
 
+  def pushBinding(singleItemBinding: SingleItemBinding, sourceEffectiveId: String): Unit =
+    singleItemBinding match {
+      case BindSingleItemBinding(scope, model, bind) =>
+        pushBinding(
+          ref                            = null,
+          context                        = null,
+          nodeset                        = null,
+          modelId                        = model.orNull,
+          bindId                         = bind,
+          bindingElement                 = null, // TODO: for id
+          bindingElementNamespaceMapping = NamespaceMapping.EmptyMapping, // unused
+          sourceEffectiveId              = sourceEffectiveId,
+          scope                          = scope,
+          handleNonFatal                 = true
+        )
+      case RefSingleItemBinding(scope, model, context, ns, ref) =>
+        pushBinding(
+          ref                            = ref,
+          context                        = context.orNull,
+          nodeset                        = null,
+          modelId                        = model.orNull,
+          bindId                         = null,
+          bindingElement                 = null, // TODO: for id
+          bindingElementNamespaceMapping = ns,
+          sourceEffectiveId              = sourceEffectiveId,
+          scope                          = scope,
+          handleNonFatal                 = true
+        )
+    }
+
   /**
    * Push an element containing either single-node or nodeset binding attributes.
    *
@@ -278,7 +308,7 @@ class XFormsContextStack {
       modelId                        = bindingElement.attributeValue(XFormsNames.MODEL_QNAME),
       bindId                         = bindingElement.attributeValue(XFormsNames.BIND_QNAME),
       bindingElement                 = bindingElement,
-      bindingElementNamespaceMapping = container.partAnalysis.getNamespaceMapping(scope, bindingElement.attributeValue(XFormsNames.ID_QNAME)),
+      bindingElementNamespaceMapping = container.partAnalysis.getNamespaceMapping(scope, bindingElement.idOrNull), // TODO: `idOrThrow` probably
       sourceEffectiveId              = sourceEffectiveId,
       scope                          = scope,
       handleNonFatal                 = handleNonFatal
@@ -322,66 +352,61 @@ class XFormsContextStack {
 
     try {
       // Handle scope
+
       // The new binding evaluates against a base binding context which must be in the same scope
       val baseBindingContext = getBindingContext(scope)
+
       // Handle model
-      var newModelOpt: Option[XFormsModel] = null
-      var isNewModel = false
-      if (modelId != null) {
-        val resolutionScopeContainer = container.findScopeRoot(scope)
-        resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, Option(null)) match {
-          case model: XFormsModel =>
-            newModelOpt = model.some
-            // Don't say it's a new model unless it has really changed
-            isNewModel =
-              baseBindingContext.modelOpt.isEmpty && newModelOpt.nonEmpty   ||
-                baseBindingContext.modelOpt.nonEmpty && newModelOpt.isEmpty ||
-                (baseBindingContext.modelOpt.nonEmpty && newModelOpt.nonEmpty && (baseBindingContext.modelOpt.get ne newModelOpt.get))
-          case _ =>
-            // Invalid model id
-            // NOTE: We used to dispatch `xforms-binding-exception`, but we want to be able to recover
-            if (! handleNonFatal)
-              throw new ValidationException("Reference to non-existing model id: " + modelId, locationData)
-            // Default to not changing the model
-            newModelOpt = baseBindingContext.modelOpt
-            isNewModel = false
+      val (newModelOpt, isNewModel) =
+        if (modelId != null) {
+          val resolutionScopeContainer = container.findScopeRoot(scope)
+          resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, None) match {
+            case model: XFormsModel =>
+              // Don't say it's a new model unless it has really changed
+              (model.some, baseBindingContext.modelOpt.forall(_ ne model))
+            case _ =>
+              // Invalid model id
+              // NOTE: We used to dispatch `xforms-binding-exception`, but we want to be able to recover
+              if (! handleNonFatal)
+                throw new ValidationException(s"Reference to non-existing model id: `$modelId`", locationData)
+              // Default to not changing the model
+              (baseBindingContext.modelOpt, false)
+          }
+        } else {
+          (baseBindingContext.modelOpt, false)
         }
-      } else {
-        newModelOpt = baseBindingContext.modelOpt
-        isNewModel = false
-      }
 
       // Handle nodeset
       var isNewBind = false
       var bind: RuntimeBind = null
       var newPosition = 0
-      var newNodeset: util.List[om.Item] = null
+      var newItems: util.List[om.Item] = null
       var hasOverriddenContext = false
       var contextItem: om.Item = null
       if (bindId != null) {
-        // Resolve the bind id to a nodeset
-        // NOTE: For now, only the top-level models in a resolution scope are considered
+        // Resolve the `bind` id to a nodeset
+        // NOTE: For now, only the top-level models in a resolution scope are considered.
         val resolutionScopeContainer = container.findScopeRoot(scope)
         resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.singleItemOpt) match {
           case runtimeBind: RuntimeBind =>
             bind = runtimeBind
-            newNodeset = bind.items
+            newItems = bind.items
             contextItem = baseBindingContext.getSingleItemOrNull
-            newPosition = Math.min(newNodeset.size, 1)
+            newPosition = Math.min(newItems.size, 1)
           case null if resolutionScopeContainer.containsBind(bindId) =>
-            // The bind attribute was valid for this scope, but no runtime object was found for the bind
-            // This can happen e.g. if a nested bind is within a bind with an empty nodeset
+            // The `bind` attribute was valid for this scope, but no runtime object was found.
+            // This can happen e.g. if a nested `bind` is within a `bind` with an empty sequence.
             bind = null
-            newNodeset = java.util.Collections.emptyList[om.Item]
+            newItems = java.util.Collections.emptyList[om.Item]
             contextItem = null
             newPosition = 0
           case _ =>
-            // The bind attribute did not resolve to a bind
+            // The `bind` attribute did not resolve to a bind
             if (! handleNonFatal)
               throw new ValidationException(s"Reference to non-existing bind id: `$bindId`", locationData)
             // Default to an empty binding
             bind = null
-            newNodeset = java.util.Collections.emptyList[om.Item]
+            newItems = java.util.Collections.emptyList[om.Item]
             contextItem = null
             newPosition = 0
         }
@@ -523,10 +548,10 @@ class XFormsContextStack {
                 } else
                   throw e
             }
-          newNodeset = result
+          newItems = result
         } else {
           // Otherwise we consider we can't evaluate
-          newNodeset = java.util.Collections.emptyList[om.Item]
+          newItems = java.util.Collections.emptyList[om.Item]
         }
 
         // Restore optional context
@@ -543,11 +568,11 @@ class XFormsContextStack {
         val modelBindingContextOpt = this.head.currentBindingContextForModel(newModelOpt)
         if (modelBindingContextOpt.isDefined) {
           val modelBindingContext = modelBindingContextOpt.get
-          newNodeset = modelBindingContext.nodeset
+          newItems = modelBindingContext.nodeset
           newPosition = modelBindingContext.position
         }
         else {
-          newNodeset = this.head.currentNodeset(newModelOpt)
+          newItems = this.head.currentNodeset(newModelOpt)
           newPosition = 1
         }
         hasOverriddenContext = false
@@ -568,7 +593,7 @@ class XFormsContextStack {
           scope                          = scope,
           handleNonFatal                 = handleNonFatal
         )
-        newNodeset = this.head.nodeset
+        newItems = this.head.nodeset
         newPosition = this.head.position
         isNewBind = false
         hasOverriddenContext = true
@@ -578,7 +603,7 @@ class XFormsContextStack {
         // No change to anything
         bind = null
         isNewBind = false
-        newNodeset = baseBindingContext.nodeset
+        newItems = baseBindingContext.nodeset
         newPosition = baseBindingContext.position
         // We set a new context item as the context into which other attributes must be evaluated. E.g.:
         // <xf:select1 ref="type">
@@ -599,7 +624,7 @@ class XFormsContextStack {
           parent               = this.head,
           modelOpt             = newModelOpt,
           bind                 = bind,
-          nodeset              = newNodeset,
+          nodeset              = newItems,
           position             = newPosition,
           elementId            = bindingElementId,
           newBind              = isNewBind,

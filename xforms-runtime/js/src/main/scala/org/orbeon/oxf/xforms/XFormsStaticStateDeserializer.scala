@@ -1,6 +1,7 @@
 package org.orbeon.oxf.xforms
 
 import cats.syntax.option._
+import io.circe.generic.auto._
 import io.circe.generic.semiauto._
 import io.circe.parser.decode
 import io.circe.{Decoder, DecodingFailure, HCursor}
@@ -482,7 +483,34 @@ object XFormsStaticStateDeserializer {
             case XFORMS_TRIGGER_QNAME          => new TriggerControl        (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case XFORMS_SWITCH_QNAME           => new SwitchControl         (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case XFORMS_GROUP_QNAME            => new GroupControl          (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
-            case XFORMS_UPLOAD_QNAME           => new UploadControl         (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_UPLOAD_QNAME           =>
+
+              val uploadControl =
+                for {
+                    multiple         <- c.getOrElse[Boolean]("multiple")(false)
+                    mediatypeBinding <- c.getOrElse[Option[SingleItemBinding]]("mediatypeBinding")(None)
+                    filenameBinding  <- c.getOrElse[Option[SingleItemBinding]]("filenameBinding")(None)
+                    sizeBinding      <- c.getOrElse[Option[SingleItemBinding]]("sizeBinding")(None)
+                } yield
+                  new UploadControl(
+                    index,
+                    element,
+                    controlStack.headOption,
+                    None,
+                    staticId,
+                    prefixedId,
+                    namespaceMapping,
+                    scope,
+                    containerScope
+                  )(
+                    multiple         = multiple,
+                    mediatypeBinding = mediatypeBinding,
+                    filenameBinding  = filenameBinding,
+                    sizeBinding      = sizeBinding,
+                  )
+
+              uploadControl.getOrElse(throw new NoSuchElementException) // XXX TODO
+
             case XXFORMS_DIALOG_QNAME          => new DialogControl         (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case XXFORMS_ATTRIBUTE_QNAME       => new AttributeControl      (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case XFORMS_REPEAT_QNAME           => new RepeatControl         (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
@@ -623,13 +651,29 @@ object XFormsStaticStateDeserializer {
                   isHtmlMediatype      <- c.getOrElse[Boolean]("isHtmlMediatype")(false)
                   isDownloadAppearance <- c.getOrElse[Boolean]("isDownloadAppearance")(false)
                   staticValue          <- c.getOrElse[Option[String]]("staticValue")(None)
+                  mediatypeBinding     <- c.getOrElse[Option[SingleItemBinding]]("mediatypeBinding")(None)
+                  filenameBinding      <- c.getOrElse[Option[SingleItemBinding]]("filenameBinding")(None)
+                  sizeBinding          <- c.getOrElse[Option[SingleItemBinding]]("sizeBinding")(None)
                 } yield
-                  new OutputControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
-                    isImageMediatype,
-                    isVideoMediatype,
-                    isHtmlMediatype,
-                    isDownloadAppearance,
-                    staticValue
+                  new OutputControl(
+                    index,
+                    element,
+                    controlStack.headOption,
+                    None,
+                    staticId,
+                    prefixedId,
+                    namespaceMapping,
+                    scope,
+                    containerScope
+                  )(
+                    isImageMediatype     = isImageMediatype,
+                    isVideoMediatype     = isVideoMediatype,
+                    isHtmlMediatype      = isHtmlMediatype,
+                    isDownloadAppearance = isDownloadAppearance,
+                    staticValue          = staticValue,
+                    mediatypeBinding     = mediatypeBinding,
+                    filenameBinding      = filenameBinding,
+                    sizeBinding          = sizeBinding
                   )
 
               output.getOrElse(throw new NoSuchElementException) // XXX TODO
@@ -643,7 +687,7 @@ object XFormsStaticStateDeserializer {
                   mustEncodeValues <- c.getOrElse[Option[Boolean]]("mustEncodeValues")(None)
                   itemsetAnalysis  <- c.getOrElse[Option[XPathAnalysis]]("itemsetAnalysis")(None)
                 } yield
-                  new SelectionControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
+                  new SelectionControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)(
                     staticItemset,
                     useCopy,
                     mustEncodeValues

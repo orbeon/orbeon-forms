@@ -39,6 +39,21 @@ object LangRef {
   case class  AVT(att: AttributeControl) extends LangRef
 }
 
+// Represent a single-item binding. As of 2023-11-15, this is only used by `UploadControl` but the intent would be to
+// use it for all controls that support single-item bindings.
+
+// We keep the `model` for descendant bindings, so we know whether we need to switch models. We don't quite do what
+// the spec says for switching models: we do it statically instead of dynamically. Later, we might be able to get rid
+// of the `model`.
+sealed trait SingleItemBinding {
+  val scope: Scope
+  val model: Option[String]
+}
+
+// `bind` resolves independently from `model`, `context`, and `ref`.
+case class BindSingleItemBinding(scope: Scope, model: Option[String], bind: String)                                               extends SingleItemBinding
+case class RefSingleItemBinding (scope: Scope, model: Option[String], context: Option[String], ns: NamespaceMapping, ref: String) extends SingleItemBinding
+
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
  */

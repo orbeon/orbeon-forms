@@ -35,7 +35,7 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.upload.api.java.{FileScan2, FileScanProvider2, FileScanResult => JFileScanResult}
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
 import org.orbeon.xforms.Constants
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 import shapeless.syntax.typeable._
 
 import java.net.URI
@@ -86,7 +86,8 @@ object UploaderServer {
           def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
             withDocumentAcquireLock(
               uuid    = uuid,
-              timeout = XFormsGlobalProperties.uploadXFormsAccessTimeout) { doc =>
+              timeout = XFormsGlobalProperties.uploadXFormsAccessTimeout)
+            { doc =>
               doc.getUploadConstraintsForControl(controlEffectiveId).map(_ -> doc.getRequestUri)
             } .flatten
         }
@@ -273,7 +274,7 @@ object UploaderServer {
             }
           catch {
             case NonFatal(t) =>
-              info(s"error thrown by file scan provider while calling `abort()`: ${OrbeonFormatter.getThrowableMessage(t)}")
+              info(s"error thrown by file scan provider while calling `abort()`: ${OrbeonFormatter.getThrowableMessage(t)}")(Private.Logger)
           }
           None
         case UploadState.Started =>
@@ -300,21 +301,21 @@ object UploaderServer {
 
   private object Private {
 
-    implicit val Logger = LoggerFactory.getLogger("org.orbeon.xforms.upload")
+    implicit val Logger: Logger = LoggerFactory.getLogger("org.orbeon.xforms.upload")
 
     val UploadProgressSessionKey = "orbeon.upload.progress."
 
-    def getProgressSessionKey(uuid: String, fieldName: String) =
+    def getProgressSessionKey(uuid: String, fieldName: String): String =
       UploadProgressSessionKey + uuid + "." + fieldName
 
-    def checkSizeLimitExceeded(maxSize: MaximumSize, currentSize: Long) = maxSize match {
+    def checkSizeLimitExceeded(maxSize: MaximumSize, currentSize: Long): Unit = maxSize match {
       case UnlimitedSize        =>
       case LimitedSize(maxSize) =>
         if (currentSize > maxSize)
           Multipart.throwSizeLimitExceeded(maxSize, currentSize)
     }
 
-    def convertFileItemHeaders(headers: FileItemHeaders) =
+    def convertFileItemHeaders(headers: FileItemHeaders): List[(String, List[String])] =
       for (name <- headers.getHeaderNames.asScala.toList)
         yield name -> headers.getHeaders(name).asScala.toList
 

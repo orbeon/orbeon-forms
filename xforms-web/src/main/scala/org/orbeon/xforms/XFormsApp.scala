@@ -13,10 +13,8 @@
  */
 package org.orbeon.xforms
 
-import org.orbeon.xforms
 import org.orbeon.xforms.InitSupport.setupGlobalClassesIfNeeded
 import org.orbeon.xforms.rpc.{ClientServerChannel, RemoteClientServerChannel}
-import org.scalajs.dom
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
@@ -25,13 +23,13 @@ import scala.scalajs.js.Dynamic.{global => g}
 // Scala.js starting point for XForms
 object XFormsApp extends App {
 
-  private var _clientServerChannel: ClientServerChannel[xforms.Form, dom.Document] = _
-  def clientServerChannel: ClientServerChannel[xforms.Form, dom.Document] = _clientServerChannel
+  private var _clientServerChannel: ClientServerChannel = _
+  def clientServerChannel: ClientServerChannel = _clientServerChannel
 
   def onOrbeonApiLoaded(): Unit =
     onOrbeonApiLoaded(RemoteClientServerChannel)
 
-  def onOrbeonApiLoaded(clientServerChannel: ClientServerChannel[xforms.Form, dom.Document]): Unit = {
+  def onOrbeonApiLoaded(clientServerChannel: ClientServerChannel): Unit = {
 
     _clientServerChannel = clientServerChannel
 

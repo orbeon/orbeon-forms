@@ -32,7 +32,7 @@ import scala.scalajs.js.{timers, |}
 import scala.util.{Failure, Success}
 
 
-object RemoteClientServerChannel extends ClientServerChannel[xforms.Form, dom.Document] {
+object RemoteClientServerChannel extends ClientServerChannel {
 
   import Private._
 

@@ -26,8 +26,11 @@
                 <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item"/>
 
                 <xh:h5 class="card-title card-header text-center"><xf:output value="xxf:label('fr-card')"/></xh:h5>
-                <xh:div class="card-body text-center">
+                <xh:div class="card-body text-center" xxf:control="true" ref=".[not(fr:component-param-value('loading') = 'true')]">
                     <xbl:content includes=":root > fr|card-body > *"/>
+                </xh:div>
+                <xh:div class="card-body text-center" xxf:control="true" ref=".[fr:component-param-value('loading') = 'true']">
+                    <xh:div class="spinner lds-ellipsis"><xh:div/><xh:div/><xh:div/><xh:div/></xh:div>
                 </xh:div>
                 <xh:ul class="list-group list-group-flush">
                     <xf:repeat ref="$items/value/string()">

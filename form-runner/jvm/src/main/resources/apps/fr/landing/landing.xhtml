@@ -59,20 +59,21 @@
                 value="
                     $fb-permissions/app/@name = '*' or exists($fb-permissions/app[1]/@name[xxf:non-blank()])"/>
 
+            <!-- Q: Why do we need this? "Published Forms" doesn't work if missing. -->
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
                 <_/>
             </xf:instance>
 
             <xf:instance id="fr-landing-form-metadata-instance" xxf:exclude-result-prefixes="#all">
-                <_/>
+                <_ state="initial"/>
             </xf:instance>
 
             <xf:instance id="fr-landing-form-builder-instance" xxf:exclude-result-prefixes="#all">
-                <_/>
+                <_ state="initial"/>
             </xf:instance>
 
             <xf:instance id="fr-landing-demo-forms-instance" xxf:exclude-result-prefixes="#all">
-                <_/>
+                <_ state="initial"/>
             </xf:instance>
 
             <xf:submission
@@ -80,7 +81,15 @@
                 method="get"
                 serialization="none"
                 resource="/fr/service/persistence/form?all-versions=false&amp;ignore-admin-permissions=true"
-                replace="none">
+                replace="none"
+                mode="asynchronous"
+                xxf:response-must-await="200ms"
+            >
+
+                <xf:setvalue
+                    event="xforms-submit"
+                    ref="instance('fr-landing-form-metadata-instance')/@state"
+                    value="'loading'"/>
 
                 <xf:action event="xforms-submit-done">
                     <xf:insert
@@ -103,7 +112,15 @@
                 method="get"
                 serialization="none"
                 resource="/fr/service/persistence/form/orbeon?all-versions=false&amp;ignore-admin-permissions=true"
-                replace="none">
+                replace="none"
+                mode="asynchronous"
+                xxf:response-must-await="200ms"
+            >
+
+                <xf:setvalue
+                    event="xforms-submit"
+                    ref="instance('fr-landing-demo-forms-instance')/@state"
+                    value="'loading'"/>
 
                 <!-- Sort alphabetically by title -->
                 <xf:action event="xforms-submit-done">
@@ -151,7 +168,10 @@
                 method="post"
                 resource="/fr/service/persistence/search/orbeon/builder"
                 replace="instance"
-                targetref="instance('fr-landing-form-builder-instance')">
+                targetref="instance('fr-landing-form-builder-instance')"
+                mode="asynchronous"
+                xxf:response-must-await="200ms"
+            >
 
                 <xf:header>
                     <xf:name>Orbeon-Form-Definition-Version</xf:name>
@@ -164,6 +184,9 @@
                     <xf:setvalue ref="lang" value="'en'"/>
                     <!-- NOTE: xxf:lang() doesn't seem to work here -->
 <!--                    <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>-->
+                    <xf:setvalue
+                        ref="instance('fr-landing-form-builder-instance')/@state"
+                        value="'loading'"/>
                 </xf:action>
                 <xf:action event="xforms-submit-error">
                     <xf:message ref="$fr-resources/errors/search"/>
@@ -215,7 +238,10 @@
                     </xh:div>
                 </xh:div>
 
-                <fr:card class="{'xforms-hidden'[not($cards-tokens = 'published-forms')]}">
+                <fr:card
+                    class="{'xforms-hidden'[not($cards-tokens = 'published-forms')]}"
+                    loading="{exists(instance('fr-landing-form-metadata-instance')/@state)}"
+                >
                     <xf:label ref="xxf:r('landing.titles.published-forms', '|fr-fr-resources|')"/>
                     <xf:itemset ref="instance('fr-landing-form-metadata-instance')/*[position() le $page-size]">
                         <!-- 2022-12-30: Don't use `<description>` as 1. it's not present with relational and 2. it can
@@ -280,7 +306,10 @@
                         </xh:span>
                     </fr:card-footer>
                 </fr:card>
-                <fr:card class="{'xforms-hidden'[not($cards-tokens = 'form-builder-forms')]}">
+                <fr:card
+                    class="{'xforms-hidden'[not($cards-tokens = 'form-builder-forms')]}"
+                    loading="{exists(instance('fr-landing-form-builder-instance')/@state)}"
+                >
                     <xf:label ref="xxf:r('landing.titles.form-builder-forms', '|fr-fr-resources|')"/>
                     <xf:itemset ref="instance('fr-landing-form-builder-instance')/*[position() le $page-size]">
                         <!-- FIXME: The API returns the i18n titles comma-separated. This is not great. -->
@@ -326,7 +355,10 @@
                         </xh:span>
                     </fr:card-footer>
                 </fr:card>
-                <fr:card class="{'xforms-hidden'[not($cards-tokens = 'demo-forms')]}">
+                <fr:card
+                    class="{'xforms-hidden'[not($cards-tokens = 'demo-forms')]}"
+                    loading="{exists(instance('fr-landing-demo-forms-instance')/@state)}"
+                >
                     <xf:label ref="xxf:r('landing.titles.demo-forms', '|fr-fr-resources|')"/>
                     <xf:itemset ref="instance('fr-landing-demo-forms-instance')/*[position() le $page-size]">
                         <!-- 2022-12-30: Don't use `<description>` as 1. it's not present with relational and 2. it can

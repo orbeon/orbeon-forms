@@ -325,13 +325,28 @@
                                     index="$new-index"/>
                             </xsl:if>
 
-                            <!-- ...and focus on specific sub-section -->
-                            <xsl:if test="p:property(string-join(('oxf.fr.detail.initial-focus', $static-app, $static-form), '.'))">
-                                <xf:setfocus
-                                    control="{$static-section-id}"
-                                    includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
-                                    excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
-                            </xsl:if>
+                            <!-- ...and focus on specific subsection -->
+                            <xsl:choose>
+                                <xsl:when test="$is-wizard">
+                                    <xsl:if test="p:property(string-join(('oxf.fr.detail.initial-focus', $static-app, $static-form), '.'))">
+                                        <xf:setfocus
+                                            control="{$static-section-id}"
+                                            includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                            excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
+                                    </xsl:if>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <!-- Not all readonly controls support focus, so we try to scroll instead  -->
+                                    <xf:action type="javascript">
+                                        <xf:param name="sectionId" value="xxf:client-id('{$static-section-id}')"/>
+                                        <xf:body>
+                                            const elem = window.document.getElementById(sectionId);
+                                            if (elem)
+                                                elem.scrollIntoView();
+                                        </xf:body>
+                                    </xf:action>
+                                </xsl:otherwise>
+                            </xsl:choose>
 
                             <xsl:if test="$is-wizard">
                                 <!-- Show body if needed -->

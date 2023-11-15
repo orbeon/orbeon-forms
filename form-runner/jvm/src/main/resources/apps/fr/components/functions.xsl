@@ -56,7 +56,7 @@
 
         <xsl:variable
             name="resources-root"
-            as="element()"
+            as="element()?"
             select="($model/xf:instance[@id = 'fr-form-resources']/*)[1]"/>
 
         <xsl:sequence

@@ -33,6 +33,7 @@ object Select2 {
     var allowClear     : Boolean            = false
     var dropdownParent : js.UndefOr[JQuery] = _
     var width          : String             = _
+    var tags           : Boolean            = false
   }
 
   trait Option extends js.Object {

@@ -40,17 +40,20 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private val    DataServicePerformsSearch = "data-service-performs-search"
   private val    DataInitialLabel          = "data-initial-label"
   private val    DataInitialValue          = "data-initial-value"
+  private val    DataSelection             = "data-selection"
+  private val    DataboundClass            = "xbl-fr-databound-select1-search"
   private object EventSupport              extends EventListenerSupport
 
-  private val select2SuccessCallbacks      : mutable.Queue[Success] = new mutable.Queue[Select2.Success]
-  private var onXFormsSelect1ValueChangeJs : Option[js.Function]    = None
-  private var mutationObservers            : List[MutationObserver] = Nil
-  private var inputElementOpt              : Option[dom.Element]    = None
+  private val select2SuccessCallbacks      : mutable.Queue[Success]           = new mutable.Queue[Select2.Success]
+  private var allResultsOpt                : Option[js.Array[Select2.Option]] = None
+  private var onXFormsSelect1ValueChangeJs : Option[js.Function]              = None
+  private var mutationObservers            : List[MutationObserver]           = Nil
+  private var inputElementOpt              : Option[dom.Element]              = None
 
   override def init(): Unit = {
     for (select <- Option(querySelect)) {
-      val elementWithData       = queryElementWithData
-      val servicePerformsSearch = Option(elementWithData.getAttribute(DataServicePerformsSearch)).contains("true")
+      val elementWithData = queryElementWithData
+      val isDatabound     = containerElem.classList.contains(DataboundClass)
 
       // Prevent the propagation of `focusout` so the client doesn't send an `xxforms-value` event when users click on the dropdown,
       // as at that point the `<span class="select2-selection--single">` looses the focus, and since Select2 places that element inside
@@ -62,8 +65,9 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       val jSelect = $(select)
       jSelect.select2(new Select2.Options {
         allowClear     = true
-        ajax           = if (servicePerformsSearch) Select2Ajax else null
+        ajax           = if (isDatabound) Select2Ajax else null
         width          = "100%" // For Select2 width to update as the viewport width changes
+        tags           = Option(queryElementWithData.getAttribute(DataSelection)).contains("open")
         placeholder    =
           new Select2.Option {
             val id   = "0"
@@ -72,7 +76,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       })
 
       // Register event listeners
-      if (servicePerformsSearch) {
+      if (isDatabound) {
         // When the search isn't done by the service, we use a `<fr:databound-select1>`, which sets the value
         // of the bound node, and in that case we also don't need to store the label
         jSelect.on("change", onChangeDispatchFrChange _)
@@ -128,14 +132,12 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       makeClearAccessible()
       jSelect.on("change", makeClearAccessible _)
 
-      if (servicePerformsSearch) {
+      if (isDatabound) {
         initOrUpdatePlaceholderCurrent()
         onAttributeChange(elementWithData, DataPlaceholder,  initOrUpdatePlaceholderCurrent)
         onAttributeChange(elementWithData, DataInitialLabel, initOrUpdatePlaceholderCurrent)
-      }
-
-      // Register and remember listener on value change
-      if (! servicePerformsSearch) {
+      } else {
+        // Register and remember listener on value change
         val listener: js.Function = onXFormsSelect1ValueChange _
         onXFormsSelect1ValueChangeJs = Some(listener)
         Controls.afterValueChange.subscribe(listener)
@@ -163,9 +165,13 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   }
 
   def updateSuggestions(results: String, isLastPage: String): Unit = {
-    val parsedResults = js.JSON.parse(results)
+    val parsedResults = js.JSON.parse(results).asInstanceOf[js.Array[Select2.Option]]
+    if (! servicePerformsSearch) {
+      // Cache results so we don't have to call the service again
+      allResultsOpt = Some(parsedResults)
+    }
     val data = new Select2.Data {
-      val results    = parsedResults.asInstanceOf[js.Array[Select2.Option]]
+      val results    = parsedResults
       val pagination = new Select2.Pagination {
         val more = !isLastPage.toBoolean
       }
@@ -174,8 +180,9 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     success(data)
   }
 
-  private def queryElementWithData = containerElem.querySelector(s":scope > [$DataPlaceholder]")
-  private def querySelect          = containerElem.querySelector("select")
+  private def queryElementWithData  = containerElem.querySelector(s":scope > [$DataPlaceholder]")
+  private def querySelect           = containerElem.querySelector("select")
+  private def servicePerformsSearch = Option(queryElementWithData.getAttribute(DataServicePerformsSearch)).contains("true")
 
   private def initOrUpdatePlaceholderCurrent(): Unit = {
     val select = querySelect
@@ -263,11 +270,11 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     )
   }
 
-  object Select2Ajax extends Select2.Ajax {
+  private object Select2Ajax extends Select2.Ajax {
 
     val delay: Int = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.delayBeforeIncrementalRequest
 
-    val transport = (
+    val transport: js.Function3[Select2.Params, Success, js.Function0[Unit], Unit] = (
       params  : Select2.Params,
       success : Select2.Success,
       failure : js.Function0[Unit]
@@ -275,17 +282,34 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
       val searchValue = params.data.term.getOrElse("")
       val searchPage  = params.data.page.getOrElse(1)
-      select2SuccessCallbacks.enqueue(success)
-      AjaxClient.fireEvent(
-        AjaxEvent(
-          eventName  = "fr-search",
-          targetId   = containerElem.id,
-          properties = Map(
-            "fr-search-value" -> searchValue,
-            "fr-search-page"  -> searchPage.toString
+
+      allResultsOpt match {
+        case Some(cachedAllResults) =>
+          val filteredResults = cachedAllResults.filter(
+            searchValue.isEmpty ||
+            _.text.toLowerCase.contains(searchValue.toLowerCase)
           )
-        )
-      )
+          val data =
+            new Select2.Data {
+              val results    = filteredResults
+              val pagination = new Select2.Pagination {
+                val more = false
+              }
+            }
+          success(data)
+        case None =>
+          select2SuccessCallbacks.enqueue(success)
+          AjaxClient.fireEvent(
+            AjaxEvent(
+              eventName  = "fr-search",
+              targetId   = containerElem.id,
+              properties = Map(
+                "fr-search-value" -> searchValue,
+                "fr-search-page"  -> searchPage.toString
+              )
+            )
+          )
+      }
     }
   }
 }

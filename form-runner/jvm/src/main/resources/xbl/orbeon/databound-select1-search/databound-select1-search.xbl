@@ -358,41 +358,19 @@
                         <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
                         <xf:var name="view"    value="fr:mode() = ('view', 'pdf')"/>
 
-                        <xsl:choose>
-                            <xsl:when test="$service-performs-search">
-                                <xf:group
-                                    ref=".[not($view)]"
-                                    xxf:element="span"
-                                    data-placeholder="{{xxf:r('select')}}"
-                                    data-service-performs-search="true"
-                                    data-initial-label="{{$binding/@label}}"
-                                    data-initial-value="{{$binding}}">
-
-                                    <xh:select id="select1"/>
-                                </xf:group>
-                                <xf:input ref="$binding[$view]/@label"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xf:group
-                                    ref="."
-                                    xxf:element="span"
-                                    data-placeholder="{{xxf:r('select')}}">
-
-                                    <!-- Default values to populate the dropdown before users start typing -->
-                                    <xf:var name="fr-search-value" value="''"/>
-                                    <xf:var name="fr-search-page"  value="'1'"/>
-
-                                    <fr:databound-select1
-                                        id="select1"
-                                        resource="{{xxf:component-param-value('resource')}}"
-                                        appearance="minimal"
-                                        ref="$binding"
-                                        xbl:attr="xxf:encrypt-item-values">
-                                        <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
-                                    </fr:databound-select1>
-                                </xf:group>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <xf:group
+                            ref=".[not($view)]"
+                            xxf:element="span"
+                            data-placeholder="{{xxf:r('select')}}"
+                            data-service-performs-search="{$service-performs-search}"
+                            data-initial-label="{{$binding/@label}}"
+                            data-initial-value="{{$binding}}">
+                            <xsl:if test="exists(@selection)">
+                                <xsl:attribute name="data-selection" select="@selection"/>
+                            </xsl:if>
+                            <xh:select id="select1"/>
+                        </xf:group>
+                        <xf:input ref="$binding[$view]/@label"/>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

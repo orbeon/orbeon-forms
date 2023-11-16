@@ -177,8 +177,6 @@ object FileMetadata {
     logger            : IndentedLogger
   ): Unit = {
 
-    println(s"xxx setInfoValue: $singleItemBinding, $value")
-
     val contextStack = m.getContextStack
     contextStack.setBinding(m.bindingContext)
     contextStack.pushBinding(singleItemBinding, m.getEffectiveId)

@@ -334,7 +334,7 @@ trait FormRunnerPersistence {
   //
   // This guarantees that the local file was in fact placed there by the upload control, and not tampered with.
   def isUploadedFileURL(value: String): Boolean =
-    value.startsWith("file:/") && XFormsUploadControl.verifyMAC(value)
+    (value.startsWith("file:/") || value.startsWith("upload:")) && XFormsUploadControl.verifyMAC(value)
 
   // Create a path starting and ending with `/`
   // `documentIdOrEmpty` can be empty and if so won't be included. Ideally should be `Option[String]`.

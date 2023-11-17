@@ -27,8 +27,6 @@ import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.collection.mutable
 import scala.scalajs.js
-import scala.collection.compat._
-
 
 object Select1Search {
   XBL.declareCompanion(name = "fr|dropdown-select1-search" , js.constructorOf[Select1SearchCompanion])
@@ -42,10 +40,11 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private val    DataInitialLabel          = "data-initial-label"
   private val    DataInitialValue          = "data-initial-value"
   private val    DataSelection             = "data-selection"
+  private val    DataMinimumInputLength    = "data-min-input-length"
   private val    DataboundClass            = "xbl-fr-databound-select1-search"
   private object EventSupport              extends EventListenerSupport
 
-  private val select2SuccessCallbacks      : mutable.Queue[Success]           = new mutable.Queue[Select2.Success]
+  private val select2SuccessCallbacks      : mutable.Queue[(String, Success)] = new mutable.Queue[(String, Success)]
   private var allResultsOpt                : Option[js.Array[Select2.Option]] = None
   private var onXFormsSelect1ValueChangeJs : Option[js.Function]              = None
   private var mutationObservers            : List[MutationObserver]           = Nil
@@ -70,6 +69,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         val ajax               = if (isDatabound) Select2Ajax else null
         val width              = "100%" // For Select2 width to update as the viewport width changes
         val tags               = Option(queryElementWithData.getAttribute(DataSelection)).contains("open")
+        val minimumInputLength = Option(queryElementWithData.getAttribute(DataMinimumInputLength)).filter(_.nonEmpty).map(_.toInt).getOrElse(0)
         val placeholder        =
           new Select2.Option {
             val id   = "0"
@@ -172,13 +172,31 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       // Cache results so we don't have to call the service again
       allResultsOpt = Some(parsedResults)
     }
+    val (searchValue, success) = select2SuccessCallbacks.dequeue()
+    callSelect2Success(
+      results     = parsedResults,
+      isLastPage  = isLastPage.toBoolean,
+      searchValue = searchValue,
+      success     = success
+    )
+  }
+
+  private def callSelect2Success(
+    results     : js.Array[Select2.Option],
+    isLastPage  : Boolean,
+    searchValue : String,
+    success     : Success
+  ): Unit = {
+    val filteredResults =
+      if (! servicePerformsSearch && searchValue.nonEmpty)
+        results.filter(_.text.toLowerCase.contains(searchValue.toLowerCase))
+      else results
     val data = new Select2.Data {
-      val results    = parsedResults
+      val results    = filteredResults
       val pagination = new Select2.Pagination {
-        val more = !isLastPage.toBoolean
+        val more = ! isLastPage
       }
     }
-    val success = select2SuccessCallbacks.dequeue()
     success(data)
   }
 
@@ -287,20 +305,14 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
       allResultsOpt match {
         case Some(cachedAllResults) =>
-          val filteredResults = cachedAllResults.filter(
-            searchValue.isEmpty ||
-            _.text.toLowerCase.contains(searchValue.toLowerCase)
+          callSelect2Success(
+            results     = cachedAllResults,
+            isLastPage  = true,
+            searchValue = searchValue,
+            success     = success
           )
-          val data =
-            new Select2.Data {
-              val results    = filteredResults
-              val pagination = new Select2.Pagination {
-                val more = false
-              }
-            }
-          success(data)
         case None =>
-          select2SuccessCallbacks.enqueue(success)
+          select2SuccessCallbacks.enqueue((searchValue, success))
           AjaxClient.fireEvent(
             AjaxEvent(
               eventName  = "fr-search",

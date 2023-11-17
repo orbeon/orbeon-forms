@@ -34,6 +34,7 @@ object Select2 {
     val dropdownParent     : js.UndefOr[JQuery]
     val width              : String
     val tags               : Boolean
+    val minimumInputLength : Int
   }
 
   trait Option extends js.Object {

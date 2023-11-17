@@ -96,102 +96,103 @@
     </property>
 
     <!-- [M]/[D]/[Y]  or [D]/[M]/[Y] or [D].[M].[Y]-->
-    <property as="xs:string"  name="oxf.xforms.format.input.date"                           value="[M]/[D]/[Y]"/>
+    <property as="xs:string"  name="oxf.xforms.format.input.date"                                value="[M]/[D]/[Y]"/>
     <!-- [h]:[m]:[s] [P,*-2]  or  [h]:[m]:[s] [P,2-2]  or  [H]:[m]:[s] -->
-    <property as="xs:string"  name="oxf.xforms.format.input.time"                           value="[h]:[m]:[s] [P,*-2]"/>
+    <property as="xs:string"  name="oxf.xforms.format.input.time"                                value="[h]:[m]:[s] [P,*-2]"/>
 
     <!-- Other XForms options -->
-    <property as="xs:string"  name="oxf.xforms.order"                                       value="label control help alert hint"/>
-    <property as="xs:string"  name="oxf.xforms.label-element"                               value="label"/>
-    <property as="xs:string"  name="oxf.xforms.hint-element"                                value="span"/>
-    <property as="xs:string"  name="oxf.xforms.help-element"                                value="button"/>
-    <property as="xs:string"  name="oxf.xforms.alert-element"                               value="span"/>
+    <property as="xs:string"  name="oxf.xforms.order"                                            value="label control help alert hint"/>
+    <property as="xs:string"  name="oxf.xforms.label-element"                                    value="label"/>
+    <property as="xs:string"  name="oxf.xforms.hint-element"                                     value="span"/>
+    <property as="xs:string"  name="oxf.xforms.help-element"                                     value="button"/>
+    <property as="xs:string"  name="oxf.xforms.alert-element"                                    value="span"/>
 
-    <property as="xs:boolean" name="oxf.xforms.a11y.focus-on-groups"                        value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.a11y.focus-on-groups"                             value="true"/>
 
-    <property as="xs:integer" name="oxf.xforms.submission-poll-delay"                       value="2000"/>
-    <property as="xs:integer" name="oxf.xforms.ajax.update.full.threshold"                  value="20"/>
-    <property as="xs:string"  name="oxf.xforms.label.appearance"                            value="full"/>
-    <property as="xs:string"  name="oxf.xforms.hint.appearance"                             value="full"/>
-    <property as="xs:string"  name="oxf.xforms.help.appearance"                             value="dialog"/>
+    <property as="xs:integer" name="oxf.xforms.submission-poll-delay"                            value="2000"/>
+    <property as="xs:integer" name="oxf.xforms.ajax.update.full.threshold"                       value="20"/>
+    <property as="xs:string"  name="oxf.xforms.label.appearance"                                 value="full"/>
+    <property as="xs:string"  name="oxf.xforms.hint.appearance"                                  value="full"/>
+    <property as="xs:string"  name="oxf.xforms.help.appearance"                                  value="dialog"/>
 
-    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                          value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.combine-resources"                          value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.resources.encode-version"                   value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                                value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.combine-resources"                                value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.resources.encode-version"                         value="true"/>
 
-    <property as="xs:boolean" name="oxf.xforms.expose-xpath-types"                          value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                           value="true"/>
-    <property as="xs:integer" name="oxf.xforms.session-expiration.trigger"                  value="80"/>
-    <property as="xs:integer" name="oxf.xforms.session-expiration.margin"                   value="10"/>
-    <property as="xs:boolean" name="oxf.xforms.host-language-avts"                          value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.expose-xpath-types"                               value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                                value="true"/>
+    <property as="xs:integer" name="oxf.xforms.session-expiration.trigger"                       value="80"/>
+    <property as="xs:integer" name="oxf.xforms.session-expiration.margin"                        value="10"/>
+    <property as="xs:boolean" name="oxf.xforms.host-language-avts"                               value="true"/>
     <!-- Space-separated list of element namespaces that can contain avts in their attributes1 -->
-    <property as="xs:string"  name="oxf.xforms.additional-avt-element-namespaces"           value=""/>
+    <property as="xs:string"  name="oxf.xforms.additional-avt-element-namespaces"                value=""/>
     <!-- Space-separated list of attribute names that contain references to id's -->
-    <property as="xs:string"  name="oxf.xforms.additional-ref-id-attribute-names"           value=""/>
-    <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                           value="true"/>
-    <property as="xs:integer" name="oxf.xforms.show-recoverable-errors"                     value="0"/>
+    <property as="xs:string"  name="oxf.xforms.additional-ref-id-attribute-names"                value=""/>
+    <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                                value="true"/>
+    <property as="xs:integer" name="oxf.xforms.show-recoverable-errors"                          value="0"/>
 
-    <property as="xs:integer" name="oxf.xforms.internal-short-delay"                        value="100"/>
-    <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"            value="500"/>
-    <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"                value="0"/>
-    <property as="xs:integer" name="oxf.xforms.delay-before-ajax-timeout"                   value="30000"/>
+    <property as="xs:integer" name="oxf.xforms.internal-short-delay"                             value="100"/>
+    <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"                 value="500"/>
+    <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"                     value="0"/>
+    <property as="xs:integer" name="oxf.xforms.delay-before-ajax-timeout"                        value="30000"/>
 
     <!-- Supports: blank, -1 (unlimited), or positive `Long` value (there should be a `xs:integer?` type) -->
-    <property as="xs:string"  name="oxf.xforms.upload.max-size"                             value=""/>
-    <property as="xs:string"  name="oxf.xforms.upload.max-size-aggregate"                   value=""/>
-    <property as="xs:string"  name="oxf.xforms.upload.max-size-aggregate-expression"        value=""/>
-    <property as="xs:string"  name="oxf.xforms.upload.mediatypes"                           value="*/*"/>
-    <property as="xs:integer" name="oxf.xforms.upload.delay-before-xforms-timeout"          value="45000"/>
-    <property as="xs:integer" name="oxf.xforms.delay-before-upload-progress-refresh"        value="2000"/>
+    <property as="xs:string"  name="oxf.xforms.upload.max-size"                                  value=""/>
+    <property as="xs:string"  name="oxf.xforms.upload.max-size-aggregate"                        value=""/>
+    <property as="xs:string"  name="oxf.xforms.upload.max-size-aggregate-expression"             value=""/>
+    <property as="xs:string"  name="oxf.xforms.upload.mediatypes"                                value="*/*"/>
+    <property as="xs:integer" name="oxf.xforms.upload.delay-before-xforms-timeout"               value="45000"/>
+    <property as="xs:integer" name="oxf.xforms.delay-before-upload-progress-refresh"             value="2000"/>
 
-    <property as="xs:string"  name="oxf.xforms.login-page-detection-regexp"                 value=""/>
-    <property as="xs:integer" name="oxf.xforms.retry.delay-increment"                       value="5000"/>
-    <property as="xs:integer" name="oxf.xforms.retry.max-delay"                             value="30000"/>
+    <property as="xs:string"  name="oxf.xforms.login-page-detection-regexp"                      value=""/>
+    <property as="xs:integer" name="oxf.xforms.retry.delay-increment"                            value="5000"/>
+    <property as="xs:integer" name="oxf.xforms.retry.max-delay"                                  value="30000"/>
 
-    <property as="xs:string"  name="oxf.xforms.location-mode"                               value="none"/>
-    <property as="xs:boolean" name="oxf.xforms.inline-resources"                            value="false"/>
+    <property as="xs:string"  name="oxf.xforms.location-mode"                                    value="none"/>
+    <property as="xs:boolean" name="oxf.xforms.inline-resources"                                 value="false"/>
 
-    <property as="xs:string"  name="oxf.xforms.readonly-appearance.static.select"           value="full"/>
-    <property as="xs:string"  name="oxf.xforms.readonly-appearance.static.select1"          value="full"/>
+    <property as="xs:string"  name="oxf.xforms.readonly-appearance.static.select"                value="full"/>
+    <property as="xs:string"  name="oxf.xforms.readonly-appearance.static.select1"               value="full"/>
 
-    <property as="xs:string"  name="oxf.xforms.sanitize"                                    value=""/>
+    <property as="xs:string"  name="oxf.xforms.sanitize"                                         value=""/>
 
     <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                              value=""/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.map.clientid"                         value=""/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.map.ssl"                              value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                                   value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.map.clientid"                              value=""/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.map.ssl"                                   value="false"/>
 
-    <property as="xs:integer" name="oxf.xforms.xbl.fr.autocomplete.max-results-displayed"   value="10"/>
+    <property as="xs:integer" name="oxf.xforms.xbl.fr.autocomplete.max-results-displayed"        value="10"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.databound-select1-search.min-input-length" value=""/>
 
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.prefix"                      value="$"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.suffix"                      value=""/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.digits-after-decimal"        value="2"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.decimal-separator"           value="."/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.grouping-separator"          value=","/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.currency.round-when-formatting"       value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.currency.round-when-storing"          value="false"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-width"                 value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-align"                 value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.prefix"                           value="$"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.suffix"                           value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.digits-after-decimal"             value="2"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.decimal-separator"                value="."/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.grouping-separator"               value=","/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.currency.round-when-formatting"            value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.currency.round-when-storing"               value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-width"                      value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-align"                      value=""/>
 
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.prefix"                        value=""/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.suffix"                        value=""/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.digits-after-decimal"          value=""/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.decimal-separator"             value="."/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.grouping-separator"            value=","/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.number.round-when-formatting"         value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.number.round-when-storing"            value="false"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-width"                   value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-align"                   value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.prefix"                             value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.suffix"                             value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.digits-after-decimal"               value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.decimal-separator"                  value="."/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.grouping-separator"                 value=","/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.number.round-when-formatting"              value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.number.round-when-storing"                 value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-width"                        value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-align"                        value=""/>
 
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.date.field-width"                     value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.date.native-picker"                   value="ios"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.time.field-width"                     value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.datetime.field-width"                 value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.us-phone.field-width"                 value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
-    <property as="xs:integer" name="oxf.xforms.xbl.fr.error-summary.page-size"              value="20"/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.error-summary.visit-value-changed"    value="true"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.date.field-width"                          value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.date.native-picker"                        value="ios"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.time.field-width"                          value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.datetime.field-width"                      value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.us-phone.field-width"                      value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:integer" name="oxf.xforms.xbl.fr.error-summary.page-size"                   value="20"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.error-summary.visit-value-changed"         value="true"/>
 
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.start-year"             value="1970"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.start-year"                  value="1970"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.end-year">
         year-from-date(current-date())
     </property>

@@ -355,8 +355,9 @@
                         </xf:action>
 
                         <xsl:variable name="service-performs-search" select="@service-performs-search = 'true'"/>
-                        <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
-                        <xf:var name="view"    value="fr:mode() = ('view', 'pdf')"/>
+                        <xf:var       name="binding"                 value="xxf:binding('fr-databound-select1-search')"/>
+                        <xf:var       name="view"                    value="fr:mode() = ('view', 'pdf')"/>
+                        <xf:var       name="min-input-length"        value="fr:component-param-value('min-input-length')"/>
 
                         <xf:group
                             ref=".[not($view)]"
@@ -364,7 +365,8 @@
                             data-placeholder="{{xxf:r('select')}}"
                             data-service-performs-search="{$service-performs-search}"
                             data-initial-label="{{$binding/@label}}"
-                            data-initial-value="{{$binding}}">
+                            data-initial-value="{{$binding}}"
+                            data-min-input-length="{{$min-input-length}}">
                             <xsl:if test="exists(@selection)">
                                 <xsl:attribute name="data-selection" select="@selection"/>
                             </xsl:if>

@@ -21,9 +21,7 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath.NodeInfoOps
-
-import scala.xml.Elem
+import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
 
 import scala.collection.mutable
 
@@ -198,21 +196,39 @@ trait FormRunnerEmail {
     }
   }
 
-  def isLegacy2021EmailMetadata(emailMetadata: NodeInfo): Boolean =
-    List("subject", "body").forall(emailMetadata.child(_).nonEmpty)
+  //@XPathFunction
+  def isLegacyEmailMetadata(emailMetadataOpt: Option[NodeInfo]): Boolean =
+    isLegacy2021EmailMetadata(emailMetadataOpt) ||
+    isLegacy2022EmailMetadata(emailMetadataOpt)
 
-  def parseEmailMetadata(
-    emailMetadata : NodeInfo,
-    formBody      : NodeInfo
-  ): EmailMetadata.Metadata =
-    if (isLegacy2021EmailMetadata(emailMetadata)) {
-      val legacy2021Metadata = EmailMetadataParsing.parseLegacy2021Metadata(emailMetadata, formBody)
-      EmailMetadataConversion.convertLegacy2021Metadata(legacy2021Metadata)
-    } else {
-      EmailMetadataParsing.parseCurrentMetadata(emailMetadata)
+  // TODO: also take the form definition as parameter, to be more discriminate, and avoid returning `true` if we don't have any `fr-email-…` controls
+  def isLegacy2021EmailMetadata(emailMetadataOpt: Option[NodeInfo]): Boolean =
+    emailMetadataOpt match {
+      case Some(emailMetadata) => List("subject", "body").exists(emailMetadata.child(_).nonEmpty)
+      case None                => true
     }
 
-  def serializeEmailMetadata(metadata: EmailMetadata.Metadata): Elem =
+  def isLegacy2022EmailMetadata(emailMetadataOpt: Option[NodeInfo]): Boolean =
+    emailMetadataOpt match {
+      case Some(emailMetadata) => emailMetadata.child("templates").child("template").child("form-fields").nonEmpty
+      case None                => false
+    }
+
+  def parseEmailMetadata(
+    emailMetadata  : Option[NodeInfo],
+    formDefinition : NodeInfo
+  ): EmailMetadata.Metadata =
+    if (isLegacy2021EmailMetadata(emailMetadata)) {
+      val legacy2021Metadata = EmailMetadataParsing.parseLegacy2021Metadata(emailMetadata, formDefinition)
+      EmailMetadataConversion.convertLegacy2021Metadata(legacy2021Metadata)
+    } else if (isLegacy2022EmailMetadata(emailMetadata)) {
+      val legacy2022Metadata = EmailMetadataParsing.parseLegacy2022Metadata(emailMetadata, formDefinition)
+      EmailMetadataConversion.convertLegacy2022Metadata(legacy2022Metadata)
+    } else {
+      EmailMetadataParsing.parseCurrentMetadata(emailMetadata, formDefinition)
+    }
+
+  def serializeEmailMetadata(metadata: EmailMetadata.Metadata): NodeInfo =
     EmailMetadataSerialization.serializeMetadata(metadata)
 
 }

@@ -415,7 +415,7 @@
     <xsl:template
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
         match="xf:instance[@id = 'fr-form-metadata']/metadata/email[
-            frf:isLegacy2021Metadata(.)
+            frf:isLegacyMetadata(.)
         ]"
         mode="within-model">
         <xsl:copy>

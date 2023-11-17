@@ -27,13 +27,13 @@ object Select2 {
     def select2(method: String): Unit = js.native
   }
 
-  class Options extends js.Object {
-    var placeholder    : Option             = _
-    var ajax           : Ajax               = _
-    var allowClear     : Boolean            = false
-    var dropdownParent : js.UndefOr[JQuery] = _
-    var width          : String             = _
-    var tags           : Boolean            = false
+  trait Options extends js.Object {
+    val placeholder        : Option
+    val ajax               : Ajax
+    val allowClear         : Boolean
+    val dropdownParent     : js.UndefOr[JQuery]
+    val width              : String
+    val tags               : Boolean
   }
 
   trait Option extends js.Object {

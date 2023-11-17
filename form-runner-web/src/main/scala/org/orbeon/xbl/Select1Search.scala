@@ -27,6 +27,7 @@ import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.collection.mutable
 import scala.scalajs.js
+import scala.collection.compat._
 
 
 object Select1Search {
@@ -64,11 +65,12 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       // Init Select2
       val jSelect = $(select)
       jSelect.select2(new Select2.Options {
-        allowClear     = true
-        ajax           = if (isDatabound) Select2Ajax else null
-        width          = "100%" // For Select2 width to update as the viewport width changes
-        tags           = Option(queryElementWithData.getAttribute(DataSelection)).contains("open")
-        placeholder    =
+        val allowClear         = true
+        val dropdownParent     = js.undefined
+        val ajax               = if (isDatabound) Select2Ajax else null
+        val width              = "100%" // For Select2 width to update as the viewport width changes
+        val tags               = Option(queryElementWithData.getAttribute(DataSelection)).contains("open")
+        val placeholder        =
           new Select2.Option {
             val id   = "0"
             val text = elementWithData.getAttribute(DataPlaceholder)

@@ -81,7 +81,7 @@ val ThumbnailatorVersion          = "0.4.16"
 val ServletApiVersion             = "4.0.1"
 val PortletApiVersion             = "3.0.1"
 val LiferayPortalServiceVersion   = "6.2.5"
-val LiferayPortalKernelVersion    = "128.0.1"
+val LiferayPortalKernelVersion    = "129.1.0"
 
 
 val CoreLibraryDependencies = Seq(

@@ -210,14 +210,14 @@ private[persistence] object PersistenceProxyProcessor {
 
   // Proxy the request depending on app/form name and whether we are accessing form or data
   private def proxyRequest(
-    request         : Request,
-    response        : Response,
-    appForm         : AppForm,
-    formOrData      : FormOrData,
-    filename        : Option[String],
-    path            : String,
-    documentIdOpt   : Option[String] = None)(implicit
-    externalContext : ExternalContext
+    request        : Request,
+    response       : Response,
+    appForm        : AppForm,
+    formOrData     : FormOrData,
+    filename       : Option[String],
+    path           : String,
+    documentIdOpt  : Option[String] = None)(implicit
+    externalContext: ExternalContext
   ): Unit = {
 
     // Throws if there is an incompatibility
@@ -225,7 +225,7 @@ private[persistence] object PersistenceProxyProcessor {
 
     val isDataXmlRequest = formOrData == FormOrData.Data && filename.contains(DataXml)
     val isFormBuilder    = appForm == AppForm.FormBuilder
-    val isAttachment     = !isDataXmlRequest && filename.isDefined
+    val isAttachment     = ! isDataXmlRequest && filename.isDefined
 
     // Get persistence implementation target URL and configuration headers
     //
@@ -481,11 +481,11 @@ private[persistence] object PersistenceProxyProcessor {
   }
 
   private def bodyContent(
-    request: Request,
+    request         : Request,
     isDataXmlRequest: Boolean,
-    isFormBuilder: Boolean,
-    appForm: AppForm,
-    formOrData: FormOrData
+    isFormBuilder   : Boolean,
+    appForm         : AppForm,
+    formOrData      : FormOrData
   ): Option[StreamedContent] =
     HttpMethod.HttpMethodsWithRequestBody(request.getMethod).option {
 
@@ -520,14 +520,14 @@ private[persistence] object PersistenceProxyProcessor {
     }
 
   private def attachmentsProviderCxr(
-    isAttachment: Boolean,
-    request: Request,
-    appForm: AppForm,
-    formOrData: FormOrData,
-    path: String,
-    streamedContent: Option[StreamedContent],
+    isAttachment            : Boolean,
+    request                 : Request,
+    appForm                 : AppForm,
+    formOrData              : FormOrData,
+    path                    : String,
+    streamedContent         : Option[StreamedContent],
     outgoingVersionHeaderOpt: Option[(String, String)]
-  ): Option[ConnectionResult] = {
+  ): Option[ConnectionResult] =
     if (isAttachment) {
       findAttachmentsProvider(appForm, formOrData).map { provider =>
         val (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
@@ -538,7 +538,6 @@ private[persistence] object PersistenceProxyProcessor {
     } else {
       None
     }
-  }
 
   private def compareVersionAgainstIncomingIfNeeded(
     effectiveFormDefinitionVersionOpt : Option[Int],
@@ -653,9 +652,9 @@ private[persistence] object PersistenceProxyProcessor {
     }
 
   private def checkDataFormatVersionIfNeeded(
-    request    : Request,
-    appForm    : AppForm,
-    formOrData : FormOrData
+    request   : Request,
+    appForm   : AppForm,
+    formOrData: FormOrData
   ): Unit =
     if (formOrData == FormOrData.Data && GetOrPutMethods(request.getMethod))
       // https://github.com/orbeon/orbeon-forms/issues/4861
@@ -676,8 +675,8 @@ private[persistence] object PersistenceProxyProcessor {
       }
 
   private def parsePruneAndSerializeXmlData(
-    is : InputStream,
-    os : OutputStream
+    is: InputStream,
+    os: OutputStream
   ): Unit = {
 
     val receiver = TransformerUtils.getIdentityTransformerHandler
@@ -732,9 +731,9 @@ private[persistence] object PersistenceProxyProcessor {
 
       @tailrec
       def applyTransforms(
-        startInputStream : InputStream,
-        endOutputStream  : OutputStream,
-        transforms       : List[(InputStream, OutputStream) => Unit]
+        startInputStream: InputStream,
+        endOutputStream : OutputStream,
+        transforms      : List[(InputStream, OutputStream) => Unit]
       ): Unit = {
         transforms match {
           case Nil                             => IOUtils.copyStreamAndClose(startInputStream, endOutputStream)
@@ -822,10 +821,10 @@ private[persistence] object PersistenceProxyProcessor {
    * results. So the response is not simply proxied, unlike for other persistence layer calls.
    */
   private def proxyPublishedFormsMetadata(
-    request   : Request, // for params, headers, and method
-    response  : Response,
-    app       : Option[String],
-    form      : Option[String]
+    request : Request, // for params, headers, and method
+    response: Response,
+    app     : Option[String],
+    form    : Option[String]
   ): Unit =
     streamDocument(
       callPublishedFormsMetadata(
@@ -837,9 +836,9 @@ private[persistence] object PersistenceProxyProcessor {
     )
 
   def callPublishedFormsMetadata(
-    request   : Request, // for params, headers, and method
-    app       : Option[String],
-    form      : Option[String] // TODO: should not be allowed if app is not provided
+    request: Request, // for params, headers, and method
+    app    : Option[String],
+    form   : Option[String] // TODO: should not be allowed if app is not provided
   ): NodeInfo = {
 
     val formProviders = getProviders(app, form, FormOrData.Form)
@@ -876,8 +875,8 @@ private[persistence] object PersistenceProxyProcessor {
   }
 
   private def proxyReindex(
-    request  : Request,
-    response : Response
+    request : Request,
+    response: Response
   ): Unit = {
     val dataProviders = getProviders(app = None, form = None, FormOrData.Data)
 
@@ -903,8 +902,8 @@ private[persistence] object PersistenceProxyProcessor {
   }
 
   private def proxyReEncryptStatus(
-    request  : Request,
-    response : Response
+    request : Request,
+    response: Response
   ): Unit = {
 
     val dataProviders = getProviders(app = None, form = None, FormOrData.Data)
@@ -933,8 +932,8 @@ private[persistence] object PersistenceProxyProcessor {
   }
 
   private def aggregateDocument(
-    root    : String,
-    content : List[NodeInfo]
+    root   : String,
+    content: List[NodeInfo]
   ): NodeInfo = {
     val documentElement = elementInfo(root)
     XFormsAPI.insert(into = documentElement, origin = content)
@@ -942,18 +941,18 @@ private[persistence] object PersistenceProxyProcessor {
   }
 
   private def streamDocument(
-    documentElement : NodeInfo,
-    response        : Response
+    documentElement: NodeInfo,
+    response       : Response
   ): Unit = {
     response.setContentType(ContentTypes.XmlContentType)
     TransformerUtils.getXMLIdentityTransformer.transform(documentElement, new StreamResult(response.getOutputStream))
   }
 
   private def getHeadersFromHeadCallProviderViaProxy(
-    requestHeaders              : Map[String, List[String]],
-    serviceURI                  : String,
-    outgoingPersistenceHeaders  : Map[String, String],
-    mustFilterVersioningHeaders : Boolean
+    requestHeaders             : Map[String, List[String]],
+    serviceURI                 : String,
+    outgoingPersistenceHeaders : Map[String, String],
+    mustFilterVersioningHeaders: Boolean
   ): Try[ResponseHeaders] = {
 
     val headRequest =

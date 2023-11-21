@@ -85,6 +85,13 @@ object StreamedContent {
       contentLength = None,
       title         = None
     )
+
+  val EmptyAsync: AsyncStreamedContent =
+    StreamedContent(
+      stream        = fs2.Stream.empty,
+      contentType   = None,
+      contentLength = None
+    )
 }
 
 case class BufferedContent(

@@ -114,13 +114,23 @@ object ConnectionResult {
     )
   }
 
-  def trySuccessConnection(cxr: ConnectionResult): Try[ConnectionResult] =
-    cxr match {
-      case ConnectionResult(_, _, _, _, _, _) if cxr.isSuccessResponse =>
-        Success(cxr)
-      case ConnectionResult(_, statusCode, _, _, _, _) =>
-        cxr.close()
-        Failure(HttpStatusCodeException(if (statusCode != StatusCode.Ok) statusCode else StatusCode.InternalServerError))
+  def syncToAsync(
+    cxr: ConnectionResult
+  ): AsyncConnectionResult = ConnectionResultT(
+    url               = cxr.url,
+    statusCode        = cxr.statusCode,
+    headers           = cxr.headers,
+    content           = ConnectionSupport.syncToAsyncStreamedContent(cxr.content),
+    hasContent        = cxr.hasContent,
+    dontHandleResponse= cxr.dontHandleResponse
+  )
+
+  def trySuccessConnection[S](cxr: ConnectionResultT[S]): Try[ConnectionResultT[S]] =
+    if (cxr.isSuccessResponse) {
+      Success(cxr)
+    } else {
+      cxr.close()
+      Failure(HttpStatusCodeException(if (cxr.statusCode != StatusCode.Ok) cxr.statusCode else StatusCode.InternalServerError))
     }
 
   def tryBody[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream => T): Try[T] = Try {

@@ -13,12 +13,10 @@
  */
 package org.orbeon.oxf.util
 
-import cats.effect.IO
 import cats.syntax.option._
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.log4s
-import org.orbeon.connection.ConnectionSupport.fs2StreamToInputStreamInMemory
 import org.orbeon.connection._
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.io.UriScheme
@@ -123,16 +121,8 @@ object Connection extends ConnectionTrait {
 //      ).getOrElse(Future.successful(None))
 
     def requestStreamedContentOptF: Future[Option[StreamedContent]] =
-      content.map { c =>
-        fs2StreamToInputStreamInMemory(c.stream).map(is =>
-          StreamedContent(
-            inputStream   = is,
-            contentType   = c.contentType,
-            contentLength = c.contentLength,
-            title         = c.title
-          ).some
-        )
-      }.getOrElse(Future.successful(None))
+      content.map(ConnectionSupport.asyncToSyncStreamedContent).map(_.map(_.some))
+        .getOrElse(Future.successful(None))
 
     def connectWithContentF(requestStreamedContentOpt: Option[StreamedContent]): Future[AsyncConnectionResult] =
       CoreCrossPlatformSupport.shiftExternalContext[Future, AsyncConnectionResult](t => Future(t)) {
@@ -151,18 +141,7 @@ object Connection extends ConnectionTrait {
         // Return an `AsyncConnectionResult` even though for now we obtain a synchronous `ConnectionResult`, so that
         // the callers deal with an `fs2.Stream` consistently for async calls on the JVM as well as JavaScript. Later
         // we can create an `AsyncConnectionResult` directly.
-        ConnectionResultT(
-          url                = cxr.url,
-          statusCode         = cxr.statusCode,
-          headers            = cxr.headers,
-          content            = StreamedContent(
-            fs2.io.readInputStream(IO.pure(cxr.content.stream), 4096, closeAfterUse = false),
-            cxr.content.contentType,
-            cxr.content.contentLength
-          ),
-          hasContent         = cxr.hasContent,
-          dontHandleResponse = cxr.dontHandleResponse
-        )
+        ConnectionResult.syncToAsync(cxr)
       }
 
     requestStreamedContentOptF.flatMap(connectWithContentF)

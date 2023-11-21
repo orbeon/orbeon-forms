@@ -13,6 +13,7 @@
  */
 package org.orbeon.xforms.embedding
 
+import org.orbeon.sjsdom
 import org.scalajs.dom.experimental.{Headers, URL}
 
 import scala.scalajs.js
@@ -25,15 +26,15 @@ import scala.scalajs.js.|
 // browsers. So for now we use our own objects.
 trait SubmissionRequest extends js.Object {
   val method  : String
-  val url     : URL                    // makes it easier to parse the components
-  val headers : Headers                // standard `Headers` object not supported in Safari for iOS for Fetch
-  val body    : js.UndefOr[Uint8Array] // or `ReadableStream` from Fetch, but that's still experimental; or `Iterable`; or plain `Array`
+  val url     : URL                                                 // makes it easier to parse the components
+  val headers : Headers                                             // standard `Headers` object not supported in Safari for iOS for Fetch
+  val body    : js.UndefOr[Uint8Array | sjsdom.ReadableStream[Uint8Array]]
 }
 
 trait SubmissionResponse extends js.Object {
   val statusCode : Int
   val headers    : Headers
-  val body       : js.UndefOr[Uint8Array | js.Array[Byte]] // we can extend supported formats later
+  val body       : js.UndefOr[Uint8Array | js.Array[Byte] | sjsdom.ReadableStream[Uint8Array]]
 }
 
 // Trait to be implemented by the embedder to support offline submissions

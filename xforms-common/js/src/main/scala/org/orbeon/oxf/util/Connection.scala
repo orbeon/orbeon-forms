@@ -13,19 +13,16 @@
  */
 package org.orbeon.oxf.util
 
-
 import cats.effect.IO
-import cats.effect.kernel.Async
-import cats.effect.unsafe.IORuntime
-import fs2.Chunk
-import org.orbeon.connection.ConnectionResult
-import org.orbeon.{fs2dom, sjsdom}
+import cats.effect.unsafe.implicits.global
+import org.orbeon.connection._
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http._
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
+import org.orbeon.{fs2dom, sjsdom}
 import org.scalajs.dom.experimental.{Headers => JSHeaders, URL => JSURL}
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import java.io.InputStream
 import java.net.URI
@@ -35,7 +32,6 @@ import scala.scalajs.js.Iterator
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSName
 import scala.scalajs.js.typedarray.Uint8Array
-import scala.util.Try
 
 
 object Connection extends ConnectionTrait {
@@ -52,43 +48,31 @@ object Connection extends ConnectionTrait {
     headers         : Map[String, List[String]],
     loadState       : Boolean,
     saveState       : Boolean,
-    logBody         : Boolean)(implicit
+    logBody         : Boolean
+  )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
   ): ConnectionResult =
-    connectInternal(
-      method      = method,
-      url         = url,
-      credentials = credentials,
-      content     = content,
-      headers     = headers,
-      async       = false,
-      loadState   = loadState,
-      logBody     = logBody
-    ).value
-      .getOrElse(throw new IllegalStateException("`connectInternal()` called with `async = false`, but no result is available")).get
+    fromResourceResolver(method, url)                           orElse
+      fromSubmissionProviderSync(method, url, content, headers) getOrElse
+      notFound(url)
 
   def connectAsync(
     method          : HttpMethod,
     url             : URI,
     credentials     : Option[BasicCredentials],
-    content         : Option[StreamedContent],
+    content         : Option[AsyncStreamedContent],
     headers         : Map[String, List[String]],
     loadState       : Boolean,
-    logBody         : Boolean)(implicit
+    logBody         : Boolean
+  )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Future[ConnectionResult] =
-    connectInternal(
-      method      = method,
-      url         = url,
-      credentials = credentials,
-      content     = content,
-      headers     = headers,
-      async       = true,
-      loadState   = loadState,
-      logBody     = logBody
-    )
+  ): Future[AsyncConnectionResult] =
+    fromResourceResolver(method, url).map(cxr => Future.successful(ConnectionResult.syncToAsync(cxr))) orElse
+      fromTemporaryFile(method, url).map(Future.successful)                                            orElse
+      fromSubmissionProviderAsync(method, url, content, headers)                                       getOrElse
+      Future.successful(ConnectionResult.syncToAsync(notFound(url)))
 
   private class IteratorEntry extends Iterator.Entry[Short] {
 
@@ -127,119 +111,219 @@ object Connection extends ConnectionTrait {
     }
   }
 
-  private def connectInternal(
-    method          : HttpMethod,
-    url             : URI,
-    credentials     : Option[BasicCredentials],
-    content         : Option[StreamedContent],
-    headers         : Map[String, List[String]],
-    async           : Boolean,
-    loadState       : Boolean,
-    logBody         : Boolean)(implicit
-    logger          : IndentedLogger
-  ): Future[ConnectionResult] = {
+  private def fromTemporaryFile(method: HttpMethod, url: URI): Option[AsyncConnectionResult] =
+    method match {
+      case HttpMethod.GET if url.getScheme == JsFileSupport.UploadUriScheme =>
+        JsFileSupport.readTemporaryFile(url) match {
+          case Some(readableStream) =>
+            Some(
+              ConnectionResultT(
+                url.toString,
+                StatusCode.Ok,
+                Map.empty,
+                StreamedContent(
+                  stream        = fs2dom.readReadableStream(IO(readableStream)),
+                  contentType   = None, // xxx content-type
+                  contentLength = None
+                ),
+                hasContent         = true, // not expecting empty temp files?
+                dontHandleResponse = false,
+              )
+            )
+          case None =>
+            None
+        }
+      case _ => None
+    }
 
-    val urlString = url.toString
+  private def fromResourceResolver(method: HttpMethod, url: URI): Option[ConnectionResult] =
+    method match {
+      case HttpMethod.GET => resourceResolver(url.toString)
+      case _              => None
+    }
 
-    def fromResourceResolver: Option[ConnectionResult] =
-      method match {
-        case HttpMethod.GET => resourceResolver(urlString)
-        case _              => None
-      }
+  private def fromSubmissionProviderSync(
+    method : HttpMethod,
+    url    : URI,
+    content: Option[StreamedContent],
+    headers: Map[String, List[String]]
+  )(implicit
+    logger : IndentedLogger
+  ): Option[ConnectionResult] =
+    submissionProvider.map { provider =>
 
-    def fromSubmissionProvider: Option[Future[ConnectionResult]] =
-      submissionProvider.map { provider =>
+      val methodString   = method.entryName
+      val jsUrl          = new JSURL(url.toString, "http://invalid/") // URL needs to be absolute; using `invalid` as base, see RFC6761
+      val requestHeaders = makeJsHeaders(url, headers)
 
-        val methodString = method.entryName
-        val jsUrl = new JSURL(urlString, "http://invalid/") // URL needs to be absolute; using `invalid` as base, see RFC6761
+      val requestDataOpt: Option[Uint8Array] =
+        content.map(c => new Uint8Array(inputStreamIterable(c.stream)))
 
-        // The `Headers` constructor expects key/value pairs, with only one value per header
-        // TODO: Check if we ever have more than one value per header
-        val requestHeaders =
-          new JSHeaders(
-            headers collect { case (k, v @ head :: tail) =>
-              if (tail.nonEmpty)
-                warn(
-                  s"more than one header value for header",
-                  List(
-                    "name"   -> k,
-                    "values" -> v.mkString(", "),
-                    "url"    -> urlString
-                  )
-                )
-              js.Array(k, head)
-            } toJSArray
-          )
-
-        val requestDataOpt =
-          content.map(c => new Uint8Array(inputStreamIterable(c.inputStream)))
-
-        val submissionRequest =
-          new SubmissionRequest {
-            val method  = methodString
-            val url     = jsUrl
-            val headers = requestHeaders
-            val body    = requestDataOpt.orUndefined
-          }
-
-        def processSubmissionResponse(response: SubmissionResponse): ConnectionResult = {
-
-          val responseHeaders =
-            response.headers.jsIterator().toIterator map { kv =>
-              kv(0) -> List(kv(1))
-            } toMap
-
-          val responseContentTypeOpt =
-            Headers.firstItemIgnoreCase(responseHeaders, Headers.ContentType)
-
-          def contentFromJsIterable(v: js.Iterable[_]) =
-            StreamedContent.fromBytes(v.asInstanceOf[js.Iterable[Byte]].toArray[Byte], responseContentTypeOpt)
-
-          // NOTE: Can't match on `js.Iterable[_]` "because it is a JS trait"
-          val responseBody = response.body.toOption match {
-            case Some(v: js.Array[_]) => contentFromJsIterable(v)
-            case Some(v: Uint8Array)  => contentFromJsIterable(v)
-            case _                    => warn("unrecognized response body type, considering empty body"); StreamedContent.Empty
-          }
-
-          ConnectionResult(
-            url                = urlString,
-            statusCode         = response.statusCode,
-            headers            = responseHeaders,
-            content            = responseBody,
-            dontHandleResponse = false,
-          )
+      val submissionRequest =
+        new SubmissionRequest {
+          val method  = methodString
+          val url     = jsUrl
+          val headers = requestHeaders
+          val body    = requestDataOpt.orUndefined
         }
 
-        if (async)
-          provider.submitAsync(submissionRequest).toFuture.map(processSubmissionResponse)
-        else
-          Future.fromTry( // doesn't schedule the task on the execution context, unlike with `Future.apply`
-            Try(processSubmissionResponse(provider.submit(submissionRequest)))
-          )
-      }
+      processSubmissionResponseSync(url, provider.submit(submissionRequest))
+    }
 
-    def notFound =
-      ConnectionResult(
-        url                = urlString,
-        statusCode         = StatusCode.NotFound,
-        headers            = Map.empty,
-        content            = StreamedContent.Empty,
-        dontHandleResponse = false,
+  private def fromSubmissionProviderAsync(
+    method : HttpMethod,
+    url    : URI,
+    content: Option[AsyncStreamedContent],
+    headers: Map[String, List[String]]
+  )(implicit
+    logger   : IndentedLogger
+  ): Option[Future[AsyncConnectionResult]] =
+    submissionProvider.map { provider =>
+
+      val methodString   = method.entryName
+      val jsUrl          = new JSURL(url.toString, "http://invalid/") // URL needs to be absolute; using `invalid` as base, see RFC6761
+      val requestHeaders = makeJsHeaders(url, headers)
+
+      val readableStreamOpt: Future[Option[sjsdom.ReadableStream[Uint8Array]]] =
+        content match {
+          case Some(c) =>
+            c.stream.through(fs2dom.toReadableStream).compile.lastOrError.unsafeToFuture().map(Some(_))
+          case None =>
+            Future.successful(None)
+        }
+
+      def newSubmissionRequest(readableStreamOpt: Option[sjsdom.ReadableStream[Uint8Array]]) =
+        new SubmissionRequest {
+          val method  = methodString
+          val url     = jsUrl
+          val headers = requestHeaders
+          val body    = readableStreamOpt.orUndefined
+        }
+
+      for {
+        readableStream     <- readableStreamOpt
+        submissionRequest  = newSubmissionRequest(readableStream)
+        submissionResponse <- provider.submitAsync(submissionRequest).toFuture
+      } yield
+        processSubmissionResponseAsync(url, submissionResponse)
+    }
+
+  private def makeJsHeaders(
+    url    : URI,
+    headers: Map[String, List[String]]
+  )(implicit
+    logger   : IndentedLogger
+  ): JSHeaders = // The `Headers` constructor expects key/value pairs, with only one value per header
+      // TODO: Check if we ever have more than one value per header
+      new JSHeaders(
+        headers collect { case (k, v @ head :: tail) =>
+          if (tail.nonEmpty)
+            warn(
+              s"more than one header value for header",
+              List(
+                "name"   -> k,
+                "values" -> v.mkString(", "),
+                "url"    -> url.toString
+              )
+            )
+          js.Array(k, head)
+        } toJSArray
       )
 
-//    def methodNotAllowed =
-//      ConnectionResult(
-//        url                = url.toString,
-//        statusCode         = StatusCode.MethodNotAllowed,
-//        headers            = Map.empty,
-//        content            = StreamedContent.Empty,
-//        dontHandleResponse = false
-//      )
+  private def notFound(url: URI): ConnectionResult =
+    ConnectionResult(
+      url                = url.toString,
+      statusCode         = StatusCode.NotFound,
+      headers            = Map.empty,
+      content            = StreamedContent.Empty,
+      dontHandleResponse = false,
+    )
 
-    fromResourceResolver.map(Future.successful) orElse
-      fromSubmissionProvider                    getOrElse
-      Future.successful(notFound)
+//  def methodNotAllowed =
+//    ConnectionResult(
+//      url                = url.toString,
+//      statusCode         = StatusCode.MethodNotAllowed,
+//      headers            = Map.empty,
+//      content            = StreamedContent.Empty,
+//      dontHandleResponse = falseFuture.successful(notFound
+//    )
+
+  private def processSubmissionResponseSync(
+    url     : URI,
+    response: SubmissionResponse
+  )(implicit
+    logger   : IndentedLogger
+  ): ConnectionResult = {
+
+    val responseHeaders =
+      response.headers.jsIterator().toIterator map { kv =>
+        kv(0) -> List(kv(1))
+      } toMap
+
+    val responseContentTypeOpt =
+      Headers.firstItemIgnoreCase(responseHeaders, Headers.ContentType)
+
+    def contentFromJsIterable(v: js.Iterable[_]) =
+      StreamedContent.fromBytes(v.asInstanceOf[js.Iterable[Byte]].toArray[Byte], responseContentTypeOpt)
+
+    // NOTE: Can't match on `js.Iterable[_]` "because it is a JS trait"
+    val responseBody = response.body.toOption match {
+      case Some(v: js.Array[_]) => contentFromJsIterable(v)
+      case Some(v: Uint8Array)  => contentFromJsIterable(v)
+      case _                    => warn("unrecognized response body type, considering empty body"); StreamedContent.Empty
+    }
+
+    ConnectionResult(
+      url                = url.toString,
+      statusCode         = response.statusCode,
+      headers            = responseHeaders,
+      content            = responseBody,
+      dontHandleResponse = false,
+    )
+  }
+
+  private def processSubmissionResponseAsync(
+    url     : URI,
+    response: SubmissionResponse
+  )(implicit
+    logger   : IndentedLogger
+  ): AsyncConnectionResult = {
+
+    val responseHeaders =
+      response.headers.jsIterator().toIterator map { kv =>
+        kv(0) -> List(kv(1))
+      } toMap
+
+    val responseContentTypeOpt =
+      Headers.firstItemIgnoreCase(responseHeaders, Headers.ContentType)
+
+    def streamFromJsIterable(v: js.Iterable[_]) =
+      fs2.Stream.emits(v.asInstanceOf[js.Iterable[Byte]].toArray[Byte])
+
+    // NOTE: Can't match on `js.Iterable[_]` "because it is a JS trait"
+    val responseStream: Option[(fs2.Stream[IO, Byte], Option[Long])] = response.body.toOption map {
+      case v: js.Array[_]                       => streamFromJsIterable(v)          -> Some(v.length)
+      case v: Uint8Array                        => streamFromJsIterable(v)          -> Some(v.length)
+      case v: js.Object => // matching on `sjsdom.ReadableStream[_]` doesn't compile
+        fs2dom.readReadableStream(IO(v.asInstanceOf[sjsdom.ReadableStream[Uint8Array]])) -> None
+      case _                                    =>
+        warn("unrecognized response body type, considering empty body")
+        fs2.Stream.empty -> None
+    }
+
+    val responseBody =
+      responseStream.map { case (stream, contentLengthOpt) =>
+        StreamedContent(stream, responseContentTypeOpt, contentLengthOpt)
+      }
+
+    ConnectionResultT(
+      url                = url.toString,
+      statusCode         = response.statusCode,
+      headers            = responseHeaders,
+      content            = responseBody.getOrElse(StreamedContent.EmptyAsync),
+      hasContent         = responseBody.isDefined,
+      dontHandleResponse = false,
+    )
   }
 
   def isInternalPath(path: String): Boolean = false

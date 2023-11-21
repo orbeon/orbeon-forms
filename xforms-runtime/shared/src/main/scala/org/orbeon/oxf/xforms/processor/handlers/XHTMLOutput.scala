@@ -15,17 +15,15 @@ package org.orbeon.oxf.xforms.processor.handlers
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, ComponentControl, GroupControl, LHHA, LHHAAnalysis, OutputControl, StaticLHHASupport}
-import org.orbeon.oxf.xforms.control.{LHHASupport, XFormsControl}
+import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml._
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XH}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsGlobalProperties}
+import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XH}
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Namespaces._
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.Attributes
-import shapeless.syntax.typeable.typeableOps
 
 
 object XHTMLOutput {

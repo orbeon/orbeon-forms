@@ -49,7 +49,7 @@ class XFormsRepeatHandler(
   ) {
 
   // Compute user classes only once for all iterations
-  private val userClasses = {
+  private lazy val userClasses = {
     val sb = new jl.StringBuilder
     appendControlUserClasses(attributes, currentControl)(sb)
     sb.toString

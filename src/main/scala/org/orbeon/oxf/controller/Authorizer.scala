@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.controller
 
-import org.orbeon.connection.ConnectionResult
+import org.orbeon.connection.{ConnectionResult, StreamedContent}
 
 import java.lang.{Boolean => JBoolean}
 import java.net.URI
@@ -21,7 +21,7 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
-import org.orbeon.oxf.http.{EmptyInputStream, HttpStatusCodeException, StreamedContent}
+import org.orbeon.oxf.http.{EmptyInputStream, HttpStatusCodeException}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._

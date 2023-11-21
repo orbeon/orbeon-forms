@@ -13,17 +13,16 @@
  */
 package org.orbeon.oxf.util
 
-import java.net.URI
-import cats.Eval
-import org.orbeon.connection.ConnectionResult
+import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, HttpMethodsWithRequestBody, POST}
-import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StreamedContent}
+import org.orbeon.oxf.http.{BasicCredentials, HttpMethod}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging.debug
 
+import java.net.URI
 import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
 

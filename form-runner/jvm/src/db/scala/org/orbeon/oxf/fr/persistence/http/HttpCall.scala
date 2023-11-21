@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.http
 
+import org.orbeon.connection.StreamedContent
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.io.IOUtils
@@ -34,6 +35,7 @@ import org.scalatest.Assertions._
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.net.URI
 import scala.util.Try
+
 
 private[persistence] object HttpCall {
 

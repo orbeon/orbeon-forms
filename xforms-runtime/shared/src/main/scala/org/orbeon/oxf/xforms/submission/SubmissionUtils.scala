@@ -13,26 +13,24 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.connection.ConnectionResult
-
-import java.io.{ByteArrayOutputStream, InputStream}
-import java.net.URI
+import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
 import org.orbeon.oxf.http.HttpMethod.GET
-import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance}
 import org.orbeon.oxf.xml.{SaxonUtils, XMLParsing}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+import java.io.{ByteArrayOutputStream, InputStream}
+import java.net.URI
 import scala.collection.mutable
 
 

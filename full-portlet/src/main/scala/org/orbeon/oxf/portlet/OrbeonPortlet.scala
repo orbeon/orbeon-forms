@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.portlet
 
-import javax.portlet._
+import org.orbeon.connection.{Redirect, StreamedContent, StreamedContentOrRedirect}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.{ExternalContext, PortletWebAppContext}
 import org.orbeon.oxf.fr.embedding._
@@ -23,12 +23,14 @@ import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponseImpl
 import org.orbeon.oxf.webapp.ServletPortlet._
 import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet}
 
+import javax.portlet._
 import scala.jdk.CollectionConverters._
 
 // For backward compatibility
 class OrbeonPortlet2         extends OrbeonPortlet
 class OrbeonPortletDelegate  extends OrbeonPortlet
 class OrbeonPortlet2Delegate extends OrbeonPortlet
+
 
 /**
  * This is the Portlet (JSR-286) entry point of Orbeon.

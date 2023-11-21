@@ -29,6 +29,7 @@ import org.apache.http.params.{BasicHttpParams, HttpConnectionParams}
 import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext}
 import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException => _, _}
+import org.orbeon.connection.StreamedContent
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.resources.URLFactory

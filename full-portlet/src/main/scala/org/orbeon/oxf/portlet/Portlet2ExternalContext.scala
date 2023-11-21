@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.portlet
 
+import org.orbeon.connection.{Redirect, StreamedContent, StreamedContentOrRedirect}
 import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.Request

@@ -13,9 +13,8 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import java.{util => ju}
-
 import org.apache.commons.io.IOUtils
+import org.orbeon.connection.StreamedContent
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.http.HttpMethod.{HttpMethodsWithRequestBody, POST}
@@ -24,8 +23,10 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 
-import scala.jdk.CollectionConverters._
+import java.{util => ju}
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
+
 
 // Request used for local (within Orbeon Forms) requests.
 //

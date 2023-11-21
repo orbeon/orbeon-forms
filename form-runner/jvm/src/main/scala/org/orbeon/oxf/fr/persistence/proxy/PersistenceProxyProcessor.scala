@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.proxy
 
 import org.apache.http.HttpStatus
-import org.orbeon.connection.ConnectionResult
+import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}

@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.syntax.option._
-import org.orbeon.connection.ConnectionResult
-import org.orbeon.oxf.http.{Headers, StatusCode, StreamedContent}
+import org.orbeon.connection.{ConnectionResult, StreamedContent}
+import org.orbeon.oxf.http.{Headers, StatusCode}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util._

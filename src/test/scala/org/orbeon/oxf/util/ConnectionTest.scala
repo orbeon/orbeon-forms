@@ -17,15 +17,17 @@ import java.net.URI
 import java.{util => ju}
 import cats.syntax.option._
 import org.mockito.Mockito
+import org.orbeon.connection.StreamedContent
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAdapter, UrlRewriteMode, WebAppContext}
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.{Headers, HttpMethod, StreamedContent}
+import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
+
 
 class ConnectionTest
   extends ResourceManagerSupport // for properties in particular

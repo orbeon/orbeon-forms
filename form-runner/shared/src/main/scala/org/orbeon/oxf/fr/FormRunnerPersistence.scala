@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import cats.syntax.option._
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.connection.ConnectionResult
+import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
@@ -24,9 +24,9 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
+import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, PUT}
-import org.orbeon.oxf.http.{BasicCredentials, StreamedContent}
 import org.orbeon.oxf.properties.Property
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.CoreUtils._

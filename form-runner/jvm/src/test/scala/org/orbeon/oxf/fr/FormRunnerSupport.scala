@@ -14,10 +14,10 @@
 package org.orbeon.oxf.fr
 
 import org.apache.commons.io.IOUtils
+import org.orbeon.connection.{BufferedContent, StreamedContent}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.fr.FormRunnerSupport._
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
-import org.orbeon.oxf.http._
 import org.orbeon.oxf.test.TestHttpClient.CacheEvent
 import org.orbeon.oxf.test.{DocumentTestBase, TestHttpClient}
 import org.orbeon.oxf.util.PathUtils

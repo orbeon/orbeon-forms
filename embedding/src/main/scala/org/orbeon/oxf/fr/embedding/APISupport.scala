@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.fr.embedding
 
-import java.io.Writer
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.apache.commons.io.IOUtils
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
+import org.orbeon.connection.{Content, Redirect, StreamedContent, StreamedContentOrRedirect}
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
@@ -28,14 +27,17 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.{ContentTypes, PathUtils}
-import org.orbeon.xforms.Constants
 import org.orbeon.wsrp.WSRPSupport
+import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory
 
-import scala.jdk.CollectionConverters._
+import java.io.Writer
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import scala.collection.immutable
-import scala.util.{Failure, Success}
+import scala.jdk.CollectionConverters._
 import scala.util.matching.Regex
+import scala.util.{Failure, Success}
+
 
 object APISupport {
 

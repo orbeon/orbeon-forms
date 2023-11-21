@@ -1,7 +1,7 @@
 package org.orbeon.oxf.fr.persistence.api
 
 import cats.syntax.option._
-import org.orbeon.connection.ConnectionResult
+import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.{ExternalContext, RequestAdapter, UrlRewriteMode}

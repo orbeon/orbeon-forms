@@ -13,10 +13,8 @@
  */
 package org.orbeon.oxf.portlet
 
-import java.io.{OutputStream, PrintWriter}
-import java.{util => ju}
-import javax.portlet._
 import org.apache.commons.io.IOUtils
+import org.orbeon.connection._
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.fr.embedding.{APISupport, EmbeddingContext, EmbeddingContextWithResponse}
 import org.orbeon.oxf.http._
@@ -25,6 +23,9 @@ import org.orbeon.oxf.portlet.liferay.LiferayURL
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.wsrp.WSRPSupport.PathParameterName
 
+import java.io.{OutputStream, PrintWriter}
+import java.{util => ju}
+import javax.portlet._
 import scala.jdk.CollectionConverters._
 import scala.util.Try
 

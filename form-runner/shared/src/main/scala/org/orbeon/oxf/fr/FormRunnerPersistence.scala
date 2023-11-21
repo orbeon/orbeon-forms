@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import cats.syntax.option._
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException

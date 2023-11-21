@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.model
 
 import cats.syntax.option._
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}

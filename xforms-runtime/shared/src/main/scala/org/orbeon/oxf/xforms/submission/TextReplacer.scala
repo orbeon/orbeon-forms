@@ -14,7 +14,8 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.syntax.option._
-import org.orbeon.oxf.util.{ConnectionResult, XPathCache}
+import org.orbeon.connection.ConnectionResult
+import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.event.Dispatch

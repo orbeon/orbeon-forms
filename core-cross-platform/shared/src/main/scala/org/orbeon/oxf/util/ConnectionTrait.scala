@@ -15,6 +15,7 @@ package org.orbeon.oxf.util
 
 import java.net.URI
 import cats.Eval
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.Headers._

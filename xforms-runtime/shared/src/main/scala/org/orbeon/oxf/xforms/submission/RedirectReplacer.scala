@@ -13,8 +13,8 @@
   */
 package org.orbeon.oxf.xforms.submission
 
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 

@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.oxf.util.ConnectionResult
+import org.orbeon.connection.ConnectionResult
 
 
 trait Replacer {

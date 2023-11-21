@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
+import org.orbeon.connection.ConnectionResult;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;

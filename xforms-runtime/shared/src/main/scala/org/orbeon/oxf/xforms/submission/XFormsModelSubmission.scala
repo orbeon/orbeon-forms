@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 import cats.syntax.option._
 import org.log4s.Logger
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.http.StatusCode

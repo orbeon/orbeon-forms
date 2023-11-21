@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.processor.generator
 
+import org.orbeon.connection.ConnectionResult
 import java.{lang => jl, util => ju}
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.{CollectionUtils, ConnectionResult, DateUtils, NetUtils}
+import org.orbeon.oxf.util.{CollectionUtils, DateUtils, NetUtils}
 
 import scala.jdk.CollectionConverters._
 import scala.collection.compat._

@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import org.orbeon.connection.ConnectionResult
+
 import java.io.{ByteArrayOutputStream, InputStream}
 import java.net.URI
 import org.orbeon.dom.{Document, Element, VisitorSupport}

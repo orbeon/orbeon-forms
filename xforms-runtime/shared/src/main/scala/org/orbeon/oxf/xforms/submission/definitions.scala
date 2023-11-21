@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.oxf.util.ConnectionResult
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
 import org.orbeon.oxf.xforms.model.XFormsInstance

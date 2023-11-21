@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.log4s
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.ValidationException

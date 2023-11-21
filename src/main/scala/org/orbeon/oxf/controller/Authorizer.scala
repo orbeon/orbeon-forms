@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.controller
 
+import org.orbeon.connection.ConnectionResult
+
 import java.lang.{Boolean => JBoolean}
 import java.net.URI
 import org.orbeon.exception.OrbeonFormatter

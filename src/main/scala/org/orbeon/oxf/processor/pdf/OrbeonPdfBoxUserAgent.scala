@@ -17,6 +17,7 @@ import com.openhtmltopdf.layout.SharedContext
 import com.openhtmltopdf.pdfboxout.{PdfBoxImage, PdfBoxOutputDevice, PdfBoxUserAgent}
 import com.openhtmltopdf.resource.ImageResource
 import com.openhtmltopdf.util.{LogMessageId, XRLog}
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
@@ -24,7 +25,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.ImageSupport.{compressJpegImage, findImageOrientation, findTransformation, transformImage}
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.TryUtils.TryOps
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, IndentedLogger, URLRewriterUtils}
+import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupportTrait, IndentedLogger, URLRewriterUtils}
 
 import java.io._
 import java.net.URI

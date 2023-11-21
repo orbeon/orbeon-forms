@@ -18,6 +18,7 @@ import org.apache.commons.fileupload.disk.DiskFileItem
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.mime.content.ByteArrayBody
 import org.apache.http.entity.mime.{FormBodyPartBuilder, HttpMultipartMode, MultipartEntityBuilder}
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.CharsetNames
@@ -33,7 +34,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.PathUtils.{recombineQuery, splitQueryDecodeParams}
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ByteEncoding, ConnectionResult, ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, Mediatypes, PathUtils, SecureUtils, StaticXPath, URLRewriterUtils}
+import org.orbeon.oxf.util.{ByteEncoding, ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, Mediatypes, PathUtils, SecureUtils, StaticXPath, URLRewriterUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI.{inScopeContainingDocument, setvalue}
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xml.SaxonUtils

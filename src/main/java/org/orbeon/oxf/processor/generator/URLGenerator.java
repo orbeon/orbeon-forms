@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.generator;
 
+import org.orbeon.connection.ConnectionResult;
 import org.orbeon.datatypes.BasicLocationData;
 import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;

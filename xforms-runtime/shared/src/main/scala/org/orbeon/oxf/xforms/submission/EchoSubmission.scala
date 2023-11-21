@@ -14,8 +14,9 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.syntax.option._
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.http.{Headers, StreamedContent}
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport}
+import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.io.ByteArrayInputStream

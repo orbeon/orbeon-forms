@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.event.events
 
 import enumeratum._
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}

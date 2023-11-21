@@ -15,10 +15,11 @@ package org.orbeon.oxf.fb
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.datatypes.Coordinate1
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
-import org.orbeon.oxf.fb.FormBuilder.{findNestedContainers, _}
+import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.fr.FormRunner._
@@ -32,7 +33,7 @@ import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, NetUtils, PathUtils, URLRewriterUtils, XPath}
+import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, NetUtils, PathUtils, URLRewriterUtils, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI

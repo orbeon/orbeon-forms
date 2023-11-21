@@ -11,16 +11,17 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.util
+package org.orbeon.connection
 
-import java.io._
-import java.{lang => jl}
 import org.log4s
 import org.orbeon.oxf.http.{DateHeaders, HttpStatusCodeException, StatusCode, StreamedContent, Headers => HttpHeaders}
 import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger}
 
-import scala.util.{Failure, Success, Try}
+import java.io._
+import java.{lang => jl}
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
 
 case class ConnectionResult(

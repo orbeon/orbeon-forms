@@ -162,7 +162,7 @@
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.map.ssl"                                   value="false"/>
 
     <property as="xs:integer" name="oxf.xforms.xbl.fr.autocomplete.max-results-displayed"        value="10"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.databound-select1-search.min-input-length" value=""/>
+    <property as="xs:integer" name="oxf.xforms.xbl.fr.databound-select1-search.min-input-length" value="0"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.prefix"                           value="$"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.suffix"                           value=""/>

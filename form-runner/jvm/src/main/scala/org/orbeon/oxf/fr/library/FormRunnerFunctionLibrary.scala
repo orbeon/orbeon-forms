@@ -165,7 +165,7 @@ private object FormRunnerFunctions {
     "workflow-stage-value"        -> (() => FormRunner.documentWorkflowStage),
     "username"                    -> (() => NetUtils.getExternalContext.getRequest.credentials map     (_.userAndGroup.username)),
     "user-group"                  -> (() => NetUtils.getExternalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)),
-    "relevant-form-values-string" -> (() => Some(FormRunnerMetadata.findAllControlsWithValues(html = false))),
+    "relevant-form-values-string" -> (() => Some(FormRunnerMetadata.findAllControlsWithValues(html = false, Nil))),
     "wizard-current-page-name"    -> (() => Wizard.wizardCurrentPageNameOpt)
   )
 

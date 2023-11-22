@@ -107,7 +107,7 @@
                                             (: 3. It would be good to have a way to configure the values separator. :)
                                             string-join($data//*[empty(*) and name() = $p/fr:controlName]/string(), ', ')
                                         else if ($p/@type = 'AllControlValuesParam') then
-                                            metadata:findAllControlsWithValues($is-html)
+                                            metadata:findAllControlsWithValues($is-html, $template-elem/exclude-from-all-control-values/control)
                                         else if (
                                             $p/@type = (
                                                 'LinkToEditPageParam',

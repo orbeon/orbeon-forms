@@ -68,7 +68,7 @@ object FormRunnerMetadata {
   val DeselectedCheckboxString = "☐"
 
   //@XPathFunction
-  def findAllControlsWithValues(html: Boolean): String = {
+  def findAllControlsWithValues(html: Boolean, controlsToExclude: List[NodeInfo]): String = {
 
     val currentFormRunnerResources = FormRunnerLang.currentFRResources
 
@@ -80,8 +80,9 @@ object FormRunnerMetadata {
 
     val controlDetails =
       gatherRelevantControls(
-        XFormsAPI.inScopeContainingDocument,
-        Lang(FormRunnerLang.currentFRLang)
+        doc                   = XFormsAPI.inScopeContainingDocument,
+        currentLang           = Lang(FormRunnerLang.currentFRLang),
+        controlNamesToExclude = controlsToExclude.map(_.stringValue).toSet
       )
 
     def createLine(
@@ -297,8 +298,9 @@ object FormRunnerMetadata {
   }
 
   def gatherRelevantControls(
-    doc         : XFormsContainingDocument,
-    currentLang : Lang
+    doc                  : XFormsContainingDocument,
+    currentLang          : Lang,
+    controlNamesToExclude: Set[String]
   ): List[ControlDetails] = {
 
     val controls = doc.controls.getCurrentControlTree.effectiveIdsToControls
@@ -332,6 +334,8 @@ object FormRunnerMetadata {
         case _                                                                 => false
       }
 
+    // Controls can be excluded via isExcluded (class on control) or controlNamesToExclude (retrieved from email template)
+
     val selectedControls =
       controls.values  filter
         (_.isRelevant) filterNot
@@ -347,6 +351,7 @@ object FormRunnerMetadata {
         staticControl = control.staticControl
         if ! staticControl.staticId.startsWith("fb-lhh-editor-for-") // HACK for this in grid.xbl
         controlName   <- FormRunner.controlNameFromIdOpt(control.getId)
+        if ! controlNamesToExclude.contains(controlName)
       } yield {
 
         val singleNodeControlOpt = control.narrowTo[XFormsSingleNodeControl]

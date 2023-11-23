@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.connection.{ConnectionResult, StreamedContent}
+import org.orbeon.connection.{AsyncConnectionResult, AsyncStreamedContent, ConnectionResult, StreamedContent}
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.Headers._
@@ -46,13 +46,13 @@ trait ConnectionTrait {
     method          : HttpMethod,
     url             : URI,
     credentials     : Option[BasicCredentials],
-    content         : Option[StreamedContent],
+    content         : Option[AsyncStreamedContent],
     headers         : Map[String, List[String]],
     loadState       : Boolean,
     logBody         : Boolean)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Future[ConnectionResult]
+  ): Future[AsyncConnectionResult]
 
   def isInternalPath(path: String): Boolean
 

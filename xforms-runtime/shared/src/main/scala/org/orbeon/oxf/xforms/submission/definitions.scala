@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.connection.ConnectionResult
+import org.orbeon.connection.{ConnectionResult, ConnectionResultT}
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
 import org.orbeon.oxf.xforms.model.XFormsInstance
@@ -44,9 +44,9 @@ case class RefContext(
   xpathContext                 : XPathContext
 )
 
-case class ConnectResult(
+case class ConnectResultT[S](
   submissionEffectiveId : String,
-  result                : Try[(Replacer, ConnectionResult)]
+  result                : Try[(Replacer, ConnectionResultT[S])]
 )
 
 sealed trait ReplaceResult

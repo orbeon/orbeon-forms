@@ -1,17 +1,21 @@
 package org.orbeon.oxf.xforms.submission
 
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
+import org.orbeon.connection.ConnectionResultT
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.{debug, debugResults, error, withDebug}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.xforms.EventNames
 
+import java.io.{ByteArrayInputStream, InputStream}
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
-import scala.util.Try
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
 
 // An instance of this class can become no longer referenced if the `XFCD` becomes passivated/serialized. If the
@@ -45,7 +49,7 @@ trait AsynchronousSubmissionManagerTrait {
 
   def addAsynchronousSubmission(
     submissionEffectiveId: String,
-    future               : Future[ConnectResult],
+    future               : Future[AsyncConnectResult],
     submissionParameters : SubmissionParameters,
     awaitInCurrentRequest: Option[Duration]
   ): Unit = {
@@ -53,19 +57,22 @@ trait AsynchronousSubmissionManagerTrait {
     totalSubmittedCount += 1
     pendingCount += 1
 
+    val inputStreamF =
+      future.flatMap(convertConnectResult)
+
     val mustWait = awaitInCurrentRequest match {
       case Some(duration) if duration.gt(Duration.Zero) =>
         requestRunningCount.incrementAndGet()
-        requestPendingList ::= future -> duration
+        requestPendingList ::= inputStreamF -> duration
         true
       case None =>
         false
     }
 
     runningCount.incrementAndGet()
-    pendingList ::= future
+    pendingList ::= inputStreamF
 
-    future.onComplete { result =>
+    inputStreamF.onComplete { result =>
       if (mustWait)
         requestRunningCount.decrementAndGet()
 
@@ -73,6 +80,31 @@ trait AsynchronousSubmissionManagerTrait {
       completionQueue.add((submissionEffectiveId, submissionParameters, result))
     }
   }
+
+  // Convert the `fs2.Stream` in the `ConnectResult` to an `InputStream`. Of course, We'd like to stream all the way
+  // ideally, but this is a first step. We cannot use `fs2.io.toInputStream` because it requires running two threads,
+  // which doesn't work in JavaScript. So we go through an in-memory `Array` for now. Note that sending data also
+  // works with `Array`s. Also, note that we use `Future` as that's currently what's submitted to this manager.
+  private def fs2StreamToInputStreamInMemory(s: fs2.Stream[IO, Byte]): Future[InputStream] =
+    s.compile.to(Array).map(new ByteArrayInputStream(_)).unsafeToFuture()
+
+  private def convertConnectResult(fs2Cr: AsyncConnectResult): Future[ConnectResult] =
+    fs2Cr match {
+      case ConnectResultT(_, Success(t @ (_, fs2Cxr @ ConnectionResultT(_, _, _, fs2Content, _, _)))) =>
+        for(is <- fs2StreamToInputStreamInMemory(fs2Content.stream))
+        yield
+          fs2Cr.copy(
+            result = Success(
+              t.copy(
+                _2 = fs2Cxr.copy(
+                  content = fs2Content.copy(stream = is)
+                )
+              )
+            )
+          )
+      case ConnectResultT(submissionEffectiveId, Failure(t)) =>
+        Future.successful(ConnectResultT(submissionEffectiveId, Failure(t)))
+    }
 
   def hasPendingAsynchronousSubmissions: Boolean = pendingCount > 0
 
@@ -93,7 +125,10 @@ trait AsynchronousSubmissionManagerTrait {
           try {
             containingDocument
               .getObjectByEffectiveId(submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
-              .processAsyncSubmissionResponse(connectResultTry, submissionParameters)
+              .processAsyncSubmissionResponse(
+                connectResultTry,
+                submissionParameters
+              )
             processedCount += 1
           } catch {
             case NonFatal(t) =>

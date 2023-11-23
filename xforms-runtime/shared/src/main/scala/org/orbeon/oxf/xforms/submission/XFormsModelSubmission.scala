@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 import cats.syntax.option._
 import org.log4s.Logger
-import org.orbeon.connection.ConnectionResult
+import org.orbeon.connection.{ConnectionResult, ConnectionResultT}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.http.StatusCode
@@ -34,6 +34,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{RelevanceHandling, XFormsId}
 import shapeless.syntax.typeable._
 
+import java.io.InputStream
 import java.net.URI
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
@@ -142,7 +143,8 @@ class XFormsModelSubmission(
       }
     )
 
-  def getReplacer(cxr: ConnectionResult, submissionParameters: SubmissionParameters)(implicit logger: IndentedLogger): Replacer = {
+
+  def getReplacer(cxr: ConnectionResultT[_], submissionParameters: SubmissionParameters)(implicit logger: IndentedLogger): Replacer = {
     // NOTE: This can be called from other threads so it must NOT modify the XFCD or submission
     // Handle response
     if (cxr.dontHandleResponse) {
@@ -478,20 +480,22 @@ class XFormsModelSubmission(
               case Some(Right(connectResultF)) if submissionParameters.isDeferredSubmission =>
                 containingDocument.setReplaceAllFuture(connectResultF)
                 None
-              case Some(Right(connectResultF)) if connectResultF.value.isDefined =>
-                // Optimization if the `Future` is already completed
-                connectResultF.value match {
-                  case Some(Success(connectResult)) =>
-                    handleConnectResult(
-                      submissionParameters   = submissionParameters,
-                      connectResult          = connectResult,
-                      initializeXPathContext = true // function context might have changed
-                    ).some
-                  case Some(Failure(t)) =>
-                    (ReplaceResult.SendError(t, Right(submissionParameters.actionOrResource.some), submissionParameters.tunnelProperties), None).some
-                  case None =>
-                    throw new IllegalStateException // we check for `isDefined` above
-                }
+                // This optimization is not possible now because we also depend on the contained `fs2.Stream` to be
+                // fully ready, not only the `Future`.
+//              case Some(Right(connectResultF)) if connectResultF.value.isDefined =>
+//                // Optimization if the `Future` is already completed
+//                connectResultF.value match {
+//                  case Some(Success(connectResult)) =>
+//                    handleConnectResult(
+//                      submissionParameters   = submissionParameters,
+//                      connectResult          = connectResult,
+//                      initializeXPathContext = true // function context might have changed
+//                    ).some
+//                  case Some(Failure(t)) =>
+//                    (ReplaceResult.SendError(t, Right(submissionParameters.actionOrResource.some), submissionParameters.tunnelProperties), None).some
+//                  case None =>
+//                    throw new IllegalStateException // we check for `isDefined` above
+//                }
               case Some(Right(connectResultF)) =>
                 // The `Future` is not completed yet so we tell the async submission manager
                 containingDocument

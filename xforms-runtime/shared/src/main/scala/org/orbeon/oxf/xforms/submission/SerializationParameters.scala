@@ -32,7 +32,7 @@ import scala.util.control.NonFatal
 
 
 case class SerializationParameters(
-  messageBody            : Option[Array[Byte]],
+  messageBody            : Option[Array[Byte]], // TODO: this should be a stream
   queryString            : String,
   actualRequestMediatype : String
 )

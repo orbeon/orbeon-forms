@@ -39,7 +39,7 @@ class ClientGetAllSubmission(submission: XFormsModelSubmission)
     serializationParameters: SerializationParameters
   )(implicit
     refContext             : RefContext
-  ): Option[ConnectResult Either Future[ConnectResult]] = {
+  ): Option[ConnectResult Either Future[AsyncConnectResult]] = {
     XFormsLoadAction.resolveStoreLoadValue(
       containingDocument           = submission.containingDocument,
       currentElem                  = Option(submission.staticSubmission.element),

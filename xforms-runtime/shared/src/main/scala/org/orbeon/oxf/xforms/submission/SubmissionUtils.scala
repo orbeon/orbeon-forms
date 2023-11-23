@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.connection.{ConnectionResult, StreamedContent}
+import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.common.OXFException
@@ -225,13 +225,24 @@ object SubmissionUtils {
     } else
       Map.empty[String, List[String]]
 
-  def forwardResponseHeaders(cxr: ConnectionResult, response: ExternalContext.Response): Unit =
+  def forwardResponseHeaders(cxr: ConnectionResultT[_], response: ExternalContext.Response): Unit =
     for {
       (headerName, headerValues) <- http.Headers.proxyHeaders(cxr.headers, request = false)
       headerValue                <- headerValues
     } locally {
       response.addHeader(headerName, headerValue)
     }
+
+  def forwardStatusAndHeaders[S](cxr: ConnectionResultT[S], response: ExternalContext.Response): Unit = {
+    response.setStatus(cxr.statusCode)
+    forwardResponseHeaders(cxr, response)
+  }
+
+  def forwardStatusContentTypeAndHeaders(cxr: ConnectionResultT[_], response: ExternalContext.Response): Unit = {
+    response.setStatus(cxr.statusCode)
+    cxr.content.contentType.foreach(response.setContentType)
+    forwardResponseHeaders(cxr, response)
+  }
 
   // Whether there is at least one relevant upload control with pending upload bound to any node of the given instance
   def hasBoundRelevantPendingUploadControls(

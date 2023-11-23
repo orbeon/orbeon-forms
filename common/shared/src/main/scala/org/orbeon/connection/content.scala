@@ -24,8 +24,7 @@ case class StreamedContentT[S](
   def close(): Unit = runQuietly(stream match {
     case is: InputStream => is.close()
     case _               => // anything to do with `fs2.Stream`?
-  }
-  )
+  })
 }
 
 object StreamedContent {
@@ -58,6 +57,14 @@ object StreamedContent {
   def fromBytes(bytes: Array[Byte], contentType: Option[String], title: Option[String] = None): StreamedContent =
     StreamedContent(
       inputStream   = new ByteArrayInputStream(bytes),
+      contentType   = contentType,
+      contentLength = Some(bytes.size.toLong),
+      title         = title
+    )
+
+  def asyncFromBytes(bytes: Array[Byte], contentType: Option[String], title: Option[String] = None): AsyncStreamedContent =
+    StreamedContentT(
+      stream        = fs2.Stream.emits(bytes),
       contentType   = contentType,
       contentLength = Some(bytes.size.toLong),
       title         = title

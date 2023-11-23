@@ -40,7 +40,7 @@ import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.state.{LockResponse, RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{ConnectResult, TwoPassSubmissionParameters}
+import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -169,7 +169,7 @@ trait ContainingDocumentTransientState {
     var nonJavaScriptLoadsToRun  : Vector[Load] = Vector.empty
     var scriptsToRun             : Vector[Either[Load, Either[ScriptInvocation, CallbackInvocation]]] = Vector.empty
 
-    var replaceAllFuture         : Option[Future[ConnectResult]] = None
+    var replaceAllFuture         : Option[Future[AsyncConnectResult]] = None
     var gotSubmissionReplaceAll  : Boolean = false
     var gotSubmissionRedirect    : Boolean = false
 
@@ -214,9 +214,9 @@ trait ContainingDocumentTransientState {
 
   def getNonJavaScriptLoadsToRun: immutable.Seq[Load] = transientState.nonJavaScriptLoadsToRun
 
-  def getReplaceAllEval: Option[Future[ConnectResult]] = transientState.replaceAllFuture
+  def getReplaceAllFuture: Option[Future[AsyncConnectResult]] = transientState.replaceAllFuture
 
-  def setReplaceAllFuture(eval: Future[ConnectResult]): Unit =
+  def setReplaceAllFuture(eval: Future[AsyncConnectResult]): Unit =
     transientState.replaceAllFuture = Some(eval.ensuring(_ ne null))
 
   def setGotSubmissionReplaceAll(): Unit = {

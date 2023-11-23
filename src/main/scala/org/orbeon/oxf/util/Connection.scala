@@ -13,11 +13,13 @@
  */
 package org.orbeon.oxf.util
 
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import cats.syntax.option._
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.log4s
-import org.orbeon.connection.{ConnectionResult, StreamedContent}
+import org.orbeon.connection._
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.{OXFException, ValidationException}
@@ -26,8 +28,6 @@ import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http._
-import org.orbeon.oxf.pipeline.InitUtils
-import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
@@ -37,7 +37,7 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 
-import java.io.File
+import java.io.{ByteArrayInputStream, File}
 import java.net.URI
 import java.{util => ju}
 import javax.servlet.http.{Cookie, HttpServletRequest}
@@ -98,13 +98,13 @@ object Connection extends ConnectionTrait {
     method          : HttpMethod,
     url             : URI,
     credentials     : Option[BasicCredentials],
-    content         : Option[StreamedContent],
+    content         : Option[AsyncStreamedContent],
     headers         : Map[String, List[String]],
     loadState       : Boolean,
     logBody         : Boolean)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Future[ConnectionResult] = {
+  ): Future[AsyncConnectionResult] = {
 
     // Make sure this is created at the time `submit` is called and not within the `Future`, which
     // could be running within another thread.
@@ -122,20 +122,71 @@ object Connection extends ConnectionTrait {
         new ResponseAdapter
       )
 
-    Future(
-      InitUtils.withPipelineContext { pipelineContext =>
-        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, newExternalContext)
-        connectInternal(
-          method      = method,
-          url         = url,
-          credentials = credentials,
-          content     = content,
-          headers     = headers,
-          loadState   = loadState,
-          logBody     = logBody
-        )._2
-      }
-    )
+    // Here we convert an `fs2.Stream` to a Java `InputStream` which is used downstream. This works if the producer and
+    // the consumer are in different threads. Ideally, our downstream code would be able to deal with an `fs2.Stream`.
+//    def requestStreamedContentOptF: Future[Option[StreamedContent]] =
+//      content.map(c =>
+//        c.stream
+//          .through(fs2.io.toInputStream)
+//          .map(is =>
+//            StreamedContent(
+//              inputStream   = is,
+//              contentType   = c.contentType,
+//              contentLength = c.contentLength,
+//              title         = c.title
+//            ).some
+//          ).compile.onlyOrError.unsafeToFuture()
+//      ).getOrElse(Future.successful(None))
+
+    def requestStreamedContentOptF: Future[Option[StreamedContent]] =
+      content.map(c =>
+        c.stream
+          .compile.to(Array).map(a =>
+            StreamedContent(
+              inputStream   = new ByteArrayInputStream(a),
+              contentType   = c.contentType,
+              contentLength = c.contentLength,
+              title         = c.title
+            ).some
+          ).unsafeToFuture()
+      ).getOrElse(Future.successful(None))
+
+    def connectWithContentF(requestStreamedContentOpt: Option[StreamedContent]): Future[ConnectionResultT[fs2.Stream[IO, Byte]]] =
+      Future(
+        InitUtils.withPipelineContext { pipelineContext =>
+
+          pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, newExternalContext)
+
+          val (_, cxr) =
+            connectInternal(
+              method      = method,
+              url         = url,
+              credentials = credentials,
+              content     = requestStreamedContentOpt,
+              headers     = headers,
+              loadState   = loadState,
+              logBody     = logBody
+            )
+
+          // Return an `AsyncConnectionResult` even though for now we obtain a synchronous `ConnectionResult`, so that
+          // the callers deal with an `fs2.Stream` consistently for async calls on the JVM as well as JavaScript. Later
+          // we can create an `AsyncConnectionResult` directly.
+          ConnectionResultT(
+            url                = cxr.url,
+            statusCode         = cxr.statusCode,
+            headers            = cxr.headers,
+            content            = StreamedContent(
+              fs2.io.readInputStream(IO.pure(cxr.content.stream), 4096, closeAfterUse = false),
+              cxr.content.contentType,
+              cxr.content.contentLength
+            ),
+            hasContent         = cxr.hasContent,
+            dontHandleResponse = cxr.dontHandleResponse
+          )
+        }
+      )
+
+    requestStreamedContentOptF.flatMap(connectWithContentF)
   }
 
   // For Java callers

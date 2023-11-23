@@ -41,14 +41,15 @@ class EchoSubmission(submission: XFormsModelSubmission)
     serializationParameters: SerializationParameters
   )(implicit
     refContext             : RefContext
-  ): Option[ConnectResult Either Future[ConnectResult]] = {
+  ): Option[ConnectResult Either Future[AsyncConnectResult]] = {
 
     serializationParameters.messageBody match {
       case None =>
         // Not sure when this can happen, but it can't be good
+        // Q: Can't we use a `GET`?
         throw new XFormsSubmissionException(
           submission  = submission,
-          message     = "Action 'test:': no message body.",
+          message     = s"Action `${submissionParameters.actionOrResource}`: no message body.",
           description = "processing submission response"
         )
       case Some(messageBody) =>
@@ -97,7 +98,7 @@ class EchoSubmission(submission: XFormsModelSubmission)
     )
 
     Left(
-      ConnectResult(
+      ConnectResultT(
         submission.getEffectiveId,
         Success((submission.getReplacer(cxr, submissionParameters)(submission.getIndentedLogger), cxr)))
     ).some

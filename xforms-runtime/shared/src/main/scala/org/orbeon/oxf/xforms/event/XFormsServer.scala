@@ -15,7 +15,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{ConnectResult, XFormsModelSubmissionSupport}
+import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, ConnectResultT, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
@@ -80,7 +80,7 @@ object XFormsServer {
     // - https://github.com/orbeon/orbeon-forms/issues/2071
     // - https://github.com/orbeon/orbeon-forms/issues/1984
     // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
-    val lockResult: Try[Try[Option[Future[ConnectResult]]]] =
+    val lockResult: Try[Try[Option[Future[AsyncConnectResult]]]] =
       withLock(requestParameters, timeout = if (isAjaxRequest) 0L else XFormsGlobalProperties.getAjaxTimeout) {
         case Some(containingDocument) =>
 
@@ -153,7 +153,7 @@ object XFormsServer {
 
               Success(
                 withUpdateResponse(containingDocument, ignoreSequenceNumber) {
-                  containingDocument.getReplaceAllEval match {
+                  containingDocument.getReplaceAllFuture match {
                     case None =>
                       xmlReceiverOpt match {
                         case Some(xmlReceiver) =>
@@ -223,9 +223,9 @@ object XFormsServer {
                           debug("handling NOP response for submission with `replace=\"all\"`")
                       }
                       None
-                    case evalOpt =>
+                    case futureOpt =>
                       // Check if there is a submission with `replace="all"` that needs processing
-                      evalOpt
+                      futureOpt
                   }
                 }
               )
@@ -293,7 +293,8 @@ object XFormsServer {
         // - Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
         //   hit the document.
         // - No need to output a null document here, `xmlReceiver` is absent anyway.
-        XFormsModelSubmissionSupport.runDeferredSubmission(replaceAllFuture, responseForReplaceAll)
+        Option(responseForReplaceAll)
+          .foreach(XFormsModelSubmissionSupport.runDeferredSubmissionForUpdate(replaceAllFuture, _))
       case Success(Success(None)) =>
       case Success(Failure(t))    => throw t
     }

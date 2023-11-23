@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import cats.effect.IO
 import cats.syntax.option._
-import org.orbeon.connection.{ConnectionResult, StreamedContent}
+import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
 import org.orbeon.oxf.http.{Headers, StatusCode}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
@@ -24,6 +25,7 @@ import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+import java.io.InputStream
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
@@ -46,7 +48,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
     serializationParameters: SerializationParameters
   )(implicit
     refContext             : RefContext
-  ): Option[ConnectResult Either Future[ConnectResult]] = {
+  ): Option[ConnectResult Either Future[AsyncConnectResult]] = {
 
     val absoluteResolvedURLString =
       getAbsoluteSubmissionURL(
@@ -76,11 +78,30 @@ class CacheableSubmission(submission: XFormsModelSubmission)
           absoluteResolvedURLString,
           StatusCode.Ok,
           Headers.EmptyHeaders,
-          StreamedContent.Empty, // we used to create non-empty content because we were using `getReplacer()`
+          StreamedContent.Empty,
           dontHandleResponse = false
         )
 
-      ConnectResult(
+      ConnectResultT(
+        submissionEffectiveId,
+        Success((new DirectInstanceReplacer((document, instanceCaching)), connectionResult))
+      )
+    }
+
+    // xxx todo reduce duplication
+    def createReplacerAndConnectionResult2(document: DocumentNodeInfoType): AsyncConnectResult = {
+
+      val connectionResult =
+        ConnectionResultT(
+          absoluteResolvedURLString,
+          StatusCode.Ok,
+          Headers.EmptyHeaders,
+          StreamedContent(fs2.Stream.empty[IO], None, None),
+          hasContent = false,
+          dontHandleResponse = false
+        )
+
+      ConnectResultT(
         submissionEffectiveId,
         Success((new DirectInstanceReplacer((document, instanceCaching)), connectionResult))
       )
@@ -102,7 +123,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
         try {
           if (submissionParameters.isAsynchronous) {
 
-            val futureNewDocumentInfo =
+            val newDocumentInfoF =
               XFormsServerSharedInstancesCache.findContentOrLoadAsync(
                 instanceCaching,
                 submissionParameters.isReadonly,
@@ -111,7 +132,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
               )(detailsLogger)
 
             // xxx probably not?
-            Right(futureNewDocumentInfo.map(createReplacerAndConnectionResult)).some
+            Right(newDocumentInfoF.map(createReplacerAndConnectionResult2)).some
           } else {
 
             val newDocumentInfo =
@@ -128,10 +149,10 @@ class CacheableSubmission(submission: XFormsModelSubmission)
         } catch {
           case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
             // The ThrowableWrapper was thrown within the inner load() method above
-            Left(ConnectResult(submissionEffectiveId, Failure(throwableWrapper.throwable))).some
+            Some(Left(ConnectResultT.apply(submissionEffectiveId, Failure(throwableWrapper.throwable))))
           case NonFatal(throwable) =>
             // Any other throwable
-            Left(ConnectResult(submissionEffectiveId, Failure(throwable))).some
+            Some(Left(ConnectResultT(submissionEffectiveId, Failure(throwable))))
         } finally {
           if (submissionParameters.isAsynchronous && timingLogger.debugEnabled) {
 

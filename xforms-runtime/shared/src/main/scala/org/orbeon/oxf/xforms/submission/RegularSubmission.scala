@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 
 import cats.syntax.option._
-import org.orbeon.connection.{ConnectionResult, StreamedContent}
+import org.orbeon.connection.{ConnectionResultT, StreamedContent}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
@@ -48,7 +48,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
     serializationParameters: SerializationParameters
   )(implicit
     refContext          : RefContext
-  ): Option[ConnectResult Either Future[ConnectResult]] = {
+  ): Option[ConnectResult Either Future[AsyncConnectResult]] = {
 
     val absoluteResolvedURL =
       URI.create(
@@ -83,15 +83,15 @@ class RegularSubmission(submission: XFormsModelSubmission)
     val submissionEffectiveId = submission.getEffectiveId
 
     val messageBody: Option[Array[Byte]] =
-      if (HttpMethodsWithRequestBody(submissionParameters.httpMethod)) serializationParameters.messageBody orElse Some(Array.emptyByteArray) else None
+      if (HttpMethodsWithRequestBody(submissionParameters.httpMethod))
+        serializationParameters.messageBody orElse Some(Array.emptyByteArray)
+      else
+        None
 
-    val content = messageBody map
-      (StreamedContent.fromBytes(_, firstItemIgnoreCase(headers, ContentType)))
-
-    def createConnectResult(cxr: ConnectionResult)(implicit logger: IndentedLogger): ConnectResult =
+    def createConnectResult[S](cxr: ConnectionResultT[S])(implicit logger: IndentedLogger): ConnectResultT[S] =
       withDebug("creating connect result") {
         try {
-          ConnectResult(
+          ConnectResultT(
             submissionEffectiveId,
             Success(submission.getReplacer(cxr, submissionParameters)(submission.getIndentedLogger), cxr)
           )
@@ -99,7 +99,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
           case NonFatal(throwable) =>
             // xxx need to close cxr in case of error also later after running deserialize()
             IOUtils.runQuietly(cxr.close()) // close here as it's not passed through `ConnectResult`
-            ConnectResult(submissionEffectiveId, Failure(throwable))
+            ConnectResultT(submissionEffectiveId, Failure(throwable))
         } finally {
           if (submissionParameters.isAsynchronous)
             debugResults(
@@ -118,7 +118,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
             method          = submissionParameters.httpMethod,
             url             = absoluteResolvedURL,
             credentials     = submissionParameters.credentialsOpt,
-            content         = content,
+            content         = messageBody.map(StreamedContent.asyncFromBytes(_, firstItemIgnoreCase(headers, ContentType))),
             headers         = headers,
             loadState       = true,
             logBody         = BaseSubmission.isLogBody)(
@@ -133,7 +133,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
               method          = submissionParameters.httpMethod,
               url             = absoluteResolvedURL,
               credentials     = submissionParameters.credentialsOpt,
-              content         = content,
+              content         = messageBody.map(StreamedContent.fromBytes(_, firstItemIgnoreCase(headers, ContentType))),
               headers         = headers,
               loadState       = true,
               saveState       = true,

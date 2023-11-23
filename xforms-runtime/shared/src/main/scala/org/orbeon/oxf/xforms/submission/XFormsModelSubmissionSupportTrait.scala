@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import org.orbeon.connection.{AsyncConnectionResult, ConnectionResult}
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.Logging._
@@ -44,7 +46,12 @@ trait XFormsModelSubmissionSupportTrait {
 
   // Run the given submission. This must be for a `replace="all"` submission.
   // Called from `XFormsServer` only
-  def runDeferredSubmission(future: Future[ConnectResult], response: ExternalContext.Response): Unit
+  def runDeferredSubmissionForUpdate(future: Future[AsyncConnectResult], response: ExternalContext.Response): Unit
+
+  def forwardResultToResponse(cxr: ConnectionResult, response: ExternalContext.Response): Unit = {
+    SubmissionUtils.forwardStatusContentTypeAndHeaders(cxr, response)
+    IOUtils.copyStreamAndClose(cxr.content.stream, response.getOutputStream)
+  }
 
   // Prepare XML for submission
   //

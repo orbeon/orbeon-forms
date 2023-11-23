@@ -686,7 +686,8 @@ object FormBuilderXPathApi {
       val controlLabel = resourceMap(controlName).firstChildOpt("label").map(_.getStringValue).getOrElse("")
       <item
         label={s"$controlLabel ($controlName)"}
-        value={controlName}/>
+        value={controlName}
+        local-name={control.localname}/>
     }.map(elemToNodeInfo)
   }
 

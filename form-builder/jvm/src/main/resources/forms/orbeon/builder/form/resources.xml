@@ -1266,6 +1266,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label>Email Settings</label>
+            <enable-if-true>Enable this template only if the following formula evaluates to true</enable-if-true>
             <subject>Email Subject</subject>
             <body>Email Body</body>
             <from-properties>Template from Properties</from-properties>
@@ -2669,6 +2670,7 @@
             <template>
                 <label>Modèle</label>
             </template>
+            <enable-if-true>Activer ce modèle uniquement si la formule suivante est évaluée comme vraie</enable-if-true>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Permissions</label>
@@ -4070,6 +4072,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>
@@ -5476,6 +5479,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>
@@ -6847,6 +6851,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>
@@ -8225,6 +8230,7 @@
             <template>
                 <label>Vorlage</label>
             </template>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Berechtigungen</label>
@@ -9621,6 +9627,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>
@@ -11020,6 +11027,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>
@@ -12405,6 +12413,7 @@
             <template>
                 <label>Template</label>
             </template>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Bevoegdheden</label>
@@ -13805,6 +13814,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>
@@ -15212,6 +15222,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>

@@ -314,7 +314,7 @@ trait XFormsModelVariables {
           // Variable value is a bind nodeset to resolve
           BindVariableResolver.resolveClosestBind(
             modelBinds          = modelBindsOpt.get, // TODO XXX
-            contextBindNodeOpt  = XFormsFunction.context.data.asInstanceOf[Option[BindNode]],
+            contextBindNodeOpt  = XFormsFunction.context.bindNodeOpt,
             targetStaticBind    = targetStaticBind
           ) map (itemsIt => new SequenceExtent(itemsIt.toList.asJava)) getOrElse // https://github.com/orbeon/orbeon-forms/issues/6016
             (throw new IllegalStateException)

@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.{StaticXPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.{BindSingleItemBinding, RefSingleItemBinding, SingleItemBinding}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}
+import org.orbeon.oxf.xforms.model.{BindNode, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
@@ -134,15 +134,14 @@ class XFormsContextStack {
   def getFunctionContext(sourceEffectiveId: String): XFormsFunction.Context =
     getFunctionContext(sourceEffectiveId, this.head)
 
-  // 2023-01-21: `data` can only be `null` or a `BindNode`
-  def getFunctionContext(sourceEffectiveId: String, data: Any): XFormsFunction.Context =
-    getFunctionContext(sourceEffectiveId, this.head, data)
+  def getFunctionContext(sourceEffectiveId: String, bindNodeOpt: Option[BindNode]): XFormsFunction.Context =
+    getFunctionContext(sourceEffectiveId, this.head, bindNodeOpt)
 
   def getFunctionContext(sourceEffectiveId: String, binding: BindingContext): XFormsFunction.Context =
-    XFormsFunction.Context(container, binding, sourceEffectiveId, binding.modelOpt, null)
+    XFormsFunction.Context(container, binding, sourceEffectiveId, binding.modelOpt, None)
 
-  private def getFunctionContext(sourceEffectiveId: String, binding: BindingContext, data: Any): XFormsFunction.Context =
-    XFormsFunction.Context(container, binding, sourceEffectiveId, binding.modelOpt, data)
+  private def getFunctionContext(sourceEffectiveId: String, binding: BindingContext, bindNodeOpt: Option[BindNode]): XFormsFunction.Context =
+    XFormsFunction.Context(container, binding, sourceEffectiveId, binding.modelOpt, bindNodeOpt)
 
   /**
    * Reset the binding context to the root of the first model's first instance, or to the parent binding context.

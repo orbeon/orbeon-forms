@@ -70,7 +70,7 @@ class XFormsValueComponentControl(
                                  bindingContext    = nestedBindingContext,
                                  sourceEffectiveId = innerRootControl.effectiveId,
                                  modelOpt          = nestedBindingContext.modelOpt,
-                                 data              = null
+                                 bindNodeOpt       = None
                                )
                              )
     } yield

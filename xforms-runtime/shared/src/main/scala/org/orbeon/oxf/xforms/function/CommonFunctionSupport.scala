@@ -25,11 +25,11 @@ import scala.collection.{mutable => m}
 trait CommonFunctionSupport {
 
   case class Context(
-    container         : XBLContainer,
-    bindingContext    : BindingContext,
-    sourceEffectiveId : String,
-    modelOpt          : Option[XFormsModel],
-    data              : Any // 2023-01-21: `data` can only be `null` or a `BindNode`, and used only for the `NamespaceMapping`
+    container        : XBLContainer,
+    bindingContext   : BindingContext,
+    sourceEffectiveId: String,
+    modelOpt         : Option[XFormsModel],
+    bindNodeOpt      : Option[BindNode] // used only for the `NamespaceMapping` and `XFormsModel.variableResolver`
   ) extends FunctionContext {
 
     def containingDocument = container.containingDocument
@@ -47,15 +47,15 @@ trait CommonFunctionSupport {
     }
 
     // TODO: We should just pass a `NamespaceMapping` to the `Context` constructor!
-    def namespaceMapping: NamespaceMapping = data match {
+    def namespaceMapping: NamespaceMapping = bindNodeOpt match {
       case Some(bindNode: BindNode) =>
         // Function was called from a bind
         bindNode.parentBind.staticBind.namespaceMapping
-      case _ if bindingContext.controlElement ne null =>
+      case None if bindingContext.controlElement ne null =>
         // Function was called from a control
         // `controlElement` is mainly used in `BindingContext` to handle repeats and context.
         container.getNamespaceMappings(bindingContext.controlElement)
-      case _ =>
+      case None =>
         // Unclear which cases reach here!
         throw new IllegalArgumentException("cannot find namespace mapping")
     }

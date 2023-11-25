@@ -19,6 +19,7 @@ import org.orbeon.connection.{ConnectionResult, ConnectionResultT}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
@@ -26,6 +27,7 @@ import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.submission.SubmissionParameters.createRefContext
+import org.orbeon.oxf.xforms.submission.SubmissionUtils.convertConnectResult
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionSupport.{isSatisfiesValidity, prepareXML, requestedSerialization}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
@@ -497,15 +499,21 @@ class XFormsModelSubmission(
 //                    throw new IllegalStateException // we check for `isDefined` above
 //                }
               case Some(Right(connectResultF)) =>
-                // The `Future` is not completed yet so we tell the async submission manager
+                // Submit the async submission manager
                 containingDocument
-                  .getAsynchronousSubmissionManager(create = true)
-                  .foreach(_.addAsynchronousSubmission(
-                    thisSubmission.getEffectiveId,
-                    connectResultF,
-                    submissionParameters,
+                  .getAsynchronousSubmissionManager
+                  .addAsynchronousCompletion(
+                    description   = s"submission id: `${thisSubmission.getEffectiveId}`",
+                    future        = connectResultF.flatMap(convertConnectResult), // running asynchronously
+                    continuation  = (connectResultTry: Try[ConnectResult]) =>     // running synchronously when we process the completed submission
+                      containingDocument
+                        .getObjectByEffectiveId(thisSubmission.getEffectiveId).asInstanceOf[XFormsModelSubmission]
+                        .processAsyncSubmissionResponse(
+                          connectResultTry,
+                          submissionParameters
+                        ),
                     awaitInCurrentRequest = submissionParameters.responseMustAwait
-                  ))
+                  )
                 None
               case None =>
                 // Nothing to do here (case of `ClientGetAllSubmission`)

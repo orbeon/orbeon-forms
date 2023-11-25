@@ -20,11 +20,10 @@ import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
-import org.orbeon.oxf.util.{MarkupUtils, PathUtils}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.TryUtils._
+import org.orbeon.oxf.util.{MarkupUtils, PathUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
@@ -36,7 +35,7 @@ import org.orbeon.xbl.{ErrorSummary, Wizard}
 import org.orbeon.xforms.analysis.model.ValidationLevel._
 
 import scala.language.postfixOps
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 
 trait FormRunnerActionsCommon {
@@ -73,15 +72,15 @@ trait FormRunnerActionsCommon {
   )
 
   // Check whether there are pending uploads
-  def tryPendingUploads(params: ActionParams): Try[Any] =
-    Try {
+  def tryPendingUploads(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       if (inScopeContainingDocument.countPendingUploads > 0)
         throw new OXFException("Pending uploads")
     }
 
   // Validate form data and fail if invalid
-  def tryValidate(params: ActionParams): Try[Any] =
-    Try {
+  def tryValidate(params: ActionParams): ActionResult =
+    ActionResult.trySync {
 
       ensureDataCalculationsAreUpToDate()
 
@@ -102,37 +101,35 @@ trait FormRunnerActionsCommon {
         throw new OXFException(s"Data has failed validations for level ${level.entryName}")
     }
 
-  def tryUpdateCurrentWizardPageValidity(params: ActionParams): Try[Any] =
-    Try {
+  def tryUpdateCurrentWizardPageValidity(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       dispatch(name = "fr-update-validity", targetId = Names.ViewComponent)
     }
 
-  def tryWizardPrev(params: ActionParams): Try[Any] = {
-    Try {
+  def tryWizardPrev(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       // Still run `fr-prev` even if not allowed, as `fr-prev` does perform actions even if not moving to the previous page
       val isPrevAllowed = Wizard.isPrevAllowed
       dispatch(name = "fr-prev", targetId = Names.ViewComponent)
       if (! isPrevAllowed)
         throw new UnsupportedOperationException()
     }
-  }
 
-  def tryWizardNext(params: ActionParams): Try[Any] = {
-    Try {
+  def tryWizardNext(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       // Still run `fr-next` even if not allowed, as `fr-next` does perform actions even if not moving to the next page
       val isNextAllowed = Wizard.isNextAllowed
       dispatch(name = "fr-next", targetId = Names.ViewComponent)
       if (! isNextAllowed)
         throw new UnsupportedOperationException()
     }
-  }
 
   // It makes sense to update all calculations as needed before saving data
   // https://github.com/orbeon/orbeon-forms/issues/3591
   protected def ensureDataCalculationsAreUpToDate(): Unit =
     frc.formInstance.model.doRecalculateRevalidate()
 
-  def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =
+  def trySaveAttachmentsAndData(params: ActionParams): ActionResult = ActionResult.Sync {
     Try {
       val FormRunnerParams(app, form, formVersion, Some(document), _, _) = FormRunnerParams()
 
@@ -210,8 +207,9 @@ trait FormRunnerActionsCommon {
       case _ =>
         dispatch(name = "fr-data-save-error", targetId = FormModel)
     }
+  }
 
-  def tryRelinquishLease(params: ActionParams): Try[Any] = Try {
+  def tryRelinquishLease(params: ActionParams): ActionResult = ActionResult.trySync {
     val leaseState = frc.persistenceInstance.rootElement / "lease-state"
     if (leaseState.stringValue == "current-user") {
       sendThrowOnError("fr-relinquish-lease-submission", Nil)
@@ -219,7 +217,7 @@ trait FormRunnerActionsCommon {
     }
   }
 
-  def tryNewToEdit(params: ActionParams): Try[Any] = Try {
+  def tryNewToEdit(params: ActionParams): ActionResult = ActionResult.trySync {
 
     val modeElement = frc.parametersInstance.get.rootElement / "mode"
     val isNew       = modeElement.stringValue == "new"
@@ -231,7 +229,7 @@ trait FormRunnerActionsCommon {
     }
   }
 
-  def trySetDataStatus(params: ActionParams): Try[Any] = Try {
+  def trySetDataStatus(params: ActionParams): ActionResult = ActionResult.trySync {
 
     val isSafe  = paramByName(params, "status") map (_ == "safe") getOrElse true
     val isDraft = booleanParamByName(params, "draft", default = false)
@@ -243,7 +241,7 @@ trait FormRunnerActionsCommon {
       (setvalue(_, if (isSafe) DataStatus.Clean.entryName else DataStatus.Dirty.entryName))
   }
 
-  def trySetWorkflowStage(params: ActionParams): Try[Any] = Try {
+  def trySetWorkflowStage(params: ActionParams): ActionResult = ActionResult.trySync {
     val name = paramByNameOrDefault(params, "name").map(spc.evaluateValueTemplate)
     frc.documentWorkflowStage = name
     // Manual dependency HACK: RR fr-form-model, as it might use the stage that we just set
@@ -271,36 +269,37 @@ trait FormRunnerActionsCommon {
     fromResource orElse fromParam
   }
 
-  def trySuccessMessage(params: ActionParams): Try[Any] = {
-    val htmlMessage = messageFromResourceOrParam(params).get.asHtml
+  def trySuccessMessage(params: ActionParams): ActionResult =
+    ActionResult.trySync {
+      val htmlMessage = messageFromResourceOrParam(params).get.asHtml
+      frc.successMessage(htmlMessage)
+    }
 
-    Try(frc.successMessage(htmlMessage))
-  }
+  def tryErrorMessage(params: ActionParams): ActionResult =
+    ActionResult.trySync {
+      val htmlMessage = messageFromResourceOrParam(params).get.asHtml
+      val appearance  = paramByName(params, "appearance").map(FormRunnerBaseOps.MessageAppearance.withName).getOrElse(FormRunnerBaseOps.MessageAppearance.Dialog)
 
-  def tryErrorMessage(params: ActionParams): Try[Any] = {
-    val htmlMessage = messageFromResourceOrParam(params).get.asHtml
-    val appearance  = paramByName(params, "appearance").map(FormRunnerBaseOps.MessageAppearance.withName).getOrElse(FormRunnerBaseOps.MessageAppearance.Dialog)
+      frc.errorMessage(htmlMessage, appearance)
+    }
 
-    Try(frc.errorMessage(htmlMessage, appearance))
-  }
-
-  def tryConfirm(params: ActionParams): Try[Any] =
-    Try {
+  def tryConfirm(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       def defaultMessage =  messageFromResourceOrParam(Map(None -> "confirmation-dialog-message")).get
       def htmlMessage    = (messageFromResourceOrParam(params) getOrElse defaultMessage).asHtml
 
       show("fr-confirmation-dialog", Map("message" -> Some(htmlMessage), "message-is-html" -> Some("true")))
     }
 
-  def tryShowResultDialog(params: ActionParams): Try[Any] =
-    Try {
+  def tryShowResultDialog(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       show("fr-submission-result-dialog", Map(
         "fr-content" -> Some(topLevelInstance(FormModel, "fr-create-update-submission-response").get.rootElement)
       ))
     }
 
-  def tryCaptcha(params: ActionParams): Try[Any] =
-    Try {
+  def tryCaptcha(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       if (frc.showCaptcha) {
         dispatch(name = "fr-verify", targetId = "fr-captcha")
         dispatch(name = "fr-verify", targetId = "fr-view-component")
@@ -341,13 +340,10 @@ trait FormRunnerActionsCommon {
     } else
       pathQueryOrUrl
 
-  private def tryNavigateTo(location: String, target: Option[String], showProgress: Boolean): Try[Any] =
-    Try(load(prependCommonFormRunnerParameters(location, forNavigate = true), target, showProgress = showProgress))
-
   // Navigate to a URL specified in parameters or indirectly in properties
   // If no URL is specified, the action fails
-  def tryNavigate(params: ActionParams): Try[Any] =
-    Try {
+  def tryNavigate(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       // Heuristic: If the parameter is anonymous, we take it as a URL or path if it looks like one. Otherwise, we
       // consider it is a property. We could also look at whether the value looks like a property. It's better to
       // be explicit and use `uri =` or `property =`.
@@ -369,21 +365,19 @@ trait FormRunnerActionsCommon {
         paramBooleanOpt.getOrElse(false)
       }
 
-      (location, targetOpt, showProgress)
-
-    } flatMap
-      (tryNavigateTo _).tupled
+      load(prependCommonFormRunnerParameters(location, forNavigate = true), targetOpt, showProgress = showProgress)
+    }
 
   // Visit/unvisit controls
-  def tryShowRelevantErrors(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-show-relevant-errors", targetId = ErrorSummaryModel))
-  def tryUnvisitAll(params: ActionParams)        : Try[Any] = Try(dispatch(name = "fr-unvisit-all",          targetId = ErrorSummaryModel))
+  def tryShowRelevantErrors(params: ActionParams): ActionResult = ActionResult.trySync(dispatch(name = "fr-show-relevant-errors", targetId = ErrorSummaryModel))
+  def tryUnvisitAll(params: ActionParams)        : ActionResult = ActionResult.trySync(dispatch(name = "fr-unvisit-all",          targetId = ErrorSummaryModel))
 
   // Collapse/expand sections
-  def tryCollapseSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-collapse-all",         targetId = SectionsModel))
-  def tryExpandAllSections(params: ActionParams) : Try[Any] = Try(dispatch(name = "fr-expand-all",           targetId = SectionsModel))
+  def tryCollapseSections(params: ActionParams)  : ActionResult = ActionResult.trySync(dispatch(name = "fr-collapse-all",         targetId = SectionsModel))
+  def tryExpandAllSections(params: ActionParams) : ActionResult = ActionResult.trySync(dispatch(name = "fr-expand-all",           targetId = SectionsModel))
 
-  def tryExpandInvalidSections(params: ActionParams)  : Try[Any] =
-    Try {
+  def tryExpandInvalidSections(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       ErrorSummary.sectionsWithVisibleErrors.foreach { sectionName =>
         val sectionId = frc.sectionId(sectionName)
         dispatch(name = "fr-expand", targetId = sectionId)

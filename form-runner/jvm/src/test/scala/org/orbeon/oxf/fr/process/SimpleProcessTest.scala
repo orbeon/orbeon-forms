@@ -24,6 +24,7 @@ import org.parboiled2.ParseError
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.Future
 import scala.util.{Success, Try}
 
 
@@ -46,33 +47,37 @@ class SimpleProcessTest
     def xpathFunctionContext = null
 
     // Just store the continuation locally
-    def writeSuspendedProcess(process: String) = _suspendedProcess = Some(process)
-    def readSuspendedProcess = _suspendedProcess.get
+    def clearSuspendedProcess(): Unit = _suspendedProcess = None
+    def writeSuspendedProcess(processId: String, process: String): Unit = _suspendedProcess = Some(processId -> process)
+    def readSuspendedProcess: Try[(String, String)] = Try(_suspendedProcess.get)
+
+    def submitContinuation[T](actionResultF: Future[T], continuation: Try[T] => Unit): Unit = ???
 
     // Constant so that we can test properly
-    override def createUniqueProcessId = ConstantProcessId
+    override def createUniqueProcessId: String = ConstantProcessId
 
-    def transactionStart()    = ()
-    def transactionRollback() = ()
+    def transactionStart(): Unit = ()
+    def transactionRollback(): Unit = ()
 
-    private var _suspendedProcess: Option[String] = None
-    def savedProcess = _suspendedProcess
+    private var _suspendedProcess: Option[(String, String)] = None
+    def savedProcess: Option[(String, String)] = _suspendedProcess
 
-    override def beforeProcess() = {
+    override def beforeProcess(): Try[Any] = {
       _trace.clear()
       Success(())
     }
 
     // a1-a20 successful actions which log a trace of their execution
-    override def extensionActions = 1 to 20 map ("a" + _) map (name => name -> mySuccessAction(name) _)
+    override def extensionActions: Iterable[(String, Action)] =
+      1 to 20 map ("a" + _) map (name => name -> mySuccessAction(name) _)
 
     private val _trace = ListBuffer[String]()
     def trace = _trace mkString " "
 
-    def mySuccessAction(name: String)(params: ActionParams): Try[Any] = {
-      _trace += name
-      Success(())
-    }
+    def mySuccessAction(name: String)(params: ActionParams): ActionResult =
+      ActionResult.trySync {
+        _trace += name
+      }
   }
 
   def normalize(s: String) = "(" + s.trimAllToEmpty + ")"
@@ -133,8 +138,8 @@ class SimpleProcessTest
         withTestExternalContext { _ =>
           interpreter.xpathContext = context
           interpreter.runProcessByName("", process)
-          assert(Some(ConstantProcessId + '|' + normalize(continuation)) === interpreter.savedProcess)
-          assert(trace === interpreter.trace)
+          assert(Some((ConstantProcessId, normalize(continuation))) == interpreter.savedProcess)
+          assert(trace == interpreter.trace)
           interpreter.runProcess("", "resume").get
         }
       }

@@ -1,21 +1,17 @@
 package org.orbeon.oxf.xforms.submission
 
-import cats.effect.IO
-import cats.effect.unsafe.implicits.global
-import org.orbeon.connection.ConnectionResultT
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.{debug, debugResults, error, withDebug}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.xforms.EventNames
 
-import java.io.{ByteArrayInputStream, InputStream}
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
+import scala.util.Try
 import scala.util.control.NonFatal
-import scala.util.{Failure, Success, Try}
 
 
 // An instance of this class can become no longer referenced if the `XFCD` becomes passivated/serialized. If the
@@ -28,11 +24,11 @@ trait AsynchronousSubmissionManagerTrait {
   private var pendingCount = 0
 
   private val runningCount           = new AtomicInteger(0)
-  private val completionQueue        = new ConcurrentLinkedQueue[(String, SubmissionParameters, Try[ConnectResult])]
-  private var pendingList            = List.empty[Future[ConnectResult]]
+  private val completionQueue        = new ConcurrentLinkedQueue[(String, Try[Any] => Any, Try[Any])]
+  private var pendingList            = List.empty[Future[Any]]
 
   private val requestRunningCount    = new AtomicInteger(0)
-  private var requestPendingList     = List.empty[(Future[ConnectResult], Duration)]
+  private var requestPendingList     = List.empty[(Future[Any], Duration)]
 
   def addClientDelayEventIfNeeded(containingDocument: XFormsContainingDocument): Unit =
     if (hasPendingAsynchronousSubmissions)
@@ -47,64 +43,36 @@ trait AsynchronousSubmissionManagerTrait {
         properties        = Nil    // poll event doesn't need properties
       )
 
-  def addAsynchronousSubmission(
-    submissionEffectiveId: String,
-    future               : Future[AsyncConnectResult],
-    submissionParameters : SubmissionParameters,
+  def addAsynchronousCompletion[T, U](
+    description          : String,
+    future               : Future[T],
+    continuation         : Try[T] => U,
     awaitInCurrentRequest: Option[Duration]
   ): Unit = {
 
     totalSubmittedCount += 1
     pendingCount += 1
 
-    val inputStreamF =
-      future.flatMap(convertConnectResult)
-
     val mustWait = awaitInCurrentRequest match {
       case Some(duration) if duration.gt(Duration.Zero) =>
         requestRunningCount.incrementAndGet()
-        requestPendingList ::= inputStreamF -> duration
+        requestPendingList ::= future -> duration
         true
       case None =>
         false
     }
 
     runningCount.incrementAndGet()
-    pendingList ::= inputStreamF
+    pendingList ::= future
 
-    inputStreamF.onComplete { result =>
+    future.onComplete { result =>
       if (mustWait)
         requestRunningCount.decrementAndGet()
 
       runningCount.decrementAndGet()
-      completionQueue.add((submissionEffectiveId, submissionParameters, result))
+      completionQueue.add((description, continuation.asInstanceOf[Try[Any] => Any], result))
     }
   }
-
-  // Convert the `fs2.Stream` in the `ConnectResult` to an `InputStream`. Of course, We'd like to stream all the way
-  // ideally, but this is a first step. We cannot use `fs2.io.toInputStream` because it requires running two threads,
-  // which doesn't work in JavaScript. So we go through an in-memory `Array` for now. Note that sending data also
-  // works with `Array`s. Also, note that we use `Future` as that's currently what's submitted to this manager.
-  private def fs2StreamToInputStreamInMemory(s: fs2.Stream[IO, Byte]): Future[InputStream] =
-    s.compile.to(Array).map(new ByteArrayInputStream(_)).unsafeToFuture()
-
-  private def convertConnectResult(fs2Cr: AsyncConnectResult): Future[ConnectResult] =
-    fs2Cr match {
-      case ConnectResultT(_, Success(t @ (_, fs2Cxr @ ConnectionResultT(_, _, _, fs2Content, _, _)))) =>
-        for(is <- fs2StreamToInputStreamInMemory(fs2Content.stream))
-        yield
-          fs2Cr.copy(
-            result = Success(
-              t.copy(
-                _2 = fs2Cxr.copy(
-                  content = fs2Content.copy(stream = is)
-                )
-              )
-            )
-          )
-      case ConnectResultT(submissionEffectiveId, Failure(t)) =>
-        Future.successful(ConnectResultT(submissionEffectiveId, Failure(t)))
-    }
 
   def hasPendingAsynchronousSubmissions: Boolean = pendingCount > 0
 
@@ -117,24 +85,19 @@ trait AsynchronousSubmissionManagerTrait {
       var failedCount = 0
 
       Iterator.continually(completionQueue.poll()).takeWhile(_ ne null).foreach {
-        case (submissionEffectiveId, submissionParameters, connectResultTry) =>
+        case (description, continuation, resultTry) =>
 
           pendingCount -= 1
 
-          debug(s"processing asynchronous submission `$submissionEffectiveId`")
+          debug(s"processing asynchronous result `$description`")
           try {
-            containingDocument
-              .getObjectByEffectiveId(submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
-              .processAsyncSubmissionResponse(
-                connectResultTry,
-                submissionParameters
-              )
+            continuation(resultTry)
             processedCount += 1
           } catch {
             case NonFatal(t) =>
               // This should be rare, as a failing submission will normally cause a `xforms-submit-error` event but not
               // an exception. We still want to log the exception here, as it's likely to be a bug.
-              error(s"error processing asynchronous submission `$submissionEffectiveId`", t)
+              error(s"error processing asynchronous submission `$description`", t)
               failedCount += 1
               throw t
           }
@@ -174,7 +137,7 @@ trait AsynchronousSubmissionManagerTrait {
 
   protected def awaitPending(
     containingDocument: XFormsContainingDocument,
-    get               : () => List[(Future[ConnectResult], Duration)],
+    get               : () => List[(Future[Any], Duration)],
     clear             : () => Unit
   )(implicit
     logger            : IndentedLogger

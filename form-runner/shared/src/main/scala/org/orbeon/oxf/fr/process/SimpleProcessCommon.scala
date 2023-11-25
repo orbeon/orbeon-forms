@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.process
 
 import org.orbeon.dom.Document
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.process.ProcessInterpreter.Action
+import org.orbeon.oxf.fr.process.ProcessInterpreter.{Action, ActionResult}
 import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
 import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
 import org.orbeon.oxf.util.StringUtils._
@@ -31,6 +31,9 @@ import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.util.{Failure, Success, Try}
 
 
 // Implementation of simple processes
@@ -63,13 +66,31 @@ trait SimpleProcessCommon
   override def processError(t: Throwable): Unit =
     tryErrorMessage(Map(Some("resource") -> "process-error"))
 
-  def writeSuspendedProcess(process: String): Unit =
-    setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, process)
+  def writeSuspendedProcess(processId: String, process: String): Unit =
+    setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, List(processId, process).mkString("|"))
 
-  def readSuspendedProcess: String =
-    topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement.stringValue
+  def readSuspendedProcess: Try[(String, String)] =
+    topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement.stringValue.splitTo[List]("|") match {
+      case processId :: continuation :: Nil =>
+        Success((processId, continuation))
+      case _ =>
+        Failure(new IllegalStateException("Invalid or missing suspended process"))
+    }
 
-  case class RollbackContent(data: Document, saveStatus: Option[DataStatus], autoSaveStatus: Option[DataStatus])
+  def clearSuspendedProcess(): Unit =
+    setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, "")
+
+  def submitContinuation[T](actionResultF: Future[T], continuation: Try[T] => Unit): Unit =
+    inScopeContainingDocument
+      .getAsynchronousSubmissionManager
+      .addAsynchronousCompletion(
+        description           = s"process process id: $runningProcessId ",
+        future                = actionResultF,
+        continuation          = continuation,
+        awaitInCurrentRequest = Some(Duration.Inf)
+      )
+
+  private case class RollbackContent(data: Document, saveStatus: Option[DataStatus], autoSaveStatus: Option[DataStatus])
 
   // Store information about what we need to potential rollback
   // Currently, assume we don't need to persist this information between client requests, and assume that
@@ -86,6 +107,7 @@ trait SimpleProcessCommon
         )
       )
 
+  // Only called from `rollback` action
   def transactionRollback(): Unit =
     inScopeContainingDocument.getTransientState[RollbackContent](RollbackContent.getClass.getName) foreach { rollbackContent =>
 

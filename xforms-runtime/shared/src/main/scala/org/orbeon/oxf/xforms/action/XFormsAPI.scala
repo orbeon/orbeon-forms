@@ -17,6 +17,7 @@ import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.DynamicVariable
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
@@ -36,9 +37,11 @@ import org.orbeon.xforms.{Constants, UrlType}
 import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
 import java.util.{List => JList}
+import scala.concurrent.{Future, Promise}
 import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
 import scala.util.Try
+import scala.util.control.NonFatal
 
 object XFormsAPI {
 
@@ -304,11 +307,33 @@ object XFormsAPI {
       // - If the dispatch completed successfully and the submission started, it *should* have completed with either
       //   `xforms-submit-done` or `xforms-submit-error`. In this case, we have called `body(event)` and return
       //   `Option[T]` or throw an exception if `body(event)` failed.
-      // - But in particular if the xforms-submit event got canceled, we might be in a situation where no
-      //   xforms-submit-done or xforms-submit-error was dispatched. In this case, we return `None`.
+      // - But in particular if the `xforms-submit` event got canceled, we might be in a situation where no
+      //   `xforms-submit-done` or `xforms-submit-error` was dispatched. In this case, we return `None`.
       // - If the dispatch failed for other reasons, it might have thrown an exception, which is propagated.
 
       result map (_.get)
+    }
+  }
+
+  private def sendAsyncImpl(submissionId: String, props: List[PropertyValue]): Option[Future[XFormsEvent]] = {
+    resolveAs[XFormsModelSubmission](submissionId) map { submission =>
+
+      val p = Promise[XFormsEvent]()
+
+      val listener: Dispatch.EventListener = p.success
+
+      SubmitEvents.foreach(submission.addListener(_, listener))
+
+      try
+        Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, ActionPropertyGetter(props)))
+      catch {
+        case NonFatal(t) =>
+          p.failure(t)
+      }
+
+      val f = p.future
+      f.onComplete(_ => SubmitEvents.foreach(submission.removeListener(_, Some(listener))))
+      f
     }
   }
 
@@ -320,6 +345,14 @@ object XFormsAPI {
       case done:  XFormsSubmitDoneEvent  => done
       case error: XFormsSubmitErrorEvent => throw new SubmitException(error)
     }
+
+    def sendAsync(submissionId: String, props: List[PropertyValue] = Nil): Option[Future[XFormsSubmitDoneEvent]] =
+      sendAsyncImpl(submissionId, props).map { f =>
+        f.map {
+          case done:  XFormsSubmitDoneEvent  => done
+          case error: XFormsSubmitErrorEvent => throw new SubmitException(error)
+        }
+      }
 
   // NOTE: There is no source id passed so we resolve relative to the document
   def resolveAs[T: ClassTag](staticOrAbsoluteId: String): Option[T] =

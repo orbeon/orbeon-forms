@@ -20,13 +20,12 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 
-import scala.util.Try
 
 trait XFormsActions {
 
   self: ProcessInterpreter =>
 
-  def AllowedXFormsActions = Map[String, Action](
+  def AllowedXFormsActions: Map[String, Action] = Map(
     "xf:send"     -> tryXFormsSend,
     "xf:dispatch" -> tryXFormsDispatch,
     "xf:show"     -> tryShowDialog,
@@ -37,8 +36,8 @@ trait XFormsActions {
     "xf:callback" -> tryCallback,
   )
 
-  def tryXFormsSend(params: ActionParams): Try[Any] =
-    Try {
+  def tryXFormsSend(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       val submission = paramByNameOrDefault(params, "submission")
       submission foreach (sendThrowOnError(_))
     }
@@ -50,30 +49,30 @@ trait XFormsActions {
     case (Some(name), value) if ! standardParamNames(name) => name -> Option(evaluateValueTemplate(value))
   }
 
-  def tryXFormsDispatch(params: ActionParams): Try[Any] =
-    Try {
+  def tryXFormsDispatch(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       val eventName     = paramByNameOrDefault(params, "name")
       val eventTargetId = paramByName(params, "targetid") getOrElse FormModel
 
       eventName foreach (dispatch(_, eventTargetId, properties = collectCustomProperties(params, StandardDispatchParams)))
     }
 
-  def tryShowDialog(params: ActionParams): Try[Any] =
-    Try {
+  def tryShowDialog(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       val dialogName = paramByNameOrDefault(params, "dialog")
 
       dialogName foreach (show(_, properties = collectCustomProperties(params, StandardDialogParams)))
     }
 
-  def tryHideDialog(params: ActionParams): Try[Any] =
-    Try {
+  def tryHideDialog(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       val dialogName = paramByNameOrDefault(params, "dialog")
 
       dialogName foreach (hide(_, properties = collectCustomProperties(params, StandardDialogParams)))
     }
 
-  def trySetvalue(params: ActionParams): Try[Any] =
-    Try {
+  def trySetvalue(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       val all      = booleanParamByName(params, "all", default = false)
       val refParam = requiredParamByName(params, "setvalue", "ref")
       val refSeq   = if (all) evaluate(refParam) else Seq(evaluateOne(refParam))
@@ -94,8 +93,8 @@ trait XFormsActions {
       }
     }
 
-  def tryInsert(params: ActionParams): Try[Any] =
-    Try {
+  def tryInsert(params: ActionParams): ActionResult =
+    ActionResult.trySync {
 
       def paramAsNodes(name: String): List[om.NodeInfo] =
         paramByName(params, name).toList flatMap (evaluate(_)) collect { case n: om.NodeInfo => n }
@@ -108,15 +107,15 @@ trait XFormsActions {
       )
     }
 
-  def tryDelete(params: ActionParams): Try[Any] =
-    Try {
+  def tryDelete(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       val refParam = requiredParamByName(params, "delete", "ref")
       delete(ref = evaluate(refParam) collect { case n: om.NodeInfo => n })
     }
 
   // callback(name = "foo", params = Map("bar" -> "baz"))
-  def tryCallback(params: ActionParams): Try[Any] =
-    Try {
+  def tryCallback(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       // TODO: callback parameters, see https://github.com/orbeon/orbeon-forms/issues/5913
       inScopeContainingDocument
         .addCallbackToRun(CallbackInvocation(requiredParamByName(params, "callback", "name"), Nil))

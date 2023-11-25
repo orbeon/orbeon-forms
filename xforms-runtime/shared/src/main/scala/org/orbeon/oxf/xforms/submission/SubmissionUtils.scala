@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.io.{CharsetNames, IOUtils}
@@ -20,6 +22,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
 import org.orbeon.oxf.http.HttpMethod.GET
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
@@ -29,12 +32,39 @@ import org.orbeon.oxf.xml.{SaxonUtils, XMLParsing}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
-import java.io.{ByteArrayOutputStream, InputStream}
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream}
 import java.net.URI
 import scala.collection.mutable
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 
 object SubmissionUtils {
+
+  def convertConnectResult(fs2Cr: AsyncConnectResult): Future[ConnectResult] =
+    fs2Cr match {
+      case ConnectResultT(_, Success(t @ (_, fs2Cxr @ ConnectionResultT(_, _, _, fs2Content, _, _)))) =>
+        for(is <- fs2StreamToInputStreamInMemory(fs2Content.stream))
+        yield
+          fs2Cr.copy(
+            result = Success(
+              t.copy(
+                _2 = fs2Cxr.copy(
+                  content = fs2Content.copy(stream = is)
+                )
+              )
+            )
+          )
+      case ConnectResultT(submissionEffectiveId, Failure(t)) =>
+        Future.successful(ConnectResultT(submissionEffectiveId, Failure(t)))
+    }
+
+  // Convert the `fs2.Stream` in the `ConnectResult` to an `InputStream`. Of course, We'd like to stream all the way
+  // ideally, but this is a first step. We cannot use `fs2.io.toInputStream` because it requires running two threads,
+  // which doesn't work in JavaScript. So we go through an in-memory `Array` for now. Note that sending data also
+  // works with `Array`s. Also, note that we use `Future` as that's currently what's submitted to this manager.
+  def fs2StreamToInputStreamInMemory(s: fs2.Stream[IO, Byte]): Future[InputStream] =
+    s.compile.to(Array).map(new ByteArrayInputStream(_)).unsafeToFuture()
 
   def logRequestBody(mediatype: String, messageBody: Array[Byte])(implicit logger: IndentedLogger): Unit =
     if (ContentTypes.isXMLMediatype(mediatype) ||

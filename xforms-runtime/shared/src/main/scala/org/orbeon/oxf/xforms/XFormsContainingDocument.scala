@@ -271,17 +271,18 @@ class XFormsContainingDocument(
   def rememberLastAjaxResponse(response: SAXStore): Unit =
     _lastAjaxResponse = response.some
 
-  def getAsynchronousSubmissionManager(create: Boolean): Option[AsynchronousSubmissionManager] =
-    asynchronousSubmissionManager match {
-      case some @ Some(_) => some
-      case None if create =>
-        asynchronousSubmissionManager = Some(new AsynchronousSubmissionManager)
-        asynchronousSubmissionManager
-      case None => None
+  def findAsynchronousSubmissionManager: Option[AsynchronousSubmissionManager] =
+    asynchronousSubmissionManager
+
+  def getAsynchronousSubmissionManager: AsynchronousSubmissionManager =
+    asynchronousSubmissionManager.getOrElse {
+      val newAsynchronousSubmissionManager = new AsynchronousSubmissionManager
+      asynchronousSubmissionManager = Some(newAsynchronousSubmissionManager)
+      newAsynchronousSubmissionManager
     }
 
   private def processCompletedAsynchronousSubmissions(skipDeferredEventHandling: Boolean, beforeResponse: Boolean): Unit =
-    getAsynchronousSubmissionManager(create = false)
+    findAsynchronousSubmissionManager
       .filter(_.hasPendingAsynchronousSubmissions)
       .foreach { manager =>
         maybeWithOutermostActionHandler(! skipDeferredEventHandling) {

@@ -13,12 +13,10 @@
  */
 package org.orbeon.builder.rpc
 
-import cats.syntax.option._
 import org.orbeon.datatypes.{AboveBelow, Direction}
 import org.orbeon.oxf.fb.UndoAction.ControlSettings
 import org.orbeon.oxf.fb._
 import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.fr.process.SimpleProcess
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
@@ -191,7 +189,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   def containerCopy(containerId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
     containerCopyImpl(containerId)
-    SimpleProcess.trySuccessMessage(Map("message".some -> (frc.currentFormResources / "copy" / "label" stringValue))).get
+    frc.successMessage(frc.currentFormResources / "copy" / "label" stringValue)
   }
 
   private def containerCopyImpl(containerId: String)(implicit ctx: FormBuilderDocContext): Unit =
@@ -206,7 +204,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     if (FormBuilder.canDeleteContainer(containerElem)) {
       containerCopyImpl(containerId)
       containerDeleteImpl(containerId)
-      SimpleProcess.trySuccessMessage(Map("message".some -> (frc.currentFormResources / "cut" / "label" stringValue))).get
+      frc.successMessage(frc.currentFormResources / "cut" / "label" stringValue)
     }
   }
 
@@ -217,7 +215,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       targetId   = "dialog-ids",
       properties = Map("container-id" -> Some(containerId), "action" -> Some("merge"))
     )
-    SimpleProcess.trySuccessMessage(Map("message".some -> (frc.currentFormResources / "merge-section" / "label" stringValue))).get
+    frc.successMessage(frc.currentFormResources / "merge-section" / "label" stringValue)
   }
 
   def resolveId(id: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =

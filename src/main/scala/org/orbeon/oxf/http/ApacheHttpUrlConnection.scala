@@ -85,7 +85,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient[org.apache.h
     (_requestHeaders mapValues (_.asJava) toMap) asJava
 
   override def getInputStream =
-    withConnection(_.content.inputStream)
+    withConnection(_.content.stream)
 
   override def getHeaderField(name: String): String =
     withConnection(_.headers.get(Headers.capitalizeCommonOrSplitHeader(name)) flatMap (_.lastOption) orNull)

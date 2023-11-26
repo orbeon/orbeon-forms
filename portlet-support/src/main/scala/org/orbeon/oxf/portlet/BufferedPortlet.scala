@@ -16,6 +16,7 @@ package org.orbeon.oxf.portlet
 import org.apache.commons.io.IOUtils
 import org.orbeon.connection._
 import org.orbeon.io.IOUtils._
+import org.orbeon.oxf.fr.embedding.APISupport.{BufferedContentOrRedirect, Redirect, StreamedContentOrRedirect}
 import org.orbeon.oxf.fr.embedding.{APISupport, EmbeddingContext, EmbeddingContextWithResponse}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.BufferedPortlet._
@@ -101,8 +102,8 @@ trait BufferedPortlet {
         // implement the redirect loop here. The issue would be what happens upon subsequent renders, as they
         // would again request the first path, not the redirected path. For now we throw.
         render match {
-          case content: StreamedContent => useAndClose(content)(writeResponseWithParameters(request, response, _))
-          case _: Redirect              => throw new IllegalStateException("Processor execution did not return content.")
+          case Left(content: StreamedContent) => useAndClose(content)(writeResponseWithParameters(request, response, _))
+          case Right(_: Redirect)             => throw new IllegalStateException("Processor execution did not return content.")
         }
     }
 
@@ -116,9 +117,9 @@ trait BufferedPortlet {
     clearResponseWithParameters()
 
     action match {
-      case Redirect(location, true) =>
+      case Right(Redirect(location, true)) =>
         response.sendRedirect(location)
-      case Redirect(location, false) =>
+      case Right(Redirect(location, false)) =>
         // Just update the render parameters to simulate a redirect within the portlet
         val (path, queryOpt) = splitQuery(location)
         val parameters = queryOpt match {
@@ -131,7 +132,7 @@ trait BufferedPortlet {
         // Set the new parameters for the subsequent render requests
         response.setRenderParameters(parameters)
 
-      case content: StreamedContent =>
+      case Left(content: StreamedContent) =>
         // Content was written, keep it in the session for subsequent render requests with the current action parameters
 
         useAndClose(content) { _ =>
@@ -152,7 +153,7 @@ trait BufferedPortlet {
 
           // Store response
           storeResponseWithParameters(
-            ResponseWithParams(BufferedContent(content)(IOUtils.toByteArray), storedParams)
+            ResponseWithParams(Left(BufferedContent(content)(IOUtils.toByteArray)), storedParams)
           )
         }
     }

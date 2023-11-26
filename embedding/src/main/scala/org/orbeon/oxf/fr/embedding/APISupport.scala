@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.embedding
 import org.apache.commons.io.IOUtils
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
-import org.orbeon.connection.{Content, Redirect, StreamedContent, StreamedContentOrRedirect}
+import org.orbeon.connection.{BufferedContent, Content, StreamedContent}
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
@@ -45,6 +45,16 @@ object APISupport {
 
   val Logger = LoggerFactory.getLogger(List("org", "orbeon", "embedding") mkString ".") // so JARJAR doesn't touch this!
 
+  case class Redirect(
+    location   : String,
+    exitPortal : Boolean = false
+  ) {
+    require(location ne null, "Missing redirect location")
+  }
+
+  type StreamedContentOrRedirect = StreamedContent Either Redirect
+  type BufferedContentOrRedirect = BufferedContent Either Redirect
+
   def proxyPage(
     baseURL      : String,
     path         : String,
@@ -58,9 +68,9 @@ object APISupport {
     val url = formRunnerURL(baseURL, path, embeddable = true)
 
     callService(RequestDetails(None, url, path, headers, params))._1 match {
-      case content: StreamedContent =>
+      case Left(content: StreamedContent) =>
         useAndClose(content)(writeResponseBody(mustRewriteForMediatype))
-      case Redirect(_, _) =>
+      case Right(Redirect(_, _)) =>
         throw new UnsupportedOperationException
     }
   }
@@ -144,11 +154,11 @@ object APISupport {
         ))
 
       contentOrRedirect match {
-        case Redirect(location, true) =>
+        case Right(Redirect(location, true)) =>
           res.sendRedirect(location)
-        case Redirect(_, false) =>
+        case Right(Redirect(_, false)) =>
           throw new NotImplementedError
-        case content: StreamedContent =>
+        case Left(content: StreamedContent) =>
 
           ctx.setStatusCode(httpResponse.statusCode)
           httpResponse.content.contentType foreach (ctx.setHeader(Headers.ContentType, _))
@@ -191,7 +201,7 @@ object APISupport {
 
   // Match on headers in a case-insensitive way, but the header we sent follows the capitalization of the
   // header specified in the init parameter.
-  def headersToForward(clientHeaders: List[(String, List[String])], configuredHeaders: Map[String, String]) =
+  def headersToForward(clientHeaders: List[(String, List[String])], configuredHeaders: Map[String, String]): Iterable[(String, String)] =
     for {
       (name, value) <- proxyAndCombineRequestHeaders(clientHeaders)
       originalName  <- configuredHeaders.get(name.toLowerCase)
@@ -209,9 +219,9 @@ object APISupport {
       if (StatusCode.isRedirectCode(cx.statusCode)) {
         // https://github.com/orbeon/orbeon-forms/issues/2967
         val location = cx.headers("Location").head
-        Redirect(location, exitPortal = urlHasProtocol(location))
+        Right(Redirect(location, exitPortal = urlHasProtocol(location)))
       } else
-        cx.content
+        Left(cx.content)
 
     redirectOrContent -> cx
   }
@@ -230,7 +240,7 @@ object APISupport {
       case Some(mediatype) if doRewrite(mediatype) =>
         // Text/JSON/XML content type: rewrite response content
         val encoding        = content.contentType flatMap ContentTypes.getContentTypeCharset getOrElse ExternalContext.StandardCharacterEncoding
-        val contentAsString = useAndClose(content.inputStream)(IOUtils.toString(_, encoding))
+        val contentAsString = useAndClose(content.stream)(IOUtils.toString(_, encoding))
         val encodeForXML    = ContentTypes.isXMLMediatype(mediatype)
 
         def decodeURL(encoded: String) = {
@@ -249,7 +259,7 @@ object APISupport {
         Logger.debug(s"using ctx.outputStream for mediatype = `$other`")
         ctx.outputStream match {
           case Success(os) =>
-            useAndClose(content.inputStream)(IOUtils.copy(_, os))
+            useAndClose(content.stream)(IOUtils.copy(_, os))
           case Failure(t)  =>
             Logger.warn(s"unable to obtain `OutputStream` possibly because of a missing mediatype downstream", t)
             ctx.writer.write("unable to provide content")

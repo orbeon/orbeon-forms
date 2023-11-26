@@ -1,5 +1,6 @@
 package org.orbeon.connection
 
+import cats.effect.IO
 import org.orbeon.io.IOUtils.{runQuietly, useAndClose}
 import org.orbeon.oxf.http.{EmptyInputStream, Headers}
 
@@ -7,26 +8,52 @@ import java.io.{ByteArrayInputStream, InputStream}
 import scala.collection.{immutable => i}
 
 
-trait Content {
-  def inputStream   : InputStream
+sealed trait ContentT[S] {
+  def stream        : S
   def contentType   : Option[String]
   def contentLength : Option[Long]
   def title         : Option[String] // this is only for portlet and should be moved out
 }
 
-sealed trait StreamedContentOrRedirect
-sealed trait BufferedContentOrRedirect
-
-case class StreamedContent(
-  inputStream   : InputStream,
-  contentType   : Option[String],
-  contentLength : Option[Long],
-  title         : Option[String]
-) extends StreamedContentOrRedirect with Content {
-  def close(): Unit = runQuietly(inputStream.close())
+case class StreamedContentT[S](
+  stream       : S,
+  contentType  : Option[String],
+  contentLength: Option[Long],
+  title        : Option[String]
+) extends ContentT[S] {
+  def close(): Unit = runQuietly(stream match {
+    case is: InputStream => is.close()
+    case _               => // anything to do with `fs2.Stream`?
+  }
+  )
 }
 
 object StreamedContent {
+
+  def apply(
+    inputStream   : InputStream,
+    contentType   : Option[String],
+    contentLength : Option[Long],
+    title         : Option[String]
+  ): StreamedContent =
+    StreamedContentT(
+      stream        = inputStream,
+      contentType   = contentType,
+      contentLength = contentLength,
+      title         = title
+    )
+
+  def apply(
+    stream        : fs2.Stream[IO, Byte],
+    contentType   : Option[String],
+    contentLength : Option[Long]
+  ): AsyncStreamedContent =
+    StreamedContentT(
+      stream        = stream,
+      contentType   = contentType,
+      contentLength = contentLength,
+      title         = None
+    )
 
   def fromBytes(bytes: Array[Byte], contentType: Option[String], title: Option[String] = None): StreamedContent =
     StreamedContent(
@@ -57,19 +84,12 @@ case class BufferedContent(
   body        : Array[Byte],
   contentType : Option[String],
   title       : Option[String]
-) extends BufferedContentOrRedirect with Content {
-  def inputStream   = new ByteArrayInputStream(body)
-  def contentLength = Some(body.size)
+) extends ContentT[InputStream] {
+  def stream   = new ByteArrayInputStream(body)
+  def contentLength: Some[Long] = Some(body.size)
 }
 
 object BufferedContent {
   def apply(content: StreamedContent)(toByteArray: InputStream => Array[Byte]): BufferedContent =
-    BufferedContent(useAndClose(content.inputStream)(toByteArray), content.contentType, content.title)
-}
-
-case class Redirect(
-  location   : String,
-  exitPortal : Boolean = false
-) extends StreamedContentOrRedirect with BufferedContentOrRedirect {
-  require(location ne null, "Missing redirect location")
+    BufferedContent(useAndClose(content.stream)(toByteArray), content.contentType, content.title)
 }

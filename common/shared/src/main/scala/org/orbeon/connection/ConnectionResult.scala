@@ -11,11 +11,11 @@ import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 
-case class ConnectionResult(
+case class ConnectionResultT[S](
   url               : String,
   statusCode        : Int,
   headers           : Map[String, List[String]],
-  content           : StreamedContent,
+  content           : StreamedContentT[S],
   hasContent        : Boolean,
   dontHandleResponse: Boolean // TODO: Should be outside of ConnectionResult.
 ) {
@@ -89,10 +89,10 @@ object ConnectionResult {
     val (hasContent, resetInputStream) = {
 
       val bis =
-        if (content.inputStream.markSupported)
-          content.inputStream
+        if (content.stream.markSupported)
+          content.stream
         else
-          new BufferedInputStream(content.inputStream)
+          new BufferedInputStream(content.stream)
 
       def hasContent(bis: InputStream) = {
         bis.mark(1)
@@ -104,11 +104,11 @@ object ConnectionResult {
       (hasContent(bis), bis)
     }
 
-    ConnectionResult(
+    ConnectionResultT(
       url                = url,
       statusCode         = statusCode,
       headers            = headers,
-      content            = content.copy(inputStream = resetInputStream),
+      content            = content.copy(stream = resetInputStream),
       hasContent         = hasContent,
       dontHandleResponse = dontHandleResponse
     )
@@ -125,7 +125,7 @@ object ConnectionResult {
 
   def tryBody[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream => T): Try[T] = Try {
     try {
-      val result = body(cxr.content.inputStream)
+      val result = body(cxr.content.stream)
       if (closeOnSuccess)
         cxr.close() // this eventually calls `InputStream.close()`
       result

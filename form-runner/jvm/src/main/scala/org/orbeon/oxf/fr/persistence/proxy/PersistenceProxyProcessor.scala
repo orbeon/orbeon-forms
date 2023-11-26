@@ -756,10 +756,10 @@ private[persistence] object PersistenceProxyProcessor {
       val inputStream = attachmentsProviderCxrOpt match {
         case Some(attachmentsProviderCxr) if request.getMethod == HttpMethod.GET &&
                                              StatusCode.isSuccessCode(connectionResult.statusCode) =>
-          attachmentsProviderCxr.content.inputStream
+          attachmentsProviderCxr.content.stream
 
         case _ =>
-          connectionResult.content.inputStream
+          connectionResult.content.stream
       }
 
       try {

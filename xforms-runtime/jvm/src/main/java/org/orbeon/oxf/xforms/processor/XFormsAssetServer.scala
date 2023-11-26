@@ -252,7 +252,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
           HttpRanges.forwardRangeHeaders(cxr, response)
           response.setStatus(cxr.statusCode)
 
-          IOUtils.copyStreamAndClose(cxr.content.inputStream, response.getOutputStream)
+          IOUtils.copyStreamAndClose(cxr.content.stream, response.getOutputStream)
         } catch {
           case NonFatal(t) => warn("exception copying stream", Seq("throwable" -> OrbeonFormatter.format(t)))
         }

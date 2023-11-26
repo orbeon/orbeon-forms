@@ -98,7 +98,7 @@ object AllReplacer extends Replacer {
 
     SubmissionUtils.forwardResponseHeaders(cxr, response)
 
-    IOUtils.copyStreamAndClose(cxr.content.inputStream, response.getOutputStream)
+    IOUtils.copyStreamAndClose(cxr.content.stream, response.getOutputStream)
   }
 
   private class ReplaceAllResponse(val response: ExternalContext.Response)

@@ -138,7 +138,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieSt
         )
 
         val is =
-          content map (_.inputStream) getOrElse
+          content map (_.stream) getOrElse
           (throw new IllegalArgumentException(s"No request content provided for method ${method.entryName}"))
 
         val contentLength =

@@ -308,10 +308,10 @@ object SubmissionUtils {
         //    In the absence of a BOM (Section 3.3), the charset parameter is
         //    authoritative if it is present
         //
-        IOUtils.readStreamAsStringAndClose(XMLParsing.getReaderFromXMLInputStream(content.inputStream))
+        IOUtils.readStreamAsStringAndClose(XMLParsing.getReaderFromXMLInputStream(content.stream))
       case mediatype if ContentTypes.isTextOrJSONContentType(mediatype) =>
         val charset = content.contentType flatMap ContentTypes.getContentTypeCharset
-        IOUtils.readStreamAsStringAndClose(content.inputStream, charset)
+        IOUtils.readStreamAsStringAndClose(content.stream, charset)
     }
   }
 }

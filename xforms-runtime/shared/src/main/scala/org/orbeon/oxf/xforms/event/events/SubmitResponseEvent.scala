@@ -125,7 +125,7 @@ private object SubmitResponseEvent {
       // as XML then as text.
       val tempURIOpt =
         try
-          XFormsCrossPlatformSupport.inputStreamToRequestUri(cxr.content.inputStream)
+          XFormsCrossPlatformSupport.inputStreamToRequestUri(cxr.content.stream)
         catch {
           warn("error while reading response body")
         }

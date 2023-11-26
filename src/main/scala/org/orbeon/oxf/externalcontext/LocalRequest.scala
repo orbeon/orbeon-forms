@@ -14,7 +14,7 @@
 package org.orbeon.oxf.externalcontext
 
 import org.apache.commons.io.IOUtils
-import org.orbeon.connection.StreamedContent
+import org.orbeon.connection.{StreamedContent, StreamedContentT}
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.http.HttpMethod.{HttpMethodsWithRequestBody, POST}
@@ -88,7 +88,7 @@ class LocalRequest(
     def bodyParameters =
       if (method == POST)
         content collect {
-          case StreamedContent(is, Some("application/x-www-form-urlencoded"), _, _) =>
+          case StreamedContentT(is, Some("application/x-www-form-urlencoded"), _, _) =>
             useAndClose(is) { is =>
               decodeSimpleQuery(IOUtils.toString(is, ExternalContext.StandardFormCharacterEncoding))
             }
@@ -108,7 +108,7 @@ class LocalRequest(
   def getCharacterEncoding = null;//TODO? // not used by our code
   def getContentLength     = _contentLengthOpt map (_.toInt) getOrElse -1
   def getContentType       = _contentTypeOpt.orNull
-  def getInputStream       = content map (_.inputStream) getOrElse EmptyInputStream
+  def getInputStream       = content map (_.stream) getOrElse EmptyInputStream
   def getHeaderValuesMap   = _headersIncludingAuthBodyLowercase
 
   lazy val getAttributesMap = {

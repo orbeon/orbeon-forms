@@ -101,7 +101,7 @@ private[persistence] object HttpCall {
       expectedResponse.body.foreach { expectedBody =>
         val actualBody = {
           val outputStream = new ByteArrayOutputStream
-          IOUtils.copyStreamAndClose(actualResponse.content.inputStream, outputStream)
+          IOUtils.copyStreamAndClose(actualResponse.content.stream, outputStream)
           outputStream.toByteArray
         }
 
@@ -256,7 +256,7 @@ private[persistence] object HttpCall {
       val body =
         Try {
           val outputStream = new ByteArrayOutputStream
-          IOUtils.copyStreamAndClose(httpResponse.content.inputStream, outputStream)
+          IOUtils.copyStreamAndClose(httpResponse.content.stream, outputStream)
           outputStream.toByteArray
         }
 

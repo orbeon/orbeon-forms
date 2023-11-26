@@ -32,7 +32,7 @@ object BinaryReplacer extends Replacer {
     submissionParameters: SubmissionParameters
   ): Option[URI] =
     XFormsCrossPlatformSupport.inputStreamToSessionUri(
-      cxr.content.inputStream)(
+      cxr.content.stream)(
       submission.getDetailsLogger(submissionParameters)
     )
 

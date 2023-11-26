@@ -129,8 +129,8 @@ trait FormRunnerActionsCommon {
   protected def ensureDataCalculationsAreUpToDate(): Unit =
     frc.formInstance.model.doRecalculateRevalidate()
 
-  def trySaveAttachmentsAndData(params: ActionParams): ActionResult = ActionResult.Sync {
-    Try {
+  def trySaveAttachmentsAndData(params: ActionParams): ActionResult =
+    ActionResult.tryAsync {
       val FormRunnerParams(app, form, formVersion, Some(document), _, _) = FormRunnerParams()
 
       ensureDataCalculationsAreUpToDate()
@@ -139,7 +139,7 @@ trait FormRunnerActionsCommon {
       val isDraft       = booleanParamByName(params, "draft", default = false)
       val pruneMetadata = booleanParamByName(params, "prune-metadata", default = false)
       val queryXVT      = paramByName(params, "query")
-      val querySuffix   = queryXVT map spc.evaluateValueTemplate map ('&' +) getOrElse ""
+      val querySuffix   = queryXVT.map(spc.evaluateValueTemplate).map('&' + _).getOrElse("")
 
       // Notify that the data is about to be saved
       dispatch(name = "fr-data-save-prepare", targetId = FormModel)
@@ -171,13 +171,14 @@ trait FormRunnerActionsCommon {
           Nil
         )
 
-      // Save
-      val (beforeURLs, afterURLs, _) = frc.putWithAttachments(
+      // Saving is an asynchronous operation
+      val future =
+        frc.putWithAttachments(
         liveData          = frc.formInstance.root,
         migrate           = Some(maybeMigrateData),
         toBaseURI         = "", // local save
         fromBasePaths     = List(frc.createFormDataBasePath(app, form, ! isDraft, document) -> formVersion),
-        toBasePath        = frc.createFormDataBasePath(app, form,   isDraft, document),
+        toBasePath        = frc.createFormDataBasePath(app, form, isDraft, document),
         filename          = DataXml,
         commonQueryString = systemParams + querySuffix,
         forceAttachments  = false,
@@ -185,29 +186,34 @@ trait FormRunnerActionsCommon {
         workflowStage     = frc.documentWorkflowStage
       )
 
-      // Manual dependency HACK: RR fr-persistence-model before updating the status because we do a setvalue just
-      // before calling the submission
-      recalculate(PersistenceModel)
-      refresh    (PersistenceModel)
+      // This will be run when the future completes, but in a controlled way
+      // Q: Could we make this an `IO`?
+      def continuation(value:Try[(Seq[String], Seq[String], Int)]): Try[Unit] =
+        Try {
+          value match {
+            case Success((beforeURLs, afterURLs, _)) =>
 
-      (beforeURLs, afterURLs, isDraft)
-    } map {
-      case result @ (_, _, isDraft) =>
-        // Mark data clean
-        trySetDataStatus(Map(Some("status") -> "safe", Some("draft") -> isDraft.toString))
-        result
-    } map {
-      case (beforeURLs, afterURLs, _) =>
-        // Notify that the data is saved (2014-07-07: used by FB only)
-        dispatch(name = "fr-data-save-done", targetId = FormModel, properties = Map(
-          "before-urls" -> Some(beforeURLs),
-          "after-urls"  -> Some(afterURLs)
-        ))
-    } onFailure {
-      case _ =>
-        dispatch(name = "fr-data-save-error", targetId = FormModel)
+              // Manual dependency HACK: RR `fr-persistence-model` before updating the status because we do a setvalue just
+              // before calling the submission
+              recalculate(PersistenceModel)
+              refresh    (PersistenceModel)
+
+              // Mark data clean
+              trySetDataStatus(Map(Some("status") -> "safe", Some("draft") -> isDraft.toString))
+
+              // Notify that the data is saved (2014-07-07: used by FB only)
+              dispatch(name = "fr-data-save-done", targetId = FormModel, properties = Map(
+                "before-urls" -> Some(beforeURLs),
+                "after-urls"  -> Some(afterURLs)
+              ))
+
+            case Failure(_) =>
+              dispatch(name = "fr-data-save-error", targetId = FormModel)
+          }
+        }
+
+      (future, continuation _)
     }
-  }
 
   def tryRelinquishLease(params: ActionParams): ActionResult = ActionResult.trySync {
     val leaseState = frc.persistenceInstance.rootElement / "lease-state"

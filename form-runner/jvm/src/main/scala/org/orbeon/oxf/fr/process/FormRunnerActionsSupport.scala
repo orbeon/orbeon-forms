@@ -205,7 +205,7 @@ object FormRunnerActionsSupport {
           )
 
         for {
-          successGetCxr <- ConnectionResult.trySuccessConnection(FormRunner.getAttachment(dataBasePaths, beforeUrl))
+          successGetCxr <- ConnectionResult.trySuccessConnection(FormRunner.getAttachmentSync(dataBasePaths, beforeUrl))
           _             <- ConnectionResult.tryBody(successGetCxr, closeOnSuccess = true)(writeBody)
         } yield
           ()

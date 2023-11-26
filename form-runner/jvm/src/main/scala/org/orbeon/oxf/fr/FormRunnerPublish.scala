@@ -27,6 +27,9 @@ import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
 
 trait FormRunnerPublish {
 
@@ -72,21 +75,25 @@ trait FormRunnerPublish {
         (FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName, Names.LibraryFormName), globalVersionOpt.getOrElse(1))
       )
 
-    val (beforeURLs, _, publishedVersion) =
-      putWithAttachments(
-        liveData          = xhtml.root,
-        migrate           = None,
-        toBaseURI         = toBaseURI,
-        fromBasePaths     = basePathsWithVersions,
-        toBasePath        = createFormDefinitionBasePath(app, form),
-        filename          = FormXhtml,
-        commonQueryString = documentIdOpt map (documentId => encodeSimpleQuery(List("document" -> documentId))) getOrElse "",
-        forceAttachments  = forceAttachments,
-        username          = username.trimAllToOpt,
-        password          = password.trimAllToOpt,
-        formVersion       = dstFormVersionTrimmedOpt,
-        workflowStage     = None
+    val (beforeURLs, _, publishedVersion) = {
+      Await.result(
+        putWithAttachments(
+          liveData          = xhtml.root,
+          migrate           = None,
+          toBaseURI         = toBaseURI,
+          fromBasePaths     = basePathsWithVersions,
+          toBasePath        = createFormDefinitionBasePath(app, form),
+          filename          = FormXhtml,
+          commonQueryString = documentIdOpt map (documentId => encodeSimpleQuery(List("document" -> documentId))) getOrElse "",
+          forceAttachments  = forceAttachments,
+          username          = username.trimAllToOpt,
+          password          = password.trimAllToOpt,
+          formVersion       = dstFormVersionTrimmedOpt,
+          workflowStage     = None
+        ),
+        Duration.Inf
       )
+    }
 
     MapFunctions.createValue(
       Map[AtomicValue, ValueRepresentation](

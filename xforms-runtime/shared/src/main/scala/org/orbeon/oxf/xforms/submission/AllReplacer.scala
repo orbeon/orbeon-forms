@@ -13,11 +13,8 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import cats.effect.IO
-import cats.effect.unsafe.implicits.global
 import cats.syntax.option._
-import org.orbeon.connection.{AsyncConnectionResult, ConnectionResult}
-import org.orbeon.io.IOUtils
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseWrapper}
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}

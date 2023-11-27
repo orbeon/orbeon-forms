@@ -16,9 +16,10 @@ package org.orbeon.oxf.xforms.action
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.QName
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
-import org.orbeon.oxf.util.DynamicVariable
+import org.orbeon.oxf.util.{DynamicVariable, IndentedLogger}
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -56,12 +57,10 @@ object XFormsAPI {
     }
   }
 
-  // Every block of action must be run within this
-  def withContainingDocument[T](containingDocument: XFormsContainingDocument)(body: => T): T = {
+  def withContainingDocument[T](containingDocument: XFormsContainingDocument)(body: => T): T =
     containingDocumentDyn.withValue(containingDocument) {
       body
     }
-  }
 
   // Return the action interpreter
   def inScopeActionInterpreter: XFormsActionInterpreter = actionInterpreterDyn.value.get
@@ -76,19 +75,21 @@ object XFormsAPI {
   def setvalue(ref: Seq[om.NodeInfo], value: String): Option[(om.NodeInfo, Boolean)] =
     ref.headOption map { nodeInfo =>
 
+      val (docOpt, indentedLoggerOpt) = findDocAndLoggerFromActionOrScope
+
       def onSuccess(oldValue: String): Unit =
-        for (action <- actionInterpreterDyn.value)
-          yield
-            DataModel.logAndNotifyValueChange(
-              source             = "scala setvalue",
-              nodeInfo           = nodeInfo,
-              oldValue           = oldValue,
-              newValue           = value,
-              isCalculate        = false,
-              collector          = Dispatch.dispatchEvent)(
-              containingDocument = action.containingDocument,
-              logger             = action.indentedLogger
-            )
+        for (doc <- docOpt)
+        yield
+          DataModel.logAndNotifyValueChange(
+            source             = "scala setvalue",
+            nodeInfo           = nodeInfo,
+            oldValue           = oldValue,
+            newValue           = value,
+            isCalculate        = false,
+            collector          = Dispatch.dispatchEvent)(
+            containingDocument = doc,
+            logger             = indentedLoggerOpt.orNull
+          )
 
       val changed = DataModel.setValueIfChanged(nodeInfo, value, onSuccess)
 
@@ -108,6 +109,19 @@ object XFormsAPI {
       case newIndex if newIndex >= 0 => newIndex
     }
 
+  private def findDocAndLoggerFromActionOrScope: (Option[XFormsContainingDocument], Option[IndentedLogger]) = {
+    val maybeActionInterpreter = actionInterpreterDyn.value
+
+    // If we are in an action the `ActionInterpreter` also returns this same logger
+    def defaultLogger: Option[IndentedLogger] =
+      containingDocumentDyn.value.map(_.getIndentedLogger(XFormsActions.LoggingCategory))
+
+    (
+      maybeActionInterpreter.map(_.containingDocument).orElse(containingDocumentDyn.value),
+      maybeActionInterpreter.map(_.indentedLogger).orElse(defaultLogger)
+    )
+  }
+
   // xf:insert
   // @return the inserted nodes
   def insert[T <: om.Item](
@@ -122,8 +136,7 @@ object XFormsAPI {
   ): Seq[T] =
     if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
 
-      val action = actionInterpreterDyn.value
-      val docOpt = action map (_.containingDocument) orElse containingDocumentDyn.value
+      val (docOpt, indentedLoggerOpt) = findDocAndLoggerFromActionOrScope
 
       val (positionAttribute, collectionToUpdate) =
         if (before.nonEmpty)
@@ -145,7 +158,7 @@ object XFormsAPI {
         searchForInstance                 = searchForInstance,
         removeInstanceDataFromClonedNodes = removeInstanceDataFromClonedNodes,
         structuralDependencies            = true)(
-        indentedLogger                    = action map (_.indentedLogger) orNull,
+        indentedLogger                    = indentedLoggerOpt.orNull,
       ).asInstanceOf[JList[T]].asScala
     } else
       Nil
@@ -157,8 +170,7 @@ object XFormsAPI {
   ): Seq[om.NodeInfo] =
     if (ref.nonEmpty) {
 
-      val actionOpt = actionInterpreterDyn.value
-      val docOpt    = actionOpt map (_.containingDocument) orElse containingDocumentDyn.value
+      val (docOpt, indentedLoggerOpt) = findDocAndLoggerFromActionOrScope
 
       val deletionDescriptors =
         XFormsDeleteAction.doDelete(
@@ -166,7 +178,7 @@ object XFormsAPI {
           collectionToUpdate    = ref,
           deleteIndexOpt        = None,
           doDispatch            = doDispatch)(
-          indentedLogger        = actionOpt map (_.indentedLogger) orNull
+          indentedLogger        = indentedLoggerOpt.orNull
         )
 
       deletionDescriptors map (_.nodeInfo)
@@ -315,12 +327,17 @@ object XFormsAPI {
     }
   }
 
-  private def sendAsyncImpl(submissionId: String, props: List[PropertyValue]): Option[Future[XFormsEvent]] = {
+  private def sendAsyncImpl(
+    submissionId   : String,
+    props          : List[PropertyValue]
+  )(implicit
+    externalContext: ExternalContext
+  ): Option[Future[XFormsEvent]] = {
     resolveAs[XFormsModelSubmission](submissionId) map { submission =>
 
       val p = Promise[XFormsEvent]()
 
-      val listener: Dispatch.EventListener = p.success
+      val listener: Dispatch.EventListener = p.success // xxx should be success or failure?
 
       SubmitEvents.foreach(submission.addListener(_, listener))
 
@@ -346,7 +363,12 @@ object XFormsAPI {
       case error: XFormsSubmitErrorEvent => throw new SubmitException(error)
     }
 
-    def sendAsync(submissionId: String, props: List[PropertyValue] = Nil): Option[Future[XFormsSubmitDoneEvent]] =
+    def sendAsync(
+      submissionId   : String,
+      props          : List[PropertyValue] = Nil
+    )(implicit
+      externalContext: ExternalContext
+    ): Option[Future[XFormsSubmitDoneEvent]] =
       sendAsyncImpl(submissionId, props).map { f =>
         f.map {
           case done:  XFormsSubmitDoneEvent  => done

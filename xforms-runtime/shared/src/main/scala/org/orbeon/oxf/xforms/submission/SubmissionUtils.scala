@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import cats.effect.IO
-import cats.effect.unsafe.implicits.global
+import org.orbeon.connection.ConnectionSupport.fs2StreamToInputStreamInMemory
 import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.io.{CharsetNames, IOUtils}
@@ -32,7 +31,7 @@ import org.orbeon.oxf.xml.{SaxonUtils, XMLParsing}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream}
+import java.io.{ByteArrayOutputStream, InputStream}
 import java.net.URI
 import scala.collection.mutable
 import scala.concurrent.Future
@@ -58,13 +57,6 @@ object SubmissionUtils {
       case ConnectResultT(submissionEffectiveId, Failure(t)) =>
         Future.successful(ConnectResultT(submissionEffectiveId, Failure(t)))
     }
-
-  // Convert the `fs2.Stream` in the `ConnectResult` to an `InputStream`. Of course, We'd like to stream all the way
-  // ideally, but this is a first step. We cannot use `fs2.io.toInputStream` because it requires running two threads,
-  // which doesn't work in JavaScript. So we go through an in-memory `Array` for now. Note that sending data also
-  // works with `Array`s. Also, note that we use `Future` as that's currently what's submitted to this manager.
-  def fs2StreamToInputStreamInMemory(s: fs2.Stream[IO, Byte]): Future[InputStream] =
-    s.compile.to(Array).map(new ByteArrayInputStream(_)).unsafeToFuture()
 
   def logRequestBody(mediatype: String, messageBody: Array[Byte])(implicit logger: IndentedLogger): Unit =
     if (ContentTypes.isXMLMediatype(mediatype) ||

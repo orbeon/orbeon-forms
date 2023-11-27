@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import cats.syntax.option._
@@ -23,15 +22,15 @@ import org.orbeon.connection.{AsyncConnectionResult, ConnectionResult, Connectio
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
-import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, PUT}
+import org.orbeon.oxf.http.{BasicCredentials, Headers}
 import org.orbeon.oxf.properties.Property
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.{properties, shiftExternalContext}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
@@ -57,7 +56,6 @@ import java.net.URI
 import java.{util => ju}
 import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
-import scala.util.Try
 
 
 sealed trait FormOrData extends EnumEntry with Lowercase
@@ -586,7 +584,7 @@ trait FormRunnerPersistence {
     (resolvedGetUri, allGetHeaders)
   }
 
-  def getAttachmentAsync(
+  private def readAttachmentIo(
     fromBasePaths           : Iterable[(String, Int)],
     beforeUrl               : String
   )(implicit
@@ -597,7 +595,7 @@ trait FormRunnerPersistence {
     val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl)
 
     IO.fromFuture(
-      IO(
+      shiftExternalContext[IO, Future[AsyncConnectionResult]](t => IO(t)) {
         Connection.connectAsync(
           method      = GET,
           url         = resolvedGetUri,
@@ -607,7 +605,48 @@ trait FormRunnerPersistence {
           loadState   = true,
           logBody     = false
         )
+      }
+    )
+  }
+
+  private def saveAttachmentIo(
+    stream         : fs2.Stream[IO, Byte],
+    pathToHolder   : String,
+    resolvedPutUri : URI,
+    formVersion    : Option[String],
+    credentials    : Option[BasicCredentials]
+  )(implicit
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): IO[AsyncConnectionResult] = {
+
+    val customPutHeaders =
+      (formVersion.toList map (v => OrbeonFormDefinitionVersion -> List(v))) ::: // write all using the form definition version
+      (OrbeonPathToHolder -> List(pathToHolder))                             ::
+      Nil
+
+    val allPutHeaders =
+      Connection.buildConnectionHeadersCapitalizedIfNeeded(
+        url              = resolvedPutUri,
+        hasCredentials   = false,
+        customHeaders    = customPutHeaders.toMap,
+        headersToForward = Connection.headersToForwardFromProperty,
+        cookiesToForward = Connection.cookiesToForwardFromProperty,
+        getHeader        = inScopeContainingDocument.headersGetter
       )
+
+    IO.fromFuture(
+      shiftExternalContext[IO, Future[AsyncConnectionResult]](t => IO(t)) {
+        Connection.connectAsync(
+          method      = PUT,
+          url         = resolvedPutUri,
+          credentials = credentials,
+          content     = StreamedContent(stream, ContentTypes.OctetStreamContentType.some, contentLength = None).some,
+          headers     = allPutHeaders,
+          loadState   = true,
+          logBody     = false
+        )
+      }
     )
   }
 
@@ -663,6 +702,9 @@ trait FormRunnerPersistence {
           AttachmentMatch.BasePaths(includes = fromBasePaths.map(_._1), excludes = List(toBasePath))
       )
 
+    val credentials =
+      username map (BasicCredentials(_, password, preemptiveAuth = true, domain = None))
+
     def updateHolder(holder: NodeInfo, afterURL: String, isEncryptedAtRest: Boolean): Unit = {
       setvalue(holder, afterURL)
       XFormsAPI.delete(holder /@ AttachmentEncryptedAttributeName)
@@ -680,41 +722,6 @@ trait FormRunnerPersistence {
         UrlRewriteMode.Absolute
       )
 
-    def connectPut(stream: fs2.Stream[IO, Byte], pathToHolder: String, afterUrl: String): IO[AsyncConnectionResult] = {
-
-      val customPutHeaders =
-        (formVersion.toList map (v => OrbeonFormDefinitionVersion -> List(v))) ::: // write all using the form definition version
-        (OrbeonPathToHolder -> List(pathToHolder))                             ::
-        Nil
-
-      val resolvedPutUri =
-        URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
-
-      val allPutHeaders =
-        Connection.buildConnectionHeadersCapitalizedIfNeeded(
-          url              = resolvedPutUri,
-          hasCredentials   = false,
-          customHeaders    = customPutHeaders.toMap,
-          headersToForward = Connection.headersToForwardFromProperty,
-          cookiesToForward = Connection.cookiesToForwardFromProperty,
-          getHeader        = inScopeContainingDocument.headersGetter
-        )
-
-      IO.fromFuture(
-        IO(
-          Connection.connectAsync(
-            method      = PUT,
-            url         = resolvedPutUri,
-            credentials = username map (BasicCredentials(_, password, preemptiveAuth = true, domain = None)),
-            content     = StreamedContent(stream, ContentTypes.OctetStreamContentType.some, contentLength = None).some,
-            headers     = allPutHeaders,
-            loadState   = true,
-            logBody     = false
-          )
-        )
-      )
-    }
-
     def getOrbeonDidEncryptHeader(cxr: ConnectionResultT[_], migratedHolder: NodeInfo, afterUrl: String): Boolean = {
       val isEncryptedAtRest = cxr.headers.get(OrbeonDidEncryptHeader).exists(_.contains("true"))
       updateHolder(migratedHolder, afterUrl, isEncryptedAtRest)
@@ -725,31 +732,32 @@ trait FormRunnerPersistence {
     def trySaveAllAttachments: fs2.Stream[IO, AttachmentWithEncryptedAtRest] =
       for {
         AttachmentWithHolder(beforeUrl, migratedHolder)
-                     <- fs2.Stream.emits(attachmentsWithHolder).covary[IO]
-        getCr        <- fs2.Stream.eval(getAttachmentAsync(fromBasePaths, beforeUrl))
-        getCxr       <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(getCr)))
-        pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
-        afterUrl     = createAttachmentFilename(beforeUrl, toBasePath)
-        putCr        <- fs2.Stream.eval(connectPut(getCxr.content.stream, pathToHolder, afterUrl))
-        putCxr       <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(putCr)))
+                       <- fs2.Stream.emits(attachmentsWithHolder).covary[IO]
+        getCr          <- fs2.Stream.eval(readAttachmentIo(fromBasePaths, beforeUrl))
+        getCxr         <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(getCr)))
+        pathToHolder   = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
+        afterUrl       = createAttachmentFilename(beforeUrl, toBasePath)
+        resolvedPutUri = URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
+        putCr          <- fs2.Stream.eval(saveAttachmentIo(getCxr.content.stream, pathToHolder, resolvedPutUri, formVersion, credentials))
+        putCxr         <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(putCr)))
       } yield
         AttachmentWithEncryptedAtRest(beforeUrl, afterUrl, getOrbeonDidEncryptHeader(putCxr, migratedHolder, afterUrl))
 
-    def saveXmlData(migratedData: DocumentNodeInfoType): Future[XFormsSubmitDoneEvent] =
-      sendAsync("fr-create-update-submission", List(
-        PropertyValue("holder"        , Some(migratedData.rootElement)),
-        PropertyValue("resource"      , Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString))),
-        PropertyValue("username"      , username),
-        PropertyValue("password"      , password),
-        PropertyValue("form-version"  , formVersion),
-        PropertyValue("workflow-stage", workflowStage),
-      )).getOrElse(throw new IllegalStateException)
+    def saveXmlDataIo(migratedData: DocumentNodeInfoType): Future[XFormsSubmitDoneEvent] = {
+        sendAsync("fr-create-update-submission", List(
+          PropertyValue("holder"        , Some(migratedData.rootElement)),
+          PropertyValue("resource"      , Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString))),
+          PropertyValue("username"      , username),
+          PropertyValue("password"      , password),
+          PropertyValue("form-version"  , formVersion),
+          PropertyValue("workflow-stage", workflowStage),
+        )).getOrElse(throw new IllegalStateException)
+      }
 
     def versionFromEvent(done: XFormsSubmitDoneEvent): Option[String] =
       for {
-        headers  <- done.headers
-        versions <- headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion => values }
-        version  <- versions.headOption
+        headers <- done.headers
+        version <- Headers.firstItemIgnoreCase(headers, OrbeonFormDefinitionVersion)
       } yield
         version
 
@@ -770,13 +778,13 @@ trait FormRunnerPersistence {
     val resultIo =
       for {
         savedAttachments <- trySaveAllAttachments.compile.toList
-        done             <- IO.fromFuture(IO(saveXmlData(savedData)))
-        _                = if (migrate.isDefined) handleMigrate(savedAttachments)
+        submitDoneEvent  <- IO.fromFuture(shiftExternalContext[IO, Future[XFormsSubmitDoneEvent]](t => IO(t))(saveXmlDataIo(savedData)))
+        _                <- IO(if (migrate.isDefined) handleMigrate(savedAttachments))
       } yield
         (
           savedAttachments.map(_.fromPath),
           savedAttachments.map(_.toPath),
-          versionFromEvent(done).map(_.toInt).getOrElse(1)
+          versionFromEvent(submitDoneEvent).map(_.toInt).getOrElse(1)
         )
 
     resultIo.unsafeToFuture()

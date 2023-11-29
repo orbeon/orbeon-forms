@@ -629,7 +629,7 @@ class RestApiTest
             doc
           }
 
-          assertXMLDocumentsIgnoreNamespacesInScope(filterResultBody(resultBodyTry.get), expectedBody)
+          assertXMLDocumentsIgnoreNamespacesInScope(expectedBody, filterResultBody(resultBodyTry.get))
         }
       }
     }

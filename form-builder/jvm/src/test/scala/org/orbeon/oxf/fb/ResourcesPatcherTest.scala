@@ -445,7 +445,7 @@ class ResourcesPatcherTest
 
       ResourcesPatcher.transform(initial, emptyFormMetadata, AppForm("*", "*"))(props)
 
-      assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
+      assertXMLDocumentsIgnoreNamespacesInScope(expected, initial)
     }
   }
 

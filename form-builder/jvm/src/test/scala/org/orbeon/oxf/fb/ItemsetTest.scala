@@ -224,7 +224,7 @@ class ItemsetTest
               }
             }</resources>
           val actualResources = resourceForNewControl()
-          assertXMLDocumentsIgnoreNamespacesInScope(actualResources.toDocument, expectedResources.toDocument)
+          assertXMLDocumentsIgnoreNamespacesInScope(expectedResources.toDocument, actualResources.toDocument)
         }
 
         // Editing a form in English; English placeholders are added

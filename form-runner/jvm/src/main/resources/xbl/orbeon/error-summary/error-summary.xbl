@@ -189,7 +189,7 @@
                     name="visit-value-changed"
                     value="
                         (
-                            xs:boolean(xxf:component-param-value('visit-value-changed')[. = ('true', 'false')]),
+                            xs:boolean(xs:string(xxf:component-param-value('visit-value-changed'))[. = ('true', 'false')]),
                             false() (: default :)
                         )[1]"/>
 

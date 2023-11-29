@@ -14,12 +14,16 @@
 package org.orbeon.oxf.fr
 
 import cats.syntax.option._
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.FormXhtml
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.MapFunctions
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
@@ -74,6 +78,10 @@ trait FormRunnerPublish {
         (FormRunner.createFormDefinitionBasePath(app,                        Names.LibraryFormName), appVersionOpt.getOrElse(1)),
         (FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName, Names.LibraryFormName), globalVersionOpt.getOrElse(1))
       )
+
+    implicit val externalContext         : ExternalContext               = CoreCrossPlatformSupport.externalContext
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+    implicit val xfcd                    : XFormsContainingDocument      = inScopeContainingDocument
 
     val (beforeURLs, _, publishedVersion) = {
       Await.result(

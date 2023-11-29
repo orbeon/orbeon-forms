@@ -1,4 +1,4 @@
- /**
+/**
  * Copyright (C) 2013 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -37,13 +37,12 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon
@@ -547,7 +546,8 @@ trait FormRunnerPersistence {
     beforeUrl               : String
   )(implicit
     externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    xfcd                    : XFormsContainingDocument
   ): (URI, Map[String, List[String]]) = {
 
     def rewriteServiceUrl(url: String) =
@@ -578,7 +578,7 @@ trait FormRunnerPersistence {
         customHeaders    = customGetHeaders,
         headersToForward = Connection.headersToForwardFromProperty,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
-        getHeader        = inScopeContainingDocument.headersGetter
+        getHeader        = xfcd.headersGetter
       )
 
     (resolvedGetUri, allGetHeaders)
@@ -589,7 +589,8 @@ trait FormRunnerPersistence {
     beforeUrl               : String
   )(implicit
     externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    xfcd                    : XFormsContainingDocument
   ): IO[AsyncConnectionResult] = {
 
     val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl)
@@ -617,7 +618,8 @@ trait FormRunnerPersistence {
     credentials    : Option[BasicCredentials]
   )(implicit
     externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    xfcd                    : XFormsContainingDocument
   ): IO[AsyncConnectionResult] = {
 
     val customPutHeaders =
@@ -632,7 +634,7 @@ trait FormRunnerPersistence {
         customHeaders    = customPutHeaders.toMap,
         headersToForward = Connection.headersToForwardFromProperty,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
-        getHeader        = inScopeContainingDocument.headersGetter
+        getHeader        = xfcd.headersGetter
       )
 
     IO.fromFuture(
@@ -650,12 +652,13 @@ trait FormRunnerPersistence {
     )
   }
 
-  def getAttachmentSync(
+  def readAttachmentSync(
     fromBasePaths           : Iterable[(String, Int)],
     beforeUrl               : String
   )(implicit
     externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    xfcd                    : XFormsContainingDocument
   ): ConnectionResult = {
 
     val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl)
@@ -685,10 +688,12 @@ trait FormRunnerPersistence {
     password          : Option[String] = None,
     formVersion       : Option[String] = None,
     workflowStage     : Option[String] = None
+  )(implicit
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    xfcd                    : XFormsContainingDocument
   ): Future[(Seq[String], Seq[String], Int)] = {
 
-    implicit val externalContext         : ExternalContext               = CoreCrossPlatformSupport.externalContext
-    implicit def coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
     val savedData = migrate.map(_(liveData)).getOrElse(liveData)
 
@@ -729,7 +734,7 @@ trait FormRunnerPersistence {
     }
 
     // xxx close resources
-    def trySaveAllAttachments: fs2.Stream[IO, AttachmentWithEncryptedAtRest] =
+    def trySaveAllAttachments(implicit xfcd: XFormsContainingDocument): fs2.Stream[IO, AttachmentWithEncryptedAtRest] =
       for {
         AttachmentWithHolder(beforeUrl, migratedHolder)
                        <- fs2.Stream.emits(attachmentsWithHolder).covary[IO]
@@ -743,16 +748,21 @@ trait FormRunnerPersistence {
       } yield
         AttachmentWithEncryptedAtRest(beforeUrl, afterUrl, getOrbeonDidEncryptHeader(putCxr, migratedHolder, afterUrl))
 
-    def saveXmlDataIo(migratedData: DocumentNodeInfoType): Future[XFormsSubmitDoneEvent] = {
-        sendAsync("fr-create-update-submission", List(
-          PropertyValue("holder"        , Some(migratedData.rootElement)),
-          PropertyValue("resource"      , Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString))),
-          PropertyValue("username"      , username),
-          PropertyValue("password"      , password),
-          PropertyValue("form-version"  , formVersion),
-          PropertyValue("workflow-stage", workflowStage),
-        )).getOrElse(throw new IllegalStateException)
-      }
+    def saveXmlDataIo(
+      migratedData: DocumentNodeInfoType
+    )(implicit
+      xfcd        : XFormsContainingDocument
+    ): Future[XFormsSubmitDoneEvent] = {
+      println("xxx saveXmlDataIo")
+      sendAsync("fr-create-update-submission", List(
+        PropertyValue("holder"        , Some(migratedData.rootElement)),
+        PropertyValue("resource"      , Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString))),
+        PropertyValue("username"      , username),
+        PropertyValue("password"      , password),
+        PropertyValue("form-version"  , formVersion),
+        PropertyValue("workflow-stage", workflowStage),
+      )).getOrElse(throw new IllegalStateException)
+    }
 
     def versionFromEvent(done: XFormsSubmitDoneEvent): Option[String] =
       for {
@@ -761,16 +771,19 @@ trait FormRunnerPersistence {
       } yield
         version
 
+    val existingXPathContext = XPath.functionContext.orNull
+
     def handleMigrate(attachmentsWithEncryptedAtRest: List[AttachmentWithEncryptedAtRest]): Unit =
       attachmentsWithEncryptedAtRest.foreach {
         case AttachmentWithEncryptedAtRest(beforeURL, afterURL, isEncryptedAtRest) =>
           val holder = {
             scaxon.XPath.evalOne(
-              item       = liveData,
-              expr       = "//*[not(*)][xxf:trim() = $beforeURL]",
-              namespaces = BasicNamespaceMapping.Mapping,
-              variables  = Map("beforeURL" -> new StringValue(beforeURL))
-            )(XFormsFunctionLibrary).asInstanceOf[NodeInfo]
+              item            = liveData,
+              expr            = "//*[not(*)][xxf:trim(.) = $beforeURL]",
+              namespaces      = BasicNamespaceMapping.Mapping,
+              variables       = Map("beforeURL" -> new StringValue(beforeURL)),
+              functionContext = existingXPathContext
+            )(xfcd.functionLibrary).asInstanceOf[NodeInfo]
           }
           updateHolder(holder, afterURL, isEncryptedAtRest)
       }

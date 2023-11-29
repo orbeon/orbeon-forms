@@ -35,6 +35,7 @@ import org.orbeon.oxf.util.PathUtils.{recombineQuery, splitQueryDecodeParams}
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ByteEncoding, ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, Mediatypes, PathUtils, SecureUtils, StaticXPath, URLRewriterUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.{inScopeContainingDocument, setvalue}
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xml.SaxonUtils
@@ -99,7 +100,8 @@ object FormRunnerActionsSupport {
     annotateWith              : Set[String],
     headersGetter             : String => Option[List[String]])(implicit
     formRunnerParams          : FormRunnerParams,
-    logger                    : IndentedLogger
+    logger                    : IndentedLogger,
+    xfcd                      : XFormsContainingDocument
   ): (URI, String) = {
 
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
@@ -205,7 +207,7 @@ object FormRunnerActionsSupport {
           )
 
         for {
-          successGetCxr <- ConnectionResult.trySuccessConnection(FormRunner.getAttachmentSync(dataBasePaths, beforeUrl))
+          successGetCxr <- ConnectionResult.trySuccessConnection(FormRunner.readAttachmentSync(dataBasePaths, beforeUrl))
           _             <- ConnectionResult.tryBody(successGetCxr, closeOnSuccess = true)(writeBody)
         } yield
           ()

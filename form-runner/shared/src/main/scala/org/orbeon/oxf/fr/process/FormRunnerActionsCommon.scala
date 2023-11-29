@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
@@ -23,7 +24,8 @@ import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{MarkupUtils, PathUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, MarkupUtils, PathUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
@@ -131,6 +133,11 @@ trait FormRunnerActionsCommon {
 
   def trySaveAttachmentsAndData(params: ActionParams): ActionResult =
     ActionResult.tryAsync {
+
+      implicit val externalContext         : ExternalContext               = CoreCrossPlatformSupport.externalContext
+      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+      implicit val xfcd                    : XFormsContainingDocument      = inScopeContainingDocument
+
       val FormRunnerParams(app, form, formVersion, Some(document), _, _) = FormRunnerParams()
 
       ensureDataCalculationsAreUpToDate()
@@ -188,7 +195,7 @@ trait FormRunnerActionsCommon {
 
       // This will be run when the future completes, but in a controlled way
       // Q: Could we make this an `IO`?
-      def continuation(value:Try[(Seq[String], Seq[String], Int)]): Try[Unit] =
+      def continuation(value: Try[(Seq[String], Seq[String], Int)]): Try[Unit] =
         Try {
           value match {
             case Success((beforeURLs, afterURLs, _)) =>

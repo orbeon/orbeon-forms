@@ -281,6 +281,8 @@ object XFormsAPI {
     delay           : Option[Int]                = None,
     showProgress    : Boolean                    = true,
     allowDuplicates : Boolean                    = false
+  )(implicit
+    xfcd            : XFormsContainingDocument = inScopeContainingDocument
   ): Unit =
     resolveAs[XFormsEventTarget](targetId) foreach {
       XFormsDispatchAction.dispatch(
@@ -299,7 +301,13 @@ object XFormsAPI {
 
   // xf:send
   // Send the given submission and applies the body with the resulting event if the submission completed
-  private def send[T](submissionId: String, props: List[PropertyValue])(body: XFormsEvent => T): Option[T] = {
+  private def send[T](
+    submissionId: String,
+    props       : List[PropertyValue])(
+    body        : XFormsEvent => T
+  )(implicit
+    xfcd        : XFormsContainingDocument
+  ): Option[T] = {
     resolveAs[XFormsModelSubmission](submissionId) flatMap { submission =>
 
       var result: Option[Try[T]] = None
@@ -331,13 +339,14 @@ object XFormsAPI {
     submissionId   : String,
     props          : List[PropertyValue]
   )(implicit
-    externalContext: ExternalContext
+    externalContext: ExternalContext,
+    xfcd           : XFormsContainingDocument
   ): Option[Future[XFormsEvent]] = {
     resolveAs[XFormsModelSubmission](submissionId) map { submission =>
 
       val p = Promise[XFormsEvent]()
 
-      val listener: Dispatch.EventListener = p.success // xxx should be success or failure?
+      val listener: Dispatch.EventListener = p.success // xxx should be success or failure? xxx
 
       SubmitEvents.foreach(submission.addListener(_, listener))
 
@@ -357,7 +366,7 @@ object XFormsAPI {
   class SubmitException(e: XFormsSubmitErrorEvent) extends RuntimeException
 
   // xf:send which throws a SubmitException in case of error
-  def sendThrowOnError(submissionId: String, props: List[PropertyValue] = Nil): Option[XFormsSubmitDoneEvent] =
+  def sendThrowOnError(submissionId: String, props: List[PropertyValue] = Nil)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Option[XFormsSubmitDoneEvent] =
     send(submissionId, props) {
       case done:  XFormsSubmitDoneEvent  => done
       case error: XFormsSubmitErrorEvent => throw new SubmitException(error)
@@ -367,7 +376,8 @@ object XFormsAPI {
       submissionId   : String,
       props          : List[PropertyValue] = Nil
     )(implicit
-      externalContext: ExternalContext
+      externalContext: ExternalContext,
+      xfcd           : XFormsContainingDocument
     ): Option[Future[XFormsSubmitDoneEvent]] =
       sendAsyncImpl(submissionId, props).map { f =>
         f.map {
@@ -377,36 +387,36 @@ object XFormsAPI {
       }
 
   // NOTE: There is no source id passed so we resolve relative to the document
-  def resolveAs[T: ClassTag](staticOrAbsoluteId: String): Option[T] =
-    inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, staticOrAbsoluteId, None) flatMap collectByErasedType[T]
+  def resolveAs[T: ClassTag](staticOrAbsoluteId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Option[T] =
+    xfcd.resolveObjectByIdInScope(Constants.DocumentId, staticOrAbsoluteId, None) flatMap collectByErasedType[T]
 
   // xf:toggle
-  def toggle(caseId: String, mustHonorDeferredUpdateFlags: Boolean = true): Unit =
+  def toggle(caseId: String, mustHonorDeferredUpdateFlags: Boolean = true)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsCaseControl](caseId) foreach
       (XFormsToggleAction.toggle(_, mustHonorDeferredUpdateFlags))
 
   // xf:rebuild
-  def rebuild(modelId: String, mustHonorDeferredUpdateFlags: Boolean = false): Unit =
+  def rebuild(modelId: String, mustHonorDeferredUpdateFlags: Boolean = false)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsModel](modelId) foreach
       (RRRAction.rebuild(_, mustHonorDeferredUpdateFlags))
 
   // xf:recalculate
-  def recalculate(modelId: String, mustHonorDeferredUpdateFlags: Boolean = false, applyDefaults: Boolean = false): Unit =
+  def recalculate(modelId: String, mustHonorDeferredUpdateFlags: Boolean = false, applyDefaults: Boolean = false)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsModel](modelId) foreach
       (RRRAction.recalculate(_, mustHonorDeferredUpdateFlags, applyDefaults))
 
   // xf:refresh
-  def refresh(modelId: String): Unit =
+  def refresh(modelId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsModel](modelId) foreach
       XFormsRefreshAction.refresh
 
   // xf:show
-  def show(dialogId: String, properties: PropertyGetter = EmptyGetter): Unit =
+  def show(dialogId: String, properties: PropertyGetter = EmptyGetter)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsEventTarget](dialogId) foreach
       (XXFormsShowAction.showDialog(_, properties = properties))
 
   // xf:hide
-  def hide(dialogId: String, properties: PropertyGetter = EmptyGetter): Unit =
+  def hide(dialogId: String, properties: PropertyGetter = EmptyGetter)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsEventTarget](dialogId) foreach
       (XXFormsHideAction.hideDialog(_, properties = properties))
 
@@ -416,9 +426,11 @@ object XFormsAPI {
     target                       : Option[String] = None,
     showProgress                 : Boolean        = false,
     mustHonorDeferredUpdateFlags : Boolean        = true
+  )(implicit
+    xfcd                         : XFormsContainingDocument = inScopeContainingDocument
   ): Unit =
     XFormsLoadAction.resolveStoreLoadValue(
-      containingDocument           = inScopeContainingDocument,
+      containingDocument           = xfcd,
       currentElem                  = None,
       doReplace                    = true,
       value                        = url.encodeHRRI(processSpace = true),
@@ -430,7 +442,7 @@ object XFormsAPI {
     )
 
   // xf:setfocus
-  def setfocus(controlId: String, includes: Set[QName], excludes: Set[QName]): Unit =
+  def setfocus(controlId: String, includes: Set[QName], excludes: Set[QName])(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsControl](controlId) foreach
       (XFormsSetfocusAction.setfocus(_, includes, excludes))
 }

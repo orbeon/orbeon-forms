@@ -13,13 +13,16 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataFormatVersionName, DataXml}
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
-import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, PathUtils}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 
@@ -85,6 +88,10 @@ trait FormRunnerSummary {
   ): Unit = {
 
     val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
+
+    implicit val externalContext         : ExternalContext               = CoreCrossPlatformSupport.externalContext
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+    implicit val xfcd                    : XFormsContainingDocument      = inScopeContainingDocument
 
     putWithAttachments(
       liveData           = data.root,

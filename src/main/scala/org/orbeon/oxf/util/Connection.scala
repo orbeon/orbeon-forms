@@ -91,7 +91,7 @@ object Connection extends ConnectionTrait {
     cxr
   }
 
-  // Only called by `RegularSubmission`
+  // Called by `RegularSubmission` and `FormRunnerPersistence`
   def connectAsync(
     method          : HttpMethod,
     url             : URI,

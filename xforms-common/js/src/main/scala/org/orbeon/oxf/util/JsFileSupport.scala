@@ -24,7 +24,7 @@ object JsFileSupport {
     URI.create(s"$UploadUriScheme:${createTemporaryFile(file, size, mediatype)}")
 
   def readTemporaryFile(uri: URI): Option[sjsdom.ReadableStream[Uint8Array]] =
-    temporaryFiles.get(uri.getSchemeSpecificPart) map { file =>
+    temporaryFiles.get(PathUtils.splitQuery(uri.getSchemeSpecificPart)._1) map { file =>
       file.asInstanceOf[js.Dynamic].stream().asInstanceOf[sjsdom.ReadableStream[Uint8Array]]
     }
 }

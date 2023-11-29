@@ -27,6 +27,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent
@@ -111,6 +112,8 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
       val FormRunnerParams(currentApp, currentForm, currentFormVersion, currentDocumentOpt, currentIsDraft, _) = formRunnerParams
+
+      implicit val xfcd: XFormsContainingDocument = inScopeContainingDocument
 
       val propertyPrefixOpt = paramByNameOrDefault(params, "property")
 
@@ -264,7 +267,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
                 dataBasePaths              = List(basePath -> currentFormVersion),
                 relevanceHandling          = relevanceHandling,
                 annotateWith               = evaluatedSendProperties.get("annotate").flatten.map(_.splitTo[Set]()).getOrElse(Set.empty),
-                headersGetter              = inScopeContainingDocument.headersGetter
+                headersGetter              = xfcd.headersGetter
               )
             )
           case _ => None

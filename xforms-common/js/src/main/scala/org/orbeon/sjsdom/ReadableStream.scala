@@ -100,7 +100,19 @@ object ReadableStream {
       queuingStrategy: js.UndefOr[QueuingStrategy[T]] = js.undefined
   ): ReadableStream[T] = {
     js.Dynamic
-      .newInstance(js.Dynamic.global.ReadableStream)(
+      // ORBEON: Use `WebStreamsPolyfill.ReadableStream` instead of `ReadableStream` as Safari doesn't support
+      // `ReadableStreamUnderlyingSource` yet. So when we need to create a `ReadableStream` from a
+      // `ReadableStreamUnderlyingSource`, we instantiate it using the polyfill. Currently, our use case is to
+      // create a `ReadableStream` and pass it to our `SubmissionProvider`. Similarly, if a `SubmissionProvider`
+      // returns a `ReadableStream`, it will need to  instantiate it using the polyfill under Safari.
+      // Safari error: `TypeError: ReadableByteStreamController` is not implemented. References:
+      //
+      // - https://streams.spec.whatwg.org/#rbs-controller-class
+      // - https://caniuse.com/?search=ReadableByteStreamController
+      // - https://github.com/MattiasBuelens/web-streams-polyfill
+
+//      .newInstance(js.Dynamic.global.ReadableStream)(
+      .newInstance(js.Dynamic.global.WebStreamsPolyfill.ReadableStream)(
           underlyingSource.asInstanceOf[js.Any],
           queuingStrategy.asInstanceOf[js.Any]
       )

@@ -255,7 +255,12 @@
                                 $link-to              := $link-to-tokens[
                                     (. = 'summary' and $can-navigate-summary) or
                                     (. = 'new'     and $can-navigate-new)
-                                ][1]
+                                ][1],
+                                $link-params          :=
+                                    if (xxf:property('oxf.fr.summary.show-version-selector.*.*')) then
+                                        concat('?form-version=', $form-version)
+                                    else
+                                        ''
                             return
                                 if (exists($link-to)) then
                                     concat(
@@ -265,8 +270,7 @@
                                         form-name,
                                         '/',
                                         $link-to,
-                                        '?form-version=',
-                                        form-version
+                                        $link-params
                                     )
                                 else
                                     ()"/>
@@ -376,8 +380,10 @@
                                     'new'
                                 else
                                     'summary',
-                                '?form-version=',
-                                form-version
+                                if (xxf:property('oxf.fr.summary.show-version-selector.*.*')) then
+                                    concat('?form-version=', $form-version)
+                                else
+                                    ''
                             )"/>
                         <!-- This doesn't work because we remove the form description from the metadata -->
 <!--                        <xf:hint ref="(description[@xml:lang = xxf:lang()], description)[normalize-space()][1]"/>-->

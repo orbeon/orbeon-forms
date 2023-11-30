@@ -245,18 +245,20 @@ private[persistence] object PersistenceProxyProcessor {
       PathUtils.encodeQueryString(request.parameters)
     )
 
-    val incomingVersion =
-      Version(
-        documentId = request.getFirstHeaderIgnoreCase(Version.OrbeonForDocumentId), // this gets precedence
-        isDraft    = request.getFirstHeaderIgnoreCase(Version.OrbeonForDocumentIsDraft),
-        version    = request.getFirstHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion),
-      )
-
     // TODO: what about permissions for the attachments? is that a thing?
     val (cxrOpt, effectiveFormDefinitionVersionOpt) =
       request.getMethod match {
         case crudMethod: HttpMethod.CrudMethod
           if formOrData == FormOrData.Form && filename.isEmpty || formOrData == FormOrData.Data && filename.isDefined =>
+
+          // Do not move this outside of the match/case, as it might lead to trying to deserialize 'all' as a Version
+          // instead of a SearchVersion, which will lead to an exception (see #6017)
+          val incomingVersion =
+            Version(
+              documentId = request.getFirstHeaderIgnoreCase(Version.OrbeonForDocumentId), // this gets precedence
+              isDraft    = request.getFirstHeaderIgnoreCase(Version.OrbeonForDocumentIsDraft),
+              version    = request.getFirstHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion),
+            )
 
           // CRUD operations on form definitions or data
 

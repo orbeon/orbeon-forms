@@ -125,7 +125,7 @@ trait ProcessInterpreter extends Logging {
     case class Process(scope: String, processId: String, var frames: List[StackFrame])
     case class StackFrame(group: GroupNode, actionCounter: Int)
 
-    def runSubProcess(process: String): InternalActionResult = {
+    def runSubProcess(process: String, initialTry: Try[Any]): InternalActionResult = {
 
       def runAction(action: ActionNode): InternalActionResult =
         withDebug("process: running action", List("action" -> action.toString)) {
@@ -151,7 +151,7 @@ trait ProcessInterpreter extends Logging {
               // TODO: we don't support concurrent processes yet so if someone starts another process in the meanwhile,
               //  some state will be lost.
               val processScope = processStackDyn.value.get.scope
-              submitContinuation(value, continuation.andThen(_ => runProcess(processScope, serializedContinuation._2)))
+              submitContinuation(value, continuation.andThen(initialTry => runProcess(processScope, serializedContinuation._2, initialTry)))
               ActionResult.Interrupt(None, None)
             case r @ ActionResult.Interrupt(_, _) =>
               debugResults(List("result" -> "interrupted action"))
@@ -224,14 +224,18 @@ trait ProcessInterpreter extends Logging {
       def parseProcess(process: String): Option[GroupNode] =
         process.nonAllBlank option ProcessParser.parse(process)
 
-      parseProcess(process) match {
-        case Some(expr) =>
-          runExpr(expr)
-        case None =>
+      (parseProcess(process), initialTry) match {
+        case (Some(groupNode), Success(_)) =>
+          // Normal process run
+          runGroup(groupNode)
+        case (Some(groupNode @ GroupNode(_, rest)), failure @ Failure(_)) =>
+          // Process run starting with a `Failure` (for continuations)
+          runGroupRest(groupNode, 1, ActionResult.Sync(failure), rest)
+        case (None, _) =>
           debug("process: empty process, canceling process")
           ActionResult.Sync(Success(()))
       }
-    }
+    } // end `runSubProcess()`
   }
 
   import ProcessRuntime._
@@ -249,13 +253,13 @@ trait ProcessInterpreter extends Logging {
   }
 
   // Main entry point for starting a literal process
-  def runProcess(scope: String, process: String): Try[Any] =
+  def runProcess(scope: String, process: String, initialTry: Try[Any] = Success(())): Try[Any] =
     withDebug("process: running", List("process" -> process)) {
       transactionStart()
       // Scope the process (for suspend/resume)
       withEmptyStack(scope) {
         beforeProcess() flatMap { _ =>
-          runSubProcess(process) match {
+          runSubProcess(process, initialTry) match {
             case ActionResult.Sync(tried) =>
               tried
             case ActionResult.Interrupt(message, Some(success @ Success(_))) =>
@@ -297,7 +301,7 @@ trait ProcessInterpreter extends Logging {
     Try(paramByNameOrDefault(params, "name").get)
       .map(rawProcessByName(processStackDyn.value.get.scope, _)) match {
       case Success(process) =>
-        runSubProcess(process)
+        runSubProcess(process, Success(()))
       case failure @ Failure(_) =>
         ActionResult.Sync(failure)
     }
@@ -319,7 +323,7 @@ trait ProcessInterpreter extends Logging {
       case Success((processId, continuation)) =>
         // TODO: Restore processId
         clearSuspendedProcess()
-        runSubProcess(continuation)
+        runSubProcess(continuation, Success(()))
       case failure @ Failure(t) =>
         error(s"error suspending process: `${t.getMessage}`")
         ActionResult.Sync(failure)
@@ -416,7 +420,7 @@ object ProcessInterpreter {
   sealed trait InternalActionResult extends ActionResult
   object ActionResult {
     case class Sync(value: Try[Any])                                       extends InternalActionResult
-    case class Async[T](value: Try[(Future[T], Try[T] => Try[Any])])            extends ActionResult
+    case class Async[T](value: Try[(Future[T], Try[T] => Try[Any])])       extends ActionResult
     case class Interrupt(message: Option[String], value: Option[Try[Any]]) extends InternalActionResult
 
     def trySync(body: => Any): ActionResult = ActionResult.Sync(Try(body))

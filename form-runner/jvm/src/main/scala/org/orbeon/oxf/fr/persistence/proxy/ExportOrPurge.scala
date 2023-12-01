@@ -4,12 +4,13 @@ package org.orbeon.oxf.fr.persistence.proxy
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
+import org.orbeon.oxf.fr.AttachmentMatch.BasePaths
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi._
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
-import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormOrData, FormRunner}
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.Logging.debug
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
@@ -237,10 +238,10 @@ trait ExportOrPurge {
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit =
-    FormRunner.collectAttachments(
+    FormRunner.collectUnsavedAttachments(
       data             = xmlData,
-      attachmentMatch  = FormRunner.AttachmentMatch.BasePaths(includes = List(makeFromPath(appFormVersion._1, documentIdOpt)), excludes = Nil)
-    ) foreach { case FormRunner.AttachmentWithHolder(fromPath, _) =>
+      attachmentMatch  = BasePaths(includes = List(makeFromPath(appFormVersion._1, documentIdOpt)), excludes = Nil)
+    ) foreach { case AttachmentWithHolder(fromPath, _) =>
 
       if (! attachmentPaths(fromPath)) { // don't attempt to put a path twice (some forms have this)
 

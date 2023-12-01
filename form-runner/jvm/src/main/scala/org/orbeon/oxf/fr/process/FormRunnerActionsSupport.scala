@@ -120,9 +120,9 @@ object FormRunnerActionsSupport {
 
     // Find all instance nodes containing file URLs we need to upload
     val attachmentsWithHolder =
-      FormRunner.collectAttachments(
+      FormRunner.collectUnsavedAttachments(
         new DocumentWrapper(dataCopiedAndMaybeMigrated, null, StaticXPath.GlobalConfiguration),
-        FormRunner.AttachmentMatch.BasePaths(includes = dataBasePaths.map(_._1), excludes = Nil)
+        AttachmentMatch.BasePaths(includes = dataBasePaths.map(_._1), excludes = Nil)
       )
 
     def createCidForNode(node: NodeInfo): String =
@@ -134,7 +134,7 @@ object FormRunnerActionsSupport {
     // We dont do this replacement if the attachments are not sent, both because it's not helpful and for backward
     // compatibility.
     if (parts.exists(_ == ContentToken.Attachments))
-      attachmentsWithHolder foreach { case FormRunner.AttachmentWithHolder(_, holder) =>
+      attachmentsWithHolder foreach { case AttachmentWithHolder(_, holder) =>
         setvalue(holder, s"cid:${createCidForNode(holder)}")
       }
 
@@ -194,7 +194,7 @@ object FormRunnerActionsSupport {
       )
 
     def processAllAttachments(builder: MultipartEntityBuilder): Unit =
-      attachmentsWithHolder foreach { case FormRunner.AttachmentWithHolder(beforeUrl, holder) =>
+      attachmentsWithHolder foreach { case AttachmentWithHolder(beforeUrl, holder) =>
 
         def writeBody(is: InputStream): Unit =
           processBinary(

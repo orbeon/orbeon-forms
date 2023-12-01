@@ -19,15 +19,19 @@ import org.orbeon.oxf.fr.FormRunnerPersistence.{DataFormatVersionName, DataXml}
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, PathUtils}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, PathUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 
 import java.time.{LocalDateTime, ZoneId}
+
 import scala.collection.JavaConverters._
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
 
 trait FormRunnerSummary {
 
@@ -93,18 +97,25 @@ trait FormRunnerSummary {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
     implicit val xfcd                    : XFormsContainingDocument      = inScopeContainingDocument
 
-    putWithAttachments(
-      liveData           = data.root,
-      migrate            = None,
-      toBaseURI          = "", // local save
-      fromBasePaths      = List(createFormDataBasePath(app, form, isDraft = false, fromDocument) -> formVersion.trimAllToOpt.map(_.toInt).getOrElse(1)),
-      toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
-      filename           = DataXml,
-      commonQueryString  = s"$DataFormatVersionName=${databaseDataFormatVersion.entryName}",
-      forceAttachments   = true,
-      formVersion        = Some(formVersion),
-      workflowStage      = Some(workflowStage)
-    )
+    val (attachmentWithEncryptedAtRest, _) =
+      Await.result(
+        putWithAttachments(
+          liveData           = data.root,
+          migrate            = None,
+          toBaseURI          = "", // local save
+          fromBasePaths      = List(createFormDataBasePath(app, form, isDraft = false, fromDocument) -> formVersion.trimAllToOpt.map(_.toInt).getOrElse(1)),
+          toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
+          filename           = DataXml,
+          commonQueryString  = s"$DataFormatVersionName=${databaseDataFormatVersion.entryName}",
+          forceAttachments   = true,
+          formVersion        = Some(formVersion),
+          workflowStage      = Some(workflowStage)
+        ),
+        Duration.Inf
+      )
+
+    // Update, in this thread, the attachment paths
+    updateAttachments(data.root, attachmentWithEncryptedAtRest)
   }
 }
 

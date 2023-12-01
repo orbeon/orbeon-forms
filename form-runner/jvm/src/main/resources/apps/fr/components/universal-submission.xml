@@ -80,38 +80,4 @@
         <response xmlns=""/>
     </xf:instance>
 
-    <!-- Submission to create/update the XML form -->
-    <!-- Note about validate="false": In general, when the user saves data, the data needs to be valid. This will be
-         enforced by the "Save" button being disabled. But there are other cases where we want to call this persistence
-         code and where the data might not be valid. For instance: auto-save, or saving as Draft as soon as a new
-         form instance is created. -->
-    <xf:submission
-        id="fr-create-update-submission"
-        validate="false"
-        nonrelevant="keep"
-        xxf:relevant-attribute="fr:relevant"
-        xxf:annotate="relevant=fr:relevant"
-        method="put"
-        ref="event('holder')"
-        resource="{event('resource')}"
-        xxf:username="{event('username')}"
-        xxf:password="{event('password')}"
-        replace="text"
-        target="instance('fr-create-update-submission-response')">
-
-        <!-- Clear response if not HTML -->
-        <xf:setvalue
-            event="xforms-submit-done"
-            if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
-            ref="instance('fr-create-update-submission-response')"/>
-        <xf:header ref="event('form-version')[xxf:non-blank()]">
-            <xf:name>Orbeon-Form-Definition-Version</xf:name>
-            <xf:value value="."/>
-        </xf:header>
-        <xf:header ref="event('workflow-stage')[xxf:non-blank()]">
-            <xf:name>Orbeon-Workflow-Stage</xf:name>
-            <xf:value value="."/>
-        </xf:header>
-    </xf:submission>
-
 </xf:model>

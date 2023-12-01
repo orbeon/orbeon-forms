@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.process
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
+import org.orbeon.oxf.fr.FormRunner.updateAttachments
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
@@ -36,6 +37,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.{ErrorSummary, Wizard}
 import org.orbeon.xforms.analysis.model.ValidationLevel._
 
+import scala.concurrent.Future
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
@@ -179,26 +181,29 @@ trait FormRunnerActionsCommon {
         )
 
       // Saving is an asynchronous operation
-      val future =
+      val future: Future[(List[AttachmentWithEncryptedAtRest], Option[Int])] =
         frc.putWithAttachments(
-        liveData          = frc.formInstance.root,
-        migrate           = Some(maybeMigrateData),
-        toBaseURI         = "", // local save
-        fromBasePaths     = List(frc.createFormDataBasePath(app, form, ! isDraft, document) -> formVersion),
-        toBasePath        = frc.createFormDataBasePath(app, form, isDraft, document),
-        filename          = DataXml,
-        commonQueryString = systemParams + querySuffix,
-        forceAttachments  = false,
-        formVersion       = Some(formVersion.toString),
-        workflowStage     = frc.documentWorkflowStage
-      )
+          liveData          = frc.formInstance.root,
+          migrate           = Some(maybeMigrateData),
+          toBaseURI         = "", // local save
+          fromBasePaths     = List(frc.createFormDataBasePath(app, form, ! isDraft, document) -> formVersion),
+          toBasePath        = frc.createFormDataBasePath(app, form, isDraft, document),
+          filename          = DataXml,
+          commonQueryString = systemParams + querySuffix,
+          forceAttachments  = false,
+          formVersion       = Some(formVersion.toString),
+          workflowStage     = frc.documentWorkflowStage
+        )
 
       // This will be run when the future completes, but in a controlled way
       // Q: Could we make this an `IO`?
-      def continuation(value: Try[(Seq[String], Seq[String], Int)]): Try[Unit] =
+      def continuation(value: Try[(List[AttachmentWithEncryptedAtRest], Option[Int])]): Try[Unit] =
         Try {
           value match {
-            case Success((beforeURLs, afterURLs, _)) =>
+            case Success((attachmentWithEncryptedAtRest, _)) =>
+
+              // Update, in this thread, the attachment paths
+              updateAttachments(frc.formInstance.root, attachmentWithEncryptedAtRest)
 
               // Manual dependency HACK: RR `fr-persistence-model` before updating the status because we do a setvalue just
               // before calling the submission
@@ -209,15 +214,21 @@ trait FormRunnerActionsCommon {
               trySetDataStatus(Map(Some("status") -> "safe", Some("draft") -> isDraft.toString))
 
               // Notify that the data is saved (2014-07-07: used by FB only)
+              // We pass the URLs to the event so that Form Builder can update `fb-form-instance`
               dispatch(name = "fr-data-save-done", targetId = FormModel, properties = Map(
-                "before-urls" -> Some(beforeURLs),
-                "after-urls"  -> Some(afterURLs)
+                "before-urls" -> Some(attachmentWithEncryptedAtRest.map(_.fromPath)),
+                "after-urls"  -> Some(attachmentWithEncryptedAtRest.map(_.toPath))
               ))
 
-            case Failure(_) =>
+              Success(())
+
+            case Failure(t) =>
+
               dispatch(name = "fr-data-save-error", targetId = FormModel)
+
+              Failure(t)
           }
-        }
+        } .flatten
 
       (future, continuation _)
     }

@@ -323,6 +323,8 @@
 
     <!-- Update attachment URLs, if any, after saving -->
     <xf:action ev:event="fr-data-save-done">
+
+        <!-- This is done here as Form Runner only updates `fr-form-instance` and not `fb-form-instance` -->
         <xf:action iterate="event('before-urls')">
             <xf:var name="p" value="position()"/>
             <xf:var name="before" value="."/>
@@ -338,6 +340,9 @@
         </xf:action>
 
     </xf:action>
+
+    <!-- Placeholder for this event which is dispatched by the `save` action -->
+    <xf:action ev:event="fr-data-save-error"/>
 
     <!-- Form is ready -->
     <xf:action ev:event="xforms-ready">

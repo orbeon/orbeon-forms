@@ -16,17 +16,16 @@ package org.orbeon.oxf.xforms.action
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.QName
-import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
-import org.orbeon.oxf.util.{DynamicVariable, IndentedLogger}
 import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.{DynamicVariable, IndentedLogger}
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.actions._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvents.{XFORMS_SUBMIT_DONE, XFORMS_SUBMIT_ERROR}
 import org.orbeon.oxf.xforms.event.events.{XFormsSubmitDoneEvent, XFormsSubmitErrorEvent, XFormsSubmitEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance, XFormsModel}
@@ -38,11 +37,9 @@ import org.orbeon.xforms.{Constants, UrlType}
 import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
 import java.util.{List => JList}
-import scala.concurrent.{Future, Promise}
 import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
 import scala.util.Try
-import scala.util.control.NonFatal
 
 object XFormsAPI {
 
@@ -258,14 +255,14 @@ object XFormsAPI {
     XFormsInstance.findInAncestorScopes(inScopeActionInterpreter.container, staticId)
 
   // Return an instance within a top-level model
-  def topLevelInstance(modelId: String, instanceId: String): Option[XFormsInstance] =
+  def topLevelInstance(modelId: String, instanceId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocumentOpt.orNull): Option[XFormsInstance] =
     topLevelModel(modelId) flatMap (_.findInstance(instanceId))
 
   // Return a top-level model by static id
   // NOTE: This search is not very efficient, but this allows mocking in tests, where getObjectByEffectiveId causes issues
   // 2013-04-03: Unsure if we still need this for mocking
-  def topLevelModel(modelId: String): Option[XFormsModel] =
-    inScopeContainingDocumentOpt flatMap (_.models find (_.getId == modelId))
+  def topLevelModel(modelId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocumentOpt.orNull): Option[XFormsModel] =
+    Option(xfcd) flatMap (_.models find (_.getId == modelId))
 
   def context[T](xpath: String)(body: => T): T = throw new NotImplementedError("context")
   def context[T](item: om.Item)(body: => T): T = throw new NotImplementedError("context")
@@ -335,33 +332,41 @@ object XFormsAPI {
     }
   }
 
-  private def sendAsyncImpl(
-    submissionId   : String,
-    props          : List[PropertyValue]
-  )(implicit
-    externalContext: ExternalContext,
-    xfcd           : XFormsContainingDocument
-  ): Option[Future[XFormsEvent]] = {
-    resolveAs[XFormsModelSubmission](submissionId) map { submission =>
-
-      val p = Promise[XFormsEvent]()
-
-      val listener: Dispatch.EventListener = p.success // xxx should be success or failure? xxx
-
-      SubmitEvents.foreach(submission.addListener(_, listener))
-
-      try
-        Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, ActionPropertyGetter(props)))
-      catch {
-        case NonFatal(t) =>
-          p.failure(t)
-      }
-
-      val f = p.future
-      f.onComplete(_ => SubmitEvents.foreach(submission.removeListener(_, Some(listener))))
-      f
-    }
-  }
+//  private def sendAsyncImpl(
+//    submissionId   : String,
+//    props          : List[PropertyValue]
+//  )(implicit
+//    externalContext: ExternalContext,
+//    xfcd           : XFormsContainingDocument
+//  ): Option[Future[XFormsEvent]] = {
+//    resolveAs[XFormsModelSubmission](submissionId) map { submission =>
+//
+//      val p = Promise[XFormsEvent]()
+//
+//      val doneListener: Dispatch.EventListener =
+//        e => p.success(e)
+//
+//      val errorListener: Dispatch.EventListener =
+//        e => p.failure(new SubmitException(e.asInstanceOf[XFormsSubmitErrorEvent]))
+//
+//      submission.addListener(XFORMS_SUBMIT_DONE,  doneListener)
+//      submission.addListener(XFORMS_SUBMIT_ERROR, errorListener)
+//
+//      try
+//        Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, ActionPropertyGetter(props)))
+//      catch {
+//        case NonFatal(t) =>
+//          p.failure(t)
+//      }
+//
+//      val f = p.future
+//      f.onComplete { _ =>
+//        submission.removeListener(XFORMS_SUBMIT_DONE, Some(doneListener))
+//        submission.removeListener(XFORMS_SUBMIT_ERROR, Some(errorListener))
+//      }
+//      f
+//    }
+//  }
 
   class SubmitException(e: XFormsSubmitErrorEvent) extends RuntimeException
 
@@ -372,19 +377,19 @@ object XFormsAPI {
       case error: XFormsSubmitErrorEvent => throw new SubmitException(error)
     }
 
-    def sendAsync(
-      submissionId   : String,
-      props          : List[PropertyValue] = Nil
-    )(implicit
-      externalContext: ExternalContext,
-      xfcd           : XFormsContainingDocument
-    ): Option[Future[XFormsSubmitDoneEvent]] =
-      sendAsyncImpl(submissionId, props).map { f =>
-        f.map {
-          case done:  XFormsSubmitDoneEvent  => done
-          case error: XFormsSubmitErrorEvent => throw new SubmitException(error)
-        }
-      }
+//    def sendAsync(
+//      submissionId   : String,
+//      props          : List[PropertyValue] = Nil
+//    )(implicit
+//      externalContext: ExternalContext,
+//      xfcd           : XFormsContainingDocument
+//    ): Option[Future[XFormsSubmitDoneEvent]] =
+//      sendAsyncImpl(submissionId, props).map { f =>
+//        f.map {
+//          case done:  XFormsSubmitDoneEvent  => done
+//          case error: XFormsSubmitErrorEvent => throw new SubmitException(error)
+//        }
+//      }
 
   // NOTE: There is no source id passed so we resolve relative to the document
   def resolveAs[T: ClassTag](staticOrAbsoluteId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Option[T] =

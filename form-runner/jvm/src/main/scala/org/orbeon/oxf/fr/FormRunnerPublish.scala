@@ -83,7 +83,7 @@ trait FormRunnerPublish {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
     implicit val xfcd                    : XFormsContainingDocument      = inScopeContainingDocument
 
-    val (beforeURLs, _, publishedVersion) = {
+    val (attachmentWithEncryptedAtRest, publishedVersion) = {
       Await.result(
         putWithAttachments(
           liveData          = xhtml.root,
@@ -103,10 +103,13 @@ trait FormRunnerPublish {
       )
     }
 
+    // Update, in this thread, the attachment paths
+    updateAttachments(xhtml.root, attachmentWithEncryptedAtRest)
+
     MapFunctions.createValue(
       Map[AtomicValue, ValueRepresentation](
-        (SaxonUtils.fixStringValue("published-attachments"), beforeURLs.size),
-        (SaxonUtils.fixStringValue("published-version"),     publishedVersion)
+        (SaxonUtils.fixStringValue("published-attachments"), attachmentWithEncryptedAtRest.size),
+        (SaxonUtils.fixStringValue("published-version"),     publishedVersion.getOrElse(1): Int)
       )
     )
   }

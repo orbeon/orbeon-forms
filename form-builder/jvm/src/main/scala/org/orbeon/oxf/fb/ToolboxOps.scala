@@ -1227,7 +1227,7 @@ object ToolboxOps {
     }
 
     private def collectUnpublishedAttachments(holderElem: NodeInfo)(implicit params: FormRunnerParams): List[AttachmentWithHolder] =
-      collectAttachments(
+      collectUnsavedAttachments(
         data            = holderElem,
         attachmentMatch =
           AttachmentMatch.BasePaths(

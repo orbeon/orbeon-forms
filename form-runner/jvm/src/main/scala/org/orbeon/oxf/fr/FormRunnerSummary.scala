@@ -97,7 +97,7 @@ trait FormRunnerSummary {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
     implicit val xfcd                    : XFormsContainingDocument      = inScopeContainingDocument
 
-    val (attachmentWithEncryptedAtRest, _) =
+    val (attachmentWithEncryptedAtRest, _, _) =
       Await.result(
         putWithAttachments(
           liveData           = data.root,

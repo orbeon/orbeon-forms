@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.process
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
-import org.orbeon.oxf.fr.FormRunner.updateAttachments
+import org.orbeon.oxf.fr.FormRunner.{setCreateUpdateResponse, updateAttachments}
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
@@ -181,7 +181,7 @@ trait FormRunnerActionsCommon {
         )
 
       // Saving is an asynchronous operation
-      val future: Future[(List[AttachmentWithEncryptedAtRest], Option[Int])] =
+      val future: Future[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] =
         frc.putWithAttachments(
           liveData          = frc.formInstance.root,
           migrate           = Some(maybeMigrateData),
@@ -197,13 +197,16 @@ trait FormRunnerActionsCommon {
 
       // This will be run when the future completes, but in a controlled way
       // Q: Could we make this an `IO`?
-      def continuation(value: Try[(List[AttachmentWithEncryptedAtRest], Option[Int])]): Try[Unit] =
+      def continuation(value: Try[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])]): Try[Unit] =
         Try {
           value match {
-            case Success((attachmentWithEncryptedAtRest, _)) =>
+            case Success((attachmentWithEncryptedAtRest, _, stringOpt)) =>
 
               // Update, in this thread, the attachment paths
               updateAttachments(frc.formInstance.root, attachmentWithEncryptedAtRest)
+
+              // Update the response instance, optionally used by the result dialog
+              setCreateUpdateResponse(stringOpt.getOrElse(""))
 
               // Manual dependency HACK: RR `fr-persistence-model` before updating the status because we do a setvalue just
               // before calling the submission

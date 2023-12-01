@@ -13,9 +13,6 @@
   */
 package org.orbeon.oxf.externalcontext
 
-import java.io._
-import java.{util => ju}
-
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.OXFException
@@ -27,8 +24,10 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.{PartUtils, XPathUtils}
 
-import scala.jdk.CollectionConverters._
+import java.io._
+import java.{util => ju}
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 /**
   * ExternalContext used by the TestScriptProcessor. It is configurable with an XML document representing
@@ -127,7 +126,7 @@ class TestExternalContext(
 
           val saxSource = PartUtils.getSAXSource(null, pipelineContext, hrefAttribute, systemId, contentType)
           val fileItem  = PartUtils.handleStreamedPartContent(saxSource)(TestExternalContext.Logger.logger)
-          if (! (ContentTypes.isTextOrJSONContentType(contentType) || ContentTypes.isXMLContentType(contentType))) {
+          if (! (ContentTypes.isTextOrXMLOrJSONContentType(contentType))) {
             // This is binary content
             if (fileItem ne null) {
               BodyDetails(

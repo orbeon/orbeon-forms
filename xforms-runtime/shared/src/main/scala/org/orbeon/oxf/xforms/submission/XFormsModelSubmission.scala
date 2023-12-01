@@ -36,7 +36,6 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{RelevanceHandling, XFormsId}
 import shapeless.syntax.typeable._
 
-import java.io.InputStream
 import java.net.URI
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}

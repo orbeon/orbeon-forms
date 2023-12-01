@@ -227,7 +227,7 @@ object APISupport {
   }
 
   def mustRewriteForMediatype(mediatype: String): Boolean =
-    ContentTypes.isTextOrJSONContentType(mediatype) || ContentTypes.isXMLMediatype(mediatype)
+    ContentTypes.isTextOrXMLOrJSONContentType(mediatype)
 
   def mustRewriteForPath(path: String): Boolean =
     path match {

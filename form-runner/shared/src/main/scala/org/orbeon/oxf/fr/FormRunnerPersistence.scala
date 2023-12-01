@@ -31,6 +31,7 @@ import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVers
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod}
 import org.orbeon.oxf.properties.Property
+import org.orbeon.oxf.util.ContentTypes.isTextOrXMLOrJSONContentType
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.{properties, shiftExternalContext}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
@@ -41,7 +42,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionSupport
+import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
@@ -581,6 +582,11 @@ trait FormRunnerPersistence {
     }
   }
 
+  def setCreateUpdateResponse(value: String): Unit =
+    topLevelInstance(FormModel, "fr-create-update-submission-response").foreach { instance =>
+      setvalue(List(instance.rootElement), value)
+    }
+
   // Here we could decide to use a nicer extension for the file. But since initially the filename comes from
   // the client, it cannot be trusted, nor can its mediatype. A first step would be to do content-sniffing to
   // determine a more trusted mediatype. A second step would be to put in an API for virus scanning. For now,
@@ -801,10 +807,13 @@ trait FormRunnerPersistence {
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     xfcd                    : XFormsContainingDocument
-  ): Future[(List[AttachmentWithEncryptedAtRest], Option[Int])] = {
+  ): Future[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] = {
 
     val credentials =
       username map (BasicCredentials(_, password, preemptiveAuth = true, domain = None))
+
+    // Clear the response instance
+    setCreateUpdateResponse("")
 
     // Prepare data for submission
     val formModel = XFormsAPI.topLevelModel(FormModel).getOrElse(throw new IllegalStateException)
@@ -868,10 +877,13 @@ trait FormRunnerPersistence {
         _                = updateAttachments(preparedDataDocumentInfo, savedAttachments)
         cxr              <- saveXmlDataIo(preparedData, putUrl, formVersion, credentials, workflowStage)
         versionOpt       = Headers.firstItemIgnoreCase(cxr.headers, OrbeonFormDefinitionVersion).map(_.toInt) // will throw if the version is not an integer
+        bytesOpt         <- if (cxr.content.contentType.exists(isTextOrXMLOrJSONContentType)) cxr.content.stream.compile.to(Array).map(Some.apply) else IO.pure(None)
+        stringOpt        = bytesOpt.flatMap(b => SubmissionUtils.readTextContent(StreamedContent.fromBytes(b, cxr.content.contentType)))
       } yield
         (
           savedAttachments,
-          versionOpt
+          versionOpt,
+          stringOpt
         )
 
     resultIo.unsafeToFuture()

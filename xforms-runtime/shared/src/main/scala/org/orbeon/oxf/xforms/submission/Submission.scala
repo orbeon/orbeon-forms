@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import scala.concurrent.Future
+import cats.effect.IO
 
 
 trait Submission {
@@ -30,5 +30,5 @@ trait Submission {
     serializationParameters: SerializationParameters
   )(implicit
     refContext             : RefContext
-  ): Option[ConnectResult Either Future[AsyncConnectResult]]
+  ): Option[ConnectResult Either IO[AsyncConnectResult]]
 }

@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.fr
 
+import cats.effect.unsafe.implicits.global
 import cats.syntax.option._
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner._
@@ -98,7 +99,7 @@ trait FormRunnerPublish {
           password          = password.trimAllToOpt,
           formVersion       = dstFormVersionTrimmedOpt,
           workflowStage     = None
-        ),
+        ).unsafeToFuture(),
         Duration.Inf
       )
     }

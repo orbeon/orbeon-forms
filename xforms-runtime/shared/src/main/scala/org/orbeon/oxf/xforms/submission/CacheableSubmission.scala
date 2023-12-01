@@ -17,7 +17,6 @@ import cats.effect.IO
 import cats.syntax.option._
 import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
 import org.orbeon.oxf.http.{Headers, StatusCode}
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
@@ -25,8 +24,6 @@ import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
-import java.io.InputStream
-import scala.concurrent.Future
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
@@ -48,7 +45,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
     serializationParameters: SerializationParameters
   )(implicit
     refContext             : RefContext
-  ): Option[ConnectResult Either Future[AsyncConnectResult]] = {
+  ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
 
     val absoluteResolvedURLString =
       getAbsoluteSubmissionURL(
@@ -123,7 +120,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
         try {
           if (submissionParameters.isAsynchronous) {
 
-            val newDocumentInfoF =
+            val newDocumentInfoIo =
               XFormsServerSharedInstancesCache.findContentOrLoadAsync(
                 instanceCaching,
                 submissionParameters.isReadonly,
@@ -132,7 +129,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
               )(detailsLogger)
 
             // xxx probably not?
-            Right(newDocumentInfoF.map(createReplacerAndConnectionResult2)).some
+            Right(newDocumentInfoIo.map(createReplacerAndConnectionResult2)).some
           } else {
 
             val newDocumentInfo =

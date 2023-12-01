@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.fr.process
 
+import cats.effect.IO
 import org.orbeon.dom.Document
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.process.ProcessInterpreter.{Action, ActionResult}
+import org.orbeon.oxf.fr.process.ProcessInterpreter.Action
 import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
 import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
 import org.orbeon.oxf.util.StringUtils._
@@ -31,7 +32,6 @@ import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
 
@@ -80,12 +80,12 @@ trait SimpleProcessCommon
   def clearSuspendedProcess(): Unit =
     setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, "")
 
-  def submitContinuation[T](actionResultF: Future[T], continuation: Try[T] => Unit): Unit =
+  def submitContinuation[T](actionResultF: IO[T], continuation: Try[T] => Unit): Unit =
     inScopeContainingDocument
       .getAsynchronousSubmissionManager
       .addAsynchronousCompletion(
         description           = s"process process id: $runningProcessId ",
-        future                = actionResultF,
+        computation           = actionResultF,
         continuation          = continuation,
         awaitInCurrentRequest = Some(Duration.Inf)
       )

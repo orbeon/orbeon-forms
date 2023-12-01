@@ -14,18 +14,17 @@
 package org.orbeon.oxf.xforms.submission
 
 
+import cats.effect.IO
 import cats.syntax.option._
 import org.orbeon.connection.{ConnectionResultT, StreamedContent}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.net.URI
-import scala.concurrent.Future
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
@@ -48,7 +47,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
     serializationParameters: SerializationParameters
   )(implicit
     refContext          : RefContext
-  ): Option[ConnectResult Either Future[AsyncConnectResult]] = {
+  ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
 
     val absoluteResolvedURL =
       URI.create(

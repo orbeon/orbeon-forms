@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import cats.effect.IO
 import cats.syntax.option._
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
@@ -29,7 +30,6 @@ import org.orbeon.oxf.http._
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils._
@@ -40,7 +40,6 @@ import java.net.URI
 import java.{util => ju}
 import javax.servlet.http.{Cookie, HttpServletRequest}
 import scala.collection.compat._
-import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
@@ -102,7 +101,7 @@ object Connection extends ConnectionTrait {
     logBody         : Boolean)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Future[AsyncConnectionResult] = {
+  ): IO[AsyncConnectionResult] = {
 
     // Here we convert an `fs2.Stream` to a Java `InputStream` which is used downstream. This works if the producer and
     // the consumer are in different threads. Ideally, our downstream code would be able to deal with an `fs2.Stream`.
@@ -120,12 +119,12 @@ object Connection extends ConnectionTrait {
 //          ).compile.onlyOrError.unsafeToFuture()
 //      ).getOrElse(Future.successful(None))
 
-    def requestStreamedContentOptF: Future[Option[StreamedContent]] =
+    def requestStreamedContentOptF: IO[Option[StreamedContent]] =
       content.map(ConnectionSupport.asyncToSyncStreamedContent).map(_.map(_.some))
-        .getOrElse(Future.successful(None))
+        .getOrElse(IO.pure(None))
 
-    def connectWithContentF(requestStreamedContentOpt: Option[StreamedContent]): Future[AsyncConnectionResult] =
-      CoreCrossPlatformSupport.shiftExternalContext[Future, AsyncConnectionResult](t => Future(t)) {
+    def connectWithContentF(requestStreamedContentOpt: Option[StreamedContent]): IO[AsyncConnectionResult] =
+      CoreCrossPlatformSupport.shiftExternalContext[IO, AsyncConnectionResult](t => IO(t)) {
 
         val (_, cxr) =
           connectInternal(

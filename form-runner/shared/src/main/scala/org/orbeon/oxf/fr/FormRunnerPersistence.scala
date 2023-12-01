@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fr
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
 import cats.syntax.option._
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
@@ -32,7 +31,7 @@ import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod}
 import org.orbeon.oxf.properties.Property
 import org.orbeon.oxf.util.ContentTypes.isTextOrXMLOrJSONContentType
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.{properties, shiftExternalContext}
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
@@ -684,18 +683,14 @@ trait FormRunnerPersistence {
         standaloneOpt      = None
       )
 
-    IO.fromFuture(
-      shiftExternalContext[IO, Future[AsyncConnectionResult]](t => IO(t)) {
-        Connection.connectAsync(
-          method      = HttpMethod.PUT,
-          url         = resolvedPutUri,
-          credentials = credentials,
-          content     = StreamedContent.asyncFromBytes(bytes, ContentTypes.XmlContentType.some).some,
-          headers     = allPutHeaders,
-          loadState   = true,
-          logBody     = false
-        )
-      }
+    Connection.connectAsync(
+      method      = HttpMethod.PUT,
+      url         = resolvedPutUri,
+      credentials = credentials,
+      content     = StreamedContent.asyncFromBytes(bytes, ContentTypes.XmlContentType.some).some,
+      headers     = allPutHeaders,
+      loadState   = true,
+      logBody     = false
     )
   }
 
@@ -710,18 +705,14 @@ trait FormRunnerPersistence {
 
     val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl)
 
-    IO.fromFuture(
-      shiftExternalContext[IO, Future[AsyncConnectionResult]](t => IO(t)) {
-        Connection.connectAsync(
-          method      = HttpMethod.GET,
-          url         = resolvedGetUri,
-          credentials = None,
-          content     = None,
-          headers     = allGetHeaders,
-          loadState   = true,
-          logBody     = false
-        )
-      }
+    Connection.connectAsync(
+      method      = HttpMethod.GET,
+      url         = resolvedGetUri,
+      credentials = None,
+      content     = None,
+      headers     = allGetHeaders,
+      loadState   = true,
+      logBody     = false
     )
   }
 
@@ -752,18 +743,14 @@ trait FormRunnerPersistence {
         getHeader        = xfcd.headersGetter
       )
 
-    IO.fromFuture(
-      shiftExternalContext[IO, Future[AsyncConnectionResult]](t => IO(t)) {
-        Connection.connectAsync(
-          method      = HttpMethod.PUT,
-          url         = resolvedPutUri,
-          credentials = credentials,
-          content     = StreamedContent(stream, ContentTypes.OctetStreamContentType.some, contentLength = None).some,
-          headers     = allPutHeaders,
-          loadState   = true,
-          logBody     = false
-        )
-      }
+    Connection.connectAsync(
+      method      = HttpMethod.PUT,
+      url         = resolvedPutUri,
+      credentials = credentials,
+      content     = StreamedContent(stream, ContentTypes.OctetStreamContentType.some, contentLength = None).some,
+      headers     = allPutHeaders,
+      loadState   = true,
+      logBody     = false
     )
   }
 
@@ -807,7 +794,7 @@ trait FormRunnerPersistence {
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     xfcd                    : XFormsContainingDocument
-  ): Future[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] = {
+  ): IO[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] = {
 
     val credentials =
       username map (BasicCredentials(_, password, preemptiveAuth = true, domain = None))
@@ -844,7 +831,6 @@ trait FormRunnerPersistence {
           AttachmentMatch.BasePaths(includes = fromBasePaths.map(_._1), excludes = List(toBasePath))
       )
 
-
     def rewriteServiceUrl(url: String) =
       URLRewriterUtils.rewriteServiceURL(
         externalContext.getRequest,
@@ -871,22 +857,19 @@ trait FormRunnerPersistence {
     val putUrl =
       URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)))
 
-    val resultIo =
-      for {
-        savedAttachments <- saveAllAttachmentsStream.compile.toList
-        _                = updateAttachments(preparedDataDocumentInfo, savedAttachments)
-        cxr              <- saveXmlDataIo(preparedData, putUrl, formVersion, credentials, workflowStage)
-        versionOpt       = Headers.firstItemIgnoreCase(cxr.headers, OrbeonFormDefinitionVersion).map(_.toInt) // will throw if the version is not an integer
-        bytesOpt         <- if (cxr.content.contentType.exists(isTextOrXMLOrJSONContentType)) cxr.content.stream.compile.to(Array).map(Some.apply) else IO.pure(None)
-        stringOpt        = bytesOpt.flatMap(b => SubmissionUtils.readTextContent(StreamedContent.fromBytes(b, cxr.content.contentType)))
-      } yield
-        (
-          savedAttachments,
-          versionOpt,
-          stringOpt
-        )
-
-    resultIo.unsafeToFuture()
+    for {
+      savedAttachments <- saveAllAttachmentsStream.compile.toList
+      _                = updateAttachments(preparedDataDocumentInfo, savedAttachments)
+      cxr              <- saveXmlDataIo(preparedData, putUrl, formVersion, credentials, workflowStage)
+      versionOpt       = Headers.firstItemIgnoreCase(cxr.headers, OrbeonFormDefinitionVersion).map(_.toInt) // will throw if the version is not an integer
+      bytesOpt         <- if (cxr.content.contentType.exists(isTextOrXMLOrJSONContentType)) cxr.content.stream.compile.to(Array).map(Some.apply) else IO.pure(None)
+      stringOpt        = bytesOpt.flatMap(b => SubmissionUtils.readTextContent(StreamedContent.fromBytes(b, cxr.content.contentType)))
+    } yield
+      (
+        savedAttachments,
+        versionOpt,
+        stringOpt
+      )
 
     // In our persistence implementation, we do not remove attachments if saving the data fails.
     // However, some custom persistence implementations do. So we don't think we can assume that

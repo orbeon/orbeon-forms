@@ -14,7 +14,6 @@
 package org.orbeon.oxf.util
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
 import org.orbeon.connection._
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http._
@@ -25,7 +24,6 @@ import org.scalajs.dom.experimental.{Headers => JSHeaders, URL => JSURL}
 
 import java.io.InputStream
 import java.net.URI
-import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Iterator
 import scala.scalajs.js.JSConverters._
@@ -75,19 +73,19 @@ object Connection extends ConnectionTrait {
   )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Future[AsyncConnectionResult] = {
+  ): IO[AsyncConnectionResult] = {
     method match {
       case HttpMethod.PUT =>
         fromSubmissionProviderAsync(method, url, content, headers)
       case HttpMethod.GET =>
-        fromResourceResolver(method, url).map(cxr => Future.successful(ConnectionResult.syncToAsync(cxr))) orElse
-          fromTemporaryFile(method, url).map(Future.successful)                                            orElse
+        fromResourceResolver(method, url).map(cxr => IO.pure(ConnectionResult.syncToAsync(cxr))) orElse
+          fromTemporaryFile(method, url).map(IO.pure)                                            orElse
           fromSubmissionProviderAsync(method, url, content, headers)
        case _ =>
-        Some(Future.successful(ConnectionResult.syncToAsync(methodNotAllowed(url))))
+        Some(IO.pure(ConnectionResult.syncToAsync(methodNotAllowed(url))))
     }
   } getOrElse
-    Future.successful(ConnectionResult.syncToAsync(notFound(url)))
+    IO.pure(ConnectionResult.syncToAsync(notFound(url)))
 
   private class IteratorEntry extends Iterator.Entry[Short] {
 
@@ -193,7 +191,7 @@ object Connection extends ConnectionTrait {
     headers: Map[String, List[String]]
   )(implicit
     logger   : IndentedLogger
-  ): Option[Future[AsyncConnectionResult]] =
+  ): Option[IO[AsyncConnectionResult]] =
     submissionProvider.map { provider =>
 
       val methodString   = method.entryName
@@ -222,7 +220,6 @@ object Connection extends ConnectionTrait {
         .map(processSubmissionResponseAsync(url, _))
         .compile
         .onlyOrError
-        .unsafeToFuture()
     }
 
   private def makeJsHeaders(

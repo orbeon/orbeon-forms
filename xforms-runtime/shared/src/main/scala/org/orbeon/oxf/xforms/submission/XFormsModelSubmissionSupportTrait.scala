@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.connection.{AsyncConnectionResult, ConnectionResult}
+import cats.effect.IO
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.IOUtils
@@ -36,7 +37,6 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
 import scala.collection.mutable
-import scala.concurrent.Future
 
 
 trait XFormsModelSubmissionSupportTrait {
@@ -46,7 +46,7 @@ trait XFormsModelSubmissionSupportTrait {
 
   // Run the given submission. This must be for a `replace="all"` submission.
   // Called from `XFormsServer` only
-  def runDeferredSubmissionForUpdate(future: Future[AsyncConnectResult], response: ExternalContext.Response): Unit
+  def runDeferredSubmissionForUpdate(computation: IO[AsyncConnectResult], response: ExternalContext.Response): Unit
 
   def forwardResultToResponse(cxr: ConnectionResult, response: ExternalContext.Response): Unit = {
     SubmissionUtils.forwardStatusContentTypeAndHeaders(cxr, response)

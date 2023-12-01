@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import cats.effect.IO
 import cats.syntax.option._
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.oxf.http.Headers
@@ -21,7 +22,6 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.io.ByteArrayInputStream
 import java.net.URI
-import scala.concurrent.Future
 import scala.util.Success
 
 
@@ -41,7 +41,7 @@ class EchoSubmission(submission: XFormsModelSubmission)
     serializationParameters: SerializationParameters
   )(implicit
     refContext             : RefContext
-  ): Option[ConnectResult Either Future[AsyncConnectResult]] = {
+  ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
 
     serializationParameters.messageBody match {
       case None =>

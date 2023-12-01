@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.process
 
+import cats.effect.IO
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
@@ -181,7 +182,7 @@ trait FormRunnerActionsCommon {
         )
 
       // Saving is an asynchronous operation
-      val future: Future[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] =
+      val computation: IO[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] =
         frc.putWithAttachments(
           liveData          = frc.formInstance.root,
           migrate           = Some(maybeMigrateData),
@@ -233,7 +234,7 @@ trait FormRunnerActionsCommon {
           }
         } .flatten
 
-      (future, continuation _)
+      (computation, continuation _)
     }
 
   def tryRelinquishLease(params: ActionParams): ActionResult = ActionResult.trySync {

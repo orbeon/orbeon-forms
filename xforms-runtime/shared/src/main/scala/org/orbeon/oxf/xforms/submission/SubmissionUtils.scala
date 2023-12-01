@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import cats.effect.IO
 import org.orbeon.connection.ConnectionSupport.fs2StreamToInputStreamInMemory
 import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
 import org.orbeon.dom.{Document, Element, VisitorSupport}
@@ -21,7 +22,6 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
 import org.orbeon.oxf.http.HttpMethod.GET
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
@@ -40,7 +40,7 @@ import scala.util.{Failure, Success}
 
 object SubmissionUtils {
 
-  def convertConnectResult(fs2Cr: AsyncConnectResult): Future[ConnectResult] =
+  def convertConnectResult(fs2Cr: AsyncConnectResult): IO[ConnectResult] =
     fs2Cr match {
       case ConnectResultT(_, Success(t @ (_, fs2Cxr @ ConnectionResultT(_, _, _, fs2Content, _, _)))) =>
         for(is <- fs2StreamToInputStreamInMemory(fs2Content.stream))
@@ -55,7 +55,7 @@ object SubmissionUtils {
             )
           )
       case ConnectResultT(submissionEffectiveId, Failure(t)) =>
-        Future.successful(ConnectResultT(submissionEffectiveId, Failure(t)))
+        IO.pure(ConnectResultT(submissionEffectiveId, Failure(t)))
     }
 
   def logRequestBody(mediatype: String, messageBody: Array[Byte])(implicit logger: IndentedLogger): Unit =

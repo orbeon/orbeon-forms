@@ -19,7 +19,6 @@ import org.orbeon.connection.{ConnectionResult, ConnectionResultT}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.http.StatusCode
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
@@ -500,14 +499,14 @@ class XFormsModelSubmission(
   //                  case None =>
   //                    throw new IllegalStateException // we check for `isDefined` above
   //                }
-                case Some(Right(connectResultF)) =>
+                case Some(Right(connectResultIo)) =>
                   // Submit the async submission manager
                   containingDocument
                     .getAsynchronousSubmissionManager
                     .addAsynchronousCompletion(
                       description   = s"submission id: `${thisSubmission.getEffectiveId}`",
-                      future        = connectResultF.flatMap(convertConnectResult), // running asynchronously
-                      continuation  = (connectResultTry: Try[ConnectResult]) =>     // running synchronously when we process the completed submission
+                      computation   = connectResultIo.flatMap(convertConnectResult), // running asynchronously
+                      continuation  = (connectResultTry: Try[ConnectResult]) =>      // running synchronously when we process the completed submission
                         containingDocument
                           .getObjectByEffectiveId(thisSubmission.getEffectiveId).asInstanceOf[XFormsModelSubmission]
                           .processAsyncSubmissionResponse(

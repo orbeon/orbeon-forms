@@ -5,13 +5,11 @@ import cats.effect.unsafe.implicits.global
 import org.orbeon.connection.AsyncConnectionResult
 import org.orbeon.oxf.externalcontext.ExternalContext
 
-import scala.concurrent.Future
-
 
 object XFormsModelSubmissionSupport extends XFormsModelSubmissionSupportTrait {
 
   // Currently this blocks, but we should be looking into not blocking a thread.
-  def runDeferredSubmissionForUpdate(future: Future[AsyncConnectResult], response: ExternalContext.Response): Unit = {
+  def runDeferredSubmissionForUpdate(computation: IO[AsyncConnectResult], response: ExternalContext.Response): Unit = {
 
     def forwardResultToResponseAsync(fs2Cxr: AsyncConnectionResult): IO[Unit] = {
       SubmissionUtils.forwardStatusContentTypeAndHeaders(fs2Cxr, response)
@@ -28,7 +26,7 @@ object XFormsModelSubmissionSupport extends XFormsModelSubmissionSupportTrait {
         }
       }
 
-    IO.fromFuture(IO(future))
+    computation
       .flatMap(fs2Cr => IO.fromTry(fs2Cr.result))
       .bracket(replace)(t => IO(t._2.close()))
       .unsafeRunSync()

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.process
 
+import cats.effect.IO
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.XMLNames
@@ -32,7 +33,6 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
-import scala.concurrent.Future
 import scala.util.control.NoStackTrace
 import scala.util.{Failure, Success, Try}
 
@@ -54,7 +54,7 @@ trait ProcessInterpreter extends Logging {
   def clearSuspendedProcess(): Unit
   def writeSuspendedProcess(processId: String, process: String): Unit
   def readSuspendedProcess: Try[(String, String)]
-  def submitContinuation[T](actionResultF: Future[T], continuation: Try[T] => Unit): Unit
+  def submitContinuation[T](actionResultF: IO[T], continuation: Try[T] => Unit): Unit
   def createUniqueProcessId: String = CoreCrossPlatformSupport.randomHexId
   def transactionStart(): Unit
   def transactionRollback(): Unit
@@ -420,11 +420,11 @@ object ProcessInterpreter {
   sealed trait InternalActionResult extends ActionResult
   object ActionResult {
     case class Sync(value: Try[Any])                                       extends InternalActionResult
-    case class Async[T](value: Try[(Future[T], Try[T] => Try[Any])])       extends ActionResult
+    case class Async[T](value: Try[(IO[T], Try[T] => Try[Any])])           extends ActionResult
     case class Interrupt(message: Option[String], value: Option[Try[Any]]) extends InternalActionResult
 
     def trySync(body: => Any): ActionResult = ActionResult.Sync(Try(body))
-    def tryAsync[T](body: => (Future[T], Try[T] => Try[Any])): ActionResult = ActionResult.Async(Try(body))
+    def tryAsync[T](body: => (IO[T], Try[T] => Try[Any])): ActionResult = ActionResult.Async(Try(body))
   }
 
   type ActionParams = Map[Option[String], String]

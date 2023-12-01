@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.effect.unsafe.implicits.global
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataFormatVersionName, DataXml}
@@ -110,7 +111,7 @@ trait FormRunnerSummary {
           forceAttachments   = true,
           formVersion        = Some(formVersion),
           workflowStage      = Some(workflowStage)
-        ),
+        ).unsafeToFuture(),
         Duration.Inf
       )
 

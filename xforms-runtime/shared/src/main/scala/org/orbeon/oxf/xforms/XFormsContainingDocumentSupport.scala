@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
+import cats.effect.IO
 import cats.syntax.option._
 import org.log4s
 import org.log4s.LogLevel
@@ -53,7 +54,6 @@ import java.net.URI
 import java.util.concurrent.locks.Lock
 import scala.annotation.tailrec
 import scala.collection.{immutable, mutable}
-import scala.concurrent.Future
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
@@ -169,7 +169,7 @@ trait ContainingDocumentTransientState {
     var nonJavaScriptLoadsToRun  : Vector[Load] = Vector.empty
     var scriptsToRun             : Vector[Either[Load, Either[ScriptInvocation, CallbackInvocation]]] = Vector.empty
 
-    var replaceAllFuture         : Option[Future[AsyncConnectResult]] = None
+    var replaceAllFuture         : Option[IO[AsyncConnectResult]] = None
     var gotSubmissionReplaceAll  : Boolean = false
     var gotSubmissionRedirect    : Boolean = false
 
@@ -214,9 +214,9 @@ trait ContainingDocumentTransientState {
 
   def getNonJavaScriptLoadsToRun: immutable.Seq[Load] = transientState.nonJavaScriptLoadsToRun
 
-  def getReplaceAllFuture: Option[Future[AsyncConnectResult]] = transientState.replaceAllFuture
+  def getReplaceAllFuture: Option[IO[AsyncConnectResult]] = transientState.replaceAllFuture
 
-  def setReplaceAllFuture(eval: Future[AsyncConnectResult]): Unit =
+  def setReplaceAllFuture(eval: IO[AsyncConnectResult]): Unit =
     transientState.replaceAllFuture = Some(eval.ensuring(_ ne null))
 
   def setGotSubmissionReplaceAll(): Unit = {

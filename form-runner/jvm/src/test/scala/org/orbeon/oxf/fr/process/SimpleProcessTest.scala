@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.process
 
+import cats.effect.IO
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.ProcessParser._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
@@ -51,7 +52,7 @@ class SimpleProcessTest
     def writeSuspendedProcess(processId: String, process: String): Unit = _suspendedProcess = Some(processId -> process)
     def readSuspendedProcess: Try[(String, String)] = Try(_suspendedProcess.get)
 
-    def submitContinuation[T](actionResultF: Future[T], continuation: Try[T] => Unit): Unit = ???
+    def submitContinuation[T](actionResultF: IO[T], continuation: Try[T] => Unit): Unit = ??? // xxx test
 
     // Constant so that we can test properly
     override def createUniqueProcessId: String = ConstantProcessId

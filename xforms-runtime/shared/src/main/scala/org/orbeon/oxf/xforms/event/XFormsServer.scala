@@ -1,5 +1,6 @@
 package org.orbeon.oxf.xforms.event
 
+import cats.effect.IO
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -10,13 +11,13 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.{withLock, withUpdateResponse}
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, ConnectResultT, XFormsModelSubmissionSupport}
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.oxf.xml.{SAXStore, TeeXMLReceiver, XMLReceiver, XMLReceiverHelper}
@@ -26,7 +27,6 @@ import org.orbeon.xforms.runtime.DelayedEvent
 import org.orbeon.xforms.{EventNames, Load, Message}
 
 import java.{util => ju}
-import scala.concurrent.Future
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
@@ -80,7 +80,7 @@ object XFormsServer {
     // - https://github.com/orbeon/orbeon-forms/issues/2071
     // - https://github.com/orbeon/orbeon-forms/issues/1984
     // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
-    val lockResult: Try[Try[Option[Future[AsyncConnectResult]]]] =
+    val lockResult: Try[Try[Option[IO[AsyncConnectResult]]]] =
       withLock(requestParameters, timeout = if (isAjaxRequest) 0L else XFormsGlobalProperties.getAjaxTimeout) {
         case Some(containingDocument) =>
 

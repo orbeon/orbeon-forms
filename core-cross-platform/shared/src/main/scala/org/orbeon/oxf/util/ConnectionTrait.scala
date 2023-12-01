@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import cats.effect.IO
 import org.orbeon.connection.{AsyncConnectionResult, AsyncStreamedContent, ConnectionResult, StreamedContent}
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -23,7 +24,6 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging.debug
 
 import java.net.URI
-import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
 
 
@@ -52,7 +52,7 @@ trait ConnectionTrait {
     logBody         : Boolean)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Future[AsyncConnectionResult]
+  ): IO[AsyncConnectionResult]
 
   def isInternalPath(path: String): Boolean
 

@@ -317,12 +317,10 @@ trait XFormsModelSubmissionSupportTrait {
           throw new IllegalArgumentException
       }
 
-  def requestedSerialization(
-    xformsSerialization : Option[String],
-    xformsMethod        : String,
-    httpMethod          : HttpMethod
-  ): Option[String] =
-      xformsSerialization flatMap (_.trimAllToOpt) orElse defaultSerialization(xformsMethod, httpMethod)
+  def requestedSerialization(submissionParameters: SubmissionParameters): Option[String] =
+      submissionParameters.serializationOpt
+        .flatMap(_.trimAllToOpt)
+        .orElse(defaultSerialization(submissionParameters.xformsMethod, submissionParameters.httpMethod))
 
   private object Private {
 

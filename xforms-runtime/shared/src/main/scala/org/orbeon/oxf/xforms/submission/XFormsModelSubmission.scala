@@ -329,9 +329,11 @@ class XFormsModelSubmission(
 
           // We can do this first, because the check just depends on the controls, instance to submit, and pending
           // submissions if any. This does not depend on the actual state of the instance.
-          if (submissionParameters.serialize && submissionParameters.xxfUploads &&
-            SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, refContext.refInstanceOpt))
-            throw new XFormsSubmissionException(
+          if (
+            submissionParameters.serialize  &&
+            submissionParameters.xxfUploads &&
+            SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, refContext.refInstanceOpt)
+          ) throw new XFormsSubmissionException(
               thisSubmission,
               "xf:submission: instance to submit has at least one pending upload.",
               "checking pending uploads",
@@ -407,7 +409,7 @@ class XFormsModelSubmission(
 
           /* ***** Serialization ********************************************************************************** */
 
-          requestedSerialization(submissionParameters.serializationOpt, submissionParameters.xformsMethod, submissionParameters.httpMethod) match {
+          requestedSerialization(submissionParameters) match {
             case None =>
               throw new XFormsSubmissionException(
                 thisSubmission,
@@ -417,6 +419,7 @@ class XFormsModelSubmission(
                 null
               )
             case Some(requestedSerialization) =>
+
               val uriOrDocumentToSubmitOpt =
                 if (submissionParameters.serialize) {
                   // Check if a submission requires file upload information
@@ -431,94 +434,94 @@ class XFormsModelSubmission(
                   None
                 }
 
-            val overriddenSerializedData =
-              if (! submissionParameters.isDeferredSubmission && submissionParameters.serialize) {
-                // Fire `xforms-submit-serialize`
-                // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
-                // is changed from the initial value of empty string, then the content of the submission-body
-                // property string is used as the submission serialization. Otherwise, the submission serialization
-                // consists of a serialization of the selected instance data according to the rules stated at 11.9
-                // Submission Options."
-                val serializeEvent =
-                  new XFormsSubmitSerializeEvent(thisSubmission, refContext.refNodeInfo, requestedSerialization)
+              val overriddenSerializedData =
+                if (! submissionParameters.isDeferredSubmission && submissionParameters.serialize) {
+                  // Fire `xforms-submit-serialize`
+                  // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
+                  // is changed from the initial value of empty string, then the content of the submission-body
+                  // property string is used as the submission serialization. Otherwise, the submission serialization
+                  // consists of a serialization of the selected instance data according to the rules stated at 11.9
+                  // Submission Options."
+                  val serializeEvent =
+                    new XFormsSubmitSerializeEvent(thisSubmission, refContext.refNodeInfo, requestedSerialization)
 
-                Dispatch.dispatchEvent(serializeEvent)
+                  Dispatch.dispatchEvent(serializeEvent)
 
-                // TODO: rest of submission should happen upon default action of event
-                serializeEvent.submissionBodyAsString
-              } else {
-                null
-              }
-
-            // Serialize
-            val serializationParameters =
-              SerializationParameters(
-                thisSubmission,
-                submissionParameters,
-                requestedSerialization,
-                uriOrDocumentToSubmitOpt,
-                overriddenSerializedData
-              )
-
-            /* ***** Submission connection ************************************************************************** */
-
-            // Result information
-            val connectResultOpt =
-              submissions.find(_.isMatch(submissionParameters, serializationParameters)).flatMap { submission =>
-                withDebug("connecting", List("type" -> submission.submissionType)) {
-                  submission.connect(submissionParameters, serializationParameters)
+                  // TODO: rest of submission should happen upon default action of event
+                  serializeEvent.submissionBodyAsString
+                } else {
+                  null
                 }
+
+              // Serialize
+              val serializationParameters =
+                SerializationParameters(
+                  thisSubmission,
+                  submissionParameters,
+                  requestedSerialization,
+                  uriOrDocumentToSubmitOpt,
+                  overriddenSerializedData
+                )
+
+              /* ***** Submission connection ************************************************************************** */
+
+              // Result information
+              val connectResultOpt =
+                submissions.find(_.isMatch(submissionParameters, serializationParameters)).flatMap { submission =>
+                  withDebug("connecting", List("type" -> submission.submissionType)) {
+                    submission.connect(submissionParameters, serializationParameters)
+                  }
+                }
+
+              /* ***** Submission result processing ******************************************************************* */
+
+              connectResultOpt match {
+                case Some(Left(connectResult)) =>
+                  handleConnectResult(
+                    submissionParameters   = submissionParameters,
+                    connectResult          = connectResult,
+                    initializeXPathContext = true // function context might have changed
+                  ).some
+                case Some(Right(connectResultF)) if submissionParameters.isDeferredSubmission =>
+                  containingDocument.setReplaceAllFuture(connectResultF)
+                  None
+                  // This optimization is not possible now because we also depend on the contained `fs2.Stream` to be
+                  // fully ready, not only the `Future`.
+  //              case Some(Right(connectResultF)) if connectResultF.value.isDefined =>
+  //                // Optimization if the `Future` is already completed
+  //                connectResultF.value match {
+  //                  case Some(Success(connectResult)) =>
+  //                    handleConnectResult(
+  //                      submissionParameters   = submissionParameters,
+  //                      connectResult          = connectResult,
+  //                      initializeXPathContext = true // function context might have changed
+  //                    ).some
+  //                  case Some(Failure(t)) =>
+  //                    (ReplaceResult.SendError(t, Right(submissionParameters.actionOrResource.some), submissionParameters.tunnelProperties), None).some
+  //                  case None =>
+  //                    throw new IllegalStateException // we check for `isDefined` above
+  //                }
+                case Some(Right(connectResultF)) =>
+                  // Submit the async submission manager
+                  containingDocument
+                    .getAsynchronousSubmissionManager
+                    .addAsynchronousCompletion(
+                      description   = s"submission id: `${thisSubmission.getEffectiveId}`",
+                      future        = connectResultF.flatMap(convertConnectResult), // running asynchronously
+                      continuation  = (connectResultTry: Try[ConnectResult]) =>     // running synchronously when we process the completed submission
+                        containingDocument
+                          .getObjectByEffectiveId(thisSubmission.getEffectiveId).asInstanceOf[XFormsModelSubmission]
+                          .processAsyncSubmissionResponse(
+                            connectResultTry,
+                            submissionParameters
+                          ),
+                      awaitInCurrentRequest = submissionParameters.responseMustAwait
+                    )
+                  None
+                case None =>
+                  // Nothing to do here (case of `ClientGetAllSubmission`)
+                  None
               }
-
-            /* ***** Submission result processing ******************************************************************* */
-
-            connectResultOpt match {
-              case Some(Left(connectResult)) =>
-                handleConnectResult(
-                  submissionParameters   = submissionParameters,
-                  connectResult          = connectResult,
-                  initializeXPathContext = true // function context might have changed
-                ).some
-              case Some(Right(connectResultF)) if submissionParameters.isDeferredSubmission =>
-                containingDocument.setReplaceAllFuture(connectResultF)
-                None
-                // This optimization is not possible now because we also depend on the contained `fs2.Stream` to be
-                // fully ready, not only the `Future`.
-//              case Some(Right(connectResultF)) if connectResultF.value.isDefined =>
-//                // Optimization if the `Future` is already completed
-//                connectResultF.value match {
-//                  case Some(Success(connectResult)) =>
-//                    handleConnectResult(
-//                      submissionParameters   = submissionParameters,
-//                      connectResult          = connectResult,
-//                      initializeXPathContext = true // function context might have changed
-//                    ).some
-//                  case Some(Failure(t)) =>
-//                    (ReplaceResult.SendError(t, Right(submissionParameters.actionOrResource.some), submissionParameters.tunnelProperties), None).some
-//                  case None =>
-//                    throw new IllegalStateException // we check for `isDefined` above
-//                }
-              case Some(Right(connectResultF)) =>
-                // Submit the async submission manager
-                containingDocument
-                  .getAsynchronousSubmissionManager
-                  .addAsynchronousCompletion(
-                    description   = s"submission id: `${thisSubmission.getEffectiveId}`",
-                    future        = connectResultF.flatMap(convertConnectResult), // running asynchronously
-                    continuation  = (connectResultTry: Try[ConnectResult]) =>     // running synchronously when we process the completed submission
-                      containingDocument
-                        .getObjectByEffectiveId(thisSubmission.getEffectiveId).asInstanceOf[XFormsModelSubmission]
-                        .processAsyncSubmissionResponse(
-                          connectResultTry,
-                          submissionParameters
-                        ),
-                    awaitInCurrentRequest = submissionParameters.responseMustAwait
-                  )
-                None
-              case None =>
-                // Nothing to do here (case of `ClientGetAllSubmission`)
-                None
-            }
           }
         } catch {
           case NonFatal(throwable) =>
@@ -589,7 +592,7 @@ class XFormsModelSubmission(
       refContext    : RefContext,
       indentedLogger: IndentedLogger
     ): URI Either Document =
-      if (requestedSerialization(submissionParameters.serializationOpt, submissionParameters.xformsMethod, submissionParameters.httpMethod).contains(ContentTypes.OctetStreamContentType))
+      if (requestedSerialization(submissionParameters).contains(ContentTypes.OctetStreamContentType))
         Left(
           URI.create(refContext.refNodeInfo.getStringValue)
         )

@@ -61,7 +61,7 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
 
   def logMessage(throwable: Throwable): Unit =
     if (errorType != ErrorType.ValidationError)
-      indentedLogger.logError("xforms-submit-error", OrbeonFormatter.message(throwable))
+      indentedLogger.logError(XFORMS_SUBMIT_ERROR, OrbeonFormatter.message(throwable))
 }
 
 sealed abstract class ErrorType(override val entryName: String) extends EnumEntry

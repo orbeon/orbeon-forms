@@ -297,7 +297,7 @@ object XFormsAPI {
       )
     }
 
-  private val SubmitEvents = Seq("xforms-submit-done", "xforms-submit-error")
+  private val SubmitEvents = List(XFORMS_SUBMIT_DONE, XFORMS_SUBMIT_ERROR)
 
   // xf:send
   // Send the given submission and applies the body with the resulting event if the submission completed

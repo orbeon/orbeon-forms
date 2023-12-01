@@ -258,7 +258,7 @@
                                 ][1],
                                 $link-params          :=
                                     if (xxf:property('oxf.fr.summary.show-version-selector.*.*')) then
-                                        concat('?form-version=', $form-version)
+                                        concat('?form-version=', form-version)
                                     else
                                         ''
                             return
@@ -381,7 +381,7 @@
                                 else
                                     'summary',
                                 if (xxf:property('oxf.fr.summary.show-version-selector.*.*')) then
-                                    concat('?form-version=', $form-version)
+                                    concat('?form-version=', form-version)
                                 else
                                     ''
                             )"/>

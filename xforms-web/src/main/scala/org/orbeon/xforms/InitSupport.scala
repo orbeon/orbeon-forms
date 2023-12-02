@@ -76,7 +76,7 @@ object InitSupport {
 
         val (path, query) = PathUtils.splitQueryDecodeParams(resourceId)
 
-        val basePath = context.dropTrailingSlash + '/' + path
+        val basePath = context.dropTrailingSlash + '/' + path.dropStartingSlash
 
         if (path.endsWith(".css"))
           PathUtils.recombineQuery(basePath, query ::: (Constants.EmbeddingNamespaceParameter -> namespace) :: Nil)

@@ -81,7 +81,7 @@ object Connection extends ConnectionTrait {
         fromResourceResolver(method, url).map(cxr => IO.pure(ConnectionResult.syncToAsync(cxr))) orElse
           fromTemporaryFile(method, url).map(IO.pure)                                            orElse
           fromSubmissionProviderAsync(method, url, content, headers)
-       case _ =>
+      case _ =>
         Some(IO.pure(ConnectionResult.syncToAsync(methodNotAllowed(url))))
     }
   } getOrElse

@@ -98,25 +98,24 @@ trait FormRunnerSummary {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
     implicit val xfcd                    : XFormsContainingDocument      = inScopeContainingDocument
 
-    val (attachmentWithEncryptedAtRest, _, _) =
-      Await.result(
-        putWithAttachments(
-          liveData           = data.root,
-          migrate            = None,
-          toBaseURI          = "", // local save
-          fromBasePaths      = List(createFormDataBasePath(app, form, isDraft = false, fromDocument) -> formVersion.trimAllToOpt.map(_.toInt).getOrElse(1)),
-          toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
-          filename           = DataXml,
-          commonQueryString  = s"$DataFormatVersionName=${databaseDataFormatVersion.entryName}",
-          forceAttachments   = true,
-          formVersion        = Some(formVersion),
-          workflowStage      = Some(workflowStage)
-        ).unsafeToFuture(),
-        Duration.Inf
-      )
+    Await.result(
+      putWithAttachments(
+        liveData           = data.root,
+        migrate            = None,
+        toBaseURI          = "", // local save
+        fromBasePaths      = List(createFormDataBasePath(app, form, isDraft = false, fromDocument) -> formVersion.trimAllToOpt.map(_.toInt).getOrElse(1)),
+        toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
+        filename           = DataXml,
+        commonQueryString  = s"$DataFormatVersionName=${databaseDataFormatVersion.entryName}",
+        forceAttachments   = true,
+        formVersion        = Some(formVersion),
+        workflowStage      = Some(workflowStage)
+      ).unsafeToFuture(),
+      Duration.Inf
+    )
 
-    // Update, in this thread, the attachment paths
-    updateAttachments(data.root, attachmentWithEncryptedAtRest)
+    // We don't need to update the attachment paths, since the caller just reads data, saves it under a different
+    // document id, and then disposes of the read data.
   }
 }
 

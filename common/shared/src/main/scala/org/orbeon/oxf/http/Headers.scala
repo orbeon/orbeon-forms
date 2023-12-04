@@ -21,56 +21,58 @@ import java.net.URLEncoder
 
 object Headers {
 
-  val OrbeonToken             = "Orbeon-Token"
-  val OrbeonUsername          = "Orbeon-Username"
-  val OrbeonGroup             = "Orbeon-Group"
-  val OrbeonOrganization      = "Orbeon-Organization"
-  val OrbeonRoles             = "Orbeon-Roles"
-  val OrbeonCredentials       = "Orbeon-Credentials"
+  val OrbeonToken                  = "Orbeon-Token"
+  val OrbeonUsername               = "Orbeon-Username"
+  val OrbeonGroup                  = "Orbeon-Group"
+  val OrbeonLastModifiedByUsername = "Orbeon-Last-Modified-By-Username"
+  val OrbeonOrganization           = "Orbeon-Organization"
+  val OrbeonRoles                  = "Orbeon-Roles"
+  val OrbeonCredentials            = "Orbeon-Credentials"
+  val OrbeonWorkflowStage          = "Orbeon-Workflow-Stage"
 
-  val OrbeonCreated           = "Orbeon-Created"
-  val OrbeonLastModified      = "Orbeon-Last-Modified"
+  val OrbeonCreated                = "Orbeon-Created"
+  val OrbeonLastModified           = "Orbeon-Last-Modified"
 
-  val OrbeonRemoteAddress     = "Orbeon-Remote-Address"
+  val OrbeonRemoteAddress          = "Orbeon-Remote-Address"
 
-  val ContentType             = "Content-Type"
-  val ContentDisposition      = "Content-Disposition"
-  val ContentId               = "Content-ID"
-  val ContentLength           = "Content-Length"
-  val LastModified            = "Last-Modified"
-  val Authorization           = "Authorization"
-  val Location                = "Location"
-  val OrbeonClient            = "Orbeon-Client"
-  val Created                 = "Created"
-  val Cookie                  = "Cookie"
-  val Accept                  = "Accept"
-  val AcceptLanguage          = "Accept-Language"
-  val SOAPAction              = "SOAPAction"
-  val Timeout                 = "Timeout"
-  val TimeoutValuePrefix      = "Second-"
+  val ContentType                  = "Content-Type"
+  val ContentDisposition           = "Content-Disposition"
+  val ContentId                    = "Content-ID"
+  val ContentLength                = "Content-Length"
+  val LastModified                 = "Last-Modified"
+  val Authorization                = "Authorization"
+  val Location                     = "Location"
+  val OrbeonClient                 = "Orbeon-Client"
+  val Created                      = "Created"
+  val Cookie                       = "Cookie"
+  val Accept                       = "Accept"
+  val AcceptLanguage               = "Accept-Language"
+  val SOAPAction                   = "SOAPAction"
+  val Timeout                      = "Timeout"
+  val TimeoutValuePrefix           = "Second-"
 
-  val Range                   = "Range"
-  val IfRange                 = "If-Range"
-  val AcceptRanges            = "Accept-Ranges"
-  val ContentRange            = "Content-Range"
+  val Range                        = "Range"
+  val IfRange                      = "If-Range"
+  val AcceptRanges                 = "Accept-Ranges"
+  val ContentRange                 = "Content-Range"
 
-  val OrbeonTokenLower        = OrbeonToken.toLowerCase
-  val OrbeonUsernameLower     = OrbeonUsername.toLowerCase
-  val OrbeonGroupLower        = OrbeonGroup.toLowerCase
-  val OrbeonOrganizationLower = OrbeonOrganization.toLowerCase
-  val OrbeonRolesLower        = OrbeonRoles.toLowerCase
-  val OrbeonCredentialsLower  = OrbeonCredentials.toLowerCase
+  val OrbeonTokenLower             = OrbeonToken.toLowerCase
+  val OrbeonUsernameLower          = OrbeonUsername.toLowerCase
+  val OrbeonGroupLower             = OrbeonGroup.toLowerCase
+  val OrbeonOrganizationLower      = OrbeonOrganization.toLowerCase
+  val OrbeonRolesLower             = OrbeonRoles.toLowerCase
+  val OrbeonCredentialsLower       = OrbeonCredentials.toLowerCase
 
-  val ContentTypeLower        = ContentType.toLowerCase
-  val ContentDispositionLower = ContentDisposition.toLowerCase
-  val ContentLengthLower      = ContentLength.toLowerCase
-  val LastModifiedLower       = LastModified.toLowerCase
-  val AuthorizationLower      = Authorization.toLowerCase
-  val LocationLower           = Location.toLowerCase
-  val OrbeonClientLower       = OrbeonClient.toLowerCase
-  val AcceptLanguageLower     = AcceptLanguage.toLowerCase
-  val CreatedLower            = Created.toLowerCase
-  val TimeoutLower            = Timeout.toLowerCase
+  val ContentTypeLower             = ContentType.toLowerCase
+  val ContentDispositionLower      = ContentDisposition.toLowerCase
+  val ContentLengthLower           = ContentLength.toLowerCase
+  val LastModifiedLower            = LastModified.toLowerCase
+  val AuthorizationLower           = Authorization.toLowerCase
+  val LocationLower                = Location.toLowerCase
+  val OrbeonClientLower            = OrbeonClient.toLowerCase
+  val AcceptLanguageLower          = AcceptLanguage.toLowerCase
+  val CreatedLower                 = Created.toLowerCase
+  val TimeoutLower                 = Timeout.toLowerCase
 
   val GeneralEmbeddedClient         = "embedded"
   val PortletEmbeddingClient        = "portlet"
@@ -156,6 +158,11 @@ object Headers {
     coll collectFirst {
       case (key, value) if name.equalsIgnoreCase(key) && value.nonEmpty => value.head
     }
+
+  def allItemsIgnoreCase[T, V](coll: Iterable[(String, T)], name: String)(implicit ev: T => Iterable[V]): Iterable[V] =
+    (coll collect {
+      case (key, value) if name.equalsIgnoreCase(key) && value.nonEmpty => value
+    }).flatten
 
   def firstNonNegativeLongHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T => Iterable[String]): Option[Long] =
     firstItemIgnoreCase(headers, name) flatMap NumericUtils.parseLong filter (_ >= 0L)

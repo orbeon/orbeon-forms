@@ -53,7 +53,8 @@ object Purge extends ExportOrPurge {
     documentNode   : DocumentInfo,
     createdTimeOpt : Option[Instant], // from history API or from reading the current data
     modifiedTimeOpt: Option[Instant], // from history API or from reading the current data
-    forCurrentData : Boolean
+    forCurrentData : Boolean,
+    metadataOpt    : Option[Metadata]
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit =

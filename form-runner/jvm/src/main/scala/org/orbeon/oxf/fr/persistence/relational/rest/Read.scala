@@ -116,9 +116,15 @@ trait Read {
           httpResponse.setHeader(Headers.OrbeonUsername, userAndGroup.username)
           userAndGroup.groupname.foreach(httpResponse.setHeader(Headers.OrbeonGroup, _))
         }
-        // TODO: set `Headers.OrbeonOrganization`, but in what format?
+        dataUser.organization.foreach { organization =>
+          // TODO: review this if organizations are ever used again in the future (are names sufficient to identify
+          //  an organization? should depths and and positions be returned as well? should a unique ID be used?)
+          organization.levels.foreach(httpResponse.addHeader(Headers.OrbeonOrganization, _))
+        }
       }
-
+      fromDatabase.lastModifiedByOpt.foreach { lastModifiedBy =>
+        httpResponse.setHeader(Headers.OrbeonLastModifiedByUsername, lastModifiedBy.username)
+      }
       fromDatabase.stageOpt.foreach(httpResponse.setHeader(StageHeader.HeaderName, _))
       httpResponse.setHeader(Headers.Created,            DateUtils.formatRfc1123DateTimeGmt(fromDatabase.createdDateTime.toInstant))
       httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(fromDatabase.lastModifiedDateTime.toInstant))
@@ -162,6 +168,7 @@ trait Read {
   // Holds the data we will read from the database
   private case class FromDatabase(
    dataUserOpt         : Option[CheckWithDataUser], // set to `Some(_)` if `forData == true`
+   lastModifiedByOpt   : Option[UserAndGroup],
    formVersion         : Int,
    stageOpt            : Option[String],
    createdDateTime     : Timestamp,
@@ -222,7 +229,7 @@ trait Read {
 
       req.lastModifiedOpt match {
         case Some(_) =>
-          s"""|SELECT  t.last_modified_time, t.created
+          s"""|SELECT  t.last_modified_time, t.created, t.last_modified_by
               |        $body
               |        $totalAttachmentSize
               |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id" else ""}
@@ -237,7 +244,7 @@ trait Read {
               |        ${if (req.forAttachment) "and t.file_name = ?"                   else ""}
               |""".stripMargin
         case None =>
-          s"""|SELECT  t.last_modified_time, t.created
+          s"""|SELECT  t.last_modified_time, t.created, t.last_modified_by
               |        $body
               |        $totalAttachmentSize
               |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id" else ""}
@@ -292,6 +299,11 @@ trait Read {
             organization = OrganizationSupport.readFromResultSet(connection, resultSet).map(_._2)
           ))
 
+          val lastModifiedByOpt = UserAndGroup.fromStrings(
+            username  = resultSet.getString("last_modified_by"),
+            groupname = ""
+          )
+
           val bodyOpt = bodyContentOpt.flatMap { bodyContent =>
             val bodyInputStream = bodyContent match {
               case FullAttachment | PartialAttachment(_, _) =>
@@ -313,6 +325,7 @@ trait Read {
 
           FromDatabase(
             dataUserOpt          = dataUser,
+            lastModifiedByOpt    = lastModifiedByOpt,
             formVersion          = dbFormVersion,
             stageOpt             = if (hasStage) Option(resultSet.getString("stage")) else None,
             createdDateTime      = resultSet.getTimestamp("created"),

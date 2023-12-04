@@ -3,14 +3,15 @@ package org.orbeon.oxf.fr.persistence.proxy
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.connection.ConnectionResult
-import org.orbeon.io.IOUtils
+import org.orbeon.dom.io.XMLWriter
+import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, tinyTreeToOrbeonDom}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupportTrait}
 import org.orbeon.oxf.xml.TransformerUtils
@@ -76,17 +77,22 @@ object Export extends ExportOrPurge {
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit = {
     debug(s"storing `$fromPath` as `$toPath`")
+
+    val connectionResult = PersistenceApi.connectPersistence(
+      method         = HttpMethod.GET,
+      path           = fromPath,
+      formVersionOpt = formVersionOpt
+    )
+
     ConnectionResult.tryWithSuccessConnection(
-      PersistenceApi.connectPersistence(
-        method         = HttpMethod.GET,
-        path           = fromPath,
-        formVersionOpt = formVersionOpt
-      ),
+      connectionResult,
       closeOnSuccess = true
     ) { is =>
       val entry = new ZipEntry(toPath)
       ctx.putNextEntry(entry)
       IOUtils.copyStreamAndClose(is, ctx, doCloseOut = false)
+
+      Metadata.fromHeaders(connectionResult.headers).foreach(addMetadata(ctx, toPath, _))
     } match {
       case Success(_) => debug(s"success retrieving attachment when $debugAction form `$fromPath`")
       case Failure(_) => error(s"failure retrieving attachment when $debugAction form `$fromPath`")
@@ -110,14 +116,17 @@ object Export extends ExportOrPurge {
     documentNode   : DocumentNodeInfoType,
     createdTimeOpt : Option[Instant],
     modifiedTimeOpt: Option[Instant],
-    forCurrentData : Boolean
+    forCurrentData : Boolean,
+    metadataOpt    : Option[Metadata]
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit = {
     debug(s"storing XML ${documentNode.rootElement.getSystemId} as `$toPath`")
+
     val entry = new ZipEntry(toPath)
     createdTimeOpt.foreach(creationTime => entry.setCreationTime(FileTime.from(creationTime)))
     modifiedTimeOpt.foreach(modifiedTime => entry.setLastModifiedTime(FileTime.from(modifiedTime)))
+
     try {
       ctx.putNextEntry(entry)
       TransformerUtils.getXMLIdentityTransformer.transform(documentNode, new StreamResult(ctx))
@@ -126,6 +135,8 @@ object Export extends ExportOrPurge {
         error(s"failed to write XML document to zip file: `$toPath`")
         // TODO: count errors? flag to say whether we should fail?
     }
+
+    metadataOpt.foreach(addMetadata(ctx, toPath, _))
   }
 
   def makeToPath(
@@ -148,4 +159,15 @@ object Export extends ExportOrPurge {
 
     basePath :: latestPath :: filename :: Nil mkString "/"
   }
+
+  private def addMetadata(ctx: Context, toPath: String, metadata: Metadata): Unit = {
+    val entry = new ZipEntry(metadataPath(toPath))
+    ctx.putNextEntry(entry)
+
+    val metadataAsString = tinyTreeToOrbeonDom(metadata.toXML).serializeToString(XMLWriter.PrettyFormat)
+    ctx.write(metadataAsString.getBytes(CharsetNames.Utf8))
+  }
+
+  private def metadataPath(toPath: String): String =
+    toPath + ".metadata.xml"
 }

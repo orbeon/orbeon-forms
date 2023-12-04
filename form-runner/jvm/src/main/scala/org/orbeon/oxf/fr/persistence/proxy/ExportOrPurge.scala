@@ -4,18 +4,21 @@ package org.orbeon.oxf.fr.persistence.proxy
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
+import org.orbeon.oxf.externalcontext.UserAndGroup
 import org.orbeon.oxf.fr.AttachmentMatch.BasePaths
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi._
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
-import org.orbeon.oxf.fr._
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.Logging.debug
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.{NonAllBlank, _}
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, LoggerFactory}
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions._
 
 import java.time.Instant
 import java.{util => ju}
@@ -107,6 +110,59 @@ trait ExportOrPurge {
     }
   }
 
+  case class Metadata(
+    createdByOpt         : Option[UserAndGroup],
+    lastModifiedByOpt    : Option[UserAndGroup],
+    workflowStageOpt     : Option[String],
+    organizationLevelsOpt: Option[List[String]]
+  ) {
+    def isEmpty: Boolean =
+      createdByOpt.isEmpty          &&
+      lastModifiedByOpt.isEmpty     &&
+      workflowStageOpt.isEmpty      &&
+      organizationLevelsOpt.isEmpty
+
+    def toXML: NodeInfo =
+      <metadata>{
+        Seq(
+          createdByOpt.map { case UserAndGroup(username, groupname) =>
+            <created-by username={username} groupname={groupname.orNull}/>
+          },
+          lastModifiedByOpt.map { case UserAndGroup(username, groupname) =>
+            <last-modified-by username={username} groupname={groupname.orNull}/>
+          },
+          workflowStageOpt.map { workflowStage =>
+            <workflow-stage>{workflowStage}</workflow-stage>
+          },
+          organizationLevelsOpt.map { organizationLevels =>
+            <organization-levels>{
+              organizationLevels.map(level => <organization-level>{level}</organization-level>)
+            }</organization-levels>
+          }
+        ).flatten
+      }</metadata>
+  }
+
+  object Metadata {
+    def fromHeaders(headers: Map[String, List[String]]): Option[Metadata] =
+      Metadata(
+        createdByOpt          = Headers.firstItemIgnoreCase(headers, Headers.OrbeonUsername).map { username =>
+          UserAndGroup(
+            username  = username,
+            groupname = Headers.firstItemIgnoreCase(headers, Headers.OrbeonGroup)
+          )
+        },
+        lastModifiedByOpt     = Headers.firstItemIgnoreCase(headers, Headers.OrbeonLastModifiedByUsername).map { username =>
+          UserAndGroup(
+            username  = username,
+            groupname = None
+          )
+        },
+        workflowStageOpt      = Headers.firstItemIgnoreCase(headers, Headers.OrbeonWorkflowStage),
+        organizationLevelsOpt = Some(Headers.allItemsIgnoreCase(headers, Headers.OrbeonOrganization).toList).filter(_.nonEmpty)
+      ).some.filterNot(_.isEmpty)
+  }
+
   def process(
     request      : Request,
     response     : Response,
@@ -196,7 +252,8 @@ trait ExportOrPurge {
     documentNode   : DocumentNodeInfoType,
     createdTimeOpt : Option[Instant],
     modifiedTimeOpt: Option[Instant],
-    forCurrentData : Boolean
+    forCurrentData : Boolean,
+    metadataOpt    : Option[Metadata]
   )(implicit
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit
@@ -426,7 +483,8 @@ trait ExportOrPurge {
           documentNode    = formDefinition,
           createdTimeOpt  = headerFromRFC1123OrIso(headers, Headers.OrbeonCreated, Headers.Created),
           modifiedTimeOpt = headerFromRFC1123OrIso(headers, Headers.OrbeonLastModified, Headers.LastModified),
-          forCurrentData  = true
+          forCurrentData  = true,
+          metadataOpt     = Metadata.fromHeaders(headers)
         )
 
         processAttachments(
@@ -557,7 +615,8 @@ trait ExportOrPurge {
                 documentNode    = formData,
                 createdTimeOpt  = headerFromRFC1123OrIso(headers, Headers.OrbeonCreated, Headers.Created),
                 modifiedTimeOpt = effectiveModifiedTimeOpt,
-                forCurrentData  = forCurrentData
+                forCurrentData  = forCurrentData,
+                metadataOpt     = Metadata.fromHeaders(headers)
               )
 
               processAttachments(

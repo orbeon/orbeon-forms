@@ -119,11 +119,11 @@ object Connection extends ConnectionTrait {
 //          ).compile.onlyOrError.unsafeToFuture()
 //      ).getOrElse(Future.successful(None))
 
-    def requestStreamedContentOptF: IO[Option[StreamedContent]] =
+    def requestStreamedContentOptIo: IO[Option[StreamedContent]] =
       content.map(ConnectionSupport.asyncToSyncStreamedContent).map(_.map(_.some))
         .getOrElse(IO.pure(None))
 
-    def connectWithContentF(requestStreamedContentOpt: Option[StreamedContent]): IO[AsyncConnectionResult] =
+    def connectWithContentIo(requestStreamedContentOpt: Option[StreamedContent]): IO[AsyncConnectionResult] =
       CoreCrossPlatformSupport.shiftExternalContext[IO, AsyncConnectionResult](t => IO(t)) {
 
         val (_, cxr) =
@@ -143,7 +143,7 @@ object Connection extends ConnectionTrait {
         ConnectionResult.syncToAsync(cxr)
       }
 
-    requestStreamedContentOptF.flatMap(connectWithContentF)
+    requestStreamedContentOptIo.flatMap(connectWithContentIo)
   }
 
   // For Java callers

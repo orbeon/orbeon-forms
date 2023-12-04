@@ -51,7 +51,7 @@ trait ProcessInterpreter extends Logging {
   def clearSuspendedProcess(): Unit
   def writeSuspendedProcess(processId: String, process: String): Unit
   def readSuspendedProcess: Try[(String, String)]
-  def submitContinuation[T](actionResultF: IO[T], continuation: Try[T] => Unit): Unit
+  def submitContinuation[T](computation: IO[T], continuation: Try[T] => Unit): Unit
   def createUniqueProcessId: String = CoreCrossPlatformSupport.randomHexId
   def transactionStart(): Unit
   def transactionRollback(): Unit
@@ -143,13 +143,13 @@ trait ProcessInterpreter extends Logging {
               r
             case ActionResult.Async(failure @ Failure(_)) =>
               ActionResult.Sync(failure)
-            case ActionResult.Async(Success((value, continuation))) =>
+            case ActionResult.Async(Success((computation, continuation))) =>
               debugResults(List("result" -> "suspended asynchronous action"))
               val serializedContinuation = serializeContinuation
               // TODO: we don't support concurrent processes yet so if someone starts another process in the meanwhile,
               //  some state will be lost.
               val processScope = processStackDyn.value.get.scope
-              submitContinuation(value, continuation.andThen(initialTry => runProcess(processScope, serializedContinuation._2, initialTry)))
+              submitContinuation(computation, continuation.andThen(initialTry => runProcess(processScope, serializedContinuation._2, initialTry)))
               ActionResult.Interrupt(None, None)
             case r @ ActionResult.Interrupt(_, _) =>
               debugResults(List("result" -> "interrupted action"))

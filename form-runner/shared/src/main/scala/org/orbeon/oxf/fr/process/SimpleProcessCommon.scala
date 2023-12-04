@@ -80,12 +80,12 @@ trait SimpleProcessCommon
   def clearSuspendedProcess(): Unit =
     setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, "")
 
-  def submitContinuation[T](actionResultF: IO[T], continuation: Try[T] => Unit): Unit =
+  def submitContinuation[T](computation: IO[T], continuation: Try[T] => Unit): Unit =
     inScopeContainingDocument
       .getAsynchronousSubmissionManager
       .addAsynchronousCompletion(
         description           = s"process process id: $runningProcessId ",
-        computation           = actionResultF,
+        computation           = computation,
         continuation          = continuation,
         awaitInCurrentRequest = Some(Duration.Inf)
       )

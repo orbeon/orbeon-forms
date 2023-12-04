@@ -15,12 +15,14 @@ package org.orbeon.oxf.fr.process
 
 import cats.effect.IO
 import org.orbeon.dom.Document
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.ProcessInterpreter.Action
 import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
 import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
+import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{FunctionContext, IndentedLogger, Logging, XPath}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, Logging, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
@@ -56,8 +58,6 @@ trait SimpleProcessCommon
   override def extensionActions: Iterable[(String, ProcessInterpreter.Action)] =
     AllowedFormRunnerActions ++ AllowedXFormsActions
 
-  def currentXFormsDocumentId: String = XFormsAPI.inScopeContainingDocument.uuid
-
   // All XPath runs in the context of the main form instance's root element
   def xpathContext: Item = formInstance.rootElement
   def xpathFunctionLibrary: FunctionLibrary = inScopeContainingDocumentOpt map (_.functionLibrary) getOrElse XFormsFunctionLibrary // don't depend on in-scope document for tests
@@ -89,6 +89,8 @@ trait SimpleProcessCommon
         continuation          = continuation,
         awaitInCurrentRequest = Some(Duration.Inf)
       )
+
+  def currentXFormsDocumentId: String = XFormsAPI.inScopeContainingDocument.uuid
 
   private case class RollbackContent(data: Document, saveStatus: Option[DataStatus], autoSaveStatus: Option[DataStatus])
 
@@ -131,6 +133,13 @@ trait SimpleProcessCommon
   def findProcessByName(scope: String, name: String): Option[String] = {
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
     formRunnerProperty(scope + '.' + name) orElse buildProcessFromLegacyProperties(name)
+  }
+
+  def withRunProcess[T](scope: String, name: String)(body: => T): T = {
+    implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
+    LifecycleLogger.withEventAssumingRequest("fr", "process", List("uuid" -> currentXFormsDocumentId, "scope" -> scope, "name" -> name)) {
+      body
+    }
   }
 
   // Legacy: build "workflow-send" process based on properties

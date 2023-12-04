@@ -15,10 +15,8 @@ package org.orbeon.oxf.fr.process
 
 import cats.effect.IO
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.XMLNames
 import org.orbeon.oxf.fr.process.ProcessParser._
-import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Logging}
@@ -45,7 +43,6 @@ trait ProcessInterpreter extends Logging {
   val EmptyActionParams: ActionParams = Map.empty
 
   // Must be overridden by implementation
-  def currentXFormsDocumentId: String
   def findProcessByName(scope: String, name: String): Option[String]
   def processError(t: Throwable): Unit
   def xpathContext: Item
@@ -58,6 +55,7 @@ trait ProcessInterpreter extends Logging {
   def createUniqueProcessId: String = CoreCrossPlatformSupport.randomHexId
   def transactionStart(): Unit
   def transactionRollback(): Unit
+  def withRunProcess[T](scope: String, name: String)(body: => T): T
   implicit def logger: IndentedLogger
 
   // May be overridden by implementation
@@ -143,7 +141,7 @@ trait ProcessInterpreter extends Logging {
             case r @ ActionResult.Sync(Failure(_)) =>
               debugResults(List("result" -> "failed action"))
               r
-            case ActionResult.Async(failure @ Failure(t)) =>
+            case ActionResult.Async(failure @ Failure(_)) =>
               ActionResult.Sync(failure)
             case ActionResult.Async(Success((value, continuation))) =>
               debugResults(List("result" -> "suspended asynchronous action"))
@@ -245,12 +243,10 @@ trait ProcessInterpreter extends Logging {
     (throw new IllegalArgumentException(s"Non-existing process: $name in scope $scope"))
 
   // Main entry point for starting a process associated with a named button
-  def runProcessByName(scope: String, name: String): Try[Any] = {
-    implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
-    LifecycleLogger.withEventAssumingRequest("fr", "process", List("uuid" -> currentXFormsDocumentId, "scope" -> scope, "name" -> name)) {
+  def runProcessByName(scope: String, name: String): Try[Any] =
+    withRunProcess(scope, name) {
       runProcess(scope, rawProcessByName(scope, name))
     }
-  }
 
   // Main entry point for starting a literal process
   def runProcess(scope: String, process: String, initialTry: Try[Any] = Success(())): Try[Any] =

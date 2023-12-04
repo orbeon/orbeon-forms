@@ -92,17 +92,6 @@
         <param-value>oxf:/apps/context/session-destroyed.xpl</param-value>
     </context-param>-->
     <!-- End session listener processors -->
-    <!--Security filter for eXist-->
-    <filter>
-        <filter-name>orbeon-exist-filter</filter-name>
-        <filter-class>org.orbeon.oxf.servlet.TokenSecurityFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>orbeon-exist-filter</filter-name>
-        <url-pattern>/exist/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-    </filter-mapping>
     <!--Limit concurrent access to Form Runner-->
     <filter>
         <filter-name>orbeon-limiter-filter</filter-name>
@@ -268,48 +257,6 @@
             <param-value>oxf:/config/error.xpl</param-value>
         </init-param>
     </servlet>
-    <!-- Uncomment this for the eXist XMLRPC support -->
-    <!--
-    <servlet>
-        <servlet-name>exist-xmlrpc-servlet</servlet-name>
-        <servlet-class>org.exist.xmlrpc.RpcServlet</servlet-class>
-    </servlet>-->
-    <!-- End eXist XMLRPC support -->
-    <servlet>
-        <servlet-name>exist-rest-servlet</servlet-name>
-        <servlet-class>org.exist.http.servlets.EXistServlet</servlet-class>
-        <init-param>
-            <param-name>basedir</param-name>
-            <param-value>WEB-INF/</param-value>
-        </init-param>
-        <init-param>
-            <param-name>configuration</param-name>
-            <param-value>exist-conf.xml</param-value>
-        </init-param>
-        <init-param>
-            <param-name>start</param-name>
-            <param-value>true</param-value>
-        </init-param>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>orbeon-main-servlet</servlet-name>
-        <url-pattern>/</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>orbeon-renderer-servlet</servlet-name>
-        <url-pattern>/xforms-renderer</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>exist-rest-servlet</servlet-name>
-        <url-pattern>/exist/rest/*</url-pattern>
-    </servlet-mapping>
-    <!-- Uncomment this for the eXist XMLRPC support -->
-    <!--
-    <servlet-mapping>
-        <servlet-name>exist-xmlrpc-servlet</servlet-name>
-        <url-pattern>/exist/xmlrpc/*</url-pattern>
-    </servlet-mapping>-->
-    <!-- End eXist XMLRPC support -->
     <!-- Uncomment this for the relational persistence, and change oracle if necessary -->
     <!--
     <resource-ref>

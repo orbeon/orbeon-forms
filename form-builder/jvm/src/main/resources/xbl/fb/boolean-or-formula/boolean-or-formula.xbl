@@ -27,6 +27,19 @@
         xxbl:mode="binding lhha"
         xxbl:label-for="fr-boolean-or-formula-elem">
 
+        <xbl:handlers>
+            <xbl:handler event="xforms-select" observer="select1">
+                <xf:dispatch name="xforms-value-changed" targetid="fb-boolean-or-formula">
+                    <xf:property name="xxf:value" value="event('xxf:item-value')"/>
+                </xf:dispatch>
+            </xbl:handler>
+            <xbl:handler event="DOMFocusOut" observer="xpath-textarea">
+                <xf:dispatch name="xforms-value-changed" targetid="fb-boolean-or-formula">
+                    <xf:property name="xxf:value" value="xxf:binding('fb-boolean-or-formula')/string()"/>
+                </xf:dispatch>
+            </xbl:handler>
+        </xbl:handlers>
+
         <xbl:template>
             <!-- Bindings specified on control -->
             <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
@@ -36,7 +49,7 @@
             <xf:var name="items"         value="$resources/dialog-control-settings/required/item"/>
 
             <xh:div id="fr-boolean-or-formula-elem" class="fr-component-group" xxf:control="true">
-                <xf:select1 ref="$binding" appearance="full xxf:horizontal">
+                <xf:select1 ref="$binding" appearance="full xxf:horizontal" id="select1">
                     <xf:itemset ref="$items[@id = (0, 1, 2)]">
                         <xf:label ref="."/>
                         <!-- Tricky bits: map @id to XPath and handle case where we switch from

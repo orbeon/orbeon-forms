@@ -876,6 +876,7 @@
                                 xxf:evaluate-avt(string($p))
                     }'
             }"
+            xxf:single-use-static-state="{$mode = 'test'}"
         >
 
             <!-- Override if specified -->

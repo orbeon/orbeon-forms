@@ -27,12 +27,16 @@ object XFormsStaticStateCache {
   }
 
   def storeDocument(staticState: XFormsStaticState): Unit =
-    cache.add(createCacheKey(staticState.digest), System.currentTimeMillis, staticState)
+    if (! (staticState.singleUseStaticState && staticState.isInlineResources)) // https://github.com/orbeon/orbeon-forms/issues/1730
+      cache.add(createCacheKey(staticState.digest), System.currentTimeMillis, staticState)
 
   def findDocument(digest: String): Option[(XFormsStaticState, Long)] =
     cache.findValidWithValidity(createCacheKey(digest), ConstantValidity) map { case (o, validity) =>
       o.asInstanceOf[XFormsStaticState] -> ProcessorImpl.findLastModified(validity)
     }
+
+ def removeDocument(digest: String): Unit =
+    cache.remove(createCacheKey(digest))
 
   private object Private {
 

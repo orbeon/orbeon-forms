@@ -15,6 +15,7 @@ abstract class XFormsStaticStateStaticPropertiesImpl(
   val isServerStateHandling   : Boolean     = staticStringProperty(P.StateHandlingProperty) == P.StateHandlingServerValue
   val isXPathAnalysis         : Boolean     = isPEFeatureEnabled(staticBooleanProperty(P.XpathAnalysisProperty),     P.XpathAnalysisProperty)
   val isCalculateDependencies : Boolean     = isPEFeatureEnabled(staticBooleanProperty(P.CalculateAnalysisProperty), P.CalculateAnalysisProperty)
+  val singleUseStaticState    : Boolean     = staticBooleanProperty(P.SingleUseStaticState)
   val allowErrorRecoveryOnInit: Boolean     = staticBooleanProperty(P.AllowErrorRecoveryOnInit)
   val isInlineResources       : Boolean     = staticBooleanProperty(P.InlineResourcesProperty)
   val allowedExternalEvents   : Set[String] = staticStringProperty(P.ExternalEventsProperty).tokenizeToSet

@@ -103,6 +103,7 @@ object XFormsProperties {
   val EncryptItemValuesProperty                 = "encrypt-item-values"
   val XpathAnalysisProperty                     = "xpath-analysis"
   val CalculateAnalysisProperty                 = "analysis.calculate"
+  val SingleUseStaticState                      = "single-use-static-state"
   val AllowErrorRecoveryOnInit                  = "allow-error-recovery-on-init"
 
   val SanitizeProperty                          = "sanitize"
@@ -204,6 +205,7 @@ object XFormsProperties {
       PropertyDefinition(Xforms11SwitchProperty,                    false,                       propagateToClient = false),
       PropertyDefinition(XpathAnalysisProperty,                     false,                       propagateToClient = false),
       PropertyDefinition(CalculateAnalysisProperty,                 false,                       propagateToClient = false),
+      PropertyDefinition(SingleUseStaticState,                      false,                       propagateToClient = false),
       PropertyDefinition(AllowErrorRecoveryOnInit,                  false,                       propagateToClient = false),
       PropertyDefinition(SanitizeProperty,                          "",                          propagateToClient = false),
       PropertyDefinition(AssetsBaselineExcludesProperty,            "",                          propagateToClient = false),

@@ -179,6 +179,10 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
               writer.write
             )
           }
+
+          // https://github.com/orbeon/orbeon-forms/issues/1730
+          if (state.singleUseStaticState)
+            XFormsStaticStateCache.removeDocument(staticStateDigest)
         }
       case ResourceRegex(hash, ext) =>
         serveCSSOrJavaScript(requestTime, hash, ext)

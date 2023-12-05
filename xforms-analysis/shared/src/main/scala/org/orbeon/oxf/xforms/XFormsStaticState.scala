@@ -54,6 +54,7 @@ trait XFormsStaticStateStaticProperties {
   def isXPathAnalysis                     : Boolean
   def isCalculateDependencies             : Boolean
 
+  def singleUseStaticState                : Boolean
   def allowErrorRecoveryOnInit            : Boolean
 
   def isInlineResources                   : Boolean

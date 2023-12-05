@@ -655,8 +655,6 @@ trait FormRunnerPersistence {
     xfcd                    : XFormsContainingDocument
   ): IO[AsyncConnectionResult] = {
 
-    println(s"xxx saveXmlDataIo $resolvedPutUri")
-
     val customPutHeaders =
       (formVersion.toList                         map (v => OrbeonFormDefinitionVersion -> List(v))) :::
       (workflowStage.filter(_.nonAllBlank).toList map (v => "Orbeon-Workflow-Stage" -> List(v)))     :::

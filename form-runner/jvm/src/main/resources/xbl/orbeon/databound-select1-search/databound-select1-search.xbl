@@ -11,15 +11,17 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/select2.full.js"/>
     <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/fr.js"/>
@@ -124,14 +126,38 @@
                     </xh:tr>
                     <xh:tr>
                         <xh:td colspan="2">
-                            <fr:yesno-input ref="xf:element('_', if (@selection = 'open') then 'true' else 'false')" id="fb-open-selection">
+                            <xf:var name="formula-prefix">{'open'[</xf:var>
+                            <xf:var name="formula-suffix">]}</xf:var>
+                            <fb:boolean-or-formula
+                                ref="xf:element('_',
+                                    if      (empty($control/@selection))   then 'false()'
+                                    else if ($control/@selection = 'open') then 'true()'
+                                    else substring-before(substring-after($control/@selection, $formula-prefix), $formula-suffix)
+                                )"
+                                resources-ref="frf:currentFormResources()"
+                                id="fb-open-selection">
+
                                 <xf:label ref="xxf:r('dialog-control-settings.open-selection.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-control-settings.open-selection.hint',  '|fr-form-resources|')"/>
-                                <xf:action event="xforms-select">
+                                <xf:action event="xforms-value-changed">
                                     <xf:delete ref="$control/@selection"/>
-                                    <xf:insert if="event('xxf:item-value') = 'true'" context="$control" origin="xf:attribute('selection', 'open')"/>
+                                    <xf:insert
+                                        if="event('xxf:value') != 'false()'"
+                                        context="$control"
+                                        origin="
+                                            xf:attribute(
+                                                'selection',
+                                                if (event('xxf:value') = 'true()')
+                                                then 'open'
+                                                else concat(
+                                                    $formula-prefix,
+                                                    event('xxf:value'),
+                                                    $formula-suffix
+                                                )
+                                            )
+                                        "/>
                                 </xf:action>
-                            </fr:yesno-input>
+                            </fb:boolean-or-formula>
                         </xh:td>
                     </xh:tr>
                     <xh:tr>

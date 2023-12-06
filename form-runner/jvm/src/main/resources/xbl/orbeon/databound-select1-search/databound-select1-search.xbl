@@ -66,7 +66,6 @@
                     <fr:databound-select1
                             id=""
                             appearance="search"
-                            ref=""
                             service-performs-search="false"
                             service-supports-paging="false"
                             is-last-page=""
@@ -126,8 +125,8 @@
                     </xh:tr>
                     <xh:tr>
                         <xh:td colspan="2">
-                            <xf:var name="formula-prefix">{'open'[</xf:var>
-                            <xf:var name="formula-suffix">]}</xf:var>
+                            <xf:var name="formula-prefix">{if (</xf:var>
+                            <xf:var name="formula-suffix">) then 'open' else ''}</xf:var>
                             <fb:boolean-or-formula
                                 ref="xf:element('_',
                                     if      (empty($control/@selection))   then 'false()'
@@ -356,9 +355,11 @@
                                     replace="instance"
                                     instance="result-raw"
                                     serialization="none">
-                                <!-- Set user agent for services that require one, like GitHub's API
-                                     (we should have more general solution, like setting a User-Agent by default,
-                                     unless a property says otherwise) -->
+                                <!--
+                                    Set user agent for services that require one, like GitHub's API
+                                    (we should have more general solution, like setting a User-Agent by default,
+                                    unless a property says otherwise)
+                                -->
                                 <xf:header>
                                     <xf:name>User-Agent</xf:name>
                                     <xf:value>OrbeonForms</xf:value>
@@ -393,10 +394,23 @@
                             data-initial-label="{{$binding/@label}}"
                             data-initial-value="{{$binding}}"
                             data-min-input-length="{{$min-input-length}}">
+
                             <xsl:if test="exists(@selection)">
-                                <xsl:attribute name="data-selection" select="@selection"/>
+                                <xf:var name="fr-selection-xpath" xxbl:scope="outer"><xsl:value-of select="@selection"/></xf:var>
+                                <xf:var name="selection">
+                                    <xxf:value xxbl:scope="outer" value="xxf:evaluate-avt($fr-selection-xpath)"/>
+                                    <xf:action event="xforms-enabled xforms-value-changed" type="javascript">
+                                        <xf:param name="selection" value="$selection"/>
+                                        <xf:body>
+                                            var i = ORBEON.xforms.XBL.instanceForControl(this);
+                                            if (i) i.updateOpenSelection(selection == 'open');
+                                        </xf:body>
+                                    </xf:action>
+                                </xf:var>
                             </xsl:if>
+
                             <xh:select id="select1"/>
+
                         </xf:group>
                         <xf:input ref="$binding[$view]/@label"/>
                     </xf:group>

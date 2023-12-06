@@ -39,7 +39,6 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private val    DataServicePerformsSearch = "data-service-performs-search"
   private val    DataInitialLabel          = "data-initial-label"
   private val    DataInitialValue          = "data-initial-value"
-  private val    DataSelection             = "data-selection"
   private val    DataMinimumInputLength    = "data-min-input-length"
   private val    DataboundClass            = "xbl-fr-databound-select1-search"
   private object EventSupport              extends EventListenerSupport
@@ -49,6 +48,9 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private var onXFormsSelect1ValueChangeJs : Option[js.Function]              = None
   private var mutationObservers            : List[MutationObserver]           = Nil
   private var inputElementOpt              : Option[dom.Element]              = None
+  private var optionsWithTagsOpt           : Option[Select2.Options]          = None
+  private var optionsWithoutTagsOpt        : Option[Select2.Options]          = None
+  private var isOpenSelection              : Boolean                          = false
 
   override def init(): Unit = {
     for (select <- Option(querySelect)) {
@@ -61,21 +63,28 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       // `<xf:select1>` having lost the focus
       Support.stopFocusOutPropagation(select.parentNode.asInstanceOf[html.Element], _.target, "select2-selection--single")
 
+      locally {
+        def options(open: Boolean): Select2.Options =
+          new Select2.Options {
+            val allowClear         = true
+            val dropdownParent     = js.undefined
+            val ajax               = if (isDatabound) Select2Ajax else null
+            val width              = "100%" // For Select2 width to update as the viewport width changes
+            val tags               = open
+            val minimumInputLength = Option(queryElementWithData.getAttribute(DataMinimumInputLength)).filter(_.nonEmpty).map(_.toInt).getOrElse(0)
+            val placeholder        =
+              new Select2.Option {
+                val id   = "0"
+                val text = elementWithData.getAttribute(DataPlaceholder)
+              }
+          }
+        optionsWithTagsOpt    = Some(options(open = true))
+        optionsWithoutTagsOpt = Some(options(open = false))
+      }
+
       // Init Select2
       val jSelect = $(select)
-      jSelect.select2(new Select2.Options {
-        val allowClear         = true
-        val dropdownParent     = js.undefined
-        val ajax               = if (isDatabound) Select2Ajax else null
-        val width              = "100%" // For Select2 width to update as the viewport width changes
-        val tags               = Option(queryElementWithData.getAttribute(DataSelection)).contains("open")
-        val minimumInputLength = Option(queryElementWithData.getAttribute(DataMinimumInputLength)).filter(_.nonEmpty).map(_.toInt).getOrElse(0)
-        val placeholder        =
-          new Select2.Option {
-            val id   = "0"
-            val text = elementWithData.getAttribute(DataPlaceholder)
-          }
-      })
+      optionsWithoutTagsOpt.foreach(jSelect.select2)
 
       // Register event listeners
       if (isDatabound) {
@@ -180,6 +189,20 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       success     = success
     )
   }
+
+  // Called from `databound-select1-search.xbl` to tell use if the `selection` AVT evaluates to `open`
+  def updateOpenSelection(newIsOpenSelection: Boolean): Unit =
+    if (newIsOpenSelection != isOpenSelection) {
+      for {
+        select  <- Option(querySelect)
+        options <- if (newIsOpenSelection) optionsWithTagsOpt else optionsWithoutTagsOpt
+      } {
+        val jSelect = $(select)
+        jSelect.select2("destroy")
+        jSelect.select2(options)
+        isOpenSelection = newIsOpenSelection
+      }
+    }
 
   private def callSelect2Success(
     results     : js.Array[Select2.Option],

@@ -109,8 +109,8 @@
                             required="true()"/>
                         <xf:bind
                             ref="xf:label/@ref"
-                            readonly="$control/@selection = 'open'"
-                            calculate="if ($control/@selection = 'open') then ../../xf:value/@ref else ."/>
+                            readonly="$control/@selection != ''"
+                            calculate="if ($control/@selection != '') then ../../xf:value/@ref else ."/>
                     </xf:bind>
                 </xf:model>
                 <fr:grid>
@@ -286,10 +286,9 @@
 
             <!--
                 Adjust `label` attribute if needed, but only in read-write modes:
-
-                 - https://github.com/orbeon/orbeon-forms/issues/4553
-                 - https://github.com/orbeon/orbeon-forms/issues/5816
-             -->
+                - https://github.com/orbeon/orbeon-forms/issues/4553
+                - https://github.com/orbeon/orbeon-forms/issues/5816
+            -->
             <xbl:handler event="xforms-enabled" if="not(fr:is-readonly-mode())">
                 <xf:var name="service-performs-search" value="xxf:component-param-value('service-performs-search') = 'true'"/>
                 <xf:var name="binding"                 value="xxf:binding('fr-databound-select1-search')"/>

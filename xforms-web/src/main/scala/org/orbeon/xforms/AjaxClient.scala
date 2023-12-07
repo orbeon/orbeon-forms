@@ -260,8 +260,8 @@ object AjaxClient {
       case r            => r.toString
     }
 
-    // Q: We used to log the JavaScript exception to the console here. In which cases can we do that? How does it help?
-    dom.console.log(ErrorMessageTitle, messageOrNull)
+    // Log exception, otherwise its source is lost
+    dom.console.log(e)
 
     val sb = new mutable.StringBuilder(ErrorMessageTitle)
 

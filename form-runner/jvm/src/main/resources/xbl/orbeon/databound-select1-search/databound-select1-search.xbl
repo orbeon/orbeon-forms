@@ -395,19 +395,15 @@
                             data-initial-value="{{$binding}}"
                             data-min-input-length="{{$min-input-length}}">
 
-                            <xsl:if test="exists(@selection)">
-                                <xf:var name="fr-selection-xpath" xxbl:scope="outer"><xsl:value-of select="@selection"/></xf:var>
-                                <xf:var name="selection">
-                                    <xxf:value xxbl:scope="outer" value="xxf:evaluate-avt($fr-selection-xpath)"/>
-                                    <xf:action event="xforms-enabled xforms-value-changed" type="javascript">
-                                        <xf:param name="selection" value="$selection"/>
-                                        <xf:body>
-                                            var i = ORBEON.xforms.XBL.instanceForControl(this);
-                                            if (i) i.updateOpenSelection(selection == 'open');
-                                        </xf:body>
-                                    </xf:action>
-                                </xf:var>
-                            </xsl:if>
+                            <xf:var name="selection" value="fr:component-param-value('selection')">
+                                <xf:action event="xforms-enabled xforms-value-changed" type="javascript">
+                                    <xf:param name="selection" value="$selection"/>
+                                    <xf:body>
+                                        var i = ORBEON.xforms.XBL.instanceForControl(this);
+                                        if (i) i.updateOpenSelection(selection == 'open');
+                                    </xf:body>
+                                </xf:action>
+                            </xf:var>
 
                             <xh:select id="select1"/>
 

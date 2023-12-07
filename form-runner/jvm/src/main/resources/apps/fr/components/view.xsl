@@ -67,6 +67,11 @@
             <fr:toc/>
             <fr:body/>
         </fr:row>
+        <xsl:if test="$mode = 'test'">
+            <fr:row>
+                <fr:console-server/>
+            </fr:row>
+        </xsl:if>
         <xsl:if test="p:property(string-join(('oxf.fr.detail.captcha.location', $app, $form), '.')) = 'form-bottom'">
             <fr:row>
                 <fr:captcha id="fr-captcha" namespace-name="{frf:captchaComponent($app, $form)}"/>

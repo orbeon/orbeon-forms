@@ -1243,6 +1243,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Form Preview</label>
+            <console>Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label>Test PDF Production</label>
@@ -2641,6 +2642,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Test du formulaire</label>
+            <console>Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label>Test de la production PDF</label>
@@ -4049,6 +4051,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Skjemaforhåndsvisning</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -5456,6 +5459,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Предварительный просмотр формы</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -6828,6 +6832,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Anteprima del modulo</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label>Test della produzione PDF</label>
@@ -8201,6 +8206,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Formularvorschau</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label>Test der PDF-Erzeugung</label>
@@ -9604,6 +9610,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Lomakkeen esikatselu</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -11004,6 +11011,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Vista Previa del Formulario</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -12384,6 +12392,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Form voorvertoning</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -13791,6 +13800,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Previsualização do formulário</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -15199,6 +15209,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Förhandsvisa formulär</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>

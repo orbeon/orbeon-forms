@@ -877,6 +877,7 @@
                     }'
             }"
             xxf:single-use-static-state="{$mode = 'test'}"
+            xxf:allow-error-recovery-on-init="{$mode = 'test'}"
         >
 
             <!-- Override if specified -->

@@ -24,7 +24,7 @@
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:map="http://www.w3.org/2005/xpath-functions/map"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
-    xmlns:p="http://www.orbeon.com/oxf/pipeline">
+>
 
     <xbl:binding
         id="fr-formula-debugger"

@@ -20,7 +20,7 @@
 
       id="fb-test-dialog" level="modal" close="true" draggable="false" class="fb-test-dialog xxforms-set-height">
 
-    <xf:label ref="$form-resources/dialog-test/label"/>
+    <xf:label ref="xxf:r('dialog-test.label')"/>
 
     <!-- Set value that controls whether the "Test PDF" button shows -->
     <xf:setvalue
@@ -28,8 +28,20 @@
         ref="instance('fb-triggers-instance')/test-pdf"
         value="event('show-test-pdf')"/>
 
-    <xh:div class="fb-dialog-remaining-height">
+    <xh:div class="fb-test-dialog-form">
         <xh:iframe id="fb-test-iframe" name="fb-test-iframe" class="fb-test-iframe" src="about:blank"/>
+    </xh:div>
+    <xh:div class="fb-test-dialog-console">
+        <xh:div class="fb-console-title">
+            <xf:output ref="xxf:r('dialog-test.console')"/>
+            <xf:trigger class="fb-console-close" appearance="minimal">
+                <xf:label><xh:i class="fa fa-window-restore "/></xf:label>
+                <xf:action event="DOMActivate">
+                    <xf:dispatch name="fr-toggle-layout" targetid="fr-console"/>
+                </xf:action>
+            </xf:trigger>
+        </xh:div>
+        <fr:console id="fr-console"/>
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <xh:span>

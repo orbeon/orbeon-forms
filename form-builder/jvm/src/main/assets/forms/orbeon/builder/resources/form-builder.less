@@ -1277,14 +1277,62 @@ body.orbeon {
     .fb-test-dialog {
         width: 90vw;                                // Try to be very wide
         max-width: none;
+
         .xxforms-dialog-body {
-            .fb-dialog-remaining-height {
-                height: 100%;
+            display: flex;
+            flex-direction: column;
+
+            .fb-test-dialog-form {
+                flex-grow: 1;
+                overflow: scroll;
             }
+
             .fb-test-iframe {
-                height: 100%; width: 100%;          // Use all the space available in container (.fb-dialog-remaining-height)
+                height: 100%; width: 100%;          // Use all the space available in container (.fb-dialog-form)
                 box-sizing: border-box;             // So the size of this box doesn't get larger than its container, which would add scrollbars to the container
                 border: none;                       // By default, iframes have a particularly ugly border
+            }
+
+            .fb-test-dialog-console {
+
+                flex-grow: 0;
+
+                .fb-console-title {
+                    background-color: @color2;
+                    margin: 0 -1px;
+                    border: none;
+                    font-size: .9rem;
+                    line-height: 2rem;
+                    padding: 0 10px;
+                    font-weight: bold;
+                    color: @textColor;
+                    border-top: 2px solid @frBorderColor; // see `.fr-dialog-buttons`
+                }
+
+                .fb-console-close {
+                    float: right;
+                }
+
+                .xbl-fr-console {
+                    padding: 10px;
+
+                    .fr-console-close {
+                        display: none;
+                    }
+
+                    .xbl-fr-grid .fr-grid .fr-grid-body .fr-grid-td.fr-console-badge {
+                        text-align: center;
+                        vertical-align: middle;
+                    }
+
+                    .tab-pane {
+                        .dialog-scrollable(25vh);
+                    }
+                }
+            }
+
+            .fr-dialog-buttons {
+                flex-grow: 0;
             }
         }
     }

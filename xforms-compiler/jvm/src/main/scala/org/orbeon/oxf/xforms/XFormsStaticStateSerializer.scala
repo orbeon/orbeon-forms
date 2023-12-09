@@ -522,6 +522,8 @@ object XFormsStaticStateSerializer {
             Json.fromFields(b)
           }
 
+          if (c.nameOpt.isDefined)
+            b += "nameOpt"                     -> c.nameOpt.asJson
           if (c.typeMIPOpt.isDefined)
             b += "typeMIPOpt"                  -> c.typeMIPOpt.asJson
   //            "dataType"                    -> c.dataType.asJson,

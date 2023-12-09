@@ -17,13 +17,15 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, Global}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, Global, XPathErrorDetails}
 import org.orbeon.oxf.xforms.xbl.XBLAssets
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.xbl.Scope
 
 trait PartGlobalOps {
+
+  def getStaticXPathErrors: List[(String, Option[Throwable], XPathErrorDetails)]
 
   // Global
   def getMark(prefixedId: String): Option[SAXStore#Mark]

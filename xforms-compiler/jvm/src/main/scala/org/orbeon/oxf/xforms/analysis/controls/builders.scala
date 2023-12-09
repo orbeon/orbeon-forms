@@ -32,7 +32,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{BasicNamespaceMapping, EventNames, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 
 object OutputControlBuilder {
@@ -597,23 +597,31 @@ object StaticBindBuilder {
     containerScope   : Scope
   ): StaticBind = {
 
-    val xpathMipLocationData = ElementAnalysis.createLocationData(element)
+    val xpathMipLocationData = ElementAnalysis.createLocationData(element) // TODO: this is always `null`, even with `oxf.xforms.location-mode` set to `smart`
     val bindTree             = StaticBind.getBindTree(parent)
 
-    // 1. Ignoring errors makes sense for Form Builder. For other dynamic components, which we don't have as of
-    //    2015-04-06, we should also fail at this point. In short, this should probably be decided by an
+    val bindNameOpt = Option(element.attributeValue(NAME_QNAME))
+
+    // 1. Ignoring errors makes sense for Form Builder. For other dynamic components, like custom editors in
+    //    Form Builder, we should also fail at this point. In short, this should probably be decided by an
     //    attribute  of `xxf:dynamic`. This should also allow providing feedback to the Form Builder user.
     // 2. When using `Try`, we should capture errors so that `xxf:dynamic` can report them.
     def createOrNone(
-      id         : String,
-      name       : String,
-      level      : ValidationLevel,
-      expression : String
+      id        : String,
+      mipName   : String,
+      level     : ValidationLevel,
+      expression: String
     ): Option[XPathMIP] =
-      if (partAnalysisCtx.isTopLevelPart)
-        Some(new XPathMIP(id, name, level, expression, namespaceMapping, xpathMipLocationData, partAnalysisCtx.functionLibrary))
+      if (partAnalysisCtx.isTopLevelPart && ! partAnalysisCtx.staticProperties.allowErrorRecoveryOnInit)
+        Some(new XPathMIP(id, mipName, level, expression, namespaceMapping, xpathMipLocationData, partAnalysisCtx.functionLibrary))
       else
-        Try(new XPathMIP(id, name, level, expression, namespaceMapping, xpathMipLocationData, partAnalysisCtx.functionLibrary)).toOption
+        Try(new XPathMIP(id, mipName, level, expression, namespaceMapping, xpathMipLocationData, partAnalysisCtx.functionLibrary)) match {
+          case Success(mip) =>
+            Some(mip)
+          case Failure(t)   =>
+            partAnalysisCtx.reportStaticXPathError(expression, t.some, XPathErrorDetails.ForBindMip(bindNameOpt, mipName))
+            None
+        }
 
     val typeMIPOpt: Option[TypeMIP] = {
 
@@ -717,7 +725,9 @@ object StaticBindBuilder {
       prefixedId,
       namespaceMapping,
       scope,
-      containerScope,
+      containerScope
+    )(
+      bindNameOpt,
       typeMIPOpt,
       mipNameToXPathMIP,
       customMIPNameToXPathMIP,

@@ -23,8 +23,14 @@ object StaticDataModel {
 
   // Reasons that setting a value on a node can fail
   sealed trait Reason { val message: String }
-  case object  DisallowedNodeReason extends Reason { val message = "Unable to set value on disallowed node" }
-  case object  ReadonlyNodeReason   extends Reason { val message = "Unable to set value on read-only node" }
+  sealed trait NodeReason extends Reason
+  object Reason {
+    case object  DisallowedNode                extends NodeReason { val message = "Unable to set value on disallowed node" }
+    case object  ReadonlyNode                  extends NodeReason { val message = "Unable to set value on read-only node" }
+    case class   InvalidModel(modelId: String) extends Reason     { val message = s"Invalid model: `$modelId`" }
+    case class   InvalidBind(bindId: String)   extends Reason     { val message = s"Invalid bind: `$bindId`" }
+    case class   Other(message: String)        extends Reason
+  }
 
   /**
    * Whether the given item is acceptable as a bound item.
@@ -57,11 +63,11 @@ object StaticDataModel {
    * - element nodes containing other elements
    * - items not backed by a mutable node (which are read-only)
    */
-  def isWritableItem(item: Item): Reason Either VirtualNodeType = item match {
-    case _: AtomicValue                                => Left(ReadonlyNodeReason)
-    case node: VirtualNodeType if node.hasChildElement => Left(DisallowedNodeReason)
+  def isWritableItem(item: Item): NodeReason Either VirtualNodeType = item match {
+    case _: AtomicValue                                => Left(Reason.ReadonlyNode)
+    case node: VirtualNodeType if node.hasChildElement => Left(Reason.DisallowedNode)
     case node: VirtualNodeType                         => Right(node)
-    case _: DocumentNodeInfoType                       => Left(DisallowedNodeReason) // XXX TODO: review this test
-    case _                                             => Left(ReadonlyNodeReason)
+    case _: DocumentNodeInfoType                       => Left(Reason.DisallowedNode) // TODO: review this test
+    case _                                             => Left(Reason.ReadonlyNode)
   }
 }

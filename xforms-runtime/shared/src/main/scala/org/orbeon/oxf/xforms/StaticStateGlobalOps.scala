@@ -15,13 +15,12 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.analysis.model.Instance
-import org.orbeon.oxf.xforms.analysis.{NestedPartAnalysis, PartAnalysis}
+import org.orbeon.oxf.xforms.analysis.{NestedPartAnalysis, PartAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.xbl.XBLAssets
 import org.orbeon.xforms.HeadElement
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.{immutable => i}
-import scala.jdk.CollectionConverters._
 
 // Global operations on parts including top-level part and descendant parts
 class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
@@ -57,6 +56,9 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   private def iterateInParts[T](get: PartAnalysis => Iterator[T]) =
     parts.iterator flatMap (part => get(part))
+
+  def getStaticXPathErrors: List[(String, Option[Throwable], XPathErrorDetails)] =
+    collectInParts(_.getStaticXPathErrors)
 
   // Models
   def getModelsForScope(scope: Scope) = collectInParts(_.getModelsForScope(scope))

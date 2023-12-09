@@ -302,23 +302,34 @@ object ElementAnalysisTreeXPathAnalyzer {
 
       val allBindVariablesInScope = bindTree.allBindVariables
 
-      // Saxon: "In the case of free-standing XPath expressions it will be the StaticContext object"
-      val staticContext  = mip.compiledExpression.expression.getInternalExpression.getContainer.asInstanceOf[ShareableXPathStaticContext]
-      if (staticContext ne null) {
-        // NOTE: The StaticContext can be null if the expression is a constant such as BooleanValue
-        val usedVariables = staticContext.referencedVariables
-
-        // Check whether all variables used by the expression are actually in scope, throw otherwise
-        usedVariables find (name => ! allBindVariablesInScope.contains(name.getLocalName)) foreach { name =>
-          throw new ValidationException("Undeclared variable in XPath expression: $" + name.getClarkName, bind.locationData)
+      val missingReferences =
+        Option(mip.compiledExpression.expression.getInternalExpression.getContainer) match {
+          case Some(staticContext: ShareableXPathStaticContext) =>
+            // Saxon: "In the case of free-standing XPath expressions it will be the `StaticContext` object"
+            staticContext.referencedVariables.collect {
+              case name if ! allBindVariablesInScope.contains(name.getLocalName) => name.getLocalName
+            } .toSet
+          case _ =>
+            // NOTE: The `StaticContext` can be missing if the expression is a constant such as `BooleanValue`
+            Set.empty[String]
         }
-      }
 
-      // Analyze and remember if figured out
-      analyzeXPathWithCompiledExpression(partAnalysisCtx, bind, getChildrenContext(partAnalysisCtx, bind), allBindVariablesInScope, mip.compiledExpression) match {
-        case valueAnalysis if valueAnalysis.figuredOutDependencies => mip.analysis = valueAnalysis
-        case _ => // NOP
-      }
+      if (missingReferences.isEmpty)
+        analyzeXPathWithCompiledExpression(partAnalysisCtx, bind, getChildrenContext(partAnalysisCtx, bind), allBindVariablesInScope, mip.compiledExpression) match {
+          case valueAnalysis if valueAnalysis.figuredOutDependencies => mip.analysis = valueAnalysis
+          case _ => // NOP
+        }
+      else if (partAnalysisCtx.isTopLevelPart && ! partAnalysisCtx.staticProperties.allowErrorRecoveryOnInit)
+        throw new ValidationException(
+          s"Undeclared variable(s) in XPath expression: ${missingReferences.mkString("`", "`, `", "`")}",
+          bind.locationData
+        )
+      else
+        partAnalysisCtx.reportStaticXPathError(
+          mip.compiledExpression.string,
+          None,
+          XPathErrorDetails.ForBindMipReferences(bind.nameOpt, mip.name, missingReferences.toSet)
+        )
     }
 
     // Return true if analysis succeeded

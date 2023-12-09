@@ -16,8 +16,9 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent}
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, NoDefaultsStrategy, XFormsModel}
 import org.orbeon.xforms.XFormsNames._
 
@@ -65,14 +66,20 @@ trait RRRAction extends XFormsAction with RRRFunctions {
       val deferred      = resolve(XXFORMS_DEFERRED_QNAME)
       val applyDefaults = resolve(XXFORMS_DEFAULTS_QNAME)
 
-      RRRAction.execute(this, model, deferred, applyDefaults)
+      RRRAction.execute(this, model, context.collector, deferred, applyDefaults)
     }
   }
 }
 
 object RRRAction {
 
-  private def execute(functions: RRRFunctions, model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false): Unit = {
+  private def execute(
+    functions    : RRRFunctions,
+    model        : XFormsModel,
+    collector    : ErrorEventCollector,
+    deferred     : Boolean = false,
+    applyDefaults: Boolean = false,
+  ): Unit = {
     // Set the flag in any case
     functions.setFlag(model, applyDefaults)
 
@@ -80,15 +87,15 @@ object RRRAction {
     // NOTE: XForms 1.1 and 2.0 say that no event should be dispatched in this case. It's a bit unclear what the
     // purpose of these events is anyway.
     if (! deferred)
-      Dispatch.dispatchEvent(functions.createEvent(model))
+      Dispatch.dispatchEvent(functions.createEvent(model), collector)
   }
 
   private object ConcreteRebuildFunctions     extends XFormsRebuildFunctions
   private object ConcreteRecalculateFunctions extends XFormsRecalculateRevalidateFunctions
 
   def rebuild(model: XFormsModel, deferred: Boolean = false): Unit =
-    execute(ConcreteRebuildFunctions, model, deferred, applyDefaults = false)
+    execute(ConcreteRebuildFunctions, model, EventCollector.Throw, deferred, applyDefaults = false)
 
   def recalculate(model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false): Unit =
-    execute(ConcreteRecalculateFunctions, model, deferred, applyDefaults)
+    execute(ConcreteRecalculateFunctions, model, EventCollector.Throw, deferred, applyDefaults)
 }

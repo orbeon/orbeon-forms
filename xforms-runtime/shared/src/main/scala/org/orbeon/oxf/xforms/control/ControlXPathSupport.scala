@@ -14,16 +14,20 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.datatypes.LocationData
-
 import cats.syntax.option._
+
 import java.{util => ju}
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.{FunctionContext, XPathCache}
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.XFormsEventTarget
+import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.saxon.om
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xml.NamespaceMapping
 
 import scala.jdk.CollectionConverters._
@@ -37,8 +41,8 @@ trait ControlXPathSupport {
   def getNamespaceMappings: NamespaceMapping =
     if (staticControl ne null) staticControl.namespaceMapping else container.getNamespaceMappings(element)
 
-  def evaluateBooleanAvt(attributeValue: String): Boolean =
-    evaluateAvt(attributeValue) == "true"
+  def evaluateBooleanAvt(attributeValue: String, collector: ErrorEventCollector): Boolean =
+    evaluateAvt(attributeValue, collector) == "true"
 
   /**
    * Evaluate an attribute of the control as an AVT.
@@ -46,7 +50,7 @@ trait ControlXPathSupport {
    * @param attributeValue    value of the attribute
    * @return                  value of the AVT or null if cannot be computed
    */
-  def evaluateAvt(attributeValue: String): String = {
+  def evaluateAvt(attributeValue: String, collector: ErrorEventCollector): String = {
 
     assert(isRelevant)
 
@@ -55,19 +59,23 @@ trait ControlXPathSupport {
       bindingContext    = bindingContext,
       namespaceMappings = getNamespaceMappings,
       container         = container,
-      locationData      = getLocationData
+      locationData      = getLocationData,
+      eventTarget       = this,
+      collector         = collector
     )(newFunctionContext).orNull
   }
 
   // Evaluate an XPath expression as a string in the context of this control.
-  // 5 usages
+  // 6 usages
   def evaluateAsString(
     xpathString        : String,
     contextItems       : Seq[om.Item],
     contextPosition    : Int,
+    collector          : ErrorEventCollector,
+    contextMessage     : String,
     namespaceMapping   : NamespaceMapping                        = getNamespaceMappings,
     variableToValueMap : ju.Map[String, ValueRepresentationType] = bindingContext.getInScopeVariables,
-    functionContext    : FunctionContext                         = newFunctionContext
+    functionContext    : FunctionContext                         = newFunctionContext,
   ): Option[String] = {
 
     assert(isRelevant)
@@ -93,7 +101,15 @@ trait ControlXPathSupport {
         )
       catch {
         case NonFatal(t) =>
-          XFormsError.handleNonFatalXPathError(container, t, Some(xpathString))
+          collector(
+            new XXFormsXPathErrorEvent(
+              target         = this,
+              expression     = xpathString,
+              contextMessage = contextMessage,
+              message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+              throwable      = t
+            )
+          )
           None
       }
     }
@@ -111,7 +127,9 @@ object ControlXPathSupport {
     bindingContext   : BindingContext,
     namespaceMappings: NamespaceMapping,
     container        : XBLContainer, // used for `PartAnalysis` and `XFCD`
-    locationData     : LocationData
+    locationData     : LocationData,
+    eventTarget      : XFormsEventTarget,
+    collector        : ErrorEventCollector,
   )(implicit xfc: XFormsFunction.Context): Option[String] = {
 
     if (! XMLUtils.maybeAVT(attributeValue))
@@ -140,7 +158,15 @@ object ControlXPathSupport {
           ).some
         catch {
           case NonFatal(t) =>
-            XFormsError.handleNonFatalXPathError(container, t, Some(attributeValue))
+            collector(
+              new XXFormsXPathErrorEvent(
+                target         = eventTarget,
+                expression     = attributeValue,
+                contextMessage = "evaluating AVT",
+                message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                throwable      = t
+              )
+            )
             None
         }
       }

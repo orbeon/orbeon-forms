@@ -15,15 +15,16 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xforms.analysis.model.{ModelDefs, StaticBind}
 import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_ITERATION_MOVED
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.saxon.om.{Item, NodeInfo}
@@ -101,8 +102,13 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     setDefaultMIPs()
   }
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
-    super.onCreate(restoreState, state, update)
+  override def onCreate(
+    restoreState: Boolean,
+    state       : Option[ControlState],
+    update      : Boolean,
+    collector   : ErrorEventCollector
+  ): Unit = {
+    super.onCreate(restoreState, state, update, collector)
 
     readBinding()
 
@@ -111,8 +117,12 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     _wasValid = true
   }
 
-  override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
-    super.onBindingUpdate(oldBinding, newBinding)
+  override def onBindingUpdate(
+    oldBinding: BindingContext,
+    newBinding: BindingContext,
+    collector : ErrorEventCollector
+  ): Unit = {
+    super.onBindingUpdate(oldBinding, newBinding, collector)
     readBinding()
   }
 
@@ -284,10 +294,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
   // NOTE: We don't compare the type here because only some controls (xf:input) need to tell the client
   // about value type changes.
-  override def compareExternalUseExternalValue(
-    previousExternalValue : Option[String],
-    previousControlOpt    : Option[XFormsControl]
-  ): Boolean =
+  override def compareExternalUseExternalValue(previousExternalValue: Option[String], previousControlOpt: Option[XFormsControl], collector: ErrorEventCollector): Boolean =
     previousControlOpt match {
       case Some(other: XFormsSingleNodeControl) =>
         isReadonly == other.isReadonly &&
@@ -295,7 +302,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         isValid    == other.isValid    &&
         alertLevel == other.alertLevel &&
         customMIPs == other.customMIPs &&
-        super.compareExternalUseExternalValue(previousExternalValue, previousControlOpt)
+        super.compareExternalUseExternalValue(previousExternalValue, previousControlOpt, collector)
       case _ => false
     }
 
@@ -308,14 +315,16 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
   override def outputAjaxDiff(
     previousControlOpt    : Option[XFormsControl],
-    content               : Option[XMLReceiverHelper => Unit])(implicit
+    content               : Option[XMLReceiverHelper => Unit],
+    collector             : ErrorEventCollector
+  )(implicit
     ch                    : XMLReceiverHelper
   ): Unit = {
 
     val atts = new AttributesImpl
 
     // Add attributes
-    val doOutputElement = addAjaxAttributes(atts, previousControlOpt)
+    val doOutputElement = addAjaxAttributes(atts, previousControlOpt, collector)
 
     if (doOutputElement || content.isDefined) {
       ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "control", atts)
@@ -326,12 +335,12 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     addExtensionAttributesExceptClassAndAcceptForAjax(previousControlOpt, "")
   }
 
-  override def addAjaxAttributes(attributesImpl: AttributesImpl, previousControl: Option[XFormsControl]) = {
+  override def addAjaxAttributes(attributesImpl: AttributesImpl, previousControl: Option[XFormsControl], collector: ErrorEventCollector): Boolean = {
 
     val control1Opt = previousControl.asInstanceOf[Option[XFormsSingleNodeControl]]
     val control2    = this
 
-    var added = super.addAjaxAttributes(attributesImpl, previousControl)
+    var added = super.addAjaxAttributes(attributesImpl, previousControl, collector)
 
     added |= addAjaxMIPs(attributesImpl, control1Opt, control2)
 
@@ -387,27 +396,27 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 //  }
 
   // Dispatch creation events
-  override def dispatchCreationEvents(): Unit = {
-    super.dispatchCreationEvents()
+  override def dispatchCreationEvents(collector: ErrorEventCollector): Unit = {
+    super.dispatchCreationEvents(collector)
 
     // MIP events
     if (isRequired)
-      Dispatch.dispatchEvent(new XFormsRequiredEvent(this))
+      Dispatch.dispatchEvent(new XFormsRequiredEvent(this), collector)
 
     if (isReadonly)
-      Dispatch.dispatchEvent(new XFormsReadonlyEvent(this))
+      Dispatch.dispatchEvent(new XFormsReadonlyEvent(this), collector)
 
     if (! isValid)
-      Dispatch.dispatchEvent(new XFormsInvalidEvent(this))
+      Dispatch.dispatchEvent(new XFormsInvalidEvent(this), collector)
   }
 
   // NOTE: For the purpose of dispatching value change and MIP events, we used to make a
   // distinction between value controls and plain single-node controls. However it seems that it is
   // still reasonable to dispatch those events to xf:group, xf:switch, and even repeat
   // iterations if they are bound.
-  override def dispatchChangeEvents(): Unit = {
+  override def dispatchChangeEvents(collector: ErrorEventCollector): Unit = {
 
-    super.dispatchChangeEvents()
+    super.dispatchChangeEvents(collector)
 
     // Gather changes
     // 2013-06-20: This is a change from what we were doing before, but it makes things clearer. Later we might
@@ -430,24 +439,24 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     // Value change
     if (isRelevant && valueChanged)
-      Dispatch.dispatchEvent(new XFormsValueChangedEvent(this))
+      Dispatch.dispatchEvent(new XFormsValueChangedEvent(this), collector)
 
     // Iteration change
     if (isRelevant && iterationMoved)
-      Dispatch.dispatchEvent(new XXFormsIterationMovedEvent(this)) // NOTE: should have context info
+      Dispatch.dispatchEvent(new XXFormsIterationMovedEvent(this), collector) // NOTE: should have context info
 
     // MIP change
     if (isRelevant && validityChanged)
-      Dispatch.dispatchEvent(if (isValid) new XFormsValidEvent(this) else new XFormsInvalidEvent(this))
+      Dispatch.dispatchEvent(if (isValid) new XFormsValidEvent(this) else new XFormsInvalidEvent(this), collector)
 
     if (isRelevant && requiredChanged)
-      Dispatch.dispatchEvent(if (isRequired) new XFormsRequiredEvent(this) else new XFormsOptionalEvent(this))
+      Dispatch.dispatchEvent(if (isRequired) new XFormsRequiredEvent(this) else new XFormsOptionalEvent(this), collector)
 
     if (isRelevant && readonlyChanged)
-      Dispatch.dispatchEvent(if (isReadonly) new XFormsReadonlyEvent(this) else new XFormsReadwriteEvent(this))
+      Dispatch.dispatchEvent(if (isReadonly) new XFormsReadonlyEvent(this) else new XFormsReadwriteEvent(this), collector)
 
     if (isRelevant && validationsChanged)
-      Dispatch.dispatchEvent(new XXFormsConstraintsChangedEvent(this, alertLevel, previousValidations, failedValidations))
+      Dispatch.dispatchEvent(new XXFormsConstraintsChangedEvent(this, alertLevel, previousValidations, failedValidations), collector)
   }
 }
 

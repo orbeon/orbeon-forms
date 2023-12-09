@@ -22,6 +22,8 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PartAnalysis, PathMapXPathDependencies, XPathDependencies}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
+import org.orbeon.oxf.xforms.event.EventCollector
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.state.InstancesControls
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager
@@ -142,7 +144,16 @@ class XFormsContainingDocument(
       }
 
       processDueDelayedEvents(submissionIdOpt = None)
+      processEagerEvaluationsIfNeeded()
     }
+
+  private def processEagerEvaluationsIfNeeded(): Unit =
+    if (staticState.allowErrorRecoveryOnInit)
+      withOutermostActionHandler {
+        EventCollector.withBufferCollector { collector =>
+          controls.eagerlyEvaluateProperties(collector)
+        }
+      }
 
   def restoreDynamicState(
     sequence           : Long,
@@ -177,7 +188,7 @@ class XFormsContainingDocument(
 
         // Restore controls state
         // Store serialized control state for retrieval later
-        controls.createControlTree(Controls.restoringControls)
+        controls.createControlTree(Controls.restoringControls, EventCollector.ToReview)
 
         // Once the control tree is rebuilt, restore focus if needed
         focusedControl foreach { focusedControl =>
@@ -251,6 +262,7 @@ class XFormsContainingDocument(
     if (submissionIdOpt.isEmpty) {
       processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, beforeResponse = true)
       processDueDelayedEvents(submissionIdOpt = None)
+      processEagerEvaluationsIfNeeded()
     }
 
     this._responseForReplaceAll = None
@@ -294,7 +306,7 @@ class XFormsContainingDocument(
         }
       }
 
-  override def initializeNestedControls(): Unit = {
+  override def initializeNestedControls(collector: ErrorEventCollector): Unit = {
     // Call-back from super class models initialization
 
     // This is important because if controls use binds, those must be up to date. In addition, MIP values will be up
@@ -303,7 +315,7 @@ class XFormsContainingDocument(
     rebuildRecalculateRevalidateIfNeeded()
 
     // Initialize controls
-    controls.createControlTree(None)
+    controls.createControlTree(None, collector)
   }
 
   override def getChildrenControls(controls: XFormsControls): Seq[XFormsControl] =

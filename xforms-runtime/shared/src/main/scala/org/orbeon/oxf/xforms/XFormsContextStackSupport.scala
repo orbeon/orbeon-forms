@@ -19,11 +19,15 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.WithExpressionOrConstantTrait
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.XFormsEventTarget
+import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
+import org.orbeon.saxon.om
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
-import org.orbeon.saxon.om
-import org.orbeon.xforms.XFormsId
+
+import scala.util.control.NonFatal
 
 
 object XFormsContextStackSupport {
@@ -37,7 +41,8 @@ object XFormsContextStackSupport {
     bindingElementNamespaceMapping : NamespaceMapping,
     sourceEffectiveId              : String,
     scope                          : Scope,
-    handleNonFatal                 : Boolean
+    eventTarget                    : XFormsEventTarget,
+    collector                      : ErrorEventCollector
   )(body: => T)(implicit xformsContextStack: XFormsContextStack): T = {
     xformsContextStack.pushBinding(
       ref.orNull,
@@ -49,7 +54,8 @@ object XFormsContextStackSupport {
       bindingElementNamespaceMapping,
       sourceEffectiveId,
       scope,
-      handleNonFatal
+      eventTarget,
+      collector
     )
     body |!> (_ => xformsContextStack.popBinding())
   }
@@ -57,9 +63,11 @@ object XFormsContextStackSupport {
   def withBinding[T](
     bindingElement    : Element,
     sourceEffectiveId : String,
-    scope             : Scope
+    scope             : Scope,
+    eventTarget       : XFormsEventTarget,
+    collector         : ErrorEventCollector
   )(body: BindingContext => T)(implicit contextStack: XFormsContextStack): T = {
-    contextStack.pushBinding(bindingElement, sourceEffectiveId, scope)
+    contextStack.pushBinding(bindingElement, sourceEffectiveId, scope, eventTarget, collector)
     body(contextStack.getCurrentBindingContext) |!>
       (_ => contextStack.popBinding())
   }
@@ -70,41 +78,22 @@ object XFormsContextStackSupport {
       (_ => contextStack.popBinding())
   }
 
-  def withContextAndModelOnly[T](
-    bindingElem       : ElementAnalysis,
-    parentEffectiveId : String
-  )(body: BindingContext => T)(implicit contextStack: XFormsContextStack): T = {
-
-    contextStack.pushBinding(
-      ref                            = null,
-      context                        = bindingElem.context.orNull,
-      nodeset                        = null,
-      modelId                        = bindingElem.model.map(_.staticId).orNull,
-      bindId                         = null,
-      bindingElement                 = bindingElem.element,
-      bindingElementNamespaceMapping = bindingElem.namespaceMapping,
-      sourceEffectiveId              = getElementEffectiveId(parentEffectiveId, bindingElem),
-      scope                          = bindingElem.scope,
-      handleNonFatal                 = true
-    )
-
-    body(contextStack.getCurrentBindingContext) |!>
-      (_ => contextStack.popBinding())
-  }
-
   def getElementEffectiveId(parentEffectiveId: String, elem: ElementAnalysis): String =
     XFormsId.buildEffectiveId(elem.prefixedId, XFormsId.getEffectiveIdSuffixParts(parentEffectiveId))
 
   def evaluateExpressionOrConstant(
     childElem           : WithExpressionOrConstantTrait,
     parentEffectiveId   : String,
-    pushContextAndModel : Boolean)(implicit
+    pushContextAndModel : Boolean,
+    eventTarget         : XFormsEventTarget,
+    collector           : ErrorEventCollector
+  )(implicit
     contextStack        : XFormsContextStack
   ): Option[String] =
     childElem.expressionOrConstant match {
       case Left(expr)   =>
 
-        def evaluate(currentBindingContext: BindingContext) =
+        def evaluate(currentBindingContext: BindingContext): Option[String] =
           Option(
             XPathCache.evaluateSingle(
               contextItems       = currentBindingContext.nodeset,
@@ -120,11 +109,50 @@ object XFormsContextStackSupport {
             )
           ).map(_.toString)
 
-        if (pushContextAndModel)
-          withContextAndModelOnly(childElem, parentEffectiveId)(evaluate)
-        else
-          evaluate(contextStack.getCurrentBindingContext)
+        try {
+          if (pushContextAndModel)
+            withContextAndModelOnly(childElem, parentEffectiveId, eventTarget, collector)(evaluate)
+          else
+            evaluate(contextStack.getCurrentBindingContext)
+        } catch {
+          case NonFatal(t) =>
+            collector(
+              new XXFormsXPathErrorEvent(
+                target         = eventTarget,
+                expression     = expr,
+                contextMessage = "evaluating expression",
+                message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                throwable      = t
+              )
+            )
+            None
+        }
       case Right(constant) =>
         constant.some
     }
+
+  private def withContextAndModelOnly[T](
+    bindingElem       : ElementAnalysis,
+    parentEffectiveId : String,
+    eventTarget       : XFormsEventTarget,
+    collector         : ErrorEventCollector
+  )(body: BindingContext => T)(implicit contextStack: XFormsContextStack): T = {
+
+    contextStack.pushBinding(
+      ref                            = null,
+      context                        = bindingElem.context.orNull,
+      nodeset                        = null,
+      modelId                        = bindingElem.model.map(_.staticId).orNull,
+      bindId                         = null,
+      bindingElement                 = bindingElem.element,
+      bindingElementNamespaceMapping = bindingElem.namespaceMapping,
+      sourceEffectiveId              = getElementEffectiveId(parentEffectiveId, bindingElem),
+      scope                          = bindingElem.scope,
+      eventTarget                    = eventTarget,
+      collector                      = collector
+    )
+
+    body(contextStack.getCurrentBindingContext) |!>
+      (_ => contextStack.popBinding())
+  }
 }

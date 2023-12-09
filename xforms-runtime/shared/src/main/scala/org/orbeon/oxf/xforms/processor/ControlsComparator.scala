@@ -17,10 +17,11 @@ import cats.syntax.option._
 import org.orbeon.oxf.rewrite.Rewrite
 import org.orbeon.oxf.util.ContentHandlerWriter
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.processor.handlers._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Constants.RepeatSeparator
 import org.orbeon.xforms.XFormsNames._
@@ -45,8 +46,10 @@ class ControlsComparator(
   def diffChildren(
     left             : Iterable[XFormsControl],
     right            : Iterable[XFormsControl],
-    fullUpdateBuffer : Option[SAXStore])(implicit
-    receiver         : XMLReceiver
+    fullUpdateBuffer : Option[SAXStore]
+  )(implicit
+    receiver         : XMLReceiver,
+    collector        : ErrorEventCollector
   ): Unit = {
 
     if (right.nonEmpty) {
@@ -59,7 +62,7 @@ class ControlsComparator(
       } locally {
 
         // 1: Diffs for current control
-        outputSingleControlDiffIfNeeded(control1Opt, control2)
+        outputSingleControlDiffIfNeeded(control1Opt, control2, collector)
 
         if (fullUpdateBuffer exists (_.getAttributesCount >= FullUpdateThreshold))
           break()
@@ -122,7 +125,7 @@ class ControlsComparator(
               tryBreakable {
                 // Output to buffer
                 val buffer = new SAXStore
-                outputDescendantControlsDiffs(control1Opt, c, Some(buffer))(buffer)
+                outputDescendantControlsDiffs(control1Opt, c, Some(buffer))(buffer, collector)
                 // Incremental updates did not trigger full updates, replay the output
                 buffer.replay(receiver)
               } catchBreak {
@@ -177,11 +180,12 @@ class ControlsComparator(
 
           val mustOutputValueChange =
             vcc2.mustOutputAjaxValueChange(
-              previousValue   = valueChangeControlIdsAndValues.get(vcc2.effectiveId) orElse Some(vcc1.getExternalValue()),
-              previousControl = Some(vcc1)
+              previousValue   = valueChangeControlIdsAndValues.get(vcc2.effectiveId) orElse Some(vcc1.getExternalValue(collector)),
+              previousControl = Some(vcc1),
+              collector       = collector
             )
 
-          mustOutputValueChange option vcc2.getEscapedExternalValue
+          mustOutputValueChange option vcc2.getEscapedExternalValue(collector)
         }
 
         // Tell the client to make lifecycle changes after the nested markup is handled
@@ -204,7 +208,7 @@ class ControlsComparator(
                         vcc2 <- cc2.narrowTo[XFormsValueComponentControl]
                         if vcc2.staticControl.commonBinding.modeExternalValue
                       } yield
-                        vcc2.getEscapedExternalValue
+                        vcc2.getEscapedExternalValue(collector)
                   )
                 }
               case Some(cc1) =>
@@ -258,7 +262,9 @@ class ControlsComparator(
   // Q: Do we need a distinction between new iteration AND control just becoming relevant?
   private def outputSingleControlDiffIfNeeded(
     control1Opt : Option[XFormsControl],
-    control2    : XFormsControl)(implicit
+    control2    : XFormsControl,
+    collector   : ErrorEventCollector
+  )(implicit
     receiver    : XMLReceiver
   ): Unit =
     if (control2.supportAjaxUpdates)
@@ -267,16 +273,19 @@ class ControlsComparator(
           // See https://github.com/orbeon/orbeon-forms/issues/2442
           val clientValueOpt   = valueChangeControlIdsAndValues.get(c.effectiveId)
           val valueControl1Opt = control1Opt.asInstanceOf[Option[XFormsValueControl]]
-          if (! c.compareExternalMaybeClientValue(clientValueOpt, valueControl1Opt))
+          if (! c.compareExternalMaybeClientValue(clientValueOpt, valueControl1Opt, collector))
             c.outputAjaxDiffMaybeClientValue(
               clientValueOpt,
-              valueControl1Opt
+              valueControl1Opt,
+              collector
             )
         case c =>
-          if (! c.compareExternalMaybeClientValue(None, control1Opt))
+          if (! c.compareExternalMaybeClientValue(None, control1Opt, collector))
             c.outputAjaxDiff(
               previousControlOpt = control1Opt,
-              content            = None)(
+              content            = None,
+              collector
+            )(
               ch                 = new XMLReceiverHelper(receiver)
             )
       }
@@ -290,8 +299,10 @@ class ControlsComparator(
   private def outputDescendantControlsDiffs(
     control1Opt      : Option[XFormsControl],
     control2         : XFormsControl,
-    fullUpdateBuffer : Option[SAXStore])(implicit
-    receiver         : XMLReceiver
+    fullUpdateBuffer : Option[SAXStore],
+  )(implicit
+    receiver         : XMLReceiver,
+    collector        : ErrorEventCollector
   ): Unit = {
 
     control2 match {
@@ -351,8 +362,10 @@ class ControlsComparator(
   private def processFullUpdateForContent(
     control           : XFormsControl,
     previousControlOpt: Option[XFormsControl],
-    replay            : XMLReceiver => Unit)(implicit
-    receiver          : XMLReceiver
+    replay            : XMLReceiver => Unit
+  )(implicit
+    receiver          : XMLReceiver,
+    collector         : ErrorEventCollector
   ): Unit = {
 
     val repeatIterationControlOpt = control.narrowTo[XFormsRepeatIterationControl]
@@ -399,7 +412,7 @@ class ControlsComparator(
         )
 
       // We know we serialize to plain HTML so unlike during initial page show, we don't need a particular prefix
-      val handlerContext = new HandlerContext(ehc, document, externalContext, control.effectiveId.some) {
+      val handlerContext = new HandlerContext(ehc, document, externalContext, control.effectiveId.some, collector) {
         override def findXHTMLPrefix = ""
       }
 

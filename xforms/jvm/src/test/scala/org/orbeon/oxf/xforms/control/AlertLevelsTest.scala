@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.junit.Test
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionSupport
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.xforms.RelevanceHandling
@@ -36,47 +37,47 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
 
       // number-control
       assert(Some(ValidationLevel.ErrorLevel) === numberControl.alertLevel)
-      assert(DefaultAlertMessage === numberControl.getAlert)
+      assert(DefaultAlertMessage === numberControl.getAlert(EventCollector.Throw))
 
       setControlValue(NumberControlId, "a")
       assert(Some(ValidationLevel.ErrorLevel) === numberControl.alertLevel)
-      assert(DefaultAlertMessage === numberControl.getAlert)
+      assert(DefaultAlertMessage === numberControl.getAlert(EventCollector.Throw))
 
       setControlValue(NumberControlId, "10")
       assert(Some(ValidationLevel.ErrorLevel) === numberControl.alertLevel)
-      assert("Must be 50 or more" === numberControl.getAlert)
+      assert("Must be 50 or more" === numberControl.getAlert(EventCollector.Throw))
 
       setControlValue(NumberControlId, "50")
       assert(Some(ValidationLevel.WarningLevel) === numberControl.alertLevel)
-      assert("Should be 100 or more" === numberControl.getAlert)
+      assert("Should be 100 or more" === numberControl.getAlert(EventCollector.Throw))
 
       setControlValue(NumberControlId, "1000")
       assert(None === numberControl.alertLevel)
-      assert(null eq numberControl.getAlert)
+      assert(null eq numberControl.getAlert(EventCollector.Throw))
 
       setControlValue(NumberControlId, "1001")
       assert(Some(ValidationLevel.InfoLevel) === numberControl.alertLevel)
-      assert("Nice, greater than 1000!" == numberControl.getAlert)
+      assert("Nice, greater than 1000!" == numberControl.getAlert(EventCollector.Throw))
 
       // text-control
       assert(None === textControl.alertLevel)
-      assert(null eq textControl.getAlert)
+      assert(null eq textControl.getAlert(EventCollector.Throw))
 
       setControlValue(TextControlId, "This is…")
       assert(None === textControl.alertLevel)
-      assert(null eq textControl.getAlert)
+      assert(null eq textControl.getAlert(EventCollector.Throw))
 
       setControlValue(TextControlId, "This is a little bit too long!")
       assert(Some(ValidationLevel.WarningLevel) === textControl.alertLevel)
-      assert("Should be shorter than 10 characters" === textControl.getAlert)
+      assert("Should be shorter than 10 characters" === textControl.getAlert(EventCollector.Throw))
 
       setControlValue(TextControlId, "this!")
       assert(Some(ValidationLevel.WarningLevel) === textControl.alertLevel)
-      assert("Should not start with a lowercase letter" === textControl.getAlert)
+      assert("Should not start with a lowercase letter" === textControl.getAlert(EventCollector.Throw))
 
       setControlValue(TextControlId, "this is a little bit too long and starts with a lowercase letter!")
       assert(Some(ValidationLevel.WarningLevel) === textControl.alertLevel)
-      assert("<ul><li>Should be shorter than 10 characters</li><li>Should not start with a lowercase letter</li></ul>" === textControl.getAlert)
+      assert("<ul><li>Should be shorter than 10 characters</li><li>Should not start with a lowercase letter</li></ul>" === textControl.getAlert(EventCollector.Throw))
     }
 
   @Test def annotate(): Unit =

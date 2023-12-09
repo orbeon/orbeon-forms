@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xml.SaxonUtils
@@ -34,7 +35,7 @@ class XXFormsItemset extends XFormsFunction {
         control        <- relevantControl(0)
         valueControl   <- control.narrowTo[XFormsValueControl]
         select1Control <- ItemsetSupport.findSelectionControl(valueControl)
-        itemset        = select1Control.getItemset
+        itemset        = select1Control.getItemset(EventCollector.Throw)
       } yield {
 
         val format   = stringArgument(1)
@@ -42,9 +43,10 @@ class XXFormsItemset extends XFormsFunction {
 
         val controlValueForSelection =
           if (selected)
-            select1Control.boundItemOpt map select1Control.getCurrentItemValueFromData map { v =>
-              (v, SaxonUtils.attCompare(select1Control.boundNodeOpt, _))
-            }
+            select1Control
+              .boundItemOpt
+              .map(select1Control.getCurrentItemValueFromData(_, EventCollector.Throw))
+              .map { v => (v, SaxonUtils.attCompare(select1Control.boundNodeOpt, _)) }
           else
             None
 

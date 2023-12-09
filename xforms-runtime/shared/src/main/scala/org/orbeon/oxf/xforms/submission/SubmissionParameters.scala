@@ -8,9 +8,9 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, TunnelProperties}
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
+import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEvent}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions.DomElemOps
@@ -386,10 +386,17 @@ object SubmissionParameters {
     val containingDocument = dynamicSubmission.containingDocument
 
     val model = dynamicSubmission.model
-    model.resetAndEvaluateVariables()
+    model.resetAndEvaluateVariables(EventCollector.Throw)
 
+    // TODO: don't update `XFormsContextStack`
     val contextStack = model.getContextStack
-    contextStack.pushBinding(staticSubmission.element, dynamicSubmission.getEffectiveId, model.getResolutionScope)
+    contextStack.pushBinding(
+      staticSubmission.element,
+      dynamicSubmission.getEffectiveId,
+      model.getResolutionScope,
+      dynamicSubmission,
+      EventCollector.Throw
+    )
 
     val bindingContext = contextStack.getCurrentBindingContext
 

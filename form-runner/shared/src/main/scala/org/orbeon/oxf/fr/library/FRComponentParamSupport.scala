@@ -1,21 +1,20 @@
 package org.orbeon.oxf.fr.library
 
 import cats.syntax.option._
-import org.orbeon.scaxon.SimplePath._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.saxon.om
-import org.orbeon.saxon.value._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.{AppForm, FormRunnerParams, Names, XMLNames}
-import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
-import org.orbeon.oxf.xforms.function.xxforms.ComponentParamSupport
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisForStaticMetadataAndProperties, model}
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.{ControlXPathSupport, XFormsComponentControl, XFormsControl}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.xxforms.ComponentParamSupport
+import org.orbeon.saxon.om
+import org.orbeon.saxon.value._
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
@@ -53,7 +52,7 @@ object FRComponentParamSupport {
         )
 
       fromAttributes orElse fromMetadataAndProperties map {
-        case paramValue: StringValue => stringToStringValue(sourceComponent.evaluateAvt(paramValue.getStringValue))
+        case paramValue: StringValue => stringToStringValue(sourceComponent.evaluateAvt(paramValue.getStringValue, EventCollector.Throw))
         case paramValue              => paramValue
       }
     }
@@ -80,7 +79,9 @@ object FRComponentParamSupport {
           bindingContext    = xfc.bindingContext,
           namespaceMappings = xfc.namespaceMapping,
           container         = xfc.container,
-          locationData      = xfc.bindingContext.locationData
+          locationData      = xfc.bindingContext.locationData,
+          eventTarget       = xfc.container.eventTarget,
+          collector         = EventCollector.Throw
         ).map(stringToStringValue)
       case paramValue =>
         paramValue.some

@@ -17,13 +17,13 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsValueChangedEvent}
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
-import org.orbeon.saxon.om._
-import org.orbeon.scaxon.SimplePath._
-import org.w3c.dom.Node._
-import StaticDataModel._
+import org.orbeon.oxf.xforms.model.StaticDataModel._
 import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.saxon.om._
+import org.w3c.dom.Node._
 
 
 /**
@@ -62,8 +62,8 @@ object DataModel {
   def setValue(
     nodeInfo  : NodeInfo,
     newValue  : String,
-    onSuccess : () => Unit     = () => (),
-    onError   : Reason => Unit = _ => ()
+    onSuccess : ()         => Unit = () => (),
+    onError   : NodeReason => Unit = _  => ()
   ): Boolean = {
 
     assert(nodeInfo ne null)
@@ -88,8 +88,8 @@ object DataModel {
   def setValueIfChanged(
     nodeInfo  : NodeInfo,
     newValue  : String,
-    onSuccess : String => Unit = _ => (),
-    onError   : Reason => Unit = _ => ()
+    onSuccess : String     => Unit = _ => (),
+    onError   : NodeReason => Unit = _ => ()
   ): Boolean = {
 
     assert(nodeInfo ne null)
@@ -117,7 +117,8 @@ object DataModel {
     valueToSet         : String,
     source             : String,
     isCalculate        : Boolean,
-    collector          : XFormsEvent => Unit = Dispatch.dispatchEvent)(implicit
+    collector          : ErrorEventCollector
+  )(implicit
     containingDocument : XFormsContainingDocument,
     logger             : IndentedLogger
   ): Boolean = {
@@ -129,7 +130,7 @@ object DataModel {
       nodeInfo  = nodeInfo,
       newValue  = valueToSet,
       onSuccess = logAndNotifyValueChange(source, nodeInfo, _, valueToSet, isCalculate, collector),
-      onError   = reason => collector(new XXFormsBindingErrorEvent(eventTarget, locationData, reason))
+      onError   = reason => collector(new XXFormsBindingErrorEvent(eventTarget, Option(locationData), reason))
     )
   }
 
@@ -140,7 +141,7 @@ object DataModel {
     oldValue           : String,
     newValue           : String,
     isCalculate        : Boolean,
-    collector          : XFormsEvent => Unit)(implicit
+    collector          : ErrorEventCollector)(implicit
     containingDocument : XFormsContainingDocument,
     logger             : IndentedLogger
   ): Unit = {
@@ -169,7 +170,7 @@ object DataModel {
     oldValue           : String,
     newValue           : String,
     isCalculate        : Boolean,
-    collector          : XFormsEvent => Unit
+    collector          : ErrorEventCollector
   ): Unit =
     containingDocument.instanceForNodeOpt(nodeInfo) match {
       case Some(modifiedInstance) =>

@@ -14,8 +14,10 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.BindingContext
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.saxon.om
+
 import scala.jdk.CollectionConverters._
 
 trait ControlBindingSupport {
@@ -64,24 +66,26 @@ trait ControlBindingSupport {
     parentContext : BindingContext,
     update        : Boolean,
     restoreState  : Boolean,
-    state         : Option[ControlState]
+    state         : Option[ControlState],
+    collector     : ErrorEventCollector
   ): Unit = {
     // Evaluate and set binding context as needed
     val pr = parentContentRelevant
     setBindingContext(
       if (pr)
-        computeBinding(parentContext)
+        computeBinding(parentContext, collector)
       else
         BindingContext.empty(element, staticControl.scope),
       pr,
       update,
       restoreState,
-      state
+      state,
+      collector
     )
   }
 
   // Refresh the control's binding during update, in case a re-evaluation is not needed
-  final def refreshBindingAndValues(parentContext: BindingContext): Unit = {
+  final def refreshBindingAndValues(parentContext: BindingContext, collector: ErrorEventCollector): Unit = {
     // Make sure the parent is updated, as ancestor bindings might have changed, and it is important to
     // ensure that the chain of bindings is consistent
     setBindingContext(
@@ -89,15 +93,16 @@ trait ControlBindingSupport {
       parentRelevant = parentContentRelevant,
       update         = true,
       restoreState   = false,
-      state          = None
+      state          = None,
+      collector      = collector
     )
   }
 
   // Default binding evaluation
-  protected def computeBinding(parentContext: BindingContext): BindingContext = {
+  protected def computeBinding(parentContext: BindingContext, collector: ErrorEventCollector): BindingContext = {
     val contextStack = container.getContextStack
     contextStack.setBinding(parentContext)
-    contextStack.pushBinding(element, effectiveId, staticControl.scope)
+    contextStack.pushBinding(element, effectiveId, staticControl.scope, this, collector) // xxx event won't reach non-relevant control
     contextStack.getCurrentBindingContext
   }
 
@@ -108,19 +113,20 @@ trait ControlBindingSupport {
   }
 
   // Return the bindings in effect within and after this control
-  def bindingContextForChildOpt  : Option[BindingContext] = Option(_bindingContext)
+  def bindingContextForChildOpt(collector: ErrorEventCollector): Option[BindingContext] = Option(_bindingContext)
   def bindingContextForFollowing : BindingContext         = _bindingContext.parent
 
-  final def bindingContextForChildOrEmpty: BindingContext =
-    bindingContextForChildOpt getOrElse (throw new IllegalStateException)
+  final def bindingContextForChildOrEmpty(collector: ErrorEventCollector): BindingContext =
+    bindingContextForChildOpt(collector) getOrElse (throw new IllegalStateException)
 
   // Set this control's binding context and handle create/destroy/update lifecycle
-  final def setBindingContext(
+  private def setBindingContext(
     bindingContext : BindingContext,
     parentRelevant : Boolean,
     update         : Boolean,
     restoreState   : Boolean,
-    state          : Option[ControlState]
+    state          : Option[ControlState],
+    collector      : ErrorEventCollector
   ): Unit = {
     val oldBinding = this._bindingContext
     this._bindingContext = bindingContext
@@ -132,36 +138,36 @@ trait ControlBindingSupport {
     if (! oldRelevant && newRelevant) {
       // Control becomes relevant
       this._isRelevant = true
-      onCreate(restoreState, state, update)
+      onCreate(restoreState, state, update, collector)
       if (update)
         markDirtyImpl()
-      evaluate()
+      evaluate(collector)
     } else if (oldRelevant && ! newRelevant) {
       // Control becomes non-relevant
       onDestroy(update)
       this._isRelevant = false
-      evaluateNonRelevant(parentRelevant)
+      evaluateNonRelevant(parentRelevant, collector)
     } else if (newRelevant) {
       // Control remains relevant
-      onBindingUpdate(oldBinding, bindingContext)
+      onBindingUpdate(oldBinding, bindingContext, collector)
       if (update)
         markDirtyImpl()
-      evaluate()
+      evaluate(collector)
     } else if (! update) {
       // Control is created non-relevant
-      evaluateNonRelevant(parentRelevant)
+      evaluateNonRelevant(parentRelevant, collector)
     }
   }
 
   // Control lifecycle
-  def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
+  def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean, collector: ErrorEventCollector): Unit = {
     _wasRelevant = false
     _wasContentRelevant = false
   }
 
   def onDestroy(update: Boolean): Unit = ()
 
-  def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = ()
+  def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext, collector: ErrorEventCollector): Unit = ()
 
   // Compute relevance in addition to the parentRelevant logic
   // For subclasses to call super.computeRelevant()

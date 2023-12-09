@@ -23,6 +23,7 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
@@ -240,6 +241,7 @@ object InstanceReplacer extends Replacer {
 
                     instanceToUpdate.replace(
                       newDocumentInfo = newDocumentInfo,
+                      collector       = EventCollector.Throw,
                       dispatch        = true,
                       instanceCaching = value.toOption.map(_._2),
                       isReadonly      = submissionParameters.isReadonly,
@@ -265,14 +267,16 @@ object InstanceReplacer extends Replacer {
                       requireDefaultValues              = applyDefaults,
                       searchForInstance                 = true,
                       removeInstanceDataFromClonedNodes = true,
-                      structuralDependencies            = true
+                      structuralDependencies            = true,
+                      collector                         = EventCollector.Throw
                     )
 
                     // Perform the deletion of the selected node
                     XFormsDeleteAction.doDeleteOne(
                       containingDocument = submission.containingDocument,
                       nodeInfo           = destinationNodeInfo,
-                      doDispatch         = true
+                      doDispatch         = true,
+                      collector          = EventCollector.Throw
                     )
                   }
                   ReplaceResult.SendDone(cxr, submissionParameters.tunnelProperties)

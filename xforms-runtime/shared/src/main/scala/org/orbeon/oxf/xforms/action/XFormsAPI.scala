@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents.{XFORMS_SUBMIT_DONE, XFORMS_SUBMIT_ERROR}
 import org.orbeon.oxf.xforms.event.events.{XFormsSubmitDoneEvent, XFormsSubmitErrorEvent, XFormsSubmitEvent}
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.saxon.om
@@ -83,7 +83,7 @@ object XFormsAPI {
             oldValue           = oldValue,
             newValue           = value,
             isCalculate        = false,
-            collector          = Dispatch.dispatchEvent)(
+            collector          = (event: XFormsEvent) => Dispatch.dispatchEvent(event, EventCollector.Throw))(
             containingDocument = doc,
             logger             = indentedLoggerOpt.orNull
           )
@@ -101,7 +101,13 @@ object XFormsAPI {
   // - Some(index) otherwise, where index is the control's new index
   def setindex(repeatStaticId: String, index: Int): Option[Int] =
     actionInterpreterDyn.value map { interpreter =>
-      XFormsSetindexAction.executeSetindexAction(interpreter, interpreter.outerAction, repeatStaticId, index)(interpreter.indentedLogger)
+      XFormsSetindexAction.executeSetindexAction(
+        interpreter,
+        interpreter.outerAction,
+        repeatStaticId,
+        index,
+        EventCollector.Throw
+      )(interpreter.indentedLogger)
     } collect {
       case newIndex if newIndex >= 0 => newIndex
     }
@@ -154,7 +160,9 @@ object XFormsAPI {
         requireDefaultValues              = requireDefaultValues,
         searchForInstance                 = searchForInstance,
         removeInstanceDataFromClonedNodes = removeInstanceDataFromClonedNodes,
-        structuralDependencies            = true)(
+        structuralDependencies            = true,
+        collector                         = EventCollector.Throw
+      )(
         indentedLogger                    = indentedLoggerOpt.orNull,
       ).asInstanceOf[JList[T]].asScala
     } else
@@ -174,7 +182,9 @@ object XFormsAPI {
           containingDocumentOpt = docOpt,
           collectionToUpdate    = ref,
           deleteIndexOpt        = None,
-          doDispatch            = doDispatch)(
+          doDispatch            = doDispatch,
+          collector             = EventCollector.Throw
+        )(
           indentedLogger        = indentedLoggerOpt.orNull
         )
 
@@ -290,7 +300,8 @@ object XFormsAPI {
         properties,
         delay,
         showProgress,
-        allowDuplicates
+        allowDuplicates,
+        EventCollector.Throw
       )
     }
 
@@ -318,7 +329,7 @@ object XFormsAPI {
       SubmitEvents foreach (submission.addListener(_, listener))
 
       // Dispatch and make sure the listeners are removed
-      try Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, ActionPropertyGetter(props)))
+      try Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, ActionPropertyGetter(props)), EventCollector.Throw)
       finally SubmitEvents foreach (submission.removeListener(_, Some(listener)))
 
       // - If the dispatch completed successfully and the submission started, it *should* have completed with either
@@ -398,7 +409,7 @@ object XFormsAPI {
   // xf:toggle
   def toggle(caseId: String, mustHonorDeferredUpdateFlags: Boolean = true)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsCaseControl](caseId) foreach
-      (XFormsToggleAction.toggle(_, mustHonorDeferredUpdateFlags))
+      (XFormsToggleAction.toggle(_, mustHonorDeferredUpdateFlags, collector = EventCollector.Throw))
 
   // xf:rebuild
   def rebuild(modelId: String, mustHonorDeferredUpdateFlags: Boolean = false)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
@@ -413,17 +424,17 @@ object XFormsAPI {
   // xf:refresh
   def refresh(modelId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsModel](modelId) foreach
-      XFormsRefreshAction.refresh
+      (XFormsRefreshAction.refresh(_, EventCollector.Throw))
 
   // xf:show
   def show(dialogId: String, properties: PropertyGetter = EmptyGetter)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsEventTarget](dialogId) foreach
-      (XXFormsShowAction.showDialog(_, properties = properties))
+      (XXFormsShowAction.showDialog(_, properties = properties, collector = EventCollector.Throw))
 
   // xf:hide
   def hide(dialogId: String, properties: PropertyGetter = EmptyGetter)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsEventTarget](dialogId) foreach
-      (XXFormsHideAction.hideDialog(_, properties = properties))
+      (XXFormsHideAction.hideDialog(_, properties = properties, collector = EventCollector.Throw))
 
   // xf:load
   def load(
@@ -449,5 +460,5 @@ object XFormsAPI {
   // xf:setfocus
   def setfocus(controlId: String, includes: Set[QName], excludes: Set[QName])(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsControl](controlId) foreach
-      (XFormsSetfocusAction.setfocus(_, includes, excludes))
+      (XFormsSetfocusAction.setfocus(_, includes, excludes, collector = EventCollector.Throw))
 }

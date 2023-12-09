@@ -18,7 +18,6 @@ import org.orbeon.connection.ConnectionSupport.fs2StreamToInputStreamInMemory
 import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.io.{CharsetNames, IOUtils}
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
 import org.orbeon.oxf.http.HttpMethod.GET
@@ -26,6 +25,8 @@ import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.event.EventCollector
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance}
 import org.orbeon.oxf.xml.{SaxonUtils, XMLParsing}
 import org.orbeon.saxon.om
@@ -34,7 +35,6 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 import java.io.{ByteArrayOutputStream, InputStream}
 import java.net.URI
 import scala.collection.mutable
-import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 
@@ -201,28 +201,27 @@ object SubmissionUtils {
 
   def evaluateHeaders(
     submission           : XFormsModelSubmission,
-    forwardClientHeaders : Boolean
-  ): Map[String, List[String]] = {
-    try {
-      val headersToForward =
-        clientHeadersToForward(submission.containingDocument.getRequestHeaders, forwardClientHeaders)
-
+    forwardClientHeaders : Boolean,
+    collector            : ErrorEventCollector
+  ): Map[String, List[String]] =
+    EventCollector.withFailFastCollector(
+      "evaluating headers",
+      submission,
+      collector,
+      throw new XFormsSubmissionException(
+        submission  = submission,
+        message     = "error evaluating headers", // TODO: details
+        description = "processing `<header>` elements",
+      )
+    ) { failFastCollector =>
       SubmissionHeaders.evaluateHeaders(
-        submission.getEffectiveId,
-        submission.staticSubmission,
-        headersToForward
+        parentEffectiveId  = submission.getEffectiveId,
+        enclosingElement   = submission.staticSubmission,
+        initialHeaders     = clientHeadersToForward(submission.containingDocument.getRequestHeaders, forwardClientHeaders),
+        eventTarget        = submission,
+        collector          = failFastCollector
       )(submission.model.getContextStack)
-
-    } catch {
-      case e: OXFException =>
-        throw new XFormsSubmissionException(
-          submission  = submission,
-          message     = e.getMessage,
-          description = "processing <header> elements",
-          throwable = e
-        )
     }
-  }
 
   def clientHeadersToForward(
     allHeaders           : Map[String, List[String]],
@@ -304,10 +303,10 @@ object SubmissionUtils {
       // Found one relevant upload control bound to the instance we are submitting
       // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those
       // will be removed during the next recalculate.
-      Option(currentUploadControl.boundFilename) foreach { fileName =>
+      Option(currentUploadControl.boundFilename(EventCollector.Throw)) foreach { fileName =>
         InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-filename", fileName)
       }
-      Option(currentUploadControl.boundFileMediatype) foreach { mediatype =>
+      Option(currentUploadControl.boundFileMediatype(EventCollector.Throw)) foreach { mediatype =>
         InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-mediatype", mediatype)
       }
     }

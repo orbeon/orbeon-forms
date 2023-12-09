@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -113,7 +114,7 @@ class SubmissionHeadersTest
         for {
           (controlId, expectedHeaders) <- expected
           control       = xfcd.getObjectByEffectiveId(controlId).asInstanceOf[XFormsOutputControl]
-          actualHeaders = control.evaluatedHeaders
+          actualHeaders = control.evaluatedHeaders(EventCollector.Throw)
           (expectedHeaderName, expectedHeaderValues) <- expectedHeaders
         } locally {
           assert(expectedHeaderValues === actualHeaders(expectedHeaderName))

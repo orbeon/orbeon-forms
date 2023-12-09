@@ -18,7 +18,9 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.control.{XFormsContainerControl, XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
+
 import scala.collection.compat._
 
 class XXFormsUpdateValidityAction extends XFormsAction {
@@ -33,13 +35,13 @@ class XXFormsUpdateValidityAction extends XFormsAction {
     resolveStringAVT("control").to(List) flatMap
       (_.splitTo[List]())                flatMap
       resolveControl                     foreach
-      (XXFormsUpdateValidityAction.updateValidity(_, recurse))
+      (XXFormsUpdateValidityAction.updateValidity(_, recurse, context.collector))
   }
 }
 
 object XXFormsUpdateValidityAction {
 
-  def updateValidity(initialControl: XFormsControl, recurse: Boolean): Unit = {
+  def updateValidity(initialControl: XFormsControl, recurse: Boolean, collector: ErrorEventCollector): Unit = {
 
     var first = true
 
@@ -57,7 +59,7 @@ object XXFormsUpdateValidityAction {
           // This is important as we don't have a guarantee that other changes will cause a refresh
           if (first) {
             val doc = initialControl.containingDocument
-            doc.controls.cloneInitialStateIfNeeded()
+            doc.controls.cloneInitialStateIfNeeded(collector)
             doc.requireRefresh()
             first = false
           }

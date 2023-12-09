@@ -15,12 +15,13 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.DynamicVariable
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.state.{ControlState, InstanceState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
 
@@ -39,10 +40,11 @@ object Controls {
   def createTree(
     containingDocument : XFormsContainingDocument,
     controlIndex       : ControlIndex,
-    state              : Option[Map[String, ControlState]]
+    state              : Option[Map[String, ControlState]],
+    collector          : ErrorEventCollector
   ): Option[XFormsControl] = {
 
-    val bindingContext = containingDocument.getContextStack.resetBindingContext()
+    val bindingContext = containingDocument.getContextStack.resetBindingContext(collector)
     val rootControl    = containingDocument.staticState.topLevelPart.getTopLevelControls.head
 
     buildTree(
@@ -52,17 +54,18 @@ object Controls {
       bindingContext,
       None,
       rootControl,
-      Nil
+      Nil,
+      collector
     ) |!>
       logTreeIfNeeded("after building full tree")
   }
 
   // Create a new repeat iteration for insertion into the current tree of controls
   def createRepeatIterationTree(
-    containingDocument : XFormsContainingDocument, // TODO: unused
-    controlIndex       : ControlIndex,
-    repeatControl      : XFormsRepeatControl,
-    iterationIndex     : Int
+    controlIndex  : ControlIndex,
+    repeatControl : XFormsRepeatControl,
+    iterationIndex: Int,
+    collector     : ErrorEventCollector
   ): XFormsRepeatIterationControl = {
 
     val idSuffix = XFormsId.getEffectiveIdSuffixParts(repeatControl.getEffectiveId).toSeq :+ iterationIndex
@@ -84,7 +87,8 @@ object Controls {
         bindingContext,
         Some(repeatControl),
         repeatControl.staticControl.iteration.get,
-        idSuffix
+        idSuffix,
+        collector
       ) |!>
         logTreeIfNeeded("after building repeat iteration tree")
 
@@ -97,11 +101,12 @@ object Controls {
     controlIndex     : ControlIndex,
     containerControl : XFormsContainerControl,
     rootAnalysis     : ElementAnalysis,
-    state            : Option[Map[String, ControlState]]
+    state            : Option[Map[String, ControlState]],
+    collector        : ErrorEventCollector
   ): Option[XFormsControl] = {
 
     val idSuffix = XFormsId.getEffectiveIdSuffixParts(containerControl.getEffectiveId).toSeq
-    val bindingContext = containerControl.bindingContextForChildOrEmpty
+    val bindingContext = containerControl.bindingContextForChildOrEmpty(collector)
 
     buildTree(
       controlIndex,
@@ -110,7 +115,8 @@ object Controls {
       bindingContext,
       Some(containerControl),
       rootAnalysis,
-      idSuffix
+      idSuffix,
+      collector
     ) |!>
       logTreeIfNeeded("after building subtree")
   }
@@ -123,7 +129,8 @@ object Controls {
     bindingContext  : BindingContext,
     parentOption    : Option[XFormsControl],
     staticElement   : ElementAnalysis,
-    idSuffix        : Seq[Int]
+    idSuffix        : Seq[Int],
+    collector       : ErrorEventCollector
   ): Option[XFormsControl] = {
 
     // Determine effective id
@@ -153,11 +160,12 @@ object Controls {
         parentContext = bindingContext,
         update        = false,
         restoreState  = state.isDefined,
-        state         = state flatMap (_.get(effectiveId))
+        state         = state flatMap (_.get(effectiveId)),
+        collector     = collector
       )
 
       // Build the control's children if any
-      control.buildChildren(buildTree(controlIndex, state, _, _, Some(control), _, _), idSuffix)
+      control.buildChildren(buildTree(controlIndex, state, _, _, Some(control), _, _, _), idSuffix, collector)
 
       control
     }
@@ -167,14 +175,15 @@ object Controls {
   def buildChildren(
     control   : XFormsControl,
     children  : => Iterable[ElementAnalysis],
-    buildTree : (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl],
-    idSuffix  : Seq[Int]
+    buildTree : (XBLContainer, BindingContext, ElementAnalysis, Seq[Int], ErrorEventCollector) => Option[XFormsControl],
+    idSuffix  : Seq[Int],
+    collector : ErrorEventCollector
   ): Unit = {
     // Start with the context within the current control
-    var newBindingContext = control.bindingContextForChildOrEmpty
+    var newBindingContext = control.bindingContextForChildOrEmpty(collector)
     // Build each child
     children foreach { childElement =>
-      buildTree(control.container, newBindingContext, childElement, idSuffix) foreach { newChildControl =>
+      buildTree(control.container, newBindingContext, childElement, idSuffix, collector) foreach { newChildControl =>
         // Update the context based on the just created control
         newBindingContext = newChildControl.bindingContextForFollowing
       }
@@ -311,15 +320,15 @@ object Controls {
 
   // Update the container's and all its descendants' bindings
   // This is used by `xf:switch` and `xxf:dialog` as of 2021-04-14.
-  def updateBindings(control: XFormsContainerControl): BindingUpdater = {
+  def updateBindings(control: XFormsContainerControl, collector: ErrorEventCollector): BindingUpdater = {
     val xpathDependencies = control.containingDocument.xpathDependencies
     xpathDependencies.bindingUpdateStart()
 
     val startBindingContext =
-      control.preceding map (_.bindingContextForFollowing) getOrElse control.parent.bindingContextForChildOrEmpty
+      control.preceding map (_.bindingContextForFollowing) getOrElse control.parent.bindingContextForChildOrEmpty(collector)
 
     val updater = new BindingUpdater(control.containingDocument, startBindingContext)
-    visitControls(control, updater, includeCurrent = true)
+    visitControls(control, updater, includeCurrent = true, collector)
     xpathDependencies.bindingUpdateDone()
 
     Option(control) foreach logTreeIfNeeded("after subtree update")
@@ -328,9 +337,13 @@ object Controls {
   }
 
   // Update the bindings for the entire tree of controls
-  def updateBindings(containingDocument: XFormsContainingDocument): BindingUpdater = {
-    val updater = new BindingUpdater(containingDocument, containingDocument.getContextStack.resetBindingContext())
-    visitAllControls(containingDocument, updater)
+  def updateBindings(
+    containingDocument: XFormsContainingDocument,
+    collector         : ErrorEventCollector
+  ): BindingUpdater = {
+
+    val updater = new BindingUpdater(containingDocument, containingDocument.getContextStack.resetBindingContext(collector))
+    visitSiblings(updater, containingDocument.controls.getCurrentControlTree.children, collector)
 
     containingDocument.controls.getCurrentControlTree.rootOpt foreach
       logTreeIfNeeded("after full tree update")
@@ -366,7 +379,7 @@ object Controls {
 
     val stats = containingDocument.getRequestStats
 
-    def startVisitControl(control: XFormsControl): Boolean = {
+    def startVisitControl(control: XFormsControl, collector: ErrorEventCollector): Boolean = {
 
       // Increment before the early return as `endVisitControl` always decrements.
       // Caused https://github.com/orbeon/orbeon-forms/issues/3976
@@ -401,7 +414,8 @@ object Controls {
             parentContext = bindingContext,
             update        = true,
             restoreState  = false,
-            state         = None
+            state         = None,
+            collector     = collector
           )
 
         control match {
@@ -413,7 +427,7 @@ object Controls {
             evaluateBindingAndValues()
 
             val (newIterations, partialFocusRepeatOption) =
-              repeatControl.updateIterations(oldRepeatSeq)
+              repeatControl.updateIterations(oldRepeatSeq, collector)
 
             // Remember partial focus out of repeat if needed
             if (this._partialFocusRepeatOption.isEmpty && partialFocusRepeatOption.isDefined)
@@ -438,7 +452,7 @@ object Controls {
         _updatedCount += 1
       } else {
         stats.bindingsRefreshed += 1
-        control.refreshBindingAndValues(bindingContext)
+        control.refreshBindingAndValues(bindingContext, collector)
         _optimizedCount += 1
       }
 
@@ -449,7 +463,7 @@ object Controls {
       if (relevanceChangeLevel == -1 && control.isInstanceOf[XFormsContainerControl] && wasContentRelevant != control.contentRelevant)
         relevanceChangeLevel = level // entering level of containing
 
-      control.bindingContextForChildOpt match {
+      control.bindingContextForChildOpt(collector) match {
         case Some(bindingContextForChild) =>
           bindingContext = bindingContextForChild
           true
@@ -488,14 +502,9 @@ object Controls {
   }
 
   trait XFormsControlVisitorListener {
-    def startVisitControl(control: XFormsControl): Boolean
+    def startVisitControl(control: XFormsControl, collector: ErrorEventCollector): Boolean
     def endVisitControl(control: XFormsControl): Unit
   }
-
-  // Visit all the controls
-  // 2018-01-04: 1 use left
-  def visitAllControls(containingDocument: XFormsContainingDocument, listener: XFormsControlVisitorListener): Unit =
-    visitSiblings(listener, containingDocument.controls.getCurrentControlTree.children)
 
   // Iterator over the given control and its descendants
   class ControlsIterator(
@@ -565,23 +574,28 @@ object Controls {
   // 2018-01-04: 2 uses left:
   // - `updateBindings`
   // - `dispatchDestructionEventsForRemovedRepeatIteration`
-  def visitControls(control: XFormsControl, listener: XFormsControlVisitorListener, includeCurrent: Boolean): Unit =
+  def visitControls(
+    control       : XFormsControl,
+    listener      : XFormsControlVisitorListener,
+    includeCurrent: Boolean,
+    collector     : ErrorEventCollector
+  ): Unit =
     control match {
       case containerControl: XFormsContainerControl =>
         // Container itself
         if (includeCurrent)
-          if (! listener.startVisitControl(containerControl))
+          if (! listener.startVisitControl(containerControl, collector))
             return
 
         // Children
-        visitSiblings(listener, containerControl.children)
+        visitSiblings(listener, containerControl.children, collector)
 
         // Container itself
         if (includeCurrent)
           listener.endVisitControl(containerControl)
       case control =>
         if (includeCurrent) {
-          listener.startVisitControl(control)
+          listener.startVisitControl(control, collector)
           listener.endVisitControl(control)
         }
     }
@@ -610,17 +624,21 @@ object Controls {
     } yield
       new InstanceState(instance)
 
-  private def visitSiblings(listener: XFormsControlVisitorListener, children: Seq[XFormsControl]): Unit =
+  private def visitSiblings(
+    listener : XFormsControlVisitorListener,
+    children : Seq[XFormsControl],
+    collector: ErrorEventCollector
+  ): Unit =
     for (currentControl <- children) {
-      if (listener.startVisitControl(currentControl)) {
+      if (listener.startVisitControl(currentControl, collector)) {
         currentControl match {
           case container: XFormsContainerControl =>
-            visitSiblings(listener, container.children)
+            visitSiblings(listener, container.children, collector)
           case nonContainer =>
             // NOTE: Unfortunately we handle children actions of non container controls a bit differently
             val childrenActions = nonContainer.childrenActions
             if (childrenActions.nonEmpty)
-              visitSiblings(listener, childrenActions)
+              visitSiblings(listener, childrenActions, collector)
         }
       }
       listener.endVisitControl(currentControl)

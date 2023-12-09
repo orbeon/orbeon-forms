@@ -17,7 +17,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
-import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames
@@ -74,7 +74,7 @@ class XFormsSetvalueAction extends XFormsAction {
             oldValue           = oldValue,
             newValue           = valueToSet,
             isCalculate        = false,
-            collector          = Dispatch.dispatchEvent
+            collector          = (event: XFormsEvent) => Dispatch.dispatchEvent(event, actionContext.collector)
           ),
           reason => throw new OXFException(reason.message)
         )

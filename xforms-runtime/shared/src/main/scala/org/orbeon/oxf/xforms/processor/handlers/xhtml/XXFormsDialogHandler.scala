@@ -9,7 +9,6 @@ import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
-import org.xml.sax.helpers.AttributesImpl
 
 
 /**
@@ -83,7 +82,7 @@ class XXFormsDialogHandler(
     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes(XFormsNames.CLASS_QNAME, "hd xxforms-dialog-head"))
     val labelValue =
       if (dialogXFormsControl != null)
-        dialogXFormsControl.getLabel
+        dialogXFormsControl.getLabel(handlerContext.collector)
       else
         null
 

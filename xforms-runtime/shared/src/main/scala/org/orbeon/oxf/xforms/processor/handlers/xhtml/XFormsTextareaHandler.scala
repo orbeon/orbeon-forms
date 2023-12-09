@@ -83,7 +83,7 @@ class XFormsTextareaHandler(
       forwardAutocompleteAttribute(attributes, "textarea", htmlTextareaAttributes)
 
       xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, htmlTextareaAttributes)
-      val value = textareaControl.getExternalValue
+      val value = textareaControl.getExternalValue(handlerContext.collector)
       if (value ne null)
         xmlReceiver.characters(value.toCharArray, 0, value.length)
       xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName)
@@ -94,7 +94,7 @@ class XFormsTextareaHandler(
         // NOTE: Another option would be to transform the text to output &nbsp; and <br/> instead.
         outputStaticReadonlyField(xhtmlPrefix, localName = "pre") {
           // NOTE: Don't replace spaces with &nbsp;, as this is not the right algorithm for all cases
-          textareaControl.externalValueOpt foreach { value =>
+          textareaControl.externalValueOpt(handlerContext.collector) foreach { value =>
               xmlReceiver.characters(value.toCharArray, 0, value.length)
             }
         }

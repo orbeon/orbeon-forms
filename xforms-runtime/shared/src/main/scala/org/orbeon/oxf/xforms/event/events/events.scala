@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.control.controls.{FileMetadata, XFormsUploadControl
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
-import org.orbeon.oxf.xforms.model.StaticDataModel.Reason
+import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.xforms.EventNames
 import shapeless.syntax.typeable._
 
@@ -32,32 +32,57 @@ class XXFormsStateRestoredEvent(target: XFormsEventTarget, properties: PropertyG
 }
 
 class XXFormsBindingErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
-  extends XFormsEvent(XXFORMS_BINDING_ERROR, target, properties, bubbles = true, cancelable = false) {
+  extends XFormsEvent(XXFORMS_BINDING_ERROR, target, properties, bubbles = true, cancelable = true) {
 
-  def this(target: XFormsEventTarget, locationData: LocationData, reason: Reason) = {
+  def this(target: XFormsEventTarget, locationDataOpt: Option[LocationData], reason: StaticDataModel.Reason) = {
     this(target, Map("message" -> Option(reason.message)))
-    _locationData = Option(locationData)
-    _reason = Option(reason)
+    _locationData = locationDataOpt
+    _reasonOpt = Option(reason)
   }
 
   private var _locationData: Option[LocationData] = None
-  override def locationData = _locationData.orNull
+  override def locationData: LocationData = _locationData.orNull
 
-  private var _reason: Option[Reason] = None
-  def reason = _reason.orNull
+  private var _reasonOpt: Option[StaticDataModel.Reason] = None
+  def reasonOpt: Option[StaticDataModel.Reason] = _reasonOpt
 }
 
 class XXFormsXPathErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XXFORMS_XPATH_ERROR, target, properties, bubbles = true, cancelable = true) {
 
-  def this(target: XFormsEventTarget, message: String, throwable: Throwable) = {
+  def this(
+    target        : XFormsEventTarget,
+    expression    : String,
+    contextMessage: String,
+    message       : String,
+    throwable     : Throwable
+  ) = {
     // MAYBE: "throwable" -> OrbeonFormatter.format(throwable)
-    this(target, Map("message" -> Option(message)))
-    _throwable = Option(throwable)
+    this(
+      target,
+      Map(
+        "expression"      -> Option(expression),
+        "context-message" -> Option(contextMessage),
+        "message"         -> Option(message)
+      )
+    )
+    _throwableOpt = Option(throwable)
   }
 
-  private var _throwable: Option[Throwable] = None
-  def throwable = _throwable.orNull
+  private var _throwableOpt: Option[Throwable] = None
+  def throwableOpt: Option[Throwable] = _throwableOpt
+
+  def expressionOpt    : Option[String] = property[String]("expression")
+  def contextMessageOpt: Option[String] = property[String]("context-message")
+  def messageOpt       : Option[String] = property[String]("message")
+
+  def combinedMessage: String = {
+    // In practice
+    val message        = messageOpt        getOrElse "[unknown]"
+    val contextMessage = contextMessageOpt getOrElse "[unknown]"
+    val expression     = expressionOpt     getOrElse "[unknown]"
+    s"$contextMessage: error `$message` while evaluating expression `$expression`"
+  }
 }
 
 trait LinkEvent extends XFormsEvent {

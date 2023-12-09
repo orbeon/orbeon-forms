@@ -21,6 +21,7 @@ import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
@@ -101,13 +102,13 @@ class XFormsModelSubmission(
   def getLocationData     : LocationData      = staticSubmission.locationData
   def parentEventObserver : XFormsEventTarget = model
 
-  def performTargetAction(event: XFormsEvent): Unit = ()
+  def performTargetAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = ()
 
-  def performDefaultAction(event: XFormsEvent): Unit = {
+  def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
     implicit val indentedLogger: IndentedLogger = getIndentedLogger
     event match {
       case e: XFormsSubmitEvent                       => doSubmit(e).foreach(processReplaceResultAndCloseConnection)
-      case e: XXFormsActionErrorEvent                 => XFormsError.handleNonFatalActionError(thisSubmission, e.throwable)
+      case e: XXFormsActionErrorEvent                 => XFormsError.handleNonFatalActionError(thisSubmission, Option(e.throwable))
       case e if e.name == XFormsEvents.XXFORMS_SUBMIT =>
 
         implicit val refContext: RefContext = createRefContext(thisSubmission)
@@ -443,7 +444,7 @@ class XFormsModelSubmission(
                   val serializeEvent =
                     new XFormsSubmitSerializeEvent(thisSubmission, refContext.refNodeInfo, requestedSerialization)
 
-                  Dispatch.dispatchEvent(serializeEvent)
+                  Dispatch.dispatchEvent(serializeEvent, EventCollector.Throw)
 
                   // TODO: rest of submission should happen upon default action of event
                   serializeEvent.submissionBodyAsString
@@ -556,8 +557,8 @@ class XFormsModelSubmission(
       }
 
     private def sendSubmitDone(cxr: ConnectionResult, tunnelProperties: Option[TunnelProperties]): Unit = {
-      model.resetAndEvaluateVariables() // after a submission, the context might have changed
-      Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, cxr, tunnelProperties))
+      model.resetAndEvaluateVariables(EventCollector.Throw) // after a submission, the context might have changed
+      Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, cxr, tunnelProperties), EventCollector.Throw)
     }
 
     private def sendSubmitError(t: Throwable, ctx: Either[Option[ConnectionResult], Option[String]], tunnelProperties: Option[TunnelProperties]): Unit =
@@ -572,7 +573,7 @@ class XFormsModelSubmission(
     private def sendSubmitErrorWithDefault(t: Throwable, default: => XFormsSubmitErrorEvent): Unit = {
 
       // After a submission, the context might have changed
-      model.resetAndEvaluateVariables()
+      model.resetAndEvaluateVariables(EventCollector.Throw)
 
       // Try to get error event from exception and if not possible create default event
       val submitErrorEvent =
@@ -581,7 +582,7 @@ class XFormsModelSubmission(
       // Dispatch event
       submitErrorEvent.logMessage(t)
 
-      Dispatch.dispatchEvent(submitErrorEvent)
+      Dispatch.dispatchEvent(submitErrorEvent, EventCollector.Throw)
     }
 
     private def createUriOrDocumentToSubmit(

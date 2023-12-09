@@ -13,18 +13,19 @@
   */
 package org.orbeon.oxf.xforms
 
-import java.{util => ju}
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{CollectionUtils, IndentedLogger}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
+import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
-import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsContainerControl, XFormsControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.XFormsNames._
 
+import java.{util => ju}
 import scala.collection.{mutable => m}
 import scala.jdk.CollectionConverters._
 
@@ -137,22 +138,26 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   def markBindingsDirty(): Unit = bindingsDirty = true
 
   // Build the entire tree of controls and associated information.
-  def initialize(containingDocument: XFormsContainingDocument, state: Option[Map[String, ControlState]]): Unit =
+  def initialize(
+    containingDocument: XFormsContainingDocument,
+    state             : Option[Map[String, ControlState]],
+    collector         : ErrorEventCollector
+  ): Unit =
     withDebug("building controls") {
       // Visit the static tree of controls to create the actual tree of controls
-      Controls.createTree(containingDocument, _controlIndex, state)
+      Controls.createTree(containingDocument, _controlIndex, state, collector)
       // Evaluate all controls
       // Dispatch initialization events for all controls created in index
       val allControls = _controlIndex.effectiveIdsToControls.values
       if (state.isEmpty) {
         // Copy list because it can be modified concurrently as events are being dispatched and handled
         val controlIds = _controlIndex.effectiveIdsToControls.keysIterator.toList
-        updateValueControls(controlIds)
-        dispatchRefreshEvents(controlIds, isInitial = true)
+        updateValueControls(controlIds, collector)
+        dispatchRefreshEvents(controlIds, isInitial = true, collector)
       } else {
         // Make sure all control state such as relevance, value changed, etc. does not mark a difference
         for (control <- allControls) {
-          updateValueControl(control)
+          updateValueControl(control, collector)
           control.commitCurrentUIState()
         }
       }
@@ -160,16 +165,16 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
       debugResults(List("controls created" -> allControls.size.toString))
     }
 
-  def updateValueControls(controlsEffectiveIds: List[String]): Unit =
-    controlsEffectiveIds.iterator flatMap findControl foreach updateValueControl
+  def updateValueControls(controlsEffectiveIds: List[String], collector: ErrorEventCollector): Unit =
+    controlsEffectiveIds.iterator.flatMap(findControl).foreach(updateValueControl(_, collector))
 
-  def updateValueControl(control: XFormsControl): Unit =
+  private def updateValueControl(control: XFormsControl, collector: ErrorEventCollector): Unit =
     control match {
-      case vc: XFormsValueControl if vc.isRelevant => vc.getValue
+      case vc: XFormsValueControl if vc.isRelevant => vc.getValue(collector)
       case _ =>
     }
 
-  def dispatchRefreshEvents(controlsEffectiveIds: List[String], isInitial: Boolean): Unit = {
+  def dispatchRefreshEvents(controlsEffectiveIds: List[String], isInitial: Boolean, collector: ErrorEventCollector): Unit =
     withDebug("dispatching refresh events") {
 
       def doDispatchRefreshEvents(control: XFormsControl): Unit =
@@ -178,13 +183,13 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
           val newRelevantState = control.isRelevant
           if (newRelevantState && ! oldRelevantState) {
             // Control has become relevant
-            control.dispatchCreationEvents()
+            control.dispatchCreationEvents(collector)
           } else if (! newRelevantState && oldRelevantState) {
             // Control has become non-relevant
-            control.dispatchDestructionEvents()
+            control.dispatchDestructionEvents(collector)
           } else if (newRelevantState) {
             // Control was and is relevant
-            control.dispatchChangeEvents()
+            control.dispatchChangeEvents(collector)
           } else if (isInitial) {
             // Initialization and control is non-relevant
             // 2018-12-20: Since we don't actually have a need for this, we are not dispatching this
@@ -194,13 +199,13 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
         }
 
       for (controlEffectiveId <- controlsEffectiveIds)
-        findControl(controlEffectiveId) foreach doDispatchRefreshEvents
+        findControl(controlEffectiveId).foreach(doDispatchRefreshEvents)
     }
-  }
 
   def dispatchDestructionEventsForRemovedRepeatIteration(
     removedControl: XFormsContainerControl,
-    includeCurrent: Boolean
+    includeCurrent: Boolean,
+    collector     : ErrorEventCollector
   ): Unit =
     withDebug("dispatching destruction events") {
       // Gather ids of controls to handle
@@ -213,7 +218,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
         removedControl,
         new Controls.XFormsControlVisitorListener {
 
-          def startVisitControl(control: XFormsControl): Boolean = {
+          def startVisitControl(control: XFormsControl, collector: ErrorEventCollector): Boolean = {
             // Don't handle container controls here
             if (! control.isInstanceOf[XFormsContainerControl])
               controlsEffectiveIds += control.getEffectiveId
@@ -227,7 +232,8 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
               controlsEffectiveIds += control.getEffectiveId
           }
         },
-        includeCurrent
+        includeCurrent,
+        collector
       )
       // Dispatch events
       for {
@@ -236,12 +242,12 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
         if XFormsControl.controlSupportsRefreshEvents(control)
       } locally {
         // Directly call destruction events as we know the iteration is going away
-        control.dispatchDestructionEvents()
+        control.dispatchDestructionEvents(collector)
       }
       debugResults(List("controls" -> controlsEffectiveIds.size.toString))
     }
 
-  def getBackCopy: Any = {
+  def getBackCopy(collector: ErrorEventCollector): Any = {
     // Clone this
     val cloned = super.clone.asInstanceOf[ControlTree]
 
@@ -251,7 +257,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
         // Do this before cloning controls so that initial/current locals are still different
         cloned._initialRepeatIndexes = XFormsRepeatControl.initialIndexes(root.containingDocument)
         // Clone children if any
-        cloned._root = Some(root.getBackCopy.asInstanceOf[XFormsContainerControl])
+        cloned._root = Some(root.getBackCopy(collector).asInstanceOf[XFormsContainerControl])
       case None =>
     }
     // NOTE: The cloned tree does not make use of this so we clear it
@@ -263,22 +269,22 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
 
   // Create a new repeat iteration for insertion into the current tree of controls
   def createRepeatIterationTree(
-    containingDocument : XFormsContainingDocument,
-    repeatControl      : XFormsRepeatControl,
-    iterationIndex     : Int                       // new iteration to repeat (1..repeat size + 1)
-  ): XFormsRepeatIterationControl = {
+    repeatControl : XFormsRepeatControl,
+    iterationIndex: Int,                 // new iteration to repeat (1..repeat size + 1)
+    collector     : ErrorEventCollector
+  ): XFormsRepeatIterationControl =
     // NOTE: We used to create a separate index, but this caused this bug:
     // [ #316177 ] When new repeat iteration is created upon repeat update, controls are not immediately accessible by id
-    Controls.createRepeatIterationTree(containingDocument, _controlIndex, repeatControl, iterationIndex)
-  }
+    Controls.createRepeatIterationTree(_controlIndex, repeatControl, iterationIndex, collector)
 
   def createAndInitializeDynamicSubTree(
     container        : XBLContainer,
     containerControl : XFormsContainerControl,
     elementAnalysis  : ElementAnalysis,
-    state            : Option[Map[String, ControlState]]
+    state            : Option[Map[String, ControlState]],
+    collector        : ErrorEventCollector
   ): Unit =
-    Controls.createSubTree(container, _controlIndex, containerControl, elementAnalysis, state)
+    Controls.createSubTree(container, _controlIndex, containerControl, elementAnalysis, state, collector)
 
   // Index a subtree of controls. Also handle special relevance binding events
   def indexSubtree(containerControl: XFormsContainerControl, includeCurrent: Boolean): Unit =

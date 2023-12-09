@@ -17,11 +17,11 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.xforms.analysis.controls.VariableControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, Variable}
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.om
 import org.orbeon.saxon.value.EmptySequence
 
 /**
@@ -57,18 +57,27 @@ class XFormsVariableControl(
   final def valueOpt = Option(_value)
   def getVariableName = variable.staticVariable.name
 
-  override def bindingContextForChildOpt  : Option[BindingContext] = Option(_bindingContextForChild)
+  override def bindingContextForChildOpt(collector: ErrorEventCollector): Option[BindingContext] = Option(_bindingContextForChild)
   override def bindingContextForFollowing : BindingContext         = _bindingContextForFollowing
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
-    super.onCreate(restoreState, state, update)
+  override def onCreate(
+    restoreState: Boolean,
+    state       : Option[ControlState],
+    update      : Boolean,
+    collector   : ErrorEventCollector
+  ): Unit = {
+    super.onCreate(restoreState, state, update, collector)
     // FIXME: Case should be caught by the requireValueUpdate() below, but it's more fail-safe to mark things dirty here too
     _value = null
   }
 
-  override def preEvaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
+  override def preEvaluateImpl(
+    relevant      : Boolean,
+    parentRelevant: Boolean,
+    collector     : ErrorEventCollector
+  ): Unit = {
 
-    super.preEvaluateImpl(relevant, parentRelevant) // 2019-09-13: `super` is a NOP
+    super.preEvaluateImpl(relevant, parentRelevant, collector) // 2019-09-13: `super` is a NOP
 
     if (relevant) {
       // Evaluate variable value if needed if relevant
@@ -80,10 +89,10 @@ class XFormsVariableControl(
         variable.staticVariable.expressionOrConstant match {
           case Left(expression) =>
             containingDocument.getRequestStats.withXPath(expression) {
-              _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, handleNonFatal = true)
+              _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, this, collector)
             }
           case Right(_) =>
-            _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, handleNonFatal = true)
+            _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, this, collector)
         }
       }
     } else {
@@ -115,12 +124,9 @@ class XFormsVariableControl(
   }
 
   // Variables don't support Ajax updates
-  override def compareExternalUseExternalValue(
-    previousExternalValue : Option[String],
-    previousControl       : Option[XFormsControl]
-  ) =
+  override def compareExternalUseExternalValue(previousExternalValue: Option[String], previousControl: Option[XFormsControl], collector: ErrorEventCollector): Boolean =
     throw new IllegalStateException
 
   override def supportAjaxUpdates = false
-  override def getBackCopy: AnyRef = this
+  override def getBackCopy(collector: ErrorEventCollector): AnyRef = this
 }

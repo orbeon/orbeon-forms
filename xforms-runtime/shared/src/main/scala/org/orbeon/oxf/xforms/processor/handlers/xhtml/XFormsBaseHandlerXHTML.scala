@@ -103,7 +103,7 @@ abstract class XFormsBaseHandlerXHTML (
             control match {
               case valueControl: XFormsValueControl =>
                 // NOTE: Test above excludes xf:group
-                if (valueControl.isEmptyValue)
+                if (valueControl.isEmptyValue(handlerContext.collector))
                   appendWithSpace("xforms-empty")
                 else
                   appendWithSpace("xforms-filled")
@@ -250,18 +250,18 @@ abstract class XFormsBaseHandlerXHTML (
       val (labelHintHelpAlertValue, mustOutputHTMLFragment) =
         lhha match {
           case LHHA.Label | LHHA.Hint if controlOrNull ne null =>
-            (controlOrNull.lhhaProperty(lhha).value(), lhhaAnalysis.containsHTML)
+            (controlOrNull.lhhaProperty(lhha).value(handlerContext.collector), lhhaAnalysis.containsHTML)
           case LHHA.Label | LHHA.Hint =>
             (null, lhhaAnalysis.containsHTML)
           case LHHA.Help if controlOrNull ne null =>
             // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
             // case because it is stored as escaped HTML within a <label> element.
-            (controlOrNull.lhhaProperty(lhha).escapedValue(), false)
+            (controlOrNull.lhhaProperty(lhha).escapedValue(handlerContext.collector), false)
           case LHHA.Help =>
             (null, false)
           case LHHA.Alert if controlOrNull ne null =>
             // Not known statically at this time because it currently depends on the number of active alerts
-            (controlOrNull.lhhaProperty(lhha).value(), controlOrNull.isHTMLAlert)
+            (controlOrNull.lhhaProperty(lhha).value(handlerContext.collector), controlOrNull.isHTMLAlert(handlerContext.collector))
           case LHHA.Alert =>
             (null, false)
         }

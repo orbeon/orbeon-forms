@@ -13,9 +13,6 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import java.util
-import java.util.Collections
-
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom._
@@ -23,19 +20,22 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.CollectionUtils.InsertPosition
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsInsertEvent, XXFormsReplaceEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, FlaggedDefaultsStrategy, InstanceDataOps, XFormsInstance}
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.xforms.XFormsNames
 import shapeless.syntax.typeable._
 
-import scala.jdk.CollectionConverters._
+import java.util
+import java.util.Collections
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 /**
  * 9.3.5 The insert Element
@@ -54,7 +54,9 @@ object XFormsInsertAction {
     requireDefaultValues              : Boolean,
     searchForInstance                 : Boolean,
     removeInstanceDataFromClonedNodes : Boolean,
-    structuralDependencies            : Boolean)(implicit
+    structuralDependencies            : Boolean,
+    collector                         : ErrorEventCollector
+  )(implicit
     indentedLogger                    : IndentedLogger
   ): util.List[om.NodeInfo] = {
 
@@ -201,7 +203,7 @@ object XFormsInsertAction {
               // NOTE: Don't need to normalize text nodes in this case, as no new text node is inserted
 
               (
-                doInsert(insertLocationNode.getDocument, clonedNodes, modifiedInstanceOpt, doDispatch),
+                doInsert(insertLocationNode.getDocument, clonedNodes, modifiedInstanceOpt, doDispatch, collector),
                 insertPosition.entryName // TODO: ideally normalize to "into document node"?
               )
 
@@ -216,7 +218,7 @@ object XFormsInsertAction {
                   // is harder as we have to deal with removing duplicate attributes and find a reasonable
                   // insertion strategy.
                   // TODO: Don't think we should even do this now in XForms 1.1
-                  doInsert(insertLocationNode.getParent, clonedNodes, modifiedInstanceOpt, doDispatch)
+                  doInsert(insertLocationNode.getParent, clonedNodes, modifiedInstanceOpt, doDispatch, collector)
                 } else {
                   // Other node types
                   val parentNode      = insertLocationNode.getParent
@@ -274,7 +276,7 @@ object XFormsInsertAction {
         case Right(insertContextNodeInfo) =>
 
           val insertLocationNode = NodeInfoConversions.unwrapNode(insertContextNodeInfo) getOrElse (throw new IllegalArgumentException(CannotInsertReadonlyMessage))
-          val insertedNodes = doInsert(insertLocationNode, clonedNodes, modifiedInstanceOpt, doDispatch)
+          val insertedNodes = doInsert(insertLocationNode, clonedNodes, modifiedInstanceOpt, doDispatch, collector)
 
           // Normalize text nodes if needed to respect XPath 1.0 constraint
           if (clonedNodes exists(_.isInstanceOf[Text]))
@@ -358,7 +360,8 @@ object XFormsInsertAction {
             adjustedInsertLocationNodeInfo,
             adjustedBeforeAfterInto,
             insertLocationIndexWithinParentBeforeUpdate
-          )
+          ),
+          collector
         )
       }
 
@@ -385,7 +388,8 @@ object XFormsInsertAction {
     insertionNode    : Node,
     clonedNodes      : List[Node],
     modifiedInstance : Option[XFormsInstance],
-    doDispatch       : Boolean
+    doDispatch       : Boolean,
+    collector        : ErrorEventCollector
   ): List[Node] = {
 
     def dispatchReplaceEventIfNeeded(formerNode: Node, currentNode: Node): Unit =
@@ -397,7 +401,8 @@ object XFormsInsertAction {
               modifiedInstance,
               documentWrapper.wrap(formerNode),
               documentWrapper.wrap(currentNode)
-            )
+            ),
+            collector
           )
         }
 
@@ -614,7 +619,8 @@ class XFormsInsertAction extends XFormsAction {
       requireDefaultValues              = setRequireDefaultValues,
       searchForInstance                 = true,
       removeInstanceDataFromClonedNodes = true,
-      structuralDependencies            = structuralDependencies
+      structuralDependencies            = structuralDependencies,
+      collector                         = actionContext.collector
     )
   }
 }

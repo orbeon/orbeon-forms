@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsReplaceEvent, XXFormsValueChangedEvent}
-import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, ListenersTrait, XFormsEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
@@ -315,7 +315,7 @@ object InstanceMirror {
               oldValue           = oldValue,
               newValue           = valueChanged.newValue,
               isCalculate        = false,
-              collector          = Dispatch.dispatchEvent
+              collector          = (event: XFormsEvent) => Dispatch.dispatchEvent(event, EventCollector.ToReview)
             ),
             reason => throw new OXFException(reason.message)
           )
@@ -453,7 +453,7 @@ object InstanceMirror {
           val deleted  = XFormsAPI.delete(matchingParent child *, doDispatch = false)
           val inserted = XFormsAPI.insert(replace.currentNode, into = matchingParent, doDispatch = false)
 
-          Dispatch.dispatchEvent(new XXFormsReplaceEvent(matchingInstance, deleted.head, inserted.head))
+          Dispatch.dispatchEvent(new XXFormsReplaceEvent(matchingInstance, deleted.head, inserted.head), EventCollector.ToReview)
           Stop
         case Continue    => NextListener
         case NonRelevant => Stop

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import java.{util => ju}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OrbeonLocationException
@@ -25,6 +24,7 @@ import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLUtils
@@ -32,11 +32,11 @@ import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.xforms.runtime.XFormsObject
-import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 
+import java.{util => ju}
 import scala.jdk.CollectionConverters._
-import scala.util.control.{Breaks, NonFatal}
+import scala.util.control.NonFatal
 
 
 // Execute a top-level XForms action and the included nested actions if any.
@@ -61,7 +61,11 @@ class XFormsActionInterpreter(
     actionXPathContext.getCurrentBindingContext.singleItemOpt.isEmpty ||
       resolveAVT(actionAnalysis, XFormsNames.XXFORMS_DEFERRED_UPDATES_QNAME) != "false"
 
-  def runAction(staticAction: ActionTrait): Unit =
+  def runAction(
+    staticAction: ActionTrait,
+    eventTarget : XFormsEventTarget,
+    collector   : ErrorEventCollector
+  ): Unit =
     try {
 
       val iterateIterationAttribute = staticAction.iterate
@@ -77,7 +81,8 @@ class XFormsActionInterpreter(
         bindingElementNamespaceMapping = staticAction.namespaceMapping,
         sourceEffectiveId              = getSourceEffectiveId(staticAction),
         scope                          = staticAction.scope,
-        handleNonFatal                 = false
+        eventTarget                    = eventTarget,
+        collector                      = collector
       ) {
 
         def runSingle(hasOverriddenContext: Boolean, contextItem: om.Item): Unit =
@@ -87,7 +92,9 @@ class XFormsActionInterpreter(
             ifConditionAttribute    = staticAction.ifCondition,
             whileIterationAttribute = staticAction.whileCondition,
             hasOverriddenContext    = hasOverriddenContext,
-            contextItem             = contextItem
+            contextItem             = contextItem,
+            eventTarget             = eventTarget,
+            collector               = collector
           )
 
         // NOTE: At this point, the context has already been set to the current action element.
@@ -132,7 +139,9 @@ class XFormsActionInterpreter(
     ifConditionAttribute    : Option[String],
     whileIterationAttribute : Option[String],
     hasOverriddenContext    : Boolean,
-    contextItem             : om.Item
+    contextItem             : om.Item,
+    eventTarget             : XFormsEventTarget,
+    collector               : ErrorEventCollector
   ): Unit = {
 
     var whileIteration = 1
@@ -180,12 +189,13 @@ class XFormsActionInterpreter(
               bindingElementNamespaceMapping = actionAnalysis.namespaceMapping,
               sourceEffectiveId              = getSourceEffectiveId(actionAnalysis),
               scope                          = actionAnalysis.scope,
-              handleNonFatal                 = false,
+              eventTarget                    = eventTarget,
+              collector                      = collector,
             ) {
-              actionImpl.execute(DynamicActionContext(this, actionAnalysis, hasOverriddenContext option contextItem))
+              actionImpl.execute(DynamicActionContext(this, actionAnalysis, hasOverriddenContext option contextItem, collector))
             }
           else
-            actionImpl.execute(DynamicActionContext(this, actionAnalysis, hasOverriddenContext option contextItem))
+            actionImpl.execute(DynamicActionContext(this, actionAnalysis, hasOverriddenContext option contextItem, collector))
         }
 
         // Stop if there is no iteration

@@ -16,16 +16,16 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom.Element
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl
 import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLReceiverHelper._
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.xforms.XFormsId
 
 
 class XXFormsAttributeControl(
@@ -66,12 +66,12 @@ class XXFormsAttributeControl(
   }
 
   // Value comes from the AVT value attribute
-  override def computeValue: String =
-    Option(evaluateAvt(attributeValue)) getOrElse ""
+  override def computeValue(collector: ErrorEventCollector): String =
+    Option(evaluateAvt(attributeValue, collector)) getOrElse ""
 
-  override def getRelevantEscapedExternalValue = {
+  protected override def getRelevantEscapedExternalValue(collector: ErrorEventCollector): String = {
     // Rewrite URI attribute if needed
-    val externalValue = getExternalValue()
+    val externalValue = getExternalValue(collector)
     attributeName match {
       case "src" =>
         XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, UrlRewriteMode.AbsolutePathOrRelative)
@@ -80,22 +80,22 @@ class XXFormsAttributeControl(
         attributeControl.urlType match {
           case "action"   => XFormsCrossPlatformSupport.resolveActionURL  (containingDocument, element, externalValue)
           case "resource" => XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, UrlRewriteMode.AbsolutePathOrRelative)
-          case _          => XFormsCrossPlatformSupport.resolveRenderURL  (containingDocument, element, externalValue, false) // default is "render"
+          case _          => XFormsCrossPlatformSupport.resolveRenderURL  (containingDocument, element, externalValue, skipRewrite = false) // default is "render"
         }
       case _ => externalValue
     }
 
   }
 
-  override def evaluateExternalValue() =
-    setExternalValue(getExternalValueHandleSrc(getValue, attributeName, forName))
+  override def evaluateExternalValue(collector: ErrorEventCollector): Unit =
+    setExternalValue(getExternalValueHandleSrc(getValue(collector), attributeName, forName))
 
-  def getAttributeName = attributeName
+  def getAttributeName: String = attributeName
 
-  def getEffectiveForAttribute =
+  def getEffectiveForAttribute: String =
     XFormsId.getRelatedEffectiveId(getEffectiveId, attributeControl.forStaticId)
 
-  override def getNonRelevantEscapedExternalValue =
+  override def getNonRelevantEscapedExternalValue: String =
     attributeName match {
       case "src" if forName == "img" =>
         // Return rewritten URL of dummy image URL
@@ -110,9 +110,11 @@ class XXFormsAttributeControl(
   final override def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
     previousControl : Option[XFormsValueControl],
-    content         : Option[XMLReceiverHelper => Unit])(implicit
+    content         : Option[XMLReceiverHelper => Unit],
+    collector       : ErrorEventCollector
+  )(implicit
     ch              : XMLReceiverHelper
-  ) = {
+  ): Unit = {
 
     // If we get here, it means that `super.compareExternalUseExternalValue()` returned `false`, which means that either
     // `previousControl.isEmpty == true` or that there is a difference in value (or other aspects which don't matter here).
@@ -149,7 +151,7 @@ class XXFormsAttributeControl(
       outputValueElement(
         attributesImpl = atts,
         elementName    = "attribute",
-        value          = getEscapedExternalValue
+        value          = getEscapedExternalValue(collector)
       )
     } else {
       // Handle class separately
@@ -161,8 +163,8 @@ class XXFormsAttributeControl(
       val isNewlyVisibleSubtree = previousControl.isEmpty
 
       // The classes are stored as the control's value
-      val classes1 = previousControl flatMap (control => Option(control.getEscapedExternalValue)) getOrElse ""
-      val classes2 = Option(attributeControl2.getEscapedExternalValue) getOrElse ""
+      val classes1 = previousControl flatMap (control => Option(control.getEscapedExternalValue(collector))) getOrElse ""
+      val classes2 = Option(attributeControl2.getEscapedExternalValue(collector)) getOrElse ""
 
       if (isNewlyVisibleSubtree || classes1 != classes2) {
         val attributeValue = diffClasses(classes1, classes2)
@@ -195,6 +197,14 @@ object XXFormsAttributeControl {
       controlValue
     }
 
-  def getExternalValueHandleSrc(concreteControl: XXFormsAttributeControl, attributeControl: AttributeControl): String =
-    getExternalValueHandleSrc(Option(concreteControl) flatMap (_.valueOpt) orNull, attributeControl.attributeName, attributeControl.forName)
+  def getExternalValueHandleSrc(
+    concreteControl : XXFormsAttributeControl,
+    attributeControl: AttributeControl,
+    collector       : ErrorEventCollector
+  ): String =
+    getExternalValueHandleSrc(
+      Option(concreteControl).flatMap(_.valueOpt(collector)).orNull,
+      attributeControl.attributeName,
+      attributeControl.forName
+    )
 }

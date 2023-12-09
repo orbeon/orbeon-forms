@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis.controls.CaseControl
 import org.orbeon.oxf.xforms.control.{VisibilityTrait, XFormsControl, XFormsNoSingleNodeContainerControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 /**
@@ -44,7 +45,7 @@ class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element:
   override def locallyVisible: Boolean = isCaseVisible
 
   // Toggle to this case and dispatch events if this causes a change in selected cases.
-  def toggle(): Unit = {
+  def toggle(collector: ErrorEventCollector): Unit = {
     // There are dependencies on toggled cases for:
     //
     // - case()
@@ -52,7 +53,7 @@ class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element:
     //
     // Ideally, XPath dependencies should make this smarter.
     //
-    getSwitch.setSelectedCase(this)
+    getSwitch.setSelectedCase(this, collector)
   }
 
   def getSwitch: XFormsSwitchControl = parent.asInstanceOf[XFormsSwitchControl]

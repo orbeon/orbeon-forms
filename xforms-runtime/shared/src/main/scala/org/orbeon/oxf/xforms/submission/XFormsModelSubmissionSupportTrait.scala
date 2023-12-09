@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, StaticXPath, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.Relevant
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -247,7 +248,7 @@ trait XFormsModelSubmissionSupportTrait {
           // constraints for the level, the sets of ids must match.
           for {
             level                <- control.alertLevel
-            controlAlert         <- Option(control.getAlert)
+            controlAlert         <- Option(control.getAlert(EventCollector.Throw))
             failedValidationsIds = control.failedValidations.map(_.id).toSet
             elementsMap          <- elementsToAnnotate.get(level)
             element              <- elementsMap.get(failedValidationsIds)

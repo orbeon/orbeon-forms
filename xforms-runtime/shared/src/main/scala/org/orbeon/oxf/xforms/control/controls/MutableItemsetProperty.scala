@@ -14,13 +14,15 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
-import org.orbeon.oxf.xforms.itemset.{ItemsetSupport, Itemset}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.itemset.{Itemset, ItemsetSupport}
 
 class MutableItemsetProperty(private val control: XFormsSelect1Control) extends MutableControlProperty[Itemset] {
-  protected def isRelevant        = control.isRelevant
-  protected def wasRelevant       = control.wasRelevant
-  protected def requireUpdate     = control.containingDocument.xpathDependencies.requireItemsetUpdate(control.staticControl, control.effectiveId)
-  protected def notifyCompute()   = control.containingDocument.xpathDependencies.notifyComputeItemset()
-  protected def notifyOptimized() = control.containingDocument.xpathDependencies.notifyOptimizeItemset()
-  protected def evaluateValue()   = ItemsetSupport.evaluateItemset(control)
+  protected def isRelevant                                   : Boolean = control.isRelevant
+  protected def wasRelevant                                  : Boolean = control.wasRelevant
+  protected def requireUpdate                                : Boolean = control.containingDocument.xpathDependencies.requireItemsetUpdate(control.staticControl, control.effectiveId)
+  protected def notifyCompute()                              : Unit = control.containingDocument.xpathDependencies.notifyComputeItemset()
+  protected def notifyOptimized()                            : Unit = control.containingDocument.xpathDependencies.notifyOptimizeItemset()
+  protected def evaluateValue(collector: ErrorEventCollector): Itemset = ItemsetSupport.evaluateItemset(control, collector)
 }

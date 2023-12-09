@@ -210,7 +210,7 @@ object Focus {
   private def focusIn(control: XFormsControl) : Unit = dispatch(control, DOM_FOCUS_IN)
 
   private def dispatch(control: XFormsControl, eventName: String): Unit =
-    Dispatch.dispatchEvent(XFormsEventFactory.createEvent(eventName, control))
+    Dispatch.dispatchEvent(XFormsEventFactory.createEvent(eventName, control), EventCollector.ToReview)
 
   // Find all ancestor container controls of the given control from leaf to root
   private def containers(control: XFormsControl) =

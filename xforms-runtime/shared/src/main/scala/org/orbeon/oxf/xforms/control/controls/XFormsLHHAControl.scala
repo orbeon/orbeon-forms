@@ -15,10 +15,11 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsContextStackSupport}
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, ValueControl}
 import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsContextStackSupport}
 
 
 //
@@ -41,7 +42,7 @@ class XFormsLHHAControl(
 
   override type Control <: LHHAAnalysis with ValueControl // Q: How can this compile? We have a class and an abstract class!
 
-  override def storeExternalValue(externalValue: String): Unit =
+  override def storeExternalValue(externalValue: String, collector: ErrorEventCollector): Unit =
     throw new OXFException("operation not allowed")
 
   // Allow the client telling us that an external LHHA has the focus, for instance in the case of an `<xf:help>`
@@ -50,7 +51,7 @@ class XFormsLHHAControl(
 
   // Special evaluation function, as in the case of LHHA, the nested content of the element is a way to evaluate
   // the value.
-  override def computeValue: String = {
+  override def computeValue(collector: ErrorEventCollector): String = {
 
     val resultOpt = {
 
@@ -68,18 +69,20 @@ class XFormsLHHAControl(
       XFormsContextStackSupport.evaluateExpressionOrConstant(
         childElem           = staticControl,
         parentEffectiveId   = selfControl.effectiveId,
-        pushContextAndModel = staticControl.hasBinding
+        pushContextAndModel = staticControl.hasBinding,
+        eventTarget         = selfControl,
+        collector           = collector
       )
     }
 
     resultOpt getOrElse ""
   }
 
-  override def getRelevantEscapedExternalValue: String =
+  protected override def getRelevantEscapedExternalValue(collector: ErrorEventCollector): String =
     if (mediatype contains "text/html")
-      XFormsControl.getEscapedHTMLValue(getLocationData, getExternalValue)
+      XFormsControl.getEscapedHTMLValue(getLocationData, getExternalValue(collector))
     else
-      getExternalValue
+      getExternalValue(collector)
 
   override def supportAjaxUpdates: Boolean = ! staticControl.isPlaceholder
 }

@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.control.Controls._
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsSingleNodeContainerControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
@@ -82,19 +83,19 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   def clearNewScripts(): Unit = _newScripts = Nil
 
   // TODO: This might blow if the control is non-relevant
-  override def bindingContextForChildOpt: Option[BindingContext] =
+  override def bindingContextForChildOpt(collector: ErrorEventCollector): Option[BindingContext] =
     _nested map { case Nested(container, _, _, _) =>
       val contextStack = container.getContextStack
       contextStack.setParentBindingContext(bindingContext)
-      contextStack.resetBindingContext()
+      contextStack.resetBindingContext(collector)
       contextStack.getCurrentBindingContext
     }
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
-    super.onCreate(restoreState, state, update)
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean, collector: ErrorEventCollector): Unit = {
+    super.onCreate(restoreState, state, update, collector)
     getBoundElement match {
       case Some(boundElem) =>
-        updateSubTree(create = true, boundElem)
+        updateSubTree(create = true, boundElem, collector)
       case _ =>
         // Don't create binding (maybe we could for a read-only instance)
         _nested = None
@@ -106,7 +107,11 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     fullUpdateChange = false
   }
 
-  override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
+  override def onBindingUpdate(
+    oldBinding: BindingContext,
+    newBinding: BindingContext,
+    collector : ErrorEventCollector
+  ): Unit = {
 
     // Q: Do we need to compare all items? Probably that comparing the single item would be enough.
     if (! SaxonUtils.compareItemSeqs(oldBinding.nodeset.asScala, newBinding.nodeset.asScala)) {
@@ -117,14 +122,14 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     // `getBoundElement` returns the first item of `newBinding` above, if it's an element. The code doesn't express
     // this very clearly.
     getBoundElement foreach { boundElem =>
-      updateSubTree(create = false, boundElem)
+      updateSubTree(create = false, boundElem, collector)
     }
   }
 
-  private def updateSubTree(create: Boolean, boundElem: VirtualNodeType): Unit =
+  private def updateSubTree(create: Boolean, boundElem: VirtualNodeType, collector: ErrorEventCollector): Unit =
     if (create || fullUpdateChange) {
       // Document has changed and needs to be fully recreated
-      processFullUpdate(create, boundElem)
+      processFullUpdate(create, boundElem, collector)
     } else {
       // Changes to nested binds
       if (bindChanges.nonEmpty)
@@ -132,7 +137,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
       // Changes to top-level XBL bindings
       if (xblChanges.nonEmpty)
-        processXBLUpdates()
+        processXBLUpdates(collector)
     }
 
   private def destroyContainerAndControls(outerInstance: Option[XFormsInstance]): Unit = {
@@ -162,7 +167,12 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     }
   }
 
-  private def processFullUpdate(create: Boolean, boundElem: VirtualNodeType): Unit = {
+  private def processFullUpdate(
+    create   : Boolean,
+    boundElem: VirtualNodeType,
+    collector: ErrorEventCollector
+  ): Unit = {
+
     fullUpdateChange = false
     xblChanges.clear()
     bindChanges.clear()
@@ -279,17 +289,18 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     val stateToRestore =
       Controls.restoringInstanceControls orElse instanceControlsOpt
 
-    def createAndInitializeDynamicSubTree(): Unit =
+    def createAndInitializeDynamicSubTree(collector: ErrorEventCollector): Unit =
       containingDocument.controls.getCurrentControlTree.createAndInitializeDynamicSubTree(
         container        = childContainer,
         containerControl = this,
         elementAnalysis  = partAnalysis.getTopLevelControls.head,
-        state            = Controls.restoringControls
+        state            = Controls.restoringControls,
+        collector        = collector
       )
 
     stateToRestore match {
-      case Some(state) => withDynamicStateToRestore(state)(createAndInitializeDynamicSubTree())
-      case None        => createAndInitializeDynamicSubTree()
+      case Some(state) => withDynamicStateToRestore(state)(createAndInitializeDynamicSubTree(collector))
+      case None        => createAndInitializeDynamicSubTree(collector)
     }
   }
 
@@ -319,7 +330,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       prefixedId -> (prefixedIdsToElemsInSource map (_._2) last)
     }
 
-  private def processXBLUpdates(): Unit = {
+  private def processXBLUpdates(collector: ErrorEventCollector): Unit = {
 
     val partAnalysis = _nested.get.partAnalysis
 
@@ -332,7 +343,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             removeDynamicShadowTree(componentControl)
             createOrUpdateStaticShadowTree(partAnalysis, componentControl, elemInSource.some)
             componentControl.recreateNestedContainer()
-            updateDynamicShadowTree(componentControl)
+            updateDynamicShadowTree(componentControl, collector)
           }
         case _ =>
       }
@@ -377,8 +388,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     (template, newPart)
   }
 
-  override def getBackCopy: XXFormsDynamicControl = {
-    val cloned = super.getBackCopy.asInstanceOf[XXFormsDynamicControl]
+  override def getBackCopy(collector: ErrorEventCollector): XXFormsDynamicControl = {
+    val cloned = super.getBackCopy(collector).asInstanceOf[XXFormsDynamicControl]
     cloned.fullUpdateChange = false // unused
     cloned._nested = None
 
@@ -389,7 +400,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   // LATER: what about new scripts?
   final override def outputAjaxDiff(
     previousControlOpt : Option[XFormsControl],
-    content            : Option[XMLReceiverHelper => Unit])(implicit
+    content            : Option[XMLReceiverHelper => Unit],
+    collector          : ErrorEventCollector
+  )(implicit
     ch                 : XMLReceiverHelper
   ): Unit = ()
 
@@ -467,7 +480,7 @@ object XXFormsDynamicControl {
     componentControl.clearChildren()
   }
 
-  def updateDynamicShadowTree(componentControl: XFormsComponentControl): Unit = {
+  def updateDynamicShadowTree(componentControl: XFormsComponentControl, collector: ErrorEventCollector): Unit = {
 
     val doc             = componentControl.containingDocument
     val templateTreeOpt = componentControl.staticControl.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
@@ -477,7 +490,8 @@ object XXFormsDynamicControl {
         container        = componentControl.nestedContainerOpt getOrElse (throw new IllegalStateException),
         containerControl = componentControl,
         elementAnalysis  = templateTree,
-        state            = Controls.restoringControls
+        state            = Controls.restoringControls,
+        collector        = collector
       )
     }
 

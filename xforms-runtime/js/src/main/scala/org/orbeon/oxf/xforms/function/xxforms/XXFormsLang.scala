@@ -3,6 +3,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LangRef}
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
+import org.orbeon.oxf.xforms.event.EventCollector
 
 
 object XXFormsLang {
@@ -13,7 +14,7 @@ object XXFormsLang {
       case LangRef.AVT(att) =>
         // TODO: resolve concrete ancestor XXFormsAttributeControl instead of just using static id
         val attributeControl = containingDocument.getControlByEffectiveId(att.staticId).asInstanceOf[XXFormsAttributeControl]
-        Option(attributeControl.getExternalValue())
+        Option(attributeControl.getExternalValue(EventCollector.Throw))
       case _ =>
         None
     }

@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.XFormsGlobalProperties._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
-import org.orbeon.oxf.xforms.event.XFormsEvents
+import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEvents}
 import org.orbeon.oxf.xforms.{ShareableScript, XFormsContainingDocument}
 import org.orbeon.xforms._
 
@@ -67,7 +67,7 @@ object ScriptBuilder {
             controlsToInitialize +=
               c.getEffectiveId -> (
                 if (includeValue && abstractBinding.modeExternalValue)
-                  c.externalValueOpt
+                  c.externalValueOpt(EventCollector.ToReview)
                 else
                   None
               )

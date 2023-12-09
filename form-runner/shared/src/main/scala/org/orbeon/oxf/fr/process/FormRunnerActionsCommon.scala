@@ -32,13 +32,13 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.{ErrorSummary, Wizard}
 import org.orbeon.xforms.analysis.model.ValidationLevel._
 
-import scala.concurrent.Future
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
@@ -96,7 +96,7 @@ trait FormRunnerActionsCommon {
       if (frc.formRunnerProperty("oxf.fr.detail.validation-mode")(FormRunnerParams()) contains "explicit") {
         inScopeContainingDocument.synchronizeAndRefresh()
         XFormsAPI.resolveAs[XFormsControl](controlId) foreach { control =>
-          XXFormsUpdateValidityAction.updateValidity(control, recurse = true)
+          XXFormsUpdateValidityAction.updateValidity(control, recurse = true, EventCollector.Throw)
         }
       }
 

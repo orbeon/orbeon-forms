@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import java.{util => ju}
-
 import cats.syntax.option._
 import org.orbeon.dom.{Attribute, Document}
 import org.orbeon.oxf.util.CollectionUtils._
@@ -22,11 +20,13 @@ import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent
 import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions
 
+import java.{util => ju}
 import scala.jdk.CollectionConverters._
 import scala.language.postfixOps
 
@@ -80,7 +80,8 @@ class XFormsDeleteAction extends XFormsAction {
         containingDocumentOpt = actionContext.containingDocument.some,
         collectionToUpdate    = collectionToUpdate,
         deleteIndexOpt        = deleteIndexOpt,
-        doDispatch            = true
+        doDispatch            = true,
+        collector             = actionContext.collector
       )
     } else {
       // "The delete action is terminated with no effect if the Sequence Binding is expressed and the Sequence Binding
@@ -102,10 +103,13 @@ object XFormsDeleteAction extends Logging {
 
   case class DeletionDescriptor(parent: om.NodeInfo, nodeInfo: om.NodeInfo, index: Int)
 
+  // For `InstanceReplacer`
   def doDeleteOne(
     containingDocument : XFormsContainingDocument,
     nodeInfo           : om.NodeInfo,
-    doDispatch         : Boolean)(implicit
+    doDispatch         : Boolean,
+    collector          : ErrorEventCollector
+  )(implicit
     indentedLogger     : IndentedLogger
   ): Option[DeletionDescriptor] = {
 
@@ -116,7 +120,8 @@ object XFormsDeleteAction extends Logging {
       containingDocumentOpt  = containingDocument.some,
       itemsToDelete          = List(nodeInfo),
       deleteIndexForEventOpt = None,
-      doDispatch             = doDispatch
+      doDispatch             = doDispatch,
+      collector              = collector
     ).headOption
   }
 
@@ -124,7 +129,9 @@ object XFormsDeleteAction extends Logging {
     containingDocumentOpt : Option[XFormsContainingDocument],
     collectionToUpdate    : Seq[om.Item],
     deleteIndexOpt        : Option[Int],
-    doDispatch            : Boolean)(implicit
+    doDispatch            : Boolean,
+    collector             : ErrorEventCollector
+  )(implicit
     indentedLogger        : IndentedLogger
   ): List[DeletionDescriptor] = {
 
@@ -140,24 +147,28 @@ object XFormsDeleteAction extends Logging {
             containingDocumentOpt,
             collectionToUpdate.lift(index - 1).toList,
             deleteIndexOpt,
-            doDispatch
+            doDispatch,
+            collector
           )
         case None =>
           doDeleteItems(
             containingDocumentOpt,
             collectionToUpdate,
             deleteIndexOpt,
-            doDispatch
+            doDispatch,
+            collector
           )
       }
     }
   }
 
-  def doDeleteItems(
+  private def doDeleteItems(
     containingDocumentOpt  : Option[XFormsContainingDocument],
     itemsToDelete          : Seq[om.Item],
     deleteIndexForEventOpt : Option[Int],
-    doDispatch             : Boolean)(implicit
+    doDispatch             : Boolean,
+    collector              : ErrorEventCollector
+  )(implicit
     indentedLogger         : IndentedLogger
 ): List[DeletionDescriptor] = {
 
@@ -202,7 +213,7 @@ object XFormsDeleteAction extends Logging {
         )
 
         if (doDispatch)
-          Dispatch.dispatchEvent(new XFormsDeleteEvent(modifiedInstance, descriptors, deleteIndexForEventOpt))
+          Dispatch.dispatchEvent(new XFormsDeleteEvent(modifiedInstance, descriptors, deleteIndexForEventOpt), collector)
 
       case (None, descriptors) =>
         debugAllowNull(

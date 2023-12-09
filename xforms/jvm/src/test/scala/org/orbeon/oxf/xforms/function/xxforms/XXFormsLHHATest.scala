@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatestplus.junit.AssertionsForJUnit
 
@@ -64,6 +65,6 @@ class XXFormsLHHATest extends DocumentTestBase with AssertionsForJUnit {
 
     // NOTE: Make the control invalid so that the alert message is not empty
     for (lhha <- Seq("label", "help", "hint", "alert"))
-      assert(getValueControl(lhha).getValue === "My " + lhha)
+      assert(getValueControl(lhha).getValue(EventCollector.Throw) === "My " + lhha)
   }
 }

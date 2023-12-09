@@ -22,6 +22,7 @@ import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, IndentedLogger}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.net.URI
@@ -71,7 +72,11 @@ class RegularSubmission(submission: XFormsModelSubmission)
         hasCredentials           = submissionParameters.credentialsOpt.isDefined,
         mediatypeOpt             = serializationParameters.actualRequestMediatype.some,
         encodingForSOAP          = submissionParameters.encoding,
-        customHeaders            = SubmissionUtils.evaluateHeaders(submission, submissionParameters.replaceType == ReplaceType.All),
+        customHeaders            = SubmissionUtils.evaluateHeaders(
+          submission,
+          submissionParameters.replaceType == ReplaceType.All,
+          EventCollector.Throw
+        ),
         headersToForward         = Connection.headersToForwardFromProperty,
         getHeader                = submission.containingDocument.headersGetter)(
         logger                   = detailsLogger,

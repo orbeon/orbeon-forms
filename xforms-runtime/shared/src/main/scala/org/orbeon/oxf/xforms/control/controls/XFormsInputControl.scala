@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls.InputControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsInputHandler
@@ -26,6 +27,7 @@ import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.helpers.AttributesImpl
+
 
 /**
  * xf:input control
@@ -48,23 +50,23 @@ class XFormsInputControl(
   private def format   = staticControlOpt flatMap (_.format)
   private def unformat = staticControlOpt flatMap (_.unformat)
 
-  private def unformatTransform(v: String) = unformat match {
-    case Some(expr) => evaluateAsString(expr, Seq(stringToStringValue(v)), 1) getOrElse ""
+  private def unformatTransform(v: String, collector: ErrorEventCollector) = unformat match {
+    case Some(expr) => evaluateAsString(expr, Seq(stringToStringValue(v)), 1, collector, "translating exernal value") getOrElse ""
     case None       => v
   }
 
-  override def performDefaultAction(event: XFormsEvent): Unit = {
+  override def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
     // The boolean input is rendered as a checkbox, so consider it visited on selection/deselection, to be consistent
     // with what are doing for other selection controls
     if (getBuiltinTypeName == "boolean" && event.isInstanceOf[XXFormsValueEvent])
       visited = true
-    super.performDefaultAction(event)
+    super.performDefaultAction(event, collector)
   }
 
-  override def evaluateExternalValue() : Unit = {
+  override def evaluateExternalValue(collector: ErrorEventCollector): Unit = {
     assert(isRelevant)
 
-    val internalValue = getValue
+    val internalValue = getValue(collector)
     assert(internalValue ne null)
 
     // TODO: format must take place between instance and internal value instead
@@ -82,12 +84,16 @@ class XFormsInputControl(
         // Other types or no type
         // Format only if the format attribute is present. We don't use the default formats, because we don't
         // yet have default "unformats".
-        format flatMap (valueWithSpecifiedFormat(_)) getOrElse internalValue
+        format.flatMap(valueWithSpecifiedFormat(_, collector)) getOrElse internalValue
 
     setExternalValue(updatedValue)
   }
 
-  override def translateExternalValue(boundItem: om.Item, externalValue: String): Option[String] = {
+  override def translateExternalValue(
+    boundItem    : om.Item,
+    externalValue: String,
+    collector    : ErrorEventCollector
+  ): Option[String] = {
 
     // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date
     // formatted value
@@ -105,44 +111,49 @@ class XFormsInputControl(
         case "boolean"       => normalizeBooleanString(externalValue)
         case "string" | null =>
           // Replacement-based input sanitation for string type only
-          containingDocument.staticState.sanitizeInput(unformatTransform(externalValue))
+          containingDocument.staticState.sanitizeInput(unformatTransform(externalValue, collector))
         case _ =>
-          unformatTransform(externalValue)
+          unformatTransform(externalValue, collector)
       }
     )
   }
 
   // Convenience method for handler: return the value of the first input field.
-  def getFirstValueUseFormat: String = {
+  def getFirstValueUseFormat(collector: ErrorEventCollector): String = {
     val result =
       if (isRelevant)
-        externalValueOpt
+        externalValueOpt(collector)
       else
         None
 
     result getOrElse ""
   }
 
-  override def getFormattedValue: Option[String] =
-    getValueUseFormat(format) orElse Option(getExternalValue)
+  override def getFormattedValue(collector: ErrorEventCollector): Option[String] =
+    getValueUseFormat(format, collector) orElse Option(getExternalValue(collector))
 
   def getFirstValueType: String = getBuiltinTypeName
 
   override def compareExternalUseExternalValue(
-    previousExternalValue : Option[String],
-    previousControl       : Option[XFormsControl]
+    previousExternalValue: Option[String],
+    previousControl      : Option[XFormsControl],
+    collector            : ErrorEventCollector
   ): Boolean =
     previousControl match {
       case Some(other: XFormsInputControl) =>
         valueType == other.valueType &&
-        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
+        super.compareExternalUseExternalValue(previousExternalValue, previousControl, collector)
       case _ => false
     }
 
   // Add type attribute if needed
-  override def addAjaxAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
+  override def addAjaxAttributes(
+    attributesImpl    : AttributesImpl,
+    previousControlOpt: Option[XFormsControl],
+    collector         : ErrorEventCollector
+  ): Boolean = {
 
-    var added = super.addAjaxAttributes(attributesImpl, previousControlOpt)
+    var added = super.addAjaxAttributes(attributesImpl, previousControlOpt, collector)
 
     val previousSingleNodeControlOpt = previousControlOpt.asInstanceOf[Option[XFormsSingleNodeControl]]
 

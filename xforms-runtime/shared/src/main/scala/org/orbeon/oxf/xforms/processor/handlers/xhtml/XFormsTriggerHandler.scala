@@ -30,10 +30,7 @@ abstract class XFormsTriggerHandler(
   ) {
 
   protected def getTriggerLabel(xformsControl: XFormsSingleNodeControl): String =
-    if (xformsControl.getLabel != null)
-      xformsControl.getLabel
-    else
-      ""
+    Option(xformsControl.getLabel(handlerContext.collector)).getOrElse("")
 
   // Don't output anything in static readonly mode
   override def isMustOutputControl(control: XFormsControl): Boolean =
@@ -53,7 +50,7 @@ abstract class XFormsTriggerHandler(
 
       val hintValue =
         if (control != null)
-          control.getHint
+          control.getHint(handlerContext.collector)
         else
           null
 

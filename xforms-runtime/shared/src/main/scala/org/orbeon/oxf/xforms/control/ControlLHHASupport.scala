@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, StaticLHHASupport}
-import org.orbeon.xforms.analysis.model.ValidationLevel
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport._
 import org.orbeon.oxf.xforms.control.XFormsControl._
-import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.xforms.analysis.model.ValidationLevel
+
 import scala.collection.compat._
 
 trait ControlLHHASupport {
@@ -53,7 +53,7 @@ trait ControlLHHASupport {
       lhhaArray(i) = null
 
   // Copy LHHA if not null
-  def updateLHHACopy(copy: XFormsControl): Unit = {
+  def updateLHHACopy(copy: XFormsControl, collector: ErrorEventCollector): Unit = {
     copy.lhhaArray = new Array[LHHAProperty](LHHA.size)
     for {
       i <- lhhaArray.indices
@@ -61,7 +61,7 @@ trait ControlLHHASupport {
       if currentLHHA ne null
     } yield {
       // Evaluate lazy value before copying
-      currentLHHA.value()
+      currentLHHA.value(collector)
 
       // Copy
       copy.lhhaArray(i) = currentLHHA.copy.asInstanceOf[LHHAProperty]
@@ -93,19 +93,23 @@ trait ControlLHHASupport {
     }
   }
 
+  def eagerlyEvaluateLhha(collector: ErrorEventCollector): Unit =
+    for (lhha <- LHHA.values)
+      lhhaProperty(lhha).value(collector)
+
   def htmlLhhaSupport: Set[LHHA] = LHHA.DefaultLHHAHTMLSupport
   def ajaxLhhaSupport: Seq[LHHA] = LHHA.values
 
-  def compareLHHA(other: XFormsControl) =
-    ajaxLhhaSupport forall (lhha => lhhaProperty(lhha).value() == other.lhhaProperty(lhha).value())
+  def compareLHHA(other: XFormsControl, collector: ErrorEventCollector) =
+    ajaxLhhaSupport forall (lhha => lhhaProperty(lhha).value(collector) == other.lhhaProperty(lhha).value(collector))
 
   // Convenience accessors
-  final def getLabel    = lhhaProperty(LHHA.Label).value()
-  final def isHTMLLabel = lhhaProperty(LHHA.Label).isHTML
-  final def getHelp     = lhhaProperty(LHHA.Help).value()
-  final def getHint     = lhhaProperty(LHHA.Hint).value()
-  final def getAlert    = lhhaProperty(LHHA.Alert).value()
-  final def isHTMLAlert = lhhaProperty(LHHA.Alert).isHTML
+  final def getLabel   (collector: ErrorEventCollector) = lhhaProperty(LHHA.Label).value(collector)
+  final def isHTMLLabel(collector: ErrorEventCollector) = lhhaProperty(LHHA.Label).isHTML(collector)
+  final def getHelp    (collector: ErrorEventCollector) = lhhaProperty(LHHA.Help).value(collector)
+  final def getHint    (collector: ErrorEventCollector) = lhhaProperty(LHHA.Hint).value(collector)
+  final def getAlert   (collector: ErrorEventCollector) = lhhaProperty(LHHA.Alert).value(collector)
+  final def isHTMLAlert(collector: ErrorEventCollector) = lhhaProperty(LHHA.Alert).isHTML(collector)
 }
 
 // NOTE: Use name different from trait so that the Java compiler is happy
@@ -115,14 +119,14 @@ object LHHASupport {
 
   // Control property for LHHA
   trait LHHAProperty extends ControlProperty[String] {
-    def escapedValue(): String
-    def isHTML: Boolean
+    def escapedValue(collector: ErrorEventCollector): String
+    def isHTML(collector: ErrorEventCollector): Boolean
   }
 
   // Immutable null LHHA property
   class NullLHHAProperty extends ImmutableControlProperty(null: String) with LHHAProperty {
-    def escapedValue(): String = null
-    def isHTML = false
+    def escapedValue(collector: ErrorEventCollector): String = null
+    def isHTML(collector: ErrorEventCollector) = false
   }
 
   // Gather all active alerts for the given control following a selection algorithm

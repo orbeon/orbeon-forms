@@ -89,9 +89,10 @@ trait XFormsSupport extends MockitoSugar {
         name,
         document.getObjectByEffectiveId(effectiveId).asInstanceOf[XFormsEventTarget],
         properties,
-        bubbles    = true,
+        bubbles = true,
         cancelable = true
-      )
+      ),
+      EventCollector.Throw
     )
 
   // Get a top-level instance
@@ -102,13 +103,13 @@ trait XFormsSupport extends MockitoSugar {
   def instanceToString(instance: XFormsInstance) =
     TransformerUtils.tinyTreeToString(instance.documentInfo)
 
-  def getControlValue(controlEffectiveId: String) = getValueControl(controlEffectiveId).getValue
-  def getControlExternalValue(controlEffectiveId: String) = getValueControl(controlEffectiveId).getExternalValue
+  def getControlValue(controlEffectiveId: String) = getValueControl(controlEffectiveId).getValue(EventCollector.Throw)
+  def getControlExternalValue(controlEffectiveId: String) = getValueControl(controlEffectiveId).getExternalValue(EventCollector.Throw)
 
   // This stores the value without testing for readonly
   def setControlValue(controlEffectiveId: String, value: String): Unit =
     document.withOutermostActionHandler {
-      getValueControl(controlEffectiveId).storeExternalValue(value)
+      getValueControl(controlEffectiveId).storeExternalValue(value, EventCollector.Throw)
     }
 
   def setControlValueWithEventSearchNested(controlEffectiveId: String, value: String): Unit =
@@ -136,12 +137,12 @@ trait XFormsSupport extends MockitoSugar {
 
   def getItemset(controlEffectiveId: String): String = {
     val select1 = getObject(controlEffectiveId).asInstanceOf[XFormsSelect1Control]
-    ItemsetSupport.asJSON(select1.getItemset, None, select1.mustEncodeValues, select1.staticControl.excludeWhitespaceTextNodesForCopy, null)
+    ItemsetSupport.asJSON(select1.getItemset(EventCollector.Throw), None, select1.mustEncodeValues, select1.staticControl.excludeWhitespaceTextNodesForCopy, null)
   }
 
   def getItemsetSearchNested(control: XFormsControl): Option[Itemset] = control match {
-    case c: XFormsSelect1Control   => Some(c.getItemset)
-    case c: XFormsComponentControl => ControlsIterator(c, includeSelf = false) collectFirst { case c: XFormsSelect1Control =>  c.getItemset }
+    case c: XFormsSelect1Control   => Some(c.getItemset(EventCollector.Throw))
+    case c: XFormsComponentControl => ControlsIterator(c, includeSelf = false) collectFirst { case c: XFormsSelect1Control =>  c.getItemset(EventCollector.Throw) }
     case _                         => None
   }
 

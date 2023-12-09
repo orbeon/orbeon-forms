@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import java.io.IOException
-
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsNoSingleNodeContainerControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsLoadEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -37,7 +37,7 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
       containingDocument.controls.getCurrentControlTree.setRoot(this)
   }
 
-  override def performDefaultAction(event: XFormsEvent): Unit = event match {
+  override def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = event match {
     case load: XXFormsLoadEvent =>
       // Internal load event for "two-pass load" handling Ajax load in portlet environments (see `XFormsLoadAction`)
       try {
@@ -46,7 +46,7 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
         case e: IOException => throw new ValidationException(e, getLocationData)
       }
     case _ =>
-      super.performDefaultAction(event)
+      super.performDefaultAction(event, collector)
   }
 
   // FIXME: Support refresh events? Simply enabling below doesn't seem to work for enabled/disabled.

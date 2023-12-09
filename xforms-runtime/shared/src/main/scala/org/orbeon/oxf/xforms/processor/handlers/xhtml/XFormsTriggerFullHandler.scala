@@ -56,7 +56,7 @@ class XFormsTriggerFullHandler(
 
     val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, triggerControl, addId = true)
 
-    val isHTMLLabel = (triggerControl ne null) && triggerControl.isHTMLLabel
+    val isHTMLLabel = (triggerControl ne null) && triggerControl.isHTMLLabel(handlerContext.collector)
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
 
     containerAttributes.addOrReplace("type", "button")

@@ -25,6 +25,8 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
+import org.orbeon.oxf.xforms.event.EventCollector
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.itemset.{ItemNode, ItemsetSupport}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
@@ -70,6 +72,8 @@ object FormRunnerMetadata {
   //@XPathFunction
   def findAllControlsWithValues(html: Boolean, controlsToExclude: List[NodeInfo]): String = {
 
+    val collector: ErrorEventCollector = EventCollector.Throw
+
     val currentFormRunnerResources = FormRunnerLang.currentFRResources
 
     val naString = currentFormRunnerResources / "email" / "na" stringValue
@@ -82,7 +86,8 @@ object FormRunnerMetadata {
       gatherRelevantControls(
         doc                   = XFormsAPI.inScopeContainingDocument,
         currentLang           = Lang(FormRunnerLang.currentFRLang),
-        controlNamesToExclude = controlsToExclude.map(_.stringValue).toSet
+        controlNamesToExclude = controlsToExclude.map(_.stringValue).toSet,
+        collector             = collector
       )
 
     def createLine(
@@ -203,6 +208,8 @@ object FormRunnerMetadata {
 
     val controls = doc.controls.getCurrentControlTree.effectiveIdsToControls
 
+    val collector: ErrorEventCollector = EventCollector.Throw
+
     def instanceInScope(control: XFormsSingleNodeControl, staticId: String): Option[XFormsInstance] =
       control.container.resolveObjectByIdInScope(control.getEffectiveId, staticId, None) flatMap
         (_.narrowTo[XFormsInstance])
@@ -223,7 +230,12 @@ object FormRunnerMetadata {
       yield
         resource.attValue("*:lang") -> resource
 
-    def resourcesForControl(staticControl: StaticLHHASupport, lang: String, resourcesRoot: NodeInfo, controlName: String) = {
+    def resourcesForControl(
+      staticControl: StaticLHHASupport,
+      lang         : String,
+      resourcesRoot: NodeInfo,
+      controlName  : String
+    ): List[Elem] = {
 
       val enclosingHolder = resourcesRoot descendant controlName take 1
 
@@ -282,7 +294,7 @@ object FormRunnerMetadata {
           }{
             for (valueControl <- control.narrowTo[XFormsValueControl].toList)
             yield
-              <value>{valueControl.getValue}</value>
+              <value>{valueControl.getValue(collector)}</value>
           }</control>
 
     import scala.{xml => sxml}
@@ -297,10 +309,11 @@ object FormRunnerMetadata {
     <metadata>{groupedMetadata}</metadata>
   }
 
-  def gatherRelevantControls(
+  private def gatherRelevantControls(
     doc                  : XFormsContainingDocument,
     currentLang          : Lang,
-    controlNamesToExclude: Set[String]
+    controlNamesToExclude: Set[String],
+    collector            : ErrorEventCollector
   ): List[ControlDetails] = {
 
     val controls = doc.controls.getCurrentControlTree.effectiveIdsToControls
@@ -367,14 +380,14 @@ object FormRunnerMetadata {
                 currentLang,
                 (
                   List(
-                    LHHA.Label -> control.getLabel,
-                    LHHA.Help  -> control.getHelp,
-                    LHHA.Hint  -> control.getHint,
-                    LHHA.Alert -> control.getAlert
+                    LHHA.Label -> control.getLabel(collector),
+                    LHHA.Help  -> control.getHelp(collector),
+                    LHHA.Hint  -> control.getHint(collector),
+                    LHHA.Alert -> control.getAlert(collector)
                   ),
                   for {
                     sc             <- control.narrowTo[XFormsSelect1Control].toList
-                    (valueNode, _) <- sc.getItemset.allItemsWithValueIterator(reverse = false)
+                    (valueNode, _) <- sc.getItemset(collector).allItemsWithValueIterator(reverse = false)
                   } yield
                     valueNode
                 )
@@ -385,15 +398,15 @@ object FormRunnerMetadata {
             Option(control) collect {
               case c: XFormsSelectControl  =>
 
-                val selectedLabels = c.findSelectedItems map (_.label.label) // TODO: HTML
+                val selectedLabels = c.findSelectedItems(collector) map (_.label.label) // TODO: HTML
 
-                MultipleControlValue(c.getValue, selectedLabels) // TODO
+                MultipleControlValue(c.getValue(collector), selectedLabels) // TODO
 
               case c: XFormsSelect1Control =>
 
-                val selectedLabel = c.findSelectedItem map (_.label.label) // TODO: HTML
+                val selectedLabel = c.findSelectedItem(collector) map (_.label.label) // TODO: HTML
 
-                SingleControlValue(c.getValue, selectedLabel) // TODO
+                SingleControlValue(c.getValue(collector), selectedLabel) // TODO
 
               case c: XFormsValueComponentControl if c.staticControl.commonBinding.modeSelection =>
 
@@ -401,23 +414,23 @@ object FormRunnerMetadata {
 
                 selectionControlOpt match {
                   case Some(selectControl: XFormsSelectControl) =>
-                    val selectedLabels = selectControl.findSelectedItems map (_.label.label)  // TODO: HTML
-                    MultipleControlValue(selectControl.getValue, selectedLabels) // TODO
+                    val selectedLabels = selectControl.findSelectedItems(collector) map (_.label.label)  // TODO: HTML
+                    MultipleControlValue(selectControl.getValue(collector), selectedLabels) // TODO
                   case Some(select1Control) =>
 
                     // HACK for https://github.com/orbeon/orbeon-forms/issues/4042
                     val itemOpt =
                       if (c.staticControl.element.getQName == QName("dropdown-select1", XMLNames.FRNamespace))
-                        select1Control.findSelectedItem filter (_.value match {
+                        select1Control.findSelectedItem(collector) filter (_.value match {
                           case Left(v) if v.nonAllBlank => true
                           case _                        => false
                         })
                       else
-                        select1Control.findSelectedItem
+                        select1Control.findSelectedItem(collector)
 
                     // TODO: HTML
                     val selectedLabelOpt  = itemOpt map (_.label.label) orElse "".some // use a blank string so we get `N/A` in the end
-                    SingleControlValue(select1Control.getValue, selectedLabelOpt)
+                    SingleControlValue(select1Control.getValue(collector), selectedLabelOpt)
                   case None =>
                     throw new IllegalStateException
                 }
@@ -428,23 +441,23 @@ object FormRunnerMetadata {
                 // instance and no initial/calculated expressions, then consider that this control doesn't have
                 // a formatted value.
                 val noCalculationAndIsEmpty =
-                  ! c.bind.get.staticBind.hasDefaultOrCalculateBind && c.getValue.trimAllToOpt.isEmpty
+                  ! c.bind.get.staticBind.hasDefaultOrCalculateBind && c.getValue(collector).trimAllToOpt.isEmpty
 
                 val formattedValue =
                   if (noCalculationAndIsEmpty)
                     None
                   else
-                    c.getFormattedValue orElse Option(c.getValue)
+                    c.getFormattedValue(collector) orElse Option(c.getValue(collector))
 
-                SingleControlValue(c.getValue, formattedValue)
+                SingleControlValue(c.getValue(collector), formattedValue)
 
               case c: XFormsValueControl if Set("image-attachment", "attachment")(staticControl.localName) =>
 
-                SingleControlValue(c.getValue, c.boundNodeOpt flatMap (_.attValueOpt("filename")))
+                SingleControlValue(c.getValue(collector), c.boundNodeOpt flatMap (_.attValueOpt("filename")))
 
               case c: XFormsValueControl =>
 
-                SingleControlValue(c.getValue, c.getFormattedValue orElse Option(c.getValue))
+                SingleControlValue(c.getValue(collector), c.getFormattedValue(collector) orElse Option(c.getValue(collector)))
             }
 
           // Include sections and repeated grids only

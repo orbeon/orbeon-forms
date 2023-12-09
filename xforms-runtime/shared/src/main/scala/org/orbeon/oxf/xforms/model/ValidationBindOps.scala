@@ -17,7 +17,7 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{Constraint, Required, Type}
-import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants, XMLParsing}
@@ -40,13 +40,13 @@ trait ValidationBindOps extends Logging {
   // TEMP: Picked a different name or `fullOptJS` fails!
   import Private2._
 
-  def applyValidationBinds(invalidInstances: m.Set[String], collector: XFormsEvent => Unit): Unit = {
+  def applyValidationBinds(invalidInstances: m.Set[String], collector: ErrorEventCollector): Unit = {
     if (! staticModel.mustRevalidate) {
       debug("skipping bind revalidate", List("model id" -> model.getEffectiveId, "reason" -> "no validation binds"))
     } else {
 
       // Reset context stack just to re-evaluate the variables
-      model.resetAndEvaluateVariables()
+      model.resetAndEvaluateVariables(collector)
 
       // 1. Validate based on type and requiredness
       if (staticModel.hasTypeBind || staticModel.hasRequiredBind)
@@ -67,7 +67,7 @@ trait ValidationBindOps extends Logging {
   protected def failedConstraintMIPs(
     mips      : List[StaticXPathMIP],
     bindNode  : BindNode,
-    collector : XFormsEvent => Unit
+    collector : ErrorEventCollector
   ): List[StaticXPathMIP] =
     for {
       mip       <- mips
@@ -261,7 +261,7 @@ trait ValidationBindOps extends Logging {
     def validateConstraint(
       bindNode         : BindNode,
       invalidInstances : m.Set[String],
-      collector        : XFormsEvent => Unit
+      collector        : ErrorEventCollector
     ): Unit = {
 
       assert(bindNode.staticBind.constraintsByLevel.nonEmpty)
@@ -305,7 +305,7 @@ trait ValidationBindOps extends Logging {
     def evaluateBooleanExpressionStoreProperties(
       bindNode  : BindNode,
       xpathMIP  : StaticXPathMIP,
-      collector : XFormsEvent => Unit
+      collector : ErrorEventCollector
     ): Boolean =
       try {
         // LATER: If we implement support for allowing binds to receive events, source must be bind id.

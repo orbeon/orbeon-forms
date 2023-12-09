@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaPlacementType}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xml.SaxSupport._
@@ -47,11 +48,17 @@ trait ControlAjaxSupport {
 
   def outputAjaxDiff(
     previousControlOpt : Option[XFormsControl],
-    content            : Option[XMLReceiverHelper => Unit])(implicit
+    content            : Option[XMLReceiverHelper => Unit],
+    collector          : ErrorEventCollector
+  )(implicit
     ch                 : XMLReceiverHelper
   ): Unit = ()
 
-  def addAjaxAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]) = {
+  def addAjaxAttributes(
+    attributesImpl    : AttributesImpl,
+    previousControlOpt: Option[XFormsControl],
+    collector         : ErrorEventCollector
+  ): Boolean = {
     var added = false
 
     // Control id
@@ -59,7 +66,7 @@ trait ControlAjaxSupport {
 
     // This is handled specially because it's a list of tokens, some of which can be added and removed
     added |= addAjaxClasses(attributesImpl, previousControlOpt, this)
-    added |= addAjaxLHHA(attributesImpl, previousControlOpt)
+    added |= addAjaxLHHA(attributesImpl, previousControlOpt, collector)
 
     // Visited
     if ((previousControlOpt exists (_.visited)) != visited) {
@@ -68,13 +75,17 @@ trait ControlAjaxSupport {
     }
 
     // Output control-specific attributes
-    added |= addAjaxExtensionAttributes(attributesImpl, previousControlOpt)
+    added |= addAjaxExtensionAttributes(attributesImpl, previousControlOpt, collector)
 
     added
   }
 
   // Label, help, hint, alert
-  final def addAjaxLHHA(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
+  final def addAjaxLHHA(
+    attributesImpl    : AttributesImpl,
+    previousControlOpt: Option[XFormsControl],
+    collector         : ErrorEventCollector
+  ): Boolean = {
 
     var added = false
 
@@ -86,11 +97,11 @@ trait ControlAjaxSupport {
       // could be nested, some external, but in the end we only get one value. For now (2022-06-09) the constraint
       // remains that we should either have all local alerts, or all separate.
       if staticLhhaSupport.hasLocal(lhha) || staticLhhaSupport.hasLHHAPlaceholder(lhha)
-      value1            = previousControlOpt.map(_.lhhaProperty(lhha).value()).orNull
+      value1            = previousControlOpt.map(_.lhhaProperty(lhha).value(collector)).orNull
       lhha2             = self.lhhaProperty(lhha)
-      value2            = lhha2.value()
+      value2            = lhha2.value(collector)
       if value1 != value2
-      attributeValue    = Option(lhha2.escapedValue()) getOrElse ""
+      attributeValue    = Option(lhha2.escapedValue(collector)) getOrElse ""
     } yield
       added |= addOrAppendToAttributeIfNeeded(attributesImpl, lhha.entryName, attributeValue, previousControlOpt.isEmpty, attributeValue == "")
 
@@ -104,7 +115,11 @@ trait ControlAjaxSupport {
    */
   // NOTE: overridden by XFormsOutputControl and XFormsUploadControl for FileMetadata. Could everything go through a
   // unified system of properties?
-  def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]) = {
+  def addAjaxExtensionAttributes(
+    attributesImpl    : AttributesImpl,
+    previousControlOpt: Option[XFormsControl],
+    collector         : ErrorEventCollector
+  ): Boolean = {
 
     var added = false
 

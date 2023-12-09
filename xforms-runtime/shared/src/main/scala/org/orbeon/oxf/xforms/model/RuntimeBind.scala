@@ -13,20 +13,22 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
 
-import scala.jdk.CollectionConverters._
 import scala.collection.{mutable => m}
+import scala.jdk.CollectionConverters._
+
 
 class RuntimeBind(
   val model           : XFormsModel,
   val staticBind      : StaticBind,
   val parentIteration : BindIteration,
-  isSingleNodeContext : Boolean
+  isSingleNodeContext : Boolean,
+  collector           : ErrorEventCollector
 ) extends XFormsObject {
 
   // TODO: Construction should be done in `RuntimeBind.apply()`.
@@ -37,7 +39,7 @@ class RuntimeBind(
 
   val (items, bindNodes) = {
     val contextStack = model.getContextStack
-    contextStack.pushBinding(staticBind.element, model.getEffectiveId, model.getResolutionScope)
+    contextStack.pushBinding(staticBind.element, model.getEffectiveId, model.getResolutionScope, model, collector)
 
     // NOTE: This should probably go into XFormsContextStack
     val bindingContext = contextStack.getCurrentBindingContext
@@ -91,7 +93,8 @@ class RuntimeBind(
                 currentPosition,
                 item,
                 childrenBindsHaveSingleNodeContext,
-                childrenStaticBinds
+                childrenStaticBinds,
+                collector
               )
 
             result += currentBindIteration

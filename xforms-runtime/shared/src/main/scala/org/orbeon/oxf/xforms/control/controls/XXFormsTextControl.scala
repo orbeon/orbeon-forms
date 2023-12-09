@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.xforms.XFormsNames
@@ -45,7 +46,9 @@ class XXFormsTextControl(
   final override def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
     previousControl : Option[XFormsValueControl],
-    content         : Option[XMLReceiverHelper => Unit])(implicit
+    content         : Option[XMLReceiverHelper => Unit],
+    collector       : ErrorEventCollector
+  )(implicit
     ch              : XMLReceiverHelper
   ) = {
 
@@ -69,7 +72,7 @@ class XXFormsTextControl(
     outputValueElement(
       attributesImpl = atts,
       elementName    = "text",
-      value          = getEscapedExternalValue
+      value          = getEscapedExternalValue(collector)
     )
   }
 

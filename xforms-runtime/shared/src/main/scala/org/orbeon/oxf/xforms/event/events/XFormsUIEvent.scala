@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
-import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEvent}
 
 
 /**
@@ -74,10 +74,10 @@ private object XFormsUIEvent {
   def controlPosition(e: XFormsUIEvent) =
     e.targetControl.container.getPartAnalysis.getControlPosition(e.targetControl.getPrefixedId)
 
-  def label(e: XFormsUIEvent) = Option(e.targetControl.getLabel)
-  def help(e: XFormsUIEvent)  = Option(e.targetControl.getHelp)
-  def hint(e: XFormsUIEvent)  = Option(e.targetControl.getHint)
-  def alert(e: XFormsUIEvent) = Option(e.targetControl.getAlert)
+  def label(e: XFormsUIEvent) = Option(e.targetControl.getLabel(EventCollector.Throw))
+  def help(e: XFormsUIEvent)  = Option(e.targetControl.getHelp(EventCollector.Throw))
+  def hint(e: XFormsUIEvent)  = Option(e.targetControl.getHint(EventCollector.Throw))
+  def alert(e: XFormsUIEvent) = Option(e.targetControl.getAlert(EventCollector.Throw))
 
   def level(e: XFormsUIEvent): Option[String] = e.targetControl match {
     case c: XFormsSingleNodeControl => c.alertLevel map (_.entryName)

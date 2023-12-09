@@ -487,7 +487,7 @@
                     <p:input name="document">
                         <xh:html>
                             <xh:head>
-                                <xf:model id="model" xxf:show-recoverable-errors="100">
+                                <xf:model id="model" xxf:show-recoverable-errors="100" xxf:allow-error-recovery-on-init="true">
                                     <xf:instance id="instance">
                                         <instance show="false">
                                             <date>2011-11-03</date>
@@ -591,24 +591,24 @@
         </input>
         <output name="response">
             <xxf:errors>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error1" (Non-numeric year component)</xxf:error>
-                <xxf:error exception="org.orbeon.oxf.common.ValidationException">(pushing XForms control binding: element='&lt;xf:action ev:event="DOMActivate" bind="non-existing-bind" id="xf-8"/&gt;'): Reference to non-existing bind id: `non-existing-bind`</xxf:error>
-                <xxf:error exception="org.orbeon.oxf.common.OXFException">Missing mandatory name attribute on xf:dispatch element.</xxf:error>
-                <xxf:error exception="org.orbeon.oxf.common.OXFException">Unable to set value on disallowed node</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error2" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error3" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error4" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error6" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error7" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error8" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error9" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error10" (Non-numeric year component)</xxf:error>
-            </xxf:errors>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error1" (Non-numeric year component)</xxf:error>
+               <xxf:error exception="org.orbeon.oxf.common.OXFException">Invalid bind: `non-existing-bind`</xxf:error>
+               <xxf:error exception="org.orbeon.oxf.common.OXFException">Missing mandatory name attribute on xf:dispatch element.</xxf:error>
+               <xxf:error exception="org.orbeon.oxf.common.OXFException">Unable to set value on disallowed node</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error2" (Non-numeric year component)</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error3" (Non-numeric year component)</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error4" (Non-numeric year component)</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error6" (Non-numeric year component)</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error7" (Non-numeric year component)</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error8" (Non-numeric year component)</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error9" (Non-numeric year component)</xxf:error>
+               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error10" (Non-numeric year component)</xxf:error>
+           </xxf:errors>
         </output>
     </test>
 

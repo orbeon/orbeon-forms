@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.RuntimeDependentFunction
 import org.orbeon.saxon.expr.XPathContext
@@ -31,10 +32,10 @@ class XXFormsLHHA extends XFormsFunction with RuntimeDependentFunction {
       relevantControl(0) map f
 
     evaluateControlItem(operation match {
-      case 0 => _.getLabel
-      case 1 => _.getHelp
-      case 2 => _.getHint
-      case 3 => _.getAlert
+      case 0 => _.getLabel(EventCollector.Throw)
+      case 1 => _.getHelp(EventCollector.Throw)
+      case 2 => _.getHint(EventCollector.Throw)
+      case 3 => _.getAlert(EventCollector.Throw)
       case _ => throw new UnsupportedOperationException
     })
   }

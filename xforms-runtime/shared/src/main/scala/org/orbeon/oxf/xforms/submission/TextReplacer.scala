@@ -18,8 +18,8 @@ import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsActions
-import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.model.StaticDataModel._
 import org.orbeon.saxon.om
@@ -113,17 +113,17 @@ object TextReplacer extends Replacer {
           oldValue           = oldValue,
           newValue           = value,
           isCalculate        = false,
-          collector          = Dispatch.dispatchEvent)(
+          collector          = (event: XFormsEvent) => Dispatch.dispatchEvent(event, EventCollector.Throw))(
           containingDocument = containingDocument,
           logger             = containingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
         )
 
-      def handleSetValueError(reason: Reason) =
+      def handleSetValueError(reason: NodeReason) =
         throw newSubmissionException(
           reason match {
-            case DisallowedNodeReason =>
+            case Reason.DisallowedNode =>
               s"""`targetref` attribute doesn't point to an element without children or to an attribute for `replace="${submissionParameters.replaceType}"`."""
-            case ReadonlyNodeReason   =>
+            case Reason.ReadonlyNode   =>
               s"""`targetref` attribute points to a readonly node for `replace="${submissionParameters.replaceType}"`."""
           }
         )

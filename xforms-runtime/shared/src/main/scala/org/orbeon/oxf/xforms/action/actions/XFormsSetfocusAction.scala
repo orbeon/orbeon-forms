@@ -20,9 +20,9 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent
 import org.orbeon.oxf.xml.dom.Extensions
-import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames._
 
 /**
@@ -47,11 +47,16 @@ class XFormsSetfocusAction extends XFormsAction {
 
     // Resolve and update control
     resolveControlAvt("control")(context) foreach
-      (XFormsSetfocusAction.setfocus(_, includesQNamesOpt, excludesQNamesOpt))
+      (XFormsSetfocusAction.setfocus(_, includesQNamesOpt, excludesQNamesOpt, context.collector))
   }
 }
 
 object XFormsSetfocusAction {
-  def setfocus(control: XFormsControl, includes: Set[QName], excludes: Set[QName]): Unit =
-    Dispatch.dispatchEvent(new XFormsFocusEvent(control, includes, excludes))
+  def setfocus(
+     control  : XFormsControl,
+     includes : Set[QName],
+     excludes : Set[QName],
+     collector: ErrorEventCollector
+  ): Unit =
+    Dispatch.dispatchEvent(new XFormsFocusEvent(control, includes, excludes), collector)
 }

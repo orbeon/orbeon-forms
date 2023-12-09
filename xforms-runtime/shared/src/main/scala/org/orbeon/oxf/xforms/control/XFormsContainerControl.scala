@@ -13,6 +13,9 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.XFormsEvent
+
 import scala.collection.mutable
 
 trait XFormsContainerControl extends VisitableTrait {
@@ -52,15 +55,15 @@ trait XFormsContainerControl extends VisitableTrait {
         currentControl.updateEffectiveId()
   }
 
-  override def getBackCopy: AnyRef = {
+  override def getBackCopy(collector: ErrorEventCollector): AnyRef = {
     // Clone this
-    val cloned = super.getBackCopy.asInstanceOf[XFormsContainerControl]
+    val cloned = super.getBackCopy(collector).asInstanceOf[XFormsContainerControl]
 
     // Clone children if any
     if (hasChildren) {
       cloned._children = new mutable.ArrayBuffer[XFormsControl](_children.size)
       for (currentChildControl <- _children) {
-        val currentChildClone = currentChildControl.getBackCopy.asInstanceOf[XFormsControl]
+        val currentChildClone = currentChildControl.getBackCopy(collector).asInstanceOf[XFormsControl]
 
         if (currentChildClone ne currentChildControl)
           currentChildClone.parent = null // cloned control doesn't need a parent

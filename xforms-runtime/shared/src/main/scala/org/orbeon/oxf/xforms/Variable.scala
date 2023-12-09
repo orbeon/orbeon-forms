@@ -14,13 +14,15 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.LocationData
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{VariableAnalysis, VariableAnalysisTrait}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.XFormsEventTarget
+import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.saxon.value.{EmptySequence, StringValue}
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 
 import scala.util.control.NonFatal
 
@@ -30,10 +32,11 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
   private var variableValueOpt: Option[ValueRepresentationType] = None
 
   def valueEvaluateIfNeeded(
-    contextStack      : XFormsContextStack,
-    sourceEffectiveId : String,
-    pushOuterContext  : Boolean,
-    handleNonFatal    : Boolean
+    contextStack     : XFormsContextStack,
+    sourceEffectiveId: String,
+    pushOuterContext : Boolean,
+    eventTarget      : XFormsEventTarget,
+    collector        : ErrorEventCollector
   ): ValueRepresentationType =
     variableValueOpt getOrElse {
       val result =
@@ -41,7 +44,8 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
           contextStack,
           XFormsId.getRelatedEffectiveId(sourceEffectiveId, staticVariable.valueStaticId),
           pushOuterContext,
-          handleNonFatal
+          eventTarget,
+          collector
         )
       variableValueOpt = Some(result)
       result
@@ -51,10 +55,11 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
   def getLocationData: LocationData = staticVariable.asInstanceOf[ElementAnalysis].locationData
 
   private def evaluate(
-    contextStack      : XFormsContextStack,
-    sourceEffectiveId : String,
-    pushOuterContext  : Boolean,
-    handleNonFatal    : Boolean
+    contextStack     : XFormsContextStack,
+    sourceEffectiveId: String,
+    pushOuterContext : Boolean,
+    eventTarget      : XFormsEventTarget,
+    collector        : ErrorEventCollector
   ): ValueRepresentationType =
     staticVariable.expressionOrConstant match {
       case Right(constant) =>
@@ -65,7 +70,13 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
         // Push binding for evaluation, so that @context and @model are evaluated
         val pushContext = pushOuterContext || staticVariable.hasNestedValue
         if (pushContext)
-          contextStack.pushBinding(staticVariable.valueElement, sourceEffectiveId, staticVariable.valueScope)
+          contextStack.pushBinding(
+            staticVariable.valueElement,
+            sourceEffectiveId,
+            staticVariable.valueScope,
+            eventTarget,
+            collector
+          )
 
         val result = {
           val bindingContext = contextStack.getCurrentBindingContext
@@ -88,13 +99,17 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
                 containingDocument.getRequestStats.getReporter
               ).reduce() // not sure if reducing is required after an evaluation
             } catch {
-              case NonFatal(t) if handleNonFatal =>
-                // Don't consider this as fatal
-                // Default value is the empty sequence
-                XFormsError.handleNonFatalXPathError(contextStack.container, t, Some(expression))
-                EmptySequence.getInstance
               case NonFatal(t) =>
-                throw new OXFException(t)
+                collector(
+                  new XXFormsXPathErrorEvent(
+                    target         = eventTarget,
+                    expression     = expression,
+                    contextMessage = s"evaluating variable `${staticVariable.name}`",
+                    message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                    throwable      = t
+                  )
+                )
+                EmptySequence.getInstance
             }
           } else {
             EmptySequence.getInstance

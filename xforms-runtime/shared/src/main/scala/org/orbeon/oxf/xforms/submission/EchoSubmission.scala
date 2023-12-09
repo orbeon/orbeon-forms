@@ -18,6 +18,7 @@ import cats.syntax.option._
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.io.ByteArrayInputStream
@@ -59,7 +60,12 @@ class EchoSubmission(submission: XFormsModelSubmission)
           SubmissionUtils.logRequestBody(serializationParameters.actualRequestMediatype, messageBody)(indentedLogger)
     }
 
-    val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, submissionParameters.replaceType == ReplaceType.All)
+    val customHeaderNameValues =
+      SubmissionUtils.evaluateHeaders(
+        submission,
+        submissionParameters.replaceType == ReplaceType.All,
+        EventCollector.Throw
+      )
 
     // Just a scheme is not a valid URI, so add a scheme-specific part if needed
     val url =

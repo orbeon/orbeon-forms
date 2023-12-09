@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers
 
-import java.{lang => jl}
-
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, LHHA}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.XFormsNames
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
 import shapeless.syntax.typeable._
+
+import java.{lang => jl}
 
 //
 // TODO:
@@ -42,6 +42,8 @@ import shapeless.syntax.typeable._
 // - show XFormsVariableControl | XXFormsAttributeControl | XFormsActionControl | internal XFormsGroupControl
 //
 object XMLOutput extends XMLReceiverSupport {
+
+  private val collector = EventCollector.Throw
 
   def send(
     xfcd            : XFormsContainingDocument,
@@ -65,9 +67,9 @@ object XMLOutput extends XMLReceiverSupport {
     for {
       lhhaType <- LHHA.values
       lhhaProp = c.lhhaProperty(lhhaType)
-      text     <- Option(lhhaProp.value())
+      text     <- Option(lhhaProp.value(collector))
     } locally {
-      writeTextOrHTML(lhhaType.entryName, text, lhhaProp.isHTML)(xmlReceiver)
+      writeTextOrHTML(lhhaType.entryName, text, lhhaProp.isHTML(collector))(xmlReceiver)
     }
 
   def matchAppearances(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
@@ -102,8 +104,11 @@ object XMLOutput extends XMLReceiverSupport {
 
       implicit val _xmlReceiver = xmlReceiver
 
-      writeTextOrHTML("value", c.getValue, isHTML)
-      c.externalValueOpt filter (_ != c.getValue) foreach (writeTextOrHTML("external-value", _, isHTML))
+      writeTextOrHTML("value", c.getValue(collector), isHTML)
+
+      c.externalValueOpt(collector)
+        .filter(_ != c.getValue(collector))
+        .foreach(writeTextOrHTML("external-value", _, isHTML))
     }
 
   def matchVisitable(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
@@ -115,7 +120,7 @@ object XMLOutput extends XMLReceiverSupport {
     c.narrowTo[XFormsSelect1Control] filter (_.isRelevant) foreach { c =>
       implicit val _xmlReceiver = xmlReceiver
       withElement("items") {
-        c.getItemset.allItemsIterator foreach { item =>
+        c.getItemset(collector).allItemsIterator foreach { item =>
           val attsList = item.attributes map { case (k, v) => k.uriQualifiedName -> v }
           val value = item match {
             case item: Item.ValueNode  => item.externalValue(encode = false)
@@ -148,7 +153,7 @@ object XMLOutput extends XMLReceiverSupport {
   def matchFileMetadata(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
     c.narrowTo[FileMetadata] foreach { c =>
 
-      val properties = c.iterateProperties collect { case (k, Some(v)) => k -> v } toList
+      val properties = c.iterateProperties(collector).collect { case (k, Some(v)) => k -> v } toList
 
       if (properties.nonEmpty)
         element("file-metadata", atts = properties)(xmlReceiver)

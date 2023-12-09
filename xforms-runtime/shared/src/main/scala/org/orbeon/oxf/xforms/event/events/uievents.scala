@@ -17,8 +17,8 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEventTarget}
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import shapeless.syntax.typeable._
 
@@ -141,7 +141,7 @@ private object XFormsValueChangedEvent {
   val XXFValue = xxfName("value")
 
   def properties(target: XFormsEventTarget): PropertyGetter = {
-    case XXFValue => target.cast[XFormsValueControl].flatMap(_.valueOpt)
+    case XXFValue => target.cast[XFormsValueControl].flatMap(_.valueOpt(EventCollector.Throw))
   }
 }
 

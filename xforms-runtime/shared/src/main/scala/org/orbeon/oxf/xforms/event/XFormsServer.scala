@@ -15,6 +15,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, XFormsModelSubmissionSupport}
@@ -498,6 +499,12 @@ object XFormsServer {
     ): Unit =
       withDebug("computing differences") {
         XFormsAPI.withContainingDocument(containingDocument) { // scope because dynamic properties can cause lazy XPath evaluations
+
+          implicit val collector: ErrorEventCollector =
+            if (containingDocument.allowErrorRecoveryOnInit)
+              EventCollector.Ignore
+            else
+              EventCollector.Throw
 
           val comparator = new ControlsComparator(
             containingDocument,

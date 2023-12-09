@@ -34,6 +34,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.event.ClientEvents._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event._
@@ -560,7 +561,7 @@ trait ContainingDocumentLogging {
 
   val loggersMap = mutable.HashMap[String, log4s.Logger]()
 
-  def logMessage(name: String, level: LogLevel, message: String): Unit = {
+  def logMessage(name: String, level: LogLevel, message: String, collector: ErrorEventCollector): Unit = {
 
     val logger = loggersMap.getOrElseUpdate(name, LoggerFactory.createLogger(name))
 
@@ -584,7 +585,8 @@ trait ContainingDocumentLogging {
         ),
         delayOpt        = None,
         showProgress    = false,
-        allowDuplicates = false
+        allowDuplicates = false,
+        collector       = collector
       )
     }
   }

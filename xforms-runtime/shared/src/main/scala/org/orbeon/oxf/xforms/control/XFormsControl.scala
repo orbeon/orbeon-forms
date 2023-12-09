@@ -21,24 +21,22 @@ import org.orbeon.oxf.rewrite.Rewrite
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysis, WithChildrenTrait}
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{BindingContext, _}
-import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLConstants}
-import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLConstants}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.RepeatSeparatorString
 import org.orbeon.xforms.runtime.XFormsObject
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.xml.sax.Attributes
-
-import scala.collection.Seq
 
 /**
  * Represents an XForms control.
@@ -105,8 +103,8 @@ class XFormsControl(
   final def resolve(staticId: String, contextItem: Option[om.Item] = None): Option[XFormsObject] =
     container.resolveObjectByIdInScope(getEffectiveId, staticId, contextItem)
 
-  final def getChildElementScope(element: Element): Scope =
-    part.scopeForPrefixedId(container.getFullPrefix + element.idOrNull)
+//  final def getChildElementScope(element: Element): Scope =
+//    part.scopeForPrefixedId(container.getFullPrefix + element.idOrNull)
 
   // Update this control's effective id based on the parent's effective id
   def updateEffectiveId(): Unit = {
@@ -142,7 +140,7 @@ class XFormsControl(
   def preceding: Option[XFormsControl] = {
     // Unlike ElementAnalysis we don't store a `preceding` pointer so we have to search for it
     val siblingsOrSelf = parent.asInstanceOf[XFormsContainerControl].children
-    val index          = siblingsOrSelf indexWhere (self eq)
+    val index          = siblingsOrSelf indexWhere (self eq _)
 
     index > 0 option siblingsOrSelf(index - 1)
   }
@@ -185,30 +183,32 @@ class XFormsControl(
 
   def compareExternalMaybeClientValue(
     previousValueOpt   : Option[String],
-    previousControlOpt : Option[XFormsControl]
+    previousControlOpt : Option[XFormsControl],
+    collector          : ErrorEventCollector
   ): Boolean =
     // NOTE: See https://github.com/orbeon/orbeon-forms/issues/2857. We might consider removing this
     // optimization as it is dangerous. `XFormsValueControl` works around it by calling
     // `compareExternalUseExternalValue` directly.
     (previousControlOpt exists (_ eq self)) && (getInitialLocal eq getCurrentLocal) ||
-    compareExternalUseExternalValue(previousValueOpt, previousControlOpt)
+    compareExternalUseExternalValue(previousValueOpt, previousControlOpt, collector)
 
   // Compare this control with another control, as far as the comparison is relevant for the external world.
   def compareExternalUseExternalValue(
-    previousExternalValueOpt : Option[String],
-    previousControlOpt       : Option[XFormsControl]
+    previousExternalValueOpt: Option[String],
+    previousControlOpt      : Option[XFormsControl],
+    collector               : ErrorEventCollector
   ): Boolean =
     previousControlOpt match {
       case Some(other) =>
         isRelevant == other.isRelevant &&
-        compareLHHA(other)             &&
+        compareLHHA(other, collector)  &&
         compareExtensionAttributes(other)
       case _ => false
     }
 
   // Evaluate the control's value and metadata
-  final def evaluate(): Unit =
-    try preEvaluateImpl(relevant = true, parentRelevant = true)
+  final def evaluate(collector: ErrorEventCollector): Unit =
+    try preEvaluateImpl(relevant = true, parentRelevant = true, collector)
     catch {
       case e: ValidationException =>
         throw OrbeonLocationException.wrapException(
@@ -222,10 +222,10 @@ class XFormsControl(
     }
 
   // Called to clear the control's values when the control becomes non-relevant
-  final def evaluateNonRelevant(parentRelevant: Boolean): Unit = {
+  final def evaluateNonRelevant(parentRelevant: Boolean, collector: ErrorEventCollector): Unit = {
     evaluateNonRelevantLHHA()
     evaluateNonRelevantExtensionAttribute()
-    preEvaluateImpl(relevant = false, parentRelevant = parentRelevant)
+    preEvaluateImpl(relevant = false, parentRelevant = parentRelevant, collector)
   }
 
   // Notify the control that some of its aspects (value, label, etc.) might have changed and require re-evaluation. It
@@ -237,27 +237,31 @@ class XFormsControl(
 
   // Evaluate this control
   // NOTE: LHHA and extension attributes are computed lazily
-  def preEvaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = ()
+  def preEvaluateImpl(relevant: Boolean, parentRelevant: Boolean, collector: ErrorEventCollector): Unit = ()
 
   /**
    * Clone a control. It is important to understand why this is implemented: to create a copy of a tree of controls
    * before updates that may change control bindings. Also, it is important to understand that we clone "back", that
    * is the new clone will be used as the reference copy for the difference engine.
    */
-  def getBackCopy: AnyRef = {
+  def getBackCopy(collector: ErrorEventCollector): AnyRef = {
     // NOTE: this.parent is handled by subclasses
     val cloned = super.clone.asInstanceOf[XFormsControl]
 
-    updateLHHACopy(cloned)
+    updateLHHACopy(cloned, collector)
     updateLocalCopy(cloned)
 
     cloned
   }
 
   // Build children controls if any, delegating the actual construction to the given `buildTree` function
-  def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl], idSuffix: Seq[Int]): Unit =
+  def buildChildren(
+    buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int], ErrorEventCollector) => Option[XFormsControl],
+    idSuffix : Seq[Int],
+    collector: ErrorEventCollector
+  ): Unit =
     staticControl match {
-      case withChildren: WithChildrenTrait => Controls.buildChildren(self, withChildren.children, buildTree, idSuffix)
+      case withChildren: WithChildrenTrait => Controls.buildChildren(self, withChildren.children, buildTree, idSuffix, collector)
       case _ =>
     }
 }
@@ -340,13 +344,14 @@ object XFormsControl {
 
   // Base trait for a control property (label, itemset, etc.)
   trait ControlProperty[T >: Null] {
-    def value(): T
+    def value(collector: ErrorEventCollector): T
     def handleMarkDirty(force: Boolean = false): Unit
     def copy: ControlProperty[T]
   }
 
   // Immutable control property
-  class ImmutableControlProperty[T >: Null](val value: T) extends ControlProperty[T] {
+  class ImmutableControlProperty[T >: Null](private val _value: T) extends ControlProperty[T] {
+    def value(collector: ErrorEventCollector): T = _value
     def handleMarkDirty(force: Boolean): Unit = ()
     def copy: ImmutableControlProperty[T] = this
   }
@@ -364,15 +369,15 @@ object XFormsControl {
     protected def notifyCompute(): Unit
     protected def notifyOptimized(): Unit
 
-    protected def evaluateValue(): T
+    protected def evaluateValue(collector: ErrorEventCollector): T
     protected def nonRelevantValue: T = null
 
-    final def value(): T = {
+    final def value(collector: ErrorEventCollector): T = {
       if (! isEvaluated) {
         _value =
           if (isRelevant) {
             notifyCompute()
-            evaluateValue()
+            evaluateValue(collector)
           } else {
             // NOTE: if the control is not relevant, nobody should ask about this in the first place
             // In practice, this can be called as of 2012-06-20

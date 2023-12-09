@@ -41,7 +41,7 @@ class XXFormsTextHandler(
     val effectiveId = handlerContext.getEffectiveId(attributes)
     val textControl = containingDocument.getControlByEffectiveId(effectiveId).asInstanceOf[XXFormsTextControl]
 
-    val externalValue = textControl.getExternalValue()
+    val externalValue = textControl.getExternalValue(handlerContext.collector)
     if ((externalValue ne null) && externalValue.nonEmpty)
       handlerContext.controller.output.characters(externalValue.toCharArray, 0, externalValue.length)
   }

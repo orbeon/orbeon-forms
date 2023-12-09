@@ -17,6 +17,7 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.xforms.XFormsId
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -42,7 +43,7 @@ class ActionsFormat20182Test
             for {
               (expectedSizeOpt, i) <- List(Some(1426), None, Some(1162), None).zipWithIndex
               control              = resolveObject[XFormsValueControl]("my-attachment-control", indexes = List(i + 1)).get
-              value                = control.getValue
+              value                = control.getValue(EventCollector.Throw)
             } locally {
               expectedSizeOpt match {
                 case Some(expectedSize) =>
@@ -67,7 +68,7 @@ class ActionsFormat20182Test
       it("must pass all service result checks") {
         withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, doc) {
-            assert("First" == resolveObject[XFormsValueControl]("my-result-control").get.getValue)
+            assert("First" == resolveObject[XFormsValueControl]("my-result-control").get.getValue(EventCollector.Throw))
           }
         }
       }
@@ -83,8 +84,8 @@ class ActionsFormat20182Test
       it("must pass all service result checks") {
         withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, doc) {
-            assert("21" == resolveObject[XFormsValueControl]("my-result-1-control").get.getValue)
-            assert("22" == resolveObject[XFormsValueControl]("my-result-2-control").get.getValue)
+            assert("21" == resolveObject[XFormsValueControl]("my-result-1-control").get.getValue(EventCollector.Throw))
+            assert("22" == resolveObject[XFormsValueControl]("my-result-2-control").get.getValue(EventCollector.Throw))
           }
         }
       }
@@ -149,7 +150,7 @@ class ActionsFormat20182Test
               (values, index)    <- Expected.zipWithIndex
               (controlId, value) <- values
             } locally {
-              assert(value == resolveObject[XFormsValueControl](controlId, indexes = List(index + 1)).get.getValue)
+              assert(value == resolveObject[XFormsValueControl](controlId, indexes = List(index + 1)).get.getValue(EventCollector.Throw))
             }
           }
         }
@@ -196,7 +197,7 @@ class ActionsFormat20182Test
               (values, index)    <- Expected.zipWithIndex
               (controlId, value) <- values
             } locally {
-              assert(value == resolveObject[XFormsValueControl](controlId, indexes = List(index + 1)).get.getValue)
+              assert(value == resolveObject[XFormsValueControl](controlId, indexes = List(index + 1)).get.getValue(EventCollector.Throw))
             }
           }
         }

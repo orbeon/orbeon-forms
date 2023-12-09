@@ -7,6 +7,7 @@ import org.orbeon.oxf.xforms.control.controls.{XFormsCaseControl, XFormsRepeatIt
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.PartAnalysis
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.oxf.xml.{ElementHandlerController, XMLConstants}
 import org.orbeon.xforms.Constants
@@ -24,7 +25,8 @@ class HandlerContext(
   val controller                 : ElementHandlerController[HandlerContext],
   val containingDocument         : XFormsContainingDocument,
   val externalContext            : ExternalContext,
-  val topLevelControlEffectiveId : Option[String]
+  val topLevelControlEffectiveId : Option[String],
+  val collector                  : ErrorEventCollector
 ) {
 
   // Computed during construction

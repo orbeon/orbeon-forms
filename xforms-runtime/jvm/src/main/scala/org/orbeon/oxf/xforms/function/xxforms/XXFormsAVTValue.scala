@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
@@ -35,7 +36,7 @@ class XXFormsAVTValue extends XFormsFunction {
       attControlAnalysis <- Option(XFormsFunction.context.container.partAnalysis.getAttributeControl(forPrefixedId, attName))
       control            <- XFormsFunction.findRelevantControls(attControlAnalysis.staticId, followIndexes = true).headOption
       attControl         <- CollectionUtils.collectByErasedType[XXFormsAttributeControl](control)
-      value              <- attControl.valueOpt
+      value              <- attControl.valueOpt(EventCollector.Throw)
     } yield
       value
   }

@@ -15,8 +15,9 @@ package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent, XXFormsInvalidEvent, XXFormsValidEvent}
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.saxon.om
 
 import scala.collection.{mutable => m}
@@ -60,19 +61,21 @@ trait XFormsModelRebuildRecalculateRevalidate {
     // order. So we are now leaving the flag as is, and waiting until they clear themselves.
     if (currentDeferredActionContext.rebuild)
       containingDocument.withOutermostActionHandler {
-        Dispatch.dispatchEvent(new XFormsRebuildEvent(selfModel))
+        Dispatch.dispatchEvent(new XFormsRebuildEvent(selfModel), EventCollector.ToReview)
       }
 
     if (currentDeferredActionContext.recalculateRevalidate)
       containingDocument.withOutermostActionHandler {
-        Dispatch.dispatchEvent(new XFormsRecalculateEvent(selfModel))
+        Dispatch.dispatchEvent(new XFormsRecalculateEvent(selfModel), EventCollector.ToReview)
       }
   }
 
   def doRebuild(): Unit = {
     if (deferredActionContext.rebuild) {
       try {
-        resetAndEvaluateVariables()
+        EventCollector.withBufferCollector { collector =>
+          resetAndEvaluateVariables(collector)
+        }
         bindsIfInstance foreach { binds =>
           // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
           binds.rebuild()
@@ -94,66 +97,64 @@ trait XFormsModelRebuildRecalculateRevalidate {
 
     // We don't want to dispatch events while we are performing the actual recalculate/revalidate operation,
     // so we collect them here and dispatch them altogether once everything is done.
-    val eventsToDispatch = m.ListBuffer[XFormsEvent]()
-    def collector(event: XFormsEvent): Unit =
-      eventsToDispatch += event
-
-    def recalculateRevalidate: Option[collection.Set[String]] =
-      if (deferredActionContext.recalculateRevalidate) {
-        try {
-
-          doRecalculate(deferredActionContext.defaultsStrategy, collector)
-          containingDocument.xpathDependencies.recalculateDone(selfModel)
-
-          // Validate only if needed, including checking the flags, because if validation state is clean, validation
-          // being idempotent, revalidating is not needed.
-          val mustRevalidate = bindsIfInstance.isDefined || hasSchema
-
-          mustRevalidate option {
-            val invalidInstances = doRevalidate(collector)
-            containingDocument.xpathDependencies.revalidateDone(selfModel)
-            invalidInstances
-          }
-        } finally {
-
-          for {
-            instanceId <- deferredActionContext.flaggedInstances
-            doc        <- getInstance(instanceId).underlyingDocumentOpt
-          } locally {
-            InstanceDataOps.clearRequireDefaultValueRecursively(doc)
-          }
-
-          deferredActionContext.resetRecalculateRevalidate()
-        }
-      } else
-        None
-
-    // Gather events to dispatch, at most one per instance, and only if validity has changed
-    // NOTE: It is possible, with binds and the use of xxf:instance(), that some instances in
-    // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
-    // algorithm below.
-    def createAndCommitValidationEvents(invalidInstancesIds: collection.Set[String]): List[XFormsEvent] = {
-
-      val changedInstancesIt =
-        for {
-          instance           <- instancesIterator
-          previouslyValid    = instance.valid
-          newlyValid         = ! invalidInstancesIds(instance.getEffectiveId)
-          if previouslyValid != newlyValid
-        } yield {
-          instance.valid = newlyValid // side-effect!
-          if (newlyValid) new XXFormsValidEvent(instance) else new XXFormsInvalidEvent(instance)
-        }
-
-      changedInstancesIt.toList
-    }
-
     val validationEvents =
-      recalculateRevalidate map createAndCommitValidationEvents getOrElse Nil
+      EventCollector.withBufferCollector { collector =>
 
-    // Dispatch all events
-    for (event <- eventsToDispatch.iterator ++ validationEvents.iterator)
-      Dispatch.dispatchEvent(event)
+        def recalculateRevalidate: Option[collection.Set[String]] =
+          if (deferredActionContext.recalculateRevalidate) {
+            try {
+
+              doRecalculate(deferredActionContext.defaultsStrategy, collector)
+              containingDocument.xpathDependencies.recalculateDone(selfModel)
+
+              // Validate only if needed, including checking the flags, because if validation state is clean, validation
+              // being idempotent, revalidating is not needed.
+              val mustRevalidate = bindsIfInstance.isDefined || hasSchema
+
+              mustRevalidate option {
+                val invalidInstances = doRevalidate(collector)
+                containingDocument.xpathDependencies.revalidateDone(selfModel)
+                invalidInstances
+              }
+            } finally {
+
+              for {
+                instanceId <- deferredActionContext.flaggedInstances
+                doc        <- getInstance(instanceId).underlyingDocumentOpt
+              } locally {
+                InstanceDataOps.clearRequireDefaultValueRecursively(doc)
+              }
+
+              deferredActionContext.resetRecalculateRevalidate()
+            }
+          } else
+            None
+
+        // Gather events to dispatch, at most one per instance, and only if validity has changed
+        // NOTE: It is possible, with binds and the use of xxf:instance(), that some instances in
+        // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
+        // algorithm below.
+        def createAndCommitValidationEvents(invalidInstancesIds: collection.Set[String]): List[XFormsEvent] = {
+
+          val changedInstancesIt =
+            for {
+              instance           <- instancesIterator
+              previouslyValid    = instance.valid
+              newlyValid         = ! invalidInstancesIds(instance.getEffectiveId)
+              if previouslyValid != newlyValid
+            } yield {
+              instance.valid = newlyValid // side-effect!
+              if (newlyValid) new XXFormsValidEvent(instance) else new XXFormsInvalidEvent(instance)
+            }
+
+          changedInstancesIt.toList
+        }
+
+        recalculateRevalidate map createAndCommitValidationEvents getOrElse Nil
+      }
+
+    for (event <- validationEvents.iterator)
+      Dispatch.dispatchEvent(event, EventCollector.ToReview)
   }
 
   def needRebuildRecalculateRevalidate: Boolean =
@@ -175,14 +176,14 @@ trait XFormsModelRebuildRecalculateRevalidate {
     lazy val _schemaValidator: XFormsModelSchemaValidator =
       new XFormsModelSchemaValidator(staticModel.element, indentedLogger) |!> (_.loadSchemas(containingDocument))
 
-    def doRecalculate(defaultsStrategy: DefaultsStrategy, collector: XFormsEvent => Unit): Unit =
+    def doRecalculate(defaultsStrategy: DefaultsStrategy, collector: ErrorEventCollector): Unit =
       withDebug("performing recalculate", List("model" -> effectiveId)) {
 
         val hasVariables = staticModel.variablesSeq.nonEmpty
 
         // Re-evaluate top-level variables if needed
         if (bindsIfInstance.isDefined || hasVariables)
-          resetAndEvaluateVariables()
+          resetAndEvaluateVariables(collector)
 
         // Apply calculate binds
         bindsIfInstance foreach { binds =>
@@ -190,7 +191,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
         }
       }
 
-    def doRevalidate(collector: XFormsEvent => Unit): collection.Set[String] =
+    def doRevalidate(collector: ErrorEventCollector): collection.Set[String] =
       withDebug("performing revalidate", List("model" -> effectiveId)) {
 
         val invalidInstancesIds = m.LinkedHashSet[String]()

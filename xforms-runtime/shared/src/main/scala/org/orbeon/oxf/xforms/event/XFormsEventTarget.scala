@@ -14,10 +14,11 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.datatypes.LocationData
-import org.orbeon.xforms.xbl.Scope
-import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.runtime.XFormsObject
+import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.immutable
 
@@ -36,8 +37,8 @@ trait XFormsEventTarget extends XFormsObject {
 
   def parentEventObserver: XFormsEventTarget
 
-  def performTargetAction(event: XFormsEvent): Unit
-  def performDefaultAction(event: XFormsEvent): Unit
+  def performTargetAction(event: XFormsEvent, collector: ErrorEventCollector): Unit
+  def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit
 
   def allowExternalEvent(eventName: String): Boolean
 

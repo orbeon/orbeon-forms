@@ -17,7 +17,10 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.event.EventCollector
 
+
+// TODO: Move to handlers as it's only used there
 case class PlaceHolderInfo(isLabelPlaceholder: Boolean, value: String)
 
 object PlaceHolderInfo {
@@ -43,9 +46,9 @@ object PlaceHolderInfo {
           val placeholderValue =
             if (control.isRelevant) {
               if (isLabelPlaceholder)
-                control.getLabel
+                control.getLabel(EventCollector.Throw)
               else
-                control.getHint
+                control.getHint(EventCollector.Throw)
             } else {
               ""
             }

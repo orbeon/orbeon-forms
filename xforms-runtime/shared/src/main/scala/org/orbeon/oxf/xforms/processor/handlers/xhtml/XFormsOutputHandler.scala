@@ -26,7 +26,7 @@ import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPACE_URI}
 import org.orbeon.oxf.xml.XMLReceiverHelper._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport, XMLUtils}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
@@ -108,7 +108,7 @@ class XFormsOutputDefaultHandler(
 
     withElement(if (hasLabel) "output" else "span", prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       val mediatypeValue = attributes.getValue("mediatype")
-      val textValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
+      val textValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue, handlerContext.collector)
       if ((textValue ne null) && textValue.nonEmpty)
         xmlReceiver.characters(textValue.toCharArray, 0, textValue.length)
     }
@@ -182,7 +182,7 @@ class XFormsOutputHTMLHandler(
 
     withElement("div", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       val mediatypeValue = attributes.getValue("mediatype")
-      val htmlValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
+      val htmlValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue, handlerContext.collector)
       XFormsCrossPlatformSupport.streamHTMLFragment(htmlValue, outputControl.getLocationData, xhtmlPrefix)
     }
   }
@@ -224,7 +224,7 @@ class XFormsOutputImageHandler(
 
     // @src="..."
     // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
-    val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
+    val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue, handlerContext.collector)
     containerAttributes.addOrReplace("src", if (srcValue ne null) srcValue else DUMMY_IMAGE_URI)
 
     XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
@@ -263,9 +263,9 @@ class XFormsOutputVideoHandler(
 
     val outputControl = currentControl.asInstanceOf[XFormsOutputControl]
     val generalMediaType = attributes.getValue("mediatype")
-    val specificMediaType = outputControl.fileMediatype
+    val specificMediaType = outputControl.fileMediatype(handlerContext.collector)
 
-    val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, generalMediaType)
+    val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, generalMediaType, handlerContext.collector)
 
     val containerAttributes = getContainerAttributes(getEffectiveId, outputControl, isField = false)
     containerAttributes.addOrReplace("controls", "")
@@ -313,7 +313,7 @@ class XFormsOutputTextHandler(
     val outputControl = currentControl.asInstanceOf[XFormsOutputControl]
     val xmlReceiver   = handlerContext.controller.output
 
-    val externalValue = outputControl.getExternalValue()
+    val externalValue = outputControl.getExternalValue(handlerContext.collector)
     if ((externalValue ne null) && externalValue.nonEmpty)
       xmlReceiver.characters(externalValue.toCharArray, 0, externalValue.length)
   }
@@ -358,7 +358,7 @@ class XFormsOutputDownloadHandler(
 
       def anchorAttributes = {
 
-        val hrefValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, null)
+        val hrefValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, null, handlerContext.collector)
 
         if (hrefValue.isAllBlank) {
           // No URL so make sure a click doesn't cause navigation, and add class
@@ -393,8 +393,8 @@ class XFormsOutputDownloadHandler(
       XFormsBaseHandler.forwardAccessibilityAttributes(attributes, aAttributes)
 
       withElement(localName = "a", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = aAttributes) {
-        val labelValue             = currentControl.getLabel
-        val mustOutputHTMLFragment = currentControl.isHTMLLabel
+        val labelValue             = currentControl.getLabel(handlerContext.collector)
+        val mustOutputHTMLFragment = currentControl.isHTMLLabel(handlerContext.collector)
         XFormsBaseHandlerXHTML.outputLabelTextIfNotEmpty(labelValue, xhtmlPrefix, mustOutputHTMLFragment, Option(currentControl.getLocationData))
       }
     }

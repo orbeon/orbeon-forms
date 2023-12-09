@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.xforms.Constants
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -50,10 +51,10 @@ class DatasetsTest
             val weatherFromDatasetControl  = resolveObject[XFormsValueControl]("weather-from-dataset-control",  sourceEffectiveId = sourceEffectiveId, container = container).get
             val activityFromDatasetControl = resolveObject[XFormsValueControl]("activity-from-dataset-control", sourceEffectiveId = sourceEffectiveId, container = container).get
 
-            assert("sunny"  === weatherControl.getValue)
-            assert("hiking" === activityControl.getValue)
-            assert("sunny"  === weatherFromDatasetControl.getValue)
-            assert("hiking" === activityFromDatasetControl.getValue)
+            assert("sunny"  === weatherControl.getValue(EventCollector.Throw))
+            assert("hiking" === activityControl.getValue(EventCollector.Throw))
+            assert("sunny"  === weatherFromDatasetControl.getValue(EventCollector.Throw))
+            assert("hiking" === activityFromDatasetControl.getValue(EventCollector.Throw))
           }
 
           // TODO: Uncomment once #3132 is fixed.
@@ -63,9 +64,9 @@ class DatasetsTest
             val staticInitialValueNotOverwrittenByDatasetControl = resolveObject[XFormsValueControl]("static-initial-value-not-overwritten-by-dataset-control", container = container).get
             val valueFromAfterDataServiceControl                 = resolveObject[XFormsValueControl]("value-from-after-data-service-control"                  , container = container).get
 
-            assert("42" === initialValueFromDatasetControl.getValue)
-            assert(""   === staticInitialValueNotOverwrittenByDatasetControl.getValue)
-            assert("43" === valueFromAfterDataServiceControl.getValue)
+            assert("42" === initialValueFromDatasetControl.getValue(EventCollector.Throw))
+            assert(""   === staticInitialValueNotOverwrittenByDatasetControl.getValue(EventCollector.Throw))
+            assert("43" === valueFromAfterDataServiceControl.getValue(EventCollector.Throw))
           }
         }
       }

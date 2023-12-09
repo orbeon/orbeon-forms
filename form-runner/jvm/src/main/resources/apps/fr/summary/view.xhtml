@@ -35,8 +35,9 @@
 
             <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
 
-            <xf:var name="app"  value="$parameters/app/string()"/>
-            <xf:var name="form" value="$parameters/form/string()"/>
+            <xf:var name="app"     value="$parameters/app/string()"/>
+            <xf:var name="form"    value="$parameters/form/string()"/>
+            <xf:var name="version" value="($parameters/form-version[xxf:non-blank()]/xs:integer(.), 1)[1]"/>
 
             <xf:var name="is-fb"        value="$app = 'orbeon' and $form = 'builder'"/>
             <xf:var name="has-fb-roles" value="$is-fb and not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>

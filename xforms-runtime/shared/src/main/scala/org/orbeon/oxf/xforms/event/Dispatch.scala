@@ -44,7 +44,6 @@ object Dispatch extends Logging {
   def dispatchEvent(event: XFormsEvent): Unit = {
 
     val containingDocument = event.containingDocument
-    val staticOps          = containingDocument.staticOps
 
     implicit val indentedLogger: IndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
 

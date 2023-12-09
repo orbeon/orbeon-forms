@@ -99,7 +99,7 @@ class XXFormsValueEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def this(target: XFormsEventTarget, value: String) =
     this(target, Map("value" -> Option(value)))
 
-  def value = property[String]("value").get
+  def value: String = property[String]("value").get
 }
 
 class XXFormsLoadEvent(target: XFormsEventTarget, properties: PropertyGetter)
@@ -108,7 +108,7 @@ class XXFormsLoadEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def this(target: XFormsEventTarget, resource: String) =
     this(target, Map("resource" -> Option(resource)))
 
-  def resource = property[String]("resource").get
+  def resource: String = property[String]("resource").get
 }
 
 object XXFormsLoadEvent {

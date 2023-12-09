@@ -122,15 +122,15 @@ trait ControlAjaxSupport {
     added
   }
 
-  def writeMIPs(write: (String, String) => Unit): Unit =
-    write("relevant", isRelevant.toString)
+//  def writeMIPs(write: (String, String) => Unit): Unit =
+//    write("relevant", isRelevant.toString)
 
-  final def writeMIPsAsAttributes(newAttributes: AttributesImpl): Unit = {
-    def write(name: String, value: String) =
-      newAttributes.addAttribute(XXFORMS_NAMESPACE_URI, name, XXFORMS_PREFIX + ':' + name, CDATA, value)
-
-    writeMIPs(write)
-  }
+//  final def writeMIPsAsAttributes(newAttributes: AttributesImpl): Unit = {
+//    def write(name: String, value: String) =
+//      newAttributes.addAttribute(XXFORMS_NAMESPACE_URI, name, XXFORMS_PREFIX + ':' + name, CDATA, value)
+//
+//    writeMIPs(write)
+//  }
 }
 
 object ControlAjaxSupport {

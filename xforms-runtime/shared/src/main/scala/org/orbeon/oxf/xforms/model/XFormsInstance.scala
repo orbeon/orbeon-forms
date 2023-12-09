@@ -403,7 +403,7 @@ trait BasicIdIndex {
     for ((id, element) <- mappings)
       addId(id, element)
 
-  protected def createIndexIfNeeded(): Unit =
+  private def createIndexIfNeeded(): Unit =
     if (idIndex eq null) {
       idIndex = m.Map()
       combineMappings(mappingsInSubtree(documentInfo))

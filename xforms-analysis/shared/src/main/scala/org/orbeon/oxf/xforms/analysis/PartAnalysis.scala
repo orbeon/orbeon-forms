@@ -2,11 +2,11 @@ package org.orbeon.oxf.xforms.analysis
 
 import cats.syntax.option._
 import org.orbeon.dom
-import org.orbeon.oxf.xforms.{PartGlobalOps, _}
+import org.orbeon.oxf.xforms.PartGlobalOps
 import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.saxon.om
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 

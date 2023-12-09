@@ -195,7 +195,7 @@ class HandlerContext(
 
     // Create postfix depending on whether we are appending to an existing postfix or not
     val newIdPostfix =
-      if (currentIdPostfix.length == 0)
+      if (currentIdPostfix.isEmpty)
         Constants.RepeatSeparatorString + iteration
       else
         currentIdPostfix + Constants.RepeatIndexSeparatorString + iteration

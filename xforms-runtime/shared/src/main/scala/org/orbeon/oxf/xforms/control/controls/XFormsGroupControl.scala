@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.xforms.XFormsNames._
 
 // Represent an xf:group container control.
 class XFormsGroupControl(

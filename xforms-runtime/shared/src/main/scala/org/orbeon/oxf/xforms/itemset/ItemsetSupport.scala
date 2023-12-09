@@ -405,10 +405,10 @@ object ItemsetSupport {
     else
       lhhaValue.label.escapeXmlMinimal
 
-  def javaScriptValue(lhhaValue: LHHAValue, locationData: LocationData): String =
+  private def javaScriptValue(lhhaValue: LHHAValue, locationData: LocationData): String =
     htmlValue(lhhaValue, locationData).escapeJavaScript
 
-  def javaScriptValue(item: Item.ValueNode, encode: Boolean): String =
+  private def javaScriptValue(item: Item.ValueNode, encode: Boolean): String =
     item.externalValue(encode).escapeJavaScript
 
   // Return the list of items as a JSON tree with hierarchical information

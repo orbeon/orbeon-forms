@@ -1127,7 +1127,7 @@
                 </xf:body>
             </xf:action>
 
-        </xsl:copy>
+        </xsl:copy><!-- main model -->
 
     </xsl:template>
 

@@ -368,23 +368,23 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     added
   }
 
-  override def writeMIPs(write: (String, String) => Unit): Unit = {
-    super.writeMIPs(write)
-
-    write("valid",            isValid.toString)
-    write("read-only",        isReadonly.toString)
-    write("static-read-only", isStaticReadonly.toString)
-    write("required",         isRequired.toString)
-
-    // Output custom MIPs classes
-    for ((name, value) <- customMIPs)
-      write(ModelDefs.buildExternalCustomMIPName(name), value)
-
-    // Output type class
-    (getBuiltinTypeNameOpt map ("xforms-type" ->))        orElse
-      (getTypeLocalNameOpt map ("xforms-type-custom" ->)) foreach
-      write.tupled
-  }
+//  override def writeMIPs(write: (String, String) => Unit): Unit = {
+//    super.writeMIPs(write)
+//
+//    write("valid",            isValid.toString)
+//    write("read-only",        isReadonly.toString)
+//    write("static-read-only", isStaticReadonly.toString)
+//    write("required",         isRequired.toString)
+//
+//    // Output custom MIPs classes
+//    for ((name, value) <- customMIPs)
+//      write(ModelDefs.buildExternalCustomMIPName(name), value)
+//
+//    // Output type class
+//    (getBuiltinTypeNameOpt map ("xforms-type" ->))        orElse
+//      (getTypeLocalNameOpt map ("xforms-type-custom" ->)) foreach
+//      write.tupled
+//  }
 
   // Dispatch creation events
   override def dispatchCreationEvents(): Unit = {

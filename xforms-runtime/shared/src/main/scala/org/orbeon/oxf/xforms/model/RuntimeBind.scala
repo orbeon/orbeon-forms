@@ -29,6 +29,8 @@ class RuntimeBind(
   isSingleNodeContext : Boolean
 ) extends XFormsObject {
 
+  // TODO: Construction should be done in `RuntimeBind.apply()`.
+
   def containingDocument = model.containingDocument
   def getEffectiveId     = XFormsId.getRelatedEffectiveId(model.getEffectiveId, staticId)
   def staticId           = staticBind.staticId

@@ -16,7 +16,7 @@ import org.orbeon.xml.NamespaceMapping
 import StaticBind._
 
 
-// Represent a static <xf:bind> element
+// Represent a static `<xf:bind>` element
 class StaticBind(
   index                       : Int,
   element                     : Element,
@@ -195,7 +195,7 @@ object StaticBind {
   // Represent an XPath MIP
   class XPathMIP(
     val id           : String,
-    val name         : String,
+    val name         : String, // should be typed
     val level        : ValidationLevel,
     val expression   : String, // public for serialization and debugging
     namespaceMapping : NamespaceMapping,

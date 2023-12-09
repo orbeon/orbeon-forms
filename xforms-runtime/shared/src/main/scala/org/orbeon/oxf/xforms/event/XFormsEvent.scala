@@ -14,6 +14,8 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.datatypes.LocationData
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
@@ -42,8 +44,8 @@ import shapeless.syntax.typeable._
  *   - Java values (including `NodeInfo`)
  *   - `Seq` of Java values
  *   - `Either` of the above (2020-02-27)
- * - for Java/Scala consumers, use `property[T]``
- * - for XPath consumers, use `getAttribute``
+ * - for Java/Scala consumers, use `property[T]`
+ * - for XPath consumers, use `getAttribute`
  * - `PropertyGetter` is used instead of a plain `Map` because:
  *   - it allows for values to be computed dynamically, so we don't compute all property values unnecessarily
  *   - it is a `PartialFunction` so `PropertyGetter` can be easily composed with `orElse`
@@ -68,7 +70,7 @@ abstract class XFormsEvent(
   require(targetObject ne null)
   require(containingDocument ne null)
 
-  final def containingDocument = targetObject.containingDocument
+  final def containingDocument: XFormsContainingDocument = targetObject.containingDocument
 
   // Priority is given to the base properties, then the lazyProperties, then the properties passed at construction
   private lazy val allProperties = getters(this, XFormsEvent.Getters) orElse lazyProperties orElse properties
@@ -125,19 +127,19 @@ abstract class XFormsEvent(
     allProperties.applyOrElse(name, { name: String => warnUnsupportedIfNeeded(name); None }) map handleOneLevel getOrElse emptyIterator
   }
 
-  private def warnDeprecatedIfNeeded(name: String) =
+  private def warnDeprecatedIfNeeded(name: String): Unit =
     newPropertyName(name) foreach { newName =>
       indentedLogger.logWarning("", "event('" + name + "') is deprecated. Use event('" + newName + "') instead.")
     }
 
-  private def warnUnsupportedIfNeeded(name: String) =
+  private def warnUnsupportedIfNeeded(name: String): Unit =
     if (warnIfMissingProperty)
       indentedLogger.logDebug("", "Unsupported event context information for event('" + name + "').")
 
   // These methods can be overridden by subclasses
-  implicit def indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
+  implicit def indentedLogger: IndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
   def warnIfMissingProperty = true
-  def newPropertyName(name: String) = Deprecated.get(name)
+  def newPropertyName(name: String): Option[String] = Deprecated.get(name)
   def locationData: LocationData = null
 
   // Whether this event matches filters placed on the given event handler.
@@ -198,7 +200,7 @@ object XFormsEvent {
   private def itemIterator   (i: Item)      = if (i ne null)  SaxonUtils.itemIterator(i) else emptyIterator
   private def listIterator   (s: Seq[Item]) = if (s.nonEmpty) SaxonUtils.listIterator(s) else emptyIterator
 
-  def xxfName(name: String) = buildExplodedQName(XXFORMS_NAMESPACE_URI, name)
+  def xxfName(name: String): String = buildExplodedQName(XXFORMS_NAMESPACE_URI, name)
 
   private val Deprecated = Map(
     "target"         -> "xxf:targetid",

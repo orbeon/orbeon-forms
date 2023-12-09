@@ -424,8 +424,4 @@ object XFormsControl {
     case appearanceTrait: AppearanceTrait => appearanceTrait.appearances
     case _                                => Set.empty[QName]
   }
-
-  // Whether the given control has the text/html mediatype
-  private val HTMLMediatype = Some("text/html")
-  def isHTMLMediatype(control: XFormsControl): Boolean = control.mediatype == HTMLMediatype
 }

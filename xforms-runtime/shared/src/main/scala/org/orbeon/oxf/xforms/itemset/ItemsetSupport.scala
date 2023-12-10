@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControl, SelectionControlUtil, WithExpressionOrConstantTrait}
-import org.orbeon.oxf.xforms.analysis.{ElemListener, ElementAnalysis}
+import org.orbeon.oxf.xforms.analysis.{ElemListener, ElementAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
@@ -384,7 +384,7 @@ object ItemsetSupport {
                             new XXFormsXPathErrorEvent(
                               target         = select1Control,
                               expression     = attributeValue,
-                              contextMessage = s"evaluating attribute `${attributeName.localName}` on item",
+                              details        = XPathErrorDetails.ForAttribute(attributeName.localName),
                               message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
                               throwable      = t
                             )

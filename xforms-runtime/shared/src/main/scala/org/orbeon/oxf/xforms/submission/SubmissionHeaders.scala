@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
-import org.orbeon.oxf.xforms.analysis.WithChildrenTrait
+import org.orbeon.oxf.xforms.analysis.{WithChildrenTrait, XPathErrorDetails}
 import org.orbeon.oxf.xforms.analysis.controls.{HeaderControl, WithExpressionOrConstantTrait}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
@@ -106,7 +106,7 @@ object SubmissionHeaders {
                       new XXFormsXPathErrorEvent(
                         target         = eventTarget,
                         expression     = avtCombine,
-                        contextMessage = "evaluating AVT",
+                        details        = XPathErrorDetails.ForOther("avt"),
                         message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
                         throwable      = t
                       )

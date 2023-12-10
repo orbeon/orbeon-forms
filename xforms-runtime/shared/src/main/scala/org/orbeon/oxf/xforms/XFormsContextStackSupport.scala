@@ -17,7 +17,7 @@ import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.analysis.controls.WithExpressionOrConstantTrait
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
@@ -120,7 +120,7 @@ object XFormsContextStackSupport {
               new XXFormsXPathErrorEvent(
                 target         = eventTarget,
                 expression     = expr,
-                contextMessage = "evaluating expression",
+                details        = XPathErrorDetails.ForOther("expression-or-constant"),
                 message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
                 throwable      = t
               )

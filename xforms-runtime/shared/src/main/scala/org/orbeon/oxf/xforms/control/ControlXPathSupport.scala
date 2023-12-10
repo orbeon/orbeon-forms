@@ -20,6 +20,7 @@ import java.{util => ju}
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.{FunctionContext, XPathCache}
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis.XPathErrorDetails
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
@@ -105,7 +106,7 @@ trait ControlXPathSupport {
             new XXFormsXPathErrorEvent(
               target         = this,
               expression     = xpathString,
-              contextMessage = contextMessage,
+              details        = XPathErrorDetails.ForOther(contextMessage),
               message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
               throwable      = t
             )
@@ -162,7 +163,7 @@ object ControlXPathSupport {
               new XXFormsXPathErrorEvent(
                 target         = eventTarget,
                 expression     = attributeValue,
-                contextMessage = "evaluating AVT",
+                details        = XPathErrorDetails.ForOther("avt"),
                 message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
                 throwable      = t
               )

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.analysis.controls.{VariableAnalysis, VariableAnalysisTrait}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
@@ -104,7 +104,7 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
                   new XXFormsXPathErrorEvent(
                     target         = eventTarget,
                     expression     = expression,
-                    contextMessage = s"evaluating variable `${staticVariable.name}`",
+                    details        = XPathErrorDetails.ForVariable(staticVariable.name),
                     message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
                     throwable      = t
                   )

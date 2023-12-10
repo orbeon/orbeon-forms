@@ -331,7 +331,7 @@ trait ValidationBindOps extends Logging {
         result
       } catch {
         case NonFatal(t) =>
-          handleMIPXPathException(t, bindNode, xpathMIP, "evaluating XForms constraint bind", collector)
+          handleMIPXPathException(t, bindNode, xpathMIP, Constraint.name, collector)
           ! ModelDefs.DEFAULT_VALID
       }
   }

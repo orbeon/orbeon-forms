@@ -73,7 +73,7 @@ trait CalculateBindOps {
       Option(evaluateStringExpression(model, bindNode, mip))
     } catch {
       case NonFatal(t) =>
-        handleMIPXPathException(t, bindNode, mip, "evaluating XForms custom bind", collector)
+        handleMIPXPathException(t, bindNode, mip, "custom-mip", collector)
         None
     }
   }
@@ -89,7 +89,7 @@ trait CalculateBindOps {
         evaluateBooleanExpression(model, bindNode, mip)
       } catch {
         case NonFatal(t) =>
-          handleMIPXPathException(t, bindNode, mip, s"evaluating XForms ${mipType.name} bind", collector)
+          handleMIPXPathException(t, bindNode, mip, mipType.name, collector)
           ! defaultForMIP // https://github.com/orbeon/orbeon-forms/issues/835
       }
     }
@@ -104,7 +104,7 @@ trait CalculateBindOps {
       try Option(evaluateStringExpression(model, bindNode, xpathMIP))
       catch {
         case NonFatal(t) =>
-          handleMIPXPathException(t, bindNode, xpathMIP, s"evaluating XForms ${xpathMIP.name} MIP", collector)
+          handleMIPXPathException(t, bindNode, xpathMIP, xpathMIP.name, collector)
           // Blank value so we don't have stale calculated values
           Some("")
       }

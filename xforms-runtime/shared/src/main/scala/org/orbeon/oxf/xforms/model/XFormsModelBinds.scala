@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.XPathDependencies
+import org.orbeon.oxf.xforms.analysis.{XPathDependencies, XPathErrorDetails}
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.event.EventCollector
@@ -199,7 +199,7 @@ object XFormsModelBinds {
           new XXFormsXPathErrorEvent(
             target         = bindNode.parentBind.model,
             expression     = xpathMIP.compiledExpression.string,
-            contextMessage = contextMessage,
+            details        = XPathErrorDetails.ForBindMip(bindNode.staticBind.nameOpt, xpathMIP.name),
             message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
             throwable      = ve
           )

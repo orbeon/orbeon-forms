@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.event.events
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.analysis.XPathErrorDetails
 import org.orbeon.oxf.xforms.control.controls.{FileMetadata, XFormsUploadControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
@@ -51,37 +52,40 @@ class XXFormsXPathErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   extends XFormsEvent(XXFORMS_XPATH_ERROR, target, properties, bubbles = true, cancelable = true) {
 
   def this(
-    target        : XFormsEventTarget,
-    expression    : String,
-    contextMessage: String,
-    message       : String,
-    throwable     : Throwable
+    target    : XFormsEventTarget,
+    expression: String,
+    details   : XPathErrorDetails,
+    message   : String,
+    throwable : Throwable
   ) = {
     // MAYBE: "throwable" -> OrbeonFormatter.format(throwable)
     this(
       target,
       Map(
-        "expression"      -> Option(expression),
-        "context-message" -> Option(contextMessage),
-        "message"         -> Option(message)
+        "expression" -> Option(expression),
+        "message"    -> Option(message)
       )
     )
+    _detailsOpt   = Option(details)
     _throwableOpt = Option(throwable)
   }
 
+  // Not stored as properties because properties don't support reading regular Java objects yet
+  private var _detailsOpt: Option[XPathErrorDetails] = None
   private var _throwableOpt: Option[Throwable] = None
+
+  def detailsOpt  : Option[XPathErrorDetails] = _detailsOpt
   def throwableOpt: Option[Throwable] = _throwableOpt
 
-  def expressionOpt    : Option[String] = property[String]("expression")
-  def contextMessageOpt: Option[String] = property[String]("context-message")
-  def messageOpt       : Option[String] = property[String]("message")
+  def expressionOpt: Option[String] = property[String]("expression")
+  def messageOpt   : Option[String] = property[String]("message")
 
   def combinedMessage: String = {
     // In practice
-    val message        = messageOpt        getOrElse "[unknown]"
-    val contextMessage = contextMessageOpt getOrElse "[unknown]"
-    val expression     = expressionOpt     getOrElse "[unknown]"
-    s"$contextMessage: error `$message` while evaluating expression `$expression`"
+    val message     = messageOpt     getOrElse "[unknown]"
+    val details     = detailsOpt getOrElse "[unknown]" //xxx todo
+    val expression  = expressionOpt  getOrElse "[unknown]"
+    s"$details: error `$message` while evaluating expression `$expression`" //xxx todo
   }
 }
 

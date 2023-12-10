@@ -20,7 +20,7 @@ import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.{StaticXPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
-import org.orbeon.oxf.xforms.analysis.{BindSingleItemBinding, RefSingleItemBinding, SingleItemBinding}
+import org.orbeon.oxf.xforms.analysis.{BindSingleItemBinding, RefSingleItemBinding, SingleItemBinding, XPathErrorDetails}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsXPathErrorEvent}
@@ -570,7 +570,7 @@ class XFormsContextStack {
                   new XXFormsXPathErrorEvent(
                     target         = eventTarget,
                     expression     = expression,
-                    contextMessage = s"evaluating `ref` attribute",
+                    details        = XPathErrorDetails.ForAttribute("ref"),
                     message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
                     throwable      = t
                   )

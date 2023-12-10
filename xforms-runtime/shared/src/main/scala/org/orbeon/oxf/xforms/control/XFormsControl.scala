@@ -103,9 +103,6 @@ class XFormsControl(
   final def resolve(staticId: String, contextItem: Option[om.Item] = None): Option[XFormsObject] =
     container.resolveObjectByIdInScope(getEffectiveId, staticId, contextItem)
 
-//  final def getChildElementScope(element: Element): Scope =
-//    part.scopeForPrefixedId(container.getFullPrefix + element.idOrNull)
-
   // Update this control's effective id based on the parent's effective id
   def updateEffectiveId(): Unit = {
     if (staticControl.isWithinRepeat) {

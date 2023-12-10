@@ -876,8 +876,8 @@
                                 xxf:evaluate-avt(string($p))
                     }'
             }"
-            xxf:single-use-static-state="{$mode = 'test'}"
-            xxf:allow-error-recovery-on-init="{$mode = 'test'}"
+            xxf:single-use-static-state="{$mode = ('test', 'test-pdf')}"
+            xxf:allow-error-recovery-on-init="{$mode = ('test', 'test-pdf')}"
         >
 
             <!-- Override if specified -->

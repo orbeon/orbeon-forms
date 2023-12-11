@@ -573,7 +573,7 @@ trait ContainingDocumentLogging {
       case log4s.Error => logger.error(message)
     }
 
-    self.findObjectByEffectiveId("orbeon-inspector") foreach { inspector =>
+    self.findObjectByEffectiveId("fr-console-server") foreach { inspector =>
       XFormsDispatchAction.dispatch(
         eventName       = "xxforms-log",
         target          = inspector.asInstanceOf[XFormsEventTarget],

@@ -69,7 +69,7 @@
         </fr:row>
         <xsl:if test="$mode = 'test'">
             <fr:row>
-                <fr:console-server/>
+                <fr:console-server id="fr-console-server"/>
             </fr:row>
         </xsl:if>
         <xsl:if test="p:property(string-join(('oxf.fr.detail.captcha.location', $app, $form), '.')) = 'form-bottom'">

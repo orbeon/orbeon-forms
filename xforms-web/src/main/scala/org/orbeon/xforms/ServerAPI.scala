@@ -70,12 +70,17 @@ object ServerAPI {
       }
     }
 
-    globalObject.selectDynamic(functionName).asInstanceOf[js.Function].call(
-      thisArg = getElementOrNull(observerId),
-      new js.Object { val target = getElementOrNull(targetId) } +: // `event.target`
-      rest                                                         // custom arguments passed with `<xxf:param>` in `<xf:action>`
-      : _*                                                         // pass as individual arguments (#3205)
-    )
+    globalObject.selectDynamic(functionName).asInstanceOf[js.UndefOr[js.Function]].toOption match {
+      case None =>
+        throw new IllegalArgumentException(s"Function `$functionName()` not found in global scope")
+      case Some(fn) =>
+        fn.call(
+          thisArg = getElementOrNull(observerId),
+          new js.Object { val target = getElementOrNull(targetId) } +: // `event.target`
+          rest                                                         // custom arguments passed with `<xxf:param>` in `<xf:action>`
+          : _*                                                         // pass as individual arguments (#3205)
+        )
+    }
   }
 
   def callUserCallback(

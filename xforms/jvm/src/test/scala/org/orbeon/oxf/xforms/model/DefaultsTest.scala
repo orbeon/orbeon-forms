@@ -55,7 +55,7 @@ class DefaultsTest
 
         withActionAndDoc(doc) {
 
-          val instance = doc.defaultModel flatMap (_. defaultInstanceOpt) get
+          val instance = doc.getDefaultModel.defaultInstanceOpt.get
 
           val expected = List("2", "", "4", "7", "", "7")
 
@@ -175,7 +175,7 @@ class DefaultsTest
 
         withActionAndDoc(doc) {
 
-          val instance = doc.defaultModel flatMap (_. defaultInstanceOpt) get
+          val instance = doc.getDefaultModel.defaultInstanceOpt.get
 
           assert("2" === (instance.rootElement / "oldvalue" stringValue))
           assert(""  === (instance.rootElement / "newvalue" stringValue))

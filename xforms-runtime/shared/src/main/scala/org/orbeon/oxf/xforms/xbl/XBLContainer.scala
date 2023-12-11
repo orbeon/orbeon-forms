@@ -93,8 +93,7 @@ class XBLContainer(
 
   def eventTarget: XFormsEventTarget =
     associatedControlOpt
-      .orElse(containingDocument.defaultModel)
-      .getOrElse(throw new IllegalStateException)
+      .getOrElse(containingDocument.getDefaultModel)
 
   private var _childrenXBLContainers: mutable.Buffer[XBLContainer] = mutable.ArrayBuffer()
   def childrenXBLContainers = _childrenXBLContainers.iterator
@@ -211,7 +210,7 @@ trait ModelContainer {
     for (model <- models)
       Dispatch.dispatchEvent(new XFormsModelDestructEvent(model, Map()), EventCollector.ToReview)
 
-  def defaultModel: Option[XFormsModel] = _models.headOption
+  def findDefaultModel: Option[XFormsModel] = _models.headOption
 
   // Get a list of all the relevant models in this container and all sub-containers
   def allModels: Iterator[XFormsModel] =

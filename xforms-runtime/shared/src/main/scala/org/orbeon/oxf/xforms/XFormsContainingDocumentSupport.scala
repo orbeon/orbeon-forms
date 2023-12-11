@@ -269,7 +269,7 @@ trait ContainingDocumentUpload {
 
   def controls       : XFormsControls
   def staticState    : XFormsStaticState
-  def defaultModel   : Option[XFormsModel]
+  def getDefaultModel: XFormsModel
   def getRequestStats: RequestStats
 
   def getUploadChecker: UploadCheckerLogic = UploadChecker
@@ -289,20 +289,17 @@ trait ContainingDocumentUpload {
 
     def currentUploadSizeAggregate = {
 
-      def evaluateAsLong(expr: CompiledExpression) =
-        defaultModel match {
-          case Some(m) =>
-            val bindingContext = m.getDefaultEvaluationContext
-            XPath.evaluateSingle(
-              contextItems       = bindingContext.nodeset,
-              contextPosition    = bindingContext.position,
-              compiledExpression = expr,
-              functionContext    = m.getContextStack.getFunctionContext(m.getEffectiveId, bindingContext),
-              variableResolver   = m.variableResolver
-            )(getRequestStats.getReporter).asInstanceOf[Long] // we statically ensure that the expression returns an `xs:integer`
-          case None =>
-            throw new AssertionError("can only evaluate dynamic properties if a model is present")
-        }
+      def evaluateAsLong(expr: CompiledExpression) = {
+        val defaultModel   = getDefaultModel
+        val bindingContext = defaultModel.getDefaultEvaluationContext
+        XPath.evaluateSingle(
+          contextItems       = bindingContext.nodeset,
+          contextPosition    = bindingContext.position,
+          compiledExpression = expr,
+          functionContext    = defaultModel.getContextStack.getFunctionContext(defaultModel.getEffectiveId, bindingContext),
+          variableResolver   = defaultModel.variableResolver
+        )(getRequestStats.getReporter).asInstanceOf[Long] // we statically ensure that the expression returns an `xs:integer`
+      }
 
       staticState.uploadMaxSizeAggregateExpression map evaluateAsLong map (0L max)
     }
@@ -360,6 +357,10 @@ trait ContainingDocumentEvent {
 
   private var eventStack: List[XFormsEvent] = Nil
 
+  // The top-level document/model container must have at least one model
+  def getDefaultModel: XFormsModel =
+    findDefaultModel.getOrElse(throw new IllegalStateException)
+
   def startHandleEvent(event: XFormsEvent): Unit                = eventStack ::= event
   def endHandleEvent()                    : Unit                = eventStack = eventStack.tail
   def currentEventOpt                     : Option[XFormsEvent] = eventStack.headOption
@@ -390,8 +391,8 @@ trait ContainingDocumentEvent {
 
 trait ContainingDocumentProperties {
 
-  def staticState: XFormsStaticState
-  def defaultModel: Option[XFormsModel]
+  def staticState    : XFormsStaticState
+  def getDefaultModel: XFormsModel
   def getRequestStats: RequestStats
 
   def disableUpdates: Boolean
@@ -436,20 +437,17 @@ trait ContainingDocumentProperties {
         )
       )
 
-    def evaluateStringPropertyAVT(expr: CompiledExpression) =
-      defaultModel match {
-        case Some(m) =>
-          val bindingContext = m.getDefaultEvaluationContext
-          XPath.evaluateAsString(
-            contextItems       = bindingContext.nodeset,
-            contextPosition    = bindingContext.position,
-            compiledExpression = expr,
-            functionContext    = m.getContextStack.getFunctionContext(m.getEffectiveId, bindingContext),
-            variableResolver   = m.variableResolver
-          )(getRequestStats.getReporter)
-        case None =>
-          throw new AssertionError("can only evaluate AVT properties if a model is present")
-      }
+    def evaluateStringPropertyAVT(expr: CompiledExpression) = {
+      val defaultModel   = getDefaultModel
+      val bindingContext = defaultModel.getDefaultEvaluationContext
+      XPath.evaluateAsString(
+        contextItems       = bindingContext.nodeset,
+        contextPosition    = bindingContext.position,
+        compiledExpression = expr,
+        functionContext    = defaultModel.getContextStack.getFunctionContext(defaultModel.getEffectiveId, bindingContext),
+        variableResolver   = defaultModel.variableResolver
+      )(getRequestStats.getReporter)
+    }
   }
 
   import Memo._

@@ -151,7 +151,7 @@ class XFormsContextStack {
    * Reset the binding context to the root of the first model's first instance, or to the parent binding context.
    */
   def resetBindingContext(collector: ErrorEventCollector): BindingContext = {
-    resetBindingContext(container.defaultModel, collector)
+    resetBindingContext(container.findDefaultModel, collector)
     this.head
   }
 

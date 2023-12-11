@@ -48,10 +48,10 @@ trait PartModelAnalysis extends TransientState {
   def getInstances(modelPrefixedId: String): Seq[Instance] =
     modelsByPrefixedId.get(modelPrefixedId).toSeq flatMap (_.instances.values)
 
-  def defaultModel: Option[Model] =
-    getDefaultModelForScope(startScope)
+  def findDefaultModel: Option[Model] =
+    findDefaultModelForScope(startScope)
 
-  def getDefaultModelForScope(scope: Scope): Option[Model] =
+  def findDefaultModelForScope(scope: Scope): Option[Model] =
     modelsByScope.get(scope) flatMap (_.headOption)
 
   def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model =
@@ -60,11 +60,6 @@ trait PartModelAnalysis extends TransientState {
 
   def getModelsForScope(scope: Scope): collection.Seq[Model] =
     modelsByScope.getOrElse(scope, Nil)
-
-  def findInstanceInScope(scope: Scope, instanceStaticId: String): Option[Instance] =
-    getModelsForScope(scope).iterator flatMap
-      (_.instances.iterator)          collectFirst
-      { case (`instanceStaticId`, instance) => instance }
 
   // NOTE: This searches ancestor scopes as well.
   def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): Option[String] = {

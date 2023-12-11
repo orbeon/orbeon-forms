@@ -95,7 +95,7 @@ trait PartAnalysisContextAfterTree extends PartAnalysisContextForTree {
   def getModel(prefixedId: String): Model
   def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model
   def getModelByInstancePrefixedId(prefixedId: String): Model
-  def getDefaultModelForScope(scope: Scope): Option[Model]
+  def findDefaultModelForScope(scope: Scope): Option[Model]
   def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): Option[String]
 
   def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl

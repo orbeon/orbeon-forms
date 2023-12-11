@@ -86,7 +86,7 @@ object ElementAnalysisTreeBuilder {
               // Use inherited model
               e.closestAncestorInScope match {
                 case Some(ancestor) => ancestor.model // there is an ancestor control in the same scope, use its model id
-                case None           => partAnalysisCtx.getDefaultModelForScope(e.scope) // top-level control in a new scope, use default model id for scope
+                case None           => partAnalysisCtx.findDefaultModelForScope(e.scope) // top-level control in a new scope, use default model id for scope
               }
           }
     }

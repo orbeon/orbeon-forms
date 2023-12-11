@@ -15,15 +15,17 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.cache
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.servlet.ServletSessionImpl
+import org.orbeon.oxf.servlet._
 import org.orbeon.oxf.util.SLF4JLogging._
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 
-import javax.servlet.http.{HttpSessionEvent, HttpSessionListener}
-import javax.servlet.{ServletContextEvent, ServletContextListener}
+// For backward compatibility
+trait ReplicationServletContextListener extends JavaxReplicationServletContextListener
 
+class JavaxReplicationServletContextListener   extends JavaxServletContextListener  (new ReplicationServletContextListenerImpl)
+class JakartaReplicationServletContextListener extends JakartaServletContextListener(new ReplicationServletContextListenerImpl)
 
-class ReplicationServletContextListener extends ServletContextListener {
+class ReplicationServletContextListenerImpl extends ServletContextListener {
 
   override def contextInitialized(servletContextEvent: ServletContextEvent): Unit =
     if (XFormsGlobalProperties.isReplication) {
@@ -34,7 +36,13 @@ class ReplicationServletContextListener extends ServletContextListener {
   override def contextDestroyed(servletContextEvent: ServletContextEvent): Unit = ()
 }
 
-class XFormsServletContextListener extends HttpSessionListener {
+// For backward compatibility
+trait XFormsServletContextListener extends JavaxXFormsServletContextListener
+
+class JavaxXFormsServletContextListener   extends JavaxHttpSessionListener  (new XFormsServletContextListenerImpl)
+class JakartaXFormsServletContextListener extends JakartaHttpSessionListener(new XFormsServletContextListenerImpl)
+
+class XFormsServletContextListenerImpl extends HttpSessionListener {
 
   override def sessionCreated(httpSessionEvent: HttpSessionEvent): Unit =
     XFormsStateManager.sessionCreated(new ServletSessionImpl(httpSessionEvent.getSession))

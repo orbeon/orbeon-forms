@@ -17,13 +17,12 @@ import cats.syntax.option._
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.servlet.OrbeonXFormsFilter.RendererBaseUriAttributeName
+import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl.RendererBaseUriAttributeName
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml.{NamespaceContext, _}
+import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Constants.DocumentId
 import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames._

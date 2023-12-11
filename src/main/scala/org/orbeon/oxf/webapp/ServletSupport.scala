@@ -1,8 +1,7 @@
 package org.orbeon.oxf.webapp
 
+import org.orbeon.oxf.servlet.HttpServletRequest
 import org.orbeon.oxf.util.PathUtils._
-
-import javax.servlet.http.HttpServletRequest
 
 
 object ServletSupport {

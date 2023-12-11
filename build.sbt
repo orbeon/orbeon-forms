@@ -78,7 +78,8 @@ val AntVersion                    = "1.10.11"
 val ThumbnailatorVersion          = "0.4.16"
 
 // "Provided" Java libraries
-val ServletApiVersion             = "4.0.1"
+val JavaxServletApiVersion        = "4.0.1"
+val JakartaServletApiVersion      = "5.0.0"
 val PortletApiVersion             = "3.0.1"
 val LiferayPortalServiceVersion   = "6.2.5"
 val LiferayPortalKernelVersion    = "128.0.1"
@@ -149,11 +150,13 @@ val CoreLibraryDependencies = Seq(
   "net.coobird"                 % "thumbnailator"                   % ThumbnailatorVersion,
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
 
-  "javax.servlet"               %  "javax.servlet-api"              % ServletApiVersion % Provided,
-  "javax.portlet"               %  "portlet-api"                    % PortletApiVersion % Provided
+  "javax.servlet"               % "javax.servlet-api"               % JavaxServletApiVersion   % Provided,
+  "jakarta.servlet"             % "jakarta.servlet-api"             % JakartaServletApiVersion % Provided,
+  "javax.portlet"               % "portlet-api"                     % PortletApiVersion        % Provided
 ) map
   (_.exclude("commons-logging", "commons-logging")) map // because we have jcl-over-slf4j
-  (_.exclude("javax.servlet"  , "servlet-api"))         // because `jcifs` depends on this and we want it provided
+  (_.exclude("javax.servlet"  , "servlet-api")) map     // because `jcifs` depends on this and we want it provided
+  (_.exclude("jakarta.servlet", "jakarta.servlet-api"))
 
 val ExplodedWarLibPath            = "build/orbeon-war/WEB-INF/lib"
 val LiferayWarLibPath             = "/Users/ebruchez/OF/liferay-portal-6.2-ce-ga6/tomcat-7.0.62/webapps/proxy-portlet/WEB-INF/lib"
@@ -538,7 +541,8 @@ lazy val embedding = (project in file("embedding"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-embedding",
-    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided
+    libraryDependencies += "javax.servlet"   % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
+    libraryDependencies += "jakarta.servlet" % "jakarta.servlet-api" % JakartaServletApiVersion % Provided
   )
 
 lazy val fullPortlet = (project in file("full-portlet"))
@@ -547,7 +551,8 @@ lazy val fullPortlet = (project in file("full-portlet"))
   .settings(
     name := "orbeon-full-portlet",
     libraryDependencies += "javax.portlet"      % "portlet-api"               % PortletApiVersion           % Provided,
-    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % ServletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % JavaxServletApiVersion      % Provided,
+    libraryDependencies += "jakarta.servlet"    % "jakarta.servlet-api"       % JakartaServletApiVersion    % Provided,
     libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
     libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
   )
@@ -558,7 +563,8 @@ lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
   .settings(
     name := "orbeon-proxy-portlet",
     libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
-    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % ServletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % JavaxServletApiVersion      % Provided,
+    libraryDependencies += "jakarta.servlet"    % "jakarta.servlet-api"       % JakartaServletApiVersion    % Provided,
     libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
     libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
   )
@@ -569,7 +575,8 @@ lazy val portletSupport = (project in file("portlet-support"))
   .settings(
     name := "orbeon-portlet-support",
     libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
-    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % ServletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % JavaxServletApiVersion      % Provided,
+    libraryDependencies += "jakarta.servlet"    % "jakarta.servlet-api"       % JakartaServletApiVersion    % Provided,
     libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
     libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
   )
@@ -605,8 +612,9 @@ lazy val formRunnerJVM = formRunner.jvm
     DebugDatabaseTest / sourceDirectory := (DatabaseTest / sourceDirectory).value,
     DebugDatabaseTest / javaOptions     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
   ).settings(
-    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion  % Provided,
-    libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion  % Provided,
+    libraryDependencies += "javax.servlet"   % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
+    libraryDependencies += "jakarta.servlet" % "jakarta.servlet-api" % JakartaServletApiVersion % Provided,
+    libraryDependencies += "javax.portlet"   % "portlet-api"         % PortletApiVersion        % Provided,
 
     libraryDependencies                ++= Seq(
       "io.circe" %%% "circe-core",
@@ -845,7 +853,8 @@ lazy val xformsJVM = xforms.jvm
   .settings(jUnitTestOptions: _*)
   .settings(
 
-    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided,
+    libraryDependencies += "javax.servlet"   % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
+    libraryDependencies += "jakarta.servlet" % "jakarta.servlet-api" % JakartaServletApiVersion % Provided,
 
     // Add the path to the assets from the `xformsWeb` project so that they get processed in this project instead
     Assets / unmanagedSourceDirectories += (xformsWeb / baseDirectory).value / "src" / "main" / "assets",
@@ -1189,7 +1198,8 @@ lazy val core = (project in file("src"))
   .dependsOn(
     coreCrossPlatformJVM,
     commonJVM,
-    domJVM
+    domJVM,
+    servletSupport
   )
   .configs(DebugTest)
   .settings(commonSettings: _*)
@@ -1216,6 +1226,25 @@ lazy val core = (project in file("src"))
     libraryDependencies                ++= CoreLibraryDependencies
   )
 
+// Common types for Javax and Jakarta servlets
+lazy val servletSupport = (project in file("servlet-support"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-servlet-support",
+    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % JavaxServletApiVersion      % Provided,
+    libraryDependencies += "jakarta.servlet"    % "jakarta.servlet-api"       % JakartaServletApiVersion    % Provided
+  )
+
+// JAR file for dynamic servlet instantiation
+lazy val servletContainerInitializer = (project in file("servlet-container-initializer"))
+  .dependsOn(formRunnerJVM, xformsJVM, servletSupport)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "servlet-container-initializer",
+    libraryDependencies += "javax.servlet"   % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
+    libraryDependencies += "jakarta.servlet" % "jakarta.servlet-api" % JakartaServletApiVersion % Provided
+  )
+
 lazy val orbeonWar = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Dummy) in file("orbeon-war"))
   .settings(
     name := "orbeon-war",
@@ -1233,14 +1262,14 @@ lazy val orbeonWarJVM = orbeonWar.jvm
     embedding,              // probably unneeded in WAR
     portletSupport,
     formRunnerProxyPortlet, // unneeded in WAR, but `proxy-portlet-jar` task for now uses JAR in WAR
-    fullPortlet
+    fullPortlet,
+    servletContainerInitializer
   )
   .settings(OrbeonWebappPlugin.projectSettings: _*)
   .settings(commonSettings: _*)
   .settings(
     exportJars := false
   )
-
 
 lazy val orbeonWarJS = orbeonWar.js
   .enablePlugins(BuildInfoPlugin)
@@ -1293,6 +1322,7 @@ lazy val root = (project in file("."))
     portletSupport,
     formRunnerProxyPortlet,
     fullPortlet,
+    servletContainerInitializer,
     orbeonWarJVM,
     orbeonWarJS
   )

@@ -6,8 +6,6 @@ import org.orbeon.oxf.webapp.ServletSupport
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.io.ByteArrayInputStream
-import javax.servlet._
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 import scala.jdk.CollectionConverters._
 
 
@@ -23,7 +21,13 @@ import scala.jdk.CollectionConverters._
 //     <dispatcher>REQUEST</dispatcher>
 // </filter-mapping>
 
-class HttpLoggingFilter extends Filter {
+// For backward compatibility
+trait HttpLoggingFilter extends JavaxHttpLoggingFilter
+
+class JavaxHttpLoggingFilter   extends JavaxFilter  (new HttpLoggingFilterImpl)
+class JakartaHttpLoggingFilter extends JakartaFilter(new HttpLoggingFilterImpl)
+
+class HttpLoggingFilterImpl extends Filter {
 
   val Logger: Logger = LoggerFactory.getLogger("org.orbeon.filter.http-logging")
 

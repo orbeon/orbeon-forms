@@ -13,18 +13,23 @@
  */
 package org.orbeon.oxf.webapp
 
-import javax.servlet.{ServletContextEvent, ServletContextListener, ServletException}
 import org.orbeon.oxf.externalcontext.ServletWebAppContext
 import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
+import org.orbeon.oxf.servlet._
 import org.orbeon.oxf.webapp.ServletPortlet._
 
 // For backward compatibility
-class OrbeonServletContextListenerDelegate extends OrbeonServletContextListener
+class OrbeonServletContextListenerDelegate extends JavaxOrbeonServletContextListener
+
+class JavaxOrbeonServletContextListener   extends JavaxServletContextListener  (new OrbeonServletContextListener with WithJavaxServletException)
+class JakartaOrbeonServletContextListener extends JakartaServletContextListener(new OrbeonServletContextListener with WithJakartaServletException)
 
 /**
  * This listener listens for HTTP context lifecycle changes.
  */
-class OrbeonServletContextListener extends ServletContextListener {
+abstract class OrbeonServletContextListener extends ServletContextListener with WithServletException {
+
+  def newServletException(throwable: Throwable): Exception
 
   private val InitProcessorPrefix     = "oxf.context-initialized-processor."
   private val InitInputPrefix         = "oxf.context-initialized-processor.input."
@@ -37,12 +42,12 @@ class OrbeonServletContextListener extends ServletContextListener {
   def initParameters = Map()
 
   override def contextInitialized(event: ServletContextEvent): Unit =
-    withRootException("context creation", new ServletException(_)) {
+    withRootException("context creation", newServletException) {
       runWithServletContext(event.getServletContext, None, logPrefix, "Context initialized.", InitProcessorPrefix, InitInputPrefix)
     }
 
   override def contextDestroyed(event: ServletContextEvent): Unit =
-    withRootException("context destruction", new ServletException(_)) {
+    withRootException("context destruction", newServletException) {
       runWithServletContext(event.getServletContext, None, logPrefix, "Context destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
       // NOTE: This calls all listeners, because the listeners are stored in the actual web app context's attributes
       // TODO: Shouldn't a singleton `WebAppContext` be available instead?

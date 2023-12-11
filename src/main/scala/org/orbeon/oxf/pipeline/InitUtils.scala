@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.pipeline
 
-import javax.servlet.ServletContext
-import javax.servlet.http.{HttpServletRequest, HttpSession}
 import org.log4s.Logger
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.errorified.Exceptions
@@ -28,6 +26,7 @@ import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceNotFoundException
+import org.orbeon.oxf.servlet.{HttpServletRequest, HttpSession, ServletContext}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{AttributesToMap, PipelineUtils}
 import org.orbeon.saxon.om.NodeInfo

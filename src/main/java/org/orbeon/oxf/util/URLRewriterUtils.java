@@ -15,14 +15,18 @@ package org.orbeon.oxf.util;
 
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;
-import org.orbeon.oxf.externalcontext.*;
+import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.URLRewriterImpl;
+import org.orbeon.oxf.externalcontext.UrlRewriteMode;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.RegexpMatcher;
 import org.orbeon.oxf.properties.Properties;
-import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
+import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
@@ -106,7 +110,7 @@ public class URLRewriterUtils {
 
     public static boolean isSeparateDeployment(ExternalContext.Request request) {
         final Map<String, Object> attributes = request.getAttributesMap();
-        return "separate".equals(attributes.get(OrbeonXFormsFilter.RendererDeploymentAttributeName()));
+        return "separate".equals(attributes.get(OrbeonXFormsFilterImpl.RendererDeploymentAttributeName()));
     }
 
     public static boolean isForwarded(ExternalContext.Request request) {

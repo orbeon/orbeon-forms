@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
-import javax.servlet._
 import org.orbeon.oxf.controller.Authorizer
-import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
 // This filter checks that the caller provides the appropriate request token. If not, it sends a 403 back.
 class TokenSecurityFilter extends Filter {

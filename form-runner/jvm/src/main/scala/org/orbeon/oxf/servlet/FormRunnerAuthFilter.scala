@@ -22,15 +22,18 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.webapp.ServletSupport
 import org.slf4j.LoggerFactory
 
-import javax.servlet._
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse}
 import scala.collection.JavaConverters._
 import scala.collection.compat._
 
+// For backward compatibility
+trait FormRunnerAuthFilter extends JavaxFormRunnerAuthFilter
 
-class FormRunnerAuthFilter extends Filter {
+class JavaxFormRunnerAuthFilter   extends JavaxFilter  (new FormRunnerAuthFilterImpl)
+class JakartaFormRunnerAuthFilter extends JakartaFilter(new FormRunnerAuthFilterImpl)
 
-  import FormRunnerAuthFilter._
+class FormRunnerAuthFilterImpl extends Filter {
+
+  import FormRunnerAuthFilterImpl._
 
   private case class FilterSettings(contentSecurityPolicy: Option[String])
 
@@ -70,7 +73,7 @@ class FormRunnerAuthFilter extends Filter {
   }
 }
 
-object FormRunnerAuthFilter {
+object FormRunnerAuthFilterImpl {
 
   private val logger = LoggerFactory.getLogger("org.orbeon.filter.form-runner-auth")
 

@@ -13,32 +13,31 @@
  */
 package org.orbeon.oxf.fr.embedding.servlet
 
+import org.orbeon.oxf.fr.embedding.APISupport._
+import org.orbeon.oxf.servlet.HttpServletRequest
+
 import java.io.Writer
 import java.{util => ju}
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-
-import org.orbeon.oxf.fr.embedding.APISupport._
-import org.orbeon.oxf.fr.embedding.FormRunnerMode
-
-import scala.jdk.CollectionConverters._
-import scala.collection.immutable.Seq
 import scala.collection.compat._
+import scala.jdk.CollectionConverters._
 
 object API {
 
   // Embed an Orbeon Forms page by path
   def embedPageJava(
-    req        : HttpServletRequest,
+    req        : AnyRef, // javax/jakarta.servlet.http.HttpServletRequest
     writer     : Writer,
     path       : String,
     headers    : ju.Map[String, String]
-   ): Unit =
-    withSettings(req, writer) { settings =>
+   ): Unit = {
+    val httpServletRequest = HttpServletRequest.fromAnyRef(req)
+
+    withSettings(httpServletRequest, writer) { settings =>
 
       implicit val ctx = new ServletEmbeddingContextWithResponse(
-        req,
+        httpServletRequest,
         Left(writer),
-        nextNamespace(req),
+        nextNamespace(httpServletRequest),
         settings.orbeonPrefix,
         settings.httpClient
       )
@@ -49,10 +48,11 @@ object API {
         Option(headers) map (_.asScala.to(List)) getOrElse Nil
       )
     }
+  }
 
   // Embed a Form Runner form
   def embedFormJava(
-    req        : HttpServletRequest,
+    req        : AnyRef, // javax/jakarta.servlet.http.HttpServletRequest
     writer     : Writer,
     app        : String,
     form       : String,
@@ -66,45 +66,6 @@ object API {
       req,
       writer,
       formRunnerPath(app, form, mode, Option(documentId), Option(query)),
-      headers
-    )
-
-  // Embed an Orbeon Forms page by path
-  def embedPage(
-    req        : HttpServletRequest,
-    out        : Writer Either HttpServletResponse,
-    path       : String,
-    headers    : Seq[(String, String)] = Nil
-   ): Unit =
-    withSettings(req, out.fold(identity, _.getWriter)) { settings =>
-
-      implicit val ctx = new ServletEmbeddingContextWithResponse(
-        req,
-        out,
-        nextNamespace(req),
-        settings.orbeonPrefix,
-        settings.httpClient
-      )
-
-      proxyPage(settings.formRunnerURL, path, headers)
-    }
-
-  // Embed a Form Runner form
-  def embedForm(
-    req        : HttpServletRequest,
-    out        : Writer Either HttpServletResponse,
-    app        : String,
-    form       : String,
-    //formVersion      : Int, TODO: We can't add this here for backward compatibility reasons, but `FormRunnerOffline` supports it.
-    mode       : FormRunnerMode,
-    documentId : Option[String] = None,
-    query      : Option[String] = None,
-    headers    : Seq[(String, String)] = Nil
-  ): Unit =
-    embedPage(
-      req,
-      out,
-      formRunnerPath(app, form, mode.entryName, documentId, query),
       headers
     )
 }

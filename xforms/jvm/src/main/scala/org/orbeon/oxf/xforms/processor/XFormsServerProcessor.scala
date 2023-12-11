@@ -21,9 +21,8 @@ import org.orbeon.oxf.http.{SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorOutput}
-import org.orbeon.oxf.servlet.OrbeonXFormsFilter
+import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.event.events.{KeyboardEvent, XXFormsDndEvent, XXFormsLoadEvent, XXFormsUploadDoneEvent}
@@ -206,7 +205,7 @@ class XFormsServerProcessor extends ProcessorImpl {
 
       // Set deployment mode into request (useful for epilogue)
       externalContext.getRequest.getAttributesMap
-        .put(OrbeonXFormsFilter.RendererDeploymentAttributeName, containingDocument.getDeploymentType.entryName)
+        .put(OrbeonXFormsFilterImpl.RendererDeploymentAttributeName, containingDocument.getDeploymentType.entryName)
     }
 
     XFormsServer.processEvents(

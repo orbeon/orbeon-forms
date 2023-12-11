@@ -23,8 +23,6 @@ import org.orbeon.oxf.webapp.ServletSupport
 
 import java.io._
 import java.util._
-import javax.servlet._
-import javax.servlet.http._
 
 
 private case class FilterSettings(context: ServletContext, orbeonContextPathOpt: Option[String], defaultEncoding: String) {
@@ -32,10 +30,16 @@ private case class FilterSettings(context: ServletContext, orbeonContextPathOpt:
   val OrbeonResourceRegex = orbeonContextPathOpt map (path => s"$path(/.*)".r) getOrElse "$.".r
 }
 
-// This filter allows forwarding requests from your web app to an separate Orbeon Forms context.
-class OrbeonXFormsFilter extends Filter {
+// For backward compatibility
+trait OrbeonXFormsFilter extends JavaxOrbeonXFormsFilter
 
-  import org.orbeon.oxf.servlet.OrbeonXFormsFilter._
+class JavaxOrbeonXFormsFilter   extends JavaxFilter  (new OrbeonXFormsFilterImpl)
+class JakartaOrbeonXFormsFilter extends JakartaFilter(new OrbeonXFormsFilterImpl)
+
+// This filter allows forwarding requests from your web app to an separate Orbeon Forms context.
+class OrbeonXFormsFilterImpl extends Filter {
+
+  import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl._
 
   private var settingsOpt: Option[FilterSettings] = None
 
@@ -174,7 +178,7 @@ class OrbeonXFormsFilter extends Filter {
     }
 }
 
-object OrbeonXFormsFilter {
+object OrbeonXFormsFilterImpl {
 
   val RendererDeploymentAttributeName      = "oxf.xforms.renderer.deployment"
   val RendererBaseUriAttributeName         = "oxf.xforms.renderer.base-uri"

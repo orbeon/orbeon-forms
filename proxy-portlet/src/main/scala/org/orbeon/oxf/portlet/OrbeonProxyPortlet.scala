@@ -347,7 +347,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     val sendUser     = getBooleanPreference(request, SendLiferayUser)
 
     val servletReqHeaders =
-      findServletRequest(request).toList flatMap APISupport.requestHeaders
+      findServletRequest(request)
+        .toList
+        .map(org.orbeon.oxf.servlet.HttpServletRequest.apply)
+        .flatMap(APISupport.requestHeaders)
 
     def portletRequestHeadersIt =
       for {

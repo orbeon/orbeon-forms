@@ -17,9 +17,8 @@ import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session, Session
 import org.orbeon.oxf.externalcontext.RequestAdapter
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.pipeline.InitUtils
+import org.orbeon.oxf.servlet.{HttpServletRequest, HttpSession}
 import org.orbeon.oxf.webapp.ServletSupport
-
-import javax.servlet.http.{HttpServletRequest, HttpSession}
 
 
 private class MinimalSession(session: HttpSession) extends Session {

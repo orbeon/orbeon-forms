@@ -13,9 +13,8 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import javax.servlet.http.HttpSession
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
-import org.orbeon.oxf.servlet.ServletSessionImpl
+import org.orbeon.oxf.servlet.{HttpSession, ServletSessionImpl}
 
 // External context which only exposes the web app, without request or response
 // Session is None when called from init()/destroy()/contextInitialized()/contextDestroyed()

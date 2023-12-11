@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import javax.portlet.PortletContext
-import javax.servlet.ServletContext
+import org.orbeon.oxf.servlet.ServletContext
 import org.orbeon.oxf.webapp.Orbeon
 
+import javax.portlet.PortletContext
 import scala.jdk.CollectionConverters._
 
 

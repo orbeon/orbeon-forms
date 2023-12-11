@@ -23,6 +23,7 @@ import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.http._
+import org.orbeon.oxf.servlet.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
@@ -32,7 +33,6 @@ import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory
 
 import java.io.Writer
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import scala.collection.immutable
 import scala.jdk.CollectionConverters._
 import scala.util.matching.Regex
@@ -116,7 +116,7 @@ object APISupport {
           )
 
         case None =>
-          ctx.setStatusCode(HttpServletResponse.SC_NOT_FOUND)
+          ctx.setStatusCode(StatusCode.NotFound)
       }
     }
 
@@ -290,7 +290,7 @@ object APISupport {
         case None        => 0
       }
 
-    req.setAttribute(LastNamespaceIndexKey, newValue)
+    req.setAttribute(LastNamespaceIndexKey, newValue: Integer)
 
     Constants.NamespacePrefix + newValue
   }

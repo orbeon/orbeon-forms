@@ -15,14 +15,13 @@ package org.orbeon.oxf.fr.embedding.servlet
 
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
+import org.orbeon.oxf.servlet._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.webapp.ServletSupport
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 
 import java.io.Writer
-import javax.servlet._
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import scala.util.Try
 
 
@@ -84,7 +83,13 @@ class ServletEmbeddingContextWithResponse(
   }
 }
 
-class ServletFilter extends Filter {
+// For backward compatibility
+trait ServletFilter extends JavaxServletFilter
+
+class JavaxServletFilter   extends JavaxFilter  (new ServletFilterImpl)
+class JakartaServletFilter extends JakartaFilter(new ServletFilterImpl)
+
+class ServletFilterImpl extends Filter {
 
   private var settingsOpt: Option[EmbeddingSettings] = None
 

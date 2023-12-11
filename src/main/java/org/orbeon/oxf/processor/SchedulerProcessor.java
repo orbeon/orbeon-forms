@@ -22,6 +22,7 @@ import org.orbeon.oxf.externalcontext.WebAppExternalContext;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
+import org.orbeon.oxf.servlet.HttpSession;
 import org.orbeon.oxf.util.DateUtilsUsingSaxon;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.task.Task;
@@ -29,7 +30,6 @@ import org.orbeon.oxf.util.task.TaskScheduler;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom.Extensions;
 
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

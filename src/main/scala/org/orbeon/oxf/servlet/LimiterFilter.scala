@@ -13,14 +13,11 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.util.concurrent.Semaphore
-import javax.servlet._
-import javax.servlet.http.HttpServletRequest
-
 import org.orbeon.oxf.logging.{LifecycleLogger, MinimalRequest}
 import org.orbeon.oxf.util.StringUtils._
 import org.slf4j.LoggerFactory
 
+import java.util.concurrent.Semaphore
 import scala.util.matching.Regex
 
 // Servlet filter to limit the number of concurrent threads entering the filter chain
@@ -37,7 +34,14 @@ import scala.util.matching.Regex
 //
 // - x0.5
 // - x1.25
-class LimiterFilter extends Filter {
+
+// For backward compatibility
+trait LimiterFilter extends JavaxLimiterFilter
+
+class JavaxLimiterFilter   extends JavaxFilter  (new LimiterFilterImpl)
+class JakartaLimiterFilter extends JakartaFilter(new LimiterFilterImpl)
+
+class LimiterFilterImpl extends Filter {
 
   import LimiterFilter.Logger._
 

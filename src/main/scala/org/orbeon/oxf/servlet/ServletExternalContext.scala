@@ -24,7 +24,6 @@ import org.orbeon.oxf.webapp.ServletSupport
 
 import java.io._
 import java.{util => ju}
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import scala.jdk.CollectionConverters._
 
 
@@ -347,7 +346,7 @@ class ServletExternalContext(
       // This is to work around a Tomcat issue whereby a session is newly created in the original servlet, but
       // somehow we can't know about it when the request is forwarded to us.
       val nativeSession = nativeRequest.getSession(
-        create || getRequest.getAttributesMap.get(OrbeonXFormsFilter.RendererHasSessionAttributeName) == "true"
+        create || getRequest.getAttributesMap.get(OrbeonXFormsFilterImpl.RendererHasSessionAttributeName) == "true"
       )
 
       if (nativeSession ne null) {

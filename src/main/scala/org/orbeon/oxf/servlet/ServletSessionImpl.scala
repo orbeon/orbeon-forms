@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.servlet
 
-import javax.servlet.http.HttpSession
 import scala.jdk.CollectionConverters._
 
 import org.orbeon.oxf.externalcontext.ExternalContext

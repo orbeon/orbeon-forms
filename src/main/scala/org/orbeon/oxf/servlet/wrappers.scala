@@ -13,16 +13,13 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.io._
-import java.{util => ju}
-
-import javax.servlet.{ReadListener, ServletInputStream}
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.PathUtils._
 
+import java.io._
+import java.{util => ju}
 import scala.jdk.CollectionConverters._
 
 // Request wrapper for forwarding a request which simulates a server-side redirect.

@@ -1,12 +1,14 @@
 package org.orbeon.oxf.cache
 
-import javax.servlet.{ServletContextEvent, ServletContextListener}
+import org.orbeon.oxf.servlet.{JakartaServletContextListener, JavaxServletContextListener, ServletContextEvent, ServletContextListener}
 
+// For backward compatibility
+trait ShutdownListener extends JavaxShutdownListener
 
-class ShutdownListener extends ServletContextListener {
+class JavaxShutdownListener   extends JavaxServletContextListener  (new ShutdownListenerImpl)
+class JakartaShutdownListener extends JakartaServletContextListener(new ShutdownListenerImpl)
 
+class ShutdownListenerImpl extends ServletContextListener {
   override def contextInitialized(servletContextEvent: ServletContextEvent): Unit = ()
-
-  override def contextDestroyed(servletContextEvent: ServletContextEvent): Unit =
-    CacheSupport.close()
+  override def contextDestroyed(servletContextEvent: ServletContextEvent): Unit = CacheSupport.close()
 }

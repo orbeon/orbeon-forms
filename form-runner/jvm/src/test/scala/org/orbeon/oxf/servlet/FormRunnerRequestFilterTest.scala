@@ -21,7 +21,6 @@ import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.funspec.AnyFunSpecLike
 import org.scalatestplus.mockito.MockitoSugar
 
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpSession}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
@@ -57,7 +56,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
           override def getPathInfo: String = path
         }
 
-      FormRunnerAuthFilter.amendRequest(mockRequest)
+      FormRunnerAuthFilterImpl.amendRequest(mockRequest)
     }
 
     val testCredentials =

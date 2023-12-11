@@ -16,21 +16,23 @@ package org.orbeon.oxf.webapp
 import org.log4s
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
-import org.orbeon.oxf.servlet.ServletSessionImpl
+import org.orbeon.oxf.servlet._
 import org.orbeon.oxf.webapp.ServletPortlet._
 
-import javax.servlet.ServletException
-import javax.servlet.http.{HttpSessionEvent, HttpSessionListener}
 import scala.util.control.NonFatal
 
 // For backward compatibility
-class OrbeonSessionListenerDelegate extends OrbeonSessionListener
+class OrbeonSessionListenerDelegate extends JavaxOrbeonSessionListener
 
+class JavaxOrbeonSessionListener   extends JavaxHttpSessionListener  (new OrbeonSessionListener with WithJavaxServletException)
+class JakartaOrbeonSessionListener extends JakartaHttpSessionListener(new OrbeonSessionListener with WithJakartaServletException)
 
 /**
  * This listener listens for HTTP session lifecycle changes.
  */
-class OrbeonSessionListener extends HttpSessionListener {
+abstract class OrbeonSessionListener extends HttpSessionListener with WithServletException {
+
+  def newServletException(throwable: Throwable): Exception
 
   import OrbeonSessionListener._
 
@@ -43,7 +45,7 @@ class OrbeonSessionListener extends HttpSessionListener {
   def initParameters = Map()
 
   override def sessionCreated(event: HttpSessionEvent): Unit =
-    withRootException("session creation", new ServletException(_)) {
+    withRootException("session creation", newServletException) {
 
       val httpSession = event.getSession
 
@@ -60,7 +62,7 @@ class OrbeonSessionListener extends HttpSessionListener {
     }
 
   override def sessionDestroyed(event: HttpSessionEvent): Unit =
-    withRootException("session destruction", new ServletException(_)) {
+    withRootException("session destruction", newServletException) {
 
       val httpSession = event.getSession
       if (httpSession ne null) {

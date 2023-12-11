@@ -549,7 +549,6 @@ object ItemsetSupport {
   // Return the list of items as an XML tree
   def asXML(
     itemset                    : Itemset,
-    configuration              : StaticXPath.SaxonConfiguration,
     controlValue               : Option[(Item.Value[om.NodeInfo], om.NodeInfo => Boolean)],
     excludeWhitespaceTextNodes : Boolean,
     locationData               : LocationData

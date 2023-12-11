@@ -63,7 +63,6 @@ class XXFormsItemset extends XFormsFunction {
           // Return an XML document
           ItemsetSupport.asXML(
             itemset                    = itemset,
-            configuration              = ctx.getConfiguration,
             controlValue               = controlValueForSelection,
             excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy,
             locationData               = control.getLocationData

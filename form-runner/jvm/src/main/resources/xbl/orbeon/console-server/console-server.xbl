@@ -74,7 +74,6 @@
                         name="data"
                         value="frf:encodeFormDataToSubmit($data)"/>
                     <xf:body>
-                        console.log('fr-console-server: sending data: ' + data);
                         window.parent.ORBEON.xforms.Document.dispatchEvent(
                             {
                                 targetId:   'fr-console',
@@ -95,12 +94,6 @@
                 defaultAction="cancel">
 
                 <xf:action xxbl:scope="inner">
-
-                    ConsoleSupport:getCurrentEventErrorDetails(
-                        ConsoleSupport:tryToUnwrapExpression(event('expression')),
-                        event('message'),
-                        event('details')
-                    )
 
                     <xf:var
                         xmlns:ConsoleSupport="java:org.orbeon.xbl.ConsoleSupport"
@@ -147,7 +140,6 @@
                             name="data"
                             value="frf:encodeFormDataToSubmit($data)"/>
                         <xf:body>
-                            console.log('fr-console-server: sending data: ' + data);
                             window.parent.ORBEON.xforms.Document.dispatchEvent(
                                 {
                                     targetId:   'fr-console',

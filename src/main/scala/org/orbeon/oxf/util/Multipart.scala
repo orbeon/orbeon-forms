@@ -304,10 +304,10 @@ object Multipart {
                 UploadState.Interrupted(
                  Option(Exceptions.getRootThrowable(t))
                  collect {
-                   case _: EmptyFileException                                     => Reason.EmptyFile
-                   case root: SizeLimitExceededException                          => Reason.SizeReason(root.getPermittedSize, root.getActualSize)
-                   case DisallowedMediatypeException(filename, permitted, actual) => Reason.MediatypeReason(filename, permitted, actual)
-                   case FileScanException(fieldName, fileScanResult)              => Reason.FileScanReason(fieldName, fileScanResult.message)
+                   case _: EmptyFileException                                     => FileRejectionReason.EmptyFile
+                   case root: SizeLimitExceededException                          => FileRejectionReason.SizeTooLarge(root.getPermittedSize, root.getActualSize)
+                   case DisallowedMediatypeException(filename, permitted, actual) => FileRejectionReason.DisallowedMediatype(filename, permitted, actual)
+                   case FileScanException(fieldName, fileScanResult)              => FileRejectionReason.FailedFileScan(fieldName, fileScanResult.message)
                  }
                 )
               ))

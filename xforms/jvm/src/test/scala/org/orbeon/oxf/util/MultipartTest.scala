@@ -24,7 +24,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.ResourceManagerSupport
 import org.orbeon.oxf.util.Multipart._
 import org.orbeon.oxf.util.NetUtils.inputStreamToByteArray
-import org.orbeon.oxf.util.Reason.SizeReason
+import org.orbeon.oxf.util.FileRejectionReason.SizeTooLarge
 import org.orbeon.oxf.xforms.upload.AllowedMediatypes.AllowedAnyMediatype
 import org.orbeon.oxf.xforms.upload.UploaderServer.UploadProgressMultipartLifecycle
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploaderServer}
@@ -163,7 +163,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
 
         it("must set `Interrupted` `UploadProgress` into session") {
           assert(
-            Some(UploadProgress(FieldName, Some(body.length), 0, UploadState.Interrupted(Some(SizeReason(limit, 8326))))) ===
+            Some(UploadProgress(FieldName, Some(body.length), 0, UploadState.Interrupted(Some(SizeTooLarge(limit, 8326))))) ===
               UploaderServer.getUploadProgressFromSession(Some(session), UUID, FieldName)
           )
         }

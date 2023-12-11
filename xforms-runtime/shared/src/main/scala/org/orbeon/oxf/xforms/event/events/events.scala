@@ -194,22 +194,22 @@ object XXFormsUploadErrorEvent {
   def reasonToProperties(target: XFormsEventTarget): List[(String, Option[Any])] =
     target.cast[XFormsUploadControl].to(List) flatMap
       FileMetadata.progress                   flatMap {
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.EmptyFile))) =>
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.EmptyFile))) =>
         List("error-type" -> Some("empty-file-error"))
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.SizeReason(permitted, actual)))) =>
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.SizeTooLarge(permitted, actual)))) =>
         List(
           "error-type" -> Some("size-error"),
           "permitted"  -> Some(permitted),
           "actual"     -> Some(actual)
         )
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.MediatypeReason(filename, permitted, actual)))) =>
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.DisallowedMediatype(filename, permitted, actual)))) =>
         List(
           "error-type" -> Some("mediatype-error"),
           "filename"   -> Some(filename),
           "permitted"  -> Some(permitted.to(List) map (_.toString)),
           "actual"     -> (actual map (_.toString))
         )
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.FileScanReason(_, message)))) =>
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.FailedFileScan(_, message)))) =>
         List(
           "error-type" -> Some("file-scan-error"),
           "message"    -> message

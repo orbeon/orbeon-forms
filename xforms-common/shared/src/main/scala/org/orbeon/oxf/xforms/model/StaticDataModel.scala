@@ -17,20 +17,10 @@ import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.{BindingErrorReason, NodeBindingErrorReason}
 
 
 object StaticDataModel {
-
-  // Reasons that setting a value on a node can fail
-  sealed trait Reason { val message: String }
-  sealed trait NodeReason extends Reason
-  object Reason {
-    case object  DisallowedNode                extends NodeReason { val message = "Unable to set value on disallowed node" }
-    case object  ReadonlyNode                  extends NodeReason { val message = "Unable to set value on read-only node" }
-    case class   InvalidModel(modelId: String) extends Reason     { val message = s"Invalid model: `$modelId`" }
-    case class   InvalidBind(bindId: String)   extends Reason     { val message = s"Invalid bind: `$bindId`" }
-    case class   Other(message: String)        extends Reason
-  }
 
   /**
    * Whether the given item is acceptable as a bound item.
@@ -63,11 +53,11 @@ object StaticDataModel {
    * - element nodes containing other elements
    * - items not backed by a mutable node (which are read-only)
    */
-  def isWritableItem(item: Item): NodeReason Either VirtualNodeType = item match {
-    case _: AtomicValue                                => Left(Reason.ReadonlyNode)
-    case node: VirtualNodeType if node.hasChildElement => Left(Reason.DisallowedNode)
+  def isWritableItem(item: Item): NodeBindingErrorReason Either VirtualNodeType = item match {
+    case _: AtomicValue                                => Left(BindingErrorReason.ReadonlyNode)
+    case node: VirtualNodeType if node.hasChildElement => Left(BindingErrorReason.DisallowedNode)
     case node: VirtualNodeType                         => Right(node)
-    case _: DocumentNodeInfoType                       => Left(Reason.DisallowedNode) // TODO: review this test
-    case _                                             => Left(Reason.ReadonlyNode)
+    case _: DocumentNodeInfoType                       => Left(BindingErrorReason.DisallowedNode) // TODO: review this test
+    case _                                             => Left(BindingErrorReason.ReadonlyNode)
   }
 }

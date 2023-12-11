@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsXPathErrorEvent}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.StaticDataModel.Reason
+import org.orbeon.xforms.BindingErrorReason
 import org.orbeon.oxf.xforms.model.{BindNode, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -384,7 +384,7 @@ class XFormsContextStack {
                 new XXFormsBindingErrorEvent(
                   target          = eventTarget,
                   locationDataOpt = Option(bindingElement).flatMap(e => Option(e.getData.asInstanceOf[LocationData])),
-                  reason          = Reason.InvalidModel(modelId)
+                  reason          = BindingErrorReason.InvalidModel(modelId)
                 )
               )
               (baseBindingContext.modelOpt, false)
@@ -423,7 +423,7 @@ class XFormsContextStack {
               new XXFormsBindingErrorEvent(
                 target          = eventTarget,
                 locationDataOpt = Option(bindingElement).flatMap(e => Option(e.getData.asInstanceOf[LocationData])),
-                reason          = Reason.InvalidBind(bindId)
+                reason          = BindingErrorReason.InvalidBind(bindId)
               )
             )
             // Default to an empty binding

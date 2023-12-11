@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsValu
 import org.orbeon.oxf.xforms.model.StaticDataModel._
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om._
+import org.orbeon.xforms.NodeBindingErrorReason
 import org.w3c.dom.Node._
 
 
@@ -63,7 +64,7 @@ object DataModel {
     nodeInfo  : NodeInfo,
     newValue  : String,
     onSuccess : ()         => Unit = () => (),
-    onError   : NodeReason => Unit = _  => ()
+    onError   : NodeBindingErrorReason => Unit = _  => ()
   ): Boolean = {
 
     assert(nodeInfo ne null)
@@ -89,7 +90,7 @@ object DataModel {
     nodeInfo  : NodeInfo,
     newValue  : String,
     onSuccess : String     => Unit = _ => (),
-    onError   : NodeReason => Unit = _ => ()
+    onError   : NodeBindingErrorReason => Unit = _ => ()
   ): Boolean = {
 
     assert(nodeInfo ne null)

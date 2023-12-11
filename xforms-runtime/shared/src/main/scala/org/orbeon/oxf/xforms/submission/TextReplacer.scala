@@ -21,8 +21,8 @@ import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.oxf.xforms.model.StaticDataModel._
 import org.orbeon.saxon.om
+import org.orbeon.xforms.{BindingErrorReason, NodeBindingErrorReason}
 
 
 object TextReplacer extends Replacer {
@@ -118,12 +118,12 @@ object TextReplacer extends Replacer {
           logger             = containingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
         )
 
-      def handleSetValueError(reason: NodeReason) =
+      def handleSetValueError(reason: NodeBindingErrorReason) =
         throw newSubmissionException(
           reason match {
-            case Reason.DisallowedNode =>
+            case BindingErrorReason.DisallowedNode =>
               s"""`targetref` attribute doesn't point to an element without children or to an attribute for `replace="${submissionParameters.replaceType}"`."""
-            case Reason.ReadonlyNode   =>
+            case BindingErrorReason.ReadonlyNode   =>
               s"""`targetref` attribute points to a readonly node for `replace="${submissionParameters.replaceType}"`."""
           }
         )

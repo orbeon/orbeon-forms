@@ -21,8 +21,7 @@ import org.orbeon.oxf.xforms.control.controls.{FileMetadata, XFormsUploadControl
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
-import org.orbeon.oxf.xforms.model.StaticDataModel
-import org.orbeon.xforms.EventNames
+import org.orbeon.xforms.{BindingErrorReason, EventNames}
 import shapeless.syntax.typeable._
 
 import scala.collection.compat._
@@ -35,7 +34,7 @@ class XXFormsStateRestoredEvent(target: XFormsEventTarget, properties: PropertyG
 class XXFormsBindingErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XXFORMS_BINDING_ERROR, target, properties, bubbles = true, cancelable = true) {
 
-  def this(target: XFormsEventTarget, locationDataOpt: Option[LocationData], reason: StaticDataModel.Reason) = {
+  def this(target: XFormsEventTarget, locationDataOpt: Option[LocationData], reason: BindingErrorReason) = {
     this(target, Map("message" -> Option(reason.message)))
     _locationData = locationDataOpt
     _reasonOpt = Option(reason)
@@ -44,8 +43,8 @@ class XXFormsBindingErrorEvent(target: XFormsEventTarget, properties: PropertyGe
   private var _locationData: Option[LocationData] = None
   override def locationData: LocationData = _locationData.orNull
 
-  private var _reasonOpt: Option[StaticDataModel.Reason] = None
-  def reasonOpt: Option[StaticDataModel.Reason] = _reasonOpt
+  private var _reasonOpt: Option[BindingErrorReason] = None
+  def reasonOpt: Option[BindingErrorReason] = _reasonOpt
 }
 
 class XXFormsXPathErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)

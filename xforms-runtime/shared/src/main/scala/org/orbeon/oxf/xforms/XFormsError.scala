@@ -17,7 +17,7 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.http.{HttpStatusCode, StatusCode}
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xforms.model.StaticDataModel.Reason
+import org.orbeon.xforms.BindingErrorReason
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.trans.XPathException
@@ -54,7 +54,7 @@ import org.orbeon.xforms.{ServerError, XFormsCrossPlatformSupport, XFormsNames}
 object XFormsError {
 
   // `xxforms-binding-error` in model and on controls
-  def handleNonFatalBindingError(target: XFormsEventTarget, locationData: LocationData, reason: Option[Reason]): Unit = {
+  def handleNonFatalBindingError(target: XFormsEventTarget, locationData: LocationData, reason: Option[BindingErrorReason]): Unit = {
     val containingDocument = target.container.getContainingDocument
     val message = reason.map(_.message).getOrElse("exception while setting value")
     containingDocument.indentedLogger.logDebug("", message)

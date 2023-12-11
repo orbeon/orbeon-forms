@@ -35,12 +35,11 @@ import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsXPathErrorEvent}
 import org.orbeon.oxf.xforms.itemset.StaticItemsetSupport.isSelected
-import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver, XMLUtils}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
+import org.orbeon.xforms.{BindingErrorReason, XFormsCrossPlatformSupport, XFormsNames}
 import org.xml.sax.SAXException
 
 import scala.jdk.CollectionConverters._
@@ -337,7 +336,7 @@ object ItemsetSupport {
                         new XXFormsBindingErrorEvent(
                           target          = select1Control,
                           locationDataOpt = Option(staticControl.locationData),
-                          reason          = StaticDataModel.Reason.Other("`xf:item` or `xf:itemset` must contain an `xf:label` element")
+                          reason          = BindingErrorReason.Other("`xf:item` or `xf:itemset` must contain an `xf:label` element")
                         )
                       )
                     None

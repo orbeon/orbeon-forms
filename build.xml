@@ -163,7 +163,7 @@
             <!--            -whyareyoukeeping class org.orbeon.saxon.om.NodeInfo-->
 
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!orbeon-form-builder*.jar,!orbeon-form-runner*.jar,orbeon-*.jar;)
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(scala-*.jar,parboiled*.jar,enumeratum*.jar,circe-*.jar,cats-*.jar,jawn-*.jar,sbinary*.jar,log4s*.jar,shapeless*.jar,autowire*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(scala-*.jar,parboiled*.jar,enumeratum*.jar,circe-*.jar,cats-*.jar,fs2-*.jar,jawn-*.jar,sbinary*.jar,log4s*.jar,shapeless*.jar,autowire*.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(commons-fileupload-*.jar,commons-pool-*.jar,commons-io-*,commons-lang3-*.jar,commons-codec-*.jar,commons-collections4-*.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(saxon-*.jar,http*.jar,jcl-over-slf4j-*.jar,log4j-*.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/ehcache-2.10.9.2.jar
@@ -199,6 +199,8 @@
             -dontwarn org.orbeon.oxf.xforms.**
             -dontwarn com.openhtmltopdf.pdfboxout.**
             -dontwarn me.gosimple.nbvcxz.**
+            -dontwarn org.osgi.annotation.**
+            -dontwarn aQute.bnd.annotation.**
 
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 

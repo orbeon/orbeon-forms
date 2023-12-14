@@ -22,10 +22,11 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
 
 import java.sql.{Connection, ResultSet}
-import javax.naming.{Context, InitialContext}
+import javax.naming.{InitialContext, NameNotFoundException}
 import javax.sql.DataSource
 import scala.collection.compat._
 import scala.util.control.NonFatal
+import scala.util.{Success, Try}
 
 
 object RelationalUtils extends Logging {
@@ -74,8 +75,14 @@ object RelationalUtils extends Logging {
 
   private def getDataSource(name: String): DataSource =
     withDebug(s"getting datasource `$name`") {
-      val jdbcContext: Context = InitialContext.doLookup("java:comp/env/jdbc")
-      jdbcContext.lookup(name).asInstanceOf[DataSource]
+      val prefixesToTry = Seq("java:comp/env/jdbc/", "java:/jdbc/")
+
+      // Workaround for WildFly (TODO: do we really need it?)
+      prefixesToTry
+        .toStream
+        .map(prefix => Try(InitialContext.doLookup(prefix + name).asInstanceOf[DataSource]))
+        .collectFirst { case Success(dataSource) => dataSource }
+        .getOrElse(throw new NameNotFoundException(s"Data source not found for '$name'"))
     }
 
   def getConnection(dataSource: DataSource): Connection =

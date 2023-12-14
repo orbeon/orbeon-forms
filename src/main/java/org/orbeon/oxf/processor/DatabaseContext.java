@@ -18,12 +18,13 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.LoggerFactory;
 
 import javax.naming.InitialContext;
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represent a database context for processors using SQL connections.
@@ -51,11 +52,23 @@ public class DatabaseContext {
             try {
                 // Create connection from datasource
                 javax.naming.Context initialContext = new InitialContext();
-                javax.naming.Context envContext = (javax.naming.Context) initialContext.lookup("java:comp/env");
-                DataSource ds = (DataSource) envContext.lookup(jndiName);
-                if (ds == null) {
-                    throw new OXFException("Cannot find DataSource object by looking-up: " + jndiName);
-                }
+
+                List<String> prefixesToTry = Arrays.asList("java:comp/env/", "java:/");
+
+                // Workaround for WildFly (TODO: do we really need it?)
+                DataSource ds = prefixesToTry.stream()
+                    .map(prefix -> {
+                        try {
+                            return Optional.of((DataSource) initialContext.lookup(prefix + jndiName));
+                        } catch (NamingException e) {
+                            return Optional.<DataSource>empty();
+                        }
+                    })
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .findFirst()
+                    .orElseThrow(() -> new NameNotFoundException("Data source not found for '" + jndiName + "'"));
+
                 Connection newConnection = ds.getConnection();
                 // Set connection properties
                 setConnectionProperties(newConnection, pipelineContext, jndiName);

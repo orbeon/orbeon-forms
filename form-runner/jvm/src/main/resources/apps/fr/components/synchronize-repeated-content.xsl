@@ -45,66 +45,70 @@
             name="apply-defaults"
             select="$right-control/@apply-defaults = 'true'"/>
 
-        <!-- Initial status -->
-        <xf:action event="xforms-model-construct-done">
+        <!-- Initial sync, unless explicitly disabled -->
+        <xsl:variable
+            name="disable-initial-sync"
+            select="@sync-on-form-load = 'none'"/>
+        <xsl:if test="not($disable-initial-sync)">
+            <xf:action event="xforms-model-construct-done">
 
-            <xf:var
-                name="left-container"
-                value="bind(frf:bindId('{$left-name}'))"/>
-            <xf:var
-                name="right-container"
-                value="bind(frf:bindId('{$right-name}'))"/>
+                <xf:var
+                    name="left-container"
+                    value="bind(frf:bindId('{$left-name}'))"/>
+                <xf:var
+                    name="right-container"
+                    value="bind(frf:bindId('{$right-name}'))"/>
 
-            <xf:var
-                name="repeat-template"
-                value="instance(frf:templateId('{$right-name}'))"/>
+                <xf:var
+                    name="repeat-template"
+                    value="instance(frf:templateId('{$right-name}'))"/>
 
-            <xf:var
-                name="diff"
-                value="count($right-container/*) - count($left-container/*)"/>
+                <xf:var
+                    name="diff"
+                    value="count($right-container/*) - count($left-container/*)"/>
 
-            <!-- Remove extra iterations if any -->
-            <xf:delete
-                if="$diff gt 0"
-                ref="$right-container/*[position() gt count($left-container/*)]"/>
+                <!-- Remove extra iterations if any -->
+                <xf:delete
+                    if="$diff gt 0"
+                    ref="$right-container/*[position() gt count($left-container/*)]"/>
 
-            <!-- Insert iterations if needed  -->
-            <xf:insert
-                context="$right-container"
-                if="$diff lt 0"
-                ref="*"
-                origin="
-                    let $t := frf:updateTemplateFromInScopeItemsetMaps($right-container, $repeat-template)
-                    return
-                        for $i in (1 to -$diff)
-                        return $t"
-                position="after"
-                xxf:defaults="{$apply-defaults}"/>
+                <!-- Insert iterations if needed  -->
+                <xf:insert
+                    context="$right-container"
+                    if="$diff lt 0"
+                    ref="*"
+                    origin="
+                        let $t := frf:updateTemplateFromInScopeItemsetMaps($right-container, $repeat-template)
+                        return
+                            for $i in (1 to -$diff)
+                            return $t"
+                    position="after"
+                    xxf:defaults="{$apply-defaults}"/>
 
-            <xf:action if="$diff != 0">
-                <xf:rebuild/>
-                <xf:recalculate/>
+                <xf:action if="$diff != 0">
+                    <xf:rebuild/>
+                    <xf:recalculate/>
+                </xf:action>
+
+                <!-- Update all values -->
+                <xf:action iterate="1 to count($left-container/*)">
+
+                    <xf:var name="p" value="."/>
+
+                    <xsl:for-each select="fr:map">
+                        <xf:action>
+                            <xf:var name="src" context="$left-container/*[$p]"  value="(.//{@left})[1]"/>
+                            <xf:var name="dst" context="$right-container/*[$p]" value="(.//{@right})[1]"/>
+
+                            <xf:setvalue
+                                ref="$dst"
+                                value="$src"/>
+                        </xf:action>
+                    </xsl:for-each>
+
+                </xf:action>
             </xf:action>
-
-            <!-- Update all values -->
-            <xf:action iterate="1 to count($left-container/*)">
-
-                <xf:var name="p" value="."/>
-
-                <xsl:for-each select="fr:map">
-                    <xf:action>
-                        <xf:var name="src" context="$left-container/*[$p]"  value="(.//{@left})[1]"/>
-                        <xf:var name="dst" context="$right-container/*[$p]" value="(.//{@right})[1]"/>
-
-                        <xf:setvalue
-                            ref="$dst"
-                            value="$src"/>
-                    </xf:action>
-                </xsl:for-each>
-
-            </xf:action>
-
-        </xf:action>
+        </xsl:if>
 
         <!-- Propagate value changes -->
         <xsl:for-each select="fr:map">

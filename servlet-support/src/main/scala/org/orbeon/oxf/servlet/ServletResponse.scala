@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.io.PrintWriter
+import java.io.{OutputStream, PrintWriter}
 import java.{util => ju}
 
 object ServletResponse {
@@ -41,7 +41,11 @@ trait ServletResponse {
   def getCharacterEncoding: String
   def getContentType: String
   def getLocale: ju.Locale
-  def getOutputStream: ServletOutputStream
+  // Return an OutputStream here instead of a ServletOutputStream wrapper to avoid runtime problems with structural types.
+  // We've had weird problems with IOUtils.useAndClose (which uses { def close(): Unit }) trying to call the wrong class
+  // in the context of WildFly (but not Tomcat), i.e. looking for a javax.* class when it should be looking for a
+  // jakarta.* class and vice versa.
+  def getOutputStream: OutputStream
   def getWriter: PrintWriter
   def isCommitted: Boolean
   def reset(): Unit
@@ -57,7 +61,7 @@ class JavaxServletResponse(servletResponse: javax.servlet.ServletResponse) exten
   override def getCharacterEncoding: String = servletResponse.getCharacterEncoding
   override def getContentType: String = servletResponse.getContentType
   override def getLocale: ju.Locale = servletResponse.getLocale
-  override def getOutputStream: ServletOutputStream = ServletOutputStream(servletResponse.getOutputStream)
+  override def getOutputStream: OutputStream = servletResponse.getOutputStream
   override def getWriter: PrintWriter = servletResponse.getWriter
   override def isCommitted: Boolean = servletResponse.isCommitted
   override def reset(): Unit = servletResponse.reset()
@@ -73,7 +77,7 @@ class JakartaServletResponse(servletResponse: jakarta.servlet.ServletResponse) e
   override def getCharacterEncoding: String = servletResponse.getCharacterEncoding
   override def getContentType: String = servletResponse.getContentType
   override def getLocale: ju.Locale = servletResponse.getLocale
-  override def getOutputStream: ServletOutputStream = ServletOutputStream(servletResponse.getOutputStream)
+  override def getOutputStream: OutputStream = servletResponse.getOutputStream
   override def getWriter: PrintWriter = servletResponse.getWriter
   override def isCommitted: Boolean = servletResponse.isCommitted
   override def reset(): Unit = servletResponse.reset()

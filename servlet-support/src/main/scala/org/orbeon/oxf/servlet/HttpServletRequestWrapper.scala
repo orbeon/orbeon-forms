@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.io.BufferedReader
+import java.io.{BufferedReader, InputStream}
 import java.{util => ju}
 
 class HttpServletRequestWrapper(request: HttpServletRequest) extends HttpServletRequest {
@@ -30,7 +30,7 @@ class HttpServletRequestWrapper(request: HttpServletRequest) extends HttpServlet
   override def getHeader(name: String): String = request.getHeader(name)
   override def getHeaderNames: ju.Enumeration[String] = request.getHeaderNames
   override def getHeaders(name: String): ju.Enumeration[String] = request.getHeaders(name)
-  override def getInputStream: ServletInputStream = request.getInputStream
+  override def getInputStream: InputStream = request.getInputStream
   override def getIntHeader(name: String): Int = request.getIntHeader(name)
   override def getLocalName: String = request.getLocalName
   override def getLocale: ju.Locale = request.getLocale

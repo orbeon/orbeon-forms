@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.io.BufferedReader
+import java.io.{BufferedReader, InputStream}
 import java.{util => ju}
 
 object ServletRequest {
@@ -43,7 +43,11 @@ trait ServletRequest {
   def getCharacterEncoding: String
   def getContentLength: Int
   def getContentType: String
-  def getInputStream: ServletInputStream
+  // Return an InputStream here instead of a ServletInputStream wrapper to avoid runtime problems with structural types.
+  // We've had weird problems with IOUtils.useAndClose (which uses { def close(): Unit }) trying to call the wrong class
+  // in the context of WildFly (but not Tomcat), i.e. looking for a javax.* class when it should be looking for a
+  // jakarta.* class and vice versa.
+  def getInputStream: InputStream
   def getLocalName: String
   def getLocale: ju.Locale
   def getLocales: ju.Enumeration[ju.Locale]
@@ -75,7 +79,7 @@ class JavaxServletRequest(servletRequest: javax.servlet.ServletRequest) extends 
   def getCharacterEncoding: String = servletRequest.getCharacterEncoding
   def getContentLength: Int = servletRequest.getContentLength
   def getContentType: String = servletRequest.getContentType
-  def getInputStream: ServletInputStream = ServletInputStream(servletRequest.getInputStream)
+  def getInputStream: InputStream = servletRequest.getInputStream
   def getLocalName: String = servletRequest.getLocalName
   def getLocale: ju.Locale = servletRequest.getLocale
   def getLocales: ju.Enumeration[ju.Locale] = servletRequest.getLocales
@@ -107,7 +111,7 @@ class JakartaServletRequest(servletRequest: jakarta.servlet.ServletRequest) exte
   def getCharacterEncoding: String = servletRequest.getCharacterEncoding
   def getContentLength: Int = servletRequest.getContentLength
   def getContentType: String = servletRequest.getContentType
-  def getInputStream: ServletInputStream = ServletInputStream(servletRequest.getInputStream)
+  def getInputStream: InputStream = servletRequest.getInputStream
   def getLocalName: String = servletRequest.getLocalName
   def getLocale: ju.Locale = servletRequest.getLocale
   def getLocales: ju.Enumeration[ju.Locale] = servletRequest.getLocales

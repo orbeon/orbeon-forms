@@ -99,7 +99,7 @@ trait RequestEmptyBody extends HttpServletRequestWrapper {
 
   import ServletRequestWrapper._
 
-  private lazy val inputStream  = newEmptyServletInputStream
+  private lazy val inputStream  = newEmptyInputStream
   private lazy val reader       = newEmptyReader
 
   override def getInputStream   = inputStream
@@ -127,16 +127,6 @@ private object ServletRequestWrapper {
     recombineQuery(pathQuery, extraQueryParametersIterator.toList)
   }
 
-  def newEmptyInputStream = new ByteArrayInputStream(Array[Byte]())
   def newEmptyReader      = new BufferedReader(new StringReader(""))
-
-  def newEmptyServletInputStream: ServletInputStream = {
-    val is = newEmptyInputStream
-    new ServletInputStream {
-      def read(): Int = is.read()
-      def isFinished: Boolean = true
-      def isReady: Boolean = false
-      def setReadListener(readListener: ReadListener): Unit = ()
-    }
-  }
+  def newEmptyInputStream = new ByteArrayInputStream(Array[Byte]())
 }

@@ -223,11 +223,8 @@ private class OptionalBodyFilterRequestWrapper(httpServletRequest: HttpServletRe
 
   override def getInputStream =
     if (forceEmptyBody)
-      new ServletInputStream {
+      new InputStream {
         def read: Int = -1
-        def isFinished: Boolean = true
-        def isReady: Boolean = false
-        def setReadListener(readListener: ReadListener): Unit = ()
       }
     else
       super.getInputStream
@@ -251,7 +248,7 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
   def statusCode = _statusCode
 
   private var _byteArrayOutputStream: ByteArrayOutputStream = null
-  private var _servletOutputStream: ServletOutputStream     = null
+  private var _servletOutputStream: OutputStream            = null
   private var _stringWriter: StringWriter                   = null
   private var _printWriter: PrintWriter                     = null
   private var _encoding: Option[String]                     = None
@@ -281,10 +278,8 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
   override def getOutputStream = {
     if (_byteArrayOutputStream eq null) {
       _byteArrayOutputStream = new ByteArrayOutputStream
-      _servletOutputStream = new ServletOutputStream {
+      _servletOutputStream = new OutputStream {
         def write(i: Int) = _byteArrayOutputStream.write(i)
-        def isReady: Boolean = true
-        def setWriteListener(writeListener: WriteListener): Unit = ()
       }
     }
     _servletOutputStream

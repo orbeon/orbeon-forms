@@ -5,7 +5,7 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.webapp.ServletSupport
 import org.slf4j.{Logger, LoggerFactory}
 
-import java.io.ByteArrayInputStream
+import java.io.{ByteArrayInputStream, InputStream}
 import scala.jdk.CollectionConverters._
 
 
@@ -63,16 +63,13 @@ class HttpLoggingFilterImpl extends Filter {
 
 private object HttpLoggingFilter {
 
-  class LoggerRequestWrapper(httpServletRequest: HttpServletRequest, servletInputStream: ServletInputStream)
+  class LoggerRequestWrapper(httpServletRequest: HttpServletRequest, servletInputStream: InputStream)
       extends HttpServletRequestWrapper(httpServletRequest) {
-    override def getInputStream: ServletInputStream = servletInputStream
+    override def getInputStream: InputStream = servletInputStream
   }
 
   class ByteArrayServletInputStream(byteArrayInputStream: ByteArrayInputStream)
-      extends ServletInputStream {
-    def isFinished: Boolean                               = byteArrayInputStream.available() == 0
-    def isReady: Boolean                                  = true
-    def setReadListener(readListener: ReadListener): Unit = ()
-    def read(): Int                                       = byteArrayInputStream.read()
+      extends InputStream {
+    def read(): Int = byteArrayInputStream.read()
   }
 }

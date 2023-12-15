@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.io.PrintWriter
+import java.io.{OutputStream, PrintWriter}
 import java.{util => ju}
 
 class HttpServletResponseWrapper(response: HttpServletResponse) extends HttpServletResponse {
@@ -26,7 +26,7 @@ class HttpServletResponseWrapper(response: HttpServletResponse) extends HttpServ
   override def getCharacterEncoding: String = response.getCharacterEncoding
   override def getContentType: String = response.getContentType
   override def getLocale: ju.Locale = response.getLocale
-  override def getOutputStream: ServletOutputStream = response.getOutputStream
+  override def getOutputStream: OutputStream = response.getOutputStream
   override def getWriter: PrintWriter = response.getWriter
   override def isCommitted: Boolean = response.isCommitted
   override def reset(): Unit = response.reset()

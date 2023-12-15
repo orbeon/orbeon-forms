@@ -209,6 +209,7 @@
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-2.0.9.jar
 
             -libraryjars lib/proguard/(javax.servlet-api-*.jar;)
+            -libraryjars lib/proguard/(jakarta.servlet-api-*.jar;)
             -libraryjars lib/proguard/(portlet-api-*.jar;)
             -libraryjars lib/proguard/(liferay-portal-service-*.jar;)
             -libraryjars lib/proguard/(liferay-portal-kernel-*.jar;)

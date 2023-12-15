@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import java.{util => ju}
-
 import org.orbeon.dom.Node
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{Required, Type}
 import org.orbeon.oxf.xforms.analysis.model.{ModelDefs, StaticBind}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.w3c.dom.Node.ELEMENT_NODE
 
-import scala.jdk.CollectionConverters._
+import java.{util => ju}
 import scala.collection.{breakOut, mutable}
+import scala.jdk.CollectionConverters._
 
 // Holds MIPs associated with a given RuntimeBind iteration
 // The constructor automatically adds the BindNode to the instance data node if any.
@@ -241,7 +241,8 @@ class BindIteration(
   position                           : Int,
   item                               : om.Item,
   childrenBindsHaveSingleNodeContext : Boolean,
-  childrenStaticBinds                : List[StaticBind]
+  childrenStaticBinds                : List[StaticBind],
+  collector                          : ErrorEventCollector
 ) extends BindNode(parentBind, position, item) {
 
   require(childrenStaticBinds.nonEmpty)
@@ -249,7 +250,7 @@ class BindIteration(
   // Iterate over children and create children binds
   val childrenBinds: List[RuntimeBind] =
     for (staticBind <- childrenStaticBinds)
-      yield new RuntimeBind(parentBind.model, staticBind, this, childrenBindsHaveSingleNodeContext)
+      yield new RuntimeBind(parentBind.model, staticBind, this, childrenBindsHaveSingleNodeContext, collector)
 
   def forStaticId = parentBind.staticId
 

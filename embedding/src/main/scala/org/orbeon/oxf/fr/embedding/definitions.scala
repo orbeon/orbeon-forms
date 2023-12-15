@@ -13,17 +13,19 @@
  */
 package org.orbeon.oxf.fr.embedding
 
-import java.io.{OutputStream, Writer}
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.oxf.http.{Headers, HttpClient, StreamedContent}
+import org.orbeon.connection.StreamedContent
+import org.orbeon.oxf.http.{Headers, HttpClient}
 import org.orbeon.oxf.util.CollectionUtils.combineValues
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.xforms.Constants
 
+import java.io.{OutputStream, Writer}
 import scala.collection.immutable
 import scala.util.Try
 import scala.util.matching.Regex
+
 
 sealed trait FormRunnerMode extends EnumEntry with Lowercase
 

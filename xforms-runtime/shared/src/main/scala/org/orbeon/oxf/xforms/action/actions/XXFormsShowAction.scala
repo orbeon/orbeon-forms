@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 
@@ -24,8 +25,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 class XXFormsShowAction extends XFormsAction {
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
-    val interpreter   = actionContext.interpreter
-    val actionElement = actionContext.element
+    val interpreter = actionContext.interpreter
 
     synchronizeAndRefreshIfNeeded(actionContext)
 
@@ -37,7 +37,8 @@ class XXFormsShowAction extends XFormsAction {
           targetDialog,
           neighborEffectiveId,
           constrainToViewport,
-          XFormsAction.eventProperties(interpreter, actionContext.analysis)
+          XFormsAction.eventProperties(interpreter, actionContext.analysis, interpreter.eventObserver, actionContext.collector),
+          actionContext.collector
         )
       case _ =>
         debug(
@@ -56,7 +57,8 @@ object XXFormsShowAction {
     targetDialog        : XFormsEventTarget,
     neighborEffectiveId : Option[String] = None,
     constrainToViewport : Boolean        = true,
-    properties          : PropertyGetter = EmptyGetter
+    properties          : PropertyGetter = EmptyGetter,
+    collector           : ErrorEventCollector
   ): Unit =
     Dispatch.dispatchEvent(
       new XXFormsDialogOpenEvent(
@@ -64,6 +66,7 @@ object XXFormsShowAction {
         targetDialog,
         neighborEffectiveId.orNull,
         constrainToViewport
-      )
+      ),
+      collector
     )
 }

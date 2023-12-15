@@ -148,7 +148,7 @@ object Wizard {
     def findWizardModel: Option[XFormsModel] =
       for {
         container <- findWizardContainer
-        model     <- container.defaultModel
+        model     <- container.findDefaultModel
       } yield
         model
 

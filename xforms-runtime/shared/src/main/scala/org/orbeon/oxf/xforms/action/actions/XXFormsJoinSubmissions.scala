@@ -21,7 +21,7 @@ class XXFormsJoinSubmissions extends XFormsAction {
     if (CoreCrossPlatformSupport.isPE) {
       // Only supported in PE version
       actionInterpreter.containingDocument
-        .getAsynchronousSubmissionManager(create = false)
+        .findAsynchronousSubmissionManager
         .filter(_.hasPendingAsynchronousSubmissions)
         .foreach(_.awaitAllAsynchronousSubmissions(actionInterpreter.containingDocument))
     } else {

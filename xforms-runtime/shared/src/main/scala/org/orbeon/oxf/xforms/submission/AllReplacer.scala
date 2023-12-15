@@ -14,10 +14,9 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.syntax.option._
-import org.orbeon.io.IOUtils
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseWrapper}
 import org.orbeon.oxf.http.StatusCode
-import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 
 
@@ -48,7 +47,7 @@ object AllReplacer extends Replacer {
     val replaceAllResponse =
       new AllReplacer.ReplaceAllResponse(submission.containingDocument.responseForReplaceAll getOrElse (throw new IllegalStateException))
 
-    AllReplacer.forwardResultToResponse(cxr, replaceAllResponse)
+    XFormsModelSubmissionSupport.forwardResultToResponse(cxr, replaceAllResponse)
 
     // Success: "the event `xforms-submit-done` may be dispatched with appropriate context information"
     // Error: "either the document is replaced with an implementation-specific indication of an error or submission
@@ -83,22 +82,6 @@ object AllReplacer extends Replacer {
       // 2. This can be called outside of the document lock, see XFormsServer.
       ReplaceResult.None
     }
-  }
-
-  def forwardResultToResponse(cxr: ConnectionResult, response: ExternalContext.Response): Unit = {
-
-    // can be null for some unit tests only :(
-    if (response == null)
-      return
-
-    response.setStatus(cxr.statusCode)
-
-    cxr.content.contentType foreach
-      response.setContentType
-
-    SubmissionUtils.forwardResponseHeaders(cxr, response)
-
-    IOUtils.copyStreamAndClose(cxr.content.inputStream, response.getOutputStream)
   }
 
   private class ReplaceAllResponse(val response: ExternalContext.Response)

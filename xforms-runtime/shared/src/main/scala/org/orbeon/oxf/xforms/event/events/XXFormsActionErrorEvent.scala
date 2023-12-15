@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget, XFormsEvents
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 class XXFormsActionErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
-  extends XFormsEvent(XFormsEvents.XXFORMS_ACTION_ERROR, target, properties, bubbles = true, cancelable = false) {
+  extends XFormsEvent(XFormsEvents.XXFORMS_ACTION_ERROR, target, properties, bubbles = true, cancelable = true) {
 
   def this(target: XFormsEventTarget, throwable: Throwable, tunnelProperties: Option[TunnelProperties]) = {
     this(target, tunnelProperties.getOrElse(EmptyGetter))

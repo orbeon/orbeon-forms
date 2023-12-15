@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.event.XFormsEventHandler
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import collection.Seq
 import org.orbeon.oxf.xforms.control.{XFormsContainerControl, XFormsControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.XFormsEventHandler
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 
 class XFormsActionControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
@@ -33,12 +33,19 @@ class XFormsActionControl(container: XBLContainer, parent: XFormsControl, elemen
 
   // Don't push the actual binding for actions because it's unnecessary at build/refresh time and the binding needs to
   // be re-evaluated when the action runs anyway.
-  override def computeBinding(parentContext: BindingContext) = computeBindingCopy(parentContext)
+  override def computeBinding(
+    parentContext: BindingContext,
+    collector    : ErrorEventCollector
+  ): BindingContext = computeBindingCopy(parentContext)
 
   // Don't build any children, as in the view we don't support event handlers nested within event handlers, and nested
   // actions are evaluated dynamically.
-  override def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl], idSuffix: Seq[Int]) = ()
+  override def buildChildren(
+    buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int], ErrorEventCollector) => Option[XFormsControl],
+    idSuffix : Seq[Int],
+    collector: ErrorEventCollector
+  ): Unit = ()
 
   override def supportAjaxUpdates = false
-  override def getBackCopy: AnyRef = this
+  override def getBackCopy(collector: ErrorEventCollector): AnyRef = this
 }

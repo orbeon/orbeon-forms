@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsA
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, PartEventHandlerAnalysis}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContextStack}
@@ -38,13 +39,12 @@ import scala.util.control.{Breaks, NonFatal}
 object Dispatch extends Logging {
 
   // Type of an event listener
-  type EventListener = XFormsEvent => Unit
+  type EventListener       = XFormsEvent => Unit
 
   // Dispatch an event
-  def dispatchEvent(event: XFormsEvent): Unit = {
+  def dispatchEvent(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
 
     val containingDocument = event.containingDocument
-    val staticOps          = containingDocument.staticOps
 
     implicit val indentedLogger: IndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
 
@@ -110,7 +110,7 @@ object Dispatch extends Logging {
                 event.currentPhase = phase
 
                 withDebug("handler", Seq("name" -> event.name, "phase" -> phase.name, "observer" -> observer.getEffectiveId)) {
-                  handleEvent(handler, observer, event)
+                  handleEvent(handler, observer, event, collector)
                   statHandleEvent += 1
                 }
               }
@@ -129,7 +129,7 @@ object Dispatch extends Logging {
 
               // NOTE: As of 2011-03-07, this is used XFormsInstance for xforms-insert/xforms-delete
               // processing, and in XFormsUploadControl for upload processing.
-              target.performTargetAction(event)
+              target.performTargetAction(event, collector)
 
               handlers.get(Phase.Target) foreach (doPhase(List(target), _, Phase.Target))
 
@@ -142,7 +142,7 @@ object Dispatch extends Logging {
 
             // Perform default action
             if (! event.cancelable || performDefaultAction)
-              target.performDefaultAction(event)
+              target.performDefaultAction(event, collector)
 
             debugResults(Seq(
               "regular handlers called" -> statHandleEvent.toString,
@@ -152,10 +152,10 @@ object Dispatch extends Logging {
         } else {
           // No handlers, try to do as little as possible
           event.currentPhase = Phase.Target
-          target.performTargetAction(event)
+          target.performTargetAction(event, collector)
           callNativeListeners(target)
           if (! event.cancelable || performDefaultAction)
-            target.performDefaultAction(event)
+            target.performDefaultAction(event, collector)
 
           // Don't log this as there are too many
           //debug("optimized dispatching", eventLogging ++ Seq("native handlers called" -> statNativeHandlers.toString))
@@ -210,9 +210,11 @@ object Dispatch extends Logging {
   }
 
   private def handleEvent(
-    eventHandler   : EventHandler,
-    eventObserver  : XFormsEventTarget,
-    event          : XFormsEvent)(implicit
+    eventHandler : EventHandler,
+    eventObserver: XFormsEventTarget,
+    event        : XFormsEvent,
+    collector    : ErrorEventCollector
+  )(implicit
     indentedLogger : IndentedLogger
   ): Unit = {
 
@@ -235,7 +237,7 @@ object Dispatch extends Logging {
           if (componentControl.canRunEventHandlers(event)) {
 
             val xblContainer = componentControl.nestedContainerOpt.get // TODO: What if None?
-            xblContainer.getContextStack.resetBindingContext()
+            xblContainer.getContextStack.resetBindingContext(collector)
             val stack = new XFormsContextStack(xblContainer, xblContainer.getContextStack.getCurrentBindingContext)
 
             val handlerEffectiveId =
@@ -287,8 +289,10 @@ object Dispatch extends Logging {
             actionXPathContext  = xpathContext,
             indentedLogger      = containingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
           )
-        ) {
-          _.runAction(eventHandler)
+        ) { interpreter =>
+          // Run the top-level action with a collector that throws an exception if an XPath or binding error occurs.
+          // The result will be caught by the `catch` below, and will result in an `XXFormsActionErrorEvent`.
+          interpreter.runAction(eventHandler, eventObserver, EventCollector.Throw)
         }
       } catch {
         case NonFatal(t) =>
@@ -297,7 +301,7 @@ object Dispatch extends Logging {
           // is running within a model before controls are created, that won't be available. SO the answer is to
           // dispatch to what we know exists, and that is the current observer or the target. The observer is
           // "closer" from the action, so we dispatch to that.
-          Dispatch.dispatchEvent(new XXFormsActionErrorEvent(eventObserver, t, event.tunnelProperties))
+          Dispatch.dispatchEvent(new XXFormsActionErrorEvent(eventObserver, t, event.tunnelProperties), collector)
       }
     } else {
       debug("skipping non-relevant handler", List(

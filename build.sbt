@@ -43,8 +43,8 @@ val ScalaJsLocalesVersion            = "1.4.1"
 val Parboiled1Version             = "1.3.1"
 
 // Shared Scala libraries
-val CatsVersion                   = "2.7.0"
-
+val CatsVersion                   = "2.10.0"
+val CatsFs2Version                = "3.9.3"
 val ScalaTestVersion              = "3.2.17"
 val CirceVersion                  = "0.14.6"
 val EnumeratumVersion             = "1.7.3"
@@ -86,8 +86,6 @@ val LiferayPortalKernelVersion    = "128.0.1"
 
 val CoreLibraryDependencies = Seq(
   "org.orbeon"                  % "saxon"                           % SaxonJvmVersion, // Java library!
-  "org.typelevel"               %% "cats-kernel"                    % CatsVersion,
-  "org.typelevel"               %% "cats-core"                      % CatsVersion,
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumCirceVersion,
   "com.chuusai"                 %% "shapeless"                      % ShapelessVersion,
@@ -436,7 +434,8 @@ lazy val assetsSettings = Seq(
   // `FileFilter`. So doing this "by hand".
   uglify / excludeFilter                   := (uglify / excludeFilter).value || HiddenFileFilter || "*-debug.js" || new SimpleFileFilter(f =>
     // Found out that: 1. `endsWith` is not type-safe 2. `Path.iterator` returns `Path`s :(
-    f.toPath.iterator().asScala.map(_.toString).toList.endsWith("acme" :: "map" :: "map.js" :: Nil)
+    f.toPath.iterator().asScala.map(_.toString).toList.endsWith("acme" :: "map" :: "map.js" :: Nil) ||
+    f.toPath.iterator().asScala.map(_.toString).toList.endsWith("ponyfill.es2018.js" :: Nil)
   ),
   uglifyCompressOptions                    := Seq("warnings=false"),
 
@@ -467,6 +466,10 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-common",
+    libraryDependencies += "org.typelevel"          %%% "cats-kernel"       % CatsVersion,
+    libraryDependencies += "org.typelevel"          %%% "cats-core"         % CatsVersion,
+    libraryDependencies += "co.fs2"                 %%% "fs2-core"          % CatsFs2Version,
+    libraryDependencies += "co.fs2"                 %%% "fs2-io"            % CatsFs2Version,
     libraryDependencies += "com.beachape"           %%% "enumeratum"        % EnumeratumVersion,
     libraryDependencies += "com.beachape"           %%% "enumeratum-circe"  % EnumeratumCirceVersion,
     libraryDependencies += "org.log4s"              %%% "log4s"             % Log4sVersion,

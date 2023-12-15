@@ -2,6 +2,7 @@ package org.orbeon.oxf.fr.persistence.proxy
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
@@ -11,7 +12,7 @@ import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, CoreCrossPlatformSupportTrait}
+import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupportTrait}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.SimplePath._
 

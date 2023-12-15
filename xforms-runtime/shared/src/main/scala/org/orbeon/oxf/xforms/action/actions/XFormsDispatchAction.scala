@@ -16,11 +16,12 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAPI, XFormsAction}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEventFactory.createEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventTarget}
+import org.orbeon.xforms.XFormsNames._
 import shapeless.syntax.typeable._
 
 import scala.util.Try
@@ -85,10 +86,11 @@ class XFormsDispatchAction extends XFormsAction {
           target          = xformsEventTarget,
           bubbles         = newEventBubbles,
           cancelable      = newEventCancelable,
-          properties      = XFormsAction.eventProperties(interpreter, actionContext.analysis),
+          properties      = XFormsAction.eventProperties(interpreter, actionContext.analysis, actionContext.interpreter.eventObserver, actionContext.collector),
           delayOpt        = resolvedDelayOpt,
           showProgress    = showProgress,
-          allowDuplicates = allowDuplicates
+          allowDuplicates = allowDuplicates,
+          collector       = actionContext.collector
         )
       case _ =>
         // "If there is a null search result for the target object and the source object is an XForms action such as
@@ -108,7 +110,8 @@ object XFormsDispatchAction {
     properties      : PropertyGetter,
     delayOpt        : Option[Int],
     showProgress    : Boolean,
-    allowDuplicates : Boolean
+    allowDuplicates : Boolean,
+    collector       : ErrorEventCollector
   ): Unit =
     delayOpt match {
       case Some(delay) if delay >= 0 =>
@@ -149,7 +152,8 @@ object XFormsDispatchAction {
             properties,
             bubbles,
             cancelable
-          )
+          ),
+          collector
         )
     }
 }

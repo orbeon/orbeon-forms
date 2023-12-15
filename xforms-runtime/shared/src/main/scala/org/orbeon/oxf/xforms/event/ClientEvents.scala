@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import java.{util => ju}
-
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.logging.LifecycleLogger
@@ -29,8 +27,9 @@ import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget}
-import org.orbeon.xforms.{EventNames, XFormsId}
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.{EventNames, XFormsCrossPlatformSupport, XFormsId}
+
+import java.{util => ju}
 
 
 // Process events sent by the client, including sorting, filtering, and security
@@ -316,7 +315,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
     def dispatchEventCheckTarget(event: XFormsEvent): Unit =
       if (checkEventTarget(event))
-        Dispatch.dispatchEvent(event)
+        Dispatch.dispatchEvent(event, EventCollector.ToReview)
 
     implicit val CurrentLogger = doc.getIndentedLogger(LOGGING_CATEGORY)
 
@@ -328,13 +327,13 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
       // Optimize case where a value change event won't change the control value to actually change
       (event, target) match {
-        case (valueChange: XXFormsValueEvent, target: XFormsValueControl) if target.getExternalValue == valueChange.value =>
+        case (valueChange: XXFormsValueEvent, target: XFormsValueControl) if target.getExternalValue(EventCollector.ToReview) == valueChange.value =>
           // We completely ignore the event if the value in the instance is the same.
           // This also saves dispatching xxforms-repeat-activate below.
           debug("ignoring value change event as value is the same", Seq(
             "control id" -> targetEffectiveId,
             "event name" -> eventName,
-            "value" -> target.getExternalValue)
+            "value"      -> target.getExternalValue(EventCollector.ToReview))
           )
           return
         case _ =>

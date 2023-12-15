@@ -13,17 +13,17 @@
  */
 package org.orbeon.oxf.util
 
-import java.net.URI
-import cats.Eval
+import cats.effect.IO
+import org.orbeon.connection.{AsyncConnectionResult, AsyncStreamedContent, ConnectionResult, StreamedContent}
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, HttpMethodsWithRequestBody, POST}
-import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StreamedContent}
+import org.orbeon.oxf.http.{BasicCredentials, HttpMethod}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging.debug
 
-import scala.concurrent.Future
+import java.net.URI
 import scala.jdk.CollectionConverters._
 
 
@@ -46,13 +46,13 @@ trait ConnectionTrait {
     method          : HttpMethod,
     url             : URI,
     credentials     : Option[BasicCredentials],
-    content         : Option[StreamedContent],
+    content         : Option[AsyncStreamedContent],
     headers         : Map[String, List[String]],
     loadState       : Boolean,
     logBody         : Boolean)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Future[ConnectionResult]
+  ): IO[AsyncConnectionResult]
 
   def isInternalPath(path: String): Boolean
 

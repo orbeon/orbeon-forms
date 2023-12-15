@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.xforms.XFormsStaticStateStaticProperties
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Global, Metadata, PartAnalysis, PartAnalysisContextForTree}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Global, Metadata, PartAnalysis, PartAnalysisContextForTree, XPathErrorDetails}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.scaxon.NodeConversions._
@@ -76,6 +76,8 @@ class XBLTransformerTest extends AnyFunSpec with XMLSupport {
     def abstractBindingsWithGlobals: mutable.Buffer[AbstractBinding] = ???
     def allGlobals: ArrayBuffer[Global] = ???
     def iterateGlobals: Iterator[Global] = ???
+
+    def reportStaticXPathError(expression: String, throwable: Option[Throwable], details: XPathErrorDetails): Unit = ???
   }
 
   def assertTransforms(data: List[(String, Elem, Elem, Elem)]): Unit =

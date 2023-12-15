@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
@@ -25,7 +26,9 @@ class XXFormsValue extends XFormsFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
     implicit val ctx = xpathContext
     implicit val xfc = XFormsFunction.context
-    relevantControls(0, booleanArgument(1, default = true)) flatMap (_.narrowTo[XFormsValueControl]) flatMap (_.valueOpt)
+    relevantControls(0, booleanArgument(1, default = true))
+      .flatMap(_.narrowTo[XFormsValueControl])
+      .flatMap(_.valueOpt(EventCollector.Throw))
   }
 
   // TODO: PathMap
@@ -36,7 +39,9 @@ class XXFormsFormattedValue extends XFormsFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
     implicit val ctx = xpathContext
     implicit val xfc = XFormsFunction.context
-    relevantControls(0, booleanArgument(1, default = true)) flatMap (_.narrowTo[XFormsValueControl]) flatMap (_.getFormattedValue)
+    relevantControls(0, booleanArgument(1, default = true))
+      .flatMap(_.narrowTo[XFormsValueControl])
+      .flatMap(_.getFormattedValue(EventCollector.Throw))
   }
 
   // TODO: PathMap

@@ -29,8 +29,13 @@
                 <xh:div class="card-body text-center" xxf:control="true" ref=".[not(fr:component-param-value('loading') = 'true')]">
                     <xbl:content includes=":root > fr|card-body > *"/>
                 </xh:div>
-                <xh:div class="card-body text-center" xxf:control="true" ref=".[fr:component-param-value('loading') = 'true']">
+                <xh:div class="card-body text-center" xxf:control="true" ref=".[fr:component-param-value('status') = 'loading']">
                     <xh:div class="spinner lds-ellipsis"><xh:div/><xh:div/><xh:div/><xh:div/></xh:div>
+                </xh:div>
+                <xh:div class="card-body text-center" xxf:control="true" ref=".[fr:component-param-value('status') = 'error']">
+                    <xh:div class="alert alert-warning" role="alert">
+                        <xf:output value="xxf:r('detail.messages.database-error', '|fr-fr-resources|')"/>
+                    </xh:div>
                 </xh:div>
                 <xh:ul class="list-group list-group-flush">
                     <xf:repeat ref="$items/value/string()">

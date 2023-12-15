@@ -93,7 +93,7 @@ class XFormsLHHAHandler(
           ) {
             for {
               currentLHHAControl <- currentControl.narrowTo[XFormsLHHAControl]
-              externalValue      <- currentLHHAControl.externalValueOpt
+              externalValue      <- currentLHHAControl.externalValueOpt(handlerContext.collector)
               if externalValue.nonEmpty
             } locally {
               if (elementAnalysis.element.attributeValueOpt("mediatype") contains "text/html")

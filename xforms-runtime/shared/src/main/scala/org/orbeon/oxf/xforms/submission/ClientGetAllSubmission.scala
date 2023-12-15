@@ -13,11 +13,10 @@
   */
 package org.orbeon.oxf.xforms.submission
 
+import cats.effect.IO
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
 import org.orbeon.xforms.UrlType
-
-import scala.concurrent.Future
 
 
 /**
@@ -39,7 +38,7 @@ class ClientGetAllSubmission(submission: XFormsModelSubmission)
     serializationParameters: SerializationParameters
   )(implicit
     refContext             : RefContext
-  ): Option[ConnectResult Either Future[ConnectResult]] = {
+  ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
     XFormsLoadAction.resolveStoreLoadValue(
       containingDocument           = submission.containingDocument,
       currentElem                  = Option(submission.staticSubmission.element),

@@ -1,6 +1,5 @@
 package org.orbeon.oxf.fr
 
-import java.{util => ju}
 import org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary
 import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
 import org.orbeon.oxf.util.StringUtils._
@@ -13,7 +12,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.compat._
-import scala.jdk.CollectionConverters.mapAsJavaMapConverter
+
 
 trait FormRunnerComponents {
 

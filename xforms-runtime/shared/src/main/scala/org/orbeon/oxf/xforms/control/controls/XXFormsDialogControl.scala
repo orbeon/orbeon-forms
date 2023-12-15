@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.control.ControlLocalSupport.XFormsControlLocal
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl, XFormsNoSingleNodeContainerControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.state.ControlState
@@ -60,9 +61,9 @@ class XXFormsDialogControl(
   // Initial local state
   setLocal(XXFormsDialogControlLocal(initiallyVisible, constrainToViewport = false, None))
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean, collector: ErrorEventCollector): Unit = {
 
-    super.onCreate(restoreState, state, update)
+    super.onCreate(restoreState, state, update, collector)
 
     state match {
       case Some(ControlState(_, _, keyValues)) =>
@@ -90,8 +91,8 @@ class XXFormsDialogControl(
   def neighborControlId     = dialogCurrentLocal.neighborControlId orElse defaultNeighborControlId
   def isConstrainToViewport = dialogCurrentLocal.constrainToViewport
 
-  override def performTargetAction(event: XFormsEvent): Unit = {
-    super.performTargetAction(event)
+  override def performTargetAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
+    super.performTargetAction(event, collector)
     event match {
       case dialogOpenEvent: XXFormsDialogOpenEvent =>
 
@@ -102,9 +103,9 @@ class XXFormsDialogControl(
           localForUpdate.constrainToViewport = dialogOpenEvent.constrainToViewport
 
           containingDocument.controls.markDirtySinceLastRequest(true)
-          containingDocument.controls.doPartialRefresh(this)
+          containingDocument.controls.doPartialRefresh(this, collector)
 
-          Dispatch.dispatchEvent(new XFormsDialogShownEvent(this))
+          Dispatch.dispatchEvent(new XFormsDialogShownEvent(this), collector)
         }
 
       case _: XXFormsDialogCloseEvent =>
@@ -116,29 +117,29 @@ class XXFormsDialogControl(
           localForUpdate.constrainToViewport = false
 
           containingDocument.controls.markDirtySinceLastRequest(false)
-          containingDocument.controls.doPartialRefresh(this)
+          containingDocument.controls.doPartialRefresh(this, collector)
 
-          Dispatch.dispatchEvent(new XFormsDialogHiddenEvent(this))
+          Dispatch.dispatchEvent(new XFormsDialogHiddenEvent(this), collector)
         }
 
       case _ =>
     }
   }
 
-  override def performDefaultAction(event: XFormsEvent): Unit = {
+  override def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
     event match {
       case _: XXFormsDialogOpenEvent =>
         // If dialog is closed and the focus is within the dialog, remove the focus
         // NOTE: Ideally, we should get back to the control that had focus before the dialog opened if possible.
         if (isDialogVisible && ! Focus.isFocusWithinContainer(this))
-          Dispatch.dispatchEvent(new XFormsFocusEvent(this, Set.empty, Set.empty))
+          Dispatch.dispatchEvent(new XFormsFocusEvent(this, Set.empty, Set.empty), collector)
       case _: XXFormsDialogCloseEvent =>
         // If dialog is open and the focus has not been set within the dialog, attempt to set the focus within
         if (! isDialogVisible && Focus.isFocusWithinContainer(this))
           Focus.removeFocus(containingDocument)
       case _ =>
     }
-    super.performDefaultAction(event)
+    super.performDefaultAction(event, collector)
   }
 
   override def serializeLocal = {
@@ -154,27 +155,26 @@ class XXFormsDialogControl(
     result
   }
 
-  override def compareExternalUseExternalValue(
-    previousExternalValue : Option[String],
-    previousControl       : Option[XFormsControl]
-  ): Boolean =
+  override def compareExternalUseExternalValue(previousExternalValue: Option[String], previousControl: Option[XFormsControl], collector: ErrorEventCollector): Boolean =
     previousControl match {
       case Some(other: XXFormsDialogControl) =>
         // NOTE: We only compare on isVisible as we don't support just changing other attributes for now
         other.wasDialogVisible == isDialogVisible &&
-        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
+        super.compareExternalUseExternalValue(previousExternalValue, previousControl, collector)
       case _ => false
   }
 
   override def outputAjaxDiff(
     previousControl : Option[XFormsControl],
-    content         : Option[XMLReceiverHelper => Unit])(implicit
+    content         : Option[XMLReceiverHelper => Unit],
+    collector       : ErrorEventCollector
+  )(implicit
     ch              : XMLReceiverHelper
   ): Unit = {
 
     locally {
       val atts = new AttributesImpl
-      val doOutputElement = addAjaxAttributes(atts, previousControl)
+      val doOutputElement = addAjaxAttributes(atts, previousControl, collector)
       if (doOutputElement)
         ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", atts)
     }

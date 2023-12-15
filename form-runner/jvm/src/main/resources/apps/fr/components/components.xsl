@@ -876,6 +876,8 @@
                                 xxf:evaluate-avt(string($p))
                     }'
             }"
+            xxf:single-use-static-state="{$mode = ('test', 'test-pdf')}"
+            xxf:allow-error-recovery-on-init="{$mode = ('test', 'test-pdf')}"
         >
 
             <!-- Override if specified -->
@@ -1127,7 +1129,7 @@
                 </xf:body>
             </xf:action>
 
-        </xsl:copy>
+        </xsl:copy><!-- main model -->
 
     </xsl:template>
 

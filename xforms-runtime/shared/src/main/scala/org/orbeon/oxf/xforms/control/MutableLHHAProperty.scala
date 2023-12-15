@@ -14,21 +14,21 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsContextStackSupport}
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
-import org.orbeon.xforms.XFormsId
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsContextStackSupport}
 
 
 class MutableLHHProperty(control: XFormsControl, lhhaType: LHHA, supportsHTML: Boolean)
   extends MutableLHHAProperty(control, lhhaType, supportsHTML) {
 
-  protected def evaluateValueImpl: Option[(String, Boolean)] =
+  protected def evaluateValueImpl(collector: ErrorEventCollector): Option[(String, Boolean)] =
     for {
       lhh   <- control.staticControl.asInstanceOf[StaticLHHASupport].lhh(lhhaType)
-      value <- evaluateOne(lhh)
+      value <- evaluateOne(lhh, collector)
     } yield
       value -> lhh.containsHTML
 }
@@ -36,7 +36,7 @@ class MutableLHHProperty(control: XFormsControl, lhhaType: LHHA, supportsHTML: B
 class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: LHHA, supportsHTML: Boolean)
   extends MutableLHHAProperty(control, lhhaType, supportsHTML) {
 
-  protected def evaluateValueImpl: Option[(String, Boolean)] = {
+  protected def evaluateValueImpl(collector: ErrorEventCollector): Option[(String, Boolean)] = {
 
     val activeAlertsOpt = LHHASupport.gatherActiveAlerts(control)
 
@@ -44,7 +44,7 @@ class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: LHHA, sup
       for {
         (_, activeAlerts) <- activeAlertsOpt.toList
         activeAlert       <- activeAlerts
-        valueWithIsHTML   <- evaluateOne(activeAlert)
+        valueWithIsHTML   <- evaluateOne(activeAlert, collector)
       } yield
         valueWithIsHTML -> activeAlert.containsHTML
 
@@ -70,12 +70,12 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
 
   private var _isHTML = false
 
-  protected def isRelevant = control.isRelevant
-  protected def wasRelevant = control.wasRelevant
+  protected def isRelevant: Boolean = control.isRelevant
+  protected def wasRelevant: Boolean = control.wasRelevant
 
   // TODO: `isHTML` now uses the static `containsHTML` except for multiple alerts. Do this more statically?
-  protected def evaluateValue() =
-    evaluateValueImpl match {
+  protected def evaluateValue(collector: ErrorEventCollector): String =
+    evaluateValueImpl(collector) match {
       case Some((value: String, isHTML)) =>
         _isHTML = isHTML
         value
@@ -84,16 +84,16 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
         null
     }
 
-  def escapedValue() = {
-    val rawValue = value()
+  def escapedValue(collector: ErrorEventCollector): String = {
+    val rawValue = value(collector)
     if (_isHTML)
       XFormsControl.getEscapedHTMLValue(control.getLocationData, rawValue)
     else
       rawValue.escapeXmlMinimal
   }
 
-  def isHTML = {
-    value()
+  def isHTML(collector: ErrorEventCollector): Boolean = {
+    value(collector)
     _isHTML
   }
 
@@ -102,23 +102,23 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
     _isHTML = false
   }
 
-  protected def requireUpdate =
+  protected def requireUpdate: Boolean =
     control.containingDocument.xpathDependencies.requireLHHAUpdate(control.staticControl, lhhaType, control.effectiveId)
 
-  protected def notifyCompute() =
+  protected def notifyCompute(): Unit =
     control.containingDocument.xpathDependencies.notifyComputeLHHA()
 
-  protected def notifyOptimized() =
+  protected def notifyOptimized(): Unit =
     control.containingDocument.xpathDependencies.notifyOptimizeLHHA()
 
   override def copy: MutableLHHAProperty =
     super.copy.asInstanceOf[MutableLHHAProperty]
 
-  protected def evaluateValueImpl: Option[(String, Boolean)]
+  protected def evaluateValueImpl(collector: ErrorEventCollector): Option[(String, Boolean)]
 
   // Evaluate the value of a LHHA related to this control
   // Can return null
-  protected def evaluateOne(lhhaAnalysis: LHHAAnalysis): Option[String] =
+  protected def evaluateOne(lhhaAnalysis: LHHAAnalysis, collector: ErrorEventCollector): Option[String] =
     if (lhhaAnalysis.isLocal) {
 
       implicit val contextStack: XFormsContextStack = control.getContextStack
@@ -127,7 +127,9 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
       XFormsContextStackSupport.evaluateExpressionOrConstant(
         childElem           = lhhaAnalysis,
         parentEffectiveId   = control.effectiveId,
-        pushContextAndModel = true
+        pushContextAndModel = true,
+        eventTarget         = control,
+        collector           = collector
       )
     } else {
       // LHHA is somewhere else. We resolve the control and ask for its value.
@@ -137,7 +139,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
         lhhaAnalysis.staticId,
         followIndexes = true
       ).headOption collect {
-        case control: XFormsLHHAControl => control.getValue
+        case control: XFormsLHHAControl => control.getValue(collector)
       }
     }
 }

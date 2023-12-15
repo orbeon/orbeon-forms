@@ -41,7 +41,7 @@ class XFormsSecretHandler(
       val inputQName = XMLUtils.buildQName(xhtmlPrefix, "input")
       containerAttributes.addOrReplace("type", "password")
       containerAttributes.addOrReplace("name", getEffectiveId)
-      containerAttributes.addOrReplace("value", if (secretControl == null || secretControl.getExternalValue == null) "" else secretControl.getExternalValue())
+      containerAttributes.addOrReplace("value", if (secretControl == null || secretControl.getExternalValue(handlerContext.collector) == null) "" else secretControl.getExternalValue(handlerContext.collector))
       // Handle accessibility attributes
       XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
       handleAriaByAtts(containerAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
@@ -60,7 +60,7 @@ class XFormsSecretHandler(
       xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName)
     } else {
       outputStaticReadonlyField(xhtmlPrefix) {
-        secretControl.getFormattedValue foreach { value =>
+        secretControl.getFormattedValue(handlerContext.collector) foreach { value =>
           xmlReceiver.characters(value.toCharArray, 0, value.length)
         }
       }

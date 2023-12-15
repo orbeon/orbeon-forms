@@ -179,12 +179,14 @@
         mode="within-controls">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
-            <xsl:for-each select="@resource">
-                <!-- Because this can generate `frf:controlVariableValue()` -->
+            <xsl:if test="exists(@resource | @selection)">
+                <!-- As calls below can generate `frf:controlVariableValue()` -->
                 <xsl:namespace name="frf" select="'java:org.orbeon.oxf.fr.FormRunner'"/>
+            </xsl:if>
+            <xsl:for-each select="@resource | @selection">
                 <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., true(), $library-name, ('fr-search-value', 'fr-search-page'))"/>
             </xsl:for-each>
-            <xsl:apply-templates select="@* except (@resource) | node() except (xf:itemset, xf:item, xf:choices)" mode="#current"/>
+            <xsl:apply-templates select="@* except (@resource | @selection) | node() except (xf:itemset, xf:item, xf:choices)" mode="#current"/>
             <xsl:apply-templates select="xf:itemset | xf:item | xf:choices" mode="within-databound-itemset"/>
         </xsl:copy>
     </xsl:template>

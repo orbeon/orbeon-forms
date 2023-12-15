@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
+import cats.effect.IO
 import cats.syntax.option._
 import org.log4s
 import org.log4s.LogLevel
@@ -33,6 +34,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.event.ClientEvents._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event._
@@ -40,7 +42,7 @@ import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.state.{LockResponse, RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{ConnectResult, TwoPassSubmissionParameters}
+import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -53,7 +55,6 @@ import java.net.URI
 import java.util.concurrent.locks.Lock
 import scala.annotation.tailrec
 import scala.collection.{immutable, mutable}
-import scala.concurrent.Future
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
@@ -169,7 +170,7 @@ trait ContainingDocumentTransientState {
     var nonJavaScriptLoadsToRun  : Vector[Load] = Vector.empty
     var scriptsToRun             : Vector[Either[Load, Either[ScriptInvocation, CallbackInvocation]]] = Vector.empty
 
-    var replaceAllFuture         : Option[Future[ConnectResult]] = None
+    var replaceAllFuture         : Option[IO[AsyncConnectResult]] = None
     var gotSubmissionReplaceAll  : Boolean = false
     var gotSubmissionRedirect    : Boolean = false
 
@@ -214,9 +215,9 @@ trait ContainingDocumentTransientState {
 
   def getNonJavaScriptLoadsToRun: immutable.Seq[Load] = transientState.nonJavaScriptLoadsToRun
 
-  def getReplaceAllEval: Option[Future[ConnectResult]] = transientState.replaceAllFuture
+  def getReplaceAllFuture: Option[IO[AsyncConnectResult]] = transientState.replaceAllFuture
 
-  def setReplaceAllFuture(eval: Future[ConnectResult]): Unit =
+  def setReplaceAllFuture(eval: IO[AsyncConnectResult]): Unit =
     transientState.replaceAllFuture = Some(eval.ensuring(_ ne null))
 
   def setGotSubmissionReplaceAll(): Unit = {
@@ -268,7 +269,7 @@ trait ContainingDocumentUpload {
 
   def controls       : XFormsControls
   def staticState    : XFormsStaticState
-  def defaultModel   : Option[XFormsModel]
+  def getDefaultModel: XFormsModel
   def getRequestStats: RequestStats
 
   def getUploadChecker: UploadCheckerLogic = UploadChecker
@@ -288,20 +289,17 @@ trait ContainingDocumentUpload {
 
     def currentUploadSizeAggregate = {
 
-      def evaluateAsLong(expr: CompiledExpression) =
-        defaultModel match {
-          case Some(m) =>
-            val bindingContext = m.getDefaultEvaluationContext
-            XPath.evaluateSingle(
-              contextItems       = bindingContext.nodeset,
-              contextPosition    = bindingContext.position,
-              compiledExpression = expr,
-              functionContext    = m.getContextStack.getFunctionContext(m.getEffectiveId, bindingContext),
-              variableResolver   = m.variableResolver
-            )(getRequestStats.getReporter).asInstanceOf[Long] // we statically ensure that the expression returns an `xs:integer`
-          case None =>
-            throw new AssertionError("can only evaluate dynamic properties if a model is present")
-        }
+      def evaluateAsLong(expr: CompiledExpression) = {
+        val defaultModel   = getDefaultModel
+        val bindingContext = defaultModel.getDefaultEvaluationContext
+        XPath.evaluateSingle(
+          contextItems       = bindingContext.nodeset,
+          contextPosition    = bindingContext.position,
+          compiledExpression = expr,
+          functionContext    = defaultModel.getContextStack.getFunctionContext(defaultModel.getEffectiveId, bindingContext),
+          variableResolver   = defaultModel.variableResolver
+        )(getRequestStats.getReporter).asInstanceOf[Long] // we statically ensure that the expression returns an `xs:integer`
+      }
 
       staticState.uploadMaxSizeAggregateExpression map evaluateAsLong map (0L max)
     }
@@ -359,6 +357,10 @@ trait ContainingDocumentEvent {
 
   private var eventStack: List[XFormsEvent] = Nil
 
+  // The top-level document/model container must have at least one model
+  def getDefaultModel: XFormsModel =
+    findDefaultModel.getOrElse(throw new IllegalStateException)
+
   def startHandleEvent(event: XFormsEvent): Unit                = eventStack ::= event
   def endHandleEvent()                    : Unit                = eventStack = eventStack.tail
   def currentEventOpt                     : Option[XFormsEvent] = eventStack.headOption
@@ -389,8 +391,8 @@ trait ContainingDocumentEvent {
 
 trait ContainingDocumentProperties {
 
-  def staticState: XFormsStaticState
-  def defaultModel: Option[XFormsModel]
+  def staticState    : XFormsStaticState
+  def getDefaultModel: XFormsModel
   def getRequestStats: RequestStats
 
   def disableUpdates: Boolean
@@ -435,20 +437,17 @@ trait ContainingDocumentProperties {
         )
       )
 
-    def evaluateStringPropertyAVT(expr: CompiledExpression) =
-      defaultModel match {
-        case Some(m) =>
-          val bindingContext = m.getDefaultEvaluationContext
-          XPath.evaluateAsString(
-            contextItems       = bindingContext.nodeset,
-            contextPosition    = bindingContext.position,
-            compiledExpression = expr,
-            functionContext    = m.getContextStack.getFunctionContext(m.getEffectiveId, bindingContext),
-            variableResolver   = m.variableResolver
-          )(getRequestStats.getReporter)
-        case None =>
-          throw new AssertionError("can only evaluate AVT properties if a model is present")
-      }
+    def evaluateStringPropertyAVT(expr: CompiledExpression) = {
+      val defaultModel   = getDefaultModel
+      val bindingContext = defaultModel.getDefaultEvaluationContext
+      XPath.evaluateAsString(
+        contextItems       = bindingContext.nodeset,
+        contextPosition    = bindingContext.position,
+        compiledExpression = expr,
+        functionContext    = defaultModel.getContextStack.getFunctionContext(defaultModel.getEffectiveId, bindingContext),
+        variableResolver   = defaultModel.variableResolver
+      )(getRequestStats.getReporter)
+    }
   }
 
   import Memo._
@@ -560,7 +559,7 @@ trait ContainingDocumentLogging {
 
   val loggersMap = mutable.HashMap[String, log4s.Logger]()
 
-  def logMessage(name: String, level: LogLevel, message: String): Unit = {
+  def logMessage(name: String, level: LogLevel, message: String, collector: ErrorEventCollector): Unit = {
 
     val logger = loggersMap.getOrElseUpdate(name, LoggerFactory.createLogger(name))
 
@@ -572,7 +571,7 @@ trait ContainingDocumentLogging {
       case log4s.Error => logger.error(message)
     }
 
-    self.findObjectByEffectiveId("orbeon-inspector") foreach { inspector =>
+    self.findObjectByEffectiveId("fr-console-server") foreach { inspector =>
       XFormsDispatchAction.dispatch(
         eventName       = "xxforms-log",
         target          = inspector.asInstanceOf[XFormsEventTarget],
@@ -584,7 +583,8 @@ trait ContainingDocumentLogging {
         ),
         delayOpt        = None,
         showProgress    = false,
-        allowDuplicates = false
+        allowDuplicates = false,
+        collector       = collector
       )
     }
   }

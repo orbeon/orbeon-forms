@@ -13,19 +13,27 @@
   */
 package org.orbeon.oxf.fr
 
+import cats.effect.unsafe.implicits.global
 import cats.syntax.option._
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.FormXhtml
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.MapFunctions
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 
 trait FormRunnerPublish {
@@ -72,26 +80,40 @@ trait FormRunnerPublish {
         (FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName, Names.LibraryFormName), globalVersionOpt.getOrElse(1))
       )
 
-    val (beforeURLs, _, publishedVersion) =
-      putWithAttachments(
-        liveData          = xhtml.root,
-        migrate           = None,
-        toBaseURI         = toBaseURI,
-        fromBasePaths     = basePathsWithVersions,
-        toBasePath        = createFormDefinitionBasePath(app, form),
-        filename          = FormXhtml,
-        commonQueryString = documentIdOpt map (documentId => encodeSimpleQuery(List("document" -> documentId))) getOrElse "",
-        forceAttachments  = forceAttachments,
-        username          = username.trimAllToOpt,
-        password          = password.trimAllToOpt,
-        formVersion       = dstFormVersionTrimmedOpt,
-        workflowStage     = None
+    implicit val externalContext         : ExternalContext               = CoreCrossPlatformSupport.externalContext
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+    implicit val xfcd                    : XFormsContainingDocument      = inScopeContainingDocument
+
+    val (attachmentWithEncryptedAtRest, publishedVersion, stringOpt) = {
+      Await.result(
+        putWithAttachments(
+          liveData          = xhtml.root,
+          migrate           = None,
+          toBaseURI         = toBaseURI,
+          fromBasePaths     = basePathsWithVersions,
+          toBasePath        = createFormDefinitionBasePath(app, form),
+          filename          = FormXhtml,
+          commonQueryString = documentIdOpt map (documentId => encodeSimpleQuery(List("document" -> documentId))) getOrElse "",
+          forceAttachments  = forceAttachments,
+          username          = username.trimAllToOpt,
+          password          = password.trimAllToOpt,
+          formVersion       = dstFormVersionTrimmedOpt,
+          workflowStage     = None
+        ).unsafeToFuture(),
+        Duration.Inf
       )
+    }
+
+    // Update, in this thread, the attachment paths
+    updateAttachments(xhtml.root, attachmentWithEncryptedAtRest)
+
+    // Update the response instance, optionally used by the publish dialog
+    setCreateUpdateResponse(stringOpt.getOrElse(""))
 
     MapFunctions.createValue(
       Map[AtomicValue, ValueRepresentation](
-        (SaxonUtils.fixStringValue("published-attachments"), beforeURLs.size),
-        (SaxonUtils.fixStringValue("published-version"),     publishedVersion)
+        (SaxonUtils.fixStringValue("published-attachments"), attachmentWithEncryptedAtRest.size),
+        (SaxonUtils.fixStringValue("published-version"),     publishedVersion.getOrElse(1): Int)
       )
     )
   }

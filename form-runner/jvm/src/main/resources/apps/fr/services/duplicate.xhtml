@@ -34,7 +34,7 @@
             <xf:instance id="fr-request" src="input:instance"/>
 
             <xf:instance id="fr-response"      xxf:exclude-result-prefixes="#all"><document-id/></xf:instance>
-            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all"><dummy/></xf:instance>
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
 
             <xf:var name="requested-document-id" value="instance('fr-request')/root()/document-id/string()"/>
             <xf:var name="data-base-path"        value="frf:createFormDataBasePath(fr:app-name(), fr:form-name(), false(), $requested-document-id)"/>
@@ -92,7 +92,7 @@
                 <xf:insert
                     event="xforms-submit-done xforms-submit-error"
                     ref="instance('fr-form-instance')"
-                    origin="xf:element('dummy')"/>
+                    origin="xf:element('_')"/>
 
             </xf:submission>
 

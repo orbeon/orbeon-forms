@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import org.junit._
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatestplus.junit.AssertionsForJUnit
 
@@ -52,10 +53,10 @@ class VariableDependenciesTest extends DocumentTestBase with AssertionsForJUnit 
         </xh:body>
       </xh:html>.toDocument
 
-    assert(getControl("my-output").getLabel === "Name")
+    assert(getControl("my-output").getLabel(EventCollector.Throw) === "Name")
 
     setControlValue("my-input", "fr")
 
-    assert(getControl("my-output").getLabel === "Nom")
+    assert(getControl("my-output").getLabel(EventCollector.Throw) === "Nom")
   }
 }

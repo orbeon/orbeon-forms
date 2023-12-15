@@ -101,6 +101,7 @@ class XFormsStaticStateImpl(
   def isServerStateHandling               : Boolean          = staticProperties.isServerStateHandling
   def isXPathAnalysis                     : Boolean          = staticProperties.isXPathAnalysis
   def isCalculateDependencies             : Boolean          = staticProperties.isCalculateDependencies
+  def singleUseStaticState                : Boolean          = staticProperties.singleUseStaticState
   def allowErrorRecoveryOnInit            : Boolean          = staticProperties.allowErrorRecoveryOnInit
   def isInlineResources                   : Boolean          = staticProperties.isInlineResources
   def uploadMaxSize                       : MaximumSize      = staticProperties.uploadMaxSize
@@ -125,13 +126,12 @@ class XFormsStaticStateImpl(
           XS_STRING_QNAME,
           propValue,
           topLevelPart
-            .defaultModel
-            .map(_.namespaceMapping.mapping)
+            .getDefaultModel
+            .namespaceMapping.mapping,
             // FIXME: It's unclear what namespace mapping to use! With Form Runner/Form Builder, the
             //   property value is read and copied over to an attribute on the first model, but the
             //   namespace context from the properties file is lost in this process. Maybe we should
             //   instead convert QNames to EQNames.
-            .getOrElse(throw new IllegalArgumentException("can't find namespace mapping")),
           P.AssetsBaselineUpdatesProperty
         )
       )

@@ -13,8 +13,7 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.util.ConnectionResult
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 
@@ -37,12 +36,7 @@ object RedirectReplacer extends Replacer {
     refContext          : RefContext
   ): ReplaceResult = {
     submission.containingDocument.setGotSubmissionRedirect()
-    RedirectReplacer.updateResponse(cxr, XFormsCrossPlatformSupport.externalContext.getResponse)
+    SubmissionUtils.forwardStatusAndHeaders(cxr, XFormsCrossPlatformSupport.externalContext.getResponse)
     ReplaceResult.None
-  }
-
-  def updateResponse(connectionResult: ConnectionResult, response: ExternalContext.Response): Unit = {
-    SubmissionUtils.forwardResponseHeaders(connectionResult, response)
-    response.setStatus(connectionResult.statusCode)
   }
 }

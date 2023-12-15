@@ -16,12 +16,12 @@ package org.orbeon.oxf.xforms.event.events
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.analysis.XPathErrorDetails
 import org.orbeon.oxf.xforms.control.controls.{FileMetadata, XFormsUploadControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
-import org.orbeon.oxf.xforms.model.StaticDataModel.Reason
-import org.orbeon.xforms.EventNames
+import org.orbeon.xforms.{BindingErrorReason, EventNames}
 import shapeless.syntax.typeable._
 
 import scala.collection.compat._
@@ -32,32 +32,60 @@ class XXFormsStateRestoredEvent(target: XFormsEventTarget, properties: PropertyG
 }
 
 class XXFormsBindingErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
-  extends XFormsEvent(XXFORMS_BINDING_ERROR, target, properties, bubbles = true, cancelable = false) {
+  extends XFormsEvent(XXFORMS_BINDING_ERROR, target, properties, bubbles = true, cancelable = true) {
 
-  def this(target: XFormsEventTarget, locationData: LocationData, reason: Reason) = {
+  def this(target: XFormsEventTarget, locationDataOpt: Option[LocationData], reason: BindingErrorReason) = {
     this(target, Map("message" -> Option(reason.message)))
-    _locationData = Option(locationData)
-    _reason = Option(reason)
+    _locationData = locationDataOpt
+    _reasonOpt = Option(reason)
   }
 
   private var _locationData: Option[LocationData] = None
-  override def locationData = _locationData.orNull
+  override def locationData: LocationData = _locationData.orNull
 
-  private var _reason: Option[Reason] = None
-  def reason = _reason.orNull
+  private var _reasonOpt: Option[BindingErrorReason] = None
+  def reasonOpt: Option[BindingErrorReason] = _reasonOpt
 }
 
 class XXFormsXPathErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XXFORMS_XPATH_ERROR, target, properties, bubbles = true, cancelable = true) {
 
-  def this(target: XFormsEventTarget, message: String, throwable: Throwable) = {
+  def this(
+    target    : XFormsEventTarget,
+    expression: String,
+    details   : XPathErrorDetails,
+    message   : String,
+    throwable : Throwable
+  ) = {
     // MAYBE: "throwable" -> OrbeonFormatter.format(throwable)
-    this(target, Map("message" -> Option(message)))
-    _throwable = Option(throwable)
+    this(
+      target,
+      Map(
+        "expression" -> Option(expression),
+        "message"    -> Option(message)
+      )
+    )
+    _detailsOpt   = Option(details)
+    _throwableOpt = Option(throwable)
   }
 
-  private var _throwable: Option[Throwable] = None
-  def throwable = _throwable.orNull
+  // Not stored as properties because properties don't support reading regular Java objects yet
+  private var _detailsOpt: Option[XPathErrorDetails] = None
+  private var _throwableOpt: Option[Throwable] = None
+
+  def detailsOpt  : Option[XPathErrorDetails] = _detailsOpt
+  def throwableOpt: Option[Throwable] = _throwableOpt
+
+  def expressionOpt: Option[String] = property[String]("expression")
+  def messageOpt   : Option[String] = property[String]("message")
+
+  def combinedMessage: String = {
+    // In practice
+    val message     = messageOpt     getOrElse "[unknown]"
+    val details     = detailsOpt getOrElse "[unknown]" //xxx todo
+    val expression  = expressionOpt  getOrElse "[unknown]"
+    s"$details: error `$message` while evaluating expression `$expression`" //xxx todo
+  }
 }
 
 trait LinkEvent extends XFormsEvent {
@@ -99,7 +127,7 @@ class XXFormsValueEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def this(target: XFormsEventTarget, value: String) =
     this(target, Map("value" -> Option(value)))
 
-  def value = property[String]("value").get
+  def value: String = property[String]("value").get
 }
 
 class XXFormsLoadEvent(target: XFormsEventTarget, properties: PropertyGetter)
@@ -108,7 +136,7 @@ class XXFormsLoadEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def this(target: XFormsEventTarget, resource: String) =
     this(target, Map("resource" -> Option(resource)))
 
-  def resource = property[String]("resource").get
+  def resource: String = property[String]("resource").get
 }
 
 object XXFormsLoadEvent {
@@ -165,22 +193,22 @@ object XXFormsUploadErrorEvent {
   def reasonToProperties(target: XFormsEventTarget): List[(String, Option[Any])] =
     target.cast[XFormsUploadControl].to(List) flatMap
       FileMetadata.progress                   flatMap {
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.EmptyFile))) =>
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.EmptyFile))) =>
         List("error-type" -> Some("empty-file-error"))
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.SizeReason(permitted, actual)))) =>
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.SizeTooLarge(permitted, actual)))) =>
         List(
           "error-type" -> Some("size-error"),
           "permitted"  -> Some(permitted),
           "actual"     -> Some(actual)
         )
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.MediatypeReason(filename, permitted, actual)))) =>
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.DisallowedMediatype(filename, permitted, actual)))) =>
         List(
           "error-type" -> Some("mediatype-error"),
           "filename"   -> Some(filename),
           "permitted"  -> Some(permitted.to(List) map (_.toString)),
           "actual"     -> (actual map (_.toString))
         )
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.FileScanReason(_, message)))) =>
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.FailedFileScan(_, message)))) =>
         List(
           "error-type" -> Some("file-scan-error"),
           "message"    -> message

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import java.{util => ju}
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.Element
@@ -26,6 +25,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{RepeatControl, RepeatIterationControl}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XXFormsDndEvent, XXFormsIndexChangedEvent, XXFormsNodesetChangedEvent, XXFormsSetindexEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.state.ControlState
@@ -36,9 +36,10 @@ import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
 import shapeless.syntax.typeable._
 
-import scala.jdk.CollectionConverters._
+import java.{util => ju}
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.collection.{mutable => m}
+import scala.jdk.CollectionConverters._
 
 // Represents an xf:repeat container control.
 class XFormsRepeatControl(
@@ -75,8 +76,13 @@ class XFormsRepeatControl(
   override def supportsRefreshEvents = true
   override def children: Seq[XFormsRepeatIterationControl] = super.children.asInstanceOf[Seq[XFormsRepeatIterationControl]]
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
-    super.onCreate(restoreState, state, update)
+  override def onCreate(
+    restoreState: Boolean,
+    state       : Option[ControlState],
+    update      : Boolean,
+    collector   : ErrorEventCollector
+  ): Unit = {
+    super.onCreate(restoreState, state, update, collector)
 
     // Ensure that the initial state is set, either from default value, or for state deserialization.
     state match {
@@ -95,7 +101,7 @@ class XFormsRepeatControl(
   }
 
   // Set the repeat index. The index is automatically adjusted to fall within bounds.
-  def setIndex(index: Int): Unit = {
+  def setIndex(index: Int, collector: ErrorEventCollector): Unit = {
 
     val oldRepeatIndex = getIndex // 1-based
 
@@ -103,7 +109,7 @@ class XFormsRepeatControl(
     setIndexInternal(index)
     if (oldRepeatIndex != getIndex) {
       // Dispatch custom event to notify that the repeat index has changed
-      Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(this, oldRepeatIndex, getIndex))
+      Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(this, oldRepeatIndex, getIndex), collector)
     }
 
     // Handle rebuild flags for container affected by changes to this repeat
@@ -136,7 +142,7 @@ class XFormsRepeatControl(
     } else
       0
 
-  def doDnD(dndEvent: XXFormsDndEvent): Unit = {
+  def doDnD(dndEvent: XXFormsDndEvent, collector: ErrorEventCollector): Unit = {
 
     require(staticControl.isDnD, s"attempt to process `${dndEvent.name}` event on non-DnD-enabled control `$effectiveId`")
 
@@ -175,7 +181,8 @@ class XFormsRepeatControl(
               containingDocumentOpt = containingDocument.some,
               collectionToUpdate    = sourceNodes,
               deleteIndexOpt        = requestedSourceIndex.some,
-              doDispatch            = false // don't dispatch event because one call to `updateRepeatNodeset()` is enough
+              doDispatch            = false, // don't dispatch event because one call to `updateRepeatNodeset()` is enough
+              collector             = collector
             )
           deletionDescriptors.head.nodeInfo // above deletes exactly one node
         }
@@ -201,7 +208,8 @@ class XFormsRepeatControl(
           requireDefaultValues              = false,
           searchForInstance                 = true,
           removeInstanceDataFromClonedNodes = true,
-          structuralDependencies            = true
+          structuralDependencies            = true,
+          collector                         = collector
         )
 
         // TODO: should dispatch xxforms-move instead of xforms-insert?
@@ -211,10 +219,10 @@ class XFormsRepeatControl(
   }
 
   // Push binding but ignore non-relevant iterations
-  override protected def computeBinding(parentContext: BindingContext): BindingContext = {
+  override protected def computeBinding(parentContext: BindingContext, collector: ErrorEventCollector): BindingContext = {
     val contextStack = container.getContextStack
     contextStack.setBinding(parentContext)
-    contextStack.pushBinding(element, effectiveId, staticControl.scope)
+    contextStack.pushBinding(element, effectiveId, staticControl.scope, this, collector)
 
     // Keep only the relevant items
     import XFormsSingleNodeControl.isRelevantItem
@@ -235,7 +243,10 @@ class XFormsRepeatControl(
     *
     * NOTE: The new binding context must have been set on this control before calling.
     */
-  def updateIterations(oldRepeatItems : Seq[om.Item]): (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
+  def updateIterations(
+    oldRepeatItems: Seq[om.Item],
+    collector     : ErrorEventCollector
+  ): (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
 
     // NOTE: The following assumes the nodesets have changed
 
@@ -282,7 +293,11 @@ class XFormsRepeatControl(
                 }
 
                 // Dispatch destruction events
-                currentControlTree.dispatchDestructionEventsForRemovedRepeatIteration(movedOrRemovedIteration, includeCurrent = true)
+                currentControlTree.dispatchDestructionEventsForRemovedRepeatIteration(
+                  movedOrRemovedIteration,
+                  includeCurrent = true,
+                  collector
+                )
 
                 // Indicate to iteration that it is being removed
                 // As of 2012-03-07, only used by XFormsComponentControl to destroy the XBL container
@@ -383,7 +398,7 @@ class XFormsRepeatControl(
               )) {
 
                 // Create repeat iteration
-                val newIteration = controls.createRepeatIterationTree(this, repeatIndex)
+                val newIteration = controls.createRepeatIterationTree(this, repeatIndex, collector)
                 updated = true
 
                 newIterations += newIteration
@@ -445,7 +460,7 @@ class XFormsRepeatControl(
             "index" -> removedIteration.iterationIndex.toString
           )) {
             // Dispatch destruction events and deindex old iteration
-            currentControlTree.dispatchDestructionEventsForRemovedRepeatIteration(removedIteration, includeCurrent = true)
+            currentControlTree.dispatchDestructionEventsForRemovedRepeatIteration(removedIteration, includeCurrent = true, collector)
             // https://github.com/orbeon/orbeon-forms/issues/5189
             currentControlTree.destroySubtree(removedIteration, includeCurrent = true)
             currentControlTree.deindexSubtree(removedIteration, includeCurrent = true)
@@ -478,7 +493,7 @@ class XFormsRepeatControl(
     (newIterations, partialFocusRepeatOption)
   }
 
-  override def dispatchChangeEvents(): Unit =
+  override def dispatchChangeEvents(collector: ErrorEventCollector): Unit =
     refreshInfoOpt foreach { localRefreshInfo =>
 
       this.refreshInfoOpt = None
@@ -486,11 +501,13 @@ class XFormsRepeatControl(
       // Dispatch custom event to `xf:repeat` to notify that the nodeset has changed
       if (localRefreshInfo.isNodesetChanged)
         Dispatch.dispatchEvent(new XXFormsNodesetChangedEvent(this, localRefreshInfo.newIterations,
-          localRefreshInfo.movedIterationsOldPositions, localRefreshInfo.movedIterationsNewPositions))
+          localRefreshInfo.movedIterationsOldPositions, localRefreshInfo.movedIterationsNewPositions
+        ), collector
+        )
 
       // Dispatch custom event to notify that the repeat index has changed
       if (localRefreshInfo.oldRepeatIndex != getIndex)
-        Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(this, localRefreshInfo.oldRepeatIndex, getIndex))
+        Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(this, localRefreshInfo.oldRepeatIndex, getIndex), collector)
     }
 
   private def findItemIndexes(items1: Seq[om.Item], items2: Seq[om.Item]) = {
@@ -516,15 +533,16 @@ class XFormsRepeatControl(
   // NOTE: pushBindingImpl ensures that any item we are bound to is relevant
   override def computeRelevant: Boolean = super.computeRelevant && getSize > 0
 
-  override def performDefaultAction(event: XFormsEvent): Unit = event match {
-    case e: XXFormsSetindexEvent => setIndex(e.index)
-    case e: XXFormsDndEvent      => doDnD(e)
-    case _                       => super.performDefaultAction(event)
+  override def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = event match {
+    case e: XXFormsSetindexEvent => setIndex(e.index, collector)
+    case e: XXFormsDndEvent      => doDnD(e, collector)
+    case _                       => super.performDefaultAction(event, collector)
   }
 
   override def buildChildren(
-    buildTree : (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl],
-    idSuffix  : Seq[Int]
+    buildTree : (XBLContainer, BindingContext, ElementAnalysis, Seq[Int], ErrorEventCollector) => Option[XFormsControl],
+    idSuffix  : Seq[Int],
+    collector : ErrorEventCollector
   ): Unit = {
 
     // Build all children that are not repeat iterations
@@ -532,14 +550,15 @@ class XFormsRepeatControl(
       this,
       staticControl.children filterNot (_.isInstanceOf[RepeatIterationControl]),
       buildTree,
-      idSuffix
+      idSuffix,
+      collector
     )
 
     // Build one sub-tree per repeat iteration (iteration itself handles its own binding with pushBinding,
     // depending on its index/suffix)
     val iterationAnalysis = staticControl.iteration.get
     for (iterationIndex <- 1 to bindingContext.nodeset.size)
-      buildTree(container, bindingContext, iterationAnalysis, idSuffix :+ iterationIndex)
+      buildTree(container, bindingContext, iterationAnalysis, idSuffix :+ iterationIndex, collector)
 
     // TODO LATER: handle isOptimizeRelevance()
   }

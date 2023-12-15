@@ -18,13 +18,14 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.FunctionContext
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.xforms.BindingContext
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, NestedPartAnalysis}
 import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, NestedPartAnalysis}
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.{InstanceMirror, XXFormsComponentRootControl, XXFormsDynamicControl}
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsModelConstructDoneEvent, XFormsModelConstructEvent, XFormsReadyEvent}
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEvents}
+import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent, XFormsEvents}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance, XFormsInstanceSupport}
 import org.orbeon.oxf.xforms.state.ControlState
@@ -38,6 +39,7 @@ import org.w3c.dom.Node.ELEMENT_NODE
 import shapeless.syntax.typeable._
 
 import scala.jdk.CollectionConverters._
+
 
 // A component control with native support for a value
 class XFormsValueComponentControl(
@@ -58,11 +60,11 @@ class XFormsValueComponentControl(
   // Don't expose an external value unless explicitly allowed
   override def handleExternalValue: Boolean = staticControl.commonBinding.modeExternalValue
 
-  private def evaluateWithContext(eval: (NamespaceMapping, FunctionContext) => Option[String]): Option[String] =
+  private def evaluateWithContext(eval: (NamespaceMapping, FunctionContext) => Option[String], collector: ErrorEventCollector): Option[String] =
     for {
       _                    <- staticControl.bindingOpt
       nestedContainer      <- nestedContainerOpt
-      nestedBindingContext <- bindingContextForChildOpt
+      nestedBindingContext <- bindingContextForChildOpt(collector)
       result               <- eval(
                                staticControl.commonBinding.bindingElemNamespaceMapping,
                                XFormsFunction.Context(
@@ -70,14 +72,14 @@ class XFormsValueComponentControl(
                                  bindingContext    = nestedBindingContext,
                                  sourceEffectiveId = innerRootControl.effectiveId,
                                  modelOpt          = nestedBindingContext.modelOpt,
-                                 data              = null
+                                 bindNodeOpt       = None
                                )
                              )
     } yield
       result
 
   // See https://github.com/orbeon/orbeon-forms/issues/4041
-  override def getFormattedValue: Option[String] = {
+  override def getFormattedValue(collector: ErrorEventCollector): Option[String] = {
 
     // TODO: Unclear when we return `None` (no binding, etc.). Right now we flatten.
     def fromBinding =
@@ -86,56 +88,68 @@ class XFormsValueComponentControl(
           (namespaceMapping, functionContext) =>
             valueWithSpecifiedFormat(
               format           = formatExpr,
+              collector        = collector,
               namespaceMapping = namespaceMapping,
               functionContext  = functionContext
-            )
+            ),
+          collector
         )
       }
 
     def fromExternal =
-      Option(getExternalValue)
+      Option(getExternalValue(collector))
 
-    fromBinding orElse valueWithDefaultFormat orElse fromExternal
+    fromBinding orElse valueWithDefaultFormat(collector) orElse fromExternal
   }
 
-  override def evaluateExternalValue(): Unit = {
+  override def evaluateExternalValue(collector: ErrorEventCollector): Unit = {
 
     def fromBinding =
       staticControl.commonBinding.serializeExternalValueOpt flatMap { serializeExpr =>
         evaluateWithContext(
           (namespaceMapping, functionContext) =>
             evaluateAsString(
-              serializeExpr,
-              List(stringToStringValue(getValue)),
-              1,
-              namespaceMapping,
-              bindingContext.getInScopeVariables,
-              functionContext
-            )
+              xpathString        = serializeExpr,
+              contextItems       = List(stringToStringValue(getValue(collector))),
+              contextPosition    = 1,
+              collector          = collector,
+              contextMessage     = "evaluating external value",
+              namespaceMapping   = namespaceMapping,
+              variableToValueMap = bindingContext.getInScopeVariables,
+              functionContext    = functionContext
+            ),
+          collector
         )
       }
 
-    setExternalValue(fromBinding getOrElse getValue)
+    setExternalValue(fromBinding getOrElse getValue(collector))
   }
 
-  override def translateExternalValue(boundItem: om.Item, externalValue: String): Option[String] = {
+  override def translateExternalValue(
+    boundItem    : om.Item,
+    externalValue: String,
+    collector    : ErrorEventCollector
+  ): Option[String] = {
 
     def fromBinding =
       staticControl.commonBinding.deserializeExternalValueOpt flatMap { deserializeExpr =>
         evaluateWithContext(
           (namespaceMapping, functionContext) =>
             evaluateAsString(
-              deserializeExpr,
-              List(externalValue),
-              1,
-              namespaceMapping,
-              bindingContext.getInScopeVariables,
-              functionContext
-            )
+              xpathString        = deserializeExpr,
+              contextItems       = List(externalValue),
+              contextPosition    = 1,
+              collector          = collector,
+              contextMessage     = "translating external value",
+              namespaceMapping   = namespaceMapping,
+              variableToValueMap = bindingContext.getInScopeVariables,
+              functionContext    = functionContext
+            ),
+          collector
         )
       }
 
-    fromBinding orElse super.translateExternalValue(boundItem, externalValue)
+    fromBinding orElse super.translateExternalValue(boundItem, externalValue, collector)
   }
 
   // TODO
@@ -144,14 +158,17 @@ class XFormsValueComponentControl(
   override def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
     previousControl : Option[XFormsValueControl],
-    content         : Option[XMLReceiverHelper => Unit])(implicit
+    content         : Option[XMLReceiverHelper => Unit],
+    collector       : ErrorEventCollector
+  )(implicit
     ch              : XMLReceiverHelper
   ): Unit =
     // NOTE: Don't output any nested content. The value is handled separately, see:
     // https://github.com/orbeon/orbeon-forms/issues/3909
     super.outputAjaxDiff(
       previousControl,
-      None
+      None,
+      collector
     )
 }
 
@@ -216,26 +233,31 @@ class XFormsComponentControl(
   private def modeBinding = staticControl.commonBinding.modeBinding
 
   // Only handle binding if we support modeBinding
-  override protected def computeBinding(parentContext: BindingContext): BindingContext =
+  override protected def computeBinding(parentContext: BindingContext, collector: ErrorEventCollector): BindingContext =
     if (modeBinding)
-      super.computeBinding(parentContext)
+      super.computeBinding(parentContext, collector)
     else
       super.computeBindingCopy(parentContext)
 
-  override def bindingContextForChildOpt: Option[BindingContext] =
+  override def bindingContextForChildOpt(collector: ErrorEventCollector): Option[BindingContext] =
     _nestedContainerOpt map { nestedContainer =>
       // Start with inner context
       // For nested event handlers, this still works, because the nested handler can never match the inner scope. So
       // the context goes inner context -> component binding.
       val contextStack = nestedContainer.getContextStack
       contextStack.setParentBindingContext(bindingContext)
-      contextStack.resetBindingContext()
+      contextStack.resetBindingContext(collector)
       contextStack.getCurrentBindingContext
     }
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
+  override def onCreate(
+    restoreState: Boolean,
+    state       : Option[ControlState],
+    update      : Boolean,
+    collector   : ErrorEventCollector
+  ): Unit = {
 
-    super.onCreate(restoreState, state, update)
+    super.onCreate(restoreState, state, update, collector)
 
     if (staticControl.hasLazyBinding && ! staticControl.hasConcreteBinding) {
 
@@ -254,7 +276,7 @@ class XFormsComponentControl(
       recreateNestedContainer()
 
       if (update)
-        XXFormsDynamicControl.updateDynamicShadowTree(this)
+        XXFormsDynamicControl.updateDynamicShadowTree(this, collector)
     }
 
     if (Controls.isRestoringDynamicState)
@@ -341,7 +363,7 @@ class XFormsComponentControl(
 
       // `xforms-model-construct` without RRR
       for (model <- nestedContainer.models) {
-        Dispatch.dispatchEvent(new XFormsModelConstructEvent(model, rrr = false))
+        Dispatch.dispatchEvent(new XFormsModelConstructEvent(model, rrr = false), EventCollector.ToReview)
         // 2023-04-05: Not sure below comment is up to date. Can's see a call to `markStructuralChange()`,
         // NOTE: `xforms-model-construct` already does a `markStructuralChange()` but without `AllDefaultsStrategy`
         model.markStructuralChange(None, AllDefaultsStrategy)
@@ -357,7 +379,7 @@ class XFormsComponentControl(
 
       // `xforms-model-construct-done`
       for (model <- nestedContainer.models)
-        Dispatch.dispatchEvent(new XFormsModelConstructDoneEvent(model))
+        Dispatch.dispatchEvent(new XFormsModelConstructDoneEvent(model), EventCollector.ToReview)
     }
 
   private def restoreModels(): Unit =
@@ -402,7 +424,7 @@ class XFormsComponentControl(
         )
 
       // Update initial instance
-      mirrorInstance.replace(doc, dispatch)
+      mirrorInstance.replace(doc, EventCollector.ToReview, dispatch)
 
       // Create the listeners
       createMirrorListener(mirrorInstance, referenceNode.get)
@@ -433,7 +455,7 @@ class XFormsComponentControl(
           container <- _nestedContainerOpt.iterator
           model     <- container.models
         } locally {
-          Dispatch.dispatchEvent(new XFormsReadyEvent(model))
+          Dispatch.dispatchEvent(new XFormsReadyEvent(model), EventCollector.ToReview)
         }
       }
 
@@ -448,8 +470,12 @@ class XFormsComponentControl(
       _enabledListener = None
     }
 
-  override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
-    super.onBindingUpdate(oldBinding, newBinding)
+  override def onBindingUpdate(
+    oldBinding: BindingContext,
+    newBinding: BindingContext,
+    collector : ErrorEventCollector
+  ): Unit = {
+    super.onBindingUpdate(oldBinding, newBinding, collector)
     val isNodesetChange = ! SaxonUtils.compareItemSeqs(oldBinding.nodeset.asScala, newBinding.nodeset.asScala)
     if (isNodesetChange) {
       destroyMirrorListenerIfNeeded()
@@ -481,15 +507,18 @@ class XFormsComponentControl(
 
   // Simply delegate but switch the container
   override def buildChildren(
-    buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl],
-    idSuffix: Seq[Int]
+    buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int], ErrorEventCollector) => Option[XFormsControl],
+    idSuffix : Seq[Int],
+    collector: ErrorEventCollector
   ): Unit =
     if (staticControl.hasConcreteBinding)
       Controls.buildChildren(
         control   = this,
         children  = staticControl.children,
-        buildTree = (_, bindingContext, staticElement, idSuffix) => buildTree(nestedContainerOpt getOrElse (throw new IllegalStateException), bindingContext, staticElement, idSuffix),
-        idSuffix  = idSuffix
+        buildTree = (_, bindingContext, staticElement, idSuffix, collector) =>
+          buildTree(nestedContainerOpt getOrElse (throw new IllegalStateException), bindingContext, staticElement, idSuffix, collector),
+        idSuffix  = idSuffix,
+        collector = collector
       )
 
   // Get the control at the root of the inner scope of the component

@@ -1,7 +1,6 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
-import org.orbeon.dom.saxon.TypedNodeWrapper
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver}

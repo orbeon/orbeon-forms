@@ -13,13 +13,16 @@
  */
 package org.orbeon.oxf.fr.process
 
+import cats.effect.IO
 import org.orbeon.dom.Document
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.ProcessInterpreter.Action
 import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
 import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
+import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{FunctionContext, IndentedLogger, Logging, XPath}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, Logging, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
@@ -31,6 +34,8 @@ import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.duration.Duration
+import scala.util.{Failure, Success, Try}
 
 
 // Implementation of simple processes
@@ -53,8 +58,6 @@ trait SimpleProcessCommon
   override def extensionActions: Iterable[(String, ProcessInterpreter.Action)] =
     AllowedFormRunnerActions ++ AllowedXFormsActions
 
-  def currentXFormsDocumentId: String = XFormsAPI.inScopeContainingDocument.uuid
-
   // All XPath runs in the context of the main form instance's root element
   def xpathContext: Item = formInstance.rootElement
   def xpathFunctionLibrary: FunctionLibrary = inScopeContainingDocumentOpt map (_.functionLibrary) getOrElse XFormsFunctionLibrary // don't depend on in-scope document for tests
@@ -63,13 +66,33 @@ trait SimpleProcessCommon
   override def processError(t: Throwable): Unit =
     tryErrorMessage(Map(Some("resource") -> "process-error"))
 
-  def writeSuspendedProcess(process: String): Unit =
-    setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, process)
+  def writeSuspendedProcess(processId: String, process: String): Unit =
+    setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, List(processId, process).mkString("|"))
 
-  def readSuspendedProcess: String =
-    topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement.stringValue
+  def readSuspendedProcess: Try[(String, String)] =
+    topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement.stringValue.splitTo[List]("|") match {
+      case processId :: continuation :: Nil =>
+        Success((processId, continuation))
+      case _ =>
+        Failure(new IllegalStateException("Invalid or missing suspended process"))
+    }
 
-  case class RollbackContent(data: Document, saveStatus: Option[DataStatus], autoSaveStatus: Option[DataStatus])
+  def clearSuspendedProcess(): Unit =
+    setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, "")
+
+  def submitContinuation[T](computation: IO[T], continuation: Try[T] => Unit): Unit =
+    inScopeContainingDocument
+      .getAsynchronousSubmissionManager
+      .addAsynchronousCompletion(
+        description           = s"process process id: $runningProcessId ",
+        computation           = computation,
+        continuation          = continuation,
+        awaitInCurrentRequest = Some(Duration.Inf)
+      )
+
+  def currentXFormsDocumentId: String = XFormsAPI.inScopeContainingDocument.uuid
+
+  private case class RollbackContent(data: Document, saveStatus: Option[DataStatus], autoSaveStatus: Option[DataStatus])
 
   // Store information about what we need to potential rollback
   // Currently, assume we don't need to persist this information between client requests, and assume that
@@ -86,6 +109,7 @@ trait SimpleProcessCommon
         )
       )
 
+  // Only called from `rollback` action
   def transactionRollback(): Unit =
     inScopeContainingDocument.getTransientState[RollbackContent](RollbackContent.getClass.getName) foreach { rollbackContent =>
 
@@ -109,6 +133,13 @@ trait SimpleProcessCommon
   def findProcessByName(scope: String, name: String): Option[String] = {
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
     formRunnerProperty(scope + '.' + name) orElse buildProcessFromLegacyProperties(name)
+  }
+
+  def withRunProcess[T](scope: String, name: String)(body: => T): T = {
+    implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
+    LifecycleLogger.withEventAssumingRequest("fr", "process", List("uuid" -> currentXFormsDocumentId, "scope" -> scope, "name" -> name)) {
+      body
+    }
   }
 
   // Legacy: build "workflow-send" process based on properties

@@ -65,5 +65,5 @@ abstract class XFormsGroupHandler(
       // 2020-11-13: Not 100% sure but haven't seen it yet. Probably safe to remove.
       null
     } else
-      xformsControl.getLabel
+      xformsControl.getLabel(handlerContext.collector)
 }

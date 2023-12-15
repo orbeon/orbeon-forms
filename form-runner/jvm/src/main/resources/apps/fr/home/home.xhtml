@@ -1067,8 +1067,7 @@
                                                     form-name,
                                                     '/',
                                                     $link-to,
-                                                    '?form-version=',
-                                                    $form-version
+                                                    if (xxf:property('oxf.fr.summary.show-version-selector.*.*') or $is-admin) then concat('?form-version=', $form-version) else ''
                                                 )
                                             else
                                                 ()"/>

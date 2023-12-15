@@ -14,8 +14,9 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events._
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
 import org.orbeon.oxf.xforms.state.ControlState
 
@@ -35,7 +36,7 @@ trait VisitableTrait extends XFormsControl {
       // non-trivial forms e.g. Form Runner will require a clone anyway as other stuff takes place upon focus out,
       // such as updating the error summary. What should be implemented is a better diff mechanism, for example lazy
       // copy of control properties upon mutation, rather than the current XFormsControlLocal/full clone alternative.
-      containingDocument.controls.cloneInitialStateIfNeeded()
+      containingDocument.controls.cloneInitialStateIfNeeded(EventCollector.ToReview)
 
       // There is no dependency handling with the xxf:visited() function. So instead of requiring callers to do this,
       // as was the case at some point, we require an RR.
@@ -58,8 +59,13 @@ trait VisitableTrait extends XFormsControl {
     }
   }
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
-    super.onCreate(restoreState, state, update)
+  override def onCreate(
+    restoreState: Boolean,
+    state       : Option[ControlState],
+    update      : Boolean,
+    collector   : ErrorEventCollector
+  ): Unit = {
+    super.onCreate(restoreState, state, update, collector)
     _visited = state match {
       case Some(state) => state.visited
       case None        => false
@@ -77,7 +83,7 @@ trait VisitableTrait extends XFormsControl {
     wasVisitedCommit()
   }
 
-  override def performTargetAction(event: XFormsEvent): Unit = {
+  override def performTargetAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
     event match {
       case _: DOMFocusOutEvent =>
         // Mark control visited upon `DOMFocusOut`. This applies to any control, including grouping controls. We
@@ -95,31 +101,28 @@ trait VisitableTrait extends XFormsControl {
         }
       case _ =>
     }
-    super.performTargetAction(event)
+    super.performTargetAction(event, collector)
   }
 
   // Compare this control with another control, as far as the comparison is relevant for the external world.
-  override def compareExternalUseExternalValue(
-    previousExternalValue : Option[String],
-    previousControlOpt    : Option[XFormsControl]
-  ): Boolean =
+  override def compareExternalUseExternalValue(previousExternalValue: Option[String], previousControlOpt: Option[XFormsControl], collector: ErrorEventCollector): Boolean =
     previousControlOpt match {
       case Some(other: VisitableTrait) =>
         visited == other.visited &&
-        super.compareExternalUseExternalValue(previousExternalValue, previousControlOpt)
+        super.compareExternalUseExternalValue(previousExternalValue, previousControlOpt, collector)
       case _ => false
     }
 
   // Dispatch change events (between the control becoming enabled and disabled)
-  override def dispatchChangeEvents(): Unit = {
+  override def dispatchChangeEvents(collector: ErrorEventCollector): Unit = {
     // Gather change first for consistency with XFormsSingleNodeControl
     val visitedChanged = wasVisitedCommit() != visited
 
     // Dispatch other events
-    super.dispatchChangeEvents()
+    super.dispatchChangeEvents(collector)
 
     // Dispatch our events
     if (visitedChanged)
-      Dispatch.dispatchEvent(if (visited) new XXFormsVisitedEvent(this) else new XXFormsUnvisitedEvent(this))
+      Dispatch.dispatchEvent(if (visited) new XXFormsVisitedEvent(this) else new XXFormsUnvisitedEvent(this), collector)
   }
 }

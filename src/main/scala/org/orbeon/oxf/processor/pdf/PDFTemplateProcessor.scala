@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.pdf
 import com.lowagie.text.pdf._
 import com.lowagie.text.{Image, Rectangle}
 import org.log4s
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper

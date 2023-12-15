@@ -15,8 +15,9 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.util.StaticXPath
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xml.XMLReceiver
+import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.AtomicValue
 
@@ -71,7 +72,7 @@ object ControlsDebugSupport {
 
     def writeValueControl(control: XFormsValueControl)(content: => Unit)(implicit receiver: XMLReceiver): Unit =
       writeControl(control) {
-        control.externalValueOpt foreach text
+        control.externalValueOpt(EventCollector.Throw) foreach text
         content
       }
 

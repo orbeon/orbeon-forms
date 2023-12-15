@@ -21,7 +21,7 @@ class XFormsStaticStateDynamicPropertiesImpl(
     val compiledExpressionOpt =
       for {
         rawProperty <- staticProperties.staticStringProperty(UploadMaxSizeAggregateExpressionProperty).trimAllToOpt
-        model       <- topLevelPart.defaultModel // ∃ property => ∃ model, right?
+        model       = topLevelPart.getDefaultModel
       } yield
         StaticXPath.compileExpression(
           xpathString      = rawProperty,
@@ -45,11 +45,9 @@ class XFormsStaticStateDynamicPropertiesImpl(
     nonDefaultProperties map { case (name, (rawPropertyValue, isInline)) =>
       name -> {
         val maybeAVT = XMLUtils.maybeAVT(rawPropertyValue)
-        topLevelPart.defaultModel match {
-          case Some(model) if isInline && maybeAVT =>
+        topLevelPart.getDefaultModel match {
+          case model if isInline && maybeAVT =>
             Right(StaticXPath.compileExpression(rawPropertyValue, model.namespaceMapping, null, topLevelPart.functionLibrary, avt = true))
-          case None if isInline && maybeAVT =>
-            throw new IllegalArgumentException("can only evaluate AVT properties if a model is present") // 2016-06-27: Uncommon case but really?
           case _ =>
             Left(P.SupportedDocumentProperties(name).parseProperty(rawPropertyValue))
         }

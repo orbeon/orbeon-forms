@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.generator;
 
+import org.orbeon.connection.ConnectionResultT;
 import org.orbeon.datatypes.BasicLocationData;
 import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
@@ -951,7 +952,7 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     private static class URLResourceHandler extends ResourceHandlerBase {
-        private ConnectionResult connectionResult;
+        private ConnectionResultT<InputStream> connectionResult;
         private InputStream inputStream;
         private scala.collection.immutable.List<Tuple2<String, String>> headersToPropagate;
 
@@ -1048,7 +1049,7 @@ public class URLGenerator extends ProcessorImpl {
                         externalContext
                     );
 
-                inputStream = connectionResult.content().inputStream();
+                inputStream = connectionResult.content().stream();
 
                 headersToPropagate = URLGeneratorBase.collectHeaders(connectionResult, config.getReadHeaders());
 

@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
-import org.orbeon.oxf.http.HttpStatusCode
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.http.{HttpStatusCode, StatusCode}
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xforms.model.StaticDataModel.Reason
+import org.orbeon.xforms.BindingErrorReason
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.trans.XPathException
@@ -55,64 +54,78 @@ import org.orbeon.xforms.{ServerError, XFormsCrossPlatformSupport, XFormsNames}
 object XFormsError {
 
   // `xxforms-binding-error` in model and on controls
-  def handleNonFatalSetvalueError(target: XFormsEventTarget, locationData: LocationData, reason: Reason): Unit = {
+  def handleNonFatalBindingError(target: XFormsEventTarget, locationData: LocationData, reason: Option[BindingErrorReason]): Unit = {
     val containingDocument = target.container.getContainingDocument
-    containingDocument.indentedLogger.logDebug("", reason.message)
-    containingDocument.addServerError(ServerError(reason.message, Option(locationData)))
+    val message = reason.map(_.message).getOrElse("exception while setting value")
+    containingDocument.indentedLogger.logDebug("", message)
+    containingDocument.addServerError(ServerError(message, Option(locationData)))
   }
 
   // `container`: used for `PartAnalysis` and `XFCD`
   def handleNonFatalXPathError(
     container    : XBLContainer,
-    throwable    : Throwable,
-    expressionOpt: Option[String]
+    throwableOpt : Option[Throwable], // all explicit `new XXFormsXPathErrorEvent` pass a throwable
+    expressionOpt: Option[String]     // all explicit `new XXFormsXPathErrorEvent` pass an expression
   ): Unit = {
-
-    def expressionFromThrowable: Option[String] =
-      XFormsCrossPlatformSupport
-        .causesIterator(throwable)
-        .flatMap(ExtendedLocationData.iterateParamNameValues(_, "expression"))
-        .lastOption()
 
     val message =
       s"exception while evaluating XPath expression${
-        expressionOpt.orElse(expressionFromThrowable).map(e => s" `$e`").getOrElse("")
+        expressionOpt.map(e => s" `$e`").getOrElse("")
       }"
 
     handleNonFatalXFormsError(
       container,
       message,
-      throwable,
-      isRecoverableOnInit = ! ( // https://github.com/orbeon/orbeon-forms/issues/5844
-        XFormsCrossPlatformSupport.causesIterator(throwable) exists {
+      throwableOpt,
+      isNormallyRecoverableOnInit = ! ( // https://github.com/orbeon/orbeon-forms/issues/5844
+        throwableOpt.iterator.flatMap(XFormsCrossPlatformSupport.causesIterator) exists {
           case e: XPathException if e.isStaticError => true
-          case _: HttpStatusCode                    => true // this is probably not needed for MIP
           case _                                    => false
         }
-      )
+      ),
+      mustNotRecoverOnInit =
+        throwableOpt.iterator.flatMap(XFormsCrossPlatformSupport.causesIterator) exists {
+          case status: HttpStatusCode if ! StatusCode.isSuccessCode(status.code)  => true
+          case _                                                                  => false
+        }
     )
   }
 
-  def handleNonFatalActionError(target: XFormsEventTarget, throwable: Throwable): Unit =
-    handleNonFatalXFormsError(target.container, "exception while running action", throwable, isRecoverableOnInit = false)
+  def handleNonFatalActionError(target: XFormsEventTarget, throwable: Option[Throwable]): Unit =
+    handleNonFatalXFormsError(
+      target.container,
+      "exception while running action",
+      throwable,
+      isNormallyRecoverableOnInit = false,
+      mustNotRecoverOnInit        = false
+    )
 
-  private def handleNonFatalXFormsError(container: XBLContainer, message: String, t: Throwable, isRecoverableOnInit: Boolean): Unit = {
+  // Relevant issues:
+  //
+  // - https://github.com/orbeon/orbeon-forms/issues/2194
+  // - https://github.com/orbeon/orbeon-forms/issues/5751
+  // - https://github.com/orbeon/orbeon-forms/issues/5845
+  // - https://github.com/orbeon/orbeon-forms/issues/5543
+  private def handleNonFatalXFormsError(
+    container                  : XBLContainer,
+    message                    : String,
+    throwableOpt               : Option[Throwable],
+    isNormallyRecoverableOnInit: Boolean,
+    mustNotRecoverOnInit       : Boolean
+  ): Unit = {
 
-    // NOTE: We want to catch a status code exception which happen during an XPathException. And in that case, the XPathException
-    // is dynamic, so we cannot simply exclude dynamic XPath exceptions. So we have to be inclusive and consider which types of
-    // errors are fatal.
-    // See https://github.com/orbeon/orbeon-forms/issues/2194
-
-    // 2023-04-07: Make all initialization errors fatal.
-    // See https://github.com/orbeon/orbeon-forms/issues/5751
+    val throwable = throwableOpt.getOrElse(new OXFException(message))
 
     if (
       container.getPartAnalysis.isTopLevelPart     &&   // LATER: Other sub-parts could be fatal, depending on settings on `xxf:dynamic`.
-      container.getContainingDocument.initializing &&
-      ! container.getContainingDocument.allowErrorRecoveryOnInit &&
-      ! isRecoverableOnInit
+      container.getContainingDocument.initializing && (
+        mustNotRecoverOnInit || (
+          ! isNormallyRecoverableOnInit &&
+          ! container.getContainingDocument.allowErrorRecoveryOnInit
+        )
+      )
     ) {
-      throw new OXFException(t)
+      throw throwable
     } else {
 
       def serverErrorFromThrowable(t: Throwable): ServerError = {
@@ -125,8 +138,8 @@ object XFormsError {
       }
 
       val containingDocument = container.getContainingDocument
-      containingDocument.indentedLogger.logDebug("", message, t)
-      containingDocument.addServerError(serverErrorFromThrowable(t))
+      containingDocument.indentedLogger.logDebug("", message, throwable)
+      containingDocument.addServerError(serverErrorFromThrowable(throwable))
     }
   }
 

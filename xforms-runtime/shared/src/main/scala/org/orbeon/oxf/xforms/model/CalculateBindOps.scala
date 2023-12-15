@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.model
 import org.orbeon.oxf.util.Whitespace.applyPolicy
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, ModelDefs, StaticBind}
-import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
 import org.orbeon.saxon.om
 
@@ -29,7 +29,7 @@ trait CalculateBindOps {
 
   import Private._
 
-  def applyDefaultAndCalculateBinds(defaultsStrategy: DefaultsStrategy, collector: XFormsEvent => Unit): Unit = {
+  def applyDefaultAndCalculateBinds(defaultsStrategy: DefaultsStrategy, collector: ErrorEventCollector): Unit = {
     if (! staticModel.mustRecalculate) {
       debug("skipping bind recalculate", List("model id" -> model.getEffectiveId, "reason" -> "no recalculation binds"))
     } else {
@@ -67,13 +67,13 @@ trait CalculateBindOps {
   protected def evaluateCustomMIP(
     bindNode  : BindNode,
     mip       : StaticXPathMIP,
-    collector : XFormsEvent => Unit
+    collector : ErrorEventCollector
   ): Option[String] = {
     try {
       Option(evaluateStringExpression(model, bindNode, mip))
     } catch {
       case NonFatal(t) =>
-        handleMIPXPathException(t, bindNode, mip, "evaluating XForms custom bind", collector)
+        handleMIPXPathException(t, bindNode, mip, "custom-mip", collector)
         None
     }
   }
@@ -82,14 +82,14 @@ trait CalculateBindOps {
     bindNode      : BindNode,
     mipType       : BooleanMIP,
     defaultForMIP : Boolean,
-    collector     : XFormsEvent => Unit
+    collector     : ErrorEventCollector
   ): Option[Boolean] = {
     bindNode.staticBind.firstXPathMIP(mipType) map { mip =>
       try {
         evaluateBooleanExpression(model, bindNode, mip)
       } catch {
         case NonFatal(t) =>
-          handleMIPXPathException(t, bindNode, mip, s"evaluating XForms ${mipType.name} bind", collector)
+          handleMIPXPathException(t, bindNode, mip, mipType.name, collector)
           ! defaultForMIP // https://github.com/orbeon/orbeon-forms/issues/835
       }
     }
@@ -98,13 +98,13 @@ trait CalculateBindOps {
   protected def evaluateCalculatedBind(
     bindNode  : BindNode,
     mip       : StringMIP,
-    collector : XFormsEvent => Unit
+    collector : ErrorEventCollector
   ): Option[String] =
     bindNode.staticBind.firstXPathMIP(mip) flatMap { xpathMIP =>
       try Option(evaluateStringExpression(model, bindNode, xpathMIP))
       catch {
         case NonFatal(t) =>
-          handleMIPXPathException(t, bindNode, xpathMIP, s"evaluating XForms ${xpathMIP.name} MIP", collector)
+          handleMIPXPathException(t, bindNode, xpathMIP, xpathMIP.name, collector)
           // Blank value so we don't have stale calculated values
           Some("")
       }
@@ -117,7 +117,7 @@ trait CalculateBindOps {
 
     def evaluateAndSetCustomMIPs(
       bindNode  : BindNode,
-      collector : XFormsEvent => Unit
+      collector : ErrorEventCollector
     ): Unit =
       if (bindNode.staticBind.customMIPNameToXPathMIP.nonEmpty) // in most cases there are no custom MIPs
         for {
@@ -128,9 +128,9 @@ trait CalculateBindOps {
           bindNode.setCustom(name, result)
         }
 
-    def applyComputedExpressionBinds(collector: XFormsEvent => Unit): Unit = {
+    def applyComputedExpressionBinds(collector: ErrorEventCollector): Unit = {
       // Reset context stack just to re-evaluate the variables as instance values may have changed with @calculate
-      model.resetAndEvaluateVariables()
+      model.resetAndEvaluateVariables(collector)
       iterateBinds(topLevelBinds, bindNode =>
         if (bindNode.staticBind.hasCalculateComputedMIPs || bindNode.staticBind.hasCustomMIPs)
           handleComputedExpressionBind(bindNode, collector)
@@ -139,7 +139,7 @@ trait CalculateBindOps {
 
     def handleComputedExpressionBind(
       bindNode  : BindNode,
-      collector : XFormsEvent => Unit
+      collector : ErrorEventCollector
     ): Unit = {
       val staticBind = bindNode.staticBind
 
@@ -163,7 +163,7 @@ trait CalculateBindOps {
       evaluateAndSetCustomMIPs(bindNode, collector)
     }
 
-    def applyWhitespaceBinds(collector: XFormsEvent => Unit): Unit = {
+    def applyWhitespaceBinds(collector: ErrorEventCollector): Unit = {
       iterateBinds(topLevelBinds, bindNode =>
         if (! bindNode.hasChildrenElements) { // quick test to rule out containing elements
           bindNode.staticBind.nonPreserveWhitespaceMIPOpt foreach { mip =>
@@ -191,7 +191,7 @@ trait CalculateBindOps {
       mip              : StringMIP,
       orderOpt         : Option[List[StaticBind]],
       defaultsStrategy : SomeDefaultsStrategy,
-      collector        : XFormsEvent => Unit
+      collector        : ErrorEventCollector
     ): Unit = {
       orderOpt match {
         case Some(order) =>
@@ -213,7 +213,7 @@ trait CalculateBindOps {
       order            : List[StaticBind],
       mip              : StringMIP,
       defaultsStrategy : SomeDefaultsStrategy,
-      collector        : XFormsEvent => Unit
+      collector        : ErrorEventCollector
     ): Unit = {
       order foreach { staticBind =>
         val logger = DependencyAnalyzer.Logger
@@ -240,7 +240,7 @@ trait CalculateBindOps {
     def evaluateAndSetCalculatedBind(
       bindNode  : BindNode,
       mip       : StringMIP,
-      collector : XFormsEvent => Unit
+      collector : ErrorEventCollector
     ): Unit =
       evaluateCalculatedBind(bindNode, mip, collector) foreach { stringResult =>
 

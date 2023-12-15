@@ -128,7 +128,7 @@ class XFormsInputHandler(
           val inputClasses = new java.lang.StringBuilder("xforms-input-input")
           if (isRelevantControl) {
             // Output value only for concrete control
-            val formattedValue = inputControl.getFirstValueUseFormat
+            val formattedValue = inputControl.getFirstValueUseFormat(handlerContext.collector)
             // Regular case, value goes to input control
             atts.addOrReplace("value", Option(formattedValue) getOrElse "")
             val firstType = inputControl.getFirstValueType
@@ -173,7 +173,7 @@ class XFormsInputHandler(
         // Output static read-only value
         if (isRelevantControl)
           outputStaticReadonlyField(xhtmlPrefix) {
-            inputControl.getFormattedValue foreach { value =>
+            inputControl.getFormattedValue(handlerContext.collector) foreach { value =>
               xmlReceiver.characters(value.toCharArray, 0, value.length)
             }
           }

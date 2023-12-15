@@ -1,5 +1,6 @@
 package org.orbeon.oxf.xforms.event
 
+import cats.effect.IO
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -10,13 +11,14 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.{withLock, withUpdateResponse}
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{ConnectResult, XFormsModelSubmissionSupport}
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.oxf.xml.{SAXStore, TeeXMLReceiver, XMLReceiver, XMLReceiverHelper}
@@ -26,7 +28,6 @@ import org.orbeon.xforms.runtime.DelayedEvent
 import org.orbeon.xforms.{EventNames, Load, Message}
 
 import java.{util => ju}
-import scala.concurrent.Future
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
@@ -80,7 +81,7 @@ object XFormsServer {
     // - https://github.com/orbeon/orbeon-forms/issues/2071
     // - https://github.com/orbeon/orbeon-forms/issues/1984
     // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
-    val lockResult: Try[Try[Option[Future[ConnectResult]]]] =
+    val lockResult: Try[Try[Option[IO[AsyncConnectResult]]]] =
       withLock(requestParameters, timeout = if (isAjaxRequest) 0L else XFormsGlobalProperties.getAjaxTimeout) {
         case Some(containingDocument) =>
 
@@ -153,7 +154,7 @@ object XFormsServer {
 
               Success(
                 withUpdateResponse(containingDocument, ignoreSequenceNumber) {
-                  containingDocument.getReplaceAllEval match {
+                  containingDocument.getReplaceAllFuture match {
                     case None =>
                       xmlReceiverOpt match {
                         case Some(xmlReceiver) =>
@@ -223,9 +224,9 @@ object XFormsServer {
                           debug("handling NOP response for submission with `replace=\"all\"`")
                       }
                       None
-                    case evalOpt =>
+                    case futureOpt =>
                       // Check if there is a submission with `replace="all"` that needs processing
-                      evalOpt
+                      futureOpt
                   }
                 }
               )
@@ -293,7 +294,8 @@ object XFormsServer {
         // - Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
         //   hit the document.
         // - No need to output a null document here, `xmlReceiver` is absent anyway.
-        XFormsModelSubmissionSupport.runDeferredSubmission(replaceAllFuture, responseForReplaceAll)
+        Option(responseForReplaceAll)
+          .foreach(XFormsModelSubmissionSupport.runDeferredSubmissionForUpdate(replaceAllFuture, _))
       case Success(Success(None)) =>
       case Success(Failure(t))    => throw t
     }
@@ -497,6 +499,12 @@ object XFormsServer {
     ): Unit =
       withDebug("computing differences") {
         XFormsAPI.withContainingDocument(containingDocument) { // scope because dynamic properties can cause lazy XPath evaluations
+
+          implicit val collector: ErrorEventCollector =
+            if (containingDocument.allowErrorRecoveryOnInit)
+              EventCollector.Ignore
+            else
+              EventCollector.Throw
 
           val comparator = new ControlsComparator(
             containingDocument,

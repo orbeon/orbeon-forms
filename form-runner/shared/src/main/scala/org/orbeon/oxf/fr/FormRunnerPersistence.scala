@@ -1,4 +1,4 @@
- /**
+/**
  * Copyright (C) 2013 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -13,20 +13,24 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.effect.IO
 import cats.syntax.option._
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.dom.QName
+import org.orbeon.connection.{AsyncConnectionResult, ConnectionResult, StreamedContent}
+import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.common
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.common.{Defaults, OXFException}
+import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.fr.FormRunnerCommon._
+import org.orbeon.oxf.fr.Names.FormModel
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.HttpMethod.{GET, PUT}
-import org.orbeon.oxf.http.{BasicCredentials, StreamedContent}
+import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod}
 import org.orbeon.oxf.properties.Property
+import org.orbeon.oxf.util.ContentTypes.isTextOrXMLOrJSONContentType
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
@@ -34,25 +38,21 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
-import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
+import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.saxon.value.StringValue
-import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.analysis.model.ValidationLevel
-import org.orbeon.xforms.{BasicNamespaceMapping, XFormsCrossPlatformSupport}
+import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport}
 
-import java.io.InputStream
 import java.net.URI
 import java.{util => ju}
+import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
-import scala.util.Try
 
 
 sealed trait FormOrData extends EnumEntry with Lowercase
@@ -98,6 +98,28 @@ object DataFormatVersion extends Enum[DataFormatVersion] {
       Edge
     else
       withName(s)
+}
+
+case class AttachmentWithHolder(
+  fromPath : String,
+  holder   : NodeInfo
+)
+
+case class AttachmentWithHolders(
+  fromPath : String,
+  holder   : List[NodeInfo]
+)
+
+case class AttachmentWithEncryptedAtRest(
+  fromPath          : String,
+  toPath            : String,
+  isEncryptedAtRest : Boolean
+)
+
+sealed trait AttachmentMatch
+object AttachmentMatch {
+  case object UploadedOnly                                                      extends AttachmentMatch
+  case class  BasePaths(includes: Iterable[String], excludes: Iterable[String]) extends AttachmentMatch
 }
 
 object FormRunnerPersistence {
@@ -334,7 +356,7 @@ trait FormRunnerPersistence {
   //
   // This guarantees that the local file was in fact placed there by the upload control, and not tampered with.
   def isUploadedFileURL(value: String): Boolean =
-    value.startsWith("file:/") && XFormsUploadControl.verifyMAC(value)
+    (value.startsWith("file:/") || value.startsWith("upload:")) && XFormsUploadControl.verifyMAC(value)
 
   // Create a path starting and ending with `/`
   // `documentIdOrEmpty` can be empty and if so won't be included. Ideally should be `Option[String]`.
@@ -453,10 +475,12 @@ trait FormRunnerPersistence {
     frc.persistenceInstance.rootElement / "data-status" === "clean"
 
   // Return all nodes which refer to data attachments
+  // Used by attachments service
   //@XPathFunction
   def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String): ju.List[NodeInfo] =
-    collectAttachments(data.getRoot, AttachmentMatch.BasePaths(includes = List(fromBasePath), excludes = Nil)).map(_.holder).asJava
+    collectUnsavedAttachments(data.getRoot, AttachmentMatch.BasePaths(includes = List(fromBasePath), excludes = Nil)).map(_.holder).asJava
 
+  // Called upon `xxforms-state-restored`
   //@XPathFunction
   def clearMissingUnsavedDataAttachmentReturnFilenamesJava(data: NodeInfo): ju.List[String] = {
 
@@ -465,7 +489,7 @@ trait FormRunnerPersistence {
     val unsavedAttachmentHolders =
       documentIdOpt match {
         case Some(_) if frc.isNewOrEditMode(mode) =>
-          collectAttachments(data.getRoot, AttachmentMatch.UploadedOnly).map(_.holder)
+          collectUnsavedAttachments(data.getRoot, AttachmentMatch.UploadedOnly).map(_.holder)
         case _ =>
           Nil
       }
@@ -489,29 +513,22 @@ trait FormRunnerPersistence {
     filenames flatMap (_.trimAllToOpt) asJava
   }
 
-  case class AttachmentWithHolder(
-    fromPath : String,
-    holder   : NodeInfo
-  )
+//  def collectUniqueUnsavedAttachments(
+//    data           : NodeInfo,
+//    attachmentMatch: AttachmentMatch
+//  ): List[AttachmentWithHolders] =
+//    collectUnsavedAttachments(data, attachmentMatch)
+//      .groupBy(_.fromPath)
+//      .mapValues(_.map(_.holder))
+//      .toList
+//      .map((AttachmentWithHolders.apply _).tupled)
 
-  case class AttachmentWithEncryptedAtRest(
-    fromPath          : String,
-    toPath            : String,
-    isEncryptedAtRest : Boolean
-  )
-
-  sealed trait AttachmentMatch
-  object AttachmentMatch {
-    case object UploadedOnly                                                      extends AttachmentMatch
-    case class  BasePaths(includes: Iterable[String], excludes: Iterable[String]) extends AttachmentMatch
-  }
-
-  def collectAttachments(
+  def collectUnsavedAttachments(
     data           : NodeInfo,
     attachmentMatch: AttachmentMatch
   ): List[AttachmentWithHolder] =
     for {
-      holder        <- data.descendantOrSelf(Node).toList
+      holder        <- data.descendantOrSelf(Node).toList  // TODO: not efficient!
       if holder.isAttribute || holder.isElement && ! holder.hasChildElement
       beforeURL     = holder.stringValue.trimAllToEmpty
       if isUploadedFileURL(beforeURL) || (
@@ -524,6 +541,50 @@ trait FormRunnerPersistence {
       )
     } yield
       AttachmentWithHolder(beforeURL, holder)
+
+  // TODO: Usually, an unsaved attachment will have a unique path in a form. However, using for example a calculated
+  //   value, it is possible to have the same path for multiple attachments. So far, we have saved the attachment
+  //   twice in the database, which is not great. But there is more. When a control requires encryption at rest,
+  //   the persistence proxy checks the attachment path, and if it is for a control that requires encryption, it will
+  //   encrypt the attachment, and return that the encryption has been done via a header. But then, when we update the
+  //   attachment paths in the data, we have to match on the `fromPath`/`beforeURL`, and here the behavior becomes
+  //   unpredictable: the second attachment saved will write over the other ones. Also, the attachment might be saved
+  //   both encrypted and unencrypted under different paths.
+  //
+  //   One idea would be to do this:
+  //
+  //   - group all attachments with the same unsaved path
+  //   - save the attachment only once, passing all associated paths in the header
+  //   - in the persistence proxy, if *any* of the associated controls requires encryption, encrypt it
+  //   - Q: What to do whe reading the attachment? Do we know for sure we need to decrypt it?
+  //
+  def updateAttachments(
+    data                          : DocumentNodeInfoType,
+    attachmentsWithEncryptedAtRest: List[AttachmentWithEncryptedAtRest],
+  ): Unit = {
+
+    val urlsToAttachments =
+      attachmentsWithEncryptedAtRest.groupBy(_.fromPath)
+
+    val tripletsIt =
+      for {
+        holder        <- data.descendantOrSelf(*).iterator // TODO: not efficient because we build a `Stream`/`LazyList` in the background!
+        if ! holder.hasChildElement
+        beforeURL     <- holder.stringValue.trimAllToOpt
+        AttachmentWithEncryptedAtRest(_, afterURL, isEncryptedAtRest) :: _ // ignore rest, see comment about duplicate `fromPath` above
+                      <- urlsToAttachments.get(beforeURL)
+      } yield
+        (holder, afterURL, isEncryptedAtRest)
+
+    tripletsIt.foreach { case (holder, afterURL, isEncryptedAtRest) =>
+      updateHolder(holder, afterURL, isEncryptedAtRest)
+    }
+  }
+
+  def setCreateUpdateResponse(value: String): Unit =
+    topLevelInstance(FormModel, "fr-create-update-submission-response").foreach { instance =>
+      setvalue(List(instance.rootElement), value)
+    }
 
   // Here we could decide to use a nicer extension for the file. But since initially the filename comes from
   // the client, it cannot be trusted, nor can its mediatype. A first step would be to do content-sniffing to
@@ -539,12 +600,14 @@ trait FormRunnerPersistence {
     basePath.appendSlash + filename
   }
 
-  def getAttachment(
+  private def getAttachmentUriAndHeaders(
     fromBasePaths           : Iterable[(String, Int)],
-    beforeUrl               : String)(implicit
+    beforeUrl               : String
+  )(implicit
     externalContext         : ExternalContext,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
-  ): ConnectionResult = {
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    xfcd                    : XFormsContainingDocument
+  ): (URI, Map[String, List[String]]) = {
 
     def rewriteServiceUrl(url: String) =
       URLRewriterUtils.rewriteServiceURL(
@@ -564,21 +627,144 @@ trait FormRunnerPersistence {
     val customGetHeaders =
       Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*)
 
-    val resolvedGetUri =
+    val resolvedGetUri: URI =
       URI.create(rewriteServiceUrl(beforeUrl))
 
-    val allGetHeaders =
+    val allGetHeaders: Map[String, List[String]] =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
         url              = resolvedGetUri,
         hasCredentials   = false,
         customHeaders    = customGetHeaders,
         headersToForward = Connection.headersToForwardFromProperty,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
-        getHeader        = inScopeContainingDocument.headersGetter
+        getHeader        = xfcd.headersGetter
       )
 
+    (resolvedGetUri, allGetHeaders)
+  }
+
+  private def saveXmlDataIo(
+    xmlData       : Document,
+    resolvedPutUri: URI,
+    formVersion   : Option[String],
+    credentials   : Option[BasicCredentials],
+    workflowStage : Option[String]
+  )(implicit
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    xfcd                    : XFormsContainingDocument
+  ): IO[AsyncConnectionResult] = {
+
+    val customPutHeaders =
+      (formVersion.toList                         map (v => OrbeonFormDefinitionVersion -> List(v))) :::
+      (workflowStage.filter(_.nonAllBlank).toList map (v => "Orbeon-Workflow-Stage" -> List(v)))     :::
+      Nil
+
+    val allPutHeaders =
+      Connection.buildConnectionHeadersCapitalizedIfNeeded(
+        url              = resolvedPutUri,
+        hasCredentials   = false, // xxx ?
+        customHeaders    = customPutHeaders.toMap,
+        headersToForward = Connection.headersToForwardFromProperty,
+        cookiesToForward = Connection.cookiesToForwardFromProperty,
+        getHeader        = xfcd.headersGetter
+      )
+
+    val bytes =
+      XFormsCrossPlatformSupport.serializeToByteArray(
+        document           = xmlData,
+        method             = "xml",
+        encoding           = Defaults.DefaultEncodingForModernUse,
+        versionOpt         = None,
+        indent             = false,
+        omitXmlDeclaration = false,
+        standaloneOpt      = None
+      )
+
+    Connection.connectAsync(
+      method      = HttpMethod.PUT,
+      url         = resolvedPutUri,
+      credentials = credentials,
+      content     = StreamedContent.asyncFromBytes(bytes, ContentTypes.XmlContentType.some).some,
+      headers     = allPutHeaders,
+      loadState   = true,
+      logBody     = false
+    )
+  }
+
+  private def readAttachmentIo(
+    fromBasePaths           : Iterable[(String, Int)],
+    beforeUrl               : String
+  )(implicit
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    xfcd                    : XFormsContainingDocument
+  ): IO[AsyncConnectionResult] = {
+
+    val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl)
+
+    Connection.connectAsync(
+      method      = HttpMethod.GET,
+      url         = resolvedGetUri,
+      credentials = None,
+      content     = None,
+      headers     = allGetHeaders,
+      loadState   = true,
+      logBody     = false
+    )
+  }
+
+  private def saveAttachmentIo(
+    stream         : fs2.Stream[IO, Byte],
+    pathToHolder   : String,
+    resolvedPutUri : URI,
+    formVersion    : Option[String],
+    credentials    : Option[BasicCredentials]
+  )(implicit
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    xfcd                    : XFormsContainingDocument
+  ): IO[AsyncConnectionResult] = {
+
+    val customPutHeaders =
+      (formVersion.toList map (v => OrbeonFormDefinitionVersion -> List(v))) ::: // write all using the form definition version
+      (OrbeonPathToHolder -> List(pathToHolder))                             ::
+      Nil
+
+    val allPutHeaders =
+      Connection.buildConnectionHeadersCapitalizedIfNeeded(
+        url              = resolvedPutUri,
+        hasCredentials   = false,
+        customHeaders    = customPutHeaders.toMap,
+        headersToForward = Connection.headersToForwardFromProperty,
+        cookiesToForward = Connection.cookiesToForwardFromProperty,
+        getHeader        = xfcd.headersGetter
+      )
+
+    Connection.connectAsync(
+      method      = HttpMethod.PUT,
+      url         = resolvedPutUri,
+      credentials = credentials,
+      content     = StreamedContent(stream, ContentTypes.OctetStreamContentType.some, contentLength = None).some,
+      headers     = allPutHeaders,
+      loadState   = true,
+      logBody     = false
+    )
+  }
+
+  def readAttachmentSync(
+    fromBasePaths           : Iterable[(String, Int)],
+    beforeUrl               : String
+  )(implicit
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    xfcd                    : XFormsContainingDocument
+  ): ConnectionResult = {
+
+    val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl)
+
     Connection.connectNow(
-      method      = GET,
+      method      = HttpMethod.GET,
       url         = resolvedGetUri,
       credentials = None,
       content     = None,
@@ -602,117 +788,86 @@ trait FormRunnerPersistence {
     password          : Option[String] = None,
     formVersion       : Option[String] = None,
     workflowStage     : Option[String] = None
-  ): (Seq[String], Seq[String], Int) = {
+  )(implicit
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    xfcd                    : XFormsContainingDocument
+  ): IO[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] = {
 
-    implicit val externalContext         : ExternalContext               = CoreCrossPlatformSupport.externalContext
-    implicit def coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+    val credentials =
+      username map (BasicCredentials(_, password, preemptiveAuth = true, domain = None))
 
-    val savedData = migrate.map(_(liveData)).getOrElse(liveData)
+    // Clear the response instance
+    setCreateUpdateResponse("")
+
+    // Prepare data for submission
+    val formModel = XFormsAPI.topLevelModel(FormModel).getOrElse(throw new IllegalStateException)
+
+    formModel.doRecalculateRevalidate()
+
+    // This will be a copy of the data
+    val preparedData =
+      XFormsModelSubmissionSupport.prepareXML(
+        xfcd              = xfcd,
+        ref               = migrate.map(_(liveData)).getOrElse(liveData), // avoid extra copy if no migration
+        relevanceHandling = RelevanceHandling.Keep,
+        namespaceContext  = formModel.staticModel.namespaceMapping.mapping,
+        annotateWith      = Set("relevant=fr:relevant"),
+        relevantAttOpt    = Some(XMLNames.FRRelevantQName)
+      )
+
+    val preparedDataDocumentInfo =
+      new DocumentWrapper(preparedData, null, XPath.GlobalConfiguration)
 
     // Find all instance nodes containing file URLs we need to upload
     val attachmentsWithHolder =
-      collectAttachments(
-        savedData,
+      collectUnsavedAttachments(
+        preparedDataDocumentInfo,
         if (forceAttachments)
           AttachmentMatch.BasePaths(includes = toBasePath :: fromBasePaths.map(_._1).toList, excludes = Nil)
         else
           AttachmentMatch.BasePaths(includes = fromBasePaths.map(_._1), excludes = List(toBasePath))
       )
 
-    def updateHolder(holder: NodeInfo, afterURL: String, isEncryptedAtRest: Boolean): Unit = {
-      setvalue(holder, afterURL)
-      XFormsAPI.delete(holder /@ AttachmentEncryptedAttributeName)
-      if (isEncryptedAtRest)
-        XFormsAPI.insert(
-          into   = holder,
-          origin = AttachmentEncryptedAttribute
-        )
-    }
+    def rewriteServiceUrl(url: String) =
+      URLRewriterUtils.rewriteServiceURL(
+        externalContext.getRequest,
+        url,
+        UrlRewriteMode.Absolute
+      )
 
-    def trySaveAllAttachments(): Try[List[AttachmentWithEncryptedAtRest]] =
-      TryUtils.sequenceLazily(attachmentsWithHolder) { case AttachmentWithHolder(beforeUrl, migratedHolder) =>
-
-        def rewriteServiceUrl(url: String) =
-          URLRewriterUtils.rewriteServiceURL(
-            externalContext.getRequest,
-            url,
-            UrlRewriteMode.Absolute
-          )
-
-        val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
-
-        val afterUrl =
-          createAttachmentFilename(beforeUrl, toBasePath)
-
-        def connectPut(is: InputStream): ConnectionResult = {
-
-          val customPutHeaders =
-            (formVersion.toList map (v => OrbeonFormDefinitionVersion -> List(v))) ::: // write all using the form definition version
-            (OrbeonPathToHolder -> List(pathToHolder))                             ::
-            Nil
-
-          val resolvedPutUri =
-            URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
-
-          val allPutHeaders =
-            Connection.buildConnectionHeadersCapitalizedIfNeeded(
-              url              = resolvedPutUri,
-              hasCredentials   = false,
-              customHeaders    = customPutHeaders.toMap,
-              headersToForward = Connection.headersToForwardFromProperty,
-              cookiesToForward = Connection.cookiesToForwardFromProperty,
-              getHeader        = inScopeContainingDocument.headersGetter
-            )
-
-          Connection.connectNow(
-            method          = PUT,
-            url             = resolvedPutUri,
-            credentials     = username map (BasicCredentials(_, password, preemptiveAuth = true, domain = None)),
-            content         = StreamedContent(is, ContentTypes.OctetStreamContentType.some, contentLength = None, title = None).some,
-            headers         = allPutHeaders,
-            loadState       = true,
-            saveState       = true,
-            logBody         = false
-          )
-        }
-
-        def getOrbeonDidEncryptHeader(cxr: ConnectionResult): Boolean = {
-          val isEncryptedAtRest = cxr.headers.get(OrbeonDidEncryptHeader).exists(_.contains("true"))
-          updateHolder(migratedHolder, afterUrl, isEncryptedAtRest)
-          isEncryptedAtRest
-        }
-
-        for {
-          successGetCxr     <- ConnectionResult.trySuccessConnection(getAttachment(fromBasePaths, beforeUrl))
-          putCxr            <- ConnectionResult.tryBody(successGetCxr, closeOnSuccess = true)(connectPut)
-          successPutCxr     <- ConnectionResult.trySuccessConnection(putCxr)
-          isEncryptedAtRest <- ConnectionResult.tryBody(successPutCxr, closeOnSuccess = true)(_ => getOrbeonDidEncryptHeader(successPutCxr))
-        } yield
-          AttachmentWithEncryptedAtRest(beforeUrl, afterUrl, isEncryptedAtRest)
-      }
-
-    def saveXmlData(migratedData: DocumentNodeInfoType) =
-      sendThrowOnError("fr-create-update-submission", List(
-        PropertyValue("holder"        , Some(migratedData.rootElement)),
-        PropertyValue("resource"      , Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString))),
-        PropertyValue("username"      , username),
-        PropertyValue("password"      , password),
-        PropertyValue("form-version"  , formVersion),
-        PropertyValue("workflow-stage", workflowStage),
-      ))
-
-    // First upload the attachments
-    val attachmentsWithEncryptedAtRest = trySaveAllAttachments().get
-
-    val versionOpt =
-      // Save and try to retrieve returned version
+    // xxx close resources
+    def saveAllAttachmentsStream(implicit xfcd: XFormsContainingDocument): fs2.Stream[IO, AttachmentWithEncryptedAtRest] =
       for {
-        done     <- saveXmlData(savedData) // https://github.com/orbeon/orbeon-forms/issues/3629
-        headers  <- done.headers
-        versions <- headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion => values }
-        version  <- versions.headOption
+        AttachmentWithHolder(beforeUrl, migratedHolder)
+                          <- fs2.Stream.emits(attachmentsWithHolder)
+        getCr             <- fs2.Stream.eval(readAttachmentIo(fromBasePaths, beforeUrl))
+        getCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(getCr)))
+        pathToHolder      = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
+        afterUrl          = createAttachmentFilename(beforeUrl, toBasePath)
+        resolvedPutUri    = URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
+        putCr             <- fs2.Stream.eval(saveAttachmentIo(getCxr.content.stream, pathToHolder, resolvedPutUri, formVersion, credentials))
+        putCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(putCr)))
+        isEncryptedAtRest = putCxr.headers.get(OrbeonDidEncryptHeader).exists(_.contains("true"))
       } yield
-        version
+        AttachmentWithEncryptedAtRest(beforeUrl, afterUrl, isEncryptedAtRest)
+
+    val putUrl =
+      URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)))
+
+    for {
+      savedAttachments <- saveAllAttachmentsStream.compile.toList
+      _                = updateAttachments(preparedDataDocumentInfo, savedAttachments)
+      cxr              <- saveXmlDataIo(preparedData, putUrl, formVersion, credentials, workflowStage)
+      versionOpt       = Headers.firstItemIgnoreCase(cxr.headers, OrbeonFormDefinitionVersion).map(_.toInt) // will throw if the version is not an integer
+      bytesOpt         <- if (cxr.content.contentType.exists(isTextOrXMLOrJSONContentType)) cxr.content.stream.compile.to(Array).map(Some.apply) else IO.pure(None)
+      stringOpt        = bytesOpt.flatMap(b => SubmissionUtils.readTextContent(StreamedContent.fromBytes(b, cxr.content.contentType)))
+    } yield
+      (
+        savedAttachments,
+        versionOpt,
+        stringOpt
+      )
 
     // In our persistence implementation, we do not remove attachments if saving the data fails.
     // However, some custom persistence implementations do. So we don't think we can assume that
@@ -724,28 +879,16 @@ trait FormRunnerPersistence {
     // - https://github.com/orbeon/orbeon-forms/issues/606
     // - https://github.com/orbeon/orbeon-forms/issues/3084
     // - https://github.com/orbeon/orbeon-forms/issues/3301
+  }
 
-    // If data isn't migrated, then it has already been updated (and doing it again would fail)
-    // FIXME: if no migration happens *and* sending an attachment failed, then the URL will still updated in the data
-    if (migrate.isDefined)
-      attachmentsWithEncryptedAtRest.foreach {
-        case AttachmentWithEncryptedAtRest(beforeURL, afterURL, isEncryptedAtRest) =>
-          val holder = {
-            scaxon.XPath.evalOne(
-              item       = liveData,
-              expr       = "//*[not(*)][xxf:trim() = $beforeURL]",
-              namespaces = BasicNamespaceMapping.Mapping,
-              variables  = Map("beforeURL" -> new StringValue(beforeURL))
-            )(XFormsFunctionLibrary).asInstanceOf[NodeInfo]
-          }
-          updateHolder(holder, afterURL, isEncryptedAtRest)
-      }
-
-    (
-      attachmentsWithEncryptedAtRest.map(_.fromPath),
-      attachmentsWithEncryptedAtRest.map(_.toPath),
-      versionOpt map (_.toInt) getOrElse 1
-    )
+  private def updateHolder(holder: NodeInfo, afterURL: String, isEncryptedAtRest: Boolean): Unit = {
+    setvalue(holder, afterURL)
+    XFormsAPI.delete(holder /@ AttachmentEncryptedAttributeName)
+    if (isEncryptedAtRest)
+      XFormsAPI.insert(
+        into   = holder,
+        origin = AttachmentEncryptedAttribute
+      )
   }
 
   def userOwnsLeaseOrNoneRequired: Boolean =

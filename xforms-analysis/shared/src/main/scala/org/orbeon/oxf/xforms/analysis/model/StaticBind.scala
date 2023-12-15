@@ -16,7 +16,7 @@ import org.orbeon.xml.NamespaceMapping
 import StaticBind._
 
 
-// Represent a static <xf:bind> element
+// Represent a static `<xf:bind>` element
 class StaticBind(
   index                       : Int,
   element                     : Element,
@@ -26,7 +26,9 @@ class StaticBind(
   prefixedId                  : String,
   namespaceMapping            : NamespaceMapping,
   scope                       : Scope,
-  containerScope              : Scope,
+  containerScope              : Scope
+)(
+  val nameOpt                 : Option[String],
   val typeMIPOpt              : Option[TypeMIP], // `Type` MIP is special as it is not an XPath expression
   val mipNameToXPathMIP       : Iterable[(String, List[XPathMIP])],
   val customMIPNameToXPathMIP : Map[String, List[XPathMIP]], // Q: Why String -> List[XPathMIP] and not String -> XPathMIP?,
@@ -44,9 +46,6 @@ class StaticBind(
 ) with WithChildrenTrait {
 
   staticBind =>
-
-  // This only uses attributes so for now we can keep here
-  val nameOpt = Option(element.attributeValue(NAME_QNAME))
 
   // This only uses attributes so for now we can keep here
   val nonPreserveWhitespaceMIPOpt: Option[WhitespaceMIP] = {
@@ -195,7 +194,7 @@ object StaticBind {
   // Represent an XPath MIP
   class XPathMIP(
     val id           : String,
-    val name         : String,
+    val name         : String, // should be typed
     val level        : ValidationLevel,
     val expression   : String, // public for serialization and debugging
     namespaceMapping : NamespaceMapping,

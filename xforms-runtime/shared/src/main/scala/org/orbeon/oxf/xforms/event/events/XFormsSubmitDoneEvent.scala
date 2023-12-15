@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.util.ConnectionResult
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.event.XFormsEvent._

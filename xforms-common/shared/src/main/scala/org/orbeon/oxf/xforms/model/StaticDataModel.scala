@@ -17,14 +17,10 @@ import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.{BindingErrorReason, NodeBindingErrorReason}
 
 
 object StaticDataModel {
-
-  // Reasons that setting a value on a node can fail
-  sealed trait Reason { val message: String }
-  case object  DisallowedNodeReason extends Reason { val message = "Unable to set value on disallowed node" }
-  case object  ReadonlyNodeReason   extends Reason { val message = "Unable to set value on read-only node" }
 
   /**
    * Whether the given item is acceptable as a bound item.
@@ -57,11 +53,11 @@ object StaticDataModel {
    * - element nodes containing other elements
    * - items not backed by a mutable node (which are read-only)
    */
-  def isWritableItem(item: Item): Reason Either VirtualNodeType = item match {
-    case _: AtomicValue                                => Left(ReadonlyNodeReason)
-    case node: VirtualNodeType if node.hasChildElement => Left(DisallowedNodeReason)
+  def isWritableItem(item: Item): NodeBindingErrorReason Either VirtualNodeType = item match {
+    case _: AtomicValue                                => Left(BindingErrorReason.ReadonlyNode)
+    case node: VirtualNodeType if node.hasChildElement => Left(BindingErrorReason.DisallowedNode)
     case node: VirtualNodeType                         => Right(node)
-    case _: DocumentNodeInfoType                       => Left(DisallowedNodeReason) // XXX TODO: review this test
-    case _                                             => Left(ReadonlyNodeReason)
+    case _: DocumentNodeInfoType                       => Left(BindingErrorReason.DisallowedNode) // TODO: review this test
+    case _                                             => Left(BindingErrorReason.ReadonlyNode)
   }
 }

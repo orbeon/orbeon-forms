@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.log4s
+import org.orbeon.connection.ConnectionResultT
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.ValidationException
@@ -25,10 +26,10 @@ import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
-import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+import java.io.InputStream
 import scala.collection.immutable
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -37,7 +38,7 @@ import scala.util.control.NonFatal
 // Helper trait for `xforms-submit-done`/`xforms-submit-error`
 trait SubmitResponseEvent extends XFormsEvent {
 
-  def connectionResult: Option[ConnectionResult]
+  def connectionResult: Option[ConnectionResultT[_]]
   final def headers: Option[Map[String, List[String]]] = connectionResult map (_.headers)
 
   // For a given event, temporarily keep a reference to the body so that it's possible to call
@@ -86,7 +87,7 @@ private object SubmitResponseEvent {
 
     implicit val logger = e.indentedLogger
 
-    def readOrReturn(cxr: ConnectionResult): Option[String Either DocumentNodeInfoType] =
+    def readOrReturn(cxr: ConnectionResultT[_]): Option[String Either DocumentNodeInfoType] =
       e.cachedBody getOrElse {
         val result = tryToReadBody(cxr)
         e.cachedBody = Some(result)
@@ -99,7 +100,7 @@ private object SubmitResponseEvent {
     }
   }
 
-  private def tryToReadBody(cxr: ConnectionResult)(implicit logger: IndentedLogger): Option[String Either DocumentNodeInfoType] = {
+  private def tryToReadBody(cxr: ConnectionResultT[_])(implicit logger: IndentedLogger): Option[String Either DocumentNodeInfoType] = {
     // Log response details if not done already
     cxr.logResponseDetailsOnce(log4s.Error)
 
@@ -124,7 +125,13 @@ private object SubmitResponseEvent {
       // as XML then as text.
       val tempURIOpt =
         try
-          XFormsCrossPlatformSupport.inputStreamToRequestUri(cxr.content.inputStream)
+          cxr.content.stream match {
+            case stream: InputStream =>
+              XFormsCrossPlatformSupport.inputStreamToRequestUri(stream)
+            case stream =>
+              logger.logInfo(s"xforms-submit-done|error", s"cannot read response body for stream class `${stream.getClass.getName}`")
+              None
+          }
         catch {
           warn("error while reading response body")
         }
@@ -137,7 +144,7 @@ private object SubmitResponseEvent {
           Try {
             Right(
               useAndClose(XFormsCrossPlatformSupport.openUrlStream(tempURI)) { is =>
-                XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, cxr.url, false, true)
+                XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, cxr.url, handleXInclude = false, handleLexical = true)
               }
             )
           }

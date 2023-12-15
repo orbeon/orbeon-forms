@@ -13,9 +13,13 @@
  */
 package org.orbeon.oxf.fr.process
 
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.ProcessParser._
+import org.orbeon.oxf.fr.process.TestProcessInterpreter.ConstantProcessId
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.om.{Item, NodeInfo}
@@ -23,57 +27,64 @@ import org.orbeon.saxon.value.BooleanValue
 import org.parboiled2.ParseError
 import org.scalatest.funspec.AnyFunSpecLike
 
+import java.util.concurrent.ConcurrentLinkedQueue
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 import scala.util.{Success, Try}
 
 
-class SimpleProcessTest
-  extends DocumentTestBase
-     with ResourceManagerSupport
-     with AnyFunSpecLike {
+object TestProcessInterpreter {
+    val ConstantProcessId = "9fbcdd2e3caf46045e2d545c26d54ffd5b241e97"
+}
 
-  val ConstantProcessId = "9fbcdd2e3caf46045e2d545c26d54ffd5b241e97"
+trait TestProcessInterpreter extends ProcessInterpreter {
 
-  class TestProcessInterpreter extends ProcessInterpreter {
+  implicit val logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[TestProcessInterpreter]), true)
 
-    implicit val logger = new IndentedLogger(LoggerFactory.createLogger(classOf[TestProcessInterpreter]), true)
+  def currentXFormsDocumentId = ""
+  def findProcessByName(scope: String, name: String): Option[String] = None
+  def processError(t: Throwable) = ()
+  var xpathContext: Item = null
+  val xpathFunctionLibrary = null
+  def xpathFunctionContext = null
 
-    override def currentXFormsDocumentId = ""
-    def findProcessByName(scope: String, name: String): Option[String] = None
-    def processError(t: Throwable) = ()
-    var xpathContext: Item = null
-    val xpathFunctionLibrary = null
-    def xpathFunctionContext = null
+  // Just store the continuation locally
+  def clearSuspendedProcess(): Unit = _suspendedProcess = None
+  def writeSuspendedProcess(processId: String, process: String): Unit = _suspendedProcess = Some(processId -> process)
+  def readSuspendedProcess: Try[(String, String)] = Try(_suspendedProcess.get)
 
-    // Just store the continuation locally
-    def writeSuspendedProcess(process: String) = _suspendedProcess = Some(process)
-    def readSuspendedProcess = _suspendedProcess.get
+  def submitContinuation[T](computation: IO[T], continuation: Try[T] => Unit): Unit = ???
 
-    // Constant so that we can test properly
-    override def createUniqueProcessId = ConstantProcessId
+  // Constant so that we can test properly
+  override def createUniqueProcessId: String = ConstantProcessId
 
-    def transactionStart()    = ()
-    def transactionRollback() = ()
+  def transactionStart(): Unit = ()
+  def transactionRollback(): Unit = ()
 
-    private var _suspendedProcess: Option[String] = None
-    def savedProcess = _suspendedProcess
+  private var _suspendedProcess: Option[(String, String)] = None
+  def savedProcess: Option[(String, String)] = _suspendedProcess
 
-    override def beforeProcess() = {
-      _trace.clear()
-      Success(())
-    }
+  def withRunProcess[T](scope: String, name: String)(body: => T): T = body
 
-    // a1-a20 successful actions which log a trace of their execution
-    override def extensionActions = 1 to 20 map ("a" + _) map (name => name -> mySuccessAction(name) _)
+  // a1-a20 successful actions which log a trace of their execution
+  override def extensionActions: Iterable[(String, Action)] =
+    (1 to 20 map ("a" + _) map (name => name -> mySuccessAction(name) _))
 
-    private val _trace = ListBuffer[String]()
-    def trace = _trace mkString " "
+  protected val _trace = ListBuffer[String]()
+  def trace: String = _trace mkString " "
 
-    def mySuccessAction(name: String)(params: ActionParams): Try[Any] = {
+  def mySuccessAction(name: String)(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       _trace += name
-      Success(())
     }
-  }
+}
+
+class SimpleProcessTest
+extends DocumentTestBase
+   with ResourceManagerSupport // access to resources is needed because `XPathCache` needs the default cache size
+   with AnyFunSpecLike {
+
 
   def normalize(s: String) = "(" + s.trimAllToEmpty + ")"
 
@@ -108,6 +119,11 @@ class SimpleProcessTest
 
     val interpreter = new TestProcessInterpreter {
 
+      override def beforeProcess(): Try[Any] = {
+        _trace.clear()
+        Success(())
+      }
+
       val processes = Map(
         "p1" -> """a1 then a2 then suspend then a3""",
         "p2" -> """a1 then (a2 then (a3 then if (". = true()") then (a4 then suspend then (a5 then a6)) else (a7 then suspend then (a8 then a9)) then a10) then a11) then a12""",
@@ -130,13 +146,11 @@ class SimpleProcessTest
 
     for ((process, context, continuation, trace) <- expected) {
       it(s"must pass with `$process/$context`") {
-        withTestExternalContext { _ =>
-          interpreter.xpathContext = context
-          interpreter.runProcessByName("", process)
-          assert(Some(ConstantProcessId + '|' + normalize(continuation)) === interpreter.savedProcess)
-          assert(trace === interpreter.trace)
-          interpreter.runProcess("", "resume").get
-        }
+        interpreter.xpathContext = context
+        interpreter.runProcessByName("", process)
+        assert(interpreter.savedProcess.contains((ConstantProcessId, normalize(continuation))))
+        assert(trace == interpreter.trace)
+        interpreter.runProcess("", "resume").get
       }
     }
   }
@@ -260,5 +274,76 @@ class SimpleProcessTest
             )
         )
       }
+  }
+
+  describe("submitContinuation") {
+
+    val Interpreter = new TestProcessInterpreter {
+
+      val processes = Map(
+        "my-process" -> """a1 then a2 then my-async then a3 then my-async then a4""",
+      )
+
+      override def findProcessByName(scope: String, name: String): Option[String] = processes.get(name)
+
+      override def extensionActions: List[(String, Action)] =
+        super.extensionActions ++: (("my-async" -> myASyncAction("my-async") _) :: Nil)
+
+      val completionQueue = new ConcurrentLinkedQueue[(Try[Any] => Any, Try[Any])]
+      var pendingList     = List.empty[Future[Any]]
+
+      override def submitContinuation[T](computation: IO[T], continuation: Try[T] => Unit): Unit = {
+        val future = computation.unsafeToFuture()
+        pendingList ::= future
+
+        future.onComplete { result =>
+         completionQueue.add((continuation.asInstanceOf[Try[Any] => Any], result))
+        }
+      }
+
+      def awaitResult(): Unit = {
+
+        val batch = pendingList
+        pendingList = Nil
+
+        Await.ready(Future.sequence(batch), Duration.Inf)
+
+        Iterator.continually(completionQueue.poll()).takeWhile(_ ne null).foreach {
+          case (continuation, resultTry) =>
+            continuation(resultTry)
+        }
+      }
+
+      def myASyncAction(name: String)(params: ActionParams): ActionResult =
+        ActionResult.tryAsync {
+
+          _trace += name
+
+          val io = IO(42)
+
+          def continuation(t: Try[Int]): Try[Any] = {
+            _trace += s"async-continuation($t)"
+            Success(())
+          }
+
+          (io, continuation _)
+        }
+    }
+
+    it(s"must pass process with async action and continuations") {
+
+      Interpreter.xpathContext = null
+      Interpreter.runProcessByName("", "my-process")
+
+      assert("a1 a2 my-async" == Interpreter.trace)
+      assert(Interpreter.pendingList.nonEmpty)
+
+      Interpreter.awaitResult()
+      assert("a1 a2 my-async async-continuation(Success(42)) a3 my-async" == Interpreter.trace)
+      assert(Interpreter.pendingList.nonEmpty)
+
+      Interpreter.awaitResult()
+      assert("a1 a2 my-async async-continuation(Success(42)) a3 my-async async-continuation(Success(42)) a4" == Interpreter.trace)
+    }
   }
 }

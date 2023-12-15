@@ -13,10 +13,12 @@
   */
 package org.orbeon.oxf.portlet
 
+import org.orbeon.connection.StreamedContent
 import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext._
+import org.orbeon.oxf.fr.embedding.APISupport.{Redirect, StreamedContentOrRedirect}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.CollectionUtils._
@@ -119,11 +121,11 @@ object Portlet2ExternalContext {
     def getCharacterEncoding: String = ExternalContext.StandardHeaderCharacterEncoding
 
     def responseContent: StreamedContentOrRedirect =
-      _responseRedirect getOrElse StreamedContent.fromBytes(
+      _responseRedirect.toRight(StreamedContent.fromBytes(
         bytes       = getBytes,
         contentType = _responseContentType,
         title       = _responseTitle
-      )
+      ))
 
     private def getBytes: Array[Byte] =
       if (streams._1.size > 0) {

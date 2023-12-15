@@ -618,6 +618,7 @@ object XFormsStaticStateDeserializer {
 
               val staticBind =
                 for {
+                  nameOpt                     <- c.getOrElse[Option[String]]("nameOpt")(None)
                   typeMIPOpt                  <- c.getOrElse[Option[StaticBind.TypeMIP]]("typeMIPOpt")(None)
                   mipNameToXPathMIP           <- c.getOrElse[Iterable[(String, List[StaticBind.XPathMIP])]]("mipNameToXPathMIP")(Nil)
                   customMIPNameToXPathMIP     <- c.getOrElse[Map[String, List[StaticBind.XPathMIP]]]("customMIPNameToXPathMIP")(Map.empty)
@@ -631,7 +632,9 @@ object XFormsStaticStateDeserializer {
                     prefixedId,
                     namespaceMapping,
                     scope,
-                    containerScope,
+                    containerScope
+                  )(
+                    nameOpt,
                     typeMIPOpt,
                     mipNameToXPathMIP,
                     customMIPNameToXPathMIP,
@@ -1074,6 +1077,7 @@ object XFormsStaticStateImpl {
       def isServerStateHandling               : Boolean          = staticProperties.isServerStateHandling
       def isXPathAnalysis                     : Boolean          = staticProperties.isXPathAnalysis
       def isCalculateDependencies             : Boolean          = staticProperties.isCalculateDependencies
+      def singleUseStaticState                : Boolean          = staticProperties.singleUseStaticState
       def allowErrorRecoveryOnInit            : Boolean          = staticProperties.allowErrorRecoveryOnInit
       def isInlineResources                   : Boolean          = staticProperties.isInlineResources
       def uploadMaxSize                       : MaximumSize      = staticProperties.uploadMaxSize
@@ -1095,6 +1099,9 @@ abstract class TopLevelPartAnalysisImpl
     with PartModelAnalysis
     with PartControlsAnalysis
     with PartEventHandlerAnalysis {
+
+  // TODO: Consider making this work in the JavaScript environment. However it is not a priority.
+  def getStaticXPathErrors: List[(String, Option[Throwable], XPathErrorDetails)] = Nil
 
   // This is set after construction because we deserialize the template and the `TopLevelPartAnalysis` separately
   var marks: Map[String, SAXStore#Mark] = Map.empty

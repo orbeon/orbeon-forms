@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogCloseEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 
@@ -24,14 +25,22 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 class XXFormsHideAction extends XFormsAction {
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
-    val interpreter   = actionContext.interpreter
-    val actionElement = actionContext.element
+    val interpreter = actionContext.interpreter
 
     synchronizeAndRefreshIfNeeded(actionContext)
 
     resolveControlAvt("dialog")(actionContext) match {
       case Some(targetDialog: XFormsEventTarget) =>
-        XXFormsHideAction.hideDialog(targetDialog, XFormsAction.eventProperties(interpreter, actionContext.analysis))
+        XXFormsHideAction.hideDialog(
+          targetDialog,
+          XFormsAction.eventProperties(
+            interpreter,
+            actionContext.analysis,
+            interpreter.eventObserver,
+            actionContext.collector
+          ),
+          actionContext.collector
+        )
       case _ =>
         debug(
           "xxf:hide: dialog does not refer to an existing xxf:dialog element, ignoring action",
@@ -47,12 +56,14 @@ object XXFormsHideAction {
 
   def hideDialog(
     targetDialog : XFormsEventTarget,
-    properties   : PropertyGetter = EmptyGetter
+    properties   : PropertyGetter = EmptyGetter,
+    collector    : ErrorEventCollector
   ): Unit =
     Dispatch.dispatchEvent(
       new XXFormsDialogCloseEvent(
         targetDialog,
         properties
-      )
+      ),
+      collector
     )
 }

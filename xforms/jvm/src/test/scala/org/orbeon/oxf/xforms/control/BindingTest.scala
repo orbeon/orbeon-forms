@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -79,7 +80,7 @@ class BindingTest extends DocumentTestBase with AssertionsForJUnit {
 
     initialNameValues foreach { case (name, value) =>
       assert(isRelevant(name))
-      assert(getValueControl(name).getValue.trimAllToEmpty === value)
+      assert(getValueControl(name).getValue(EventCollector.Throw).trimAllToEmpty === value)
     }
 
     assert(! isRelevant("complex-input"))
@@ -96,7 +97,7 @@ class BindingTest extends DocumentTestBase with AssertionsForJUnit {
 
     newNameValues foreach { case (name, value) =>
       setControlValue(name, value)
-      assert(getValueControl(name).getValue === value)
+      assert(getValueControl(name).getValue(EventCollector.Throw) === value)
     }
 
     // Set empty value on text node

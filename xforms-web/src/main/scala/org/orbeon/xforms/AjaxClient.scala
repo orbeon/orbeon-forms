@@ -260,8 +260,8 @@ object AjaxClient {
       case r            => r.toString
     }
 
-    // Q: We used to log the JavaScript exception to the console here. In which cases can we do that? How does it help?
-    dom.console.log(ErrorMessageTitle, messageOrNull)
+    // Log exception, otherwise its source is lost
+    dom.console.log(e)
 
     val sb = new mutable.StringBuilder(ErrorMessageTitle)
 
@@ -336,6 +336,49 @@ object AjaxClient {
     }
   }
 
+  def handleResponse(
+    responseXML        : dom.Document,
+    currentForm        : xforms.Form,
+    requestSequenceOpt : Option[Int],
+    ignoreErrors       : Boolean
+  ): Unit = {
+
+    // This is a little tricky. Some code registers callbacks or `Future`s for the Ajax response received.
+    // However, scheduling futures in the JavaScript contact is done via a global queue. We want to make sure
+    // that those callbacks or `Future`s run *before* we process the response, otherwise it's pointless. So
+    // we schedule processing the response as a `Future` as well, with the guarantee that it will run last
+    // since the execution context is an ordered queue. It would be nice if there was a cleaner, less
+    // error-prone way of doing this!
+
+    callbackF(ajaxResponseReceived, forCurrentEventQueue = false, "handleResponseDom") foreach { details =>
+
+      requestSequenceOpt foreach { requestSequence =>
+        StateHandling.updateSequence(currentForm.namespacedFormId, requestSequence + 1)
+      }
+
+      logger.debug("before `handleResponseDom`")
+      AjaxServer.handleResponseDom(responseXML, currentForm.namespacedFormId, ignoreErrors)
+      logger.debug("after `handleResponseDom`")
+
+      // Reset changes, as changes are included in this batch of events
+      currentForm.ajaxFieldChangeTracker.afterResponseProcessed()
+      ServerValueStore.purgeExpired()
+
+      // `require(EventQueue.ajaxRequestInProgress == false)`
+
+      EventQueue.ajaxRequestInProgress = false
+
+      // Notify listeners that we are done processing this request
+      ajaxResponseProcessed.fire(details)
+
+      // Schedule next requests as needed
+      EventQueue.updateQueueSchedule()
+    }
+
+    // And then we fire the callback, which triggers both direct callbacks and `Future`s
+    ajaxResponseReceived.fire(new AjaxResponseDetails(responseXML, currentForm.namespacedFormId))
+  }
+
   private object Private {
 
     def callbackF[T](cb: CallbackList[T], forCurrentEventQueue: Boolean, debugName: String): Future[T] = {
@@ -362,50 +405,6 @@ object AjaxClient {
       cb.add(callback)
 
       result.future
-    }
-
-    private def handleResponse(
-      responseXML        : dom.Document,
-      currentForm        : xforms.Form,
-      requestSequenceOpt : Option[Int],
-      showProgress       : Boolean,
-      ignoreErrors       : Boolean
-    ): Unit = {
-
-      // This is a little tricky. Some code registers callbacks or `Future`s for the Ajax response received.
-      // However, scheduling futures in the JavaScript contact is done via a global queue. We want to make sure
-      // that those callbacks or `Future`s run *before* we process the response, otherwise it's pointless. So
-      // we schedule processing the response as a `Future` as well, with the guarantee that it will run last
-      // since the execution context is an ordered queue. It would be nice if there was a cleaner, less
-      // error-prone way of doing this!
-
-      callbackF(ajaxResponseReceived, forCurrentEventQueue = false, "handleResponseDom") foreach { details =>
-
-        requestSequenceOpt foreach { requestSequence =>
-          StateHandling.updateSequence(currentForm.namespacedFormId, requestSequence + 1)
-        }
-
-        logger.debug("before `handleResponseDom`")
-        AjaxServer.handleResponseDom(responseXML, currentForm.namespacedFormId, ignoreErrors)
-        logger.debug("after `handleResponseDom`")
-
-        // Reset changes, as changes are included in this batch of events
-        currentForm.ajaxFieldChangeTracker.afterResponseProcessed()
-        ServerValueStore.purgeExpired()
-
-        // `require(EventQueue.ajaxRequestInProgress == false)`
-
-        EventQueue.ajaxRequestInProgress = false
-
-        // Notify listeners that we are done processing this request
-        ajaxResponseProcessed.fire(details)
-
-        // Schedule next requests as needed
-        EventQueue.updateQueueSchedule()
-      }
-
-      // And then we fire the callback, which triggers both direct callbacks and `Future`s
-      ajaxResponseReceived.fire(new AjaxResponseDetails(responseXML, currentForm.namespacedFormId))
     }
 
     def findEventsToProcess(originalEvents: NonEmptyList[AjaxEvent]): Option[(html.Form, NonEmptyList[AjaxEvent], List[AjaxEvent])] = {
@@ -552,11 +551,10 @@ object AjaxClient {
         ignoreErrors      = ignoreErrors
       ) foreach { responseXml =>
         handleResponse(
-          responseXml,
-          currentForm,
-          sequenceNumberOpt,
-          showProgress,
-          ignoreErrors
+          responseXML        = responseXml,
+          currentForm        = currentForm,
+          requestSequenceOpt = sequenceNumberOpt,
+          ignoreErrors       = ignoreErrors
         )
       }
     }

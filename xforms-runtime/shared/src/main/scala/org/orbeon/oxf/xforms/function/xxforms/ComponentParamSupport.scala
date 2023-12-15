@@ -1,13 +1,13 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
-import shapeless.syntax.typeable._
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.{XFormsId, XFormsNames}
+import shapeless.syntax.typeable._
 
 
 object ComponentParamSupport {
@@ -30,7 +30,7 @@ object ComponentParamSupport {
       val attrValue =
         fromElemAlsoTryAvt(
           concreteBinding.boundElementAtts.lift,
-          sourceComponent.evaluateAvt,
+          sourceComponent.evaluateAvt(_, EventCollector.Throw),
           paramName
         )
 

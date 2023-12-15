@@ -88,12 +88,17 @@ class XFormsActionAction extends XFormsAction {
           childActionAnalysis match {
             case variable: VariableAnalysisTrait =>
               // Scope variable
-              contextStack.scopeVariable(variable, actionInterpreter.getSourceEffectiveId(actionAnalysis), handleNonFatal = false)
+              contextStack.scopeVariable(
+                variable,
+                actionInterpreter.getSourceEffectiveId(actionAnalysis),
+                actionContext.interpreter.eventObserver,
+                actionContext.collector
+              )
               variablesCount += 1
             case action: ActionTrait =>
               // Run child action
               // NOTE: We execute children actions even if they happen to have `observer` or `target` attributes.
-              actionInterpreter.runAction(action)
+              actionInterpreter.runAction(action, actionInterpreter.eventObserver, actionContext.collector)
             case _ =>
               throw new IllegalStateException
           }

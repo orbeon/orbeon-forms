@@ -33,7 +33,11 @@
         <xbl:template>
             <xf:group>
                 <xf:trigger ref="xxf:binding('fr-ladda-button')">
-                    <xf:label mediatype="text/html" value="xxf:label('fr-ladda-button')"/>
+                    <xf:label>
+                        <xh:span class="ladda-label"><!-- https://github.com/orbeon/orbeon-forms/issues/6069 -->
+                            <xf:output mediatype="text/html" value="xxf:label('fr-ladda-button')"/>
+                        </xh:span>>
+                    </xf:label>
                     <xf:dispatch event="DOMActivate" name="DOMActivate" targetid="fr-ladda-button"/>
                 </xf:trigger>
             </xf:group>

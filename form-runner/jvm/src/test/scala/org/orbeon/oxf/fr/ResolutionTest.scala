@@ -19,6 +19,7 @@ import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xml.dom.Converter._
@@ -191,7 +192,7 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
 
       val model = resolveObject[XFormsModel](Names.FormModel).get
 
-      XPath.withFunctionContext(XFormsFunction.Context(inScopeContainingDocument, null, model.getId, Some(model), null)) {
+      XPath.withFunctionContext(XFormsFunction.Context(inScopeContainingDocument, null, model.getId, Some(model), None)) {
 
         // 1. Resolution via concrete controls
 
@@ -214,7 +215,7 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
 
         // Resolve from buttonControl
         for (followIndexes <- List(true, false))
-          assert(List(resultControl.getValue) === resolveAllNodeValues(buttonControl.absoluteId, "result", followIndexes))
+          assert(List(resultControl.getValue(EventCollector.Throw)) === resolveAllNodeValues(buttonControl.absoluteId, "result", followIndexes))
 
         for (index <- 1 to 3) {
           setindex("grid-control-repeat", index)
@@ -231,8 +232,8 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
           followIndexes <- List(true, false)
           numberControl <- numberControls
         } locally {
-          assert(List(s"o${numberControl.getValue}") === resolveAllNodeValues(numberControl.absoluteId, "other", followIndexes))
-          assert(List(resultControl.getValue)        === resolveAllNodeValues(numberControl.absoluteId, "result", followIndexes))
+          assert(List(s"o${numberControl.getValue(EventCollector.Throw)}") === resolveAllNodeValues(numberControl.absoluteId, "other", followIndexes))
+          assert(List(resultControl.getValue(EventCollector.Throw))        === resolveAllNodeValues(numberControl.absoluteId, "result", followIndexes))
         }
 
         // 2. Resolution via binds

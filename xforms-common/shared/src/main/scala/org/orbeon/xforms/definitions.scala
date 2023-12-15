@@ -17,6 +17,16 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 
 
+sealed trait BindingErrorReason { val message: String }
+sealed trait NodeBindingErrorReason extends BindingErrorReason
+object BindingErrorReason {
+  case object DisallowedNode                extends NodeBindingErrorReason { val message = "Unable to set value on disallowed node" }
+  case object ReadonlyNode                  extends NodeBindingErrorReason { val message = "Unable to set value on read-only node" }
+  case class  InvalidModel(modelId: String) extends BindingErrorReason     { val message = s"Invalid model: `$modelId`" }
+  case class  InvalidBind(bindId: String)   extends BindingErrorReason     { val message = s"Invalid bind: `$bindId`" }
+  case class  Other(message: String)        extends BindingErrorReason
+}
+
 sealed trait RelevanceHandling extends EnumEntry
 
 object RelevanceHandling extends Enum[RelevanceHandling] {

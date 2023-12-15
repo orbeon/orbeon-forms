@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.xforms.model
 
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.saxon.om
 
 import scala.collection.compat._
@@ -62,11 +63,15 @@ trait RebuildBindOps {
       // Iterate through all top-level bind elements to create new bind tree
       // TODO: In the future, XPath dependencies must allow for partial rebuild of the tree as is the case with controls
       // Even before that, the bind tree could be modified more dynamically as is the case with controls
-      _topLevelBinds =
-        for (staticBind <- staticModel.topLevelBinds)
-          yield new RuntimeBind(model, staticBind, null, isSingleNodeContext = true)
 
-      _isFirstRebuildForModel = false
+      EventCollector.withBufferCollector { collector =>
+
+        _topLevelBinds =
+          for (staticBind <- staticModel.topLevelBinds)
+            yield new RuntimeBind(model, staticBind, null, isSingleNodeContext = true, collector)
+
+        _isFirstRebuildForModel = false
+      }
     }
 
   // Implement "4.7.2 References to Elements within a bind Element":

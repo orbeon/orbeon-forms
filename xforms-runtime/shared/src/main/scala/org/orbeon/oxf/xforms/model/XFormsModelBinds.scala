@@ -22,20 +22,20 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.XPathDependencies
+import org.orbeon.oxf.xforms.analysis.{XPathDependencies, XPathErrorDetails}
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
-import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.oxf.xforms.event.EventCollector
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 
 import scala.collection.compat._
-import scala.collection.{mutable => m}
 import scala.language.postfixOps
 import scala.util.control.NonFatal
 
@@ -53,36 +53,32 @@ class XFormsModelBinds(protected val model: XFormsModel)
   protected val staticModel                : Model                    = model.staticModel
 
   // Support for `xxf:evaluate-bind-property` function
-  def evaluateBindByType(bind: RuntimeBind, position: Int, mipType: QName): Option[AtomicValue] = {
-
-    val bindNode = bind.getOrCreateBindNode(position)
-
+  def evaluateBindByType(bind: RuntimeBind, position: Int, mipType: QName): Option[AtomicValue] =
     // We don't want to dispatch events while we are performing the actual recalculate/revalidate operation,
     // so we collect them here and dispatch them altogether once everything is done.
-    val eventsToDispatch = m.ListBuffer[XFormsEvent]()
-    def collector(event: XFormsEvent): Unit =
-      eventsToDispatch += event
+    EventCollector.withBufferCollector { collector =>
 
-    def makeQNameValue(qName: QName) =
-      new QNameValue(qName.namespace.prefix, qName.namespace.uri, qName.localName)
+      val bindNode = bind.getOrCreateBindNode(position)
 
-    def hasSuccessfulErrorConstraints =
-      bind.staticBind.constraintsByLevel.nonEmpty option {
-        bindNode.staticBind.constraintsByLevel.get(ErrorLevel).to(List) flatMap { mips =>
-          failedConstraintMIPs(mips, bindNode, collector)
-        } isEmpty
-      }
+      def makeQNameValue(qName: QName) =
+        new QNameValue(qName.namespace.prefix, qName.namespace.uri, qName.localName)
 
-    // NOTE: This only evaluates the first custom MIP of the given name associated with the bind. We do store multiple
-    // ones statically, but don't have yet a solution to combine them. Should we string-join them?
-    def evaluateCustomMIPByName(mipType: QName) =
-      evaluateCustomMIP(
-        bindNode,
-        bindNode.staticBind.customMIPNameToXPathMIP(buildInternalCustomMIPName(mipType)).head,
-        collector
-      )
+      def hasSuccessfulErrorConstraints =
+        bind.staticBind.constraintsByLevel.nonEmpty option {
+          bindNode.staticBind.constraintsByLevel.get(ErrorLevel).to(List) flatMap { mips =>
+            failedConstraintMIPs(mips, bindNode, collector)
+          } isEmpty
+        }
 
-    val result =
+      // NOTE: This only evaluates the first custom MIP of the given name associated with the bind. We do store multiple
+      // ones statically, but don't have yet a solution to combine them. Should we string-join them?
+      def evaluateCustomMIPByName(mipType: QName) =
+        evaluateCustomMIP(
+          bindNode,
+          bindNode.staticBind.customMIPNameToXPathMIP(buildInternalCustomMIPName(mipType)).head,
+          collector
+        )
+
       mipType match {
         case TYPE_QNAME            => bind.staticBind.dataType                                            map makeQNameValue
         case RELEVANT_QNAME        => evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT, collector) map booleanToBooleanValue
@@ -93,13 +89,7 @@ class XFormsModelBinds(protected val model: XFormsModel)
         case XXFORMS_DEFAULT_QNAME => evaluateCalculatedBind(bindNode, Default, collector)                map stringToStringValue
         case mipType               => evaluateCustomMIPByName(mipType)                                    map stringToStringValue
       }
-
-    // Dispatch all events
-    for (event <- eventsToDispatch)
-      Dispatch.dispatchEvent(event)
-
-    result
-  }
+    }
 }
 
 object XFormsModelBinds {
@@ -175,11 +165,11 @@ object XFormsModelBinds {
     )
 
   def handleMIPXPathException(
-    throwable : Throwable,
-    bindNode  : BindNode,
-    xpathMIP  : StaticXPathMIP,
-    message   : String,
-    collector : XFormsEvent => Unit)(implicit
+    throwable     : Throwable,
+    bindNode      : BindNode,
+    xpathMIP      : StaticXPathMIP,
+    contextMessage: String,
+    collector     : ErrorEventCollector)(implicit
     logger    : IndentedLogger
   ): Unit = {
     XFormsCrossPlatformSupport.getRootThrowable(throwable) match {
@@ -199,13 +189,21 @@ object XFormsModelBinds {
         val ve = OrbeonLocationException.wrapException(t,
           XmlExtendedLocationData(
             locationData = bindNode.locationData,
-            description  = Option(message),
+            description  = Option(contextMessage),
             params       = List("expression" -> xpathMIP.compiledExpression.string),
             element      = Some(bindNode.staticBind.element)
           )
         )
 
-        collector(new XXFormsXPathErrorEvent(bindNode.parentBind.model, ve.getMessage, ve))
+        collector(
+          new XXFormsXPathErrorEvent(
+            target         = bindNode.parentBind.model,
+            expression     = xpathMIP.compiledExpression.string,
+            details        = XPathErrorDetails.ForBindMip(bindNode.staticBind.nameOpt, xpathMIP.name),
+            message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+            throwable      = ve
+          )
+        )
     }
   }
 }

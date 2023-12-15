@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.itemset
@@ -25,10 +26,10 @@ import org.orbeon.oxf.xforms.itemset.{Item, ItemsetSupport, StaticItemsetSupport
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
+import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.compat._
 import scala.collection.{mutable, Set => CSet}
-import org.orbeon.scaxon.SimplePath._
 
 class XFormsSelectControl(
   container : XBLContainer,
@@ -52,13 +53,19 @@ class XFormsSelectControl(
    * - Itemset values which are in the list of tokens are merged with the bound control's value.
    * - Itemset values which are not in the list of tokens are removed from the bound control's value.
    */
-  override def translateExternalValue(boundItem: om.Item, externalValue: String): Option[String] = {
+  override def translateExternalValue(
+    boundItem    : om.Item,
+    externalValue: String,
+    collector    : ErrorEventCollector
+  ): Option[String] = {
 
-    def filterItemsReturnValues(f: itemset.Item.ValueNode => Boolean): List[Item.Value[om.Item]] =
-      (getItemset.allItemsWithValueIterator(reverse = false) filter (t => f(t._1)) map (_._2)).to(List)
+    def filterItemsReturnValues(
+      f:
+      itemset.Item.ValueNode => Boolean): List[Item.Value[om.Item]] =
+      (getItemset(collector).allItemsWithValueIterator(reverse = false) filter (t => f(t._1)) map (_._2)).to(List)
 
     val dataItemValues =
-      getCurrentItemValueFromData(boundItem) match {
+      getCurrentItemValueFromData(boundItem, collector) match {
         case Left(dataValue) =>
           valueAsLinkedSet(dataValue).toList map Left.apply
         case Right(allDataItems) =>
@@ -79,10 +86,10 @@ class XFormsSelectControl(
     // selected items receive the event xforms-select immediately after all newly deselected items receive the
     // event xforms-deselect."
     for (value <- newlyDeselectedValues)
-      Dispatch.dispatchEvent(new XFormsDeselectEvent(selfControl, value))
+      Dispatch.dispatchEvent(new XFormsDeselectEvent(selfControl, value), collector)
 
     for (value <- newlySelectedValues)
-      Dispatch.dispatchEvent(new XFormsSelectEvent(selfControl, value))
+      Dispatch.dispatchEvent(new XFormsSelectEvent(selfControl, value), collector)
 
     // Value is updated via `xforms-select`/`xforms-deselect` events
     // Q: Could/should this be the case for other controls as well?
@@ -98,9 +105,9 @@ class XFormsSelectControl(
     }
   }
 
-  override def evaluateExternalValue(): Unit = {
+  override def evaluateExternalValue(collector: ErrorEventCollector): Unit = {
 
-    val selectedItems = findSelectedItems
+    val selectedItems = findSelectedItems(collector)
 
     val updatedValue =
       if (selectedItems.isEmpty) {
@@ -117,15 +124,15 @@ class XFormsSelectControl(
     setExternalValue(updatedValue)
   }
 
-  override def findSelectedItems: List[Item.ValueNode] =
+  override def findSelectedItems(collector: ErrorEventCollector): List[Item.ValueNode] =
     boundItemOpt match {
       case Some(boundItem) =>
-        getItemset.iterateSelectedItems(getCurrentItemValueFromData(boundItem), _ => true, staticControl.excludeWhitespaceTextNodesForCopy).to(List)
+        getItemset(collector).iterateSelectedItems(getCurrentItemValueFromData(boundItem, collector), _ => true, staticControl.excludeWhitespaceTextNodesForCopy).to(List)
       case None =>
         Nil
     }
 
-  override def performDefaultAction(event: XFormsEvent): Unit = {
+  override def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
     event match {
       case deselect: XFormsDeselectEvent =>
         boundNodeOpt match {
@@ -138,11 +145,12 @@ class XFormsSelectControl(
                   nodeInfo     = boundNode,
                   valueToSet   = (valueAsLinkedSet(DataModel.getValue(boundNode)) - v) mkString " ",
                   source       = "deselect",
-                  isCalculate  = false
+                  isCalculate  = false,
+                  collector    = collector
                 )
               case r @ Right(_) =>
                 XFormsAPI.delete(
-                  ref = ItemsetSupport.findMultipleItemValues(getCurrentItemValueFromData(boundNode), r)
+                  ref = ItemsetSupport.findMultipleItemValues(getCurrentItemValueFromData(boundNode, collector), r)
                 )
             }
           case None =>
@@ -159,7 +167,8 @@ class XFormsSelectControl(
                   nodeInfo     = boundNode,
                   valueToSet   = (valueAsLinkedSet(DataModel.getValue(boundNode)) + v) mkString " ",
                   source       = "select",
-                  isCalculate  = false
+                  isCalculate  = false,
+                  collector    = collector
                 )
               case Right(v) =>
                 XFormsAPI.insert(
@@ -176,7 +185,7 @@ class XFormsSelectControl(
     // Make sure not to call the method of XFormsSelect1Control
     // We should *not* use inheritance this way here!
     markVisitedOnSelectDeselect(event)
-    super.valueControlPerformDefaultAction(event)
+    super.valueControlPerformDefaultAction(event, collector)
   }
 }
 

@@ -1,0 +1,186 @@
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+>
+
+    <xbl:binding
+        element="fr|console"
+        id="fr-console"
+        xxf:external-events="fr-console-data"
+    >
+        <xbl:handlers>
+            <xbl:handler event="xforms-enabled xforms-disabled" phase="target">
+                <xf:delete ref="instance('formulas-instance')/*"/>
+                <xf:setvalue
+                    ref="instance('console-instance')/layout"
+                    value="'close'"/>
+            </xbl:handler>
+            <xbl:handler event="fr-toggle-layout" phase="target">
+                <xf:setvalue
+                    ref="instance('console-instance')/layout"
+                    value="if (. = 'open') then 'close' else 'open'"/>
+            </xbl:handler>
+            <xbl:handler event="fr-console-data" phase="target">
+
+                <!-- Automatically open on first event -->
+                <xf:setvalue
+                    if="empty(instance('formulas-instance')/*)"
+                    ref="instance('console-instance')/layout"
+                    value="'open'"/>
+
+                <xf:action iterate="frf:decodeSubmittedFormData(event('fr-console-data'))/*/*">
+
+                    <xf:var
+                        name="new-elem"
+                        value="."/>
+
+                    <xf:var
+                        name="existing-elem"
+                        value="
+                            instance('formulas-instance')/*[
+                                @bind-name    = $new-elem/@bind-name and
+                                @error        = $new-elem/@error and
+                                @context-name = $new-elem/@context-name and
+                                .             = $new-elem
+                            ][1]"/>
+
+                    <xf:insert
+                        if="empty($existing-elem)"
+                        context="instance('formulas-instance')"
+                        ref="*"
+                        origin="$new-elem"/>
+
+                    <xf:setvalue
+                        if="exists($existing-elem)"
+                        ref="$existing-elem/@count"
+                        value=". + 1"/>
+
+                </xf:action>
+
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:resources>
+<!--            <xbl:style src="/xbl/orbeon/console/console.css"/>-->
+        </xbl:resources>
+        <xbl:implementation>
+            <xf:model id="console-model" xxf:expose-xpath-types="true">
+
+                <xf:instance id="formulas-instance" xxf:exclude-result-prefixes="#all">
+                    <_ xmlns=""/>
+                </xf:instance>
+
+                <xf:bind ref="instance('formulas-instance')" id="formulas-bind">
+                    <xf:bind ref="_">
+                        <xf:bind ref="@count"        id="formula-count-bind"/>
+                        <xf:bind ref="@bind-name"    id="formula-bind-name-bind"/>
+                        <xf:bind ref="@context-name" id="formula-context-name-bind"/>
+                        <xf:bind ref="."             id="formula-formula-bind"/>
+                        <xf:bind ref="@error"        id="formula-error-bind"/>
+                    </xf:bind>
+                </xf:bind>
+
+                <xf:instance id="console-instance" xxf:exclude-result-prefixes="#all">
+                    <_ xmlns="">
+                        <layout>open</layout>
+                    </_>
+                </xf:instance>
+
+                <xf:bind
+                    ref="instance('console-instance')/layout"
+                    xxf:default="'closed'"/>
+
+            </xf:model>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <_>
+                        <resource xml:lang="en">
+                            <formula-errors>Formula Errors</formula-errors>
+                            <control-name>Control Name</control-name>
+                            <context-name>Context</context-name>
+                            <formula>Formula</formula>
+                            <error>Error</error>
+                        </resource>
+                        <resource xml:lang="fr">
+                            <formula-errors>Erreurs de formules</formula-errors>
+                            <control-name>Nom du contrôle</control-name>
+                            <context-name>Contexte</context-name>
+                            <formula>Formule</formula>
+                            <error>Erreur</error>
+                        </resource>
+                        <resource xml:lang="de">
+                            <formula-errors>Formelfehler</formula-errors>
+                            <control-name>Steuerelementname</control-name>
+                            <context-name>Kontext</context-name>
+                            <formula>Formel</formula>
+                            <error>Fehler</error>
+                        </resource>
+                        <resource xml:lang="it">
+                            <formula-errors>Errori di formula</formula-errors>
+                            <control-name>Nome controllo</control-name>
+                            <context-name>Contesto</context-name>
+                            <formula>Formula</formula>
+                            <error>Errore</error>
+                        </resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xf:group id="console-group" model="console-model" class="fr-console-group fr-console-{instance('console-instance')/layout}">
+                <fr:tabbable>
+                    <fr:tab>
+                        <xf:label ref="xxf:r('formula-errors')"/>
+                        <fr:grid id="fr-console-formulas-grid" bind="formulas-bind" repeat="content" readonly="true" columns="24" template="()" number-rows="true">
+                            <fr:c x="1" y="1" w="4">
+                                <xf:output id="formula-bind-name-control" bind="formula-bind-name-bind">
+                                    <xf:label appearance="minimal" ref="xxf:r('control-name')"/>
+                                </xf:output>
+                            </fr:c>
+                            <fr:c x="5" y="1" w="4">
+                                <xf:output id="formula-context-name-control" bind="formula-context-name-bind">
+                                    <xf:label appearance="minimal" ref="xxf:r('context-name')"/>
+                                </xf:output>
+                            </fr:c>
+                            <fr:c x="9" y="1" w="16">
+                                <xf:output id="formula-formula-control" bind="formula-formula-bind">
+                                    <xf:label appearance="minimal" ref="xxf:r('formula')"/>
+                                </xf:output>
+                            </fr:c>
+                            <fr:c x="1" y="2" w="23">
+                                <xf:output id="formula-error-control" bind="formula-error-bind">
+                                    <xf:label appearance="minimal" ref="xxf:r('error')"/>
+                                </xf:output>
+                            </fr:c>
+                            <fr:c x="24" y="2" w="1" h="1" class="fr-console-badge">
+                                <xh:div class="badge badge-info">
+                                    <xf:output id="formula-count-control" bind="formula-count-bind" appearance="minimal">
+<!--                                        <xf:label appearance="minimal">Count</xf:label>-->
+                                    </xf:output>
+                                </xh:div>
+                            </fr:c>
+                        </fr:grid>
+                    </fr:tab>
+<!--                    <fr:tab>-->
+<!--                        <xf:label>Actions</xf:label>-->
+<!--                    </fr:tab>-->
+<!--                    <fr:tab>-->
+<!--                        <xf:label>Service Calls</xf:label>-->
+<!--                    </fr:tab>-->
+<!--                    <fr:tab>-->
+<!--                        <xf:label>Log</xf:label>-->
+<!--                    </fr:tab>-->
+                </fr:tabbable>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

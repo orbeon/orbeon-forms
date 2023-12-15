@@ -13,8 +13,8 @@
   */
 package org.orbeon.oxf.xforms.submission
 
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.io.FileUtils
-import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.hmacURL
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
@@ -32,7 +32,7 @@ object BinaryReplacer extends Replacer {
     submissionParameters: SubmissionParameters
   ): Option[URI] =
     XFormsCrossPlatformSupport.inputStreamToSessionUri(
-      cxr.content.inputStream)(
+      cxr.content.stream)(
       submission.getDetailsLogger(submissionParameters)
     )
 

@@ -91,6 +91,11 @@
                     ref="instance('fr-landing-form-metadata-instance')/@state"
                     value="'loading'"/>
 
+                <xf:setvalue
+                    event="xforms-submit-error"
+                    ref="instance('fr-landing-form-metadata-instance')/@state"
+                    value="'error'"/>
+
                 <xf:action event="xforms-submit-done">
                     <xf:insert
                         ref="instance('fr-landing-form-metadata-instance')"
@@ -121,6 +126,11 @@
                     event="xforms-submit"
                     ref="instance('fr-landing-demo-forms-instance')/@state"
                     value="'loading'"/>
+
+                <xf:setvalue
+                    event="xforms-submit-error"
+                    ref="instance('fr-landing-form-metadata-instance')/@state"
+                    value="'error'"/>
 
                 <!-- Sort alphabetically by title -->
                 <xf:action event="xforms-submit-done">
@@ -178,6 +188,11 @@
                     <xf:value value="1"/>
                 </xf:header>
 
+                <xf:setvalue
+                    event="xforms-submit-error"
+                    ref="instance('fr-landing-form-metadata-instance')/@state"
+                    value="'error'"/>
+
                 <!-- Set language upon submitting -->
                 <xf:action event="xforms-submit">
                     <xf:setvalue ref="page-size" value="$page-size + 1"/>
@@ -187,9 +202,6 @@
                     <xf:setvalue
                         ref="instance('fr-landing-form-builder-instance')/@state"
                         value="'loading'"/>
-                </xf:action>
-                <xf:action event="xforms-submit-error">
-                    <xf:message ref="$fr-resources/errors/search"/>
                 </xf:action>
             </xf:submission>
 
@@ -240,7 +252,7 @@
 
                 <fr:card
                     class="{'xforms-hidden'[not($cards-tokens = 'published-forms')]}"
-                    loading="{exists(instance('fr-landing-form-metadata-instance')/@state)}"
+                    status="{(instance('fr-landing-form-metadata-instance')/@state, 'done')[1]}"
                 >
                     <xf:label ref="xxf:r('landing.titles.published-forms', '|fr-fr-resources|')"/>
                     <xf:itemset ref="instance('fr-landing-form-metadata-instance')/*[position() le $page-size]">
@@ -255,7 +267,12 @@
                                 $link-to              := $link-to-tokens[
                                     (. = 'summary' and $can-navigate-summary) or
                                     (. = 'new'     and $can-navigate-new)
-                                ][1]
+                                ][1],
+                                $link-params          :=
+                                    if (xxf:property('oxf.fr.summary.show-version-selector.*.*')) then
+                                        concat('?form-version=', form-version)
+                                    else
+                                        ''
                             return
                                 if (exists($link-to)) then
                                     concat(
@@ -265,8 +282,7 @@
                                         form-name,
                                         '/',
                                         $link-to,
-                                        '?form-version=',
-                                        form-version
+                                        $link-params
                                     )
                                 else
                                     ()"/>
@@ -308,7 +324,7 @@
                 </fr:card>
                 <fr:card
                     class="{'xforms-hidden'[not($cards-tokens = 'form-builder-forms')]}"
-                    loading="{exists(instance('fr-landing-form-builder-instance')/@state)}"
+                    status="{(instance('fr-landing-form-builder-instance')/@state, 'done')[1]}"
                 >
                     <xf:label ref="xxf:r('landing.titles.form-builder-forms', '|fr-fr-resources|')"/>
                     <xf:itemset ref="instance('fr-landing-form-builder-instance')/*[position() le $page-size]">
@@ -357,7 +373,7 @@
                 </fr:card>
                 <fr:card
                     class="{'xforms-hidden'[not($cards-tokens = 'demo-forms')]}"
-                    loading="{exists(instance('fr-landing-demo-forms-instance')/@state)}"
+                    status="{(instance('fr-landing-demo-forms-instance')/@state, 'done')[1]}"
                 >
                     <xf:label ref="xxf:r('landing.titles.demo-forms', '|fr-fr-resources|')"/>
                     <xf:itemset ref="instance('fr-landing-demo-forms-instance')/*[position() le $page-size]">
@@ -376,8 +392,10 @@
                                     'new'
                                 else
                                     'summary',
-                                '?form-version=',
-                                form-version
+                                if (xxf:property('oxf.fr.summary.show-version-selector.*.*')) then
+                                    concat('?form-version=', form-version)
+                                else
+                                    ''
                             )"/>
                         <!-- This doesn't work because we remove the form description from the metadata -->
 <!--                        <xf:hint ref="(description[@xml:lang = xxf:lang()], description)[normalize-space()][1]"/>-->

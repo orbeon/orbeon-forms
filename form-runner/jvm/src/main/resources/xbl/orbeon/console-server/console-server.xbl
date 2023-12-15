@@ -1,0 +1,159 @@
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+>
+
+    <xbl:binding element="fr|console-server" id="fr-console-server">
+        <xbl:handlers>
+            <xbl:handler
+                event="xforms-enabled"
+                phase="target">
+
+                <xf:var
+                    xmlns:ConsoleSupport="java:org.orbeon.xbl.ConsoleSupport"
+                    name="data"
+                    value="
+                        xf:element(
+                            '_',
+                            let $rows := ConsoleSupport:getStaticXPathErrors()
+                            return
+                                for $i in 1 to array:size($rows)
+                                return
+                                    let $row := array:get($rows, $i),
+                                        $refs := map:get($row, 'references')
+                                    return
+                                        xf:element(
+                                            '_',
+                                            (
+                                                xf:attribute(
+                                                    'count',
+                                                    1
+                                                ),
+                                                for $a in ('bind-name', 'error'[empty($refs)])
+                                                return
+                                                    xf:attribute(
+                                                        $a,
+                                                        map:get($row, $a)
+                                                    ),
+                                                for $v in map:get($row, 'context-name')
+                                                return
+                                                    xf:attribute(
+                                                        'context-name',
+                                                        $v
+                                                    ),
+                                                if (exists($refs)) then
+                                                    xf:attribute(
+                                                        'error',
+                                                        concat(
+                                                            'Unresolved reference(s) to form control(s): `',
+                                                            string-join($refs, '`, `'),
+                                                            '`'
+                                                        )
+                                                    )
+                                                else
+                                                    (),
+                                                ConsoleSupport:tryToUnwrapExpression(map:get($row, 'expression'))
+                                            )
+                                        )
+                        )"/>
+
+                <xf:action
+                    if="exists($data/*)"
+                    type="javascript">
+                    <xf:param
+                        name="data"
+                        value="frf:encodeFormDataToSubmit($data)"/>
+                    <xf:body>
+                        window.parent.ORBEON.xforms.Document.dispatchEvent(
+                            {
+                                targetId:   'fr-console',
+                                form: window.parent.document.querySelector('form'),
+                                eventName:  'fr-console-data',
+                                properties: { 'fr-console-data': data }
+                            }
+                        );
+                    </xf:body>
+                </xf:action>
+
+            </xbl:handler>
+            <xbl:handler
+                xxbl:scope="outer"
+                xxf:phantom="true"
+                observer="fr-view-component fr-form-model"
+                event="xxforms-xpath-error"
+                defaultAction="cancel">
+
+                <xf:action xxbl:scope="inner">
+
+                    <xf:var
+                        xmlns:ConsoleSupport="java:org.orbeon.xbl.ConsoleSupport"
+                        name="data"
+                        value="
+                            let $expression := ConsoleSupport:tryToUnwrapExpression(event('expression')),
+                                $message    := event('message'),
+                                $details    := ConsoleSupport:getCurrentEventErrorDetails()
+                            return
+                                xf:element(
+                                    '_',
+                                    xf:element(
+                                        '_',
+                                        (
+                                            xf:attribute(
+                                                'count',
+                                                1
+                                            ),
+                                            for $v in (
+                                                    map:get($details, 'bind-name'),
+                                                    frf:controlNameFromId(event('xxf:targetid')) (: if event targets a control :)
+                                                )[1]
+                                            return
+                                                xf:attribute(
+                                                    'bind-name',
+                                                    $v
+                                                ),
+                                            xf:attribute(
+                                                'error',
+                                                $message
+                                            ),
+                                            xf:attribute(
+                                                'context-name',
+                                                map:get($details, 'context-name')
+                                            ),
+                                            $expression
+                                        )
+                                    )
+                                )"/>
+
+                    <xf:action
+                        type="javascript">
+                        <xf:param
+                            name="data"
+                            value="frf:encodeFormDataToSubmit($data)"/>
+                        <xf:body>
+                            window.parent.ORBEON.xforms.Document.dispatchEvent(
+                                {
+                                    targetId:   'fr-console',
+                                    form: window.parent.document.querySelector('form'),
+                                    eventName:  'fr-console-data',
+                                    properties: { 'fr-console-data': data }
+                                }
+                            );
+                        </xf:body>
+                    </xf:action>
+                </xf:action>
+
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:template/>
+    </xbl:binding>
+</xbl:xbl>

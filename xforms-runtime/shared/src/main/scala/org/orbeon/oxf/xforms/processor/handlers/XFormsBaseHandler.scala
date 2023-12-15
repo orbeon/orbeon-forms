@@ -147,17 +147,17 @@ object XFormsBaseHandler {
   def handleAVTsAndIDs(
     _attributes          : Attributes,
     refIdAttributeNames  : Array[String],
-    xformsHandlerContext : HandlerContext
+    handlerContext: HandlerContext
   ): Attributes = {
 
     var attributes = _attributes
 
-    val prefixedId = xformsHandlerContext.getPrefixedId(attributes)
+    val prefixedId = handlerContext.getPrefixedId(attributes)
     if (prefixedId ne null) {
 
-      val containingDocument = xformsHandlerContext.containingDocument
-      val hasAVT             = xformsHandlerContext.getPartAnalysis.hasAttributeControl(prefixedId)
-      val effectiveId        = xformsHandlerContext.getEffectiveId(attributes)
+      val containingDocument = handlerContext.containingDocument
+      val hasAVT             = handlerContext.getPartAnalysis.hasAttributeControl(prefixedId)
+      val effectiveId        = handlerContext.getEffectiveId(attributes)
 
       var found = false
       if (hasAVT) {
@@ -172,7 +172,7 @@ object XFormsBaseHandler {
             val attributeQName = attributes.getQName(i) // use qualified name so we match on "xml:lang"
 
             // Control analysis
-            val controlAnalysis = xformsHandlerContext.getPartAnalysis.getAttributeControl(prefixedId, attributeQName)
+            val controlAnalysis = handlerContext.getPartAnalysis.getAttributeControl(prefixedId, attributeQName)
 
             // Get static id of attribute control associated with this particular attribute
             val attributeControlStaticId = controlAnalysis.staticId
@@ -183,7 +183,7 @@ object XFormsBaseHandler {
 
             // Determine attribute value
             // NOTE: This also handles dummy images for the xhtml:img/@src case
-            val effectiveAttributeValue = XXFormsAttributeControl.getExternalValueHandleSrc(attributeControl, controlAnalysis)
+            val effectiveAttributeValue = XXFormsAttributeControl.getExternalValueHandleSrc(attributeControl, controlAnalysis, handlerContext.collector)
             // Set the value of the attribute
             attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, attributes.getURI(i), XMLUtils.prefixFromQName(attributeQName), attributeLocalName, effectiveAttributeValue)
           }
@@ -198,7 +198,7 @@ object XFormsBaseHandler {
     for (refIdAttributeName <- refIdAttributeNames) {
       val forAttribute = attributes.getValue(refIdAttributeName)
       if (forAttribute != null)
-        attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", refIdAttributeName, xformsHandlerContext.getIdPrefix + forAttribute + xformsHandlerContext.getIdPostfix)
+        attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", refIdAttributeName, handlerContext.getIdPrefix + forAttribute + handlerContext.getIdPostfix)
     }
     attributes
   }

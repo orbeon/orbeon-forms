@@ -11,15 +11,17 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/select2.full.js"/>
     <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/fr.js"/>
@@ -64,7 +66,6 @@
                     <fr:databound-select1
                             id=""
                             appearance="search"
-                            ref=""
                             service-performs-search="false"
                             service-supports-paging="false"
                             is-last-page=""
@@ -108,8 +109,8 @@
                             required="true()"/>
                         <xf:bind
                             ref="xf:label/@ref"
-                            readonly="$control/@selection = 'open'"
-                            calculate="if ($control/@selection = 'open') then ../../xf:value/@ref else ."/>
+                            readonly="$control/@selection != ''"
+                            calculate="if ($control/@selection != '') then ../../xf:value/@ref else ."/>
                     </xf:bind>
                 </xf:model>
                 <fr:grid>
@@ -124,14 +125,38 @@
                     </xh:tr>
                     <xh:tr>
                         <xh:td colspan="2">
-                            <fr:yesno-input ref="xf:element('_', if (@selection = 'open') then 'true' else 'false')" id="fb-open-selection">
+                            <xf:var name="formula-prefix">{if (</xf:var>
+                            <xf:var name="formula-suffix">) then 'open' else ''}</xf:var>
+                            <fb:boolean-or-formula
+                                ref="xf:element('_',
+                                    if      (empty($control/@selection))   then 'false()'
+                                    else if ($control/@selection = 'open') then 'true()'
+                                    else substring-before(substring-after($control/@selection, $formula-prefix), $formula-suffix)
+                                )"
+                                resources-ref="frf:currentFormResources()"
+                                id="fb-open-selection">
+
                                 <xf:label ref="xxf:r('dialog-control-settings.open-selection.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-control-settings.open-selection.hint',  '|fr-form-resources|')"/>
-                                <xf:action event="xforms-select">
+                                <xf:action event="xforms-value-changed">
                                     <xf:delete ref="$control/@selection"/>
-                                    <xf:insert if="event('xxf:item-value') = 'true'" context="$control" origin="xf:attribute('selection', 'open')"/>
+                                    <xf:insert
+                                        if="event('xxf:value') != 'false()'"
+                                        context="$control"
+                                        origin="
+                                            xf:attribute(
+                                                'selection',
+                                                if (event('xxf:value') = 'true()')
+                                                then 'open'
+                                                else concat(
+                                                    $formula-prefix,
+                                                    event('xxf:value'),
+                                                    $formula-suffix
+                                                )
+                                            )
+                                        "/>
                                 </xf:action>
-                            </fr:yesno-input>
+                            </fb:boolean-or-formula>
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
@@ -261,10 +286,9 @@
 
             <!--
                 Adjust `label` attribute if needed, but only in read-write modes:
-
-                 - https://github.com/orbeon/orbeon-forms/issues/4553
-                 - https://github.com/orbeon/orbeon-forms/issues/5816
-             -->
+                - https://github.com/orbeon/orbeon-forms/issues/4553
+                - https://github.com/orbeon/orbeon-forms/issues/5816
+            -->
             <xbl:handler event="xforms-enabled" if="not(fr:is-readonly-mode())">
                 <xf:var name="service-performs-search" value="xxf:component-param-value('service-performs-search') = 'true'"/>
                 <xf:var name="binding"                 value="xxf:binding('fr-databound-select1-search')"/>
@@ -330,9 +354,11 @@
                                     replace="instance"
                                     instance="result-raw"
                                     serialization="none">
-                                <!-- Set user agent for services that require one, like GitHub's API
-                                     (we should have more general solution, like setting a User-Agent by default,
-                                     unless a property says otherwise) -->
+                                <!--
+                                    Set user agent for services that require one, like GitHub's API
+                                    (we should have more general solution, like setting a User-Agent by default,
+                                    unless a property says otherwise)
+                                -->
                                 <xf:header>
                                     <xf:name>User-Agent</xf:name>
                                     <xf:value>OrbeonForms</xf:value>
@@ -367,10 +393,19 @@
                             data-initial-label="{{$binding/@label}}"
                             data-initial-value="{{$binding}}"
                             data-min-input-length="{{$min-input-length}}">
-                            <xsl:if test="exists(@selection)">
-                                <xsl:attribute name="data-selection" select="@selection"/>
-                            </xsl:if>
+
+                            <xf:var name="selection" value="fr:component-param-value('selection')">
+                                <xf:action event="xforms-enabled xforms-value-changed" type="javascript">
+                                    <xf:param name="selection" value="$selection"/>
+                                    <xf:body>
+                                        var i = ORBEON.xforms.XBL.instanceForControl(this);
+                                        if (i) i.updateOpenSelection(selection == 'open');
+                                    </xf:body>
+                                </xf:action>
+                            </xf:var>
+
                             <xh:select id="select1"/>
+
                         </xf:group>
                         <xf:input ref="$binding[$view]/@label"/>
                     </xf:group>

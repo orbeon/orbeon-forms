@@ -24,6 +24,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.InstanceLoader
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.Instance
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
@@ -185,7 +186,7 @@ class XFormsInstance(
 
   def parentEventObserver: XFormsEventTarget = model
 
-  def performDefaultAction(event: XFormsEvent): Unit =
+  def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit =
     event match {
       case _: XXFormsInstanceInvalidate =>
         implicit val indentedLogger: IndentedLogger = event.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
@@ -204,11 +205,11 @@ class XFormsInstance(
             )
         }
       case ev: XXFormsActionErrorEvent =>
-        XFormsError.handleNonFatalActionError(this, ev.throwable)
+        XFormsError.handleNonFatalActionError(this, Option(ev.throwable))
       case _ =>
     }
 
-  def performTargetAction(event: XFormsEvent): Unit =
+  def performTargetAction(event: XFormsEvent, collector: ErrorEventCollector): Unit =
     event match {
       case insertEvent: XFormsInsertEvent =>
         // New nodes were just inserted
@@ -285,6 +286,7 @@ class XFormsInstance(
   // This includes marking the structural change as well as dispatching events
   def replace(
     newDocumentInfo : DocumentNodeInfoType,
+    collector       : ErrorEventCollector,
     dispatch        : Boolean                 = true,
     instanceCaching : Option[InstanceCaching] = instanceCaching,
     isReadonly      : Boolean                 = readonly,
@@ -313,7 +315,8 @@ class XFormsInstance(
           this,
           formerRoot,
           currentRoot
-        )
+        ),
+        collector
       )
 
       // Dispatch xforms-insert event for backward compatibility
@@ -323,11 +326,12 @@ class XFormsInstance(
         new XFormsInsertEvent(
           this,
           Seq[om.NodeInfo](currentRoot).asJava,
-          null,   // CHECK
+          null, // CHECK
           currentRoot.getRoot,
           "into", // "into" makes more sense than "after" or "before"! We used to have "after", not sure why.
           0
-        )
+        ),
+        collector
       )
     }
   }
@@ -403,7 +407,7 @@ trait BasicIdIndex {
     for ((id, element) <- mappings)
       addId(id, element)
 
-  protected def createIndexIfNeeded(): Unit =
+  private def createIndexIfNeeded(): Unit =
     if (idIndex eq null) {
       idIndex = m.Map()
       combineMappings(mappingsInSubtree(documentInfo))

@@ -65,6 +65,8 @@ trait PartAnalysisContextMutable extends TransientState {
   def wrapElement(elem: dom.Element): om.NodeInfo =
     new DocumentWrapper(elem.getDocument, null, StaticXPath.GlobalConfiguration).wrap(elem)
 
+  def reportStaticXPathError(expression: String, throwable: Option[Throwable], details: XPathErrorDetails): Unit
+
   def freeTransientState(): Unit
 }
 
@@ -93,7 +95,7 @@ trait PartAnalysisContextAfterTree extends PartAnalysisContextForTree {
   def getModel(prefixedId: String): Model
   def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model
   def getModelByInstancePrefixedId(prefixedId: String): Model
-  def getDefaultModelForScope(scope: Scope): Option[Model]
+  def findDefaultModelForScope(scope: Scope): Option[Model]
   def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): Option[String]
 
   def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl
@@ -158,6 +160,14 @@ case class StaticPartAnalysisImpl(
   }
 
   def getMark(prefixedId: String): Option[SAXStore#Mark] = metadata.getMark(prefixedId)
+
+  private var staticXPathErrors: List[(String, Option[Throwable], XPathErrorDetails)] = Nil
+
+  def reportStaticXPathError(expression: String, throwable: Option[Throwable], details: XPathErrorDetails): Unit = {
+    staticXPathErrors ::= (expression, throwable, details)
+  }
+
+  def getStaticXPathErrors: List[(String, Option[Throwable], XPathErrorDetails)] = staticXPathErrors
 
   override def freeTransientState(): Unit = super.freeTransientState()
 }

@@ -15,18 +15,23 @@ package org.orbeon.oxf.xforms.submission
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.dom.Node
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.CollectionUtils.InsertPosition
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
-import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, IndentedLogger, XPath}
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceCaching, InstanceDataOps, XFormsInstance}
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.xforms.XFormsCrossPlatformSupport
+
+import scala.util.control.NonFatal
 
 
 class DirectInstanceReplacer(value: (DocumentNodeInfoType, InstanceCaching)) extends Replacer {
@@ -196,28 +201,14 @@ object InstanceReplacer extends Replacer {
                     submissionParameters.tunnelProperties
                   )
                 } else {
-                  implicit val detailsLogger  = submission.getDetailsLogger(submissionParameters)
+                  implicit val detailsLogger: IndentedLogger = submission.getDetailsLogger(submissionParameters)
+
+                  debug(
+                    s"replacing instance with ${if (submissionParameters.isReadonly) "read-only" else "mutable"} instance",
+                    List("instance"-> instanceToUpdate.getEffectiveId)
+                  )
 
                   // Obtain root element to insert
-                  if (detailsLogger.debugEnabled)
-                    detailsLogger.logDebug(
-                      "",
-                      if (submissionParameters.isReadonly)
-                        "replacing instance with read-only instance"
-                      else
-                        "replacing instance with mutable instance",
-                      "instance",
-                      instanceToUpdate.getEffectiveId
-                    )
-
-                  // Perform insert/delete. This will dispatch xforms-insert/xforms-delete events.
-                  // "the replacement is performed by an XForms action that performs some
-                  // combination of node insertion and deletion operations that are
-                  // performed by the insert action (10.3 The insert Element) and the
-                  // delete action"
-
-                  // NOTE: As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
-                  // performing RRRR directly.
                   val newDocumentInfo =
                     value match {
                       case Left(instanceDocument) =>
@@ -228,6 +219,15 @@ object InstanceReplacer extends Replacer {
                       case Right((documentNodeInfo, _)) =>
                         documentNodeInfo
                     }
+
+                  // Perform insert/delete. This will dispatch xforms-insert/xforms-delete events.
+                  // "the replacement is performed by an XForms action that performs some
+                  // combination of node insertion and deletion operations that are
+                  // performed by the insert action (10.3 The insert Element) and the
+                  // delete action"
+
+                  // NOTE: As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
+                  // performing RRRR directly.
 
                   val applyDefaults = submissionParameters.applyDefaults
                   if (isDestinationRootElement) {
@@ -241,6 +241,7 @@ object InstanceReplacer extends Replacer {
 
                     instanceToUpdate.replace(
                       newDocumentInfo = newDocumentInfo,
+                      collector       = EventCollector.Throw,
                       dispatch        = true,
                       instanceCaching = value.toOption.map(_._2),
                       isReadonly      = submissionParameters.isReadonly,
@@ -266,21 +267,17 @@ object InstanceReplacer extends Replacer {
                       requireDefaultValues              = applyDefaults,
                       searchForInstance                 = true,
                       removeInstanceDataFromClonedNodes = true,
-                      structuralDependencies            = true
+                      structuralDependencies            = true,
+                      collector                         = EventCollector.Throw
                     )
 
                     // Perform the deletion of the selected node
                     XFormsDeleteAction.doDeleteOne(
                       containingDocument = submission.containingDocument,
                       nodeInfo           = destinationNodeInfo,
-                      doDispatch         = true
+                      doDispatch         = true,
+                      collector          = EventCollector.Throw
                     )
-
-                    // Update model instance
-                    // NOTE: The inserted node NodeWrapper.index might be out of date at this point because:
-                    // - doInsert() dispatches an event which might itself change the instance
-                    // - doDelete() does as well
-                    // Does this mean that we should check that the node is still where it should be?
                   }
                   ReplaceResult.SendDone(cxr, submissionParameters.tunnelProperties)
                 }
@@ -297,16 +294,11 @@ object InstanceReplacer extends Replacer {
     tunnelProperties : Option[TunnelProperties]
   )(implicit
     logger           : IndentedLogger
-  ): InstanceDocument = {
-    // Create resulting instance whether entire instance is replaced or not, because this:
-    // 1. Wraps a Document within a DocumentInfo if needed
-    // 2. Performs text nodes adjustments if needed
+  ): InstanceDocument =
     try {
       ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is =>
-
         if (! isReadonly) {
-          if (logger.debugEnabled)
-            logger.logDebug("", "deserializing to mutable instance")
+          debug("deserializing to mutable instance")
           // Q: What about configuring validation? And what default to choose?
           Left(
             if (isJSON) {
@@ -318,8 +310,7 @@ object InstanceReplacer extends Replacer {
             }
           )
         } else {
-          if (logger.debugEnabled)
-            logger.logDebug("", "deserializing to read-only instance")
+          debug("deserializing to read-only instance")
           // Q: What about configuring validation? And what default to choose?
           Right(
             if (isJSON)
@@ -330,12 +321,12 @@ object InstanceReplacer extends Replacer {
         }
       }
     } catch {
-      case e: Exception =>
+      case NonFatal(t) =>
         throw new XFormsSubmissionException(
           submission       = submission,
           message          = "xf:submission: exception while reading XML response.",
           description      = "processing instance replacement",
-          throwable        = e,
+          throwable        = t,
           submitErrorEvent = new XFormsSubmitErrorEvent(
             submission,
             ErrorType.ParseError,
@@ -344,5 +335,4 @@ object InstanceReplacer extends Replacer {
           )
         )
     }
-  }
 }

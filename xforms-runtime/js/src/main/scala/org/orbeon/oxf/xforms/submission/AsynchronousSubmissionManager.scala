@@ -13,7 +13,7 @@ class AsynchronousSubmissionManager
 
   protected def awaitPending(
     containingDocument: XFormsContainingDocument,
-    get               : () => List[(Future[ConnectResult], Duration)],
+    get               : () => List[(Future[Any], Duration)],
     clear             : () => Unit
   )(implicit
     logger            : IndentedLogger

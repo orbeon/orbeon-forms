@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.portlet
 
-import javax.portlet._
+import org.orbeon.connection.StreamedContentT
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.{ExternalContext, PortletWebAppContext}
+import org.orbeon.oxf.fr.embedding.APISupport.{Redirect, StreamedContentOrRedirect}
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -23,12 +24,14 @@ import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponseImpl
 import org.orbeon.oxf.webapp.ServletPortlet._
 import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet}
 
+import javax.portlet._
 import scala.jdk.CollectionConverters._
 
 // For backward compatibility
 class OrbeonPortlet2         extends OrbeonPortlet
 class OrbeonPortletDelegate  extends OrbeonPortlet
 class OrbeonPortlet2Delegate extends OrbeonPortlet
+
 
 /**
  * This is the Portlet (JSR-286) entry point of Orbeon.
@@ -129,9 +132,9 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
 
     // Write out the response
     externalContext.getResponse.responseContent match {
-      case _: Redirect =>
+      case Right(_: Redirect) =>
         throw new NotImplementedError("redirect not supported when serving resource")
-      case s @ StreamedContent(_, contentType, _, _) =>
+      case Left(s @ StreamedContentT(_, contentType, _, _)) =>
         contentType foreach response.setContentType
         APISupport.writeResponseBody(APISupport.mustRewriteForMediatype)(s)
     }

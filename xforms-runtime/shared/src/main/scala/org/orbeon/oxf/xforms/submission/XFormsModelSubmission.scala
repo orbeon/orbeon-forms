@@ -15,16 +15,19 @@ package org.orbeon.oxf.xforms.submission
 
 import cats.syntax.option._
 import org.log4s.Logger
+import org.orbeon.connection.{ConnectionResult, ConnectionResultT}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.submission.SubmissionParameters.createRefContext
+import org.orbeon.oxf.xforms.submission.SubmissionUtils.convertConnectResult
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionSupport.{isSatisfiesValidity, prepareXML, requestedSerialization}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
@@ -99,13 +102,13 @@ class XFormsModelSubmission(
   def getLocationData     : LocationData      = staticSubmission.locationData
   def parentEventObserver : XFormsEventTarget = model
 
-  def performTargetAction(event: XFormsEvent): Unit = ()
+  def performTargetAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = ()
 
-  def performDefaultAction(event: XFormsEvent): Unit = {
+  def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
     implicit val indentedLogger: IndentedLogger = getIndentedLogger
     event match {
       case e: XFormsSubmitEvent                       => doSubmit(e).foreach(processReplaceResultAndCloseConnection)
-      case e: XXFormsActionErrorEvent                 => XFormsError.handleNonFatalActionError(thisSubmission, e.throwable)
+      case e: XXFormsActionErrorEvent                 => XFormsError.handleNonFatalActionError(thisSubmission, Option(e.throwable))
       case e if e.name == XFormsEvents.XXFORMS_SUBMIT =>
 
         implicit val refContext: RefContext = createRefContext(thisSubmission)
@@ -141,7 +144,8 @@ class XFormsModelSubmission(
       }
     )
 
-  def getReplacer(cxr: ConnectionResult, submissionParameters: SubmissionParameters)(implicit logger: IndentedLogger): Replacer = {
+
+  def getReplacer(cxr: ConnectionResultT[_], submissionParameters: SubmissionParameters)(implicit logger: IndentedLogger): Replacer = {
     // NOTE: This can be called from other threads so it must NOT modify the XFCD or submission
     // Handle response
     if (cxr.dontHandleResponse) {
@@ -324,9 +328,11 @@ class XFormsModelSubmission(
 
           // We can do this first, because the check just depends on the controls, instance to submit, and pending
           // submissions if any. This does not depend on the actual state of the instance.
-          if (submissionParameters.serialize && submissionParameters.xxfUploads &&
-            SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, refContext.refInstanceOpt))
-            throw new XFormsSubmissionException(
+          if (
+            submissionParameters.serialize  &&
+            submissionParameters.xxfUploads &&
+            SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, refContext.refInstanceOpt)
+          ) throw new XFormsSubmissionException(
               thisSubmission,
               "xf:submission: instance to submit has at least one pending upload.",
               "checking pending uploads",
@@ -402,7 +408,7 @@ class XFormsModelSubmission(
 
           /* ***** Serialization ********************************************************************************** */
 
-          requestedSerialization(submissionParameters.serializationOpt, submissionParameters.xformsMethod, submissionParameters.httpMethod) match {
+          requestedSerialization(submissionParameters) match {
             case None =>
               throw new XFormsSubmissionException(
                 thisSubmission,
@@ -412,6 +418,7 @@ class XFormsModelSubmission(
                 null
               )
             case Some(requestedSerialization) =>
+
               val uriOrDocumentToSubmitOpt =
                 if (submissionParameters.serialize) {
                   // Check if a submission requires file upload information
@@ -426,86 +433,94 @@ class XFormsModelSubmission(
                   None
                 }
 
-            val overriddenSerializedData =
-              if (! submissionParameters.isDeferredSubmission && submissionParameters.serialize) {
-                // Fire `xforms-submit-serialize`
-                // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
-                // is changed from the initial value of empty string, then the content of the submission-body
-                // property string is used as the submission serialization. Otherwise, the submission serialization
-                // consists of a serialization of the selected instance data according to the rules stated at 11.9
-                // Submission Options."
-                val serializeEvent =
-                  new XFormsSubmitSerializeEvent(thisSubmission, refContext.refNodeInfo, requestedSerialization)
+              val overriddenSerializedData =
+                if (! submissionParameters.isDeferredSubmission && submissionParameters.serialize) {
+                  // Fire `xforms-submit-serialize`
+                  // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
+                  // is changed from the initial value of empty string, then the content of the submission-body
+                  // property string is used as the submission serialization. Otherwise, the submission serialization
+                  // consists of a serialization of the selected instance data according to the rules stated at 11.9
+                  // Submission Options."
+                  val serializeEvent =
+                    new XFormsSubmitSerializeEvent(thisSubmission, refContext.refNodeInfo, requestedSerialization)
 
-                Dispatch.dispatchEvent(serializeEvent)
+                  Dispatch.dispatchEvent(serializeEvent, EventCollector.Throw)
 
-                // TODO: rest of submission should happen upon default action of event
-                serializeEvent.submissionBodyAsString
-              } else {
-                null
-              }
-
-            // Serialize
-            val serializationParameters =
-              SerializationParameters(
-                thisSubmission,
-                submissionParameters,
-                requestedSerialization,
-                uriOrDocumentToSubmitOpt,
-                overriddenSerializedData
-              )
-
-            /* ***** Submission connection ************************************************************************** */
-
-            // Result information
-            val connectResultOpt =
-              submissions.find(_.isMatch(submissionParameters, serializationParameters)).flatMap { submission =>
-                withDebug("connecting", List("type" -> submission.submissionType)) {
-                  submission.connect(submissionParameters, serializationParameters)
+                  // TODO: rest of submission should happen upon default action of event
+                  serializeEvent.submissionBodyAsString
+                } else {
+                  null
                 }
-              }
 
-            /* ***** Submission result processing ******************************************************************* */
+              // Serialize
+              val serializationParameters =
+                SerializationParameters(
+                  thisSubmission,
+                  submissionParameters,
+                  requestedSerialization,
+                  uriOrDocumentToSubmitOpt,
+                  overriddenSerializedData
+                )
 
-            connectResultOpt match {
-              case Some(Left(connectResult)) =>
-                handleConnectResult(
-                  submissionParameters   = submissionParameters,
-                  connectResult          = connectResult,
-                  initializeXPathContext = true // function context might have changed
-                ).some
-              case Some(Right(connectResultF)) if submissionParameters.isDeferredSubmission =>
-                containingDocument.setReplaceAllFuture(connectResultF)
-                None
-              case Some(Right(connectResultF)) if connectResultF.value.isDefined =>
-                // Optimization if the `Future` is already completed
-                connectResultF.value match {
-                  case Some(Success(connectResult)) =>
-                    handleConnectResult(
-                      submissionParameters   = submissionParameters,
-                      connectResult          = connectResult,
-                      initializeXPathContext = true // function context might have changed
-                    ).some
-                  case Some(Failure(t)) =>
-                    (ReplaceResult.SendError(t, Right(submissionParameters.actionOrResource.some), submissionParameters.tunnelProperties), None).some
-                  case None =>
-                    throw new IllegalStateException // we check for `isDefined` above
+              /* ***** Submission connection ************************************************************************** */
+
+              // Result information
+              val connectResultOpt =
+                submissions.find(_.isMatch(submissionParameters, serializationParameters)).flatMap { submission =>
+                  withDebug("connecting", List("type" -> submission.submissionType)) {
+                    submission.connect(submissionParameters, serializationParameters)
+                  }
                 }
-              case Some(Right(connectResultF)) =>
-                // The `Future` is not completed yet so we tell the async submission manager
-                containingDocument
-                  .getAsynchronousSubmissionManager(create = true)
-                  .foreach(_.addAsynchronousSubmission(
-                    thisSubmission.getEffectiveId,
-                    connectResultF,
-                    submissionParameters,
-                    awaitInCurrentRequest = submissionParameters.responseMustAwait
-                  ))
-                None
-              case None =>
-                // Nothing to do here (case of `ClientGetAllSubmission`)
-                None
-            }
+
+              /* ***** Submission result processing ******************************************************************* */
+
+              connectResultOpt match {
+                case Some(Left(connectResult)) =>
+                  handleConnectResult(
+                    submissionParameters   = submissionParameters,
+                    connectResult          = connectResult,
+                    initializeXPathContext = true // function context might have changed
+                  ).some
+                case Some(Right(connectResultF)) if submissionParameters.isDeferredSubmission =>
+                  containingDocument.setReplaceAllFuture(connectResultF)
+                  None
+                  // This optimization is not possible now because we also depend on the contained `fs2.Stream` to be
+                  // fully ready, not only the `Future`.
+  //              case Some(Right(connectResultF)) if connectResultF.value.isDefined =>
+  //                // Optimization if the `Future` is already completed
+  //                connectResultF.value match {
+  //                  case Some(Success(connectResult)) =>
+  //                    handleConnectResult(
+  //                      submissionParameters   = submissionParameters,
+  //                      connectResult          = connectResult,
+  //                      initializeXPathContext = true // function context might have changed
+  //                    ).some
+  //                  case Some(Failure(t)) =>
+  //                    (ReplaceResult.SendError(t, Right(submissionParameters.actionOrResource.some), submissionParameters.tunnelProperties), None).some
+  //                  case None =>
+  //                    throw new IllegalStateException // we check for `isDefined` above
+  //                }
+                case Some(Right(connectResultIo)) =>
+                  // Submit the async submission manager
+                  containingDocument
+                    .getAsynchronousSubmissionManager
+                    .addAsynchronousCompletion(
+                      description   = s"submission id: `${thisSubmission.getEffectiveId}`",
+                      computation   = connectResultIo.flatMap(convertConnectResult), // running asynchronously
+                      continuation  = (connectResultTry: Try[ConnectResult]) =>      // running synchronously when we process the completed submission
+                        containingDocument
+                          .getObjectByEffectiveId(thisSubmission.getEffectiveId).asInstanceOf[XFormsModelSubmission]
+                          .processAsyncSubmissionResponse(
+                            connectResultTry,
+                            submissionParameters
+                          ),
+                      awaitInCurrentRequest = submissionParameters.responseMustAwait
+                    )
+                  None
+                case None =>
+                  // Nothing to do here (case of `ClientGetAllSubmission`)
+                  None
+              }
           }
         } catch {
           case NonFatal(throwable) =>
@@ -542,8 +557,8 @@ class XFormsModelSubmission(
       }
 
     private def sendSubmitDone(cxr: ConnectionResult, tunnelProperties: Option[TunnelProperties]): Unit = {
-      model.resetAndEvaluateVariables() // after a submission, the context might have changed
-      Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, cxr, tunnelProperties))
+      model.resetAndEvaluateVariables(EventCollector.Throw) // after a submission, the context might have changed
+      Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, cxr, tunnelProperties), EventCollector.Throw)
     }
 
     private def sendSubmitError(t: Throwable, ctx: Either[Option[ConnectionResult], Option[String]], tunnelProperties: Option[TunnelProperties]): Unit =
@@ -558,7 +573,7 @@ class XFormsModelSubmission(
     private def sendSubmitErrorWithDefault(t: Throwable, default: => XFormsSubmitErrorEvent): Unit = {
 
       // After a submission, the context might have changed
-      model.resetAndEvaluateVariables()
+      model.resetAndEvaluateVariables(EventCollector.Throw)
 
       // Try to get error event from exception and if not possible create default event
       val submitErrorEvent =
@@ -567,7 +582,7 @@ class XFormsModelSubmission(
       // Dispatch event
       submitErrorEvent.logMessage(t)
 
-      Dispatch.dispatchEvent(submitErrorEvent)
+      Dispatch.dispatchEvent(submitErrorEvent, EventCollector.Throw)
     }
 
     private def createUriOrDocumentToSubmit(
@@ -576,7 +591,7 @@ class XFormsModelSubmission(
       refContext    : RefContext,
       indentedLogger: IndentedLogger
     ): URI Either Document =
-      if (requestedSerialization(submissionParameters.serializationOpt, submissionParameters.xformsMethod, submissionParameters.httpMethod).contains(ContentTypes.OctetStreamContentType))
+      if (requestedSerialization(submissionParameters).contains(ContentTypes.OctetStreamContentType))
         Left(
           URI.create(refContext.refNodeInfo.getStringValue)
         )

@@ -16,19 +16,23 @@ package org.orbeon.oxf.xforms
 import cats.syntax.option._
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
-import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
+import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.{StaticXPath, XPathCache}
-import org.orbeon.oxf.xforms.analysis.{BindSingleItemBinding, RefSingleItemBinding, SingleItemBinding}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
+import org.orbeon.oxf.xforms.analysis.{BindSingleItemBinding, RefSingleItemBinding, SingleItemBinding, XPathErrorDetails}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.XFormsEventTarget
+import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsXPathErrorEvent}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}
+import org.orbeon.xforms.BindingErrorReason
+import org.orbeon.oxf.xforms.model.{BindNode, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
-import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
 import java.util
@@ -134,28 +138,27 @@ class XFormsContextStack {
   def getFunctionContext(sourceEffectiveId: String): XFormsFunction.Context =
     getFunctionContext(sourceEffectiveId, this.head)
 
-  // 2023-01-21: `data` can only be `null` or a `BindNode`
-  def getFunctionContext(sourceEffectiveId: String, data: Any): XFormsFunction.Context =
-    getFunctionContext(sourceEffectiveId, this.head, data)
+  def getFunctionContext(sourceEffectiveId: String, bindNodeOpt: Option[BindNode]): XFormsFunction.Context =
+    getFunctionContext(sourceEffectiveId, this.head, bindNodeOpt)
 
   def getFunctionContext(sourceEffectiveId: String, binding: BindingContext): XFormsFunction.Context =
-    XFormsFunction.Context(container, binding, sourceEffectiveId, binding.modelOpt, null)
+    XFormsFunction.Context(container, binding, sourceEffectiveId, binding.modelOpt, None)
 
-  private def getFunctionContext(sourceEffectiveId: String, binding: BindingContext, data: Any): XFormsFunction.Context =
-    XFormsFunction.Context(container, binding, sourceEffectiveId, binding.modelOpt, data)
+  private def getFunctionContext(sourceEffectiveId: String, binding: BindingContext, bindNodeOpt: Option[BindNode]): XFormsFunction.Context =
+    XFormsFunction.Context(container, binding, sourceEffectiveId, binding.modelOpt, bindNodeOpt)
 
   /**
    * Reset the binding context to the root of the first model's first instance, or to the parent binding context.
    */
-  def resetBindingContext(): BindingContext = {
-    resetBindingContext(container.defaultModel)
+  def resetBindingContext(collector: ErrorEventCollector): BindingContext = {
+    resetBindingContext(container.findDefaultModel, collector)
     this.head
   }
 
   /**
    * Reset the binding context to the root of the given model's first instance.
    */
-  def resetBindingContext(modelOpt: Option[XFormsModel]): Unit = {
+  def resetBindingContext(modelOpt: Option[XFormsModel], collector: ErrorEventCollector): Unit = {
 
     val defaultInstanceOpt = modelOpt flatMap (_.defaultInstanceOpt)
 
@@ -186,12 +189,15 @@ class XFormsContextStack {
 
     // Add model variables for default model
     modelOpt foreach { model =>
-      model.setTopLevelVariables(evaluateModelVariables(model))
+      model.setTopLevelVariables(evaluateModelVariables(model, collector))
     }
   }
 
   // NOTE: This only scopes top-level model variables, but not binds-as-variables.
-  private def evaluateModelVariables(model: XFormsModel): Map[String, ValueRepresentationType] = {
+  private def evaluateModelVariables(
+    model    : XFormsModel,
+    collector: ErrorEventCollector
+  ): Map[String, ValueRepresentationType] = {
     // TODO: Check dirty flag to prevent needless re-evaluation
     // All variables in the model are in scope for the nested binds and actions.
     val variables = model.staticModel.variablesSeq
@@ -199,7 +205,7 @@ class XFormsContextStack {
 
       val variableInfos =
         variables map { variable =>
-          variable.name -> scopeVariable(variable, model.getEffectiveId, handleNonFatal = true).value
+          variable.name -> scopeVariable(variable, model.getEffectiveId, model, collector).value
         } toMap
 
       val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
@@ -215,9 +221,10 @@ class XFormsContextStack {
   }
 
   def scopeVariable(
-    staticVariable    : VariableAnalysisTrait,
-    sourceEffectiveId : String,
-    handleNonFatal    : Boolean
+    staticVariable   : VariableAnalysisTrait,
+    sourceEffectiveId: String,
+    eventTarget      : XFormsEventTarget,
+    collector        : ErrorEventCollector
   ): VariableNameValue = {
 
     // Create variable object
@@ -239,12 +246,13 @@ class XFormsContextStack {
     this.head =
       this.head.pushVariable(
         staticVariable,
-        variable.staticVariable.name,
+        staticVariable.name,
         variable.valueEvaluateIfNeeded(
           contextStack      = this,
           sourceEffectiveId = sourceEffectiveId,
           pushOuterContext  = true,
-          handleNonFatal    = handleNonFatal
+          eventTarget       = eventTarget,
+          collector         = collector
         ),
         newScope
       )
@@ -257,7 +265,13 @@ class XFormsContextStack {
     this.head
   }
 
-  def pushBinding(singleItemBinding: SingleItemBinding, sourceEffectiveId: String): Unit =
+  // 2 callers
+  def pushBinding(
+    singleItemBinding: SingleItemBinding,
+    sourceEffectiveId: String,
+    eventTarget      : XFormsEventTarget,
+    collector        : ErrorEventCollector
+  ): Unit =
     singleItemBinding match {
       case BindSingleItemBinding(scope, model, bind) =>
         pushBinding(
@@ -270,7 +284,8 @@ class XFormsContextStack {
           bindingElementNamespaceMapping = NamespaceMapping.EmptyMapping, // unused
           sourceEffectiveId              = sourceEffectiveId,
           scope                          = scope,
-          handleNonFatal                 = true
+          eventTarget                    = eventTarget,
+          collector                      = collector
         )
       case RefSingleItemBinding(scope, model, context, ns, ref) =>
         pushBinding(
@@ -283,24 +298,20 @@ class XFormsContextStack {
           bindingElementNamespaceMapping = ns,
           sourceEffectiveId              = sourceEffectiveId,
           scope                          = scope,
-          handleNonFatal                 = true
+          eventTarget                    = eventTarget,
+          collector                      = collector
         )
     }
 
-  /**
-   * Push an element containing either single-node or nodeset binding attributes.
-   *
-   * @param bindingElement    current element containing node binding attributes
-   * @param sourceEffectiveId effective id of source control for id resolution of models and binds
-   * @param scope             XBL scope
-   */
-  // TODO: Could all callers use the `ElementAnalysis`?
-  def pushBinding(bindingElement: Element, sourceEffectiveId: String, scope: Scope): Unit =
-    pushBinding(bindingElement, sourceEffectiveId, scope, handleNonFatal = true)
-
-  // NOTE: actions pass handleNonFatal = "false", other callers pass handleNonFatal = "true".
   // TODO: move away from element and use static analysis information
-  def pushBinding(bindingElement: Element, sourceEffectiveId: String, scope: Scope, handleNonFatal: Boolean): Unit =
+  // 11 external callers
+  def pushBinding(
+    bindingElement   : Element,
+    sourceEffectiveId: String,
+    scope            : Scope,
+    eventTarget      : XFormsEventTarget,
+    collector        : ErrorEventCollector
+  ): Unit =
     pushBinding(
       ref                            = bindingElement.attributeValue(XFormsNames.REF_QNAME),
       context                        = bindingElement.attributeValue(XFormsNames.CONTEXT_QNAME),
@@ -311,7 +322,8 @@ class XFormsContextStack {
       bindingElementNamespaceMapping = container.partAnalysis.getNamespaceMapping(scope, bindingElement.idOrNull), // TODO: `idOrThrow` probably
       sourceEffectiveId              = sourceEffectiveId,
       scope                          = scope,
-      handleNonFatal                 = handleNonFatal
+      eventTarget                    = eventTarget,
+      collector                      = collector
     )
 
   private def getBindingContext(scope: Scope): BindingContext = {
@@ -325,6 +337,7 @@ class XFormsContextStack {
     bindingContext
   }
 
+  // 2 external callers
   def pushBinding(
     ref                            : String,
     context                        : String,
@@ -335,7 +348,8 @@ class XFormsContextStack {
     bindingElementNamespaceMapping : NamespaceMapping,
     sourceEffectiveId              : String,
     scope                          : Scope,
-    handleNonFatal                 : Boolean
+    eventTarget                    : XFormsEventTarget,
+    collector                      : ErrorEventCollector
   ): Unit = {
 
     assert(scope != null)
@@ -366,10 +380,13 @@ class XFormsContextStack {
               (model.some, baseBindingContext.modelOpt.forall(_ ne model))
             case _ =>
               // Invalid model id
-              // NOTE: We used to dispatch `xforms-binding-exception`, but we want to be able to recover
-              if (! handleNonFatal)
-                throw new ValidationException(s"Reference to non-existing model id: `$modelId`", locationData)
-              // Default to not changing the model
+              collector(
+                new XXFormsBindingErrorEvent(
+                  target          = eventTarget,
+                  locationDataOpt = Option(bindingElement).flatMap(e => Option(e.getData.asInstanceOf[LocationData])),
+                  reason          = BindingErrorReason.InvalidModel(modelId)
+                )
+              )
               (baseBindingContext.modelOpt, false)
           }
         } else {
@@ -402,8 +419,13 @@ class XFormsContextStack {
             newPosition = 0
           case _ =>
             // The `bind` attribute did not resolve to a bind
-            if (! handleNonFatal)
-              throw new ValidationException(s"Reference to non-existing bind id: `$bindId`", locationData)
+            collector(
+              new XXFormsBindingErrorEvent(
+                target          = eventTarget,
+                locationDataOpt = Option(bindingElement).flatMap(e => Option(e.getData.asInstanceOf[LocationData])),
+                reason          = BindingErrorReason.InvalidBind(bindId)
+              )
+            )
             // Default to an empty binding
             bind = null
             newItems = java.util.Collections.emptyList[om.Item]
@@ -432,7 +454,8 @@ class XFormsContextStack {
             bindingElementNamespaceMapping = bindingElementNamespaceMapping,
             sourceEffectiveId              = sourceEffectiveId,
             scope                          = scope,
-            handleNonFatal                 = handleNonFatal
+            eventTarget                    = eventTarget,
+            collector                      = collector
           )
           hasOverriddenContext = true
           val newBindingContext = this.head
@@ -450,7 +473,8 @@ class XFormsContextStack {
             bindingElementNamespaceMapping = bindingElementNamespaceMapping,
             sourceEffectiveId              = sourceEffectiveId,
             scope                          = scope,
-            handleNonFatal                 = handleNonFatal
+            eventTarget                    = eventTarget,
+            collector                      = collector
           )
           hasOverriddenContext = false
           val newBindingContext = this.head
@@ -541,12 +565,17 @@ class XFormsContextStack {
                 containingDocument.getRequestStats.getReporter
               )
             catch {
-              case e: Exception =>
-                if (handleNonFatal) {
-                  XFormsError.handleNonFatalXPathError(container, e, Some(expression))
-                  java.util.Collections.emptyList[om.Item]
-                } else
-                  throw e
+              case NonFatal(t) =>
+                collector(
+                  new XXFormsXPathErrorEvent(
+                    target         = eventTarget,
+                    expression     = expression,
+                    details        = XPathErrorDetails.ForAttribute("ref"),
+                    message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                    throwable      = t
+                  )
+                )
+                java.util.Collections.emptyList[om.Item]
             }
           newItems = result
         } else {
@@ -591,7 +620,8 @@ class XFormsContextStack {
           bindingElementNamespaceMapping = bindingElementNamespaceMapping,
           sourceEffectiveId              = sourceEffectiveId,
           scope                          = scope,
-          handleNonFatal                 = handleNonFatal
+          eventTarget                    = eventTarget,
+          collector                      = collector
         )
         newItems = this.head.nodeset
         newPosition = this.head.position

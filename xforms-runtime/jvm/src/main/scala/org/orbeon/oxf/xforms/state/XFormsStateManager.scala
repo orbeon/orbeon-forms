@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
@@ -204,7 +204,7 @@ object XFormsStateManager extends XFormsStateManagerTrait {
       documentFromStore.controls.getCurrentControlTree.rootOpt foreach { rootContainerControl =>
         XFormsAPI.withContainingDocument(documentFromStore) {
           documentFromStore.withOutermostActionHandler {
-            Dispatch.dispatchEvent(new XXFormsStateRestoredEvent(rootContainerControl, XFormsEvent.EmptyGetter))
+            Dispatch.dispatchEvent(new XXFormsStateRestoredEvent(rootContainerControl, XFormsEvent.EmptyGetter), EventCollector.Throw)
           }
         }
       }

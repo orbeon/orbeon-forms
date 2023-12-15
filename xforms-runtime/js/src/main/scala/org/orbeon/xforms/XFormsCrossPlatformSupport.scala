@@ -147,7 +147,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
       )
 
     val baos = new ByteArrayOutputStream
-    IOUtils.copyStreamAndClose(cxr.content.inputStream, baos)
+    IOUtils.copyStreamAndClose(cxr.content.stream, baos)
     "data:" + contentType.orElse(cxr.mediatype).getOrElse("") + ";base64," + Base64.encode(baos.toByteArray, useLineBreaks = false)
   }
 

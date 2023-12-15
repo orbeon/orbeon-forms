@@ -15,6 +15,7 @@ package org.orbeon.oxf.util
 
 import cats.syntax.option._
 import net.coobird.thumbnailator.Thumbnails
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.datatypes.Mediatype
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -30,7 +31,6 @@ import javax.imageio.stream.MemoryCacheImageOutputStream
 import javax.imageio.{IIOImage, ImageIO, ImageWriteParam}
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
-
 import scala.collection.compat._
 
 object ImageSupport {

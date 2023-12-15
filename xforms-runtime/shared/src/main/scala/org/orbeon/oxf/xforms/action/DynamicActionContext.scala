@@ -14,13 +14,15 @@
 package org.orbeon.oxf.xforms.action
 
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.saxon.om
 
 
 case class DynamicActionContext(
   interpreter       : XFormsActionInterpreter,
   analysis          : ActionTrait,
-  overriddenContext : Option[om.Item]
+  overriddenContext : Option[om.Item],
+  collector         : ErrorEventCollector
 ) {
   def actionName         = analysis.localName
   def element            = analysis.element

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.EventHandler
-import org.orbeon.oxf.xforms.event.{XFormsEventHandler, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEventHandler, XFormsEventTarget}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
@@ -26,7 +26,7 @@ class XFormsModelAction(parent: XFormsEventTarget, eventHandler: EventHandler) e
   def container = parent.container
   def containingDocument = parent.containingDocument
 
-  // This is called by EventHandlerImpl when determining the XPath context for nested event handlers
+  // This is called by `Dispatch`
   def bindingContext: BindingContext =
     parent match {
       case model: XFormsModel =>
@@ -36,7 +36,13 @@ class XFormsModelAction(parent: XFormsEventTarget, eventHandler: EventHandler) e
         // Evaluate the binding of the submission element based on the model's inner context
         // NOTE: When the submission actually starts processing, the binding will be re-evaluated
         val contextStack = new XFormsContextStack(submission.container, submission.model.getDefaultEvaluationContext)
-        contextStack.pushBinding(submission.staticSubmission.element, submission.getEffectiveId, submission.model.getResolutionScope)
+        contextStack.pushBinding(
+          submission.staticSubmission.element,
+          submission.getEffectiveId,
+          submission.model.getResolutionScope,
+          submission,
+          EventCollector.ToReview
+        )
         contextStack.getCurrentBindingContext
       case _ =>
         // We know we are either nested directly within the model, or within a submission

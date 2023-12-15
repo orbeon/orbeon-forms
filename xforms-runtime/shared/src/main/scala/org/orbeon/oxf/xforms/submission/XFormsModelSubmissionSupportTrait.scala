@@ -13,8 +13,11 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import cats.effect.IO
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.Logging._
@@ -25,6 +28,7 @@ import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, StaticXPath, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.Relevant
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -34,7 +38,6 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
 import scala.collection.mutable
-import scala.concurrent.Future
 
 
 trait XFormsModelSubmissionSupportTrait {
@@ -44,7 +47,12 @@ trait XFormsModelSubmissionSupportTrait {
 
   // Run the given submission. This must be for a `replace="all"` submission.
   // Called from `XFormsServer` only
-  def runDeferredSubmission(future: Future[ConnectResult], response: ExternalContext.Response): Unit
+  def runDeferredSubmissionForUpdate(computation: IO[AsyncConnectResult], response: ExternalContext.Response): Unit
+
+  def forwardResultToResponse(cxr: ConnectionResult, response: ExternalContext.Response): Unit = {
+    SubmissionUtils.forwardStatusContentTypeAndHeaders(cxr, response)
+    IOUtils.copyStreamAndClose(cxr.content.stream, response.getOutputStream)
+  }
 
   // Prepare XML for submission
   //
@@ -240,7 +248,7 @@ trait XFormsModelSubmissionSupportTrait {
           // constraints for the level, the sets of ids must match.
           for {
             level                <- control.alertLevel
-            controlAlert         <- Option(control.getAlert)
+            controlAlert         <- Option(control.getAlert(EventCollector.Throw))
             failedValidationsIds = control.failedValidations.map(_.id).toSet
             elementsMap          <- elementsToAnnotate.get(level)
             element              <- elementsMap.get(failedValidationsIds)
@@ -310,12 +318,10 @@ trait XFormsModelSubmissionSupportTrait {
           throw new IllegalArgumentException
       }
 
-  def requestedSerialization(
-    xformsSerialization : Option[String],
-    xformsMethod        : String,
-    httpMethod          : HttpMethod
-  ): Option[String] =
-      xformsSerialization flatMap (_.trimAllToOpt) orElse defaultSerialization(xformsMethod, httpMethod)
+  def requestedSerialization(submissionParameters: SubmissionParameters): Option[String] =
+      submissionParameters.serializationOpt
+        .flatMap(_.trimAllToOpt)
+        .orElse(defaultSerialization(submissionParameters.xformsMethod, submissionParameters.httpMethod))
 
   private object Private {
 

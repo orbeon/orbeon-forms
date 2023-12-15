@@ -32,6 +32,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.mutable.LinkedHashSet
+import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 
 
@@ -55,7 +56,7 @@ object PathMapXPathAnalysisBuilder {
     logger                    : IndentedLogger
   ): XPathAnalysis = {
 
-    val compiledExpression =
+    def compileExpression =
       XPath.compileExpression(
         xpathString      = xpathString,
         namespaceMapping = namespaceMapping,
@@ -64,16 +65,28 @@ object PathMapXPathAnalysisBuilder {
         avt              = avt
       )
 
-    apply(
-      partAnalysisCtx,
-      compiledExpression,
-      baseAnalysis,
-      inScopeVariables,
-      pathMapContext,
-      scope,
-      defaultInstancePrefixedId,
-      element
-    )
+    def applyCompiledExpression(compiledExpression: CompiledExpression) =
+      apply(
+        partAnalysisCtx,
+        compiledExpression,
+        baseAnalysis,
+        inScopeVariables,
+        pathMapContext,
+        scope,
+        defaultInstancePrefixedId,
+        element
+      )
+
+    if (partAnalysisCtx.isTopLevelPart && ! partAnalysisCtx.staticProperties.allowErrorRecoveryOnInit)
+      applyCompiledExpression(compileExpression)
+    else
+      Try(compileExpression) match {
+        case Success(compiledExpression) =>
+          applyCompiledExpression(compiledExpression)
+        case Failure(t) =>
+          partAnalysisCtx.reportStaticXPathError(xpathString, Some(t), XPathErrorDetails.ForAnalysis())
+          new NegativeAnalysis(xpathString)
+      }
   }
 
   /**
@@ -245,7 +258,7 @@ object PathMapXPathAnalysisBuilder {
 
           if (processPaths())
             // Success
-            new PathMapXPathAnalysis(
+            PathMapXPathAnalysis(
               xpathString,
               true,
               valueDependentPaths,

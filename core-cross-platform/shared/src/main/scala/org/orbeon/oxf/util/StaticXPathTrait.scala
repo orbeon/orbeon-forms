@@ -50,6 +50,17 @@ trait StaticXPathTrait {
   def makeStringOptExpression(expression: String): String =  "for $_orbeon_private in (" + expression + ")[1] return string($_orbeon_private)"
   def makeBooleanExpression  (expression: String): String =  "boolean(" + expression + ")"
 
+  private val StringRegex    = """string\(\((.+)\)\[1]\)""".r
+  private val BooleanRegex   = """boolean\((.+)\)""".r
+  private val StringOptRegex = """for \$_orbeon_private in \((.+)\)\[1] return string\(\$_orbeon_private\)""".r
+
+  def tryToUnwrapExpression(expression: String) = expression match {
+    case StringRegex(v)    => v
+    case BooleanRegex(v)   => v
+    case StringOptRegex(v) => v
+    case _                 => expression
+  }
+
   val GlobalConfiguration: SaxonConfiguration
 
   // Create and compile an expression

@@ -17,6 +17,7 @@ import cats.syntax.option._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LangRef, PathMapXPathAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{PathMap, XPathContext}
 import org.orbeon.saxon.value.StringValue
@@ -47,7 +48,7 @@ object XXFormsLang {
       case LangRef.AVT(att) =>
         // TODO: resolve concrete ancestor XXFormsAttributeControl instead of just using static id
         val attributeControl = containingDocument.getControlByEffectiveId(att.staticId).asInstanceOf[XXFormsAttributeControl]
-        Option(attributeControl.getExternalValue())
+        Option(attributeControl.getExternalValue(EventCollector.Throw))
       case _ =>
         None
     }

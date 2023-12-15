@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.event.events
 
 import enumeratum._
+import org.orbeon.connection.{ConnectionResult, ConnectionResultT}
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
@@ -41,7 +41,7 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   }
 
   // 20 callers
-  def this(target: XFormsEventTarget, errorType: ErrorType, cxrOpt: Option[ConnectionResult], tunnelProperties: Option[TunnelProperties]) = {
+  def this(target: XFormsEventTarget, errorType: ErrorType, cxrOpt: Option[ConnectionResultT[_]], tunnelProperties: Option[TunnelProperties]) = {
     this(
       target     = target,
       properties = Map(
@@ -56,12 +56,12 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   private var _errorType: ErrorType = _
   def errorType: ErrorType = _errorType
 
-  private var _connectionResult: Option[ConnectionResult] = None
-  def connectionResult: Option[ConnectionResult] = _connectionResult
+  private var _connectionResult: Option[ConnectionResultT[_]] = None
+  def connectionResult: Option[ConnectionResultT[_]] = _connectionResult
 
   def logMessage(throwable: Throwable): Unit =
     if (errorType != ErrorType.ValidationError)
-      indentedLogger.logError("xforms-submit-error", OrbeonFormatter.message(throwable))
+      indentedLogger.logError(XFORMS_SUBMIT_ERROR, OrbeonFormatter.message(throwable))
 }
 
 sealed abstract class ErrorType(override val entryName: String) extends EnumEntry

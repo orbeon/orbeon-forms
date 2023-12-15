@@ -406,7 +406,7 @@
             <readwrite>Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title>Form Runner Administration</title>
+            <title>Forms Admin</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -417,7 +417,7 @@
                 <form-builder-summary>Form Builder Forms</form-builder-summary>
                 <demo-forms>Demo Forms</demo-forms>
                 <quick-links>Quick Links</quick-links>
-                <form-runner-admin>Forms Administration</form-runner-admin>
+                <form-runner-admin>Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms>Access your published forms</published-forms>
@@ -427,7 +427,7 @@
             <show-more>Show more…</show-more>
         </landing>
         <home>
-            <title>Form Runner Forms</title>
+            <title>Published Forms</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Make Unavailable</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Make Available</publish>
@@ -1027,7 +1027,7 @@
             <readwrite>Lecture et écriture</readwrite>
         </share-dialog>
         <admin>
-            <title>Administration Form Runner</title>
+            <title>Admin formulaires</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -1038,7 +1038,7 @@
                 <form-builder-summary>Formulaires Form Builder</form-builder-summary>
                 <demo-forms>Formulaires de démonstration</demo-forms>
                 <quick-links>Raccourcis</quick-links>
-                <form-runner-admin>Fonctions d'administration</form-runner-admin>
+                <form-runner-admin>Admin formulaires</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms>Accédez vos formulaires publiés</published-forms>
@@ -1048,7 +1048,7 @@
             <show-more>Voir plus…</show-more>
         </landing>
         <home>
-            <title>Accueil Form Runner</title>
+            <title>Formulaires Publiés</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Rendre non disponible</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Rendre disponible</publish>
@@ -1637,7 +1637,7 @@
             <readwrite todo="true">Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title todo="true">[Form Runner Administration]</title>
+            <title todo="true">[Forms Admin]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -1648,7 +1648,7 @@
                 <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
-                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+                <form-runner-admin todo="true">Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms todo="true">Access your published forms</published-forms>
@@ -1658,7 +1658,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title>Inicio Form Runner</title>
+            <title todo="true">Inicio Form Runner</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Despublicar</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
@@ -2267,7 +2267,7 @@
             <readwrite todo="true">Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title todo="true">[Form Runner Administration]</title>
+            <title todo="true">[Forms Admin]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -2278,7 +2278,7 @@
                 <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
-                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+                <form-runner-admin todo="true">Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms todo="true">Access your published forms</published-forms>
@@ -2288,7 +2288,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title>Inici Form Runner</title>
+            <title todo="true">Inici Form Runner</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Despublicar</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
@@ -2885,7 +2885,7 @@
             <readwrite todo="true">Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title todo="true">[Form Runner Administration]</title>
+            <title todo="true">[Forms Admin]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -2896,7 +2896,7 @@
                 <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
-                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+                <form-runner-admin todo="true">Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms todo="true">Access your published forms</published-forms>
@@ -2906,7 +2906,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title>Skjemamotor hjem</title>
+            <title todo="true">Skjemamotor hjem</title>
             <buttons>
                 <unpublish todo="true">[&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Unpublish]</unpublish>
                 <publish todo="true">[&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish]</publish>
@@ -3491,7 +3491,7 @@
             <readwrite todo="true">Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title todo="true">[Form Runner Administration]</title>
+            <title todo="true">[Forms Admin]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -3502,7 +3502,7 @@
                 <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
-                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+                <form-runner-admin todo="true">Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms todo="true">Access your published forms</published-forms>
@@ -3512,7 +3512,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title todo="true">[Form Runner Home]</title>
+            <title todo="true">[Published Forms]</title>
             <buttons>
                 <unpublish todo="true">[&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Unpublish]</unpublish>
                 <publish todo="true">[&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish]</publish>
@@ -4107,7 +4107,7 @@
             <readwrite todo="true">Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title todo="true">[Form Runner Administration]</title>
+            <title todo="true">[Forms Admin]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -4118,7 +4118,7 @@
                 <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
-                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+                <form-runner-admin todo="true">Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms todo="true">Access your published forms</published-forms>
@@ -4128,7 +4128,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title>Form Runner Home</title>
+            <title todo="true">[Published Forms]</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Nascondi</unpublish>
                 <publish todo="true">&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Pubblica</publish>
@@ -4723,7 +4723,7 @@
             <readwrite todo="true">Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title todo="true">[Form Runner Administration]</title>
+            <title todo="true">[Forms Admin]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -4734,7 +4734,7 @@
                 <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
-                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+                <form-runner-admin todo="true">Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms todo="true">Access your published forms</published-forms>
@@ -4744,7 +4744,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title>Form Runner Home</title>
+            <title todo="true">[Published Forms]</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Verbergen</unpublish>
                 <publish todo="true">&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Veröffentlichen</publish>
@@ -5339,7 +5339,7 @@
             <readwrite todo="true">Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title todo="true">[Form Runner Administration]</title>
+            <title todo="true">[Forms Admin]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -5350,7 +5350,7 @@
                 <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
-                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+                <form-runner-admin todo="true">Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms todo="true">Access your published forms</published-forms>
@@ -5360,7 +5360,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title>Form Runner Koti</title>
+            <title todo="true">Form Runner Koti</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Poista julkaisu</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Julkaise</publish>
@@ -5955,7 +5955,7 @@
             <readwrite todo="true">Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title todo="true">[Form Runner Administration]</title>
+            <title todo="true">[Forms Admin]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -5966,7 +5966,7 @@
                 <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
-                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+                <form-runner-admin todo="true">Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms todo="true">Access your published forms</published-forms>
@@ -5976,7 +5976,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title>Start av formulärmotorn</title>
+            <title todo="true">Start av formulärmotorn</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Upphäv publicering</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicera</publish>
@@ -6571,7 +6571,7 @@
             <readwrite todo="true">Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title todo="true">[Form Runner Administration]</title>
+            <title todo="true">[Forms Admin]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -6582,7 +6582,7 @@
                 <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
-                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+                <form-runner-admin todo="true">Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms todo="true">Access your published forms</published-forms>
@@ -6592,7 +6592,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title>Form Runner Home</title>
+            <title todo="true">[Published Forms]</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Publicatie verwijderen</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiceren</publish>
@@ -7187,7 +7187,7 @@
             <readwrite todo="true">Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title todo="true">[Form Runner Administration]</title>
+            <title todo="true">[Forms Admin]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -7198,7 +7198,7 @@
                 <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
-                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+                <form-runner-admin todo="true">Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms todo="true">Access your published forms</published-forms>
@@ -7208,7 +7208,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title>Orbeon Form Runner</title>
+            <title todo="true">[Published Forms]</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Não publicar</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
@@ -7794,7 +7794,7 @@
             <readwrite todo="true">Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title todo="true">[Form Runner Administration]</title>
+            <title todo="true">[Forms Admin]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -7805,7 +7805,7 @@
                 <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
-                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+                <form-runner-admin todo="true">Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms todo="true">Access your published forms</published-forms>
@@ -7815,7 +7815,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title>Blanketbehandler start</title>
+            <title todo="true">Blanketbehandler start</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Afpublisér</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Offentliggør</publish>
@@ -8410,7 +8410,7 @@
             <readwrite todo="true">Read-write</readwrite>
         </share-dialog>
         <admin>
-            <title todo="true">[Form Runner Administration]</title>
+            <title todo="true">[Forms Admin]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -8421,7 +8421,7 @@
                 <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
-                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+                <form-runner-admin todo="true">Forms Admin</form-runner-admin>
             </titles>
             <descriptions>
                 <published-forms todo="true">Access your published forms</published-forms>
@@ -8431,7 +8431,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title>Form Runner Home</title>
+            <title todo="true">[Published Forms]</title>
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"&gt;&lt;/i&gt; Cofnij publikację</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publikuj</publish>

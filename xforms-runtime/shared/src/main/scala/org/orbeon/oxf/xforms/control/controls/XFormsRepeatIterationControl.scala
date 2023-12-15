@@ -18,9 +18,10 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeContainerControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.xforms.{XFormsNames, XFormsId}
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax.helpers.AttributesImpl
 
 /**
@@ -78,8 +79,9 @@ class XFormsRepeatIterationControl(
   }
 
   override def compareExternalUseExternalValue(
-    previousExternalValueOpt : Option[String],
-    previousControlOpt       : Option[XFormsControl]
+    previousExternalValueOpt: Option[String],
+    previousControlOpt      : Option[XFormsControl],
+    collector               : ErrorEventCollector
   ): Boolean =
     previousControlOpt match {
       case Some(previousRepeatIterationControl: XFormsRepeatIterationControl) =>
@@ -100,7 +102,9 @@ class XFormsRepeatIterationControl(
 
   final override def outputAjaxDiff(
     previousControlOpt    : Option[XFormsControl],
-    content               : Option[XMLReceiverHelper => Unit])(implicit
+    content               : Option[XMLReceiverHelper => Unit],
+    collector      : ErrorEventCollector
+  )(implicit
     ch                    : XMLReceiverHelper
   ): Unit = {
     val repeatIterationControl1Opt = previousControlOpt.asInstanceOf[Option[XFormsRepeatIterationControl]]
@@ -120,7 +124,7 @@ class XFormsRepeatIterationControl(
     // NOTE: in this case, don't do the regular Ajax output (maybe in the future we should to be more consistent?)
   }
 
-  override def computeBinding(parentContext: BindingContext): BindingContext = {
+  override def computeBinding(parentContext: BindingContext, collector: ErrorEventCollector): BindingContext = {
     val contextStack = container.getContextStack
     contextStack.setBinding(parentContext)
     contextStack.pushIteration(iterationIndex)

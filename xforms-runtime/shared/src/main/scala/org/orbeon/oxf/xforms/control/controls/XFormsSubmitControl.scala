@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.xforms.XFormsNames.SUBMISSION_QNAME
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvents.DOM_ACTIVATE
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent
@@ -30,7 +31,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 class XFormsSubmitControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
     extends XFormsTriggerControl(container, parent, element, id) {
 
-  override def performDefaultAction(event: XFormsEvent): Unit = {
+  override def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
     // Do the default stuff upon receiving a DOMActivate event
     if (event.name == DOM_ACTIVATE) {
 
@@ -42,7 +43,7 @@ class XFormsSubmitControl(container: XBLContainer, parent: XFormsControl, elemen
       resolve(submissionId) match {
         case Some(submission: XFormsModelSubmission) =>
           // Submission found, dispatch xforms-submit event to it
-          Dispatch.dispatchEvent(new XFormsSubmitEvent(submission))
+          Dispatch.dispatchEvent(new XFormsSubmitEvent(submission), collector)
         case _ =>
           // "If there is a null search result for the target object and the source object is an XForms action such as
           // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
@@ -50,6 +51,6 @@ class XFormsSubmitControl(container: XBLContainer, parent: XFormsControl, elemen
             Seq("submission id" -> submissionId))
       }
     }
-    super.performDefaultAction(event)
+    super.performDefaultAction(event, collector)
   }
 }

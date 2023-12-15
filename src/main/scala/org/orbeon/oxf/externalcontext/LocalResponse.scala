@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import java.io._
-
+import org.orbeon.connection.StreamedContent
 import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
-import org.orbeon.oxf.http.{EmptyInputStream, Headers, StatusCode, StreamedContent}
+import org.orbeon.oxf.http.{EmptyInputStream, Headers, StatusCode}
 
+import java.io._
 import scala.collection.mutable
 
 

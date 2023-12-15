@@ -1,5 +1,7 @@
 package org.orbeon.oxf.xforms.submission
 
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.{debug, debugResults, error, withDebug}
@@ -24,11 +26,11 @@ trait AsynchronousSubmissionManagerTrait {
   private var pendingCount = 0
 
   private val runningCount           = new AtomicInteger(0)
-  private val completionQueue        = new ConcurrentLinkedQueue[(String, SubmissionParameters, Try[ConnectResult])]
-  private var pendingList            = List.empty[Future[ConnectResult]]
+  private val completionQueue        = new ConcurrentLinkedQueue[(String, Try[Any] => Any, Try[Any])]
+  private var pendingList            = List.empty[Future[Any]]
 
   private val requestRunningCount    = new AtomicInteger(0)
-  private var requestPendingList     = List.empty[(Future[ConnectResult], Duration)]
+  private var requestPendingList     = List.empty[(Future[Any], Duration)]
 
   def addClientDelayEventIfNeeded(containingDocument: XFormsContainingDocument): Unit =
     if (hasPendingAsynchronousSubmissions)
@@ -43,12 +45,14 @@ trait AsynchronousSubmissionManagerTrait {
         properties        = Nil    // poll event doesn't need properties
       )
 
-  def addAsynchronousSubmission(
-    submissionEffectiveId: String,
-    future               : Future[ConnectResult],
-    submissionParameters : SubmissionParameters,
+  def addAsynchronousCompletion[T, U](
+    description          : String,
+    computation          : IO[T],
+    continuation         : Try[T] => U,
     awaitInCurrentRequest: Option[Duration]
   ): Unit = {
+
+    val future = computation.unsafeToFuture()
 
     totalSubmittedCount += 1
     pendingCount += 1
@@ -70,7 +74,7 @@ trait AsynchronousSubmissionManagerTrait {
         requestRunningCount.decrementAndGet()
 
       runningCount.decrementAndGet()
-      completionQueue.add((submissionEffectiveId, submissionParameters, result))
+      completionQueue.add((description, continuation.asInstanceOf[Try[Any] => Any], result))
     }
   }
 
@@ -85,21 +89,19 @@ trait AsynchronousSubmissionManagerTrait {
       var failedCount = 0
 
       Iterator.continually(completionQueue.poll()).takeWhile(_ ne null).foreach {
-        case (submissionEffectiveId, submissionParameters, connectResultTry) =>
+        case (description, continuation, resultTry) =>
 
           pendingCount -= 1
 
-          debug(s"processing asynchronous submission `$submissionEffectiveId`")
+          debug(s"processing asynchronous result `$description`")
           try {
-            containingDocument
-              .getObjectByEffectiveId(submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
-              .processAsyncSubmissionResponse(connectResultTry, submissionParameters)
+            continuation(resultTry)
             processedCount += 1
           } catch {
             case NonFatal(t) =>
               // This should be rare, as a failing submission will normally cause a `xforms-submit-error` event but not
               // an exception. We still want to log the exception here, as it's likely to be a bug.
-              error(s"error processing asynchronous submission `$submissionEffectiveId`", t)
+              error(s"error processing asynchronous submission `$description`", t)
               failedCount += 1
               throw t
           }
@@ -139,7 +141,7 @@ trait AsynchronousSubmissionManagerTrait {
 
   protected def awaitPending(
     containingDocument: XFormsContainingDocument,
-    get               : () => List[(Future[ConnectResult], Duration)],
+    get               : () => List[(Future[Any], Duration)],
     clear             : () => Unit
   )(implicit
     logger            : IndentedLogger

@@ -17,6 +17,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.ViewTrait
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 
@@ -24,7 +25,7 @@ trait ControlEventSupport extends ListenersTrait {
 
   self: XFormsControl =>
 
-  def performDefaultAction(event: XFormsEvent): Unit = event match {
+  def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = event match {
     case _ @ (_: XXFormsRepeatActivateEvent | _: XFormsFocusEvent) =>
       // Try to update xf:repeat indexes based on this
 
@@ -48,7 +49,7 @@ trait ControlEventSupport extends ListenersTrait {
           if (indentedLogger.debugEnabled)
             indentedLogger.logDebug("xf:repeat", "setting index upon focus change", "new index", newRepeatIndex.toString)
 
-          repeatIterationControl.repeat.setIndex(newRepeatIndex)
+          repeatIterationControl.repeat.setIndex(newRepeatIndex, collector)
         }
       }
 
@@ -59,7 +60,7 @@ trait ControlEventSupport extends ListenersTrait {
           // Try to update hidden `xf:case` controls
           // NOTE: We don't allow this behavior when events come from the client in ClientEvents
           // NOTE: See note above on re-obtaining controls by id. Do we need to do this here as well?
-          Focus.ancestorOrSelfHiddenCases(this.parent) foreach (_.toggle())
+          Focus.ancestorOrSelfHiddenCases(this.parent) foreach (_.toggle(collector))
 
           val includes = focusEvent.includes
           val excludes = focusEvent.excludes
@@ -78,14 +79,16 @@ trait ControlEventSupport extends ListenersTrait {
 
     case _: XFormsHelpEvent =>
       containingDocument.setClientHelpEffectiveControlId(getEffectiveId)
+    case ev: XXFormsXPathErrorEvent =>
+      XFormsError.handleNonFatalXPathError(container, ev.throwableOpt, ev.expressionOpt)
     case ev: XXFormsBindingErrorEvent =>
-      XFormsError.handleNonFatalSetvalueError(this, ev.locationData, ev.reason)
+      XFormsError.handleNonFatalBindingError(this, ev.locationData, ev.reasonOpt)
     case ev: XXFormsActionErrorEvent =>
-      XFormsError.handleNonFatalActionError(this, ev.throwable)
+      XFormsError.handleNonFatalActionError(this, Option(ev.throwable))
     case _ =>
   }
 
-  def performTargetAction(event: XFormsEvent): Unit = ()
+  def performTargetAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = ()
 
   // Check whether this concrete control supports receiving the external event specified
   final def allowExternalEvent(eventName: String): Boolean = staticControl match {
@@ -97,21 +100,21 @@ trait ControlEventSupport extends ListenersTrait {
   def supportsRefreshEvents: Boolean = false
 
   // Dispatch creation events
-  def dispatchCreationEvents(): Unit = {
+  def dispatchCreationEvents(collector: ErrorEventCollector): Unit = {
     commitCurrentUIState()
-    Dispatch.dispatchEvent(new XFormsEnabledEvent(this))
+    Dispatch.dispatchEvent(new XFormsEnabledEvent(this), collector)
   }
 
   // Dispatch change events (between the control becoming enabled and disabled)
-  def dispatchChangeEvents(): Unit = ()
+  def dispatchChangeEvents(collector: ErrorEventCollector): Unit = ()
 
   // Dispatch destruction events
-  def dispatchDestructionEvents(): Unit = {
+  def dispatchDestructionEvents(collector: ErrorEventCollector): Unit = {
     // Don't test for relevance here
     // - in iteration removal case, control is still relevant
     // - in refresh case, control is non-relevant
-    Dispatch.dispatchEvent(new XFormsDisabledEvent(this))
+    Dispatch.dispatchEvent(new XFormsDisabledEvent(this), collector)
   }
 
-  final def parentEventObserver: XFormsEventTarget = Option(parent) orNull
+  final def parentEventObserver: XFormsEventTarget = Option(parent).orNull
 }

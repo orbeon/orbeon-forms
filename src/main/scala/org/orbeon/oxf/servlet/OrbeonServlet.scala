@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
+import cats.effect.unsafe.IORuntime
 import org.orbeon.oxf.externalcontext.ServletWebAppContext
 import org.orbeon.oxf.http.PropertiesApacheHttpClient
 import org.orbeon.oxf.pipeline.api._
@@ -59,7 +60,10 @@ class OrbeonServlet extends HttpServlet with ServletPortlet {
       init(ServletWebAppContext(getServletContext), Some("oxf.servlet-initialized-processor." -> "oxf.servlet-initialized-processor.input."))
 
       // Unclear whether there is a better place to do this
-      webAppContext.addListener(() => PropertiesApacheHttpClient.shutdown())
+      webAppContext.addListener(() => {
+        PropertiesApacheHttpClient.shutdown()
+        cats.effect.unsafe.implicits.global.shutdown()
+      })
     }
 
   // Servlet destroy

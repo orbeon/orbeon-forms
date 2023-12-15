@@ -68,6 +68,9 @@ object ContentTypes {
   def isTextOrJSONContentType(contentTypeOrNull: String): Boolean =
     isTextContentType(contentTypeOrNull) || isJSONContentType(contentTypeOrNull)
 
+  def isTextOrXMLOrJSONContentType(contentTypeOrNull: String): Boolean =
+    isTextOrJSONContentType(contentTypeOrNull) || isXMLContentType(contentTypeOrNull)
+
   def getContentTypeMediaType(contentTypeOrNull: String): Option[String] = {
 
     if (contentTypeOrNull eq null)

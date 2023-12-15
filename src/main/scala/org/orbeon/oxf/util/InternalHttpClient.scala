@@ -14,6 +14,7 @@
 package org.orbeon.oxf.util
 
 import org.apache.http.client.CookieStore
+import org.orbeon.connection.StreamedContent
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{Credentials => _, _}
 import org.orbeon.oxf.http.HttpMethod.GET
@@ -22,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.webapp.ProcessorService
 
 import scala.annotation.tailrec
+
 
 // HTTP client for internal requests
 //

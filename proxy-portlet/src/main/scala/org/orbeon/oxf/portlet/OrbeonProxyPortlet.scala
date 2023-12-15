@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.portlet
 
-import javax.portlet._
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import org.orbeon.connection.StreamedContent
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.fr.embedding._
@@ -25,10 +24,12 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 
+import javax.portlet._
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 import scala.util.matching.Regex
-import scala.collection.compat._
 
 
 /**

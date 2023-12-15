@@ -18,10 +18,11 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.control.Controls.{BindingUpdater, ControlsIterator}
-import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsRepeatIterationControl}
-import org.orbeon.oxf.xforms.control.{Controls, Focus, XFormsContainerControl, XFormsControl}
-import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsRepeatIterationControl, XFormsSelect1Control}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsRefreshDoneEvent
+import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector}
 import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.oxf.xforms.state.ControlState
 
@@ -61,7 +62,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
   }
 
   // Create the controls, whether upon initial creation of restoration of the controls.
-  def createControlTree(state: Option[Map[String, ControlState]]): Unit = {
+  def createControlTree(state: Option[Map[String, ControlState]], collector: ErrorEventCollector): Unit = {
 
     assert(! initialized)
 
@@ -75,7 +76,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
       // Set this here so that while `initialize()` runs below, refresh events will find the flag set
       initialized = true
 
-      currentControlTree.initialize(containingDocument, state)
+      currentControlTree.initialize(containingDocument, state, collector)
     } else {
       initialized = true
     }
@@ -103,14 +104,15 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
   // Create a new repeat iteration for insertion into the current tree of controls.
   def createRepeatIterationTree(
     repeatControl  : XFormsRepeatControl,
-    iterationIndex : Int // 1..repeat size + 1
+    iterationIndex : Int, //
+    collector      : ErrorEventCollector// 1..repeat size + 1
   ): XFormsRepeatIterationControl = {
 
     if ((initialControlTree eq currentControlTree) && containingDocument.isHandleDifferences)
       throw new OXFException("Cannot call `insertRepeatIteration()` when `initialControlTree eq currentControlTree`")
 
     withDebug("controls: adding iteration") {
-      currentControlTree.createRepeatIterationTree(containingDocument, repeatControl, iterationIndex)
+      currentControlTree.createRepeatIterationTree(repeatControl, iterationIndex, collector)
     }
   }
 
@@ -128,12 +130,12 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
   // The rationale for #2 is that there is no controls comparison needed during initialization. Only during further
   // client requests do the controls need to be compared.
   //
-  def cloneInitialStateIfNeeded(): Unit =
+  def cloneInitialStateIfNeeded(collector: ErrorEventCollector): Unit =
     if ((initialControlTree eq currentControlTree) && containingDocument.isHandleDifferences)
       withDebug("controls: cloning") {
         // NOTE: We clone "back", that is the new tree is used as the "initial" tree. This is done so that
         // if we started working with controls in the initial tree, we can keep using those references safely.
-        initialControlTree = currentControlTree.getBackCopy.asInstanceOf[ControlTree]
+        initialControlTree = currentControlTree.getBackCopy(collector).asInstanceOf[ControlTree]
       }
 
   // For Java callers
@@ -152,6 +154,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
   def setConstantItems(controlPrefixedId: String, itemset: Itemset): Unit =
     constantItems += controlPrefixedId -> itemset
 
+  // 1 caller
   def doRefresh(): Unit = {
 
     if (! initialized) {
@@ -182,60 +185,67 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
         // Focused control before updating bindings
         val focusedBeforeOpt = focusedControlOpt
 
+
         val resultOpt =
-          try {
+          EventCollector.withBufferCollector { collector =>
+            try {
 
-            // Update control bindings
-            // NOTE: During this process, ideally, no events are dispatched. However, at this point, the code
-            // can an dispatch, upon removed repeat iterations, xforms-disabled, DOMFocusOut and possibly events
-            // arising from updating the binding of nested XBL controls.
-            // This unfortunately means that side-effects can take place. This should be fixed, maybe by simply
-            // detaching removed iterations first, and then dispatching events after all bindings have been
-            // updated as part of dispatchRefreshEvents() below. This requires that controls are able to kind of
-            // stay alive in detached mode, and then that the index is also available while these events are
-            // dispatched.
+              // Update control bindings
+              // NOTE: During this process, ideally, no events are dispatched. However, at this point, the code
+              // can dispatch, upon removed repeat iterations, `xforms-disabled`, `DOMFocusOut` and possibly events
+              // arising from updating the binding of nested XBL controls.
+              // This unfortunately means that side-effects can take place. This should be fixed, maybe by simply
+              // detaching removed iterations first, and then dispatching events after all bindings have been
+              // updated as part of `dispatchRefreshEvents()` below. This requires that controls are able to kind of
+              // stay alive in detached mode, and then that the index is also available while these events are
+              // dispatched.
 
-            // `None` if bindings are clean
-            for (updater <- updateControlBindings())
-              yield updater -> gatherControlsForRefresh
+              // `None` if bindings are clean
+              for (updater <- updateControlBindings(collector))
+                yield updater -> gatherControlsForRefresh
 
-          } finally {
-
-            // TODO: Why a `finally` block here? If an exception happened, do we really need to do a `refreshDone()`?
-
-            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
-            // effect, and clear the corresponding flag."
-            refreshDone()
+            } finally {
+              // TODO: Why a `finally` block here? If an exception happened, do we really need to do a `refreshDone()`?
+              // 2023-12-08: Maybe ok as this cleans-up the XPath dependencies state.
+              refreshDone()
+            }
           }
 
-        resultOpt foreach { case (updater, controlsEffectiveIds) =>
+        resultOpt.foreach { case (updater, controlsEffectiveIds) =>
+
+          EventCollector.withBufferCollector { collector =>
+            currentControlTree.updateValueControls(controlsEffectiveIds, collector)
+          }
+
           // Dispatch events
-          currentControlTree.updateValueControls(controlsEffectiveIds)
-          currentControlTree.dispatchRefreshEvents(controlsEffectiveIds, isInitial = false)
+          currentControlTree.dispatchRefreshEvents(controlsEffectiveIds, isInitial = false, EventCollector.ToReview)
+
           // Handle focus changes
           Focus.updateFocusWithEvents(focusedBeforeOpt, updater.partialFocusRepeat)(containingDocument)
 
           // Dispatch to the root control
           getCurrentControlTree.rootOpt foreach { root =>
-            Dispatch.dispatchEvent(new XXFormsRefreshDoneEvent(root))
+            Dispatch.dispatchEvent(new XXFormsRefreshDoneEvent(root), EventCollector.ToReview)
           }
         }
+
+        // xxx if resultOpt.isEmpty && collector.events.nonEmpty
       }
     }
   }
 
   // Do a refresh of a subtree of controls starting at the given container control.
   // This is used by `xf:switch` and `xxf:dialog` as of 2021-04-14.
-  def doPartialRefresh(containerControl: XFormsContainerControl): Unit = {
+  def doPartialRefresh(containerControl: XFormsContainerControl, collector: ErrorEventCollector): Unit = {
 
     val focusedBeforeOpt = getFocusedControl
 
     // Update bindings starting at the container control
-    val updater = updateSubtreeBindings(containerControl)
+    val updater = updateSubtreeBindings(containerControl, collector)
 
     val controlIds = gatherControlsForRefresh(containerControl)
-    currentControlTree.updateValueControls(controlIds)
-    currentControlTree.dispatchRefreshEvents(controlIds, isInitial = false)
+    currentControlTree.updateValueControls(controlIds, collector)
+    currentControlTree.dispatchRefreshEvents(controlIds, isInitial = false, collector)
 
     Focus.updateFocusWithEvents(focusedBeforeOpt, updater.partialFocusRepeat)(containingDocument)
   }
@@ -245,6 +255,24 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
 
   def setFocusedControl(focusedControl: Option[XFormsControl]): Unit =
     Private.focusedControlOpt = focusedControl
+
+  def eagerlyEvaluateProperties(collector: ErrorEventCollector): Unit =
+    ControlsIterator(containingDocument.controls.getCurrentControlTree)
+      .filter(_.isRelevant)
+      .foreach {
+        case control: XFormsSelect1Control =>
+          control.getItemset(collector)
+          control.getExternalValue(collector)
+          control.getFormattedValue(collector)
+          control.eagerlyEvaluateLhha(collector)
+        case control: XFormsValueControl =>
+          control.getExternalValue(collector)
+          control.getFormattedValue(collector)
+          control.eagerlyEvaluateLhha(collector)
+        case control: ControlLHHASupport =>
+          control.eagerlyEvaluateLhha(collector)
+        case _ =>
+      }
 
   private object Private {
 
@@ -278,19 +306,19 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
     // Return `None` if control bindings are not dirty. Otherwise, control bindings are
     // updated and the `BindingUpdater` is returned.
     //
-    def updateControlBindings(): Option[BindingUpdater] = {
+    def updateControlBindings(collector: ErrorEventCollector): Option[BindingUpdater] = {
 
       assert(initialized)
 
       currentControlTree.bindingsDirty option {
 
         // Clone if needed
-        cloneInitialStateIfNeeded()
+        cloneInitialStateIfNeeded(collector)
 
         // Visit all controls and update their bindings
         val updater =
           withDebug("controls: updating bindings") {
-            Controls.updateBindings(containingDocument) |!>
+            Controls.updateBindings(containingDocument, collector) |!>
               (updater => debugResults(updaterDebugResults(updater)))
           }
 
@@ -304,12 +332,12 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
 
     // Update the bindings of a container control and its descendants.
     // This is used by `xf:switch` and `xxf:dialog` as of 2021-04-14.
-    def updateSubtreeBindings(containerControl: XFormsContainerControl): BindingUpdater = {
+    def updateSubtreeBindings(containerControl: XFormsContainerControl, collector: ErrorEventCollector): BindingUpdater = {
 
-      cloneInitialStateIfNeeded()
+      cloneInitialStateIfNeeded(collector)
 
       withDebug("controls: updating bindings", List("container" -> containerControl.effectiveId)) {
-        Controls.updateBindings(containerControl) |!>
+        Controls.updateBindings(containerControl, collector) |!>
           (updater => debugResults(updaterDebugResults(updater)))
       }
     }

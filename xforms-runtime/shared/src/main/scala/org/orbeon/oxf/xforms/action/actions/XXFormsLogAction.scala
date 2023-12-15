@@ -17,7 +17,11 @@ class XXFormsLogAction extends XFormsAction {
         XFormsContextStackSupport.evaluateExpressionOrConstant(
           childElem           = actionContext.analysis.asInstanceOf[WithExpressionOrConstantTrait],
           parentEffectiveId   = actionContext.interpreter.getSourceEffectiveId(actionContext.analysis),
-          pushContextAndModel = false // `XFormsActionInterpreter` already handles that
-        )(actionContext.interpreter.actionXPathContext) getOrElse ""
+          pushContextAndModel = false, // `XFormsActionInterpreter` already handles that
+          eventTarget         = actionContext.interpreter.eventObserver,
+          collector           = actionContext.collector
+        )(actionContext.interpreter.actionXPathContext)
+          .getOrElse(""),
+      collector = actionContext.collector
     )
 }

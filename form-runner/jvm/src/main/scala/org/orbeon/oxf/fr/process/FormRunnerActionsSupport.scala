@@ -18,6 +18,7 @@ import org.apache.commons.fileupload.disk.DiskFileItem
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.mime.content.ByteArrayBody
 import org.apache.http.entity.mime.{FormBodyPartBuilder, HttpMultipartMode, MultipartEntityBuilder}
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.CharsetNames
@@ -33,7 +34,8 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.PathUtils.{recombineQuery, splitQueryDecodeParams}
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ByteEncoding, ConnectionResult, ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, Mediatypes, PathUtils, SecureUtils, StaticXPath, URLRewriterUtils}
+import org.orbeon.oxf.util.{ByteEncoding, ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, Mediatypes, PathUtils, SecureUtils, StaticXPath, URLRewriterUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.{inScopeContainingDocument, setvalue}
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xml.SaxonUtils
@@ -98,7 +100,8 @@ object FormRunnerActionsSupport {
     annotateWith              : Set[String],
     headersGetter             : String => Option[List[String]])(implicit
     formRunnerParams          : FormRunnerParams,
-    logger                    : IndentedLogger
+    logger                    : IndentedLogger,
+    xfcd                      : XFormsContainingDocument
   ): (URI, String) = {
 
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
@@ -117,9 +120,9 @@ object FormRunnerActionsSupport {
 
     // Find all instance nodes containing file URLs we need to upload
     val attachmentsWithHolder =
-      FormRunner.collectAttachments(
+      FormRunner.collectUnsavedAttachments(
         new DocumentWrapper(dataCopiedAndMaybeMigrated, null, StaticXPath.GlobalConfiguration),
-        FormRunner.AttachmentMatch.BasePaths(includes = dataBasePaths.map(_._1), excludes = Nil)
+        AttachmentMatch.BasePaths(includes = dataBasePaths.map(_._1), excludes = Nil)
       )
 
     def createCidForNode(node: NodeInfo): String =
@@ -131,7 +134,7 @@ object FormRunnerActionsSupport {
     // We dont do this replacement if the attachments are not sent, both because it's not helpful and for backward
     // compatibility.
     if (parts.exists(_ == ContentToken.Attachments))
-      attachmentsWithHolder foreach { case FormRunner.AttachmentWithHolder(_, holder) =>
+      attachmentsWithHolder foreach { case AttachmentWithHolder(_, holder) =>
         setvalue(holder, s"cid:${createCidForNode(holder)}")
       }
 
@@ -191,7 +194,7 @@ object FormRunnerActionsSupport {
       )
 
     def processAllAttachments(builder: MultipartEntityBuilder): Unit =
-      attachmentsWithHolder foreach { case FormRunner.AttachmentWithHolder(beforeUrl, holder) =>
+      attachmentsWithHolder foreach { case AttachmentWithHolder(beforeUrl, holder) =>
 
         def writeBody(is: InputStream): Unit =
           processBinary(
@@ -204,7 +207,7 @@ object FormRunnerActionsSupport {
           )
 
         for {
-          successGetCxr <- ConnectionResult.trySuccessConnection(FormRunner.getAttachment(dataBasePaths, beforeUrl))
+          successGetCxr <- ConnectionResult.trySuccessConnection(FormRunner.readAttachmentSync(dataBasePaths, beforeUrl))
           _             <- ConnectionResult.tryBody(successGetCxr, closeOnSuccess = true)(writeBody)
         } yield
           ()

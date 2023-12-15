@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.model
 
 import cats.syntax.option._
-import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
+import org.orbeon.connection.ConnectionResult
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentationType}
@@ -26,6 +26,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.control.Controls
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.function.XFormsFunction
@@ -139,7 +140,7 @@ class XFormsModel(
     }
   }
 
-  def performDefaultAction(event: XFormsEvent): Unit =
+  def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit =
     event match {
       case ev: XFormsModelConstructEvent =>
         // 4.2.1 The xforms-model-construct Event
@@ -178,27 +179,11 @@ class XFormsModel(
           case t => throw new ValidationException(s"Received fatal error event: `${ev.name}`", t, getLocationData)
         }
       case ev: XXFormsXPathErrorEvent =>
-        // Custom event for XPath errors
-
-        // 2023-06-01: We get here only with dispatch from `handleMIPXPathException()` (or it could be a manual
-        // dispatch or forward, but we don't do this as of now).
-
-        // NOTE: We don't like this event very much as it is dispatched in the middle of rebuild/recalculate/revalidate,
-        // and event handlers for this have to be careful. It might be better to dispatch it *after* RRR.
-
-        XFormsError.handleNonFatalXPathError(
-          container,
-          ev.throwable,
-          XFormsCrossPlatformSupport
-            .causesIterator(ev.throwable)
-            .flatMap(ExtendedLocationData.iterateParamNameValues(_, "expression"))
-            .lastOption()
-        )
+        XFormsError.handleNonFatalXPathError(container, ev.throwableOpt, ev.expressionOpt)
       case ev: XXFormsBindingErrorEvent =>
-        // Custom event for binding errors
-        XFormsError.handleNonFatalSetvalueError(selfModel, ev.locationData, ev.reason)
+        XFormsError.handleNonFatalBindingError(selfModel, ev.locationData, ev.reasonOpt)
       case ev: XXFormsActionErrorEvent =>
-        XFormsError.handleNonFatalActionError(selfModel, ev.throwable)
+        XFormsError.handleNonFatalActionError(selfModel, Option(ev.throwable))
       case _ => // NOP
     }
 
@@ -208,9 +193,9 @@ class XFormsModel(
     // after having processed the xforms-ready event."
     // "Then, the events xforms-rebuild, xforms-recalculate, xforms-revalidate and
     // xforms-refresh are dispatched to the model element in sequence."
-    Dispatch.dispatchEvent(new XFormsRebuildEvent(selfModel))
-    Dispatch.dispatchEvent(new XFormsRecalculateEvent(selfModel))
-    Dispatch.dispatchEvent(new XFormsRefreshEvent(selfModel))
+    Dispatch.dispatchEvent(new XFormsRebuildEvent(selfModel), EventCollector.ToReview)
+    Dispatch.dispatchEvent(new XFormsRecalculateEvent(selfModel), EventCollector.ToReview)
+    Dispatch.dispatchEvent(new XFormsRefreshEvent(selfModel), EventCollector.ToReview)
   }
 
   private def doAfterReady(): Unit = ()
@@ -223,7 +208,7 @@ class XFormsModel(
     catch {
       case NonFatal(t) =>
         val schemaAttribute = modelElement.attributeValue(XFormsNames.SCHEMA_QNAME)
-        Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(selfModel, schemaAttribute, t))
+        Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(selfModel, schemaAttribute, t), EventCollector.ToReview)
     }
 
     // 2. For each instance element, an XPath data model is constructed
@@ -239,7 +224,7 @@ class XFormsModel(
     deferredActionContext.markStructuralChange(NoDefaultsStrategy, None)
 
     // Custom event after instances are ready
-    Dispatch.dispatchEvent(new XXFormsInstancesReadyEvent(selfModel))
+    Dispatch.dispatchEvent(new XXFormsInstancesReadyEvent(selfModel), EventCollector.ToReview)
 
     // 3. A rebuild, recalculate, and revalidate are then performed in sequence for this mode
     if (rrr) {
@@ -267,7 +252,7 @@ trait XFormsModelEventTarget
   // NOTE: This could change in the future once models are more integrated in the components hierarchy
   def parentEventObserver: XFormsEventTarget = null
 
-  def performTargetAction(event: XFormsEvent): Unit = ()
+  def performTargetAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = ()
 
   // Don't allow any external events
   def allowExternalEvent(eventName: String) = false
@@ -299,10 +284,10 @@ trait XFormsModelVariables {
   def getDefaultEvaluationContext: BindingContext = defaultEvaluationContext
 
   // Evaluate all top-level variables
-  def resetAndEvaluateVariables(): Unit = {
+  def resetAndEvaluateVariables(collector: ErrorEventCollector): Unit = {
     // NOTE: This method is called during RRR and by submission processing. Need to do dependency handling.
     // Reset context to this model, including evaluating the model variables
-    contextStack.resetBindingContext(selfModel.some)
+    contextStack.resetBindingContext(selfModel.some, collector)
     // Remember context and variables
     defaultEvaluationContext = contextStack.getCurrentBindingContext
   }
@@ -314,7 +299,7 @@ trait XFormsModelVariables {
           // Variable value is a bind nodeset to resolve
           BindVariableResolver.resolveClosestBind(
             modelBinds          = modelBindsOpt.get, // TODO XXX
-            contextBindNodeOpt  = XFormsFunction.context.data.asInstanceOf[Option[BindNode]],
+            contextBindNodeOpt  = XFormsFunction.context.bindNodeOpt,
             targetStaticBind    = targetStaticBind
           ) map (itemsIt => new SequenceExtent(itemsIt.toList.asJava)) getOrElse // https://github.com/orbeon/orbeon-forms/issues/6016
             (throw new IllegalStateException)
@@ -472,7 +457,8 @@ trait XFormsModelInstances {
                     element = instance.element.some
                   )
                 )
-              )
+              ),
+              EventCollector.ToReview
             )
         }
       } else {
@@ -489,7 +475,8 @@ trait XFormsModelInstances {
                 element = instance.element.some
               )
             )
-          )
+          ),
+          EventCollector.ToReview
         )
       }
     }
@@ -538,7 +525,8 @@ trait XFormsModelInstances {
                 element = instance.element.some
               )
             )
-          )
+          ),
+          EventCollector.ToReview
         )
     }
   }

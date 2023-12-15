@@ -8,6 +8,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{MessageFormatCache, MessageFormatter, XPathCache}
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction._
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang.resolveXMLangHandleAVTs
@@ -170,12 +171,12 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def value(staticOrAbsoluteId: String, followIndexes: Boolean = true)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =
     XFormsFunction.findRelevantControls(staticOrAbsoluteId, followIndexes) flatMap
-      (_.narrowTo[XFormsValueControl]) flatMap (_.valueOpt)
+      (_.narrowTo[XFormsValueControl]) flatMap (_.valueOpt(EventCollector.Throw))
 
   @XPathFunction
   def formattedValue(staticOrAbsoluteId: String, followIndexes: Boolean = true)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =
     XFormsFunction.findRelevantControls(staticOrAbsoluteId, followIndexes) flatMap
-      (_.narrowTo[XFormsValueControl]) flatMap (_.getFormattedValue)
+      (_.narrowTo[XFormsValueControl]) flatMap (_.getFormattedValue(EventCollector.Throw))
 
   @XPathFunction
   def avtValue(forId: String, attName: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =
@@ -184,7 +185,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       attControlAnalysis <- Option(xfc.container.partAnalysis.getAttributeControl(forPrefixedId, attName))
       control            <- findRelevantControls(attControlAnalysis.staticId, followIndexes = true).headOption
       attControl         <- control.narrowTo[XXFormsAttributeControl]
-      value              <- attControl.valueOpt
+      value              <- attControl.valueOpt(EventCollector.Throw)
     } yield
       value
 
@@ -262,14 +263,15 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       control        <- relevantControl(controlId)
       valueControl   <- control.narrowTo[XFormsValueControl]
       select1Control <- ItemsetSupport.findSelectionControl(valueControl)
-      itemset        = select1Control.getItemset
+      itemset        = select1Control.getItemset(EventCollector.Throw)
     } yield {
 
       val controlValueForSelection =
         if (selected)
-          select1Control.boundItemOpt map select1Control.getCurrentItemValueFromData map { v =>
-            (v, SaxonUtils.attCompare(select1Control.boundNodeOpt, _))
-          }
+          select1Control
+            .boundItemOpt
+            .map(select1Control.getCurrentItemValueFromData(_, EventCollector.Throw))
+            .map { v => (v, SaxonUtils.attCompare(select1Control.boundNodeOpt, _)) }
         else
           None
 
@@ -288,7 +290,6 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         // Return an XML document
         ItemsetSupport.asXML(
           itemset                    = itemset,
-          configuration              = xpc.getConfiguration,
           controlValue               = controlValueForSelection,
           excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy,
           locationData               = control.getLocationData
@@ -399,19 +400,19 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
   def label(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
-    relevantControl(controlId) map (_.getLabel)
+    relevantControl(controlId) map (_.getLabel(EventCollector.Throw))
 
   @XPathFunction
   def help(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
-    relevantControl(controlId) map (_.getHelp)
+    relevantControl(controlId) map (_.getHelp(EventCollector.Throw))
 
   @XPathFunction
   def hint(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
-    relevantControl(controlId) map (_.getHint)
+    relevantControl(controlId) map (_.getHint(EventCollector.Throw))
 
   @XPathFunction
   def alert(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
-    relevantControl(controlId) map (_.getAlert)
+    relevantControl(controlId) map (_.getAlert(EventCollector.Throw))
 
   @XPathFunction
   def visited(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[Boolean] =

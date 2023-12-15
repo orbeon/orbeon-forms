@@ -58,7 +58,7 @@ class XFormsUploadHandler(
 
   protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit = {
     val uploadControl = control.asInstanceOf[XFormsUploadControl]
-    val state = if (uploadControl eq null) "empty" else uploadControl.state
+    val state = if (uploadControl eq null) "empty" else uploadControl.state(handlerContext.collector)
     classes.append(" xforms-upload-state-" + state)
   }
 
@@ -119,9 +119,9 @@ class XFormsUploadHandler(
               { v => receiver.characters(v.toCharArray, 0, v.length) }
           }
 
-        outputSpan("filename",  _.filename)
-        outputSpan("mediatype", _.fileMediatype)
-        outputSpan("size",      _.humanReadableFileSize)
+        outputSpan("filename",  _.filename(handlerContext.collector))
+        outputSpan("mediatype", _.fileMediatype(handlerContext.collector))
+        outputSpan("size",      _.humanReadableFileSize(handlerContext.collector))
 
         // Clickable image
         val imgAtts = List(

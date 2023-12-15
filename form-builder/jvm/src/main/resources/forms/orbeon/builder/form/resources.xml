@@ -350,7 +350,7 @@
                         <item id="6">Summary page</item>
                         <item id="7">Home page</item>
                         <item id="9">Published forms page</item>
-                        <item id="10">Administration page</item>
+                        <item id="10">Forms admin</item>
                         <item id="8">PDF file</item>
                     </choice>
                 </type>
@@ -1243,6 +1243,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Form Preview</label>
+            <console>Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label>Test PDF Production</label>
@@ -1266,6 +1267,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label>Email Settings</label>
+            <enable-if-true>Enable this template only if the following formula evaluates to true</enable-if-true>
             <subject>Email Subject</subject>
             <body>Email Body</body>
             <from-properties>Template from Properties</from-properties>
@@ -1745,8 +1747,8 @@
                         <item id="5">Page de création</item>
                         <item id="6">Page de sommaire</item>
                         <item id="7">Page d'accueil</item>
-                        <item id="9">Page des formulaires publiés</item>
-                        <item id="10">Page d'administration</item>
+                        <item id="9">Page formulaires publiés</item>
+                        <item id="10">Page admin formulaires</item>
                         <item id="8">Fichier PDF</item>
                     </choice>
                 </type>
@@ -2640,6 +2642,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Test du formulaire</label>
+            <console>Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label>Test de la production PDF</label>
@@ -2669,6 +2672,7 @@
             <template>
                 <label>Modèle</label>
             </template>
+            <enable-if-true>Activer ce modèle uniquement si la formule suivante est évaluée comme vraie</enable-if-true>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Permissions</label>
@@ -3125,7 +3129,7 @@
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
                         <item id="9" todo="true">[Published forms page]</item>
-                        <item id="10" todo="true">[Administration page]</item>
+                        <item id="10" todo="true">[Forms admin]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -4047,6 +4051,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Skjemaforhåndsvisning</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -4070,6 +4075,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>
@@ -4532,7 +4538,7 @@
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
                         <item id="9" todo="true">[Published forms page]</item>
-                        <item id="10" todo="true">[Administration page]</item>
+                        <item id="10" todo="true">[Forms admin]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -5453,6 +5459,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Предварительный просмотр формы</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -5476,6 +5483,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>
@@ -5939,7 +5947,7 @@
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
                         <item id="9" todo="true">[Published forms page]</item>
-                        <item id="10" todo="true">[Administration page]</item>
+                        <item id="10" todo="true">[Forms admin]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -6824,6 +6832,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Anteprima del modulo</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label>Test della produzione PDF</label>
@@ -6847,6 +6856,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>
@@ -7310,7 +7320,7 @@
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
                         <item id="9" todo="true">[Published forms page]</item>
-                        <item id="10" todo="true">[Administration page]</item>
+                        <item id="10" todo="true">[Forms admin]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -8196,6 +8206,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Formularvorschau</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label>Test der PDF-Erzeugung</label>
@@ -8225,6 +8236,7 @@
             <template>
                 <label>Vorlage</label>
             </template>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Berechtigungen</label>
@@ -8684,7 +8696,7 @@
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
                         <item id="9" todo="true">[Published forms page]</item>
-                        <item id="10" todo="true">[Administration page]</item>
+                        <item id="10" todo="true">[Forms admin]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -9598,6 +9610,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Lomakkeen esikatselu</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -9621,6 +9634,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>
@@ -10083,7 +10097,7 @@
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
                         <item id="9" todo="true">[Published forms page]</item>
-                        <item id="10" todo="true">[Administration page]</item>
+                        <item id="10" todo="true">[Forms admin]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -10997,6 +11011,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Vista Previa del Formulario</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -11020,6 +11035,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>
@@ -11483,7 +11499,7 @@
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
                         <item id="9" todo="true">[Published forms page]</item>
-                        <item id="10" todo="true">[Administration page]</item>
+                        <item id="10" todo="true">[Forms admin]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -12376,6 +12392,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Form voorvertoning</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -12405,6 +12422,7 @@
             <template>
                 <label>Template</label>
             </template>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Bevoegdheden</label>
@@ -12862,7 +12880,7 @@
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
                         <item id="9" todo="true">[Published forms page]</item>
-                        <item id="10" todo="true">[Administration page]</item>
+                        <item id="10" todo="true">[Forms admin]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -13782,6 +13800,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Previsualização do formulário</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -13805,6 +13824,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>
@@ -14268,7 +14288,7 @@
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
                         <item id="9" todo="true">[Published forms page]</item>
-                        <item id="10" todo="true">[Administration page]</item>
+                        <item id="10" todo="true">[Forms admin]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -15189,6 +15209,7 @@
         </dialog-actions>
         <dialog-test>
             <label>Förhandsvisa formulär</label>
+            <console todo="true">Console</console>
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
@@ -15212,6 +15233,7 @@
         </dialog-pe>
         <dialog-email-settings>
             <label todo="true">[Email Settings]</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject todo="true">[Email Subject]</subject>
             <body todo="true">[Email Body]</body>
             <from-properties todo="true">[Template from Properties]</from-properties>

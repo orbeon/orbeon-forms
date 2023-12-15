@@ -52,6 +52,141 @@
         <param-name>oxf.initialize-logging</param-name>
         <param-value>true</param-value>
     </context-param>
+
+    <!--Mapping and init params for main servlet-->
+    <context-param>
+        <param-name>oxf.orbeon-main-servlet.mapping</param-name>
+        <param-value>/</param-value>
+    </context-param>
+    <!--Set main processor-->
+    <context-param>
+        <param-name>oxf.orbeon-main-servlet.init-param.oxf.main-processor.name</param-name>
+        <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.orbeon-main-servlet.init-param.oxf.main-processor.input.config</param-name>
+        <param-value>oxf:/config/prologue-servlet.xpl</param-value>
+    </context-param>
+    <!--Set error processor-->
+    <context-param>
+        <param-name>oxf.orbeon-main-servlet.init-param.oxf.error-processor.name</param-name>
+        <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.orbeon-main-servlet.init-param.oxf.error-processor.input.controller</param-name>
+        <param-value>oxf:/config/error-page-flow.xml</param-value>
+    </context-param>
+    <!--Set supported methods-->
+    <context-param>
+        <param-name>oxf.orbeon-main-servlet.init-param.oxf.http.accept-methods</param-name>
+        <param-value>get,post,head,put,delete,lock,unlock</param-value>
+    </context-param>
+    <!--Set servlet initialization and destruction listeners-->
+    <!-- Uncomment this for the servlet listener processors -->
+    <!--
+    <context-param>
+        <param-name>oxf.orbeon-main-servlet.init-param.oxf.servlet-initialized-processor.name</param-name>
+        <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.orbeon-main-servlet.init-param.oxf.servlet-initialized-processor.input.config</param-name>
+        <param-value>oxf:/apps/context/servlet-initialized.xpl</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.orbeon-main-servlet.init-param.oxf.servlet-destroyed-processor.name</param-name>
+        <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.orbeon-main-servlet.init-param.oxf.servlet-destroyed-processor.input.config</param-name>
+        <param-value>oxf:/apps/context/servlet-destroyed.xpl</param-value>
+    </context-param>
+    -->
+    <!-- End servlet listener processors -->
+
+    <!--Mapping and init params for renderer servlet-->
+    <context-param>
+        <param-name>oxf.orbeon-renderer-servlet.mapping</param-name>
+        <param-value>/xforms-renderer</param-value>
+    </context-param>
+    <!--Set main processor-->
+    <context-param>
+        <param-name>oxf.orbeon-renderer-servlet.init-param.oxf.main-processor.name</param-name>
+        <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.orbeon-renderer-servlet.init-param.oxf.main-processor.input.controller</param-name>
+        <param-value>oxf:/ops/xforms/xforms-renderer-page-flow.xml</param-value>
+    </context-param>
+    <!--Set error processor-->
+    <context-param>
+        <param-name>oxf.orbeon-renderer-servlet.init-param.oxf.error-processor.name</param-name>
+        <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.orbeon-renderer-servlet.init-param.oxf.error-processor.input.config</param-name>
+        <param-value>oxf:/config/error.xpl</param-value>
+    </context-param>
+
+    <!--Mapping and init params for concurrency limiter filter-->
+    <context-param>
+        <param-name>oxf.orbeon-limiter-filter.url-pattern</param-name>
+        <param-value>/*</param-value>
+    </context-param>
+    <!--Include Form Runner pages and XForms Ajax requests-->
+    <context-param>
+        <param-name>oxf.orbeon-limiter-filter.init-param.include</param-name>
+        <param-value>(/fr/.*)|(/xforms-server)</param-value>
+    </context-param>
+    <!--Exclude resources not produced by services-->
+    <context-param>
+        <param-name>oxf.orbeon-limiter-filter.init-param.exclude</param-name>
+        <param-value>(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|coffee|map|png|jpg|xsd|htc|ico|swf|html|htm|txt)</param-value>
+    </context-param>
+    <!--Minimum, requested, and maximum number of concurrent threads allowed-->
+    <!--The `x` prefix specifies a multiple of the number of CPU cores reported by the JVM-->
+    <context-param>
+        <param-name>oxf.orbeon-limiter-filter.init-param.min-threads</param-name>
+        <param-value>1</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.orbeon-limiter-filter.init-param.num-threads</param-name>
+        <param-value>x1</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.orbeon-limiter-filter.init-param.max-threads</param-name>
+        <param-value>x1</param-value>
+    </context-param>
+
+    <!--Mapping and init params for Orbeon-* auth headers filter-->
+    <context-param>
+        <param-name>oxf.orbeon-form-runner-auth-servlet-filter.url-pattern</param-name>
+        <param-value>/*</param-value>
+    </context-param>
+    <!--
+    <context-param>
+        <param-name>oxf.orbeon-form-runner-auth-servlet-filter.init-param.content-security-policy</param-name>
+        <param-value>default-src 'self'; img-src 'self' data:</param-value>
+    </context-param>
+    -->
+
+    <!--Mapping and init params for JSP files filter-->
+    <context-param>
+        <param-name>oxf.orbeon-xforms-filter.url-pattern</param-name>
+        <param-value>/xforms-jsp/*</param-value>
+    </context-param>
+    <!-- Uncomment this for the separate WAR deployment -->
+    <!--
+    <context-param>
+        <param-name>oxf.orbeon-xforms-filter.init-param.oxf.xforms.renderer.context</param-name>
+        <param-value>/orbeon</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.orbeon-xforms-filter.init-param.oxf.xforms.renderer.default-encoding</param-name>
+        <param-value>UTF-8</param-value>
+    </context-param>
+    -->
+    <!-- End separate WAR deployment -->
+
     <!--Set context listener processors-->
     <!-- Uncomment this for the context listener processors -->
     <!--
@@ -92,224 +227,7 @@
         <param-value>oxf:/apps/context/session-destroyed.xpl</param-value>
     </context-param>-->
     <!-- End session listener processors -->
-    <!--Security filter for eXist-->
-    <filter>
-        <filter-name>orbeon-exist-filter</filter-name>
-        <filter-class>org.orbeon.oxf.servlet.TokenSecurityFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>orbeon-exist-filter</filter-name>
-        <url-pattern>/exist/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-    </filter-mapping>
-    <!--Limit concurrent access to Form Runner-->
-    <filter>
-        <filter-name>orbeon-limiter-filter</filter-name>
-        <filter-class>org.orbeon.oxf.servlet.LimiterFilter</filter-class>
-        <!--Include Form Runner pages and XForms Ajax requests-->
-        <init-param>
-            <param-name>include</param-name>
-            <param-value>(/fr/.*)|(/xforms-server)</param-value>
-        </init-param>
-        <!--Exclude resources not produced by services-->
-        <init-param>
-            <param-name>exclude</param-name>
-            <param-value>(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|coffee|map|png|jpg|xsd|htc|ico|swf|html|htm|txt)</param-value>
-        </init-param>
-        <!--Minimum, requested, and maximum number of concurrent threads allowed-->
-        <!--The `x` prefix specifies a multiple of the number of CPU cores reported by the JVM-->
-        <init-param>
-            <param-name>min-threads</param-name>
-            <param-value>1</param-value>
-        </init-param>
-        <init-param>
-            <param-name>num-threads</param-name>
-            <param-value>x1</param-value>
-        </init-param>
-        <init-param>
-            <param-name>max-threads</param-name>
-            <param-value>x1</param-value>
-        </init-param>
-    </filter>
-    <filter-mapping>
-        <filter-name>orbeon-limiter-filter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-    </filter-mapping>
-    <!--Add internal Orbeon-* headers for auth-->
-    <filter>
-        <filter-name>orbeon-form-runner-auth-servlet-filter</filter-name>
-        <filter-class>org.orbeon.oxf.servlet.FormRunnerAuthFilter</filter-class>
-        <!--
-        <init-param>
-            <param-name>content-security-policy</param-name>
-            <param-value>default-src 'self'; img-src 'self' data:</param-value>
-        </init-param>
-        -->
-    </filter>
-    <filter-mapping>
-        <filter-name>orbeon-form-runner-auth-servlet-filter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-    </filter-mapping>
-    <!--All JSP files under /xforms-jsp go through the XForms filter-->
-    <filter>
-        <filter-name>orbeon-xforms-filter</filter-name>
-        <filter-class>org.orbeon.oxf.servlet.OrbeonXFormsFilter</filter-class>
-        <!-- Uncomment this for the separate WAR deployment -->
-        <!--
-    <init-param>
-        <param-name>oxf.xforms.renderer.context</param-name>
-        <param-value>/orbeon</param-value>
-    </init-param>
-    <init-param>
-        <param-name>oxf.xforms.renderer.default-encoding</param-name>
-        <param-value>UTF-8</param-value>
-    </init-param>-->
-        <!-- End separate WAR deployment -->
-    </filter>
-    <filter-mapping>
-        <filter-name>orbeon-xforms-filter</filter-name>
-        <url-pattern>/xforms-jsp/*</url-pattern>
-        <!--Servlet 2.4 configuration allowing the filter to run upon forward in addition to request-->
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-    </filter-mapping>
-    <!--Orbeon context listener-->
-    <listener>
-        <listener-class>org.orbeon.oxf.webapp.OrbeonServletContextListener</listener-class>
-    </listener>
-    <!--Context listener for deployment with replication-->
-    <listener>
-        <listener-class>org.orbeon.oxf.xforms.ReplicationServletContextListener</listener-class>
-    </listener>
-    <!--XForms session listener-->
-    <listener>
-        <listener-class>org.orbeon.oxf.xforms.XFormsServletContextListener</listener-class>
-    </listener>
-    <!--General-purpose session listener-->
-    <listener>
-        <listener-class>org.orbeon.oxf.webapp.OrbeonSessionListener</listener-class>
-    </listener>
-    <!-- Cache shutdown listener-->
-    <listener>
-        <listener-class>org.orbeon.oxf.cache.ShutdownListener</listener-class>
-    </listener>
-    <!--This is the main Orbeon Forms servlet-->
-    <servlet>
-        <servlet-name>orbeon-main-servlet</servlet-name>
-        <servlet-class>org.orbeon.oxf.servlet.OrbeonServlet</servlet-class>
-        <!--Set main processor-->
-        <init-param>
-            <param-name>oxf.main-processor.name</param-name>
-            <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-        </init-param>
-        <init-param>
-            <param-name>oxf.main-processor.input.config</param-name>
-            <param-value>oxf:/config/prologue-servlet.xpl</param-value>
-        </init-param>
-        <!--Set error processor-->
-        <init-param>
-            <param-name>oxf.error-processor.name</param-name>
-            <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
-        </init-param>
-        <init-param>
-            <param-name>oxf.error-processor.input.controller</param-name>
-            <param-value>oxf:/config/error-page-flow.xml</param-value>
-        </init-param>
-        <!--Set supported methods-->
-        <init-param>
-            <param-name>oxf.http.accept-methods</param-name>
-            <param-value>get,post,head,put,delete,lock,unlock</param-value>
-        </init-param>
-        <!--Set servlet initialization and destruction listeners-->
-        <!-- Uncomment this for the servlet listener processors -->
-        <!--
-    <init-param>
-        <param-name>oxf.servlet-initialized-processor.name</param-name>
-        <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-    </init-param>
-    <init-param>
-        <param-name>oxf.servlet-initialized-processor.input.config</param-name>
-        <param-value>oxf:/apps/context/servlet-initialized.xpl</param-value>
-    </init-param>
-    <init-param>
-        <param-name>oxf.servlet-destroyed-processor.name</param-name>
-        <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-    </init-param>
-    <init-param>
-        <param-name>oxf.servlet-destroyed-processor.input.config</param-name>
-        <param-value>oxf:/apps/context/servlet-destroyed.xpl</param-value>
-    </init-param>-->
-        <!-- End servlet listener processors -->
-    </servlet>
-    <!--This is the XForms Renderer servlet, used to deploy Orbeon Forms as a separate WAR-->
-    <servlet>
-        <servlet-name>orbeon-renderer-servlet</servlet-name>
-        <servlet-class>org.orbeon.oxf.servlet.OrbeonServlet</servlet-class>
-        <!--Set main processor-->
-        <init-param>
-            <param-name>oxf.main-processor.name</param-name>
-            <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
-        </init-param>
-        <init-param>
-            <param-name>oxf.main-processor.input.controller</param-name>
-            <param-value>oxf:/ops/xforms/xforms-renderer-page-flow.xml</param-value>
-        </init-param>
-        <!--Set error processor-->
-        <init-param>
-            <param-name>oxf.error-processor.name</param-name>
-            <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-        </init-param>
-        <init-param>
-            <param-name>oxf.error-processor.input.config</param-name>
-            <param-value>oxf:/config/error.xpl</param-value>
-        </init-param>
-    </servlet>
-    <!-- Uncomment this for the eXist XMLRPC support -->
-    <!--
-    <servlet>
-        <servlet-name>exist-xmlrpc-servlet</servlet-name>
-        <servlet-class>org.exist.xmlrpc.RpcServlet</servlet-class>
-    </servlet>-->
-    <!-- End eXist XMLRPC support -->
-    <servlet>
-        <servlet-name>exist-rest-servlet</servlet-name>
-        <servlet-class>org.exist.http.servlets.EXistServlet</servlet-class>
-        <init-param>
-            <param-name>basedir</param-name>
-            <param-value>WEB-INF/</param-value>
-        </init-param>
-        <init-param>
-            <param-name>configuration</param-name>
-            <param-value>exist-conf.xml</param-value>
-        </init-param>
-        <init-param>
-            <param-name>start</param-name>
-            <param-value>true</param-value>
-        </init-param>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>orbeon-main-servlet</servlet-name>
-        <url-pattern>/</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>orbeon-renderer-servlet</servlet-name>
-        <url-pattern>/xforms-renderer</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>exist-rest-servlet</servlet-name>
-        <url-pattern>/exist/rest/*</url-pattern>
-    </servlet-mapping>
-    <!-- Uncomment this for the eXist XMLRPC support -->
-    <!--
-    <servlet-mapping>
-        <servlet-name>exist-xmlrpc-servlet</servlet-name>
-        <url-pattern>/exist/xmlrpc/*</url-pattern>
-    </servlet-mapping>-->
-    <!-- End eXist XMLRPC support -->
+
     <!-- Uncomment this for the relational persistence, and change oracle if necessary -->
     <!--
     <resource-ref>

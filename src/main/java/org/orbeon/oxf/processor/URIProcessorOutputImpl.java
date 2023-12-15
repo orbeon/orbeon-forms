@@ -13,21 +13,33 @@
  */
 package org.orbeon.oxf.processor;
 
+import org.orbeon.connection.ConnectionResult;
+import org.orbeon.connection.ConnectionResultT;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.externalcontext.UrlRewriteMode;
-import org.orbeon.oxf.http.*;
+import org.orbeon.oxf.http.BasicCredentials;
+import org.orbeon.oxf.http.HttpMethod;
+import org.orbeon.oxf.http.URIReference;
+import org.orbeon.oxf.http.URIReferences;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.ParserConfiguration;
+import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.XMLParsing;
 
-import java.net.*;
-import java.util.*;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -340,7 +352,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                         CoreCrossPlatformSupport$.MODULE$
                     );
 
-                final ConnectionResult connectionResult =
+                final ConnectionResultT<InputStream> connectionResult =
                     Connection.jConnectNow(
                         HttpMethod.GET$.MODULE$,
                         submissionURL,

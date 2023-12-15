@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 // Represents an xf:secret control.
@@ -31,7 +32,7 @@ class XFormsSecretControl(
 ) with XFormsValueControl
   with SingleNodeFocusableTrait {
 
-  override def getFormattedValue: Option[String] = {
+  override def getFormattedValue(collector: ErrorEventCollector): Option[String] = {
     Some(XFormsSecretControl.HiddenPasswordPlaceholder)
   }
 }

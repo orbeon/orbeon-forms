@@ -1,33 +1,21 @@
-/**
- * Copyright (C) 2009 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
-package org.orbeon.oxf.util
+package org.orbeon.connection
+
+import org.log4s
+import org.orbeon.oxf.http.{DateHeaders, HttpStatusCodeException, StatusCode, Headers => HttpHeaders}
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger}
 
 import java.io._
 import java.{lang => jl}
-import org.log4s
-import org.orbeon.oxf.http.{DateHeaders, HttpStatusCodeException, StatusCode, StreamedContent, Headers => HttpHeaders}
-import org.orbeon.oxf.util.Logging._
-
-import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
 
-case class ConnectionResult(
+case class ConnectionResultT[S](
   url               : String,
   statusCode        : Int,
   headers           : Map[String, List[String]],
-  content           : StreamedContent,
+  content           : StreamedContentT[S],
   hasContent        : Boolean,
   dontHandleResponse: Boolean // TODO: Should be outside of ConnectionResult.
 ) {
@@ -101,10 +89,10 @@ object ConnectionResult {
     val (hasContent, resetInputStream) = {
 
       val bis =
-        if (content.inputStream.markSupported)
-          content.inputStream
+        if (content.stream.markSupported)
+          content.stream
         else
-          new BufferedInputStream(content.inputStream)
+          new BufferedInputStream(content.stream)
 
       def hasContent(bis: InputStream) = {
         bis.mark(1)
@@ -116,28 +104,38 @@ object ConnectionResult {
       (hasContent(bis), bis)
     }
 
-    ConnectionResult(
+    ConnectionResultT(
       url                = url,
       statusCode         = statusCode,
       headers            = headers,
-      content            = content.copy(inputStream = resetInputStream),
+      content            = content.copy(stream = resetInputStream),
       hasContent         = hasContent,
       dontHandleResponse = dontHandleResponse
     )
   }
 
-  def trySuccessConnection(cxr: ConnectionResult): Try[ConnectionResult] =
-    cxr match {
-      case ConnectionResult(_, _, _, _, _, _) if cxr.isSuccessResponse =>
-        Success(cxr)
-      case ConnectionResult(_, statusCode, _, _, _, _) =>
-        cxr.close()
-        Failure(HttpStatusCodeException(if (statusCode != StatusCode.Ok) statusCode else StatusCode.InternalServerError))
+  def syncToAsync(
+    cxr: ConnectionResult
+  ): AsyncConnectionResult = ConnectionResultT(
+    url               = cxr.url,
+    statusCode        = cxr.statusCode,
+    headers           = cxr.headers,
+    content           = ConnectionSupport.syncToAsyncStreamedContent(cxr.content),
+    hasContent        = cxr.hasContent,
+    dontHandleResponse= cxr.dontHandleResponse
+  )
+
+  def trySuccessConnection[S](cxr: ConnectionResultT[S]): Try[ConnectionResultT[S]] =
+    if (cxr.isSuccessResponse) {
+      Success(cxr)
+    } else {
+      cxr.close()
+      Failure(HttpStatusCodeException(if (cxr.statusCode != StatusCode.Ok) cxr.statusCode else StatusCode.InternalServerError))
     }
 
   def tryBody[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream => T): Try[T] = Try {
     try {
-      val result = body(cxr.content.inputStream)
+      val result = body(cxr.content.stream)
       if (closeOnSuccess)
         cxr.close() // this eventually calls `InputStream.close()`
       result

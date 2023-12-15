@@ -27,8 +27,10 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, PropertyValue}
+import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.scaxon.Implicits._
@@ -55,8 +57,8 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       ("edit"                   -> tryNavigateToEdit _)   +
       ("open-rendered-format"   -> tryOpenRenderedFormat)
 
-  def trySendEmail(params: ActionParams): Try[Any] =
-    Try {
+  def trySendEmail(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
 
       ensureDataCalculationsAreUpToDate()
@@ -98,18 +100,20 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
           createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
         )
 
-      (path, formRunnerParams.modeType)
-    } flatMap { case (path, sourceModeType) =>
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_NONE, path, sourceModeType = sourceModeType)
+      tryChangeMode(XFORMS_SUBMIT_REPLACE_NONE, path, sourceModeType = formRunnerParams.modeType)
     }
 
-  def trySend(params: ActionParams): Try[Any] =
-    Try {
+  def trySend(params: ActionParams): ActionResult =
+    ActionResult.trySync(trySendImpl(params))
+
+  def trySendImpl(params: ActionParams): Option[XFormsSubmitDoneEvent] = {
 
       ensureDataCalculationsAreUpToDate()
 
       implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
       val FormRunnerParams(currentApp, currentForm, currentFormVersion, currentDocumentOpt, currentIsDraft, _) = formRunnerParams
+
+      implicit val xfcd: XFormsContainingDocument = inScopeContainingDocument
 
       val propertyPrefixOpt = paramByNameOrDefault(params, "property")
 
@@ -263,7 +267,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
                 dataBasePaths              = List(basePath -> currentFormVersion),
                 relevanceHandling          = relevanceHandling,
                 annotateWith               = evaluatedSendProperties.get("annotate").flatten.map(_.splitTo[Set]()).getOrElse(Set.empty),
-                headersGetter              = inScopeContainingDocument.headersGetter
+                headersGetter              = xfcd.headersGetter
               )
             )
           case _ => None
@@ -303,44 +307,38 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     formTargetOpt      : Option[String] = None,
     showProgress       : Boolean        = true,
     responseIsResource : Boolean        = false
-  ): Try[Any] =
-    Try {
-      val params: List[Option[(Option[String], String)]] =
-        List(
-          Some(             Some("uri")                  -> prependUserAndStandardParamsForModeChange(propagateInternalState = true, prependCommonFormRunnerParameters(path, forNavigate = false))),
-          Some(             Some("method")               -> HttpMethod.POST.entryName.toLowerCase),
-          Some(             Some(NonRelevantName)        -> RelevanceHandling.Keep.entryName.toLowerCase),
-          Some(             Some("replace")              -> replace),
-          Some(             Some(ShowProgressName)       -> showProgress.toString),
-          Some(             Some("content")              -> "xml"),
-          Some(             Some(DataFormatVersionName)  -> getOrGuessFormDataFormatVersion(frc.metadataInstance.map(_.rootElement)).entryName), // use the form's current internal data format version, not `Edge`
-          Some(             Some(PruneMetadataName)      -> false.toString),
-          Some(             Some("parameters")           -> s"$FormVersionParam $DataFormatVersionName"),
-          formTargetOpt.map(Some(FormTargetName)         -> _),
-          Some(             Some("response-is-resource") -> responseIsResource.toString)
-        )
-      params.flatten.toMap
-    } flatMap
-      trySend
+  ): Option[XFormsSubmitDoneEvent] = {
+    val params: List[Option[(Option[String], String)]] =
+      List(
+        Some(             Some("uri")                  -> prependUserAndStandardParamsForModeChange(propagateInternalState = true, prependCommonFormRunnerParameters(path, forNavigate = false))),
+        Some(             Some("method")               -> HttpMethod.POST.entryName.toLowerCase),
+        Some(             Some(NonRelevantName)        -> RelevanceHandling.Keep.entryName.toLowerCase),
+        Some(             Some("replace")              -> replace),
+        Some(             Some(ShowProgressName)       -> showProgress.toString),
+        Some(             Some("content")              -> "xml"),
+        Some(             Some(DataFormatVersionName)  -> getOrGuessFormDataFormatVersion(frc.metadataInstance.map(_.rootElement)).entryName), // use the form's current internal data format version, not `Edge`
+        Some(             Some(PruneMetadataName)      -> false.toString),
+        Some(             Some("parameters")           -> s"$FormVersionParam $DataFormatVersionName"),
+        formTargetOpt.map(Some(FormTargetName)         -> _),
+        Some(             Some("response-is-resource") -> responseIsResource.toString)
+      )
+    trySendImpl(params.flatten.toMap)
+  }
 
-  def tryNavigateToReview(params: ActionParams): Try[Any] =
-    Try {
+  def tryNavigateToReview(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
-      (s"/fr/$app/$form/view/$document", formRunnerParams.modeType)
-    } flatMap { case (path, sourceModeType) =>
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL, path, sourceModeType)
+      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL, s"/fr/$app/$form/view/$document", formRunnerParams.modeType)
     }
 
-  def tryNavigateToEdit(params: ActionParams): Try[Any] =
-    Try {
+  def tryNavigateToEdit(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
-      (s"/fr/$app/$form/edit/$document", formRunnerParams.modeType)
-    } flatMap { case (path, sourceModeType) =>
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL, path, sourceModeType)
+      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL, s"/fr/$app/$form/edit/$document", formRunnerParams.modeType)
     }
 
-  def tryOpenRenderedFormat(params: ActionParams): Try[Any] =
-    Try {
+  def tryOpenRenderedFormat(params: ActionParams): ActionResult =
+    ActionResult.trySync {
       implicit val frParams: FormRunnerParams = FormRunnerParams()
 
       ensureDataCalculationsAreUpToDate()
@@ -371,30 +369,30 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
           case RenderedFormat.ExcelWithNamedRanges | RenderedFormat.XmlFormStructureAndData => None
         }
 
-      (path, formTargetOpt, frParams.modeType)
-    } flatMap { case (path, formTargetOpt, sourceModeType) =>
       tryChangeMode(
         replace            = XFORMS_SUBMIT_REPLACE_ALL,
         path               = path,
-        sourceModeType     = sourceModeType,
+        sourceModeType     = frParams.modeType,
         showProgress       = false,
         formTargetOpt      = formTargetOpt,
         responseIsResource = true
       )
+
     }
 
-  def clearRenderedFormatsResources(): Try[Any] = Try {
+  def clearRenderedFormatsResources(): Try[Any] =
+    Try {
 
-    val childElems = FormRunnerActionsCommon.findUrlsInstanceRootElem.toList child *
+      val childElems = FormRunnerActionsCommon.findUrlsInstanceRootElem.toList child *
 
-    // Remove resource and temporary file if any
-    childElems map (_.stringValue) flatMap trimAllToOpt foreach { path =>
-      XFormsAssetServer.tryToRemoveDynamicResource(path, removeFile = true)
+      // Remove resource and temporary file if any
+      childElems map (_.stringValue) flatMap trimAllToOpt foreach { path =>
+        XFormsAssetServer.tryToRemoveDynamicResource(path, removeFile = true)
+      }
+
+      // Clear stored paths
+      delete(childElems)
     }
-
-    // Clear stored paths
-    delete(childElems)
-  }
 
   private val ParamsToExcludeUponModeChange = StateParamNames + DataFormatVersionName + DataMigrationBehaviorName
 

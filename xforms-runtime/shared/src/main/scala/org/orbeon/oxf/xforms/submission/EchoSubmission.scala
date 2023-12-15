@@ -13,14 +13,16 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import cats.effect.IO
 import cats.syntax.option._
-import org.orbeon.oxf.http.{Headers, StreamedContent}
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport}
+import org.orbeon.connection.{ConnectionResult, StreamedContent}
+import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.io.ByteArrayInputStream
 import java.net.URI
-import scala.concurrent.Future
 import scala.util.Success
 
 
@@ -40,14 +42,15 @@ class EchoSubmission(submission: XFormsModelSubmission)
     serializationParameters: SerializationParameters
   )(implicit
     refContext             : RefContext
-  ): Option[ConnectResult Either Future[ConnectResult]] = {
+  ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
 
     serializationParameters.messageBody match {
       case None =>
         // Not sure when this can happen, but it can't be good
+        // Q: Can't we use a `GET`?
         throw new XFormsSubmissionException(
           submission  = submission,
-          message     = "Action 'test:': no message body.",
+          message     = s"Action `${submissionParameters.actionOrResource}`: no message body.",
           description = "processing submission response"
         )
       case Some(messageBody) =>
@@ -57,7 +60,12 @@ class EchoSubmission(submission: XFormsModelSubmission)
           SubmissionUtils.logRequestBody(serializationParameters.actualRequestMediatype, messageBody)(indentedLogger)
     }
 
-    val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, submissionParameters.replaceType == ReplaceType.All)
+    val customHeaderNameValues =
+      SubmissionUtils.evaluateHeaders(
+        submission,
+        submissionParameters.replaceType == ReplaceType.All,
+        EventCollector.Throw
+      )
 
     // Just a scheme is not a valid URI, so add a scheme-specific part if needed
     val url =
@@ -96,7 +104,7 @@ class EchoSubmission(submission: XFormsModelSubmission)
     )
 
     Left(
-      ConnectResult(
+      ConnectResultT(
         submission.getEffectiveId,
         Success((submission.getReplacer(cxr, submissionParameters)(submission.getIndentedLogger), cxr)))
     ).some

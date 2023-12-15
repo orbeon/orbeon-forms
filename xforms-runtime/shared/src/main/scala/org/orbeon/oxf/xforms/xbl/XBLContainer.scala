@@ -18,13 +18,14 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.{NestedPartAnalysis, PartAnalysis}
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, RepeatControl}
+import org.orbeon.oxf.xforms.analysis.{NestedPartAnalysis, PartAnalysis}
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsRepeatIterationControl}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsContainerControl, XFormsControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventFactory}
+import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEventFactory, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.ComponentSeparator
@@ -35,7 +36,7 @@ import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable.typeableOps
 
 import scala.collection.compat._
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 
 /**
  * Represent an XBL container of models and controls.
@@ -83,9 +84,16 @@ class XBLContainer(
   def ancestorsIterator: Iterator[XBLContainer] =
     Iterator.iterateOpt(self)(_.parentXBLContainer)
 
-  val containingDocument = ancestorsIterator collectFirst { case cd: XFormsContainingDocument => cd } get
+  val containingDocument: XFormsContainingDocument =
+    ancestorsIterator
+      .collectFirst { case cd: XFormsContainingDocument => cd }
+      .getOrElse(throw new IllegalStateException)
 
   val contextStack = new XFormsContextStack(self)
+
+  def eventTarget: XFormsEventTarget =
+    associatedControlOpt
+      .getOrElse(containingDocument.getDefaultModel)
 
   private var _childrenXBLContainers: mutable.Buffer[XBLContainer] = mutable.ArrayBuffer()
   def childrenXBLContainers = _childrenXBLContainers.iterator
@@ -189,19 +197,20 @@ trait ModelContainer {
 
   def initializeModels(eventsToDispatch: List[String]): Unit =
     for (eventName <- eventsToDispatch) {
-      if (eventName == XFORMS_READY) {
-        initializeNestedControls()
-        requireRefresh()
-      }
+      if (eventName == XFORMS_READY)
+        EventCollector.withBufferCollector { collector =>
+          initializeNestedControls(collector) // can cause binding errors; events are dispatched at the end of the block
+          requireRefresh()
+        }
       for (model <- _models)
-        Dispatch.dispatchEvent(XFormsEventFactory.createEvent(eventName, model))
+        Dispatch.dispatchEvent(XFormsEventFactory.createEvent(eventName, model), EventCollector.ToReview)
     }
 
   def destroyModels(): Unit =
     for (model <- models)
-      Dispatch.dispatchEvent(new XFormsModelDestructEvent(model, Map()))
+      Dispatch.dispatchEvent(new XFormsModelDestructEvent(model, Map()), EventCollector.ToReview)
 
-  def defaultModel: Option[XFormsModel] = _models.headOption
+  def findDefaultModel: Option[XFormsModel] = _models.headOption
 
   // Get a list of all the relevant models in this container and all sub-containers
   def allModels: Iterator[XFormsModel] =
@@ -281,7 +290,7 @@ trait RefreshSupport {
   // ConcurrentModificationException. This should no longer happen as once we obtain a reference to
   // childrenXBLContainers, that collection doesn't change.
   def rebuildRecalculateRevalidateIfNeeded(): Unit =
-    allModels foreach (_.rebuildRecalculateRevalidateIfNeeded)
+    allModels foreach (_.rebuildRecalculateRevalidateIfNeeded())
 
   def requireRefresh(): Unit = {
     // Note that we don't recurse into children container as for now refresh is global
@@ -491,7 +500,7 @@ trait ContainerResolver {
   // For Java callers
   def findInstanceOrNull(instanceId: String) = findInstance(instanceId).orNull
 
-  protected def initializeNestedControls(): Unit = ()
+  protected def initializeNestedControls(collector: ErrorEventCollector): Unit = ()
 
   def findFirstControlEffectiveId: Option[String] =
     // We currently don't have a real notion of a "root" control, so we resolve against the first control if any

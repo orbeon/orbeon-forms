@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ByteEncoding, ContentHandlerOutputStream, IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
@@ -61,21 +62,21 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     markFileMetadataDirty()
   }
 
-  override def computeValue: String = {
+  override def computeValue(collector: ErrorEventCollector): String = {
 
-    val result = super.computeValue
+    val result = super.computeValue(collector)
 
     // This is ugly, but `evaluateFileMetadata` require that the value is set. If not, there will be an infinite loop.
     // We need to find a better solution.
     setValue(result)
-    evaluateFileMetadata(isRelevant)
+    evaluateFileMetadata(isRelevant, collector)
 
     result
   }
 
   // NOTE: Perform all actions at target, so that user event handlers are called after these operations.
-  override def performTargetAction(event: XFormsEvent): Unit = {
-    super.performTargetAction(event)
+  override def performTargetAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
+    super.performTargetAction(event, collector)
     event match {
       case _: XXFormsUploadStartEvent =>
         // Upload started
@@ -95,7 +96,8 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
           doneEvent.file,
           Option(doneEvent.filename).map(PathUtils.filenameFromPath), // in case the filename contains a path
           Option(doneEvent.contentType),
-          Option(doneEvent.contentLength)
+          Option(doneEvent.contentLength),
+          collector
         )
         visitWithAncestors()
       case _: XXFormsUploadErrorEvent =>
@@ -106,13 +108,13 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     }
   }
 
-  override def performDefaultAction(event: XFormsEvent): Unit = {
-    super.performDefaultAction(event)
+  override def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
+    super.performDefaultAction(event, collector)
     event match {
       case _: XXFormsUploadErrorEvent =>
         // Upload error: sent by the client in case of error
         // It would be good to support i18n at the XForms engine level, but form authors can handle
-        // xxforms-upload-error in a custom way if needed. This is what Form Runner does.
+        // `xxforms-upload-error` in a custom way if needed. This is what Form Runner does.
         containingDocument.addMessageToRun("There was an error during the upload.", "modal")
       case _ =>
     }
@@ -128,25 +130,32 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Improvement-to-client-side-server-s
   def getUploadUniqueId: String = getEffectiveId
 
-  private def handleUploadedFile(value: String, filename: Option[String], mediatype: Option[String], size: Option[String]): Unit =
+  private def handleUploadedFile(
+    value    : String,
+    filename : Option[String],
+    mediatype: Option[String],
+    size     : Option[String],
+    collector: ErrorEventCollector
+  ): Unit =
     if (size.exists(_ != "0") || filename.exists(_ != ""))
-      storeExternalValueAndMetadata(value, filename, mediatype, size)
+      storeExternalValueAndMetadata(value, filename, mediatype, size, collector)
 
   // This can only be called from the client to clear the value
-  override def storeExternalValue(value: String): Unit = {
+  override def storeExternalValue(value: String, collector: ErrorEventCollector): Unit = {
     assert(value == "")
-    storeExternalValueAndMetadata(value, None, None, None)
+    storeExternalValueAndMetadata(value, None, None, None, collector)
   }
 
   private def storeExternalValueAndMetadata(
     rawNewValue : String,
     filename    : Option[String],
     mediatype   : Option[String],
-    size        : Option[String]
+    size        : Option[String],
+    collector   : ErrorEventCollector
   ): Unit =
     try {
 
-      val oldValueOpt = getValue.trimAllToOpt
+      val oldValueOpt = getValue(collector).trimAllToOpt
 
       // Attempt to delete the temporary file both when:
       //
@@ -173,53 +182,58 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 
             // TODO: This should probably take place during refresh instead.
             if (oldValueOpt.nonEmpty)
-              Dispatch.dispatchEvent(new XFormsDeselectEvent(this, EmptyGetter))
+              Dispatch.dispatchEvent(new XFormsDeselectEvent(this, EmptyGetter), collector)
 
             ""
         }
 
       // Store the value
-      doStoreExternalValue(valueToStore)
+      doStoreExternalValue(valueToStore, collector)
 
       // NOTE: We used to call markFileMetadataDirty() here, but it was wrong, because getBackCopy would then
       // obtain the new data, and control diffs wouldn't work properly. This was done for XFormsSubmissionUtils,
       // which is now modified to use boundFileMediatype/boundFilename instead.
 
       // Filename, mediatype and size
-      setFilename(filename.getOrElse(""))
-      setFileMediatype(mediatype.getOrElse(""))
-      setFileSize(size.getOrElse(""))
+      setFilename(filename.getOrElse(""), collector)
+      setFileMediatype(mediatype.getOrElse(""), collector)
+      setFileSize(size.getOrElse(""), collector)
 
     } catch {
       case NonFatal(t) => throw new ValidationException(t, getLocationData)
   }
 
   // Don't expose an external value
-  override def evaluateExternalValue(): Unit = setExternalValue(null)
+  override def evaluateExternalValue(collector: ErrorEventCollector): Unit = setExternalValue(null)
 
   override def compareExternalUseExternalValue(
-    previousExternalValue : Option[String],
-    previousControl       : Option[XFormsControl]
+    previousExternalValue: Option[String],
+    previousControl      : Option[XFormsControl],
+    collector            : ErrorEventCollector
   ): Boolean =
     previousControl match {
       case Some(other: XFormsUploadControl) =>
-        compareFileMetadata(other) &&
-        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
+        compareFileMetadata(other, collector) &&
+        super.compareExternalUseExternalValue(previousExternalValue, previousControl, collector)
       case _ => false
     }
 
-  override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
-    var added = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)
-    added |= addFileMetadataAttributes(attributesImpl, previousControlOpt.asInstanceOf[Option[FileMetadata]])
+  override def addAjaxExtensionAttributes(
+    attributesImpl    : AttributesImpl,
+    previousControlOpt: Option[XFormsControl],
+    collector         : ErrorEventCollector
+  ): Boolean = {
+    var added = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt, collector)
+    added |= addFileMetadataAttributes(attributesImpl, previousControlOpt.asInstanceOf[Option[FileMetadata]], collector)
     added
   }
 
   override def findAriaByControlEffectiveIdWithNs: Option[String] =
     containingDocument.namespaceId(XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input")).some
 
-  override def getBackCopy: AnyRef = {
-    val cloned = super.getBackCopy.asInstanceOf[XFormsUploadControl]
-    updateFileMetadataCopy(cloned)
+  override def getBackCopy(collector: ErrorEventCollector): AnyRef = {
+    val cloned = super.getBackCopy(collector).asInstanceOf[XFormsUploadControl]
+    updateFileMetadataCopy(cloned, collector)
     cloned
   }
 }

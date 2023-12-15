@@ -131,10 +131,10 @@ class FormRunnerCompiler extends ProcessorImpl {
                     removeInstanceData = false
                   )
 
-                FormRunner.collectAttachments(
+                FormRunner.collectUnsavedAttachments(
                   data            = dataDoc,
-                  attachmentMatch = FormRunner.AttachmentMatch.BasePaths(includes = basePaths, excludes = Nil)
-                ) map { case FormRunner.AttachmentWithHolder(fromPath, holder) =>
+                  attachmentMatch = AttachmentMatch.BasePaths(includes = basePaths, excludes = Nil)
+                ) map { case AttachmentWithHolder(fromPath, holder) =>
                   ManifestEntry(URI.create(fromPath), holder.attValueOpt("mediatype").flatMap(_.trimAllToOpt))
                 }
             }

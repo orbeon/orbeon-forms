@@ -13,14 +13,12 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
+import cats.effect.IO
 import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.oxf.xforms.model.XFormsInstance._
-
-import scala.concurrent.Future
 
 
 /**
@@ -66,10 +64,10 @@ trait XFormsServerSharedInstancesCacheTrait {
     loadInstance     : InstanceLoader
   )(implicit
     indentedLogger   : IndentedLogger
-  ): Future[DocumentNodeInfoType] =
+  ): IO[DocumentNodeInfoType] =
     find(instanceCaching)
-      .map(Future.successful)
-      .getOrElse(Future(loadAndCache(instanceCaching, loadInstance)))
+      .map(IO.pure)
+      .getOrElse(IO(loadAndCache(instanceCaching, loadInstance)))
       .map(wrapDocumentInfoIfNeeded(_, readonly, exposeXPathTypes))
 
   protected def add(

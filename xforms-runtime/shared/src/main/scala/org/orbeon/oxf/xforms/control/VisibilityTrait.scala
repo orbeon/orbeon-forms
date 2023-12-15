@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.state.ControlState
 
@@ -40,13 +41,22 @@ trait VisibilityTrait extends XFormsControl {
     locallyVisible && ! (ancestorVisibleOpt contains false)
   }
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
-    super.onCreate(restoreState, state, update)
+  override def onCreate(
+    restoreState: Boolean,
+    state       : Option[ControlState],
+    update      : Boolean,
+    collector   : ErrorEventCollector
+  ): Unit = {
+    super.onCreate(restoreState, state, update, collector)
     _visible = computeVisible
   }
 
-  override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
-    super.onBindingUpdate(oldBinding, newBinding)
+  override def onBindingUpdate(
+    oldBinding: BindingContext,
+    newBinding: BindingContext,
+    collector : ErrorEventCollector
+  ): Unit = {
+    super.onBindingUpdate(oldBinding, newBinding, collector)
     _visible = computeVisible
   }
 
@@ -61,27 +71,27 @@ trait VisibilityTrait extends XFormsControl {
     wasVisibleCommit()
   }
 
-  override def dispatchCreationEvents(): Unit = {
-    super.dispatchCreationEvents()
+  override def dispatchCreationEvents(collector: ErrorEventCollector): Unit = {
+    super.dispatchCreationEvents(collector)
     if (visible)
-      Dispatch.dispatchEvent(new XXFormsVisibleEvent(this))
+      Dispatch.dispatchEvent(new XXFormsVisibleEvent(this), collector)
   }
 
-  override def dispatchChangeEvents(): Unit = {
+  override def dispatchChangeEvents(collector: ErrorEventCollector): Unit = {
     // Gather change first for consistency with XFormsSingleNodeControl
     val visibleChanged = wasVisibleCommit() != visible
 
     // Dispatch other events
-    super.dispatchChangeEvents()
+    super.dispatchChangeEvents(collector)
 
     // Dispatch our events
     if (visibleChanged)
-      Dispatch.dispatchEvent(if (visible) new XXFormsVisibleEvent(self) else new XXFormsHiddenEvent(self))
+      Dispatch.dispatchEvent(if (visible) new XXFormsVisibleEvent(self) else new XXFormsHiddenEvent(self), collector)
   }
 
-  override def dispatchDestructionEvents(): Unit = {
+  override def dispatchDestructionEvents(collector: ErrorEventCollector): Unit = {
     if (visible)
-      Dispatch.dispatchEvent(new XXFormsHiddenEvent(this))
-    super.dispatchDestructionEvents()
+      Dispatch.dispatchEvent(new XXFormsHiddenEvent(this), collector)
+    super.dispatchDestructionEvents(collector)
   }
 }

@@ -13,28 +13,50 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import java.io.{ByteArrayOutputStream, InputStream}
-import java.net.URI
+import cats.effect.IO
+import org.orbeon.connection.ConnectionSupport.fs2StreamToInputStreamInMemory
+import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.io.{CharsetNames, IOUtils}
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
 import org.orbeon.oxf.http.HttpMethod.GET
-import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.event.EventCollector
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance}
 import org.orbeon.oxf.xml.{SaxonUtils, XMLParsing}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+import java.io.{ByteArrayOutputStream, InputStream}
+import java.net.URI
 import scala.collection.mutable
+import scala.util.{Failure, Success}
 
 
 object SubmissionUtils {
+
+  def convertConnectResult(fs2Cr: AsyncConnectResult): IO[ConnectResult] =
+    fs2Cr match {
+      case ConnectResultT(_, Success(t @ (_, fs2Cxr @ ConnectionResultT(_, _, _, fs2Content, _, _)))) =>
+        for(is <- fs2StreamToInputStreamInMemory(fs2Content.stream))
+        yield
+          fs2Cr.copy(
+            result = Success(
+              t.copy(
+                _2 = fs2Cxr.copy(
+                  content = fs2Content.copy(stream = is)
+                )
+              )
+            )
+          )
+      case ConnectResultT(submissionEffectiveId, Failure(t)) =>
+        IO.pure(ConnectResultT(submissionEffectiveId, Failure(t)))
+    }
 
   def logRequestBody(mediatype: String, messageBody: Array[Byte])(implicit logger: IndentedLogger): Unit =
     if (ContentTypes.isXMLMediatype(mediatype) ||
@@ -179,28 +201,27 @@ object SubmissionUtils {
 
   def evaluateHeaders(
     submission           : XFormsModelSubmission,
-    forwardClientHeaders : Boolean
-  ): Map[String, List[String]] = {
-    try {
-      val headersToForward =
-        clientHeadersToForward(submission.containingDocument.getRequestHeaders, forwardClientHeaders)
-
+    forwardClientHeaders : Boolean,
+    collector            : ErrorEventCollector
+  ): Map[String, List[String]] =
+    EventCollector.withFailFastCollector(
+      "evaluating headers",
+      submission,
+      collector,
+      throw new XFormsSubmissionException(
+        submission  = submission,
+        message     = "error evaluating headers", // TODO: details
+        description = "processing `<header>` elements",
+      )
+    ) { failFastCollector =>
       SubmissionHeaders.evaluateHeaders(
-        submission.getEffectiveId,
-        submission.staticSubmission,
-        headersToForward
+        parentEffectiveId  = submission.getEffectiveId,
+        enclosingElement   = submission.staticSubmission,
+        initialHeaders     = clientHeadersToForward(submission.containingDocument.getRequestHeaders, forwardClientHeaders),
+        eventTarget        = submission,
+        collector          = failFastCollector
       )(submission.model.getContextStack)
-
-    } catch {
-      case e: OXFException =>
-        throw new XFormsSubmissionException(
-          submission  = submission,
-          message     = e.getMessage,
-          description = "processing <header> elements",
-          throwable = e
-        )
     }
-  }
 
   def clientHeadersToForward(
     allHeaders           : Map[String, List[String]],
@@ -225,13 +246,24 @@ object SubmissionUtils {
     } else
       Map.empty[String, List[String]]
 
-  def forwardResponseHeaders(cxr: ConnectionResult, response: ExternalContext.Response): Unit =
+  def forwardResponseHeaders(cxr: ConnectionResultT[_], response: ExternalContext.Response): Unit =
     for {
       (headerName, headerValues) <- http.Headers.proxyHeaders(cxr.headers, request = false)
       headerValue                <- headerValues
     } locally {
       response.addHeader(headerName, headerValue)
     }
+
+  def forwardStatusAndHeaders[S](cxr: ConnectionResultT[S], response: ExternalContext.Response): Unit = {
+    response.setStatus(cxr.statusCode)
+    forwardResponseHeaders(cxr, response)
+  }
+
+  def forwardStatusContentTypeAndHeaders(cxr: ConnectionResultT[_], response: ExternalContext.Response): Unit = {
+    response.setStatus(cxr.statusCode)
+    cxr.content.contentType.foreach(response.setContentType)
+    forwardResponseHeaders(cxr, response)
+  }
 
   // Whether there is at least one relevant upload control with pending upload bound to any node of the given instance
   def hasBoundRelevantPendingUploadControls(
@@ -271,10 +303,10 @@ object SubmissionUtils {
       // Found one relevant upload control bound to the instance we are submitting
       // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those
       // will be removed during the next recalculate.
-      Option(currentUploadControl.boundFilename) foreach { fileName =>
+      Option(currentUploadControl.boundFilename(EventCollector.Throw)) foreach { fileName =>
         InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-filename", fileName)
       }
-      Option(currentUploadControl.boundFileMediatype) foreach { mediatype =>
+      Option(currentUploadControl.boundFileMediatype(EventCollector.Throw)) foreach { mediatype =>
         InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-mediatype", mediatype)
       }
     }
@@ -308,10 +340,10 @@ object SubmissionUtils {
         //    In the absence of a BOM (Section 3.3), the charset parameter is
         //    authoritative if it is present
         //
-        IOUtils.readStreamAsStringAndClose(XMLParsing.getReaderFromXMLInputStream(content.inputStream))
+        IOUtils.readStreamAsStringAndClose(XMLParsing.getReaderFromXMLInputStream(content.stream))
       case mediatype if ContentTypes.isTextOrJSONContentType(mediatype) =>
         val charset = content.contentType flatMap ContentTypes.getContentTypeCharset
-        IOUtils.readStreamAsStringAndClose(content.inputStream, charset)
+        IOUtils.readStreamAsStringAndClose(content.stream, charset)
     }
   }
 }

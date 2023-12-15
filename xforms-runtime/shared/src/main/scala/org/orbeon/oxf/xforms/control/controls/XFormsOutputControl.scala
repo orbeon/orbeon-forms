@@ -16,15 +16,16 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
-import org.orbeon.oxf.util.{PathUtils, URLRewriterUtils}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{PathUtils, URLRewriterUtils}
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, OutputControl}
 import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.event.EventCollector
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.XFormsError
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.XFormsNames._
@@ -64,7 +65,7 @@ class XFormsOutputControl(
     markFileMetadataDirty()
   }
 
-  override def computeValue: String =
+  override def computeValue(collector: ErrorEventCollector): String =
     staticControlOpt flatMap (_.staticValue) getOrElse {
 
       val bc = bindingContext
@@ -72,7 +73,7 @@ class XFormsOutputControl(
         valueAttributeOpt match {
           case Some(valueAttribute) =>
             // Value from the `value` attribute
-            evaluateAsString(valueAttribute, bc.nodeset.asScala, bc.position)
+            evaluateAsString(valueAttribute, bc.nodeset.asScala, bc.position, collector, "computing value")
           case None =>
             // Value from the binding
             bc.singleItemOpt map DataModel.getValue // using `singleItemOpt` directly so we can handle the case of a missing binding
@@ -83,23 +84,23 @@ class XFormsOutputControl(
       // This is ugly, but `evaluateFileMetadata` require that the value is set. If not, there will be an infinite loop.
       // We need to find a better solution.
       setValue(result)
-      evaluateFileMetadata(isRelevant)
+      evaluateFileMetadata(isRelevant, collector)
 
       result
     }
 
-  override def evaluateExternalValue(): Unit = {
+  override def evaluateExternalValue(collector: ErrorEventCollector): Unit = {
     assert(isRelevant)
 
-    val internalValue = getValue
+    val internalValue = getValue(collector)
     assert(internalValue ne null)
 
     val updatedValue =
       if (staticControlOpt exists (c => c.isDownloadAppearance || c.isVideoMediatype)) {
-        proxyValueIfNeeded(internalValue, "", filename, fileMediatype orElse mediatype)
+        proxyValueIfNeeded(internalValue, "", filename(collector), fileMediatype(collector) orElse mediatype, collector)
       } else if (staticControlOpt exists (_.isImageMediatype)) {
         // Use dummy image as default value so that client always has something to load
-        proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, filename, fileMediatype orElse mediatype)
+        proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, filename(collector), fileMediatype(collector) orElse mediatype, collector)
       } else if (staticControlOpt exists (_.isHtmlMediatype)) {
         internalValue
       } else {
@@ -110,7 +111,7 @@ class XFormsOutputControl(
             internalValue
           case None =>
             // There is a single-node binding, so the format may be used
-            getValueUseFormat(format) getOrElse internalValue
+            getValueUseFormat(format, collector) getOrElse internalValue
         }
       }
 
@@ -118,24 +119,35 @@ class XFormsOutputControl(
   }
 
   // Keep public for unit tests
-  def evaluatedHeaders: Map[String, List[String]] = {
+  def evaluatedHeaders(collector: ErrorEventCollector): Map[String, List[String]] = {
+
     // TODO: pass BindingContext directly
     getContextStack.setBinding(bindingContext)
     val headersToForward = SubmissionUtils.clientHeadersToForward(containingDocument.getRequestHeaders, forwardClientHeaders = true)
-    try
+
+    EventCollector.withFailFastCollector(
+      "evaluating headers",
+      this,
+      collector,
+      Map.empty[String, List[String]]
+    ) { failFastCollector =>
       SubmissionHeaders.evaluateHeaders(
         getEffectiveId,
         staticControl,
-        headersToForward
+        headersToForward,
+        this,
+        failFastCollector
       )(getContextStack)
-    catch {
-      case NonFatal(t) =>
-        XFormsError.handleNonFatalXPathError(container, t, None)
-        Map()
     }
   }
 
-  private def proxyValueIfNeeded(internalValue: String, defaultValue: String, filename: Option[String], mediatype: Option[String]): String =
+  private def proxyValueIfNeeded(
+    internalValue: String,
+    defaultValue : String,
+    filename     : Option[String],
+    mediatype    : Option[String],
+    collector    : ErrorEventCollector
+  ): String =
     try {
       // If the value is a file: we make sure it is signed otherwise we return the default value
 
@@ -174,7 +186,7 @@ class XFormsOutputControl(
                       filename         = filename,
                       contentType      = mediatype,
                       lastModified     = XFormsCrossPlatformSupport.getLastModifiedIfFast(resolvedURI),
-                      customHeaders    = evaluatedHeaders,
+                      customHeaders    = evaluatedHeaders(collector),
                       getHeader        = containingDocument.headersGetter
                     )
                   )
@@ -197,7 +209,7 @@ class XFormsOutputControl(
                 trimmedInternalValue,
                 filename,
                 mediatype,
-                evaluatedHeaders,
+                evaluatedHeaders(collector),
                 containingDocument.headersGetter
               )
             case _ =>
@@ -221,9 +233,9 @@ class XFormsOutputControl(
         defaultValue
     }
 
-  override def getRelevantEscapedExternalValue: String =
+  protected override def getRelevantEscapedExternalValue(collector: ErrorEventCollector): String =
     if (staticControlOpt exists (c => c.isDownloadAppearance || c.isImageMediatype || c.isVideoMediatype)) {
-      val externalValue = getExternalValue
+      val externalValue = getExternalValue(collector)
       if (externalValue.nonAllBlank) {
         // External value is not blank, rewrite as absolute path. Two cases:
         // - URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
@@ -234,10 +246,10 @@ class XFormsOutputControl(
         externalValue
     } else if (staticControlOpt exists (_.isHtmlMediatype))
       // Rewrite the HTML value with resolved @href and @src attributes
-      XFormsControl.getEscapedHTMLValue(getLocationData, getExternalValue)
+      XFormsControl.getEscapedHTMLValue(getLocationData, getExternalValue(collector))
     else
       // Return external value as is
-      getExternalValue
+      getExternalValue(collector)
 
   override def getNonRelevantEscapedExternalValue: String =
     if (mediatype exists (_.startsWith("image/")))
@@ -267,20 +279,25 @@ class XFormsOutputControl(
     (staticControl.hasLHHA(LHHA.Label) || staticControl.isHtmlMediatype) &&
     super.isDirectlyFocusableMaybeWithToggle
 
-  override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
-    var added: Boolean = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)
-    added |= addFileMetadataAttributes(attributesImpl, previousControlOpt.asInstanceOf[Option[FileMetadata]])
+  override def addAjaxExtensionAttributes(
+    attributesImpl    : AttributesImpl,
+    previousControlOpt: Option[XFormsControl],
+    collector         : ErrorEventCollector
+  ): Boolean = {
+    var added = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt, collector)
+    added |= addFileMetadataAttributes(attributesImpl, previousControlOpt.asInstanceOf[Option[FileMetadata]], collector)
     added
   }
 
   override def compareExternalUseExternalValue(
-    previousExternalValue : Option[String],
-    previousControl       : Option[XFormsControl]
+    previousExternalValue: Option[String],
+    previousControl      : Option[XFormsControl],
+    collector            : ErrorEventCollector
   ): Boolean =
     previousControl match {
       case Some(other: XFormsOutputControl) =>
-        compareFileMetadata(other) &&
-        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
+        compareFileMetadata(other, collector) &&
+        super.compareExternalUseExternalValue(previousExternalValue, previousControl, collector)
       case _ => false
     }
 
@@ -291,19 +308,23 @@ class XFormsOutputControl(
     else
       super.findAriaByControlEffectiveIdWithNs
 
-  override def getBackCopy: AnyRef = {
-    val cloned = super.getBackCopy.asInstanceOf[XFormsOutputControl]
-    updateFileMetadataCopy(cloned)
+  override def getBackCopy(collector: ErrorEventCollector): AnyRef = {
+    val cloned = super.getBackCopy(collector).asInstanceOf[XFormsOutputControl]
+    updateFileMetadataCopy(cloned, collector)
     cloned
   }
 }
 
 object XFormsOutputControl {
 
-  def getExternalValueOrDefault(control: XFormsOutputControl, mediatypeValue: String): String =
+  def getExternalValueOrDefault(
+    control       : XFormsOutputControl,
+    mediatypeValue: String,
+    collector     : ErrorEventCollector
+  ): String =
     if ((control ne null) && control.isRelevant)
       // Ask control
-      control.getExternalValue
+      control.getExternalValue(collector)
     else if ((mediatypeValue ne null) && mediatypeValue.startsWith("image/"))
       // Dummy image
       DUMMY_IMAGE_URI

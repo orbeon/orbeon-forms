@@ -17,16 +17,17 @@ import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.DynamicVariable
 import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.{DynamicVariable, IndentedLogger}
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.actions._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvents.{XFORMS_SUBMIT_DONE, XFORMS_SUBMIT_ERROR}
 import org.orbeon.oxf.xforms.event.events.{XFormsSubmitDoneEvent, XFormsSubmitErrorEvent, XFormsSubmitEvent}
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.saxon.om
@@ -53,12 +54,10 @@ object XFormsAPI {
     }
   }
 
-  // Every block of action must be run within this
-  def withContainingDocument[T](containingDocument: XFormsContainingDocument)(body: => T): T = {
+  def withContainingDocument[T](containingDocument: XFormsContainingDocument)(body: => T): T =
     containingDocumentDyn.withValue(containingDocument) {
       body
     }
-  }
 
   // Return the action interpreter
   def inScopeActionInterpreter: XFormsActionInterpreter = actionInterpreterDyn.value.get
@@ -73,19 +72,21 @@ object XFormsAPI {
   def setvalue(ref: Seq[om.NodeInfo], value: String): Option[(om.NodeInfo, Boolean)] =
     ref.headOption map { nodeInfo =>
 
+      val (docOpt, indentedLoggerOpt) = findDocAndLoggerFromActionOrScope
+
       def onSuccess(oldValue: String): Unit =
-        for (action <- actionInterpreterDyn.value)
-          yield
-            DataModel.logAndNotifyValueChange(
-              source             = "scala setvalue",
-              nodeInfo           = nodeInfo,
-              oldValue           = oldValue,
-              newValue           = value,
-              isCalculate        = false,
-              collector          = Dispatch.dispatchEvent)(
-              containingDocument = action.containingDocument,
-              logger             = action.indentedLogger
-            )
+        for (doc <- docOpt)
+        yield
+          DataModel.logAndNotifyValueChange(
+            source             = "scala setvalue",
+            nodeInfo           = nodeInfo,
+            oldValue           = oldValue,
+            newValue           = value,
+            isCalculate        = false,
+            collector          = (event: XFormsEvent) => Dispatch.dispatchEvent(event, EventCollector.Throw))(
+            containingDocument = doc,
+            logger             = indentedLoggerOpt.orNull
+          )
 
       val changed = DataModel.setValueIfChanged(nodeInfo, value, onSuccess)
 
@@ -100,10 +101,29 @@ object XFormsAPI {
   // - Some(index) otherwise, where index is the control's new index
   def setindex(repeatStaticId: String, index: Int): Option[Int] =
     actionInterpreterDyn.value map { interpreter =>
-      XFormsSetindexAction.executeSetindexAction(interpreter, interpreter.outerAction, repeatStaticId, index)(interpreter.indentedLogger)
+      XFormsSetindexAction.executeSetindexAction(
+        interpreter,
+        interpreter.outerAction,
+        repeatStaticId,
+        index,
+        EventCollector.Throw
+      )(interpreter.indentedLogger)
     } collect {
       case newIndex if newIndex >= 0 => newIndex
     }
+
+  private def findDocAndLoggerFromActionOrScope: (Option[XFormsContainingDocument], Option[IndentedLogger]) = {
+    val maybeActionInterpreter = actionInterpreterDyn.value
+
+    // If we are in an action the `ActionInterpreter` also returns this same logger
+    def defaultLogger: Option[IndentedLogger] =
+      containingDocumentDyn.value.map(_.getIndentedLogger(XFormsActions.LoggingCategory))
+
+    (
+      maybeActionInterpreter.map(_.containingDocument).orElse(containingDocumentDyn.value),
+      maybeActionInterpreter.map(_.indentedLogger).orElse(defaultLogger)
+    )
+  }
 
   // xf:insert
   // @return the inserted nodes
@@ -119,8 +139,7 @@ object XFormsAPI {
   ): Seq[T] =
     if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
 
-      val action = actionInterpreterDyn.value
-      val docOpt = action map (_.containingDocument) orElse containingDocumentDyn.value
+      val (docOpt, indentedLoggerOpt) = findDocAndLoggerFromActionOrScope
 
       val (positionAttribute, collectionToUpdate) =
         if (before.nonEmpty)
@@ -141,8 +160,10 @@ object XFormsAPI {
         requireDefaultValues              = requireDefaultValues,
         searchForInstance                 = searchForInstance,
         removeInstanceDataFromClonedNodes = removeInstanceDataFromClonedNodes,
-        structuralDependencies            = true)(
-        indentedLogger                    = action map (_.indentedLogger) orNull,
+        structuralDependencies            = true,
+        collector                         = EventCollector.Throw
+      )(
+        indentedLogger                    = indentedLoggerOpt.orNull,
       ).asInstanceOf[JList[T]].asScala
     } else
       Nil
@@ -154,16 +175,17 @@ object XFormsAPI {
   ): Seq[om.NodeInfo] =
     if (ref.nonEmpty) {
 
-      val actionOpt = actionInterpreterDyn.value
-      val docOpt    = actionOpt map (_.containingDocument) orElse containingDocumentDyn.value
+      val (docOpt, indentedLoggerOpt) = findDocAndLoggerFromActionOrScope
 
       val deletionDescriptors =
         XFormsDeleteAction.doDelete(
           containingDocumentOpt = docOpt,
           collectionToUpdate    = ref,
           deleteIndexOpt        = None,
-          doDispatch            = doDispatch)(
-          indentedLogger        = actionOpt map (_.indentedLogger) orNull
+          doDispatch            = doDispatch,
+          collector             = EventCollector.Throw
+        )(
+          indentedLogger        = indentedLoggerOpt.orNull
         )
 
       deletionDescriptors map (_.nodeInfo)
@@ -243,14 +265,14 @@ object XFormsAPI {
     XFormsInstance.findInAncestorScopes(inScopeActionInterpreter.container, staticId)
 
   // Return an instance within a top-level model
-  def topLevelInstance(modelId: String, instanceId: String): Option[XFormsInstance] =
+  def topLevelInstance(modelId: String, instanceId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocumentOpt.orNull): Option[XFormsInstance] =
     topLevelModel(modelId) flatMap (_.findInstance(instanceId))
 
   // Return a top-level model by static id
   // NOTE: This search is not very efficient, but this allows mocking in tests, where getObjectByEffectiveId causes issues
   // 2013-04-03: Unsure if we still need this for mocking
-  def topLevelModel(modelId: String): Option[XFormsModel] =
-    inScopeContainingDocumentOpt flatMap (_.models find (_.getId == modelId))
+  def topLevelModel(modelId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocumentOpt.orNull): Option[XFormsModel] =
+    Option(xfcd) flatMap (_.models find (_.getId == modelId))
 
   def context[T](xpath: String)(body: => T): T = throw new NotImplementedError("context")
   def context[T](item: om.Item)(body: => T): T = throw new NotImplementedError("context")
@@ -266,6 +288,8 @@ object XFormsAPI {
     delay           : Option[Int]                = None,
     showProgress    : Boolean                    = true,
     allowDuplicates : Boolean                    = false
+  )(implicit
+    xfcd            : XFormsContainingDocument = inScopeContainingDocument
   ): Unit =
     resolveAs[XFormsEventTarget](targetId) foreach {
       XFormsDispatchAction.dispatch(
@@ -276,15 +300,22 @@ object XFormsAPI {
         properties,
         delay,
         showProgress,
-        allowDuplicates
+        allowDuplicates,
+        EventCollector.Throw
       )
     }
 
-  private val SubmitEvents = Seq("xforms-submit-done", "xforms-submit-error")
+  private val SubmitEvents = List(XFORMS_SUBMIT_DONE, XFORMS_SUBMIT_ERROR)
 
   // xf:send
   // Send the given submission and applies the body with the resulting event if the submission completed
-  private def send[T](submissionId: String, props: List[PropertyValue])(body: XFormsEvent => T): Option[T] = {
+  private def send[T](
+    submissionId: String,
+    props       : List[PropertyValue])(
+    body        : XFormsEvent => T
+  )(implicit
+    xfcd        : XFormsContainingDocument
+  ): Option[T] = {
     resolveAs[XFormsModelSubmission](submissionId) flatMap { submission =>
 
       var result: Option[Try[T]] = None
@@ -298,62 +329,112 @@ object XFormsAPI {
       SubmitEvents foreach (submission.addListener(_, listener))
 
       // Dispatch and make sure the listeners are removed
-      try Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, ActionPropertyGetter(props)))
+      try Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, ActionPropertyGetter(props)), EventCollector.Throw)
       finally SubmitEvents foreach (submission.removeListener(_, Some(listener)))
 
       // - If the dispatch completed successfully and the submission started, it *should* have completed with either
       //   `xforms-submit-done` or `xforms-submit-error`. In this case, we have called `body(event)` and return
       //   `Option[T]` or throw an exception if `body(event)` failed.
-      // - But in particular if the xforms-submit event got canceled, we might be in a situation where no
-      //   xforms-submit-done or xforms-submit-error was dispatched. In this case, we return `None`.
+      // - But in particular if the `xforms-submit` event got canceled, we might be in a situation where no
+      //   `xforms-submit-done` or `xforms-submit-error` was dispatched. In this case, we return `None`.
       // - If the dispatch failed for other reasons, it might have thrown an exception, which is propagated.
 
       result map (_.get)
     }
   }
 
+//  private def sendAsyncImpl(
+//    submissionId   : String,
+//    props          : List[PropertyValue]
+//  )(implicit
+//    externalContext: ExternalContext,
+//    xfcd           : XFormsContainingDocument
+//  ): Option[Future[XFormsEvent]] = {
+//    resolveAs[XFormsModelSubmission](submissionId) map { submission =>
+//
+//      val p = Promise[XFormsEvent]()
+//
+//      val doneListener: Dispatch.EventListener =
+//        e => p.success(e)
+//
+//      val errorListener: Dispatch.EventListener =
+//        e => p.failure(new SubmitException(e.asInstanceOf[XFormsSubmitErrorEvent]))
+//
+//      submission.addListener(XFORMS_SUBMIT_DONE,  doneListener)
+//      submission.addListener(XFORMS_SUBMIT_ERROR, errorListener)
+//
+//      try
+//        Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, ActionPropertyGetter(props)))
+//      catch {
+//        case NonFatal(t) =>
+//          p.failure(t)
+//      }
+//
+//      val f = p.future
+//      f.onComplete { _ =>
+//        submission.removeListener(XFORMS_SUBMIT_DONE, Some(doneListener))
+//        submission.removeListener(XFORMS_SUBMIT_ERROR, Some(errorListener))
+//      }
+//      f
+//    }
+//  }
+
   class SubmitException(e: XFormsSubmitErrorEvent) extends RuntimeException
 
   // xf:send which throws a SubmitException in case of error
-  def sendThrowOnError(submissionId: String, props: List[PropertyValue] = Nil): Option[XFormsSubmitDoneEvent] =
+  def sendThrowOnError(submissionId: String, props: List[PropertyValue] = Nil)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Option[XFormsSubmitDoneEvent] =
     send(submissionId, props) {
       case done:  XFormsSubmitDoneEvent  => done
       case error: XFormsSubmitErrorEvent => throw new SubmitException(error)
     }
 
+//    def sendAsync(
+//      submissionId   : String,
+//      props          : List[PropertyValue] = Nil
+//    )(implicit
+//      externalContext: ExternalContext,
+//      xfcd           : XFormsContainingDocument
+//    ): Option[Future[XFormsSubmitDoneEvent]] =
+//      sendAsyncImpl(submissionId, props).map { f =>
+//        f.map {
+//          case done:  XFormsSubmitDoneEvent  => done
+//          case error: XFormsSubmitErrorEvent => throw new SubmitException(error)
+//        }
+//      }
+
   // NOTE: There is no source id passed so we resolve relative to the document
-  def resolveAs[T: ClassTag](staticOrAbsoluteId: String): Option[T] =
-    inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, staticOrAbsoluteId, None) flatMap collectByErasedType[T]
+  def resolveAs[T: ClassTag](staticOrAbsoluteId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Option[T] =
+    xfcd.resolveObjectByIdInScope(Constants.DocumentId, staticOrAbsoluteId, None) flatMap collectByErasedType[T]
 
   // xf:toggle
-  def toggle(caseId: String, mustHonorDeferredUpdateFlags: Boolean = true): Unit =
+  def toggle(caseId: String, mustHonorDeferredUpdateFlags: Boolean = true)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsCaseControl](caseId) foreach
-      (XFormsToggleAction.toggle(_, mustHonorDeferredUpdateFlags))
+      (XFormsToggleAction.toggle(_, mustHonorDeferredUpdateFlags, collector = EventCollector.Throw))
 
   // xf:rebuild
-  def rebuild(modelId: String, mustHonorDeferredUpdateFlags: Boolean = false): Unit =
+  def rebuild(modelId: String, mustHonorDeferredUpdateFlags: Boolean = false)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsModel](modelId) foreach
       (RRRAction.rebuild(_, mustHonorDeferredUpdateFlags))
 
   // xf:recalculate
-  def recalculate(modelId: String, mustHonorDeferredUpdateFlags: Boolean = false, applyDefaults: Boolean = false): Unit =
+  def recalculate(modelId: String, mustHonorDeferredUpdateFlags: Boolean = false, applyDefaults: Boolean = false)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsModel](modelId) foreach
       (RRRAction.recalculate(_, mustHonorDeferredUpdateFlags, applyDefaults))
 
   // xf:refresh
-  def refresh(modelId: String): Unit =
+  def refresh(modelId: String)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsModel](modelId) foreach
-      XFormsRefreshAction.refresh
+      (XFormsRefreshAction.refresh(_, EventCollector.Throw))
 
   // xf:show
-  def show(dialogId: String, properties: PropertyGetter = EmptyGetter): Unit =
+  def show(dialogId: String, properties: PropertyGetter = EmptyGetter)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsEventTarget](dialogId) foreach
-      (XXFormsShowAction.showDialog(_, properties = properties))
+      (XXFormsShowAction.showDialog(_, properties = properties, collector = EventCollector.Throw))
 
   // xf:hide
-  def hide(dialogId: String, properties: PropertyGetter = EmptyGetter): Unit =
+  def hide(dialogId: String, properties: PropertyGetter = EmptyGetter)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsEventTarget](dialogId) foreach
-      (XXFormsHideAction.hideDialog(_, properties = properties))
+      (XXFormsHideAction.hideDialog(_, properties = properties, collector = EventCollector.Throw))
 
   // xf:load
   def load(
@@ -361,9 +442,11 @@ object XFormsAPI {
     target                       : Option[String] = None,
     showProgress                 : Boolean        = false,
     mustHonorDeferredUpdateFlags : Boolean        = true
+  )(implicit
+    xfcd                         : XFormsContainingDocument = inScopeContainingDocument
   ): Unit =
     XFormsLoadAction.resolveStoreLoadValue(
-      containingDocument           = inScopeContainingDocument,
+      containingDocument           = xfcd,
       currentElem                  = None,
       doReplace                    = true,
       value                        = url.encodeHRRI(processSpace = true),
@@ -375,7 +458,7 @@ object XFormsAPI {
     )
 
   // xf:setfocus
-  def setfocus(controlId: String, includes: Set[QName], excludes: Set[QName]): Unit =
+  def setfocus(controlId: String, includes: Set[QName], excludes: Set[QName])(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Unit =
     resolveAs[XFormsControl](controlId) foreach
-      (XFormsSetfocusAction.setfocus(_, includes, excludes))
+      (XFormsSetfocusAction.setfocus(_, includes, excludes, collector = EventCollector.Throw))
 }

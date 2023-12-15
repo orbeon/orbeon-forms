@@ -2,11 +2,11 @@ package org.orbeon.oxf.xforms.analysis
 
 import cats.syntax.option._
 import org.orbeon.dom
-import org.orbeon.oxf.xforms.{PartGlobalOps, _}
+import org.orbeon.oxf.xforms.PartGlobalOps
 import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.saxon.om
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
@@ -21,6 +21,9 @@ trait TopLevelPartAnalysis
   def bindingIncludes: Set[String]
   def bindingsIncludesAreUpToDate: Boolean
   def debugOutOfDateBindingsIncludes: String
+
+  // The top-level document part must have at least one model
+  def getDefaultModel: Model = findDefaultModel.getOrElse(throw new IllegalStateException)
 }
 
 trait PartAnalysisForStaticMetadataAndProperties {
@@ -69,7 +72,7 @@ trait PartAnalysisRuntimeOps extends PartGlobalOps {
 
   def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping]
   def hasControls: Boolean
-  def defaultModel: Option[Model]
+  def findDefaultModel: Option[Model]
   def getModel(prefixedId: String): Model
   def getTopLevelControls: List[ElementAnalysis]
   def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean

@@ -19,21 +19,28 @@ import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
-import org.orbeon.oxf.xforms.analysis.WithChildrenTrait
+import org.orbeon.oxf.xforms.analysis.{WithChildrenTrait, XPathErrorDetails}
 import org.orbeon.oxf.xforms.analysis.controls.{HeaderControl, WithExpressionOrConstantTrait}
-import org.orbeon.xforms.{XFormsId, XFormsNames}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.XFormsEventTarget
+import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
 
 import scala.collection.mutable
+import scala.util.control.NonFatal
 
 
 object SubmissionHeaders {
 
   // Evaluate children <xf:header> elements.
   def evaluateHeaders(
-    parentEffectiveId : String,                             // effective id of the enclosing `<xf:submission>` or `<xf:output>`
-    enclosingElement  : WithChildrenTrait,                  // in practice `<xf:submission>` or `<xf:output>`
-    initialHeaders    : Map[String, List[String]])(implicit // initial headers or empty list of headers
-    contextStack      : XFormsContextStack                  // context stack set to enclosing <xf:*> element
+    parentEffectiveId : String,                    // effective id of the enclosing `<xf:submission>` or `<xf:output>`
+    enclosingElement  : WithChildrenTrait,         // in practice `<xf:submission>` or `<xf:output>`
+    initialHeaders    : Map[String, List[String]], // initial headers or empty list of headers
+    eventTarget       : XFormsEventTarget,
+    collector         : ErrorEventCollector
+  )(implicit
+    contextStack      : XFormsContextStack         // context stack set to enclosing <xf:*> element
   ): Map[String, List[String]] = {
 
     val xblContainer = contextStack.container
@@ -46,7 +53,13 @@ object SubmissionHeaders {
         // Process all nested <header> elements
         for (headerElem <- headerElems) {
 
-          withBinding(headerElem.element, getElementEffectiveId(parentEffectiveId, headerElem), headerElem.scope) { headerElemBindingContext =>
+          withBinding(
+            headerElem.element,
+            getElementEffectiveId(parentEffectiveId, headerElem),
+            headerElem.scope,
+            eventTarget,
+            collector
+          ) { headerElemBindingContext =>
 
             // Handle a single header element
             def handleHeaderElement(): Unit = {
@@ -58,9 +71,11 @@ object SubmissionHeaders {
                     (throw new OXFException(s"Missing `<${name.qualifiedName}>` child element of `<xf:header>` element"))
 
                 evaluateExpressionOrConstant(
-                  labelOrValueElem,
-                  parentEffectiveId,
-                  pushContextAndModel = true
+                  childElem           = labelOrValueElem,
+                  parentEffectiveId   = parentEffectiveId,
+                  pushContextAndModel = true,
+                  eventTarget         = eventTarget,
+                  collector           = collector
                 )
               }
 
@@ -72,18 +87,32 @@ object SubmissionHeaders {
               val combine = {
                 val avtCombine = headerElem.element.attributeValueOpt("combine") getOrElse DefaultCombineValue
                 val result =
-                  XPathCache.evaluateAsAvt(
-                    contextStack.getCurrentBindingContext.nodeset,
-                    contextStack.getCurrentBindingContext.position,
-                    avtCombine,
-                    headerElem.namespaceMapping,
-                    contextStack.getCurrentBindingContext.getInScopeVariables,
-                    xblContainer.getContainingDocument.functionLibrary,
-                    contextStack.getFunctionContext(parentEffectiveId),
-                    null,
-                    headerElem.locationData,
-                    xblContainer.getContainingDocument.getRequestStats.getReporter
-                  )
+                  try
+                    XPathCache.evaluateAsAvt(
+                      contextStack.getCurrentBindingContext.nodeset,
+                      contextStack.getCurrentBindingContext.position,
+                      avtCombine,
+                      headerElem.namespaceMapping,
+                      contextStack.getCurrentBindingContext.getInScopeVariables,
+                      xblContainer.getContainingDocument.functionLibrary,
+                      contextStack.getFunctionContext(parentEffectiveId),
+                      null,
+                      headerElem.locationData,
+                      xblContainer.getContainingDocument.getRequestStats.getReporter
+                    )
+                catch {
+                  case NonFatal(t) =>
+                    collector(
+                      new XXFormsXPathErrorEvent(
+                        target         = eventTarget,
+                        expression     = avtCombine,
+                        details        = XPathErrorDetails.ForOther("avt"),
+                        message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                        throwable      = t
+                      )
+                    )
+                    ""
+                }
 
                 if (! AllowedCombineValues(result))
                   throw new OXFException(s"Invalid value '$result' for attribute combine.")

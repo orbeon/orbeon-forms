@@ -228,7 +228,6 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
             containingDocument
         }
 
-
       // Output resulting document
       if (initializeXFormsDocument)
         produceOutput(pipelineContext, outputName, externalContext, htmlLogger, stage2CacheableState.template, containingDocument, xmlReceiver)

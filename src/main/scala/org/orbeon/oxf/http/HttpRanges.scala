@@ -1,8 +1,9 @@
 package org.orbeon.oxf.http
 
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{ConnectionResult, TryUtils}
+import org.orbeon.oxf.util.TryUtils
 
 import java.io.{File, InputStream}
 import scala.jdk.CollectionConverters._

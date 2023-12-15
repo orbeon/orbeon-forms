@@ -15,6 +15,8 @@ trait FormRunnerEncodeDecode {
 
   // The data can be encoded and encrypted, or just encoded in Base64 format.
   // The encrypted version is only used by the "Test PDF" feature as of 2021-10-13.
+  // 2023-12-09: Adding support for the console.
+  //@XPathFunction
   def decodeSubmittedFormData(data: String): DocumentNodeInfoType =
     Try(decodeXmlNodeInfo(data, forceEncryption = true)) getOrElse {
       XFormsCrossPlatformSupport.stringToTinyTree(

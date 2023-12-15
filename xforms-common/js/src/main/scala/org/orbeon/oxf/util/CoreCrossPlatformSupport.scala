@@ -50,12 +50,19 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
   private val externalContextDyn  = new DynamicVariable[ExternalContext]
 
+  def externalContext: ExternalContext =
+    externalContextDyn.value.getOrElse(throw new IllegalStateException("missing ExternalContext"))
+
   def withExternalContext[T](ec: ExternalContext)(body: => T): T = {
     externalContextDyn.withValue(ec) {
       body
     }
   }
 
-  def externalContext: ExternalContext =
-    externalContextDyn.value.getOrElse(throw new IllegalStateException("missing ExternalContext"))
+  def shiftExternalContext[F[_], T](lift: T => F[T])(body: => T)(implicit ec: ExternalContext): F[T] =
+    lift(
+      externalContextDyn.withValue(ec) {
+        body
+      }
+    )
 }

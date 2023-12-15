@@ -25,19 +25,21 @@ import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
-import org.orbeon.oxf.xforms.analysis.{ElemListener, ElementAnalysis}
-import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil, WithExpressionOrConstantTrait}
+import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControl, SelectionControlUtil, WithExpressionOrConstantTrait}
+import org.orbeon.oxf.xforms.analysis.{ElemListener, ElementAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.event.EventCollector
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsXPathErrorEvent}
 import org.orbeon.oxf.xforms.itemset.StaticItemsetSupport.isSelected
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver, XMLUtils}
 import org.orbeon.saxon.om
-import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.{BindingErrorReason, XFormsCrossPlatformSupport, XFormsNames}
 import org.xml.sax.SAXException
 
 import scala.jdk.CollectionConverters._
@@ -84,7 +86,10 @@ object ItemsetSupport {
     }
 
   // Evaluate the itemset for a given `xf:select` or `xf:select1` control.
-  def evaluateItemset(select1Control: XFormsSelect1Control): Itemset = {
+  def evaluateItemset(
+    select1Control: XFormsSelect1Control,
+    collector     : ErrorEventCollector
+  ): Itemset = {
 
     val staticControl = select1Control.staticControl
 
@@ -92,15 +97,27 @@ object ItemsetSupport {
       case Some(staticItemset) =>
         staticItemset
       case None =>
-        val container = select1Control.container
-        try {
-          val parentEffectiveId = select1Control.getEffectiveId
 
-          val result = new Itemset(multiple = staticControl.isMultiple, hasCopy = staticControl.useCopy)
+        def newEmptyItemset(staticControl: SelectionControl): Itemset =
+          new Itemset(multiple = staticControl.isMultiple, hasCopy = staticControl.useCopy)
+
+        // The idea is that if there is any failure in the evaluation of the itemset, we stop evaluating the itemset,
+        // we report the first failure, and then we return an empty itemset, provided the original `collector` has not
+        // opted to throw. If the body throws, then this throws.
+        EventCollector.withFailFastCollector(
+          "evaluating itemset",
+          select1Control,
+          collector,
+          newEmptyItemset(staticControl)
+        ) { failFastCollector =>
+
+          val container         = select1Control.container
+          val parentEffectiveId = select1Control.getEffectiveId
+          val result            = newEmptyItemset(staticControl)
 
           // Set binding on this control, after saving the current context because the context stack must
           // remain unmodified.
-          implicit val contextStack = container.getContextStack
+          implicit val contextStack: XFormsContextStack = container.getContextStack
           val savedBindingContext = contextStack.getCurrentBindingContext
           contextStack.setBinding(select1Control.bindingContext)
 
@@ -118,7 +135,7 @@ object ItemsetSupport {
                 domElem.getQName match {
                   case XFORMS_ITEM_QNAME =>
 
-                    contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope)
+                    contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope, select1Control, failFastCollector)
 
                     getValueOrCopyItemValue(elem) map (createValueNode(_, elem, position)) foreach { newItem =>
                       currentContainer.addChildItem(newItem)
@@ -127,7 +144,7 @@ object ItemsetSupport {
 
                   case XFORMS_ITEMSET_QNAME =>
 
-                    contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope)
+                    contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope, select1Control, failFastCollector)
 
                     val currentBindingContext = contextStack.getCurrentBindingContext
 
@@ -156,7 +173,7 @@ object ItemsetSupport {
                       }(contextStack)
                   case XFORMS_CHOICES_QNAME =>
 
-                    contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope)
+                    contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope, select1Control, failFastCollector)
 
                     if (findChildElem(elem, LABEL_QNAME).isDefined) {
                       val newItem = createChoiceNode(elem, position)
@@ -241,7 +258,14 @@ object ItemsetSupport {
                     (_.asInstanceOf[WithExpressionOrConstantTrait]) flatMap { valueElem =>
 
                       // Returns `None` if the result is `()`
-                      val rawValue = evaluateExpressionOrConstant(valueElem, parentEffectiveId, pushContextAndModel = true)
+                      val rawValue =
+                        evaluateExpressionOrConstant(
+                          childElem           = valueElem,
+                          parentEffectiveId   = parentEffectiveId,
+                          pushContextAndModel = true,
+                          eventTarget         = select1Control,
+                          collector           = failFastCollector
+                        )
 
                       // For multiple selection:
                       //
@@ -272,11 +296,11 @@ object ItemsetSupport {
               // - the context item is missing
               //
               private def getCopyValue(copyElem: ElementAnalysis): Option[List[om.Item]] =
-                copyElem.element.attributeValueOpt(XFormsNames.REF_QNAME) flatMap { refAtt =>
+                copyElem.element.attributeValueOpt(XFormsNames.REF_QNAME) flatMap { _ =>
 
                   val sourceEffectiveId = getElementEffectiveId(parentEffectiveId, copyElem)
 
-                  withBinding(copyElem.element, sourceEffectiveId, copyElem.scope) { currentBindingContext =>
+                  withBinding(copyElem.element, sourceEffectiveId, copyElem.scope, select1Control, failFastCollector) { currentBindingContext =>
                     val currentNodeset = currentBindingContext.nodeset.asScala.toList
                     currentNodeset.nonEmpty option currentNodeset
                   }(contextStack)
@@ -286,7 +310,15 @@ object ItemsetSupport {
                 lhhaElemOpt match {
                   case Some(lhhaElem: LHHAAnalysis) =>
 
-                    val lhhaValueOpt = evaluateExpressionOrConstant(lhhaElem, parentEffectiveId, pushContextAndModel = true)
+                    val lhhaValueOpt =
+                      evaluateExpressionOrConstant(
+                        childElem           = lhhaElem,
+                        parentEffectiveId   = parentEffectiveId,
+                        pushContextAndModel = true,
+                        eventTarget         = select1Control,
+                        collector           = failFastCollector
+                      )
+
                     val containsHtml = lhhaElem.containsHTML
 
                     // XXX TODO
@@ -300,12 +332,14 @@ object ItemsetSupport {
                       trimmed map (LHHAValue(_, containsHtml))
                   case _ =>
                     if (required)
-                      throw new ValidationException(
-                        "`xf:item` or `xf:itemset` must contain an `xf:label` element",
-                        staticControl.locationData
+                      collector(
+                        new XXFormsBindingErrorEvent(
+                          target          = select1Control,
+                          locationDataOpt = Option(staticControl.locationData),
+                          reason          = BindingErrorReason.Other("`xf:item` or `xf:itemset` must contain an `xf:label` element")
+                        )
                       )
-                    else
-                      None
+                    None
                 }
 
               private def getAttributes(elem: ElementAnalysis): List[(QName, String)] =
@@ -345,7 +379,15 @@ object ItemsetSupport {
                         )
                       } catch {
                         case NonFatal(t) =>
-                          XFormsError.handleNonFatalXPathError(container, t, Some(attributeValue))
+                          failFastCollector(
+                            new XXFormsXPathErrorEvent(
+                              target         = select1Control,
+                              expression     = attributeValue,
+                              details        = XPathErrorDetails.ForAttribute(attributeName.localName),
+                              message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                              throwable      = t
+                            )
+                          )
                           ""
                       }
                     Some(attributeName -> tempResult)
@@ -381,10 +423,6 @@ object ItemsetSupport {
           contextStack.setBinding(savedBindingContext)
 
           result
-        } catch {
-          case NonFatal(t) =>
-            XFormsError.handleNonFatalXPathError(container, t, None)
-            new Itemset(multiple = staticControl.isMultiple, hasCopy = staticControl.useCopy)
         }
     }
   }
@@ -405,10 +443,10 @@ object ItemsetSupport {
     else
       lhhaValue.label.escapeXmlMinimal
 
-  def javaScriptValue(lhhaValue: LHHAValue, locationData: LocationData): String =
+  private def javaScriptValue(lhhaValue: LHHAValue, locationData: LocationData): String =
     htmlValue(lhhaValue, locationData).escapeJavaScript
 
-  def javaScriptValue(item: Item.ValueNode, encode: Boolean): String =
+  private def javaScriptValue(item: Item.ValueNode, encode: Boolean): String =
     item.externalValue(encode).escapeJavaScript
 
   // Return the list of items as a JSON tree with hierarchical information
@@ -511,7 +549,6 @@ object ItemsetSupport {
   // Return the list of items as an XML tree
   def asXML(
     itemset                    : Itemset,
-    configuration              : StaticXPath.SaxonConfiguration,
     controlValue               : Option[(Item.Value[om.NodeInfo], om.NodeInfo => Boolean)],
     excludeWhitespaceTextNodes : Boolean,
     locationData               : LocationData

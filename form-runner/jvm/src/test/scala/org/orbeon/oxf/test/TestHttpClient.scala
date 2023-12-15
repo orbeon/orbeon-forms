@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.test
 
-import java.{util => ju}
-
+import org.orbeon.connection.StreamedContent
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
-import org.orbeon.oxf.externalcontext.{Credentials, LocalExternalContext, _}
+import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.InitUtils._
@@ -29,6 +28,7 @@ import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
 
+import java.{util => ju}
 import scala.collection.mutable
 
 // HttpClient which simulates a call to Orbeon Forms without using a servlet. This acts as if the caller

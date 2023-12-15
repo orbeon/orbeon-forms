@@ -6,7 +6,7 @@ import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.DependencyAnalyzer
-import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xml.{SaxonUtils, ShareableXPathStaticContext}
 import org.orbeon.saxon.expr.{Expression, StringLiteral}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.{NodeInfo, StructuredQName}
@@ -160,23 +160,22 @@ object FormRunnerRename {
       .replaceAll(s"""'$name'""", Matcher.quoteReplacement(s"""'$replacement'"""))
       .replaceAll(s""""$name"""", Matcher.quoteReplacement(s""""$replacement""""))
 
+  // Compile expression but don't `typeCheck()` it so that we don't throw static XPath errors at this point, but later
+  // when we have the option to gather XPath errors in the static state or the running form.
   private def compileExpression(
     xpathString     : String,
     namespaceMapping: NamespaceMapping,
     functionLibrary : FunctionLibrary,
     avt             : Boolean)(implicit
     logger          : IndentedLogger
-  ): Expression = {
-
-    val compiledExpr =
-      XPath.compileExpression(
-        xpathString      = xpathString,
-        namespaceMapping = namespaceMapping,
-        locationData     = null,
-        functionLibrary  = functionLibrary,
-        avt              = avt
-      )
-
-    compiledExpr.expression.getInternalExpression
-  }
+  ): Expression =
+    XPath.compileExpressionMinimal(
+      staticContext = new ShareableXPathStaticContext(
+          XPath.GlobalConfiguration,
+          namespaceMapping,
+          functionLibrary
+        ),
+      xpathString   = xpathString,
+      avt           = avt
+    )
 }

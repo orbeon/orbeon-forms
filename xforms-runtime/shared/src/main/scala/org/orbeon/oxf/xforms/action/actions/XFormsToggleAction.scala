@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAPI, XFormsAction}
 import org.orbeon.oxf.xforms.control.Focus
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.xforms.XFormsNames.XXFORMS_TOGGLE_ANCESTORS_QNAME
 
 
@@ -36,7 +37,8 @@ class XFormsToggleAction extends XFormsAction {
         XFormsToggleAction.toggle(
           caseControl                  = caseControl,
           mustHonorDeferredUpdateFlags = interpreter.mustHonorDeferredUpdateFlags(actionContext.analysis),
-          mustToggleAncestors          = ! actionContext.analysis.element.attributeValueOpt(XXFORMS_TOGGLE_ANCESTORS_QNAME).contains("false")
+          mustToggleAncestors          = ! actionContext.analysis.element.attributeValueOpt(XXFORMS_TOGGLE_ANCESTORS_QNAME).contains("false"),
+          collector                    = actionContext.collector
         )
       case _ =>
         // "If there is a null search result for the target object and the source object is an XForms action such as
@@ -54,7 +56,8 @@ object XFormsToggleAction {
   def toggle(
     caseControl                  : XFormsCaseControl,
     mustHonorDeferredUpdateFlags : Boolean = true,
-    mustToggleAncestors          : Boolean = true
+    mustToggleAncestors          : Boolean = true,
+    collector                    : ErrorEventCollector
   ): Unit = {
 
     val doc = XFormsAPI.inScopeContainingDocument
@@ -76,7 +79,7 @@ object XFormsToggleAction {
         else
           ! caseControl.isCaseVisible iterator caseControl
 
-      casesToToggle foreach (_.toggle())
+      casesToToggle foreach (_.toggle(collector))
 
       // Update the focus only if at least one `xf:case` requires toggling
       focusedBeforeOpt foreach

@@ -22,7 +22,9 @@ import org.orbeon.oxf.xforms.analysis.EventHandler.PropertyQNames
 import org.orbeon.oxf.xforms.analysis.WithChildrenTrait
 import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, VariableAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, PropertyGetter, PropertyValue}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, PropertyValue}
+import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames._
@@ -111,7 +113,9 @@ object XFormsAction {
   // Obtain context attributes based on nested `xf:property` elements.
   def eventProperties(
     actionInterpreter : XFormsActionInterpreter,
-    actionAnalysis    : ActionTrait
+    actionAnalysis    : ActionTrait,
+    eventTarget       : XFormsEventTarget,
+    collector         : ErrorEventCollector
   ): ActionPropertyGetter = {
 
     val contextStack = actionInterpreter.actionXPathContext
@@ -147,7 +151,8 @@ object XFormsAction {
               bindingElement    = element,
               sourceEffectiveId = actionInterpreter.getSourceEffectiveId(property),
               scope             = property.scope,
-              handleNonFatal    = false
+              eventTarget       = eventTarget,
+              collector         = collector
             )
 
             // Evaluate context parameter

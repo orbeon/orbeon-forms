@@ -13,18 +13,26 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.effect.unsafe.implicits.global
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataFormatVersionName, DataXml}
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
-import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, PathUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 
 import java.time.{LocalDateTime, ZoneId}
+
 import scala.collection.JavaConverters._
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
 
 trait FormRunnerSummary {
 
@@ -86,18 +94,28 @@ trait FormRunnerSummary {
 
     val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
 
-    putWithAttachments(
-      liveData           = data.root,
-      migrate            = None,
-      toBaseURI          = "", // local save
-      fromBasePaths      = List(createFormDataBasePath(app, form, isDraft = false, fromDocument) -> formVersion.trimAllToOpt.map(_.toInt).getOrElse(1)),
-      toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
-      filename           = DataXml,
-      commonQueryString  = s"$DataFormatVersionName=${databaseDataFormatVersion.entryName}",
-      forceAttachments   = true,
-      formVersion        = Some(formVersion),
-      workflowStage      = Some(workflowStage)
+    implicit val externalContext         : ExternalContext               = CoreCrossPlatformSupport.externalContext
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+    implicit val xfcd                    : XFormsContainingDocument      = inScopeContainingDocument
+
+    Await.result(
+      putWithAttachments(
+        liveData           = data.root,
+        migrate            = None,
+        toBaseURI          = "", // local save
+        fromBasePaths      = List(createFormDataBasePath(app, form, isDraft = false, fromDocument) -> formVersion.trimAllToOpt.map(_.toInt).getOrElse(1)),
+        toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
+        filename           = DataXml,
+        commonQueryString  = s"$DataFormatVersionName=${databaseDataFormatVersion.entryName}",
+        forceAttachments   = true,
+        formVersion        = Some(formVersion),
+        workflowStage      = Some(workflowStage)
+      ).unsafeToFuture(),
+      Duration.Inf
     )
+
+    // We don't need to update the attachment paths, since the caller just reads data, saves it under a different
+    // document id, and then disposes of the read data.
   }
 }
 

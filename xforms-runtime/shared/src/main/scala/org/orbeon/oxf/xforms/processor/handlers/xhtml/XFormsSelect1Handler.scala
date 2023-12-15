@@ -50,18 +50,21 @@ object XFormsSelect1Handler {
     )
 
   // Support `XFormsValueControl` only for the legacy boolean `xf:input`
-  def dataValueFromControl(control: XFormsValueControl): Option[(Item.Value[om.NodeInfo], Boolean)] =
+  def dataValueFromControl(control: XFormsValueControl, handlerContext: HandlerContext): Option[(Item.Value[om.NodeInfo], Boolean)] =
     control match {
-      case c: XFormsSelect1Control => c.boundItemOpt map (i => c.getCurrentItemValueFromData(i) -> c.staticControl.excludeWhitespaceTextNodesForCopy)
-      case c: XFormsValueControl   => c.valueOpt     map (v => Left(v)                          -> false)
-      case null                    => None
+      case c: XFormsSelect1Control =>
+        c.boundItemOpt.map(i => c.getCurrentItemValueFromData(i, handlerContext.collector) -> c.staticControl.excludeWhitespaceTextNodesForCopy)
+      case c: XFormsValueControl   =>
+        c.valueOpt(handlerContext.collector).map(v => Left(v) -> false)
+      case null                    =>
+        None
     }
 
   // Support `XFormsValueControl` only for the legacy boolean `xf:input`
-  def isItemSelected(control: XFormsValueControl, itemNode: ItemNode, isMultiple: Boolean): Boolean =
+  def isItemSelected(control: XFormsValueControl, itemNode: ItemNode, isMultiple: Boolean, handlerContext: HandlerContext): Boolean =
     itemNode match {
       case item: Item.ValueNode =>
-        dataValueFromControl(control) exists { case (dataValue, excludeWhitespaceTextNodes) =>
+        dataValueFromControl(control, handlerContext) exists { case (dataValue, excludeWhitespaceTextNodes) =>
           StaticItemsetSupport.isSelected(
             isMultiple                 = isMultiple,
             dataValue                  = dataValue,
@@ -122,7 +125,8 @@ object XFormsSelect1Handler {
         isFirst          = true,
         isBooleanInput   = false,
         isStaticReadonly = false,
-        encode           = false
+        encode           = false,
+        handlerContext   = baseHandler.handlerContext
       )
     }
 
@@ -140,13 +144,15 @@ object XFormsSelect1Handler {
     isFirst            : Boolean,
     isBooleanInput     : Boolean,
     isStaticReadonly   : Boolean,
-    encode             : Boolean)(implicit
+    encode             : Boolean,
+    handlerContext     : HandlerContext
+  )(implicit
     xmlReceiver        : XMLReceiver,
   ): Unit = {
 
     val xformsHandlerContextForItem = baseHandler.handlerContext
 
-    val isSelected = isItemSelected(control, item, isMultiple)
+    val isSelected = isItemSelected(control, item, isMultiple, handlerContext)
 
     // `xh:span` enclosing input and label
     val itemClasses = getItemClasses(item, if (isSelected) "xforms-selected" else "xforms-deselected")
@@ -332,7 +338,7 @@ class XFormsSelect1Handler(
     // Get items if:
     // 1. The itemset is static
     // 2. The control exists and is relevant
-    val itemsetOpt = XFormsSelect1Control.getInitialItemset(xformsSelect1Control, staticSelectionControl)
+    val itemsetOpt = XFormsSelect1Control.getInitialItemset(xformsSelect1Control, staticSelectionControl, handlerContext.collector)
 
     outputContent(
       attributes           = attributes,
@@ -462,7 +468,7 @@ class XFormsSelect1Handler(
           var selectedFound = false
           val ch = new XMLReceiverHelper(xmlReceiver)
           for {
-            (dataValue, excludeWhitespaceTextNodes) <- XFormsSelect1Handler.dataValueFromControl(control).iterator
+            (dataValue, excludeWhitespaceTextNodes) <- XFormsSelect1Handler.dataValueFromControl(control, handlerContext).iterator
             currentItem                             <- itemset.iterateSelectedItems(dataValue, SaxonUtils.attCompare(control.boundNodeOpt, _), excludeWhitespaceTextNodes)
           } locally {
             if (selectedFound)
@@ -557,7 +563,8 @@ class XFormsSelect1Handler(
           isFirst            = itemIndex == 0,
           isBooleanInput     = isBooleanInput,
           isStaticReadonly   = isStaticReadonly,
-          encode             = encode
+          encode             = encode,
+          handlerContext     = handlerContext
         )
       }
     }
@@ -591,7 +598,7 @@ class XFormsSelect1Handler(
     // Don't output more than one `selected` in the case of single-selection, see:
     // https://github.com/orbeon/orbeon-forms/issues/2901
     val mustSelect =
-      (isMultiple || ! gotSelected) && XFormsSelect1Handler.isItemSelected(xformsControl, item, isMultiple)
+      (isMultiple || ! gotSelected) && XFormsSelect1Handler.isItemSelected(xformsControl, item, isMultiple, handlerContext)
     if (mustSelect)
       optionAttributes.addOrReplace("selected", "selected")
 

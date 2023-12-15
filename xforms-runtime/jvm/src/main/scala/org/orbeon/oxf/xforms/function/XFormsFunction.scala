@@ -13,32 +13,23 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import java.util.{Locale, Iterator => JIterator}
 import org.orbeon.dom
-import org.orbeon.dom.Namespace
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.{FunctionContext, PooledXPathExpression, XPath, XPathCache}
 import org.orbeon.oxf.util.XPath.compileExpressionWithStaticContext
+import org.orbeon.oxf.util.{PooledXPathExpression, XPathCache}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeXPathAnalyzer}
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang
-import org.orbeon.oxf.xforms.model.{BindNode, XFormsModel}
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtils}
+import org.orbeon.oxf.xml.DefaultFunctionSupport
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
-import org.orbeon.saxon.expr.{Expression, _}
+import org.orbeon.saxon.expr._
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
-import org.orbeon.xforms.XFormsId
-import org.orbeon.xforms.runtime.XFormsObject
-import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xml.NamespaceMapping
 
+import java.util.{Locale, Iterator => JIterator}
 import scala.jdk.CollectionConverters._
-import scala.collection.{mutable => m}
 
 
 /**

@@ -78,7 +78,7 @@
             <value>/myapp</value>
         </attribute>
         <attribute>
-            <name>oxf.xforms.renderer.deployment</name>
+            <name>deployment</name>
             <value>separate</value>
         </attribute>
     </attributes>

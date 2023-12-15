@@ -15,6 +15,7 @@ package org.orbeon.oxf.servlet
 
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 
 import java.{util => ju}
 import scala.jdk.CollectionConverters.enumerationAsScalaIteratorConverter
@@ -98,11 +99,11 @@ trait CommonContainerInitializer {
       servletName         = "orbeon-main-servlet",
       servletClass        = orbeonServletClass,
       mandatoryInitParams = Set(
-        "oxf.main-processor.name",
-        "oxf.main-processor.input.config",
-        "oxf.error-processor.name",
-        "oxf.error-processor.input.controller",
-        "oxf.http.accept-methods"
+        "main-processor.name",
+        "main-processor.input.config",
+        "error-processor.name",
+        "error-processor.input.controller",
+        "http.accept-methods"
       )
     )
 
@@ -111,10 +112,10 @@ trait CommonContainerInitializer {
       servletName         = "orbeon-renderer-servlet",
       servletClass        = orbeonServletClass,
       mandatoryInitParams = Set(
-        "oxf.main-processor.name",
-        "oxf.main-processor.input.controller",
-        "oxf.error-processor.name",
-        "oxf.error-processor.input.config"
+        "main-processor.name",
+        "main-processor.input.controller",
+        "error-processor.name",
+        "error-processor.input.config"
       )
     )
 
@@ -149,15 +150,26 @@ trait CommonContainerInitializer {
 
     // Listeners
 
-    ctx.addListener(orbeonServletContextListenerClass)
+    registerListener(ctx, "orbeon-servlet-context-listener",      orbeonServletContextListenerClass)
     // Context listener for deployment with replication
-    ctx.addListener(replicationServletContextListenerClass)
+    registerListener(ctx, "replication-servlet-context-listener", replicationServletContextListenerClass)
     // XForms session listener
-    ctx.addListener(xFormsServletContextListenerClass)
+    registerListener(ctx, "xforms-servlet-context-listener",      xFormsServletContextListenerClass)
     // General-purpose session listener
-    ctx.addListener(orbeonSessionListenerClass)
+    registerListener(ctx, "orbeon-session-listener",              orbeonSessionListenerClass)
     // Cache shutdown listener
-    ctx.addListener(shutdownListenerClass)
+    registerListener(ctx, "shutdown-listener",                    shutdownListenerClass)
+  }
+
+  private val EnabledParamPart    = "enabled"
+  private val MappingParamPart    = "mapping"
+  private val UrlPatternParamPart = "url-pattern"
+
+  private def paramPrefix(servletOrFilterOrListenerName: String) = s"oxf.$servletOrFilterOrListenerName"
+
+  private def enabled(ctx: ServletContext, paramPrefix: String): Boolean = {
+    val enabledParam = s"$paramPrefix.$EnabledParamPart"
+    ctx.getInitParameter(enabledParam).trimAllToOpt.forall(_ == "true")
   }
 
   private def registerServlet(
@@ -166,24 +178,28 @@ trait CommonContainerInitializer {
     servletClass       : Class[_ <: JavaxOrJakartaServlet],
     mandatoryInitParams: Set[String]
   ): Unit = {
-    val paramPrefix = s"oxf.$servletName"
+    val paramPrefix = this.paramPrefix(servletName)
 
-    // Dynamically register servlet
-    val registration = ctx.addServlet(servletName, servletClass)
+    if (enabled(ctx, paramPrefix)) {
+      // Dynamically register servlet
+      val registration = ctx.addServlet(servletName, servletClass)
 
-    // Servlet mapping
-    val mappingParam = s"$paramPrefix.mapping"
-    val mapping      = ctx.getInitParameter(mappingParam)
-    registration.addMapping(mapping)
+      // Servlet mapping
+      val mappingParam = s"$paramPrefix.$MappingParamPart"
+      val mapping      = ctx.getInitParameter(mappingParam)
+      registration.addMapping(mapping)
 
-    copyInitParams(
-      ctx                 = ctx,
-      registration        = registration,
-      paramPrefix         = paramPrefix,
-      servletOrFilter     = "Servlet",
-      servletOrFilterName = servletName,
-      mandatoryInitParams = mandatoryInitParams
-    )
+      copyInitParams(
+        ctx                 = ctx,
+        registration        = registration,
+        paramPrefix         = paramPrefix,
+        servletOrFilter     = "Servlet",
+        servletOrFilterName = servletName,
+        mandatoryInitParams = mandatoryInitParams
+      )
+    } else {
+      logger.info(s"Servlet '$servletName' is disabled")
+    }
   }
 
   private def registerFilter(
@@ -193,25 +209,44 @@ trait CommonContainerInitializer {
     dispatcherTypes    : Set[DispatcherType],
     mandatoryInitParams: Set[String]
   ): Unit = {
-    val paramPrefix = s"oxf.$filterName"
+    val paramPrefix = this.paramPrefix(filterName)
 
-    // Dynamically register filter
-    val registration = ctx.addFilter(filterName, filterClass)
+    if (enabled(ctx, paramPrefix)) {
+      // Dynamically register filter
+      val registration = ctx.addFilter(filterName, filterClass)
 
-    // Servlet mapping
-    val urlPatternParam = s"$paramPrefix.url-pattern"
-    val urlPattern      = ctx.getInitParameter(urlPatternParam)
-    // TODO: parse dispatcher types as well?
-    registration.addMappingForUrlPatterns(dispatcherTypes, true, urlPattern)
+      // Servlet mapping
+      val urlPatternParam = s"$paramPrefix.$UrlPatternParamPart"
+      val urlPattern      = ctx.getInitParameter(urlPatternParam)
+      // TODO: parse dispatcher types as well?
+      registration.addMappingForUrlPatterns(dispatcherTypes, true, urlPattern)
 
-    copyInitParams(
-      ctx                 = ctx,
-      registration        = registration,
-      paramPrefix         = paramPrefix,
-      servletOrFilter     = "Filter",
-      servletOrFilterName = filterName,
-      mandatoryInitParams = mandatoryInitParams
-    )
+      copyInitParams(
+        ctx                 = ctx,
+        registration        = registration,
+        paramPrefix         = paramPrefix,
+        servletOrFilter     = "Filter",
+        servletOrFilterName = filterName,
+        mandatoryInitParams = mandatoryInitParams
+      )
+    } else {
+      logger.info(s"Filter '$filterName' is disabled")
+    }
+  }
+
+  private def registerListener(
+    ctx          : ServletContext,
+    listenerName : String,
+    listenerClass: Class[_ <: ju.EventListener]
+  ): Unit = {
+    val paramPrefix = this.paramPrefix(listenerName)
+
+    if (enabled(ctx, paramPrefix)) {
+      // Dynamically register listener
+      ctx.addListener(listenerClass)
+    } else {
+      logger.info(s"Listener '$listenerName' is disabled")
+    }
   }
 
   private def copyInitParams(
@@ -223,22 +258,27 @@ trait CommonContainerInitializer {
     mandatoryInitParams: Set[String]
   ): Unit = {
     // Copy context params to servlet/filter init params
-    val contextParams   = ctx.getInitParameterNames.asScala.toSeq
-    val initParamPrefix = s"$paramPrefix.init-param."
-    val foundInitParams = contextParams.filter(_.startsWith(initParamPrefix)).map { contextParamName =>
+    val contextParams         = ctx.getInitParameterNames.asScala.toSeq
+    val paramPartsToFilterOut = Seq(EnabledParamPart, MappingParamPart, UrlPatternParamPart)
+    val prefixesToFilterOut   = paramPartsToFilterOut.map(paramPart => s"$paramPrefix.$paramPart")
 
-      val initParamName = contextParamName.substring(initParamPrefix.length)
-      val value         = ctx.getInitParameter(contextParamName)
+    val foundInitParams =
+      contextParams
+        .filter(_.startsWith(paramPrefix))
+        .filterNot(param => prefixesToFilterOut.exists(prefix => param.startsWith(prefix)))
+        .map { contextParamName =>
+          val initParamName = contextParamName.substring(paramPrefix.length + 1) // Remove the dot as well
+          val value         = ctx.getInitParameter(contextParamName)
 
-      val success       = registration.setInitParameter(initParamName, value)
+          val success       = registration.setInitParameter(initParamName, value)
 
-      if (success) {
-        logger.info(s"$servletOrFilter '$servletOrFilterName': set init parameter '$initParamName' to '$value'")
-      } else {
-        logger.error(s"$servletOrFilter '$servletOrFilterName': failed to set init parameter '$initParamName'")
-      }
+          if (success) {
+            logger.info(s"$servletOrFilter '$servletOrFilterName': set init parameter '$initParamName' to '$value'")
+          } else {
+            logger.error(s"$servletOrFilter '$servletOrFilterName': failed to set init parameter '$initParamName'")
+          }
 
-      initParamName
+          initParamName
     }
 
     val missingMandatoryInitParams = mandatoryInitParams -- foundInitParams

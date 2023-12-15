@@ -10,11 +10,11 @@
         <filter-name>orbeon-xforms-filter</filter-name>
         <filter-class>org.orbeon.oxf.servlet.OrbeonXFormsFilter</filter-class>
         <init-param>
-            <param-name>oxf.xforms.renderer.context</param-name>
+            <param-name>context</param-name>
             <param-value>/orbeon</param-value>
         </init-param>
         <init-param>
-            <param-name>oxf.xforms.renderer.default-encoding</param-name>
+            <param-name>default-encoding</param-name>
             <param-value>UTF-8</param-value>
         </init-param>
     </filter>

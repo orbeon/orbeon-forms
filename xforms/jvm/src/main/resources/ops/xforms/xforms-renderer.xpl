@@ -33,7 +33,7 @@
     <p:processor name="oxf:scope-generator">
         <p:input name="config">
             <config>
-                <key>oxf.xforms.renderer.document</key>
+                <key>document</key>
                 <scope>request</scope>
             </config>
         </p:input>

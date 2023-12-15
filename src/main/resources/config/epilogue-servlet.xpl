@@ -73,7 +73,7 @@
                                                 p:property('oxf.epilogue.embeddable')
                                                     or /request/parameters/parameter[name = 'orbeon-embeddable']/value = 'true' return
                                             for $is-renderer in
-                                                p:get-request-attribute('oxf.xforms.renderer.deployment', 'text/plain') = ('separate', 'integrated') return
+                                                p:get-request-attribute('deployment', 'text/plain') = ('separate', 'integrated') return
                                             for $app-style in concat('oxf:/apps/', $app, if ($is-embeddable) then '/theme-embeddable.xsl' else '/theme.xsl') return
                                             if (not($is-renderer) and doc-available($app-style))
                                                 then $app-style

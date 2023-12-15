@@ -30,10 +30,10 @@ import scala.collection.compat._
 trait ServletPortlet {
 
   // Main and error processor property prefixes
-  private val MainProcessorPropertyPrefix       = "oxf.main-processor."
-  private val MainProcessorInputPropertyPrefix  = "oxf.main-processor.input."
-  private val ErrorProcessorPropertyPrefix      = "oxf.error-processor."
-  private val ErrorProcessorInputPropertyPrefix = "oxf.error-processor.input."
+  private val MainProcessorPropertyPrefix       = "main-processor."
+  private val MainProcessorInputPropertyPrefix  = "main-processor.input."
+  private val ErrorProcessorPropertyPrefix      = "error-processor."
+  private val ErrorProcessorInputPropertyPrefix = "error-processor.input."
 
   def logPrefix: String
   def initParameters: Map[String, String]

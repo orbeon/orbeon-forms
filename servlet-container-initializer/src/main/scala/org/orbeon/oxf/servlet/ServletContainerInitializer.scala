@@ -98,12 +98,13 @@ trait CommonContainerInitializer {
       ctx                 = ctx,
       servletName         = "orbeon-main-servlet",
       servletClass        = orbeonServletClass,
+      initParamPrefix     = "oxf.",
       mandatoryInitParams = Set(
-        "main-processor.name",
-        "main-processor.input.config",
-        "error-processor.name",
-        "error-processor.input.controller",
-        "http.accept-methods"
+        "oxf.main-processor.name",
+        "oxf.main-processor.input.config",
+        "oxf.error-processor.name",
+        "oxf.error-processor.input.controller",
+        "oxf.http.accept-methods"
       )
     )
 
@@ -111,11 +112,12 @@ trait CommonContainerInitializer {
       ctx                 = ctx,
       servletName         = "orbeon-renderer-servlet",
       servletClass        = orbeonServletClass,
+      initParamPrefix     = "oxf.",
       mandatoryInitParams = Set(
-        "main-processor.name",
-        "main-processor.input.controller",
-        "error-processor.name",
-        "error-processor.input.config"
+        "oxf.main-processor.name",
+        "oxf.main-processor.input.controller",
+        "oxf.error-processor.name",
+        "oxf.error-processor.input.config"
       )
     )
 
@@ -127,6 +129,7 @@ trait CommonContainerInitializer {
       filterName          = "orbeon-limiter-filter",
       filterClass         = limiterFilterClass,
       dispatcherTypes     = Set(DispatcherType.REQUEST),
+      initParamPrefix     = "",
       mandatoryInitParams = Set("include", "exclude", "min-threads", "num-threads", "max-threads")
     )
 
@@ -136,6 +139,7 @@ trait CommonContainerInitializer {
       filterName          = "orbeon-form-runner-auth-servlet-filter",
       filterClass         = formRunnerAuthFilterClass,
       dispatcherTypes     = Set(DispatcherType.REQUEST, DispatcherType.FORWARD),
+      initParamPrefix     = "",
       mandatoryInitParams = Set.empty
     )
 
@@ -145,6 +149,7 @@ trait CommonContainerInitializer {
       filterName          = "orbeon-xforms-filter",
       filterClass         = orbeonXFormsFilterClass,
       dispatcherTypes     = Set(DispatcherType.REQUEST, DispatcherType.FORWARD),
+      initParamPrefix     = "oxf.xforms.renderer.",
       mandatoryInitParams = Set.empty
     )
 
@@ -176,6 +181,7 @@ trait CommonContainerInitializer {
     ctx                : ServletContext,
     servletName        : String,
     servletClass       : Class[_ <: JavaxOrJakartaServlet],
+    initParamPrefix    : String,
     mandatoryInitParams: Set[String]
   ): Unit = {
     val paramPrefix = this.paramPrefix(servletName)
@@ -195,6 +201,7 @@ trait CommonContainerInitializer {
         paramPrefix         = paramPrefix,
         servletOrFilter     = "Servlet",
         servletOrFilterName = servletName,
+        initParamPrefix     = initParamPrefix,
         mandatoryInitParams = mandatoryInitParams
       )
     } else {
@@ -207,6 +214,7 @@ trait CommonContainerInitializer {
     filterName         : String,
     filterClass        : Class[_ <: JavaxOrJakartaFilter],
     dispatcherTypes    : Set[DispatcherType],
+    initParamPrefix    : String,
     mandatoryInitParams: Set[String]
   ): Unit = {
     val paramPrefix = this.paramPrefix(filterName)
@@ -227,6 +235,7 @@ trait CommonContainerInitializer {
         paramPrefix         = paramPrefix,
         servletOrFilter     = "Filter",
         servletOrFilterName = filterName,
+        initParamPrefix     = initParamPrefix,
         mandatoryInitParams = mandatoryInitParams
       )
     } else {
@@ -255,6 +264,7 @@ trait CommonContainerInitializer {
     paramPrefix        : String,
     servletOrFilter    : String,
     servletOrFilterName: String,
+    initParamPrefix    : String,
     mandatoryInitParams: Set[String]
   ): Unit = {
     // Copy context params to servlet/filter init params
@@ -267,7 +277,7 @@ trait CommonContainerInitializer {
         .filter(_.startsWith(paramPrefix))
         .filterNot(param => prefixesToFilterOut.exists(prefix => param.startsWith(prefix)))
         .map { contextParamName =>
-          val initParamName = contextParamName.substring(paramPrefix.length + 1) // Remove the dot as well
+          val initParamName = initParamPrefix + contextParamName.substring(paramPrefix.length + 1) // Remove the dot as well
           val value         = ctx.getInitParameter(contextParamName)
 
           val success       = registration.setInitParameter(initParamName, value)

@@ -74,7 +74,7 @@
     </headers>
     <attributes>
         <attribute>
-            <name>deployment</name>
+            <name>oxf.xforms.renderer.deployment</name>
             <value>separate</value>
         </attribute>
         <attribute>

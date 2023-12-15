@@ -7,19 +7,19 @@
         <portlet-class>org.orbeon.oxf.portlet.OrbeonPortlet</portlet-class>
         <!-- Initialization parameters -->
         <init-param>
-            <name>main-processor.name</name>
+            <name>oxf.main-processor.name</name>
             <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
         </init-param>
         <init-param>
-            <name>main-processor.input.config</name>
+            <name>oxf.main-processor.input.config</name>
             <value>oxf:/config/prologue-portlet.xpl</value>
         </init-param>
         <init-param>
-            <name>error-processor.name</name>
+            <name>oxf.error-processor.name</name>
             <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
         </init-param>
         <init-param>
-            <name>error-processor.input.config</name>
+            <name>oxf.error-processor.input.config</name>
             <value>oxf:/config/error.xpl</value>
         </init-param>
 

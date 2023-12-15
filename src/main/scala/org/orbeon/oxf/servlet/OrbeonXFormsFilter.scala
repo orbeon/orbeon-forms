@@ -180,14 +180,14 @@ class OrbeonXFormsFilterImpl extends Filter {
 
 object OrbeonXFormsFilterImpl {
 
-  val RendererDeploymentAttributeName      = "deployment"
-  val RendererBaseUriAttributeName         = "base-uri"
-  val RendererDocumentAttributeName        = "document"
-  val RendererContentTypeAttributeName     = "content-type"
-  val RendererHasSessionAttributeName      = "has-session"
+  val RendererDeploymentAttributeName      = "oxf.xforms.renderer.deployment"
+  val RendererBaseUriAttributeName         = "oxf.xforms.renderer.base-uri"
+  val RendererDocumentAttributeName        = "oxf.xforms.renderer.document"
+  val RendererContentTypeAttributeName     = "oxf.xforms.renderer.content-type"
+  val RendererHasSessionAttributeName      = "oxf.xforms.renderer.has-session"
 
-  private val RendererContextParameterName = "context"
-  private val DefaultEncodingParameterName = "default-encoding"
+  private val RendererContextParameterName = "oxf.xforms.renderer.context"
+  private val DefaultEncodingParameterName = "oxf.xforms.renderer.default-encoding"
   private val RendererPath                 = "/xforms-renderer"
 
   private def normalizeContextPath(s: String) =

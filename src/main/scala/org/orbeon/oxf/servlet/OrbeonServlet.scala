@@ -47,7 +47,7 @@ abstract class OrbeonServletImpl(servletContextProvider: ServletContextProvider)
 
   private implicit val logger = ProcessorService.Logger
 
-  val HttpAcceptMethodsParam = "http.accept-methods"
+  val HttpAcceptMethodsParam = "oxf.http.accept-methods"
   val DefaultMethods = "get post head"
 
   // Accepted methods for this servlet
@@ -64,7 +64,7 @@ abstract class OrbeonServletImpl(servletContextProvider: ServletContextProvider)
   // Servlet init
   override def init(): Unit =
     withRootException("initialization", newServletException) {
-      init(ServletWebAppContext(servletContextProvider.getOrbeonServletContext), Some("servlet-initialized-processor." -> "servlet-initialized-processor.input."))
+      init(ServletWebAppContext(servletContextProvider.getOrbeonServletContext), Some("oxf.servlet-initialized-processor." -> "oxf.servlet-initialized-processor.input."))
 
       // Unclear whether there is a better place to do this
       webAppContext.addListener(() => {
@@ -76,7 +76,7 @@ abstract class OrbeonServletImpl(servletContextProvider: ServletContextProvider)
   // Servlet destroy
   override def destroy(): Unit =
     withRootException("destruction", newServletException) {
-      destroy(Some("servlet-destroyed-processor." -> "servlet-destroyed-processor.input."))
+      destroy(Some("oxf.servlet-destroyed-processor." -> "oxf.servlet-destroyed-processor.input."))
     }
 
   // Servlet request

@@ -203,6 +203,7 @@
             -dontwarn aQute.bnd.annotation.**
             -dontwarn cats.effect.**
             -dontwarn fs2.**
+            -dontwarn jakarta.servlet.**
 
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 

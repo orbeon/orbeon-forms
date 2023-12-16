@@ -159,9 +159,9 @@
 
                 <view-data>View this revision</view-data>
 
-                <value-entered>value "{0}" entered</value-entered>
-                <value-cleared>value "{0}" cleared</value-cleared>
-                <value-changed>value changed from "{0}" to "{1}"</value-changed>
+                <value-entered>"{0}" entered</value-entered>
+                <value-cleared>"{0}" cleared</value-cleared>
+                <value-changed>changed from "{0}" to "{1}"</value-changed>
                 <iteration-added>{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed>{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed>internal information changed</other-changed>
@@ -1397,9 +1397,9 @@
 
                 <view-data todo="true">View this revision</view-data>
 
-                <value-entered todo="true">value "{0}" entered</value-entered>
-                <value-cleared todo="true">value "{0}" cleared</value-cleared>
-                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <value-entered todo="true">"{0}" entered</value-entered>
+                <value-cleared todo="true">"{0}" cleared</value-cleared>
+                <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
@@ -2007,9 +2007,9 @@
 
                 <view-data todo="true">View this revision</view-data>
 
-                <value-entered todo="true">value "{0}" entered</value-entered>
-                <value-cleared todo="true">value "{0}" cleared</value-cleared>
-                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <value-entered todo="true">"{0}" entered</value-entered>
+                <value-cleared todo="true">"{0}" cleared</value-cleared>
+                <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
@@ -2648,9 +2648,9 @@
 
                 <view-data todo="true">View this revision</view-data>
 
-                <value-entered todo="true">value "{0}" entered</value-entered>
-                <value-cleared todo="true">value "{0}" cleared</value-cleared>
-                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <value-entered todo="true">"{0}" entered</value-entered>
+                <value-cleared todo="true">"{0}" cleared</value-cleared>
+                <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
@@ -3255,9 +3255,9 @@
 
                 <view-data todo="true">View this revision</view-data>
 
-                <value-entered todo="true">value "{0}" entered</value-entered>
-                <value-cleared todo="true">value "{0}" cleared</value-cleared>
-                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <value-entered todo="true">"{0}" entered</value-entered>
+                <value-cleared todo="true">"{0}" cleared</value-cleared>
+                <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
@@ -3861,9 +3861,9 @@
 
                 <view-data todo="true">View this revision</view-data>
 
-                <value-entered todo="true">value "{0}" entered</value-entered>
-                <value-cleared todo="true">value "{0}" cleared</value-cleared>
-                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <value-entered todo="true">"{0}" entered</value-entered>
+                <value-cleared todo="true">"{0}" cleared</value-cleared>
+                <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
@@ -4477,9 +4477,9 @@
 
                 <view-data todo="true">View this revision</view-data>
 
-                <value-entered todo="true">value "{0}" entered</value-entered>
-                <value-cleared todo="true">value "{0}" cleared</value-cleared>
-                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <value-entered todo="true">"{0}" entered</value-entered>
+                <value-cleared todo="true">"{0}" cleared</value-cleared>
+                <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
@@ -5093,9 +5093,9 @@
 
                 <view-data todo="true">View this revision</view-data>
 
-                <value-entered todo="true">value "{0}" entered</value-entered>
-                <value-cleared todo="true">value "{0}" cleared</value-cleared>
-                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <value-entered todo="true">"{0}" entered</value-entered>
+                <value-cleared todo="true">"{0}" cleared</value-cleared>
+                <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
@@ -5709,9 +5709,9 @@
 
                 <view-data todo="true">View this revision</view-data>
 
-                <value-entered todo="true">value "{0}" entered</value-entered>
-                <value-cleared todo="true">value "{0}" cleared</value-cleared>
-                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <value-entered todo="true">"{0}" entered</value-entered>
+                <value-cleared todo="true">"{0}" cleared</value-cleared>
+                <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
@@ -6325,9 +6325,9 @@
 
                 <view-data todo="true">View this revision</view-data>
 
-                <value-entered todo="true">value "{0}" entered</value-entered>
-                <value-cleared todo="true">value "{0}" cleared</value-cleared>
-                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <value-entered todo="true">"{0}" entered</value-entered>
+                <value-cleared todo="true">"{0}" cleared</value-cleared>
+                <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
@@ -6941,9 +6941,9 @@
 
                 <view-data todo="true">View this revision</view-data>
 
-                <value-entered todo="true">value "{0}" entered</value-entered>
-                <value-cleared todo="true">value "{0}" cleared</value-cleared>
-                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <value-entered todo="true">"{0}" entered</value-entered>
+                <value-cleared todo="true">"{0}" cleared</value-cleared>
+                <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
@@ -7557,9 +7557,9 @@
 
                 <view-data todo="true">View this revision</view-data>
 
-                <value-entered todo="true">value "{0}" entered</value-entered>
-                <value-cleared todo="true">value "{0}" cleared</value-cleared>
-                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <value-entered todo="true">"{0}" entered</value-entered>
+                <value-cleared todo="true">"{0}" cleared</value-cleared>
+                <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
@@ -8164,9 +8164,9 @@
 
                 <view-data todo="true">View this revision</view-data>
 
-                <value-entered todo="true">value "{0}" entered</value-entered>
-                <value-cleared todo="true">value "{0}" cleared</value-cleared>
-                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <value-entered todo="true">"{0}" entered</value-entered>
+                <value-cleared todo="true">"{0}" cleared</value-cleared>
+                <value-changed todo="true">changed from "{0}" to "{1}"</value-changed>
                 <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>

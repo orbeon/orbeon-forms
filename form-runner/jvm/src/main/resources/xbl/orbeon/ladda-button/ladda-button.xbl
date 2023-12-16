@@ -36,7 +36,7 @@
                     <xf:label>
                         <xh:span class="ladda-label"><!-- https://github.com/orbeon/orbeon-forms/issues/6069 -->
                             <xf:output mediatype="text/html" value="xxf:label('fr-ladda-button')"/>
-                        </xh:span>>
+                        </xh:span>
                     </xf:label>
                     <xf:dispatch event="DOMActivate" name="DOMActivate" targetid="fr-ladda-button"/>
                 </xf:trigger>

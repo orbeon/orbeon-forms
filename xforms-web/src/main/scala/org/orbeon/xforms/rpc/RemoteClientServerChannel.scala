@@ -138,6 +138,8 @@ object RemoteClientServerChannel extends ClientServerChannel {
                   promise.complete
               )
           }
+        } else {
+            Page.loadingIndicator().requestEnded(showProgress)
         }
       }
 

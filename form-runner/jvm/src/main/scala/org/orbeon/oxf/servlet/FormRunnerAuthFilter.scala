@@ -117,6 +117,10 @@ object FormRunnerAuthFilterImpl {
         }
 
         servletRequest
+      } else if (ServletSupport.getRequestPathInfo(servletRequest).endsWith(".map")) {
+        // Don't amend headers for `.map` as this would cause the credentials code to clear the credentials
+        // unnecessarily. https://github.com/orbeon/orbeon-forms/issues/6080
+        servletRequest
       } else {
 
         trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {

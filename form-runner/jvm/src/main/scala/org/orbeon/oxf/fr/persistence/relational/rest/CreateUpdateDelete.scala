@@ -285,10 +285,14 @@ trait CreateUpdateDelete {
       val lastModifiedPart = lastModifiedOpt.map(_ => "AND last_modified_time = ?").getOrElse("")
       val filenamePart     = filenameOpt    .map(_ => "AND file_name          = ?").getOrElse("")
 
-      val orderByPart = req.provider match {
-        case Provider.MySQL => List("ORDER BY last_modified_time")
-        case _              => Nil
-      }
+      val orderByPart =
+        if (table == "orbeon_i_control_text")
+          Nil
+        else
+          req.provider match {
+          case Provider.MySQL => List("ORDER BY last_modified_time")
+          case _              => Nil
+        }
 
       val selectParts = List("SELECT count(*) count", fromPart, wherePart, lastModifiedPart, filenamePart)
       val deleteParts = List("DELETE",                fromPart, wherePart, lastModifiedPart, filenamePart) ::: orderByPart

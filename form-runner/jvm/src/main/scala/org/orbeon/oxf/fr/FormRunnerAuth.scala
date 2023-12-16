@@ -234,19 +234,6 @@ object FormRunnerAuth {
       }
     }
 
-    def fromHeaderValues(
-      credentialsOpt: => Option[String],
-      usernameOpt   : => Option[String],
-      rolesList     : => List[String],
-      groupOpt      : => Option[String]
-    ): Option[Credentials] =
-      fromCredentialsHeader(credentialsOpt) orElse
-        fromIndividualHeaders(
-          usernameOpt = usernameOpt,
-          rolesList   = rolesList,
-          groupOpt    = groupOpt
-        )
-
     // Credentials coming from the JSON-encoded HTTP header
     def fromCredentialsHeader(
       headerValueOpt: => Option[String]

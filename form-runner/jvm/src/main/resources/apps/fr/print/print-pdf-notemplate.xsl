@@ -97,7 +97,7 @@
 
                 <style type="text/css">
                     <xsl:variable name="css">
-                        <xsl:for-each select="$pdf-header-footer-config-elem/pages/*">
+                        <xsl:for-each select="$pdf-header-footer-config-elem/pages/*"><!-- `all`|`first`|`odd`|`even` -->
                             <xsl:variable name="header-footer-page-type" select="name()"/>
                             <xsl:value-of select="
                                 if      ($header-footer-page-type = 'all')   then '@page {'
@@ -106,14 +106,14 @@
                                 else if ($header-footer-page-type = 'even')  then '@page :left {'
                                 else ''"/>
 
-                            <xsl:for-each select="*">
+                            <xsl:for-each select="*"><!-- `header`|`footer` -->
                                 <xsl:variable name="header-footer-type" select="name()"/>
                                 <xsl:variable name="prefix" select="
                                     if      ($header-footer-type = 'header') then '@top'
                                     else if ($header-footer-type = 'footer') then '@bottom'
                                     else ''"/>
 
-                                <xsl:for-each select="*">
+                                <xsl:for-each select="*"><!-- `left`|`center`|`right` -->
                                     <xsl:variable name="header-footer-position" select="name()"/>
                                     <xsl:value-of select="concat($prefix, '-', $header-footer-position, ' { content: ')"/>
 
@@ -146,8 +146,10 @@
                                     </xsl:choose>
 
                                     <xsl:value-of select="';'"/>
-                                    <xsl:value-of select="css"/>
-                                    <xsl:value-of select="';'"/>
+                                    <xsl:if test="normalize-space(css)">
+                                        <xsl:value-of select="css"/>
+                                        <xsl:value-of select="';'"/>
+                                    </xsl:if>
 
                                     <!-- Apparently, the CSS doesn't combine with the default :( -->
                                     <xsl:choose>

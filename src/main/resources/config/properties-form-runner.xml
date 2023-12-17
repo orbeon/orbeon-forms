@@ -652,6 +652,11 @@
                   "values": {
                     "_": "{$fr-form-title}"
                   }
+                },
+                "right": {
+                  "values": {
+                    "_": ""
+                  }
                 }
               },
               "footer": {
@@ -663,6 +668,11 @@
                 "center": {
                   "values": {
                     "_": "{$fr-page-number} / {$fr-page-count}"
+                  }
+                },
+                "right": {
+                  "values": {
+                    "_": ""
                   }
                 }
               }

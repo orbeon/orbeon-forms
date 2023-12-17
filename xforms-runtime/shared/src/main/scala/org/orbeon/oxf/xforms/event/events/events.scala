@@ -80,11 +80,10 @@ class XXFormsXPathErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   def messageOpt   : Option[String] = property[String]("message")
 
   def combinedMessage: String = {
-    // In practice
-    val message     = messageOpt     getOrElse "[unknown]"
-    val details     = detailsOpt getOrElse "[unknown]" //xxx todo
-    val expression  = expressionOpt  getOrElse "[unknown]"
-    s"$details: error `$message` while evaluating expression `$expression`" //xxx todo
+    val details    = detailsOpt.map(XPathErrorDetails.message).getOrElse("[unknown]")
+    val message    = messageOpt     getOrElse "[unknown]"
+    val expression = expressionOpt  getOrElse "[unknown]"
+    s"XPath error `$message` while evaluating expression `$expression` ($details)"
   }
 }
 

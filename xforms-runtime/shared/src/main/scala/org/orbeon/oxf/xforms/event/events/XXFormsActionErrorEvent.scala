@@ -25,14 +25,14 @@ class XXFormsActionErrorEvent(target: XFormsEventTarget, properties: PropertyGet
 
   def this(target: XFormsEventTarget, throwable: Throwable, tunnelProperties: Option[TunnelProperties]) = {
     this(target, tunnelProperties.getOrElse(EmptyGetter))
-    throwableOpt = Option(throwable)
+    _throwableOpt = Option(throwable)
   }
 
-  private var throwableOpt: Option[Throwable] = None
-  def throwable = throwableOpt.orNull
+  private var _throwableOpt: Option[Throwable] = None
+  def throwableOpt: Option[Throwable] = _throwableOpt
   private lazy val rootLocationOpt = throwableOpt flatMap getRootLocationData
 
-  override def lazyProperties = getters(this, XXFormsActionErrorEvent.Getters)
+  override def lazyProperties: PropertyGetter = getters(this, XXFormsActionErrorEvent.Getters)
 }
 
 private object XXFormsActionErrorEvent {

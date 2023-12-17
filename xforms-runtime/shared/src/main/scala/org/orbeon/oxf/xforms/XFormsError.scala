@@ -54,28 +54,22 @@ import org.orbeon.xforms.{ServerError, XFormsCrossPlatformSupport, XFormsNames}
 object XFormsError {
 
   // `xxforms-binding-error` in model and on controls
-  def handleNonFatalBindingError(target: XFormsEventTarget, locationData: LocationData, reason: Option[BindingErrorReason]): Unit = {
+  def handleNonFatalBindingError(target: XFormsEventTarget, locationData: Option[LocationData], reason: Option[BindingErrorReason]): Unit = {
     val containingDocument = target.container.getContainingDocument
-    val message = reason.map(_.message).getOrElse("exception while setting value")
-    containingDocument.indentedLogger.logDebug("", message)
-    containingDocument.addServerError(ServerError(message, Option(locationData)))
+    val message            = reason.map(_.message).getOrElse("exception while setting value")
+    containingDocument.indentedLogger.logInfo("", message)
+    containingDocument.addServerError(ServerError(message, locationData))
   }
 
   // `container`: used for `PartAnalysis` and `XFCD`
   def handleNonFatalXPathError(
-    container    : XBLContainer,
-    throwableOpt : Option[Throwable], // all explicit `new XXFormsXPathErrorEvent` pass a throwable
-    expressionOpt: Option[String]     // all explicit `new XXFormsXPathErrorEvent` pass an expression
-  ): Unit = {
-
-    val message =
-      s"exception while evaluating XPath expression${
-        expressionOpt.map(e => s" `$e`").getOrElse("")
-      }"
-
+    container   : XBLContainer,
+    throwableOpt: Option[Throwable],
+    message     : String
+  ): Unit =
     handleNonFatalXFormsError(
       container,
-      message,
+      ServerError(message, None, None),
       throwableOpt,
       isNormallyRecoverableOnInit = ! ( // https://github.com/orbeon/orbeon-forms/issues/5844
         throwableOpt.iterator.flatMap(XFormsCrossPlatformSupport.causesIterator) exists {
@@ -89,13 +83,12 @@ object XFormsError {
           case _                                                                  => false
         }
     )
-  }
 
-  def handleNonFatalActionError(target: XFormsEventTarget, throwable: Option[Throwable]): Unit =
+  def handleNonFatalActionError(target: XFormsEventTarget, throwableOpt: Option[Throwable]): Unit =
     handleNonFatalXFormsError(
       target.container,
-      "exception while running action",
-      throwable,
+      serverErrorFromThrowable(throwableOpt, "exception while running action"),
+      throwableOpt,
       isNormallyRecoverableOnInit = false,
       mustNotRecoverOnInit        = false
     )
@@ -108,13 +101,11 @@ object XFormsError {
   // - https://github.com/orbeon/orbeon-forms/issues/5543
   private def handleNonFatalXFormsError(
     container                  : XBLContainer,
-    message                    : String,
+    serverError                : ServerError,
     throwableOpt               : Option[Throwable],
     isNormallyRecoverableOnInit: Boolean,
     mustNotRecoverOnInit       : Boolean
   ): Unit = {
-
-    val throwable = throwableOpt.getOrElse(new OXFException(message))
 
     if (
       container.getPartAnalysis.isTopLevelPart     &&   // LATER: Other sub-parts could be fatal, depending on settings on `xxf:dynamic`.
@@ -125,28 +116,27 @@ object XFormsError {
         )
       )
     ) {
-      throw throwable
+      throw throwableOpt.getOrElse(new OXFException(serverError.message))
     } else {
-
-      def serverErrorFromThrowable(t: Throwable): ServerError = {
-        val root = XFormsCrossPlatformSupport.getRootThrowable(t)
-        ServerError(
-          root.getMessage,
-          OrbeonLocationException.getRootLocationData(t),
-          Some(root.getClass.getName)
-        )
-      }
-
       val containingDocument = container.getContainingDocument
-      containingDocument.indentedLogger.logDebug("", message, throwable)
-      containingDocument.addServerError(serverErrorFromThrowable(throwable))
+      containingDocument.indentedLogger.logInfo("", serverError.message)
+      containingDocument.addServerError(serverError)
     }
+  }
+
+  private def serverErrorFromThrowable(throwableOpt: Option[Throwable], defaultMessage: => String): ServerError = {
+    val rootThrowableOpt = throwableOpt.map(XFormsCrossPlatformSupport.getRootThrowable)
+    ServerError(
+      rootThrowableOpt.map(_.getMessage).getOrElse(defaultMessage),
+      rootThrowableOpt.flatMap(OrbeonLocationException.getRootLocationData),
+      rootThrowableOpt.map(_.getClass.getName)
+    )
   }
 
   import XMLReceiverSupport._
 
   // Insert server errors into the Ajax response
-  def outputAjaxErrors(errors: Seq[ServerError])(implicit xmlReceiver: XMLReceiver): Unit = {
+  def outputAjaxErrors(errors: Seq[ServerError])(implicit xmlReceiver: XMLReceiver): Unit =
     withElement(localName = "errors", prefix = "xxf", uri = XFormsNames.XXFORMS_NAMESPACE_URI) {
       for (error <- errors)
         element(
@@ -157,5 +147,4 @@ object XFormsError {
           text      = error.message
         )
     }
-  }
 }

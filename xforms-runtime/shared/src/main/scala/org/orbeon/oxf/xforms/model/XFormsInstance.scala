@@ -205,7 +205,7 @@ class XFormsInstance(
             )
         }
       case ev: XXFormsActionErrorEvent =>
-        XFormsError.handleNonFatalActionError(this, Option(ev.throwable))
+        XFormsError.handleNonFatalActionError(this, ev.throwableOpt)
       case _ =>
     }
 

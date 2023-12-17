@@ -80,11 +80,11 @@ trait ControlEventSupport extends ListenersTrait {
     case _: XFormsHelpEvent =>
       containingDocument.setClientHelpEffectiveControlId(getEffectiveId)
     case ev: XXFormsXPathErrorEvent =>
-      XFormsError.handleNonFatalXPathError(container, ev.throwableOpt, ev.expressionOpt)
+      XFormsError.handleNonFatalXPathError(container, ev.throwableOpt, ev.combinedMessage)
     case ev: XXFormsBindingErrorEvent =>
-      XFormsError.handleNonFatalBindingError(this, ev.locationData, ev.reasonOpt)
+      XFormsError.handleNonFatalBindingError(this, Option(ev.locationData), ev.reasonOpt)
     case ev: XXFormsActionErrorEvent =>
-      XFormsError.handleNonFatalActionError(this, Option(ev.throwable))
+      XFormsError.handleNonFatalActionError(this, ev.throwableOpt)
     case _ =>
   }
 

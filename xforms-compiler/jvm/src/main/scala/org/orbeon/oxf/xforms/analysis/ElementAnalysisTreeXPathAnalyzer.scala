@@ -328,7 +328,7 @@ object ElementAnalysisTreeXPathAnalyzer {
         partAnalysisCtx.reportStaticXPathError(
           mip.compiledExpression.string,
           None,
-          XPathErrorDetails.ForBindMipReferences(bind.nameOpt, mip.name, missingReferences.toSet)
+          XPathErrorDetails.ForBindMipReferences(bind.nameOpt, mip.name, missingReferences)
         )
     }
 

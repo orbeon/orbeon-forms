@@ -108,7 +108,7 @@ class XFormsModelSubmission(
     implicit val indentedLogger: IndentedLogger = getIndentedLogger
     event match {
       case e: XFormsSubmitEvent                       => doSubmit(e).foreach(processReplaceResultAndCloseConnection)
-      case e: XXFormsActionErrorEvent                 => XFormsError.handleNonFatalActionError(thisSubmission, Option(e.throwable))
+      case e: XXFormsActionErrorEvent                 => XFormsError.handleNonFatalActionError(thisSubmission, e.throwableOpt)
       case e if e.name == XFormsEvents.XXFORMS_SUBMIT =>
 
         implicit val refContext: RefContext = createRefContext(thisSubmission)

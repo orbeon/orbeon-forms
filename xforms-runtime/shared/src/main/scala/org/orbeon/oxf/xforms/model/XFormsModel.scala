@@ -179,11 +179,11 @@ class XFormsModel(
           case t => throw new ValidationException(s"Received fatal error event: `${ev.name}`", t, getLocationData)
         }
       case ev: XXFormsXPathErrorEvent =>
-        XFormsError.handleNonFatalXPathError(container, ev.throwableOpt, ev.expressionOpt)
+        XFormsError.handleNonFatalXPathError(container, ev.throwableOpt, ev.combinedMessage)
       case ev: XXFormsBindingErrorEvent =>
-        XFormsError.handleNonFatalBindingError(selfModel, ev.locationData, ev.reasonOpt)
+        XFormsError.handleNonFatalBindingError(selfModel, Option(ev.locationData), ev.reasonOpt)
       case ev: XXFormsActionErrorEvent =>
-        XFormsError.handleNonFatalActionError(selfModel, Option(ev.throwable))
+        XFormsError.handleNonFatalActionError(selfModel, ev.throwableOpt)
       case _ => // NOP
     }
 

@@ -45,7 +45,6 @@ class HttpServletRequestWrapper(request: HttpServletRequest) extends HttpServlet
   override def getProtocol: String = request.getProtocol
   override def getQueryString: String = request.getQueryString
   override def getReader: BufferedReader = request.getReader
-  override def getRealPath(path: String): String = request.getRealPath(path)
   override def getRemoteAddr: String = request.getRemoteAddr
   override def getRemoteHost: String = request.getRemoteHost
   override def getRemoteUser: String = request.getRemoteUser

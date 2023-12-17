@@ -61,7 +61,6 @@ class ServletWebAppContext(val servletContext: ServletContext) extends WebAppCon
 
   def getResource(s: String) = servletContext.getResource(s)
   def getResourceAsStream(s: String) = servletContext.getResourceAsStream(s)
-  def getRealPath(s: String) = servletContext.getRealPath(s)
 
   def log(message: String, throwable: Throwable)  = servletContext.log(message, throwable)
   def log(message: String) = servletContext.log(message)
@@ -81,7 +80,6 @@ class PortletWebAppContext(val portletContext: PortletContext) extends WebAppCon
 
   def getResource(s: String) = portletContext.getResource(s)
   def getResourceAsStream(s: String) = portletContext.getResourceAsStream(s)
-  def getRealPath(s: String) = portletContext.getRealPath(s)
 
   def log(message: String, throwable: Throwable)  = portletContext.log(message, throwable)
   def log(message: String) = portletContext.log(message)

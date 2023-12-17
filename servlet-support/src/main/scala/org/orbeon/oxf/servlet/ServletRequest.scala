@@ -57,7 +57,6 @@ trait ServletRequest {
   def getParameterValues(name: String): Array[String]
   def getProtocol: String
   def getReader: BufferedReader
-  def getRealPath(path: String): String
   def getRemoteAddr: String
   def getRemoteHost: String
   def getRequestDispatcher(path: String): RequestDispatcher
@@ -89,7 +88,6 @@ class JavaxServletRequest(servletRequest: javax.servlet.ServletRequest) extends 
   def getParameterValues(name: String): Array[String] = servletRequest.getParameterValues(name)
   def getProtocol: String = servletRequest.getProtocol
   def getReader: BufferedReader = servletRequest.getReader
-  def getRealPath(path: String): String = servletRequest.getRealPath(path)
   def getRemoteAddr: String = servletRequest.getRemoteAddr
   def getRemoteHost: String = servletRequest.getRemoteHost
   def getRequestDispatcher(path: String): RequestDispatcher = RequestDispatcher(servletRequest.getRequestDispatcher(path))
@@ -121,7 +119,6 @@ class JakartaServletRequest(servletRequest: jakarta.servlet.ServletRequest) exte
   def getParameterValues(name: String): Array[String] = servletRequest.getParameterValues(name)
   def getProtocol: String = servletRequest.getProtocol
   def getReader: BufferedReader = servletRequest.getReader
-  def getRealPath(path: String): String = servletRequest.getRealPath(path)
   def getRemoteAddr: String = servletRequest.getRemoteAddr
   def getRemoteHost: String = servletRequest.getRemoteHost
   def getRequestDispatcher(path: String): RequestDispatcher = RequestDispatcher(servletRequest.getRequestDispatcher(path))

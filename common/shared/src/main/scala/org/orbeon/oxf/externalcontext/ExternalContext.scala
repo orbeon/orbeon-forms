@@ -262,7 +262,6 @@ trait WebAppContext {
   // Resource handling
   def getResource(s: String): URL
   def getResourceAsStream(s: String): InputStream
-  def getRealPath(s: String): String
 
   // Immutable context initialization parameters
   def initParameters: Map[String, String]

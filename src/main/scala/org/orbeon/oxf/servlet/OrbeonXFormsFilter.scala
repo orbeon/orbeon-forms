@@ -255,7 +255,6 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
   private var _mediatype: Option[String]                    = None
 
   override def setStatus(code: Int)                         = _statusCode = Some(code)
-  override def setStatus(code: Int, message: String)        = setStatus(code)
   override def sendError(code: Int, string: String)         = setStatus(code)
   override def sendError(code: Int)                         = setStatus(code)
 

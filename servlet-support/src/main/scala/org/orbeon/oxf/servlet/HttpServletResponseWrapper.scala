@@ -43,5 +43,4 @@ class HttpServletResponseWrapper(response: HttpServletResponse) extends HttpServ
   override def setIntHeader(name: String, value: Int): Unit = response.setIntHeader(name, value)
   override def setLocale(loc: ju.Locale): Unit = response.setLocale(loc)
   override def setStatus(sc: Int): Unit = response.setStatus(sc)
-  override def setStatus(sc: Int, sm: String): Unit = response.setStatus(sc, sm)
 }

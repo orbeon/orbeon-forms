@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.WebAppContext;
 import org.orbeon.oxf.util.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -73,15 +74,26 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
      */
     protected long lastModifiedImpl(String key, boolean doNotThrowResourceNotFound) {
         try {
-            // Some application server do not return a real path, as they do
-            // not uncompress the WAR file. This is in particular the case
-            // when deploying compressed WAR files on Tomcat.
-            URL url = webAppContext.getResource(rootDirectory + key);
-            if (url == null) {
-                if (doNotThrowResourceNotFound) return -1;
-                else throw new ResourceNotFoundException(key);
+            long lm;
+            String realPath = webAppContext.getRealPath(rootDirectory + key);
+            if (realPath == null) {
+                // Some application server do not return a real path, as they do
+                // not uncompress the WAR file. This is in particular the case
+                // when deploying compressed WAR files on Tomcat.
+                URL url = webAppContext.getResource(rootDirectory + key);
+                if (url == null) {
+                    if (doNotThrowResourceNotFound) return -1;
+                    else throw new ResourceNotFoundException(key);
+                }
+                lm = url.openConnection().getLastModified();
+            } else {
+                File file = new File(realPath);
+                if (!file.canRead()) {
+                    if (doNotThrowResourceNotFound) return -1;
+                    else throw new ResourceNotFoundException(key);
+                }
+                lm = file.lastModified();
             }
-            long lm = url.openConnection().getLastModified();
             if (lm == 0) lm = 1;
             return lm;
         } catch (IOException e) {
@@ -94,11 +106,21 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
      * @return The length, in bytes, of the file denoted by this abstract pathname, or 0L if the file does not exist
      */
     public int length(String key) {
-        // FIXME: In this case we should try to figure out the last modified of the WAR itself.
-        return 0;
+        String realPath = webAppContext.getRealPath(rootDirectory + key);
+        if (realPath == null) {
+            // FIXME: this happens when the resources are in a WAR file in
+            // WLS. In this case we should try to figure out the last modified of
+            // the WAR itself.
+            return 0;
+        } else {
+            return Long.valueOf(new File(realPath).length()).intValue();
+        }
     }
 
     public String getRealPath(String key) {
-        return null;
+        final String realPath = webAppContext.getRealPath(rootDirectory + key);
+        if (realPath == null || ! new File(realPath).canRead())
+            throw new ResourceNotFoundException(key);
+        return realPath;
     }
 }

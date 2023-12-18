@@ -20,6 +20,7 @@ import scala.collection.mutable
 class TestWebAppContext(logger: Logger, val attributes: mutable.Map[String, AnyRef]) extends WebAppContext {
   def getResource(s: String)                     = throw new UnsupportedOperationException
   def getResourceAsStream(s: String)             = throw new UnsupportedOperationException
+  def getRealPath(s: String)                     = null
   val initParameters                             = Map.empty[String, String]
   def log(message: String, throwable: Throwable) = logger.error(throwable)(message)
   def log(message: String)                       = logger.info(message)

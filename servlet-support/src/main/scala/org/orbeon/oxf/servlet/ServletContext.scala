@@ -33,6 +33,7 @@ trait ServletContext {
   def getContext(uripath: String): ServletContext
   def getInitParameter(name: String): String
   def getInitParameterNames: java.util.Enumeration[String]
+  def getRealPath(path: String): String
   def getRequestDispatcher(path: String): RequestDispatcher
   def getResource(path: String): URL
   def getResourceAsStream(path: String): InputStream
@@ -53,6 +54,7 @@ class JavaxServletContext(servletContext: javax.servlet.ServletContext) extends 
   override def getContext(uripath: String): ServletContext = ServletContext(servletContext.getContext(uripath))
   override def getInitParameter(name: String): String = servletContext.getInitParameter(name)
   override def getInitParameterNames: java.util.Enumeration[String] = servletContext.getInitParameterNames
+  override def getRealPath(path: String): String = servletContext.getRealPath(path)
   override def getRequestDispatcher(path: String): RequestDispatcher = RequestDispatcher(servletContext.getRequestDispatcher(path))
   override def getResource(path: String): URL = servletContext.getResource(path)
   override def getResourceAsStream(path: String): InputStream = servletContext.getResourceAsStream(path)
@@ -73,6 +75,7 @@ class JakartaServletContext(servletContext: jakarta.servlet.ServletContext) exte
   override def getContext(uripath: String): ServletContext = ServletContext(servletContext.getContext(uripath))
   override def getInitParameter(name: String): String = servletContext.getInitParameter(name)
   override def getInitParameterNames: java.util.Enumeration[String] = servletContext.getInitParameterNames
+  override def getRealPath(path: String): String = servletContext.getRealPath(path)
   override def getRequestDispatcher(path: String): RequestDispatcher = RequestDispatcher(servletContext.getRequestDispatcher(path))
   override def getResource(path: String): URL = servletContext.getResource(path)
   override def getResourceAsStream(path: String): InputStream = servletContext.getResourceAsStream(path)

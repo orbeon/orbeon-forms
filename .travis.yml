@@ -38,6 +38,7 @@ before_install:
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   - sudo apt-get -y install docker-ce
+  - sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/3.0.0-M0/2.13-3.0.0-M0) > /usr/local/bin/amm && chmod +x /usr/local/bin/amm'
 install:
 # From https://docs.travis-ci.com/user/languages/java/: "Because there is no single standard way of installing project dependencies with Ant, you need to
 # specify the exact command to run using install". Here we install npm dependencies for Node.js as we need them for integration tests.

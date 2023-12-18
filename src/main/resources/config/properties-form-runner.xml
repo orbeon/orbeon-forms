@@ -21,7 +21,7 @@
     <!-- === Persistence configuration === -->
 
     <!-- Default provider -->
-    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                          value="mysql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                          value="sqlite"/>
     <!-- Define resource, relational, and attachments providers with their parameters -->
     <property as="xs:anyURI"  name="oxf.fr.persistence.resource.uri"                            value="/fr/service/resource"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.oracle.uri"                              value="/fr/service/oracle"/>
@@ -36,12 +36,16 @@
     <property as="xs:string"  name="oxf.fr.persistence.db2.datasource"                          value="db2"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.sqlserver.uri"                           value="/fr/service/sqlserver"/>
     <property as="xs:string"  name="oxf.fr.persistence.sqlserver.datasource"                    value="sqlserver"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.sqlite.uri"                              value="/fr/service/sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.sqlite.datasource"                       value="sqlite"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.create-flat-view"                 value="false"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.filesystem.uri"                          value="/fr/service/filesystem"/>
 
     <!-- Whether providers support autosave -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.autosave"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.autosave"                          value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.postgresql.autosave"                     value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.autosave"                         value="true"/>
 
     <!-- Whether providers support permissions -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.permissions"                           value="false"/>
@@ -52,16 +56,20 @@
     <property as="xs:boolean" name="oxf.fr.persistence.*.versioning"                            value="false"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.versioning"                        value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.postgresql.versioning"                   value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.versioning"                       value="true"/>
 
     <!-- Whether providers support the lease feature -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.lease"                                 value="false"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.lease"                             value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.postgresql.lease"                        value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.lease"                            value="true"/>
 
     <!-- Whether providers support reindexing -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.reindex"                               value="false"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.reindex"                           value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.postgresql.reindex"                      value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.reindex"                          value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.reencrypt"                        value="true"/>
 
     <property as="xs:string"  name="oxf.fr.field-encryption.password"                           value=""/><!-- blank by default, which means use `oxf.crypto.password` -->
 
@@ -332,12 +340,12 @@
 
     <!-- Configuration of built-in forms -->
     <!-- Be specific, as user might change the default persistence layer -->
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="mysql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"            value="mysql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"           value="mysql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="mysql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.w9.form"                 value="mysql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"             value="mysql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"            value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"           value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.w9.form"                 value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"             value="sqlite"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf">
         home summary clear pdf|tiff wizard-toc wizard-prev wizard-next save-final review

@@ -14,13 +14,18 @@
 package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.sqlite.SQLiteDataSource;
+import scala.Option;
 
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -33,6 +38,58 @@ public class DatabaseContext {
 
     private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(DatabaseContext.class);
     public static final String DATASOURCE_CONTEXT = "datasource-context"; // used by DatabaseContext
+
+    private static final String SQLITE_PROPERTY = "oxf.fr.persistence.provider.sqlite-path";
+
+    private static final String SQLITE_WAR_PATH = "WEB-INF/orbeon-demo.sqlite";
+
+    private static Boolean fileExists(final String nonNullPath, final String pathSource) {
+        if (nonNullPath.trim().isEmpty()) {
+            return false;
+        } else if (! new File(nonNullPath).exists()) {
+            logger.warn("File '" + nonNullPath + "' from " + pathSource + " does not exist");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private static String checkedPath(final String nullablePath, final String pathSource) {
+        return Option.apply(nullablePath).filter(path -> fileExists(path, pathSource)).getOrElse(() -> null);
+    }
+
+    public static DataSource fallbackDataSource(ExternalContext externalContext, final String jndiName) throws NamingException {
+        if (jndiName.equals("sqlite") || jndiName.equals("jdbc/sqlite")) {
+            String sqliteFilePathFromProperties =
+                checkedPath(
+                    Properties.instance().getPropertySet().getString(SQLITE_PROPERTY),
+                    "'" + SQLITE_PROPERTY + "' property"
+                );
+
+            String sqliteFilePathFromRealPath =
+                checkedPath(
+                    externalContext.getWebAppContext().getRealPath(SQLITE_WAR_PATH),
+                    "WAR file"
+                );
+
+            String sqliteFilePath;
+            if (sqliteFilePathFromProperties != null) {
+                logger.info("Using SQLite database from property: " + sqliteFilePathFromProperties);
+                sqliteFilePath = sqliteFilePathFromProperties;
+            } else if (sqliteFilePathFromRealPath != null) {
+                logger.info("Using SQLite database from WAR: " + sqliteFilePathFromRealPath);
+                sqliteFilePath = sqliteFilePathFromRealPath;
+            } else {
+                throw new NameNotFoundException("Data source not found for '" + jndiName + "'");
+            }
+
+            SQLiteDataSource dataSource = new SQLiteDataSource();
+            dataSource.setUrl("jdbc:sqlite:" + sqliteFilePath);
+            return dataSource;
+        } else {
+            throw new NameNotFoundException("Data source not found for '" + jndiName + "'");
+        }
+    }
 
     /**
      * Get a connection valid for this pipeline execution, given a JDBC JNDI name.
@@ -67,7 +124,7 @@ public class DatabaseContext {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .findFirst()
-                    .orElseThrow(() -> new NameNotFoundException("Data source not found for '" + jndiName + "'"));
+                    .orElse(fallbackDataSource((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT), jndiName));
 
                 Connection newConnection = ds.getConnection();
                 // Set connection properties

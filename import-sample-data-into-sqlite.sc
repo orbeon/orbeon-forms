@@ -57,7 +57,7 @@ def importData(connection: Connection, directoryToImport: os.Path): Unit = {
     (_.ext.endsWith("~")) foreach { p =>
 
     val relativePath     = p.relativeTo(directoryToImport)
-    val fileContent      = os.read(p)
+    val fileContent      = os.read.bytes(p)
     val currentTimeStamp = new java.sql.Timestamp(System.currentTimeMillis())
 
     // Version 2 temporarily as on demo we have this and have a /new bug
@@ -74,7 +74,7 @@ def importData(connection: Connection, directoryToImport: os.Path): Unit = {
       ps.setString   (4, form)             // form
       ps.setInt      (5, formVersion)      // form_version
       ps.setString   (6, "N")              // deleted
-      ps.setString   (7, fileContent)      // xml
+      ps.setBytes    (7, fileContent)      // xml
     }
 
     relativePath.toString match {
@@ -135,8 +135,9 @@ def importData(connection: Connection, directoryToImport: os.Path): Unit = {
 }
 
 // Assumption: first metadata node in the demo form definitions is the form metadata node (in fr-form-metadata instance)
-def metadataFromFormDefinition(formDefinition: String): String = {
-  val xml          = XML.loadString(formDefinition)
-  val metadataNode = (xml \\ "metadata").headOption.getOrElse(sys.error("No metadata node found"))
+def metadataFromFormDefinition(formDefinitionAsBytes: Array[Byte]): String = {
+  val formDefinition = new String(formDefinitionAsBytes, "UTF-8")
+  val xml            = XML.loadString(formDefinition)
+  val metadataNode   = (xml \\ "metadata").headOption.getOrElse(sys.error("No metadata node found"))
   metadataNode.toString
 }

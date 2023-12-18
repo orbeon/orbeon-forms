@@ -18,7 +18,7 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
-import org.orbeon.oxf.fr.persistence.relational.Provider.{PostgreSQL, binarySize, partialBinary}
+import org.orbeon.oxf.fr.persistence.relational.Provider.{PostgreSQL, SQLite, binarySize, partialBinary}
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.http._
@@ -309,14 +309,14 @@ trait Read {
             val bodyInputStream = bodyContent match {
               case FullAttachment | PartialAttachment(_, _) =>
                 req.provider match {
-                  case PostgreSQL => Option(resultSet.getBytes("file_content")).map(new ByteArrayInputStream(_))
-                  case _          => Option(resultSet.getBlob("file_content")).map(_.getBinaryStream)
+                  case PostgreSQL | SQLite  => Option(resultSet.getBytes("file_content")).map(new ByteArrayInputStream(_))
+                  case _                    => Option(resultSet.getBlob("file_content")).map(_.getBinaryStream)
                 }
 
               case Xml =>
                 val reader = req.provider match {
-                  case PostgreSQL => new StringReader(resultSet.getString("xml"))
-                  case _          => resultSet.getClob("xml").getCharacterStream
+                  case PostgreSQL | SQLite => new StringReader(resultSet.getString("xml"))
+                  case _                   => resultSet.getClob("xml").getCharacterStream
                 }
                 Some(new ReaderInputStream(reader, CharsetNames.Utf8))
             }

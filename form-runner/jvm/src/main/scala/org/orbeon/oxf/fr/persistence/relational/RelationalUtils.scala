@@ -17,12 +17,13 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.processor.DatabaseContext
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Logging, NetUtils}
 
 import java.sql.{Connection, ResultSet}
-import javax.naming.{InitialContext, NameNotFoundException}
+import javax.naming.InitialContext
 import javax.sql.DataSource
 import scala.collection.compat._
 import scala.util.control.NonFatal
@@ -82,7 +83,7 @@ object RelationalUtils extends Logging {
         .toStream
         .map(prefix => Try(InitialContext.doLookup(prefix + name).asInstanceOf[DataSource]))
         .collectFirst { case Success(dataSource) => dataSource }
-        .getOrElse(throw new NameNotFoundException(s"Data source not found for '$name'"))
+        .getOrElse(DatabaseContext.fallbackDataSource(CoreCrossPlatformSupport.externalContext, name))
     }
 
   def getConnection(dataSource: DataSource): Connection =

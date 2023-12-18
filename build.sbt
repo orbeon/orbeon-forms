@@ -140,6 +140,7 @@ val CoreLibraryDependencies = Seq(
   "mysql"                       % "mysql-connector-java"            % "8.0.26"          % Test,
   "org.postgresql"              % "postgresql"                      % "42.2.24"         % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
+  "org.xerial"                  % "sqlite-jdbc"                     % "3.44.1.0",
   "com.openhtmltopdf"           % "openhtmltopdf-core"              % OpenHtmlToPdfVersion,
   "com.openhtmltopdf"           % "openhtmltopdf-pdfbox"            % OpenHtmlToPdfVersion,
   "com.openhtmltopdf"           % "openhtmltopdf-java2d"            % OpenHtmlToPdfVersion,
@@ -1268,7 +1269,18 @@ lazy val orbeonWarJVM = orbeonWar.jvm
   .settings(OrbeonWebappPlugin.projectSettings: _*)
   .settings(commonSettings: _*)
   .settings(
-    exportJars := false
+    exportJars := false,
+
+    Compile / compile := {
+      val compileAnalysis = (Compile / compile).value
+
+      import scala.sys.process._
+
+      // Generate SQLite file from demo data files
+      Seq("amm", "import-sample-data-into-sqlite.sc", (ThisBuild / baseDirectory).value.toString).!
+
+      compileAnalysis
+    }
   )
 
 lazy val orbeonWarJS = orbeonWar.js

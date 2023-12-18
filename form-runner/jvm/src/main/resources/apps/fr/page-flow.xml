@@ -20,15 +20,15 @@
     <!-- ==== Built-in relational persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
+    <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
          model="persistence/relational/crud.xpl"/>
 
     <!-- Search -->
-    <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver)/search/([^/^.]+)/([^/^.]+)"
+    <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/search/([^/^.]+)/([^/^.]+)"
              view="persistence/relational/search.xpl"/>
 
     <!-- Deployed forms services -->
-    <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver)/form(/([^/]+)(/([^/]+))?)?"
+    <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/form(/([^/]+)(/([^/]+))?)?"
              default-submission="persistence/form-instance.xml"
              view="persistence/relational/form.xpl">
         <setvalue ref="/*/app" matcher-group="3"/>
@@ -37,7 +37,7 @@
 
     <!-- Data history -->
     <service
-        path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver)/history/([^/]+/[^/]+/[^/]+)"
+        path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/history/([^/]+/[^/]+/[^/]+)"
         methods="GET"
         model="persistence/relational/history.xpl"/>
 

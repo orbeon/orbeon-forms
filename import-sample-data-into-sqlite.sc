@@ -6,7 +6,7 @@ import scala.xml._
 def main(path: String): Unit = {
   val buildPath = os.Path(path)
 
-  val sqliteFile        = buildPath / os.RelPath("orbeon.sqlite")
+  val sqliteFile        = buildPath / os.RelPath("orbeon-war/jvm/target/webapp/WEB-INF/orbeon-demo.sqlite")
   val sqlScript         = buildPath / os.RelPath("form-runner/jvm/src/main/resources/apps/fr/persistence/relational/ddl/2023.1/sqlite-2023_1.sql")
   val directoryToImport = buildPath / os.RelPath("data/orbeon/fr")
 

@@ -53,14 +53,14 @@ object InitSupport {
   def pageContainsFormsMarkup(): Unit =
     pageContainsFormsMarkupPromise.success(())
 
-  def mapNamespacePromise(namespace: String): Future[xforms.Form] = {
-    val promise = Promise[xforms.Form]()
+  def mapNamespacePromise(namespace: String): Future[Option[xforms.Form]] = {
+    val promise = Promise[Option[xforms.Form]]()
     formNamespacesToPromise += namespace -> promise
     promise.future
   }
 
-  def completeNamespacePromise(namespace: String, form: xforms.Form): Unit =
-    formNamespacesToPromise.get(namespace).foreach(_.success(form))
+  private def completeNamespacePromise(namespace: String, formOpt: Option[xforms.Form]): Unit =
+    formNamespacesToPromise.get(namespace).foreach(_.success(formOpt))
 
   def removeNamespacePromise(namespace: String): Unit =
     formNamespacesToPromise -= namespace
@@ -110,7 +110,11 @@ object InitSupport {
 
   // Called by form-specific dynamic initialization
   @JSExport
-  def initializeFormWithInitData(initializeFormWithInitData: String, contextPathOrUndef: js.UndefOr[String], namespaceOrUndef: js.UndefOr[String]): Unit = {
+  def initializeFormWithInitData(
+    initializeFormWithInitData : String,
+    contextPathOrUndef         : js.UndefOr[String],
+    namespaceOrUndef           : js.UndefOr[String])
+  : Unit = {
 
     initTimestampBeforeMs = System.currentTimeMillis()
 
@@ -131,12 +135,9 @@ object InitSupport {
 
     pageContainsFormsMarkupF foreach { _ =>
 
-      for {
-        form      <- initializeForm(initializations, contextAndNamespaceOpt)
-        namespace <- namespaceOrUndef
-      } locally {
-        // https://github.com/orbeon/orbeon-forms/issues/5913
-        completeNamespacePromise(namespace, form)
+      namespaceOrUndef.toOption.foreach { namespace =>
+        val formOpt = initializeForm(initializations, contextAndNamespaceOpt)
+        completeNamespacePromise(namespace, formOpt)
       }
 
       initializeReactWhenSessionAboutToExpire(initializations.configuration)
@@ -210,109 +211,113 @@ object InitSupport {
     private var reactWhenSessionAboutToExpireInitialized = false
     private var orbeonLoadedEventScheduled               = false
 
-    var formNamespacesToPromise : Map[String, Promise[xforms.Form]] = Map.empty
+    var formNamespacesToPromise : Map[String, Promise[Option[xforms.Form]]] = Map.empty
 
     def initializeForm(initializations: Initializations, contextAndNamespaceOpt: Option[(String, String)]): Option[Form] = {
 
       logger.debug(s"initializing form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
-      val formId   = initializations.namespacedFormId
-      val formElem = dom.document.getElementById(formId).asInstanceOf[html.Form] // TODO: Error instead of plain cast?
+      val formId      = initializations.namespacedFormId
+      // Form is an `Option` as it might already have been removed by the time we receive the dynamic JavaScript
+      // (Should we do an error instead of a cast?)
+      val formElemOpt = Option(dom.document.getElementById(formId).asInstanceOf[html.Form])
+      formElemOpt.flatMap { formElem =>
 
-      // Q: Do this later?
-      $(formElem).removeClass(Constants.InitiallyHiddenClass)
+        // Q: Do this later?
+        $(formElem).removeClass(Constants.InitiallyHiddenClass)
 
-      val uuid =
-        StateHandling.initializeState(formId, initializations.uuid, initializations.configuration.revisitHandling) match {
-          case StateResult.Uuid(uuid) =>
-            uuid
-          case StateResult.Restore(uuid) =>
-            AjaxClient.fireEvent(
-              AjaxEvent(
-                eventName = EventNames.XXFormsAllEventsRequired,
-                form      = formElem
+        val uuid =
+          StateHandling.initializeState(formId, initializations.uuid, initializations.configuration.revisitHandling) match {
+            case StateResult.Uuid(uuid) =>
+              uuid
+            case StateResult.Restore(uuid) =>
+              AjaxClient.fireEvent(
+                AjaxEvent(
+                  eventName = EventNames.XXFormsAllEventsRequired,
+                  form      = formElem
+                )
               )
-            )
-            uuid
-          case StateResult.Reload =>
-            dom.window.location.reload(flag = true)
-            return None
-        }
+              uuid
+            case StateResult.Reload =>
+              dom.window.location.reload(flag = true)
+              return None
+          }
 
-      val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
-        processRepeatHierarchy(initializations.repeatTree)
+        val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
+          processRepeatHierarchy(initializations.repeatTree)
 
-      // NOTE on paths: We switched back and forth between trusting the client or the server. Starting 2010-08-27
-      // the server provides the info. Starting 2011-10-05 we revert to using the server values instead of client
-      // detection, as that works in portals. The concern with using the server values was proxying. But should
-      // proxying be able to change the path itself? If so, wouldn't other things break anyway? So for now
-      // server values it is.
+        // NOTE on paths: We switched back and forth between trusting the client or the server. Starting 2010-08-27
+        // the server provides the info. Starting 2011-10-05 we revert to using the server values instead of client
+        // detection, as that works in portals. The concern with using the server values was proxying. But should
+        // proxying be able to change the path itself? If so, wouldn't other things break anyway? So for now
+        // server values it is.
 
-      val newForm =
-        new Form(
-          uuid                           = uuid,
-          elem                           = formElem,
-          ns                             = formId.substring(0, formId.indexOf(Constants.FormClass)), // namespaceOpt.getOrElse("")
-          contextAndNamespaceOpt         = contextAndNamespaceOpt,
-          xformsServerPath               = initializations.xformsServerPath,
-          xformsServerSubmitActionPath   = initializations.xformsServerSubmitActionPath,
-          xformsServerSubmitResourcePath = initializations.xformsServerSubmitResourcePath,
-          xformsServerUploadPath         = initializations.xformsServerUploadPath,
-          repeatTreeChildToParent        = repeatTreeChildToParent,
-          repeatTreeParentToAllChildren  = repeatTreeParentToAllChildren,
-          repeatIndexes                  = processRepeatIndexes(initializations.repeatIndexes),
-          xblInstances                   = js.Array(),
-          configuration                  = initializations.configuration
+        val newForm =
+          new Form(
+            uuid                           = uuid,
+            elem                           = formElem,
+            ns                             = formId.substring(0, formId.indexOf(Constants.FormClass)), // namespaceOpt.getOrElse("")
+            contextAndNamespaceOpt         = contextAndNamespaceOpt,
+            xformsServerPath               = initializations.xformsServerPath,
+            xformsServerSubmitActionPath   = initializations.xformsServerSubmitActionPath,
+            xformsServerSubmitResourcePath = initializations.xformsServerSubmitResourcePath,
+            xformsServerUploadPath         = initializations.xformsServerUploadPath,
+            repeatTreeChildToParent        = repeatTreeChildToParent,
+            repeatTreeParentToAllChildren  = repeatTreeParentToAllChildren,
+            repeatIndexes                  = processRepeatIndexes(initializations.repeatIndexes),
+            xblInstances                   = js.Array(),
+            configuration                  = initializations.configuration
+          )
+
+        Page.registerForm(
+          formId,
+          newForm
         )
 
-      Page.registerForm(
-        formId,
-        newForm
-      )
+        initializeJavaScriptControls(initializations.controls)
+        initializeKeyListeners(initializations.listeners, formElem)
+        dispatchInitialServerEvents(initializations.pollEvent, formId)
 
-      initializeJavaScriptControls(initializations.controls)
-      initializeKeyListeners(initializations.listeners, formElem)
-      dispatchInitialServerEvents(initializations.pollEvent, formId)
+        initializeGlobalEventListenersIfNeeded()
 
-      initializeGlobalEventListenersIfNeeded()
+        // Putting this here due to possible Scala.js bug reporting a "applyDynamic does not support passing a vararg parameter"
+        // 2020-11-26: Using Scala.js 1.0 way of detecting the global variable.
 
-      // Putting this here due to possible Scala.js bug reporting a "applyDynamic does not support passing a vararg parameter"
-      // 2020-11-26: Using Scala.js 1.0 way of detecting the global variable.
+        // TODO: move to shared place
+        def namespaceBuildXFormsPageLoadedServer(namespaceOpt: Option[String]): String =
+          s"xformsPageLoadedServer${namespaceOpt.getOrElse("")}"
 
-      // TODO: move to shared place
-      def namespaceBuildXFormsPageLoadedServer(namespaceOpt: Option[String]): String =
-        s"xformsPageLoadedServer${namespaceOpt.getOrElse("")}"
+        val xformsPageLoadedServerName = namespaceBuildXFormsPageLoadedServer(contextAndNamespaceOpt.map(_._2))
 
-      val xformsPageLoadedServerName = namespaceBuildXFormsPageLoadedServer(contextAndNamespaceOpt.map(_._2))
+        val hasOtherScripts =
+          js.typeOf(js.special.fileLevelThis.asInstanceOf[js.Dynamic].selectDynamic(xformsPageLoadedServerName)) != "undefined"
 
-      val hasOtherScripts =
-        js.typeOf(js.special.fileLevelThis.asInstanceOf[js.Dynamic].selectDynamic(xformsPageLoadedServerName)) != "undefined"
+        // Run user scripts
+        initializations.userScripts foreach { case rpc.UserScript(functionName, targetId, observerId, paramsValues) =>
+          ServerAPI.callUserScript(formId, functionName, targetId, observerId, paramsValues map (_.asInstanceOf[js.Any]): _*)
+        }
 
-      // Run user scripts
-      initializations.userScripts foreach { case rpc.UserScript(functionName, targetId, observerId, paramsValues) =>
-        ServerAPI.callUserScript(formId, functionName, targetId, observerId, paramsValues map (_.asInstanceOf[js.Any]): _*)
+        // Run other code sent by server
+        if (initializations.messagesToRun.nonEmpty)
+          MessageDialog.showMessages(initializations.messagesToRun.toJSArray)
+
+        initializations.dialogsToShow foreach { case rpc.Dialog(id, neighborId) =>
+          XFormsUI.showDialogForInit(id, neighborId)
+        }
+
+        // Do this after dialogs as focus might be within a dialog
+        initializations.focusElementId foreach { focusElementId =>
+          Controls.setFocus(focusElementId)
+        }
+
+        initializations.errorsToShow foreach { case rpc.Error(title, details, formId) =>
+          AjaxClient.showError(title, details, formId, ignoreErrors = false)
+        }
+
+        if (hasOtherScripts)
+          js.special.fileLevelThis.asInstanceOf[js.Dynamic].applyDynamic(xformsPageLoadedServerName)()
+
+        Some(newForm)
       }
-
-      // Run other code sent by server
-      if (initializations.messagesToRun.nonEmpty)
-        MessageDialog.showMessages(initializations.messagesToRun.toJSArray)
-
-      initializations.dialogsToShow foreach { case rpc.Dialog(id, neighborId) =>
-        XFormsUI.showDialogForInit(id, neighborId)
-      }
-
-      // Do this after dialogs as focus might be within a dialog
-      initializations.focusElementId foreach { focusElementId =>
-        Controls.setFocus(focusElementId)
-      }
-
-      initializations.errorsToShow foreach { case rpc.Error(title, details, formId) =>
-        AjaxClient.showError(title, details, formId, ignoreErrors = false)
-      }
-
-      if (hasOtherScripts)
-        js.special.fileLevelThis.asInstanceOf[js.Dynamic].applyDynamic(xformsPageLoadedServerName)()
-
-      Some(newForm)
     }
 
     // The heartbeat is per servlet session and we only need one. But see https://github.com/orbeon/orbeon-forms/issues/2014.

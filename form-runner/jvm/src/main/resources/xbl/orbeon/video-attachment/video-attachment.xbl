@@ -1,0 +1,97 @@
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-video-attachment"
+        element="fr|video-attachment"
+        xxbl:mode="binding lhha value"
+        xxbl:container="span"
+        xxbl:label-for="fr-video-attachment-elem">
+
+        <!-- Orbeon Form Builder Component Metadata -->
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Video Attachment</display-name>
+            <display-name lang="es" todo="true">[Video Attachment]</display-name>
+            <display-name lang="fi" todo="true">[Video Attachment]</display-name>
+            <display-name lang="fr">Vidéo jointe</display-name>
+            <display-name lang="ru" todo="true">[Video Attachment]</display-name>
+            <display-name lang="de">Video Anhang</display-name>
+            <display-name lang="it">Video allegato</display-name>
+            <display-name lang="sv" todo="true">[Video Attachment]</display-name>
+            <display-name lang="nl" todo="true">[Video Attachment]</display-name>
+            <display-name lang="pt" todo="true">[Video Attachment]</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-file-video-o</icon-class>
+            </icon>
+            <templates>
+                <bind type="xf:anyURI" constraint="xxf:upload-mediatypes('video/*')"/>
+                <instance filename="" mediatype="" size=""/>
+                <view>
+                     <fr:video-attachment id="" ref="" class="fr-attachment">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:video-attachment>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:template>
+            <xf:var
+
+                name="binding"
+                value="xxf:binding('fr-video-attachment')"/>
+
+            <xh:div id="fr-video-attachment-elem" xxf:control="true">
+                <fr:attachment
+                    ref="$binding"
+                    accept="{(xxf:custom-mip($binding, 'upload-mediatypes')[xxf:non-blank()], 'video/*')[1]}">
+
+                    <xf:filename  ref="@filename"  xxbl:scope="outer"/>
+                    <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
+                    <xxf:size     ref="@size"      xxbl:scope="outer"/>
+
+                    <!-- Retarget of upload events -->
+                    <!-- NOTE: Duplicated logic in attachment.xbl -->
+                    <xf:dispatch
+                        event="xxforms-upload-start xxforms-upload-cancel"
+                        targetid="fr-video-attachment"
+                        name="{event('xxf:type')}"/>
+
+                    <xf:dispatch
+                        event="xxforms-upload-done"
+                        targetid="fr-video-attachment"
+                        name="{event('xxf:type')}"
+                        propagate="stop"
+                        defaultAction="cancel">
+                        <xf:property name="file"           value="event('file')"/>
+                        <xf:property name="filename"       value="event('filename')"/>
+                        <xf:property name="content-type"   value="event('content-type')"/>
+                        <xf:property name="content-length" value="event('content-length')"/>
+                    </xf:dispatch>
+
+                    <xf:dispatch
+                        event="xxforms-upload-error"
+                        targetid="fr-video-attachment"
+                        name="{event('xxf:type')}"
+                        propagate="stop"
+                        defaultAction="cancel">
+                        <xf:property name="error-type" value="event('error-type')"/>
+                        <xf:property name="permitted"  value="event('permitted')"/>
+                        <xf:property name="actual"     value="event('actual')"/>
+                        <xf:property name="message"    value="event('message')"/>
+                    </xf:dispatch>
+
+                </fr:attachment>
+                <fr:video ref="$binding[xxf:non-blank()]"/>
+            </xh:div>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

@@ -47,6 +47,7 @@
                 <view>
                      <fr:image id="" ref="" class="fr-static-attachment">
                          <xf:label ref=""/>
+                         <xf:hint ref=""/>
                          <xf:help  ref=""/>
                          <xf:alert ref=""/>
                     </fr:image>

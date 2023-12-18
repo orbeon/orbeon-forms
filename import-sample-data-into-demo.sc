@@ -1,4 +1,4 @@
-// Run with: `amm import-sample-data-to-demo.sc username password`
+// Run with: `amm import-sample-data-into-demo.sc username password`
 // https://ammonite.io/#AmmoniteArgumentsinScripts
 
 @main

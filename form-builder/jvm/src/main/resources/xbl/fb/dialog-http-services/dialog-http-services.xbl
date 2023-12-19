@@ -720,7 +720,7 @@
                                             </fr:grid>
                                         </xf:group>
 
-                                        <xf:textarea ref="$request/body[$has-request-body]" id="fb-service-body" incremental="true" class="fb-service-request-body">
+                                        <xf:textarea ref="$request/body[$has-request-body]" id="fb-service-body" incremental="true" class="fb-service-request-body" appearance="clipboard-copy">
                                             <xf:label ref="$resources/dialog-http-services/request-body/label"/>
                                             <xf:hint ref="$resources/dialog-http-services/request-body/hint"/>
                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>

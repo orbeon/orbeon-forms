@@ -23,10 +23,14 @@
                             <textarea>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
 
 From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
-                            <textarea-counter>Let's write a Tweet. It must fit in 280 characters.</textarea-counter>
+                            <textarea-counter>Let's write a message. It must fit in 280 characters.</textarea-counter>
                             <textarea-resize>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
 
 From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
+                            <textarea-clipboard>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
+
+From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
+                            <input-clipboard>I Have a Dream</input-clipboard>
                             <secret>42</secret>
                         </grid-1>
                         <grid-2>
@@ -42,6 +46,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <calculated-value>Great love and great achievements involve great risk.</calculated-value>
                             <calculated-value-borderless>Great love and great achievements involve great risk.</calculated-value-borderless>
                             <hidden-field/>
+                            <calculated-value-clipboard>Great love and great achievements involve great risk.</calculated-value-clipboard>
                         </grid-9>
                     </utility-controls>
                     <typed-controls>
@@ -164,8 +169,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
 
                         <xf:bind id="textarea-resize-bind" ref="textarea-resize" name="textarea-resize"
                                  xxf:whitespace="trim"/>
+                        <xf:bind id="input-clipboard-bind" ref="input-clipboard" name="input-clipboard"
+                                 xxf:whitespace="trim"/>
                         <xf:bind id="secret-bind" ref="secret" name="secret" required="true()"
                                  constraint=". = '42'"/>
+                        <xf:bind id="textarea-clipboard-bind" ref="textarea-clipboard" name="textarea-clipboard"
+                                 xxf:whitespace="trim"/>
 
                     </xf:bind>
                 </xf:bind>
@@ -286,6 +295,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                         <xf:bind ref="calculated-value-borderless" id="calculated-value-borderless-bind"
                                  name="calculated-value-borderless"/>
                         <xf:bind id="hidden-field-bind" ref="hidden-field" name="hidden-field"/>
+                        <xf:bind ref="calculated-value-clipboard" id="calculated-value-clipboard-bind"
+                                 name="calculated-value-clipboard"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
@@ -358,6 +369,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label/>
                             <hint/>
                         </hidden-field>
+                        <calculated-value-clipboard>
+                            <label>Calculated Value with Clipboard Copy</label>
+                            <hint>Standard text output with a label and copy</hint>
+
+
+                        </calculated-value-clipboard>
                         <dropdown>
                             <label>Dropdown</label>
                             <hint/>
@@ -716,6 +733,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label>Plain Text Area with Resizing</label>
                             <hint>Standard text area</hint>
                         </textarea-resize>
+                        <textarea-clipboard>
+                            <label>Plain Text Area with Clipboard Copy</label>
+                            <hint>Standard text area with clipboard copy</hint>
+
+
+                        </textarea-clipboard>
+                        <input-clipboard>
+                            <label>Text Field with Clipboard Copy</label>
+                            <hint/>
+                        </input-clipboard>
                         <secret>
                             <label>Secret Field</label>
                             <hint>The password is 42 ;)</hint>
@@ -774,6 +801,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label/>
                             <hint/>
                         </hidden-field>
+                        <calculated-value-clipboard>
+                            <label>Valeur calculée avec copie vers le presse-papiers</label>
+                            <hint>Sortie texte standard avec libellé et copie</hint>
+
+
+                        </calculated-value-clipboard>
                         <dropdown>
                             <label>Menu déroulant</label>
                             <hint/>
@@ -1132,6 +1165,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label>Zone de texte avec redimensionnement</label>
                             <hint>Zone de texte standard</hint>
                         </textarea-resize>
+                        <textarea-clipboard>
+                            <label>Zone de texte avec copie vers le presse-papiers</label>
+                            <hint>Zone de texte standard avec copie vers le presse-papiers</hint>
+
+
+                        </textarea-clipboard>
+                        <input-clipboard>
+                            <label>Champ de texte avec copie vers le presse-papiers</label>
+                            <hint/>
+                        </input-clipboard>
                         <secret>
                             <label>Champ secret</label>
                             <hint>Le mot de passe est 42 ;)</hint>
@@ -1197,16 +1240,32 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:textarea>
                         </fr:c>
-                        <fr:c x="7" y="3" w="6">
+                        <fr:c x="7" y="3" w="6" h="2">
+                            <xf:textarea bind="textarea-clipboard-bind" id="textarea-clipboard-control"
+                                         appearance="clipboard-copy">
+                                <xf:label ref="$form-resources/textarea-clipboard/label"/>
+                                <xf:hint ref="$form-resources/textarea-clipboard/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:textarea>
+
+
+                        </fr:c>
+                        <fr:c x="1" y="5" w="6">
+                            <xf:input id="input-clipboard-control" bind="input-clipboard-bind"
+                                      appearance="clipboard-copy">
+                                <xf:label ref="$form-resources/input-clipboard/label"/>
+                                <xf:hint ref="$form-resources/input-clipboard/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="5" w="6">
                             <xf:secret id="secret-control" bind="secret-bind" xxf:autocomplete="off">
                                 <xf:label ref="$form-resources/secret/label"/>
                                 <xf:hint ref="$form-resources/secret/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:secret>
-
-                        </fr:c>
-                        <fr:c y="4" x="7" w="6">
-
                         </fr:c>
                     </fr:grid>
                     <fr:grid columns="1" id="grid-2-grid" bind="grid-2-bind">
@@ -1269,7 +1328,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
 
                             </fr:hidden>
                         </fr:c>
-                        <fr:c x="7" y="3" w="6"/>
+                        <fr:c x="7" y="3" w="6">
+                            <xf:output bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control"
+                                       appearance="clipboard-copy">
+                                <xf:label ref="$form-resources/calculated-value-clipboard/label"/>
+                                <xf:hint ref="$form-resources/calculated-value-clipboard/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="typed-controls-section" bind="typed-controls-bind">

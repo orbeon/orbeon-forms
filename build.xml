@@ -201,6 +201,8 @@
             -dontwarn me.gosimple.nbvcxz.**
             -dontwarn org.osgi.annotation.**
             -dontwarn aQute.bnd.annotation.**
+            -dontwarn edu.umd.cs.findbugs.**
+            -dontwarn com.google.errorprone.**
             -dontwarn cats.effect.**
             -dontwarn fs2.**
 

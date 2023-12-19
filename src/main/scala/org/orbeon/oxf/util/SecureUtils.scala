@@ -170,6 +170,14 @@ object SecureUtils extends SecureUtilsTrait {
     finally pool.returnObject(cipher)
   }
 
+  def checkPasswordForKeyUsage(keyUsage: KeyUsage): Boolean =
+    try {
+      getOrComputePassword(keyUsage)
+      true
+    } catch {
+      case _: ConfigurationException => false
+    }
+
   // Encrypt a byte array
   // The result is converted to Base64 encoding without line breaks or spaces
   def encrypt(keyUsage: KeyUsage, bytes: Array[Byte]): String = encryptIV(keyUsage, bytes, None)

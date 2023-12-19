@@ -630,6 +630,7 @@
 
         <fr:view fluid="true">
             <fr:navbar/>
+            <fr:config-check/>
             <fr:row>
                 <!-- Make sure not to show during initialization otherwise the alert appears at the top behind the modal dialog -->
                 <xf:group ref=".[empty($forms) and instance()/initializing = 'false']">

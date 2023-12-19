@@ -19,6 +19,9 @@
                 <day-this-year>[MNn,*-3] [D]</day-this-year>
                 <short-date>[M01]/[D01]/[Y01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration>Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Create</create>
@@ -636,6 +639,9 @@
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration>Votre configuration Orbeon Forms est incomplète. Veuillez vérifier vos fichiers de log Orbeon Forms pour les détails.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Créer</create>
@@ -1257,6 +1263,9 @@
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
@@ -1867,6 +1876,9 @@
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
@@ -2508,6 +2520,9 @@
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Opprett</create>
@@ -3115,6 +3130,9 @@
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
@@ -3721,6 +3739,9 @@
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
@@ -4337,6 +4358,9 @@
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
@@ -4953,6 +4977,9 @@
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
@@ -5569,6 +5596,9 @@
                 <day-this-year>[D] [Mn,*-3]</day-this-year>
                 <short-date>[Y0001]-[M01]-[D01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
@@ -6185,6 +6215,9 @@
                 <day-this-year>[D] [MNn,*-3]</day-this-year>
                 <short-date>[D01]-[M01]-[Y01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Maken</create>
@@ -6801,6 +6834,9 @@
                 <day-this-year>[D] [MNn,*-3]</day-this-year>
                 <short-date>[M01]/[Y01]</short-date>
             </formats>
+            <messages>
+                <c todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</c>
+            </messages>
         </common>
         <buttons>
             <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
@@ -7417,6 +7453,9 @@
                 <day-this-year>[D]. [MNn]</day-this-year>
                 <short-date>[D01]-[M01]-[Y01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Create</create>
@@ -8024,6 +8063,9 @@
                 <day-this-year>[Y01]-[M01]-[D01]</day-this-year>
                 <short-date>[Y01]-[M01]-[D01]</short-date>
             </formats>
+            <messages>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+            </messages>
         </common>
         <buttons>
             <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Utwórz</create>

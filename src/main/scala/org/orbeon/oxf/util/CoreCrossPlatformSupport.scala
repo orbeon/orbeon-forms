@@ -20,6 +20,7 @@ import org.orbeon.oxf.externalcontext.{AsyncRequest, ExternalContext, LocalExter
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.{Properties, PropertySet}
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 
 import scala.concurrent.ExecutionContext
 
@@ -56,4 +57,12 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
         body
       )
     )
+
+  def configCheck(): Set[String] = {
+    val passwordGeneral         = (! SecureUtils.checkPasswordForKeyUsage(SecureUtils.KeyUsage.General)        ).set("password.general")
+    val passwordToken           = (! SecureUtils.checkPasswordForKeyUsage(SecureUtils.KeyUsage.Token)          ).set("password.token")
+    val passwordFieldEncryption = (! SecureUtils.checkPasswordForKeyUsage(SecureUtils.KeyUsage.FieldEncryption)).set("password.field-encryption")
+
+    passwordGeneral ++ passwordToken ++ passwordFieldEncryption
+  }
 }

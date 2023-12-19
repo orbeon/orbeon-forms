@@ -44,6 +44,8 @@
     <xsl:variable name="default-page-template" as="element(*)*">
         <fr:navbar/>
 
+        <fr:config-check/>
+
         <fr:description/>
 
         <!-- Error summary (if at top) -->
@@ -820,6 +822,22 @@
     <xsl:template match="fr:title" name="fr-title">
         <!-- Q: Why do we need @ref here? -->
         <xh:h1 class="{if ($bs5) then 'text-white-50 fs-3 mb-0' else ''}"><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h1>
+    </xsl:template>
+
+    <xsl:template match="fr:config-check" name="fr-config-check">
+        <xh:div class="row{if ($fluid) then '-fluid' else ''}">
+            <xf:var name="config-check" value="frf:configCheck()"/>
+            <xh:div class="span12">
+                <xf:group xxf:element="p" ref=".[exists($config-check)]" class="alert alert-danger fr-config-check">
+                    <xf:output
+                        value="
+                            xxf:r(
+                                'common.messages.incomplete-configuration',
+                                'fr-fr-resources'
+                            )"/>
+                </xf:group>
+            </xh:div>
+        </xh:div>
     </xsl:template>
 
     <!-- Description in chosen language or first one if not found -->

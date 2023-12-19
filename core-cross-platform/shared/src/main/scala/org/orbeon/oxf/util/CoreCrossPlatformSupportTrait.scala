@@ -35,4 +35,5 @@ trait CoreCrossPlatformSupportTrait {
   def externalContext: ExternalContext
   def withExternalContext[T](ec: ExternalContext)(body: => T): T
   def shiftExternalContext[F[_], T](lift: T => F[T])(body: => T)(implicit ec: ExternalContext): F[T]
+  def configCheck(): Set[String]
 }

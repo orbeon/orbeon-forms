@@ -22,8 +22,7 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.{Property, PropertySet}
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
-import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtils}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.Loggers
@@ -32,7 +31,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
@@ -131,6 +130,29 @@ trait FormRunnerBaseOps {
   val DefaultIterationSuffix = "-iteration"
   val TemplateContentSuffix  = "-content"
   val TemplateSuffix         = "-template"
+
+  // This logs configuration issues once only per server start
+  private lazy val configCheckResult = {
+    val tokens = CoreCrossPlatformSupport.configCheck().toList
+    if (tokens.nonEmpty) {
+
+      val lines =
+        tokens.map {
+          case "password.general"          => "The password for the `oxf.crypto.password` property is missing or not strong enough."
+          case "password.token"            => "The password for the `oxf.fr.access-token.password` property is missing or not strong enough."
+          case "password.field-encryption" => "The password for the `oxf.fr.field-encryption.password` property is missing or not strong enough."
+          case other                       => s"The property `$other` is not defined."
+        }
+
+      Loggers.logger.error(
+        s"The following Orbeon Forms configurations are incomplete:\n\n${lines.map(l => s"- $l\n").mkString}"
+      )
+    }
+    tokens
+  }
+
+  //@XPathFunction
+  def configCheck(): SequenceIterator = configCheckResult
 
   // Get an id based on a name
   // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid
@@ -277,26 +299,26 @@ trait FormRunnerBaseOps {
 
   // Return a property using the form's app/name, None if the property is not defined
   def formRunnerProperty(name: String)(implicit p: FormRunnerParams): Option[String] =
-    properties.getObjectOpt(buildPropertyName(name)) map (_.toString)
+    CoreCrossPlatformSupport.properties.getObjectOpt(buildPropertyName(name)) map (_.toString)
 
   def formRunnerProperty(name: String, appForm: AppForm): Option[String] =
-    properties.getObjectOpt(buildPropertyName(name, appForm)) map (_.toString)
+    CoreCrossPlatformSupport.properties.getObjectOpt(buildPropertyName(name, appForm)) map (_.toString)
 
   def formRunnerRawProperty(name: String, appForm: AppForm): Option[Property] =
-    properties.getPropertyOpt(buildPropertyName(name, appForm))
+    CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name, appForm))
 
   def formRunnerRawProperty(name: String)(implicit p: FormRunnerParams): Option[Property] =
-    properties.getPropertyOpt(buildPropertyName(name))
+    CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name))
 
   def formRunnerPropertyWithNs(name: String)(implicit p: FormRunnerParams): Option[(String, NamespaceMapping)] =
-    properties.getPropertyOpt(buildPropertyName(name)) map { p => (p.stringValue, p.namespaceMapping) }
+    CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name)) map { p => (p.stringValue, p.namespaceMapping) }
 
   def intFormRunnerProperty(name: String)(implicit p: FormRunnerParams): Option[Int] =
-    properties.getIntOpt(buildPropertyName(name))
+    CoreCrossPlatformSupport.properties.getIntOpt(buildPropertyName(name))
 
   // Return a boolean property using the form's app/name, false if the property is not defined
   def booleanFormRunnerProperty(name: String)(implicit p: FormRunnerParams): Boolean =
-    properties.getObjectOpt(buildPropertyName(name)) map (_.toString) contains "true"
+    CoreCrossPlatformSupport.properties.getObjectOpt(buildPropertyName(name)) map (_.toString) contains "true"
 
   // We expect that the app/form are the last two parts of the property
   def trailingAppFormFromProperty(requestedName: String, property: Property): AppForm =
@@ -389,7 +411,7 @@ trait FormRunnerBaseOps {
     val captchaPropertyPrefix    = "oxf.fr.detail.captcha"
     val captchaPropertyShortName = captchaPropertyPrefix                :: app :: form :: Nil mkString "."
     val captchaPropertyLongName  = captchaPropertyPrefix :: "component" :: app :: form :: Nil mkString "."
-    def property(name: String)   = properties.getPropertyOpt(name)
+    def property(name: String)   = CoreCrossPlatformSupport.properties.getPropertyOpt(name)
     val captchaPropertyOpt       = property(captchaPropertyLongName) orElse
                                    property(captchaPropertyShortName)
     captchaPropertyOpt match {

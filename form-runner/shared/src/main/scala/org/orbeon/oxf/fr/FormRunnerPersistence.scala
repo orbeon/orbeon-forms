@@ -858,7 +858,8 @@ trait FormRunnerPersistence {
     for {
       savedAttachments <- saveAllAttachmentsStream.compile.toList
       _                = updateAttachments(preparedDataDocumentInfo, savedAttachments)
-      cxr              <- saveXmlDataIo(preparedData, putUrl, formVersion, credentials, workflowStage)
+      cr               <- saveXmlDataIo(preparedData, putUrl, formVersion, credentials, workflowStage)
+      cxr              <- IO.fromTry(ConnectionResult.trySuccessConnection(cr))
       versionOpt       = Headers.firstItemIgnoreCase(cxr.headers, OrbeonFormDefinitionVersion).map(_.toInt) // will throw if the version is not an integer
       bytesOpt         <- if (cxr.content.contentType.exists(isTextOrXMLOrJSONContentType)) cxr.content.stream.compile.to(Array).map(Some.apply) else IO.pure(None)
       stringOpt        = bytesOpt.flatMap(b => SubmissionUtils.readTextContent(StreamedContent.fromBytes(b, cxr.content.contentType)))

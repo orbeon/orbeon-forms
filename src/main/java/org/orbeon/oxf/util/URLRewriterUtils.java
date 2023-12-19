@@ -289,7 +289,7 @@ public class URLRewriterUtils {
     }
 
     private static String getHmacVersion() {
-        return SecureUtils.hmacStringJava(Version.VersionNumber(), "hex");
+        return SecureUtils.hmacStringWeakJava(Version.VersionNumber());
     }
 
     public static List<PathMatcher> getMatchAllPathMatcher() {

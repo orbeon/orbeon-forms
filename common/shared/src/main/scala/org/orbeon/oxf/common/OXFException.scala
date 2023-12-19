@@ -18,3 +18,5 @@ class OXFException(message: String, cause: Throwable) extends RuntimeException(m
   def this(message: String)  = this(message, null)
   def this(cause: Throwable) = this(cause.toString, cause) // this is what Throwable does
 }
+
+class ConfigurationException(message: String) extends IllegalArgumentException(message)

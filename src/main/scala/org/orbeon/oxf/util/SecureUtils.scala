@@ -17,6 +17,7 @@ import com.google.crypto.tink.subtle.{AesGcmJce, Base64 => TinkBase64}
 import org.apache.commons.pool.BasePoolableObjectFactory
 import org.log4s.Logger
 import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.common.ConfigurationException
 import org.orbeon.oxf.properties.Properties
 
 import java.security.{MessageDigest, SecureRandom, Security}
@@ -28,6 +29,7 @@ object SecureUtils extends SecureUtilsTrait {
 
   sealed trait KeyUsage
   object KeyUsage {
+    case object Weak            extends KeyUsage
     case object General         extends KeyUsage
     case object Token           extends KeyUsage
     case object FieldEncryption extends KeyUsage
@@ -70,6 +72,7 @@ object SecureUtils extends SecureUtilsTrait {
     def getPassword: String = {
 
       val propertyNames = keyUsage match {
+        case KeyUsage.Weak            => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
         case KeyUsage.General         => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
         case KeyUsage.Token           => List(TokenPasswordProperty)
         case KeyUsage.FieldEncryption => List(FieldEncryptionPasswordProperty, GeneralPasswordProperty)
@@ -81,10 +84,10 @@ object SecureUtils extends SecureUtilsTrait {
         propertyNames
           .flatMap(n => propertySet.getNonBlankString(n).map(n ->))
           .headOption
-          .getOrElse(throw new IllegalArgumentException(s"Missing password for property ${propertyNames.mkString("`", "`, `", "`")}"))
+          .getOrElse(throw new ConfigurationException(s"Missing password for property ${propertyNames.mkString("`", "`, `", "`")}"))
 
-      if (checkPasswordStrengthProperty && ! PasswordChecker.checkAndLog(propertyName, rawPassword))
-        throw new IllegalArgumentException(s"Invalid password for property `$propertyName` property, see log for details")
+      if (keyUsage != KeyUsage.Weak && checkPasswordStrengthProperty && ! PasswordChecker.checkAndLog(propertyName, rawPassword))
+        throw new ConfigurationException(s"Invalid password for property `$propertyName` property, see log for details")
 
       rawPassword
     }
@@ -227,8 +230,8 @@ object SecureUtils extends SecureUtilsTrait {
     withEncoding(messageDigest.digest, encoding)
   }
 
-  def hmacStringJava(text: String, encoding: String): String =
-    hmacString(SecureUtils.KeyUsage.General, text, ByteEncoding.fromString(encoding))
+  def hmacStringWeakJava(text: String): String =
+    hmacString(SecureUtils.KeyUsage.Weak, text, ByteEncoding.Hex)
 
   def hmacStringToHexShort(keyUsage: KeyUsage, text: String): String =
     hmacString(keyUsage, text, ByteEncoding.Hex).substring(0, HexShortLength)

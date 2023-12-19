@@ -135,8 +135,8 @@ object InitSupport {
 
     pageContainsFormsMarkupF foreach { _ =>
 
+      val formOpt = initializeForm(initializations, contextAndNamespaceOpt)
       namespaceOrUndef.toOption.foreach { namespace =>
-        val formOpt = initializeForm(initializations, contextAndNamespaceOpt)
         completeNamespacePromise(namespace, formOpt)
       }
 

@@ -215,6 +215,11 @@
                         <xf:var name="anyone-operations"                 value="xxf:split(bind('anyone-permission-bind')/operations)"/>
                         <xf:var name="anyone-with-token-operations"      value="xxf:split(bind('anyone-with-token-bind')/operations)"/>
                         <xf:var name="any-authenticated-user-operations" value="xxf:split(bind('any-authenticated-user-bind')/operations)"/>
+
+                        <!-- Hack for headings. The repeated variable with the same name will be in scope for each
+                             iteration and shadow this outer one. -->
+                        <xf:var name="is-anyone-with-token" value="false()"/>
+
                         <fr:grid
                             repeat="content"
                             bind="permissions-bind"

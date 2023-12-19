@@ -20,7 +20,7 @@ object PasswordChecker {
     val scoreLine   = s"score (0-4): ${checkResult.getBasicScore}"
 
     if (checkResult.isMinimumEntropyMet) {
-      logger.info(s"Password for `$propertyName` property is strong enough:\n\n- $scoreLine\n")
+      logger.info(s"Password for `$propertyName` property is strong enough: $scoreLine")
     } else {
 
       val warningLine =
@@ -34,7 +34,7 @@ object PasswordChecker {
       val lines = scoreLine :: warningLine.toList ::: suggestionLines
 
       logger.error(
-        s"Password for `$propertyName` property is not strong enough:\n\n${lines.map(l => s"- $l\n").mkString}"
+        s"Password for `$propertyName` property is not strong enough:\n${lines.map(l => s"- $l\n").mkString}"
       )
     }
 

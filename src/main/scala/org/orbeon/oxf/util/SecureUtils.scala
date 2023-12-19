@@ -75,7 +75,7 @@ object SecureUtils extends SecureUtilsTrait {
         case KeyUsage.Weak            => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
         case KeyUsage.General         => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
         case KeyUsage.Token           => List(TokenPasswordProperty)
-        case KeyUsage.FieldEncryption => List(FieldEncryptionPasswordProperty, GeneralPasswordProperty)
+        case KeyUsage.FieldEncryption => List(FieldEncryptionPasswordProperty)
       }
 
       val propertySet = Properties.instance.getPropertySet

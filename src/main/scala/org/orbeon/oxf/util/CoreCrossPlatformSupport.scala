@@ -57,12 +57,4 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
         body
       )
     )
-
-  def configCheck(): Set[String] = {
-    val passwordGeneral         = (! SecureUtils.checkPasswordForKeyUsage(SecureUtils.KeyUsage.General)        ).set("password.general")
-    val passwordToken           = (! SecureUtils.checkPasswordForKeyUsage(SecureUtils.KeyUsage.Token)          ).set("password.token")
-    val passwordFieldEncryption = (! SecureUtils.checkPasswordForKeyUsage(SecureUtils.KeyUsage.FieldEncryption)).set("password.field-encryption")
-
-    passwordGeneral ++ passwordToken ++ passwordFieldEncryption
-  }
 }

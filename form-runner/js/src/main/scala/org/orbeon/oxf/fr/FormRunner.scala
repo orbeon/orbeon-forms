@@ -1,4 +1,4 @@
 package org.orbeon.oxf.fr
 
 
-object FormRunner extends FormRunnerCommon
+object FormRunner extends FormRunnerCommon with FormRunnerPlatformJS

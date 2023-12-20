@@ -706,6 +706,16 @@ body.orbeon {
                 grid-row-start: 3;
                 grid-column-start: 2;
             }
+
+            &> .xbl-fr-error-summary {
+                grid-row-start: 4;
+                grid-column-start: 2;
+            }
+        }
+
+        div.fb-settings-mode-new .xbl-fr-error-summary {
+            // Hide the error summary when creating a form, as it is superfluous
+            display: none;
         }
 
         img {

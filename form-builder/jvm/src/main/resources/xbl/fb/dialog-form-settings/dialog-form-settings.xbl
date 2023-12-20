@@ -285,57 +285,136 @@
             <!-- Save and close if valid -->
             <xbl:handler
                 event="DOMActivate"
-                observer="fb-app-name-input fb-form-name-input fb-title-input fb-metadata-continue-trigger"
-                if="valid($i)">
+                observer="fb-app-name-input fb-form-name-input fb-title-input fb-metadata-continue-trigger">
 
-                <xf:var name="form" value="xxf:instance('fb-form-instance')"/>
+                <xf:action if="$i/@valid = 'true'">
 
-                <!-- Tell custom settings to apply changes -->
-                <xf:dispatch name="fb-apply" targetid="fb-custom-form-settings">
-                    <xf:property name="form"              value="$form"/>
-                    <xf:property name="form-instance"     value="frf:formInstanceRoot($form)"/>
-                    <xf:property name="metadata-instance" value="frf:metadataInstanceRootOpt($form)"/>
-                </xf:dispatch>
+                    <xf:var name="form" value="xxf:instance('fb-form-instance')"/>
 
-                <!-- Remove attributes if their value is the same as the value of the attribute on the view template -->
-                <xf:action iterate="instance('dynamic')/*">
-                    <xf:var
-                        name="p"
-                        value="position()"/>
-                    <xf:var
-                        name="control-settings-elem"
-                        value="(.//xf:instance/*)[1]"/>
-                    <!--
-                        Search by position. Each element under `instance('dynamic')` has a corresponding element under
-                        `instance('control-details-metadata')` in order. We cannot search using the element name under
-                        the view template as we did previously because we use a uniquely identifiable direct name. See:
 
-                        - https://github.com/orbeon/orbeon-forms/issues/5026
-                        - https://github.com/orbeon/orbeon-forms/issues/5315
-                    -->
-                    <xf:var
-                        name="view-template"
-                        value="
-                            (
-                                instance('control-details-metadata')/
-                                fb:metadata[$p]/
-                                (fb:template | fb:templates/fb:view)/
-                                *
-                            )[1]"/>
-                    <xf:action iterate="$control-settings-elem/@*">
-                        <xf:var name="xbl-attribute" value="."/>
-                        <xf:delete
-                            if="
-                                exists(
-                                    $view-template/@*[
-                                        name() = $xbl-attribute/name() and
-                                        .      = $xbl-attribute
-                                    ]
-                                )"
-                            ref="$xbl-attribute"/>
+                    <!-- Tell custom settings to apply changes -->
+                    <xf:dispatch name="fb-apply" targetid="fb-custom-form-settings">
+                        <xf:property name="form"              value="$form"/>
+                        <xf:property name="form-instance"     value="frf:formInstanceRoot($form)"/>
+                        <xf:property name="metadata-instance" value="frf:metadataInstanceRootOpt($form)"/>
+                    </xf:dispatch>
+
+                    <!-- Remove attributes if their value is the same as the value of the attribute on the view template -->
+                    <xf:action iterate="instance('dynamic')/*">
+                        <xf:var
+                            name="p"
+                            value="position()"/>
+                        <xf:var
+                            name="control-settings-elem"
+                            value="(.//xf:instance/*)[1]"/>
+                        <!--
+                            Search by position. Each element under `instance('dynamic')` has a corresponding element under
+                            `instance('control-details-metadata')` in order. We cannot search using the element name under
+                            the view template as we did previously because we use a uniquely identifiable direct name. See:
+
+                            - https://github.com/orbeon/orbeon-forms/issues/5026
+                            - https://github.com/orbeon/orbeon-forms/issues/5315
+                        -->
+                        <xf:var
+                            name="view-template"
+                            value="
+                                (
+                                    instance('control-details-metadata')/
+                                    fb:metadata[$p]/
+                                    (fb:template | fb:templates/fb:view)/
+                                    *
+                                )[1]"/>
+                        <xf:action iterate="$control-settings-elem/@*">
+                            <xf:var name="xbl-attribute" value="."/>
+                            <xf:delete
+                                if="
+                                    exists(
+                                        $view-template/@*[
+                                            name() = $xbl-attribute/name() and
+                                            .      = $xbl-attribute
+                                        ]
+                                    )"
+                                ref="$xbl-attribute"/>
+                        </xf:action>
                     </xf:action>
+
+                    <!-- Dispatch event with result -->
+                    <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
+                        <xf:property name="app"                           value="$i/app/string()"/>
+                        <xf:property name="form"                          value="$i/form/string()"/>
+                        <xf:property name="title"                         value="$i/title/string()"/>
+                        <xf:property name="description"                   value="$i/description/string()"/>
+                        <xf:property name="description-mediatype"         value="if ($i/description/@isHTML = 'true') then 'text/html' else 'text/plain'"/>
+                        <xf:property name="singleton"                     value="$i/singleton/string()"/>
+                        <xf:property name="attachment-max-size"           value="$i/attachment-max-size/string()"/>
+                        <xf:property name="attachment-max-size-aggregate" value="$i/attachment-max-size-aggregate/string()"/>
+                        <xf:property name="attachment-mediatypes"         value="$i/attachment-mediatypes/string()[. != $unlikely-mediatype]"/>
+                        <xf:property name="wizard"                        value="$i/wizard/string()"/>
+                        <xf:property name="wizard-mode"                   value="$i/wizard-mode/string()"/>
+                        <xf:property name="wizard-subsections-nav"        value="$i/wizard-subsections-nav/string()"/>
+                        <xf:property name="wizard-subsections-toc"        value="$i/wizard-subsections-toc/string()"/>
+                        <xf:property name="wizard-separate-toc"           value="$i/wizard-separate-toc/string()"/>
+                        <xf:property name="wizard-section-status"         value="$i/wizard-section-status/string()"/>
+                        <xf:property name="mode"                          value="$i/mode/string()"/>
+                        <xf:property name="automatic-hints"               value="$i/automatic-hints/string()"/>
+                        <xf:property name="data-migration"                value="$i/data-migration/string()"/>
+                        <xf:property name="available-from"                value="$i/available-from"/>
+                        <xf:property name="available-to"                  value="$i/available-to"/>
+                        <xf:property name="grid-tab-order"                value="$i/grid-tab-order/string()"/>
+                        <xf:property name="rendered-page-orientation"     value="$i/rendered-page-orientation/string()"/>
+                        <xf:property name="rendered-page-size"            value="$i/rendered-page-size/string()"/>
+                        <xf:property name="readonly-disable-calculate"    value="$i/readonly-disable-calculate/string()"/>
+                        <xf:property name="relevant"                      value="$i/relevant/string()"/>
+                        <xf:property name="readonly"                      value="$i/readonly/string()"/>
+                        <xf:property name="html-page-layout"              value="$i/html-page-layout/string()"/>
+                        <xf:property name="analysis-calculate"            value="$i/analysis-calculate/string()"/>
+                        <xf:property name="automatic-hints"               value="$i/automatic-hints/string()"/>
+
+                        <xf:property
+                            name="labels"
+                            value="
+                                if ($i/labels = 'default') then
+                                    ()
+                                else string-join(
+                                    (
+                                        $i/labels/string(),
+                                        'minimal'[data($i/labels-placeholders)]
+                                    ),
+                                    ' '
+                                )"/>
+
+                        <xf:property
+                            name="hints"
+                            value="
+                                if ($i/hints = 'default') then
+                                    ()
+                                else string-join(
+                                    (
+                                        $i/hints/string(),
+                                        'minimal'[data($i/hints-placeholders)]
+                                    ),
+                                    ' '
+                                )"/>
+
+                        <xf:property
+                            name="control-settings-elems"
+                            value="
+                                for $subform in instance('dynamic')/*
+                                return
+                                    ($subform//xf:instance/*)[1]
+                        "/>
+
+                    </xf:dispatch>
+
+                    <!-- Don't leave this stuff around -->
+                    <xf:delete
+                        ref="instance('dynamic')/* | instance('control-details-metadata')/*"/>
+
+                    <!-- Hide this dialog -->
+                    <xxf:hide dialog="dialog"/>
                 </xf:action>
 
+<<<<<<< HEAD
                 <!-- Dispatch event with result -->
                 <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
                     <xf:property name="app"                           value="$i/app/string()"/>
@@ -365,55 +444,20 @@
                     <xf:property name="html-page-layout"              value="$i/html-page-layout/string()"/>
                     <xf:property name="analysis-calculate"            value="$i/analysis-calculate/string()"/>
                     <xf:property name="automatic-hints"               value="$i/automatic-hints/string()"/>
+=======
+                <!-- Mark all visited if the data is invalid -->
+                <xxf:setvisited
+                    if="not($i/@valid = 'true')"
+                    control="dialog"
+                    recurse="true"/>
+>>>>>>> bb8c225617 (For #2432: make the dateTime required when not readonly)
 
-                    <xf:property
-                        name="labels"
-                        value="
-                            if ($i/labels = 'default') then
-                                ()
-                            else string-join(
-                                (
-                                    $i/labels/string(),
-                                    'minimal'[data($i/labels-placeholders)]
-                                ),
-                                ' '
-                            )"/>
-
-                    <xf:property
-                        name="hints"
-                        value="
-                            if ($i/hints = 'default') then
-                                ()
-                            else string-join(
-                                (
-                                    $i/hints/string(),
-                                    'minimal'[data($i/hints-placeholders)]
-                                ),
-                                ' '
-                            )"/>
-
-                    <xf:property
-                        name="control-settings-elems"
-                        value="
-                            for $subform in instance('dynamic')/*
-                            return
-                                ($subform//xf:instance/*)[1]
-                    "/>
-
-                </xf:dispatch>
-
-                <!-- Don't leave this stuff around -->
-                <xf:delete
-                    ref="instance('dynamic')/* | instance('control-details-metadata')/*"/>
-
-                <!-- Hide this dialog -->
-                <xxf:hide dialog="dialog"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="model">
                 <xf:instance id="local">
-                    <_>
+                    <_ valid="true">
                         <lang/>
                         <app/>
                         <form/>
@@ -486,11 +530,9 @@
                     constraint="matches(., '^[A-Za-z0-9\-_]+$') and xxf:max-length(255)"
                     xxf:whitespace="trim"
                     readonly="false()"/>
-
                 <xf:bind
                     ref="title | description"
                     xxf:whitespace="trim"/>
-
                 <xf:bind
                     ref="app"
                     constraint="not($has-roles and not($allowed-apps-if-has-roles = ('*', .)))"/>
@@ -520,7 +562,9 @@
                 <xf:bind
                     ref="data-migration"
                     relevant="fr:is-pe()"/>
-
+                <xf:bind
+                    ref="(available-from, available-to)/@dateTime"
+                    type="xs:dateTime"/>
                 <xf:bind
                     ref="relevant | readonly"
                     type="xxf:XPath2"
@@ -604,7 +648,7 @@
 
                         <xh:img src="/forms/orbeon/builder/images/label_64.png" alt=""/>
 
-                        <fr:tabbable class="fb-dialog-form-settings-fields">
+                        <fr:tabbable id="fb-tabbable" class="fb-dialog-form-settings-fields">
                             <fr:tab>
                                 <fr:label ref="$resources/general-settings"/>
 
@@ -1154,6 +1198,10 @@
                             </xsl:if>
 
                         </fr:tabbable>
+
+                        <fr:error-summary id="error-summary" observer="fb-tabbable" valid-ref="$i/@valid">
+                            <fr:label><xf:output value="xxf:r('errors.label', '|fr-form-resources|')"/></fr:label>
+                        </fr:error-summary>
 
                     </xh:div>
 

@@ -65,6 +65,4 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
         body
       }
     )
-
-  def configCheck(): Set[String] = Set.empty
 }

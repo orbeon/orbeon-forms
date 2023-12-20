@@ -110,7 +110,7 @@ object AppForm {
     isSpecificPart(app) && isSpecificPart(form)
 }
 
-trait FormRunnerBaseOps {
+trait FormRunnerBaseOps extends FormRunnerPlatform {
 
   import FormRunnerBaseOps._
 
@@ -133,7 +133,7 @@ trait FormRunnerBaseOps {
 
   // This logs configuration issues once only per server start
   private lazy val configCheckResult = {
-    val tokens = CoreCrossPlatformSupport.configCheck().toList
+    val tokens = configCheck().toList
     if (tokens.nonEmpty) {
 
       val lines =
@@ -152,7 +152,7 @@ trait FormRunnerBaseOps {
   }
 
   //@XPathFunction
-  def configCheck(): SequenceIterator = configCheckResult
+  def configCheckJava(): SequenceIterator = configCheckResult
 
   // Get an id based on a name
   // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid
@@ -505,7 +505,7 @@ trait FormRunnerBaseOps {
   }
 }
 
-object FormRunnerBaseOps extends FormRunnerBaseOps {
+object FormRunnerBaseOps {
 
   sealed trait MessageAppearance extends EnumEntry with Lowercase
   object MessageAppearance extends Enum[MessageAppearance] {

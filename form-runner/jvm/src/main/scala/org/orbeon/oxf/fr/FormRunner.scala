@@ -12,3 +12,4 @@ object FormRunner
      with FormRunnerEncodeDecode
      with FormRunnerComponents
      with FormRunnerRevisionHistory
+     with FormRunnerPlatformJVM

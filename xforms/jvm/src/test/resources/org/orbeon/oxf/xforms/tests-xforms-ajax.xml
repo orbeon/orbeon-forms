@@ -595,19 +595,19 @@
                <xxf:error exception="org.orbeon.oxf.common.OXFException">Invalid bind: `non-existing-bind`</xxf:error>
                <xxf:error exception="org.orbeon.oxf.common.OXFException">Missing mandatory name attribute on xf:dispatch element.</xxf:error>
                <xxf:error exception="org.orbeon.oxf.common.OXFException">Unable to set value on disallowed node</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error2" (Non-numeric year component)</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error3" (Non-numeric year component)</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error4" (Non-numeric year component)</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error6" (Non-numeric year component)</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error7" (Non-numeric year component)</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error8" (Non-numeric year component)</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error9" (Non-numeric year component)</xxf:error>
-               <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error10" (Non-numeric year component)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error5" (Non-numeric year component)` while evaluating expression `xs:date(error[5])` (evaluating variable `var1`)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error2" (Non-numeric year component)` while evaluating expression `date[xs:date(../error[2]) = xs:date('2011-11-04')]` (evaluating attribute `ref`)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error5" (Non-numeric year component)` while evaluating expression `xs:date(error[5])` (evaluating variable `var1`)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error3" (Non-numeric year component)` while evaluating expression `string((xs:date(../error[3]))[1])` (evaluating MIP `calculate` for bind)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error5" (Non-numeric year component)` while evaluating expression `xs:date(error[5])` (evaluating variable `var1`)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error4" (Non-numeric year component)` while evaluating expression `boolean(xs:date(../error[4]) = current-date())` (evaluating MIP `required` for bind)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error5" (Non-numeric year component)` while evaluating expression `xs:date(error[5])` (evaluating variable `var1`)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error5" (Non-numeric year component)` while evaluating expression `xs:date(error[5])` (evaluating variable `var1`)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error6" (Non-numeric year component)` while evaluating expression `xs:date(error[6])` (evaluating variable `var2`)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error7" (Non-numeric year component)` while evaluating expression `.[xs:date(error[7]) = current-date()]` (evaluating attribute `ref`)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error8" (Non-numeric year component)` while evaluating expression `xs:date(error[8])` (computing value)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error9" (Non-numeric year component)` while evaluating expression `string((xs:date(../error[9]))[1])` (expression-or-constant)</xxf:error>
+               <xxf:error>XPath error `Invalid date "error10" (Non-numeric year component)` while evaluating expression `xs:date(../error[10])` (evaluating attribute `ref`)</xxf:error>
            </xxf:errors>
         </output>
     </test>

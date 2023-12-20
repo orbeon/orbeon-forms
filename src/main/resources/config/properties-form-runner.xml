@@ -22,6 +22,7 @@
 
     <!-- Default provider -->
     <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                          value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.sqlite-path"                    value=""/>
     <!-- Define resource, relational, and attachments providers with their parameters -->
     <property as="xs:anyURI"  name="oxf.fr.persistence.resource.uri"                            value="/fr/service/resource"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.oracle.uri"                              value="/fr/service/oracle"/>

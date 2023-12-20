@@ -181,11 +181,15 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
       </xh:body>
     </xh:html>.toDocument
 
-  private def resolveAllNodeValues(actionSourceAbsoluteId: String, targetControlName: String, followIndexes: Boolean): List[String] =
-    FormRunner.resolveTargetRelativeToActionSource(actionSourceAbsoluteId, targetControlName, followIndexes, "") match {
-      case value: Value   => asScalaIterator(value.iterate()) map (_.getStringValue) toList
-      case node: NodeInfo => List(node.getStringValue)
-    }
+  private def resolveAllNodeValues(
+    actionSourceAbsoluteId: String,
+    targetControlName     : String,
+    followIndexes         : Boolean
+  ): List[String] =
+    FormRunner
+      .resolveTargetRelativeToActionSourceOpt(actionSourceAbsoluteId, targetControlName, followIndexes, None)
+      .toList
+      .flatMap(_.map(_.getStringValue))
 
   @Test def resolveTarget(): Unit =
     withActionAndDoc(setupDocument(source)) {

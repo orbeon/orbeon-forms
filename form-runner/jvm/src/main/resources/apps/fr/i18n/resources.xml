@@ -6835,7 +6835,7 @@
                 <short-date>[M01]/[Y01]</short-date>
             </formats>
             <messages>
-                <c todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</c>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
             </messages>
         </common>
         <buttons>

@@ -16,8 +16,11 @@ package org.orbeon.oxf.fr.persistence.relational
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.fr.FormRunner.providerPropertyAsBoolean
+import org.orbeon.oxf.fr.FormRunnerPersistence.PersistencePropertyPrefix
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.processor.DatabaseContext
+import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Logging, NetUtils}
@@ -33,6 +36,34 @@ import scala.util.{Success, Try}
 object RelationalUtils extends Logging {
 
   implicit val Logger = new IndentedLogger(LoggerFactory.createLogger("org.orbeon.relational"))
+
+  def databaseConfigurationPresent(): Boolean = {
+    val propertySet = Properties.instance.getPropertySet
+
+    val providers = propertySet
+      .propertiesStartsWith("oxf.fr.persistence.provider", matchWildcards = false)
+      .flatMap(propertySet.getNonBlankString)
+      .filter(_ != "resource")
+      .toSet
+
+    val activeDataSources = providers.filter(providerPropertyAsBoolean(_, "active", default = true))
+
+    val problematicDataSources = activeDataSources.filter { provider =>
+      val dataSourceName   = propertySet.getNonBlankString(s"$PersistencePropertyPrefix.$provider.datasource")
+
+      dataSourceName match {
+        case Some(name) =>
+          val dataSourceNotFound = getDataSourceNoFallback(name).isEmpty
+          error(s"Data source `$name` not configured")
+          dataSourceNotFound
+        case None =>
+          error(s"No data source configured for provider `$provider`")
+          true
+      }
+    }
+
+    problematicDataSources.isEmpty
+  }
 
   def withConnection[T](thunk: Connection => T): T =
     withConnection(getDataSourceNameFromHeaders)(thunk)
@@ -74,16 +105,19 @@ object RelationalUtils extends Logging {
     NetUtils.getExternalContext.getRequest.getFirstHeaderIgnoreCase("orbeon-datasource") getOrElse
       (throw new OXFException("Missing `orbeon-datasource` header"))
 
+  private def getDataSourceNoFallback(name: String): Option[DataSource] = {
+    val prefixesToTry = Seq("java:comp/env/jdbc/", "java:/jdbc/")
+
+    // Workaround for WildFly (TODO: do we really need it?)
+    prefixesToTry
+      .toStream
+      .map(prefix => Try(InitialContext.doLookup(prefix + name).asInstanceOf[DataSource]))
+      .collectFirst { case Success(dataSource) => dataSource }
+  }
+
   private def getDataSource(name: String): DataSource =
     withDebug(s"getting datasource `$name`") {
-      val prefixesToTry = Seq("java:comp/env/jdbc/", "java:/jdbc/")
-
-      // Workaround for WildFly (TODO: do we really need it?)
-      prefixesToTry
-        .toStream
-        .map(prefix => Try(InitialContext.doLookup(prefix + name).asInstanceOf[DataSource]))
-        .collectFirst { case Success(dataSource) => dataSource }
-        .getOrElse(DatabaseContext.fallbackDataSource(CoreCrossPlatformSupport.externalContext, name))
+      getDataSourceNoFallback(name).getOrElse(DatabaseContext.fallbackDataSource(CoreCrossPlatformSupport.externalContext, name))
     }
 
   def getConnection(dataSource: DataSource): Connection =

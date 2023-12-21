@@ -414,7 +414,6 @@
                     <xxf:hide dialog="dialog"/>
                 </xf:action>
 
-<<<<<<< HEAD
                 <!-- Dispatch event with result -->
                 <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
                     <xf:property name="app"                           value="$i/app/string()"/>
@@ -444,13 +443,6 @@
                     <xf:property name="html-page-layout"              value="$i/html-page-layout/string()"/>
                     <xf:property name="analysis-calculate"            value="$i/analysis-calculate/string()"/>
                     <xf:property name="automatic-hints"               value="$i/automatic-hints/string()"/>
-=======
-                <!-- Mark all visited if the data is invalid -->
-                <xxf:setvisited
-                    if="not($i/@valid = 'true')"
-                    control="dialog"
-                    recurse="true"/>
->>>>>>> bb8c225617 (For #2432: make the dateTime required when not readonly)
 
             </xbl:handler>
         </xbl:handlers>

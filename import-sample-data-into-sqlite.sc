@@ -1,4 +1,5 @@
 import $ivy.`org.xerial:sqlite-jdbc:3.44.1.0`
+
 import java.sql.{Connection, DriverManager, PreparedStatement}
 import scala.xml._
 
@@ -12,6 +13,9 @@ def main(path: String): Unit = {
 
   // Delete any previously existing SQLite file
   os.remove(sqliteFile)
+
+  // Create parent directories if needed
+  sqliteFile.toIO.getParentFile.mkdirs()
 
   val url                    = s"jdbc:sqlite:$sqliteFile"
   val connection: Connection = DriverManager.getConnection(url)
@@ -134,10 +138,31 @@ def importData(connection: Connection, directoryToImport: os.Path): Unit = {
   }
 }
 
+// Ideally, we'd like to call the same code used in RequestReader.dataAndMetadataAsString.
 // Assumption: first metadata node in the demo form definitions is the form metadata node (in fr-form-metadata instance)
 def metadataFromFormDefinition(formDefinitionAsBytes: Array[Byte]): String = {
   val formDefinition = new String(formDefinitionAsBytes, "UTF-8")
   val xml            = XML.loadString(formDefinition)
-  val metadataNode   = (xml \\ "metadata").headOption.getOrElse(sys.error("No metadata node found"))
-  metadataNode.toString
+  val elementsToKeep = Set("metadata", "title", "permissions", "available") // See RequestReader.MetadataElementsToKeep
+  val metadataNode   = filterElements(xml \\ "metadata", elementsToKeep).headOption.getOrElse(sys.error("No metadata node found"))
+  new PrettyPrinter(0, 0).format(metadataNode)
 }
+
+def filterElements(nodeSeq: NodeSeq, elementsToKeep: Set[String]): NodeSeq =
+  nodeSeq.flatMap {
+    case elem: Elem =>
+      if (elementsToKeep.contains(elem.label)) {
+        Some(Elem(
+          prefix        = elem.prefix,
+          label         = elem.label,
+          attributes    = elem.attributes,
+          scope         = elem.scope,
+          minimizeEmpty = elem.minimizeEmpty,
+          child         = filterElements(elem.child, elementsToKeep): _*
+        ))
+      } else {
+        None
+      }
+    case other =>
+      Some(other)
+  }

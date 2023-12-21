@@ -18,6 +18,7 @@ env:
     - TARGET=test-unit
     - TARGET=test-db     DB=mysql
     - TARGET=test-db     DB=postgresql
+    - TARGET=test-db     DB=sqlite
 addons:
   postgresql: "9.5"
   artifacts:

@@ -24,7 +24,7 @@ import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
+import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL, SQLite}
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
@@ -367,6 +367,7 @@ class RestApiTest
                 // Some of these sizes could probably be made higher by changing the default database configurations
                 case MySQL      =>   2 * MiB - 256
                 case PostgreSQL => 247 * MiB
+                case SQLite     => 256 * MiB // TODO: use exact value
               }
             }
 

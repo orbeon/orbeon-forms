@@ -15,8 +15,9 @@ package org.orbeon.oxf.fr.persistence.db
 
 import org.orbeon.oxf.fr.persistence.db.Connect.TestDatabaseName
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
+import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL, SQLite}
 
+import java.io.File
 
 case class DatasourceDescriptor(
   name      : String,
@@ -24,7 +25,7 @@ case class DatasourceDescriptor(
   url       : String,
   username  : String,
   password  : String,
-  switchDB  : String
+  switchDB  : Option[String]
 )
 
 object DatasourceDescriptor {
@@ -39,7 +40,7 @@ object DatasourceDescriptor {
           url       = "jdbc:mysql://localhost:3306/",
           username  = "root",
           password  = "",
-          switchDB  = s"USE $TestDatabaseName"
+          switchDB  = Some(s"USE $TestDatabaseName")
         )
       case PostgreSQL =>
         DatasourceDescriptor(
@@ -48,9 +49,23 @@ object DatasourceDescriptor {
           url       = "jdbc:postgresql://localhost:5432/",
           username  = "orbeon",
           password  = "",
-          switchDB  = s"SET search_path TO $TestDatabaseName"
+          switchDB  = Some(s"SET search_path TO $TestDatabaseName")
         )
+      case SQLite =>
+        // SQLite file will be created in the current directory. This is fine for tests.
+
+        val sqliteFilename = "test-db.sqlite"
+
+        // Delete the file if it exists
+        new File(sqliteFilename).delete()
+
+        DatasourceDescriptor(
+          name      = provider.entryName,
+          driver    = "org.sqlite.JDBC",
+          url       = s"jdbc:$sqliteFilename",
+          username  = "",
+          password  = "",
+          switchDB  = None
     }
   }
 }
-

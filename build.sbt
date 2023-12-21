@@ -1271,6 +1271,8 @@ lazy val orbeonWarJVM = orbeonWar.jvm
   .settings(
     exportJars := false,
 
+    // TODO: Integrate SQLite script in a cleaner way, e.g. via dependencies. We should also avoid
+    //    running it on every compile.
     Compile / compile := {
       val compileAnalysis = (Compile / compile).value
 

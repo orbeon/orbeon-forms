@@ -62,10 +62,11 @@ object DatasourceDescriptor {
         DatasourceDescriptor(
           name      = provider.entryName,
           driver    = "org.sqlite.JDBC",
-          url       = s"jdbc:$sqliteFilename",
+          url       = s"jdbc:sqlite:$sqliteFilename",
           username  = "",
           password  = "",
           switchDB  = None
+        )
     }
   }
 }

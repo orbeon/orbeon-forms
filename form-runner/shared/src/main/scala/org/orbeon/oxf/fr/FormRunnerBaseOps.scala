@@ -141,6 +141,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
           case "password.general"          => "The password for the `oxf.crypto.password` property is missing or not strong enough."
           case "password.token"            => "The password for the `oxf.fr.access-token.password` property is missing or not strong enough."
           case "password.field-encryption" => "The password for the `oxf.fr.field-encryption.password` property is missing or not strong enough."
+          case "database.configuration"    => "The database configuration is missing or incomplete."
           case other                       => s"The property `$other` is not defined."
         }
 

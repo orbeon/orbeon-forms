@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2010 Orbeon, Inc.
+  Copyright (C) 2023 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -1759,10 +1759,10 @@
             <save-as>Sauvegarder sous…</save-as>
             <open><label>Paramètres du formulaire</label></open>
             <options>Options</options>
-            <wizard-options>Options de la vue</wizard-options>
-            <pdf-options>Options PDF</pdf-options>
-            <control-settings>Options contrôles</control-settings>
-            <about>Au sujet de ce formulaire</about>
+            <wizard-options>Vue</wizard-options>
+            <pdf-options>PDF</pdf-options>
+            <control-settings>Contrôles</control-settings>
+            <about>À propos</about>
             <stats>Statistiques</stats>
             <sections>Sections</sections>
             <repeats>Grilles répétées</repeats>
@@ -1802,7 +1802,7 @@
                 <label>Table de matières séparée pour le wizard</label>
             </wizard-separate-toc>
             <wizard-section-status>
-                <label>Toujour montrer l'état des sections du wizard</label>
+                <label>Toujours montrer l'état des sections du wizard</label>
             </wizard-section-status>
             <attachment-max-size>
                 <label>Taille maximale des fichiers joints par contrôle</label>

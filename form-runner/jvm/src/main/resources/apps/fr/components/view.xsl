@@ -285,9 +285,11 @@
         <xf:var name="_fr-document-available-to-dateTime-opt"   as="xs:string?"                 value="if (exists($_fr-document-available-to-elem-opt))
                                                                                                        then $_fr-document-available-to-elem-opt/@dateTime/string()
                                                                                                        else xxf:property(string-join(('oxf.fr.detail.available-to.dateTime', fr:app-name(), fr:form-name()), '.'))"/>
-        <xf:var name="_fr-document-available-too-early"         as="xs:boolean"                 value="xxf:non-blank($_fr-document-available-from-dateTime-opt) and
+        <xf:var name="_fr-document-available-too-early"         as="xs:boolean"                 value="fr:mode() = 'new' and
+                                                                                                       xxf:non-blank($_fr-document-available-from-dateTime-opt) and
                                                                                                        current-dateTime() lt xs:dateTime($_fr-document-available-from-dateTime-opt)"/>
-        <xf:var name="_fr-document-available-too-late"          as="xs:boolean"                 value="xxf:non-blank($_fr-document-available-to-dateTime-opt) and
+        <xf:var name="_fr-document-available-too-late"          as="xs:boolean"                 value="fr:mode() = 'new' and
+                                                                                                       xxf:non-blank($_fr-document-available-to-dateTime-opt) and
                                                                                                        current-dateTime() gt xs:dateTime($_fr-document-available-to-dateTime-opt)"/>
         <xf:var name="_fr-document-available-too-early-or-late" as="xs:boolean"                 value="$_fr-document-available-too-early or $_fr-document-available-too-late"/>
 

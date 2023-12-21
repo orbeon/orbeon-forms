@@ -93,12 +93,7 @@ public class DatabaseContext {
 
     /**
      * Get a connection valid for this pipeline execution, given a JDBC JNDI name.
-     *
      * The returned connection must not be closed by the user.
-     *
-     * @param pipelineContext  current pipeline context
-     * @param datasource       Datasource object
-     * @return                 Connection object
      */
     public static Connection getConnection(PipelineContext pipelineContext, final String jndiName) {
         // Try to obtain connection from context
@@ -110,33 +105,31 @@ public class DatabaseContext {
                 // Create connection from datasource
                 javax.naming.Context initialContext = new InitialContext();
 
-                List<String> prefixesToTry = Arrays.asList("java:comp/env/", "java:/");
-
                 // Workaround for WildFly (TODO: do we really need it?)
-                DataSource ds = prefixesToTry.stream()
-                    .map(prefix -> {
-                        try {
-                            return Optional.of((DataSource) initialContext.lookup(prefix + jndiName));
-                        } catch (NamingException e) {
-                            return Optional.<DataSource>empty();
-                        }
-                    })
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .findFirst()
-                    .orElse(fallbackDataSource((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT), jndiName));
+                DataSource ds = null;
+                List<String> prefixesToTry = Arrays.asList("java:comp/env/", "java:/");
+                for (String prefix : prefixesToTry) {
+                    try {
+                        ds = (DataSource) initialContext.lookup(prefix + jndiName);
+                        if (ds != null) break;
+                    } catch (NamingException e) {
+                        // NOP: we'll try the next prefix
+                    }
+                }
+                if (ds == null) {
+
+                    ds = fallbackDataSource((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT), jndiName);
+                }
 
                 Connection newConnection = ds.getConnection();
-                // Set connection properties
                 setConnectionProperties(newConnection, pipelineContext, jndiName);
-                // Save connection into context
                 getContext(pipelineContext).connections.put(jndiName, newConnection);
 
                 connection = newConnection;
             } catch (OXFException e) {
                 throw e;
             } catch (Exception e) {
-                 throw new OXFException(e);
+                throw new OXFException(e);
             }
         }
         return connection;

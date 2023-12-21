@@ -13,15 +13,13 @@
  */
 package org.orbeon.oxf.fr.persistence.db
 
-import java.sql.{Connection, DriverManager}
-
-import org.orbeon.oxf.fr.persistence._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 
+import java.sql.{Connection, DriverManager}
 import scala.sys.process._
 import scala.util.Try
 
@@ -47,6 +45,7 @@ private[persistence] object Connect {
             val sql = provider match {
               case MySQL      => "2019.1/mysql-2019_1.sql"
               case PostgreSQL => "2019.1/postgresql-2019_1.sql"
+              case SQLite     => "2023.1/sqlite-2023_1.sql"
             }
             val createDDL = SQL.read(sql)
             Logging.withDebug("creating tables") { SQL.executeStatements(provider, statement, createDDL) }
@@ -75,6 +74,7 @@ private[persistence] object Connect {
         val createUser: PartialFunction[Provider, Unit] = {
           case MySQL      => runStatements(connection, List(s"CREATE DATABASE $TestDatabaseName"))
           case PostgreSQL => runStatements(connection, List(s"CREATE SCHEMA   $TestDatabaseName"))
+          case SQLite     =>
         }
 
         if (createUser.isDefinedAt(provider)) {
@@ -83,7 +83,7 @@ private[persistence] object Connect {
           }
         }
         // Run block
-        runStatements(connection, List(datasourceDescriptor.switchDB))
+        datasourceDescriptor.switchDB.foreach(switchDB => runStatements(connection, List(switchDB)))
         block(connection)
       }
 
@@ -92,6 +92,12 @@ private[persistence] object Connect {
         provider match {
           case MySQL      => runStatements(datasourceDescriptor, List(s"DROP DATABASE  $TestDatabaseName"))
           case PostgreSQL => runStatements(datasourceDescriptor, List(s"DROP SCHEMA    $TestDatabaseName    CASCADE"))
+          case SQLite     => withConnection(datasourceDescriptor) { connection =>
+                               datasourceDescriptor.switchDB.foreach(switchDB => runStatements(connection, List(switchDB)))
+                               val tables = getTableNames(provider, connection)
+                               val dropStatements = tables.map("DROP TABLE " + _)
+                               runStatements(connection, dropStatements)
+                             }
         }
       }
     }
@@ -151,6 +157,10 @@ private[persistence] object Connect {
         """SELECT table_name
           |  FROM information_schema.tables
           | WHERE table_name LIKE 'orbeon%'"""
+      case SQLite =>
+        """SELECT name FROM sqlite_schema
+          |WHERE type = 'table'
+          |AND name NOT LIKE 'sqlite_%';"""
     }
     useAndClose(connection.createStatement.executeQuery(query.stripMargin)) { tableNameResultSet =>
       val tableNamesList = Iterator

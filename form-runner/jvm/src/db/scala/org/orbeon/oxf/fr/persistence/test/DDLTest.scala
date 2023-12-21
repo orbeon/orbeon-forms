@@ -105,6 +105,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
         assertSameTable(provider, "2016_3" , "2017_2")
         assertSameTable(provider, "2017_2" , "2018_2")
         assertSameTable(provider, "2018_2" , "2019_1")
+      case provider @ SQLite =>
     }
   }
 }

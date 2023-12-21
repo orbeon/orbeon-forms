@@ -45,7 +45,7 @@ object Provider extends Enum[Provider] {
   def xmlCol(provider: Provider, tableName: String): String =
     provider match {
       case PostgreSQL | SQLite => s"$tableName.xml as xml"
-      case _          => s"$tableName.xml xml"
+      case _                   => s"$tableName.xml xml"
     }
 
   def xmlColSelect(provider: Provider, tableName: String): String =
@@ -73,7 +73,7 @@ object Provider extends Enum[Provider] {
     provider match {
       case MySQL      => "instr(xml, ?) > 0"
       case PostgreSQL => "to_tsvector('simple', xml::text) @@ plainto_tsquery('simple', ?)"
-      case SQLite     => "xml::text ilike ?"
+      case SQLite     => "xml LIKE ?" // SQLite doesn't support XML columns
     }
 
   private def paramForLike(param: String, surroundingPercents: Boolean): String = {
@@ -81,16 +81,20 @@ object Provider extends Enum[Provider] {
      if (surroundingPercents) s"%$escapedParam%" else escapedParam
   }
 
-  def xmlContainsParam(provider: Provider, param: String): String = param
+  def xmlContainsParam(provider: Provider, param: String): String =
+    provider match {
       case SQLite =>
         paramForLike(param, surroundingPercents = true)
+      case _ =>
+        param
+    }
 
   def textContains(provider: Provider, colName: String): String =
     provider match {
-      case MySQL =>
-        // LIKE is case insensitive on MySQL and SQL Server
+      case MySQL | SQLite =>
+        // LIKE is case insensitive on MySQL, SQL Server, and SQLite
         s"$colName LIKE ?"
-      case PostgreSQL | SQLite  =>
+      case PostgreSQL =>
         // PostgreSQL has ILIKE as a case insensitive version of LIKE
         s"$colName ILIKE ?"
     }
@@ -159,13 +163,14 @@ object Provider extends Enum[Provider] {
     tableName  : String,
     thunk      : () => Unit
   ): Unit = {
-    val lockSQL = provider match {
-      case MySQL      => s"LOCK TABLES $tableName WRITE"
-      case PostgreSQL | SQLite => s"LOCK TABLE $tableName IN EXCLUSIVE MODE"
+    val lockSQLOpt = provider match {
+      case MySQL      => Some(s"LOCK TABLES $tableName WRITE")
+      case PostgreSQL => Some(s"LOCK TABLE $tableName IN EXCLUSIVE MODE")
+      case SQLite     => None // SQLite doesn't support locking tables
       case _          => throw new UnsupportedOperationException
     }
     // See https://github.com/orbeon/orbeon-forms/issues/3866
-    useAndClose(connection.createStatement())(_.execute(lockSQL))
+    lockSQLOpt.foreach(lockSQL => useAndClose(connection.createStatement())(_.execute(lockSQL)))
     try {
       thunk()
     } finally {
@@ -181,16 +186,18 @@ object Provider extends Enum[Provider] {
 
   def secondsTo(provider: Provider, date: String): String =
     provider match {
-      case MySQL                => s"TIMESTAMPDIFF(second, CURRENT_TIMESTAMP, $date)"
-      case PostgreSQL | SQLite  => s"EXTRACT(EPOCH FROM ($date - CURRENT_TIMESTAMP))"
+      case MySQL      => s"TIMESTAMPDIFF(second, CURRENT_TIMESTAMP, $date)"
+      case PostgreSQL => s"EXTRACT(EPOCH FROM ($date - CURRENT_TIMESTAMP))"
+      case SQLite     => s"(julianday($date) - julianday(CURRENT_TIMESTAMP)) * 24 * 60 * 60"
       case _          => throw new UnsupportedOperationException
     }
 
   def dateIn(provider: Provider): String =
     provider match {
-      case MySQL        => "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? second)"
-      case PostgreSQL | SQLite   => "CURRENT_TIMESTAMP + (interval '1' second * ?)"
-      case _            => throw new UnsupportedOperationException
+      case MySQL      => "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? second)"
+      case PostgreSQL => "CURRENT_TIMESTAMP + (interval '1' second * ?)"
+      case SQLite     => "DATETIME(CURRENT_TIMESTAMP, format('+%f seconds', ?))"
+      case _          => throw new UnsupportedOperationException
     }
 
   case class RowNumSQL(

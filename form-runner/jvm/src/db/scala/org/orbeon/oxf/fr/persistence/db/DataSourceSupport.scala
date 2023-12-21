@@ -72,7 +72,7 @@ object DataSourceSupport {
   class TestDataSource(dsd: DatasourceDescriptor) extends BasicDataSource {
     override def getConnection: Connection = {
       val connection = super.getConnection
-      connection.createStatement.execute(dsd.switchDB)
+      dsd.switchDB.foreach(switchDB => connection.createStatement.execute(switchDB))
       connection
     }
   }

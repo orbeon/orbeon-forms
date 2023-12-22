@@ -73,7 +73,7 @@ object Provider extends Enum[Provider] {
     provider match {
       case MySQL      => "instr(xml, ?) > 0"
       case PostgreSQL => "to_tsvector('simple', xml::text) @@ plainto_tsquery('simple', ?)"
-      case SQLite     => "xml LIKE ?" // SQLite doesn't support XML columns
+      case SQLite     => "xml LIKE ? ESCAPE '\\'" // SQLite doesn't support XML columns
     }
 
   private def paramForLike(param: String, surroundingPercents: Boolean): String = {
@@ -91,9 +91,11 @@ object Provider extends Enum[Provider] {
 
   def textContains(provider: Provider, colName: String): String =
     provider match {
-      case MySQL | SQLite =>
+      case MySQL =>
         // LIKE is case insensitive on MySQL, SQL Server, and SQLite
         s"$colName LIKE ?"
+      case SQLite =>
+        s"$colName LIKE ? ESCAPE '\\'"
       case PostgreSQL =>
         // PostgreSQL has ILIKE as a case insensitive version of LIKE
         s"$colName ILIKE ?"

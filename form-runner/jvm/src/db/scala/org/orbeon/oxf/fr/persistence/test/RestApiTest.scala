@@ -367,7 +367,7 @@ class RestApiTest
                 // Some of these sizes could probably be made higher by changing the default database configurations
                 case MySQL      =>   2 * MiB - 256
                 case PostgreSQL => 247 * MiB
-                case SQLite     => 256 * MiB // TODO: use exact value
+                case SQLite     => 256 * MiB
               }
             }
 

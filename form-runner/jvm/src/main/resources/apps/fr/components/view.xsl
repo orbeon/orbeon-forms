@@ -828,7 +828,7 @@
         <xh:div class="row{if ($fluid) then '-fluid' else ''}">
             <xf:var name="config-check" value="frf:configCheckJava()"/>
             <xh:div class="span12">
-                <xf:group xxf:element="p" ref=".[$config-check = 'password.general']" class="alert alert-danger fr-config-check">
+                <xf:group xxf:element="p" ref=".[$config-check = ('password.general', 'database.configuration')]" class="alert alert-danger fr-config-check">
                     <xf:output
                         value="
                             xxf:r(

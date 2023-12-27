@@ -95,7 +95,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <dropdown-with-other>Pistachio</dropdown-with-other>
                             <dropdown-with-search>cat</dropdown-with-search>
                             <dynamic-dropdown itemset-empty="false">ca</dynamic-dropdown>
-                            <dynamic-dropdown-with-search-by-ui itemset-empty="false" label="Canada">ca</dynamic-dropdown-with-search-by-ui>
+                            <dynamic-dropdown-with-search-by-ui itemset-empty="false">ca</dynamic-dropdown-with-search-by-ui>
                             <dynamic-dropdown-with-search-by-service itemset-empty="false" label="Canada">ca</dynamic-dropdown-with-search-by-service>
                             <checkboxes>cat bird</checkboxes>
                             <scrollable-checkboxes>cat bird</scrollable-checkboxes>
@@ -110,12 +110,19 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     <attachment-controls>
                         <grid-7>
                             <static-image filename="Eta Carinae Nebula (384).jpg" mediatype="image/jpeg" size="193055">/fr/service/persistence/crud/orbeon/controls/form/340971f98952e4b9d15a9810b1eff00fb7b8cdb1.bin</static-image>
-                                <image-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg" size="218652">/fr/service/persistence/crud/orbeon/controls/form/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</image-attachment>
                             <static-video filename="Apollo 11 Moonwalk Montage.mp4" mediatype="video/mp4" size="2600533">/fr/service/persistence/crud/orbeon/controls/form/8e442acb004488a6fc08b932366f12c725c5f819.bin</static-video>
-                            <single-file-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg" size="218652">/fr/service/persistence/crud/orbeon/controls/form/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</single-file-attachment>
+                            <image-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg"
+                                              size="218652">/fr/service/persistence/crud/orbeon/controls/form/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</image-attachment>
+                             <video-attachment filename="Apollo 11 Moonwalk Montage.mp4" mediatype="video/mp4" size="2600533">/fr/service/persistence/crud/orbeon/controls/form/8e442acb004488a6fc08b932366f12c725c5f819.bin</video-attachment>
+
+
+                            <single-file-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg"
+                                                    size="218652">/fr/service/persistence/crud/orbeon/controls/form/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</single-file-attachment>
                             <multiple-file-attachment>
-                                <_ filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg" size="218652">/fr/service/persistence/crud/orbeon/controls/form/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</_>
-                                <_ filename="Mars Valles Marineris (1024).jpg" mediatype="image/jpeg" size="117440">/fr/service/persistence/crud/orbeon/controls/form/60f7b39c8394d4c4c49321e292d80b3c162d9b75.bin</_>
+                                <_ filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg"
+                                   size="218652">/fr/service/persistence/crud/orbeon/controls/form/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</_>
+                                <_ filename="Mars Valles Marineris (1024).jpg" mediatype="image/jpeg"
+                                   size="117440">/fr/service/persistence/crud/orbeon/controls/form/60f7b39c8394d4c4c49321e292d80b3c162d9b75.bin</_>
                             </multiple-file-attachment>
                         </grid-7>
                     </attachment-controls>
@@ -224,9 +231,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="multiple-file-attachment-bind" ref="multiple-file-attachment"
                                  type="xf:anyURI"
                                  name="multiple-file-attachment"/>
+                        <xf:bind id="static-video-bind" ref="static-video" name="static-video" type="xf:anyURI"/>
                             <xf:bind id="image-attachment-bind" ref="image-attachment" name="image-attachment"
                                  type="xf:anyURI"/>
-                        <xf:bind id="static-video-bind" ref="static-video" name="static-video" type="xf:anyURI"/>
+                        <xf:bind id="video-attachment-bind" ref="video-attachment" name="video-attachment"
+                                 type="xf:anyURI"
+                                 constraint="xxf:upload-mediatypes('video/*')"/>
+
+
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="buttons-bind" ref="buttons" name="buttons"
@@ -543,14 +555,20 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Static Image</label>
                             <hint/>
                         </static-image>
-                        <image-attachment>
-                            <label>Image Attachment</label>
-                            <hint/>
-                        </image-attachment>
                         <static-video>
                             <label>Static Video</label>
                             <hint>&lt;div&gt;Credit: &lt;a href="https://images.nasa.gov/details/Apollo%2011%20Moonwalk%20Montage"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </static-video>
+                        <image-attachment>
+                            <label>Image Attachment</label>
+                            <hint/>
+                        </image-attachment>
+                        <video-attachment>
+                            <label>Video Attachment</label>
+                            <hint>&lt;div&gt;Credit: &lt;a href="https://images.nasa.gov/details/Apollo%2011%20Moonwalk%20Montage"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
+                        </video-attachment>
+
+
                         <single-file-attachment>
                             <label>Single File Attachment</label>
                             <hint/>
@@ -967,14 +985,20 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Image fixe</label>
                             <hint/>
                         </static-image>
-                        <image-attachment>
-                            <label>Image jointe</label>
-                            <hint/>
-                        </image-attachment>
                         <static-video>
                             <label>Vidéo fixe</label>
                             <hint>&lt;div&gt;Crédit: &lt;a href="https://images.nasa.gov/details/Apollo%2011%20Moonwalk%20Montage"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </static-video>
+                        <image-attachment>
+                            <label>Image jointe</label>
+                            <hint/>
+                        </image-attachment>
+                        <video-attachment>
+                            <label>Vidéo jointe</label>
+                            <hint>&lt;div&gt;Crédit: &lt;a href="https://images.nasa.gov/details/Apollo%2011%20Moonwalk%20Montage"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
+                        </video-attachment>
+
+
                         <single-file-attachment>
                             <label>Fichier joint</label>
                             <hint/>
@@ -1833,6 +1857,21 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </fr:image>
                         </fr:c>
                         <fr:c x="7" y="1" w="6" h="2">
+                            <fr:video xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                      xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                      id="static-video-control"
+                                      bind="static-video-bind"
+                                      class="fr-static-attachment">
+                                <xf:label ref="$form-resources/static-video/label" mediatype="text/html"/>
+                                <xf:hint ref="$form-resources/static-video/hint" mediatype="text/html"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:video>
+
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+
+                        </fr:c>
+                        <fr:c x="1" y="3" w="6">
                             <fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder"
                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                                  id="image-attachment-control"
@@ -1843,20 +1882,20 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:image-attachment>
                         </fr:c>
-                        <fr:c x="1" y="2" w="6">
-                            <fr:video xmlns="http://orbeon.org/oxf/xml/form-builder"
+                        <fr:c x="7" y="3" w="6">
+                            <fr:video-attachment xmlns="http://orbeon.org/oxf/xml/form-builder"
                                       xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                      id="static-video-control"
-                                      bind="static-video-bind"
-                                      class="fr-static-attachment">
-                                <xf:label ref="$form-resources/static-video/label" mediatype="text/html"/>
-                                <xf:hint ref="$form-resources/static-video/hint" mediatype="text/html"/>
+                                                 id="video-attachment-control"
+                                                 bind="video-attachment-bind"
+                                                 class="fr-attachment">
+                                <xf:label ref="$form-resources/video-attachment/label"/>
+                                <xf:hint ref="$form-resources/video-attachment/hint" mediatype="text/html"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </fr:video>
+                            </fr:video-attachment>
                         </fr:c>
-                        <fr:c x="1" y="3" w="6">
+                        <fr:c x="1" y="4" w="6">
                             <fr:attachment bind="single-file-attachment-bind" id="single-file-attachment-control"
                                            class="fr-attachment">
                                 <xf:label ref="$form-resources/single-file-attachment/label"/>
@@ -1864,7 +1903,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:attachment>
                         </fr:c>
-                        <fr:c x="7" y="3" w="6">
+                        <fr:c x="7" y="4" w="6">
                             <fr:attachment bind="multiple-file-attachment-bind" id="multiple-file-attachment-control"
                                            multiple="true"
                                            class="fr-attachment">

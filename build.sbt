@@ -1279,7 +1279,8 @@ lazy val orbeonWarJVM = orbeonWar.jvm
       import scala.sys.process._
 
       // Generate SQLite file from demo data files
-      Seq("amm", "import-sample-data-into-sqlite.sc", (ThisBuild / baseDirectory).value.toString).!
+      //Seq("amm", "import-sample-data-into-sqlite.sc", (ThisBuild / baseDirectory).value.toString).!
+      Seq("cp", "data/orbeon-demo.sqlite", "orbeon-war/jvm/target/webapp/WEB-INF/orbeon-demo.sqlite").!
 
       compileAnalysis
     }

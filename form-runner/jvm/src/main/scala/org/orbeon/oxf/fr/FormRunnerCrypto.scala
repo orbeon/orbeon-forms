@@ -25,9 +25,13 @@ object FormRunnerAccessToken extends FormRunnerAccessTokenTrait {
 
 object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrait {
 
+  // The following operations use `KeyUsage.Weak` as they are only used to encrypt and decrypt parameter for
+  // mode changes and the like. They are not used to encrypt sensitive data. `KeyUsage.Weak` is meant to be
+  // used only temporarily, until the installation is setup with a proper crypto password.
+
   def encryptOperations(operationsTokens: Set[String]): String =
     SecureUtils.encrypt(
-      keyUsage = SecureUtils.KeyUsage.General,
+      keyUsage = SecureUtils.KeyUsage.Weak,
       bytes    = operationsTokens.mkString(" ").getBytes(CharsetNames.Utf8)
     )
 
@@ -35,7 +39,7 @@ object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrai
     operationsString.trimAllToOpt.flatMap(nonBlankOperationsString =>
       Operations.parseFromString(new String(
         SecureUtils.decrypt(
-          keyUsage = SecureUtils.KeyUsage.General,
+          keyUsage = SecureUtils.KeyUsage.Weak,
           text     = nonBlankOperationsString
         ),
         CharsetNames.Utf8
@@ -45,7 +49,7 @@ object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrai
   // TODO: Find a better location for these methods as they are not specific to operations.
   def encryptString(value: String): String =
     SecureUtils.encrypt(
-      keyUsage = SecureUtils.KeyUsage.General,
+      keyUsage = SecureUtils.KeyUsage.Weak,
       bytes    = value.getBytes(CharsetNames.Utf8)
     )
 
@@ -53,7 +57,7 @@ object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrai
     value.trimAllToOpt.map(nonBlankValue =>
       new String(
         SecureUtils.decrypt(
-          keyUsage = SecureUtils.KeyUsage.General,
+          keyUsage = SecureUtils.KeyUsage.Weak,
           text     = nonBlankValue
         ),
         CharsetNames.Utf8

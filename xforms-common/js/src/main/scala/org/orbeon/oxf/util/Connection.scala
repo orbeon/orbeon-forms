@@ -244,24 +244,6 @@ object Connection extends ConnectionTrait {
         } toJSArray
       )
 
-  private def notFound(url: URI): ConnectionResult =
-    ConnectionResult(
-      url                = url.toString,
-      statusCode         = StatusCode.NotFound,
-      headers            = Map.empty,
-      content            = StreamedContent.Empty,
-      dontHandleResponse = false,
-    )
-
-  def methodNotAllowed(url: URI) =
-    ConnectionResult(
-      url                = url.toString,
-      statusCode         = StatusCode.MethodNotAllowed,
-      headers            = Map.empty,
-      content            = StreamedContent.Empty,
-      dontHandleResponse = false
-    )
-
   private def processSubmissionResponseSync(
     url     : URI,
     response: SubmissionResponse

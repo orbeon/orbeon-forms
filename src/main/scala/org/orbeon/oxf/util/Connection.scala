@@ -429,52 +429,57 @@ object Connection extends ConnectionTrait {
           case scheme @ UriScheme.File if ! org.orbeon.io.FileUtils.isTemporaryFileUri(normalizedUrl) =>
             throw new OXFException(s"URL scheme `${scheme.entryName}` not allowed")
           case scheme if method == GET && SupportedNonHttpReadonlySchemes(scheme) =>
+            try {
+              // Create URL connection object
+              val url           = URLFactory.createURL(normalizedUrlString)
+              val urlConnection = url.openConnection
+              urlConnection.connect()
 
-            // Create URL connection object
-            val url           = URLFactory.createURL(normalizedUrlString)
-            val urlConnection = url.openConnection
-            urlConnection.connect()
+              // NOTE: The data: scheme doesn't have a path but can have a content type in the URL. Do this for the
+              // "data:" only as urlConnection.getContentType returns funny results e.g. for "file:".
+              def contentTypeFromConnection =
+                if (scheme == UriScheme.Data) Option(urlConnection.getContentType) else None
 
-            // NOTE: The data: scheme doesn't have a path but can have a content type in the URL. Do this for the
-            // "data:" only as urlConnection.getContentType returns funny results e.g. for "file:".
-            def contentTypeFromConnection =
-              if (scheme == UriScheme.Data) Option(urlConnection.getContentType) else None
+              def contentTypeFromPath =
+                Option(normalizedUrl.getPath) flatMap Mediatypes.findMediatypeForPath
 
-            def contentTypeFromPath =
-              Option(normalizedUrl.getPath) flatMap Mediatypes.findMediatypeForPath
+              def contentTypeHeader =
+                contentTypeFromConnection orElse contentTypeFromPath map (ct => ContentType -> List(ct))
 
-            def contentTypeHeader =
-              contentTypeFromConnection orElse contentTypeFromPath map (ct => ContentType -> List(ct))
+              val headersFromConnection =
+                urlConnection.getHeaderFields.asScala map { case (k, v) => k -> v.asScala.to(List) } toMap
 
-            val headersFromConnection =
-              urlConnection.getHeaderFields.asScala map { case (k, v) => k -> v.asScala.to(List) } toMap
+              val headersWithContentType =
+                headersFromConnection ++ contentTypeHeader.toList
 
-            val headersWithContentType =
-              headersFromConnection ++ contentTypeHeader.toList
+              // Take care of HTTP ranges with local files
+              val (statusCode, rangeHeaders, inputStream) =
+                if (url.getProtocol == "file") { // xxx scheme == UriScheme.File
+                  val streamedFile = HttpRanges(headers).get.streamedFile(new File(url.toURI), urlConnection.getInputStream).get
+                  (streamedFile.statusCode, streamedFile.headers, streamedFile.inputStream)
+                } else {
+                  (StatusCode.Ok,           Map(),                urlConnection.getInputStream)
+                }
 
-            // Take care of HTTP ranges with local files
-            val (statusCode, rangeHeaders, inputStream) =
-              if (url.getProtocol == "file") {
-                val streamedFile = HttpRanges(headers).get.streamedFile(new File(url.toURI), urlConnection.getInputStream).get
-                (streamedFile.statusCode, streamedFile.headers, streamedFile.inputStream)
-              } else {
-                (StatusCode.Ok,           Map(),                urlConnection.getInputStream)
+              // Create result
+              val connectionResult = ConnectionResult(
+                url        = normalizedUrlString,
+                statusCode = statusCode,
+                headers    = headersWithContentType ++ rangeHeaders,
+                content    = StreamedContent.fromStreamAndHeaders(inputStream, headersWithContentType)
+              )
+
+              ifDebug {
+                connectionResult.logResponseDetailsOnce(log4s.Debug)
+                connectionResult.logResponseBody(log4s.Debug, logBody)
               }
 
-            // Create result
-            val connectionResult = ConnectionResult(
-              url        = normalizedUrlString,
-              statusCode = statusCode,
-              headers    = headersWithContentType ++ rangeHeaders,
-              content    = StreamedContent.fromStreamAndHeaders(inputStream, headersWithContentType)
-            )
+              connectionResult
 
-            ifDebug {
-              connectionResult.logResponseDetailsOnce(log4s.Debug)
-              connectionResult.logResponseBody(log4s.Debug, logBody)
+            } catch {
+              case _: java.io.FileNotFoundException =>
+                notFound(normalizedUrl)
             }
-
-            connectionResult
 
           case UriScheme.Http | UriScheme.Https =>
 

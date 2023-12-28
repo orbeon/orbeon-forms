@@ -19,7 +19,7 @@ import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, HttpMethodsWithRequestBody, POST}
-import org.orbeon.oxf.http.{BasicCredentials, HttpMethod}
+import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging.debug
 
@@ -89,6 +89,24 @@ trait ConnectionTrait {
     cookiesToForward : List[String])(implicit
     logger           : IndentedLogger
   ): Option[(String, List[String])]
+
+  def notFound(url: URI): ConnectionResult =
+    ConnectionResult(
+      url                = url.toString,
+      statusCode         = StatusCode.NotFound,
+      headers            = Map.empty,
+      content            = StreamedContent.Empty,
+      dontHandleResponse = false,
+    )
+
+  def methodNotAllowed(url: URI): ConnectionResult =
+    ConnectionResult(
+      url                = url.toString,
+      statusCode         = StatusCode.MethodNotAllowed,
+      headers            = Map.empty,
+      content            = StreamedContent.Empty,
+      dontHandleResponse = false
+    )
 
   private def buildSOAPHeadersCapitalizedIfNeeded(
     method                    : HttpMethod,
@@ -201,7 +219,7 @@ trait ConnectionTrait {
    * - whether explicit credentials are available (disables forwarding of session cookies and Authorization header)
    * - a list of headers to forward
    */
-  def buildConnectionHeadersCapitalized(
+  protected def buildConnectionHeadersCapitalized(
     normalizedUrl            : URI,
     hasCredentials           : Boolean,
     customHeadersCapitalized : Map[String, List[String]],
@@ -243,7 +261,7 @@ trait ConnectionTrait {
   }
 
   // From header names and a getter for header values, find the list of headers to forward
-  def getHeadersToForwardCapitalized(
+  private def getHeadersToForwardCapitalized(
     hasCredentials         : Boolean, // exclude `Authorization` header when true
     headerNamesCapitalized : Set[String],
     getHeader              : String => Option[List[String]])(implicit

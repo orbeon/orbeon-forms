@@ -168,11 +168,11 @@
                         <xh:td>
                             <xf:output
                                 ref=".[$latest-version gt 0 and $versioning-supported and instance()/selected-version = 'next']"
-                                class="alert"
+                                class="alert alert-warning"
                                 value="$form-resources/dialog-publish/create-new-version-help/normalize-space()"/>
                             <xf:output
                                 ref=".[$latest-version gt 0 and ($versioning-supported and instance()/selected-version != 'next' or not($versioning-supported))]"
-                                class="alert"
+                                class="alert alert-warning"
                                 value="$form-resources/dialog-publish/overwrite-version-help/normalize-space()"/>
                         </xh:td>
                     </xh:tr>

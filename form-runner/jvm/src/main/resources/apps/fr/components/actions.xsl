@@ -500,7 +500,7 @@
                 <xsl:attribute name="xxf:response-must-await">{
                     (
                         event('fr-response-must-await'),
-                        'Inf'
+                        'forever'
                     )[1]
                 }</xsl:attribute>
             </xsl:if>

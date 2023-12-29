@@ -333,8 +333,28 @@ object SubmissionParameters {
       resolvedReplace != ReplaceType.All && isRequestedAsynchronousMode
     }
 
+    // We don't actually want to support the `scala.concurrent.duration.Duration` syntax, only a subset of it.
+    def normalizeDurationString(s: String): String = s match {
+      case "forever" => "Inf"
+      case "Inf"      |
+           "PlusInf"  |
+           "+Inf"     |
+           "MinusInf" |
+           "-Inf" => throw new IllegalArgumentException(s)
+      case s
+        if s.contains("-") ||
+          s.contains("+")  ||
+          s.contains("e")  ||
+          s.contains("E")  ||
+          s.contains(".") => throw new IllegalArgumentException( s)
+      case _ => s
+    }
+
     val responseMustAwait =
-      staticSubmission.avtResponseMustAwaitOpt flatMap stringAvtTrimmedOpt map Duration.apply
+      staticSubmission.avtResponseMustAwaitOpt
+        .flatMap(stringAvtTrimmedOpt)
+        .map(normalizeDurationString)
+        .map(Duration.apply)
 
     SubmissionParameters(
 

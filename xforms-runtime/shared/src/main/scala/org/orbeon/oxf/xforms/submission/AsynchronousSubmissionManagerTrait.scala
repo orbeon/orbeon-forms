@@ -127,23 +127,41 @@ trait AsynchronousSubmissionManagerTrait {
   def awaitAllAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit = {
     implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
     debug("awaiting all pending asynchronous submissions")
-    awaitPending(containingDocument, () => pendingList.map(_ -> Duration.Inf), () => pendingList = Nil)
+    awaitPending(
+      containingDocument,
+      skipDeferredEventHandling = true, // `xxf:join-submissions` already runs within a deferred action handling context
+      () => {
+        val r = pendingList.map(_ -> Duration.Inf)
+        pendingList = Nil
+        r
+      })
   }
 
   /**
    * Await all pending asynchronous submissions that have been specially marked and started in this current request.
    */
-  def awaitAsynchronousSubmissionsForCurrentRequest(containingDocument: XFormsContainingDocument): Unit = {
+  def awaitAsynchronousSubmissionsForCurrentRequest(
+    containingDocument       : XFormsContainingDocument,
+    skipDeferredEventHandling: Boolean
+  ): Unit = {
     implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
     debug("awaiting all pending asynchronous submissions for current request")
-    awaitPending(containingDocument, () => requestPendingList, () => requestPendingList = Nil)
+    awaitPending(
+      containingDocument,
+      skipDeferredEventHandling,
+      () => {
+        val r = requestPendingList
+        requestPendingList = Nil
+        r
+      }
+    )
   }
 
   protected def awaitPending(
-    containingDocument: XFormsContainingDocument,
-    get               : () => List[(Future[Any], Duration)],
-    clear             : () => Unit
+    containingDocument       : XFormsContainingDocument,
+    skipDeferredEventHandling: Boolean,
+    getAndClear              : () => List[(Future[Any], Duration)]
   )(implicit
-    logger            : IndentedLogger
+    logger                   : IndentedLogger
   ): Unit
 }

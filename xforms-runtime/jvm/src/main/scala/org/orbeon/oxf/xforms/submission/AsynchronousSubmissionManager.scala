@@ -13,16 +13,19 @@ class AsynchronousSubmissionManager
   extends AsynchronousSubmissionManagerTrait {
 
   protected def awaitPending(
-    containingDocument: XFormsContainingDocument,
-    get               : () => List[(Future[Any], Duration)],
-    clear             : () => Unit
+    containingDocument       : XFormsContainingDocument,
+    skipDeferredEventHandling: Boolean,
+    getAndClear              : () => List[(Future[Any], Duration)]
   )(implicit
-    logger            : IndentedLogger
-  ): Unit =
-    while (get().nonEmpty) {
+    logger                   : IndentedLogger
+  ): Unit = {
 
-      val batch = get()
-      clear()
+    var batch: List[(Future[Any], Duration)] = Nil
+
+    while ({
+      batch = getAndClear()
+      batch.nonEmpty
+    }) {
 
       val maxDuration = batch.map(_._2).max
 
@@ -31,9 +34,16 @@ class AsynchronousSubmissionManager
       // TODO: It would be good to process submissions as soon as one is ready to be processed.
       try {
         Await.ready(Future.sequence(batch.map(_._1)), maxDuration)
+        debug(s"batch completed while awaiting pending asynchronous submissions")
       } catch {
-        case _: TimeoutException => // just continue
+        case _: TimeoutException =>
+        // Just continue
+        debug(s"timeout reached while awaiting pending asynchronous submissions")
       }
-      processCompletedAsynchronousSubmissions(containingDocument)
+
+      containingDocument.maybeWithOutermostActionHandler(! skipDeferredEventHandling) {
+        processCompletedAsynchronousSubmissions(containingDocument)
+      }
     }
+  }
 }

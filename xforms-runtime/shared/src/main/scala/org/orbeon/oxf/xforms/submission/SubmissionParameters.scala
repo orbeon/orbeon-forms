@@ -346,7 +346,7 @@ object SubmissionParameters {
           s.contains("+")  ||
           s.contains("e")  ||
           s.contains("E")  ||
-          s.contains(".") => throw new IllegalArgumentException( s)
+          s.contains(".") => throw new IllegalArgumentException(s)
       case _ => s
     }
 

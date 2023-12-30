@@ -1,7 +1,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.{SecureUtils, XPath}
 import org.orbeon.oxf.xml.EncodeDecode.{decodeBytes, encodeBytes}
 import org.orbeon.oxf.xml.{SAXStoreBinaryFormat, TransformerUtils}
 import org.orbeon.saxon.om
@@ -34,11 +34,11 @@ trait FormRunnerEncodeDecode {
   private def encodeXmlNodeInfo(document: om.NodeInfo, compress: Boolean, encrypt: Boolean): String = {
     val saxStore = TransformerUtils.tinyTreeToSAXStore(document)
     val bytes = SAXStoreBinaryFormat.serialize(saxStore)
-    encodeBytes(bytes, compress, encrypt)
+    encodeBytes(bytes, compress, encrypt, SecureUtils.KeyUsage.Weak)
   }
 
   private def decodeXmlNodeInfo(encodedXML: String, forceEncryption: Boolean): om.DocumentInfo = {
-    val bytes = decodeBytes(encodedXML, forceEncryption)
+    val bytes = decodeBytes(encodedXML, forceEncryption, SecureUtils.KeyUsage.Weak)
     val saxStore = SAXStoreBinaryFormat.deserialize(bytes)
     TransformerUtils.saxStoreToTinyTree(XPath.GlobalConfiguration, saxStore)
   }

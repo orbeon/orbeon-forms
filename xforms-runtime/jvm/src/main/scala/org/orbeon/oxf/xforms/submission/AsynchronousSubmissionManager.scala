@@ -50,7 +50,7 @@ class AsynchronousSubmissionManager
   // In the JVM environment we don't need to schedule an immediate poll event as we have the ability to process
   // already-completed submissions immediately, or to wait on those that require waiting. So we just schedule a
   // poll event with the regular delay.
-  protected def addClientDelayEventIfNeeded(containingDocument: XFormsContainingDocument, hasRequestPending: Boolean): Unit =
+  protected def addClientPollEventIfNeeded(containingDocument: XFormsContainingDocument, hasRequestPending: Boolean): Unit =
     if (hasPendingAsynchronousSubmissions)
-      addClientDelayEventIfNeeded(containingDocument, containingDocument.getSubmissionPollDelay)
+      addClientPollEventIfNeeded(containingDocument, containingDocument.getSubmissionPollDelay)
 }

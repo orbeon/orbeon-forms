@@ -143,7 +143,7 @@ class XFormsContainingDocument(
         processCompletedAsynchronousSubmissions(skipDeferredEventHandling = true, beforeResponse = true)
       }
 
-      processDueDelayedEvents(submissionIdOpt = None)
+      processDueDelayedEvents(submissionIdOpt = None, excludePollEvents = true)
       processEagerEvaluationsIfNeeded()
     }
 
@@ -254,14 +254,14 @@ class XFormsContainingDocument(
 
     if (submissionIdOpt.isEmpty)
       processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, beforeResponse = false)
-    processDueDelayedEvents(submissionIdOpt)
+    processDueDelayedEvents(submissionIdOpt, excludePollEvents = false)
   }
 
   def afterExternalEvents(submissionIdOpt: Option[String]): Unit = {
 
     if (submissionIdOpt.isEmpty) {
       processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, beforeResponse = true)
-      processDueDelayedEvents(submissionIdOpt = None)
+      processDueDelayedEvents(submissionIdOpt = None, excludePollEvents = true)
       processEagerEvaluationsIfNeeded()
     }
 

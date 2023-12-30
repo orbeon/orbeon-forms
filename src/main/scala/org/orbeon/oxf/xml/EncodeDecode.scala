@@ -51,7 +51,12 @@ object EncodeDecode {
 
   // 2016-09-14: `encrypt = false` only when encoding static state when using server-side state handling, and
   // for some unit tests.
-  def encodeBytes(bytesToEncode: Array[Byte], compress: Boolean, encrypt: Boolean): String = {
+  def encodeBytes(
+    bytesToEncode: Array[Byte],
+    compress     : Boolean,
+    encrypt      : Boolean,
+    keyUsage     : SecureUtils.KeyUsage = SecureUtils.KeyUsage.General
+  ): String = {
 
     // Compress if needed
     val gzipByteArrayOpt =
@@ -60,14 +65,18 @@ object EncodeDecode {
 
     // Encrypt/encode
     (encrypt, gzipByteArrayOpt) match {
-      case (true,  None)                => "X1" + SecureUtils.encrypt(SecureUtils.KeyUsage.General, bytesToEncode)
-      case (true,  Some(gzipByteArray)) => "X2" + SecureUtils.encrypt(SecureUtils.KeyUsage.General, gzipByteArray)
+      case (true,  None)                => "X1" + SecureUtils.encrypt(keyUsage, bytesToEncode)
+      case (true,  Some(gzipByteArray)) => "X2" + SecureUtils.encrypt(keyUsage, gzipByteArray)
       case (false, None)                => "X3" + org.orbeon.oxf.util.Base64.encode(bytesToEncode, useLineBreaks = false)
       case (false, Some(gzipByteArray)) => "X4" + org.orbeon.oxf.util.Base64.encode(gzipByteArray, useLineBreaks = false)
     }
   }
 
-  def decodeBytes(encoded: String, forceEncryption: Boolean): Array[Byte] = {
+  def decodeBytes(
+    encoded        : String,
+    forceEncryption: Boolean,
+    keyUsage       : SecureUtils.KeyUsage = SecureUtils.KeyUsage.General
+  ): Array[Byte] = {
 
     // Get raw text
     val prefix        = encoded.substring(0, 2)
@@ -76,8 +85,8 @@ object EncodeDecode {
     // Decrypt/decode
     val rawOrCompressedBytes =
       prefix match {
-        case "X1"                      => Left(SecureUtils.decrypt(SecureUtils.KeyUsage.General, encodedString))  // encryption    + uncompressed
-        case "X2"                      => Right(SecureUtils.decrypt(SecureUtils.KeyUsage.General, encodedString)) // encryption    + compressed
+        case "X1"                      => Left(SecureUtils.decrypt(keyUsage, encodedString))  // encryption    + uncompressed
+        case "X2"                      => Right(SecureUtils.decrypt(keyUsage, encodedString)) // encryption    + compressed
         case "X3" if ! forceEncryption => Left(org.orbeon.oxf.util.Base64.decode(encodedString))                  // no encryption + uncompressed
         case "X4" if ! forceEncryption => Right(org.orbeon.oxf.util.Base64.decode(encodedString))                 // no encryption + compressed
         case _                         => throw new OXFException(s"Invalid prefix for encoded string: `$prefix`")

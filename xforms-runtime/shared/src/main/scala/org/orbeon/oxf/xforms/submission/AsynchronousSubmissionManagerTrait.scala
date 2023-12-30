@@ -23,27 +23,30 @@ import scala.util.control.NonFatal
 trait AsynchronousSubmissionManagerTrait {
 
   private var totalSubmittedCount = 0
-  private var pendingCount = 0
+  private var pendingCount        = 0
 
   private val runningCount           = new AtomicInteger(0)
   private val completionQueue        = new ConcurrentLinkedQueue[(String, Try[Any] => Any, Try[Any])]
   private var pendingList            = List.empty[Future[Any]]
 
-  private val requestRunningCount    = new AtomicInteger(0)
-  private var requestPendingList     = List.empty[(Future[Any], Duration)]
+  private var requestRunningCount         = new AtomicInteger(0)
 
-  def addClientDelayEventIfNeeded(containingDocument: XFormsContainingDocument): Unit =
-    if (hasPendingAsynchronousSubmissions)
-      containingDocument.addDelayedEvent(
-        eventName         = EventNames.XXFormsPoll,
-        targetEffectiveId = containingDocument.getEffectiveId,
-        bubbles           = false,
-        cancelable        = false,
-        time              = System.currentTimeMillis + containingDocument.getSubmissionPollDelay,
-        showProgress      = false, // could get from submission, but default must be `false`
-        allowDuplicates   = false, // no need for duplicates
-        properties        = Nil    // poll event doesn't need properties
-      )
+  private var requestWithWaitRunningCount = new AtomicInteger(0)
+  private var requestWithWaitPendingList  = List.empty[(Future[Any], Duration)]
+
+  protected def addClientDelayEventIfNeeded(containingDocument: XFormsContainingDocument, delayMs: Int): Unit =
+    containingDocument.addDelayedEvent(
+      eventName         = EventNames.XXFormsPoll,
+      targetEffectiveId = containingDocument.getEffectiveId,
+      bubbles           = false,
+      cancelable        = false,
+      time              = System.currentTimeMillis + delayMs,
+      showProgress      = false, // could get from submission, but default must be `false`
+      allowDuplicates   = false, // no need for duplicates
+      properties        = Nil    // poll event doesn't need properties
+    )
+
+  def hasPendingAsynchronousSubmissions: Boolean = pendingCount > 0
 
   def addAsynchronousCompletion[T, U](
     description          : String,
@@ -57,10 +60,12 @@ trait AsynchronousSubmissionManagerTrait {
     totalSubmittedCount += 1
     pendingCount += 1
 
+    requestRunningCount.incrementAndGet()
+
     val mustWait = awaitInCurrentRequest match {
       case Some(duration) if duration.gt(Duration.Zero) =>
-        requestRunningCount.incrementAndGet()
-        requestPendingList ::= future -> duration
+        requestWithWaitRunningCount.incrementAndGet()
+        requestWithWaitPendingList ::= future -> duration
         true
       case None =>
         false
@@ -69,16 +74,22 @@ trait AsynchronousSubmissionManagerTrait {
     runningCount.incrementAndGet()
     pendingList ::= future
 
+    // Copy references so they are captured by the closure below
+    val localRequestRunningCount         = requestRunningCount
+    val localRequestWithWaitRunningCount = requestWithWaitRunningCount
+
     future.onComplete { result =>
+      // This runs asynchronously
+
+      // Decrement through copied references so we don't impact future requests
+      localRequestRunningCount.decrementAndGet()
       if (mustWait)
-        requestRunningCount.decrementAndGet()
+        localRequestWithWaitRunningCount.decrementAndGet()
 
       runningCount.decrementAndGet()
       completionQueue.add((description, continuation.asInstanceOf[Try[Any] => Any], result))
     }
   }
-
-  def hasPendingAsynchronousSubmissions: Boolean = pendingCount > 0
 
   def processCompletedAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit = {
 
@@ -109,12 +120,13 @@ trait AsynchronousSubmissionManagerTrait {
 
       debugResults(
         List(
-          "processed"          -> processedCount.toString,
-          "failed"             -> failedCount.toString,
-          "total submitted"    -> totalSubmittedCount.toString,
-          "pending"            -> pendingCount.toString,
-          "running"            -> runningCount.toString,
-          "running in request" -> requestRunningCount.toString,
+          "processed"                  -> processedCount.toString,
+          "failed"                     -> failedCount.toString,
+          "total submitted"            -> totalSubmittedCount.toString,
+          "pending"                    -> pendingCount.toString,
+          "running"                    -> runningCount.toString,
+          "running in request"         -> requestRunningCount.toString,
+          "running in request waiting" -> requestWithWaitRunningCount.toString,
         )
       )
     }
@@ -140,7 +152,7 @@ trait AsynchronousSubmissionManagerTrait {
   /**
    * Await all pending asynchronous submissions that have been specially marked and started in this current request.
    */
-  def awaitAsynchronousSubmissionsForCurrentRequest(
+  def awaitAsynchronousSubmissionsForCurrentRequestMaybeSubmitPollEvent(
     containingDocument       : XFormsContainingDocument,
     skipDeferredEventHandling: Boolean
   ): Unit = {
@@ -150,11 +162,19 @@ trait AsynchronousSubmissionManagerTrait {
       containingDocument,
       skipDeferredEventHandling,
       () => {
-        val r = requestPendingList
-        requestPendingList = Nil
+        val r = requestWithWaitPendingList
+        requestWithWaitPendingList = Nil
         r
       }
     )
+    // Reset request information as there won't be any new updates
+    val hasRequestPending = requestRunningCount.get() > 0
+
+    requestRunningCount         = new AtomicInteger(0)
+    requestWithWaitPendingList  = Nil
+    requestWithWaitRunningCount = new AtomicInteger(0)
+
+    addClientDelayEventIfNeeded(containingDocument, hasRequestPending)
   }
 
   protected def awaitPending(
@@ -163,5 +183,10 @@ trait AsynchronousSubmissionManagerTrait {
     getAndClear              : () => List[(Future[Any], Duration)]
   )(implicit
     logger                   : IndentedLogger
+  ): Unit
+
+  protected def addClientDelayEventIfNeeded(
+    containingDocument: XFormsContainingDocument,
+    hasRequestPending : Boolean
   ): Unit
 }

@@ -301,8 +301,7 @@ class XFormsContainingDocument(
           manager.processCompletedAsynchronousSubmissions(this)
         }
         if (beforeResponse) {
-          manager.awaitAsynchronousSubmissionsForCurrentRequest(this, skipDeferredEventHandling)
-          manager.addClientDelayEventIfNeeded(this)
+          manager.awaitAsynchronousSubmissionsForCurrentRequestMaybeSubmitPollEvent(this, skipDeferredEventHandling)
         }
       }
 

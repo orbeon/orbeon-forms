@@ -20,13 +20,16 @@ class AsynchronousSubmissionManager
     getAndClear              : () => List[(Future[Any], Duration)]
   )(implicit
     logger                   : IndentedLogger
-  ): Unit = {
+  ): Unit =
     info(s"skipping `awaitPending()` as it's not implemented in the JS environment")
-  }
 
-//  private def sendShortCircuitPollEvent(containingDocument: XFormsContainingDocument): Unit =
-//    js.Dynamic.global.window.ORBEON.xforms.AjaxClient.createDelayedPollEvent(
-//      0,
-//      containingDocument.getNamespacedFormId
-//    )
+  // If we have pending request submissions, that is they were newly started in this submission, in the JS
+  // environment we can't process them immediately as we need the single thread to return to the main event loop.
+  // So we schedule an immediate poll event to reduce the latency. For submissions created in previous requests, we
+  // schedule a poll event with the regular delay.
+  protected def addClientDelayEventIfNeeded(containingDocument: XFormsContainingDocument, hasRequestPending: Boolean): Unit =
+    if (hasRequestPending)
+      addClientDelayEventIfNeeded(containingDocument, 0)
+    else if (hasPendingAsynchronousSubmissions)
+      addClientDelayEventIfNeeded(containingDocument, containingDocument.getSubmissionPollDelay)
 }

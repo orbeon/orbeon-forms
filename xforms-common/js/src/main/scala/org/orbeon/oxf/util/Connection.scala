@@ -194,24 +194,25 @@ object Connection extends ConnectionTrait {
 
       val methodString   = method.entryName
       val jsUrl          = new JSURL(url.toString, "http://invalid/") // URL needs to be absolute; using `invalid` as base, see RFC6761
-      val requestHeaders = makeJsHeaders(url, headers)
 
-      def newSubmissionRequest(readableStreamOpt: Option[sjsdom.ReadableStream[Uint8Array]]) =
+      def newSubmissionRequest(readableStreamOpt: Option[sjsdom.ReadableStream[Uint8Array]], contentType: Option[String]) = {
+        val headersWithContentType = makeJsHeaders(url, headers + (Headers.ContentType -> contentType.toList))
         new SubmissionRequest {
           val method  = methodString
           val url     = jsUrl
-          val headers = requestHeaders
+          val headers = headersWithContentType
           val body    = readableStreamOpt.orUndefined.asInstanceOf[js.UndefOr[Uint8Array | sjsdom.ReadableStream[Uint8Array]]] // HACK: otherwise this doesn't compile with `-Xsource-features:v2.13.14`
         }
+      }
 
       val initialStream =
         content match {
           case Some(c) =>
             c.stream
               .through(fs2dom.toReadableStream)
-              .map(rs => newSubmissionRequest(Some(rs)))
+              .map(rs => newSubmissionRequest(Some(rs), c.contentType))
           case None =>
-            fs2.Stream.emit(newSubmissionRequest(None))
+            fs2.Stream.emit(newSubmissionRequest(None, None))
         }
 
       initialStream.evalMap(submissionRequest => IO.fromPromise(IO(provider.submitAsync(submissionRequest))))

@@ -80,8 +80,8 @@
             <validation-dialog-continue>Continue</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
-            <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
-            <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
+            <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
@@ -1324,8 +1324,8 @@
             <validation-dialog-continue>Continuar</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testear</test>
-            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
-            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
@@ -1937,8 +1937,8 @@
             <validation-dialog-continue>Continuar</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testejar</test>
-            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspeccionar fòrmules (Experimental)</test-formulas>
-            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspeccionar fòrmules (Beta)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Exportar a excel</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
@@ -2581,8 +2581,8 @@
             <validation-dialog-continue>Fortsett</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
-            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
-            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
@@ -3191,8 +3191,8 @@
             <validation-dialog-continue todo="true">[Continue]</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Тестировать</test>
-            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
-            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
@@ -3800,8 +3800,8 @@
             <validation-dialog-continue>Continua</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Prova</test>
-            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
-            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
@@ -4419,8 +4419,8 @@
             <validation-dialog-continue>Weiter</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
-            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
-            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
@@ -5038,8 +5038,8 @@
             <validation-dialog-continue>Jatka</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testaa</test>
-            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
-            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
@@ -5657,8 +5657,8 @@
             <validation-dialog-continue>Fortsätt</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testa</test>
-            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
-            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
@@ -6276,8 +6276,8 @@
             <validation-dialog-continue>Doorgaan</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testen</test>
-            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
-            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
@@ -6895,8 +6895,8 @@
             <validation-dialog-continue>Continuar</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testar</test>
-            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
-            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
@@ -7514,8 +7514,8 @@
             <validation-dialog-continue>Fortsæt</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
-            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
-            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
@@ -8124,8 +8124,8 @@
             <validation-dialog-continue>Kontynuuj</validation-dialog-continue>
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testuj</test>
-            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
-            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"/&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>

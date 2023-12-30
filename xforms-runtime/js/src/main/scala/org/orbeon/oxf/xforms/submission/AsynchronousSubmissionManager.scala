@@ -27,9 +27,9 @@ class AsynchronousSubmissionManager
   // environment we can't process them immediately as we need the single thread to return to the main event loop.
   // So we schedule an immediate poll event to reduce the latency. For submissions created in previous requests, we
   // schedule a poll event with the regular delay.
-  protected def addClientDelayEventIfNeeded(containingDocument: XFormsContainingDocument, hasRequestPending: Boolean): Unit =
+  protected def addClientPollEventIfNeeded(containingDocument: XFormsContainingDocument, hasRequestPending: Boolean): Unit =
     if (hasRequestPending)
-      addClientDelayEventIfNeeded(containingDocument, 0)
+      addClientPollEventIfNeeded(containingDocument, 0)
     else if (hasPendingAsynchronousSubmissions)
-      addClientDelayEventIfNeeded(containingDocument, containingDocument.getSubmissionPollDelay)
+      addClientPollEventIfNeeded(containingDocument, containingDocument.getSubmissionPollDelay)
 }

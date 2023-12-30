@@ -34,7 +34,7 @@ trait AsynchronousSubmissionManagerTrait {
   private var requestWithWaitRunningCount = new AtomicInteger(0)
   private var requestWithWaitPendingList  = List.empty[(Future[Any], Duration)]
 
-  protected def addClientDelayEventIfNeeded(containingDocument: XFormsContainingDocument, delayMs: Int): Unit =
+  protected def addClientPollEventIfNeeded(containingDocument: XFormsContainingDocument, delayMs: Int): Unit =
     containingDocument.addDelayedEvent(
       eventName         = EventNames.XXFormsPoll,
       targetEffectiveId = containingDocument.getEffectiveId,
@@ -174,7 +174,7 @@ trait AsynchronousSubmissionManagerTrait {
     requestWithWaitPendingList  = Nil
     requestWithWaitRunningCount = new AtomicInteger(0)
 
-    addClientDelayEventIfNeeded(containingDocument, hasRequestPending)
+    addClientPollEventIfNeeded(containingDocument, hasRequestPending)
   }
 
   protected def awaitPending(
@@ -185,7 +185,7 @@ trait AsynchronousSubmissionManagerTrait {
     logger                   : IndentedLogger
   ): Unit
 
-  protected def addClientDelayEventIfNeeded(
+  protected def addClientPollEventIfNeeded(
     containingDocument: XFormsContainingDocument,
     hasRequestPending : Boolean
   ): Unit

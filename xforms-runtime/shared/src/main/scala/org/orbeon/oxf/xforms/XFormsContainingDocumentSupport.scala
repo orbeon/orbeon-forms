@@ -720,8 +720,7 @@ trait ContainingDocumentDelayedEvents {
   ): Unit = {
 
     // For `xxforms-poll`, we *could* attempt to preserve the earlier time. But currently,
-    // `addClientDelayEventIfNeeded()` for async submissions always uses a newer time at
-    // each call.
+    // `addClientPollEventIfNeeded()` for async submissions is called only once.
     def isDuplicate(e: DelayedEvent) =
       e.eventName == eventName && e.targetEffectiveId == targetEffectiveId
 
@@ -744,7 +743,7 @@ trait ContainingDocumentDelayedEvents {
   def delayedEvents: List[DelayedEvent] =
     _delayedEvents.toList
 
-  def processDueDelayedEvents(submissionIdOpt: Option[String]): Unit = {
+  def processDueDelayedEvents(submissionIdOpt: Option[String], excludePollEvents: Boolean): Unit = {
 
     implicit val logger = self.containingDocument.getIndentedLogger(LOGGING_CATEGORY)
 
@@ -765,7 +764,8 @@ trait ContainingDocumentDelayedEvents {
 
             (eventOpt.toList, remaining)
           case None =>
-            delayedEvents partition (_.time exists (_ <= currentTime))
+            delayedEvents partition
+              (e => e.time.exists(_ <= currentTime) && ! (excludePollEvents && e.eventName == EventNames.XXFormsPoll))
         }
 
       if (dueEvents.nonEmpty) {

@@ -80,16 +80,24 @@ object SecureUtils extends SecureUtilsTrait {
 
       val propertySet = Properties.instance.getPropertySet
 
-      val (propertyName, rawPassword) =
+      val propertyNameRawPasswordOpt =
         propertyNames
           .flatMap(n => propertySet.getNonBlankString(n).map(n ->))
           .headOption
-          .getOrElse(throw new ConfigurationException(s"Missing password for property ${propertyNames.mkString("`", "`, `", "`")}"))
 
-      if (keyUsage != KeyUsage.Weak && checkPasswordStrengthProperty && ! PasswordChecker.checkAndLog(propertyName, rawPassword))
-        throw new ConfigurationException(s"Invalid password for property `$propertyName` property, see log for details")
-
-      rawPassword
+      (keyUsage, propertyNameRawPasswordOpt) match {
+        case (KeyUsage.Weak, Some((_, rawPassword))) =>
+          rawPassword
+        case (KeyUsage.Weak, None) =>
+          randomHexId
+        case (_, Some((propertyName, rawPassword)))
+          if ! checkPasswordStrengthProperty || PasswordChecker.checkAndLog(propertyName, rawPassword) =>
+          rawPassword
+        case (_, Some((propertyName, _)))  =>
+          throw new ConfigurationException(s"Invalid password for property `$propertyName` property, see log for details")
+        case (_, None) =>
+          throw new ConfigurationException(s"Missing password for property ${propertyNames.mkString("`", "`, `", "`")}")
+      }
     }
 
     passwords.computeIfAbsent(keyUsage, _ => getPassword)

@@ -16,7 +16,7 @@
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <!-- Encryption properties -->
-    <property as="xs:string"  name="oxf.crypto.password"                             value="CHANGE THIS PASSWORD"/>
+    <property as="xs:string"  name="oxf.crypto.password"                             value=""/>
     <property as="xs:boolean" name="oxf.crypto.check-password-strength"              value="true"/>
     <property as="xs:integer" name="oxf.crypto.key-length"                           value="128"/>
     <property as="xs:string"  name="oxf.crypto.hash-algorithm"                       value="SHA-256"/>

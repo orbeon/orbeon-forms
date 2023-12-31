@@ -413,37 +413,6 @@
                     <!-- Hide this dialog -->
                     <xxf:hide dialog="dialog"/>
                 </xf:action>
-
-                <!-- Dispatch event with result -->
-                <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
-                    <xf:property name="app"                           value="$i/app/string()"/>
-                    <xf:property name="form"                          value="$i/form/string()"/>
-                    <xf:property name="title"                         value="$i/title/string()"/>
-                    <xf:property name="description"                   value="$i/description/string()"/>
-                    <xf:property name="description-mediatype"         value="if ($i/description/@isHTML = 'true') then 'text/html' else 'text/plain'"/>
-                    <xf:property name="singleton"                     value="$i/singleton/string()"/>
-                    <xf:property name="attachment-max-size"           value="$i/attachment-max-size/string()"/>
-                    <xf:property name="attachment-max-size-aggregate" value="$i/attachment-max-size-aggregate/string()"/>
-                    <xf:property name="attachment-mediatypes"         value="$i/attachment-mediatypes/string()[. != $unlikely-mediatype]"/>
-                    <xf:property name="wizard"                        value="$i/wizard/string()"/>
-                    <xf:property name="wizard-mode"                   value="$i/wizard-mode/string()"/>
-                    <xf:property name="wizard-subsections-nav"        value="$i/wizard-subsections-nav/string()"/>
-                    <xf:property name="wizard-subsections-toc"        value="$i/wizard-subsections-toc/string()"/>
-                    <xf:property name="wizard-separate-toc"           value="$i/wizard-separate-toc/string()"/>
-                    <xf:property name="wizard-section-status"         value="$i/wizard-section-status/string()"/>
-                    <xf:property name="mode"                          value="$i/mode/string()"/>
-                    <xf:property name="automatic-hints"               value="$i/automatic-hints/string()"/>
-                    <xf:property name="data-migration"                value="$i/data-migration/string()"/>
-                    <xf:property name="grid-tab-order"                value="$i/grid-tab-order/string()"/>
-                    <xf:property name="rendered-page-orientation"     value="$i/rendered-page-orientation/string()"/>
-                    <xf:property name="rendered-page-size"            value="$i/rendered-page-size/string()"/>
-                    <xf:property name="readonly-disable-calculate"    value="$i/readonly-disable-calculate/string()"/>
-                    <xf:property name="relevant"                      value="$i/relevant/string()"/>
-                    <xf:property name="readonly"                      value="$i/readonly/string()"/>
-                    <xf:property name="html-page-layout"              value="$i/html-page-layout/string()"/>
-                    <xf:property name="analysis-calculate"            value="$i/analysis-calculate/string()"/>
-                    <xf:property name="automatic-hints"               value="$i/automatic-hints/string()"/>
-
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>

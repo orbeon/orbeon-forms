@@ -348,11 +348,11 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"             value="sqlite"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf">
-        home summary clear pdf|tiff wizard-toc wizard-prev wizard-next save-final review
+        home summary clear pdf wizard-toc wizard-prev wizard-next save-final review
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls">
-        home pdf tiff wizard-prev wizard-next review
+        home pdf wizard-prev wizard-next review
     </property>
     <property as="xs:string"  name="oxf.fr.detail.button.review.enabled.orbeon.controls">
         fr:is-wizard-last-page()
@@ -401,11 +401,11 @@
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.repeated-grids">
-        home pdf|tiff review
+        home pdf review
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.pta-remittance">
-        home summary clear pdf|tiff save-final review
+        home summary clear pdf save-final review
     </property>
 
     <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.orbeon.*"             value="2"/>

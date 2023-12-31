@@ -2666,13 +2666,13 @@
         </dialog-pe>
         <dialog-email-settings>
             <label>Paramètres Email</label>
+            <enable-if-true>Activer ce modèle uniquement si la formule suivante est évaluée comme vraie</enable-if-true>
             <subject>Sujet email</subject>
             <body>Corps email</body>
             <from-properties>Le modèle vient des propriétés</from-properties>
             <template>
                 <label>Modèle</label>
             </template>
-            <enable-if-true>Activer ce modèle uniquement si la formule suivante est évaluée comme vraie</enable-if-true>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Permissions</label>
@@ -8230,13 +8230,13 @@
         </dialog-pe>
         <dialog-email-settings>
             <label>E-Mail-Einstellungen</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject>E-Mail Betreff</subject>
             <body>E-Mail Text</body>
             <from-properties>Vorlage aus Eigenschaften</from-properties>
             <template>
                 <label>Vorlage</label>
             </template>
-            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Berechtigungen</label>
@@ -12416,13 +12416,13 @@
         </dialog-pe>
         <dialog-email-settings>
             <label>E-mail instellingen</label>
+            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
             <subject>E-mail onderwerp</subject>
             <body>Email inhoud</body>
             <from-properties>Template van properties</from-properties>
             <template>
                 <label>Template</label>
             </template>
-            <enable-if-true todo="true">[Enable this template only if the following formula evaluates to true]</enable-if-true>
         </dialog-email-settings>
         <dialog-permissions>
             <label>Bevoegdheden</label>

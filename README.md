@@ -4,7 +4,7 @@ Orbeon Forms
 Web Forms for the Enterprise and the Government
 -----------------------------------------------
 
-Last updated for Orbeon Forms 2022.1.5 (September 2023)
+Last updated for Orbeon Forms 2023.1 (December 2023)
 
 [![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -12,7 +12,7 @@ Last updated for Orbeon Forms 2022.1.5 (September 2023)
 What is Orbeon Forms?
 ---------------------
 
-Orbeon Forms is an open source, standard-based web forms solution, which includes:
+Orbeon Forms is a Web forms solution which includes:
 
 - __Form Builder:__ a browser-based visual form authoring tool
 - __Form Runner:__ a runtime environment which facilitates the deployment and integration of large and complex forms
@@ -23,6 +23,7 @@ For more information about Orbeon Forms, please visit [orbeon.com](https://www.o
 What's new
 ----------
 
+- [Orbeon Forms 2023.1](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1)
 - [Orbeon Forms 2022.1.5](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1.5)
 - [Orbeon Forms 2021.1.9 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.9)
 - [Orbeon Forms 2022.1.4](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1.4)
@@ -100,7 +101,6 @@ What's new
 - [Orbeon Forms 4.1](https://blog.orbeon.com/2013/04/orbeon-forms-41.html)
 - [Orbeon Forms 4.0.1](https://blog.orbeon.com/2013/03/orbeon-forms-401.html)
 - [Orbeon Forms 4.0](https://blog.orbeon.com/2013/03/announcing-orbeon-forms-40.html)
-- [Orbeon Forms 4 release notes](http://wiki.orbeon.com/forms/doc/developer-guide/release-notes/40)
 
 
 Downloading and installing
@@ -145,7 +145,7 @@ What's happening?
 
 - [Orbeon Blog](https://blog.orbeon.com/)
 - [Orbeon on Twitter](https://twitter.com/orbeon)
-- [Latest commits on github](https://github.com/orbeon/orbeon-forms/commits/)
+- [Latest commits on github](https://github.com/orbeon/orbeon-forms/commits)
 - [Forum archive](https://groups.google.com/g/orbeon)
 
 
@@ -178,7 +178,7 @@ This product includes:
 
 - software developed by the [Apache Software Foundation](https://www.apache.org/)
 - other third-party software (see [build.sbt](https://github.com/orbeon/orbeon-forms/blob/master/build.sbt)) 
-- [Silk Icons](http://www.famfamfam.com/lab/icons/silk) (Creative Commons Attribution 2.5 License)
+- Silk Icons (Creative Commons Attribution 2.5 License)
 - [PixelMixer icons](https://iconarchive.com/artist/pixelmixer.html)
 - schemas for XSLT 2.0 and XForms 1.1 (W3C Software License)
 

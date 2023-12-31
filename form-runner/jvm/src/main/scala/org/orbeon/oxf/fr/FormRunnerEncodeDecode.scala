@@ -34,11 +34,11 @@ trait FormRunnerEncodeDecode {
   private def encodeXmlNodeInfo(document: om.NodeInfo, compress: Boolean, encrypt: Boolean): String = {
     val saxStore = TransformerUtils.tinyTreeToSAXStore(document)
     val bytes = SAXStoreBinaryFormat.serialize(saxStore)
-    encodeBytes(bytes, compress, encrypt, SecureUtils.KeyUsage.Weak)
+    encodeBytes(bytes, compress, encrypt, SecureUtils.KeyUsage.GeneralNoCheck)
   }
 
   private def decodeXmlNodeInfo(encodedXML: String, forceEncryption: Boolean): om.DocumentInfo = {
-    val bytes = decodeBytes(encodedXML, forceEncryption, SecureUtils.KeyUsage.Weak)
+    val bytes = decodeBytes(encodedXML, forceEncryption, SecureUtils.KeyUsage.GeneralNoCheck)
     val saxStore = SAXStoreBinaryFormat.deserialize(bytes)
     TransformerUtils.saxStoreToTinyTree(XPath.GlobalConfiguration, saxStore)
   }

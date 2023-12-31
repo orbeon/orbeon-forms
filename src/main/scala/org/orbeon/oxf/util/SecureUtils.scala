@@ -29,7 +29,7 @@ object SecureUtils extends SecureUtilsTrait {
 
   sealed trait KeyUsage
   object KeyUsage {
-    case object Weak            extends KeyUsage
+    case object GeneralNoCheck  extends KeyUsage
     case object General         extends KeyUsage
     case object Token           extends KeyUsage
     case object FieldEncryption extends KeyUsage
@@ -72,7 +72,7 @@ object SecureUtils extends SecureUtilsTrait {
     def getPassword: String = {
 
       val propertyNames = keyUsage match {
-        case KeyUsage.Weak            => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
+        case KeyUsage.GeneralNoCheck  => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
         case KeyUsage.General         => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
         case KeyUsage.Token           => List(TokenPasswordProperty)
         case KeyUsage.FieldEncryption => List(FieldEncryptionPasswordProperty)
@@ -86,9 +86,9 @@ object SecureUtils extends SecureUtilsTrait {
           .headOption
 
       (keyUsage, propertyNameRawPasswordOpt) match {
-        case (KeyUsage.Weak, Some((_, rawPassword))) =>
+        case (KeyUsage.GeneralNoCheck, Some((_, rawPassword))) =>
           rawPassword
-        case (KeyUsage.Weak, None) =>
+        case (KeyUsage.GeneralNoCheck, None) =>
           randomHexId
         case (_, Some((propertyName, rawPassword)))
           if ! checkPasswordStrengthProperty || PasswordChecker.checkAndLog(propertyName, rawPassword) =>
@@ -247,7 +247,7 @@ object SecureUtils extends SecureUtilsTrait {
   }
 
   def hmacStringWeakJava(text: String): String =
-    hmacString(SecureUtils.KeyUsage.Weak, text, ByteEncoding.Hex)
+    hmacString(SecureUtils.KeyUsage.GeneralNoCheck, text, ByteEncoding.Hex)
 
   def hmacStringToHexShort(keyUsage: KeyUsage, text: String): String =
     hmacString(keyUsage, text, ByteEncoding.Hex).substring(0, HexShortLength)

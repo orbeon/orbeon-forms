@@ -12,6 +12,7 @@ import scala.util.Try
 // CE doesn't support encryption/decryption
 object FormRunnerAccessToken extends FormRunnerAccessTokenTrait {
 
+
   def encryptToken(tokenHmac: TokenHmac, tokenPayload: TokenPayload): Option[String] = {
     Version.instance.requirePEFeature("Token-based authentication")
     None
@@ -31,7 +32,7 @@ object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrai
 
   def encryptOperations(operationsTokens: Set[String]): String =
     SecureUtils.encrypt(
-      keyUsage = SecureUtils.KeyUsage.Weak,
+      keyUsage = SecureUtils.KeyUsage.GeneralNoCheck,
       bytes    = operationsTokens.mkString(" ").getBytes(CharsetNames.Utf8)
     )
 
@@ -39,7 +40,7 @@ object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrai
     operationsString.trimAllToOpt.flatMap(nonBlankOperationsString =>
       Operations.parseFromString(new String(
         SecureUtils.decrypt(
-          keyUsage = SecureUtils.KeyUsage.Weak,
+          keyUsage = SecureUtils.KeyUsage.GeneralNoCheck,
           text     = nonBlankOperationsString
         ),
         CharsetNames.Utf8
@@ -49,7 +50,7 @@ object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrai
   // TODO: Find a better location for these methods as they are not specific to operations.
   def encryptString(value: String): String =
     SecureUtils.encrypt(
-      keyUsage = SecureUtils.KeyUsage.Weak,
+      keyUsage = SecureUtils.KeyUsage.GeneralNoCheck,
       bytes    = value.getBytes(CharsetNames.Utf8)
     )
 
@@ -57,7 +58,7 @@ object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrai
     value.trimAllToOpt.map(nonBlankValue =>
       new String(
         SecureUtils.decrypt(
-          keyUsage = SecureUtils.KeyUsage.Weak,
+          keyUsage = SecureUtils.KeyUsage.GeneralNoCheck,
           text     = nonBlankValue
         ),
         CharsetNames.Utf8

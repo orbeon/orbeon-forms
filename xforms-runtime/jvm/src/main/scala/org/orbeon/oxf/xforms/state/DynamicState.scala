@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.state
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.PathMatcher
+import org.orbeon.oxf.util.{PathMatcher, SecureUtils}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.model.XFormsInstance
@@ -69,7 +69,8 @@ case class DynamicState(
     EncodeDecode.encodeBytes(
       toByteArray(this),
       compress,
-      isForceEncryption
+      isForceEncryption,
+      SecureUtils.KeyUsage.GeneralNoCheck
     )
 
   // Encode to an XML representation (as of 2012-02-05, used only by unit tests)
@@ -225,7 +226,7 @@ object DynamicState {
 
   // Create a `DynamicState` from an encoded string representation
   def apply(encoded: String): DynamicState = {
-    val bytes = EncodeDecode.decodeBytes(encoded, forceEncryption = false)
+    val bytes = EncodeDecode.decodeBytes(encoded, forceEncryption = false, SecureUtils.KeyUsage.GeneralNoCheck)
     fromByteArray[DynamicState](bytes)
   }
 

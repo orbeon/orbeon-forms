@@ -34,12 +34,12 @@ object EncodeDecode {
     val bytes = SAXStoreBinaryFormat.serialize(saxStore)
 
     // Encode bytes
-    encodeBytes(bytes, compress, encrypt)
+    encodeBytes(bytes, compress, encrypt, SecureUtils.KeyUsage.GeneralNoCheck)
   }
 
   def decodeXML(encodedXML: String, forceEncryption: Boolean): Document = {
 
-    val bytes = decodeBytes(encodedXML, forceEncryption)
+    val bytes = decodeBytes(encodedXML, forceEncryption, SecureUtils.KeyUsage.GeneralNoCheck)
 
     // Deserialize bytes to SAXStore
     // TODO: This is not optimal
@@ -55,7 +55,7 @@ object EncodeDecode {
     bytesToEncode: Array[Byte],
     compress     : Boolean,
     encrypt      : Boolean,
-    keyUsage     : SecureUtils.KeyUsage = SecureUtils.KeyUsage.General
+    keyUsage     : SecureUtils.KeyUsage
   ): String = {
 
     // Compress if needed
@@ -75,7 +75,7 @@ object EncodeDecode {
   def decodeBytes(
     encoded        : String,
     forceEncryption: Boolean,
-    keyUsage       : SecureUtils.KeyUsage = SecureUtils.KeyUsage.General
+    keyUsage       : SecureUtils.KeyUsage
   ): Array[Byte] = {
 
     // Get raw text

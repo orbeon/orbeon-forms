@@ -26,6 +26,7 @@
         element="fb|boolean-or-formula"
         xxbl:mode="binding lhha"
         xxbl:label-for="fr-boolean-or-formula-elem">
+        <!-- try adding value without handler -->
 
         <xbl:handlers>
             <xbl:handler event="xforms-select" observer="select1">

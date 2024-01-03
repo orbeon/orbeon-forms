@@ -323,8 +323,18 @@
                         <xsl:for-each select="'xml', 'pdf', 'tiff'">
 
                             <xsl:variable name="type" select="."/>
+                            <xsl:variable name="property-prefix" select="concat('oxf.fr.email.attach-', $type)"/>
+                            <xsl:variable
+                                name="do-attach"
+                                select="
+                                    (
+                                        for $attribute in $template-elem/attach/@*[local-name() = $type] return $attribute = 'true',
+                                        p:property(string-join(($property-prefix, $app, $form), '.')),
+                                        false()
+                                    )[1]"
+                                as="xs:boolean"/>
 
-                            <xsl:if test="p:property(string-join((concat('oxf.fr.email.attach-', $type), $app, $form), '.'))">
+                            <xsl:if test="$do-attach">
 
                                 <xsl:variable
                                     name="filename"

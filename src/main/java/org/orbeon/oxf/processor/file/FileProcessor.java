@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.processor.file;
 
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.optional.ssh.Scp;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
@@ -152,51 +150,6 @@ public class FileProcessor extends ProcessorImpl {
 
                     // Copy
                     copyFile(fromFile, toFile);
-
-
-                } else if (currentElement.getName().equals("scp")) {
-                    // scp operation
-
-                    // Create ant task
-                    final Scp scp = new Scp() {
-                        @Override
-                        public void log(String msg, int msgLevel) {
-                            switch (msgLevel) {
-                                case Project.MSG_ERR:
-                                    logger.error(msg);
-                                    break;
-                                case Project.MSG_WARN:
-                                    logger.warn(msg);
-                                    break;
-                                case Project.MSG_INFO:
-                                    logger.info(msg);
-                                    break;
-                                case Project.MSG_VERBOSE:
-                                case Project.MSG_DEBUG:
-                                    logger.debug(msg);
-                                    break;
-                            }
-                        }
-
-                        private final Project project = new Project() {
-                            @Override
-                            public File getBaseDir() {
-                                return super.getBaseDir();
-                            }
-                        };
-
-                        @Override
-                        public Project getProject() {
-                            return project;
-                        }
-                    };
-                    scp.init();
-
-                    // Set it up
-                    setupScp(scp, currentElement);
-
-                    // Execute it
-                    scp.execute();
                 }
             }
         } catch (Exception e) {
@@ -234,90 +187,6 @@ public class FileProcessor extends ProcessorImpl {
         }
         catch (IOException e) {
             throw new OXFException("Cannot copy file" + sourceFile + " to " + destFile, e);
-        }
-    }
-
-    private void setupScp(Scp scp, Element currentElement) {
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@file");
-            if (value != null)
-                scp.setFile(value);
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@todir");
-            if (value != null)
-                scp.setTodir(value);
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@localFile");
-            if (value != null)
-                scp.setLocalFile(value);
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@remoteFile");
-            if (value != null)
-                scp.setRemoteFile(value);
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@localTodir");
-            if (value != null)
-                scp.setLocalTodir(value);
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@remoteTodir");
-            if (value != null)
-                scp.setRemoteTodir(value);
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@localTofile");
-            if (value != null)
-                scp.setLocalTofile(value);
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@remoteTofile");
-            if (value != null)
-                scp.setRemoteTofile(value);
-        }
-
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@failonerror");
-            if (value != null)
-                scp.setFailonerror(Boolean.parseBoolean(value));
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@verbose");
-            if (value != null)
-                scp.setVerbose(Boolean.parseBoolean(value));
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@password");
-            if (value != null)
-                scp.setPassword(value);
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@keyfile");
-            if (value != null)
-                scp.setKeyfile(value);
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@passphrase");
-            if (value != null)
-                scp.setPassphrase(value);
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@knownhost");
-            if (value != null)
-                scp.setKnownhosts(value);
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@trust");
-            if (value != null)
-                scp.setTrust(Boolean.parseBoolean(value));
-        }
-        {
-            final String value = XPathUtils.selectStringValueNormalize(currentElement, "@port");
-            if (value != null)
-                scp.setPort(Integer.parseInt(value));
         }
     }
 }

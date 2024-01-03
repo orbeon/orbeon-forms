@@ -108,7 +108,6 @@ val CoreLibraryDependencies = Seq(
   "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
   "commons-pool"                %  "commons-pool"                   % "1.6",
   "org.apache.ant"              %  "ant"                            % AntVersion,
-  "org.apache.ant"              %  "ant-jsch"                       % AntVersion,
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
   "com.sun.mail"                % "javax.mail"                      % JavaMailVersion exclude("javax.activation", "activation"),
   "com.sun.activation"          % "javax.activation"                % JavaActivationVersion,
@@ -124,7 +123,6 @@ val CoreLibraryDependencies = Seq(
   "org.apache.logging.log4j"    % "log4j-api"                       % Log4j2Version,
   "org.apache.logging.log4j"    % "log4j-core"                      % Log4j2Version,
   "org.apache.logging.log4j"    % "log4j-1.2-api"                   % Log4j2Version, // for eXist JARs
-  "com.jcraft"                  % "jsch"                            % "0.1.55",
   "com.google.crypto.tink"      % "tink"                            % TinkVersion excludeAll (
     ExclusionRule(organization = "com.amazonaws"),
     ExclusionRule(organization = "com.fasterxml.jackson.core")

@@ -35,7 +35,7 @@ object FieldEncryption {
   ): Unit =
     IOUtils.copyStreamAndClose(inputStream, outputStream)
 
-  def getFieldsToEncrypt(
+  def getControlsToEncrypt(
     formDefinition  : DocumentInfo,
     appForm         : AppForm
   ): List[ControlBindPathHoldersResources] = Nil

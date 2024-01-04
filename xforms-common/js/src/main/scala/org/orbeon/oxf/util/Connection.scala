@@ -298,11 +298,11 @@ object Connection extends ConnectionTrait {
 
     // NOTE: Can't match on `js.Iterable[_]` "because it is a JS trait"
     val responseStream: Option[(fs2.Stream[IO, Byte], Option[Long])] = response.body.toOption map {
-      case v: js.Array[_]                       => streamFromJsIterable(v)          -> Some(v.length)
-      case v: Uint8Array                        => streamFromJsIterable(v)          -> Some(v.length)
-      case v: js.Object => // matching on `sjsdom.ReadableStream[_]` doesn't compile
+      case v: js.Array[_] => streamFromJsIterable(v)          -> Some(v.length)
+      case v: Uint8Array  => streamFromJsIterable(v)          -> Some(v.length)
+      case v: js.Object   => // matching on `sjsdom.ReadableStream[_]` doesn't compile
         fs2dom.readReadableStream(IO(v.asInstanceOf[sjsdom.ReadableStream[Uint8Array]]), cancelAfterUse = true) -> None
-      case _                                    =>
+      case _              =>
         warn("unrecognized response body type, considering empty body")
         fs2.Stream.empty -> None
     }

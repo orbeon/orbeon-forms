@@ -71,7 +71,7 @@ object PersistenceMetadataSupport {
             indexedControlsXPaths  = Eval.later(Index.findIndexedControls(
               formDefinitionDoc,
               appForm,
-              // We only need the controls XPaths, no need to specify the version (used to call the distinct control values API)
+              // We only need the controls XPaths, no need to specify the version (used to call the distinct values API)
               versionOpt = None,
               FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
             ).map(_.xpath))

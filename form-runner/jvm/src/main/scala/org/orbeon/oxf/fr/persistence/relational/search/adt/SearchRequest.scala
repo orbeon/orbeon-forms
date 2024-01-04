@@ -19,6 +19,8 @@ import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Provider
 
+import java.time.Instant
+
 
 trait SearchRequestCommon {
   def provider        : Provider
@@ -35,6 +37,13 @@ case class SearchRequest(
   credentials     : Option[Credentials],
   pageSize        : Int,
   pageNumber      : Int,
+  createdGteOpt      : Option[Instant],
+  createdLtOpt       : Option[Instant],
+  createdBy          : Set[String],
+  lastModifiedGteOpt : Option[Instant],
+  lastModifiedLtOpt  : Option[Instant],
+  lastModifiedBy     : Set[String],
+  workflowStage      : Set[String],
   controls        : List[Control],
   drafts          : Drafts,
   freeTextSearch  : Option[String],

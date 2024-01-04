@@ -38,9 +38,9 @@ import scala.collection.mutable
 
 object SearchLogic {
 
-  // TODO: The methods below are used by the search API, but also by the distinct control values API. Should we leave
-  //   them here, as they're more closely associated with the search API, or move them elsewhere (e.g. in the parent
-  //   package), in which case some classes/methods should be renamed (SearchVersion, SearchPermissions, doSearch, etc.)?
+  // TODO: The methods below are used by the search API, but also by the distinct values API. Should we leave  them
+  //  here, as they're more closely associated with the search API, or move them elsewhere (e.g. in the parent package),
+  //  in which case some classes/methods should be renamed (SearchVersion, SearchPermissions, doSearch, etc.)?
 
   def searchVersion(httpRequest: ExternalContext.Request): SearchVersion = {
     val formDefinitionVersionHeader = httpRequest.getFirstHeaderIgnoreCase(OrbeonFormDefinitionVersion)
@@ -91,12 +91,12 @@ object SearchLogic {
     else
       RelationalUtils.withConnection { connection =>
 
-        val commonParts = List(
+        val commonAndPermissionsParts = List(
           commonPart     (request.appForm, version, controls, freeTextSearch),
           permissionsPart(permissions)
         )
 
-        body(connection, commonParts, permissions)
+        body(connection, commonAndPermissionsParts, permissions)
       }
     }
 
@@ -111,9 +111,9 @@ trait SearchLogic extends SearchRequestParser {
       freeTextSearch    = request.freeTextSearch,
       noPermissionValue = (List[Document](), 0)
     ) {
-      case (connection: Connection, commonParts: List[StatementPart], permissions: SearchPermissions) =>
+      case (connection: Connection, commonAndPermissionsParts: List[StatementPart], permissions: SearchPermissions) =>
 
-        val statementParts = commonParts ++ List(
+        val statementParts = commonAndPermissionsParts ++ metadataPart(request).toList ++ List(
           columnFilterPart  (request),
           draftsPart        (request),
           freeTextFilterPart(request)

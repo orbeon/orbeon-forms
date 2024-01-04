@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.relational.distinctcontrolvalues
+package org.orbeon.oxf.fr.persistence.relational.distinctvalues
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
@@ -23,11 +23,11 @@ import org.orbeon.oxf.util.{NetUtils, XPath}
 import org.orbeon.oxf.xml.XMLReceiver
 
 
-class DistinctControlValuesProcessor
+class DistinctValuesProcessor
   extends ProcessorImpl
-    with DistinctControlValuesRequestParser
-    with DistinctControlValuesLogic
-    with DistinctControlValuesResult {
+    with DistinctValuesRequestParser
+    with DistinctValuesLogic
+    with DistinctValuesResult {
 
   self =>
 
@@ -47,10 +47,10 @@ class DistinctControlValuesProcessor
             XPath.GlobalConfiguration
           )
 
-          val request          = parseRequest(document, SearchLogic.searchVersion(httpRequest))
-          val allControlValues = queryControlValues(request)
+          val request        = parseRequest(document, SearchLogic.searchVersion(httpRequest))
+          val distinctValues = queryDistinctValues(request)
 
-          outputResult(allControlValues, xmlReceiver)
+          outputResult(distinctValues, xmlReceiver)
         }
       }
     )

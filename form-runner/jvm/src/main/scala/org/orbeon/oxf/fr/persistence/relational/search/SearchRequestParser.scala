@@ -21,14 +21,15 @@ import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
-import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider}
+import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider, RelationalUtils}
 import org.orbeon.oxf.fr.persistence.{PersistenceMetadataSupport, SearchVersion}
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{DateUtils, NetUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SimplePath._
 
+import java.time.Instant
 import scala.util.{Failure, Success}
 
 
@@ -118,6 +119,13 @@ trait SearchRequestParser {
           credentials    = credentials,
           pageSize       = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-size"),  10),
           pageNumber     = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-number"), 1),
+          createdGteOpt       = searchElement.elemValueOpt("created-gte")      .map(RelationalUtils.instantFromString),
+          createdLtOpt        = searchElement.elemValueOpt("created-lt")       .map(RelationalUtils.instantFromString),
+          createdBy           = searchElement.elemValues  ("created-by")       .toSet,
+          lastModifiedGteOpt  = searchElement.elemValueOpt("last-modified-gte").map(RelationalUtils.instantFromString),
+          lastModifiedLtOpt   = searchElement.elemValueOpt("last-modified-lt") .map(RelationalUtils.instantFromString),
+          lastModifiedBy      = searchElement.elemValues  ("last-modified-by") .toSet,
+          workflowStage       = searchElement.elemValues  ("workflow-stage")   .toSet,
           freeTextSearch = freeTextElOpt.map(_.stringValue).flatMap(trimAllToOpt), // blank means no search
           controls       = controls,
           drafts         =

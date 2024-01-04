@@ -183,7 +183,6 @@ object SimplePath {
       attValueNonBlankOpt(attName) getOrElse
         (throw new IllegalArgumentException(s"attribute `$attName` is required on element `$name`"))
 
-
     def elemValue(elemName: String) = /(elemName).stringValue
     def elemValue(elemName: QName)  = /(elemName).stringValue
 
@@ -196,6 +195,9 @@ object SimplePath {
       case Seq() => None
       case s     => Some(s.stringValue)
     }
+
+    def elemValues(elemName: String): Seq[String] = /(elemName).map(_.stringValue)
+    def elemValues(elemName: QName): Seq[String]  = /(elemName).map(_.stringValue)
 
     def elemWithLangOpt(elemName: QName, lang: String): Option[NodeInfo] =
       /(elemName) find { _ attValueOpt "*:lang" contains lang }

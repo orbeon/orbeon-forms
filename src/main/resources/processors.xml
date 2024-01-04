@@ -684,8 +684,8 @@
     <processor name="fr:relational-search">
         <class name="org.orbeon.oxf.fr.persistence.relational.search.SearchProcessor"/>
     </processor>
-    <processor name="fr:relational-distinct-control-values">
-        <class name="org.orbeon.oxf.fr.persistence.relational.distinctcontrolvalues.DistinctControlValuesProcessor"/>
+    <processor name="fr:relational-distinct-values">
+        <class name="org.orbeon.oxf.fr.persistence.relational.distinctvalues.DistinctValuesProcessor"/>
     </processor>
     <processor name="fr:attachments-crud">
         <class name="org.orbeon.oxf.fr.persistence.attachments.CRUD"/>

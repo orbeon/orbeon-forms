@@ -9,7 +9,6 @@ import org.orbeon.oxf.fr.FormRunner.createFormDataBasePath
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr._
-import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http._
@@ -124,26 +123,21 @@ trait PersistenceApiTrait {
 
   def distinctControlValues(
     appFormVersion          : AppFormVersion,
-    controlPaths            : Seq[String],
-    anyOfOperationsOpt      : Option[Set[Operation]] = None)(implicit
+    controlPaths            : Seq[String])(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Seq[ControlDetails] = {
 
-    debug(s"calling distinct control values for `$appFormVersion`")
+    debug(s"calling distinct values for `$appFormVersion`")
 
-    val servicePath = s"/fr/service/persistence/distinct-control-values/${appFormVersion._1.app}/${appFormVersion._1.form}"
+    val servicePath = s"/fr/service/persistence/distinct-values/${appFormVersion._1.app}/${appFormVersion._1.form}"
 
     val queryXml =
-      <distinct-control-values>{
+      <distinct-values>{
         controlPaths.map { controlPath =>
           <control path={controlPath}/>
-        } ++ {
-          anyOfOperationsOpt.filter(_.nonEmpty).toList.map { anyOfOperations =>
-            <operations any-of={anyOfOperations.toSeq.map(_.entryName).mkString(" ")}/>
-          }
         }
-      }</distinct-control-values>
+      }</distinct-values>
 
     val controlsXml = documentsXmlTry(servicePath, queryXml, appFormVersion._2).get
 

@@ -73,7 +73,7 @@ private[persistence] object HttpAssert extends XMLSupport {
         body match {
           case HttpCall.XML(expectedDoc) =>
             val resultDoc = IOSupport.readOrbeonDom(new ByteArrayInputStream(resultBody.get))
-            assertXMLDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc)
+            assertXMLDocumentsIgnoreNamespacesInScope(expectedDoc, resultDoc)
           case HttpCall.Binary(expectedFile) =>
             // Compare `java.lang.Array[Byte]` with `sameElements`, as `==` always returns `false` on `java.lang.Array`
             assert(resultBody.get sameElements expectedFile)
@@ -107,7 +107,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Unit = {
-    val actualCode = HttpCall.post(url, version, body, credentials)
+    val actualCode = HttpCall.post(url, version, body, credentials).statusCode
     assert(actualCode == expectedCode)
   }
 
@@ -122,7 +122,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Unit = {
-    val actualCode = HttpCall.put(url, version, stage, body, credentials)
+    val actualCode = HttpCall.put(url, version, stage, body, credentials).statusCode
     assert(actualCode == expectedCode)
   }
 
@@ -135,7 +135,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Unit = {
-    val actualCode = HttpCall.del(url, version, credentials)
+    val actualCode = HttpCall.del(url, version, credentials).statusCode
     assert(actualCode == expectedCode)
   }
 

@@ -17,7 +17,7 @@
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 
-    <p:processor name="fr:relational-distinct-control-values">
+    <p:processor name="fr:relational-distinct-values">
         <p:input  name="data" href="#instance"/>
         <p:output name="data" ref="data"/>
     </p:processor>

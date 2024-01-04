@@ -15,21 +15,24 @@ package org.orbeon.oxf.fr.persistence.test
 
 import org.orbeon.dom.Document
 import org.orbeon.oxf.fr.persistence.db.Connect
-import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
-import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
+import org.orbeon.oxf.fr.persistence.http.HttpCall
+import org.orbeon.oxf.fr.persistence.http.HttpCall.assertCall
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Version.{Specific, Unspecified}
 import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
-import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.scaxon.NodeConversions
 import org.scalatest.concurrent.Eventually.eventually
 import org.scalatest.concurrent.Futures.{interval, timeout}
 import org.scalatest.funspec.AnyFunSpecLike
 import org.scalatest.time.{Second, Seconds, Span}
+
+import java.io.ByteArrayInputStream
+import java.time.Instant
 
 class SearchTest
     extends DocumentTestBase
@@ -39,6 +42,8 @@ class SearchTest
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[SearchTest]), true)
   private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+
+  private val controlPath = "section-1/control-1"
 
   describe("Search API") {
 
@@ -62,10 +67,10 @@ class SearchTest
 
           HttpCall.assertCall(
             HttpCall.SolicitedRequest(
-              path = SearchURL,
+              path    = SearchURL,
               version = Specific(1),
-              method = POST,
-              body = Some(HttpCall.XML(searchRequest))
+              method  = POST,
+              body    = Some(HttpCall.XML(searchRequest))
             ),
             HttpCall.ExpectedResponse(
               code = StatusCode.Ok,
@@ -87,24 +92,19 @@ class SearchTest
 
         val searchRequest =
           <search>
-            <query>{ lookingFor }</query>
-            <query path="section-1/control-1"/>
+            <query>{lookingFor}</query>
+            <query path={controlPath}/>
             <drafts>include</drafts>
             <page-size>10</page-size>
             <page-number>1</page-number>
             <lang>en</lang>
           </search>.toDocument
 
-        val searchResult =
-          <documents search-total="1">
-            <document name="1" draft="false" operations="*">
-              <details>
-                <detail path="section-1/control-1">{ lookingFor }</detail>
-              </details>
-            </document>
-          </documents>.toDocument
-
-        testWithSimpleValues(searchRequest, searchResult, values = Seq("1" -> lookingFor, "2" -> notLookingFor))
+        testWithSimpleValues(
+          searchRequest         = _ => searchRequest,
+          expectedDocumentNames = Set("1"),
+          formData              = Seq(FormData("1", lookingFor), FormData("2", notLookingFor))
+        )
       }
     }
 
@@ -112,7 +112,7 @@ class SearchTest
       val searchRequest =
         <search>
           <query>t_st3 *test4*</query>
-          <query path="section-1/control-1"/>
+          <query path={controlPath}/>
           <drafts>include</drafts>
           <page-size>10</page-size>
           <page-number>1</page-number>
@@ -121,21 +121,16 @@ class SearchTest
 
       // Test Oracle and SQL Server's AND logic (see Provider.xmlContainsParam)
 
-      val searchResult =
-        <documents search-total="1">
-          <document name="3" draft="false" operations="*">
-            <details>
-              <detail path="section-1/control-1">*t_st3* *test4* *test5*</detail>
-            </details>
-          </document>
-        </documents>.toDocument
-
       testWithSimpleValues(
-        searchRequest = searchRequest,
-        searchResult  = searchResult,
-        values        = Seq("1" -> "*test1*", "2" -> "*test2*", "3" -> "*t_st3* *test4* *test5*"),
+        searchRequest         = _ => searchRequest,
+        expectedDocumentNames = Set("3"),
+        formData              = Seq(
+          FormData("1", "*test1*"),
+          FormData("2", "*test2*"),
+          FormData("3", "*t_st3* *test4* *test5*")
+        ),
         // TODO: add test for other databases as well
-        providers     = Some(List())
+        providers             = Some(List())
       )
     }
 
@@ -143,154 +138,249 @@ class SearchTest
       val searchRequest =
         <search>
           <query/>
-          <query path="section-1/control-1" match="substring">t_st</query>
+          <query path={controlPath} match="substring">t_st</query>
           <drafts>include</drafts>
           <page-size>10</page-size>
           <page-number>1</page-number>
           <lang>en</lang>
         </search>.toDocument
 
-      val searchResult =
-        <documents search-total="1">
-          <document name="3" draft="false" operations="*">
-            <details>
-              <detail path="section-1/control-1">*t_st3*</detail>
-            </details>
-          </document>
-        </documents>.toDocument
-
-      testWithSimpleValues(searchRequest, searchResult, values = Seq("1" -> "*test1*", "2" -> "*test2*", "3" -> "*t_st3*"))
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest,
+        expectedDocumentNames = Set("3"),
+        formData              = Seq(
+          FormData("1", "*test1*"),
+          FormData("2", "*test2*"),
+          FormData("3", "*t_st3*")
+        )
+      )
     }
 
     it("returns correct results with underscores (structured text, exact)") {
       val searchRequest =
         <search>
           <query/>
-          <query path="section-1/control-1" match="exact">t_st</query>
+          <query path={controlPath} match="exact">t_st</query>
           <drafts>include</drafts>
           <page-size>10</page-size>
           <page-number>1</page-number>
           <lang>en</lang>
         </search>.toDocument
 
-      val searchResult =
-        <documents search-total="1">
-          <document name="3" draft="false" operations="*">
-            <details>
-              <detail path="section-1/control-1">t_st</detail>
-            </details>
-          </document>
-        </documents>.toDocument
-
-      testWithSimpleValues(searchRequest, searchResult, values = Seq("1" -> "t1st", "2" -> "t2st", "3" -> "t_st", "4" -> "*t_st*"))
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest,
+        expectedDocumentNames = Set("3"),
+        formData              = Seq(
+          FormData("1", "t1st"),
+          FormData("2", "t2st"),
+          FormData("3", "t_st"),
+          FormData("4", "*t_st*")
+        )
+      )
     }
 
     it("returns correct results with underscores (structured text, token)") {
-      val values = Seq(
-        "1" -> "t1st",
-        "2" -> "t1st t2st",
-        "3" -> "t1st t2st t3st",
-        "4" -> "t_st t2st t3st",
-        "5" -> "t1st t_st t3st",
-        "6" -> "t1st t2st t_st",
-        "7" -> "t1st t2st *t_st*"
+      val formData = Seq(
+        FormData("1", "t1st"),
+        FormData("2", "t1st t2st"),
+        FormData("3", "t1st t2st t3st"),
+        FormData("4", "t_st t2st t3st"),
+        FormData("5", "t1st t_st t3st"),
+        FormData("6", "t1st t2st t_st"),
+        FormData("7", "t1st t2st *t_st*")
       )
 
       val searchRequest1 =
         <search>
           <query/>
-          <query path="section-1/control-1" match="token">t_st</query>
+          <query path={controlPath} match="token">t_st</query>
           <drafts>include</drafts>
           <page-size>10</page-size>
           <page-number>1</page-number>
           <lang>en</lang>
         </search>.toDocument
 
-      val searchResult1 =
-        <documents search-total="3">
-          <document name="4" draft="false" operations="*">
-            <details>
-              <detail path="section-1/control-1">t_st t2st t3st</detail>
-            </details>
-          </document>
-          <document name="5" draft="false" operations="*">
-            <details>
-              <detail path="section-1/control-1">t1st t_st t3st</detail>
-            </details>
-          </document>
-          <document name="6" draft="false" operations="*">
-            <details>
-              <detail path="section-1/control-1">t1st t2st t_st</detail>
-            </details>
-          </document>
-        </documents>.toDocument
-
-      testWithSimpleValues(searchRequest1, searchResult1, values)
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest1,
+        expectedDocumentNames = Set("4", "5", "6"),
+        formData              = formData
+      )
 
       val searchRequest2 =
         <search>
           <query/>
-          <query path="section-1/control-1" match="token">t3st t_st</query>
+          <query path={controlPath} match="token">t3st t_st</query>
           <drafts>include</drafts>
           <page-size>10</page-size>
           <page-number>1</page-number>
           <lang>en</lang>
         </search>.toDocument
 
-      val searchResult2 =
-        <documents search-total="2">
-          <document name="4" draft="false" operations="*">
-            <details>
-              <detail path="section-1/control-1">t_st t2st t3st</detail>
-            </details>
-          </document>
-          <document name="5" draft="false" operations="*">
-            <details>
-              <detail path="section-1/control-1">t1st t_st t3st</detail>
-            </details>
-          </document>
-        </documents>.toDocument
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest2,
+        expectedDocumentNames = Set("4", "5"),
+        formData              = formData
+      )
+    }
 
-      testWithSimpleValues(searchRequest2, searchResult2, values)
+    it("returns correct results with created by, last modified by, and workflow stage") {
+      def searchRequest(
+        createdByOpt     : Option[String] = None,
+        lastModifiedByOpt: Option[String] = None,
+        workflowStageOpt : Option[String] = None
+      ) =
+        <search>{
+          val baseParams =
+            <_>
+              <query/>
+              <query path={controlPath} match="substring">test</query>
+              <drafts>include</drafts>
+              <page-size>10</page-size>
+              <page-number>1</page-number>
+              <lang>en</lang>
+            </_>
+
+          baseParams.child ++
+            createdByOpt     .map(createdBy      => <created-by>{createdBy}</created-by>                 ).getOrElse(Seq.empty) ++
+            lastModifiedByOpt.map(lastModifiedBy => <last-modified-by>{lastModifiedBy}</last-modified-by>).getOrElse(Seq.empty) ++
+            workflowStageOpt .map(workflowStage  => <workflow-stage>{workflowStage}</workflow-stage>     ).getOrElse(Seq.empty)
+        }</search>.toDocument
+
+      val formData = Seq(
+        FormData("1", "test1", createdByOpt = Some("created-by-1"), lastModifiedByOpt = Some("last-modified-by-1"), workflowStageOpt = Some("stage-1")),
+        FormData("2", "test2", createdByOpt = Some("created-by-2"), lastModifiedByOpt = Some("last-modified-by-2"), workflowStageOpt = Some("stage-2")),
+        FormData("3", "test3", createdByOpt = Some("created-by-3"), lastModifiedByOpt = Some("last-modified-by-3"), workflowStageOpt = Some("stage-3")),
+        FormData("4", "test4", createdByOpt = Some("created-by-4"), lastModifiedByOpt = Some("last-modified-by-4"), workflowStageOpt = Some("stage-4"))
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest(createdByOpt = Some("created-by-1")),
+        expectedDocumentNames = Set("1"),
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest(lastModifiedByOpt = Some("last-modified-by-2")),
+        expectedDocumentNames = Set("2"),
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest(workflowStageOpt = Some("stage-3")),
+        expectedDocumentNames = Set("3"),
+        formData              = formData
+      )
+    }
+
+    it("returns correct results with creation and modification dates") {
+      def searchRequest(
+         createdGteOpt     : Option[Instant] = None,
+         createdLtOpt      : Option[Instant] = None,
+         lastModifiedGteOpt: Option[Instant] = None,
+         lastModifiedLtOpt : Option[Instant] = None
+       ) =
+        <search>{
+          val baseParams =
+            <_>
+              <query/>
+              <query path={controlPath} match="substring">test</query>
+              <drafts>include</drafts>
+              <page-size>10</page-size>
+              <page-number>1</page-number>
+              <lang>en</lang>
+            </_>
+
+          baseParams.child ++
+            createdGteOpt     .map(createdGte      => <created-gte>{createdGte}</created-gte>                 ).getOrElse(Seq.empty) ++
+            createdLtOpt      .map(createdLt       => <created-lt>{createdLt}</created-lt>                    ).getOrElse(Seq.empty) ++
+            lastModifiedGteOpt.map(lastModifiedGte => <last-modified-gte>{lastModifiedGte}</last-modified-gte>).getOrElse(Seq.empty) ++
+            lastModifiedLtOpt .map(lastModifiedLt  => <last-modified-lt>{lastModifiedLt}</last-modified-lt>   ).getOrElse(Seq.empty)
+          }</search>.toDocument
+
+      val formData = Seq(
+        FormData("1", "test1", createdByOpt = Some("created-by-1")),
+        FormData("2", "test2", createdByOpt = Some("created-by-2"), lastModifiedByOpt = Some("last-modified-by-2")),
+        FormData("3", "test3", createdByOpt = Some("created-by-3")),
+        FormData("4", "test4", createdByOpt = Some("created-by-4"), lastModifiedByOpt = Some("last-modified-by-4"))
+      )
+
+      testWithSimpleValues(
+        // >= creation date of document 3
+        searchRequest         = formDataAndDates => searchRequest(createdGteOpt = Some(formDataAndDates.map(_._2).apply(2).createdBy)),
+        expectedDocumentNames = Set("3", "4"),
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        // < creation date of document 3
+        searchRequest         = formDataAndDates => searchRequest(createdLtOpt = Some(formDataAndDates.map(_._2).apply(2).createdBy)),
+        expectedDocumentNames = Set("1", "2"),
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        // >= modification date of document 2
+        searchRequest         = formDataAndDates => searchRequest(lastModifiedGteOpt = Some(formDataAndDates.map(_._2).apply(1).lastModifiedBy)),
+        expectedDocumentNames = Set("2", "3", "4"),
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        // < modification date of document 4
+        searchRequest         = formDataAndDates => searchRequest(lastModifiedLtOpt = Some(formDataAndDates.map(_._2).apply(3).lastModifiedBy)),
+        expectedDocumentNames = Set("1", "2", "3"),
+        formData              = formData
+      )
     }
   }
 
   def testWithSimpleValues(
-    searchRequest: Document,
-    searchResult : Document,
-    values       : Seq[(String, String)],
-    providers    : Option[List[Provider]] = None
+    searchRequest        : Seq[(FormData, FormDataDates)] => Document,
+    expectedDocumentNames: Set[String],
+    formData             : Seq[FormData],
+    providers            : Option[List[Provider]] = None
   ): Unit =
     withTestExternalContext { implicit externalContext =>
       Connect.withOrbeonTables("form definition") { (connection, provider) =>
         if (providers.forall(_.contains(provider))) {
-          val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
+          val testForm  = TestForm(provider, controls = Seq(TestForm.Control("control label")))
+          val version   = Specific(1)
 
-          HttpAssert.put(formURL, Unspecified, HttpCall.XML(testFormDefinition(provider)), StatusCode.Created)
+          testForm.putFormDefinition(version)
 
-          // TODO: we might want to publish the form and remove the `migration` metadata from the form definition
-
-          def dataURL(id: String) = HttpCall.crudURLPrefix(provider) + s"data/$id/data.xml"
-
-          values.foreach { case (id, value) =>
-            HttpAssert.put(dataURL(id), Specific(1), HttpCall.XML(testFormData(value)), StatusCode.Created)
-          }
+          // Create the form data and retrieve creation/modification dates
+          val formDataDates = testForm.putFormData(version, formData, returnDates = true)
 
           // Use eventually clause mainly for SQL Server, which doesn't update its indexes during several seconds after
           // the form data has been created
           eventually(timeout(Span(10, Seconds)), interval(Span(1, Second))) {
-            HttpCall.assertCall(
-              HttpCall.SolicitedRequest(
+            assertCall(
+              actualRequest  = HttpCall.SolicitedRequest(
                 path              = HttpCall.searchURLPrefix(provider),
                 version           = Unspecified,
                 method            = POST,
-                body              = Some(HttpCall.XML(searchRequest)),
+                body              = Some(HttpCall.XML(searchRequest(formData.zip(formDataDates)))),
                 xmlResponseFilter = Some(searchResultFilter)
               ),
-              HttpCall.ExpectedResponse(
-                code = StatusCode.Ok,
-                body = Some(HttpCall.XML(searchResult))
-              )
+              assertResponse = actualResponse => {
+                // Extract document names from the response
+                val resultDoc     = IOSupport.readOrbeonDom(new ByteArrayInputStream(actualResponse.body))
+                val root          = resultDoc.getRootElement
+                val documentNames = root.elements("document").map(_.attribute("name").getValue).toSet
+
+                assert(documentNames == expectedDocumentNames)
+
+                for {
+                  document <- root.elements("document")
+                  name      = document.attribute("name").getValue
+                  details  <- document.elements("details")
+                  detail   <- details.elements("detail")
+                  value     = detail.getText
+                } {
+                  // Make sure the returned values are correct
+                  assert(formData.find(_.id == name).get.singleControlValue == value)
+                }
+              }
             )
           }
         }
@@ -303,9 +393,12 @@ class SearchTest
     import scala.xml._
 
     def withFilteredAttributes(elem: Elem): Elem = {
+      val attributesToRemove =
+        Set("created", "last-modified", "operations", "created-by", "last-modified-by", "workflow-stage")
+
       val filteredAttributes = elem.attributes.filter {
-        case Attribute(key, _, _) if Set("created", "last-modified", "operations").contains(key) => false
-        case _                                                                                   => true
+        case Attribute(key, _, _) if attributesToRemove.contains(key) => false
+        case _                                                        => true
       }
       elem.copy(attributes = filteredAttributes)
     }
@@ -323,123 +416,4 @@ class SearchTest
 
     NodeConversions.elemToOrbeonDom(rootElem.copy(child = filteredResultDocuments))
   }
-
-  // Make sure there's no whitespace around the value
-  def testFormData(value: String): Document =
-    <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
-      <section-1>
-        <control-1>{value}</control-1>
-      </section-1>
-    </form>.toDocument
-
-  def testFormDefinition(provider: Provider, formName: String = DefaultFormName): Document =
-    <xh:html
-        xmlns:xh="http://www.w3.org/1999/xhtml"
-        xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-        xmlns:map="http://www.w3.org/2005/xpath-functions/map"
-        xmlns:array="http://www.w3.org/2005/xpath-functions/array"
-        xmlns:math="http://www.w3.org/2005/xpath-functions/math"
-        xmlns:exf="http://www.exforms.org/exf/1-0"
-        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:saxon="http://saxon.sf.net/"
-        xmlns:sql="http://orbeon.org/oxf/xml/sql"
-        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-        xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
-      <xh:head>
-        <xh:title>{formName}</xh:title>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
-          <!-- Main instance -->
-          <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
-            <form>
-              <section-1>
-                <grid-1>
-                  <control-1/>
-                </grid-1>
-              </section-1>
-            </form>
-          </xf:instance>
-          <!-- Bindings -->
-          <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
-            <xf:bind id="section-1-bind" name="section-1" ref="section-1">
-              <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
-                <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
-              </xf:bind>
-            </xf:bind>
-          </xf:bind>
-          <!-- Metadata -->
-          <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
-            <metadata>
-              <application-name>{provider.entryName}</application-name>
-              <form-name>{formName}</form-name>
-              <title xml:lang="en">{formName}</title>
-              <description xml:lang="en"></description>
-              <created-with-version>2022.1-SNAPSHOT PE</created-with-version>
-              <email>
-                <templates>
-                  <template name="default">
-                    <form-fields></form-fields>
-                  </template>
-                </templates>
-                <parameters></parameters>
-              </email>
-              <grid-tab-order>default</grid-tab-order>
-              <library-versions></library-versions>
-              <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version>
-              <migration version="2019.1.0">
-                {{"migrations":[ {{"containerPath": [ {{"value": "section-1"}}], "newGridElem": {{"value": "grid-1"}}, "afterElem": null, "content": [ {{"value": "control-1"}}], "topLevel": true}}]}}
-              </migration>
-            </metadata>
-          </xf:instance>
-          <!-- Attachments -->
-          <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
-            <attachments></attachments>
-          </xf:instance>
-          <!-- All form resources -->
-          <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
-            <resources>
-              <resource xml:lang="en">
-                <section-1>
-                  <label>Untitled Section</label>
-                </section-1>
-                <control-1>
-                  <label>Text field</label>
-                  <hint></hint>
-                </control-1>
-              </resource>
-            </resources>
-          </xf:instance>
-        </xf:model>
-      </xh:head>
-      <xh:body>
-        <fr:view>
-          <fr:body
-              xmlns:p="http://www.orbeon.com/oxf/pipeline"
-              xmlns:xbl="http://www.w3.org/ns/xbl"
-              xmlns:oxf="http://www.orbeon.com/oxf/processors">
-            <fr:section id="section-1-section" bind="section-1-bind">
-              <xf:label ref="$form-resources/section-1/label"></xf:label>
-              <fr:grid id="grid-1-grid" bind="grid-1-bind">
-                <fr:c y="1" x="1" w="6">
-                  <xf:input id="control-1-control" bind="control-1-bind">
-                    <fr:index>
-                      <fr:summary-show/>
-                    </fr:index>
-                    <xf:label ref="$form-resources/control-1/label"></xf:label>
-                    <xf:hint ref="$form-resources/control-1/hint"></xf:hint>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
-                  </xf:input>
-                </fr:c>
-                <fr:c y="1" x="7" w="6"/>
-              </fr:grid>
-            </fr:section>
-          </fr:body>
-        </fr:view>
-      </xh:body>
-    </xh:html>.toDocument
 }

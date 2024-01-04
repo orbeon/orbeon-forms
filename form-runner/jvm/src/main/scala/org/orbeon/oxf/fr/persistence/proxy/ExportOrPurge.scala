@@ -186,12 +186,12 @@ trait ExportOrPurge {
 
     val dateRangeGtOpt =
       request.getFirstParamAsString(DateRangeGtParam).map { dateRangeGe =>
-        Instant.parse(dateRangeGe)
+        RelationalUtils.instantFromString(dateRangeGe)
       }
 
     val dateRangeLtOpt =
       request.getFirstParamAsString(DateRangeLtParam).map { dateRangeLe =>
-        Instant.parse(dateRangeLe)
+        RelationalUtils.instantFromString(dateRangeLe)
       }
 
     processImpl(

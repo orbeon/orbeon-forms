@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.part
 
+import org.orbeon.oxf.fr.persistence.relational.Statement
 import org.orbeon.oxf.fr.persistence.relational.Statement.StatementPart
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
@@ -23,7 +24,7 @@ object draftsPart {
 
   def apply(request: SearchRequest): StatementPart =
     request.drafts match {
-      case IncludeDrafts => StatementPart("", Nil)
+      case IncludeDrafts => Statement.NilPart
       case ExcludeDrafts => StatementPart(" AND c.draft = 'N'", Nil)
       case OnlyDrafts(whichDrafts) =>
         val justDraft = " AND c.draft = 'Y'"

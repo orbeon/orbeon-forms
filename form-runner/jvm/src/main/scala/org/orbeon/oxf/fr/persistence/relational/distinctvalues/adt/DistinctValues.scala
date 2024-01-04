@@ -11,6 +11,13 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.relational.distinctcontrolvalues.adt
+package org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt
 
 case class ControlValues(path: String, distinctValues: Seq[String])
+
+case class DistinctValues(
+  controlValues       : Seq[ControlValues] = Seq.empty,
+  createdByValues     : Option[Seq[String]] = None,
+  lastModifiedByValues: Option[Seq[String]] = None,
+  workflowStageValues : Option[Seq[String]] = None
+)

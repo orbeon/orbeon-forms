@@ -23,9 +23,10 @@ import org.orbeon.oxf.processor.DatabaseContext
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Logging, NetUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtilsUsingSaxon, IndentedLogger, LoggerFactory, Logging, NetUtils}
 
 import java.sql.{Connection, ResultSet}
+import java.time.Instant
 import javax.naming.InitialContext
 import javax.sql.DataSource
 import scala.collection.compat._
@@ -141,4 +142,14 @@ object RelationalUtils extends Logging {
         case None              => throw HttpStatusCodeException(StatusCode.BadRequest)
         case Some(v)           => v
     }.getOrElse(default)
+
+
+  def instantFromString(string: String): Instant =
+    Try {
+      Instant.parse(string)
+    } orElse Try {
+      Instant.ofEpochMilli(DateUtilsUsingSaxon.parseISODateOrDateTime(string))
+    } getOrElse {
+      throw new IllegalArgumentException(s"Invalid date/time format: $string")
+    }
 }

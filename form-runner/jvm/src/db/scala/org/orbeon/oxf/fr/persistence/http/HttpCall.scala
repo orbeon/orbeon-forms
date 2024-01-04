@@ -13,14 +13,16 @@
  */
 package org.orbeon.oxf.fr.persistence.http
 
-import org.orbeon.connection.StreamedContent
+import org.apache.commons.io.IOUtils.toByteArray
+import org.orbeon.connection.{BufferedContent, ConnectionResult, StreamedContent}
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
+import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.Operations
-import org.orbeon.oxf.fr.persistence.relational.Version.Unspecified
+import org.orbeon.oxf.fr.persistence.relational.Version.{Specific, Unspecified}
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
@@ -63,9 +65,59 @@ private[persistence] object HttpCall {
     body        : Option[Body]        = None
   )
 
+  case class Response(
+    code        : Int,
+    operations  : Operations,
+    formVersion : Option[Int],
+    body        : Array[Byte]
+  )
+
   def assertCall(
     actualRequest            : SolicitedRequest,
     expectedResponse         : ExpectedResponse)(implicit
+    logger                   : IndentedLogger,
+    externalContext          : ExternalContext,
+    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+  ): Unit =
+    assertCall(
+      actualRequest  = actualRequest,
+      assertResponse = actualResponse => {
+        // Check response code
+        assert(actualResponse.code == expectedResponse.code)
+
+        // Check operations
+        expectedResponse.operations.foreach { expectedOperations =>
+          assert(actualResponse.operations == expectedOperations)
+        }
+
+        // Check form version
+        assert(actualResponse.formVersion == expectedResponse.formVersion)
+
+        // Check body
+        expectedResponse.body.foreach {
+          case HttpCall.XML(originalExpectedDoc) =>
+            val originalResultDoc  = IOSupport.readOrbeonDom(new ByteArrayInputStream(actualResponse.body))
+
+            val (resultDoc, expectedDoc) = actualRequest.xmlResponseFilter match {
+              case None         => (       originalResultDoc,         originalExpectedDoc)
+              case Some(filter) => (filter(originalResultDoc), filter(originalExpectedDoc))
+            }
+
+            if (! Comparator.compareDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc))
+              assert(
+                resultDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===
+                  expectedDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat)
+              )
+
+          case HttpCall.Binary(expectedFile) =>
+            assert(actualResponse.body sameElements expectedFile)
+        }
+      }
+    )
+
+  def assertCall(
+    actualRequest            : SolicitedRequest,
+    assertResponse           : Response => Unit)(implicit
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
@@ -85,45 +137,18 @@ private[persistence] object HttpCall {
       val actualResponse = closableHttpResponse.httpResponse
       val actualHeaders  = actualResponse.headers
 
-      // Check response code
-      assert(actualResponse.statusCode == expectedResponse.code)
-
-      // Check operations
-      expectedResponse.operations.foreach { expectedOperations =>
-        assert(Operations.parseFromHeaders(actualHeaders).getOrElse(Operations.None) == expectedOperations)
-      }
-
-      // Check form version
-      val resultFormVersion = actualHeaders.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)
-      assert(expectedResponse.formVersion == resultFormVersion)
-
-      // Check body
-      expectedResponse.body.foreach { expectedBody =>
-        val actualBody = {
+      val response = Response(
+        code        = actualResponse.statusCode,
+        operations  = Operations.parseFromHeaders(actualHeaders).getOrElse(Operations.None),
+        formVersion = actualHeaders.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt),
+        body        = {
           val outputStream = new ByteArrayOutputStream
           IOUtils.copyStreamAndClose(actualResponse.content.stream, outputStream)
           outputStream.toByteArray
         }
+      )
 
-        expectedBody match {
-          case HttpCall.XML(originalExpectedDoc) =>
-            val originalResultDoc  = IOSupport.readOrbeonDom(new ByteArrayInputStream(actualBody))
-
-            val (resultDoc, expectedDoc) = actualRequest.xmlResponseFilter match {
-              case None         => (       originalResultDoc,         originalExpectedDoc)
-              case Some(filter) => (filter(originalResultDoc), filter(originalExpectedDoc))
-            }
-
-            if (! Comparator.compareDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc))
-              assert(
-                resultDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===
-                  expectedDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat)
-              )
-
-          case HttpCall.Binary(expectedFile) =>
-            assert(actualBody == expectedFile)
-        }
-      }
+      assertResponse(response)
     }
   }
 
@@ -201,10 +226,11 @@ private[persistence] object HttpCall {
   }
 
   val DefaultFormName = "my-form"
-  def crudURLPrefix                (provider: Provider, formName: String = DefaultFormName) = s"crud/${provider.entryName}/$formName/"
-  def searchURLPrefix              (provider: Provider, formName: String = DefaultFormName) = s"search/${provider.entryName}/$formName"
-  def metadataURL                  (provider: Provider, formName: String = DefaultFormName) = s"form/${provider.entryName}/$formName"
-  def distinctControlValueURLPrefix(provider: Provider, formName: String = DefaultFormName) = s"distinct-control-values/${provider.entryName}/$formName"
+  def crudURLPrefix         (appForm: AppForm): String                                       = s"crud/${appForm.app}/${appForm.form}/"
+  def crudURLPrefix         (provider: Provider, formName: String = DefaultFormName): String = crudURLPrefix(AppForm(provider.entryName, formName))
+  def searchURLPrefix       (provider: Provider, formName: String = DefaultFormName): String = s"search/${provider.entryName}/$formName"
+  def metadataURL           (provider: Provider, formName: String = DefaultFormName): String = s"form/${provider.entryName}/$formName"
+  def distinctValueURLPrefix(provider: Provider, formName: String = DefaultFormName): String = s"distinct-values/${provider.entryName}/$formName"
 
   def post(
     url                      : String,
@@ -214,8 +240,8 @@ private[persistence] object HttpCall {
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
-  ): Int =
-    useAndClose(request(url, POST, version, None, Some(body), credentials))(_.httpResponse.statusCode)
+  ): HttpResponse =
+    useAndClose(request(url, POST, version, None, Some(body), credentials))(_.httpResponse)
 
   def put(
     url                      : String,
@@ -226,8 +252,8 @@ private[persistence] object HttpCall {
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
-  ): Int =
-    useAndClose(request(url, PUT, version, stage, Some(body), credentials))(_.httpResponse.statusCode)
+  ): HttpResponse =
+    useAndClose(request(url, PUT, version, stage, Some(body), credentials))(_.httpResponse)
 
   def del(
     url                      : String,
@@ -236,8 +262,8 @@ private[persistence] object HttpCall {
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
-  ): Int =
-    useAndClose(request(url, DELETE, version, None, None, credentials))(_.httpResponse.statusCode)
+  ): HttpResponse =
+    useAndClose(request(url, DELETE, version, None, None, credentials))(_.httpResponse)
 
   def get(
     url                      : String,
@@ -296,5 +322,36 @@ private[persistence] object HttpCall {
       val body = Some(XML(LockInfo.toOrbeonDom(lockInfo)))
       useAndClose(request(url, method, Version.Unspecified, None, body, None, None, timeout))(_.httpResponse.statusCode)
     }
+  }
+
+  // Used to test PersistenceApi (dataHistory, etc.)
+  def connectPersistence(
+    method                   : HttpMethod,
+    path                     : String,
+    requestBodyContent       : Option[StreamedContent] = None,
+    formVersionOpt           : Option[Int] = None,
+    customHeaders            : Map[String, List[String]] = Map.empty)(implicit
+    logger                   : IndentedLogger,
+    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+  ): ConnectionResult = {
+
+    implicit val ec: ExternalContext = coreCrossPlatformSupport.externalContext
+
+    val chr = HttpCall.request(
+      path        = path.stripPrefix(PersistenceBase),
+      method      = method,
+      version     = formVersionOpt.map(Specific).getOrElse(Unspecified),
+      stage       = None,
+      body        = requestBodyContent.map(sc => Binary(BufferedContent(sc)(toByteArray).body)),
+      credentials = None
+    )
+
+    ConnectionResult(
+      url                = path,
+      statusCode         = chr.httpResponse.statusCode,
+      headers            = chr.httpResponse.headers,
+      content            = chr.httpResponse.content,
+      dontHandleResponse = false
+    )
   }
 }

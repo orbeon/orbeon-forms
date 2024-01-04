@@ -1,11 +1,25 @@
 package org.orbeon.oxf.fr.persistence.test
 
 import org.orbeon.dom.Document
+import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext, UserAndGroup}
+import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
+import org.orbeon.oxf.fr.persistence.api.PersistenceApi.headerFromRFC1123OrIso
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
-import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
+import org.orbeon.oxf.fr.persistence.relational.{Provider, Version}
+import org.orbeon.oxf.fr.workflow.definitions20201.Stage
+import org.orbeon.oxf.http.{Headers, StatusCode}
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger}
 import org.orbeon.oxf.xml.dom.Converter.ScalaElemConverterOps
 
+import java.time.Instant
+
 object TestForm {
+  def apply(provider: Provider, controls: Seq[TestForm.Control], formName: String = DefaultFormName): TestForm =
+    TestForm(AppForm(provider.entryName, formName), title = formName, controls)
+
   case class Control(label: String)
 
   private def controlName(index: Int) = s"control-${index + 1}"
@@ -20,25 +34,92 @@ object TestForm {
       child         = children: _*)
 }
 
-case class TestForm(controls: Seq[TestForm.Control], formName: String = DefaultFormName) {
+case class FormData(
+  id                : String,
+  singleControlValue: String,
+  createdByOpt      : Option[String] = None,
+  lastModifiedByOpt : Option[String] = None,
+  workflowStageOpt  : Option[String] = None
+)
+
+case class FormDataDates(createdBy: Instant, lastModifiedBy: Instant)
+
+case class TestForm(appForm: AppForm, title: String, controls: Seq[TestForm.Control]) {
 
   def controlPath(index: Int): String = s"section-1/${TestForm.controlName(index)}"
 
-  def formData(values: Seq[String]): Document = {
-    assert(controls.size == values.size)
+  def formDefinitionURL: String       = HttpCall.crudURLPrefix(appForm) + s"form/$FormXhtml"
+  def formDataURL(id: String): String = HttpCall.crudURLPrefix(appForm) + s"data/$id/$DataXml"
 
-    <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
-      <section-1>{
-        values.zipWithIndex.map { case (value, index) =>
-          TestForm.controlElem(index, children = Seq(xml.Text(value)))
-        }
-      }</section-1>
-    </form>.toDocument
+  def putFormDefinition(
+    version                 : Version)(implicit
+    logger                  : IndentedLogger,
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Unit =
+    HttpAssert.put(
+      url          = formDefinitionURL,
+      version      = version,
+      body         = HttpCall.XML(formDefinition),
+      expectedCode = StatusCode.Created
+    )
+
+  def putFormData(
+    version                 : Version,
+    formData                : Seq[FormData],
+    returnDates             : Boolean = false)(implicit
+    logger                  : IndentedLogger,
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Seq[FormDataDates] =
+    formData.flatMap { formData =>
+      putSingleFormData(
+        version          = version,
+        id               = formData.id,
+        values           = Seq(formData.singleControlValue),
+        createdByOpt     = formData.createdByOpt     .map(user => Credentials(UserAndGroup(user, None), Nil, Nil)),
+        modifiedByOpt    = formData.lastModifiedByOpt.map(user => Credentials(UserAndGroup(user, None), Nil, Nil)),
+        workflowStageOpt = formData.workflowStageOpt,
+        returnDates      = returnDates
+      )
+    }
+
+  def putSingleFormData(
+    version                 : Version,
+    id                      : String,
+    values                  : Seq[String],
+    createdByOpt            : Option[Credentials] = None,
+    modifiedByOpt           : Option[Credentials] = None,
+    workflowStageOpt        : Option[String] = None,
+    returnDates             : Boolean = false)(implicit
+    logger                  : IndentedLogger,
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Option[FormDataDates] = {
+    val url            = formDataURL(id)
+    val body           = HttpCall.XML(formData(values))
+    val stageOpt       = workflowStageOpt.map(Stage( _, documentation = ""))
+    val credentialsOpt = createdByOpt.orElse(modifiedByOpt)
+
+    // Create
+    HttpAssert.put(url, version, body, StatusCode.Created, credentialsOpt, stageOpt)
+
+    modifiedByOpt.foreach { modifiedBy =>
+      // Update
+      HttpAssert.put(url, version, body, StatusCode.NoContent, Some(modifiedBy), stageOpt)
+    }
+
+    returnDates.option {
+      val headers = HttpCall.get(url, version)._2
+
+      val createdTime      = headerFromRFC1123OrIso(headers, Headers.OrbeonCreated, Headers.Created).get
+      val lastModifiedTime = headerFromRFC1123OrIso(headers, Headers.OrbeonLastModified, Headers.LastModified).get
+
+      FormDataDates(createdTime, lastModifiedTime)
+    }
   }
 
-  // TODO: migration elem
-
-  def formDefinition(provider: Provider): Document =
+  def formDefinition: Document =
     <xh:html
         xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:xf="http://www.w3.org/2002/xforms"
@@ -58,7 +139,7 @@ case class TestForm(controls: Seq[TestForm.Control], formName: String = DefaultF
         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
       <xh:head>
-        <xh:title>{formName}</xh:title>
+        <xh:title>{title}</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
           <!-- Main instance -->
           <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
@@ -82,9 +163,9 @@ case class TestForm(controls: Seq[TestForm.Control], formName: String = DefaultF
           <!-- Metadata -->
           <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
             <metadata>
-              <application-name>{provider.entryName}</application-name>
-              <form-name>{formName}</form-name>
-              <title xml:lang="en">{formName}</title>
+              <application-name>{appForm.app}</application-name>
+              <form-name>{appForm.form}</form-name>
+              <title xml:lang="en">{title}</title>
               <description xml:lang="en"></description>
               <created-with-version>2022.1-SNAPSHOT PE</created-with-version>
               <email>
@@ -98,9 +179,14 @@ case class TestForm(controls: Seq[TestForm.Control], formName: String = DefaultF
               <grid-tab-order>default</grid-tab-order>
               <library-versions></library-versions>
               <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version>
-              <migration version="2019.1.0">
-                {{"migrations":[ {{"containerPath": [ {{"value": "section-1"}}], "newGridElem": {{"value": "grid-1"}}, "afterElem": null, "content": [ {{"value": "control-1"}}], "topLevel": true}}]}}
-              </migration>
+              <migration version="2019.1.0">{
+                val content = controls.indices.map { index =>
+                  val controlName = TestForm.controlName(index)
+                  s"""{"value":"$controlName"}"""
+                }.mkString(",")
+
+                s"""{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[$content],"topLevel":true}]}"""
+              }</migration>
             </metadata>
           </xf:instance>
           <!-- Attachments -->
@@ -152,4 +238,16 @@ case class TestForm(controls: Seq[TestForm.Control], formName: String = DefaultF
         </fr:view>
       </xh:body>
     </xh:html>.toDocument
+
+  def formData(values: Seq[String]): Document = {
+    assert(controls.size == values.size)
+
+    <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+      <section-1>{
+        values.zipWithIndex.map { case (value, index) =>
+          TestForm.controlElem(index, children = Seq(xml.Text(value)))
+        }
+      }</section-1>
+    </form>.toDocument
+  }
 }

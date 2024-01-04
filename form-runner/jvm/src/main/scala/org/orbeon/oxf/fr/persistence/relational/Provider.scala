@@ -28,8 +28,6 @@ import java.io.StringReader
 import java.sql.{Connection, ResultSet}
 import javax.xml.transform.stream.StreamSource
 
-import java.io.StringReader
-
 
 sealed trait Provider extends EnumEntry with Lowercase
 
@@ -330,5 +328,10 @@ object Provider extends Enum[Provider] {
   def binarySize(provider: Provider, columnName: String, alias: String): String =
     provider match {
       case _         => s"length($columnName) as $alias"
+    }
+
+  def distinctVal(provider: Provider, columnName: String, alias: String): String =
+    provider match {
+      case _         => s"DISTINCT $columnName AS $alias"
     }
 }

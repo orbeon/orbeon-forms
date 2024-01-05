@@ -71,7 +71,7 @@
     <property as="xs:boolean" name="oxf.fr.persistence.sqlite.reindex"                          value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.sqlite.reencrypt"                        value="true"/>
 
-    <property as="xs:string"  name="oxf.fr.field-encryption.password"                           value=""/><!-- blank by default, which means use `oxf.crypto.password` -->
+    <property as="xs:string"  name="oxf.fr.field-encryption.password"                           value=""/>
 
     <!-- Whether providers are active -->
     <!-- It's possible to set providers to be inactive so the Home page does not attempt searches -->

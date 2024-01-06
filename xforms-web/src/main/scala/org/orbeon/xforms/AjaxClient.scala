@@ -230,6 +230,7 @@ object AjaxClient {
   def hasShowProgressEvent: Boolean =
     EventQueue.eventsReversed exists (_.showProgress)
 
+  // TODO: Would be good if we could return a `Future` to tell us when the event has been processed
   @JSExport
   def fireEvent(event: AjaxEvent): Unit = {
 

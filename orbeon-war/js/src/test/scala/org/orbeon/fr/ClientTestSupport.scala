@@ -1,6 +1,6 @@
 package org.orbeon.fr
 
-import org.orbeon.fr.DockerSupport.{OrbeonDockerNetwork, removeContainerByImage, runContainer}
+import org.orbeon.fr.DockerSupport.{removeContainerByImage, runContainer}
 import org.orbeon.oxf.util.FutureUtils.eventuallyAsTry
 import org.orbeon.web
 import org.scalajs.dom
@@ -49,8 +49,9 @@ trait FormRunnerFormTrait extends js.Object {
   def isFormDataSafe(): Boolean
   def activateProcessButton(buttonName: String): Unit
   def findControlsByName(controlName: String): js.Array[html.Element]
-  def setControlValue(controlName: String, controlValue: String): Unit
-  def activateControl(controlName: String): Unit
+  def setControlValue(controlName: String, controlValue: String, index: js.UndefOr[Int] = js.undefined): js.UndefOr[js.Promise[Unit]]
+  def activateControl(controlName: String, index: js.UndefOr[Int] = js.undefined): js.UndefOr[js.Promise[Unit]]
+  def getControlValue(controlName: String, index: js.UndefOr[Int] = js.undefined): js.UndefOr[String]
 }
 
 case class XFormsWindow(window: Window, documentAPI: DocumentApiTrait, ajaxServer: AjaxServerTrait)

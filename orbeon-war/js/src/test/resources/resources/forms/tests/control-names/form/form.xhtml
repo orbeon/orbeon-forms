@@ -14,7 +14,8 @@
     xmlns:saxon="http://saxon.sf.net/"
     xmlns:sql="http://orbeon.org/oxf/xml/sql"
     xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:math="http://www.w3.org/2005/xpath-functions/math">
     <xh:head>
         <xf:model id="fr-form-model" xxf:xpath-analysis="true">
             <xf:instance id="fr-form-instance" xxf:index="id">
@@ -31,9 +32,13 @@
                         <grid-2>
                             <order-number/>
                             <topic/>
+                            <add-comment/>
                         </grid-2>
                         <grid-3>
+                            <grid-3-iteration>
                             <comments/>
+                            </grid-3-iteration>
+
                         </grid-3>
                     </message>
                 </form>
@@ -49,25 +54,31 @@
                 </xf:bind>
                 <xf:bind id="message-bind" ref="message" name="message">
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
-                        <xf:bind id="comments-bind" ref="comments" type="xs:string" required="true()" name="comments"/>
+                        <xf:bind id="grid-3-iteration-bind" ref="grid-3-iteration" name="grid-3-iteration">
+                            <xf:bind id="comments-bind" ref="comments" type="xs:string" required="true()"
+                                     name="comments"/>
+                        </xf:bind>
+
                     </xf:bind>
                     <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
                         <xf:bind id="order-number-bind" ref="order-number" type="xs:string" required="true()" xxf:whitespace="trim" name="order-number"/>
                         <xf:bind id="topic-bind" ref="topic" type="xs:string" required="true()" name="topic"/>
+                        <xf:bind id="add-comment-bind" ref="add-comment" name="add-comment"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
             <xf:instance id="fr-form-metadata" xxf:readonly="true">
                 <metadata>
-                    <application-name>orbeon</application-name>
-                    <form-name>contact</form-name>
+                    <application-name>tests</application-name>
+                    <form-name>control-names</form-name>
                     <title xml:lang="en">Simple Contact Form</title>
                     <description xml:lang="en">The Contact form is a simple form which can be created in a few minutes with Form Builder.</description>
                     <title xml:lang="fr">Formulaire de contact simple</title>
                     <description xml:lang="fr">Le formulaire Contact peut être créé à l'aide de Form Builder en quelques minutes.</description>
-                    <updated-with-version>2019.1-SNAPSHOT PE</updated-with-version>
-                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"contact"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"first-name"},{"value":"last-name"},{"value":"email"},{"value":"phone"}],"topLevel":true},{"containerPath":[{"value":"message"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"order-number"},{"value":"topic"}],"topLevel":true},{"containerPath":[{"value":"message"}],"newGridElem":{"value":"grid-3"},"afterElem":{"value":"grid-2"},"content":[{"value":"comments"}],"topLevel":true}]}</migration>
-                </metadata>
+                <email><templates><template name="default">
+                    <headers/>
+                    <exclude-from-all-control-values/></template></templates>
+                    <parameters/></email><grid-tab-order>default</grid-tab-order><library-versions><orbeon>3</orbeon><app>1</app></library-versions><updated-with-version>2019.1-SNAPSHOT PE</updated-with-version><updated-with-version>2022.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "message/grid-3", "iteration-name": "grid-3-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"contact"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"first-name"},{"value":"last-name"},{"value":"email"},{"value":"phone"}],"topLevel":true},{"containerPath":[{"value":"message"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"order-number"},{"value":"topic"},{"value":"add-comment"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
                 <attachments>
@@ -116,6 +127,10 @@
                                 <value>other</value>
                             </item>
                         </topic>
+                        <add-comment>
+                            <label>Add Comment</label>
+                            <hint/>
+                        </add-comment>
                         <contact>
                             <label>Contact Information</label>
                             <help/>
@@ -188,6 +203,10 @@
                                 <value>other</value>
                             </item>
                         </topic>
+                        <add-comment>
+                            <label/>
+                            <hint/>
+                        </add-comment>
                         <contact>
                             <label>Informations de contact</label>
                             <help/>
@@ -222,12 +241,28 @@
                         </message>
                     </resource>
                 </resources>
+            </xf:instance><xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-3-template"><grid-3-iteration>
+                    <comments/>
+                </grid-3-iteration>
             </xf:instance>
+
+            <fr:listener
+                version="2018.2"
+                controls="add-comment"
+                events="activated"
+                actions="my-action"/>
+
+            <fr:action
+                name="my-action"
+                version="2018.2">
+                <fr:repeat-add-iteration repeat="grid-3" at="end"/>
+            </fr:action>
         </xf:model>
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="contact-section" bind="contact-bind">
                     <xf:label ref="$form-resources/contact/label"/>
                     <fr:grid columns="2" id="grid-1-grid" bind="grid-1-bind">
@@ -294,8 +329,21 @@
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:trigger id="add-comment-control" bind="add-comment-bind">
+                                <xf:label ref="$form-resources/add-comment/label"/>
+
+                                <xf:hint ref="$form-resources/add-comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:trigger>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6"/>
                     </fr:grid>
-                    <fr:grid columns="1" id="grid-3-grid" bind="grid-3-bind">
+                    <fr:grid id="grid-3-grid" bind="grid-3-bind" repeat="content" min="1"
+                             template="instance('grid-3-template')"
+                             apply-defaults="true"
+                             fb:initial-iterations="first">
                         <fr:c y="1" x="1" w="12">
                             <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder" bind="comments-bind" id="comments-control">
                                 <xf:label ref="$form-resources/comments/label"/>

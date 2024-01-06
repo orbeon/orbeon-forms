@@ -20,6 +20,7 @@ import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
 import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters.JSRichFutureNonThenable
 import scala.scalajs.js.|
 
 
@@ -76,8 +77,9 @@ object DocumentAPI extends js.Object {
   def setValue(
     controlIdOrElem : String | html.Element,
     newValue        : String | Double | Boolean,
-    formElem        : js.UndefOr[html.Form] = js.undefined
-  ): Future[Unit] = {
+    formElem        : js.UndefOr[html.Form] = js.undefined,
+    waitForServer   : js.UndefOr[Boolean] = js.undefined
+  ): js.Promise[Unit] = {
 
     val newStringValue = newValue.toString
 
@@ -99,6 +101,14 @@ object DocumentAPI extends js.Object {
           )
         )
       }
+
+    def fireValueEventMaybeServerF: Future[Unit] = {
+      fireValueEvent()
+      if (waitForServer.contains(true))
+        AjaxClient.allEventsProcessedF("setValue")
+      else
+        Future.unit
+    }
 
     // Directly change the value in the UI without waiting for an Ajax response; for an XBL component, this calls
     // `xformsUpdateValue()` on the companion object if supported, which doesn't dispatch an event (at least not directly)
@@ -123,14 +133,15 @@ object DocumentAPI extends js.Object {
       }
 
     // If setting the value was synchronous, fire the event right away
-    if (js.isUndefined(undefOrPromiseOrFuture)) {
-      fireValueEvent()
-      Future(())
-    } else {
-      XFormsUI.maybeFutureToScalaFuture(undefOrPromiseOrFuture).flatMap { _ =>
-        Future(fireValueEvent())
-      }
-    }
+    val resultF =
+      if (js.isUndefined(undefOrPromiseOrFuture))
+        fireValueEventMaybeServerF
+      else
+        XFormsUI.maybeFutureToScalaFuture(undefOrPromiseOrFuture).flatMap { _ =>
+          fireValueEventMaybeServerF
+        }
+
+    resultF.toJSPromise
   }
 
   def focus(

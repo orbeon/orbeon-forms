@@ -90,7 +90,7 @@ object CodeMirror {
       DocumentAPI.setValue(
         containerElem.id,
         this.xformsGetValue()
-      )
+      ).toFuture
     }
 
     private def codeMirrorChange(codeMirror: js.Dynamic, event: js.Dynamic): Unit = {

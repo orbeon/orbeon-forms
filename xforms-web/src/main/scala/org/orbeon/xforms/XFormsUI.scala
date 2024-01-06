@@ -370,7 +370,7 @@ object XFormsUI {
       promiseOrUndef.asInstanceOf[js.Promise[Unit]].toFuture
     } else {
       // Not a future
-      Future(())
+      Future.unit
     }
   }
 

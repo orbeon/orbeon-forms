@@ -34,7 +34,7 @@ class ExecutionQueueTest extends AsyncFunSpec {
 
       def execute(events: NonEmptyList[String]): Future[Unit] = {
         result.success(events)
-        Future(())
+        Future.unit
       }
 
       val eq = new ExecutionQueue(execute)

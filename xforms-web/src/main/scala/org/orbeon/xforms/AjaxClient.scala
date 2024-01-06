@@ -64,7 +64,7 @@ object AjaxClient {
   // classes cannot go through that boundary.
   @JSExport
   def allEventsProcessedP(): js.Promise[Unit] =
-    allEventsProcessedF("response processed as `js.Promise`").map(_ => ()).toJSPromise
+    allEventsProcessedF("response processed as `js.Promise`").toJSPromise
 
   // 2020-05-05: Used by dialog centering only.
   @JSExport

@@ -55,39 +55,45 @@ trait AsynchronousSubmissionManagerTrait {
     awaitInCurrentRequest: Option[Duration]
   ): Unit = {
 
-    val future = computation.unsafeToFuture()
 
     totalSubmittedCount += 1
     pendingCount += 1
 
     requestRunningCount.incrementAndGet()
 
-    val mustWait = awaitInCurrentRequest match {
-      case Some(duration) if duration.gt(Duration.Zero) =>
+    val mustWaitDurationOpt = awaitInCurrentRequest.collect {
+      case duration if duration.gt(Duration.Zero) =>
         requestWithWaitRunningCount.incrementAndGet()
-        requestWithWaitPendingList ::= future -> duration
-        true
-      case None =>
-        false
+        duration
     }
 
     runningCount.incrementAndGet()
-    pendingList ::= future
 
     // Copy references so they are captured by the closure below
     val localRequestRunningCount         = requestRunningCount
     val localRequestWithWaitRunningCount = requestWithWaitRunningCount
 
-    future.onComplete { result =>
+
+    def preProcessFutureCompletion(result: Try[T]): Try[T] = {
       // This runs asynchronously
 
       // Decrement through copied references so we don't impact future requests
       localRequestRunningCount.decrementAndGet()
-      if (mustWait)
+      if (mustWaitDurationOpt.isDefined)
         localRequestWithWaitRunningCount.decrementAndGet()
 
       runningCount.decrementAndGet()
       completionQueue.add((description, continuation.asInstanceOf[Try[Any] => Any], result))
+
+      result
+    }
+
+    val newFuture = computation.unsafeToFuture().transform(preProcessFutureCompletion)
+
+    pendingList ::= newFuture
+
+    mustWaitDurationOpt.foreach { mustWaitDuration =>
+      requestWithWaitPendingList ::= newFuture -> mustWaitDuration
     }
   }
 

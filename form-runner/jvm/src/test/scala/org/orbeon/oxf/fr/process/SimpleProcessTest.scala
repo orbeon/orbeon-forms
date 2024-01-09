@@ -293,22 +293,23 @@ extends DocumentTestBase
       var pendingList     = List.empty[Future[Any]]
 
       override def submitContinuation[T](computation: IO[T], continuation: Try[T] => Unit): Unit = {
-        val future = computation.unsafeToFuture()
-        pendingList ::= future
-
-        future.onComplete { result =>
-         completionQueue.add((continuation.asInstanceOf[Try[Any] => Any], result))
+        pendingList ::= computation.unsafeToFuture().transform { result =>
+          // Make sure we add to the completion queue before the `Future` in the pendingList is completed
+          completionQueue.add((continuation.asInstanceOf[Try[Any] => Any], result))
+          result
         }
       }
 
-      def awaitResult(): Unit = {
+      def awaitResultAndProcessSingleBatch(): Unit = {
 
         val batch = pendingList
         pendingList = Nil
 
         Await.ready(Future.sequence(batch), Duration.Inf)
 
-        Iterator.continually(completionQueue.poll()).takeWhile(_ ne null).foreach {
+
+        // Do it only once
+        Option(completionQueue.poll()).foreach {
           case (continuation, resultTry) =>
             continuation(resultTry)
         }
@@ -338,11 +339,11 @@ extends DocumentTestBase
       assert("a1 a2 my-async" == Interpreter.trace)
       assert(Interpreter.pendingList.nonEmpty)
 
-      Interpreter.awaitResult()
+      Interpreter.awaitResultAndProcessSingleBatch()
       assert("a1 a2 my-async async-continuation(Success(42)) a3 my-async" == Interpreter.trace)
       assert(Interpreter.pendingList.nonEmpty)
 
-      Interpreter.awaitResult()
+      Interpreter.awaitResultAndProcessSingleBatch()
       assert("a1 a2 my-async async-continuation(Success(42)) a3 my-async async-continuation(Success(42)) a4" == Interpreter.trace)
     }
   }

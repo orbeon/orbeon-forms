@@ -41,6 +41,11 @@ class FormRunnerClientTest extends AsyncFunSpec with ClientTestSupport {
           assert(form.findControlsByName("comments").forall(_.classList.contains("xforms-textarea")))
 
           await(form.setControlValue("comments", "Hello world!").map(_.toFuture).get)
+
+          // Use same value to make sure that we get a resolving `Promise` in this case as well
+          await(form.setControlValue("comments", "Hello world!").map(_.toFuture).get)
+          await(form.setControlValue("comments", "Hello world!").map(_.toFuture).get)
+
           assert(form.getControlValue("comments").contains("Hello world!"))
 
           await(form.activateControl("add-comment").map(_.toFuture).get)

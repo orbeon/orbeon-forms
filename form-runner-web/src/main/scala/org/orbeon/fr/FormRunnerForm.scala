@@ -52,7 +52,7 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
   // - returns `undefined` if
   //   - the control is not found
   //   - the index is not in range
-  //   - if the control is an XBL component that doesn't support the JavaScript lifecycle
+  //   - the control is an XBL component that doesn't support the JavaScript lifecycle
   // - returns a `Promise` that resolves when the server has processed the value change
   def setControlValue(controlName: String, controlValue: String, index: js.UndefOr[Int] = js.undefined): js.UndefOr[js.Promise[Unit]] = {
 
@@ -75,7 +75,7 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
   // - returns `undefined` if
   //   - the control is not found
   //   - the index is not in range
-  //   - if the control is not a trigger or input control
+  //   - the control is not a trigger or input control
   // - returns a `Promise` that resolves when the server has processed the activation
   def activateControl(controlName: String, index: js.UndefOr[Int] = js.undefined): js.UndefOr[js.Promise[Unit]] =
     findControlsByName(controlName).lift(index.getOrElse(0)).map { e =>

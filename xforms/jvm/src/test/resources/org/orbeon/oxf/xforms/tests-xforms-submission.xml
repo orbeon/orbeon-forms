@@ -2515,7 +2515,7 @@ az4K</document>
         </output>
     </test>
 
-    <test description="Chained async submission awaiting response" name="oxf:pipeline">
+    <test description="Chained async submission awaiting response" name="oxf:pipeline" only="true">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>

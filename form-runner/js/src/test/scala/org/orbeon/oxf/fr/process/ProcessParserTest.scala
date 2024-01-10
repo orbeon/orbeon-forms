@@ -49,6 +49,17 @@ class ProcessParserTest extends AnyFunSpec {
           Nil
         )
       ),
+      ( // NOTE: Also contains a "tab" character
+        """success-message   ("save-success")
+          |recover error-message
+          |  ("database-error")""".stripMargin,
+        GroupNode(
+          ActionNode("success-message", Map(None -> "save-success")),
+          List(
+            (RecoverCombinator, ActionNode("error-message",   Map(None -> "database-error")))
+          )
+        )
+      ),
     )
 
     for ((process, expected) <- Expected)

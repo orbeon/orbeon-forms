@@ -32,7 +32,7 @@ class ProcessParser(val input: ParserInput) extends Parser {
   }
 
   def Action: Rule1[ActionNode] = rule {
-    Name ~ optional("(" ~ OptWhiteSpace ~ zeroOrMore(Param).separatedBy(ParamSeparator) ~ OptWhiteSpace ~ ")") ~>
+    Name ~ optional(OptWhiteSpace ~ "(" ~ OptWhiteSpace ~ zeroOrMore(Param).separatedBy(ParamSeparator) ~ OptWhiteSpace ~ ")") ~>
       ((name: String, params: Option[Seq[(Option[String], String)]]) => ActionNode(name, params.getOrElse(Nil).toMap))
   }
 

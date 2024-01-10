@@ -318,7 +318,7 @@ trait Read {
                   case PostgreSQL | SQLite => new StringReader(resultSet.getString("xml"))
                   case _                   => resultSet.getClob("xml").getCharacterStream
                 }
-                Some(new ReaderInputStream(reader, CharsetNames.Utf8))
+                Some(ReaderInputStream.builder.setReader(reader).setCharset(CharsetNames.Utf8).get())
             }
 
             bodyInputStream.map(useAndClose(_)(NetUtils.inputStreamToByteArray))

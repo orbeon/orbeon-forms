@@ -9,6 +9,8 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 
+import scala.xml.Elem
+
 
 sealed trait StageHeader
 object StageHeader {
@@ -39,6 +41,21 @@ case class SummarySettings(
   edit   : Boolean
 )
 
+case class SearchableValues(
+  controls       : Seq[IndexedControl],
+  createdBy      : Seq[String],
+  lastModifiedBy : Seq[String],
+  workflowStage  : Seq[String]
+) {
+  def toXML: NodeInfo =
+    <searchable-values>{
+      controls.map(_.toXML) ++
+        <created-by>{createdBy.map(value => <value>{value}</value>)}</created-by> ++
+        <last-modified-by>{lastModifiedBy.map(value => <value>{value}</value>)}</last-modified-by> ++
+        <workflow-stage>{workflowStage.map(value => <value>{value}</value>)}</workflow-stage>
+    }</searchable-values>
+}
+
 case class IndexedControl(
     name               : String,
     xpath              : String,
@@ -49,7 +66,7 @@ case class IndexedControl(
     htmlLabel          : Boolean,
     resources          : List[(String, NodeInfo)]
   ) {
-    def toXML: NodeInfo =
+    def toXML: Elem =
       <query
         name={name}
         path={xpath}

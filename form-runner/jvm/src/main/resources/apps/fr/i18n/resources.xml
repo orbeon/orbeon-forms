@@ -231,6 +231,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Search Options</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Search Options</close-search-options>
                 <search-options>Search options</search-options>
+                <dates>
+                    <item>
+                        <label>Today</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label>Yesterday</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label>Last 7 days</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label>Last 30 days</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label>Last 90 days</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label>Custom...</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after>After</date-after>
+                <date-before>Before</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit</show-bulk-edit>
@@ -854,6 +882,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer les options de recherche</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher les options de recherche</close-search-options>
                 <search-options>Options de recherche</search-options>
+                <dates>
+                    <item>
+                        <label>Aujourd'hui</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label>Hier</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label>7 derniers jours</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label>30 derniers jours</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label>90 derniers jours</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label>Personnalisé...</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after>Après le</date-after>
+                <date-before>Avant le</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer la modification groupée</show-bulk-edit>
@@ -1469,6 +1525,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opciones</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cerrar opciones</close-search-options>
                 <search-options>Buscar opciones</search-options>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
@@ -2086,6 +2170,34 @@
                 <show-search-options>Mostrar opcions de cerca</show-search-options>
                 <close-search-options>Tancar opcions de cerca</close-search-options>
                 <search-options>Opcions de cerca</search-options>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
@@ -2726,6 +2838,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søk</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Lukk alternativer for søk</close-search-options>
                 <search-options>Alternativer for søk</search-options>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
@@ -3336,6 +3476,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Показать настройки поиска</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Закрыть настройки поиска</close-search-options>
                 <search-options>настройки поиска</search-options>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
@@ -3951,6 +4119,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostra opzioni</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Chiudi opzioni</close-search-options>
                 <search-options>Opzioni di ricerca</search-options>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
@@ -4570,6 +4766,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Suchoptionen anzeigen</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Suchoptionen schließen</close-search-options>
                 <search-options>Suchoptionen</search-options>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
@@ -5189,6 +5413,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Näytä hakuvaihtoehdot</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Sulje hakuvaihtoehdot</close-search-options>
                 <search-options>Hakuvaihtoehdot</search-options>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
@@ -5808,6 +6060,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Visa sökalternativ</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Dölj sökalternativ</close-search-options>
                 <search-options>Sökalternativ</search-options>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
@@ -6427,6 +6707,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Zoekopties tonen</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zoekopties sluiten</close-search-options>
                 <search-options>Zoekopties</search-options>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
@@ -7046,6 +7354,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opções</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Fechar opções</close-search-options>
                 <search-options>Opções de procurar</search-options>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
@@ -7659,6 +7995,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søgning</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Luk alternativer for søgnng</close-search-options>
                 <search-options>Alternativer for søgning</search-options>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
@@ -8275,6 +8639,34 @@
                 <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Pokaż opcje wyszukiwania</show-search-options>
                 <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zamknij opcje wyszukiwania</close-search-options>
                 <search-options>Opcje wyszukiwania</search-options>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
             </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>

@@ -2,6 +2,7 @@ package org.orbeon.oxf.fr.persistence
 
 import cats.Eval
 import org.orbeon.oxf.cache.{CacheApi, CacheSupport}
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
 import org.orbeon.oxf.fr.persistence.relational.EncryptionAndIndexDetails
@@ -68,13 +69,13 @@ object PersistenceMetadataSupport {
         PersistenceApi.readPublishedFormDefinition(appForm.app, appForm.form, version) map { case ((_, formDefinitionDoc), _)=>
           EncryptionAndIndexDetails(
             encryptedControlsPaths = Eval.later(FieldEncryption.getControlsToEncrypt(formDefinitionDoc, appForm).map(_.path)),
-            indexedControlsXPaths  = Eval.later(Index.findIndexedControls(
+            indexedControlsXPaths  = Eval.later(Index.searchableValues(
               formDefinitionDoc,
               appForm,
               // We only need the controls XPaths, no need to specify the version (used to call the distinct values API)
               versionOpt = None,
               FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
-            ).map(_.xpath))
+            ).controls.toList.map(_.xpath))
           )
         }
       }

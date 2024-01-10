@@ -366,12 +366,12 @@ class IndexTest
     } locally {
       it(s"must find the expected indexed controls for source ${srcVersion.entryName} and destination ${dstVersion.entryName}") {
         assert(
-          expected == Index.findIndexedControls(
+          expected == Index.searchableValues(
             formDoc                   = elemToDocumentInfo(elem),
             appForm                   = appForm,
             versionOpt                = None,
             databaseDataFormatVersion = dstVersion
-          )
+          ).controls
         )
       }
     }
@@ -535,7 +535,7 @@ class IndexTest
         </xh:body>
       </xh:html>
 
-    val expectedSummarySettings =
+    val expectedIndexedControls =
       List(
         IndexedControl("control-1", "section-1/grid-1/control-1", "xs:string", "input", SummarySettings(show = false, search = false,  edit = false), staticallyRequired = false, htmlLabel = false, resources = Nil),
         IndexedControl("control-2", "section-1/grid-1/control-2", "xs:string", "input", SummarySettings(show = true,  search = false,  edit = false), staticallyRequired = false, htmlLabel = false, resources = Nil),
@@ -546,12 +546,12 @@ class IndexTest
 
     it("must find the expected indexed controls when using sub-elements instead of classes") {
       assert(
-        expectedSummarySettings == Index.findIndexedControls(
+        expectedIndexedControls == Index.searchableValues(
           formDoc                   = elemToDocumentInfo(formWithSummarySettings),
           appForm                   = appForm,
           versionOpt                = None,
           databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
-        )
+        ).controls
       )
     }
   }

@@ -71,14 +71,13 @@ trait FormRunnerSummary {
       .orNull
 
   //@XPathFunction
-  def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String, version: Int): Seq[NodeInfo] =
-    Index.findIndexedControls(
+  def searchableValues(formDoc: DocumentInfo, app: String, form: String, version: Int): NodeInfo =
+    Index.searchableValues(
       formDoc,
       AppForm(app, form),
       Some(version),
       FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
-    ) map
-      (_.toXML)
+    ).toXML
 
   //@XPathFunction
   def duplicate(

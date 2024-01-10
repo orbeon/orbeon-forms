@@ -14,7 +14,7 @@ import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVers
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, tinyTreeToOrbeonDom}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Connection, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, PathUtils, URLRewriterUtils, XPath}
 import org.orbeon.saxon.om
@@ -44,7 +44,14 @@ trait PersistenceApiTrait {
     isDraft     : Boolean
   )
 
-  case class ControlDetails(path: String, distinctValues: Seq[String])
+  case class DistinctValues(
+     controls      : Seq[Control],
+     createdBy     : Seq[String],
+     lastModifiedBy: Seq[String],
+     workflowStage : Seq[String]
+  )
+
+  case class Control(path: String, distinctValues: Seq[String])
 
   case class DataHistoryDetails(
     modifiedTime    : Instant,
@@ -121,32 +128,38 @@ trait PersistenceApiTrait {
     callPagedService(pageNumber => readPage(pageNumber).map(pageToDataDetails))
   }
 
-  def distinctControlValues(
+  def distinctValues(
     appFormVersion          : AppFormVersion,
     controlPaths            : Seq[String])(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
-  ): Seq[ControlDetails] = {
+  ): DistinctValues = {
 
     debug(s"calling distinct values for `$appFormVersion`")
 
     val servicePath = s"/fr/service/persistence/distinct-values/${appFormVersion._1.app}/${appFormVersion._1.form}"
 
     val queryXml =
-      <distinct-values>{
+      <distinct-values include-created-by="true" include-last-modified-by="true" include-workflow-stage="true">{
         controlPaths.map { controlPath =>
           <control path={controlPath}/>
         }
       }</distinct-values>
 
-    val controlsXml = documentsXmlTry(servicePath, queryXml, appFormVersion._2).get
+    val result = documentsXmlTry(servicePath, queryXml, appFormVersion._2).get.rootElement
 
-    (controlsXml.rootElement / "control") map { controlElem =>
-      ControlDetails(
+    val controls = (result / "control") map { controlElem =>
+      Control(
         path           = controlElem.attValue("path"),
-        distinctValues = (controlElem / "values" / "value").map(_.getStringValue)
+        distinctValues = (controlElem / "value").map(_.getStringValue)
       )
     }
+
+    DistinctValues(
+      controls       = controls,
+      createdBy      = result / "created-by"       / "value" map (_.getStringValue),
+      lastModifiedBy = result / "last-modified-by" / "value" map (_.getStringValue),
+      workflowStage  = result / "workflow-stage"   / "value" map (_.getStringValue))
   }
 
   def dataHistory(

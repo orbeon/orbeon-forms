@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
 import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.api.PersistenceApiTrait
-import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SummarySettings}
+import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SearchableValues, SummarySettings}
 import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunner, InDocFormRunnerDocContext}
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
@@ -66,13 +66,15 @@ trait FormDefinition {
     }
   }
 
-  // Returns the controls that are searchable from a form definition
-  def findIndexedControls(
+
+
+  // Returns the controls and other values that are searchable from a form definition
+  def searchableValues(
     formDoc                   : DocumentNodeInfoType,
     appForm                   : AppForm,
     versionOpt                : Option[Int],
     databaseDataFormatVersion : DataFormatVersion
-  ): List[IndexedControl] = {
+  ): SearchableValues = {
 
     implicit val ctx = new InDocFormRunnerDocContext(formDoc) {
       override lazy val bodyElemOpt: Option[om.NodeInfo] = {
@@ -92,7 +94,7 @@ trait FormDefinition {
 
     object PersistenceApi extends PersistenceApiTrait
 
-    val distinctValuesByControlPath = versionOpt.toSeq.flatMap { version =>
+    val distinctValuesOpt = versionOpt.toSeq.map { version =>
       val dynamicControlPaths = indexedControlBindPathHolders.filter { controlInfo =>
         // Is the control databound/dynamic?
         databoundControlLocalNames.contains(controlInfo.control.localname)
@@ -100,13 +102,15 @@ trait FormDefinition {
         pathString(controlInfo.path)
       }
 
-      // Retrieve distinct control values for all dynamic controls
-      PersistenceApi.distinctControlValues((appForm, version), dynamicControlPaths)
-    }.map { controlDetails =>
+      // Retrieve distinct values for all dynamic controls
+      PersistenceApi.distinctValues((appForm, version), dynamicControlPaths)
+    }
+
+    val distinctValuesByControlPath = distinctValuesOpt.flatMap(_.controls).map { controlDetails =>
       controlDetails.path -> controlDetails.distinctValues
     }.toMap
 
-    indexedControlBindPathHolders map { case ControlBindPathHoldersResources(control, bind, path, _, resources) =>
+    val controls = indexedControlBindPathHolders map { case ControlBindPathHoldersResources(control, bind, path, _, resources) =>
       val controlName = FormRunner.getControlName(control)
       val controlPath = pathString(path)
 
@@ -126,6 +130,13 @@ trait FormDefinition {
         resources          = resourcesWithDynamicItems.toList
       )
     }
+
+    SearchableValues(
+      controls        = controls,
+      createdBy       = distinctValuesOpt.flatMap(_.createdBy),
+      lastModifiedBy  = distinctValuesOpt.flatMap(_.lastModifiedBy),
+      workflowStage   = distinctValuesOpt.flatMap(_.workflowStage)
+    )
   }
 
   def matchForControl(control: String): String =

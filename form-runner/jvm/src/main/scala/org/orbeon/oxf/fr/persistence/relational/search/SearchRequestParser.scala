@@ -112,6 +112,16 @@ trait SearchRequestParser {
           } else
             specificControls
 
+        def instant(elem: String): Option[Instant] = {
+          // Blank means no search
+          searchElement.elemValueOpt(elem).flatMap(trimAllToOpt).map(RelationalUtils.instantFromString)
+        }
+
+        def stringSet(elem: String): Set[String] = {
+          // Blank means no search
+          searchElement.elemValues(elem).flatMap(trimAllToOpt).toSet
+        }
+
         SearchRequest(
           provider       = Provider.withName(provider),
           appForm        = appForm,
@@ -119,14 +129,14 @@ trait SearchRequestParser {
           credentials    = credentials,
           pageSize       = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-size"),  10),
           pageNumber     = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-number"), 1),
-          createdGteOpt       = searchElement.elemValueOpt("created-gte")      .map(RelationalUtils.instantFromString),
-          createdLtOpt        = searchElement.elemValueOpt("created-lt")       .map(RelationalUtils.instantFromString),
-          createdBy           = searchElement.elemValues  ("created-by")       .toSet,
-          lastModifiedGteOpt  = searchElement.elemValueOpt("last-modified-gte").map(RelationalUtils.instantFromString),
-          lastModifiedLtOpt   = searchElement.elemValueOpt("last-modified-lt") .map(RelationalUtils.instantFromString),
-          lastModifiedBy      = searchElement.elemValues  ("last-modified-by") .toSet,
-          workflowStage       = searchElement.elemValues  ("workflow-stage")   .toSet,
-          freeTextSearch = freeTextElOpt.map(_.stringValue).flatMap(trimAllToOpt), // blank means no search
+          createdGteOpt       = instant  ("created-gte"),
+          createdLtOpt        = instant  ("created-lt"),
+          createdBy           = stringSet("created-by"),
+          lastModifiedGteOpt  = instant  ("last-modified-gte"),
+          lastModifiedLtOpt   = instant  ("last-modified-lt"),
+          lastModifiedBy      = stringSet("last-modified-by"),
+          workflowStage       = stringSet("workflow-stage"),
+          freeTextSearch      = freeTextElOpt.map(_.stringValue).flatMap(trimAllToOpt), // Blank means no search
           controls       = controls,
           drafts         =
             credentials match {

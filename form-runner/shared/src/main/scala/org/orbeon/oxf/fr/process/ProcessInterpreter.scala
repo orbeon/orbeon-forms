@@ -70,14 +70,24 @@ trait ProcessInterpreter extends Logging {
     import org.orbeon.oxf.util.DynamicVariable
 
     private val StandardActions: Map[String, Action] = Map(
-      "success"  -> trySuccess,
-      "failure"  -> tryFailure,
-      "process"  -> tryProcess,
-      "suspend"  -> trySuspend,
-      "resume"   -> tryResume,
-      "abort"    -> tryAbort,
-      "rollback" -> tryRollback,
-      "nop"      -> tryNop
+      "terminate-with-success" -> tryTerminateWithSuccess,
+      "success"                -> tryTerminateWithSuccess, // deprecated
+      "terminate-with-failure" -> tryTerminateWithFailure,
+      "failure"                -> tryTerminateWithFailure, // deprecated
+
+      "continue-with-success"  -> tryContinueWithSuccess,
+      "nop"                    -> tryContinueWithSuccess,  // deprecated
+      "continue-with-failure"  -> tryContinueWithFailure,
+
+      "process"                -> tryProcess,
+
+      "suspend"                -> trySuspend,
+      "resume-with-success"    -> tryResumeWithSuccess,
+      "resume"                 -> tryResumeWithSuccess,    // deprecated
+      "resume-with-failure"    -> tryResumeWithFailure,
+      "abort"                  -> tryAbort,
+
+      "rollback"               -> tryRollback,
     )
 
     val AllAllowedActions = StandardActions ++ extensionActions
@@ -298,11 +308,11 @@ trait ProcessInterpreter extends Logging {
   def runningProcessId: Option[String] = processStackDyn.value map (_.processId)
 
   // Interrupt the process and complete with a success
-  private def trySuccess(params: ActionParams): ActionResult =
+  private def tryTerminateWithSuccess(params: ActionParams): ActionResult =
     ActionResult.Interrupt(paramByNameUseAvt(params, "message"), Left(Success(())))
 
   // Interrupt the process and complete with a failure
-  private def tryFailure(params: ActionParams): ActionResult =
+  private def tryTerminateWithFailure(params: ActionParams): ActionResult =
     ActionResult.Interrupt(paramByNameUseAvt(params, "message"), Left(Failure(ProcessFailure())))
 
   // Run a sub-process
@@ -319,7 +329,7 @@ trait ProcessInterpreter extends Logging {
   private def trySuspend(params: ActionParams): ActionResult =
     Try((writeSuspendedProcess _).tupled(serializeContinuation)) match {
       case Success(_) =>
-        trySuccess(EmptyActionParams) // this will not be caught by `Try.apply()`
+        tryTerminateWithSuccess(EmptyActionParams) // this will not be caught by `Try.apply()`
         ActionResult.Interrupt(None, Left(Success(())))
       case failure @ Failure(t) =>
         error(s"error suspending process: `${t.getMessage}`")
@@ -327,12 +337,18 @@ trait ProcessInterpreter extends Logging {
     }
 
   // Resume a process
-  private def tryResume(params: ActionParams): ActionResult =
+  private def tryResumeWithSuccess(params: ActionParams): ActionResult =
+    tryResumeWithTry(params, Success(()))
+
+  private def tryResumeWithFailure(params: ActionParams): ActionResult =
+    tryResumeWithTry(params, Failure(ProcessFailure()))
+
+  private def tryResumeWithTry(params: ActionParams, initialTry: Try[Any]): ActionResult =
     readSuspendedProcess match {
       case Success((processId, continuation)) =>
         // TODO: Restore processId
         clearSuspendedProcess()
-        runSubProcess(continuation, Success(()))
+        runSubProcess(continuation, initialTry)
       case failure @ Failure(t) =>
         error(s"error suspending process: `${t.getMessage}`")
         ActionResult.Sync(failure)
@@ -354,8 +370,11 @@ trait ProcessInterpreter extends Logging {
     }
 
   // Don't do anything
-  private def tryNop(params: ActionParams): ActionResult =
+  private def tryContinueWithSuccess(params: ActionParams): ActionResult =
     ActionResult.Sync(Success(()))
+
+  private def tryContinueWithFailure(params: ActionParams): ActionResult =
+    ActionResult.Sync(Failure(ProcessFailure()))
 
   private def evaluateBoolean(expr: String, item: om.Item = xpathContext): Boolean =
     evaluateOne(

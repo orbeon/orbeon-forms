@@ -21,7 +21,8 @@
     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors">
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/select2.full.js"/>
     <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/fr.js"/>

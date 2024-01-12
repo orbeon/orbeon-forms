@@ -28,7 +28,7 @@ object Select2 {
   }
 
   trait Options extends js.Object {
-    val placeholder        : Option
+    val placeholder        : js.UndefOr[Option]
     val ajax               : Ajax
     val allowClear         : Boolean
     val dropdownParent     : js.UndefOr[JQuery]

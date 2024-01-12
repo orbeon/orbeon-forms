@@ -1096,7 +1096,7 @@
                                         </xf:group>
                                     </xf:group>
                                     <xf:group ref="''[$show-created-by]" class="fr-summary-search-item">
-                                        <xf:select1 id="created-by-select" ref="instance('fr-search-instance')/created-by" appearance="search">
+                                        <xf:select1 id="created-by-select" ref="instance('fr-search-instance')/created-by" appearance="search" disable-placeholder="true">
                                             <xf:label ref="$fr-resources/summary/titles/created-by"/>
                                             <xf:item>
                                                 <xf:label ref="$fr-resources/summary/labels/any"/>
@@ -1136,7 +1136,7 @@
                                         </xf:group>
                                     </xf:group>
                                     <xf:group ref="''[$show-last-modified-by]" class="fr-summary-search-item">
-                                        <xf:select1 id="last-modified-by-select" ref="instance('fr-search-instance')/last-modified-by" appearance="search">
+                                        <xf:select1 id="last-modified-by-select" ref="instance('fr-search-instance')/last-modified-by" appearance="search" disable-placeholder="true">
                                             <xf:label ref="$fr-resources/summary/titles/last-modified-by"/>
                                             <xf:item>
                                                 <xf:label ref="$fr-resources/summary/labels/any"/>
@@ -1149,7 +1149,7 @@
                                         </xf:select1>
                                     </xf:group>
                                     <xf:group ref="''[$show-workflow-stage]" class="fr-summary-search-item">
-                                        <xf:select1 id="workflow-stage-select" ref="instance('fr-search-instance')/workflow-stage" appearance="search">
+                                        <xf:select1 id="workflow-stage-select" ref="instance('fr-search-instance')/workflow-stage" appearance="search" disable-placeholder="true">
                                             <xf:label ref="$fr-resources/summary/titles/workflow-stage"/>
                                             <xf:item>
                                                 <xf:label ref="$fr-resources/summary/labels/any"/>

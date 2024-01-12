@@ -170,16 +170,18 @@
         </xbl:implementation>
 
         <xbl:template>
+            <xf:var name="disable-placeholder" value="fr:component-param-value('disable-placeholder') = 'true'"/>
+
             <xf:select1
                 appearance="minimal"
                 ref="xxf:binding('fr-dropdown-select1-search')"
                 id="select1"
-                data-placeholder="{xxf:r('select')}"
+                data-placeholder="{if ($disable-placeholder) then '' else xxf:r('select')}"
             >
-                <xf:item>
+                <xf:itemset ref="''[not($disable-placeholder)]">
                     <xf:label/>
                     <xf:value/>
-                </xf:item>
+                </xf:itemset>
                 <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
             </xf:select1>
         </xbl:template>

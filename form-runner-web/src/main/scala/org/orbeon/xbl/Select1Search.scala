@@ -27,6 +27,7 @@ import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.collection.mutable
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters.JSRichOption
 
 object Select1Search {
   XBL.declareCompanion(name = "fr|dropdown-select1-search" , js.constructorOf[Select1SearchCompanion])
@@ -64,19 +65,22 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       Support.stopFocusOutPropagation(select.parentNode.asInstanceOf[html.Element], _.target, "select2-selection--single")
 
       locally {
+        val placeholderOpt = Option(elementWithData.getAttribute(DataPlaceholder)).filter(_.nonEmpty).map { placeholder =>
+          new Select2.Option {
+            val id   = "0"
+            val text = placeholder
+          }
+        }
+
         def options(open: Boolean): Select2.Options =
           new Select2.Options {
-            val allowClear         = true
+            val allowClear         = placeholderOpt.isDefined // allowClear can be enabled only if a placeholder is defined
             val dropdownParent     = js.undefined
             val ajax               = if (isDatabound) Select2Ajax else null
             val width              = "100%" // For Select2 width to update as the viewport width changes
             val tags               = open
             val minimumInputLength = Option(queryElementWithData.getAttribute(DataMinimumInputLength)).filter(_.nonEmpty).map(_.toInt).getOrElse(0)
-            val placeholder        =
-              new Select2.Option {
-                val id   = "0"
-                val text = elementWithData.getAttribute(DataPlaceholder)
-              }
+            val placeholder        = placeholderOpt.orUndefined
           }
         optionsWithTagsOpt    = Some(options(open = true))
         optionsWithoutTagsOpt = Some(options(open = false))

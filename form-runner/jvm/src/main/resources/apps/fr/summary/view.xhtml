@@ -553,13 +553,25 @@
                     <!-- After -->
                     <xf:setvalue ref="$dst-gte"/>
                     <xf:action if="$src-after != ''">
-                        <xf:setvalue ref="$dst-gte" value="adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-after)))"/>
+                        <xf:setvalue
+                            ref="$dst-gte"
+                            value="
+                                if (exists($tz)) then
+                                     adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-after)), $tz)
+                                else
+                                    adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-after)))"/>
                     </xf:action>
 
                     <!-- Before -->
                     <xf:setvalue ref="$dst-lt"/>
                     <xf:action if="$src-before != ''">
-                        <xf:setvalue ref="$dst-lt" value="adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-before)))"/>
+                        <xf:setvalue
+                            ref="$dst-lt"
+                            value="
+                                if (exists($tz)) then
+                                     adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-before)), $tz)
+                                else
+                                    adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-before)))"/>
                     </xf:action>
                 </xf:action>
 

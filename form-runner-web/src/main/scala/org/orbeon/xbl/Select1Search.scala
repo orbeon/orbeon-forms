@@ -255,8 +255,8 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     ))
   }
 
-  // When the value of the underlying dropdown changed, typically because it set based on that the server
-  // tells the client, tell the Select2 component that the value has changed
+  // For the non-databound case, when the value of the underlying dropdown changed, typically because it set based
+  // on that the server tells the client, tell the Select2 component that the value has changed
   private def onXFormsSelect1ValueChange(event: js.Dynamic): Unit = {
     val control  = event.control.asInstanceOf[html.Element]
     if (containerElem.querySelector(".xforms-select1") == control)

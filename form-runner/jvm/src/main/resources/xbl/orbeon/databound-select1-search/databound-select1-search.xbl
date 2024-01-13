@@ -308,7 +308,6 @@
             <xsl:transform version="2.0">
                 <xsl:template match="/*">
                     <xf:group appearance="xxf:internal" id="view">
-
                         <xf:model>
 
                             <xf:instance id="orbeon-resources" xxf:readonly="true">
@@ -367,6 +366,41 @@
                             </xf:submission>
 
                         </xf:model>
+                        <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
+
+                        <!-- Detect value of `resource` changing -->
+                        <xf:group xxf:appearance="internal" xxbl:scope="outer">
+                            <xf:var name="fr-search-value" value="@label"/>
+                            <xf:var name="fr-search-page"/>
+                            <xf:var name="resource-attr"  ><xxf:value xxbl:scope="inner" value="instance('local')/resource-attr"/></xf:var>
+                            <xf:var name="resource"                                      value="xxf:evaluate-avt($resource-attr)">
+                                <xf:action event="xforms-value-changed">
+                                    <xf:action xxbl:scope="inner">
+                                        <xf:var name="resource"><xxf:value xxbl:scope="outer" value="$resource"/></xf:var>
+                                        <xf:send submission="get-result">
+                                            <xf:property name="fr-resource" value="$resource"/>
+                                        </xf:send>
+                                        <xf:var name="items"            value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
+                                        <xf:var name="items-values"     value="$items/xxf:evaluate(instance('local')/value-ref)"/>
+                                        <xf:var name="current-possible" value="$items-values = $binding"/>
+
+                                        <!-- If the current value is not in the new itemset, blank binding -->
+                                        <xf:action if="not($current-possible)">
+                                            <xf:setvalue iterate="$binding, $binding/@label" ref="."/>
+                                        </xf:action>
+                                        <!-- If only one value is returned, auto-select it -->
+                                        <!-- To do only if we have `auto-select-unique-choice="true"`
+                                        <xf:action if="count($items) = 1">
+                                            <xf:setvalue ref="$binding"        value="$items/xxf:evaluate(instance('local')/value-ref)"/>
+                                            <xf:setvalue ref="$binding/@label" value="$items/xxf:evaluate(instance('local')/label-ref)"/>
+                                        </xf:action>
+                                        -->
+                                    </xf:action>
+                                </xf:action>
+                            </xf:var>
+                        </xf:group>
+
+                        <xf:output value="xxf:serialize($binding, 'xml')"/>
 
                         <xf:action event="fr-update-resource">
                             <xf:action xxbl:scope="outer">

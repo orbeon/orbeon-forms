@@ -190,6 +190,24 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     )
   }
 
+  // XBL tells us about a new label due to value or resource change, requiring an update
+  def updateLabel(label: String): Unit = {
+    val select = querySelect
+    while (select.hasChildNodes())
+      select.removeChild(select.firstChild)
+    val initialOption = dom.document.createElement("option").asInstanceOf[html.Option]
+    initialOption.text     = label
+    initialOption.value    = "_"
+    initialOption.selected = true
+    select.appendChild(initialOption)
+  }
+
+  // XBL tells us the itemset might have changed due to the resource changing
+  def invalidateCachedItemset(): Unit = {
+    allResultsOpt = None
+    // To prevent Select2 from flashing old options during retrieval, we should also invalidate its cache
+  }
+
   // Called from `databound-select1-search.xbl` to tell use if the `selection` AVT evaluates to `open`
   def updateOpenSelection(newIsOpenSelection: Boolean): Unit =
     if (newIsOpenSelection != isOpenSelection) {

@@ -219,6 +219,23 @@
                             </xf:input>
                         </xh:td>
                     </xh:tr>
+                    <xh:tr>
+                        <xh:td>
+                            <xf:var name="control" value="."/>
+                            <fr:yesno-input ref="xf:element('_', (@auto-select-unique-choice/string(), 'false')[1])">
+                                <xf:label ref="xxf:r('dialog-actions.auto-select-unique-choice.label', '|fr-form-resources|')"/>
+                                <xf:action event="xforms-select">
+                                    <xf:insert
+                                        if="event('xxf:item-value') = 'true'"
+                                        context="$control"
+                                        origin="xf:attribute('auto-select-unique-choice', 'true')"/>
+                                    <xf:delete
+                                        if="event('xxf:item-value') = 'false'"
+                                        ref="$control/@auto-select-unique-choice"/>
+                                </xf:action>
+                            </fr:yesno-input>
+                        </xh:td>
+                    </xh:tr>
                 </fr:grid>
             </control-details>
         </metadata>
@@ -277,6 +294,60 @@
                 </xf:action>
             </xbl:handler>
 
+            <!-- Maybe update label when the value changes or the resource URL changes -->
+            <xbl:handler event="fr-update-select2-label">
+                <xf:var name="resource-param" value="event('fr-resource')"/>
+                <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
+
+                <!-- Evaluate resource URL if not provided -->
+                <xf:action if="xxf:is-blank($resource-param)">
+                    <xf:dispatch name="fr-update-resource" targetid="view">
+                        <xf:property name="fr-search-value" value="event('fr-search-value')"/>
+                        <xf:property name="fr-search-page"  value="event('fr-search-page')"/>
+                    </xf:dispatch>
+                </xf:action>
+                <xf:var
+                    name="resource"
+                    value="
+                        if (xxf:is-blank($resource-param))
+                        then instance('local')/resource
+                        else $resource-param"/>
+
+                <!-- Call service -->
+                <xf:send submission="get-result">
+                    <xf:property name="fr-resource" value="$resource"/>
+                </xf:send>
+
+                <xf:var name="items"               value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
+                <xf:var name="items-values"        value="$items/xxf:evaluate(instance('local')/value-ref)"/>
+                <xf:var name="current-impossible"  value="not($items-values = $binding)"/>
+                <xf:var name="unique-choice"       value="count($items) = 1 and xxf:component-param-value('auto-select-unique-choice') = 'true'"/>
+                <xf:var name="unique-choice-value" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/value-ref) else ()"/>
+                <xf:var name="unique-choice-label" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/label-ref) else ()"/>
+                <xf:var name="do-update"           value="$current-impossible or $unique-choice"/>
+
+                <!-- If only one value is returned, auto-select it -->
+                <xf:action if="$unique-choice">
+                    <xf:setvalue ref="$binding"        value="$unique-choice-value"/>
+                    <xf:setvalue ref="$binding/@label" value="$unique-choice-label"/>
+                </xf:action>
+
+                <!-- If the current value is not in the new itemset, blank binding -->
+                <xf:action if="not($unique-choice) and $current-impossible">
+                    <xf:setvalue iterate="$binding, $binding/@label" ref="."/>
+                </xf:action>
+
+                <!-- Tell Scala.js about the new label -->
+                <xf:action if="$do-update" type="javascript">
+                    <xf:param name="label"    value="if ($unique-choice) then $unique-choice-label else ''"/>
+                    <xf:body>
+                        var i = ORBEON.xforms.XBL.instanceForControl(this);
+                        if (i) i.updateLabel(label);
+                    </xf:body>
+                </xf:action>
+
+            </xbl:handler>
+
             <!-- Scala.js tells us that a new value was selected, save the label -->
             <xbl:handler event="fr-change">
                 <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
@@ -285,11 +356,7 @@
                 <xf:setvalue ref="$binding"        value="event('fr-value')"/>
             </xbl:handler>
 
-            <!--
-                Adjust `label` attribute if needed, but only in read-write modes:
-                - https://github.com/orbeon/orbeon-forms/issues/4553
-                - https://github.com/orbeon/orbeon-forms/issues/5816
-            -->
+            <!-- Adjust `label` attribute if needed (not in readonly mode) -->
             <xbl:handler event="xforms-enabled" if="not(fr:is-readonly-mode())">
                 <xf:var name="service-performs-search" value="xxf:component-param-value('service-performs-search') = 'true'"/>
                 <xf:var name="binding"                 value="xxf:binding('fr-databound-select1-search')"/>
@@ -376,31 +443,18 @@
                             <xf:var name="resource"                                      value="xxf:evaluate-avt($resource-attr)">
                                 <xf:action event="xforms-value-changed">
                                     <xf:action xxbl:scope="inner">
+                                        <xf:action type="javascript">
+                                            var i = ORBEON.xforms.XBL.instanceForControl(this);
+                                            if (i) i.invalidateCachedItemset();
+                                        </xf:action>
                                         <xf:var name="resource"><xxf:value xxbl:scope="outer" value="$resource"/></xf:var>
-                                        <xf:send submission="get-result">
+                                        <xf:dispatch name="fr-update-select2-label" targetid="fr-databound-select1-search">
                                             <xf:property name="fr-resource" value="$resource"/>
-                                        </xf:send>
-                                        <xf:var name="items"            value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
-                                        <xf:var name="items-values"     value="$items/xxf:evaluate(instance('local')/value-ref)"/>
-                                        <xf:var name="current-possible" value="$items-values = $binding"/>
-
-                                        <!-- If the current value is not in the new itemset, blank binding -->
-                                        <xf:action if="not($current-possible)">
-                                            <xf:setvalue iterate="$binding, $binding/@label" ref="."/>
-                                        </xf:action>
-                                        <!-- If only one value is returned, auto-select it -->
-                                        <!-- To do only if we have `auto-select-unique-choice="true"`
-                                        <xf:action if="count($items) = 1">
-                                            <xf:setvalue ref="$binding"        value="$items/xxf:evaluate(instance('local')/value-ref)"/>
-                                            <xf:setvalue ref="$binding/@label" value="$items/xxf:evaluate(instance('local')/label-ref)"/>
-                                        </xf:action>
-                                        -->
+                                        </xf:dispatch>
                                     </xf:action>
                                 </xf:action>
                             </xf:var>
                         </xf:group>
-
-                        <xf:output value="xxf:serialize($binding, 'xml')"/>
 
                         <xf:action event="fr-update-resource">
                             <xf:action xxbl:scope="outer">

@@ -1224,6 +1224,9 @@
             <is-last-page>
                 <label>Is last page formula</label>
             </is-last-page>
+            <auto-select-unique-choice>
+                <label>Auto-select unique choice</label>
+            </auto-select-unique-choice>
             <save>
                 <label>Save</label>
             </save>
@@ -2623,6 +2626,9 @@
             <is-last-page>
                 <label>Expression XPath indiquant s'il s'agit de la dernière page</label>
             </is-last-page>
+            <auto-select-unique-choice>
+                <label>Sélection automatique d'un choix unique</label>
+            </auto-select-unique-choice>
             <save>
                 <label>Sauvegarder</label>
             </save>
@@ -4032,6 +4038,9 @@
             <is-last-page>
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
+            <auto-select-unique-choice>
+                <label toto="true">[Auto-select unique choice]</label>
+            </auto-select-unique-choice>
             <save>
                 <label>Lagre</label>
             </save>
@@ -5440,6 +5449,9 @@
             <is-last-page>
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
+            <auto-select-unique-choice>
+                <label toto="true">[Auto-select unique choice]</label>
+            </auto-select-unique-choice>
             <save>
                 <label>Сохранить</label>
             </save>
@@ -6813,6 +6825,9 @@
             <is-last-page>
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
+            <auto-select-unique-choice>
+                <label toto="true">[Auto-select unique choice]</label>
+            </auto-select-unique-choice>
             <save>
                 <label>Salva</label>
             </save>
@@ -8187,6 +8202,9 @@
             <is-last-page>
                 <label>Letzte Seite erreicht XPath-Ausdruck</label>
             </is-last-page>
+            <auto-select-unique-choice>
+                <label toto="true">[Auto-select unique choice]</label>
+            </auto-select-unique-choice>
             <save>
                 <label>Speichern</label>
             </save>
@@ -9591,6 +9609,9 @@
             <is-last-page>
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
+            <auto-select-unique-choice>
+                <label toto="true">[Auto-select unique choice]</label>
+            </auto-select-unique-choice>
             <save>
                 <label>Tallenna</label>
             </save>
@@ -10992,6 +11013,9 @@
             <is-last-page>
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
+            <auto-select-unique-choice>
+                <label toto="true">[Auto-select unique choice]</label>
+            </auto-select-unique-choice>
             <save>
                 <label>Guardar</label>
             </save>
@@ -12373,6 +12397,9 @@
             <is-last-page>
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
+            <auto-select-unique-choice>
+                <label toto="true">[Auto-select unique choice]</label>
+            </auto-select-unique-choice>
             <save>
                 <label>Bewaar</label>
             </save>
@@ -13781,6 +13808,9 @@
             <is-last-page>
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
+            <auto-select-unique-choice>
+                <label toto="true">[Auto-select unique choice]</label>
+            </auto-select-unique-choice>
             <save>
                 <label>Guardar</label>
             </save>
@@ -15190,6 +15220,9 @@
             <is-last-page>
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
+            <auto-select-unique-choice>
+                <label toto="true">[Auto-select unique choice]</label>
+            </auto-select-unique-choice>
             <save>
                 <label>Spara</label>
             </save>

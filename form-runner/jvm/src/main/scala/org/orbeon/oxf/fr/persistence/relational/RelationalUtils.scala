@@ -55,7 +55,9 @@ object RelationalUtils extends Logging {
       dataSourceName match {
         case Some(name) =>
           val dataSourceNotFound = getDataSourceNoFallback(name).isEmpty
-          error(s"Data source `$name` not configured")
+          if (dataSourceNotFound) {
+            error(s"Data source `$name` not configured")
+          }
           dataSourceNotFound
         case None =>
           error(s"No data source configured for provider `$provider`")

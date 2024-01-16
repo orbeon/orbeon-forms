@@ -27,23 +27,21 @@ object NProgress extends js.Object {
 
 class LoadingIndicator extends js.Object { // so that properties/methods can be accessed from JavaScript
 
-  private var shownCounter = 0
+  private var showRequests = 0
 
   NProgress.configure(new js.Object { val showSpinner = false })
 
   def requestStarted(showProgress: Boolean, configuration: rpc.ConfigurationProperties): Unit =
     if (showProgress) {
-      if (shownCounter == 0) {
-        // Show the indicator after a delay
-        val delay = configuration.delayBeforeDisplayLoading
-        if (delay > 0)
-          js.timers.setTimeout(delay)(showIfNotAlreadyVisible())
-        else
-          showIfNotAlreadyVisible()
-      } else {
-        // Indicator already shown, just increment counter
-        shownCounter += 1
-      }
+      // Show the indicator after a delay
+      val delay = configuration.delayBeforeDisplayLoading
+      if (delay > 0)
+        js.timers.setTimeout(delay)(showIfNotAlreadyVisible())
+      else
+        showIfNotAlreadyVisible()
+    } else {
+      // Indicator already shown, just increment counter
+      showRequests += 1
     }
 
   def requestEnded(showProgress: Boolean): Unit =
@@ -54,17 +52,16 @@ class LoadingIndicator extends js.Object { // so that properties/methods can be 
 
   // Public for `AjaxServer.js`
   def showIfNotAlreadyVisible(): Unit = {
-    shownCounter += 1
-    if (shownCounter == 1)
+    showRequests += 1
+    if (showRequests == 1)
       show()
   }
 
-  def hideIfAlreadyVisible(): Unit =
-    if (shownCounter > 0) {
-      shownCounter -= 1
-      if (shownCounter == 0)
+  def hideIfAlreadyVisible(): Unit = {
+    showRequests -= 1
+    if (showRequests == 0)
         hide()
-    }
+  }
 
   // Actually shows the loading indicator (no delay or counter)
   private def show(): Unit =

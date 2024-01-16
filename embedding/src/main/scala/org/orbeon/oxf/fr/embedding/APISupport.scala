@@ -33,7 +33,6 @@ import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory
 
 import java.io.Writer
-import scala.collection.immutable
 import scala.jdk.CollectionConverters._
 import scala.util.matching.Regex
 import scala.util.{Failure, Success}
@@ -58,8 +57,8 @@ object APISupport {
   def proxyPage(
     baseURL      : String,
     path         : String,
-    headers      : immutable.Seq[(String, String)] = Nil,
-    params       : immutable.Seq[(String, String)] = Nil)(
+    headers      : List[(String, String)],
+    params       : List[(String, String)])(
     implicit ctx : EmbeddingContextWithResponse
   ): Unit = {
 

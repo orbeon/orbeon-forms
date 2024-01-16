@@ -22,7 +22,6 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.xforms.Constants
 
 import java.io.{OutputStream, Writer}
-import scala.collection.immutable
 import scala.util.Try
 import scala.util.matching.Regex
 
@@ -41,9 +40,9 @@ object FormRunnerMode extends Enum[FormRunnerMode] {
 case class RequestDetails(
   content : Option[StreamedContent],
   url     : String,
-  path    : String, // this is the path used to create the URL
-  headers : immutable.Seq[(String, String)],
-  params  : immutable.Seq[(String, String)]
+  path    : String, // this is the path used to create the URL // xxx only used for `mustRewriteForPath()`
+  headers : List[(String, String)],
+  params  : List[(String, String)]
 ) {
   def contentType: Option[String] =
     content flatMap (_.contentType)

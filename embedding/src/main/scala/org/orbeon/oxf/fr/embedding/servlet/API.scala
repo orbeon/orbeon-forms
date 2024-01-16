@@ -43,9 +43,10 @@ object API {
       )
 
       proxyPage(
-        settings.formRunnerURL,
-        path,
-        Option(headers) map (_.asScala.to(List)) getOrElse Nil
+        baseURL = settings.formRunnerURL,
+        path    = path,
+        headers = Option(headers) map (_.asScala.to(List)) getOrElse Nil,
+        params  = Nil
       )
     }
   }

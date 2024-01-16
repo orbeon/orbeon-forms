@@ -322,6 +322,16 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       name -> nonBlankValue
   }
 
+  private def nonPublicRenderParametersIt(request: PortletRequest): Iterator[(String, String)] = {
+    val params = request.getRenderParameters
+    for {
+      name  <- params.getNames.asScala.iterator
+      if ! params.isPublic(name)
+      value <- params.getValues(name)
+    } yield
+      name -> value
+  }
+
   private def sessionParameters(request: PortletRequest): Iterator[(String, String)] = {
 
     def fromSession(name: String) =
@@ -345,6 +355,8 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
     val sendLanguage = getBooleanPreference(request, SendLiferayLanguage)
     val sendUser     = getBooleanPreference(request, SendLiferayUser)
+
+    val isResourceRequest = request.isInstanceOf[ResourceRequest]
 
     val servletReqHeaders =
       findServletRequest(request)
@@ -385,7 +397,11 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       APISupport.headersToForward(portletReqHeaders, settings.forwardProperties ++ userHeadersToForward) ++
       languageHeader
 
-    val paramsToSet = keepFromPortalQueryIt(request, settings.forwardParams).to(List)
+    val paramsToSet =
+      (
+        keepFromPortalQueryIt(request, settings.forwardParams) ++
+        (if (isResourceRequest) Iterator.empty else nonPublicRenderParametersIt(request))
+      ).to(List)
 
     APISupport.Logger.debug(s"outgoing request headers: $headersToSet")
     APISupport.Logger.debug(s"outgoing request parameters: $paramsToSet")

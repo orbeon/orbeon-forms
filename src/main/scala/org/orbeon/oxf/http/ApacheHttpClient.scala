@@ -32,7 +32,6 @@ import org.apache.http.{ProtocolException => _, _}
 import org.orbeon.connection.StreamedContent
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.http.HttpMethod._
-import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.slf4j.LoggerFactory
@@ -42,9 +41,11 @@ import java.security.KeyStore
 import javax.net.ssl.SSLContext
 
 
-class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieStore] {
+abstract class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieStore] {
 
   import Private._
+
+  def createURL(urlString: String): URL
 
   def connect(
     url         : String,
@@ -273,7 +274,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieSt
               settings.sslKeystoreType getOrElse KeyStore.getDefaultType
 
             val keyStore =
-              useAndClose(URLFactory.createURL(keyStoreURI).openStream) { is => // URL is typically local (file:, etc.)
+              useAndClose(createURL(keyStoreURI).openStream) { is => // URL is typically local (file:, etc.)
                 KeyStore.getInstance(keyStoreType) |!>
                   (_.load(is, keyStorePassword.toCharArray))
               }

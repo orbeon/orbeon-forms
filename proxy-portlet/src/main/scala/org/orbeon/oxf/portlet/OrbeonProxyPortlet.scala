@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 
+import java.net.URL
 import javax.portlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import scala.collection.compat._
@@ -90,7 +91,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         forwardProperties  = config.getInitParameter("forward-properties").tokenizeToSet.iterator.map(name => name.toLowerCase -> name).toMap,
         keepParams         = config.getInitParameter("keep-parameters").tokenizeToSet,
         resourcesRegex     = Option(config.getInitParameter("resources-regex")) getOrElse APISupport.DefaultFormRunnerResourcePath,
-        httpClient         = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
+        httpClient         = new ApacheHttpClient(HttpClientSettings(config.getInitParameter)) {
+          override def createURL(urlString: String): URL = ???
+        }
       )
     )
   }

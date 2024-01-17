@@ -22,6 +22,7 @@ import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 
 import java.io.Writer
+import java.net.URL
 import scala.util.Try
 
 
@@ -101,7 +102,9 @@ class ServletFilterImpl extends Filter {
           formRunnerURL  = Option(config.getInitParameter("form-runner-url")) getOrElse "http://localhost:8080/orbeon/",
           orbeonPrefix   = Option(config.getInitParameter("orbeon-prefix"))   getOrElse "/orbeon",
           resourcesRegex = Option(config.getInitParameter("resources-regex")) getOrElse APISupport.DefaultFormRunnerResourcePath,
-          httpClient     = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
+          httpClient     = new ApacheHttpClient(HttpClientSettings(config.getInitParameter)) {
+            override def createURL(urlString: String): URL = ???
+          }
         )
       )
   }

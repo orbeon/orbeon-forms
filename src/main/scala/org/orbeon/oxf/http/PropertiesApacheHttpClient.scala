@@ -12,8 +12,15 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.http
+import org.orbeon.oxf.resources.URLFactory
 
-object PropertiesApacheHttpClient extends ApacheHttpClient(PropertiesConnectionSettings.apply)
+import java.net.URL
+
+
+object PropertiesApacheHttpClient extends ApacheHttpClient(PropertiesConnectionSettings.apply) {
+  override def createURL(urlString: String): URL =
+    URLFactory.createURL(urlString)
+}
 
 object PropertiesConnectionSettings {
 

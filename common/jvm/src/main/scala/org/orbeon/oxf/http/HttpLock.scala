@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.http
 
-import java.net.URI
-
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
 
-class HttpUnlock(uri: URI) extends HttpEntityEnclosingRequestBase {
+import java.net.URI
+
+class HttpLock(uri: URI) extends HttpEntityEnclosingRequestBase {
   setURI(uri)
-  val METHOD_NAME = "UNLOCK"
+  val METHOD_NAME = "LOCK"
   override def getMethod: String = METHOD_NAME
 }

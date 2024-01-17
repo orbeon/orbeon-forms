@@ -485,9 +485,10 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
       (unmanagedJars / includeFilter).value,
       (unmanagedJars / excludeFilter).value
     ),
-    libraryDependencies += "org.scala-js"             %% "scalajs-stubs"   % ScalaJsStubsVersion % Provided,
-    libraryDependencies += "org.slf4j"                %  "slf4j-api"       % Slf4jVersion,
-    libraryDependencies += "org.apache.logging.log4j" % "log4j-slf4j-impl" % Log4j2Version,
+    libraryDependencies += "org.scala-js"              %% "scalajs-stubs"   % ScalaJsStubsVersion % Provided,
+    libraryDependencies += "org.slf4j"                 %  "slf4j-api"       % Slf4jVersion,
+    libraryDependencies += "org.apache.logging.log4j"  % "log4j-slf4j-impl" % Log4j2Version,
+    libraryDependencies += "org.apache.httpcomponents" % "httpclient"       % HttpComponentsVersion,
   )
   .jsSettings(commonScalaJsSettings)
   .jsSettings(

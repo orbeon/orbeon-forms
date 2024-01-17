@@ -82,7 +82,13 @@ object History {
     RelationalUtils.withConnection { connection =>
 
       val startOffsetZeroBased = (request.pageNumber - 1) * request.pageSize
-      val rowNumSQL            = Provider.rowNumSQL(request.provider, connection, tableAlias = "d")
+      val rowNumSQL            = Provider.rowNumSQL(
+        provider       = request.provider,
+        connection     = connection,
+        tableAlias     = "d",
+        orderColumn    = "last_modified_time",
+        orderDirection = "DESC"
+      )
       val rowNumCol            = rowNumSQL.col
       val rowNumOrderBy        = rowNumSQL.orderBy
       val rowNumTable          = rowNumSQL.table match {

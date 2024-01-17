@@ -207,10 +207,10 @@
                 <delete-confirmation>Confirm Deletion</delete-confirmation>
                 <created>Created</created>
                 <modified>Modified</modified>
-                <last-modified>Last Modified</last-modified>
+                <last-modified>Modified</last-modified>
                 <workflow-stage>Workflow stage</workflow-stage>
                 <created-by>Created By</created-by>
-                <last-modified-by>Last Modified By</last-modified-by>
+                <last-modified-by>Modified By</last-modified-by>
                 <selected>Selected</selected>
                 <refresh>This operation will refresh the page</refresh>
                 <toc>Table of Contents</toc>
@@ -858,7 +858,7 @@
                 <delete-confirmation>Confirmer la suppression</delete-confirmation>
                 <created>Création</created>
                 <modified>Modification</modified>
-                <last-modified>Dernière modification</last-modified>
+                <last-modified>Modification</last-modified>
                 <workflow-stage>Étape du workflow</workflow-stage>
                 <created-by>Créé par</created-by>
                 <last-modified-by>Modifié par</last-modified-by>
@@ -1501,10 +1501,10 @@
                 <delete-confirmation>Confirma Eliminación</delete-confirmation>
                 <created>Creado</created>
                 <modified>Modificación</modified>
-                <last-modified todo="true">Modificación</last-modified>
+                <last-modified>Modificación</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <created-by todo="true">Created By</created-by>
-                <last-modified-by todo="true">Last Modified By</last-modified-by>
+                <created-by todo="true">[Created By]</created-by>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Seleccionado</selected>
                 <refresh>Este botón actualizará la página</refresh>
                 <toc>Tabla de contenidos</toc>
@@ -2146,10 +2146,10 @@
                 <delete-confirmation>Confirma Eliminació</delete-confirmation>
                 <created>Creat</created>
                 <modified>Modificació</modified>
-                <last-modified todo="true">Modificació</last-modified>
+                <last-modified>Modificació</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <created-by todo="true">Creat per</created-by>
-                <last-modified-by todo="true">Última modificació per</last-modified-by>
+                <created-by>Creat per</created-by>
+                <last-modified-by>Última modificació per</last-modified-by>
                 <selected>Seleccionat</selected>
                 <refresh>Aquest botó actualitzarà la pàgina</refresh>
                 <toc>Taula de continguts</toc>
@@ -2814,10 +2814,10 @@
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
                 <created>Opprettet</created>
                 <modified>Sist endret</modified>
-                <last-modified todo="true">Sist endret</last-modified>
+                <last-modified>Sist endret</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <created-by todo="true">Created By</created-by>
-                <last-modified-by todo="true">Last Modified By</last-modified-by>
+                <created-by todo="true">[Created By]</created-by>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Valgt</selected>
                 <refresh>Denne operasjonen vil laste siden på nytt</refresh>
                 <toc>Innholdsfortegnelse</toc>
@@ -3452,14 +3452,14 @@
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
                 <created>Дата создания</created>
                 <modified>Дата изменения</modified>
-                <last-modified todo="true">Дата изменения</last-modified>
+                <last-modified>Дата изменения</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <created-by todo="true">Created By</created-by>
-                <last-modified-by todo="true">Last Modified By</last-modified-by>
+                <created-by todo="true">[Created By]</created-by>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Выбрана</selected>
                 <refresh>Эта операция потребует перезагрузки страницы</refresh>
                 <toc>Оглавление</toc>
-                <description>Description</description>
+                <description todo="true">[Description]</description>
                 <help>Помощь</help>
                 <error-count>Есть ошибка</error-count>
                 <errors-count>Есть ошибки</errors-count>
@@ -4095,10 +4095,10 @@
                 <delete-confirmation>Conferma cancella</delete-confirmation>
                 <created>Creato</created>
                 <modified>Modificato</modified>
-                <last-modified todo="true">Modificato</last-modified>
+                <last-modified>Modificato</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <created-by todo="true">Created By</created-by>
-                <last-modified-by todo="true">Last Modified By</last-modified-by>
+                <created-by todo="true">[Created By]</created-by>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Selezionato</selected>
                 <refresh>Questa operazione aggiorna la pagina</refresh>
                 <toc>Tabella dei contenuti</toc>
@@ -4742,10 +4742,10 @@
                 <delete-confirmation>Löschen bestätigen</delete-confirmation>
                 <created>Erstellt</created>
                 <modified>Änderungsdatum</modified>
-                <last-modified todo="true">Änderungsdatum</last-modified>
+                <last-modified>Änderungsdatum</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <created-by todo="true">Created By</created-by>
-                <last-modified-by todo="true">Last Modified By</last-modified-by>
+                <created-by todo="true">[Created By]</created-by>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Ausgewählt</selected>
                 <refresh>Diese Operation wird die Seite aktualisieren</refresh>
                 <toc>Inhaltstabelle</toc>
@@ -5389,10 +5389,10 @@
                 <delete-confirmation>Vahvista poistaminen</delete-confirmation>
                 <created>Luotu</created>
                 <modified>Viimeksi muokattu</modified>
-                <last-modified todo="true">Viimeksi muokattu</last-modified>
+                <last-modified>Viimeksi muokattu</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <created-by todo="true">Created By</created-by>
-                <last-modified-by todo="true">Last Modified By</last-modified-by>
+                <created-by todo="true">[Created By]</created-by>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Valittu</selected>
                 <refresh>Tämä toiminto lataa sivun uudelleen</refresh>
                 <toc>Sisällysluettelo</toc>
@@ -6036,10 +6036,10 @@
                 <delete-confirmation>Bekräfta borttag</delete-confirmation>
                 <created>Skapad</created>
                 <modified>Ändrad</modified>
-                <last-modified todo="true">Ändrad</last-modified>
+                <last-modified>Ändrad</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <created-by todo="true">Created By</created-by>
-                <last-modified-by todo="true">Last Modified By</last-modified-by>
+                <created-by todo="true">[Created By]</created-by>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Vald</selected>
                 <refresh>Uppdatera sidan</refresh>
                 <toc>Innehållsförteckning</toc>
@@ -6683,10 +6683,10 @@
                 <delete-confirmation>Verwijderen bevestigen</delete-confirmation>
                 <created>Aangemaakt</created>
                 <modified>Bewerkt</modified>
-                <last-modified todo="true">Bewerkt</last-modified>
+                <last-modified>Bewerkt</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <created-by todo="true">Created By</created-by>
-                <last-modified-by todo="true">Last Modified By</last-modified-by>
+                <created-by todo="true">[Created By]</created-by>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Geselecteerd</selected>
                 <refresh>Deze bewerking zal de pagina doen verversen</refresh>
                 <toc>Inhoudsopgave</toc>
@@ -7330,10 +7330,10 @@
                 <delete-confirmation>Deseja apagar</delete-confirmation>
                 <created>Criado</created>
                 <modified>Modificado</modified>
-                <last-modified todo="true">Modificado</last-modified>
+                <last-modified>Modificado</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <created-by todo="true">Created By</created-by>
-                <last-modified-by todo="true">Last Modified By</last-modified-by>
+                <created-by todo="true">[Created By]</created-by>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Seleccionado</selected>
                 <refresh>Esta operação irá refrescar a página</refresh>
                 <toc>Tablea de Conteúdos</toc>
@@ -7971,10 +7971,10 @@
                 <delete-confirmation>Bekræft sletning</delete-confirmation>
                 <created>Oprettet</created>
                 <modified>Senest ændret</modified>
-                <last-modified todo="true">Senest ændret</last-modified>
+                <last-modified>Senest ændret</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <created-by todo="true">Created By</created-by>
-                <last-modified-by todo="true">Last Modified By</last-modified-by>
+                <created-by todo="true">[Created By]</created-by>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Valgt</selected>
                 <refresh>Dette indlæser siden igen</refresh>
                 <toc>Indholdsfortegnelse</toc>
@@ -8615,10 +8615,10 @@
                 <delete-confirmation>Potwierdź usunięcie</delete-confirmation>
                 <created>Utworzony</created>
                 <modified>Zmodyfikowany</modified>
-                <last-modified todo="true">Zmodyfikowany</last-modified>
+                <last-modified>Zmodyfikowany</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <created-by todo="true">Created By</created-by>
-                <last-modified-by todo="true">Last Modified By</last-modified-by>
+                <created-by todo="true">[Created By]</created-by>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Wybrany</selected>
                 <refresh>Ta operacja spowoduje odświeżenie strony</refresh>
                 <toc>Spis treści</toc>

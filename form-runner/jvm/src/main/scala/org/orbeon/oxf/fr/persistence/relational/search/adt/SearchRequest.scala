@@ -30,13 +30,52 @@ trait SearchRequestCommon {
   def anyOfOperations : Option[Set[Operation]]
 }
 
+object OrderColumn {
+  def apply(s: String): OrderColumn = s.toLowerCase.trim match {
+    case "created"          => Created
+    case "created-by"       => CreatedBy
+    case "last-modified"    => LastModified
+    case "last-modified-by" => LastModifiedBy
+    case "workflow-stage"   => WorkflowStage
+    case controlPath        => ControlColumn(controlPath)
+  }
+}
+
+sealed trait OrderColumn {
+  val sql: String
+}
+
+case object Created                    extends OrderColumn { override val sql = "created" }
+case object CreatedBy                  extends OrderColumn { override val sql = "username" }
+case object LastModified               extends OrderColumn { override val sql = "last_modified_time" }
+case object LastModifiedBy             extends OrderColumn { override val sql = "last_modified_by" }
+case object WorkflowStage              extends OrderColumn { override val sql = "stage" }
+case class ControlColumn(path: String) extends OrderColumn { override val sql = "val" }
+
+object OrderDirection {
+  def apply(s: String): OrderDirection = s.toLowerCase.trim match {
+    case "asc"  => Ascending
+    case "desc" => Descending
+    case _      => throw new IllegalArgumentException(s"Invalid order direction: $s")
+  }
+}
+
+sealed trait OrderDirection {
+  val sql: String
+}
+case object Ascending  extends OrderDirection { override val sql = "ASC" }
+case object Descending extends OrderDirection { override val sql = "DESC" }
+
+case class OrderBy(column: OrderColumn, direction: OrderDirection)
+
 case class SearchRequest(
-  provider        : Provider,
-  appForm         : AppForm,
-  version         : SearchVersion,
-  credentials     : Option[Credentials],
-  pageSize        : Int,
-  pageNumber      : Int,
+  provider           : Provider,
+  appForm            : AppForm,
+  version            : SearchVersion,
+  credentials        : Option[Credentials],
+  pageSize           : Int,
+  pageNumber         : Int,
+  orderBy            : OrderBy,
   createdGteOpt      : Option[Instant],
   createdLtOpt       : Option[Instant],
   createdBy          : Set[String],
@@ -44,10 +83,10 @@ case class SearchRequest(
   lastModifiedLtOpt  : Option[Instant],
   lastModifiedBy     : Set[String],
   workflowStage      : Set[String],
-  controls        : List[Control],
-  drafts          : Drafts,
-  freeTextSearch  : Option[String],
-  anyOfOperations : Option[Set[Operation]],
+  controls           : List[Control],
+  drafts             : Drafts,
+  freeTextSearch     : Option[String],
+  anyOfOperations    : Option[Set[Operation]]
 ) extends SearchRequestCommon
 
 sealed trait FilterType

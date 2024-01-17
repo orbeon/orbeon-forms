@@ -257,6 +257,8 @@
                     <last-modified-lt/>
                     <last-modified-by/>
                     <workflow-stage/>
+                    <order-by-column>last-modified</order-by-column>
+                    <order-by-direction>desc</order-by-direction>
                     <page-size>5</page-size>
                     <page-number>1</page-number>
                     <lang/>
@@ -437,6 +439,10 @@
                     ref="$page-size"
                     model="fr-persistence-model"
                     value="xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
+
+                <!-- Reset order by directive to default -->
+                <xf:set ref="instance('fr-search-instance')/order-by-column"    value="'last-modified'"/>
+                <xf:set ref="instance('fr-search-instance')/order-by-direction" value="'desc'"/>
 
                 <!-- Create elements holding structured search data -->
                 <xf:delete
@@ -730,6 +736,30 @@
                 </xf:action>
 
             </xf:submission>
+
+            <xf:action event="fr-order-by">
+                <xf:var name="column" value="event('column')"/>
+
+                <!-- If same column, toggle direction -->
+                <xf:setvalue
+                    if="instance('fr-search-instance')/order-by-column = $column"
+                    ref="instance('fr-search-instance')/order-by-direction"
+                    value="
+                        if (instance('fr-search-instance')/order-by-direction = 'asc') then 'desc'
+                        else                                                                'asc'
+                    "/>
+
+                <!-- If different column, choose default direction -->
+                <xf:setvalue
+                    if="instance('fr-search-instance')/order-by-column != $column"
+                    ref="instance('fr-search-instance')/order-by-direction"
+                    value="if ($column = ('created', 'last-modified')) then 'desc' else 'asc'"/>
+
+                <xf:setvalue ref="instance('fr-search-instance')/order-by-column" value="$column"/>
+
+                <!-- Update search results (do not reset pagination, etc.) -->
+                <xf:send submission="fr-summary-search-submission"/>
+            </xf:action>
 
         </xf:model>
         <!-- Needs to be after the first model as it makes use of `fr:app()`, etc. -->
@@ -1461,46 +1491,75 @@
                             <!-- One column for each detail -->
                             <xf:var name="detail-positions" value="instance('fr-search-instance')/query[@name and @summary-show = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
 
+                            <xf:var
+                                name="metadata-columns"
+                                value="(
+                                    'created'[$show-created],
+                                    'last-modified'[$show-last-modified],
+                                    'created-by'[$show-created-by],
+                                    'last-modified-by'[$show-last-modified-by],
+                                    'workflow-stage'[$show-workflow-stage]
+                                )"/>
+
                             <xh:table class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
-                                <xh:thead>
+                                <xh:thead class="summary-column-header">
                                     <xh:tr>
                                         <xh:th class="fr-summary-repeat-selection-checkbox"/>
                                         <xh:th class="{$labels-class}"/>
-                                        <xf:group ref="''[$show-created]">
-                                            <xh:th>
-                                                <xf:output value="$fr-resources/summary/titles/created"/>
-                                            </xh:th>
-                                        </xf:group>
-                                        <xf:group ref="''[$show-last-modified]">
-                                            <xh:th>
-                                                <xf:output value="$fr-resources/summary/titles/modified"/>
-                                            </xh:th>
-                                        </xf:group>
-                                        <xf:group ref="''[$show-created-by]">
-                                            <xh:th>
-                                                <xf:output value="$fr-resources/summary/titles/created-by"/>
-                                            </xh:th>
-                                        </xf:group>
-                                        <xf:group ref="''[$show-last-modified-by]">
-                                            <xh:th>
-                                                <xf:output value="$fr-resources/summary/titles/last-modified-by"/>
-                                            </xh:th>
-                                        </xf:group>
-                                        <xf:group ref="''[$show-workflow-stage]">
-                                            <xh:th>
-                                                <xf:output value="$fr-resources/summary/titles/workflow-stage"/>
-                                            </xh:th>
-                                        </xf:group>
+
+                                        <xf:repeat ref="$metadata-columns">
+                                            <xf:var name="column" value="."/>
+
+                                            <xf:group>
+                                                <xh:th>
+                                                    <xf:trigger appearance="minimal">
+                                                        <xf:label>
+                                                            <xf:output value="$fr-resources/summary/titles/*[local-name() = $column]"/>
+                                                            <span class="summary-column-caret">
+                                                                <xf:output value="
+                                                                    if      (instance('fr-search-instance')/order-by-column != $column) then ''
+                                                                    else if (instance('fr-search-instance')/order-by-direction = 'asc') then '&#x25B2;'
+                                                                    else                                                                     '&#x25BC;'
+                                                                "/>
+                                                            </span>
+                                                        </xf:label>
+                                                        <xf:action event="DOMActivate">
+                                                            <xf:dispatch
+                                                                name="fr-order-by"
+                                                                targetid="fr-form-model">
+                                                                <xf:property name="column" value="$column"/>
+                                                            </xf:dispatch>
+                                                        </xf:action>
+                                                    </xf:trigger>
+                                                </xh:th>
+                                            </xf:group>
+                                        </xf:repeat>
                                         <xf:group ref="''[empty($detail-positions)]">
                                             <xh:th/>
                                         </xf:group>
                                         <xf:repeat ref="instance('fr-search-labels-instance')/query[@summary-show = 'true']" id="fr-summary-repeat-column-number">
                                             <xh:th class="{if (@control = ('number', 'currency')) then 'fr-align-right' else ''}">
-                                                <!-- Output showing as the header of the column -->
-                                                <xf:output
-                                                    mediatype="text/html"
-                                                    value="resources[@lang = xxf:instance('fr-language-instance')]/label"/>
+                                                <xf:trigger appearance="minimal">
+                                                    <xf:label>
+                                                        <!-- Output showing as the header of the column -->
+                                                        <xf:output
+                                                            mediatype="text/html"
+                                                            value="resources[@lang = xxf:instance('fr-language-instance')]/label"/>
+                                                        <span class="summary-column-caret">
+                                                            <xf:output value="
+                                                                if      (instance('fr-search-instance')/order-by-column != @path)   then ''
+                                                                else if (instance('fr-search-instance')/order-by-direction = 'asc') then '&#x25B2;'
+                                                                else                                                                     '&#x25BC;'
+                                                            "/>
+                                                        </span>
+                                                    </xf:label>
+                                                    <xf:action event="DOMActivate">
+                                                        <xf:dispatch name="fr-order-by" targetid="fr-form-model">
+                                                            <xf:property name="column" value="@path"/>
+                                                        </xf:dispatch>
+                                                    </xf:action>
+                                                </xf:trigger>
                                             </xh:th>
                                         </xf:repeat>
                                     </xh:tr>

@@ -142,6 +142,47 @@
             max-width: none;                                        // Because table can scrolls beyond size of container
         }
 
+        thead.summary-column-header {
+            tr {
+                th {
+                    padding: 0;
+
+                    // Override the style of a "minimal" button
+                    button.btn-link {
+                        border: 0;
+                        padding: 4px 5px;
+                        width: 100%;
+                        vertical-align: middle;
+                        color: inherit;
+                        text-decoration: none;
+                        box-shadow: none;
+
+                        // Bold by default in Bootstrap and overridden to "normal" in form-runner-bootstrap-override.less
+                        font-weight: 500;
+
+                        &:hover, &:focus {
+                            color: inherit;
+                            background-color: #f9f9f9;
+                            cursor: pointer;
+                        }
+
+                        div.xforms-output {
+                            display: inline-block;
+                        }
+
+                        .summary-column-caret {
+                            display: inline-block;
+                            width: 15px;
+                            height: 15px;
+                            text-align: center;
+                            vertical-align: baseline;
+                            font-size: 80%;
+                        }
+                    }
+                }
+            }
+        }
+
         // We can't use .table-striped, as xf:repeat adds delimiters, so we do our own zebra-striping
         tbody tr:nth-child(4n+3) > td {
             background-color: @tableBackgroundAccent;

@@ -41,11 +41,11 @@ trait DistinctValuesLogic {
       freeTextSearch    = None,
       noPermissionValue = DistinctValues()
     ) {
-      case (connection: Connection, commonParts: List[StatementPart], _: SearchPermissions) =>
+      case (connection: Connection, commonAndPermissionsParts: List[StatementPart], _: SearchPermissions) =>
 
-        val innerSQL = buildQuery(commonParts)
+        val innerSQL = buildQuery(commonAndPermissionsParts)
 
-        implicit val requestContext = RequestContext(request.provider, connection, commonParts, innerSQL)
+        implicit val requestContext = RequestContext(request.provider, connection, commonAndPermissionsParts, innerSQL)
 
         DistinctValues(
           controlValues        = controlValues(request.controlPaths),

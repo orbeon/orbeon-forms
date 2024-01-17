@@ -208,9 +208,11 @@ object Provider extends Enum[Provider] {
 
   // MySQL < 8 lacks row_number, see http://stackoverflow.com/a/1895127/5295
   def rowNumSQL(
-    provider   : Provider,
-    connection : Connection,
-    tableAlias : String
+    provider       : Provider,
+    connection     : Connection,
+    tableAlias     : String,
+    orderColumn    : String,
+    orderDirection : String
   ): RowNumSQL = {
 
     val mySQLMajorVersion =
@@ -232,12 +234,12 @@ object Provider extends Enum[Provider] {
         RowNumSQL(
           table   = Some("(select @rownum := 0) r"),
           col     = "@rownum := @rownum + 1 row_num",
-          orderBy = s"ORDER BY $tableAlias.last_modified_time DESC"
+          orderBy = s"ORDER BY $tableAlias.$orderColumn $orderDirection"
         )
       case _ =>
         RowNumSQL(
           table   = None,
-          col     = s"row_number() over (order by $tableAlias.last_modified_time desc) row_num",
+          col     = s"row_number() over (order by $tableAlias.$orderColumn $orderDirection) row_num",
           orderBy = ""
         )
     }

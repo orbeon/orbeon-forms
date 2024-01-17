@@ -135,10 +135,25 @@ trait SearchLogic extends SearchRequestParser {
           }
         }
 
+        // To order the results by control value, we need to join with orbeon_i_control_text
+        val (innerJoinForControlOrderBy, controlOrderByStatementPartOpt) = request.orderBy.column match {
+          case ControlColumn(controlPath) => (
+            "INNER JOIN orbeon_i_control_text t ON t.data_id = s.data_id AND t.control = ?",
+            Some(StatementPart("", List[Setter]((ps, i) => ps.setString(i, controlPath))))
+          )
+          case _                          => ("", None)
+        }
+
         // Build SQL and create statement
         val sql = {
           val startOffsetZeroBased = (request.pageNumber - 1) * request.pageSize
-          val rowNumSQL            = Provider.rowNumSQL(request.provider, connection, tableAlias = "d")
+          val rowNumSQL            = Provider.rowNumSQL(
+            provider       = request.provider,
+            connection     = connection,
+            tableAlias     = "d",
+            orderColumn    = "sort_column",
+            orderDirection = request.orderBy.direction.sql
+          )
           val rowNumCol            = rowNumSQL.col
           val rowNumOrderBy        = rowNumSQL.orderBy
           val rowNumTable          = rowNumSQL.table match {
@@ -158,6 +173,12 @@ trait SearchLogic extends SearchRequestParser {
                                  ON c.data_id = s.data_id
            */
 
+          val sortTableAlias = request.orderBy.column match {
+            case ControlColumn(_) => "t" // Control value => comes from orbeon_i_control_text t
+            case _                => "c" // Form metadata => comes from orbeon_i_current c
+          }
+          val sortColumn = request.orderBy.column.sql
+
           // Use `LEFT JOIN` instead of regular join, in case the form doesn't have any control marked
           // to be indexed, in which case there won't be anything for it in `orbeon_i_control_text`.
           s"""SELECT
@@ -173,7 +194,7 @@ trait SearchLogic extends SearchRequestParser {
              |        FROM
              |            (
              |                SELECT
-             |                    c.*
+             |                    c.*, $sortTableAlias.$sortColumn AS sort_column
              |                FROM
              |                    $rowNumTable
              |                    (
@@ -182,6 +203,7 @@ trait SearchLogic extends SearchRequestParser {
              |                INNER JOIN
              |                    orbeon_i_current c
              |                    ON c.data_id = s.data_id
+             |                $innerJoinForControlOrderBy
              |            ) d
              |        $rowNumOrderBy
              |    ) c
@@ -192,11 +214,13 @@ trait SearchLogic extends SearchRequestParser {
              |    row_num
              |        BETWEEN ${startOffsetZeroBased + 1}
              |        AND     ${startOffsetZeroBased + request.pageSize}
+             | ORDER BY row_num
              |""".stripMargin
         }
         Logger.logDebug("search items query", sql)
 
-        val documentsMetadataValues = executeQuery(connection, sql, statementParts) { documentsResultSet =>
+        val allStatementParts            = statementParts ::: controlOrderByStatementPartOpt.toList
+        val rawDocumentMetadataAndValues = executeQuery(connection, sql, allStatementParts) { documentsResultSet =>
 
           Iterator.iterateWhile(
             cond = documentsResultSet.next(),
@@ -217,19 +241,20 @@ trait SearchLogic extends SearchRequestParser {
                   value            = documentsResultSet.getString                 ("val")
                 )
             )
-          )
-            .toList
+          ).toList
+        }
 
-            // Group row by common metadata, since the metadata is repeated in the result set
-            .groupBy(_._1).mapValues(_.map(_._2)).toList
-
-            // Sort by last modified in descending order, as the call expects the result to be pre-sorted
-            .sortBy(_._1.lastModifiedTime)(Ordering[Timestamp].reverse)
+        // The order of the document metadata in the SQL results is already correct, take it as a reference for the final order
+        val orderedDocumentMetadata          = rawDocumentMetadataAndValues.map(_._1).distinct
+        val documentValuesByDocumentMetadata = rawDocumentMetadataAndValues.groupBy(_._1).mapValues(_.map(_._2))
+        val documentMetadataAndValues        = orderedDocumentMetadata.map { documentMetadata =>
+          // Keep document metadata order and group all values together
+          documentMetadata -> documentValuesByDocumentMetadata(documentMetadata)
         }
 
         // Compute possible operations for each document
         val organizationsCache = mutable.Map[Int, Organization]()
-        val documents = documentsMetadataValues.map{ case (metadata, values) =>
+        val documents = documentMetadataAndValues.map{ case (metadata, values) =>
             def readFromDatabase(id: Int) = OrganizationSupport.read(connection, OrganizationId(id)).get
             val organization              = metadata.organizationId.map(id => organizationsCache.getOrElseUpdate(id, readFromDatabase(id)))
             val check                     = CheckWithDataUser(metadata.createdBy, organization)

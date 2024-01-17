@@ -122,6 +122,14 @@ trait SearchRequestParser {
           searchElement.elemValues(elem).flatMap(trimAllToOpt).toSet
         }
 
+        val orderBy =
+          (for {
+            column    <- searchElement.elemValueOpt("order-by-column").map(OrderColumn.apply)
+            direction <- searchElement.elemValueOpt("order-by-direction").map(OrderDirection.apply)
+          } yield OrderBy(column, direction)).getOrElse {
+            OrderBy(LastModified, Descending)
+          }
+
         SearchRequest(
           provider       = Provider.withName(provider),
           appForm        = appForm,
@@ -129,6 +137,7 @@ trait SearchRequestParser {
           credentials    = credentials,
           pageSize       = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-size"),  10),
           pageNumber     = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-number"), 1),
+          orderBy             = orderBy,
           createdGteOpt       = instant  ("created-gte"),
           createdLtOpt        = instant  ("created-lt"),
           createdBy           = stringSet("created-by"),

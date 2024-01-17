@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.webapp
+package org.orbeon.oxf.externalcontext
 
 import java.io.{Externalizable, ObjectInput, ObjectOutput}
 import java.util.concurrent.ConcurrentLinkedQueue

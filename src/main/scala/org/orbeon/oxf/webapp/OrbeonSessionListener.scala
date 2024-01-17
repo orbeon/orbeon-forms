@@ -14,7 +14,7 @@
 package org.orbeon.oxf.webapp
 
 import org.log4s
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, SessionListeners}
 import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
 import org.orbeon.oxf.servlet._
 import org.orbeon.oxf.webapp.ServletPortlet._

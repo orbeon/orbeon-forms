@@ -14,10 +14,8 @@
 package org.orbeon.oxf.servlet
 
 import scala.jdk.CollectionConverters._
-
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, SessionListeners}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
-import org.orbeon.oxf.webapp.SessionListeners
 
 
 trait SessionDelegate {

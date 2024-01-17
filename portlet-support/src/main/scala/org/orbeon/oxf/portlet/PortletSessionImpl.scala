@@ -15,17 +15,14 @@ package org.orbeon.oxf.portlet
 
 import javax.portlet.PortletSession
 import scala.jdk.CollectionConverters._
-
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, SessionListeners}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
-import org.orbeon.oxf.webapp.SessionListeners
+
 
 class PortletSessionImpl(portletSession: PortletSession)
   extends ExternalContext.Session {
 
   import PortletSession._
-
-  import SessionListeners._
 
   // Delegate
   def getCreationTime                       = portletSession.getCreationTime
@@ -53,7 +50,7 @@ class PortletSessionImpl(portletSession: PortletSession)
   }
 
   def addListener(sessionListener: ExternalContext.SessionListener): Unit =
-    portletSession.getAttribute(SessionListenersKey, APPLICATION_SCOPE) match {
+    portletSession.getAttribute(SessionListeners.SessionListenersKey, APPLICATION_SCOPE) match {
       case listeners: SessionListeners => listeners.addListener(sessionListener)
       case _ =>
         throw new IllegalStateException(
@@ -62,7 +59,7 @@ class PortletSessionImpl(portletSession: PortletSession)
     }
 
   def removeListener(sessionListener: ExternalContext.SessionListener): Unit =
-    portletSession.getAttribute(SessionListenersKey, APPLICATION_SCOPE) match {
+    portletSession.getAttribute(SessionListeners.SessionListenersKey, APPLICATION_SCOPE) match {
       case listeners: SessionListeners => listeners.removeListener(sessionListener)
       case _ =>
     }

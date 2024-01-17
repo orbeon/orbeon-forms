@@ -392,7 +392,7 @@ lazy val commonSettings = Seq(
 
   copyJarToExplodedWar := copyJarFile((Compile / packageBin).value, ExplodedWarLibPath, JarFilesToExcludeFromWar.contains, matchRawJarName = true),
   copyJarToLiferayWar  := copyJarFile((Compile / packageBin).value, LiferayWarLibPath,  JarFilesToExcludeFromLiferayWar.contains, matchRawJarName = true)
-) ++ unmanagedJarsSettings
+)
 
 lazy val commonScalaJvmSettings = Seq(
   libraryDependencies ++= Seq(
@@ -535,18 +535,24 @@ lazy val webSupport = (project in file("web-support"))
 
 lazy val embedding = (project in file("embedding"))
   .dependsOn(
-    core,
+    commonJVM,
+    servletSupport,
     xformsClientServerJVM
   )
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-embedding",
-    libraryDependencies += "javax.servlet"   % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
-    libraryDependencies += "jakarta.servlet" % "jakarta.servlet-api" % JakartaServletApiVersion % Provided
+    libraryDependencies += "javax.servlet"             % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
+    libraryDependencies += "jakarta.servlet"           % "jakarta.servlet-api" % JakartaServletApiVersion % Provided,
+    libraryDependencies += "commons-io"                %  "commons-io"         % CommonsIoVersion,
+    libraryDependencies += "org.apache.httpcomponents" % "httpclient"          % HttpComponentsVersion,
   )
 
 lazy val fullPortlet = (project in file("full-portlet"))
-  .dependsOn(portletSupport)
+  .dependsOn(
+    portletSupport,
+    core
+  )
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-full-portlet",
@@ -558,15 +564,33 @@ lazy val fullPortlet = (project in file("full-portlet"))
   )
 
 lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
-  .dependsOn(portletSupport)
+  .dependsOn(
+    portletSupport,
+  )
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-proxy-portlet",
-    libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
-    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % JavaxServletApiVersion      % Provided,
-    libraryDependencies += "jakarta.servlet"    % "jakarta.servlet-api"       % JakartaServletApiVersion    % Provided,
-    libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
-    libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
+
+    libraryDependencies += "javax.portlet"          %  "portlet-api"              % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet"          % "javax.servlet-api"         % JavaxServletApiVersion      % Provided,
+    libraryDependencies += "jakarta.servlet"        % "jakarta.servlet-api"       % JakartaServletApiVersion    % Provided,
+    libraryDependencies += "com.liferay.portal"     % "portal-service"            % LiferayPortalServiceVersion % Provided,
+    libraryDependencies += "com.liferay.portal"     % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided,
+    libraryDependencies += "org.scala-lang.modules" %% "scala-xml"                % ScalaXmlVersion,
+  )
+
+lazy val formRunnerProxyPortletWar = (project in file("proxy-portlet-war"))
+  .settings(
+    name := "orbeon-proxy-portlet-war",
+    exportJars := false
+  )
+  .dependsOn(
+    formRunnerProxyPortlet
+  )
+  .settings(OrbeonWebappPlugin.projectSettings: _*)
+  .settings(commonSettings: _*)
+  .settings(
+    exportJars := false,
   )
 
 lazy val portletSupport = (project in file("portlet-support"))
@@ -1203,6 +1227,7 @@ lazy val core = (project in file("src"))
   )
   .configs(DebugTest)
   .settings(commonSettings: _*)
+  .settings(unmanagedJarsSettings: _*)
   .settings(commonScalaJvmSettings)
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
   .settings(assetsSettings: _*)
@@ -1260,10 +1285,7 @@ lazy val orbeonWarJVM = orbeonWar.jvm
     xformsJVM,
     formRunnerJVM,
     formBuilderJVM,
-    embedding,              // probably unneeded in WAR
-    portletSupport,
-    formRunnerProxyPortlet, // unneeded in WAR, but `proxy-portlet-jar` task for now uses JAR in WAR
-    fullPortlet,
+    embedding,              // probably unneeded in WAR except for `embedding-jar` in build.xml
     servletContainerInitializer
   )
   .settings(OrbeonWebappPlugin.projectSettings: _*)
@@ -1334,9 +1356,7 @@ lazy val root = (project in file("."))
     formRunnerWeb,
     formBuilderJVM,
     formBuilderJS,
-    embedding,
-    portletSupport,
-    formRunnerProxyPortlet,
+    formRunnerProxyPortletWar,
     fullPortlet,
     servletContainerInitializer,
     orbeonWarJVM,

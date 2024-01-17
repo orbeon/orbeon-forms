@@ -262,7 +262,6 @@
         </zip>
     </target>
 
-
     <target name="xforms-filter-war" depends="xforms-filter-jar" description="Create XForms filter WAR">
     	<mkdir dir="build/distrib"/>
         <war destfile="build/distrib/orbeon-${release.number}-xforms-filter.war">

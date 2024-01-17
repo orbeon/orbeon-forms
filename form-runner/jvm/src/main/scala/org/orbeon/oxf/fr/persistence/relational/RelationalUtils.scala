@@ -41,11 +41,14 @@ object RelationalUtils extends Logging {
   def databaseConfigurationPresent(): Boolean = {
     val propertySet = Properties.instance.getPropertySet
 
-    val providers = propertySet
+    val propertiesByProvider = propertySet
       .propertiesStartsWith("oxf.fr.persistence.provider", matchWildcards = false)
-      .flatMap(propertySet.getNonBlankString)
-      .filter(_ != "resource")
-      .toSet
+      .flatMap(p => propertySet.getNonBlankString(p).map(_ -> p))
+      .filter(_._1 != "resource")
+      .groupBy(_._1)
+      .map(kv => kv._1 -> kv._2.map(_._2).sorted)
+
+    val providers = propertiesByProvider.keys.toSet
 
     val activeDataSources = providers.filter(providerPropertyAsBoolean(_, "active", default = true))
 
@@ -56,7 +59,15 @@ object RelationalUtils extends Logging {
         case Some(name) =>
           val dataSourceNotFound = getDataSourceNoFallback(name).isEmpty
           if (dataSourceNotFound) {
-            error(s"Data source `$name` not configured")
+            error(s"Data source `$name` referenced by provider `$provider` not configured")
+
+            val propertiesWithProvider = propertiesByProvider.get(provider).toSeq.flatten
+
+            error(s"Provider `$provider` is used by the following properties:")
+            propertiesWithProvider.foreach(property => error(s" - $property"))
+
+            val activeProperty = PersistencePropertyPrefix :: provider :: "active" :: Nil mkString "."
+            error(s"Provider `$provider` can be disabled by setting property `$activeProperty` to `false`")
           }
           dataSourceNotFound
         case None =>

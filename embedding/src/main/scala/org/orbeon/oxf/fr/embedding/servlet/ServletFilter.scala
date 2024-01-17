@@ -17,7 +17,6 @@ import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.servlet._
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.webapp.ServletSupport
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 
@@ -122,7 +121,7 @@ class ServletFilterImpl extends Filter {
       val httpRes = res.asInstanceOf[HttpServletResponse]
 
       APISupport.scopeSettings(httpReq, settings) {
-        ServletSupport.getRequestPathInfo(httpReq) match {
+        httpReq.getRequestPathInfo match {
           case settings.OrbeonSubmitPathRegex() =>
             // Request is for an Orbeon submission
             APISupport.proxySubmission(httpReq, httpRes)

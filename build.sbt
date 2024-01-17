@@ -1228,6 +1228,7 @@ lazy val core = (project in file("src"))
 
 // Common types for Javax and Jakarta servlets
 lazy val servletSupport = (project in file("servlet-support"))
+  .dependsOn(commonJVM)
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-servlet-support",

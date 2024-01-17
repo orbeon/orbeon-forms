@@ -18,7 +18,6 @@ import org.orbeon.oxf.externalcontext.RequestAdapter
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.servlet.{HttpServletRequest, HttpSession}
-import org.orbeon.oxf.webapp.ServletSupport
 
 
 private class MinimalSession(session: HttpSession) extends Session {
@@ -43,7 +42,7 @@ private class MinimalSession(session: HttpSession) extends Session {
 private class MinimalRequest(req: HttpServletRequest) extends RequestAdapter {
 
   override lazy val getAttributesMap = new InitUtils.RequestMap(req)
-  override def getRequestPath        = ServletSupport.getRequestPathInfo(req)
+  override def getRequestPath        = req.getRequestPathInfo
   override def getMethod             = HttpMethod.withNameInsensitive(req.getMethod)
 
   private lazy val sessionWrapper = new MinimalSession(req.getSession(true))

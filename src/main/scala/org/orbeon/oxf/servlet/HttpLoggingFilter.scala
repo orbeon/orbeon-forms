@@ -2,7 +2,6 @@ package org.orbeon.oxf.servlet
 
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.webapp.ServletSupport
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.io.{ByteArrayInputStream, InputStream}
@@ -39,7 +38,7 @@ class HttpLoggingFilterImpl extends Filter {
 
     val httpRequest        = servletRequest.asInstanceOf[HttpServletRequest]
     val byteArray          = NetUtils.inputStreamToByteArray(httpRequest.getInputStream)
-    val requestPath        = ServletSupport.getRequestPathInfo(httpRequest)
+    val requestPath        = httpRequest.getRequestPathInfo
     val requestBody        = new String(byteArray, CharsetNames.Utf8)
     val inputStream        = new ByteArrayInputStream(byteArray)
     val servletInputStream = new HttpLoggingFilter.ByteArrayServletInputStream(inputStream)

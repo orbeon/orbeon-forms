@@ -19,7 +19,6 @@ import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.webapp.ServletSupport
 
 import java.io._
 import java.util._
@@ -78,7 +77,7 @@ class OrbeonXFormsFilterImpl extends Filter {
 
         val httpRequest  = servletRequest.asInstanceOf[HttpServletRequest]
         val httpResponse = servletResponse.asInstanceOf[HttpServletResponse]
-        val requestPath  = ServletSupport.getRequestPathInfo(httpRequest)
+        val requestPath  = httpRequest.getRequestPathInfo
 
         // Set whether deployment is integrated or separate
         // NOTE: Also for resources so that e.g. /xforms-server, /xforms-server-submit can handle URLs properly.

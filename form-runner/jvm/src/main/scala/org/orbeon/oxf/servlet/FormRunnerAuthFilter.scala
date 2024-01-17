@@ -19,7 +19,6 @@ import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.webapp.ServletSupport
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
@@ -96,7 +95,7 @@ object FormRunnerAuthFilterImpl {
     // credentials, which would be provided by the container or by incoming headers. Instead, credentials are provided
     // directly with `Orbeon-*` headers. See https://github.com/orbeon/orbeon-forms/issues/2275
     val requestWithAmendedHeaders =
-      if (ServletSupport.getRequestPathInfo(servletRequest).startsWith("/fr/service/")) {
+      if (servletRequest.getRequestPathInfo.startsWith("/fr/service/")) {
 
         // `ServletPortletRequest` gets credentials from the session, which means we need to store the credentials into
         // the session. This is done by `getCredentialsAsHeadersUseSession()` if we are not a service, but here we
@@ -117,7 +116,7 @@ object FormRunnerAuthFilterImpl {
         }
 
         servletRequest
-      } else if (ServletSupport.getRequestPathInfo(servletRequest).endsWith(".map")) {
+      } else if (servletRequest.getRequestPathInfo.endsWith(".map")) {
         // Don't amend headers for `.map` as this would cause the credentials code to clear the credentials
         // unnecessarily. https://github.com/orbeon/orbeon-forms/issues/6080
         servletRequest

@@ -142,7 +142,7 @@
             <rule pattern="org.relaxng.datatype.**" result="org.orbeon.msv.relaxng.datatype.@1"/>
         </jarjar>
     </target>
-
+    
     <target name="xforms-filter-jar" depends="war-common">
 <!--    <target name="xforms-filter-jar" depends="prepare">-->
 

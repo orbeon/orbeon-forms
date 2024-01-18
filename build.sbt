@@ -548,6 +548,16 @@ lazy val embedding = (project in file("embedding"))
     libraryDependencies += "org.apache.httpcomponents" % "httpclient"          % HttpComponentsVersion,
   )
 
+lazy val embeddingWar = (project in file("embedding-war"))
+  .settings(
+    name := "orbeon-embedding-war",
+  )
+  .dependsOn(
+    embedding
+  )
+  .settings(OrbeonWebappPlugin.projectSettings: _*)
+  .settings(commonSettings: _*)
+
 lazy val fullPortlet = (project in file("full-portlet"))
   .dependsOn(
     portletSupport,
@@ -582,16 +592,12 @@ lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
 lazy val formRunnerProxyPortletWar = (project in file("proxy-portlet-war"))
   .settings(
     name := "orbeon-proxy-portlet-war",
-    exportJars := false
   )
   .dependsOn(
     formRunnerProxyPortlet
   )
   .settings(OrbeonWebappPlugin.projectSettings: _*)
   .settings(commonSettings: _*)
-  .settings(
-    exportJars := false,
-  )
 
 lazy val portletSupport = (project in file("portlet-support"))
   .dependsOn(embedding)
@@ -1285,7 +1291,6 @@ lazy val orbeonWarJVM = orbeonWar.jvm
     xformsJVM,
     formRunnerJVM,
     formBuilderJVM,
-    embedding,              // probably unneeded in WAR except for `embedding-jar` in build.xml
     servletContainerInitializer
   )
   .settings(OrbeonWebappPlugin.projectSettings: _*)
@@ -1356,6 +1361,7 @@ lazy val root = (project in file("."))
     formRunnerWeb,
     formBuilderJVM,
     formBuilderJS,
+    embeddingWar,
     formRunnerProxyPortletWar,
     fullPortlet,
     servletContainerInitializer,

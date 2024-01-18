@@ -92,7 +92,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         // of the bound node, and in that case we also don't need to store the label
         jSelect.on("change", onChangeDispatchFrChange _)
       }
-      jSelect.on("select2:open", (onOpen _))
+      jSelect.on("select2:open", onOpen _)
       jSelect.data("select2").on("results:focus", onResultsFocus _)
 
       // Add `aria-labelledby` pointing to the label, `aria-describedby` pointing to the help and hint

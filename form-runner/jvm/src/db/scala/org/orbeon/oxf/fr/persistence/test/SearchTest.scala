@@ -102,7 +102,8 @@ class SearchTest
 
         testWithSimpleValues(
           searchRequest         = _ => searchRequest,
-          expectedDocumentNames = Set("1"),
+          expectedDocumentNames = List("1"),
+          testDocumentOrder     = false,
           formData              = Seq(FormData("1", lookingFor), FormData("2", notLookingFor))
         )
       }
@@ -123,7 +124,8 @@ class SearchTest
 
       testWithSimpleValues(
         searchRequest         = _ => searchRequest,
-        expectedDocumentNames = Set("3"),
+        expectedDocumentNames = List("3"),
+        testDocumentOrder     = false,
         formData              = Seq(
           FormData("1", "*test1*"),
           FormData("2", "*test2*"),
@@ -147,7 +149,8 @@ class SearchTest
 
       testWithSimpleValues(
         searchRequest         = _ => searchRequest,
-        expectedDocumentNames = Set("3"),
+        expectedDocumentNames = List("3"),
+        testDocumentOrder     = false,
         formData              = Seq(
           FormData("1", "*test1*"),
           FormData("2", "*test2*"),
@@ -169,7 +172,8 @@ class SearchTest
 
       testWithSimpleValues(
         searchRequest         = _ => searchRequest,
-        expectedDocumentNames = Set("3"),
+        expectedDocumentNames = List("3"),
+        testDocumentOrder     = false,
         formData              = Seq(
           FormData("1", "t1st"),
           FormData("2", "t2st"),
@@ -202,7 +206,8 @@ class SearchTest
 
       testWithSimpleValues(
         searchRequest         = _ => searchRequest1,
-        expectedDocumentNames = Set("4", "5", "6"),
+        expectedDocumentNames = List("4", "5", "6"),
+        testDocumentOrder     = false,
         formData              = formData
       )
 
@@ -218,7 +223,8 @@ class SearchTest
 
       testWithSimpleValues(
         searchRequest         = _ => searchRequest2,
-        expectedDocumentNames = Set("4", "5"),
+        expectedDocumentNames = List("4", "5"),
+        testDocumentOrder     = false,
         formData              = formData
       )
     }
@@ -255,19 +261,22 @@ class SearchTest
 
       testWithSimpleValues(
         searchRequest         = _ => searchRequest(createdByOpt = Some("created-by-1")),
-        expectedDocumentNames = Set("1"),
+        expectedDocumentNames = List("1"),
+        testDocumentOrder     = false,
         formData              = formData
       )
 
       testWithSimpleValues(
         searchRequest         = _ => searchRequest(lastModifiedByOpt = Some("last-modified-by-2")),
-        expectedDocumentNames = Set("2"),
+        expectedDocumentNames = List("2"),
+        testDocumentOrder     = false,
         formData              = formData
       )
 
       testWithSimpleValues(
         searchRequest         = _ => searchRequest(workflowStageOpt = Some("stage-3")),
-        expectedDocumentNames = Set("3"),
+        expectedDocumentNames = List("3"),
+        testDocumentOrder     = false,
         formData              = formData
       )
     }
@@ -307,28 +316,137 @@ class SearchTest
       testWithSimpleValues(
         // >= creation date of document 3
         searchRequest         = formDataAndDates => searchRequest(createdGteOpt = Some(formDataAndDates.map(_._2).apply(2).createdBy)),
-        expectedDocumentNames = Set("3", "4"),
+        expectedDocumentNames = List("3", "4"),
+        testDocumentOrder     = false,
         formData              = formData
       )
 
       testWithSimpleValues(
         // < creation date of document 3
         searchRequest         = formDataAndDates => searchRequest(createdLtOpt = Some(formDataAndDates.map(_._2).apply(2).createdBy)),
-        expectedDocumentNames = Set("1", "2"),
+        expectedDocumentNames = List("1", "2"),
+        testDocumentOrder     = false,
         formData              = formData
       )
 
       testWithSimpleValues(
         // >= modification date of document 2
         searchRequest         = formDataAndDates => searchRequest(lastModifiedGteOpt = Some(formDataAndDates.map(_._2).apply(1).lastModifiedBy)),
-        expectedDocumentNames = Set("2", "3", "4"),
+        expectedDocumentNames = List("2", "3", "4"),
+        testDocumentOrder     = false,
         formData              = formData
       )
 
       testWithSimpleValues(
         // < modification date of document 4
         searchRequest         = formDataAndDates => searchRequest(lastModifiedLtOpt = Some(formDataAndDates.map(_._2).apply(3).lastModifiedBy)),
-        expectedDocumentNames = Set("1", "2", "3"),
+        expectedDocumentNames = List("1", "2", "3"),
+        testDocumentOrder     = false,
+        formData              = formData
+      )
+    }
+
+    it("returns correct results when sorting") {
+      def searchRequest(column: String, direction: String) =
+        <search>
+          <query/>
+          <query path={controlPath} match="substring">test</query>
+          <drafts>include</drafts>
+          <order-by-column>{column}</order-by-column>
+          <order-by-direction>{direction}</order-by-direction>
+          <page-size>10</page-size>
+          <page-number>1</page-number>
+          <lang>en</lang>
+        </search>.toDocument
+
+      val formData = Seq(
+        FormData("1", "test2", createdByOpt = Some("created-by-4"), lastModifiedByOpt = Some("last-modified-by-4"), workflowStageOpt = Some("workflow-stage-3")),
+        FormData("2", "test3", createdByOpt = Some("created-by-2"), lastModifiedByOpt = Some("last-modified-by-1"), workflowStageOpt = Some("workflow-stage-4")),
+        FormData("3", "test4", createdByOpt = Some("created-by-1"), lastModifiedByOpt = Some("last-modified-by-3"), workflowStageOpt = Some("workflow-stage-2")),
+        FormData("4", "test1", createdByOpt = Some("created-by-3"), lastModifiedByOpt = Some("last-modified-by-2"), workflowStageOpt = Some("workflow-stage-1"))
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest("created", "asc"),
+        expectedDocumentNames = List("1", "2", "3", "4"),
+        testDocumentOrder     = true,
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest("created", "desc"),
+        expectedDocumentNames = List("4", "3", "2", "1"),
+        testDocumentOrder     = true,
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest("last-modified", "asc"),
+        expectedDocumentNames = List("1", "2", "3", "4"),
+        testDocumentOrder     = true,
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest("last-modified", "desc"),
+        expectedDocumentNames = List("4", "3", "2", "1"),
+        testDocumentOrder     = true,
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest("created-by", "asc"),
+        expectedDocumentNames = List("3", "2", "4", "1"),
+        testDocumentOrder     = true,
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest("created-by", "desc"),
+        expectedDocumentNames = List("1", "4", "2", "3"),
+        testDocumentOrder     = true,
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest("last-modified-by", "asc"),
+        expectedDocumentNames = List("2", "4", "3", "1"),
+        testDocumentOrder     = true,
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest("last-modified-by", "desc"),
+        expectedDocumentNames = List("1", "3", "4", "2"),
+        testDocumentOrder     = true,
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest("workflow-stage", "asc"),
+        expectedDocumentNames = List("4", "3", "1", "2"),
+        testDocumentOrder     = true,
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest("workflow-stage", "desc"),
+        expectedDocumentNames = List("2", "1", "3", "4"),
+        testDocumentOrder     = true,
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest(controlPath, "asc"),
+        expectedDocumentNames = List("4", "1", "2", "3"),
+        testDocumentOrder     = true,
+        formData              = formData
+      )
+
+      testWithSimpleValues(
+        searchRequest         = _ => searchRequest(controlPath, "desc"),
+        expectedDocumentNames = List("3", "2", "1", "4"),
+        testDocumentOrder     = true,
         formData              = formData
       )
     }
@@ -336,7 +454,8 @@ class SearchTest
 
   def testWithSimpleValues(
     searchRequest        : Seq[(FormData, FormDataDates)] => Document,
-    expectedDocumentNames: Set[String],
+    expectedDocumentNames: List[String],
+    testDocumentOrder    : Boolean,
     formData             : Seq[FormData],
     providers            : Option[List[Provider]] = None
   ): Unit =
@@ -366,9 +485,13 @@ class SearchTest
                 // Extract document names from the response
                 val resultDoc     = IOSupport.readOrbeonDom(new ByteArrayInputStream(actualResponse.body))
                 val root          = resultDoc.getRootElement
-                val documentNames = root.elements("document").map(_.attribute("name").getValue).toSet
+                val documentNames = root.elements("document").map(_.attribute("name").getValue).toList
 
-                assert(documentNames == expectedDocumentNames)
+                if (testDocumentOrder) {
+                  assert(documentNames == expectedDocumentNames)
+                } else {
+                  assert(documentNames.toSet == expectedDocumentNames.toSet)
+                }
 
                 for {
                   document <- root.elements("document")

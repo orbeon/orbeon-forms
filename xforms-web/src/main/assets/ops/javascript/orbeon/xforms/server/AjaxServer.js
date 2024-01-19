@@ -18,6 +18,7 @@
     ORBEON.xforms.AjaxServerResponse = {};
 
     var $ = ORBEON.jQuery;
+    var _ = ORBEON._;
 
     /**
      * Process events in the DOM passed as parameter.

@@ -14,6 +14,7 @@
 (function() {
 
     var $ = ORBEON.jQuery;
+    var _ = ORBEON._;
 
     YAHOO.namespace('xbl.fr');
     YAHOO.xbl.fr.Countdown = function() {};

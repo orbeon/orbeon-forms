@@ -33,7 +33,7 @@ abstract class JQueryTooltipConfig extends js.Object {
   val title: String
 }
 
-@JSGlobal("_")
+@JSGlobal("ORBEON._")
 @js.native
 object Underscore extends js.Object {
   def uniqueId(): String = js.native

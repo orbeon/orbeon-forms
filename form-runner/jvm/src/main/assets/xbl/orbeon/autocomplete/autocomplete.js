@@ -15,6 +15,7 @@
 (function() {
     var OD = ORBEON.util.Dom;
     var YD = YAHOO.util.Dom;
+    var _  = ORBEON._;
 
     YAHOO.namespace("xbl.fr");
     YAHOO.xbl.fr.Autocomplete = function() {};

@@ -28,6 +28,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 (function() {
 
     var $ = ORBEON.jQuery;
+    var _ = ORBEON._;
 
     /**
      * Functions we add to the awesome Underscore.js
@@ -603,6 +604,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 (function() {
 
     var $ = ORBEON.jQuery;
+    var _ = ORBEON._;
 
     // Define packages
     ORBEON.xforms = ORBEON.xforms || {};

@@ -149,7 +149,7 @@
                 <xsl:choose>
                     <xsl:when test="$use-paging">
                         <xsl:choose>
-                            <xsl:when test="exists(fr:iteration-label)">
+                            <xsl:when test="exists($static-current-section/fr:iteration-label)">
                                 <xsl:value-of select="
                                     concat(
                                         'xxf:value(''',
@@ -338,7 +338,16 @@
                                 <xsl:otherwise>
                                     <!-- Not all readonly controls support focus, so we try to scroll instead  -->
                                     <xf:action type="javascript">
-                                        <xf:param name="sectionId" value="xxf:client-id('{$static-section-id}')"/>
+                                        <xf:param
+                                            name="sectionId"
+                                            value="
+                                                xxf:client-id('{
+                                                    $static-section-id
+                                                }{
+                                                    '-repeater-iteration-label'[
+                                                        exists($static-current-section/fr:iteration-label)
+                                                    ]
+                                                }')"/>
                                         <xf:body>
                                             const elem = window.document.getElementById(sectionId);
                                             if (elem)

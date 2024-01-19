@@ -135,7 +135,7 @@ trait XFormsCrossPlatformSupportTrait {
   }
 
   def proxyURI(
-    uri              : String,
+    urlString        : String,
     filename         : Option[String],
     contentType      : Option[String],
     lastModified     : Long,

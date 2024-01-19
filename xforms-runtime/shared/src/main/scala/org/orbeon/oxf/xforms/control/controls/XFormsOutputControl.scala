@@ -182,7 +182,7 @@ class XFormsOutputControl(
                   (
                     resolvedURI,
                     XFormsCrossPlatformSupport.proxyURI(
-                      uri              = resolvedURI,
+                      urlString        = resolvedURI,
                       filename         = filename,
                       contentType      = mediatype,
                       lastModified     = XFormsCrossPlatformSupport.getLastModifiedIfFast(resolvedURI),

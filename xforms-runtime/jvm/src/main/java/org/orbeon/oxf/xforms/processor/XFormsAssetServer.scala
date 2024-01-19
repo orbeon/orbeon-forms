@@ -337,13 +337,13 @@ object XFormsAssetServer {
   // Transform an URI accessible from the server into a URI accessible from the client.
   // The mapping expires with the session.
   def proxyURI(
-    uri              : String,
-    filename         : Option[String],
-    contentType      : Option[String],
-    lastModified     : Long,
-    customHeaders    : Map[String, List[String]],
-    headersToForward : Set[String],
-    getHeader        : String => Option[List[String]])(implicit
+    urlString       : String,
+    filename        : Option[String],
+    contentType     : Option[String],
+    lastModified    : Long,
+    customHeaders   : Map[String, List[String]],
+    headersToForward: Set[String],
+    getHeader       : String => Option[List[String]])(implicit
     logger           : IndentedLogger
   ): String = {
 
@@ -358,7 +358,7 @@ object XFormsAssetServer {
     val serviceAbsoluteUrl = URI.create(
       URLRewriterUtils.rewriteServiceURL(
         XFormsCrossPlatformSupport.externalContext.getRequest,
-        uri,
+        urlString,
         UrlRewriteMode.Absolute
       )
     )
@@ -387,8 +387,8 @@ object XFormsAssetServer {
 
   // For Java callers
   // 2015-09-21: Only used by FileSerializer.
-  def jProxyURI(uri: String, contentType: String) =
-    proxyURI(uri, None, Option(contentType), -1, Map(), Set(), _ => None)(null)
+  def jProxyURI(urlString: String, contentType: String) =
+    proxyURI(urlString, None, Option(contentType), -1, Map(), Set(), _ => None)(null)
 
   // Try to remove a dynamic resource
   //

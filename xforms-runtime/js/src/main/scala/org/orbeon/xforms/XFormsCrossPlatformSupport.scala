@@ -123,32 +123,42 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   // In the JavaScript environment, we currently don't require a way to handle dynamic URLs, so we
   // proxy resources as `data:` URLs.
   def proxyURI(
-    uri              : String,
-    filename         : Option[String],
-    contentType      : Option[String],
-    lastModified     : Long,
-    customHeaders    : Map[String, List[String]],
-    getHeader        : String => Option[List[String]])(implicit
+    urlString    : String,
+    filename     : Option[String],
+    contentType  : Option[String],
+    lastModified : Long,
+    customHeaders: Map[String, List[String]],
+    getHeader    : String => Option[List[String]])(implicit
     logger           : IndentedLogger
   ): String = {
 
     implicit val ec = externalContext
 
-    val cxr =
-      Connection.connectNow(
-        method          = GET,
-        url             = URI.create(uri),
-        credentials     = None,
-        content         = None,
-        headers         = Map.empty,
-        loadState       = false,
-        saveState       = false,
-        logBody         = false
-      )
+    val uri = URI.create(urlString)
 
-    val baos = new ByteArrayOutputStream
-    IOUtils.copyStreamAndClose(cxr.content.stream, baos)
-    "data:" + contentType.orElse(cxr.mediatype).getOrElse("") + ";base64," + Base64.encode(baos.toByteArray, useLineBreaks = false)
+    uri.getScheme match {
+      case "data" =>
+        urlString
+      case JsFileSupport.UploadUriScheme =>
+        // TODO
+        "javascript:void(0)";
+      case _ =>
+        val cxr =
+          Connection.connectNow(
+            method          = GET,
+            url             = uri,
+            credentials     = None,
+            content         = None,
+            headers         = Map.empty,
+            loadState       = false,
+            saveState       = false,
+            logBody         = false
+          )
+
+        val baos = new ByteArrayOutputStream
+        IOUtils.copyStreamAndClose(cxr.content.stream, baos)
+        "data:" + contentType.orElse(cxr.mediatype).getOrElse("") + ";base64," + Base64.encode(baos.toByteArray, useLineBreaks = false)
+    }
   }
 
   // In the JavaScript environment, we currently don't require a way to handle dynamic URLs, so we

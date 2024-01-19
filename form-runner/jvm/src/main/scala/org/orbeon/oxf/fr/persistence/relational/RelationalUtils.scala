@@ -50,7 +50,7 @@ object RelationalUtils extends Logging {
       .flatMap(p => propertySet.getNonBlankString(p).map(_ -> p))
       .filter(_._1 != "resource")
       .groupBy(_._1)
-      .map(kv => kv._1 -> kv._2.map(_._2).sorted)
+      .mapValues(_.map(_._2).sorted)
 
     val providers = propertiesByProvider.keys.toSet
 

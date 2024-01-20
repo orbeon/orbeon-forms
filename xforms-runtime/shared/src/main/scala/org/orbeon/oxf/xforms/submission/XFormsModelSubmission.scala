@@ -484,24 +484,7 @@ class XFormsModelSubmission(
                 case Some(Right(connectResultF)) if submissionParameters.isDeferredSubmission =>
                   containingDocument.setReplaceAllFuture(connectResultF)
                   None
-                  // This optimization is not possible now because we also depend on the contained `fs2.Stream` to be
-                  // fully ready, not only the `Future`.
-  //              case Some(Right(connectResultF)) if connectResultF.value.isDefined =>
-  //                // Optimization if the `Future` is already completed
-  //                connectResultF.value match {
-  //                  case Some(Success(connectResult)) =>
-  //                    handleConnectResult(
-  //                      submissionParameters   = submissionParameters,
-  //                      connectResult          = connectResult,
-  //                      initializeXPathContext = true // function context might have changed
-  //                    ).some
-  //                  case Some(Failure(t)) =>
-  //                    (ReplaceResult.SendError(t, Right(submissionParameters.actionOrResource.some), submissionParameters.tunnelProperties), None).some
-  //                  case None =>
-  //                    throw new IllegalStateException // we check for `isDefined` above
-  //                }
                 case Some(Right(connectResultIo)) =>
-                  // Submit the async submission manager
                   containingDocument
                     .getAsynchronousSubmissionManager
                     .addAsynchronousCompletion(

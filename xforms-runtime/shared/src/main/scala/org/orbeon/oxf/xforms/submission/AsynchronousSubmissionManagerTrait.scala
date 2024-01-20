@@ -55,7 +55,6 @@ trait AsynchronousSubmissionManagerTrait {
     awaitInCurrentRequest: Option[Duration]
   ): Unit = {
 
-
     totalSubmittedCount += 1
     pendingCount += 1
 
@@ -72,7 +71,6 @@ trait AsynchronousSubmissionManagerTrait {
     // Copy references so they are captured by the closure below
     val localRequestRunningCount         = requestRunningCount
     val localRequestWithWaitRunningCount = requestWithWaitRunningCount
-
 
     def preProcessFutureCompletion(result: Try[T]): Try[T] = {
       // This runs asynchronously

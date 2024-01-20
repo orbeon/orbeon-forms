@@ -60,12 +60,14 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient[org.apache.h
 
         Some(
           client.connect(
-            url         = url.toExternalForm,
-            credentials = credentialsFromURL(url),
-            cookieStore = new BasicCookieStore,
-            method      = HttpMethod.withNameInsensitive(Option(method) getOrElse "GET"),
-            headers     = _requestHeaders mapValues (_.toList) toMap,
-            content     = None
+            url           = url.toExternalForm,
+            credentials   = credentialsFromURL(url),
+            cookieStore   = new BasicCookieStore,
+            method        = HttpMethod.withNameInsensitive(Option(method) getOrElse "GET"),
+            headers       = _requestHeaders mapValues (_.toList) toMap,
+            content       = None
+          )(
+            connectionCtx = None
           )
         )
       }

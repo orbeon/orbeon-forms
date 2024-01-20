@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.submission
 
 import cats.effect.IO
 import cats.syntax.option._
-import org.orbeon.connection.{ConnectionResultT, StreamedContent}
+import org.orbeon.connection.{ConnectionResultT, ConnectionContextSupport, StreamedContent}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
@@ -127,7 +127,8 @@ class RegularSubmission(submission: XFormsModelSubmission)
             loadState       = true,
             logBody         = BaseSubmission.isLogBody)(
             logger          = detailsLogger,
-            externalContext = externalContext
+            externalContext = externalContext,
+            connectionCtx   = ConnectionContextSupport.getContext(Map.empty)
           ).map(createConnectResult(_)(timingLogger))
         )
       else

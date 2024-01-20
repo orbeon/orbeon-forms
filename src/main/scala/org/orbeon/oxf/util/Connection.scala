@@ -73,6 +73,8 @@ object Connection extends ConnectionTrait {
     externalContext : ExternalContext
   ): ConnectionResult = {
 
+    implicit val connectionContext: Option[ConnectionContextSupport.ConnectionContext] = None
+
     val (cookieStore, cxr) =
       connectInternal(
         method      = method,
@@ -100,7 +102,8 @@ object Connection extends ConnectionTrait {
     loadState       : Boolean,
     logBody         : Boolean)(implicit
     logger          : IndentedLogger,
-    externalContext : ExternalContext
+    externalContext : ExternalContext,
+    connectionCtx: Option[ConnectionContextSupport.ConnectionContext]
   ): IO[AsyncConnectionResult] = {
 
     // Here we convert an `fs2.Stream` to a Java `InputStream` which is used downstream. This works if the producer and
@@ -379,7 +382,8 @@ object Connection extends ConnectionTrait {
       loadState       : Boolean,
       logBody         : Boolean)(implicit
       logger          : IndentedLogger,
-      externalContext : ExternalContext
+      externalContext : ExternalContext,
+      ConnectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
     ): (CookieStore, ConnectionResult) = {
 
       val normalizedUrlString = url.toString
@@ -419,7 +423,8 @@ object Connection extends ConnectionTrait {
       findClient      : => (String, HttpClient[CookieStore]),
       headers         : Map[String, List[String]], // capitalized, or entirely lowercase in which case capitalization is attempted
       logBody         : Boolean)(implicit
-      logger          : IndentedLogger
+      logger          : IndentedLogger,
+      ConnectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
     ): ConnectionResult = {
 
       val normalizedUrlString = normalizedUrl.toString

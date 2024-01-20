@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import cats.effect.unsafe.implicits.global
+import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataFormatVersionName, DataXml}
@@ -92,9 +93,10 @@ trait FormRunnerSummary {
 
     val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
 
-    implicit val externalContext         : ExternalContext               = CoreCrossPlatformSupport.externalContext
-    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
-    implicit val xfcd                    : XFormsContainingDocument      = inScopeContainingDocument
+    implicit val externalContext         : ExternalContext                                    = CoreCrossPlatformSupport.externalContext
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait                      = CoreCrossPlatformSupport
+    implicit val connectionCtx           : Option[ConnectionContextSupport.ConnectionContext] = ConnectionContextSupport.getContext(Map.empty)
+    implicit val xfcd                    : XFormsContainingDocument                           = inScopeContainingDocument
 
     Await.result(
       putWithAttachments(

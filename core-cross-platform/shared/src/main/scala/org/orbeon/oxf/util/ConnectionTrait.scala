@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import cats.effect.IO
-import org.orbeon.connection.{AsyncConnectionResult, AsyncStreamedContent, ConnectionResult, StreamedContent}
+import org.orbeon.connection.{AsyncConnectionResult, AsyncStreamedContent, ConnectionResult, ConnectionContextSupport, StreamedContent}
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.Headers._
@@ -51,7 +51,8 @@ trait ConnectionTrait {
     loadState       : Boolean,
     logBody         : Boolean)(implicit
     logger          : IndentedLogger,
-    externalContext : ExternalContext
+    externalContext : ExternalContext,
+    ConnectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
   ): IO[AsyncConnectionResult]
 
   def isInternalPath(path: String): Boolean

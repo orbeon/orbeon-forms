@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.process
 
 import cats.effect.IO
+import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
@@ -137,9 +138,10 @@ trait FormRunnerActionsCommon {
   def trySaveAttachmentsAndData(params: ActionParams): ActionResult =
     ActionResult.tryAsync {
 
-      implicit val externalContext         : ExternalContext               = CoreCrossPlatformSupport.externalContext
-      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
-      implicit val xfcd                    : XFormsContainingDocument      = inScopeContainingDocument
+      implicit val externalContext         : ExternalContext                                    = CoreCrossPlatformSupport.externalContext
+      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait                      = CoreCrossPlatformSupport
+      implicit val connectionCtx           : Option[ConnectionContextSupport.ConnectionContext] = ConnectionContextSupport.getContext(Map.empty)
+      implicit val xfcd                    : XFormsContainingDocument                           = inScopeContainingDocument
 
       val FormRunnerParams(app, form, formVersion, Some(document), _, _) = FormRunnerParams()
 

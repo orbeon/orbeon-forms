@@ -72,7 +72,8 @@ object Connection extends ConnectionTrait {
     logBody         : Boolean
   )(implicit
     logger          : IndentedLogger,
-    externalContext : ExternalContext
+    externalContext : ExternalContext,
+    connectionCtx   : Option[ConnectionContextSupport.ConnectionContext],
   ): IO[AsyncConnectionResult] = {
     method match {
       case HttpMethod.PUT =>

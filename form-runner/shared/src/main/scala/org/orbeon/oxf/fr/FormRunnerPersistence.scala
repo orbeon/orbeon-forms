@@ -17,7 +17,7 @@ import cats.effect.IO
 import cats.syntax.option._
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.connection.{AsyncConnectionResult, ConnectionResult, StreamedContent}
+import org.orbeon.connection.{AsyncConnectionResult, ConnectionContextSupport, ConnectionResult, StreamedContent}
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.common
@@ -51,7 +51,6 @@ import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport}
 
 import java.net.URI
 import java.{util => ju}
-import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
 
 
@@ -657,6 +656,7 @@ trait FormRunnerPersistence {
   )(implicit
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
     xfcd                    : XFormsContainingDocument
   ): IO[AsyncConnectionResult] = {
 
@@ -703,6 +703,7 @@ trait FormRunnerPersistence {
   )(implicit
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
     xfcd                    : XFormsContainingDocument
   ): IO[AsyncConnectionResult] = {
 
@@ -728,6 +729,7 @@ trait FormRunnerPersistence {
   )(implicit
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
     xfcd                    : XFormsContainingDocument
   ): IO[AsyncConnectionResult] = {
 
@@ -796,6 +798,7 @@ trait FormRunnerPersistence {
   )(implicit
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
     xfcd                    : XFormsContainingDocument
   ): IO[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] = {
 
@@ -842,7 +845,10 @@ trait FormRunnerPersistence {
       )
 
     // xxx close resources
-    def saveAllAttachmentsStream(implicit xfcd: XFormsContainingDocument): fs2.Stream[IO, AttachmentWithEncryptedAtRest] =
+    def saveAllAttachmentsStream(implicit
+      xfcd             : XFormsContainingDocument,
+      connectionContext: Option[ConnectionContextSupport.ConnectionContext]
+    ): fs2.Stream[IO, AttachmentWithEncryptedAtRest] =
       for {
         AttachmentWithHolder(beforeUrl, migratedHolder)
                           <- fs2.Stream.emits(attachmentsWithHolder)

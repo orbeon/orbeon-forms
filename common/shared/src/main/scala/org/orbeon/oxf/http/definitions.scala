@@ -14,7 +14,7 @@
 package org.orbeon.oxf.http
 
 import enumeratum._
-import org.orbeon.connection.StreamedContent
+import org.orbeon.connection.{ConnectionContextSupport, StreamedContent}
 import org.orbeon.oxf.util.StringUtils._
 
 import java.io.InputStream
@@ -209,12 +209,14 @@ object HttpMethod extends Enum[HttpMethod] {
 trait HttpClient[CookieStore] {
 
   def connect(
-    url         : String,
-    credentials : Option[BasicCredentials],
-    cookieStore : CookieStore,
-    method      : HttpMethod,
-    headers     : Map[String, List[String]],
-    content     : Option[StreamedContent]
+    url          : String,
+    credentials  : Option[BasicCredentials],
+    cookieStore  : CookieStore,
+    method       : HttpMethod,
+    headers      : Map[String, List[String]],
+    content      : Option[StreamedContent]
+  )(implicit
+    connectionCtx: Option[ConnectionContextSupport.ConnectionContext]
   ): HttpResponse
 
   def shutdown(): Unit

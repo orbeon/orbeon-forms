@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import cats.effect.unsafe.implicits.global
 import cats.syntax.option._
+import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.FormXhtml
@@ -80,9 +81,10 @@ trait FormRunnerPublish {
         (FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName, Names.LibraryFormName), globalVersionOpt.getOrElse(1))
       )
 
-    implicit val externalContext         : ExternalContext               = CoreCrossPlatformSupport.externalContext
-    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
-    implicit val xfcd                    : XFormsContainingDocument      = inScopeContainingDocument
+    implicit val externalContext         : ExternalContext                                    = CoreCrossPlatformSupport.externalContext
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait                      = CoreCrossPlatformSupport
+    implicit val connectionCtx           : Option[ConnectionContextSupport.ConnectionContext] = ConnectionContextSupport.getContext(Map.empty)
+    implicit val xfcd                    : XFormsContainingDocument                           = inScopeContainingDocument
 
     val (attachmentWithEncryptedAtRest, publishedVersion, stringOpt) = {
       Await.result(

@@ -114,7 +114,7 @@ object SecureUtils extends SecureUtilsTrait {
     def computeSecretKey: SecretKey = {
 
       // Random seeded salt
-      val salt = new Array[Byte](8)
+      val salt = new Array[Byte](16)
       secureRandom.nextBytes(salt)
 
       val spec = new PBEKeySpec(getOrComputePassword(keyUsage).toCharArray, salt, 65536, getKeyLength)

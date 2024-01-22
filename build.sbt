@@ -558,6 +558,30 @@ lazy val embeddingWar = (project in file("embedding-war"))
   .settings(OrbeonWebappPlugin.projectSettings: _*)
   .settings(commonSettings: _*)
 
+lazy val xformsFilter = (project in file("xforms-filter"))
+  .dependsOn(
+    commonJVM,
+    servletSupport
+  )
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-xforms-filter",
+    libraryDependencies += "javax.servlet"             % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
+    libraryDependencies += "jakarta.servlet"           % "jakarta.servlet-api" % JakartaServletApiVersion % Provided,
+    libraryDependencies += "commons-io"                % "commons-io"          % CommonsIoVersion,
+    libraryDependencies += "org.apache.httpcomponents" % "httpclient"          % HttpComponentsVersion,
+  )
+
+lazy val xformsFilterWar = (project in file("xforms-filter-war"))
+  .settings(
+    name := "orbeon-xforms-filter-war",
+  )
+  .dependsOn(
+    xformsFilter
+  )
+  .settings(OrbeonWebappPlugin.projectSettings: _*)
+  .settings(commonSettings: _*)
+
 lazy val fullPortlet = (project in file("full-portlet"))
   .dependsOn(
     portletSupport,
@@ -1363,6 +1387,7 @@ lazy val root = (project in file("."))
     formBuilderJS,
     embeddingWar,
     formRunnerProxyPortletWar,
+    xformsFilterWar,
     fullPortlet,
     servletContainerInitializer,
     orbeonWarJVM,

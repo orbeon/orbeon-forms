@@ -156,54 +156,33 @@
             -optimizations !method/inlining/unique,!method/inlining/short
 
             <!--            -whyareyoukeeping class org.orbeon.saxon.om.NodeInfo-->
+            <!--            -ignorewarnings-->
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!orbeon-form-builder*.jar,!orbeon-form-runner*.jar,orbeon-*.jar;)
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(scala-*.jar,parboiled*.jar,enumeratum*.jar,circe-*.jar,cats-*.jar,fs2-*.jar,jawn-*.jar,sbinary*.jar,log4s*.jar,shapeless*.jar,autowire*.jar;)
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(commons-fileupload-*.jar,commons-pool-*.jar,commons-io-*,commons-lang3-*.jar,commons-codec-*.jar,commons-collections4-*.jar;)
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(saxon-*.jar,http*.jar,jcl-over-slf4j-*.jar,log4j-*.jar;)
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/ehcache-2.10.9.2.jar
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(tink-*.jar,gson-*.jar,protobuf-*.jar;)
-            <!-- Use explicit version number because there is also `javax.activation-api-*.jar` -->
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(javax.activation-1.2.0.jar;)
+            -injars      xforms-filter-war/target/webapp/WEB-INF/lib/(*.jar;)
 
-<!--            -ignorewarnings-->
-            -dontwarn net.sf.ehcache.**
-            -dontwarn org.terracotta.**
             -dontwarn org.apache.http.auth.KerberosCredentials
             -dontwarn org.apache.http.impl.auth.**
-            -dontwarn org.apache.http.impl.client.cache.memcached.**
-            -dontwarn org.orbeon.saxon.ant.**
-            -dontwarn org.orbeon.saxon.xqj.**
-            -dontwarn com.google.crypto.tink.**
-            -dontwarn com.google.protobuf.**
+
             -dontwarn org.apache.logging.log4j.core.**
             -dontwarn org.apache.logging.log4j.util.**
             -dontwarn org.slf4j.ext.**
-            -dontwarn org.orbeon.apache.xerces.**
-            -dontwarn org.orbeon.oxf.xml.xerces.**
+            -dontwarn ch.qos.logback.**
+            -dontwarn org.apache.commons.logging.**
+
             -dontwarn scala.collection.immutable.VM
             -dontwarn scala.reflect.**
             -dontwarn scala.tools.nsc.**
-            -dontwarn javax.jms.**
-            -dontwarn javax.mail.**
-            -dontwarn javax.cache.**
-            -dontwarn org.orbeon.oxf.processor.**
-            -dontwarn org.orbeon.oxf.util.ImageMetadata**
-            -dontwarn org.orbeon.oxf.util.ImageSupport**
-            -dontwarn org.orbeon.xforms.**
-            -dontwarn org.orbeon.oxf.xforms.**
-            -dontwarn com.openhtmltopdf.pdfboxout.**
-            -dontwarn me.gosimple.nbvcxz.**
+            -dontwarn cats.effect.Signal**
+            -dontwarn fs2.io.net.unixsocket.**
+
             -dontwarn org.osgi.annotation.**
             -dontwarn aQute.bnd.annotation.**
             -dontwarn edu.umd.cs.findbugs.**
             -dontwarn com.google.errorprone.**
-            -dontwarn cats.effect.**
-            -dontwarn fs2.**
 
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 
-            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-2.0.10.jar
+            -libraryjars xforms-filter-war/target/webapp/WEB-INF/lib/slf4j-api-2.0.10.jar
 
             -libraryjars lib/proguard/(javax.servlet-api-*.jar;)
             -libraryjars lib/proguard/(jakarta.servlet-api-*.jar;)
@@ -265,13 +244,10 @@
     <target name="xforms-filter-war" depends="xforms-filter-jar" description="Create XForms filter WAR">
     	<mkdir dir="build/distrib"/>
         <war destfile="build/distrib/orbeon-${release.number}-xforms-filter.war">
-            <webinf dir="descriptors/xforms-filter/WEB-INF"/>
+            <webinf dir="xforms-filter-war/src/main/webapp/WEB-INF"/>
             <lib dir="build/lib">
                 <include name="orbeon-xforms-filter.jar"/>
             </lib>
-            <zipfileset dir="descriptors/xforms-filter" prefix="">
-                <include name="*.jsp"/>
-            </zipfileset>
         </war>
     </target>
 

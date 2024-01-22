@@ -95,19 +95,19 @@ val CoreLibraryDependencies = Seq(
   "org.scala-sbt"               %% "sbinary"                        % SbinaryVersion,
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "org.log4s"                   %% "log4s"                          % Log4sVersion,
-  "org.apache.commons"          %  "commons-lang3"                  % "3.12.0",
+  "org.apache.commons"          % "commons-lang3"                   % "3.12.0",
   "javax.cache"                 % "cache-api"                       % "1.1.1",
-  "net.sf.ehcache"              %  "ehcache"                        % "2.10.9.2",
+  "net.sf.ehcache"              % "ehcache"                         % "2.10.9.2",
   "org.ehcache"                 % "ehcache"                         % "3.10.8",
   "javax.xml.bind"              % "jaxb-api"                        % "2.3.1",   // for Ehcache 3
   "com.sun.xml.bind"            % "jaxb-core"                       % "2.3.0.1", // for Ehcache 3
   "com.sun.xml.bind"            % "jaxb-impl"                       % "2.3.1",   // for Ehcache 3
-  "commons-codec"               %  "commons-codec"                  % "1.15",
-  "org.apache.commons"          %  "commons-collections4"           % "4.4",
-  "commons-fileupload"          %  "commons-fileupload"             % "1.5",
-  "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
-  "commons-pool"                %  "commons-pool"                   % "1.6",
-  "org.apache.ant"              %  "ant"                            % AntVersion,
+  "commons-codec"               % "commons-codec"                   % "1.15",
+  "org.apache.commons"          % "commons-collections4"            % "4.4",
+  "commons-fileupload"          % "commons-fileupload"              % "1.5",
+  "commons-io"                  % "commons-io"                      % CommonsIoVersion,
+  "commons-pool"                % "commons-pool"                    % "1.6",
+  "org.apache.ant"              % "ant"                             % AntVersion,
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
   "com.sun.mail"                % "javax.mail"                      % JavaMailVersion exclude("javax.activation", "activation"),
   "com.sun.activation"          % "javax.activation"                % JavaActivationVersion,
@@ -544,7 +544,7 @@ lazy val embedding = (project in file("embedding"))
     name := "orbeon-embedding",
     libraryDependencies += "javax.servlet"             % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
     libraryDependencies += "jakarta.servlet"           % "jakarta.servlet-api" % JakartaServletApiVersion % Provided,
-    libraryDependencies += "commons-io"                %  "commons-io"         % CommonsIoVersion,
+    libraryDependencies += "commons-io"                % "commons-io"          % CommonsIoVersion,
     libraryDependencies += "org.apache.httpcomponents" % "httpclient"          % HttpComponentsVersion,
   )
 

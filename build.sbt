@@ -1253,7 +1253,8 @@ lazy val core = (project in file("src"))
     coreCrossPlatformJVM,
     commonJVM,
     domJVM,
-    servletSupport
+    servletSupport,
+    xformsFilter // only for access to a constant
   )
   .configs(DebugTest)
   .settings(commonSettings: _*)

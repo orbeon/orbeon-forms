@@ -195,6 +195,12 @@
             -keep public class org.orbeon.oxf.servlet.OrbeonXFormsFilter {
                 public static *;
             }
+            -keep public class org.orbeon.oxf.servlet.JavaxOrbeonXFormsFilter {
+                public static *;
+            }
+            -keep public class org.orbeon.oxf.servlet.JakartaOrbeonXFormsFilter {
+                public static *;
+            }
         </proguard>
         <jarjar jarfile="build/lib/orbeon-xforms-filter.jar">
             <zipfileset src="${temp.jar}"/>

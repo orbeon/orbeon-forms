@@ -30,7 +30,7 @@ private case class FilterSettings(context: ServletContext, orbeonContextPathOpt:
 }
 
 // For backward compatibility
-trait OrbeonXFormsFilter extends JavaxOrbeonXFormsFilter
+class OrbeonXFormsFilter extends JavaxOrbeonXFormsFilter
 
 class JavaxOrbeonXFormsFilter   extends JavaxFilter  (new OrbeonXFormsFilterImpl)
 class JakartaOrbeonXFormsFilter extends JakartaFilter(new OrbeonXFormsFilterImpl)

@@ -63,7 +63,7 @@ object LifecycleLogger {
   def basicRequestDetailsAssumingRequest(params: List[(String, String)])(implicit ec: ExternalContext): List[(String, String)] =
     basicRequestDetails(ec.getRequest) ::: params
 
-  def basicRequestDetails(req: Request) =
+  def basicRequestDetails(req: Request): List[(String, String)] =
     List(
       "path"   -> req.getRequestPath,
       "method" -> req.getMethod.entryName

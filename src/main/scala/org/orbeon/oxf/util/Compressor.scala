@@ -32,7 +32,7 @@ object Compressor extends Logging {
   private val BUFFER_SIZE = 1024 * 8
   private val TRAILER_SIZE = 8
 
-  def compressBytes(bytesToEncode: Array[Byte], level: Int) = {
+  def compressBytes(bytesToEncode: Array[Byte], level: Int): Array[Byte] = {
     val deflater = deflaterPool.borrowObject
     try {
       deflater.setLevel(level)
@@ -120,7 +120,7 @@ object Compressor extends Logging {
     private var closed = false
 
     // Override because default implementation calls def.close()
-    override def close() =
+    override def close(): Unit =
       if (!closed) {
         finish()
         out.close()

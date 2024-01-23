@@ -47,7 +47,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
   override def start(pipelineContext: PipelineContext): Unit = {
 
-    implicit val externalContext = XFormsCrossPlatformSupport.externalContext
+    implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
 
     val requestPath = externalContext.getRequest.getRequestPath
     val response    = externalContext.getResponse
@@ -387,7 +387,7 @@ object XFormsAssetServer {
 
   // For Java callers
   // 2015-09-21: Only used by FileSerializer.
-  def jProxyURI(urlString: String, contentType: String) =
+  def jProxyURI(urlString: String, contentType: String): String =
     proxyURI(urlString, None, Option(contentType), -1, Map(), Set(), _ => None)(null)
 
   // Try to remove a dynamic resource
@@ -400,7 +400,7 @@ object XFormsAssetServer {
     removeFile      : Boolean
   ): Unit = {
 
-    implicit val externalContext = XFormsCrossPlatformSupport.externalContext
+    implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
 
     findDynamicResource(requestPath) foreach { resource =>
       externalContext.getRequest.sessionOpt foreach { session =>

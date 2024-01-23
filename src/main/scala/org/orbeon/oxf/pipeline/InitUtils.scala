@@ -44,7 +44,7 @@ object InitUtils {
   // Run with a pipeline context and destroy the pipeline when done
   def withPipelineContext[T](body: PipelineContext => T): T = {
     var success = false
-    val pipelineContext = new PipelineContext
+    val pipelineContext = new PipelineContext // side-effect of creating a `ThreadLocal`
     try {
       val result = body(pipelineContext)
       success = true
@@ -123,7 +123,7 @@ object InitUtils {
       import PipelineUtils._
       import ProcessorImpl.OUTPUT_DATA
 
-      def connectInput(file: Option[String], create: (String, Long, String) => DOMGenerator) =
+      def connectInput(file: Option[String], create: (String, Long, String) => DOMGenerator): Unit =
         connect(create("init input", ZeroValidity, file getOrElse DefaultContext), OUTPUT_DATA, processor, inputName)
 
       value match {
@@ -185,7 +185,7 @@ object InitUtils {
   // mapping of processor names to class names.
   lazy val processorDefinitions: Unit = {
 
-    def registerProcessors(url: String) = {
+    def registerProcessors(url: String): Unit = {
       val processorDefinitions = PipelineUtils.createURLGenerator(url, true)
       val registry = new XMLProcessorRegistry
       PipelineUtils.connect(processorDefinitions, "data", registry, "config")
@@ -210,7 +210,7 @@ object InitUtils {
     registerProcessors(processors)
   }
 
-  def getDefinitionFromServletContext(
+  private def getDefinitionFromServletContext(
     servletContext        : ServletContext,
     uriNamePropertyPrefix : String,
     inputPropertyPrefix   : String

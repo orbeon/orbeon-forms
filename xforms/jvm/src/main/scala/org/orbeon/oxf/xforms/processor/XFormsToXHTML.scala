@@ -55,7 +55,7 @@ class XFormsToXHTML extends XFormsProcessorBase {
     )
 }
 
-object XFormsToXHTML {
+private object XFormsToXHTML {
 
   def outputResponseDocument(
     externalContext    : ExternalContext,

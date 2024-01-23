@@ -134,7 +134,7 @@ object UploaderServer {
       }
 
     // Session keys created, for cleanup
-    val sessionKeys = m.ListBuffer[String]()
+    private val sessionKeys = m.ListBuffer[String]()
 
     def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)]
 
@@ -303,7 +303,7 @@ object UploaderServer {
 
     implicit val Logger: Logger = LoggerFactory.getLogger("org.orbeon.xforms.upload")
 
-    val UploadProgressSessionKey = "orbeon.upload.progress."
+    private val UploadProgressSessionKey = "orbeon.upload.progress."
 
     def getProgressSessionKey(uuid: String, fieldName: String): String =
       UploadProgressSessionKey + uuid + "." + fieldName
@@ -333,7 +333,7 @@ object UploaderServer {
         case Failure(t)                => FileScanErrorResult(message = Option(t.getMessage), throwable = Option(t))
       }
 
-    def loadProvider[T <: { def init(): Unit } : ClassTag]: Option[T] = {
+    private def loadProvider[T <: { def init(): Unit } : ClassTag]: Option[T] =
       try {
         Version.instance.requirePEFeature("File scan API")
 
@@ -352,14 +352,13 @@ object UploaderServer {
           Logger.error(s"Failed to obtain file scan provider:\n${OrbeonFormatter.format(t)}")
           None
       }
-    }
 
     lazy val fileScanProviderOpt: Option[Either[FileScanProvider2, FileScanProvider]] =
       loadProvider[FileScanProvider2].map(Left.apply)
         .orElse(loadProvider[FileScanProvider].map(Right.apply))
 
     // The Java API uses its own ADT. Here we convert from that to our native Scala ADT.
-    def fileScanResultFromJavaApi(jfsr: JFileScanResult): FileScanResult =
+    private def fileScanResultFromJavaApi(jfsr: JFileScanResult): FileScanResult =
       jfsr match {
         case r: JFileScanResult.FileScanAcceptResult =>
           FileScanAcceptResult(

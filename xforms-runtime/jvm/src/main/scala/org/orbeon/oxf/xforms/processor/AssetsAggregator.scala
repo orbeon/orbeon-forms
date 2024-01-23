@@ -40,9 +40,9 @@ class AssetsAggregator extends ProcessorImpl {
   addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
   addOutputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))
 
-  override def createOutput(name: String) =
+  override def createOutput(name: String): ProcessorOutput =
     addOutput(name, new ProcessorOutputImpl(self, name) {
-      override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) =
+      override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit =
         readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA,
           if (! XFormsGlobalProperties.isCombinedResources) xmlReceiver else new SimpleForwardingXMLReceiver(xmlReceiver) {
 

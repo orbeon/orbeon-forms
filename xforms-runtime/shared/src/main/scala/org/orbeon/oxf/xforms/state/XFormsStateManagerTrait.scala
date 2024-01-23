@@ -103,11 +103,10 @@ trait XFormsStateManagerTrait extends XFormsStateLifecycle {
     * @return delay in ms, or -1 is not applicable
     */
   def getMaxInactiveIntervalMillis(containingDocument: XFormsContainingDocument, externalContext: ExternalContext): Long =
-    if (containingDocument.staticState.isClientStateHandling) {
+    if (containingDocument.staticState.isClientStateHandling)
       -1L
-    } else {
+    else
       externalContext.getRequest.getSession(ForceSessionCreation).getMaxInactiveInterval * 1000
-    }
 
   // Ideally we wouldn't want to force session creation, but it's hard to implement the more elaborate expiration
   // strategy without session.

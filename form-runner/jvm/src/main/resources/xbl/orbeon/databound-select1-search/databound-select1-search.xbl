@@ -265,16 +265,24 @@
                 <!-- Build JSON for Select2 -->
                 <xf:delete ref="instance('result-json')/*"/>
                 <xf:var name="items" value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
-                <xf:action iterate="$items">
-                    <xf:var name="item" value="."/>
-                    <xf:setvalue ref="instance('item-template')/id"   value="$item/xxf:evaluate(instance('local')/value-ref)"/>
-                    <xf:setvalue ref="instance('item-template')/text" value="$item/xxf:evaluate(instance('local')/label-ref)"/>
-                    <xf:insert
-                        context="instance('result-json')"
-                        ref="*"
-                        position="after"
-                        origin="instance('item-template')"/>
-                </xf:action>
+                <xf:insert
+                    ref="instance('result-json')"
+                    origin="
+                        xf:element(
+                            '_',
+                            (
+                                xf:attribute('type', 'array'),
+                                for $item in $items return
+                                    xf:element(
+                                        '_',
+                                        (
+                                            xf:attribute('type', 'object'),
+                                            xf:element  ('id'  , string($item/xxf:evaluate(instance('local')/value-ref))),
+                                            xf:element  ('text', string($item/xxf:evaluate(instance('local')/label-ref)))
+                                        )
+                                    )
+                            )
+                        )"/>
 
                 <xf:var
                     name="is-last-page"
@@ -407,13 +415,7 @@
                             </xf:instance>
 
                             <xf:instance id="result-raw" ><_/></xf:instance>
-                            <xf:instance id="result-json"><results type="array"/></xf:instance>
-                            <xf:instance id="item-template">
-                                <_ type="object">
-                                    <id/>
-                                    <text/>
-                                </_>
-                            </xf:instance>
+                            <xf:instance id="result-json"><_/></xf:instance>
                             <xf:submission
                                     id="get-result"
                                     method="get"

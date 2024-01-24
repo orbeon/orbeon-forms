@@ -46,6 +46,8 @@ class AssetsAggregator extends ProcessorImpl {
         readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA,
           if (! XFormsGlobalProperties.isCombinedResources) xmlReceiver else new SimpleForwardingXMLReceiver(xmlReceiver) {
 
+            implicit val logger: IndentedLogger = Loggers.newIndentedLogger("resources")
+
             sealed trait HeadElement {
               val name: String
               val attributes: Attributes
@@ -242,10 +244,10 @@ object AssetsAggregator extends Logging {
     outputElement : String => T,
     namespaceOpt  : Option[String],
     isCSS         : Boolean
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Option[T] =
     resources.nonEmpty option {
-
-      implicit val logger = Loggers.getIndentedLogger("resources")
 
       // If there is at least one non-platform path, we also hash the app version number
       val hasAppResource = ! (resources forall URLRewriterUtils.isPlatformPath)

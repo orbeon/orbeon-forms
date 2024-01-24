@@ -21,8 +21,9 @@ import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.resources.ResourceManagerWrapper
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.{IndentedLogger, NetUtils, URLRewriterUtils}
 import org.orbeon.oxf.xforms.AssetPath
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
@@ -33,7 +34,7 @@ import scala.util.control.NonFatal
 
 
 // NOTE: Should rename to XFormsAssetRewriter?
-object XFormsResourceRewriter extends Logging {
+object XFormsResourceRewriter {
 
   // Generate the resources into the given OutputStream. The stream is flushed and closed when done.
   def generateAndClose(

@@ -21,6 +21,7 @@ import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.{Headers, HttpRanges, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsAssetPaths._
@@ -37,11 +38,10 @@ import scala.collection.immutable.ListSet
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
-
 /**
   * Serve XForms engine JavaScript and CSS resources by combining them.
   */
-class XFormsAssetServer extends ProcessorImpl with Logging {
+class XFormsAssetServer extends ProcessorImpl {
 
   import org.orbeon.oxf.xforms.processor.XFormsAssetServer._
 
@@ -54,10 +54,11 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
     val requestTime = System.currentTimeMillis
 
+    implicit val indentedLogger: IndentedLogger = Loggers.newIndentedLogger("resources")
+
     requestPath match {
       case DynamicResourceRegex(_) =>
         serveDynamicResource(requestPath)
-
       case BaselineResourceRegex(ext) =>
 
         val isCSS = ext == "css"
@@ -191,7 +192,12 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
     }
   }
 
-  private def serveDynamicResource(requestPath: String)(implicit externalContext: ExternalContext): Unit = {
+  private def serveDynamicResource(
+    requestPath    : String
+  )(implicit
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
+  ): Unit = {
 
     val response = externalContext.getResponse
 
@@ -266,7 +272,14 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
     }
   }
 
-  private def serveCSSOrJavaScript(requestTime: Long, hash: String, ext: String)(implicit externalContext: ExternalContext): Unit = {
+  private def serveCSSOrJavaScript(
+    requestTime    : Long,
+    hash           : String,
+    ext            : String
+  )(implicit
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
+  ): Unit = {
 
     val response = externalContext.getResponse
 
@@ -330,9 +343,7 @@ object XFormsAssetServer {
 
   import XFormsAssetPaths._
 
-  val DynamicResourcesSessionKey = "orbeon.resources.dynamic."
-
-  implicit def indentedLogger: IndentedLogger = Loggers.getIndentedLogger("resources")
+  private val DynamicResourcesSessionKey = "orbeon.resources.dynamic."
 
   // Transform an URI accessible from the server into a URI accessible from the client.
   // The mapping expires with the session.

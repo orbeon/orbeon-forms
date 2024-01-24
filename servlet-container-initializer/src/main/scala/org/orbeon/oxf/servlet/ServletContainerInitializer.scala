@@ -192,8 +192,12 @@ trait CommonContainerInitializer {
 
       // Servlet mapping
       val mappingParam = s"$paramPrefix.$MappingParamPart"
-      val mapping      = ctx.getInitParameter(mappingParam)
-      registration.addMapping(mapping)
+      Option(ctx.getInitParameter(mappingParam)) match {
+        case Some(mapping) =>
+          registration.addMapping(mapping)
+        case None =>
+          logger.error(s"Servlet '$servletName': missing mandatory init parameter '$mappingParam'")
+      }
 
       copyInitParams(
         ctx                 = ctx,
@@ -225,9 +229,13 @@ trait CommonContainerInitializer {
 
       // Servlet mapping
       val urlPatternParam = s"$paramPrefix.$UrlPatternParamPart"
-      val urlPattern      = ctx.getInitParameter(urlPatternParam)
-      // TODO: parse dispatcher types as well?
-      registration.addMappingForUrlPatterns(dispatcherTypes, true, urlPattern)
+      Option(ctx.getInitParameter(urlPatternParam)) match {
+        case Some(urlPattern) =>
+          // TODO: parse dispatcher types as well?
+          registration.addMappingForUrlPatterns(dispatcherTypes, isMatchAfter = true, urlPattern)
+        case None =>
+          logger.error(s"Filter '$filterName': missing mandatory init parameter '$urlPatternParam'")
+      }
 
       copyInitParams(
         ctx                 = ctx,

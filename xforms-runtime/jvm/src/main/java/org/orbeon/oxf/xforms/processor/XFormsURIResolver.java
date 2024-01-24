@@ -23,7 +23,6 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.URIProcessorOutputImpl;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xml.ParserConfiguration;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -45,8 +44,6 @@ import java.net.URL;
  * URIProcessorOutputImpl.
  */
 public class XFormsURIResolver extends TransformerURIResolver {
-
-    private static final IndentedLogger indentedLogger = Loggers.getIndentedLogger("resolver");
 
     private URIProcessorOutputImpl processorOutput;
 
@@ -92,8 +89,8 @@ public class XFormsURIResolver extends TransformerURIResolver {
                         }
                     };
 
-                    if (indentedLogger.debugEnabled())
-                        indentedLogger.logDebug("", "resolving resource through initialization resolver", "uri", urlString);
+                    if (Loggers.isDebugEnabled("resolver"))
+                        Loggers.logger().debug("resolving resource through initialization resolver: `{}` ", urlString);
 
                     return new SAXSource(xmlReader, new InputSource(urlString));
                 } else {

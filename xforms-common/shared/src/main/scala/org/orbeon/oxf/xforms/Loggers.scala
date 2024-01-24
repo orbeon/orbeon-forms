@@ -41,7 +41,10 @@ object Loggers {
   ): IndentedLogger =
     new IndentedLogger(
       logger,
-      logger.isDebugEnabled && XFormsGlobalProperties.getDebugLogging.contains(category),
+      isDebugEnabled(category),
       indentation
     )
+
+  def isDebugEnabled(category: String): Boolean =
+    logger.isDebugEnabled && XFormsGlobalProperties.getDebugLogging.contains(category)
 }

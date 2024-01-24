@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.pipeline
 
-import org.log4s.Logger
+import org.log4s
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
@@ -33,6 +33,7 @@ import org.orbeon.saxon.om.NodeInfo
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+
 
 object InitUtils {
 
@@ -58,7 +59,7 @@ object InitUtils {
     processor       : Processor,
     externalContext : ExternalContext,
     pipelineContext : PipelineContext)(implicit
-    logger          : Logger
+    logger          : log4s.Logger
   ): Unit = {
 
     // Record start time for this request
@@ -155,7 +156,7 @@ object InitUtils {
     message                : String,
     uriNamePropertyPrefix  : String,
     processorInputProperty : String)(implicit
-    logger                 : Logger
+    logger                 : log4s.Logger
   ): Unit = {
 
     require(servletContext ne null)

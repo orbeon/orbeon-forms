@@ -138,7 +138,7 @@ trait SearchLogic extends SearchRequestParser {
         // To order the results by control value, we need to join with orbeon_i_control_text
         val (innerJoinForControlOrderBy, controlOrderByStatementPartOpt) = request.orderBy.column match {
           case ControlColumn(controlPath) => (
-            "INNER JOIN orbeon_i_control_text t ON t.data_id = s.data_id AND t.control = ?",
+            "LEFT JOIN orbeon_i_control_text t ON t.data_id = s.data_id AND t.control = ?",
             Some(StatementPart("", List[Setter]((ps, i) => ps.setString(i, controlPath))))
           )
           case _                          => ("", None)

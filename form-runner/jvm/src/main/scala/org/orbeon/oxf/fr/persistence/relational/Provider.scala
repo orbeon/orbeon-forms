@@ -229,17 +229,21 @@ object Provider extends Enum[Provider] {
         mySQLVersion.splitTo(".").head.toInt
       }
 
+    val orderByColumn = provider match {
+      case _         => s"$tableAlias.$orderColumn"
+    }
+
     mySQLMajorVersion match {
       case Some(v) if v < 8 =>
         RowNumSQL(
           table   = Some("(select @rownum := 0) r"),
           col     = "@rownum := @rownum + 1 row_num",
-          orderBy = s"ORDER BY $tableAlias.$orderColumn $orderDirection"
+          orderBy = s"ORDER BY $orderByColumn $orderDirection"
         )
       case _ =>
         RowNumSQL(
           table   = None,
-          col     = s"row_number() over (order by $tableAlias.$orderColumn $orderDirection) row_num",
+          col     = s"row_number() over (order by $orderByColumn $orderDirection) row_num",
           orderBy = ""
         )
     }

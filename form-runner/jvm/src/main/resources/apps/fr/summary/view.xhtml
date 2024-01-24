@@ -737,6 +737,8 @@
 
             </xf:submission>
 
+            <xf:var name="sort-supported" value="frf:isSortSupported($app, $form)"/>
+
             <xf:action event="fr-order-by">
                 <xf:var name="column" value="event('column')"/>
 
@@ -1503,7 +1505,7 @@
 
                             <xh:table class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
-                                <xh:thead class="summary-column-header">
+                                <xh:thead class="{'summary-column-header', 'sortable-column'[$sort-supported], 'non-sortable-column'[not($sort-supported)]}">
                                     <xh:tr>
                                         <xh:th class="fr-summary-repeat-selection-checkbox"/>
                                         <xh:th class="{$labels-class}"/>
@@ -1518,13 +1520,13 @@
                                                             <xf:output value="$fr-resources/summary/titles/*[local-name() = $column]"/>
                                                             <span class="summary-column-caret">
                                                                 <xf:output value="
-                                                                    if      (instance('fr-search-instance')/order-by-column != $column) then ''
-                                                                    else if (instance('fr-search-instance')/order-by-direction = 'asc') then '&#x25B2;'
-                                                                    else                                                                     '&#x25BC;'
+                                                                    if      (instance('fr-search-instance')/order-by-column != $column or not($sort-supported)) then ''
+                                                                    else if (instance('fr-search-instance')/order-by-direction = 'asc') then                         '&#x25B2;'
+                                                                    else                                                                                             '&#x25BC;'
                                                                 "/>
                                                             </span>
                                                         </xf:label>
-                                                        <xf:action event="DOMActivate">
+                                                        <xf:action event="DOMActivate" if="$sort-supported">
                                                             <xf:dispatch
                                                                 name="fr-order-by"
                                                                 targetid="fr-form-model">
@@ -1548,13 +1550,13 @@
                                                             value="resources[@lang = xxf:instance('fr-language-instance')]/label"/>
                                                         <span class="summary-column-caret">
                                                             <xf:output value="
-                                                                if      (instance('fr-search-instance')/order-by-column != @path)   then ''
-                                                                else if (instance('fr-search-instance')/order-by-direction = 'asc') then '&#x25B2;'
-                                                                else                                                                     '&#x25BC;'
+                                                                if      (instance('fr-search-instance')/order-by-column != @path or not($sort-supported))   then ''
+                                                                else if (instance('fr-search-instance')/order-by-direction = 'asc') then                         '&#x25B2;'
+                                                                else                                                                                             '&#x25BC;'
                                                             "/>
                                                         </span>
                                                     </xf:label>
-                                                    <xf:action event="DOMActivate">
+                                                    <xf:action event="DOMActivate" if="$sort-supported">
                                                         <xf:dispatch name="fr-order-by" targetid="fr-form-model">
                                                             <xf:property name="column" value="@path"/>
                                                         </xf:dispatch>

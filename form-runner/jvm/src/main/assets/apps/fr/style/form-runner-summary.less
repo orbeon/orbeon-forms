@@ -143,6 +143,31 @@
         }
 
         thead.summary-column-header {
+            &.sortable-column {
+                tr {
+                    th {
+                        button.btn-link {
+                            &:hover, &:focus {
+                                color: inherit;
+                                background-color: #f9f9f9;
+                                cursor: pointer;
+                            }
+                        }
+                    }
+                }
+            }
+            &.non-sortable-column {
+                tr {
+                    th {
+                        button.btn-link {
+                            &:hover, &:focus {
+                                cursor: default;
+                            }
+                        }
+                    }
+                }
+            }
+
             tr {
                 th {
                     padding: 0;
@@ -159,12 +184,6 @@
 
                         // Bold by default in Bootstrap and overridden to "normal" in form-runner-bootstrap-override.less
                         font-weight: 500;
-
-                        &:hover, &:focus {
-                            color: inherit;
-                            background-color: #f9f9f9;
-                            cursor: pointer;
-                        }
 
                         div.xforms-output {
                             display: inline-block;

@@ -458,6 +458,10 @@ trait FormRunnerPersistence {
   def isLeaseSupported(app: String, form: String): Boolean =
     providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Data).get, "lease", default = false)
 
+  //@XPathFunction
+  def isSortSupported(app: String, form: String): Boolean =
+    providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Data).get, "sort", default = false)
+
   def isActiveProvider(provider: String): Boolean =
     providerPropertyAsBoolean(provider, "active", default = true)
 

@@ -41,7 +41,7 @@ object XFormsStaticStateImpl {
     require(encodedState ne null)
     require(digest ne null)
 
-    implicit val logger: IndentedLogger = Loggers.getIndentedLogger("analysis")
+    implicit val logger: IndentedLogger = Loggers.newIndentedLogger("analysis") // https://github.com/orbeon/orbeon-forms/issues/179
 
     val staticProperties =
       new XFormsStaticStateStaticPropertiesImpl(

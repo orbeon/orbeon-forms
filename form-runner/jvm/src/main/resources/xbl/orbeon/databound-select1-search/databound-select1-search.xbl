@@ -439,7 +439,7 @@
 
                         <!-- Detect value of `resource` changing -->
                         <xf:group xxf:appearance="internal" xxbl:scope="outer">
-                            <xf:var name="fr-search-value" value="@label"/>
+                            <xf:var name="fr-search-value"/>
                             <xf:var name="fr-search-page"/>
                             <xf:var name="resource-attr"  ><xxf:value xxbl:scope="inner" value="instance('local')/resource-attr"/></xf:var>
                             <xf:var name="resource"                                      value="xxf:evaluate-avt($resource-attr)">

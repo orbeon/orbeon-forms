@@ -41,8 +41,6 @@ object ResourceManagerSupport {
 
   val logger: Logger = LoggerFactory.createLogger(ResourceManagerSupport.getClass)
 
-  def newIndentedLogger: IndentedLogger = new IndentedLogger(logger, true)
-
   // For Java callers
   def initializeJava(): Unit = ()
 

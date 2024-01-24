@@ -29,10 +29,19 @@ object Loggers {
   def getIndentedLogger(category: String): IndentedLogger =
     LoggersByCategory.computeIfAbsent(
       category,
-      _ => {
-        val logger = Loggers.logger
-        val isDebugEnabled = logger.isDebugEnabled && XFormsGlobalProperties.getDebugLogging.contains(category)
-        new IndentedLogger(logger, isDebugEnabled)
-      }
+      _ => newIndentedLogger(category)
+    )
+
+  // Used by:
+  // - ContainingDocumentLogging: "document", etc. (11 categories) that share indentation within a document
+  // - XFormsStaticStateImpl: "analysis"
+  def newIndentedLogger(
+    category   : String,
+    indentation: IndentedLogger.Indentation = new IndentedLogger.Indentation
+  ): IndentedLogger =
+    new IndentedLogger(
+      logger,
+      logger.isDebugEnabled && XFormsGlobalProperties.getDebugLogging.contains(category),
+      indentation
     )
 }

@@ -547,12 +547,9 @@ trait ContainingDocumentLogging {
   private final val indentedLoggersMap = mutable.HashMap[String, IndentedLogger]()
 
   def getIndentedLogger(loggingCategory: String): IndentedLogger =
-    indentedLoggersMap.getOrElseUpdate(loggingCategory,
-      new IndentedLogger(
-        Loggers.logger,
-        Loggers.logger.isDebugEnabled && XFormsGlobalProperties.getDebugLogging.contains(loggingCategory),
-        indentation
-      )
+    indentedLoggersMap.getOrElseUpdate(
+      loggingCategory,
+      Loggers.newIndentedLogger(loggingCategory, indentation)
     )
 
   val indentedLogger = getIndentedLogger("document")

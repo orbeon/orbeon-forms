@@ -23,6 +23,8 @@ import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsServer}
 import org.orbeon.oxf.xforms.processor.handlers.{XHTMLOutput, XMLOutput}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml._
+import org.orbeon.oxf.util.Logging._
+
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -61,7 +63,8 @@ private object XFormsToXHTML {
     externalContext    : ExternalContext,
     template           : AnnotatedTemplate,
     containingDocument : XFormsContainingDocument,
-    xmlReceiver        : XMLReceiver)(implicit
+    xmlReceiver        : XMLReceiver
+  )(implicit
     indentedLogger     : IndentedLogger
   ): Unit =
     XFormsAPI.withContainingDocument(containingDocument) { // scope because dynamic properties can cause lazy XPath evaluations
@@ -72,14 +75,14 @@ private object XFormsToXHTML {
       if (containingDocument.isGotSubmissionReplaceAll) {
         // 1. Got a submission with replace="all"
         // NOP: Response already sent out by a submission
-        indentedLogger.logDebug("", "handling response for submission with replace=\"all\"")
+        debug("handling response for submission with `replace=\"all\"`")
       } else if (nonJavaScriptLoads.nonEmpty) {
         // 2. Got at least one xf:load which is not a JavaScript call
 
         // This is the "load upon initialization in Servlet container, embedded or not" case.
         // See `XFormsLoadAction` for details.
         val location = nonJavaScriptLoads.head.resource
-        indentedLogger.logDebug("", "handling redirect response for xf:load", "url", location)
+        debug("handling redirect response for `xf:load`", List("url" -> location))
         externalContext.getResponse.sendRedirect(location, isServerSide = false, isExitPortal = false)
 
         // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context

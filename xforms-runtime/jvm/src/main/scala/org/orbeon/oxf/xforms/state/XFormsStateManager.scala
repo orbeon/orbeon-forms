@@ -17,12 +17,12 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties}
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties}
 
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.locks.ReentrantLock
@@ -38,6 +38,9 @@ object XFormsStateManager extends XFormsStateManagerTrait {
   if (ReplicationEnabled)
      Version.instance.requirePEFeature("State replication")
 
+  def newIndentedLogger: IndentedLogger =
+    Loggers.newIndentedLogger("state")
+
   def getDocumentLock(uuid: String): Option[ReentrantLock] =
     getSessionDocument(uuid) map (_.lock)
 
@@ -48,6 +51,8 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     containingDocument   : XFormsContainingDocument,
     isInitialState       : Boolean,
     disableDocumentCache : Boolean // for testing only
+  )(implicit
+    indentedLogger       : IndentedLogger
   ): Unit =
     Private.cacheOrStore(containingDocument, isInitialState, disableDocumentCache)
 
@@ -110,19 +115,21 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     containingDocument   : XFormsContainingDocument,
     keepDocument         : Boolean,
     disableDocumentCache : Boolean
-  ): Unit =
+  ): Unit = {
+    implicit val logger: IndentedLogger = containingDocument.getIndentedLogger("state")
     if (keepDocument) {
       // Re-add document to the cache
-      Logger.logDebug(LogType, "Keeping document in cache.")
+      debug("Keeping document in cache.")
       cacheOrStore(containingDocument, isInitialState = false, disableDocumentCache = disableDocumentCache)
     } else {
       // Don't re-add document to the cache
-      Logger.logDebug(LogType, "Not keeping document in cache following error.")
+      debug("Not keeping document in cache following error.")
       // Remove all information about this document from the session
       val uuid = containingDocument.uuid
       removeUuidFromSession(uuid)
       removeSessionDocument(uuid)
     }
+  }
 
   // Find or restore a document based on an incoming request.
   // NOTE: If found in cache, document is removed from cache.
@@ -130,7 +137,8 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     parameters           : RequestParameters,
     disableUpdates       : Boolean, // whether to disable updates (for recreating initial document upon browser back)
     disableDocumentCache : Boolean  // for testing only
-  ): Option[XFormsContainingDocument] =
+  ): Option[XFormsContainingDocument] = {
+    implicit val indentedLogger: IndentedLogger = newIndentedLogger
     // Try cache first unless the initial state is requested
     if (XFormsGlobalProperties.isCacheDocument && ! disableDocumentCache) {
       // Try to find the document in cache using the UUID
@@ -142,21 +150,22 @@ object XFormsStateManager extends XFormsStateManagerTrait {
 
       XFormsDocumentCache.take(parameters.uuid) match {
         case Some(cachedDocument) if newerSequenceNumberInStore(cachedDocument)  =>
-          Logger.logDebug(LogType, "Document cache enabled. Document from cache has out of date sequence number. Retrieving state from store.")
+          debug("Document cache enabled. Document from cache has out of date sequence number. Retrieving state from store.")
           XFormsDocumentCache.remove(parameters.uuid)
           createDocumentFromStore(parameters, isInitialState = false, disableUpdates = disableUpdates)
         case some @ Some(_) =>
           // Found in cache
-          Logger.logDebug(LogType, "Document cache enabled. Returning document from cache.")
+          debug("Document cache enabled. Returning document from cache.")
           some
         case None =>
-          Logger.logDebug(LogType, "Document cache enabled. Document not found in cache. Retrieving state from store.")
+          debug("Document cache enabled. Document not found in cache. Retrieving state from store.")
           createDocumentFromStore(parameters, isInitialState = false, disableUpdates = disableUpdates)
       }
     } else {
-      Logger.logDebug(LogType, "Document cache disabled. Retrieving state from store.")
+      debug("Document cache disabled. Retrieving state from store.")
       createDocumentFromStore(parameters, isInitialState = false, disableUpdates = disableUpdates)
     }
+  }
 
   // Return the static state string to send to the client in the HTML page.
   def getClientEncodedStaticState(containingDocument: XFormsContainingDocument): Option[String] =
@@ -174,27 +183,31 @@ object XFormsStateManager extends XFormsStateManagerTrait {
       (_.asInstanceOf[ConcurrentLinkedQueue[String]]) getOrElse
       (throw new IllegalStateException(s"`$XFormsStateManagerUUIDListKey` was not set in the session. Check your listeners."))
 
-  def createInitialDocumentFromStore(parameters: RequestParameters): Option[XFormsContainingDocument] =
+  def createInitialDocumentFromStore(parameters: RequestParameters): Option[XFormsContainingDocument] = {
+    implicit val indentedLogger: IndentedLogger = newIndentedLogger
     createDocumentFromStore(
       parameters,
       isInitialState = true,
       disableUpdates = true
     )
+  }
 
   private[state] def createDocumentFromStore(
     parameters     : RequestParameters,
     isInitialState : Boolean,
     disableUpdates : Boolean
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Option[XFormsContainingDocument] = {
 
     val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
 
-    implicit val externalContext = XFormsCrossPlatformSupport.externalContext
+//    implicit val externalContext = XFormsCrossPlatformSupport.externalContext
 
     getStateFromParamsOrStore(parameters, isInitialState) map { xformsState =>
       // Create document
       val documentFromStore =
-        XFormsContainingDocumentBuilder(xformsState, disableUpdates, ! isServerState)(Logger) ensuring { document =>
+      XFormsContainingDocumentBuilder(xformsState, disableUpdates, ! isServerState) ensuring { document =>
           (isServerState && document.staticState.isServerStateHandling) ||
             document.staticState.isClientStateHandling
         }
@@ -215,8 +228,9 @@ object XFormsStateManager extends XFormsStateManagerTrait {
 
   def getStateFromParamsOrStore(
     parameters      : RequestParameters,
-    isInitialState  : Boolean)(implicit
-    externalContext : ExternalContext
+    isInitialState  : Boolean
+  )(implicit
+    indentedLogger  : IndentedLogger
   ): Option[XFormsState] = {
 
     val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
@@ -227,14 +241,14 @@ object XFormsStateManager extends XFormsStateManagerTrait {
         assert(isServerState)
 
         // State must be found by UUID in the store
-        if (Logger.debugEnabled)
-          Logger.logDebug(
-            LogType,
-            "Getting document state from store.",
-            "current cache size", XFormsDocumentCache.getCurrentSize.toString,
-            "current store size", XFormsStateStore.getCurrentSize.map(_.toString).getOrElse("unknown"),
-            "max store size",     XFormsStateStore.getMaxSize.map(_.toString).getOrElse("undefined")
+        debug(
+          "Getting document state from store.",
+          List(
+            "current cache size" -> XFormsDocumentCache.getCurrentSize.toString,
+            "current store size" -> XFormsStateStore.getCurrentSize.map(_.toString).getOrElse("unknown"),
+            "max store size"     -> XFormsStateStore.getMaxSize.map(_.toString).getOrElse("undefined")
           )
+        )
 
         // 2014-11-12: This means that 1. We had a valid incoming session and 2. we obtained a lock on the document, yet
         // we didn't find it. This means that somehow state was not placed into or expired from the state store.
@@ -287,20 +301,22 @@ object XFormsStateManager extends XFormsStateManagerTrait {
       containingDocument   : XFormsContainingDocument,
       isInitialState       : Boolean,
       disableDocumentCache : Boolean // for testing only
+    )(implicit
+      indentedLogger       : IndentedLogger
     ): Unit = {
 
       if (XFormsGlobalProperties.isCacheDocument && ! disableDocumentCache) {
         // Cache the document
-        Logger.logDebug(LogType, "Document cache enabled. Putting document in cache.")
+        debug("Document cache enabled. Putting document in cache.")
         XFormsDocumentCache.put(containingDocument)
         if ((isInitialState || ReplicationEnabled) && containingDocument.staticState.isServerStateHandling) {
           // Also store document state (used by browser soft reload, browser back, `<xf:reset>` and replication)
-          Logger.logDebug(LogType, "Storing initial document state.")
+          debug("Storing initial document state.")
           storeDocumentState(containingDocument, isInitialState)
         }
       } else if (containingDocument.staticState.isServerStateHandling) {
         // Directly store the document state
-        Logger.logDebug(LogType, "Document cache disabled. Storing initial document state.")
+        debug("Document cache disabled. Storing initial document state.")
         storeDocumentState(containingDocument, isInitialState)
       }
 

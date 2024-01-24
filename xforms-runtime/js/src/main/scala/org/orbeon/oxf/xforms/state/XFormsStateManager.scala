@@ -1,8 +1,9 @@
 package org.orbeon.oxf.xforms.state
 
-import java.util.concurrent.locks.ReentrantLock
-
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+
+import java.util.concurrent.locks.ReentrantLock
 
 
 object XFormsStateManager extends XFormsStateManagerTrait {
@@ -17,6 +18,8 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     containingDocument   : XFormsContainingDocument,
     isInitialState       : Boolean, // TODO: handle `isInitialState = true`
     disableDocumentCache : Boolean  // for testing only
+  )(implicit
+    indentedLogger       : IndentedLogger
   ): Unit =
     documents += containingDocument.uuid -> containingDocument
 

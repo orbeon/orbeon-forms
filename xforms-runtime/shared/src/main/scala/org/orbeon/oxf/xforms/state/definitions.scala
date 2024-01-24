@@ -1,12 +1,11 @@
 package org.orbeon.oxf.xforms.state
 
-import org.orbeon.dom.Document
-import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-
-import java.util.concurrent.locks.Lock
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
+
+import java.util.concurrent.locks.Lock
 
 
 sealed trait LockResponse
@@ -69,6 +68,8 @@ trait XFormsStateLifecycle {
   def afterInitialResponse(
     containingDocument   : XFormsContainingDocument,
     disableDocumentCache : Boolean
+  )(implicit
+    indentedLogger       : IndentedLogger
   ): Unit
 
   def findOrRestoreDocument(

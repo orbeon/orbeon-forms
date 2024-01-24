@@ -54,6 +54,8 @@ object XFormsContainingDocumentBuilder {
     uriResolver    : Option[XFormsURIResolver],
     response       : Option[ExternalContext.Response],
     mustInitialize : Boolean
+  )(implicit
+    indentedLogger : IndentedLogger
   ): XFormsContainingDocument =
     try {
 
@@ -66,7 +68,6 @@ object XFormsContainingDocumentBuilder {
         LifecycleLogger.eventAssumingRequest("xforms", "new form session", List("uuid" -> uuid))
 
       val doc = new XFormsContainingDocument(staticState, uuid, disableUpdates = false)
-      implicit val logger = doc.indentedLogger
       withDebug("initialization: creating new ContainingDocument (static state object provided).", List("uuid" -> uuid)) {
 
         doc.setRequestInformation(createInitialRequestInformation)
@@ -145,18 +146,18 @@ object XFormsContainingDocumentBuilder {
   def apply(
     xformsState     : XFormsState,
     disableUpdates  : Boolean,
-    forceEncryption : Boolean)(
+    forceEncryption : Boolean
+  )(implicit
     indentedLogger  : IndentedLogger
   ): XFormsContainingDocument =
     try {
       // 1. Restore the static state
-      val staticState = findOrRestoreStaticState(xformsState, forceEncryption)(indentedLogger)
+      val staticState = findOrRestoreStaticState(xformsState, forceEncryption)
 
       // 2. Restore the dynamic state
       val dynamicState = xformsState.dynamicState getOrElse (throw new IllegalStateException)
 
       val doc = new XFormsContainingDocument(staticState, dynamicState.uuid, disableUpdates)
-      implicit val logger = doc.indentedLogger
       withDebug("initialization: restoring containing document") {
 
         val requestHeaders     = dynamicState.requestHeaders.toMap
@@ -224,7 +225,8 @@ object XFormsContainingDocumentBuilder {
 
   private def findOrRestoreStaticState(
     xformsState     : XFormsState,
-    forceEncryption : Boolean)(implicit
+    forceEncryption : Boolean
+  )(implicit
     indentedLogger  : IndentedLogger
   ): XFormsStaticState =
     xformsState.staticStateDigest match {

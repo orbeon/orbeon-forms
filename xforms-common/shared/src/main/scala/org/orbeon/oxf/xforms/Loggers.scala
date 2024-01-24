@@ -16,25 +16,22 @@ package org.orbeon.oxf.xforms
 import org.log4s.Logger
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 
-import java.util.concurrent.ConcurrentHashMap
 
-
-// Global indented loggers
+// Indented loggers management
 object Loggers {
 
   val logger: Logger = LoggerFactory.createLogger("org.orbeon.oxf.xforms.processor.XFormsServer")
 
-  private val LoggersByCategory = new ConcurrentHashMap[String, IndentedLogger]
-
-  def getIndentedLogger(category: String): IndentedLogger =
-    LoggersByCategory.computeIfAbsent(
-      category,
-      _ => newIndentedLogger(category)
-    )
-
   // Used by:
-  // - ContainingDocumentLogging: "document", etc. (11 categories) that share indentation within a document
-  // - XFormsStaticStateImpl: "analysis"
+  // - `ContainingDocumentLogging`: "document", etc. (11 categories total) that share indentation within a document
+  // - `XFormsStaticStateImpl`    : "analysis"
+  // - `AssetsAggregator`         : "resources"
+  // - `XFormsAssetServer`        : "resources"
+  // - `XFormsServerProcessor`    : "server"
+  // - `XFormsURIResolver`        : "resolver"
+  // - `XFormsStateManager`       : "state"
+  // - `XFormsProcessorBase`      : "html"
+  // - `LocalClientServerChannel` : "offline" (single-threaded)
   def newIndentedLogger(
     category   : String,
     indentation: IndentedLogger.Indentation = new IndentedLogger.Indentation

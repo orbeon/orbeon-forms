@@ -546,6 +546,22 @@ trait ContainingDocumentLogging {
   private final val indentation        = new IndentedLogger.Indentation
   private final val indentedLoggersMap = mutable.HashMap[String, IndentedLogger]()
 
+  // Q: Why do we use different instances of `IndentedLogger` for different categories, since the indentation is
+  // shared? A: Because the `IndentedLogger` instance contains whether debug logging is enabled for the category.
+  // But could there be a more straightforward way to do this?
+  //
+  // Categories:
+  // - "submission"
+  // - "event"
+  // - "form-builder"
+  // - "form-runner"
+  // - "action"
+  // - "model"
+  // - "dependencies"
+  // - "rpc"
+  // - "process"
+  // - "document"
+  // - "control"
   def getIndentedLogger(loggingCategory: String): IndentedLogger =
     indentedLoggersMap.getOrElseUpdate(
       loggingCategory,

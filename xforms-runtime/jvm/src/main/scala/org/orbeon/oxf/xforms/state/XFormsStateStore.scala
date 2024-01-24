@@ -34,6 +34,7 @@ object XFormsStateStore {
     assert(document.staticState.isServerStateHandling)
 
     implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
+    implicit val logger: IndentedLogger = document.getIndentedLogger("state")
 
     if (! isInitialState)
       LifecycleLogger.eventAssumingRequest("xforms", "save state", List("uuid" -> document.uuid))
@@ -68,6 +69,7 @@ object XFormsStateStore {
   ): Option[XFormsState] = {
 
     implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
+    implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
 
     LifecycleLogger.withEventAssumingRequest(
       "xforms",
@@ -77,7 +79,6 @@ object XFormsStateStore {
         "backOrReload" -> isInitialState.toString
       )
     ) {
-
       debug(s"store size before finding: ${getCurrentSize.map(_.toString).getOrElse("unknown")} entries.")
 
       Caches.stateCache.get(documentUUID).map(_.asInstanceOf[CacheValueMappingType]) match {
@@ -117,9 +118,6 @@ object XFormsStateStore {
   def getCurrentSize : Option[Long] = Caches.stateCache.getLocalHeapSize
 
   private object Private {
-
-    implicit val logger: IndentedLogger = XFormsStateManager.Logger
-
     def createDynamicStateKey(documentUUID: String, isInitialState: Boolean) =
       documentUUID + (if (isInitialState) "-I" else "-C") // key is different for initial vs. subsequent state
   }

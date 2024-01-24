@@ -183,7 +183,7 @@ class XFormsServerProcessor extends ProcessorImpl {
       (throw SessionExpiredException("Session has expired. Unable to process incoming request."))
 
     // Logger used for heartbeat and request/response
-    implicit val indentedLogger = Loggers.getIndentedLogger("server")
+    implicit val indentedLogger = Loggers.newIndentedLogger("server")
 
     val logRequestResponse = XFormsGlobalProperties.getDebugLogging.contains("server-body")
 

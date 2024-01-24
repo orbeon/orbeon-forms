@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.state
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.SecureUtils
+import org.orbeon.oxf.util.{IndentedLogger, SecureUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventTarget}
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsContainingDocumentSupport, XFormsGlobalProperties}
+import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsContainingDocumentSupport, XFormsGlobalProperties}
 import org.scalatest.funspec.AnyFunSpecLike
 
 
@@ -48,6 +48,8 @@ class XFormsStateManagerTest
       withTestExternalContext { ec =>
 
         val session = ec.getSession(true)
+
+        implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
 
         def createDoc() = {
 
@@ -103,6 +105,8 @@ class XFormsStateManagerTest
 
     def testClient(isCache: Boolean, formFile: String): Unit = {
       withTestExternalContext { ec =>
+
+        implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
 
         ec.getSession(true)
 
@@ -166,6 +170,8 @@ class XFormsStateManagerTest
 
     def testServer(isCache: Boolean, formFile: String): Unit = {
       withTestExternalContext { ec =>
+
+        implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
 
         ec.getSession(true)
 
@@ -262,7 +268,12 @@ class XFormsStateManagerTest
       }
     }
 
-    def getInitialState(state1: TestState, isCache: Boolean) = {
+    def getInitialState(
+      state1        : TestState,
+      isCache       : Boolean
+    )(implicit
+      indentedLogger: IndentedLogger
+    ): TestState = {
 
       val parameters =
         RequestParameters(

@@ -1,18 +1,16 @@
 package org.orbeon.oxf.xforms.state
 
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.{Lock, ReentrantLock}
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument}
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.{Lock, ReentrantLock}
 
 
 trait XFormsStateManagerTrait extends XFormsStateLifecycle {
-
-  val LogType = "state manager"
-  val Logger  = Loggers.getIndentedLogger("state")
 
   // Require implementation
   def getDocumentLock(uuid: String): Option[ReentrantLock]
@@ -22,6 +20,8 @@ trait XFormsStateManagerTrait extends XFormsStateLifecycle {
     containingDocument   : XFormsContainingDocument,
     isInitialState       : Boolean,
     disableDocumentCache : Boolean // for testing only
+  )(implicit
+    indentedLogger       : IndentedLogger
   ): Unit
 
   // Return the locked document lock. Must be called before `beforeUpdate()`.
@@ -54,13 +54,11 @@ trait XFormsStateManagerTrait extends XFormsStateLifecycle {
 
   // Update the document's change sequence.
   def beforeUpdateResponse(containingDocument: XFormsContainingDocument, ignoreSequence: Boolean): Unit = {
-    if (containingDocument.isDirtySinceLastRequest) {
-      Logger.logDebug(LogType, "Document is dirty. Generating new dynamic state.")
-    } else {
-      // The document is not dirty: no real encoding takes place here
-      Logger.logDebug(LogType, "Document is not dirty. Keep existing dynamic state.")
-    }
-    // Tell the document to update its state
+    implicit val logger: IndentedLogger = containingDocument.getIndentedLogger("state")
+    if (containingDocument.isDirtySinceLastRequest)
+      debug("Document is dirty. Generating new dynamic state.")
+    else
+      debug("Document is not dirty. Keep existing dynamic state.")
     if (! ignoreSequence)
       containingDocument.incrementSequence()
   }
@@ -73,6 +71,8 @@ trait XFormsStateManagerTrait extends XFormsStateLifecycle {
   def afterInitialResponse(
     containingDocument   : XFormsContainingDocument,
     disableDocumentCache : Boolean
+  )(implicit
+    indentedLogger       : IndentedLogger
   ): Unit =
     if (! containingDocument.isNoUpdates) {
       addDocumentToSession(containingDocument.uuid)

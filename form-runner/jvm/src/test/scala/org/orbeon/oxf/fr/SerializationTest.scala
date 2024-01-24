@@ -14,8 +14,9 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.xforms.state.{DynamicState, XFormsState}
-import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocumentBuilder}
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.xforms.XFormsContainingDocumentBuilder
+import org.orbeon.oxf.xforms.state.{DynamicState, XFormsState, XFormsStateManager}
 import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -58,7 +59,8 @@ class SerializationTest
           dynamicState      = Some(DynamicState(doc))
         )
 
-        val restoredDoc = XFormsContainingDocumentBuilder(serializedState, disableUpdates = false, forceEncryption = false)(Loggers.getIndentedLogger("state"))
+        implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
+        val restoredDoc = XFormsContainingDocumentBuilder(serializedState, disableUpdates = false, forceEncryption = false)
 
         assert(restoredDoc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
       }
@@ -117,7 +119,7 @@ class SerializationTest
           dynamicState      = Some(DynamicState(doc))
         )
 
-        val restoredDoc = XFormsContainingDocumentBuilder(serializedState, disableUpdates = false, forceEncryption = false)(Loggers.getIndentedLogger("state"))
+        val restoredDoc = XFormsContainingDocumentBuilder(serializedState, disableUpdates = false, forceEncryption = false)(XFormsStateManager.newIndentedLogger)
 
         for (id <- List("my-foo", "my-bar", "my-number"))
           assert(restoredDoc.resolveObjectByIdInScope("#document", id, None).isDefined)

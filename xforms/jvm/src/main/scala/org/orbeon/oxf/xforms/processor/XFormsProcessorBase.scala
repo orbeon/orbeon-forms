@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.URIProcessorOutputImpl.URIReferencesState
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
@@ -108,12 +109,14 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
   ): Unit = {
 
     val externalContext = XFormsCrossPlatformSupport.externalContext
-    val htmlLogger      = Loggers.getIndentedLogger("html")
-    val cachingLogger   = Loggers.getIndentedLogger("cache")
+    implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
+
+    def newHtmlLogger: IndentedLogger =
+      Loggers.newIndentedLogger("html")
 
     val cacheTracer =
       Option(pipelineContext.getAttribute("orbeon.cache.test.tracer").asInstanceOf[XFormsStaticStateCache.CacheTracer]) getOrElse
-        new LoggingCacheTracer(cachingLogger)
+        new LoggingCacheTracer(indentedLogger)
 
     val initializeXFormsDocument =
       Option(pipelineContext.getAttribute("orbeon.cache.test.initialize-xforms-document").asInstanceOf[jl.Boolean]) forall
@@ -150,7 +153,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
 
               // Read static state from input
               val (stage2CacheableState, staticState) =
-                readStaticState(readInputAsSAX(pipelineContext, InputAnnotatedDocument, _), cachingLogger, cacheTracer)
+                readStaticState(readInputAsSAX(pipelineContext, InputAnnotatedDocument, _), cacheTracer)
 
               // Create containing document and initialize XForms engine
               // NOTE: Create document here so we can do appropriate analysis of caching dependencies
@@ -162,7 +165,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
                   mustInitialize = initializeXFormsDocument
                 )
 
-              collectDependencies(containingDocument, cachingLogger) foreach {
+              collectDependencies(containingDocument) foreach {
                 case (url, credentialsOpt) => stage1CacheableState.addReference(null, url, credentialsOpt.orNull)
               }
 
@@ -186,6 +189,8 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
         containingDocumentFromReadOpt match {
           case None =>
 
+            implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
+
             // In this case, we found the static state digest and more in the cache, but we must now create a new
             // `XFormsContainingDocument` from this information
             cacheTracer.digestAndTemplateStatus(Option(stage2CacheableState.staticStateDigest))
@@ -201,22 +206,20 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
                   // NOTE: In out of date case, could clone static state and reprocess instead?
 
                   other foreach { case (cachedState, _) =>
-                    cachingLogger.logDebug("", s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.debugOutOfDateBindingsIncludes}")
+                    debug(s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.debugOutOfDateBindingsIncludes}")
                   }
 
                   val staticState =
                     PartAnalysisBuilder.createFromStaticStateBits(
                       StaticStateBits.fromXmlReceiver(
                         stage2CacheableState.staticStateDigest.some,
-                        readInputAsSAX(pipelineContext, InputAnnotatedDocument, _))(
-                        cachingLogger
+                        readInputAsSAX(pipelineContext, InputAnnotatedDocument, _)
                       )
                     )
                   cacheTracer.staticStateStatus(found = false, staticState.digest)
                   XFormsStaticStateCache.storeDocument(staticState)
                   staticState
               }
-
               XFormsContainingDocumentBuilder(
                 staticState    = staticState,
                 uriResolver    = uriResolver.some,
@@ -230,7 +233,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
 
       // Output resulting document
       if (initializeXFormsDocument)
-        produceOutput(pipelineContext, outputName, externalContext, htmlLogger, stage2CacheableState.template, containingDocument, xmlReceiver)
+        produceOutput(pipelineContext, outputName, externalContext, newHtmlLogger, stage2CacheableState.template, containingDocument, xmlReceiver)
 
       // Notify state manager
       // Scope because dynamic properties can cause lazy XPath evaluations
@@ -239,7 +242,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
       }
     } catch {
       case NonFatal(t) =>
-        htmlLogger.logDebug("", "throwable caught during initialization.")
+        newHtmlLogger.logDebug("", "throwable caught during initialization.")
         throw new OXFException(t)
     }
   }
@@ -265,8 +268,9 @@ private object XFormsProcessorBase {
   }
 
   def collectDependencies(
-    containingDocument : XFormsContainingDocument,
-    logger             : IndentedLogger
+    containingDocument : XFormsContainingDocument
+  )(implicit
+    indentedLogger     : IndentedLogger
   ): Iterator[(String, Option[BasicCredentials])] = {
 
     val instanceDependencies = {
@@ -285,9 +289,7 @@ private object XFormsProcessorBase {
             UrlRewriteMode.Absolute
           )
       } yield {
-        if (logger.debugEnabled)
-            logger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", resolvedDependencyURL)
-
+        debug("adding document cache dependency for non-cacheable instance", List("instance URI" -> resolvedDependencyURL))
         (resolvedDependencyURL, instance.credentials)
       }
     }
@@ -301,8 +303,7 @@ private object XFormsProcessorBase {
         schemaURIs       <- currentModel.getSchemaURIs.toList
         currentSchemaURI <- schemaURIs
       } yield {
-        if (logger.debugEnabled)
-          logger.logDebug("", "adding document cache dependency for schema", "schema URI", currentSchemaURI)
+        debug("adding document cache dependency for schema", List("schema URI" -> currentSchemaURI))
         (currentSchemaURI, None)
       }
 
@@ -315,12 +316,13 @@ private object XFormsProcessorBase {
 
   def readStaticState(
     read          : XMLReceiver => Unit,
-    cachingLogger : IndentedLogger,
     cacheTracer   : XFormsStaticStateCache.CacheTracer
+  )(implicit
+    indentedLogger: IndentedLogger
   ): (Stage2CacheableState, XFormsStaticState) = {
 
     val staticStateBits =
-      StaticStateBits.fromXmlReceiver(None, read)(cachingLogger)
+      StaticStateBits.fromXmlReceiver(None, read)
 
     val staticState =
       XFormsStaticStateCache.findDocument(staticStateBits.staticStateDigest) match {
@@ -331,7 +333,7 @@ private object XFormsProcessorBase {
           // Not found static state in cache OR it is out of date, create and initialize static state object
 
           other foreach { case (cachedState, _) =>
-            cachingLogger.logDebug("", s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.debugOutOfDateBindingsIncludes}")
+            debug(s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.debugOutOfDateBindingsIncludes}")
           }
 
           val newStaticState = PartAnalysisBuilder.createFromStaticStateBits(staticStateBits)

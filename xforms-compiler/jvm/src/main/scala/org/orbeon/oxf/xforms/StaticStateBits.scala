@@ -40,7 +40,8 @@ object StaticStateBits {
 
   def fromXmlReceiver(
     existingStaticStateDigest : Option[String],
-    read                      : XMLReceiver => Unit)(implicit
+    read                      : XMLReceiver => Unit
+  )(implicit
     logger                    : IndentedLogger
   ): StaticStateBits =
     withDebug("reading input", List("existing digest" -> existingStaticStateDigest.orNull)) {

@@ -21,7 +21,7 @@ import org.orbeon.xforms._
 import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
-import org.scalajs.dom.raw.Element
+import org.scalajs.dom.raw.{Element, Node}
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
@@ -140,8 +140,6 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           )
         }
       }
-      makeClearAccessible()
-      jSelect.on("change", makeClearAccessible _)
 
       if (isDatabound) {
         initOrUpdatePlaceholderCurrent()
@@ -153,6 +151,9 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         onXFormsSelect1ValueChangeJs = Some(listener)
         Controls.afterValueChange.subscribe(listener)
       }
+
+      makeClearAccessible()
+      onElementAdded(containerElem, ".select2-selection__clear", makeClearAccessible)
     }
   }
 
@@ -247,18 +248,16 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
   private def initOrUpdatePlaceholderCurrent(): Unit = {
     val select = querySelect
-    (for {
+    for {
       initialLabel <- Option(queryElementWithData.getAttribute(DataInitialLabel))
       initialValue <- Option(queryElementWithData.getAttribute(DataInitialValue))
-    } yield {
+      if (! initialValue.isBlank)
+    } locally {
       val initialOption = dom.document.createElement("option").asInstanceOf[html.Option]
       initialOption.text     = initialLabel
       initialOption.value    = initialValue
       initialOption.selected = true
       select.appendChild(initialOption)
-    }).getOrElse {
-      while (select.hasChildNodes())
-        select.removeChild(select.firstChild)
     }
   }
 
@@ -272,6 +271,23 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       attributeFilter = js.Array(attributeName)
     ))
   }
+
+  private def onElementAdded(container: Element, selector: String, listener: () => Unit): Unit = {
+    val observer = new MutationObserver((mutations, _) => {
+      mutations.foreach { mutation =>
+        mutation.addedNodes.foreach { node =>
+          if (node.nodeType == Node.ELEMENT_NODE && node.asInstanceOf[Element].matches(selector)) {
+            listener()
+          }
+        }
+      }
+    })
+    mutationObservers = observer :: mutationObservers
+
+    val config = MutationObserverInit(childList = true, subtree = true)
+    observer.observe(container, config)
+  }
+
 
   // For the non-databound case, when the value of the underlying dropdown changed, typically because it set based
   // on that the server tells the client, tell the Select2 component that the value has changed

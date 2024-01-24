@@ -302,7 +302,7 @@
                 </xf:action>
             </xbl:handler>
 
-            <!-- Maybe update label when the value changes or the resource URL changes -->
+            <!-- Maybe update item label in dropdown when the value changes or the resource URL changes -->
             <xbl:handler event="fr-update-select2-label">
                 <xf:var name="resource-param" value="event('fr-resource')"/>
                 <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
@@ -328,7 +328,7 @@
 
                 <xf:var name="items"               value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
                 <xf:var name="items-values"        value="$items/xxf:evaluate(instance('local')/value-ref)"/>
-                <xf:var name="current-impossible"  value="not($items-values = $binding)"/>
+                <xf:var name="current-impossible"  value="xxf:non-blank($binding) and not($items-values = $binding)"/>
                 <xf:var name="unique-choice"       value="count($items) = 1 and xxf:component-param-value('auto-select-unique-choice') = 'true'"/>
                 <xf:var name="unique-choice-value" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/value-ref) else ()"/>
                 <xf:var name="unique-choice-label" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/label-ref) else ()"/>
@@ -347,7 +347,7 @@
 
                 <!-- Tell Scala.js about the new label -->
                 <xf:action if="$do-update" type="javascript">
-                    <xf:param name="label"    value="if ($unique-choice) then $unique-choice-label else ''"/>
+                    <xf:param name="label" value="if ($unique-choice) then $unique-choice-label else ''"/>
                     <xf:body>
                         var i = ORBEON.xforms.XBL.instanceForControl(this);
                         if (i) i.updateLabel(label);

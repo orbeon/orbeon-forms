@@ -307,23 +307,9 @@
                 <xf:var name="resource-param" value="event('fr-resource')"/>
                 <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
 
-                <!-- Evaluate resource URL if not provided -->
-                <xf:action if="xxf:is-blank($resource-param)">
-                    <xf:dispatch name="fr-update-resource" targetid="view">
-                        <xf:property name="fr-search-value" value="event('fr-search-value')"/>
-                        <xf:property name="fr-search-page"  value="event('fr-search-page')"/>
-                    </xf:dispatch>
-                </xf:action>
-                <xf:var
-                    name="resource"
-                    value="
-                        if (xxf:is-blank($resource-param))
-                        then instance('local')/resource
-                        else $resource-param"/>
-
                 <!-- Call service -->
                 <xf:send submission="get-result">
-                    <xf:property name="fr-resource" value="$resource"/>
+                    <xf:property name="fr-resource" value="$resource-param"/>
                 </xf:send>
 
                 <xf:var name="items"               value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
@@ -456,7 +442,6 @@
                                 <xf:action event="xforms-value-changed xforms-enabled">
                                     <xf:action xxbl:scope="inner" if="event('xxf:type') != 'xforms-enabled' or empty($binding/@label)">
                                         <xf:var name="resource"><xxf:value xxbl:scope="outer" value="$resource"/></xf:var>
-                                        <xf:setvalue ref="instance('local')/resource" value="$resource"/>
                                         <xf:action type="javascript">
                                             var i = ORBEON.xforms.XBL.instanceForControl(this);
                                             if (i) i.invalidateCachedItemset();

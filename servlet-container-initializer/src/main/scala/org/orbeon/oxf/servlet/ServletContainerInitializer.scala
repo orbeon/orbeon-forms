@@ -94,7 +94,7 @@ trait CommonContainerInitializer {
 
     // Servlets
 
-    registerServlet(
+    val mainRegistrationResult = registerServlet(
       ctx                 = ctx,
       servletName         = "orbeon-main-servlet",
       servletClass        = orbeonServletClass,
@@ -108,7 +108,7 @@ trait CommonContainerInitializer {
       )
     )
 
-    registerServlet(
+    val renderedRegistrationResult = registerServlet(
       ctx                 = ctx,
       servletName         = "orbeon-renderer-servlet",
       servletClass        = orbeonServletClass,
@@ -124,7 +124,7 @@ trait CommonContainerInitializer {
     // Filters
 
     // Limit concurrent access to Form Runner
-    registerFilter(
+    val limiterRegistrationResult = registerFilter(
       ctx                 = ctx,
       filterName          = "orbeon-limiter-filter",
       filterClass         = limiterFilterClass,
@@ -134,7 +134,7 @@ trait CommonContainerInitializer {
     )
 
     // Add internal Orbeon-* headers for auth
-    registerFilter(
+    val authRegistrationResult = registerFilter(
       ctx                 = ctx,
       filterName          = "orbeon-form-runner-auth-servlet-filter",
       filterClass         = formRunnerAuthFilterClass,
@@ -144,7 +144,7 @@ trait CommonContainerInitializer {
     )
 
     // All JSP files under /xforms-jsp go through the XForms filter
-    registerFilter(
+    val xformsRegistrationResult = registerFilter(
       ctx                 = ctx,
       filterName          = "orbeon-xforms-filter",
       filterClass         = orbeonXFormsFilterClass,
@@ -164,6 +164,21 @@ trait CommonContainerInitializer {
     registerListener(ctx, "orbeon-session-listener",              orbeonSessionListenerClass)
     // Cache shutdown listener
     registerListener(ctx, "shutdown-listener",                    shutdownListenerClass)
+
+
+    val registrationResult = RegistrationResult.merged(
+      Seq(
+        mainRegistrationResult,
+        renderedRegistrationResult,
+        limiterRegistrationResult,
+        authRegistrationResult,
+        xformsRegistrationResult
+      )
+    )
+
+    if (registrationResult.missingInitParams.nonEmpty) {
+      logger.error(s"One or more init parameters are missing, please update your web.xml configuration")
+    }
   }
 
   private val EnabledParamPart    = "enabled"
@@ -177,13 +192,20 @@ trait CommonContainerInitializer {
     ctx.getInitParameter(enabledParam).trimAllToOpt.forall(_ == "true")
   }
 
+  private case class RegistrationResult(missingInitParams: Set[String] = Set.empty)
+
+  private object RegistrationResult {
+    def merged(RegistrationResults: Seq[RegistrationResult]): RegistrationResult =
+      RegistrationResult(missingInitParams = RegistrationResults.flatMap(_.missingInitParams).toSet)
+  }
+
   private def registerServlet(
     ctx                : ServletContext,
     servletName        : String,
     servletClass       : Class[_ <: JavaxOrJakartaServlet],
     initParamPrefix    : String,
     mandatoryInitParams: Set[String]
-  ): Unit = {
+  ): RegistrationResult = {
     val paramPrefix = this.paramPrefix(servletName)
 
     if (enabled(ctx, paramPrefix)) {
@@ -191,15 +213,17 @@ trait CommonContainerInitializer {
       val registration = ctx.addServlet(servletName, servletClass)
 
       // Servlet mapping
-      val mappingParam = s"$paramPrefix.$MappingParamPart"
-      Option(ctx.getInitParameter(mappingParam)) match {
+      val mappingParam            = s"$paramPrefix.$MappingParamPart"
+      val missingMappingInitParam = Option(ctx.getInitParameter(mappingParam)) match {
         case Some(mapping) =>
           registration.addMapping(mapping)
+          Set.empty[String]
         case None =>
           logger.error(s"Servlet '$servletName': missing mandatory init parameter '$mappingParam'")
+          Set(mappingParam)
       }
 
-      copyInitParams(
+      val registrationResult = copyInitParams(
         ctx                 = ctx,
         registration        = registration,
         paramPrefix         = paramPrefix,
@@ -208,8 +232,12 @@ trait CommonContainerInitializer {
         initParamPrefix     = initParamPrefix,
         mandatoryInitParams = mandatoryInitParams
       )
+
+      RegistrationResult(missingInitParams = registrationResult.missingInitParams ++ missingMappingInitParam)
     } else {
       logger.info(s"Servlet '$servletName' is disabled")
+
+      RegistrationResult()
     }
   }
 
@@ -220,7 +248,7 @@ trait CommonContainerInitializer {
     dispatcherTypes    : Set[DispatcherType],
     initParamPrefix    : String,
     mandatoryInitParams: Set[String]
-  ): Unit = {
+  ): RegistrationResult = {
     val paramPrefix = this.paramPrefix(filterName)
 
     if (enabled(ctx, paramPrefix)) {
@@ -228,16 +256,18 @@ trait CommonContainerInitializer {
       val registration = ctx.addFilter(filterName, filterClass)
 
       // Servlet mapping
-      val urlPatternParam = s"$paramPrefix.$UrlPatternParamPart"
-      Option(ctx.getInitParameter(urlPatternParam)) match {
+      val urlPatternParam         = s"$paramPrefix.$UrlPatternParamPart"
+      val missingMappingInitParam = Option(ctx.getInitParameter(urlPatternParam)) match {
         case Some(urlPattern) =>
           // TODO: parse dispatcher types as well?
           registration.addMappingForUrlPatterns(dispatcherTypes, isMatchAfter = true, urlPattern)
+          Set.empty[String]
         case None =>
           logger.error(s"Filter '$filterName': missing mandatory init parameter '$urlPatternParam'")
+          Set(urlPatternParam)
       }
 
-      copyInitParams(
+      val registrationResult = copyInitParams(
         ctx                 = ctx,
         registration        = registration,
         paramPrefix         = paramPrefix,
@@ -246,8 +276,12 @@ trait CommonContainerInitializer {
         initParamPrefix     = initParamPrefix,
         mandatoryInitParams = mandatoryInitParams
       )
+
+      RegistrationResult(missingInitParams = registrationResult.missingInitParams ++ missingMappingInitParam)
     } else {
       logger.info(s"Filter '$filterName' is disabled")
+
+      RegistrationResult()
     }
   }
 
@@ -274,7 +308,7 @@ trait CommonContainerInitializer {
     servletOrFilterName: String,
     initParamPrefix    : String,
     mandatoryInitParams: Set[String]
-  ): Unit = {
+  ): RegistrationResult = {
     // Copy context params to servlet/filter init params
     val contextParams         = ctx.getInitParameterNames.asScala.toSeq
     val paramPartsToFilterOut = Seq(EnabledParamPart, MappingParamPart, UrlPatternParamPart)
@@ -305,6 +339,8 @@ trait CommonContainerInitializer {
     missingMandatoryInitParams.toSeq.sorted.foreach { param =>
       logger.error(s"$servletOrFilter '$servletOrFilterName': missing mandatory init parameter '$param'")
     }
+
+    RegistrationResult(missingInitParams = missingMandatoryInitParams)
   }
 }
 

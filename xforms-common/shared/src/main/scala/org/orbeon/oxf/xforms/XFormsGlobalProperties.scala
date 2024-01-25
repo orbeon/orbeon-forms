@@ -13,10 +13,10 @@ object XFormsGlobalProperties {
     CoreCrossPlatformSupport.properties
 
   def getDebugLogging: collection.Set[String] =
-    Option(propertySet.getNmtokens(PropertyPrefix + "logging.debug")) map (_.asScala) getOrElse Set.empty
+    propertySet.getNmtokensOpt(PropertyPrefix + "logging.debug").map(_.asScala).getOrElse(Set.empty)
 
   def getErrorLogging: collection.Set[String] =
-    Option(propertySet.getNmtokens(PropertyPrefix + "logging.error")) map (_.asScala) getOrElse Set.empty
+    propertySet.getNmtokensOpt(PropertyPrefix + "logging.error").map(_.asScala).getOrElse(Set.empty)
 
   def isCacheDocument           : Boolean = propertySet.getBoolean("cache.document",                                      default = true)
   def isGZIPState               : Boolean = propertySet.getBoolean(PropertyPrefix + "gzip-state",                         default = true)

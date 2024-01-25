@@ -352,9 +352,8 @@ class PropertySet private (
   def getString(name: String, default: String): String =
     getNonBlankString(name) getOrElse default
 
-  // 2019-05-03: 2 calls in `XFormsProperties`
-  def getNmtokens(name: String): ju.Set[String] =
-    getPropertyValueOrNull(name, XMLConstants.XS_NMTOKENS_QNAME).asInstanceOf[ju.Set[String]]
+  def getNmtokensOpt(name: String): Option[ju.Set[String]] =
+    getPropertyValueOpt(name, XMLConstants.XS_NMTOKENS_QNAME).map(_.asInstanceOf[ju.Set[String]])
 
   def getInteger(name: String): jl.Integer =
     getPropertyValueOrNull(name, XMLConstants.XS_INTEGER_QNAME).asInstanceOf[jl.Integer]

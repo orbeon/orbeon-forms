@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.properties.{Property, PropertySet}
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, Logging}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.XFormsAssetsBuilder
 import org.orbeon.oxf.xforms.xbl.XBLAssetsBuilder.HeadElementBuilder
 import org.orbeon.oxf.xml.ParserConfiguration
@@ -36,11 +36,11 @@ trait BindingLoader extends Logging {
   private val XBLBaselineProperty      = "oxf.xforms.resources.baseline"
 
   def getPropertySet: PropertySet
-  def lastModifiedByPath(path: String): Long
-  def existsByPath(path: String): Boolean
-  def contentAsOrbeonDom(path: String): Document
+  def lastModifiedByPath(path: String)(implicit indentedLogger: IndentedLogger): Long
+  def existsByPath(path: String)(implicit indentedLogger: IndentedLogger): Boolean
+  def contentAsOrbeonDom(path: String)(implicit indentedLogger: IndentedLogger): Document
 
-  def findXblAssets(xbl: Set[QName]): (List[String], List[String]) = {
+  def findXblAssets(xbl: Set[QName])(implicit indentedLogger: IndentedLogger): (List[String], List[String]) = {
 
     val (foundBaselinePaths, _) =
       pathsForQNames(xbl, readURLMappingsCacheAgainstProperty)
@@ -57,6 +57,8 @@ trait BindingLoader extends Logging {
   def getUpToDateLibraryAndBaseline(
     indexOpt      : Option[BindingIndex[IndexableBinding]],
     checkUpToDate : Boolean // 2016-10-06: always set to `true`
+  )(implicit
+    indentedLogger: IndentedLogger
   ): (BindingIndex[IndexableBinding], Set[String], List[String], List[String]) = {
 
     var originalOrUpdatedIndexOpt = indexOpt
@@ -68,7 +70,7 @@ trait BindingLoader extends Logging {
       val libraryProperty  = propertySet.getPropertyOrThrow(XBLLibraryProperty)
       val baselineProperty = propertySet.getPropertyOrThrow(XBLBaselineProperty)
 
-      def readAndIndexBindings: (List[AbstractBinding], Set[String]) = {
+      def readAndIndexBindings(implicit indentedLogger: IndentedLogger): (List[AbstractBinding], Set[String]) = {
 
         debug("reloading library and baseline")
 
@@ -176,6 +178,8 @@ trait BindingLoader extends Logging {
     uri          : String,
     localname    : String,
     atts         : Attributes
+  )(implicit
+    indentedLogger: IndentedLogger
   ): (BindingIndex[IndexableBinding], Set[String], Option[IndexableBinding]) = {
 
     var currentIndex        = index
@@ -220,7 +224,7 @@ trait BindingLoader extends Logging {
       }
     }
 
-    def findFromAutomaticBinding: Option[AbstractBinding] =
+    def findFromAutomaticBinding(implicit indentedLogger: IndentedLogger): Option[AbstractBinding] =
       findBindingPathByName(uri, localname) match {
         case Some((path, true)) =>
           val (newIndex, newBindings) = extractAndIndexFromPaths(currentIndex, List(path))
@@ -266,14 +270,23 @@ trait BindingLoader extends Logging {
   def bindingPathByName(prefix: String, localname: String) =
     s"/xbl/$prefix/$localname/$localname.xbl"
 
-  private def pathsForQNames(qNames: Set[QName], nsUriToPrefix: Map[String, String]): (Set[String], Set[String]) =
+  private def pathsForQNames(
+    qNames        : Set[QName],
+    nsUriToPrefix : Map[String, String]
+  )(implicit
+    indentedLogger: IndentedLogger
+  ): (Set[String], Set[String]) =
     qNames flatMap { qName =>
       findBindingPathByNameUseMappings(nsUriToPrefix, qName.namespace.uri, qName.localName)
     } partition (_._2) match {
       case (found, notFound) => (found map (_._1), notFound map (_._1))
     }
 
-  private def collectResourceBaselines(baselineBindings: Iterable[AbstractBinding]): (List[String], List[String]) = {
+  private def collectResourceBaselines(
+    baselineBindings: Iterable[AbstractBinding]
+  )(
+    implicit         indentedLogger: IndentedLogger
+  ): (List[String], List[String]) = {
 
     debug("collecting resource baselines")
 
@@ -287,8 +300,10 @@ trait BindingLoader extends Logging {
   }
 
   private def extractAndIndexFromPaths(
-    index : BindingIndex[IndexableBinding],
-    paths : IterableOnce[String]
+    index         : BindingIndex[IndexableBinding],
+    paths         : IterableOnce[String]
+  )(implicit
+    indentedLogger: IndentedLogger
   ): (BindingIndex[IndexableBinding], List[AbstractBinding]) = {
 
     val newBindings =
@@ -315,7 +330,13 @@ trait BindingLoader extends Logging {
     currentIndex
   }
 
-  private def updateBindingIfOutOfDate(index: BindingIndex[IndexableBinding], path: String, lastModified: Long) = {
+  private def updateBindingIfOutOfDate(
+    index         : BindingIndex[IndexableBinding],
+    path          : String,
+    lastModified  : Long
+  )(implicit
+    indentedLogger: IndentedLogger
+  ) = {
 
     var currentIndex = index
 
@@ -335,8 +356,10 @@ trait BindingLoader extends Logging {
 
   // Missing or out of date bindings are removed, and out-of-date bindings are reloaded
   private def updateOutOfDateBindings(
-    index : BindingIndex[IndexableBinding],
-    paths : Set[String]
+    index         : BindingIndex[IndexableBinding],
+    paths         : Set[String]
+  )(implicit
+    indentedLogger: IndentedLogger
   ): BindingIndex[IndexableBinding] = {
 
     var currentIndex = index
@@ -379,16 +402,22 @@ trait BindingLoader extends Logging {
   }
 
   // E.g. `fr:tabview -> oxf:/xbl/orbeon/tabview/tabview.xbl`
-  private def findBindingPathByNameUseMappings(nsUriToPrefix: Map[String, String], uri: String, localname: String) =
+  private def findBindingPathByNameUseMappings(
+    nsUriToPrefix : Map[String, String],
+    uri           : String,
+    localname     : String
+  )(implicit
+    indentedLogger: IndentedLogger
+  ) =
     nsUriToPrefix.get(uri) map { prefix =>
       val path = bindingPathByName(prefix, localname)
       (path, existsByPath(path))
     }
 
-  private def findBindingPathByName(uri: String, localname: String) =
+  private def findBindingPathByName(uri: String, localname: String)(implicit indentedLogger: IndentedLogger) =
     findBindingPathByNameUseMappings(readURLMappingsCacheAgainstProperty, uri, localname)
 
-  private def readXBLResource(xblPath: String): (Element, Long) = {
+  private def readXBLResource(xblPath: String)(implicit indentedLogger: IndentedLogger): (Element, Long) = {
 
     val lastModified = lastModifiedByPath(xblPath)
 
@@ -435,17 +464,17 @@ object BindingLoader extends BindingLoader {
 
   def getPropertySet = CoreCrossPlatformSupport.properties
 
-  def lastModifiedByPath(path: String): Long = {
+  def lastModifiedByPath(path: String)(implicit indentedLogger: IndentedLogger): Long = {
     debug("checking last modified", List("path" -> path))
     rm.lastModified(path, true)
   }
 
-  def existsByPath(path: String): Boolean = {
+  def existsByPath(path: String)(implicit indentedLogger: IndentedLogger): Boolean = {
     debug("checking existence", List("path" -> path))
     rm.exists(path)
   }
 
-  def contentAsOrbeonDom(path: String): Document = {
+  def contentAsOrbeonDom(path: String)(implicit indentedLogger: IndentedLogger): Document = {
     debug("reading content", List("path" -> path))
     rm.getContentAsOrbeonDom(path, ParserConfiguration.XIncludeOnly, false)
   }

@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
+import org.log4s
+import org.orbeon.oxf.util.LoggerFactory
 
 
 /**
@@ -39,5 +40,5 @@ import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
  *     - bindingsIncludesAreUpToDate (to see if static state has expired)
  */
 package object xbl {
-  implicit val Logger = new IndentedLogger(LoggerFactory.createLogger("org.orbeon.xbl"))
+  val Logger: log4s.Logger = LoggerFactory.createLogger("org.orbeon.xbl")
 }

@@ -108,7 +108,8 @@ object StaticStateBits {
               outputSingleTemplate = false
             ),
             metadata,
-            true
+            true,
+            logger
           ),
           WhitespaceMatching.defaultHTMLPolicy,
           WhitespaceMatching.htmlPolicyMatcher

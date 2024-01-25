@@ -101,6 +101,8 @@ object XBLBindingBuilder {
     outerScope      : Scope,
     startScope      : XXBLScope,
     containerScope  : Scope
+  )(implicit
+    indentedLogger  : IndentedLogger
   ): Element =
     annotateSubtree(
       partAnalysisCtx,
@@ -125,6 +127,8 @@ object XBLBindingBuilder {
     containerScope  : Scope,
     hasFullUpdate   : Boolean,
     ignoreRoot      : Boolean
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Document =
     withDebug("annotating tree") {
 
@@ -141,9 +145,11 @@ object XBLBindingBuilder {
 
   // Keep public for unit tests
   def annotateShadowTree(
-    metadata   : Metadata,
-    shadowTree : Document,
-    prefix     : String
+    metadata      : Metadata,
+    shadowTree    : Document,
+    prefix        : String
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Document = {
 
     val identity = TransformerUtils.getIdentityTransformerHandler
@@ -152,7 +158,7 @@ object XBLBindingBuilder {
     identity.setResult(documentResult)
 
     // FIXME: This adds `xml:base` on root element.
-    TransformerUtils.writeOrbeonDom(shadowTree, new XFormsAnnotator(identity, null, metadata, false) {
+    TransformerUtils.writeOrbeonDom(shadowTree, new XFormsAnnotator(identity, null, metadata, false, indentedLogger) {
       // Use prefixed id for marks and namespaces to avoid clashes between top-level controls and shadow trees
       protected override def rewriteId(id: String): String = prefix + id
     })
@@ -206,6 +212,8 @@ object XBLBindingBuilder {
       containerScope         : Scope,
       abstractBinding        : AbstractBinding,
       rawShadowTree          : Document
+    )(implicit
+      indentedLogger         : IndentedLogger
     ): (ConcreteBinding, Option[Global], Document) = {
 
       // New prefix corresponds to bound element prefixed id
@@ -266,6 +274,8 @@ object XBLBindingBuilder {
       containerScope  : Scope,
       hasFullUpdate   : Boolean,
       ignoreRoot      : Boolean
+    )(implicit
+      indentedLogger  : IndentedLogger
     ): (SAXStore, Document) = withDebug("annotating and extracting tree") {
 
       val baseURI = boundElement map (_.resolveXMLBase(None, ".").toString) getOrElse "."
@@ -298,7 +308,8 @@ object XBLBindingBuilder {
                 baseURI
               ),
               partAnalysisCtx.metadata,
-              false
+              false,
+              indentedLogger
             ) {
               // Use prefixed id for marks and namespaces in order to avoid clashes between top-level
               // controls and shadow trees
@@ -325,6 +336,8 @@ object XBLBindingBuilder {
     def processGlobalsIfPresent(
       partAnalysisCtx : PartAnalysisContextForTree,
       abstractBinding : AbstractBinding
+    )(implicit
+      indentedLogger  : IndentedLogger
     ): Option[Global] =
       abstractBinding.global map { globalDocument =>
 

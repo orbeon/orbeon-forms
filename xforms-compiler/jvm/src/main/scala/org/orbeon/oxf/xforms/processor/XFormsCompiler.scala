@@ -20,7 +20,8 @@ class XFormsCompiler extends ProcessorImpl {
       new ProcessorOutputImpl(XFormsCompiler.this, outputName) {
         def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
-          implicit val rcv = xmlReceiver
+          implicit val rcv: XMLReceiver = xmlReceiver
+          implicit val indentedLogger: IndentedLogger = Loggers.newIndentedLogger("compiler")
 
           val formDocument = readCacheInputAsOrbeonDom(pipelineContext, "data")
           val (jsonString, _) = XFormsCompiler.compile(formDocument)
@@ -32,7 +33,12 @@ class XFormsCompiler extends ProcessorImpl {
 
 object XFormsCompiler {
 
-  def compile(formDocument: dom.Document)(implicit xmlReceiver: XMLReceiver): (String, XFormsStaticState) = {
+  def compile(
+    formDocument  : dom.Document
+  )(implicit
+    xmlReceiver   : XMLReceiver,
+    indentedLogger: IndentedLogger
+  ): (String, XFormsStaticState) = {
 
     val (template, staticState) = PartAnalysisBuilder.createFromDocument(formDocument)
     val jsonString = XFormsStaticStateSerializer.serialize(template, staticState)

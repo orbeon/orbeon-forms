@@ -203,7 +203,13 @@ object XFormsContainingDocumentBuilder {
 
   // Create static state from an encoded version. This is used when restoring a static state from a serialized form.
   // NOTE: `digest` can be None when using client state, if all we have are serialized static and dynamic states.
-  def restoreStaticState(digest: Option[String], encodedState: String, forceEncryption: Boolean): XFormsStaticStateImpl = {
+  def restoreStaticState(
+    digest         : Option[String],
+    encodedState   : String,
+    forceEncryption: Boolean
+  )(implicit
+    indentedLogger : IndentedLogger
+  ): XFormsStaticStateImpl = {
 
     val staticStateDocument = new StaticStateDocument(EncodeDecode.decodeXML(encodedState, forceEncryption))
 

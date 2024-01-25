@@ -14,8 +14,10 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
+import org.orbeon.oxf.xforms.xbl
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLAssets}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{Constants, XFormsId}
@@ -131,6 +133,6 @@ trait PartXBLAnalysis extends TransientState {
 
   override def freeTransientState(): Unit = {
     super.freeTransientState()
-    metadata.commitBindingIndex()
+    metadata.commitBindingIndex(new IndentedLogger(xbl.Logger))
   }
 }

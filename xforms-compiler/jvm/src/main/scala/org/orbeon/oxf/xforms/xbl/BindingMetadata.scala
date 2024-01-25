@@ -17,7 +17,7 @@ import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.{ElementWithFiltersSelector, Selector, TypeSelector}
 import org.orbeon.dom.Element
 import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
-import org.orbeon.oxf.util.Logging
+import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
@@ -37,7 +37,7 @@ trait BindingMetadata extends Logging {
   private var _checkedPaths      : Set[String]= Set.empty
   private var _baselineResources : (List[String], List[String]) = (Nil, Nil)
 
-  def initializeBindingLibraryIfNeeded(): Unit =
+  def initializeBindingLibraryIfNeeded(implicit indentedLogger: IndentedLogger): Unit =
     if (_xblIndex.isEmpty) {
 
       debug("entering view")
@@ -61,7 +61,7 @@ trait BindingMetadata extends Logging {
       _baselineResources = (scripts, styles)
     }
 
-  def commitBindingIndex(): Unit =
+  def commitBindingIndex(implicit indentedLogger: IndentedLogger): Unit =
     _xblIndex match {
       case Some(index) =>
         val cleanIndex = BindingIndex.keepBindingsWithPathOnly(index)
@@ -71,7 +71,13 @@ trait BindingMetadata extends Logging {
         debug("no binding index to commit")
     }
 
-  def registerInlineBinding(ns: NamespaceMapping, elementAtt: String, bindingPrefixedId: String): Unit = {
+  def registerInlineBinding(
+    ns               : NamespaceMapping,
+    elementAtt       : String,
+    bindingPrefixedId: String
+  )(implicit
+    indentedLogger   : IndentedLogger
+  ): Unit = {
     debug(
       "registering inline binding",
       List(
@@ -100,7 +106,13 @@ trait BindingMetadata extends Logging {
   }
 
   // Used by `XFormsAnnotator`
-  def findBindingForElement(uri: String, localname: String, atts: Attributes): Option[IndexableBinding] =
+  def findBindingForElement(
+    uri           : String,
+    localname     : String,
+    atts          : Attributes
+  )(implicit
+    indentedLogger: IndentedLogger
+  ): Option[IndexableBinding] =
     _xblIndex flatMap { index =>
 
     val (newIndex, newPaths, bindingOpt) =
@@ -154,7 +166,7 @@ trait BindingMetadata extends Logging {
 
   // ==== XBLBindings API
 
-  def extractInlineXBL(inlineXBL: Iterable[Element], scope: Scope): Unit =
+  def extractInlineXBL(inlineXBL: Iterable[Element], scope: Scope)(implicit indentedLogger: IndentedLogger): Unit =
     _xblIndex foreach { index =>
 
       val (newIndex, newBindings) = BindingLoader.extractAndIndexFromElements(index, inlineXBL)

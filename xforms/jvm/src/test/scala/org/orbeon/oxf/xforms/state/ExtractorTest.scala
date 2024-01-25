@@ -17,7 +17,7 @@ import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.WhitespaceMatching
+import org.orbeon.oxf.util.{IndentedLogger, WhitespaceMatching}
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.oxf.xforms.analysis.{Metadata, XFormsAnnotator, XFormsExtractor}
 import org.orbeon.oxf.xml.ParserConfiguration._
@@ -79,7 +79,8 @@ class ExtractorTest
             outputSingleTemplate         = false
           ),
           metadata,
-          true
+          true,
+          XFormsStateManager.newIndentedLogger
         ),
         WhitespaceMatching.defaultHTMLPolicy,
         WhitespaceMatching.htmlPolicyMatcher

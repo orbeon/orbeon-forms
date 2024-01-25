@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.properties.PropertySet;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsGlobalProperties$;
 import org.orbeon.oxf.xforms.analysis.controls.LHHA;
 import org.orbeon.oxf.xforms.xbl.IndexableBinding;
@@ -64,6 +65,8 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
     private final Metadata metadata;
     private final boolean isGenerateIds;
 
+    private final IndentedLogger indentedLogger;
+
     private NamespaceContext namespaceContext = new NamespaceContext();
 
 
@@ -90,28 +93,30 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
      * @param extractorReceiver     extractor output (can be null for XBL for now)
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotator(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, Metadata metadata, boolean isTopLevel) {
+    public XFormsAnnotator(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, Metadata metadata, boolean isTopLevel, IndentedLogger indentedLogger) {
         super(templateReceiver, extractorReceiver, metadata, isTopLevel);
 
-        this.metadata      = metadata;
-        this.isGenerateIds = true;
-        this.isTopLevel    = isTopLevel;
-        this.isRestore     = false;
+        this.metadata       = metadata;
+        this.isGenerateIds  = true;
+        this.isTopLevel     = isTopLevel;
+        this.isRestore      = false;
+        this.indentedLogger = indentedLogger;
     }
 
     /**
      * This constructor just computes the namespace mappings and AVT elements and gathers id information.
      */
-    public XFormsAnnotator(Metadata metadata) {
+    public XFormsAnnotator(Metadata metadata, IndentedLogger indentedLogger) {
         super(null, null, metadata, true);
 
         // In this mode, all elements that need to have ids already have them, so set safe defaults
-        this.metadata      = metadata;
-        this.isGenerateIds = false;
-        this.isTopLevel    = true;
-        this.isRestore     = true;
+        this.metadata       = metadata;
+        this.isGenerateIds  = false;
+        this.isTopLevel     = true;
+        this.isRestore      = true;
+        this.indentedLogger = indentedLogger;
 
-        metadata.initializeBindingLibraryIfNeeded();
+        metadata.initializeBindingLibraryIfNeeded(indentedLogger);
     }
 
     @Override
@@ -154,7 +159,8 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     metadata.registerInlineBinding(
                         NamespaceMapping.apply(namespaceContext.current().mappings()),
                         elementAtt,
-                        rewriteId(reusableStringArray[0])
+                        rewriteId(reusableStringArray[0]),
+                        indentedLogger
                     );
             }
             // Output element
@@ -172,7 +178,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
             // are within an XBL component already). But when restoring, always search, because we don't have a distinction
             // between model and view under <static-state>.
             final scala.Option<IndexableBinding> bindingOpt =
-                (inBody || isRestore || ! isTopLevel) ? metadata.findBindingForElement(uri, localname, attributes) : NONE_INDEXABLE_BINDING;
+                (inBody || isRestore || ! isTopLevel) ? metadata.findBindingForElement(uri, localname, attributes, indentedLogger) : NONE_INDEXABLE_BINDING;
 
             if (bindingOpt.isDefined()) {
                 // Element with a binding
@@ -253,7 +259,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                         } else if ("body".equals(localname)) {
                             // Entering body
                             inBody = true;
-                            metadata.initializeBindingLibraryIfNeeded();
+                            metadata.initializeBindingLibraryIfNeeded(indentedLogger);
 
                             if (this.isTopLevel)
                                 mustOutputPanels = true;
@@ -440,7 +446,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                         // Register the fr:xforms-inspector binding
                         reusableAttributes.clear();
                         final scala.Option<IndexableBinding> inspectorBindingOpt =
-                            metadata.findBindingForElement(frURI, inspectorLocal, reusableAttributes);
+                            metadata.findBindingForElement(frURI, inspectorLocal, reusableAttributes, indentedLogger);
 
                         if (inspectorBindingOpt.isDefined()) {
 

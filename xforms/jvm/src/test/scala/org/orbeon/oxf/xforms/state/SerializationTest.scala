@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.state
 import org.junit.{Assume, Test}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.state.XFormsOperations._
 import org.orbeon.oxf.xforms.state.XFormsProtocols._
 import org.orbeon.oxf.xforms.{XFormsContainingDocumentBuilder, XFormsStaticStateImpl}
@@ -165,6 +166,8 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
   @Test def staticState(): Unit = {
 
     Assume.assumeTrue(Version.isPE)
+
+    implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
 
     val doc = this setupDocument simpleDoc
     val staticStateXML = doc.staticState.asInstanceOf[XFormsStaticStateImpl].staticStateDocumentForTests.xmlDocument

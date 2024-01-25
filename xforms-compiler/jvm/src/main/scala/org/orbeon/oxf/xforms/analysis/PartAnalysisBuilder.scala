@@ -118,7 +118,11 @@ object PartAnalysisBuilder {
 
   // Create analyzed static state for the given XForms document.
   // Used by offline compiler and tests.
-  def createFromDocument(formDocument: Document): (SAXStore, XFormsStaticState) = {
+  def createFromDocument(
+    formDocument  : Document
+  )(implicit
+    indentedLogger: IndentedLogger
+  ): (SAXStore, XFormsStaticState) = {
 
     val startScope = new Scope(None, "")
 
@@ -145,7 +149,8 @@ object PartAnalysisBuilder {
     staticState  : XFormsStaticState,
     parent       : PartAnalysis,
     formDocument : Document,
-    startScope   : Scope)(implicit
+    startScope   : Scope
+  )(implicit
     logger       : IndentedLogger
   ): (SAXStore, NestedPartAnalysis) =
     createFromDocument(formDocument, startScope, (staticStateDocument: Document, _: String, metadata: Metadata, _) => {
@@ -197,20 +202,25 @@ object PartAnalysisBuilder {
     startScope        : Scope,
     template          : XMLReceiver,
     prefix            : String
+  )(implicit
+    indentedLogger    : IndentedLogger
   ) extends XFormsAnnotator(
     template,
     extractorReceiver,
     metadata,
-    startScope.isTopLevelScope
+    startScope.isTopLevelScope,
+    indentedLogger
   ) {
     protected override def rewriteId(id: String) = prefix + id
   }
 
   // Used by `xxf:dynamic`, offline compiler, and tests.
   private def createFromDocument[T](
-    formDocument : Document,
-    startScope   : Scope,
-    create       : (Document, String, Metadata, AnnotatedTemplate) => T
+    formDocument  : Document,
+    startScope    : Scope,
+    create        : (Document, String, Metadata, AnnotatedTemplate) => T
+  )(implicit
+    indentedLogger: IndentedLogger
   ): (SAXStore, T) = {
     val identity = TransformerUtils.getIdentityTransformerHandler
 

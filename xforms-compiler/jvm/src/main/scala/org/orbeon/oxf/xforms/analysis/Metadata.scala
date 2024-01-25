@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 
 import org.orbeon.dom.io.DocumentSource
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl._
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
@@ -50,13 +51,18 @@ object Metadata {
     new Metadata(idGenerator, isTopLevelPart)
 
   // For restoring
-  def apply(staticStateDocument: StaticStateDocument, template: Option[AnnotatedTemplate]): Metadata = {
+  def apply(
+    staticStateDocument: StaticStateDocument,
+    template           : Option[AnnotatedTemplate]
+  )(implicit
+    indentedLogger     : IndentedLogger
+  ): Metadata = {
 
     // Restore generator with last id
     val metadata = new Metadata(new IdGenerator(staticStateDocument.lastId), isTopLevelPart = true)
 
     // Restore namespace mappings and ids
-    TransformerUtils.sourceToSAX(new DocumentSource(staticStateDocument.xmlDocument), new XFormsAnnotator(metadata))
+    TransformerUtils.sourceToSAX(new DocumentSource(staticStateDocument.xmlDocument), new XFormsAnnotator(metadata, indentedLogger))
 
     // Restore marks if there is a template
     template foreach { template =>

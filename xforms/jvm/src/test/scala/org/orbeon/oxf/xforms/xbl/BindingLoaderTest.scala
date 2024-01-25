@@ -17,6 +17,8 @@ import org.junit.Test
 import org.orbeon.dom.Document
 import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatestplus.junit.AssertionsForJUnit
 import org.xml.sax.helpers.AttributesImpl
@@ -106,13 +108,13 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
 
     def getPropertySet = propertySet
 
-    def lastModifiedByPath(path: String) =
+    def lastModifiedByPath(path: String)(implicit indentedLogger: IndentedLogger) =
       lastModified
 
-    def existsByPath(path: String) =
+    def existsByPath(path: String)(implicit indentedLogger: IndentedLogger) =
       Docs.contains(path)
 
-    def contentAsOrbeonDom(path: String) = {
+    def contentAsOrbeonDom(path: String)(implicit indentedLogger: IndentedLogger) = {
       contentRead += path
       Docs(path)
     }
@@ -123,6 +125,8 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
 
 
   @Test def testLibraryLoad(): Unit = {
+
+    implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
 
     val Loader = new TestBindingLoader
 
@@ -199,6 +203,8 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
   }
 
   @Test def testByNameLoad(): Unit = {
+
+    implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
 
     val Loader = new TestBindingLoader
 

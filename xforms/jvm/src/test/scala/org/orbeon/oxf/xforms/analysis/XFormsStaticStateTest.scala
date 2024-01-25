@@ -21,6 +21,7 @@ import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsId.buildEffectiveId
 import org.scalatestplus.junit.AssertionsForJUnit
@@ -29,7 +30,7 @@ import org.scalatestplus.junit.AssertionsForJUnit
 object XFormsStaticStateTest {
 
   def getStaticState(documentURL: String): XFormsStaticState =
-    PartAnalysisBuilder.createFromDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))._2
+    PartAnalysisBuilder.createFromDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))(XFormsStateManager.newIndentedLogger)._2
 
   def withRefresh[T](thunk: => T)(implicit dependencies: XPathDependencies): T = {
     dependencies.refreshStart()

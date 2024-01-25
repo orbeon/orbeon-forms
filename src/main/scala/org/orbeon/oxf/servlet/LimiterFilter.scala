@@ -36,7 +36,7 @@ import scala.util.matching.Regex
 // - x1.25
 
 // For backward compatibility
-trait LimiterFilter extends JavaxLimiterFilter
+class LimiterFilter extends JavaxLimiterFilter
 
 class JavaxLimiterFilter   extends JavaxFilter  (new LimiterFilterImpl)
 class JakartaLimiterFilter extends JakartaFilter(new LimiterFilterImpl)

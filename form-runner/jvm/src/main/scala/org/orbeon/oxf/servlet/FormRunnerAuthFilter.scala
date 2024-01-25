@@ -26,7 +26,7 @@ import scala.collection.JavaConverters._
 import scala.collection.compat._
 
 // For backward compatibility
-trait FormRunnerAuthFilter extends JavaxFormRunnerAuthFilter
+class FormRunnerAuthFilter extends JavaxFormRunnerAuthFilter
 
 class JavaxFormRunnerAuthFilter   extends JavaxFilter  (new FormRunnerAuthFilterImpl)
 class JakartaFormRunnerAuthFilter extends JakartaFilter(new FormRunnerAuthFilterImpl)

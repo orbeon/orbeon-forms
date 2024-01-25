@@ -22,15 +22,15 @@ import org.orbeon.oxf.webapp.ServletPortlet._
 import scala.util.control.NonFatal
 
 // For backward compatibility
-class OrbeonSessionListenerDelegate extends JavaxOrbeonSessionListener
+class OrbeonSessionListener extends JavaxOrbeonSessionListener
 
-class JavaxOrbeonSessionListener   extends JavaxHttpSessionListener  (new OrbeonSessionListener with WithJavaxServletException)
-class JakartaOrbeonSessionListener extends JakartaHttpSessionListener(new OrbeonSessionListener with WithJakartaServletException)
+class JavaxOrbeonSessionListener   extends JavaxHttpSessionListener  (new OrbeonSessionListenerImpl with WithJavaxServletException)
+class JakartaOrbeonSessionListener extends JakartaHttpSessionListener(new OrbeonSessionListenerImpl with WithJakartaServletException)
 
 /**
  * This listener listens for HTTP session lifecycle changes.
  */
-abstract class OrbeonSessionListener extends HttpSessionListener with WithServletException {
+abstract class OrbeonSessionListenerImpl extends HttpSessionListener with WithServletException {
 
   def newServletException(throwable: Throwable): Exception
 

@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.SLF4JLogging._
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 
 // For backward compatibility
-trait ReplicationServletContextListener extends JavaxReplicationServletContextListener
+class ReplicationServletContextListener extends JavaxReplicationServletContextListener
 
 class JavaxReplicationServletContextListener   extends JavaxServletContextListener  (new ReplicationServletContextListenerImpl)
 class JakartaReplicationServletContextListener extends JakartaServletContextListener(new ReplicationServletContextListenerImpl)
@@ -37,7 +37,7 @@ class ReplicationServletContextListenerImpl extends ServletContextListener {
 }
 
 // For backward compatibility
-trait XFormsServletContextListener extends JavaxXFormsServletContextListener
+class XFormsServletContextListener extends JavaxXFormsServletContextListener
 
 class JavaxXFormsServletContextListener   extends JavaxHttpSessionListener  (new XFormsServletContextListenerImpl)
 class JakartaXFormsServletContextListener extends JakartaHttpSessionListener(new XFormsServletContextListenerImpl)

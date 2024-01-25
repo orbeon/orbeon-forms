@@ -24,6 +24,7 @@ import scala.jdk.CollectionConverters._
 
 // For backward compatibility
 class OrbeonServletDelegate extends JavaxOrbeonServlet
+class OrbeonServlet         extends JavaxOrbeonServlet
 
 /**
  * This is the Servlet entry point of Orbeon.

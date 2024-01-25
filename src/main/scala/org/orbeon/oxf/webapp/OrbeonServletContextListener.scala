@@ -19,15 +19,15 @@ import org.orbeon.oxf.servlet._
 import org.orbeon.oxf.webapp.ServletPortlet._
 
 // For backward compatibility
-class OrbeonServletContextListenerDelegate extends JavaxOrbeonServletContextListener
+class OrbeonServletContextListener extends JavaxOrbeonServletContextListener
 
-class JavaxOrbeonServletContextListener   extends JavaxServletContextListener  (new OrbeonServletContextListener with WithJavaxServletException)
-class JakartaOrbeonServletContextListener extends JakartaServletContextListener(new OrbeonServletContextListener with WithJakartaServletException)
+class JavaxOrbeonServletContextListener   extends JavaxServletContextListener  (new OrbeonServletContextListenerImpl with WithJavaxServletException)
+class JakartaOrbeonServletContextListener extends JakartaServletContextListener(new OrbeonServletContextListenerImpl with WithJakartaServletException)
 
 /**
  * This listener listens for HTTP context lifecycle changes.
  */
-abstract class OrbeonServletContextListener extends ServletContextListener with WithServletException {
+abstract class OrbeonServletContextListenerImpl extends ServletContextListener with WithServletException {
 
   def newServletException(throwable: Throwable): Exception
 

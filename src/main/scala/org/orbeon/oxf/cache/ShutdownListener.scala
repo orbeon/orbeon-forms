@@ -3,7 +3,7 @@ package org.orbeon.oxf.cache
 import org.orbeon.oxf.servlet.{JakartaServletContextListener, JavaxServletContextListener, ServletContextEvent, ServletContextListener}
 
 // For backward compatibility
-trait ShutdownListener extends JavaxShutdownListener
+class ShutdownListener extends JavaxShutdownListener
 
 class JavaxShutdownListener   extends JavaxServletContextListener  (new ShutdownListenerImpl)
 class JakartaShutdownListener extends JakartaServletContextListener(new ShutdownListenerImpl)

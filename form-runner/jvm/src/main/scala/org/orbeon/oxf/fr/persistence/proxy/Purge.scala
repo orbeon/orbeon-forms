@@ -7,8 +7,8 @@ import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
-import org.orbeon.oxf.util.CoreCrossPlatformSupportTrait
 import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger}
 import org.orbeon.saxon.om.DocumentInfo
 
 import java.time.Instant
@@ -31,7 +31,8 @@ object Purge extends ExportOrPurge {
     dateRangeGtOpt       : Option[Instant],
     dateRangeLtOpt       : Option[Instant]
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    indentedLogger          : IndentedLogger
   ): Unit = {
     val ctx = PurgeContext()
     matchesOpt match {
@@ -56,7 +57,8 @@ object Purge extends ExportOrPurge {
     forCurrentData : Boolean,
     metadataOpt    : Option[Metadata]
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    indentedLogger          : IndentedLogger
   ): Unit =
     (modifiedTimeOpt, forCurrentData) match {
       case (Some(modifiedTime), true) =>
@@ -81,7 +83,8 @@ object Purge extends ExportOrPurge {
     toPath        : String,
     debugAction   : String
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    indentedLogger          : IndentedLogger
   ): Unit = ()
 
   def completeAttachments(
@@ -91,7 +94,8 @@ object Purge extends ExportOrPurge {
     attachmentPaths     : mutable.Set[String], // for data that has been deleted
     otherAttachmentPaths: mutable.Set[String]  // for data that hasn't been deleted
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    indentedLogger          : IndentedLogger
   ): Unit =
     (attachmentPaths -- otherAttachmentPaths) foreach { fromPath =>
       // The CRUD implementation supports deleting all data matching the document id and filename, regardless of the

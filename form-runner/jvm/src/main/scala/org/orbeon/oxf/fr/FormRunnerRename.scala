@@ -2,7 +2,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.XMLNames.{FR, FRPrefix}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.DependencyAnalyzer

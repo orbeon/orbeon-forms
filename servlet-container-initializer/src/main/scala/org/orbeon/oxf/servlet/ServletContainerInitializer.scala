@@ -15,7 +15,7 @@ package org.orbeon.oxf.servlet
 
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.util.StringUtils._
 
 import java.{util => ju}
 import scala.jdk.CollectionConverters.enumerationAsScalaIteratorConverter

@@ -18,7 +18,7 @@ import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomSupport
 import org.orbeon.xforms.facade.{Controls, Init, Utils, XBL}
 import org.scalajs.dom

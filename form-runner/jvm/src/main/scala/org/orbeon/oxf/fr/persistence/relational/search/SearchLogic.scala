@@ -27,12 +27,11 @@ import org.orbeon.oxf.fr.persistence.{PersistenceMetadataSupport, SearchVersion}
 import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.SQLUtils._
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.{Document => _, _}
 
-import java.sql.{Connection, Timestamp}
+import java.sql.Connection
 import scala.collection.mutable
 
 

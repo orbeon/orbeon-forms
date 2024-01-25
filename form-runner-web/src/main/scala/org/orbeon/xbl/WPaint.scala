@@ -13,7 +13,7 @@
  */
 package org.orbeon.xbl
 
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}

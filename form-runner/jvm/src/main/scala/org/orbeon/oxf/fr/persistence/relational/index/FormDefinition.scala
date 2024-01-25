@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.persistence.api.PersistenceApiTrait
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SearchableValues, SummarySettings}
 import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunner, InDocFormRunnerDocContext}
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo

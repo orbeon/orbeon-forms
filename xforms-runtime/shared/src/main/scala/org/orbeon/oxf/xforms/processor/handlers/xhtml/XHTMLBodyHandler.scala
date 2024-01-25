@@ -100,11 +100,12 @@ class XHTMLBodyHandler(
       prefix    = htmlPrefix,
       uri       = XH,
       atts      =
-        ("id"       -> containingDocument.getNamespacedFormId) ::
-        ("class"    -> formElemClasses)                        ::
-        ("method"   -> "POST")                                 ::
-        ("onsubmit" -> "return false")                         ::
-        ("enctype"  -> "multipart/form-data")                  ::
+        ("id"           -> containingDocument.getNamespacedFormId) ::
+        ("class"        -> formElemClasses)                        ::
+        ("data-xf-uuid" -> containingDocument.uuid)                ::
+        ("method"       -> "POST")                                 ::
+        ("onsubmit"     -> "return false")                         ::
+        ("enctype"      -> "multipart/form-data")                  ::
         Nil
     )
 

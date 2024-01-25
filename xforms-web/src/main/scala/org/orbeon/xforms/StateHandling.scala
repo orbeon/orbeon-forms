@@ -13,177 +13,80 @@
   */
 package org.orbeon.xforms
 
-import cats.syntax.option._
 import enumeratum._
-import io.circe.generic.auto._
-import io.circe.parser._
-import io.circe.syntax._
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
-import org.scalajs.dom
-import org.scalajs.dom.HashChangeEvent
+import org.scalajs.dom.ext.SessionStorage
 
+import scala.collection.compat._
 import scala.collection.immutable
-import scala.scalajs.js
-import scala.scalajs.js.Dictionary
 import scala.scalajs.js.annotation.JSExport
-
 
 object StateHandling {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.StateHandling")
 
-  import Private._
-
-  // Restore state after hash changes
-  def initializeHashChangeListener(): Unit =
-    GlobalEventListenerSupport.addListener(
-      target = dom.window,
-      name   = "hashchange",
-      fn     = (_: HashChangeEvent) => Private.varStateOpt.foreach(Private.replaceState)
-    )
-
-  case class ClientState(
-    uuid     : String,
-    sequence : Int
-  )
-
   sealed trait StateResult extends EnumEntry
-
-  object StateResult extends Enum[StateResult] {
+  object       StateResult extends Enum[StateResult] {
 
     val values: immutable.IndexedSeq[StateResult] = findValues
 
-    case class  Uuid(uuid: String)    extends StateResult
-    case class  Restore(uuid: String) extends StateResult
-    case object Reload                extends StateResult
+    case object Initialized extends StateResult
+    case object Restored    extends StateResult
+    case object Reloaded    extends StateResult
   }
 
-  def initializeState(formId: String, initialUuid: String, revisitHandling: String): StateResult = {
-
-    def setInitialState(uuid: String): Unit =
-      updateClientState(
-        formId,
-        ClientState(
-          uuid     = uuid,
-          sequence = 1
-        )
-      )
-
-    findClientState(formId, initialUuid.some) match {
+  def initializeState(formId: String, revisitHandling: String): StateResult =
+    XFormsSessionStorage.get(formId) match {
       case None =>
-
         logger.debug("no state found, setting initial state")
-
-        val uuid = initialUuid
-        setInitialState(uuid)
-        StateResult.Uuid(uuid)
-
-      case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload =>
-
-        logger.debug("state found upon reload, setting initial state")
-
-        val uuid = initialUuid
-        setInitialState(uuid)
-        StateResult.Uuid(uuid)
-
-      case Some(_) if revisitHandling == "reload" =>
-
-        logger.debug("state found with `revisitHandling` set to `reload`, reloading page")
-
-        clearClientState(formId)
-        StateResult.Reload
-
-      case Some(state) =>
-
-        logger.debug("state found, assuming back/forward/navigate, requesting all events")
-
-        StateResult.Restore(state.uuid)
+        XFormsSessionStorage.set(formId, 1)
+        StateResult.Initialized
+      case Some(_) =>
+        if (BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload) {
+          logger.debug("state found upon reload, setting initial state")
+          XFormsSessionStorage.set(formId, 1)
+          StateResult.Initialized
+        } else if (revisitHandling == "reload") {
+          logger.debug("state found with `revisitHandling` set to `reload`, reloading page")
+          clearClientState(formId)
+          StateResult.Reloaded
+        } else {
+          logger.debug("state found, assuming back/forward/navigate, requesting all events")
+          StateResult.Restored
+        }
     }
-  }
 
   @JSExport
   def getSequence(formId: String): String =
-    getClientStateOrThrow(formId).sequence.toString
+    XFormsSessionStorage.get(formId) match {
+        case Some(sequence) => sequence.toString
+        case None           => throw new IllegalArgumentException(s"Sequence for form `$formId` not found")
+      }
 
   @JSExport
   def updateSequence(formId: String, newSequence: Int): Unit =
-    updateClientState(
-      formId      = formId,
-      clientState = getClientStateOrThrow(formId).copy(sequence = newSequence)
-    )
-
-  def getClientStateOrThrow(formId: String): ClientState =
-    findClientState(formId) getOrElse (throw new IllegalStateException(s"client state not found for form `$formId`"))
-
-  def findClientState(formId: String, uuid: Option[String] = None): Option[ClientState] =
-    findRawState flatMap (_.get(formId)) flatMap { serialized =>
-      decode[ClientState](serialized) match {
-        case Left(_)  =>
-          logger.debug(s"error parsing state for form `$formId` and value `$serialized`")
-          None
-        case Right(state) if uuid.isEmpty =>
-          logger.debug(s"found state for form `$formId` and value `$state` with ignored UUID")
-          Some(state)
-        case Right(state) if uuid.contains(state.uuid) =>
-          logger.debug(s"found state for form `$formId` and value `$state` with matching UUID (`${state.uuid}`)")
-          Some(state)
-        case Right(state) =>
-          // https://github.com/orbeon/orbeon-forms/issues/5572
-          logger.debug(s"found state for form `$formId` and value `$state` with non-matching UUID, clearing state")
-          clearClientState(formId)
-          None
-      }
-    }
-
-  def updateClientState(formId: String, clientState: ClientState): Unit = {
-
-    val dict       = findRawState getOrElse js.Dictionary[String]()
-    val serialized = clientState.asJson.noSpaces
-
-    logger.debug(s"updating client state for form `$formId` with value `$serialized`")
-
-    dict(formId) = serialized
-    Private.replaceState(dict)
-  }
+    XFormsSessionStorage.set(formId, newSequence)
 
   def clearClientState(formId: String): Unit =
-    findRawState foreach { state =>
-      state -= formId
-      Private.replaceState(state)
-    }
+    XFormsSessionStorage.remove(formId)
 
-  private object Private {
+  private object XFormsSessionStorage {
 
-    // When present, state is a `js.Dictionary[String]` mapping form ids to serialized state
-    var varStateOpt: Option[Dictionary[String]] = None
+    def get(formId: String): Option[Int] =
+      SessionStorage(key(formId)).flatMap(_.toIntOption)
 
-    def replaceState(newState: Dictionary[String]): Unit = {
-      Private.varStateOpt = Some(newState)
-      saveStateToHistory(newState)
-    }
+    def set(formId: String, sequence: Int): Unit =
+      SessionStorage.update(key(formId), sequence.toString)
 
-    def findRawState: Option[Dictionary[String]] = {
+    def remove(formId: String): Unit =
+      SessionStorage.remove(key(formId))
 
-      // Update `varStateOpt` from history, or vice versa, as needed
-      // Saving to history can help getting around Firefox issue 1183881
-      // Avoid calling `saveStateToHistory()` unless necessary, to avoid hitting Safari rate-limit on `replaceState()`
-      (varStateOpt, Option(dom.window.history.state)) match {
-        case (Some(_)       , Some(_)    ) => logger.debug(s"Some/Some"); // nop (all good)
-        case (Some(varState), None       ) => logger.debug(s"Some/None"); saveStateToHistory(varState)
-        case (None          , Some(state)) => logger.debug(s"None/Some"); varStateOpt = Some(state.asInstanceOf[js.Dictionary[String]])
-        case (None          , None       ) => logger.debug(s"None/None"); // nop (nothing we can do here; we might be in trouble later)
+    private val KeyPrefix = "xf-"
+    private def key(formId: String): String =
+      Page.findXFormsFormFromNamespacedId(formId) match {
+        case Some(form) => KeyPrefix + form.uuid
+        case None       => throw new IllegalArgumentException(s"UUID for form `$formId` not found")
       }
-
-      // Just return `varStateOpt` as it is now up-to-date
-      varStateOpt
-    }
-
-    def saveStateToHistory(state: Dictionary[String]): Unit =
-      dom.window.history.replaceState(
-        statedata = state,
-        title     = "",
-        url       = null
-      )
   }
 }

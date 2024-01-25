@@ -225,35 +225,18 @@ object InitSupport {
         // Q: Do this later?
         $(formElem).removeClass(Constants.InitiallyHiddenClass)
 
-        val uuid =
-          StateHandling.initializeState(formId, initializations.uuid, initializations.configuration.revisitHandling) match {
-            case StateResult.Uuid(uuid) =>
-              uuid
-            case StateResult.Restore(uuid) =>
-              AjaxClient.fireEvent(
-                AjaxEvent(
-                  eventName = EventNames.XXFormsAllEventsRequired,
-                  form      = formElem
-                )
-              )
-              uuid
-            case StateResult.Reload =>
-              dom.window.location.reload(flag = true)
-              return None
-          }
-
-        val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
-          processRepeatHierarchy(initializations.repeatTree)
-
         // NOTE on paths: We switched back and forth between trusting the client or the server. Starting 2010-08-27
         // the server provides the info. Starting 2011-10-05 we revert to using the server values instead of client
         // detection, as that works in portals. The concern with using the server values was proxying. But should
         // proxying be able to change the path itself? If so, wouldn't other things break anyway? So for now
         // server values it is.
 
+        val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
+          processRepeatHierarchy(initializations.repeatTree)
+
         val newForm =
           new Form(
-            uuid                           = uuid,
+            uuid                           = initializations.uuid,
             elem                           = formElem,
             ns                             = formId.substring(0, formId.indexOf(Constants.FormClass)), // namespaceOpt.getOrElse("")
             contextAndNamespaceOpt         = contextAndNamespaceOpt,
@@ -273,10 +256,23 @@ object InitSupport {
           newForm
         )
 
+        StateHandling.initializeState(formId, initializations.configuration.revisitHandling) match {
+          case StateResult.Initialized => //nop
+          case StateResult.Restored =>
+            AjaxClient.fireEvent(
+              AjaxEvent(
+                eventName = EventNames.XXFormsAllEventsRequired,
+                form      = formElem
+              )
+            )
+          case StateResult.Reloaded =>
+            dom.window.location.reload(flag = true)
+            return None
+        }
+
         initializeJavaScriptControls(initializations.controls)
         initializeKeyListeners(initializations.listeners, formElem)
         dispatchInitialServerEvents(initializations.pollEvent, formId)
-
         initializeGlobalEventListenersIfNeeded()
 
         // Putting this here due to possible Scala.js bug reporting a "applyDynamic does not support passing a vararg parameter"

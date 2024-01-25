@@ -126,7 +126,7 @@ class XFormsModelSubmission(
     connectResultTry    : Try[ConnectResult],
     submissionParameters: SubmissionParameters
   )(implicit
-    logger       : IndentedLogger
+    logger              : IndentedLogger
   ): Unit =
     processReplaceResultAndCloseConnection(
       connectResultTry match {

@@ -37,7 +37,8 @@ trait ConnectionTrait {
     headers         : Map[String, List[String]],
     loadState       : Boolean,
     saveState       : Boolean,
-    logBody         : Boolean)(implicit
+    logBody         : Boolean
+  )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
   ): ConnectionResult
@@ -49,7 +50,8 @@ trait ConnectionTrait {
     content         : Option[AsyncStreamedContent],
     headers         : Map[String, List[String]],
     loadState       : Boolean,
-    logBody         : Boolean)(implicit
+    logBody         : Boolean
+  )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext,
     ConnectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
@@ -69,7 +71,8 @@ trait ConnectionTrait {
     customHeaders            : Map[String, List[String]],
     headersToForward         : Set[String],
     cookiesToForward         : List[String],
-    getHeader                : String => Option[List[String]])(implicit
+    getHeader                : String => Option[List[String]]
+  )(implicit
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
@@ -87,7 +90,8 @@ trait ConnectionTrait {
   // TODO: `ExternalContext` must expose cookie directly
   def sessionCookieHeaderCapitalized(
     externalContext  : ExternalContext,
-    cookiesToForward : List[String])(implicit
+    cookiesToForward : List[String]
+  )(implicit
     logger           : IndentedLogger
   ): Option[(String, List[String])]
 
@@ -112,7 +116,8 @@ trait ConnectionTrait {
   private def buildSOAPHeadersCapitalizedIfNeeded(
     method                    : HttpMethod,
     mediatypeMaybeWithCharset : Option[String],
-    encoding                  : String)(implicit
+    encoding                  : String
+  )(implicit
     logger                    : IndentedLogger
   ): List[(String, List[String])] = {
 
@@ -168,7 +173,8 @@ trait ConnectionTrait {
     encodingForSOAP          : String,
     customHeaders            : Map[String, List[String]],
     headersToForward         : Set[String],
-    getHeader                : String => Option[List[String]])(implicit
+    getHeader                : String => Option[List[String]]
+  )(implicit
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
@@ -226,7 +232,8 @@ trait ConnectionTrait {
     customHeadersCapitalized : Map[String, List[String]],
     headersToForward         : Set[String],
     cookiesToForward         : List[String],
-    getHeader                : String => Option[List[String]])(implicit
+    getHeader                : String => Option[List[String]]
+  )(implicit
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
@@ -265,7 +272,8 @@ trait ConnectionTrait {
   private def getHeadersToForwardCapitalized(
     hasCredentials         : Boolean, // exclude `Authorization` header when true
     headerNamesCapitalized : Set[String],
-    getHeader              : String => Option[List[String]])(implicit
+    getHeader              : String => Option[List[String]]
+  )(implicit
     logger                 : IndentedLogger
   ): List[(String, List[String])] = {
 

@@ -68,7 +68,8 @@ object Connection extends ConnectionTrait {
     headers         : Map[String, List[String]],
     loadState       : Boolean,
     saveState       : Boolean,
-    logBody         : Boolean)(implicit
+    logBody         : Boolean
+  )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
   ): ConnectionResult = {
@@ -100,10 +101,11 @@ object Connection extends ConnectionTrait {
     content         : Option[AsyncStreamedContent],
     headers         : Map[String, List[String]],
     loadState       : Boolean,
-    logBody         : Boolean)(implicit
+    logBody         : Boolean
+  )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext,
-    connectionCtx: Option[ConnectionContextSupport.ConnectionContext]
+    connectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
   ): IO[AsyncConnectionResult] = {
 
     // Here we convert an `fs2.Stream` to a Java `InputStream` which is used downstream. This works if the producer and
@@ -221,7 +223,8 @@ object Connection extends ConnectionTrait {
     customHeaders            : Map[String, List[String]],
     headersToForward         : Set[String],
     cookiesToForward         : List[String],
-    getHeader                : String => Option[List[String]])(implicit
+    getHeader                : String => Option[List[String]]
+  )(implicit
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
@@ -269,7 +272,8 @@ object Connection extends ConnectionTrait {
 
   def sessionCookieHeaderCapitalized(
     externalContext  : ExternalContext,
-    cookiesToForward : List[String])(implicit
+    cookiesToForward : List[String]
+  )(implicit
     logger           : IndentedLogger
   ): Option[(String, List[String])] = {
 
@@ -380,7 +384,8 @@ object Connection extends ConnectionTrait {
       content         : Option[StreamedContent],
       headers         : Map[String, List[String]],
       loadState       : Boolean,
-      logBody         : Boolean)(implicit
+      logBody         : Boolean
+    )(implicit
       logger          : IndentedLogger,
       externalContext : ExternalContext,
       ConnectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
@@ -422,7 +427,8 @@ object Connection extends ConnectionTrait {
       cookieStore     : CookieStore,
       findClient      : => (String, HttpClient[CookieStore]),
       headers         : Map[String, List[String]], // capitalized, or entirely lowercase in which case capitalization is attempted
-      logBody         : Boolean)(implicit
+      logBody         : Boolean
+    )(implicit
       logger          : IndentedLogger,
       ConnectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
     ): ConnectionResult = {
@@ -597,7 +603,8 @@ object Connection extends ConnectionTrait {
       externalContext   : ExternalContext,
       nativeRequest     : HttpServletRequest,
       cookiesToForward  : List[String],
-      sessionCookieName : String)(implicit
+      sessionCookieName : String
+    )(implicit
       logger            : IndentedLogger
     ): Option[(String, List[String])] = {
 
@@ -647,7 +654,8 @@ object Connection extends ConnectionTrait {
     private val DefaultStateScope        = ExternalContext.Scope.Session
 
     def loadHttpState(
-      stateScope      : ExternalContext.Scope)(implicit
+      stateScope      : ExternalContext.Scope
+    )(implicit
       logger          : IndentedLogger,
       externalContext : ExternalContext
     ): Option[CookieStore] = {
@@ -663,7 +671,8 @@ object Connection extends ConnectionTrait {
 
     def saveHttpState(
       cookieStore     : CookieStore,
-      stateScope      : ExternalContext.Scope)(implicit
+      stateScope      : ExternalContext.Scope
+    )(implicit
       logger          : IndentedLogger,
       externalContext : ExternalContext
     ): Unit = {
@@ -685,7 +694,8 @@ object Connection extends ConnectionTrait {
       cookieStoreOpt : Option[CookieStore],
       stateScope     : ExternalContext.Scope,
       positive       : String,
-      negative       : String)(implicit
+      negative       : String
+    )(implicit
       logger         : IndentedLogger
     ): Unit =
       ifDebug {
@@ -703,7 +713,8 @@ object Connection extends ConnectionTrait {
 
     private def stateAttributes(
       stateScope      : ExternalContext.Scope,
-      createSession   : Boolean)(implicit
+      createSession   : Boolean
+    )(implicit
       externalContext : ExternalContext
     ): Option[(String => AnyRef, (String, AnyRef) => Unit)] =
       stateScope match {

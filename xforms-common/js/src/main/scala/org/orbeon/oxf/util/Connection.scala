@@ -191,7 +191,7 @@ object Connection extends ConnectionTrait {
     content: Option[AsyncStreamedContent],
     headers: Map[String, List[String]]
   )(implicit
-    logger   : IndentedLogger
+    logger : IndentedLogger
   ): Option[IO[AsyncConnectionResult]] =
     submissionProvider.map { provider =>
 

@@ -75,7 +75,8 @@ class ConnectionTest
           encodingForSOAP          = CharsetNames.Utf8,
           customHeaders            = customHeaderValuesMap,
           headersToForward         = Set(Headers.Cookie, Headers.Authorization, "User-Agent"),
-          getHeader                = Connection.getHeaderFromRequest(externalContext.getRequest))(
+          getHeader                = Connection.getHeaderFromRequest(externalContext.getRequest)
+        )(
           logger                   = ResourceManagerTestBase.newIndentedLogger,
           externalContext          = externalContext,
           coreCrossPlatformSupport = CoreCrossPlatformSupport
@@ -131,7 +132,8 @@ class ConnectionTest
           encodingForSOAP          = CharsetNames.Utf8,
           customHeaders            = explicitHeaders,
           headersToForward         = Set.empty,
-          getHeader                = _ => None)(
+          getHeader                = _ => None
+        )(
           logger                   = ResourceManagerTestBase.newIndentedLogger,
           externalContext          = externalContext,
           coreCrossPlatformSupport = CoreCrossPlatformSupport
@@ -181,7 +183,8 @@ class ConnectionTest
             encodingForSOAP          = CharsetNames.Utf8,
             customHeaders            = Map.empty,
             headersToForward         = Set.empty,
-            getHeader                = _ => None)(
+            getHeader                = _ => None
+          )(
             logger                   = ResourceManagerTestBase.newIndentedLogger,
             externalContext          = externalContext,
             coreCrossPlatformSupport = CoreCrossPlatformSupport
@@ -219,7 +222,8 @@ class ConnectionTest
             encodingForSOAP          = CharsetNames.Utf8,
             customHeaders            = Map.empty,
             headersToForward         = Set.empty,
-            getHeader                = _ => None)(
+            getHeader                = _ => None
+          )(
             logger                   = ResourceManagerTestBase.newIndentedLogger,
             externalContext          = externalContext,
             coreCrossPlatformSupport = CoreCrossPlatformSupport

@@ -125,7 +125,8 @@ class RegularSubmission(submission: XFormsModelSubmission)
             content         = messageBody.map(StreamedContent.asyncFromBytes(_, firstItemIgnoreCase(headers, ContentType))),
             headers         = headers,
             loadState       = true,
-            logBody         = BaseSubmission.isLogBody)(
+            logBody         = BaseSubmission.isLogBody
+          )(
             logger          = detailsLogger,
             externalContext = externalContext,
             connectionCtx   = ConnectionContextSupport.getContext(Map.empty)
@@ -142,7 +143,8 @@ class RegularSubmission(submission: XFormsModelSubmission)
               headers         = headers,
               loadState       = true,
               saveState       = true,
-              logBody         = BaseSubmission.isLogBody)(
+              logBody         = BaseSubmission.isLogBody
+            )(
               logger          = detailsLogger,
               externalContext = externalContext
             )

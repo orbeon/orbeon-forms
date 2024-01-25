@@ -14,9 +14,9 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.externalcontext.{ExternalContext, Organization, UserAndGroup}
+import org.orbeon.oxf.fr.FormDefinitionVersion
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationId, OrganizationSupport}
@@ -24,9 +24,10 @@ import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.fr.persistence.relational.search.part._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.fr.persistence.{PersistenceMetadataSupport, SearchVersion}
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.{Document => _, _}
@@ -50,8 +51,10 @@ object SearchLogic {
     rootElement.child("operations").headOption.map(_.attValue("any-of").splitTo[Set]().map(Operation.withName))
 
   private def computePermissions(
-    request         : SearchRequestCommon,
-    version         : FormDefinitionVersion
+    request       : SearchRequestCommon,
+    version       : FormDefinitionVersion
+  )(implicit
+    indentedLogger: IndentedLogger
   ): SearchPermissions = {
 
     val searchOperations = request.anyOfOperations.getOrElse(SearchOps.SearchOperations)
@@ -77,8 +80,11 @@ object SearchLogic {
     request           : R,
     controls          : List[Control],
     freeTextSearch    : Option[String],
-    noPermissionValue : T)(
+    noPermissionValue : T
+  )(
     body              : (Connection, List[StatementPart], SearchPermissions) => T
+  )(implicit
+    indentedLogger: IndentedLogger
   ): T = {
 
     val version          = PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(request.appForm, request.version)
@@ -108,7 +114,7 @@ object SearchLogic {
 
 trait SearchLogic extends SearchRequestParser {
 
-  def doSearch(request: SearchRequest): (List[Document], Int) =
+  def doSearch(request: SearchRequest)(implicit indentedLogger: IndentedLogger): (List[Document], Int) =
     SearchLogic.doSearch(
       request           = request,
       controls          = request.controls,
@@ -132,7 +138,7 @@ trait SearchLogic extends SearchRequestParser {
                |       ) a
              """.stripMargin
 
-          Logger.logDebug("search total query", sql)
+          debug(s"search total query\n$sql")
           executeQuery(connection, sql, statementParts) { rs =>
             rs.next()
             rs.getInt(1)
@@ -242,7 +248,7 @@ trait SearchLogic extends SearchRequestParser {
              | ORDER BY row_num
              |""".stripMargin
         }
-        Logger.logDebug("search items query", sql)
+        debug(s"search items query\n$sql")
 
         val allStatementParts            = statementParts ::: orderByStatementPartOpt.toList
         val rawDocumentMetadataAndValues = executeQuery(connection, sql, allStatementParts) { documentsResultSet =>

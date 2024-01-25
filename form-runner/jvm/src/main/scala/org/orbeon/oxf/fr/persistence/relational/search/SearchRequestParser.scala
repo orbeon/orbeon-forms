@@ -16,14 +16,15 @@ package org.orbeon.oxf.fr.persistence.relational.search
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.{Logger, parsePositiveIntParamOrThrow}
+import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.parsePositiveIntParamOrThrow
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider, RelationalUtils}
 import org.orbeon.oxf.fr.persistence.{PersistenceMetadataSupport, SearchVersion}
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
@@ -39,10 +40,14 @@ trait SearchRequestParser {
 
   def httpRequest: ExternalContext.Request = NetUtils.getExternalContext.getRequest
 
-  def parseRequest(searchDocument: DocumentInfo, version: SearchVersion): SearchRequest = {
+  def parseRequest(
+    searchDocument: DocumentInfo,
+    version       : SearchVersion
+  )(implicit
+    indentedLogger: IndentedLogger
+  ): SearchRequest = {
 
-    if (Logger.debugEnabled)
-      Logger.logDebug("search request", TransformerUtils.tinyTreeToString(searchDocument))
+    debug(s"search request: ${TransformerUtils.tinyTreeToString(searchDocument)}")
 
     httpRequest.getRequestPath match {
       case SearchPath(provider, app, form) =>

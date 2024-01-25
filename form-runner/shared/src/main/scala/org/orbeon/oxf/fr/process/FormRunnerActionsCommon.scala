@@ -27,7 +27,7 @@ import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, MarkupUtils, PathUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, MarkupUtils, PathUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -50,6 +50,7 @@ trait FormRunnerActionsCommon {
 
   def runningProcessId: Option[String]
   def AllowedFormRunnerActions: Map[String, Action]
+  implicit def logger: IndentedLogger
 
   protected val CommonAllowedFormRunnerActions: Map[String, Action] = Map(
     "pending-uploads"        -> tryPendingUploads,

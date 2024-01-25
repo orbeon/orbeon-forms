@@ -20,6 +20,7 @@ import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.IndentedLogger
 
 import java.sql.Connection
 
@@ -33,7 +34,7 @@ trait DistinctValuesLogic {
     innerSQL   : String
   )
 
-  def queryDistinctValues(request: DistinctValuesRequest): DistinctValues = {
+  def queryDistinctValues(request: DistinctValuesRequest)(implicit indentedLogger: IndentedLogger): DistinctValues = {
     // Re-use part of the search API logic (permissions, SQL generation)
     SearchLogic.doSearch(
       request           = request,

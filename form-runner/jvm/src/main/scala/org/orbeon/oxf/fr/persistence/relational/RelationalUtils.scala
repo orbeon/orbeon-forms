@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.fr.persistence.relational
 
+import org.log4s
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.OXFException
@@ -36,9 +37,12 @@ import scala.util.{Success, Try}
 
 object RelationalUtils extends Logging {
 
-  implicit val Logger = new IndentedLogger(LoggerFactory.createLogger("org.orbeon.relational"))
+  val Logger: log4s.Logger = LoggerFactory.createLogger("org.orbeon.relational")
 
-  def databaseConfigurationPresent(): Boolean = {
+  def newIndentedLogger: IndentedLogger =
+    new IndentedLogger(Logger)
+
+  def databaseConfigurationPresent(implicit indentedLogger: IndentedLogger): Boolean = {
     val propertySet = Properties.instance.getPropertySet
 
     val propertiesByProvider = propertySet
@@ -79,10 +83,10 @@ object RelationalUtils extends Logging {
     problematicDataSources.isEmpty
   }
 
-  def withConnection[T](thunk: Connection => T): T =
+  def withConnection[T](thunk: Connection => T)(implicit indentedLogger: IndentedLogger): T =
     withConnection(getDataSourceNameFromHeaders)(thunk)
 
-  def withConnection[T](datasourceName: String)(thunk: Connection => T): T =
+  def withConnection[T](datasourceName: String)(thunk: Connection => T)(implicit indentedLogger: IndentedLogger): T =
     useAndClose(getConnection(getDataSource(datasourceName))) { connection =>
       try {
         val result = withDebug("executing block with connection")(thunk(connection))
@@ -129,12 +133,12 @@ object RelationalUtils extends Logging {
       .collectFirst { case Success(dataSource) => dataSource }
   }
 
-  private def getDataSource(name: String): DataSource =
+  private def getDataSource(name: String)(implicit indentedLogger: IndentedLogger): DataSource =
     withDebug(s"getting datasource `$name`") {
       getDataSourceNoFallback(name).getOrElse(DatabaseContext.fallbackDataSource(CoreCrossPlatformSupport.externalContext, name))
     }
 
-  def getConnection(dataSource: DataSource): Connection =
+  def getConnection(dataSource: DataSource)(implicit indentedLogger: IndentedLogger): Connection =
     withDebug("getting connection and setting auto commit to `false`") {
       val connection = dataSource.getConnection
       try {

@@ -21,6 +21,8 @@ import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon
@@ -44,6 +46,8 @@ trait Reindex extends FormDefinition {
     provider      : Provider,
     connection    : Connection,
     whatToReindex : WhatToReindex
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Unit = {
 
     // If a document id was provided, produce WHERE clause, and set parameter
@@ -214,7 +218,7 @@ trait Reindex extends FormDefinition {
               val appForm = AppForm(app, form)
               PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, FormDefinitionVersion.Specific(formVersion)) match {
                 case Failure(_) =>
-                  RelationalUtils.Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
+                  error(s"Can't index documents for $app/$form as form definition can't be found")
                   Nil
                 case Success(EncryptionAndIndexDetails(_, indexedFields)) =>
                   indexedFields.value

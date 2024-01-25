@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.persistence.proxy
 
 import org.apache.http.HttpStatus
+import org.log4s
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
@@ -68,6 +69,7 @@ class PersistenceProxyProcessor extends ProcessorImpl {
   // Start the processor
   override def start(pipelineContext: PipelineContext): Unit = {
     implicit val ec: ExternalContext = NetUtils.getExternalContext
+    implicit val indentedLogger: IndentedLogger = new IndentedLogger(PersistenceProxyProcessor.Logger)
     proxyRequest(ec.getRequest, ec.getResponse)
   }
 }
@@ -80,7 +82,7 @@ private[persistence] object PersistenceProxyProcessor {
   val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.HEAD, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST, HttpMethod.LOCK, HttpMethod.UNLOCK)
   val GetOrPutMethods                = Set[HttpMethod](HttpMethod.GET, HttpMethod.PUT)
 
-  implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(PersistenceProxyProcessor.getClass))
+  val Logger: log4s.Logger = LoggerFactory.createLogger(PersistenceProxyProcessor.getClass)
 
   case class OutgoingRequest(
     method : HttpMethod,
@@ -167,7 +169,13 @@ private[persistence] object PersistenceProxyProcessor {
 
   // TODO: Could just pass `ec` and no separate `request`/`response`
   // Proxy the request to the appropriate persistence implementation
-  def proxyRequest(request: Request, response: Response)(implicit externalContext: ExternalContext): Unit =
+  def proxyRequest(
+    request        : Request,
+    response       : Response
+  )(implicit
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
+  ): Unit =
     (request.getMethod, request.getRequestPath) match {
       case (_,               FormPath(path, app, form, _))                       => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, None            , path)
       case (_,               DataPath(path, app, form, _, documentId, filename)) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Some(filename)  , path, Some(documentId))
@@ -184,11 +192,13 @@ private[persistence] object PersistenceProxyProcessor {
 
   // TODO: test
   private def proxySimpleRequest(
-    request   : Request,
-    response  : Response,
-    appForm   : AppForm,
-    formOrData: FormOrData,
-    path      : String,
+    request       : Request,
+    response      : Response,
+    appForm       : AppForm,
+    formOrData    : FormOrData,
+    path          : String
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Unit = {
 
     val (persistenceBaseURL, outgoingPersistenceHeaders) =
@@ -217,8 +227,10 @@ private[persistence] object PersistenceProxyProcessor {
     formOrData     : FormOrData,
     filename       : Option[String],
     path           : String,
-    documentIdOpt  : Option[String] = None)(implicit
-    externalContext: ExternalContext
+    documentIdOpt  : Option[String] = None
+  )(implicit
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
   ): Unit = {
 
     // Throws if there is an incompatibility
@@ -498,6 +510,8 @@ private[persistence] object PersistenceProxyProcessor {
     isFormBuilder   : Boolean,
     appForm         : AppForm,
     formOrData      : FormOrData
+    )(implicit
+    indentedLogger: IndentedLogger
   ): Option[StreamedContent] =
     HttpMethod.HttpMethodsWithRequestBody(request.getMethod).option {
 
@@ -539,6 +553,8 @@ private[persistence] object PersistenceProxyProcessor {
     path                    : String,
     streamedContent         : Option[StreamedContent],
     outgoingVersionHeaderOpt: Option[(String, String)]
+  )(implicit
+    indentedLogger          : IndentedLogger
   ): Option[ConnectionResult] =
     if (isAttachment) {
       findAttachmentsProvider(appForm, formOrData).map { provider =>
@@ -570,6 +586,8 @@ private[persistence] object PersistenceProxyProcessor {
     outgoingPersistenceHeaders : Map[String, String],
     specificIncomingVersionOpt : Option[Int],
     queryForToken              : List[(String, String)]
+  )(implicit
+    indentedLogger             : IndentedLogger
   ): (Option[ConnectionResult], Int, Option[ResponseHeaders]) =
     requestMethod match {
       case HttpMethod.GET | HttpMethod.HEAD =>
@@ -604,6 +622,8 @@ private[persistence] object PersistenceProxyProcessor {
     serviceUri                 : String,
     outgoingPersistenceHeaders : Map[String, String],
     specificIncomingVersionOpt : Option[Int]
+  )(implicit
+    indentedLogger             : IndentedLogger
   ): (ConnectionResult, Int, ResponseHeaders) = {
 
     val cxr =
@@ -625,6 +645,8 @@ private[persistence] object PersistenceProxyProcessor {
     specificIncomingVersionOpt : Option[Int],
     queryForToken              : List[(String, String)],
     mustFilterVersioningHeaders: Boolean
+  )(implicit
+    indentedLogger             : IndentedLogger
   ): (Int, Option[ResponseHeaders]) = { // `ResponseHeaders` are `None` in case of non-existing data
 
       // The call to `HEAD` will require permissions so we need to forward the token
@@ -787,6 +809,8 @@ private[persistence] object PersistenceProxyProcessor {
     requestContent : Option[StreamedContent],
     uri            : String,
     headers        : Map[String, String]
+  )(implicit
+    indentedLogger : IndentedLogger
   ): ConnectionResult = {
 
     implicit val externalContext          = NetUtils.getExternalContext
@@ -833,10 +857,12 @@ private[persistence] object PersistenceProxyProcessor {
    * results. So the response is not simply proxied, unlike for other persistence layer calls.
    */
   private def proxyPublishedFormsMetadata(
-    request : Request, // for params, headers, and method
-    response: Response,
-    app     : Option[String],
-    form    : Option[String]
+    request       : Request, // for params, headers, and method
+    response      : Response,
+    app           : Option[String],
+    form          : Option[String]
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Unit =
     streamDocument(
       callPublishedFormsMetadata(
@@ -848,9 +874,11 @@ private[persistence] object PersistenceProxyProcessor {
     )
 
   def callPublishedFormsMetadata(
-    request: Request, // for params, headers, and method
-    app    : Option[String],
-    form   : Option[String] // TODO: should not be allowed if app is not provided
+    request       : Request, // for params, headers, and method
+    app           : Option[String],
+    form          : Option[String] // TODO: should not be allowed if app is not provided
+  )(implicit
+    indentedLogger: IndentedLogger
   ): NodeInfo = {
 
     val formProviders = getProviders(app, form, FormOrData.Form)
@@ -887,8 +915,10 @@ private[persistence] object PersistenceProxyProcessor {
   }
 
   private def proxyReindex(
-    request : Request,
-    response: Response
+    request       : Request,
+    response      : Response
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Unit = {
     val dataProviders = getProviders(appOpt = None, formOpt = None, FormOrData.Data)
 
@@ -914,8 +944,10 @@ private[persistence] object PersistenceProxyProcessor {
   }
 
   private def proxyReEncryptStatus(
-    request : Request,
-    response: Response
+    request       : Request,
+    response      : Response
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Unit = {
 
     val dataProviders = getProviders(appOpt = None, formOpt = None, FormOrData.Data)
@@ -965,6 +997,8 @@ private[persistence] object PersistenceProxyProcessor {
     serviceURI                 : String,
     outgoingPersistenceHeaders : Map[String, String],
     mustFilterVersioningHeaders: Boolean
+  )(implicit
+    indentedLogger             : IndentedLogger
   ): Try[ResponseHeaders] = {
 
     val headRequest =

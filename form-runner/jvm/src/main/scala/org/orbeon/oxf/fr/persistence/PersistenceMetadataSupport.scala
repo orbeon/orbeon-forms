@@ -12,7 +12,7 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
@@ -30,9 +30,6 @@ import scala.util.{Success, Try}
 //
 object PersistenceMetadataSupport {
 
-  private implicit val Logger: IndentedLogger =
-    new IndentedLogger(LoggerFactory.createLogger("org.orbeon.fr.persistence.form-definition-cache"))
-
   private def cacheEnabled =
     ! Properties.instance.getPropertySet.getBooleanOpt("oxf.fr.persistence.form-definition-cache.enable").contains(false)
 
@@ -46,7 +43,7 @@ object PersistenceMetadataSupport {
 
   // When publishing a form, we need to invalidate the caches. This doesn't cover cases where form definitions are
   // updated directly in the database, but it's the most frequent case.
-  def maybeInvalidateCachesFor(appForm: AppForm, version: Int): Unit = {
+  def maybeInvalidateCachesFor(appForm: AppForm, version: Int)(implicit indentedLogger: IndentedLogger): Unit = {
 
     val cacheKey: CacheKey = (appForm.app, appForm.form, version)
 
@@ -62,6 +59,8 @@ object PersistenceMetadataSupport {
   def readPublishedFormEncryptionAndIndexDetails(
     appForm : AppForm,
     version : FormDefinitionVersion
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Try[EncryptionAndIndexDetails] =
     readMaybeFromCache(appForm, version, formDefinitionCache) {
       implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
@@ -81,7 +80,7 @@ object PersistenceMetadataSupport {
       }
     }
 
-  def readLatestVersion(appForm: AppForm): Option[Int] = {
+  def readLatestVersion(appForm: AppForm)(implicit indentedLogger: IndentedLogger): Option[Int] = {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
     PersistenceApi.readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)
       .flatMap(_.firstChildOpt(Names.FormVersion))
@@ -99,6 +98,8 @@ object PersistenceMetadataSupport {
     isInternalAdminUser: Boolean,
     appForm            : AppForm,
     version            : FormDefinitionVersion
+  )(implicit
+    indentedLogger     : IndentedLogger
   ): Permissions =
     // TODO: Check possible optimization above to avoid retrieving form permissions twice.
     // TODO: Check if/why we are not using the caching mechanism.
@@ -113,7 +114,7 @@ object PersistenceMetadataSupport {
     ) |!>
       (formPermissions => debug("CRUD: form permissions", List("permissions" -> formPermissions.toString)))
 
-  def readFormPermissions(appForm: AppForm, version: FormDefinitionVersion): Option[NodeInfo] = {
+  def readFormPermissions(appForm: AppForm, version: FormDefinitionVersion)(implicit indentedLogger: IndentedLogger): Option[NodeInfo] = {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
     PersistenceApi.readFormMetadataOpt(appForm, version)
       .flatMap(_.firstChildOpt(Names.Permissions))
@@ -123,6 +124,8 @@ object PersistenceMetadataSupport {
   def getEffectiveFormVersionForSearchMaybeCallApi(
     appForm        : AppForm,
     incomingVersion: SearchVersion
+  )(implicit
+    indentedLogger : IndentedLogger
   ): FormDefinitionVersion =
     incomingVersion match {
       case SearchVersion.Unspecified  => PersistenceMetadataSupport.readLatestVersion(appForm).map(FormDefinitionVersion.Specific).getOrElse(FormDefinitionVersion.Latest)
@@ -133,10 +136,12 @@ object PersistenceMetadataSupport {
   private object Private {
 
     def readMaybeFromCache[T <: Serializable](
-      appForm  : AppForm,
-      version  : FormDefinitionVersion,
-      cacheOpt : Option[CacheApi])(
-      read     : => Try[T]
+      appForm       : AppForm,
+      version       : FormDefinitionVersion,
+      cacheOpt      : Option[CacheApi])(
+      read          : => Try[T]
+    )(implicit
+      indentedLogger: IndentedLogger
     ): Try[T] =
       (version, cacheOpt) match {
         case (_, None) =>

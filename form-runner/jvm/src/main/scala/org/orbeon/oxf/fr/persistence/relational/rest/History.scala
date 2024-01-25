@@ -2,7 +2,6 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.oxf.externalcontext.UserAndGroup
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
@@ -10,7 +9,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ContentTypes, DateUtils, NetUtils, XPath}
+import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger, NetUtils, XPath}
 import org.orbeon.oxf.xml.{DeferredXMLReceiver, DeferredXMLReceiverImpl, TransformerUtils}
 
 import java.io.OutputStream
@@ -26,6 +25,8 @@ class History extends ProcessorImpl {
 
     val httpRequest  = NetUtils.getExternalContext.getRequest
     val httpResponse = NetUtils.getExternalContext.getResponse
+
+    implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
 
     try {
       require(httpRequest.getMethod == HttpMethod.GET)
@@ -81,6 +82,8 @@ private object History {
     filenameOpt        : Option[String],
     isInternalAdminUser: Boolean, // xxx unused for now, we don't check permissions!
     outputStream       : OutputStream
+  )(implicit
+    indentedLogger     : IndentedLogger
   ): Unit = {
     RelationalUtils.withConnection { connection =>
 
@@ -161,7 +164,7 @@ private object History {
              |       ) a
            """.stripMargin
 
-        Logger.logDebug("search total query", sql)
+        RelationalUtils.Logger.debug(s"search total query:\n$sql")
         executeQuery(connection, sql, List(StatementPart("", setters))) { rs =>
           rs.next()
           rs.getInt(1)

@@ -13,11 +13,12 @@
   */
 package org.orbeon.oxf.fr.persistence.relational.search
 
+import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorOutput}
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xml.XMLReceiver
 
 
@@ -36,6 +37,8 @@ class SearchProcessor
     addOutput(
       name, new CacheableTransformerOutputImpl(self, name) {
         def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
+
+          implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
 
           val searchDocument = readInputAsTinyTree(
             pipelineContext,

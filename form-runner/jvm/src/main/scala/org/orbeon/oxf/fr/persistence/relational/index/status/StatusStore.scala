@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index.status
 
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 
 import java.util.Date
 
-// Functions dealing with the session
 
+// Functions dealing with the session
 object StatusStore {
 
   private var lastModified: Date = new Date()
@@ -27,16 +28,16 @@ object StatusStore {
   def getLastModified : Date   = lastModified
   def getStatus       : Status = currentStatus
 
-  def setStatus(status: Status): Unit = {
+  def setStatus(status: Status)(implicit indentedLogger: IndentedLogger): Unit = {
 
     // Log status
-    if (RelationalUtils.Logger.debugEnabled) {
-      def liftLog(log: (String, String) => Unit): String => Unit = log("Reindex status", _: String)
-      def logInfo  = liftLog(RelationalUtils.Logger.logInfo(_, _, Nil: _*))
-      def logDebug = liftLog(RelationalUtils.Logger.logDebug(_, _, Nil: _*))
+    ifDebug {
+      def liftLog(log: String => Unit): String => Unit = m => log(s"Reindex status: $m")
+      def logInfo  = liftLog(info(_))
+      def logDebug = liftLog(debug(_))
       status match {
-        case Status.Stopped                         => logInfo("Stopped" )
-        case Status.Starting(providers)             => logInfo("Starting, will index " + providers.mkString("[", ", ", "]"))
+        case Status.Stopped                         => logInfo("Stopped")
+        case Status.Starting(providers)             => logInfo(s"Starting, will index ${providers.mkString("[", ", ", "]")}")
         case Status.Stopping                        => logInfo("Stopping")
         case Status.Indexing(provider, providerCount, maybeDocumentCount) =>
           def providerInfo = s"$provider ${providerCount.current}/${providerCount.total}"

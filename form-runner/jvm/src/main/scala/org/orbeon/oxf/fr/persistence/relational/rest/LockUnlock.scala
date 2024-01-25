@@ -21,7 +21,7 @@ import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{ContentTypes, NetUtils}
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, NetUtils}
 
 import java.sql.Connection
 import scala.util.Try
@@ -31,7 +31,11 @@ trait LockUnlock {
 
   import Private._
 
-  def lock(req: LockUnlockRequest)(implicit httpResponse: ExternalContext.Response): Unit = {
+  def lock(
+    req           : LockUnlockRequest
+  )(implicit
+    httpResponse  : ExternalContext.Response,
+    indentedLogger: IndentedLogger): Unit = {
     import LeaseStatus._
     val timeout = readTimeoutFromHeader
     readLeaseStatus(req) { (connection, leaseStatus, dataPart, reqLockInfo) =>
@@ -46,7 +50,11 @@ trait LockUnlock {
     }
   }
 
-  def unlock(req: LockUnlockRequest)(implicit httpResponse: ExternalContext.Response): Unit = {
+  def unlock(
+    req           : LockUnlockRequest
+  )(implicit
+    httpResponse  : ExternalContext.Response,
+    indentedLogger: IndentedLogger): Unit = {
     import LeaseStatus._
     readLeaseStatus(req) { (connection, leaseStatus, dataPart, _) =>
       leaseStatus match {
@@ -89,8 +97,10 @@ trait LockUnlock {
     }
 
     def readLeaseStatus(
-      req   : LockUnlockRequest)(
-      thunk : (Connection, LeaseStatus, DataPart, LockInfo) => Unit
+      req           : LockUnlockRequest)(
+      thunk         : (Connection, LeaseStatus, DataPart, LockInfo) => Unit
+    )(implicit
+      indentedLogger: IndentedLogger
     ): Unit = {
 
       import LeaseStatus._

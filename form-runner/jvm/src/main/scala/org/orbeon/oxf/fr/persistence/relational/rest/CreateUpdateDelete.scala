@@ -28,7 +28,7 @@ import org.orbeon.oxf.pipeline.api.{PipelineContext, TransformerXMLReceiver}
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.{DateUtils, NetUtils, Whitespace, XPath}
+import org.orbeon.oxf.util.{DateUtils, IndentedLogger, NetUtils, Whitespace, XPath}
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
@@ -414,7 +414,13 @@ trait CreateUpdateDelete {
     lastModifiedOpt
   }
 
-  def change(req: CrudRequest, delete: Boolean)(implicit httpResponse: ExternalContext.Response): Unit = {
+  def change(
+    req           : CrudRequest,
+    delete        : Boolean
+  )(implicit
+    httpResponse  : ExternalContext.Response,
+    indentedLogger: IndentedLogger
+  ): Unit = {
 
     debug("CRUD: handling change request", List("delete" -> delete.toString, "request" -> req.toString))
 

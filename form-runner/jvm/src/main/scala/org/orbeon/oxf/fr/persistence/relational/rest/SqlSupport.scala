@@ -16,14 +16,11 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import org.orbeon.oxf.externalcontext.{Organization, UserAndGroup}
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IndentedLogger
 
 import java.sql.{PreparedStatement, Timestamp}
 
 
 object SqlSupport {
-
-  implicit val Logger: IndentedLogger = RelationalUtils.Logger
 
   def tableName(request: CrudRequest, master: Boolean = false): String =
     Seq(

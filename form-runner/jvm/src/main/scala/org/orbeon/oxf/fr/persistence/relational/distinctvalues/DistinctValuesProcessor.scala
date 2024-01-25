@@ -14,12 +14,13 @@
 package org.orbeon.oxf.fr.persistence.relational.distinctvalues
 
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorOutput}
-import org.orbeon.oxf.util.{NetUtils, XPath}
+import org.orbeon.oxf.util.{IndentedLogger, NetUtils, XPath}
 import org.orbeon.oxf.xml.XMLReceiver
 
 
@@ -40,6 +41,8 @@ class DistinctValuesProcessor
     addOutput(
       name, new CacheableTransformerOutputImpl(self, name) {
         def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
+
+          implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
 
           val document = readInputAsTinyTree(
             pipelineContext,

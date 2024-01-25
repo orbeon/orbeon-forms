@@ -17,23 +17,28 @@ import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization
 import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt.DistinctValuesRequest
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SimplePath._
 
 
-trait DistinctValuesRequestParser { this: DistinctValuesProcessor =>
+trait DistinctValuesRequestParser {
+
+  this: DistinctValuesProcessor =>
 
   private val DistinctValuesPath = "/fr/service/([^/]+)/distinct-values/([^/]+)/([^/]+)".r
 
+  def parseRequest(
+    document      : DocumentInfo,
+    version       : SearchVersion
+  )(implicit
+    indentedLogger: IndentedLogger
+  ): DistinctValuesRequest = {
 
-  def parseRequest(document: DocumentInfo, version: SearchVersion): DistinctValuesRequest = {
-
-    if (Logger.debugEnabled) {
-      Logger.logDebug("distinct values request", TransformerUtils.tinyTreeToString(document))
-    }
+    debug(s"distinct values request:\n${TransformerUtils.tinyTreeToString(document)}")
 
     httpRequest.getRequestPath match {
       case DistinctValuesPath(providerName, app, form) =>

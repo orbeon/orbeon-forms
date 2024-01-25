@@ -30,6 +30,7 @@ class ReindexProcessor extends ProcessorImpl {
   private val ReindexPathRegex    = """/fr/service/([^/]+)/reindex""".r
 
   override def start(pipelineContext: PipelineContext): Unit = {
+    implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
     val ReindexPathRegex(providerToken) = NetUtils.getExternalContext.getRequest.getRequestPath
     RelationalUtils.withConnection(Index.reindex(Provider.withName(providerToken), _, WhatToReindex.AllData))
   }

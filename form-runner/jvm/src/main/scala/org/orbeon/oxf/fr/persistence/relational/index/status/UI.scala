@@ -16,24 +16,30 @@ package org.orbeon.oxf.fr.persistence.relational.index.status
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.util.DateUtils
 
-// Functions called by UI
 
+// Functions called by UI
 object UI {
 
+  //@XPathFunction
   def status : String = {
-    RelationalUtils.Logger.logDebug("Reindex status read from UI", StatusStore.getStatus.name)
+    RelationalUtils.Logger.debug(s"Reindex status read from UI: ${StatusStore.getStatus.name}")
     val lastModified = DateUtils.formatIsoDateTimeUtc(StatusStore.getLastModified.getTime)
     val statusName   = StatusStore.getStatus.name
     s"$lastModified $statusName"
   }
 
-  def stop() : Unit   = StatusStore.setStatus(Status.Stopping)
+  //@XPathFunction
+  def stop() : Unit   = StatusStore.setStatus(Status.Stopping)(RelationalUtils.newIndentedLogger)
 
-  def getProviderToken   = Some(StatusStore.getStatus).collect{case Status.Indexing(p, _, _) => p               }.getOrElse("")
-  def getProviderCurrent = Some(StatusStore.getStatus).collect{case Status.Indexing(_, c, _) => c.current       }.getOrElse(0)
-  def getProviderTotal   = Some(StatusStore.getStatus).collect{case Status.Indexing(_, c, _) => c.total         }.getOrElse(0)
-  def getDocumentCurrent = Some(StatusStore.getStatus).collect{case Status.Indexing(_, _, Some(d)) => d.current }.getOrElse(0)
-  def getDocumentTotal   = Some(StatusStore.getStatus).collect{case Status.Indexing(_, _, Some(d)) => d.total   }.getOrElse(0)
-
+  //@XPathFunction
+  def getProviderToken  : String = Some(StatusStore.getStatus).collect{case Status.Indexing(p, _, _) => p               }.getOrElse("")
+  //@XPathFunction
+  def getProviderCurrent: Int    = Some(StatusStore.getStatus).collect{case Status.Indexing(_, c, _) => c.current       }.getOrElse(0)
+  //@XPathFunction
+  def getProviderTotal  : Int    = Some(StatusStore.getStatus).collect{case Status.Indexing(_, c, _) => c.total         }.getOrElse(0)
+  //@XPathFunction
+  def getDocumentCurrent: Int    = Some(StatusStore.getStatus).collect{case Status.Indexing(_, _, Some(d)) => d.current }.getOrElse(0)
+  //@XPathFunction
+  def getDocumentTotal  : Int    = Some(StatusStore.getStatus).collect{case Status.Indexing(_, _, Some(d)) => d.total   }.getOrElse(0)
 }
 

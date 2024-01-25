@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{ContentTypes, DateUtils, NetUtils}
+import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger, NetUtils}
 
 import java.io.{ByteArrayInputStream, StringReader}
 import java.sql.Timestamp
@@ -32,7 +32,13 @@ import scala.annotation.tailrec
 
 trait Read {
 
-  def getOrHead(req: CrudRequest, method: HttpMethod)(implicit httpResponse: ExternalContext.Response): Unit = {
+  def getOrHead(
+    req           : CrudRequest,
+    method        : HttpMethod
+  )(implicit
+    httpResponse  : ExternalContext.Response,
+    indentedLogger: IndentedLogger
+  ): Unit = {
 
     val hasStage = req.forData && ! req.forAttachment
     val readBody = method == HttpMethod.GET
@@ -80,6 +86,8 @@ trait Read {
     headersSet    : Boolean,
     hasStage      : Boolean,
     bodyContentOpt: Option[BodyContent]
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Unit = {
     val partialBinaryMaxLength = Provider.partialBinaryMaxLength(req.provider)
 
@@ -187,6 +195,8 @@ trait Read {
     hasStage               : Boolean,
     readTotalAttachmentSize: Boolean,
     bodyContentOpt         : Option[BodyContent]
+  )(implicit
+    indentedLogger         : IndentedLogger
   ): FromDatabase = RelationalUtils.withConnection { connection =>
     val sql = {
       val table  = SqlSupport.tableName(req)

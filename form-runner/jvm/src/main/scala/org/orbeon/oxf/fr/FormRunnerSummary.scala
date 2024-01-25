@@ -22,7 +22,7 @@ import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, PathUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
@@ -72,13 +72,15 @@ trait FormRunnerSummary {
       .orNull
 
   //@XPathFunction
-  def searchableValues(formDoc: DocumentInfo, app: String, form: String, version: Int): NodeInfo =
+  def searchableValues(formDoc: DocumentInfo, app: String, form: String, version: Int): NodeInfo = {
+    implicit val indentedLogger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("form-runner")
     Index.searchableValues(
       formDoc,
       AppForm(app, form),
       Some(version),
       FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
     ).toXML
+  }
 
   //@XPathFunction
   def duplicate(
@@ -97,6 +99,7 @@ trait FormRunnerSummary {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait                      = CoreCrossPlatformSupport
     implicit val connectionCtx           : Option[ConnectionContextSupport.ConnectionContext] = ConnectionContextSupport.getContext(Map.empty)
     implicit val xfcd                    : XFormsContainingDocument                           = inScopeContainingDocument
+    implicit val indentedLogger          : IndentedLogger                                     = xfcd.getIndentedLogger("form-runner")
 
     Await.result(
       putWithAttachments(

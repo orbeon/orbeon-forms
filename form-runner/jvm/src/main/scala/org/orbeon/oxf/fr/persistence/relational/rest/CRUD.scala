@@ -17,13 +17,13 @@ import org.orbeon.oxf.controller.Authorizer
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
-import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.Logger
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 
 import java.time.Instant
 import scala.util.{Failure, Success}
@@ -41,8 +41,9 @@ class CRUD
 
   override def start(pipelineContext: PipelineContext): Unit = {
 
-    implicit val httpRequest : ExternalContext.Request = NetUtils.getExternalContext.getRequest
-    implicit val httpResponse: ExternalContext.Response = NetUtils.getExternalContext.getResponse
+    implicit val httpRequest   : ExternalContext.Request = NetUtils.getExternalContext.getRequest
+    implicit val httpResponse  : ExternalContext.Response = NetUtils.getExternalContext.getResponse
+    implicit val indentedLogger: IndentedLogger          = new IndentedLogger(logger)
 
     try {
 
@@ -83,10 +84,14 @@ private object CRUD {
         throw HttpStatusCodeException(StatusCode.BadRequest)
     }
 
-  def getCrudRequest(requestPath: String)(implicit httpRequest: ExternalContext.Request): CrudRequest = {
+  def getCrudRequest(
+    requestPath: String
+  )(implicit
+    httpRequest   : ExternalContext.Request,
+    indentedLogger: IndentedLogger
+  ): CrudRequest = {
 
-    if (Logger.debugEnabled)
-      Logger.logDebug("CRUD", s"receiving request: method = ${httpRequest.getMethod}, path = $requestPath")
+    debug(s"receiving request: method = ${httpRequest.getMethod}, path = $requestPath")
 
     // The persistence proxy must pass a specific version when needed. It is not always needed. For example a `GET` of
     // data doesn't require a version, but a `GET` or a form definition does, and a `PUT` of data does as well as the

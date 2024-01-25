@@ -43,7 +43,7 @@ trait FormDefinition {
     Set[QName](FRDataboundSelect1QName, FRDataboundSelect1SearchQName).map(_.localName)
 
   private          val logger                   = LoggerFactory.createLogger(classOf[FormDefinition])
-  private implicit val indentedLogger           = new IndentedLogger(logger)
+//  private implicit val indentedLogger           = new IndentedLogger(logger)
   private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
   private def withDynamicItems(
@@ -73,6 +73,8 @@ trait FormDefinition {
     appForm                   : AppForm,
     versionOpt                : Option[Int],
     databaseDataFormatVersion : DataFormatVersion
+  )(implicit
+    indentedLogger: IndentedLogger
   ): SearchableValues = {
 
     implicit val ctx = new InDocFormRunnerDocContext(formDoc) {

@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, SearchRequest}
-import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{DateUtils, IndentedLogger}
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.scaxon.NodeConversions
+
 
 trait SearchResult extends SearchRequestParser {
 
@@ -26,6 +27,8 @@ trait SearchResult extends SearchRequestParser {
     documents : List[Document],
     count     : Int,
     receiver  : XMLReceiver
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Unit = {
 
     // Produce XML result
@@ -62,8 +65,7 @@ trait SearchResult extends SearchRequestParser {
         )
       }</documents>
 
-    if (Logger.debugEnabled)
-      Logger.logDebug("search result", documentsElem.toString)
+    debug(s"search result: ${documentsElem.toString}")
 
     NodeConversions.elemToSAX(documentsElem, receiver)
   }

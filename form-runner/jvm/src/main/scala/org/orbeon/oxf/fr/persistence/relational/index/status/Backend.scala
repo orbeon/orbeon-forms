@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index.status
 
+import org.orbeon.oxf.util.IndentedLogger
+
 // Functions called by the backend
 
 object Backend {
@@ -20,6 +22,8 @@ object Backend {
   def reindexingProviders(
     providers     : List[String],
     indexProvider : String => Unit
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Unit = {
     StatusStore.setStatus(Status.Starting(providers))
     providers
@@ -37,18 +41,18 @@ object Backend {
     StatusStore.setStatus(Status.Stopped)
   }
 
-  def setProviderDocumentTotal(total: Int): Unit =
+  def setProviderDocumentTotal(total: Int)(implicit indentedLogger: IndentedLogger): Unit =
     setIndexing(i => Some(i.copy(documentCount = Some(Count(total = total, current = 0)))))
 
-  def setProviderDocumentNext(): Unit =
+  def setProviderDocumentNext()(implicit indentedLogger: IndentedLogger): Unit =
     setDocumentCount(c => c.copy(current = c.current + 1))
 
-  private def setIndexing(setter: Status.Indexing => Option[Status.Indexing]): Unit =
+  private def setIndexing(setter: Status.Indexing => Option[Status.Indexing])(implicit indentedLogger: IndentedLogger): Unit =
     Some(StatusStore.getStatus).collect { case status: Status.Indexing =>
       setter(status).foreach(StatusStore.setStatus)
     }
 
-  private def setDocumentCount(setter: Count => Count): Unit =
+  private def setDocumentCount(setter: Count => Count)(implicit indentedLogger: IndentedLogger): Unit =
     setIndexing(indexing =>
       indexing.documentCount.map { dc =>
         indexing.copy(documentCount = Some(setter(dc)))

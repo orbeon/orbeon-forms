@@ -349,8 +349,6 @@ object FormRunnerPersistence {
 
 trait FormRunnerPersistence {
 
-  private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(FormRunnerPersistence.getClass))
-
   import FormRunnerPersistence._
 
   // Check whether a value correspond to an uploaded file
@@ -615,7 +613,8 @@ trait FormRunnerPersistence {
   )(implicit
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    xfcd                    : XFormsContainingDocument
+    xfcd                    : XFormsContainingDocument,
+    indentedLogger          : IndentedLogger
   ): (URI, Map[String, List[String]]) = {
 
     def rewriteServiceUrl(url: String) =
@@ -662,7 +661,8 @@ trait FormRunnerPersistence {
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
-    xfcd                    : XFormsContainingDocument
+    xfcd                    : XFormsContainingDocument,
+    indentedLogger          : IndentedLogger
   ): IO[AsyncConnectionResult] = {
 
     val customPutHeaders =
@@ -709,7 +709,8 @@ trait FormRunnerPersistence {
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
-    xfcd                    : XFormsContainingDocument
+    xfcd                    : XFormsContainingDocument,
+    indentedLogger          : IndentedLogger
   ): IO[AsyncConnectionResult] = {
 
     val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl)
@@ -735,7 +736,8 @@ trait FormRunnerPersistence {
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
-    xfcd                    : XFormsContainingDocument
+    xfcd                    : XFormsContainingDocument,
+    indentedLogger          : IndentedLogger
   ): IO[AsyncConnectionResult] = {
 
     val customPutHeaders =
@@ -770,7 +772,8 @@ trait FormRunnerPersistence {
   )(implicit
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    xfcd                    : XFormsContainingDocument
+    xfcd                    : XFormsContainingDocument,
+    indentedLogger          : IndentedLogger
   ): ConnectionResult = {
 
     val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl)
@@ -804,7 +807,8 @@ trait FormRunnerPersistence {
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     connectionContext       : Option[ConnectionContextSupport.ConnectionContext],
-    xfcd                    : XFormsContainingDocument
+    xfcd                    : XFormsContainingDocument,
+    indentedLogger          : IndentedLogger
   ): IO[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])] = {
 
     val credentials =
@@ -849,10 +853,10 @@ trait FormRunnerPersistence {
         UrlRewriteMode.Absolute
       )
 
-    // xxx close resources
+    // xxx xxx close resources
     def saveAllAttachmentsStream(implicit
       xfcd             : XFormsContainingDocument,
-      connectionContext: Option[ConnectionContextSupport.ConnectionContext]
+      connectionContext: Option[ConnectionContextSupport.ConnectionContext],
     ): fs2.Stream[IO, AttachmentWithEncryptedAtRest] =
       for {
         AttachmentWithHolder(beforeUrl, migratedHolder)

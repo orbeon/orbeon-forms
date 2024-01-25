@@ -13,16 +13,20 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.distinctvalues
 
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt.DistinctValues
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.scaxon.NodeConversions
+
 
 trait DistinctValuesResult {
 
   def outputResult(
     distinctValues: DistinctValues,
     receiver      : XMLReceiver
+  )(implicit
+    indentedLogger: IndentedLogger
   ): Unit = {
 
     val controlsElems =
@@ -59,8 +63,7 @@ trait DistinctValuesResult {
         ).flatten
       }</distinct-values>
 
-    if (Logger.debugEnabled)
-      Logger.logDebug("distinct values result", controlsElems.toString)
+    debug(s"distinct values result: ${controlsElems.toString}")
 
     NodeConversions.elemToSAX(controlsElems, receiver)
   }

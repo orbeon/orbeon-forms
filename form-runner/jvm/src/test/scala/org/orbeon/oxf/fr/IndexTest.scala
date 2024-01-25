@@ -2,8 +2,9 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.persistence.relational.index.Index
-import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SummarySettings}
+import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, RelationalUtils, SummarySettings}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -14,6 +15,8 @@ class IndexTest
      with AnyFunSpecLike {
 
   describe("The `findIndexedControls` function") {
+
+    implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
 
     val formElem48 =
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"

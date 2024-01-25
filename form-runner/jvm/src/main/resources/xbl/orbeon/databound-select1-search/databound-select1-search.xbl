@@ -328,12 +328,13 @@
 
                 <xf:var name="items"               value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
                 <xf:var name="items-values"        value="$items/xxf:evaluate(instance('local')/value-ref)"/>
-                <xf:var name="current-impossible"  value="xxf:non-blank($binding) and not($items-values = $binding)"/>
+                <xf:var name="current-item"        value="$items[xxf:evaluate(instance('local')/value-ref) = $binding]"/>
+                <xf:var name="current-impossible"  value="xxf:non-blank($binding) and empty($current-item)"/>
+                <xf:var name="current-label"       value="$current-item/xxf:evaluate(instance('local')/label-ref)"/>
                 <xf:var name="unique-choice"       value="count($items) = 1 and xxf:component-param-value('auto-select-unique-choice') = 'true'"/>
                 <xf:var name="unique-choice-value" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/value-ref) else ()"/>
                 <xf:var name="unique-choice-label" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/label-ref) else ()"/>
-                <xf:var name="do-update"           value="$current-impossible or $unique-choice"/>
-
+                <xf:var name="do-update"           value="$current-impossible or $unique-choice or empty($binding/@label)"/>
                 <!-- If only one value is returned, auto-select it -->
                 <xf:action if="$unique-choice">
                     <xf:setvalue ref="$binding"        value="$unique-choice-value"/>
@@ -347,7 +348,12 @@
 
                 <!-- Tell Scala.js about the new label -->
                 <xf:action if="$do-update" type="javascript">
-                    <xf:param name="label" value="if ($unique-choice) then $unique-choice-label else ''"/>
+                    <xf:param
+                        name="label"
+                        value="
+                                 if ($current-impossible) then ''
+                            else if ($unique-choice)      then $unique-choice-label
+                            else                               $current-label"/>
                     <xf:body>
                         var i = ORBEON.xforms.XBL.instanceForControl(this);
                         if (i) i.updateLabel(label);
@@ -437,14 +443,20 @@
                         </xf:model>
                         <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
 
-                        <!-- Detect value of `resource` changing -->
+                        <!--
+                            Update label based on `resource` URL in either one if the following two cases:
+                            1. The control is enabled and the label is empty (the service doesn't perform search)
+                            2. The value of `resource` changes, typically because the value of another control it depends on changed
+                        -->
                         <xf:group xxf:appearance="internal" xxbl:scope="outer">
                             <xf:var name="fr-search-value"/>
                             <xf:var name="fr-search-page"/>
                             <xf:var name="resource-attr"  ><xxf:value xxbl:scope="inner" value="instance('local')/resource-attr"/></xf:var>
                             <xf:var name="resource"                                      value="xxf:evaluate-avt($resource-attr)">
-                                <xf:action event="xforms-value-changed">
-                                    <xf:action xxbl:scope="inner">
+                                <xf:action event="xforms-value-changed xforms-enabled">
+                                    <xf:action xxbl:scope="inner" if="event('xxf:type') != 'xforms-enabled' or empty($binding/@label)">
+                                        <xf:var name="resource"><xxf:value xxbl:scope="outer" value="$resource"/></xf:var>
+                                        <xf:setvalue ref="instance('local')/resource" value="$resource"/>
                                         <xf:action type="javascript">
                                             var i = ORBEON.xforms.XBL.instanceForControl(this);
                                             if (i) i.invalidateCachedItemset();

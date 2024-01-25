@@ -32,6 +32,7 @@ object Loggers {
   // - `XFormsStateManager`       : "state"
   // - `XFormsProcessorBase`      : "html"
   // - `LocalClientServerChannel` : "offline" (single-threaded)
+  // - `XFormsCompiler`           : "compiler"
   def newIndentedLogger(
     category   : String,
     indentation: IndentedLogger.Indentation = new IndentedLogger.Indentation

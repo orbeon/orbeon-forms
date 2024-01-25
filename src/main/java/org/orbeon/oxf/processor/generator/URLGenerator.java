@@ -66,7 +66,6 @@ import java.util.*;
 public class URLGenerator extends ProcessorImpl {
 
     private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(URLGenerator.class);
-    public static IndentedLogger indentedLogger = new IndentedLogger(logger);
 
     public static final boolean DEFAULT_VALIDATING = false;
     public static final boolean DEFAULT_HANDLE_XINCLUDE = false;
@@ -1022,6 +1021,8 @@ public class URLGenerator extends ProcessorImpl {
                 }
 
                 final ExternalContext externalContext = NetUtils.getExternalContext();
+
+                final IndentedLogger indentedLogger = new IndentedLogger(logger);
 
                 final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
                     Connection.jBuildConnectionHeadersCapitalizedIfNeeded(

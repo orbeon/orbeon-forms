@@ -16,9 +16,7 @@ import scala.collection.compat._
 
 trait FormRunnerComponents {
 
-  private val Logger = LoggerFactory.createLogger(FormRunner.getClass)
-  private val indentedLogger: IndentedLogger = new IndentedLogger(Logger)
-  private val DefaultNorewriteSet = Set("fr-lang")
+  import Private._
 
   // In an XPath expression, replace non-local variable references.
   //@XPathFunction
@@ -39,7 +37,7 @@ trait FormRunnerComponents {
           s"$$$name"
         else
           s"frf:controlVariableValue('$name', ${libraryName.trimAllToOpt.map("'" + _ + "'").getOrElse("()")})"
-    )(indentedLogger)
+    )(newIndentedLogger)
 
   //@XPathFunction
   def knownConstraintsToAutomaticHint(
@@ -51,7 +49,7 @@ trait FormRunnerComponents {
         attributeWithXPath.getStringValue,
         Private.namespaceMappingForNode(attributeWithXPath),
         Private.componentsFunctionLibrary
-      )(indentedLogger)
+      )(newIndentedLogger)
     )
 
     def hintResourceXPath(key: String): String =
@@ -103,6 +101,12 @@ trait FormRunnerComponents {
   }
 
   private object Private {
+
+    val Logger = LoggerFactory.createLogger(FormRunner.getClass)
+    val DefaultNorewriteSet = Set("fr-lang")
+
+    def newIndentedLogger: IndentedLogger =
+      new IndentedLogger(Logger)
 
     def namespaceMappingForNode(elemOrAtt: NodeInfo): NamespaceMapping =
       NamespaceMapping(elemOrAtt.namespaceMappings.toMap)

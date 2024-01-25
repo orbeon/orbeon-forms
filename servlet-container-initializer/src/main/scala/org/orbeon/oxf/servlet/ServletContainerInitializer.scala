@@ -153,19 +153,6 @@ trait CommonContainerInitializer {
       mandatoryInitParams = Set.empty
     )
 
-    // Listeners
-
-    registerListener(ctx, "orbeon-servlet-context-listener",      orbeonServletContextListenerClass)
-    // Context listener for deployment with replication
-    registerListener(ctx, "replication-servlet-context-listener", replicationServletContextListenerClass)
-    // XForms session listener
-    registerListener(ctx, "xforms-servlet-context-listener",      xFormsServletContextListenerClass)
-    // General-purpose session listener
-    registerListener(ctx, "orbeon-session-listener",              orbeonSessionListenerClass)
-    // Cache shutdown listener
-    registerListener(ctx, "shutdown-listener",                    shutdownListenerClass)
-
-
     val registrationResult = RegistrationResult.merged(
       Seq(
         mainRegistrationResult,
@@ -178,6 +165,20 @@ trait CommonContainerInitializer {
 
     if (registrationResult.missingInitParams.nonEmpty) {
       logger.error(s"One or more init parameters are missing, please update your web.xml configuration")
+    } else {
+      // If the servlets and filters could be registered correctly, register listeners as well
+
+      // Listeners
+
+      registerListener(ctx, "orbeon-servlet-context-listener",      orbeonServletContextListenerClass)
+      // Context listener for deployment with replication
+      registerListener(ctx, "replication-servlet-context-listener", replicationServletContextListenerClass)
+      // XForms session listener
+      registerListener(ctx, "xforms-servlet-context-listener",      xFormsServletContextListenerClass)
+      // General-purpose session listener
+      registerListener(ctx, "orbeon-session-listener",              orbeonSessionListenerClass)
+      // Cache shutdown listener
+      registerListener(ctx, "shutdown-listener",                    shutdownListenerClass)
     }
   }
 

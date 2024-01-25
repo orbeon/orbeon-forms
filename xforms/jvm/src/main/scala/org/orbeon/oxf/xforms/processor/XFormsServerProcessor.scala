@@ -185,7 +185,7 @@ class XFormsServerProcessor extends ProcessorImpl {
     // Logger used for heartbeat and request/response
     implicit val indentedLogger = Loggers.newIndentedLogger("server")
 
-    val logRequestResponse = XFormsGlobalProperties.getDebugLogging.contains("server-body")
+    val logRequestResponse = Loggers.isDebugEnabled("server-body")
 
     if (logRequestResponse)
       debug("ajax request", List("body" -> requestDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))

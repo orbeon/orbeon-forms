@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.submission.SubmissionParameters.createRefContext
 import org.orbeon.oxf.xforms.submission.SubmissionUtils.convertConnectResult
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionSupport.{isSatisfiesValidity, prepareXML, requestedSerialization}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
+import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsError}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{RelevanceHandling, XFormsId}
@@ -63,7 +63,7 @@ object XFormsModelSubmission {
       indentedLogger
     }
 
-  private def isLogDetails = XFormsGlobalProperties.getDebugLogging.contains("submission-details")
+  private def isLogDetails = Loggers.isDebugEnabled("submission-details")
 
   private val AllowedExternalEvents = Set(XFormsEvents.XXFORMS_SUBMIT)
 }

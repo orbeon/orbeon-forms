@@ -646,6 +646,6 @@ object Controls {
 
   // Log a subtree of controls as XML
   private def logTreeIfNeeded(message: String)(control: XFormsControl): Unit =
-    if (XFormsGlobalProperties.getDebugLogging.contains("control-tree"))
+    if (Loggers.isDebugEnabled("control-tree"))
       control.containingDocument.controls.indentedLogger.logDebug(message, ControlsDebugSupport.controlTreeAsXmlString(control))
 }

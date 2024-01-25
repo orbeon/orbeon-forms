@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.{lang => jl}
 import cats.syntax.option._
-
-import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.Document
 import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.util.CoreUtils._
@@ -27,6 +24,9 @@ import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.xforms.XXBLScope
+
+import java.{lang => jl}
+import javax.xml.transform.stream.StreamResult
 
 
 class StaticStateBits(
@@ -46,7 +46,7 @@ object StaticStateBits {
   ): StaticStateBits =
     withDebug("reading input", List("existing digest" -> existingStaticStateDigest.orNull)) {
 
-      val isLogStaticStateInput = XFormsGlobalProperties.getDebugLogging.contains("html-static-state")
+      val isLogStaticStateInput = Loggers.isDebugEnabled("html-static-state")
 
       val existingStaticStateDigestOrReceiver =
         (if (isLogStaticStateInput) None else existingStaticStateDigest).toLeft(new DigestContentHandler)

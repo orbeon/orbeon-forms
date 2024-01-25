@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, WhitespaceMatching}
-import org.orbeon.oxf.xforms.XFormsGlobalProperties
+import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -162,7 +162,7 @@ object XBLBindingBuilder {
 
   private object Private {
 
-    val logShadowTrees = XFormsGlobalProperties.getDebugLogging.contains("analysis-xbl-tree")
+    val logShadowTrees = Loggers.isDebugEnabled("analysis-xbl-tree")
 
     // Generate raw (non-annotated) shadow content for the given control id and XBL binding.
     def generateRawShadowTree(

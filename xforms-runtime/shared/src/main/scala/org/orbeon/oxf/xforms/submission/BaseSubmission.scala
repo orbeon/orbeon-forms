@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
-import org.orbeon.oxf.xforms.XFormsGlobalProperties
+import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.xforms.{UrlType, XFormsCrossPlatformSupport}
 
 
@@ -63,5 +63,5 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
 
 object BaseSubmission {
   def isLogBody: Boolean =
-    XFormsGlobalProperties.getDebugLogging.contains("submission-body")
+    Loggers.isDebugEnabled("submission-body")
 }

@@ -13,18 +13,16 @@
  */
 package org.orbeon.oxf.util
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, OutputStream}
-import java.util.zip.{Deflater, GZIPInputStream, GZIPOutputStream}
-
 import org.apache.commons.pool.BasePoolableObjectFactory
-import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.IOUtils
 
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, OutputStream}
+import java.util.zip.{Deflater, GZIPInputStream, GZIPOutputStream}
 import scala.util.control.NonFatal
 
-object Compressor extends Logging {
+object Compressor {
 
-  private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(getClass))
+  private val Logger = LoggerFactory.createLogger(getClass)
 
   // Use a Deflater pool as creating deflaters is expensive
   private val deflaterPool = new SoftReferenceObjectPool(new DeflaterPoolableObjectFactory)
@@ -49,7 +47,8 @@ object Compressor extends Logging {
 
   // Compress using BEST_SPEED as serializing state quickly has been determined to be more important than saving extra
   // memory. Even this way compression typically is more than 10X.
-  def compressBytes(bytesToEncode: Array[Byte]): Array[Byte] = compressBytes(bytesToEncode, Deflater.BEST_SPEED)
+  def compressBytes(bytesToEncode: Array[Byte]): Array[Byte] =
+    compressBytes(bytesToEncode, Deflater.BEST_SPEED)
 
   // Example of effective compression ratios and speeds for XML inputs:
   //
@@ -73,15 +72,18 @@ object Compressor extends Logging {
 
   def compressBytesMeasurePerformance(bytesToEncode: Array[Byte]): Array[Byte] = {
 
+    implicit val indentedLogger: IndentedLogger = new IndentedLogger(Logger)
+    import org.orbeon.oxf.util.Logging._
+
     val settings = Map(
-      Deflater.BEST_SPEED          -> "BEST_SPEED",
-      Deflater.DEFAULT_COMPRESSION -> "DEFAULT_COMPRESSION",
-      Deflater.BEST_COMPRESSION    -> "BEST_COMPRESSION"
+    Deflater.BEST_SPEED          -> "BEST_SPEED",
+    Deflater.DEFAULT_COMPRESSION -> "DEFAULT_COMPRESSION",
+    Deflater.BEST_COMPRESSION    -> "BEST_COMPRESSION"
     )
 
     for ((level, description) <- settings)
       withDebug(description) {
-        for (v <- 1 to 100)
+        for (_ <- 1 to 100)
           compressBytes(bytesToEncode, level)
       }
 
@@ -97,17 +99,18 @@ object Compressor extends Logging {
 
   private class DeflaterPoolableObjectFactory extends BasePoolableObjectFactory[Deflater] {
 
-    def makeObject = {
-      debug("creating new Deflater")
+    def makeObject: Deflater = {
+      Logger.debug("creating new Deflater")
       // Use BEST_SPEED as profiler shows that DEFAULT_COMPRESSION is slower
       new Deflater(Deflater.BEST_SPEED, true)
     }
 
     override def passivateObject(o: Deflater): Unit =
-      try o.reset()
+      try
+        o.reset()
       catch {
         case NonFatal(t) =>
-          error("exception while passivating Deflater", Seq("throwable" -> OrbeonFormatter.format(t)))
+          Logger.error(t)("exception while passivating `Deflater`")
       }
   }
 

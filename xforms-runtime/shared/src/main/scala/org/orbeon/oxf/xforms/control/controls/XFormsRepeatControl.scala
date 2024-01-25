@@ -19,6 +19,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils.InsertPosition
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
@@ -40,6 +41,7 @@ import java.{util => ju}
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.collection.{mutable => m}
 import scala.jdk.CollectionConverters._
+
 
 // Represents an xf:repeat container control.
 class XFormsRepeatControl(

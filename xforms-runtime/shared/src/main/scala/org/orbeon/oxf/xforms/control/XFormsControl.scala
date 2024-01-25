@@ -19,8 +19,8 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.rewrite.Rewrite
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysis, WithChildrenTrait}
@@ -57,8 +57,7 @@ class XFormsControl(
      with ControlEventSupport
      with ControlBindingSupport
      with XFormsEventTarget
-     with MaybeFocusableTrait
-     with Logging {
+     with MaybeFocusableTrait {
 
   self =>
 

@@ -31,6 +31,7 @@ import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
 import org.orbeon.oxf.processor.serializer.{BinaryTextXMLReceiver, HttpSerializerBase}
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -49,7 +50,7 @@ import scala.util.control.NonFatal
 /**
  * The PDF Template processor reads a PDF template and performs textual annotations on it.
  */
-class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: HttpBinarySerializer is deprecated
+class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySerializer is deprecated
 
   addInputInfo(new ProcessorInputOutputInfo("model", PDFTemplateModelNamespaceURI))
   addInputInfo(new ProcessorInputOutputInfo("data"))

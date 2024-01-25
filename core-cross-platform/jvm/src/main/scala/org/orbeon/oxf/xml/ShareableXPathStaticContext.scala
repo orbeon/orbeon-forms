@@ -1,9 +1,7 @@
 package org.orbeon.oxf.xml
 
-import java.{util => ju}
-
-import javax.xml.transform.{Source, SourceLocator}
-import org.orbeon.oxf.util.{IndentedLogger, Logging, StaticXPath}
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
@@ -13,7 +11,10 @@ import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.{QNameValue, SequenceType}
 import org.orbeon.xml.NamespaceMapping
 
+import java.{util => ju}
+import javax.xml.transform.{Source, SourceLocator}
 import scala.jdk.CollectionConverters._
+
 
 // Similar to Saxon JAXPXPathStaticContext. JAXPXPathStaticContext holds a reference to an XPathVariableResolver, which
 // is not desirable as variable resolution occurs at runtime. So here instead we create a fully shareable context.
@@ -23,8 +24,7 @@ class ShareableXPathStaticContext(
   functionLibrary  : FunctionLibrary)(implicit
   logger           : IndentedLogger
 ) extends AbstractStaticContext
-   with XPathStaticContext
-   with Logging {
+   with XPathStaticContext {
 
   // This also creates an Executable
   setConfiguration(config)

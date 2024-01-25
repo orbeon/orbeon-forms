@@ -14,19 +14,21 @@
 package org.orbeon.oxf.fr.persistence.test
 
 import org.junit.Test
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.scalatestplus.junit.AssertionsForJUnit
+
 
 /**
  * Test the DDL we provide to create and update databases.
  */
-class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Logging {
+class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[DDLTest]), true)
 

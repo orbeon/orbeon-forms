@@ -19,6 +19,7 @@ import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.Connection.isInternalPath
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.InstanceLoader
@@ -112,8 +113,7 @@ class XFormsInstance(
   var valid                   : Boolean                   // whether instance was valid as of the last revalidation
 ) extends ListenersTrait
   with XFormsInstanceIndex
-  with XFormsEventTarget
-  with Logging {
+  with XFormsEventTarget {
 
   require(! (_readonly && _documentInfo.isInstanceOf[VirtualNodeType]))
 

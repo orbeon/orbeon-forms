@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{PathUtils, URLRewriterUtils}
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
@@ -33,6 +34,7 @@ import org.xml.sax.helpers.AttributesImpl
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+
 
 /**
  * Represents an xf:output control.

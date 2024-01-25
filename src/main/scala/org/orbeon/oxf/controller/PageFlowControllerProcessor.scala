@@ -31,6 +31,7 @@ import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.resources.ResourceNotFoundException
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.util._
@@ -44,7 +45,7 @@ import scala.util.control.NonFatal
 
 
 // Orbeon Forms application controller
-class PageFlowControllerProcessor extends ProcessorImpl with Logging {
+class PageFlowControllerProcessor extends ProcessorImpl {
 
   import PageFlowControllerBuilder._
   import PageFlowControllerProcessor._
@@ -543,7 +544,7 @@ object PageFlowControllerProcessor {
     ): Unit
   }
 
-  case class FileRoute(routeElement: FileElement) extends Route with Logging {
+  case class FileRoute(routeElement: FileElement) extends Route {
     // Serve a file by path
     def process(
       pc            : PipelineContext,
@@ -564,7 +565,7 @@ object PageFlowControllerProcessor {
     routeElement    : PageOrServiceElement,
     compile         : PageOrServiceElement => PipelineConfig)(implicit
     val propertySet : PropertySet
-  ) extends Route with Authorization with Logging {
+  ) extends Route with Authorization {
 
     val isPage    = routeElement.isPage
     val isService = ! isPage

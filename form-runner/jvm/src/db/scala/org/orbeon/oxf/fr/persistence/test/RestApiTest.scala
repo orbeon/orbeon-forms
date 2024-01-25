@@ -31,7 +31,7 @@ import org.orbeon.oxf.fr.{AppForm, FormOrData}
 import org.orbeon.oxf.http.{HttpRange, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Logging}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatest.funspec.AnyFunSpecLike
@@ -53,8 +53,7 @@ class RestApiTest
      with AnyFunSpecLike
      with ResourceManagerSupport
      with XMLSupport
-     with XFormsSupport
-     with Logging {
+     with XFormsSupport {
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
   private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport

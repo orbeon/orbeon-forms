@@ -15,7 +15,8 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.{IndentedLogger, Logging}
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
@@ -27,14 +28,13 @@ import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
-import org.w3c.dom.Node._
 
 import scala.collection.{mutable => m}
 
 
 class PathMapXPathDependencies(
   containingDocument: XFormsContainingDocument
-) extends XPathDependencies with Logging {
+) extends XPathDependencies {
 
   import PathMapXPathDependencies._
 

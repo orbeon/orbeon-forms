@@ -19,11 +19,11 @@ import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Logging, NetUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, NetUtils}
 import org.scalatestplus.junit.AssertionsForJUnit
 
 
-class LockUnlockTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
+class LockUnlockTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport {
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[LockUnlockTest]), true)
   private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport

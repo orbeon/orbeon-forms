@@ -13,10 +13,6 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import java.awt.image._
-import java.io.{File, OutputStream}
-import javax.imageio.{IIOImage, ImageIO, ImageTypeSpecifier, ImageWriteParam}
-
 import cats.syntax.option._
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.icepdf.core.pobjects.{Page, Document => ICEDocument}
@@ -33,6 +29,9 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.XMLReceiver
 
+import java.awt.image._
+import java.io.{File, OutputStream}
+import javax.imageio.{IIOImage, ImageIO, ImageTypeSpecifier, ImageWriteParam}
 import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 
@@ -51,7 +50,7 @@ import scala.jdk.CollectionConverters._
 //
 // In the future one could imagine the processor producing a sequence of images as well, which could then be
 // combined into a ZIP file for example.
-class PDFToImageProcessor extends ProcessorImpl with Logging {
+class PDFToImageProcessor extends ProcessorImpl {
 
   import PDFToImage._
 

@@ -15,15 +15,16 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.xforms.XFormsNames.SUBMISSION_QNAME
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.event.XFormsEvents.DOM_ACTIVATE
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.xforms.XFormsNames.SUBMISSION_QNAME
+
 
 /**
  * xf:submit control.

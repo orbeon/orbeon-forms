@@ -22,7 +22,7 @@ import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinato
 import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, Logging, XPath}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
@@ -48,8 +48,7 @@ import scala.util.{Failure, Success, Try}
 trait SimpleProcessCommon
   extends ProcessInterpreter
      with FormRunnerActionsCommon
-     with XFormsActions
-     with Logging {
+     with XFormsActions {
 
   def AllowedFormRunnerActions: Map[String, Action]
 

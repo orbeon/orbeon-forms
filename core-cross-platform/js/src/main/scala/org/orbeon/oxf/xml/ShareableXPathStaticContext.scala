@@ -1,7 +1,8 @@
 package org.orbeon.oxf.xml
 
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.VariableResolver
-import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.saxon.expr.Expression.ITERATE_METHOD
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.expr.instruct.SlotManager
@@ -30,8 +31,7 @@ class ShareableXPathStaticContext(
   functionLibrary  : FunctionLibrary)(implicit
   logger           : IndentedLogger
 ) extends AbstractStaticContext
-   with XPathStaticContext
-   with Logging {
+   with XPathStaticContext {
 
   // Primary constructor
   locally {

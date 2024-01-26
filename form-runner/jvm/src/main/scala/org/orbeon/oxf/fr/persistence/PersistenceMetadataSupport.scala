@@ -3,11 +3,11 @@ package org.orbeon.oxf.fr.persistence
 import cats.Eval
 import org.orbeon.oxf.cache.{CacheApi, CacheSupport}
 import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.permission.{Operation, Permission, Permissions, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
 import org.orbeon.oxf.fr.persistence.relational.EncryptionAndIndexDetails
 import org.orbeon.oxf.fr.persistence.relational.index.Index
-import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunnerPersistence, Names}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
@@ -87,6 +87,31 @@ object PersistenceMetadataSupport {
       .flatMap(_.firstChildOpt(Names.FormVersion))
       .map(_.getStringValue.toInt)
   }
+
+  def isInternalAdminUser(requestParam: String => Option[String]): Boolean =
+    requestParam(FormRunner.InternalAdminTokenParam)
+      .exists(param =>
+        FormRunnerAdminToken.decryptTokenPayloadCheckExpiration((), param)
+          .getOrElse(throw new IllegalArgumentException)
+      )
+
+  def readFormPermissionsMaybeWithAdminSupport(
+    isInternalAdminUser: Boolean,
+    appForm            : AppForm,
+    version            : FormDefinitionVersion
+  ): Permissions =
+    // TODO: Check possible optimization above to avoid retrieving form permissions twice.
+    // TODO: Check if/why we are not using the caching mechanism.
+    (
+      if (isInternalAdminUser)
+        Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Operation.Read)))))
+      else
+        FormRunner.permissionsFromElemOrProperties(
+          readFormPermissions(appForm, version),
+          appForm
+        )
+    ) |!>
+      (formPermissions => debug("CRUD: form permissions", List("permissions" -> formPermissions.toString)))
 
   def readFormPermissions(appForm: AppForm, version: FormDefinitionVersion): Option[NodeInfo] = {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport

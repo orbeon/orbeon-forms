@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider, RelationalUtils}
 import org.orbeon.oxf.fr.persistence.{PersistenceMetadataSupport, SearchVersion}
-import org.orbeon.oxf.util.{DateUtils, NetUtils}
+import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
@@ -131,12 +131,13 @@ trait SearchRequestParser {
           }
 
         SearchRequest(
-          provider       = Provider.withName(provider),
-          appForm        = appForm,
-          version        = version,
-          credentials    = credentials,
-          pageSize       = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-size"),  10),
-          pageNumber     = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-number"), 1),
+          provider            = Provider.withName(provider),
+          appForm             = appForm,
+          version             = version,
+          credentials         = credentials,
+          isInternalAdminUser = PersistenceMetadataSupport.isInternalAdminUser(httpRequest.getFirstParamAsString),
+          pageSize            = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-size"),  10),
+          pageNumber          = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-number"), 1),
           orderBy             = orderBy,
           createdGteOpt       = instant  ("created-gte"),
           createdLtOpt        = instant  ("created-lt"),
@@ -146,8 +147,8 @@ trait SearchRequestParser {
           lastModifiedBy      = stringSet("last-modified-by"),
           workflowStage       = stringSet("workflow-stage"),
           freeTextSearch      = freeTextElOpt.map(_.stringValue).flatMap(trimAllToOpt), // Blank means no search
-          controls       = controls,
-          drafts         =
+          controls            = controls,
+          drafts              =
             credentials match {
               case None =>
                 ExcludeDrafts

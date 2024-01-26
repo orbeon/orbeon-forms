@@ -3,18 +3,37 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.permission.{Operation, Operations}
 
 
-trait FormRunnerAccessTokenTrait {
+trait FormRunnerAccessTokenTrait extends FormRunnerTokenTrait {
 
-  case class TokenHmac(
-    app     : String,
-    form    : String,
-    version : Int,
-    document: Option[String]
-  )
+  def encryptToken(
+    app        : String,
+    form       : String,
+    version    : Int,
+    documentOpt: Option[String],
+    validity   : java.time.Duration,
+    operations : Set[Operation]
+  ): Option[String]
+
+  type TokenPayloadType = List[Operation]
+}
+
+trait FormRunnerAdminTokenTrait extends FormRunnerTokenTrait {
+
+  def encryptToken(
+    validity           : java.time.Duration,
+    isInternalAdminUser: TokenPayloadType
+  ): Option[String]
+
+  type TokenPayloadType = Boolean
+}
+
+trait FormRunnerTokenTrait {
+
+  type TokenPayloadType
 
   case class TokenPayload(
     exp: java.time.Instant, // keep `exp` short for serialization
-    ops: List[Operation]    // keep `ops` short for serialization
+    ops: TokenPayloadType   // keep `ops` short for serialization
   )
 }
 

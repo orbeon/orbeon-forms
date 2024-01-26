@@ -152,26 +152,6 @@ object PermissionsAuthorization {
     }
   }
 
-  // If we call this, it means that we don't have access based on `Anyone`, `AnyAuthenticatedUser`, `Owner`, roles,
-  // etc. We are just testing for `AnyoneWithToken`.
-  def operationsFromToken(
-    definedPermissions: Permissions.Defined,
-    token             : String,
-    tokenHmac         : FormRunnerAccessToken.TokenHmac
-  ): Try[Operations] =
-    FormRunnerAccessToken.decryptToken(tokenHmac, token) map { tokenPayload =>
-      if (tokenPayload.exp.isAfter(java.time.Instant.now)) {
-        Operations.combine(
-          definedPermissions.permissionsList collect {
-            case permission if permission.conditions.contains(Condition.AnyoneWithToken) =>
-              SpecificOperations(permission.operations.operations.intersect(tokenPayload.ops.toSet))
-          }
-        )
-      } else {
-        throw HttpStatusCodeException(StatusCode.Forbidden)
-      }
-    }
-
   def possiblyAllowedTokenOperations(permissions: Permissions, authorizedOperationsOpt: Option[Set[Operation]]): Operations =
     (permissions, authorizedOperationsOpt) match {
       case (Permissions.Undefined, _) =>

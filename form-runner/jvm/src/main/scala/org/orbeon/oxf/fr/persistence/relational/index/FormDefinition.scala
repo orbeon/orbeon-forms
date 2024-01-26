@@ -18,7 +18,6 @@ import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
-import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.api.PersistenceApiTrait
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SearchableValues, SummarySettings}
 import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunner, InDocFormRunnerDocContext}

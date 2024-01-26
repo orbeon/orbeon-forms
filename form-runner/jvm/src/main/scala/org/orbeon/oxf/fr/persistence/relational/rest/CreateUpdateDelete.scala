@@ -346,7 +346,7 @@ trait CreateUpdateDelete {
         // 2. In `Reindex.scala`:
         //   2.1. 1st,   we read       from    orbeon_form_data                       (get data to index)
         //   2.2. 2nd,   we write      to      orbeon_i_current/orbeon_i_control_text (update the index)
-        // This can lease to a deadlock, hence here doing a commit after deleting the drafts.
+        // This can lead to a deadlock, hence here doing a commit after deleting the drafts.
         // The downside is that if writing the data (1.2) fails, with the commit we'll have lost the draft, which seems negligible.
         connection.commit()
 

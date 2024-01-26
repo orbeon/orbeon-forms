@@ -71,6 +71,13 @@
                     <xsl:variable
                         name="has-multiple-choices"
                         select="count(fr:positive-choice | fr:negative-choice | fr:neutral-choice) > 1"/>
+                    <!-- Clean this and document -->
+                    <xsl:variable
+                        name="warning"
+                        select="@warning = 'true'"/>
+                    <xsl:variable
+                        name="icon"
+                        select="if ($warning) then 'warning' else if ($has-multiple-choices) then 'question' else 'info'"/>
 
                     <!-- Once AVTs are supported: close="{exists(fr:neutral-choice) and not ($has-multiple-choices)}"  -->
                     <xxf:dialog
@@ -78,7 +85,7 @@
                         level="modal"
                         appearance="full"
                         close="{(@close, 'false')[1]}"
-                        class="xbl-fr-alert-dialog xbl-fr-alert-dialog-{if ($has-multiple-choices) then 'question' else 'info'}">
+                        class="xbl-fr-alert-dialog xbl-fr-alert-dialog-{$icon}">
 
                         <xf:var name="local" value="instance()"/>
 

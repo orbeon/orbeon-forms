@@ -37,7 +37,7 @@ import scala.collection.mutable
 
 object SearchLogic {
 
-  // TODO: The methods below are used by the search API, but also by the distinct values API. Should we leave  them
+  // TODO: The methods below are used by the search API, but also by the distinct values API. Should we leave them
   //  here, as they're more closely associated with the search API, or move them elsewhere (e.g. in the parent package),
   //  in which case some classes/methods should be renamed (SearchVersion, SearchPermissions, doSearch, etc.)?
 
@@ -54,9 +54,14 @@ object SearchLogic {
     version         : FormDefinitionVersion
   ): SearchPermissions = {
 
-    val searchOperations     = request.anyOfOperations.getOrElse(SearchOps.SearchOperations)
-    val formPermissionsElOpt = PersistenceMetadataSupport.readFormPermissions(request.appForm, version)
-    val formPermissions      = FormRunner.permissionsFromElemOrProperties(formPermissionsElOpt, request.appForm)
+    val searchOperations = request.anyOfOperations.getOrElse(SearchOps.SearchOperations)
+
+    val formPermissions =
+      PersistenceMetadataSupport.readFormPermissionsMaybeWithAdminSupport(
+        request.isInternalAdminUser,
+        request.appForm,
+        version
+      )
 
     SearchPermissions(
       formPermissions,

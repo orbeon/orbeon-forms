@@ -1,17 +1,18 @@
 package org.orbeon.oxf.fr.persistence.proxy
 
 import org.orbeon.oxf.externalcontext.{Credentials, Organization, UserAndGroup}
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, FormRunnerAccessToken}
+import org.orbeon.oxf.fr.FormRunnerAccessToken
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization._
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.{StageHeader, Version}
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.debug
 import shapeless.syntax.typeable.typeableOps
+
+import scala.util.Try
 
 
 object PersistenceProxyPermissions {
@@ -23,35 +24,7 @@ object PersistenceProxyPermissions {
     stage        : Option[String]
   )
 
-  def permissionCheck(
-    appFormVersion    : AppFormVersion,
-    method            : HttpMethod.CrudMethod,
-    documentId        : String,
-    incomingTokenOpt  : Option[String],
-    responseHeadersOpt: Option[ResponseHeaders])(implicit
-    logger            : IndentedLogger
-  ): Operations = {
-
-    // TODO: Check possible optimization above to avoid retrieving form permissions twice.
-    val formPermissions =
-      FormRunner.permissionsFromElemOrProperties(
-        PersistenceMetadataSupport.readFormPermissions(appFormVersion._1, FormDefinitionVersion.Specific(appFormVersion._2)),
-        appFormVersion._1
-      ) |!>
-        (formPermissions => debug("CRUD: form permissions", List("permissions" -> formPermissions.toString)))
-
-    PersistenceProxyPermissions.findAuthorizedOperationsOrThrow(
-      formPermissions,
-      findCurrentCredentialsFromSession,
-      method,
-      appFormVersion,
-      documentId,
-      incomingTokenOpt,
-      responseHeadersOpt,
-    )
-  }
-
-  private def findAuthorizedOperationsOrThrow(
+  def findAuthorizedOperationsOrThrow(
     formPermissions   : Permissions,
     credentialsOpt    : Option[Credentials],
     crudMethod        : HttpMethod.CrudMethod,
@@ -141,6 +114,22 @@ object PersistenceProxyPermissions {
         throw HttpStatusCodeException(StatusCode.Forbidden)
     }
   }
+
+  // If we call this, it means that we don't have access based on `Anyone`, `AnyAuthenticatedUser`, `Owner`, roles,
+  // etc. We are just testing for `AnyoneWithToken`.
+  private def operationsFromToken(
+    definedPermissions: Permissions.Defined,
+    token             : String,
+    tokenHmac         : FormRunnerAccessToken.TokenHmac
+  ): Try[Operations] =
+    FormRunnerAccessToken.decryptTokenPayloadCheckExpiration(tokenHmac, token).map { ops =>
+      Operations.combine(
+        definedPermissions.permissionsList collect {
+          case permission if permission.conditions.contains(Condition.AnyoneWithToken) =>
+            SpecificOperations(permission.operations.operations.intersect(ops.toSet))
+        }
+      )
+    }
 
   def extractResponseHeaders(getHeaderIgnoreCase: String => Option[String]): ResponseHeaders = {
 

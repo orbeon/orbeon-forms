@@ -13,12 +13,15 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.NonEmptyTraverse.ops.toAllNonEmptyTraverseOps
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsActions
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.om.NodeInfo
 
 
@@ -150,6 +153,10 @@ trait FormRunnerPermissionsOps {
   //@XPathFunction
   def encryptParameterIfNeeded(parameterValue: String): String =
     parameterValue.trimAllToOpt.map(FormRunnerOperationsEncryption.encryptString).getOrElse("")
+
+  //@XPathFunction
+  def createInternalAdminTokenParam(): String =
+    PersistenceApi.createInternalAdminUserToken(XFormsFunction.context.containingDocument.getRequestPath).orNull
 
   //@XPathFunction
   def decryptParameterIfNeeded(parameterValue: String): String =

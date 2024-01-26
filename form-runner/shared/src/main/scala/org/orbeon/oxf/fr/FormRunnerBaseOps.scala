@@ -121,6 +121,8 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   val AccessTokenParam                  = "fr-access-token"
   //@XPathFunction
   val InternalAuthorizedOperationsParam = "fr-internal-authorized-operations"
+  //@XPathFunction
+  val InternalAdminTokenParam           = "fr-internal-admin-token"
 
   //@XPathFunction
   val InternalWorkflowStageParam = "fr-internal-workflow-stage"

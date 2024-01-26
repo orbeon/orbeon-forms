@@ -23,11 +23,12 @@ import java.time.Instant
 
 
 trait SearchRequestCommon {
-  def provider        : Provider
-  def appForm         : AppForm
-  def version         : SearchVersion
-  def credentials     : Option[Credentials]
-  def anyOfOperations : Option[Set[Operation]]
+  def provider           : Provider
+  def appForm            : AppForm
+  def version            : SearchVersion
+  def credentials        : Option[Credentials]
+  def anyOfOperations    : Option[Set[Operation]]
+  def isInternalAdminUser: Boolean
 }
 
 object OrderColumn {
@@ -73,6 +74,7 @@ case class SearchRequest(
   appForm            : AppForm,
   version            : SearchVersion,
   credentials        : Option[Credentials],
+  isInternalAdminUser: Boolean,
   pageSize           : Int,
   pageNumber         : Int,
   orderBy            : OrderBy,

@@ -1,6 +1,7 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.oxf.externalcontext.UserAndGroup
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
@@ -38,6 +39,7 @@ class History extends ProcessorImpl {
             form,
             documentId,
             Option(filenameOrNull),
+            PersistenceMetadataSupport.isInternalAdminUser(httpRequest.getFirstParamAsString),
             httpResponse.getOutputStream
           )
         case _ =>
@@ -50,7 +52,7 @@ class History extends ProcessorImpl {
   }
 }
 
-object History {
+private object History {
 
   private val xmlIndentation = 2
 
@@ -72,12 +74,13 @@ object History {
   val ServicePathRe: Regex = "/fr/service/([^/]+)/history/([^/]+)/([^/]+)/([^/^.]+)(?:/([^/]+))?".r
 
   def returnHistory(
-    request      : Request,
-    app          : String,
-    form         : String,
-    documentId   : String,
-    filenameOpt  : Option[String],
-    outputStream : OutputStream
+    request            : Request,
+    app                : String,
+    form               : String,
+    documentId         : String,
+    filenameOpt        : Option[String],
+    isInternalAdminUser: Boolean, // xxx unused for now, we don't check permissions!
+    outputStream       : OutputStream
   ): Unit = {
     RelationalUtils.withConnection { connection =>
 
@@ -114,7 +117,6 @@ object History {
             |        and t.document_id = ?
             |        and t.draft = ?
             |        ${if (filenameOpt.isDefined) "and t.file_name = ?" else ""}
-            |ORDER BY last_modified_time DESC
             |""".stripMargin
 
       // Boilerplate for cross-database paging, see also `SearchLogic`

@@ -68,11 +68,11 @@ trait PersistenceApiTrait {
     version                 : Int)(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
-  )  =
+  ): Try[DocumentNodeInfoType] =
     ConnectionResult.tryWithSuccessConnection(
       connectPersistence(
         method             = HttpMethod.POST,
-        path               = servicePath,
+        pathQuery          = servicePath,
         requestBodyContent = StreamedContent.fromBytes(queryXml.toString.getBytes(CharsetNames.Utf8), ContentTypes.XmlContentType.some).some,
         formVersionOpt     = version.some
       ),
@@ -87,15 +87,50 @@ trait PersistenceApiTrait {
       )
     }
 
+  // Largely more time than needed for an internal request to come through
+  private val DefaultTokenValidity = java.time.Duration.ofSeconds(20)
+
+  def createInternalAdminUserTokenParam(
+    isInternalAdminUser: Boolean
+  )(implicit
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Option[(String, String)] =
+    isInternalAdminUser
+      .flatOption(
+        createInternalAdminUserToken(coreCrossPlatformSupport.externalContext.getRequest.getRequestPath)
+          .map(FormRunner.InternalAdminTokenParam -> _)
+      )
+
+  def createInternalAdminUserToken(requestPath: String): Option[String] = {
+
+    // Only whitelisted callers can use this function
+    requestPath match {
+      case "/fr/admin"         =>
+      case _                   => throw HttpStatusCodeException(StatusCode.Forbidden)
+    }
+
+    FormRunnerAdminToken.encryptToken(
+      validity            = DefaultTokenValidity,
+      isInternalAdminUser = true
+    )
+  }
+
   def search(
-    appFormVersion          : AppFormVersion)(implicit
-    logger                  : IndentedLogger,
+    appFormVersion     : AppFormVersion,
+    isInternalAdminUser: Boolean,
+  )(implicit
+    logger             : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Iterator[DataDetails] = {
 
     debug(s"calling search for `$appFormVersion`")
 
-    val servicePath = s"/fr/service/persistence/search/${appFormVersion._1.app}/${appFormVersion._1.form}"
+    val servicePathQuery =
+      PathUtils.recombineQuery(
+        s"/fr/service/persistence/search/${appFormVersion._1.app}/${appFormVersion._1.form}",
+        createInternalAdminUserTokenParam(isInternalAdminUser).toList,
+        overwrite = true
+      )
 
     def readPage(pageNumber: Int): Try[DocumentNodeInfoType] = {
 
@@ -108,7 +143,7 @@ trait PersistenceApiTrait {
             <page-number>{pageNumber}</page-number>
         </search>
 
-      documentsXmlTry(servicePath, queryXml, appFormVersion._2)
+      documentsXmlTry(servicePathQuery, queryXml, appFormVersion._2)
     }
 
     def pageToDataDetails(page: DocumentNodeInfoType): (Iterator[DataDetails], Int, Int) =
@@ -176,7 +211,8 @@ trait PersistenceApiTrait {
   def dataHistory(
     appForm              : AppForm,
     documentId           : String,
-    attachmentFilenameOpt: Option[String] = None
+    attachmentFilenameOpt: Option[String],
+    isInternalAdminUser  : Boolean,
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -184,21 +220,25 @@ trait PersistenceApiTrait {
 
     debug(s"calling data history for `$appForm`/`$documentId`")
 
-    val servicePath =
-      s"/fr/service/persistence/history/${appForm.app}/${appForm.form}/$documentId${attachmentFilenameOpt.map(f => s"/$f").getOrElse("")}"
+    val servicePathQuery =
+      PathUtils.recombineQuery(
+        s"/fr/service/persistence/history/${appForm.app}/${appForm.form}/$documentId${attachmentFilenameOpt.map(f => s"/$f").getOrElse("")}",
+        createInternalAdminUserTokenParam(isInternalAdminUser).toList,
+        overwrite = true
+      )
 
     def readPage(pageNumber: Int): Try[DocumentNodeInfoType] = {
 
       debug(s"reading data history page `$pageNumber`")
 
       val servicePathParams =
-        PathUtils.recombineQuery(servicePath, List("page-size" -> SearchPageSize.toString, "page-number" -> pageNumber.toString))
+        PathUtils.recombineQuery(servicePathQuery, List("page-size" -> SearchPageSize.toString, "page-number" -> pageNumber.toString))
 
       val documentsXmlTry =
         ConnectionResult.tryWithSuccessConnection(
           connectPersistence(
-            method = HttpMethod.GET,
-            path   = servicePathParams
+            method    = HttpMethod.GET,
+            pathQuery = servicePathParams
           ),
           closeOnSuccess = true
         ) { is =>
@@ -234,9 +274,10 @@ trait PersistenceApiTrait {
   }
 
   def readFormData(
-    appFormVersion  : AppFormVersion,
-    documentId      : String,
-    lastModifiedTime: Option[Instant]
+    appFormVersion     : AppFormVersion,
+    documentId         : String,
+    lastModifiedTime   : Option[Instant],
+    isInternalAdminUser: Boolean,
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -246,7 +287,9 @@ trait PersistenceApiTrait {
 
     val path = PathUtils.recombineQuery(
       FormRunner.createFormDataBasePath(appFormVersion._1.app, appFormVersion._1.form, isDraft = false, documentId) + DataXml,
-      lastModifiedTime.toList.map("last-modified-time" -> _.toString)
+      lastModifiedTime.toList.map("last-modified-time" -> _.toString) :::
+      createInternalAdminUserTokenParam(isInternalAdminUser).toList,
+      overwrite = true
     )
     val customHeaders = Map(OrbeonFormDefinitionVersion -> List(appFormVersion._2.toString))
 
@@ -322,9 +365,10 @@ trait PersistenceApiTrait {
   } .get
 
   def doDelete(
-    path           : String,
-    modifiedTimeOpt: Option[Instant],
-    forceDelete    : Boolean
+    path               : String,
+    modifiedTimeOpt    : Option[Instant],
+    forceDelete        : Boolean,
+    isInternalAdminUser: Boolean
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -336,6 +380,7 @@ trait PersistenceApiTrait {
       PathUtils.recombineQuery(
         path,
         (forceDelete list ("force-delete" -> true.toString)) :::
+        createInternalAdminUserTokenParam(isInternalAdminUser).toList :::
         modifiedTimeOpt.toList.map(modifiedTime => "last-modified-time" -> modifiedTime.toString),
         // Overwrite last-modified-time parameter (might already exist if we got the URL from the history API)
         overwrite = true
@@ -344,7 +389,7 @@ trait PersistenceApiTrait {
     val cxr =
       connectPersistence(
         method         = HttpMethod.DELETE,
-        path           = pathWithParams,
+        pathQuery      = pathWithParams,
         formVersionOpt = None // xxx TODO
       )
 
@@ -375,11 +420,12 @@ trait PersistenceApiTrait {
 
   // TODO: call proxy directly?
   def connectPersistence(
-    method                  : HttpMethod,
-    path                    : String,
-    requestBodyContent      : Option[StreamedContent]   = None,
-    formVersionOpt          : Option[Int]               = None,
-    customHeaders           : Map[String, List[String]] = Map.empty)(implicit
+    method            : HttpMethod,
+    pathQuery         : String,
+    requestBodyContent: Option[StreamedContent]   = None,
+    formVersionOpt    : Option[Int]               = None,
+    customHeaders     : Map[String, List[String]] = Map.empty
+  )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): ConnectionResult = {
@@ -390,7 +436,7 @@ trait PersistenceApiTrait {
       URI.create(
         URLRewriterUtils.rewriteServiceURL(
           ec.getRequest,
-          path,
+          pathQuery,
           UrlRewriteMode.Absolute
         )
       )
@@ -442,7 +488,7 @@ trait PersistenceApiTrait {
     val cxr =
       connectPersistence(
         method        = HttpMethod.GET,
-        path          = urlString,
+        pathQuery     = urlString,
         customHeaders = customHeaders
       )
 

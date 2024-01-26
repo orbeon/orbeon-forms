@@ -185,15 +185,20 @@ object FormRunnerPersistence {
     )
 
   // Get all providers that can be used either for form data or for form definitions
-  def getProviders(app: Option[String], form: Option[String], formOrData: FormOrData): List[String] =
-    (app, form) match {
-      case (Some(appName), Some(formName)) =>
+  def getProviders(appOpt: Option[String], formOpt: Option[String], formOrData: FormOrData): List[String] =
+    (appOpt, formOpt) match {
+      case (Some(app), Some(form)) =>
         // Get the specific provider for this app/form
-        findProvider(AppForm(appName, formName), FormOrData.Form).toList
+        findProvider(AppForm(app, form), FormOrData.Form).toList
+
       case _ =>
-        // Get providers independently from app/form
-        // NOTE: Could also optimize case where only app is provided, but there are no callers as of 2013-10-21.
-        properties.propertiesStartsWith(PersistenceProviderPropertyPrefix, matchWildcards = false)
+        val propertyNamePrefix = appOpt match {
+          case Some(app) => PersistenceProviderPropertyPrefix + s".$app"
+          case None      => PersistenceProviderPropertyPrefix
+        }
+
+        // Get providers using app only or independently from app/form
+        properties.propertiesStartsWith(propertyNamePrefix, matchWildcards = false)
           .filter(propName => propName.endsWith(".*") || propName.endsWith(s".${formOrData.entryName}"))
           .flatMap(properties.getNonBlankString)
           .distinct

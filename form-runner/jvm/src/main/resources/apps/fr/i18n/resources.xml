@@ -508,12 +508,14 @@
                 <last-modified>Last Modified</last-modified>
                 <reindexing-confirmation>Confirm Reindexing</reindexing-confirmation>
                 <reencrypt-confirmation>Confirm Re-encryption</reencrypt-confirmation>
+                <purge-confirmation>Confirm Purge</purge-confirmation>
             </titles>
             <messages>
                 <no-forms>You don't have access to any deployed forms.</no-forms>
                 <publish-confirmation>Are you sure you want to {0,choice,0#make available|1#make unavailable|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} forms}? This operation cannot be undone.</publish-confirmation>
                 <reindexing-confirmation>While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?</reindexing-confirmation>
                 <reencrypt-confirmation>We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?</reencrypt-confirmation>
+                <purge-confirmation>Are you sure you want to purge the selected data?</purge-confirmation>
             </messages>
             <labels>
                 <available>Available</available>
@@ -531,6 +533,37 @@
                 <reencrypt-started>Re-encryption started</reencrypt-started>
                 <reencrypt-finished>Re-encryption finished</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export>Export</export>
+                <purge>Purge</purge>
+                <or>or</or>
+                <selected-forms>Selected forms ({0,number,integer})</selected-forms>
+                <following-forms>Following forms:</following-forms>
+                <application>Application:</application>
+                <form>Form:</form>
+                <version>Version:</version>
+                <all-applications>All applications</all-applications>
+                <all-forms>All forms</all-forms>
+                <all-versions>All versions</all-versions>
+                <latest-version>Latest version</latest-version>
+                <definitions-data>
+                    <label>Form definitions / data:</label>
+                    <definitions>Definitions only</definitions>
+                    <data>Data only</data>
+                    <both>Definitions and data</both>
+                </definitions-data>
+                <current-history>
+                    <label>Current data / revision history:</label>
+                    <current-data>Current data only</current-data>
+                    <revision-history>Revision history only</revision-history>
+                    <both>Current data and revision history</both>
+                </current-history>
+                <from-date>From:</from-date>
+                <until-date>Until:</until-date>
+                <redundant-values>Redundant values</redundant-values>
+                <invalid-date>Invalid date</invalid-date>
+                <wrong-date-order>Wrong date order</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -1160,12 +1193,14 @@
                 <last-modified>Dernière modification</last-modified>
                 <reindexing-confirmation>Confirmer le réindexage</reindexing-confirmation>
                 <reencrypt-confirmation>Confirmer le recryptage</reencrypt-confirmation>
+                <purge-confirmation>Confirmer la purge</purge-confirmation>
             </titles>
             <messages>
                 <no-forms>Vous n'avez accès à aucun formulaire déployé.</no-forms>
                 <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#rendre disponible|1#rendre non disponible|2#mettre à jour|3#supprimer} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}? Cette opération ne peut pas être annulée.</publish-confirmation>
                 <reindexing-confirmation>Pendant le réindexage, certaines fonctionnalités, comme les pages de sommaires de Form Runner, ne fonctionneront pas comme prévu. Nous vous recommandons donc d'effectuez le réindexage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de réindexage?</reindexing-confirmation>
                 <reencrypt-confirmation>Nous vous recommandons d'effectuez le recryptage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de recryptage?</reencrypt-confirmation>
+                <purge-confirmation>Êtes-vous sûr de vouloir purger les données sélectionnées?</purge-confirmation>
             </messages>
             <labels>
                 <available>Disponible</available>
@@ -1183,6 +1218,37 @@
                 <reencrypt-started>Recryptage commencé</reencrypt-started>
                 <reencrypt-finished>Recryptage terminé</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export>Exporter</export>
+                <purge>Purger</purge>
+                <or>ou</or>
+                <selected-forms>Formulaires sélectionnés ({0,number,integer})</selected-forms>
+                <following-forms>Formulaires suivants:</following-forms>
+                <application>Application:</application>
+                <form>Formulaire:</form>
+                <version>Version:</version>
+                <all-applications>Toutes les applications</all-applications>
+                <all-forms>Tous les formulaires</all-forms>
+                <all-versions>Toutes les versions</all-versions>
+                <latest-version>Dernière version</latest-version>
+                <definitions-data>
+                    <label>Définitions / données des formulaires:</label>
+                    <definitions>Définitions uniquement</definitions>
+                    <data>Données uniquement</data>
+                    <both>Définitions et données</both>
+                </definitions-data>
+                <current-history>
+                    <label>Données courantes / historique des révisions:</label>
+                    <current-data>Données courantes uniquement</current-data>
+                    <revision-history>Historique des révisions uniquement</revision-history>
+                    <both>Données courantes et historique des révisions</both>
+                </current-history>
+                <from-date>Depuis:</from-date>
+                <until-date>Jusqu'à:</until-date>
+                <redundant-values>Valeurs redondantes</redundant-values>
+                <invalid-date>Date invalide</invalid-date>
+                <wrong-date-order>Ordre des dates incorrect</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -1801,12 +1867,14 @@
                 <last-modified todo="true">Modificado</last-modified>
                 <reindexing-confirmation>Confirmar Reindexación</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
                 <no-forms>No tiene permisos para ningún formulario de Producción</no-forms>
                 <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?</publish-confirmation>
                 <reindexing-confirmation>Mientras se reindexa algunas funcionalidades no estarán disponibles, como ser el Form Runner. Por lo que se recomienda ejecutar la reindexación con el sistema fuera de línea. Esta seguro que quiere proceder con la reindexación ?</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
             </messages>
             <labels>
                 <available>Disponibile</available>
@@ -1824,6 +1892,37 @@
                 <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export todo="true">[Export]</export>
+                <purge todo="true">[Purge]</purge>
+                <or todo="true">[or]</or>
+                <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
+                <following-forms todo="true">[Following forms:]</following-forms>
+                <application todo="true">[Application:]</application>
+                <form todo="true">[Form:]</form>
+                <version todo="true">[Version:]</version>
+                <all-applications todo="true">[All applications]</all-applications>
+                <all-forms todo="true">[All forms]</all-forms>
+                <all-versions todo="true">[All versions]</all-versions>
+                <latest-version todo="true">[Latest version]</latest-version>
+                <definitions-data>
+                    <label todo="true">[Form definitions / data:]</label>
+                    <definitions todo="true">[Definitions only]</definitions>
+                    <data todo="true">[Data only]</data>
+                    <both todo="true">[Definitions and data]</both>
+                </definitions-data>
+                <current-history>
+                    <label todo="true">[Current data / revision history:]</label>
+                    <current-data todo="true">[Current data only]</current-data>
+                    <revision-history todo="true">[Revision history only]</revision-history>
+                    <both todo="true">[Current data and revision history]</both>
+                </current-history>
+                <from-date todo="true">[From:]</from-date>
+                <until-date todo="true">[Until:]</until-date>
+                <redundant-values todo="true">[Redundant values]</redundant-values>
+                <invalid-date todo="true">[Invalid date]</invalid-date>
+                <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -2462,6 +2561,7 @@
                 <last-modified todo="true">Modificat</last-modified>
                 <reindexing-confirmation>Confirmar reindexació</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
                 <no-forms>No té permisos per cap formulari de Producció</no-forms>
@@ -2472,6 +2572,7 @@
                     el sistema fora de línia. Està segur que vol fer la reindexació?</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the
                     system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
             </messages>
             <labels>
                 <available>Disponible</available>
@@ -2489,6 +2590,37 @@
                 <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export todo="true">[Export]</export>
+                <purge todo="true">[Purge]</purge>
+                <or todo="true">[or]</or>
+                <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
+                <following-forms todo="true">[Following forms:]</following-forms>
+                <application todo="true">[Application:]</application>
+                <form todo="true">[Form:]</form>
+                <version todo="true">[Version:]</version>
+                <all-applications todo="true">[All applications]</all-applications>
+                <all-forms todo="true">[All forms]</all-forms>
+                <all-versions todo="true">[All versions]</all-versions>
+                <latest-version todo="true">[Latest version]</latest-version>
+                <definitions-data>
+                    <label todo="true">[Form definitions / data:]</label>
+                    <definitions todo="true">[Definitions only]</definitions>
+                    <data todo="true">[Data only]</data>
+                    <both todo="true">[Definitions and data]</both>
+                </definitions-data>
+                <current-history>
+                    <label todo="true">[Current data / revision history:]</label>
+                    <current-data todo="true">[Current data only]</current-data>
+                    <revision-history todo="true">[Revision history only]</revision-history>
+                    <both todo="true">[Current data and revision history]</both>
+                </current-history>
+                <from-date todo="true">[From:]</from-date>
+                <until-date todo="true">[Until:]</until-date>
+                <redundant-values todo="true">[Redundant values]</redundant-values>
+                <invalid-date todo="true">[Invalid date]</invalid-date>
+                <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -3111,12 +3243,14 @@
                 <last-modified>Sist endret</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
                 <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
                 <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
             </messages>
             <labels>
                 <available todo="true">[Available]</available>
@@ -3134,6 +3268,37 @@
                 <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export todo="true">[Export]</export>
+                <purge todo="true">[Purge]</purge>
+                <or todo="true">[or]</or>
+                <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
+                <following-forms todo="true">[Following forms:]</following-forms>
+                <application todo="true">[Application:]</application>
+                <form todo="true">[Form:]</form>
+                <version todo="true">[Version:]</version>
+                <all-applications todo="true">[All applications]</all-applications>
+                <all-forms todo="true">[All forms]</all-forms>
+                <all-versions todo="true">[All versions]</all-versions>
+                <latest-version todo="true">[Latest version]</latest-version>
+                <definitions-data>
+                    <label todo="true">[Form definitions / data:]</label>
+                    <definitions todo="true">[Definitions only]</definitions>
+                    <data todo="true">[Data only]</data>
+                    <both todo="true">[Definitions and data]</both>
+                </definitions-data>
+                <current-history>
+                    <label todo="true">[Current data / revision history:]</label>
+                    <current-data todo="true">[Current data only]</current-data>
+                    <revision-history todo="true">[Revision history only]</revision-history>
+                    <both todo="true">[Current data and revision history]</both>
+                </current-history>
+                <from-date todo="true">[From:]</from-date>
+                <until-date todo="true">[Until:]</until-date>
+                <redundant-values todo="true">[Redundant values]</redundant-values>
+                <invalid-date todo="true">[Invalid date]</invalid-date>
+                <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -3748,12 +3913,14 @@
                 <last-modified todo="true">[Modified]</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
                 <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
                 <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
             </messages>
             <labels>
                 <available todo="true">[Available]</available>
@@ -3771,6 +3938,37 @@
                 <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export todo="true">[Export]</export>
+                <purge todo="true">[Purge]</purge>
+                <or todo="true">[or]</or>
+                <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
+                <following-forms todo="true">[Following forms:]</following-forms>
+                <application todo="true">[Application:]</application>
+                <form todo="true">[Form:]</form>
+                <version todo="true">[Version:]</version>
+                <all-applications todo="true">[All applications]</all-applications>
+                <all-forms todo="true">[All forms]</all-forms>
+                <all-versions todo="true">[All versions]</all-versions>
+                <latest-version todo="true">[Latest version]</latest-version>
+                <definitions-data>
+                    <label todo="true">[Form definitions / data:]</label>
+                    <definitions todo="true">[Definitions only]</definitions>
+                    <data todo="true">[Data only]</data>
+                    <both todo="true">[Definitions and data]</both>
+                </definitions-data>
+                <current-history>
+                    <label todo="true">[Current data / revision history:]</label>
+                    <current-data todo="true">[Current data only]</current-data>
+                    <revision-history todo="true">[Revision history only]</revision-history>
+                    <both todo="true">[Current data and revision history]</both>
+                </current-history>
+                <from-date todo="true">[From:]</from-date>
+                <until-date todo="true">[Until:]</until-date>
+                <redundant-values todo="true">[Redundant values]</redundant-values>
+                <invalid-date todo="true">[Invalid date]</invalid-date>
+                <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -4395,12 +4593,14 @@
                 <last-modified todo="true">Modificato</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
                 <no-forms>Non hai accesso a nessuno dei moduli distributi.</no-forms>
                 <publish-confirmation todo="true">Sei sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di|2#aggiornare|3#cancellare} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
             </messages>
             <labels>
                 <available>Disponibile</available>
@@ -4418,6 +4618,37 @@
                 <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export todo="true">[Export]</export>
+                <purge todo="true">[Purge]</purge>
+                <or todo="true">[or]</or>
+                <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
+                <following-forms todo="true">[Following forms:]</following-forms>
+                <application todo="true">[Application:]</application>
+                <form todo="true">[Form:]</form>
+                <version todo="true">[Version:]</version>
+                <all-applications todo="true">[All applications]</all-applications>
+                <all-forms todo="true">[All forms]</all-forms>
+                <all-versions todo="true">[All versions]</all-versions>
+                <latest-version todo="true">[Latest version]</latest-version>
+                <definitions-data>
+                    <label todo="true">[Form definitions / data:]</label>
+                    <definitions todo="true">[Definitions only]</definitions>
+                    <data todo="true">[Data only]</data>
+                    <both todo="true">[Definitions and data]</both>
+                </definitions-data>
+                <current-history>
+                    <label todo="true">[Current data / revision history:]</label>
+                    <current-data todo="true">[Current data only]</current-data>
+                    <revision-history todo="true">[Revision history only]</revision-history>
+                    <both todo="true">[Current data and revision history]</both>
+                </current-history>
+                <from-date todo="true">[From:]</from-date>
+                <until-date todo="true">[Until:]</until-date>
+                <redundant-values todo="true">[Redundant values]</redundant-values>
+                <invalid-date todo="true">[Invalid date]</invalid-date>
+                <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -5042,12 +5273,14 @@
                 <last-modified todo="true">Geändert am</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
                 <no-forms>Sie haben keinen Zugang zu den bereitgestellten Formularen.</no-forms>
                 <publish-confirmation todo="true">Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} Formulare} {0,choice,0#veröffentlichen |1#verbergen|2#aktualisiern|3#löschen} wollen?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
             </messages>
             <labels>
                 <available>Verfügbar</available>
@@ -5065,6 +5298,37 @@
                 <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export todo="true">[Export]</export>
+                <purge todo="true">[Purge]</purge>
+                <or todo="true">[or]</or>
+                <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
+                <following-forms todo="true">[Following forms:]</following-forms>
+                <application todo="true">[Application:]</application>
+                <form todo="true">[Form:]</form>
+                <version todo="true">[Version:]</version>
+                <all-applications todo="true">[All applications]</all-applications>
+                <all-forms todo="true">[All forms]</all-forms>
+                <all-versions todo="true">[All versions]</all-versions>
+                <latest-version todo="true">[Latest version]</latest-version>
+                <definitions-data>
+                    <label todo="true">[Form definitions / data:]</label>
+                    <definitions todo="true">[Definitions only]</definitions>
+                    <data todo="true">[Data only]</data>
+                    <both todo="true">[Definitions and data]</both>
+                </definitions-data>
+                <current-history>
+                    <label todo="true">[Current data / revision history:]</label>
+                    <current-data todo="true">[Current data only]</current-data>
+                    <revision-history todo="true">[Revision history only]</revision-history>
+                    <both todo="true">[Current data and revision history]</both>
+                </current-history>
+                <from-date todo="true">[From:]</from-date>
+                <until-date todo="true">[Until:]</until-date>
+                <redundant-values todo="true">[Redundant values]</redundant-values>
+                <invalid-date todo="true">[Invalid date]</invalid-date>
+                <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -5689,12 +5953,14 @@
                 <last-modified todo="true">Muokattu</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
                 <no-forms>Sinulla ei ole pääsyä yhteenkään lomakkeeseen.</no-forms>
                 <publish-confirmation todo="true">Haluatko varmasti{0,choice,0#julkaista|1#merkata vanhaksi|2#upgrade|3#delete} {1,choice,1#yhden lomakkeen|1&lt;{1,number,integer} lomaketta}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
             </messages>
             <labels>
                 <available>Saatavilla</available>
@@ -5712,6 +5978,37 @@
                 <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export todo="true">[Export]</export>
+                <purge todo="true">[Purge]</purge>
+                <or todo="true">[or]</or>
+                <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
+                <following-forms todo="true">[Following forms:]</following-forms>
+                <application todo="true">[Application:]</application>
+                <form todo="true">[Form:]</form>
+                <version todo="true">[Version:]</version>
+                <all-applications todo="true">[All applications]</all-applications>
+                <all-forms todo="true">[All forms]</all-forms>
+                <all-versions todo="true">[All versions]</all-versions>
+                <latest-version todo="true">[Latest version]</latest-version>
+                <definitions-data>
+                    <label todo="true">[Form definitions / data:]</label>
+                    <definitions todo="true">[Definitions only]</definitions>
+                    <data todo="true">[Data only]</data>
+                    <both todo="true">[Definitions and data]</both>
+                </definitions-data>
+                <current-history>
+                    <label todo="true">[Current data / revision history:]</label>
+                    <current-data todo="true">[Current data only]</current-data>
+                    <revision-history todo="true">[Revision history only]</revision-history>
+                    <both todo="true">[Current data and revision history]</both>
+                </current-history>
+                <from-date todo="true">[From:]</from-date>
+                <until-date todo="true">[Until:]</until-date>
+                <redundant-values todo="true">[Redundant values]</redundant-values>
+                <invalid-date todo="true">[Invalid date]</invalid-date>
+                <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -6336,12 +6633,14 @@
                 <last-modified todo="true">Senast ändrad</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
                 <no-forms>Du har inte tillgång till några publicerade formulär.</no-forms>
                 <publish-confirmation todo="true">Bekräfta {0,choice,0#publicering|1#upphävande av publicering|2#uppgradering|3#delete} av {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}.</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
             </messages>
             <labels>
                 <available>Tillgänglig</available>
@@ -6359,6 +6658,37 @@
                 <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export todo="true">[Export]</export>
+                <purge todo="true">[Purge]</purge>
+                <or todo="true">[or]</or>
+                <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
+                <following-forms todo="true">[Following forms:]</following-forms>
+                <application todo="true">[Application:]</application>
+                <form todo="true">[Form:]</form>
+                <version todo="true">[Version:]</version>
+                <all-applications todo="true">[All applications]</all-applications>
+                <all-forms todo="true">[All forms]</all-forms>
+                <all-versions todo="true">[All versions]</all-versions>
+                <latest-version todo="true">[Latest version]</latest-version>
+                <definitions-data>
+                    <label todo="true">[Form definitions / data:]</label>
+                    <definitions todo="true">[Definitions only]</definitions>
+                    <data todo="true">[Data only]</data>
+                    <both todo="true">[Definitions and data]</both>
+                </definitions-data>
+                <current-history>
+                    <label todo="true">[Current data / revision history:]</label>
+                    <current-data todo="true">[Current data only]</current-data>
+                    <revision-history todo="true">[Revision history only]</revision-history>
+                    <both todo="true">[Current data and revision history]</both>
+                </current-history>
+                <from-date todo="true">[From:]</from-date>
+                <until-date todo="true">[Until:]</until-date>
+                <redundant-values todo="true">[Redundant values]</redundant-values>
+                <invalid-date todo="true">[Invalid date]</invalid-date>
+                <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -6983,12 +7313,14 @@
                 <last-modified todo="true">Bewerkt</last-modified>
                 <reindexing-confirmation>Bevestigen herindexeren</reindexing-confirmation>
                 <reencrypt-confirmation>Bevestigen her-encryptie</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
                 <no-forms>U hebt geen toegang tot de actieve forms.</no-forms>
                 <publish-confirmation todo="true">Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgraden|3#delete}?</publish-confirmation>
                 <reindexing-confirmation>Tijdens het herindexeren werken bepaalde functies, zoals de Form Runner samenvattingpagina's, mogelijk niet zoals verwacht. We raden u om die reden aan om te herindexeren als uw systeem offline is. Weet u zeker dat het herindexeren wilt starten?</reindexing-confirmation>
                 <reencrypt-confirmation>We adviseren u het vernieuwen van de encryptie te doen als het systeem offline is. Weet u zeker dat u door wilt gaan met her-encryptie?</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
             </messages>
             <labels>
                 <available>Beschikbaar</available>
@@ -7006,6 +7338,37 @@
                 <reencrypt-started>Her-encryptie gestart</reencrypt-started>
                 <reencrypt-finished>Her-encryptie voltooid</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export todo="true">[Export]</export>
+                <purge todo="true">[Purge]</purge>
+                <or todo="true">[or]</or>
+                <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
+                <following-forms todo="true">[Following forms:]</following-forms>
+                <application todo="true">[Application:]</application>
+                <form todo="true">[Form:]</form>
+                <version todo="true">[Version:]</version>
+                <all-applications todo="true">[All applications]</all-applications>
+                <all-forms todo="true">[All forms]</all-forms>
+                <all-versions todo="true">[All versions]</all-versions>
+                <latest-version todo="true">[Latest version]</latest-version>
+                <definitions-data>
+                    <label todo="true">[Form definitions / data:]</label>
+                    <definitions todo="true">[Definitions only]</definitions>
+                    <data todo="true">[Data only]</data>
+                    <both todo="true">[Definitions and data]</both>
+                </definitions-data>
+                <current-history>
+                    <label todo="true">[Current data / revision history:]</label>
+                    <current-data todo="true">[Current data only]</current-data>
+                    <revision-history todo="true">[Revision history only]</revision-history>
+                    <both todo="true">[Current data and revision history]</both>
+                </current-history>
+                <from-date todo="true">[From:]</from-date>
+                <until-date todo="true">[Until:]</until-date>
+                <redundant-values todo="true">[Redundant values]</redundant-values>
+                <invalid-date todo="true">[Invalid date]</invalid-date>
+                <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -7630,12 +7993,14 @@
                 <last-modified todo="true">Modificado</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
                 <no-forms>Não tem acesso a quaisquer formulários.</no-forms>
                 <publish-confirmation todo="true">Tem a certeza que quer {0,choice,0#publicar|1#não publicar|2#upgrade|3#delete} {1,choice,1#um formulário|1&lt;{1,number,integer} formulários}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
             </messages>
             <labels>
                 <available>Disponível</available>
@@ -7653,6 +8018,37 @@
                 <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export todo="true">[Export]</export>
+                <purge todo="true">[Purge]</purge>
+                <or todo="true">[or]</or>
+                <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
+                <following-forms todo="true">[Following forms:]</following-forms>
+                <application todo="true">[Application:]</application>
+                <form todo="true">[Form:]</form>
+                <version todo="true">[Version:]</version>
+                <all-applications todo="true">[All applications]</all-applications>
+                <all-forms todo="true">[All forms]</all-forms>
+                <all-versions todo="true">[All versions]</all-versions>
+                <latest-version todo="true">[Latest version]</latest-version>
+                <definitions-data>
+                    <label todo="true">[Form definitions / data:]</label>
+                    <definitions todo="true">[Definitions only]</definitions>
+                    <data todo="true">[Data only]</data>
+                    <both todo="true">[Definitions and data]</both>
+                </definitions-data>
+                <current-history>
+                    <label todo="true">[Current data / revision history:]</label>
+                    <current-data todo="true">[Current data only]</current-data>
+                    <revision-history todo="true">[Revision history only]</revision-history>
+                    <both todo="true">[Current data and revision history]</both>
+                </current-history>
+                <from-date todo="true">[From:]</from-date>
+                <until-date todo="true">[Until:]</until-date>
+                <redundant-values todo="true">[Redundant values]</redundant-values>
+                <invalid-date todo="true">[Invalid date]</invalid-date>
+                <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -8268,12 +8664,14 @@
                 <last-modified todo="true">Ændret</last-modified>
                 <reindexing-confirmation>Bekræft genindeksering</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
                 <no-forms>Du har ikke adgang til nogen udsendte blanketter.</no-forms>
                 <publish-confirmation todo="true">Er du sikker på du vil {0,choice,0#offentliggøre|1#afpublisére|2#upgrade|3#delete} {1,choice,1#en blanket|1&lt;{1,number,integer} blanketter}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
             </messages>
             <labels>
                 <available>Tilgængelig</available>
@@ -8291,6 +8689,37 @@
                 <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
                 <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export todo="true">[Export]</export>
+                <purge todo="true">[Purge]</purge>
+                <or todo="true">[or]</or>
+                <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
+                <following-forms todo="true">[Following forms:]</following-forms>
+                <application todo="true">[Application:]</application>
+                <form todo="true">[Form:]</form>
+                <version todo="true">[Version:]</version>
+                <all-applications todo="true">[All applications]</all-applications>
+                <all-forms todo="true">[All forms]</all-forms>
+                <all-versions todo="true">[All versions]</all-versions>
+                <latest-version todo="true">[Latest version]</latest-version>
+                <definitions-data>
+                    <label todo="true">[Form definitions / data:]</label>
+                    <definitions todo="true">[Definitions only]</definitions>
+                    <data todo="true">[Data only]</data>
+                    <both todo="true">[Definitions and data]</both>
+                </definitions-data>
+                <current-history>
+                    <label todo="true">[Current data / revision history:]</label>
+                    <current-data todo="true">[Current data only]</current-data>
+                    <revision-history todo="true">[Revision history only]</revision-history>
+                    <both todo="true">[Current data and revision history]</both>
+                </current-history>
+                <from-date todo="true">[From:]</from-date>
+                <until-date todo="true">[Until:]</until-date>
+                <redundant-values todo="true">[Redundant values]</redundant-values>
+                <invalid-date todo="true">[Invalid date]</invalid-date>
+                <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>
@@ -8915,12 +9344,14 @@
                 <last-modified todo="true">Zmodyfikowany</last-modified>
                 <reindexing-confirmation>Potwierdź reindeksację</reindexing-confirmation>
                 <reencrypt-confirmation>Potwierdź ponowne szyfrowanie</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
                 <no-forms>Nie masz dostępu do wdrożonych formularzy.</no-forms>
                 <publish-confirmation todo="true">Czy jesteś pewien, że chcesz {0,choice,0#opublikować|1#cofnąć publikację|2#zaktualizować|3#delete} {1,choice,1#jeden formularz|1&lt;{1,number,integer} formularzy}?</publish-confirmation>
                 <reindexing-confirmation>W trakcie reindeksacji niektóre funkcje, jak strony podsumowań Form Runner'a, mogą nie działać prawidłowo. Z tego powodu rekomendujemy, abyś wykonywał reindeksowanie, kiedy system jest offline. Czy jesteś pewien, że chcesz kontynuować reindeksację?</reindexing-confirmation>
                 <reencrypt-confirmation>Zalecamy ponowne szyfrowanie, gdy system jest w trybie offline. Czy na pewno chcesz kontynuować ponowne szyfrowanie?</reencrypt-confirmation>
+                <purge-confirmation todo="true">[Are you sure you want to purge the selected data?]</purge-confirmation>
             </messages>
             <labels>
                 <available>Dostępny</available>
@@ -8938,6 +9369,37 @@
                 <reencrypt-started>Rozpoczęto ponowne szyfrowanie</reencrypt-started>
                 <reencrypt-finished>Ponowne szyfrowanie zakończone</reencrypt-finished>
             </labels>
+            <export-purge>
+                <export todo="true">[Export]</export>
+                <purge todo="true">[Purge]</purge>
+                <or todo="true">[or]</or>
+                <selected-forms todo="true">[Selected forms ({0,number,integer})]</selected-forms>
+                <following-forms todo="true">[Following forms:]</following-forms>
+                <application todo="true">[Application:]</application>
+                <form todo="true">[Form:]</form>
+                <version todo="true">[Version:]</version>
+                <all-applications todo="true">[All applications]</all-applications>
+                <all-forms todo="true">[All forms]</all-forms>
+                <all-versions todo="true">[All versions]</all-versions>
+                <latest-version todo="true">[Latest version]</latest-version>
+                <definitions-data>
+                    <label todo="true">[Form definitions / data:]</label>
+                    <definitions todo="true">[Definitions only]</definitions>
+                    <data todo="true">[Data only]</data>
+                    <both todo="true">[Definitions and data]</both>
+                </definitions-data>
+                <current-history>
+                    <label todo="true">[Current data / revision history:]</label>
+                    <current-data todo="true">[Current data only]</current-data>
+                    <revision-history todo="true">[Revision history only]</revision-history>
+                    <both todo="true">[Current data and revision history]</both>
+                </current-history>
+                <from-date todo="true">[From:]</from-date>
+                <until-date todo="true">[Until:]</until-date>
+                <redundant-values todo="true">[Redundant values]</redundant-values>
+                <invalid-date todo="true">[Invalid date]</invalid-date>
+                <wrong-date-order todo="true">[Wrong date order]</wrong-date-order>
+            </export-purge>
         </home>
         <import>
             <form-version>

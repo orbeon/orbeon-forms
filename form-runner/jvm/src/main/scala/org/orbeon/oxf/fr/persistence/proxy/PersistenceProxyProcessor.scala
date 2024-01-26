@@ -21,6 +21,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.findCurrentCredentialsFromSession
 import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyPermissions.{ResponseHeaders, extractResponseHeaders}
@@ -174,8 +175,6 @@ private[persistence] object PersistenceProxyProcessor {
       case (HttpMethod.POST, SearchPath(path, app, form))                        => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
       case (HttpMethod.POST, ReEncryptAppFormPath(path, app, form))              => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
       case (HttpMethod.GET,  HistoryPath(path, app, form, documentId, filename)) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Option(filename).orElse(Some(DataXml)), path, Some(documentId))
-      case (HttpMethod.GET,  ExportPath(app, form, documentId))                  => Export.process             (request, response, Option(app), Option(form), Option(documentId))
-      case (HttpMethod.POST, PurgePath(app, form, documentId))                   => Purge.process              (request, response, Option(app), Option(form), Option(documentId))
       case (HttpMethod.POST, DistinctValuesPath(path, app, form))                => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
       case (HttpMethod.GET,  PublishedFormsMetadataPath(_, app, form))           => proxyPublishedFormsMetadata(request, response, Option(app), Option(form))
       case (HttpMethod.GET,  ReindexPath)                                        => proxyReindex               (request, response) // TODO: should be `POST`
@@ -323,12 +322,21 @@ private[persistence] object PersistenceProxyProcessor {
 
               val operations =
                 try {
-                  PersistenceProxyPermissions.permissionCheck(
+                  val formPermissions =
+                    PersistenceMetadataSupport.readFormPermissionsMaybeWithAdminSupport(
+                      PersistenceMetadataSupport.isInternalAdminUser(request.getFirstParamAsString),
+                      appForm,
+                      FormDefinitionVersion.Specific(effectiveFormDefinitionVersion)
+                    )
+
+                  PersistenceProxyPermissions.findAuthorizedOperationsOrThrow(
+                    formPermissions    = formPermissions,
+                    credentialsOpt     = findCurrentCredentialsFromSession,
+                    crudMethod         = crudMethod,
                     appFormVersion     = (appForm, effectiveFormDefinitionVersion),
-                    method             = crudMethod,
                     documentId         = documentIdOpt.getOrElse(throw new IllegalArgumentException), // for data there must be a `documentId`,
                     incomingTokenOpt   = incomingTokenOpt,
-                    responseHeadersOpt = responseHeadersOpt // `None` in case of non-existing data
+                    responseHeadersOpt = responseHeadersOpt, // `None` in case of non-existing data
                   )
                 } catch {
                   case NonFatal(t) =>
@@ -882,7 +890,7 @@ private[persistence] object PersistenceProxyProcessor {
     request : Request,
     response: Response
   ): Unit = {
-    val dataProviders = getProviders(app = None, form = None, FormOrData.Data)
+    val dataProviders = getProviders(appOpt = None, formOpt = None, FormOrData.Data)
 
     val dataProvidersWithIndexSupport =
       dataProviders.filter { provider =>
@@ -910,7 +918,7 @@ private[persistence] object PersistenceProxyProcessor {
     response: Response
   ): Unit = {
 
-    val dataProviders = getProviders(app = None, form = None, FormOrData.Data)
+    val dataProviders = getProviders(appOpt = None, formOpt = None, FormOrData.Data)
 
     val dataProvidersWithReEncryptSupport =
       dataProviders.filter { provider =>

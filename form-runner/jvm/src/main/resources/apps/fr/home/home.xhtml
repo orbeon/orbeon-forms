@@ -888,7 +888,7 @@
                                 <xf:dispatch event="DOMActivate" name="fr-initialize" targetid="fr-form-model"/>
                             </xf:trigger>
 
-                            <xh:div class="btn-group">
+                            <xh:div class="{'btn-group', 'btn-group-empty'[count(instance()/remote-servers/remote-server) = 0]}">
                                 <xf:group ref=".[count(instance()/remote-servers/remote-server) gt 1]">
                                     <xf:select1 ref="instance()/current-remote-server">
                                         <xf:label ref="$fr-resources/home/labels/remote-server" class="xforms-hidden"/>
@@ -906,20 +906,18 @@
                             </xh:div>
 
                             <!-- Buttons for reindexing -->
-                            <xf:group ref="instance('fr-reindex-instance')" xxf:internal="true">
+                            <xf:group ref="instance('fr-reindex-instance')" xxf:internal="true" class="btn-group">
 
                                 <xf:var name="status-name" value="xxf:split(status)[2]"/>
 
                                 <!-- Button: start reindexing -->
-                                <xf:trigger ref=".[$status-name = ('stopped', 'done')]"
-                                            class="btn-group" >
+                                <xf:trigger ref=".[$status-name = ('stopped', 'done')]">
                                     <xf:label mediatype="text/html" ref="$fr-resources/home/buttons/reindex"/>
                                     <xf:dispatch event="DOMActivate" name="fr-show" targetid="reindex-confirmation-dialog"/>
                                 </xf:trigger>
 
                                 <!-- Button: stop reindexing -->
-                                <xf:trigger ref=".[$status-name = ('starting', 'indexing')]"
-                                            class="btn-group">
+                                <xf:trigger ref=".[$status-name = ('starting', 'indexing')]">
                                     <xf:label mediatype="text/html" ref="$fr-resources/home/buttons/stop-reindex"/>
                                     <xf:action event="DOMActivate" type="xpath">
                                         index:stop()

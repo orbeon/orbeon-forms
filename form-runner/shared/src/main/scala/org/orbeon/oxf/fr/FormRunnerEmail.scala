@@ -157,16 +157,12 @@ trait FormRunnerEmail {
 
       val token =
         FormRunnerAccessToken.encryptToken(
-          FormRunnerAccessToken.TokenHmac(
-            app      = app,
-            form     = form,
-            version  = version,
-            document = documentOpt
-          ),
-          FormRunnerAccessToken.TokenPayload(
-            exp = java.time.Instant.now.plus(java.time.Duration.ofMinutes(validityMinutes)),
-            ops = Operations.inDefinitionOrder(tokenOperations)
-          )
+          app         = app,
+          form        = form,
+          version     = version,
+          documentOpt = documentOpt,
+          validity    = java.time.Duration.ofMinutes(validityMinutes),
+          operations  = tokenOperations
         )
 
       token.map(frc.AccessTokenParam -> _)
@@ -230,7 +226,6 @@ trait FormRunnerEmail {
 
   def serializeEmailMetadata(metadata: EmailMetadata.Metadata): NodeInfo =
     EmailMetadataSerialization.serializeMetadata(metadata)
-
 }
 
 object FormRunnerEmail extends FormRunnerEmail

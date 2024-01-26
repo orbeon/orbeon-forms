@@ -1,13 +1,25 @@
 package org.orbeon.oxf.fr
-import org.orbeon.oxf.fr.permission.Operations
 
-import scala.util.Try
+import org.orbeon.oxf.fr.permission.{Operation, Operations}
 
 
 // Offline doesn't support encryption/decryption
 object FormRunnerAccessToken extends FormRunnerAccessTokenTrait {
-  def encryptToken(tokenHmac: TokenHmac, tokenPayload: TokenPayload): Option[String] = None
-  def decryptToken(tokenHmac: TokenHmac, token: String): Try[TokenPayload] = ???
+  def encryptToken(
+    app        : String,
+    form       : String,
+    version    : Int,
+    documentOpt: Option[String],
+    validity   : java.time.Duration,
+    operations : Set[Operation]
+  ): Option[String] = None
+}
+
+object FormRunnerAdminToken extends FormRunnerAdminTokenTrait {
+  def encryptToken(
+    validity           : java.time.Duration,
+    isInternalAdminUser: Boolean
+  ): Option[String] = None
 }
 
 object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrait {

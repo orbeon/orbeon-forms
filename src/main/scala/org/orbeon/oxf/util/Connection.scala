@@ -129,18 +129,19 @@ object Connection extends ConnectionTrait {
         .getOrElse(IO.pure(None))
 
     def connectWithContentIo(requestStreamedContentOpt: Option[StreamedContent]): IO[AsyncConnectionResult] =
-      CoreCrossPlatformSupport.shiftExternalContext[IO, AsyncConnectionResult](t => IO(t)) {
-
+      IO {
         val (_, cxr) =
-          connectInternal(
-            method      = method,
-            url         = url,
-            credentials = credentials,
-            content     = requestStreamedContentOpt,
-            headers     = headers,
-            loadState   = loadState,
-            logBody     = logBody
-          )
+          CoreCrossPlatformSupport.withExternalContext(externalContext) { // we can be in a different thread
+            connectInternal(
+              method      = method,
+              url         = url,
+              credentials = credentials,
+              content     = requestStreamedContentOpt,
+              headers     = headers,
+              loadState   = loadState,
+              logBody     = logBody
+            )
+          }
 
         // Return an `AsyncConnectionResult` even though for now we obtain a synchronous `ConnectionResult`, so that
         // the callers deal with an `fs2.Stream` consistently for async calls on the JVM as well as JavaScript. Later

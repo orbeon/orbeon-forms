@@ -16,11 +16,10 @@ package org.orbeon.oxf.util
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.externalcontext.{AsyncRequest, ExternalContext, LocalExternalContext, ResponseAdapter}
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.{Properties, PropertySet}
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
 
 import scala.concurrent.ExecutionContext
 
@@ -44,17 +43,4 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
       pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, ec)
       body
     }
-
-  def shiftExternalContext[F[_], T](lift: T => F[T])(body: => T)(implicit ec: ExternalContext): F[T] =
-    lift(
-      withExternalContext(
-        new LocalExternalContext(
-          ec.getWebAppContext,
-          new AsyncRequest(ec.getRequest),
-          new ResponseAdapter
-        )
-      )(
-        body
-      )
-    )
 }

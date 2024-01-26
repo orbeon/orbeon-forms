@@ -55,7 +55,7 @@ class EchoSubmission(submission: XFormsModelSubmission)
         )
       case Some(messageBody) =>
         // Log message body for debugging purposes
-        val indentedLogger = getDetailsLogger(submissionParameters)
+        val indentedLogger = submission.getDetailsLogger
         if (indentedLogger.debugEnabled && BaseSubmission.isLogBody)
           SubmissionUtils.logRequestBody(serializationParameters.actualRequestMediatype, messageBody)(indentedLogger)
     }
@@ -84,8 +84,9 @@ class EchoSubmission(submission: XFormsModelSubmission)
       encodingForSOAP          = submissionParameters.encoding,
       customHeaders            = customHeaderNameValues,
       headersToForward         = Connection.headersToForwardFromProperty,
-      getHeader                = submission.containingDocument.headersGetter)(
-      logger                   = getDetailsLogger(submissionParameters),
+      getHeader                = submission.containingDocument.headersGetter
+    )(
+      logger                   = submission.getDetailsLogger,
       externalContext          = XFormsCrossPlatformSupport.externalContext,
       coreCrossPlatformSupport = CoreCrossPlatformSupport
     )

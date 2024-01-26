@@ -26,6 +26,7 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
+import org.orbeon.oxf.util.Logging._
 
 
 private object CacheableSubmission {
@@ -47,6 +48,10 @@ class CacheableSubmission(submission: XFormsModelSubmission)
     refContext             : RefContext
   ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
 
+    implicit val logger: IndentedLogger = submission.getIndentedLogger
+
+    val detailsLogger = submission.getDetailsLogger
+
     val absoluteResolvedURLString =
       getAbsoluteSubmissionURL(
         submissionParameters.actionOrResource,
@@ -57,8 +62,6 @@ class CacheableSubmission(submission: XFormsModelSubmission)
 
     val requestBodyHash =
       serializationParameters.messageBody.map(XFormsCrossPlatformSupport.digestBytes(_, ByteEncoding.Hex))
-
-    val detailsLogger = getDetailsLogger(submissionParameters)
 
     val submissionEffectiveId = submission.getEffectiveId
 
@@ -111,55 +114,53 @@ class CacheableSubmission(submission: XFormsModelSubmission)
         Left(createReplacerAndConnectionResult(cachedDocumentInfo)).some
       case None =>
         // NOTE: somebody else could put an instance in cache between now and the obtaining of the result below
-        if (detailsLogger.debugEnabled)
-          detailsLogger.logDebug("", "did not find instance in cache", "id", instanceStaticId, "URI", absoluteResolvedURLString, "request hash", requestBodyHash.orNull)
-        val timingLogger = getTimingLogger(submissionParameters)
+        debug(
+          "did not find instance in cache",
+          List(
+            "id"           -> instanceStaticId,
+            "URI"          -> absoluteResolvedURLString,
+            "request hash" -> requestBodyHash.orNull
+          )
+        )(detailsLogger)
         // Create deferred evaluation for synchronous or asynchronous loading
-        if (submissionParameters.isAsynchronous && timingLogger.debugEnabled)
-          timingLogger.startHandleOperation("", "running asynchronous submission", "id", submission.getEffectiveId, "cacheable", "true")
-        try {
-          if (submissionParameters.isAsynchronous) {
+        maybeWithDebug(
+          "running asynchronous submission",
+          List("id" -> submission.getEffectiveId, "cacheable" -> "true"),
+          condition = submissionParameters.isAsynchronous
+        ) {
+          try {
+            if (submissionParameters.isAsynchronous) {
 
-            val newDocumentInfoIo =
-              XFormsServerSharedInstancesCache.findContentOrLoadAsync(
-                instanceCaching,
-                submissionParameters.isReadonly,
-                staticInstance.exposeXPathTypes,
-                loadFn(submissionParameters, serializationParameters)
-              )(detailsLogger)
+              val newDocumentInfoIo =
+                XFormsServerSharedInstancesCache.findContentOrLoadAsync(
+                  instanceCaching,
+                  submissionParameters.isReadonly,
+                  staticInstance.exposeXPathTypes,
+                  loadFn(submissionParameters, serializationParameters)
+                )(detailsLogger)
 
-            // xxx probably not?
-            Right(newDocumentInfoIo.map(createReplacerAndConnectionResult2)).some
-          } else {
+              // xxx probably not?
+              Right(newDocumentInfoIo.map(createReplacerAndConnectionResult2)).some
+            } else {
 
-            val newDocumentInfo =
-              XFormsServerSharedInstancesCache.findContentOrLoad(
-                instanceCaching,
-                submissionParameters.isReadonly,
-                staticInstance.exposeXPathTypes,
-                loadFn(submissionParameters, serializationParameters)
-              )(detailsLogger)
+              val newDocumentInfo =
+                XFormsServerSharedInstancesCache.findContentOrLoad(
+                  instanceCaching,
+                  submissionParameters.isReadonly,
+                  staticInstance.exposeXPathTypes,
+                  loadFn(submissionParameters, serializationParameters)
+                )(detailsLogger)
 
-            // xxx probably not?
-            Left(createReplacerAndConnectionResult(newDocumentInfo)).some
-          }
-        } catch {
-          case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
-            // The ThrowableWrapper was thrown within the inner load() method above
-            Some(Left(ConnectResultT.apply(submissionEffectiveId, Failure(throwableWrapper.throwable))))
-          case NonFatal(throwable) =>
-            // Any other throwable
-            Some(Left(ConnectResultT(submissionEffectiveId, Failure(throwable))))
-        } finally {
-          if (submissionParameters.isAsynchronous && timingLogger.debugEnabled) {
-
-            timingLogger.setDebugResults(
-              "id",
-              submission.getEffectiveId,
-              "asynchronous", submissionParameters.isAsynchronous.toString,
-            )
-
-            timingLogger.endHandleOperation()
+              // xxx probably not?
+              Left(createReplacerAndConnectionResult(newDocumentInfo)).some
+            }
+          } catch {
+            case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
+              // The ThrowableWrapper was thrown within the inner load() method above
+              Some(Left(ConnectResultT.apply(submissionEffectiveId, Failure(throwableWrapper.throwable))))
+            case NonFatal(throwable) =>
+              // Any other throwable
+              Some(Left(ConnectResultT(submissionEffectiveId, Failure(throwable))))
           }
         }
     } // match

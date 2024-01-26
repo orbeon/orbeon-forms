@@ -33,7 +33,7 @@ object BinaryReplacer extends Replacer {
   ): Option[URI] =
     XFormsCrossPlatformSupport.inputStreamToSessionUri(
       cxr.content.stream)(
-      submission.getDetailsLogger(submissionParameters)
+      submission.getDetailsLogger
     )
 
   def replace(

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.submission
 
 import cats.effect.IO
 import cats.syntax.option._
-import org.orbeon.connection.{ConnectionResultT, ConnectionContextSupport, StreamedContent}
+import org.orbeon.connection.{ConnectionContextSupport, ConnectionResultT, StreamedContent}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
@@ -50,6 +50,11 @@ class RegularSubmission(submission: XFormsModelSubmission)
     refContext          : RefContext
   ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
 
+    implicit val logger: IndentedLogger = submission.getIndentedLogger
+
+    val detailsLogger   = submission.getDetailsLogger
+    val externalContext = XFormsCrossPlatformSupport.externalContext
+
     val absoluteResolvedURL =
       URI.create(
         getAbsoluteSubmissionURL(
@@ -59,11 +64,6 @@ class RegularSubmission(submission: XFormsModelSubmission)
           submissionParameters.urlType
         )
       )
-
-    val timingLogger  = getTimingLogger(submissionParameters)
-    val detailsLogger = getDetailsLogger(submissionParameters)
-
-    val externalContext = XFormsCrossPlatformSupport.externalContext
 
     val headers =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
@@ -78,7 +78,8 @@ class RegularSubmission(submission: XFormsModelSubmission)
           EventCollector.Throw
         ),
         headersToForward         = Connection.headersToForwardFromProperty,
-        getHeader                = submission.containingDocument.headersGetter)(
+        getHeader                = submission.containingDocument.headersGetter
+      )(
         logger                   = detailsLogger,
         externalContext          = externalContext,
         coreCrossPlatformSupport = CoreCrossPlatformSupport
@@ -130,7 +131,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
             logger          = detailsLogger,
             externalContext = externalContext,
             connectionCtx   = ConnectionContextSupport.getContext(Map.empty)
-          ).map(createConnectResult(_)(timingLogger))
+          ).map(createConnectResult(_))
         )
       else
         Left(
@@ -148,7 +149,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
               logger          = detailsLogger,
               externalContext = externalContext
             )
-          )(timingLogger)
+          )
         )
     )
   }

@@ -77,11 +77,11 @@ object Connection extends ConnectionTrait {
   ): IO[AsyncConnectionResult] = {
     method match {
       case HttpMethod.PUT =>
-        fromSubmissionProviderAsync(method, url, content, headers)
+        fromSubmissionProviderAsync(method, url, content, headers)(logger = IndentedLogger(logger)) // logger copied
       case HttpMethod.GET =>
         fromResourceResolver(method, url).map(cxr => IO.pure(ConnectionResult.syncToAsync(cxr))) orElse
           fromTemporaryFile(method, url).map(IO.pure)                                            orElse
-          fromSubmissionProviderAsync(method, url, content, headers)
+          fromSubmissionProviderAsync(method, url, content, headers)(logger = IndentedLogger(logger)) // logger copied
       case _ =>
         Some(IO.pure(ConnectionResult.syncToAsync(methodNotAllowed(url))))
     }

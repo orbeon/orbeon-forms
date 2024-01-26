@@ -30,6 +30,12 @@ import scala.annotation.varargs
  */
 object IndentedLogger {
 
+  def apply(logger: IndentedLogger): IndentedLogger =
+    new IndentedLogger(logger.logger, logger.debugEnabled, logger.indentation)
+
+  def apply(logger: IndentedLogger, debugEnabled: Boolean): IndentedLogger =
+    new IndentedLogger(logger.logger, debugEnabled, logger.indentation)
+
   private def getLogIndentSpaces(level: Int): String = {
     val sb = new jl.StringBuilder
     for (_ <- 0 until level)

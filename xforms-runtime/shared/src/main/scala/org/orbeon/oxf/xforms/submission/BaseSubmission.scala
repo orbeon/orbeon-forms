@@ -51,14 +51,6 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
       if (isNorewrite) UrlRewriteMode.AbsoluteNoContext else UrlRewriteMode.Absolute
     )
   }
-
-  protected def getDetailsLogger(
-    submissionParameters: SubmissionParameters
-  ): IndentedLogger = submission.getDetailsLogger(submissionParameters)
-
-  protected def getTimingLogger(
-    submissionParameters: SubmissionParameters
-  ): IndentedLogger = submission.getTimingLogger(submissionParameters)
 }
 
 object BaseSubmission {

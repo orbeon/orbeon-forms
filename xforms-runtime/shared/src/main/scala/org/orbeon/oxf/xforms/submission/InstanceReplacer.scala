@@ -69,7 +69,7 @@ object InstanceReplacer extends Replacer {
     val contentType = cxr.mediatypeOrDefault(ContentTypes.XmlContentType)
     val isJSON = ContentTypes.isJSONContentType(contentType)
     if (ContentTypes.isXMLContentType(contentType) || isJSON) {
-      implicit val detailsLogger: IndentedLogger = submission.getDetailsLogger(submissionParameters)
+      implicit val detailsLogger: IndentedLogger = submission.getDetailsLogger
       Left(
         deserializeInstance(
           submission       = submission,
@@ -201,7 +201,7 @@ object InstanceReplacer extends Replacer {
                     submissionParameters.tunnelProperties
                   )
                 } else {
-                  implicit val detailsLogger: IndentedLogger = submission.getDetailsLogger(submissionParameters)
+                  implicit val detailsLogger: IndentedLogger = submission.getDetailsLogger
 
                   debug(
                     s"replacing instance with ${if (submissionParameters.isReadonly) "read-only" else "mutable"} instance",

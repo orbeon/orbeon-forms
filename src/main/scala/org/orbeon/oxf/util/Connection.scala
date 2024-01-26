@@ -108,6 +108,10 @@ object Connection extends ConnectionTrait {
     connectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
   ): IO[AsyncConnectionResult] = {
 
+    // Copy `IndentedLogger` as we cannot share logger state with other threads, and the caller's logger might be
+    // associated with the `XFormsContainingDocument` and reused by the calling thread.
+    val newLogger = IndentedLogger(logger)
+
     // Here we convert an `fs2.Stream` to a Java `InputStream` which is used downstream. This works if the producer and
     // the consumer are in different threads. Ideally, our downstream code would be able to deal with an `fs2.Stream`.
 //    def requestStreamedContentOptF: Future[Option[StreamedContent]] =
@@ -140,6 +144,10 @@ object Connection extends ConnectionTrait {
               headers     = headers,
               loadState   = loadState,
               logBody     = logBody
+            )(
+              logger          = newLogger,
+              externalContext = externalContext,
+              connectionCtx   = connectionCtx
             )
           }
 

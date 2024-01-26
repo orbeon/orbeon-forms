@@ -67,6 +67,12 @@ trait Logging {
     }
   }
 
+  def maybeWithDebug[T](message: => String, parameters: => Seq[(String, String)] = Nil, condition: Boolean = true)(body: => T)(implicit logger: IndentedLogger): T =
+    if (condition)
+      withDebug(message, parameters)(body)
+    else
+      body
+
   // Run the given block only in debug mode
   def ifDebug[T](body: => T)(implicit logger: IndentedLogger): Unit =
     if (logger.debugEnabled)

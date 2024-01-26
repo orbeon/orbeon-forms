@@ -46,24 +46,6 @@ object XFormsModelSubmission {
   val LOGGING_CATEGORY = "submission"
   val logger: Logger = LoggerFactory.createLogger(classOf[XFormsModelSubmission])
 
-  private def getNewLogger(
-    submissionParameters: SubmissionParameters,
-    indentedLogger      : IndentedLogger,
-    newDebugEnabled     : Boolean
-  ) =
-    if (submissionParameters.isAsynchronous && submissionParameters.replaceType != ReplaceType.None) {
-      // Background asynchronous submission creates a new logger with its own independent indentation
-      val newIndentation = new IndentedLogger.Indentation(indentedLogger.indentation.indentation)
-      new IndentedLogger(indentedLogger, newIndentation, newDebugEnabled)
-    } else if (indentedLogger.debugEnabled != newDebugEnabled) {
-      // Keep shared indentation but use new debug setting
-      new IndentedLogger(indentedLogger, indentedLogger.indentation, newDebugEnabled)
-    } else {
-      // Synchronous submission or foreground asynchronous submission uses current logger
-      indentedLogger
-    }
-
-  private def isLogDetails = Loggers.isDebugEnabled("submission-details")
 
   private val AllowedExternalEvents = Set(XFormsEvents.XXFORMS_SUBMIT)
 }
@@ -281,13 +263,8 @@ class XFormsModelSubmission(
   def getIndentedLogger: IndentedLogger =
     containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
 
-  def getDetailsLogger(submissionParameters: SubmissionParameters): IndentedLogger =
-    XFormsModelSubmission.getNewLogger(submissionParameters, getIndentedLogger, XFormsModelSubmission.isLogDetails)
-
-  def getTimingLogger(submissionParameters: SubmissionParameters): IndentedLogger = {
-    val indentedLogger = getIndentedLogger
-    XFormsModelSubmission.getNewLogger(submissionParameters, indentedLogger, indentedLogger.debugEnabled)
-  }
+  def getDetailsLogger: IndentedLogger =
+    IndentedLogger(getIndentedLogger, Loggers.isDebugEnabled("submission-details"))
 
   def allowExternalEvent(eventName: String): Boolean =
     XFormsModelSubmission.AllowedExternalEvents.contains(eventName)

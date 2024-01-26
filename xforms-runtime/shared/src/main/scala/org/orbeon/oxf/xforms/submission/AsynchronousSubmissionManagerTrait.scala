@@ -97,7 +97,7 @@ trait AsynchronousSubmissionManagerTrait {
 
   def processCompletedAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit = {
 
-    implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
+    implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LoggingCategory)
 
     withDebug("processing completed asynchronous submissions") {
       var processedCount = 0
@@ -141,7 +141,7 @@ trait AsynchronousSubmissionManagerTrait {
     * asynchronous submissions to be started, also wait for the completion of those.
     */
   def awaitAllAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit = {
-    implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
+    implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LoggingCategory)
     debug("awaiting all pending asynchronous submissions")
     awaitPending(
       containingDocument,
@@ -160,7 +160,7 @@ trait AsynchronousSubmissionManagerTrait {
     containingDocument       : XFormsContainingDocument,
     skipDeferredEventHandling: Boolean
   ): Unit = {
-    implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
+    implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LoggingCategory)
     debug("awaiting all pending asynchronous submissions for current request")
     awaitPending(
       containingDocument,

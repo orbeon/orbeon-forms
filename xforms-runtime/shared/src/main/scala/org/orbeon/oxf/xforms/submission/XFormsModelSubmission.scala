@@ -43,9 +43,10 @@ import scala.util.{Failure, Success, Try}
 
 object XFormsModelSubmission {
 
-  val LOGGING_CATEGORY = "submission"
-  val logger: Logger = LoggerFactory.createLogger(classOf[XFormsModelSubmission])
+  val LoggingCategory        = "submission"
+  val DetailsLoggingCategory = "submission-details"
 
+  val logger: Logger = LoggerFactory.createLogger(classOf[XFormsModelSubmission])
 
   private val AllowedExternalEvents = Set(XFormsEvents.XXFORMS_SUBMIT)
 }
@@ -261,10 +262,10 @@ class XFormsModelSubmission(
   }
 
   def getIndentedLogger: IndentedLogger =
-    containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
+    containingDocument.getIndentedLogger(XFormsModelSubmission.LoggingCategory)
 
   def getDetailsLogger: IndentedLogger =
-    IndentedLogger(getIndentedLogger, Loggers.isDebugEnabled("submission-details"))
+    IndentedLogger(getIndentedLogger, Loggers.isDebugEnabled(XFormsModelSubmission.DetailsLoggingCategory))
 
   def allowExternalEvent(eventName: String): Boolean =
     XFormsModelSubmission.AllowedExternalEvents.contains(eventName)

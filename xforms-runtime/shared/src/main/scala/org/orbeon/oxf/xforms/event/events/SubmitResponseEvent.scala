@@ -45,7 +45,7 @@ trait SubmitResponseEvent extends XFormsEvent {
   // `event('response-body')` multiple times.
   var cachedBody: Option[Option[String Either DocumentNodeInfoType]] = None
 
-  override implicit def indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
+  override implicit def indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LoggingCategory)
   override def lazyProperties = getters(this, SubmitResponseEvent.Getters)
   override def newPropertyName(name: String) = SubmitResponseEvent.Deprecated.get(name) orElse super.newPropertyName(name)
 }

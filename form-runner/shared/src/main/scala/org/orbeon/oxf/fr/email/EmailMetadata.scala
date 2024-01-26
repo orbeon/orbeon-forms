@@ -18,7 +18,8 @@ object EmailMetadata {
     headers                    : List[(HeaderName, TemplateValue)],
     subject                    : Option[Part],
     body                       : Option[Part],
-    attachPdf                  : Boolean,
+    attachPdf                  : Option[Boolean],
+    attachXml                  : Option[Boolean],
     attachFiles                : Option[String],
     attachControls             : List[TemplateValue.Control],
     excludeFromAllControlValues: List[TemplateValue.Control]
@@ -123,7 +124,7 @@ object EmailMetadata {
       formFields : List[FormField],
       subject    : Option[Part],
       body       : Option[Part],
-      attachPdf  : Boolean,
+      attachPdf  : Option[Boolean],
       attachFiles: Option[String]
     )
   }

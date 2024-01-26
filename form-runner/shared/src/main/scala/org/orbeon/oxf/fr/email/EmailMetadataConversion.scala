@@ -132,7 +132,8 @@ object EmailMetadataConversion {
           headers                     = headersFromFormFields(metadata.formFields),
           subject                     = subject,
           body                        = body,
-          attachPdf                   = false,
+          attachPdf                   = None,
+          attachXml                   = None,
           attachFiles                 = None,
           attachControls              = attachControls,
           excludeFromAllControlValues = controlsWithFormFieldRole(metadata.formFields, FormFieldRole.ExcludeFromAllFields)
@@ -158,6 +159,7 @@ object EmailMetadataConversion {
           subject                     = template2022.subject,
           body                        = template2022.body,
           attachPdf                   = template2022.attachPdf,
+          attachXml                   = None,
           attachFiles                 = template2022.attachFiles,
           attachControls              = attachControls,
           excludeFromAllControlValues = controlsWithFormFieldRole(template2022.formFields, FormFieldRole.ExcludeFromAllFields),

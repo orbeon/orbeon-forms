@@ -53,7 +53,8 @@ object EmailMetadataParsing {
       headers                     = withHeaderNamesOnly(templateValuesInRootElement("headers")),
       subject                     = templateNodeInfo.child("subject").headOption.map(parseCurrentPart),
       body                        = templateNodeInfo.child("body"   ).headOption.map(parseCurrentPart),
-      attachPdf                   = templateNodeInfo.child("attach").att("pdf"  ).headOption.exists(_.stringValue == "true"),
+      attachPdf                   = templateNodeInfo.child("attach").att("pdf"  ).headOption.map(_.stringValue == "true"),
+      attachXml                   = templateNodeInfo.child("attach").att("xml"  ).headOption.map(_.stringValue == "true"),
       attachFiles                 = templateNodeInfo.child("attach").att("files").headOption.map(_.stringValue),
       attachControls              = controlsOnly(templateValuesInRootElement("attach")),
       excludeFromAllControlValues = controlsOnly(templateValuesInRootElement("exclude-from-all-control-values"))
@@ -177,7 +178,7 @@ object EmailMetadataParsing {
       subject     = templateNodeInfo.child("subject"    ).headOption.map(parseCurrentPart),
       body        = templateNodeInfo.child("body"       ).headOption.map(parseCurrentPart),
       formFields  = templateNodeInfo.child("form-fields").headOption.toList.flatMap(parseFields2022(_, formDefinition)),
-      attachPdf   = templateNodeInfo.child("attach").att("pdf"  ).headOption.exists(_.stringValue == "true"),
+      attachPdf   = templateNodeInfo.child("attach").att("pdf"  ).headOption.map(_.stringValue == "true"),
       attachFiles = templateNodeInfo.child("attach").att("files").headOption.map(_.stringValue)
     )
 
@@ -185,7 +186,7 @@ object EmailMetadataParsing {
 
     def parseFormFields(
       formFieldsNodeInfo: NodeInfo,
-      formFieldNodeInfoToSection: (NodeInfo) => Option[String]
+      formFieldNodeInfoToSection: NodeInfo => Option[String]
     ): List[Legacy.FormField] =
       formFieldsNodeInfo.child(*).toList.map { formFieldNodeInfo =>
         Legacy.FormField(

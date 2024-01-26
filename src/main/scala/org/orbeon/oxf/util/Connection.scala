@@ -388,7 +388,7 @@ object Connection extends ConnectionTrait {
     )(implicit
       logger          : IndentedLogger,
       externalContext : ExternalContext,
-      ConnectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
+      connectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
     ): (CookieStore, ConnectionResult) = {
 
       val normalizedUrlString = url.toString
@@ -430,7 +430,7 @@ object Connection extends ConnectionTrait {
       logBody         : Boolean
     )(implicit
       logger          : IndentedLogger,
-      ConnectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
+      connectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
     ): ConnectionResult = {
 
       val normalizedUrlString = normalizedUrl.toString

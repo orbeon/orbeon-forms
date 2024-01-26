@@ -54,7 +54,7 @@ trait ConnectionTrait {
   )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext,
-    ConnectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
+    connectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
   ): IO[AsyncConnectionResult]
 
   def isInternalPath(path: String): Boolean

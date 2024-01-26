@@ -645,7 +645,7 @@ body.orbeon {
         }
 
         .xforms-label {
-            margin-top: 5px;
+            margin-top: 4px;
 
             // Try to make icons appear vertically centered
             img {
@@ -702,6 +702,8 @@ body.orbeon {
         .xbl-fr-checkbox-input {
             .xforms-select-appearance-full, .xforms-select1-appearance-full {
                 .xforms-items {
+                    // Use same top/bottom as the for the margin on `.xforms-label`,
+                    // so the radio/checkboxes are aligned with a label on the same line
                     padding: 4px 0;
                 }
             }

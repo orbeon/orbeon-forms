@@ -31,6 +31,7 @@ trait ExportOrPurge {
   type Context
 
   val Logger = LoggerFactory.createLogger("org.orbeon.fr.export")
+  implicit val indentedLogger: IndentedLogger = new IndentedLogger(Logger)
 
   val FormVersionParam         = "form-version"
   val ContentParam             = "content"
@@ -171,7 +172,6 @@ trait ExportOrPurge {
   ): Unit = {
 
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
-    implicit val indentedLogger: IndentedLogger = new IndentedLogger(Logger)
 
     val appFormVersionMatchOpt = findAppFormVersionMatch(
       request       = request,
@@ -214,8 +214,7 @@ trait ExportOrPurge {
     dateRangeGtOpt       : Option[Instant],
     dateRangeLtOpt       : Option[Instant]
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    indentedLogger          : IndentedLogger
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit
 
   private def findAppFormVersionMatch(
@@ -256,8 +255,7 @@ trait ExportOrPurge {
     forCurrentData : Boolean,
     metadataOpt    : Option[Metadata]
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    indentedLogger          : IndentedLogger
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit
 
   def processAttachment(
@@ -267,8 +265,7 @@ trait ExportOrPurge {
     toPath        : String,
     debugAction   : String
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    indentedLogger          : IndentedLogger
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit
 
   def completeAttachments(
@@ -278,8 +275,7 @@ trait ExportOrPurge {
     attachmentPaths     : mutable.Set[String],
     otherAttachmentPaths: mutable.Set[String]
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    indentedLogger          : IndentedLogger
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit
 
   def makeToPath(
@@ -297,8 +293,7 @@ trait ExportOrPurge {
     modifiedTimeOpt: Option[Instant],
     attachmentPaths: mutable.Set[String]
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    indentedLogger          : IndentedLogger
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit =
     FormRunner.collectUnsavedAttachments(
       data             = xmlData,
@@ -338,8 +333,7 @@ trait ExportOrPurge {
     dateRangeGtOpt     : Option[Instant],
     dateRangeLtOpt     : Option[Instant]
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    indentedLogger          : IndentedLogger
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit =
     matchOpt match {
       case None | Some(MatchSpec(_, None, _)) | Some(MatchSpec(_, Some((_, None)), _)) =>
@@ -416,8 +410,7 @@ trait ExportOrPurge {
     dateRangeGtOpt     : Option[Instant],
     dateRangeLtOpt     : Option[Instant]
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    indentedLogger          : IndentedLogger
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit =
     getFormMetadata(
       appOpt,
@@ -461,8 +454,7 @@ trait ExportOrPurge {
     dateRangeGtOpt     : Option[Instant],
     dateRangeLtOpt     : Option[Instant]
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    indentedLogger          : IndentedLogger
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit = {
 
     if (formOrDataSet(FormOrData.Form))
@@ -476,8 +468,7 @@ trait ExportOrPurge {
     ctx           : Context,
     appFormVersion: AppFormVersion
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    indentedLogger          : IndentedLogger
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Try[Unit] = {
 
     debug(s"exporting form definition `$appFormVersion`")
@@ -515,8 +506,7 @@ trait ExportOrPurge {
     dateRangeGtOpt     : Option[Instant],
     dateRangeLtOpt     : Option[Instant]
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    indentedLogger          : IndentedLogger
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Unit = {
 
     val attachmentPaths      = mutable.Set[String]()
@@ -599,8 +589,7 @@ trait ExportOrPurge {
     dateRangeLtOpt         : Option[Instant],
     forCurrentData         : Boolean
   )(implicit
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    indentedLogger          : IndentedLogger
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Try[Boolean] =
     modifiedTimeOpt match {
       case Some(modifiedTime) if ! isTimeInRange(modifiedTime, dateRangeGtOpt, dateRangeLtOpt) =>

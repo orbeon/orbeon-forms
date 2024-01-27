@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.xforms.upload
 
+import org.slf4j
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.apache.commons.fileupload.{FileItem, FileItemHeaders, FileItemHeadersSupport, UploadContext}
 import org.orbeon.datatypes.MaximumSize
@@ -25,6 +26,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.generator.RequestGenerator
+import org.orbeon.oxf.util.CoreUtils.OptionOps
 import org.orbeon.oxf.util.Multipart.UploadItem
 import org.orbeon.oxf.util.SLF4JLogging._
 import org.orbeon.oxf.util.StringUtils._
@@ -35,15 +37,11 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.upload.api.java.{FileScan2, FileScanProvider2, FileScanResult => JFileScanResult}
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
 import org.orbeon.xforms.Constants
-import org.slf4j.{Logger, LoggerFactory}
 import shapeless.syntax.typeable._
 
 import java.net.URI
-import java.util.ServiceLoader
-import scala.collection.compat._
 import scala.collection.{mutable => m}
 import scala.jdk.CollectionConverters._
-import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
@@ -119,6 +117,8 @@ object UploaderServer {
     outerLimiterInputStream  : LimiterInputStream,
     session                  : Session
   ) extends MultipartLifecycle {
+
+    import Private._
 
     // Mutable state
     private var uuidOpt     : Option[String]                       = None
@@ -274,7 +274,7 @@ object UploaderServer {
             }
           catch {
             case NonFatal(t) =>
-              info(s"error thrown by file scan provider while calling `abort()`: ${OrbeonFormatter.getThrowableMessage(t)}")(Private.Logger)
+              info(s"error thrown by file scan provider while calling `abort()`: ${OrbeonFormatter.getThrowableMessage(t)}")
           }
           None
         case UploadState.Started =>
@@ -301,7 +301,7 @@ object UploaderServer {
 
   private object Private {
 
-    implicit val Logger: Logger = LoggerFactory.getLogger("org.orbeon.xforms.upload")
+    implicit val logger: slf4j.Logger = LoggerFactory.createLogger("org.orbeon.xforms.upload").logger
 
     private val UploadProgressSessionKey = "orbeon.upload.progress."
 
@@ -333,29 +333,12 @@ object UploaderServer {
         case Failure(t)                => FileScanErrorResult(message = Option(t.getMessage), throwable = Option(t))
       }
 
-    private def loadProvider[T <: { def init(): Unit } : ClassTag]: Option[T] =
-      try {
-        Version.instance.requirePEFeature("File scan API")
-
-        val runtimeClass = implicitly[ClassTag[T]].runtimeClass
-
-        Option(ServiceLoader.load(runtimeClass)) flatMap { serviceLoader =>
-          serviceLoader.iterator.asScala.nextOption() map { provider =>
-            Logger.info(s"Initializing file scan provider for class `${runtimeClass.getName}`")
-            val withInit = provider.asInstanceOf[T] // it better be but we can't prove it in code!
-            withInit.init()
-            withInit
-          }
-        }
-      } catch {
-        case NonFatal(t) =>
-          Logger.error(s"Failed to obtain file scan provider:\n${OrbeonFormatter.format(t)}")
-          None
-      }
-
     lazy val fileScanProviderOpt: Option[Either[FileScanProvider2, FileScanProvider]] =
-      loadProvider[FileScanProvider2].map(Left.apply)
-        .orElse(loadProvider[FileScanProvider].map(Right.apply))
+      ServiceProviderSupport.loadProvider[FileScanProvider2]("file scan", checkVersion).kestrel(_.init()).map(Left.apply)
+        .orElse(ServiceProviderSupport.loadProvider[FileScanProvider]("file scan", checkVersion).kestrel(_.init()).map(Right.apply))
+
+    private def checkVersion(): Unit =
+      Version.instance.requirePEFeature("File scan API")
 
     // The Java API uses its own ADT. Here we convert from that to our native Scala ADT.
     private def fileScanResultFromJavaApi(jfsr: JFileScanResult): FileScanResult =

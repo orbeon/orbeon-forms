@@ -39,7 +39,8 @@ object Loggers {
     new IndentedLogger(
       logger,
       isDebugEnabled(category),
-      indentation
+      indentation,
+      Some(category)
     )
 
   def isDebugEnabled(category: String): Boolean =

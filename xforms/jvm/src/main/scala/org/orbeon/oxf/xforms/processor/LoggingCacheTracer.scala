@@ -13,20 +13,22 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
 
-class LoggingCacheTracer(logger: IndentedLogger) extends CacheTracer {
+
+class LoggingCacheTracer(implicit logger: IndentedLogger) extends CacheTracer {
 
   def digestAndTemplateStatus(digestIfFound: Option[String]): Unit =
     digestIfFound match {
-      case Some(digest) => logger.logDebug("", "template and static state digest obtained from cache", "digest", digest)
-      case None         => logger.logDebug("", "template and static state digest not obtained from cache.")
+      case Some(digest) => debug("template and static state digest obtained from cache", List("digest" -> digest))
+      case None         => debug("template and static state digest not obtained from cache.")
     }
 
   def staticStateStatus(found: Boolean, digest: String): Unit =
     if (found)
-      logger.logDebug("", "found up-to-date static state by digest in cache", "digest", digest)
+      debug("found up-to-date static state by digest in cache", List("digest" -> digest))
     else
-      logger.logDebug("", "did not find static state by digest in cache", "digest", digest)
+      debug("did not find static state by digest in cache", List("digest" -> digest))
 }

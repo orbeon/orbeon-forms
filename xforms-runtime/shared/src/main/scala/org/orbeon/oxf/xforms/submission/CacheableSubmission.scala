@@ -184,8 +184,10 @@ class CacheableSubmission(submission: XFormsModelSubmission)
       case Some(destinationNodeInfo) =>
         submission.containingDocument.instanceForNodeOpt(destinationNodeInfo) match {
           case Some(updatedInstance) if updatedInstance.rootElement.isSameNodeInfo(destinationNodeInfo) =>
-            if (indentedLogger.debugEnabled)
-              indentedLogger.logDebug("", "using instance from application shared instance cache", "instance", updatedInstance.getEffectiveId)
+            debug(
+              "using instance from application shared instance cache",
+              List("instance" -> updatedInstance.getEffectiveId)
+            )(indentedLogger)
             updatedInstance
           case _ =>
             // Only support replacing the root element of an instance

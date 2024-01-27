@@ -31,10 +31,12 @@ import scala.annotation.varargs
 object IndentedLogger {
 
   def apply(logger: IndentedLogger): IndentedLogger =
-    new IndentedLogger(logger.logger, logger.debugEnabled, logger.indentation)
+    new IndentedLogger(logger.logger, logger.debugEnabled, logger.indentation, logger.categoryOpt)
 
   def apply(logger: IndentedLogger, debugEnabled: Boolean): IndentedLogger =
-    new IndentedLogger(logger.logger, debugEnabled, logger.indentation)
+    new IndentedLogger(logger.logger, debugEnabled, logger.indentation, logger.categoryOpt)
+
+  private val Separator = " - "
 
   private def getLogIndentSpaces(level: Int): String = {
     val sb = new jl.StringBuilder
@@ -44,38 +46,53 @@ object IndentedLogger {
   }
 
   private def log(
-    logger      : log4s.Logger.LevelLogger,
-    indentLevel : Int,
-    `type`      : String,
-    message     : String,
-    parameters  : String*
+    logger     : log4s.Logger.LevelLogger,
+    indentLevel: Int,
+    `type`     : String,
+    categoryOpt: Option[String],
+    message    : String,
+    parameters : String*
   ): Unit = {
-    val parametersString =
-      if ((parameters ne null) && parameters.nonEmpty) {
-        val sb = new jl.StringBuilder(" {")
-        var first = true
-        var i = 0
-        while (i < parameters.length) {
-          val paramName = parameters(i)
-          val paramValue = parameters(i + 1)
-          if ((paramName ne null) && (paramValue ne null)) {
-            if (! first)
-              sb.append(", ")
-            sb.append(paramName)
-            sb.append(": \"")
-            sb.append(paramValue)
-            sb.append('\"')
-            first = false
-          }
-          i += 2
+
+    val sb = new jl.StringBuilder
+
+    sb.append(getLogIndentSpaces(indentLevel))
+
+    // Deprecated
+    if (`type`.nonEmpty) {
+      sb.append(`type`)
+      sb.append(Separator)
+    }
+
+    categoryOpt.foreach { category =>
+      sb.append(category)
+      sb.append(Separator)
+    }
+
+    sb.append(message)
+
+    if ((parameters ne null) && parameters.nonEmpty) {
+      sb.append(" {")
+      var first = true
+      var i = 0
+      while (i < parameters.length) {
+        val paramName = parameters(i)
+        val paramValue = parameters(i + 1)
+        if ((paramName ne null) && (paramValue ne null)) {
+          if (! first)
+            sb.append(", ")
+          sb.append(paramName)
+          sb.append(": \"")
+          sb.append(paramValue)
+          sb.append('\"')
+          first = false
         }
-        sb.append('}')
-        sb.toString
-      } else
-        ""
-    val text = (if (`type`.nonEmpty) `type` + " - " else "") + message + parametersString
-    val indentation = getLogIndentSpaces(indentLevel)
-    logger(indentation + text)
+        i += 2
+      }
+      sb.append('}')
+    }
+
+    logger(sb.toString)
   }
 
   class Indentation(var indentation: Int) {
@@ -83,7 +100,12 @@ object IndentedLogger {
   }
 }
 
-class IndentedLogger(val logger: log4s.Logger, val debugEnabled: Boolean, val indentation: Indentation) {
+class IndentedLogger(
+  val logger      : log4s.Logger,
+  val debugEnabled: Boolean,
+  val indentation : Indentation,
+  val categoryOpt: Option[String] = None
+) {
 
   private var stack: List[Operation] = Nil
 
@@ -138,16 +160,13 @@ class IndentedLogger(val logger: log4s.Logger, val debugEnabled: Boolean, val in
     stack.head.resultParameters = parameters
 
   def log(level: log4s.LogLevel, `type`: String, message: String, parameters: String*): Unit =
-    log(level, indentation.indentation, `type`, message, parameters: _*)
+    if (!((level eq log4s.Debug) && ! debugEnabled))
+      log(level, indentation.indentation, `type`, message, parameters: _*)
 
   @varargs
   def logDebug(`type`: String, message: String, parameters: String*): Unit =
     if (debugEnabled)
-      IndentedLogger.log(logger(log4s.Debug), indentation.indentation, `type`, message, parameters: _*)
-
-  def logDebug(`type`: String, message: String, throwable: Throwable): Unit =
-    if (debugEnabled)
-      IndentedLogger.log(logger(log4s.Debug), indentation.indentation, `type`, message, "throwable", OrbeonFormatter.format(throwable))
+      IndentedLogger.log(logger(log4s.Debug), indentation.indentation, `type`, categoryOpt, message, parameters: _*)
 
   def logWarning(`type`: String, message: String, parameters: String*): Unit =
     log(log4s.Warn, indentation.indentation, `type`, message, parameters: _*)
@@ -164,10 +183,8 @@ class IndentedLogger(val logger: log4s.Logger, val debugEnabled: Boolean, val in
   def logError(`type`: String, message: String, throwable: Throwable): Unit =
     log(log4s.Error, indentation.indentation, `type`, message, "throwable", OrbeonFormatter.format(throwable))
 
-  // Handle DEBUG level locally, everything else goes through
   private def log(level: log4s.LogLevel, indentLevel: Int, `type`: String, message: String, parameters: String*): Unit =
-    if (! ((level eq log4s.Debug) && ! debugEnabled))
-      IndentedLogger.log(logger(level), indentLevel, `type`, message, parameters: _*)
+    IndentedLogger.log(logger(level), indentLevel, `type`, categoryOpt, message, parameters: _*)
 
   private class Operation(val `type`: String, val message: String) {
 

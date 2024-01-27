@@ -62,7 +62,7 @@ object StaticStateBits {
             override def endDocument(): Unit = {
               super.endDocument()
               // Log out at end of document
-              logger.logDebug("", "static state input", "input", writer.result)
+              debug("static state input", List("input" -> writer.result))
             }
           }
         }

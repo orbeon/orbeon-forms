@@ -40,6 +40,7 @@ private object XFormsMessageAction {
 
   val LogPrefix = "xf:message"
 
+  // TODO: consider using `Logger`
   val ExtensionLevels = Map[QName, (IndentedLogger, String) => Unit](
     LogDebugQName -> (_.logDebug  (LogPrefix, _)),
     LogInfoQName  -> (_.logInfo   (LogPrefix, _)),

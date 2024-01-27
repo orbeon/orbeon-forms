@@ -634,8 +634,10 @@ object XFormsInstance extends Logging {
       val scopes    = Iterator.iterateOpt(startScope)(_.parent)
       val instances = scopes flatMap ops.getModelsForScope flatMap (_.instances.get(instanceId))
 
-      if (! instances.hasNext)
-        containingDocument.getIndentedLogger(XFormsModel.LoggingCategory).logDebug("xxf:instance()", "instance not found", "instance id", instanceId)
+      if (! instances.hasNext) {
+        implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
+        debug("xxf:instance(): instance not found", List("instance id" -> instanceId))
+      }
 
       None
     }

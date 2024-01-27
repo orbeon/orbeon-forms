@@ -36,6 +36,8 @@ import java.util
 import java.util.Collections
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
+import org.orbeon.oxf.util.Logging._
+
 
 /**
  * 9.3.5 The insert Element
@@ -110,8 +112,8 @@ object XFormsInsertAction {
 
               Iterator(singleSourceNode.createCopy)
             case Right(_) =>
-              if (indentedLogger != null && indentedLogger.debugEnabled)
-                indentedLogger.logDebug("xf:insert", "origin node-set from node-set binding is empty, terminating")
+              if (indentedLogger != null)
+                debug("xf:insert: origin node-set from node-set binding is empty, terminating")
               return Collections.emptyList[om.NodeInfo]
           }
 
@@ -119,8 +121,8 @@ object XFormsInsertAction {
           // There are explicitly specified origin objects
           // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
           if (originItems.isEmpty) {
-            if (indentedLogger != null && indentedLogger.debugEnabled)
-              indentedLogger.logDebug("xf:insert", "origin node-set is empty, terminating")
+            if (indentedLogger != null)
+              debug("xf:insert: origin node-set is empty, terminating")
             return Collections.emptyList[om.NodeInfo]
           }
           // "Each node in the origin node-set is cloned in the order it appears in the origin node-set."
@@ -242,15 +244,16 @@ object XFormsInsertAction {
 
                   otherNodes foreach { node =>
                     // We never insert attributes or namespace nodes as siblings
-                    if (indentedLogger != null && indentedLogger.debugEnabled)
-                      indentedLogger.logDebug(
-                        "xf:insert",
-                        "skipping insertion of node as sibling in element content",
-                        "type", Node.nodeTypeName(node),
-                        "node", node match {
-                          case att: Attribute => att.toDebugString
-                          case _              => node.toString
-                        }
+                    if (indentedLogger != null)
+                      debug(
+                        "xf:insert: skipping insertion of node as sibling in element content",
+                        List(
+                          "type" -> Node.nodeTypeName(node),
+                          "node" -> (node match {
+                            case att: Attribute => att.toDebugString
+                            case _              => node.toString
+                          })
+                        )
                       )
                   }
 
@@ -290,16 +293,17 @@ object XFormsInsertAction {
     val didInsertNodes = insertedNodes.nonEmpty
 
     // Log stuff
-    if (indentedLogger != null && indentedLogger.debugEnabled)
+    if (indentedLogger != null)
       if (didInsertNodes)
-        indentedLogger.logDebug(
-          "xf:insert",
-          "inserted nodes",
-          "count", insertedNodes.size.toString,
-          "instance", modifiedInstanceOpt map (_.getEffectiveId) orNull
+        debug(
+          "xf:insert: inserted nodes",
+          List(
+            "count"    -> insertedNodes.size.toString,
+            "instance" -> modifiedInstanceOpt.map(_.getEffectiveId).orNull
+          )
         )
       else
-        indentedLogger.logDebug("xf:insert", "no node inserted")
+        debug("xf:insert: no node inserted")
 
     // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
     val insertedNodeInfos =

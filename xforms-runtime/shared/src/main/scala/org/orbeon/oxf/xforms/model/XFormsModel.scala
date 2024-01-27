@@ -66,10 +66,10 @@ class XFormsModel(
   def updateEffectiveId(effectiveId: String): Unit =
     selfModel.effectiveId = effectiveId
 
-  val containingDocument  = container.getContainingDocument
+  val containingDocument: XFormsContainingDocument = container.getContainingDocument
   val sequenceNumber: Int = containingDocument.nextModelSequenceNumber()
 
-  implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
+  implicit val indentedLogger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
 
   def getResolutionScope: Scope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)
 
@@ -376,11 +376,12 @@ trait XFormsModelInstances {
     instanceStatesIt foreach { state =>
 
       XFormsInstance.restoreInstanceFromState(selfModel, state, loadInstance)
-      indentedLogger.logDebug(
-        "restore",
-        "restoring instance from dynamic state",
-        "model effective id", effectiveId,
-        "instance effective id", state.effectiveId
+      debug(
+        "restore: restoring instance from dynamic state",
+        List(
+          "model effective id"    -> effectiveId,
+          "instance effective id" -> state.effectiveId
+        )
       )
     }
 
@@ -543,8 +544,7 @@ trait XFormsModelInstances {
           // NOTE: If there is no resolver, URLs of the form input:* are not allowed
           assert(! Instance.isProcessorInputScheme(absoluteURLString))
 
-          if (indentedLogger.debugEnabled)
-            indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteURLString)
+          debug("getting document from URI", List("URI" -> absoluteURLString))
 
           val absoluteResolvedUrl = URI.create(absoluteURLString)
 
@@ -577,14 +577,13 @@ trait XFormsModelInstances {
             // Read result as XML
             // TODO: use submission code?
             if (! instance.readonly)
-              Left(XFormsCrossPlatformSupport.readOrbeonDom(is, connectionResult.url, false, true))
+              Left(XFormsCrossPlatformSupport.readOrbeonDom(is, connectionResult.url, handleXInclude = false, handleLexical = true))
             else
-              Right(XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, false, true))
+              Right(XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, handleXInclude = false, handleLexical = true))
           }
         case Some(uriResolver) =>
           // Optimized case that uses the provided resolver
-          if (indentedLogger.debugEnabled)
-            indentedLogger.logDebug("load", "getting document from resolver", "URI", absoluteURLString)
+          debug("getting document from resolver", List("URI" -> absoluteURLString))
 
           // TODO: Handle validating and handleXInclude!
           if (! instance.readonly)

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.model
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
@@ -157,13 +158,19 @@ object DataModel {
     source              : String,
     oldValue            : String,
     newValue            : String,
-    instanceEffectiveId : Option[String])(implicit
+    instanceEffectiveId : Option[String]
+  )(implicit
     logger              : IndentedLogger
   ): Unit =
-    if (logger.debugEnabled)
-      logger.logDebug("xf:setvalue", "setting instance value", "source", source,
-        "old value", oldValue, "new value", newValue,
-        "instance", instanceEffectiveId getOrElse "N/A")
+      debug(
+        "xf:setvalue: setting instance value",
+        List(
+          "source"    -> source,
+          "old value" -> oldValue,
+          "new value" -> newValue,
+          "instance"  -> instanceEffectiveId.getOrElse("N/A")
+        )
+      )
 
   private def notifyValueChange(
     containingDocument : XFormsContainingDocument,

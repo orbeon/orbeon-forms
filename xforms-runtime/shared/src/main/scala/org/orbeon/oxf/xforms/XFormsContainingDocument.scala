@@ -17,6 +17,7 @@ import cats.syntax.option._
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, PathMatcher}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PartAnalysis, PathMapXPathDependencies, XPathDependencies}
@@ -167,7 +168,13 @@ class XFormsContainingDocument(
 
     this._sequence = sequence
 
-    indentedLogger.logDebug("initialization", "restoring dynamic state for UUID", "UUID", this.uuid, "sequence", this._sequence.toString)
+    debug(
+      "initialization:restoring dynamic state for UUID",
+      List(
+        "UUID"     -> this.uuid,
+        "sequence" -> this._sequence.toString
+      )
+    )(indentedLogger)
 
     // Restore request information
     setRequestInformation(requestInformation)

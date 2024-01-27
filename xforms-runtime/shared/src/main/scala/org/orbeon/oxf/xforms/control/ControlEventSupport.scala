@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.ViewTrait
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
@@ -20,6 +21,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
+
 
 trait ControlEventSupport extends ListenersTrait {
 
@@ -45,9 +47,7 @@ trait ControlEventSupport extends ListenersTrait {
             containingDocument.getControlByEffectiveId(repeatIterationEffectiveId).asInstanceOf[XFormsRepeatIterationControl]
           val newRepeatIndex = repeatIterationControl.iterationIndex
 
-          val indentedLogger = controls.indentedLogger
-          if (indentedLogger.debugEnabled)
-            indentedLogger.logDebug("xf:repeat", "setting index upon focus change", "new index", newRepeatIndex.toString)
+          debug("xf:repeat: setting index upon focus change", List("new index" -> newRepeatIndex.toString))(controls.indentedLogger)
 
           repeatIterationControl.repeat.setIndex(newRepeatIndex, collector)
         }

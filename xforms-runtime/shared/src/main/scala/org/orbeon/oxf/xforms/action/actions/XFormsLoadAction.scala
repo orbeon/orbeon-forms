@@ -17,13 +17,13 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.xforms.{Load, UrlType, XFormsCrossPlatformSupport, XFormsNames}
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.xforms.{Load, UrlType, XFormsCrossPlatformSupport, XFormsNames}
 
 
 class XFormsLoadAction extends XFormsAction {
@@ -91,13 +91,10 @@ class XFormsLoadAction extends XFormsAction {
                   mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionContext.analysis)
                 )
               case None =>
-                if (interpreter.indentedLogger.debugEnabled)
-                  interpreter.indentedLogger.logDebug(
-                    "xf:load",
-                    "resource AVT returned an empty sequence, ignoring action",
-                    "resource",
-                    resourceAttValue
-                  )
+                debug(
+                  "xf:load: resource AVT returned an empty sequence, ignoring action",
+                  List("resource" -> resourceAttValue)
+                )
             }
 
           case None =>

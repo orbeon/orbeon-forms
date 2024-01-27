@@ -18,6 +18,8 @@ import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging.debug
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
 import org.orbeon.oxf.xforms.function.XFormsFunction.relevantControl
@@ -33,7 +35,6 @@ import org.orbeon.scaxon.Implicits
 import org.orbeon.xforms.Namespaces
 
 import scala.collection.compat._
-
 import scala.jdk.CollectionConverters._
 
 
@@ -152,8 +153,8 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
       case Some(rootElemOpt) =>
         rootElemOpt
       case None =>
-        xfc.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
-          .logDebug("instance()", "instance not found", "instance id", instanceIdOpt.orNull)
+        implicit val logger: IndentedLogger = XFormsFunction.context.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
+        debug("instance(): instance not found", List("instance id" -> instanceIdOpt.orNull))
         None
     }
   }

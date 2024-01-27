@@ -45,7 +45,8 @@ class XFormsActionInterpreter(
   val outerAction        : ActionTrait,
   val handlerEffectiveId : String,
   val event              : XFormsEvent,
-  val eventObserver      : XFormsEventTarget)(implicit
+  val eventObserver      : XFormsEventTarget
+)(implicit
   val actionXPathContext : XFormsContextStack,
   val indentedLogger     : IndentedLogger
 ) {

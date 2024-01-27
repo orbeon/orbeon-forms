@@ -36,6 +36,7 @@ import java.io.{ByteArrayOutputStream, InputStream}
 import java.net.URI
 import scala.collection.mutable
 import scala.util.{Failure, Success}
+import org.orbeon.oxf.util.Logging._
 
 
 object SubmissionUtils {
@@ -62,9 +63,9 @@ object SubmissionUtils {
     if (ContentTypes.isXMLMediatype(mediatype) ||
       ContentTypes.isTextOrJSONContentType(mediatype) ||
       mediatype == "application/x-www-form-urlencoded")
-      logger.logDebug("submission", "setting request body", "body", new String(messageBody, CharsetNames.Utf8))
+      debug("setting request body", List("body" -> new String(messageBody, CharsetNames.Utf8)))
     else
-      logger.logDebug("submission", "setting binary request body")
+      debug("setting binary request body")
 
   // Create an `application/x-www-form-urlencoded` string, encoded in UTF-8, based on the elements and text content
   // present in an XML document. This assumes that non-relevant elements are already pruned or blanked if needed.

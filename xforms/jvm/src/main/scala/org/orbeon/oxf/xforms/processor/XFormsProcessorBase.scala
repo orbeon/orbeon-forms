@@ -115,12 +115,12 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
       Loggers.newIndentedLogger("html")
 
     val cacheTracer =
-      Option(pipelineContext.getAttribute("orbeon.cache.test.tracer").asInstanceOf[XFormsStaticStateCache.CacheTracer]) getOrElse
-        new LoggingCacheTracer(indentedLogger)
+      Option(pipelineContext.getAttribute("orbeon.cache.test.tracer").asInstanceOf[XFormsStaticStateCache.CacheTracer])
+        .getOrElse(new LoggingCacheTracer)
 
     val initializeXFormsDocument =
-      Option(pipelineContext.getAttribute("orbeon.cache.test.initialize-xforms-document").asInstanceOf[jl.Boolean]) forall
-        (_.booleanValue)
+      Option(pipelineContext.getAttribute("orbeon.cache.test.initialize-xforms-document").asInstanceOf[jl.Boolean])
+        .forall(_.booleanValue)
 
     val uriResolver =
       new XFormsURIResolver(
@@ -242,7 +242,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
       }
     } catch {
       case NonFatal(t) =>
-        newHtmlLogger.logDebug("", "throwable caught during initialization.")
+        debug("throwable caught during initialization.")(newHtmlLogger)
         throw new OXFException(t)
     }
   }

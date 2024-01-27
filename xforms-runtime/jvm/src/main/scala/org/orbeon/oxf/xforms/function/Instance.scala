@@ -14,6 +14,8 @@
 package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.saxon.expr._
@@ -33,7 +35,7 @@ class Instance extends XFormsFunction with InstanceTrait {
     findInstance(stringArgumentOpt(0)(xpathContext) flatMap trimAllToOpt)(xpathContext)
   }
 
-  private def findInstance(instanceId: Option[String])(implicit xpathContext: XPathContext): SequenceIterator = {
+  private def findInstance(instanceIdOpt: Option[String])(implicit xpathContext: XPathContext): SequenceIterator = {
     // Get model and instance with given id for that model only
 
     // "If a match is located, and the matching instance data is associated with the same XForms Model as the
@@ -53,12 +55,12 @@ class Instance extends XFormsFunction with InstanceTrait {
           // this or other models might not yet have been constructed, however they might be referred to, for
           // example with model variables.
 
-          def dynamicInstanceOpt = instanceId match {
+          def dynamicInstanceOpt = instanceIdOpt match {
             case Some(instanceId) => model.findInstance(instanceId)
             case None             => model.defaultInstanceOpt
           }
 
-          def staticInstanceOpt = instanceId match {
+          def staticInstanceOpt = instanceIdOpt match {
             case Some(instanceId) => model.staticModel.instances.get(instanceId)
             case None             => model.staticModel.defaultInstanceOpt
           }
@@ -74,13 +76,15 @@ class Instance extends XFormsFunction with InstanceTrait {
       case Some(iterator) =>
         iterator
       case None =>
-        XFormsFunction.context.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory).logDebug("instance()", "instance not found", "instance id", instanceId.orNull)
+        implicit val logger: IndentedLogger = XFormsFunction.context.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
+        debug("instance(): instance not found", List("instance id" -> instanceIdOpt.orNull))
         EmptyIterator.getInstance
     }
   }
 
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
-    if (argument.length > 0) argument(0).addToPathMap(pathMap, pathMapNodeSet)
+    if (argument.length > 0)
+      argument(0).addToPathMap(pathMap, pathMapNodeSet)
     new PathMap.PathMapNodeSet(pathMap.makeNewRoot(this))
   }
 }

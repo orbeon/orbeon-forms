@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.DynamicVariable
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls._
@@ -647,5 +648,5 @@ object Controls {
   // Log a subtree of controls as XML
   private def logTreeIfNeeded(message: String)(control: XFormsControl): Unit =
     if (Loggers.isDebugEnabled("control-tree"))
-      control.containingDocument.controls.indentedLogger.logDebug(message, ControlsDebugSupport.controlTreeAsXmlString(control))
+      debug(s"$message\n${ControlsDebugSupport.controlTreeAsXmlString(control)}")(control.containingDocument.controls.indentedLogger)
 }

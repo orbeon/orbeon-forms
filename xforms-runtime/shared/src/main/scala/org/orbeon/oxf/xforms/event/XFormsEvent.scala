@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.event
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.event.XFormsEvent._
@@ -134,7 +135,7 @@ abstract class XFormsEvent(
 
   private def warnUnsupportedIfNeeded(name: String): Unit =
     if (warnIfMissingProperty)
-      indentedLogger.logDebug("", "Unsupported event context information for event('" + name + "').")
+      debug(s"Unsupported event context information for event('$name').")
 
   // These methods can be overridden by subclasses
   implicit def indentedLogger: IndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)

@@ -1281,7 +1281,7 @@
                         )
                     else
                         xxf:r(
-                            concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')),
+                            'detail.messages.upload-error',
                             'fr-fr-resources'
                         )
                 )
@@ -1293,10 +1293,11 @@
             ev:observer="fr-view-component"
             ev:defaultAction="cancel"
             xxf:phantom="true"
+            if="not(fr:is-browser-environment()) (: https://github.com/orbeon/orbeon-forms/issues/6171 :)"
             type="xpath">
             frf:successMessage(
                 xxf:r(
-                    concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')),
+                    'detail.messages.upload-done',
                     'fr-fr-resources'
                 )
             )

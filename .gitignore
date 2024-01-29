@@ -27,3 +27,5 @@ scratch.txt
 package-lock.json
 # SQLite file used for tests
 form-runner/test-db.sqlite
+# jenv
+.java-version

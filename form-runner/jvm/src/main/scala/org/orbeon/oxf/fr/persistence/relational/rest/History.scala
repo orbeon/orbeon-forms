@@ -85,9 +85,7 @@ object History {
       val rowNumSQL            = Provider.rowNumSQL(
         provider       = request.provider,
         connection     = connection,
-        tableAlias     = "d",
-        orderColumn    = "last_modified_time",
-        orderDirection = "DESC"
+        orderBy        = "d.last_modified_time DESC"
       )
       val rowNumCol            = rowNumSQL.col
       val rowNumOrderBy        = rowNumSQL.orderBy

@@ -135,7 +135,7 @@ trait SearchLogic extends SearchRequestParser {
         }
 
         // To order the results by control value, we need to join with orbeon_i_control_text
-        val (innerJoinForControlOrderBy, controlOrderByStatementPartOpt) = request.orderBy.column match {
+        val (orderByJoin, orderByStatementPartOpt) = request.orderBy.column match {
           case ControlColumn(controlPath) => (
             "LEFT JOIN orbeon_i_control_text t ON t.data_id = s.data_id AND t.control = ?",
             Some(StatementPart("", List[Setter]((ps, i) => ps.setString(i, controlPath))))
@@ -143,15 +143,42 @@ trait SearchLogic extends SearchRequestParser {
           case _                          => ("", None)
         }
 
+        // We'll refer to the order by column as "sort_column"
+        val orderByTableAlias = request.orderBy.column match {
+          case ControlColumn(_) => "t" // Control value => comes from orbeon_i_control_text t
+          case _                => "c" // Form metadata => comes from orbeon_i_current c
+        }
+        val orderByAliasing   = s"$orderByTableAlias.${request.orderBy.column.sql} AS sort_column"
+
+        // First order by clause (specified by request), with CAST if necessary
+        val firstOrderByColumn         = "d.sort_column"
+        val firstOrderByColumnWithCast = request.orderBy.column match {
+          case ControlColumn(_) =>
+            // DB2, Oracle, and SQL Server use CLOB/NTEXT data types for control values, which cannot be used in ORDER
+            // BY clauses, so we cast them to VARCHAR.
+            request.provider match {
+              case _         => firstOrderByColumn
+            }
+          case _                =>
+            firstOrderByColumn
+        }
+        val firstOrderByClause         = s"$firstOrderByColumnWithCast ${request.orderBy.direction.sql}"
+
+        // Second order by clause (we order by last_modified_time DESC as well, if it makes sense)
+        val secondOrderByClause = request.orderBy.column match {
+          case LastModified => ""
+          case _            => ", d.last_modified_time DESC"
+        }
+
+        val orderByClauses = firstOrderByClause + secondOrderByClause
+
         // Build SQL and create statement
         val sql = {
           val startOffsetZeroBased = (request.pageNumber - 1) * request.pageSize
           val rowNumSQL            = Provider.rowNumSQL(
             provider       = request.provider,
             connection     = connection,
-            tableAlias     = "d",
-            orderColumn    = "sort_column",
-            orderDirection = request.orderBy.direction.sql
+            orderBy        = orderByClauses,
           )
           val rowNumCol            = rowNumSQL.col
           val rowNumOrderBy        = rowNumSQL.orderBy
@@ -172,12 +199,6 @@ trait SearchLogic extends SearchRequestParser {
                                  ON c.data_id = s.data_id
            */
 
-          val sortTableAlias = request.orderBy.column match {
-            case ControlColumn(_) => "t" // Control value => comes from orbeon_i_control_text t
-            case _                => "c" // Form metadata => comes from orbeon_i_current c
-          }
-          val sortColumn = request.orderBy.column.sql
-
           // Use `LEFT JOIN` instead of regular join, in case the form doesn't have any control marked
           // to be indexed, in which case there won't be anything for it in `orbeon_i_control_text`.
           s"""SELECT
@@ -193,7 +214,7 @@ trait SearchLogic extends SearchRequestParser {
              |        FROM
              |            (
              |                SELECT
-             |                    c.*, $sortTableAlias.$sortColumn AS sort_column
+             |                    c.*, $orderByAliasing
              |                FROM
              |                    $rowNumTable
              |                    (
@@ -202,7 +223,7 @@ trait SearchLogic extends SearchRequestParser {
              |                INNER JOIN
              |                    orbeon_i_current c
              |                    ON c.data_id = s.data_id
-             |                $innerJoinForControlOrderBy
+             |                $orderByJoin
              |            ) d
              |        $rowNumOrderBy
              |    ) c
@@ -218,7 +239,7 @@ trait SearchLogic extends SearchRequestParser {
         }
         Logger.logDebug("search items query", sql)
 
-        val allStatementParts            = statementParts ::: controlOrderByStatementPartOpt.toList
+        val allStatementParts            = statementParts ::: orderByStatementPartOpt.toList
         val rawDocumentMetadataAndValues = executeQuery(connection, sql, allStatementParts) { documentsResultSet =>
 
           Iterator.iterateWhile(

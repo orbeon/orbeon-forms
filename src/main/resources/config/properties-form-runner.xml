@@ -71,6 +71,15 @@
     <property as="xs:boolean" name="oxf.fr.persistence.sqlite.reindex"                          value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.sqlite.reencrypt"                        value="true"/>
 
+    <!-- Whether providers support distinct values -->
+    <property as="xs:boolean" name="oxf.fr.persistence.*.distinct"                              value="false"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.oracle.distinct"                         value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.mysql.distinct"                          value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.postgresql.distinct"                     value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.db2.distinct"                            value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlserver.distinct"                      value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlite.distinct"                         value="true"/>
+
     <!-- Whether providers support sorting -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.sort"                                  value="false"/>
     <property as="xs:boolean" name="oxf.fr.persistence.oracle.sort"                             value="true"/>

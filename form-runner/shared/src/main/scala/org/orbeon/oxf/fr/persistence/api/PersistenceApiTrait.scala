@@ -5,16 +5,16 @@ import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.{ExternalContext, RequestAdapter, UrlRewriteMode}
-import org.orbeon.oxf.fr.FormRunner.createFormDataBasePath
+import org.orbeon.oxf.fr.FormRunner.{createFormDataBasePath, providerPropertyAsBoolean}
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
-import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
+import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml, findProvider}
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, tinyTreeToOrbeonDom}
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Connection, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, PathUtils, URLRewriterUtils, XPath}
 import org.orbeon.saxon.om
@@ -137,29 +137,40 @@ trait PersistenceApiTrait {
 
     debug(s"calling distinct values for `$appFormVersion`")
 
-    val servicePath = s"/fr/service/persistence/distinct-values/${appFormVersion._1.app}/${appFormVersion._1.form}"
+    val provider = findProvider(appFormVersion._1, FormOrData.Data).get
 
-    val queryXml =
-      <distinct-values include-created-by="true" include-last-modified-by="true" include-workflow-stage="true">{
-        controlPaths.map { controlPath =>
-          <control path={controlPath}/>
-        }
-      }</distinct-values>
+    if (providerPropertyAsBoolean(provider, "distinct", default  = false)) {
+      val servicePath = s"/fr/service/persistence/distinct-values/${appFormVersion._1.app}/${appFormVersion._1.form}"
 
-    val result = documentsXmlTry(servicePath, queryXml, appFormVersion._2).get.rootElement
+      val queryXml =
+        <distinct-values include-created-by="true" include-last-modified-by="true" include-workflow-stage="true">{
+          controlPaths.map { controlPath =>
+            <control path={controlPath}/>
+          }
+        }</distinct-values>
 
-    val controls = (result / "control") map { controlElem =>
-      Control(
-        path           = controlElem.attValue("path"),
-        distinctValues = (controlElem / "value").map(_.getStringValue)
-      )
-    }
+      val result = documentsXmlTry(servicePath, queryXml, appFormVersion._2).get.rootElement
 
-    DistinctValues(
-      controls       = controls,
-      createdBy      = result / "created-by"       / "value" map (_.getStringValue),
-      lastModifiedBy = result / "last-modified-by" / "value" map (_.getStringValue),
-      workflowStage  = result / "workflow-stage"   / "value" map (_.getStringValue))
+      val controls = (result / "control") map { controlElem =>
+        Control(
+          path           = controlElem.attValue("path"),
+          distinctValues = (controlElem / "value").map(_.getStringValue)
+        )
+      }
+
+      DistinctValues(
+        controls       = controls,
+        createdBy      = result / "created-by"       / "value" map (_.getStringValue),
+        lastModifiedBy = result / "last-modified-by" / "value" map (_.getStringValue),
+        workflowStage  = result / "workflow-stage"   / "value" map (_.getStringValue))
+    } else {
+      // For providers that don't support distinct values, we return empty lists
+      DistinctValues(
+        controls       = Seq.empty,
+        createdBy      = Seq.empty,
+        lastModifiedBy = Seq.empty,
+        workflowStage  = Seq.empty)
+      }
   }
 
   def dataHistory(

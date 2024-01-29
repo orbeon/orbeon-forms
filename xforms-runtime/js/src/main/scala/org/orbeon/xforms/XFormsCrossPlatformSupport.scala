@@ -67,10 +67,10 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     }
 
   def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String =
-    if (url.startsWith("data:"))
+    if (url.startsWith("data:") || url.startsWith("javascript:"))
       url
     else
-      throw new NotImplementedError("resolveResourceURL")
+      throw new NotImplementedError(s"resolveResourceURL for `$url`")
 
   def resolveRenderURL(
     containingDocument : XFormsContainingDocument,

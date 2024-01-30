@@ -14,7 +14,8 @@
 <project name="orbeon" default="orbeon-dev-war">
 
     <!-- Properties to update when version number changes -->
-    <property name="version.number" value="2023.1-SNAPSHOT"/>
+
+    <property name="version.number" value="2024.1-SNAPSHOT"/>
     <property name="edition"        value="CE"/>
 
     <property file="build-local.properties"/>

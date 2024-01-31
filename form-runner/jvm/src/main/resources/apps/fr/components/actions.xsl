@@ -290,7 +290,7 @@
                 event="xforms-submit-error"
                 observer="{string-join(for $n in $all-service-names return concat($n, '-submission'), ' ')}"
                 type="xpath">
-                xxf:remove-document-attributes(event('fr-action-id')),
+                if (exists(event('fr-action-id'))) then xxf:remove-document-attributes(event('fr-action-id')) else (),
                 fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')
             </xf:action>
         </xsl:if>
@@ -300,7 +300,7 @@
                 <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
                 <xf:message level="xxf:log-error" value="event('element')"/>
                 <xf:action type="xpath" if="exists(event('fr-action-id'))">
-                    xxf:remove-document-attributes(event('fr-action-id')),
+                    if (exists(event('fr-action-id'))) then xxf:remove-document-attributes(event('fr-action-id')) else (),
                     fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')
                 </xf:action>
             </xf:action>

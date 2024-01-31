@@ -23,7 +23,7 @@
 
       id="fb-add-language-dialog"
       appearance="minimal"
-      level="modeless"
+      level="modal"
       class="fb-add-language-dialog">
 
     <xf:label ref="$form-resources/dialog-add-language/label"/>

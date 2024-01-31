@@ -128,6 +128,7 @@
         mode="within-controls"
         match="*[$validate-selection-controls-choices and frf:isSelectionControl(.)]">
         <xsl:param name="choice-validation-selection-control-names" tunnel="yes"/>
+        <xsl:variable name="is-multiple" select="frf:isMultipleSelectionControl(local-name(.))"/>
         <xsl:choose>
             <xsl:when test="frf:controlNameFromId(@id) = $choice-validation-selection-control-names">
                 <xsl:copy>
@@ -135,13 +136,40 @@
                         <xf:alert
                             ref="
                                 xxf:format-message(
-                                    xxf:r('detail.labels.alert-out-of-range', '|fr-fr-resources|'),
+                                    xxf:r(
+                                        'detail.labels.alert-out-of-range{'-multiple'[$is-multiple]}',
+                                        '|fr-fr-resources|'
+                                    ),
                                     (
                                         string(.)
                                     )
                                 )"
                             validation="{frf:controlNameFromId(@id)}-choice-constraint"/>
                 </xsl:copy>
+                <xf:trigger
+                    class="fr-clear-out-of-range"
+                    ref="
+                        let $has-invalid-values :=
+                            exists(
+                                xxf:split()[
+                                    not(. = instance('fr-form-resources')/*[1]/{frf:controlNameFromId(@id)}/item/value/string())
+                                ]
+                            )
+                        return
+                            .[$has-invalid-values and not(xxf:valid(xxf:binding('{@id}')))]" appearance="xxf:mini">
+                    <xf:label ref="xxf:r('detail.labels.clear-out-of-range', '|fr-fr-resources|')"/>
+                    <xf:action event="DOMActivate">
+                        <xf:setvalue
+                                ref="xxf:binding('{@id}')"
+                                value="
+                                    string-join(
+                                        xxf:split()[
+                                            . = instance('fr-form-resources')/*[1]/{frf:controlNameFromId(@id)}/item/value/string()
+                                        ],
+                                        ' '
+                                    )"/>
+                    </xf:action>
+                </xf:trigger>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:next-match/>

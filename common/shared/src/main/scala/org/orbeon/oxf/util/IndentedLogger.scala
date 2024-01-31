@@ -139,13 +139,8 @@ class IndentedLogger(
 
           stack = tail
 
-          val timeParams = List("time (ms)", operation.timeElapsed.toString)
-
           val newParams =
-            if (resultParameters ne null)
-              timeParams ::: resultParameters.toList
-            else
-              timeParams
+            "time (ms)" :: operation.timeElapsed.toString :: resultParameters.toList
 
           logDebug(
             operation.`type`,
@@ -194,7 +189,7 @@ class IndentedLogger(
       else
         0L
 
-    var resultParameters: Seq[String] = null
+    var resultParameters: Seq[String] = Nil
 
     def timeElapsed: Long = System.currentTimeMillis - startTime
   }

@@ -51,7 +51,15 @@ object EmailMetadata {
 
   sealed trait Param extends EnumEntry with Camelcase {
     def name: String
-    override def toString: String = getClass.getSimpleName // For `entryName` not to hold the above `name` value
+    override def toString: String =
+      try {
+        // For `entryName` not to hold the above `name` value
+        getClass.getSimpleName
+      } catch {
+        case _: InternalError =>
+          // Workaround for Java 8 ("Malformed class name")
+          getClass.toString.split('$').last
+      }
   }
 
   object Param extends Enum[Param] {

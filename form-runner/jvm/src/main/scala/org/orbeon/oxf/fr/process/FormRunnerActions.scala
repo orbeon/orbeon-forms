@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.FormRunnerCommon.frc
+import org.orbeon.oxf.fr.FormRunnerCommon.{frc, spc}
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
@@ -73,6 +73,9 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       val currentFormLang = FormRunner.currentLang
 
+      val templateParams      = paramByName(params, "template").map(spc.evaluateValueTemplate).map("fr-template" -> _).toList
+      val templateMatchParam  = paramByName(params, "match").map(spc.evaluateValueTemplate).getOrElse("first")
+      val templateMatchParams = Seq("fr-match" -> templateMatchParam).toList
       val pdfTiffParams =
         for {
           renderedFormat <- RenderedFormat.values.toList
@@ -96,6 +99,8 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         recombineQuery(
           s"/fr/service/$app/$form/email/$document",
           emailParam     ::
+          templateParams :::
+          templateMatchParams :::
           pdfTiffParams  :::
           createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
         )

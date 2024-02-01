@@ -439,7 +439,7 @@
                                 </fr:index>
                                 <fr:encrypt/>
                             </xf:input>
-                            <xf:input id="control-28-control" bind="control-28-bind" class="custom1 custom2 fr-email-subject">
+                            <xf:input id="control-28-control" bind="control-28-bind" class="custom1 custom2">
                                 <xf:label ref="$form-resources/control-28/label"/>
                                 <xf:hint ref="$form-resources/control-28/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -457,7 +457,7 @@
                                     service-performs-search="true"
                                     service-supports-paging="false"
                                     is-last-page=""
-                                    class="custom1 custom2 fr-email-subject">
+                                    class="custom1 custom2">
                                 <xf:label>Country code:</xf:label>
                                 <xf:itemset ref="/countries/country">
                                     <xf:label ref="name"/>

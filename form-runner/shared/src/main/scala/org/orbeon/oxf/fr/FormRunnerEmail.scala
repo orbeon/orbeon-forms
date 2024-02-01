@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.email.{EmailMetadata, EmailMetadataConversion, EmailMetadataParsing, EmailMetadataSerialization}
-import org.orbeon.oxf.fr.permission.{Operation, Operations}
+import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -27,6 +27,11 @@ import scala.collection.mutable
 
 
 trait FormRunnerEmail {
+
+  private def emailMetadataFromFormDefinition(formDefinition: NodeInfo): EmailMetadata.Metadata = {
+    val emailMetadataNode  = frc.metadataInstanceRootOpt(formDefinition).flatMap(_.firstChildOpt("email"))
+    parseEmailMetadata(emailMetadataNode, formDefinition)
+  }
 
   // Given a form body and instance data:
   //

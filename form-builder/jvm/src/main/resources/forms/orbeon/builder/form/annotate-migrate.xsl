@@ -410,19 +410,37 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- Migrate email definition to support multiple emails -->
-    <!--
+    <!-- Migrate email definition to current format -->
+
+    <!-- Migrate email metadata -->
     <xsl:template
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-        match="xf:instance[@id = 'fr-form-metadata']/metadata/email[
-            frf:isLegacyMetadata(.)
-        ]"
+        match="xf:instance[@id = 'fr-form-metadata']/metadata"
         mode="within-model">
         <xsl:copy>
-           XXX
+            <xsl:apply-templates select="@* | node() except email" mode="#current"/>
+            <xsl:copy-of select="frf:serializeEmailMetadata(frf:parseEmailMetadata(email, /*))"/>
         </xsl:copy>
     </xsl:template>
-     -->
+
+    <!-- Remove the `fr-email-` classes -->
+    <xsl:template
+        mode="within-body"
+        match="
+            @class[
+                some $class in p:split()
+                satisfies starts-with($class, 'fr-email-')
+            ]">
+        <xsl:variable
+            name="filtered-classes"
+            select="
+                p:split()[
+                    not(starts-with(., 'fr-email-'))
+                ]"/>
+        <xsl:if test="exists($filtered-classes)">
+            <xsl:attribute name="class" select="string-join($filtered-classes, ' ')"/>
+        </xsl:if>
+    </xsl:template>
 
     <!-- Migrate control settings from classes to sub-elements -->
     <xsl:variable name="control-classes-to-migrate"  select="('fr-index', 'fr-summary', 'fr-search', 'fr-encrypt')"/>

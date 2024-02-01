@@ -261,12 +261,12 @@ class EmailTest
 
       assert(
         FormRunnerEmail.parseEmailMetadata(MetadataCurrentOpt   , formDoc) ===
-          FormRunnerEmail.parseEmailMetadata(MetadataLegacy2021Opt, formDoc)
+        FormRunnerEmail.parseEmailMetadata(MetadataLegacy2021Opt, formDoc)
       )
 
       assert(
         FormRunnerEmail.parseEmailMetadata(MetadataCurrentOpt   , formDoc) ===
-          FormRunnerEmail.parseEmailMetadata(MetadataLegacy2022Opt, formDoc)
+        FormRunnerEmail.parseEmailMetadata(MetadataLegacy2022Opt, formDoc)
       )
     }
 
@@ -275,20 +275,20 @@ class EmailTest
       assert(param.entryName === "AllControlValuesParam")
     }
 
-    //    describe("serialize metadata") {
-    //
-    //      def prettyPrint(nodeInfo: NodeInfo): String =
-    //        TransformerUtils.tinyTreeToOrbeonDom(nodeInfo).getRootElement.serializeToString(XMLWriter.PrettyFormat)
-    //
-    //      val originalMetadata            = MetadataCurrent.pipe(prettyPrint)
-    //      val parsedAndSerializedMetadata = MetadataCurrentOpt
-    //        .pipe(FormRunnerEmail.parseEmailMetadata(_, formDoc))
-    //        .pipe(FormRunnerEmail.serializeEmailMetadata)
-    //        .pipe(NodeConversions.elemToNodeInfo)
-    //        .pipe(prettyPrint)
-    //
-    //      assert(parsedAndSerializedMetadata === originalMetadata)
-    //    }
+//    describe("serialize metadata") {
+//
+//      def prettyPrint(nodeInfo: NodeInfo): String =
+//        TransformerUtils.tinyTreeToOrbeonDom(nodeInfo).getRootElement.serializeToString(XMLWriter.PrettyFormat)
+//
+//      val originalMetadata            = MetadataCurrent.pipe(prettyPrint)
+//      val parsedAndSerializedMetadata = MetadataCurrentOpt
+//        .pipe(FormRunnerEmail.parseEmailMetadata(_, formDoc))
+//        .pipe(FormRunnerEmail.serializeEmailMetadata)
+//        .pipe(NodeConversions.elemToNodeInfo)
+//        .pipe(prettyPrint)
+//
+//      assert(parsedAndSerializedMetadata === originalMetadata)
+//    }
 
   }
 }

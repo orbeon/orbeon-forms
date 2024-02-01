@@ -11,102 +11,123 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<group description="Email" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+<group description="Email"
+   xmlns:p="http://www.orbeon.com/oxf/pipeline"
+   xmlns:oxf="http://www.orbeon.com/oxf/processors"
+   xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <test description="Creation of email message including from, to, cc, bcc" name="oxf:unsafe-xslt">
-        <input name="config" href="oxf:/apps/fr/email/email-form.xsl"/>
-        <input name="parameters">
-            <request>
-                <app>acme</app>
-                <form>email</form>
-                <form-version>1</form-version>
-                <document>123456890</document>
-                <mode>email</mode>
-            </request>
+    <test description="Creation of email message including from, to, cc, bcc" name="oxf:pipeline">
+        <input name="config">
+            <p:config>
+                <p:param type="output" name="message"/>
+
+                <p:processor name="oxf:unsafe-xslt">
+                    <p:input  name="data"   href="form-with-email-controls.xhtml"/>
+                    <p:input  name="config" href="oxf:/apps/fr/email/email-migrate-form.xsl"/>
+                    <p:output name="data"   id="xhtml"/>
+                </p:processor>
+
+                <p:processor name="oxf:unsafe-xslt">
+                    <p:input name="config" href="oxf:/apps/fr/email/email-form.xsl"/>
+                    <p:input name="parameters">
+                        <request>
+                            <app>acme</app>
+                            <form>email</form>
+                            <form-version>1</form-version>
+                            <document>123456890</document>
+                            <mode>email</mode>
+                        </request>
+                    </p:input>
+                    <p:input name="data">
+                        <form>
+                            <section-1>
+                                <control-1>info+toplevel@orbeon.com</control-1>
+                                <control-2>cc+toplevel@orbeon.com</control-2>
+                                <control-3>bcc+toplevel@orbeon.com</control-3>
+                                <control-4>from+toplevel@orbeon.com</control-4>
+                                <control-12>attachment-12.bin</control-12>
+                                <control-13 filename="" mediatype="" size="">attachment-13.bin</control-13>
+                                <control-14 filename="" mediatype="" size="">attachment-14.bin</control-14>
+                            </section-1>
+                            <section-3>
+                                <control-1>info+0@orbeon.com</control-1>
+                                <control-8>Abc</control-8>
+                                <control-9>attachment-9.bin</control-9>
+                                <control-10 filename="" mediatype="" size="">attachment-10.bin</control-10>
+                                <control-11 filename="" mediatype="" size="">attachment-11.bin</control-11>
+                                <section-3>
+                                    <grid-4>
+                                        <grid-4-iteration>
+                                            <control-6>info+1@orbeon.com</control-6>
+                                            <control-7>Def</control-7>
+                                        </grid-4-iteration>
+                                        <grid-4-iteration>
+                                            <control-6>info+2@orbeon.com</control-6>
+                                            <control-7>Ghi</control-7>
+                                        </grid-4-iteration>
+                                    </grid-4>
+                                </section-3>
+                            </section-3>
+                        </form>
+                    </p:input>
+                    <p:input name="xhtml" href="#xhtml"/>
+                    <p:input name="request">
+                        <request>
+                            <parameters>
+                                <parameter>
+                                    <name>fr-language</name>
+                                    <value>en</value>
+                                </parameter>
+                            </parameters>
+                        </request>
+                    </p:input>
+                    <p:input name="fr-resources" href="oxf:/apps/fr/i18n/resources.xml"/>
+                    <p:output name="data" ref="message"/>
+                </p:processor>
+            </p:config>
         </input>
-        <input name="data">
-            <form>
-                <section-1>
-                    <control-1>info+toplevel@orbeon.com</control-1>
-                    <control-2>cc+toplevel@orbeon.com</control-2>
-                    <control-3>bcc+toplevel@orbeon.com</control-3>
-                    <control-4>from+toplevel@orbeon.com</control-4>
-                    <control-12>attachment-12.bin</control-12>
-                    <control-13 filename="" mediatype="" size="">attachment-13.bin</control-13>
-                    <control-14 filename="" mediatype="" size="">attachment-14.bin</control-14>
-                </section-1>
-                <section-3>
-                    <control-1>info+0@orbeon.com</control-1>
-                    <control-8>Abc</control-8>
-                    <control-9>attachment-9.bin</control-9>
-                    <control-10 filename="" mediatype="" size="">attachment-10.bin</control-10>
-                    <control-11 filename="" mediatype="" size="">attachment-11.bin</control-11>
-                    <section-3>
-                        <grid-4>
-                            <grid-4-iteration>
-                                <control-6>info+1@orbeon.com</control-6>
-                                <control-7>Def</control-7>
-                            </grid-4-iteration>
-                            <grid-4-iteration>
-                                <control-6>info+2@orbeon.com</control-6>
-                                <control-7>Ghi</control-7>
-                            </grid-4-iteration>
-                        </grid-4>
-                    </section-3>
-                </section-3>
-            </form>
-        </input>
-        <input name="xhtml" href="form-with-email-controls.xhtml"/>
-        <input name="request">
-            <request>
-                <parameters>
-                    <parameter>
-                        <name>fr-language</name>
-                        <value>en</value>
-                    </parameter>
-                </parameters>
-            </request>
-        </input>
-        <input name="fr-resources" href="oxf:/apps/fr/i18n/resources.xml"/>
-        <input name="attachments">
-            <attachments/>
-        </input>
-        <output name="data">
-            <message>
-                <smtp-host/>
-                <encryption/>
-                <credentials>
-                    <username/>
-                    <password/>
-                </credentials>
-                <from>
-                    <email>from+toplevel@orbeon.com</email>
-                </from>
-                <to>
-                    <email>info+toplevel@orbeon.com</email>
-                </to>
-                <to>
-                    <email>info+0@orbeon.com</email>
-                </to>
-                <to>
-                    <email>info+1@orbeon.com</email>
-                </to>
-                <to>
-                    <email>info+2@orbeon.com</email>
-                </to>
-                <cc>
-                    <email>cc+toplevel@orbeon.com</email>
-                </cc>
-                <bcc>
-                   <email>bcc+toplevel@orbeon.com</email>
-               </bcc>
-               <subject>Orbeon Forms Confirmation Abc, Def, Ghi</subject>
-               <body content-type="multipart/related">
-                   <part name="text" content-type="text/plain">Please find attached the form in PDF and XML format.</part>
-                   <part name="form-xml" content-type="application/xml" content-disposition="attachment; filename=&quot;form.xml&quot;" src="input:form-xml"/>
-                   <part name="form-pdf" content-type="application/pdf" content-disposition="attachment; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
-               </body>
-           </message>
+        <output name="message">
+            <messages>
+                <message>
+                    <smtp-host/>
+                    <encryption/>
+                    <credentials>
+                        <username/>
+                        <password/>
+                    </credentials>
+                    <from>
+                        <email>from+toplevel@orbeon.com</email>
+                    </from>
+                    <to>
+                        <email>info+toplevel@orbeon.com</email>
+                    </to>
+                    <to>
+                        <email>info+0@orbeon.com</email>
+                    </to>
+                    <to>
+                        <email>info+1@orbeon.com</email>
+                    </to>
+                    <to>
+                        <email>info+2@orbeon.com</email>
+                    </to>
+                    <cc>
+                        <email>cc+toplevel@orbeon.com</email>
+                    </cc>
+                    <bcc>
+                       <email>bcc+toplevel@orbeon.com</email>
+                   </bcc>
+                   <subject>Orbeon Forms Confirmation</subject>
+                   <body content-type="multipart/related">
+                       <part name="text" content-type="text/plain">Please find attached the form in PDF and XML format.</part>
+                       <part name="form-xml" content-type="application/xml" content-disposition="attachment; filename=&quot;form.xml&quot;" src="input:form-xml"/>
+                       <part name="form-pdf" content-type="application/pdf" content-disposition="attachment; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
+                       <part name="attachment-1" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-1" fr:uri="http://example.org/cool/serviceattachment-13.bin"/>
+                       <part name="attachment-2" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-2" fr:uri="http://example.org/cool/serviceattachment-14.bin"/>
+                       <part name="attachment-3" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-3" fr:uri="http://example.org/cool/serviceattachment-10.bin"/>
+                       <part name="attachment-4" content-type="" content-disposition="attachment; filename=&quot;&quot;" src="input:attachment-4" fr:uri="http://example.org/cool/serviceattachment-11.bin"/>
+                   </body>
+                </message>
+            </messages>
         </output>
     </test>
 

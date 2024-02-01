@@ -91,11 +91,8 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       optionsWithoutTagsOpt.foreach(jSelect.select2)
 
       // Register event listeners
-      if (isDatabound) {
-        // When the search isn't done by the service, we use a `<fr:databound-select1>`, which sets the value
-        // of the bound node, and in that case we also don't need to store the label
+      if (isDatabound)
         jSelect.on("change", onChangeDispatchFrChange _)
-      }
       jSelect.on("select2:open", onOpen _)
       jSelect.data("select2").on("results:focus", onResultsFocus _)
 

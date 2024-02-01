@@ -91,8 +91,10 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       optionsWithoutTagsOpt.foreach(jSelect.select2)
 
       // Register event listeners
-      if (isDatabound)
-        jSelect.on("change", onChangeDispatchFrChange _)
+      if (isDatabound) {
+        // Listen on `select2:close` instead of `change` as the latter is not triggered the first time an open value is selected
+        jSelect.on("select2:close", onChangeDispatchFrChange _)
+      }
       jSelect.on("select2:open", onOpen _)
       jSelect.data("select2").on("results:focus", onResultsFocus _)
 
@@ -136,6 +138,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
               if (Set(10, 13, 32)(event.keyCode)) { // Enter and space
                 event.stopPropagation() // Prevent Select2 from opening the dropdown
                 jSelect.value("").trigger("change")
+                onChangeDispatchFrChange()
                 xformsFocus() // Move the focus from the "x", which disappeared, to the dropdown
               }
           )
@@ -244,7 +247,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   }
 
   private def queryElementWithData  = containerElem.querySelector(s":scope > [$DataPlaceholder]")
-  private def querySelect           = containerElem.querySelector("select")
+  private def querySelect           = containerElem.querySelector("select").asInstanceOf[html.Select]
   private def servicePerformsSearch = Option(queryElementWithData.getAttribute(DataServicePerformsSearch)).contains("true")
 
   private def initOrUpdatePlaceholderCurrent(): Unit = {
@@ -315,16 +318,16 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     inputElementOpt.foreach(_.setAttribute("aria-activedescendant", focusedElementId))
   }
 
-  private def onChangeDispatchFrChange(event: JQueryEventObject): Unit = {
-    val htmlSelect = event.target.asInstanceOf[html.Select]
-    if (htmlSelect.selectedIndex == -1) {
+  private def onChangeDispatchFrChange(): Unit = {
+    val selectEl = querySelect
+    if (selectEl.selectedIndex == -1) {
       // `selectedIndex` is -1 when the value was cleared
       dispatchFrChange(
         label = "",
         value = ""
       )
     } else {
-      val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
+      val selectedOption = selectEl.options(selectEl.selectedIndex)
       dispatchFrChange(
         label = selectedOption.text,
         value = selectedOption.value

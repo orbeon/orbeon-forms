@@ -141,21 +141,23 @@
                                 <xf:hint  ref="xxf:r('dialog-control-settings.open-selection.hint',  '|fr-form-resources|')"/>
                                 <xf:action event="xforms-value-changed">
                                     <xf:delete ref="$control/@selection"/>
-                                    <xf:insert
-                                        if="event('xxf:value') != 'false()'"
-                                        context="$control"
-                                        origin="
-                                            xf:attribute(
-                                                'selection',
-                                                if (event('xxf:value') = 'true()')
-                                                then 'open'
-                                                else concat(
-                                                    $formula-prefix,
-                                                    event('xxf:value'),
-                                                    $formula-suffix
+                                    <xf:action if="event('xxf:value') != 'false()'">
+                                        <xf:insert
+                                            context="$control"
+                                            origin="
+                                                xf:attribute(
+                                                    'selection',
+                                                    if (event('xxf:value') = 'true()')
+                                                    then 'open'
+                                                    else concat(
+                                                        $formula-prefix,
+                                                        event('xxf:value'),
+                                                        $formula-suffix
+                                                    )
                                                 )
-                                            )
-                                        "/>
+                                            "/>
+                                        <xf:delete ref="$control/@auto-select-unique-choice"/>
+                                    </xf:action>
                                 </xf:action>
                             </fb:boolean-or-formula>
                         </xh:td>
@@ -222,7 +224,10 @@
                     <xh:tr>
                         <xh:td>
                             <xf:var name="control" value="."/>
-                            <fr:yesno-input ref="xf:element('_', (@auto-select-unique-choice/string(), 'false')[1])">
+                            <fr:yesno-input ref="
+                                    if (exists(@selection))
+                                    then 'false'
+                                    else xf:element('_', (@auto-select-unique-choice/string(), 'false')[1])">
                                 <xf:label ref="xxf:r('dialog-actions.auto-select-unique-choice.label', '|fr-form-resources|')"/>
                                 <xf:action event="xforms-select">
                                     <xf:insert
@@ -312,10 +317,11 @@
                     <xf:property name="fr-resource" value="$resource-param"/>
                 </xf:send>
 
+                <xf:var name="is-open"             value="fr:component-param-value('selection') = 'open'"/>
                 <xf:var name="items"               value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
                 <xf:var name="items-values"        value="$items/xxf:evaluate(instance('local')/value-ref)"/>
                 <xf:var name="current-item"        value="$items[xxf:evaluate(instance('local')/value-ref) = $binding]"/>
-                <xf:var name="current-impossible"  value="xxf:non-blank($binding) and empty($current-item)"/>
+                <xf:var name="current-impossible"  value="xxf:non-blank($binding) and empty($current-item) and not($is-open)"/>
                 <xf:var name="current-label"       value="$current-item/xxf:evaluate(instance('local')/label-ref)"/>
                 <xf:var name="unique-choice"       value="count($items) = 1 and xxf:component-param-value('auto-select-unique-choice') = 'true'"/>
                 <xf:var name="unique-choice-value" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/value-ref) else ()"/>
@@ -331,6 +337,8 @@
                 <xf:action if="not($unique-choice) and $current-impossible">
                     <xf:setvalue iterate="$binding, $binding/@label" ref="."/>
                 </xf:action>
+
+                <xf:action type="javascript"><xf:param name="xxx" value="$current-impossible"/><xf:body>console.log(this.id, 'Impossible', xxx)</xf:body></xf:action>
 
                 <!-- Tell Scala.js about the new label -->
                 <xf:action if="$do-update" type="javascript">

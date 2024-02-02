@@ -52,7 +52,9 @@ trait SimpleProcessCommon
 
   def AllowedFormRunnerActions: Map[String, Action]
 
-  lazy implicit val logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("process")
+  // Don't store the logger as a `val` or `lazy val`!
+  // https://github.com/orbeon/orbeon-forms/issues/179
+  implicit def logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("process")
 
   override def extensionActions: Iterable[(String, ProcessInterpreter.Action)] =
     AllowedFormRunnerActions ++ AllowedXFormsActions

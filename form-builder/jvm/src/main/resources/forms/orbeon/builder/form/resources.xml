@@ -466,14 +466,14 @@
                 <item id="legal">Legal</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label>Calculations in readonly modes (review, PDF)</label>
+                <label>Calculations in Read-Only Modes (Review, PDF)</label>
                 <hint/>
                 <item id="default">Use property</item>
                 <item id="false">Enable</item>
                 <item id="true">Disable</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label>Browser page layout</label>
+                <label>Browser Page Layout</label>
                 <hint>Whether the form take a fixed or fluid width</hint>
                 <item id="0">Use property</item>
                 <item id="1">Fixed width</item>
@@ -3251,14 +3251,14 @@
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
                 <hint/>
                 <item todo="true" id="default">Use property</item>
                 <item todo="true" id="false">Enable</item>
                 <item todo="true" id="true">Disable</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label todo="true">[Browser page layout]</label>
+                <label todo="true">[Browser Page Layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
                 <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Fixed width]</item>
@@ -4039,7 +4039,7 @@
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label toto="true">[Auto-select unique choice]</label>
+                <label todo="true">[Auto-select unique choice]</label>
             </auto-select-unique-choice>
             <save>
                 <label>Lagre</label>
@@ -4663,14 +4663,14 @@
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
                 <hint/>
                 <item todo="true" id="default">Use property</item>
                 <item todo="true" id="false">Enable</item>
                 <item todo="true" id="true">Disable</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label todo="true">[Browser page layout]</label>
+                <label todo="true">[Browser Page Layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
                 <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Fixed width]</item>
@@ -5450,7 +5450,7 @@
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label toto="true">[Auto-select unique choice]</label>
+                <label todo="true">[Auto-select unique choice]</label>
             </auto-select-unique-choice>
             <save>
                 <label>Сохранить</label>
@@ -6075,14 +6075,14 @@
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
                 <hint/>
                 <item todo="true" id="default">Use property</item>
                 <item todo="true" id="false">Enable</item>
                 <item todo="true" id="true">Disable</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label todo="true">[Browser page layout]</label>
+                <label todo="true">[Browser Page Layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
                 <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Fixed width]</item>
@@ -6826,7 +6826,7 @@
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label toto="true">[Auto-select unique choice]</label>
+                <label todo="true">[Auto-select unique choice]</label>
             </auto-select-unique-choice>
             <save>
                 <label>Salva</label>
@@ -7451,14 +7451,14 @@
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
                 <hint/>
                 <item todo="true" id="default">Use property</item>
                 <item todo="true" id="false">Enable</item>
                 <item todo="true" id="true">Disable</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label todo="true">[Browser page layout]</label>
+                <label todo="true">[Browser Page Layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
                 <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Fixed width]</item>
@@ -8203,7 +8203,7 @@
                 <label>Letzte Seite erreicht XPath-Ausdruck</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label toto="true">[Auto-select unique choice]</label>
+                <label todo="true">[Auto-select unique choice]</label>
             </auto-select-unique-choice>
             <save>
                 <label>Speichern</label>
@@ -8830,14 +8830,14 @@
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
                 <hint/>
                 <item todo="true" id="default">Use property</item>
                 <item todo="true" id="false">Enable</item>
                 <item todo="true" id="true">Disable</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label todo="true">[Browser page layout]</label>
+                <label todo="true">[Browser Page Layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
                 <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Fixed width]</item>
@@ -9610,7 +9610,7 @@
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label toto="true">[Auto-select unique choice]</label>
+                <label todo="true">[Auto-select unique choice]</label>
             </auto-select-unique-choice>
             <save>
                 <label>Tallenna</label>
@@ -10234,14 +10234,14 @@
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
                 <hint/>
                 <item todo="true" id="default">Use property</item>
                 <item todo="true" id="false">Enable</item>
                 <item todo="true" id="true">Disable</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label todo="true">[Browser page layout]</label>
+                <label todo="true">[Browser Page Layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
                 <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Fixed width]</item>
@@ -11014,7 +11014,7 @@
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label toto="true">[Auto-select unique choice]</label>
+                <label todo="true">[Auto-select unique choice]</label>
             </auto-select-unique-choice>
             <save>
                 <label>Guardar</label>
@@ -11639,14 +11639,14 @@
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
                 <hint/>
                 <item todo="true" id="default">Use property</item>
                 <item todo="true" id="false">Enable</item>
                 <item todo="true" id="true">Disable</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label todo="true">[Browser page layout]</label>
+                <label todo="true">[Browser Page Layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
                 <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Fixed width]</item>
@@ -12398,7 +12398,7 @@
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label toto="true">[Auto-select unique choice]</label>
+                <label todo="true">[Auto-select unique choice]</label>
             </auto-select-unique-choice>
             <save>
                 <label>Bewaar</label>
@@ -13023,14 +13023,14 @@
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
                 <hint/>
                 <item todo="true" id="default">Use property</item>
                 <item todo="true" id="false">Enable</item>
                 <item todo="true" id="true">Disable</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label todo="true">[Browser page layout]</label>
+                <label todo="true">[Browser Page Layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
                 <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Fixed width]</item>
@@ -13809,7 +13809,7 @@
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label toto="true">[Auto-select unique choice]</label>
+                <label todo="true">[Auto-select unique choice]</label>
             </auto-select-unique-choice>
             <save>
                 <label>Guardar</label>
@@ -14434,14 +14434,14 @@
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
             <readonly-disable-calculate>
-                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
                 <hint/>
                 <item todo="true" id="default">Use property</item>
                 <item todo="true" id="false">Enable</item>
                 <item todo="true" id="true">Disable</item>
             </readonly-disable-calculate>
             <html-page-layout>
-                <label todo="true">[Browser page layout]</label>
+                <label todo="true">[Browser Page Layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
                 <item id="0" todo="true">[Use property]</item>
                 <item id="1" todo="true">[Fixed width]</item>
@@ -15221,7 +15221,7 @@
                 <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <auto-select-unique-choice>
-                <label toto="true">[Auto-select unique choice]</label>
+                <label todo="true">[Auto-select unique choice]</label>
             </auto-select-unique-choice>
             <save>
                 <label>Spara</label>

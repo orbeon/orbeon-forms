@@ -260,7 +260,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             getPreferenceOrRequested(request, FormName),
             getPreferenceOrRequested(request, Page),
             Option(getPreferenceOrRequested(request, DocumentId)),
-            None
+            Option(getPreferenceOrRequested(request, Draft)).map(v => s"draft=${v == true.toString}")
           )
 
       def filterMode(mode: String) =

@@ -78,6 +78,7 @@ trait ProxyPortletEdit extends GenericPortlet {
   case object AppName                       extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("app-name",                         "Form Runner app name",    Some("orbeon-app")) }
   case object FormName                      extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("form-name",                        "Form Runner form name",   Some("orbeon-form")) }
   case object DocumentId                    extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("document-id",                      "Form Runner document id", Some("orbeon-document")) }
+  case object Draft                         extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("draft",                            "Form Runner document is draft", Some("orbeon-draft")) }
   case object ReadOnly                      extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("read-only",                        "Readonly access") }
   case object SendLiferayLanguage           extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("send-liferay-language",            "Send Liferay language") }
   case object SendLiferayUser               extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("send-liferay-user",                "Send Liferay user") }

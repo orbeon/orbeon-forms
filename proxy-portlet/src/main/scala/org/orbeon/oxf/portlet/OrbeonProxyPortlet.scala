@@ -200,7 +200,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
         APISupport.sanitizeResourceId(request.getResourceID, settings.FormRunnerResourcePathRegex) match {
           case Some(sanitizedResourcePath) =>
-            val url = APISupport.formRunnerURL(getPreference(request, FormRunnerURL), sanitizedResourcePath, embeddable = false)
+            val url = APISupport.formRunnerURL(getPreferenceOrThrow(request, FormRunnerURL), sanitizedResourcePath, embeddable = false)
 
             val requestDetails =
               newRequestDetails(
@@ -238,29 +238,33 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     else
       None
 
-  private def getPreferenceOrRequested(request: PortletRequest, pref: Pref) =
+  private def getPreferenceOrRequested(request: PortletRequest, pref: Pref): Option[String] =
     preferenceFromSessionParameter(request, pref)        orElse
       preferenceFromPublicRenderParameter(request, pref) orElse
-      preferenceFromPortalQuery(request, pref)           getOrElse
+      preferenceFromPortalQuery(request, pref)           orElse
       getPreference(request, pref)
+
+  private def getPreferenceOrRequestedOrThrow(request: PortletRequest, pref: Pref): String =
+    getPreferenceOrRequested(request, pref)
+      .getOrElse(throw new PortletException(s"Preference `${pref.nameLabel.name}` is required"))
 
   private def createRequestDetails(settings: PortletSettings, request: PortletRequest, namespace: String): RequestDetails = {
     // Determine URL based on preferences and request
     val path = {
 
-      def pathParameterOpt =
+      def pathParameterOpt: Option[String] =
         Option(request.getRenderParameters.getValue(WSRPSupport.PathParameterName))
 
       def defaultPath =
-        if (getPreference(request, Page) == "home")
+        if (getPreference(request, Page).contains("home"))
           APISupport.formRunnerHomePath(None)
         else
           APISupport.formRunnerPath(
-            getPreferenceOrRequested(request, AppName),
-            getPreferenceOrRequested(request, FormName),
-            getPreferenceOrRequested(request, Page),
-            Option(getPreferenceOrRequested(request, DocumentId)),
-            Option(getPreferenceOrRequested(request, Draft)).map(v => s"draft=${v == true.toString}")
+            getPreferenceOrRequestedOrThrow(request, AppName),
+            getPreferenceOrRequestedOrThrow(request, FormName),
+            getPreferenceOrRequestedOrThrow(request, Page),
+            getPreferenceOrRequested(request, DocumentId),
+            getPreferenceOrRequested(request, Draft).map(v => s"draft=${v == true.toString}")
           )
 
       def filterMode(mode: String) =
@@ -288,7 +292,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       settings,
       request,
       contentFromRequest(request, namespace),
-      APISupport.formRunnerURL(getPreference(request, FormRunnerURL), path, embeddable = true),
+      APISupport.formRunnerURL(getPreferenceOrThrow(request, FormRunnerURL), path, embeddable = true),
       path
     )
   }

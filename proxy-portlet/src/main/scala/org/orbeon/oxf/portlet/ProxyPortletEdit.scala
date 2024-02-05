@@ -75,16 +75,16 @@ trait ProxyPortletEdit extends GenericPortlet {
   case object EnableURLParameters           extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("enable-url-parameters",            "Enable form selection via URL parameters") }
   case object EnablePublicRenderParameters  extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("enable-public-render-parameters",  "Enable form selection via public render parameters") }
   case object EnableSessionParameters       extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("enable-session-parameters",        "Enable form selection via session parameters") }
-  case object AppName                       extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("app-name",                         "Form Runner app name",    Some("orbeon-app")) }
-  case object FormName                      extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("form-name",                        "Form Runner form name",   Some("orbeon-form")) }
-  case object DocumentId                    extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("document-id",                      "Form Runner document id", Some("orbeon-document")) }
+  case object AppName                       extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("app-name",                         "Form Runner app name",          Some("orbeon-app")) }
+  case object FormName                      extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("form-name",                        "Form Runner form name",         Some("orbeon-form")) }
+  case object DocumentId                    extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("document-id",                      "Form Runner document id",       Some("orbeon-document")) }
   case object Draft                         extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("draft",                            "Form Runner document is draft", Some("orbeon-draft")) }
   case object ReadOnly                      extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("read-only",                        "Readonly access") }
   case object SendLiferayLanguage           extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("send-liferay-language",            "Send Liferay language") }
   case object SendLiferayUser               extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("send-liferay-user",                "Send Liferay user") }
-  case object Page                          extends Pref { val tpe = SelectControl(PageNameLabels); val nameLabel = NameLabel("action",                           "Form Runner page",        Some("orbeon-page")) }
+  case object Page                          extends Pref { val tpe = SelectControl(PageNameLabels); val nameLabel = NameLabel("action",                           "Form Runner page",              Some("orbeon-page")) }
 
-  val AllPreferences = List(
+  val AllEditablePreferences: List[Pref] = List(
     Page,
     FormRunnerURL,
     AppName,
@@ -96,11 +96,14 @@ trait ProxyPortletEdit extends GenericPortlet {
 
   // Return the value of the preference if set, otherwise the value of the initialization parameter
   // NOTE: We should be able to use portlet.xml portlet-preferences/preference, but somehow this doesn't work properly
-  def getPreference(request: PortletRequest, pref: Pref) =
-    request.getPreferences.getValue(pref.nameLabel.name, getPortletConfig.getInitParameter(pref.nameLabel.name))
+  def getPreference(request: PortletRequest, pref: Pref): Option[String] =
+    Option(request.getPreferences.getValue(pref.nameLabel.name, getPortletConfig.getInitParameter(pref.nameLabel.name)))
 
-  def getBooleanPreference(request: PortletRequest, pref: Pref) =
-    getPreference(request, pref) == "true"
+  def getPreferenceOrThrow(request: PortletRequest, pref: Pref): String =
+    getPreference(request, pref).getOrElse(throw new PortletException(s"Preference `${pref.nameLabel.name}` not set"))
+
+  def getBooleanPreference(request: PortletRequest, pref: Pref): Boolean =
+    getPreference(request, pref).contains("true")
 
   // Very simple preferences editor
   override def doEdit(request: RenderRequest, response: RenderResponse): Unit =
@@ -121,8 +124,8 @@ trait ProxyPortletEdit extends GenericPortlet {
             <fieldset>
               <legend>Form Runner Portlet Settings</legend>
               {
-                for (pref <- AllPreferences) yield
-                  pref.tpe.render(pref, getPreference(request, pref))
+                for (pref <- AllEditablePreferences) yield
+                  pref.tpe.render(pref, getPreferenceOrThrow(request, pref))
               }
               <hr/>
               <div>
@@ -139,10 +142,10 @@ trait ProxyPortletEdit extends GenericPortlet {
     withRootException("view action", new PortletException(_)) {
       request.getParameter("save") match {
         case "save" =>
-          def setPreference(pref: Pref, value: String) =
+          def setPreference(pref: Pref, value: String): Unit =
             request.getPreferences.setValue(pref.nameLabel.name, value)
 
-          for (pref <- AllPreferences)
+          for (pref <- AllEditablePreferences)
             setPreference(pref, request.getParameter(pref.nameLabel.name))
 
           request.getPreferences.store()

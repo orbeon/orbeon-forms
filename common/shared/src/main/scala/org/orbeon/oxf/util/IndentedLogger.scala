@@ -104,7 +104,7 @@ class IndentedLogger(
   val logger      : log4s.Logger,
   val debugEnabled: Boolean,
   val indentation : Indentation,
-  val categoryOpt: Option[String] = None
+  val categoryOpt : Option[String] = None
 ) {
 
   private var stack: List[Operation] = Nil

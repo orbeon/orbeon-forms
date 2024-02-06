@@ -88,6 +88,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
     )
 
+    Fun("failed-validations", classOf[XXFormsFailedValidations], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
+    )
+
     Fun("if", classOf[If], op = 0, min = 3, STRING, EXACTLY_ONE,
       Arg(BOOLEAN, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE),

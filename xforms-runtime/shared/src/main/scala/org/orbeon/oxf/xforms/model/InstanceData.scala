@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 
@@ -58,7 +59,7 @@ object InstanceData {
     override def getRequired: Boolean = ModelDefs.DEFAULT_REQUIRED
     override def getValid: Boolean = ModelDefs.DEFAULT_VALID
     override def getSchemaOrBindType: QName = null
-    override def getInvalidBindIds: String = null
+    override def getInvalidBindIds: List[String] = Nil
     override def getLocationData: LocationData = null
   }
 
@@ -212,10 +213,10 @@ object InstanceData {
     }
   }
 
-  def getInvalidBindIds(nodeInfo: om.NodeInfo): String = {
+  def getInvalidBindIds(nodeInfo: om.NodeInfo): List[String] = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
     if (existingInstanceData eq null)
-      null
+      Nil
     else
       existingInstanceData.getInvalidBindIds
   }
@@ -405,25 +406,23 @@ class InstanceData private () {
     else
       bindType
 
-  def getInvalidBindIds: String = {
-    var sb: jl.StringBuilder = null
+  def getInvalidBindIds: List[String] = {
+    var sb: mutable.ListBuffer[String] = null
     if ((bindNodes ne null) && ! bindNodes.isEmpty) {
       val it = bindNodes.iterator
       while (it.hasNext) {
         val bindNode = it.next()
         if (bindNode.valid != ModelDefs.DEFAULT_VALID) {
           if (sb eq null)
-            sb = new jl.StringBuilder
-          else if (sb.length > 0)
-            sb.append(' ')
-          sb.append(bindNode.parentBind.staticId)
+            sb = new mutable.ListBuffer
+          sb += bindNode.parentBind.staticId
         }
       }
     }
     if (sb eq null)
-      null
+      Nil
     else
-      sb.toString
+      sb.result()
   }
 
   private def setTransientAnnotation(name: String, value: String): Unit = {

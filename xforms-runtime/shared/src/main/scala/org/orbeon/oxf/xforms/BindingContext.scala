@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms
 
 import java.{util => ju}
-
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
@@ -94,6 +93,8 @@ case class BindingContext(
 
     new BindingContext(this, ancestorOrSelfInScope(scope), variableElement.element, variableElement.locationData, name, value, scope)
   }
+
+  def contextItemOpt: Option[om.Item] = Option(contextItem)
 
   def singleItemOpt: Option[om.Item] =
     ! nodeset.isEmpty option nodeset.get(position - 1)

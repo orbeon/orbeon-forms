@@ -13,45 +13,48 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.InstanceData
+import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
 import org.orbeon.oxf.xml.DependsOnContextItemIfSingleArgumentMissing
 import org.orbeon.saxon.expr._
+import org.orbeon.saxon.om
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.Implicits._
+import shapeless.syntax.typeable.typeableOps
 
-import scala.collection.mutable
 
-/**
- * xxf:invalid-binds()
- */
 class XXFormsInvalidBinds
   extends XFormsFunction
      with DependsOnContextItemIfSingleArgumentMissing { // don't extend XFormsMIPFunction as addToPathMap returns something different
 
-  override def iterate(xpathContext: XPathContext): SequenceIterator = {
+  override def iterate(xpathContext: XPathContext): SequenceIterator =
+    argument
+      .headOption
+      .map(e => Option(e.iterate(xpathContext).next()))
+      .getOrElse(Option(xpathContext.getContextItem))
+      .flatMap(_.narrowTo[om.NodeInfo])
+      .map(InstanceData.getInvalidBindIds)
+      .getOrElse(Nil): List[String]
 
-    // First item or context node if any
-    val item = argument.headOption map (e => Option(e.iterate(xpathContext).next())) getOrElse Option(xpathContext.getContextItem)
+  // TODO: something smart
+  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =
+    super.addToPathMap(pathMap, pathMapNodeSet)
+}
 
-    (
-      item match {
-        case Some(nodeInfo: NodeInfo) =>
-          Option(InstanceData.getInvalidBindIds(nodeInfo)) match {
-            case Some(invalidBindIdsString) =>
-              invalidBindIdsString.splitTo[Array]()
-            case None =>
-              // No invalid bind ids
-              Nil
-          }
+class XXFormsFailedValidations
+  extends XFormsFunction
+     with DependsOnContextItemIfSingleArgumentMissing { // don't extend XFormsMIPFunction as addToPathMap returns something different
 
-        case _ =>
-          // Return () if we can't access the node
-          Nil
-      }
-    ): collection.Seq[String]
-  }
+  override def iterate(xpathContext: XPathContext): SequenceIterator =
+    argument
+      .headOption
+      .map(e => Option(e.iterate(xpathContext).next()))
+      .getOrElse(Option(xpathContext.getContextItem))
+      .flatMap(_.narrowTo[om.NodeInfo])
+      .flatMap(BindNode.failedValidationsForHighestLevelPrioritizeRequired)
+      .map(_._2)
+      .getOrElse(Nil)
+      .map(_.id)
 
   // TODO: something smart
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =

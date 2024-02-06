@@ -16,7 +16,7 @@ import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport.{findResour
 import org.orbeon.oxf.xforms.function.xxforms.{ComponentParamSupport, NumericValidation, ValidationFunctionNames, XXFormsLang}
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.library.XFormsEnvFunctions.findIndexForRepeatId
-import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
+import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.{CoreSupport, GetRequestHeaderSupport, ProcessTemplateSupport}
@@ -133,10 +133,34 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       qName   = XFormsFunction.getQNameFromItem(qName)
     )
 
-//    Fun("invalid-binds", classOf[XXFormsInvalidBinds], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
-//      Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
-//    )
-//
+  @XPathFunction
+  def invalidBinds(
+    binding : Option[Iterable[om.Item]]
+  )(implicit
+    xpc     : XPathContext
+  ): Iterable[String] =
+    binding
+      .getOrElse(Option(xpc.getContextItem).toList)
+      .headOption
+      .flatMap(_.narrowTo[om.NodeInfo])
+      .map(InstanceData.getInvalidBindIds)
+      .getOrElse(Nil)
+
+  @XPathFunction
+  def failedValidations(
+    binding : Option[Iterable[om.Item]]
+  )(implicit
+    xpc     : XPathContext
+  ): Iterable[String] =
+    binding
+      .getOrElse(Option(xpc.getContextItem).toList)
+      .headOption
+      .flatMap(_.narrowTo[om.NodeInfo])
+      .flatMap(BindNode.failedValidationsForHighestLevelPrioritizeRequired)
+      .map(_._2)
+      .getOrElse(Nil)
+      .map(_.id)
+
 //    Fun("if", classOf[If], op = 0, min = 3, STRING, EXACTLY_ONE,
 //      Arg(BOOLEAN, EXACTLY_ONE),
 //      Arg(STRING, EXACTLY_ONE),

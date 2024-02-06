@@ -1384,7 +1384,7 @@
                                     else
                                         id(@fr:itemsetid)[1]/choices[1]/item/value/string()
                                 return
-                                    . = $values
+                                    string(.) = $values
                             )"/>
                 </xsl:copy>
             </xsl:when>
@@ -1399,7 +1399,7 @@
                                 let $values :=
                                     instance('fr-form-resources')/*[1]/{$itemset-resource-name}/item/value/string()
                                 return
-                                    . = $values
+                                    string(.) = $values
                             )"/>
                 </xsl:copy>
             </xsl:when>
@@ -1417,7 +1417,7 @@
                                     else
                                         id(@fr:itemsetid)[1]/choices[1]/item/value/string()
                                 return
-                                    (every $v in xxf:split(.) satisfies $v = $values)
+                                    (every $v in xxf:split(string(.)) satisfies $v = $values)
                             )"/>
                 </xsl:copy>
             </xsl:when>
@@ -1432,7 +1432,7 @@
                                 let $values :=
                                     instance('fr-form-resources')/*[1]/{$itemset-resource-name}/item/value/string()
                                 return
-                                    (every $v in xxf:split(.) satisfies $v = $values)
+                                    (every $v in xxf:split(string(.)) satisfies $v = $values)
                             )"/>
                 </xsl:copy>
             </xsl:when>

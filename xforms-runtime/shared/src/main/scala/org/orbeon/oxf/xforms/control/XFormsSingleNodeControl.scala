@@ -59,25 +59,25 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
   // Standard MIPs
   private var _readonly = ModelDefs.DEFAULT_READONLY
-  final def isReadonly = _readonly
+  final def isReadonly: Boolean = _readonly
 
   private var _required = ModelDefs.DEFAULT_REQUIRED
-  final def isRequired = _required
+  final def isRequired: Boolean = _required
 
   // TODO: maybe represent as case class
   //case class ValidationStatus(valid: Boolean, alertLevel: Option[ValidationLevel], failedValidations: List[StaticBind.MIP])
   //private var _validationStatus: Option[ValidationStatus] = None
 
   private var _valid = ModelDefs.DEFAULT_VALID
-  def isValid = _valid
+  def isValid: Boolean = _valid
 
   // NOTE: At this time, the control only stores the constraints for a single level (the "highest" level). There is no
   // mixing of constraints among levels, like error and warning.
   private var _alertLevel: Option[ValidationLevel] = None
-  def alertLevel = _alertLevel
+  def alertLevel: Option[ValidationLevel] = _alertLevel
 
   private var _failedValidations: List[StaticBind.MIP] = Nil
-  def failedValidations = _failedValidations
+  def failedValidations: List[StaticBind.MIP] = _failedValidations
 
   // Previous values for refresh
   private var _wasReadonly = false
@@ -89,7 +89,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   // Type
   private var _valueType: QName = null
   def valueType: QName = _valueType
-  def valueTypeOpt = Option(valueType)
+  def valueTypeOpt: Option[QName] = Option(valueType)
 
   // Custom MIPs
   private var _customMIPs = Map.empty[String, String]

@@ -150,7 +150,7 @@ object BindNode {
   //   would have more impact (Form Builder, Form Runner error summary) so we would need to investigate more. For
   //   now, we consider that, for a control, required error validations take precedence over other validations.
   // - also prioritize failed datatype validation, as part of https://github.com/orbeon/orbeon-forms/issues/2242
-  private def prioritizeValidations(mipsForLevel: (ValidationLevel, List[StaticBind.MIP])) =
+  private def prioritizeValidations(mipsForLevel: (ValidationLevel, List[StaticBind.MIP])): (ValidationLevel, List[StaticBind.MIP]) =
     mipsForLevel match {
       case (ValidationLevel.ErrorLevel, mips) if mips exists (_.name == Required.name) =>
         ValidationLevel.ErrorLevel -> (mips filter (_.name == Required.name))
@@ -162,10 +162,10 @@ object BindNode {
 
   // Get all failed constraints for all levels, combining BindNodes if needed.
   // 2014-07-18: Used by XFormsModelSubmissionBase.annotateWithAlerts only.
-  def failedValidationsForAllLevelsPrioritizeRequired(node: Node) =
+  def failedValidationsForAllLevelsPrioritizeRequired(node: Node): Map[ValidationLevel, List[StaticBind.MIP]] =
     failedValidationsForAllLevels(node) map prioritizeValidations
 
-  def failedValidationsForAllLevels(node: Node): Validations =
+  private def failedValidationsForAllLevels(node: Node): Validations =
     collectFailedValidationsForAllLevels(
       Option(InstanceData.getLocalInstanceData(node))
       map (_.getBindNodes.asScala)
@@ -197,10 +197,10 @@ object BindNode {
 
   // Get all failed constraints for the highest level only, combining BindNodes if needed.
   // 2014-07-18: Used by XFormsSingleNodeControl only.
-  def failedValidationsForHighestLevelPrioritizeRequired(nodeInfo: om.NodeInfo) =
+  def failedValidationsForHighestLevelPrioritizeRequired(nodeInfo: om.NodeInfo): Option[(ValidationLevel, List[StaticBind.MIP])] =
     failedValidationsForHighestLevel(nodeInfo) map prioritizeValidations
 
-  def failedValidationsForHighestLevel(nodeInfo: om.NodeInfo) =
+  private def failedValidationsForHighestLevel(nodeInfo: om.NodeInfo): Option[(ValidationLevel, List[StaticBind.MIP])] =
     collectFailedValidationsForHighestLevel(
       Option(InstanceData.getLocalInstanceData(nodeInfo, forUpdate = false))
       map (_.getBindNodes.asScala)

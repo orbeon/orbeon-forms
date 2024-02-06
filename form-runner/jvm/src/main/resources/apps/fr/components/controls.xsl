@@ -148,26 +148,28 @@
                 </xsl:copy>
                 <xf:trigger
                     class="fr-clear-out-of-range"
-                    ref="
-                        let $has-invalid-values :=
-                            exists(
-                                xxf:split()[
-                                    not(. = instance('fr-form-resources')/*[1]/{frf:controlNameFromId(@id)}/item/value/string())
-                                ]
-                            )
-                        return
-                            .[$has-invalid-values and not(xxf:valid(xxf:binding('{@id}')))]" appearance="xxf:mini">
+                    ref=".[xxf:failed-validations(xxf:binding('{@id}')) = concat(frf:controlNameFromId('{@id}'), '-choice-constraint')]">
                     <xf:label ref="xxf:r('detail.labels.clear-out-of-range', '|fr-fr-resources|')"/>
                     <xf:action event="DOMActivate">
-                        <xf:setvalue
-                                ref="xxf:binding('{@id}')"
-                                value="
-                                    string-join(
-                                        xxf:split()[
-                                            . = instance('fr-form-resources')/*[1]/{frf:controlNameFromId(@id)}/item/value/string()
-                                        ],
-                                        ' '
-                                    )"/>
+                        <xsl:choose>
+                            <xsl:when test="$is-multiple">
+                                <xf:setvalue
+                                    ref="xxf:binding('{@id}')"
+                                    value="
+                                        let $itemset-values := xxf:itemset('{@id}', 'xml')//value/string()
+                                        return
+                                            string-join(
+                                                xxf:split(string(.))[
+                                                    . = $itemset-values
+                                                ],
+                                                ' '
+                                            )"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xf:setvalue
+                                    ref="xxf:binding('{@id}')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xf:action>
                 </xf:trigger>
             </xsl:when>

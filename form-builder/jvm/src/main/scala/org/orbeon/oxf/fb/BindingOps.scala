@@ -149,27 +149,32 @@ trait BindingOps {
   private def bindingMetadata(binding: NodeInfo) =
     binding / FBMetadataTest
 
-  // From an <xbl:binding>, return the view template (say <fr:autocomplete>)
-  def findViewTemplate(binding: NodeInfo): Option[NodeInfo] = {
+  // From an `<xbl:binding>`, return the view template (say `<fr:autocomplete>`)
+  def findViewTemplate(binding: NodeInfo, forEnclosingSection: Boolean): Option[NodeInfo] = {
     val metadata = bindingMetadata(binding)
-    (((metadata / FBTemplateTest) ++ (metadata / FBTemplatesTest / FBViewTest)) / *).headOption
+    (
+      (
+        (if (forEnclosingSection) Nil else metadata / FBTemplateTest) ++
+        (metadata / (if (forEnclosingSection) FBEnclosingSectionTemplatesTest else FBTemplatesTest) / FBViewTest)
+      ) / *
+    ).headOption
   }
 
   def hasViewTemplateSupportElementFor(binding: NodeInfo, name: String): Boolean =
-    findViewTemplate(binding).toSeq / name nonEmpty
+    findViewTemplate(binding, forEnclosingSection = false).toSeq / name nonEmpty
 
   // In other words we leave Type and Required and custom MIPs as they are
   // This must match what is done in annotate.xpl
   private val BindTemplateAttributesToNamespace =
     Set(ModelDefs.Relevant, ModelDefs.Readonly, ModelDefs.Constraint, ModelDefs.Calculate, ModelDefs.Default) map (_.aName)
 
-  // From an <xbl:binding>, return all bind attributes
-  // They are obtained from the legacy datatype element or from templates/bind.
-  def findBindAttributesTemplate(binding: NodeInfo): Seq[NodeInfo] = {
+  // From an `<xbl:binding>`, return all bind attributes
+  // They are obtained from the legacy `datatype` element or from `templates/bind`.
+  def findBindAttributesTemplate(binding: NodeInfo, forEnclosingSection: Boolean): Seq[NodeInfo] = {
 
     val metadata            = bindingMetadata(binding)
-    val datatypeMetadataOpt = metadata / FBDatatypeTest headOption
-    val bindMetadataOpt     = metadata / FBTemplatesTest / FBBindTest headOption
+    val datatypeMetadataOpt = if (forEnclosingSection) None else metadata / FBDatatypeTest headOption
+    val bindMetadataOpt     = metadata / (if (forEnclosingSection) FBEnclosingSectionTemplatesTest else FBTemplatesTest) / FBBindTest headOption
 
     val allAttributes = {
 

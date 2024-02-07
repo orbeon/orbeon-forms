@@ -176,7 +176,7 @@
                                     <xf:output value="$form-resources/new-section/label"/>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">
-                                    toolboxOps:insertNewSection(true())
+                                    toolboxOps:insertNewSection(true(), ())
                                 </xf:action>
                             </xf:trigger>
                         </xh:div>

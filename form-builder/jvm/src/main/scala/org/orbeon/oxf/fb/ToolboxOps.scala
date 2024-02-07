@@ -31,6 +31,8 @@ import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVers
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.processor.XPLConstants
+import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.ContentTypes.HtmlContentType
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, NetUtils, PathUtils, URLRewriterUtils, XPath}
@@ -46,7 +48,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames
-import org.orbeon.xforms.XFormsNames.ID_QNAME
+import org.orbeon.xforms.XFormsNames.{ID_QNAME, MEDIATYPE_QNAME}
 
 import java.net.URI
 import scala.collection.compat._
@@ -71,7 +73,7 @@ object ToolboxOps {
 
           // Insert control template
           val newControlElem: NodeInfo =
-            findViewTemplate(binding) match {
+            findViewTemplate(binding, forEnclosingSection = false) match {
               case Some(viewTemplate) =>
                 // There is a specific template available
                 val controlElem = insert(into = gridTd, origin = viewTemplate).head
@@ -164,7 +166,7 @@ object ToolboxOps {
           ensureAttribute(newControlElem, XFormsNames.BIND_QNAME.localName, bind.id)
 
           // Set bind attributes if any
-          insert(into = bind, origin = findBindAttributesTemplate(binding))
+          insert(into = bind, origin = findBindAttributesTemplate(binding, forEnclosingSection = false))
 
           // This can impact templates
           updateTemplatesCheckContainers(findAncestorRepeatNames(gridTd).to(Set))
@@ -191,7 +193,7 @@ object ToolboxOps {
   def canInsertControl(inDoc: NodeInfo): Boolean = (inDoc ne null) && willEnsureEmptyCellSucceed(FormBuilderDocContext(inDoc))
 
   //@XPathFunction
-  def insertNewSection(withGrid: Boolean): Some[NodeInfo] = {
+  def insertNewSection(withGrid: Boolean, suggestedNameOrNull: String): Some[(NodeInfo, NodeInfo)] = {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -199,9 +201,9 @@ object ToolboxOps {
 
       val (into, after) = findSectionInsertionPoint
 
-      val newSectionName = controlNameFromId(nextId("section"))
-      val newGridName    = controlNameFromId(nextId("grid"))
-      val newCellIdsIt   = nextTmpIds(count = 2).iterator
+      val newSectionName    = Option(suggestedNameOrNull).getOrElse(controlNameFromId(nextId("section")))
+      lazy val newGridName  = controlNameFromId(nextId("grid"))
+      lazy val newCellIdsIt = nextTmpIds(count = 2).iterator
 
       val precedingSectionName = after flatMap getControlNameOpt
 
@@ -240,7 +242,7 @@ object ToolboxOps {
       )
 
       // Insert the bind element
-      ensureBinds(findContainerNamesForModel(newSectionElem, includeSelf = true))
+      val sectionBind = ensureBinds(findContainerNamesForModel(newSectionElem, includeSelf = true))
 
       newNestedGridElemOpt foreach { newNestedGridElem =>
         insertHolders(
@@ -265,7 +267,7 @@ object ToolboxOps {
 
       Undo.pushUserUndoAction(InsertSection(newSectionElem.id))
 
-      Some(newSectionElem)
+      Some((newSectionElem, sectionBind))
     }
   }
 
@@ -339,22 +341,66 @@ object ToolboxOps {
 
     implicit val ctx = FormBuilderDocContext()
 
+    val xblSectionName = bindingFirstURIQualifiedName(binding).localName
+
+    val suggestedSectionName = {
+
+      val allSectionNamesInUse = {
+
+        val (allSections, _) =
+          findNestedContainers(ctx.bodyElem) partition IsSection
+
+        allSections flatMap getControlNameOpt toSet
+      }
+
+      ! allSectionNamesInUse(xblSectionName) option xblSectionName
+    }
+
     // Insert new section first
-    insertNewSection(withGrid = false) map { section =>
+    insertNewSection(withGrid = false,  suggestedSectionName.orNull) map { case (section, bind) =>
 
-      val selector = binding attValue "element"
-
-      val xbl              = ctx.modelElem followingSibling XBLXBLTest
-      val existingBindings = xbl child XBLBindingTest
+      val formSectionName =
+        ControlOps.controlNameFromIdOpt(section.id)
+          .getOrElse(throw new IllegalStateException)
 
       // Insert template into section
-      findViewTemplate(binding) foreach { template =>
+      findViewTemplate(binding, forEnclosingSection = false) foreach { template =>
         val control     = insert(into = section, after = section / *, origin = template)
-        val sectionName = ControlOps.controlNameFromIdOpt(section.id).get
-        val contentName = sectionName + TemplateContentSuffix
+        val contentName = formSectionName + TemplateContentSuffix
         val idAttribute = NodeInfoFactory.attributeInfo(ID_QNAME, controlId(contentName))
         insert(into = control, origin = idAttribute)
       }
+
+      findViewTemplate(binding, forEnclosingSection = true) foreach { template =>
+        // Propagate `class` from the template to the control
+        insert(into = section, origin = template /@ "class")
+
+        // Propagate label and help `mediatype` from the template to the control
+        for (lhhaTest <- List(XFLabelTest, XFHelpTest))
+          if (hasHTMLMediatype(template / lhhaTest))
+            setHTMLMediatype(section / lhhaTest, isHTML = true)
+      }
+
+      // Propagate label and help values
+      val xblResourcesRootElem =
+        (findXblInstance(binding, Names.FormResources).toList / *)
+          .headOption
+          .getOrElse(throw new IllegalStateException)
+
+      val triples =
+        for {
+          (lang, xblResource) <- allLangsWithResources(xblResourcesRootElem)
+          resourceName        <- List("label", "help")
+          xblHolder           <- (xblResource / xblSectionName / resourceName).headOption
+        } yield
+          (resourceName, lang, xblHolder.stringValue)
+
+      triples.toList.groupByKeepOrder(_._1).foreach { case (resourceName, list) =>
+        setControlResourcesWithLang(formSectionName, resourceName, list.map(t => (t._2, List(t._3))))
+      }
+      
+      // Propagate bind attributes to the `bind` element if present
+      insert(into = bind, origin = findBindAttributesTemplate(binding, forEnclosingSection = true))
 
       UndoAction.InsertSectionTemplate(section.id)
     }

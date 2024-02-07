@@ -384,15 +384,39 @@
 
                 <!-- Control template -->
                 <templates>
-                    <!-- Type if any -->
-                    <xsl:if test="$section-bind/@type">
-                        <bind type="{$section-bind/@type}"/>
-                    </xsl:if>
                     <view>
-                        <!-- NOTE: Element doesn't have LHHA elements for now -->
                         <xsl:element name="component:{$section-name}" namespace="{$component-namespace}"/>
                     </view>
                 </templates>
+
+                <!-- Enclosing section metadata -->
+                <xsl:variable name="type-att"        select="$section-bind/@type[p:non-blank()]"/>
+                <xsl:variable name="relevant-att"    select="$section-bind/@relevant[p:non-blank()]"/>
+                <xsl:variable name="readonly-att"    select="$section-bind/@readonly[p:non-blank()]"/>
+
+                <xsl:variable name="class-att"       select="$fr-section/@class[p:non-blank()]"/>
+                <xsl:variable name="html-label-elem" select="$fr-section/xf:label[@mediatype = 'text/html']"/>
+                <xsl:variable name="html-help-elem"  select="$fr-section/xf:help[@mediatype = 'text/html']"/>
+
+                <xsl:if test="exists(($type-att, $relevant-att, $readonly-att, $class-att, $html-label-elem, $html-help-elem))">
+                    <enclosing-section-templates>
+                        <xsl:if test="exists(($type-att, $relevant-att, $readonly-att))">
+                            <bind>
+                                <!-- Unclear why `type` would be useful -->
+                                <xsl:copy-of select="$type-att, $relevant-att, $readonly-att"/>
+                            </bind>
+                        </xsl:if>
+
+                        <xsl:if test="exists(($class-att, $html-label-elem, $html-help-elem))">
+                            <view>
+                                <fr:section>
+                                    <xsl:copy-of select="$class-att, $html-label-elem, $html-help-elem" copy-namespaces="no"/>
+                                </fr:section>
+                            </view>
+                        </xsl:if>
+                    </enclosing-section-templates>
+                </xsl:if>
+
             </metadata>
 
             <!-- Handlers for actions that listen to events from controls-->

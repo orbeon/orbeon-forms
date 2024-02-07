@@ -90,7 +90,10 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-itemsets",
-      properties = Map("control-element" -> resolveId(controlId)(FormBuilderDocContext()))
+      properties = Map(
+        "control-element"      -> resolveId(controlId)(FormBuilderDocContext()),
+        "control-effective-id" -> Some(controlId)
+      )
     )
 
   def controlDnD(controlId: String, destCellId: String, copy: Boolean): Unit = {

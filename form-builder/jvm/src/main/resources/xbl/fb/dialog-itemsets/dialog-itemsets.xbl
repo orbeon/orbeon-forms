@@ -32,15 +32,19 @@
                 <xf:setvalue iterate="*[not(*)]" ref="."/>          <!-- Clear local values -->
                 <xf:delete ref="(items, template)/item"/>           <!-- Clear local items and template -->
 
-                <xf:var name="control-name"      value="frf:controlNameFromId(event('control-element')/@id)"/>
-                <xf:setvalue ref="control-name"  value="$control-name"/>
-                <xf:setvalue ref="control-type"  value="event('control-element')/local-name()"/>
-                <xf:setvalue ref="control-value" value="fbf:findControlBoundNodeByName($control-name)"/>
-                <xf:setvalue ref="appearance"    value="event('control-element')/@appearance"/>
-                <xf:setvalue ref="html"          value="fbf:isItemsetHTMLMediatype($control-name)"/>
+                <xf:var name="control-effective-id"     value="event('control-effective-id')"/>
+                <xf:var name="control-name"             value="frf:controlNameFromId($control-effective-id)"/>
+
+                <xf:setvalue ref="control-effective-id" value="$control-effective-id"/>
+                <xf:setvalue ref="control-name"         value="$control-name"/>
+                <xf:setvalue ref="control-type"         value="event('control-element')/local-name()"/>
+                <xf:setvalue ref="control-value"        value="fbf:findControlBoundNodeByEffectiveId($control-effective-id)"/>
+                <xf:setvalue ref="appearance"           value="event('control-element')/@appearance"/>
+                <xf:setvalue ref="html"                 value="fbf:isItemsetHTMLMediatype($control-name)"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
 
+            <!-- Q: Why a separate handler? -->
             <xbl:handler event="xxforms-dialog-open" observer="dialog">
 
                 <!-- Get current language and items in the all languages -->
@@ -77,7 +81,9 @@
                 fbf:setItemsetHTMLMediatype($i/control-name, $i/html)
             </xbl:handler>
             <xbl:handler event="DOMActivate" observer="save-trigger">
-                <xf:setvalue ref="fbf:findControlBoundNodeByName($i/control-name)" value="$i/control-value"/>
+                <xf:setvalue
+                    ref="fbf:findControlBoundNodeByEffectiveId($i/control-effective-id)"
+                    value="$i/control-value"/>
             </xbl:handler>
 
             <!-- Add line when users press enter -->
@@ -89,6 +95,7 @@
             <xf:model id="model">
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
                     <instance>
+                        <control-effective-id/>
                         <control-name/>     <!-- So we can find back the control when saving if users change the name -->
                         <control-type/>     <!-- Either 'select' or 'select1' -->
                         <control-value/>    <!-- Default value of control -->

@@ -656,11 +656,10 @@ object FormBuilderXPathApi {
 
   // Find the control's bound item if any (resolved from the top-level form model `fr-form-model`)
   //@XPathFunction
-  def findControlBoundNodeByName(controlName: String): Option[NodeInfo] = (
-    findConcreteControlByName(controlName)(FormBuilderDocContext())
-    collect { case c: XFormsSingleNodeControl => c }
-    flatMap (_.boundNodeOpt)
-  )
+  def findControlBoundNodeByEffectiveId(controlEffectiveId: String): Option[NodeInfo] =
+    findConcreteControlByEffectiveId(controlEffectiveId)(FormBuilderDocContext())
+      .collect { case c: XFormsSingleNodeControl => c }
+      .flatMap(_.boundNodeOpt)
 
   //@XPathFunction
   def currentLang: String =

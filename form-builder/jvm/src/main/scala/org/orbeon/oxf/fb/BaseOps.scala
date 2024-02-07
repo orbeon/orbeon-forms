@@ -31,11 +31,6 @@ trait BaseOps extends Logging {
   // Id of the xxf:dynamic control holding the edited form
   val DynamicControlId = "fb"
 
-  // Find the top-level form model of the form being edited
-  def getFormModel: XFormsModel =
-    inScopeContainingDocument.getObjectByEffectiveId(s"$DynamicControlId${ComponentSeparator}fr-form-model")
-      .asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
-
   def findTemplateRoot(repeatName: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     inlineInstanceRootElem(ctx.formDefinitionRootElem, templateId(repeatName))
 

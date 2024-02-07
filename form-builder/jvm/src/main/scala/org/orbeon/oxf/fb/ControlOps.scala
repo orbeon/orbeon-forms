@@ -468,14 +468,9 @@ trait ControlOps extends ResourcesOps {
     FormBuilder.controlElementHasEditor(controlElement: NodeInfo, editor: String, ctx.componentBindings)
 
   // Find the control by name (resolved from the top-level form model `fr-form-model`)
-  def findConcreteControlByName(controlName: String)(implicit ctx: FormBuilderDocContext): Option[XFormsControl] = {
-    val model = getFormModel
-    for {
-      controlId <- findControlIdByName(controlName)
-      control   <- model.container.resolveObjectByIdInScope(model.getEffectiveId, controlId) map (_.asInstanceOf[XFormsControl])
-    } yield
-      control
-  }
+  def findConcreteControlByEffectiveId(controlEffectiveId: String)(implicit ctx: FormBuilderDocContext): Option[XFormsControl] =
+    inScopeContainingDocument.findObjectByEffectiveId(controlEffectiveId)
+      .map(_.asInstanceOf[XFormsControl])
 
   def setControlLabelHintHelpOrText(
     controlName : String,

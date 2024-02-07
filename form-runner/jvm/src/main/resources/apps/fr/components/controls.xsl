@@ -148,7 +148,8 @@
                 </xsl:copy>
                 <xf:trigger
                     class="fr-clear-out-of-range"
-                    ref=".[xxf:failed-validations(xxf:binding('{@id}')) = concat(frf:controlNameFromId('{@id}'), '-choice-constraint')]">
+                    appearance="xxf:mini"
+                    ref=".[xxf:visited('{@id}') and xxf:failed-validations(xxf:binding('{@id}')) = concat(frf:controlNameFromId('{@id}'), '-choice-constraint')]">
                     <xf:label ref="xxf:r('detail.labels.clear-out-of-range', '|fr-fr-resources|')"/>
                     <xf:action event="DOMActivate">
                         <xsl:choose>

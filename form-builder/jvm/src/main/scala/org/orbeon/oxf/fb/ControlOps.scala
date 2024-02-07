@@ -43,6 +43,7 @@ import org.orbeon.xml.NamespaceMapping
 import scala.annotation.tailrec
 import scala.collection.compat._
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 
 /*
@@ -632,6 +633,8 @@ trait ControlOps extends ResourcesOps {
 
     val addHints = FormBuilder.hasItemHintEditor(controlName)
 
+    val values = new ListBuffer[String]
+
     for ((lang, holder) <- FormRunner.findResourceHoldersWithLang(controlName, resourcesRoot)) {
 
       delete(holder / "item")
@@ -640,16 +643,34 @@ trait ControlOps extends ResourcesOps {
         for (item <- items / "item")
         yield {
           <item>
-            <label>{item / "label" filter (_.attValue("lang") == lang) stringValue}</label>
+            <label>{(item / "label" filter (_.attValue("lang") == lang)).stringValue}</label>
             {
               if (addHints)
-                <hint>{ item / "hint"  filter (_.attValue("lang") == lang) stringValue}</hint>
+                <hint>{(item / "hint"  filter (_.attValue("lang") == lang)).stringValue}</hint>
             }
-            <value>{item / "value" stringValue}</value>
+            <value>{(item / "value").stringValue.kestrel(values += _)}</value>
           </item>
         }
 
       insert(into = holder, after = holder / *, origin = newItemElems map elemToNodeInfo toList)
+    }
+
+    // Remove or clear no longer allowed values in the data
+    // https://github.com/orbeon/orbeon-forms/issues/6043
+    val dataHolders      = FormRunner.findDataHolders(controlName)
+    val isMultiple       = findControlByName(controlName).exists(e => isMultipleSelectionControl(e.localname))
+    val allowedValuesSet = values.toSet
+
+    if (isMultiple) {
+      dataHolders.foreach { dataHolder =>
+        val remainingValues = dataHolder.stringValue.trimAllToEmpty.splitTo[List]().filter(allowedValuesSet)
+        setvalue(dataHolder, remainingValues.mkString(" "))
+      }
+    } else {
+      dataHolders.foreach { dataHolder =>
+        if (! allowedValuesSet(dataHolder.stringValue.trimAllToEmpty))
+          setvalue(dataHolder, "")
+      }
     }
   }
 

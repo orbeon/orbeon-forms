@@ -75,15 +75,19 @@
             </xbl:handler>
 
             <!-- Save on click on save -->
-            <xbl:handler event="DOMActivate" observer="save-trigger" type="xpath">
-                fbf:saveControlToUndoStack($i/control-name, $i/control-name),
-                fbf:setControlItems($i/control-name, $i/items),
-                fbf:setItemsetHTMLMediatype($i/control-name, $i/html)
-            </xbl:handler>
             <xbl:handler event="DOMActivate" observer="save-trigger">
+                <xf:action type="xpath">
+                    fbf:saveControlToUndoStack($i/control-name, $i/control-name)
+                </xf:action>
+                <!-- Set current value before `fbf:setControlItems()`, as the latter will normalize all repeated values
+                     based on the itemset. -->
                 <xf:setvalue
                     ref="fbf:findControlBoundNodeByEffectiveId($i/control-effective-id)"
                     value="$i/control-value"/>
+                <xf:action type="xpath">
+                    fbf:setControlItems($i/control-name, $i/items),
+                    fbf:setItemsetHTMLMediatype($i/control-name, $i/html)
+                </xf:action>
             </xbl:handler>
 
             <!-- Add line when users press enter -->

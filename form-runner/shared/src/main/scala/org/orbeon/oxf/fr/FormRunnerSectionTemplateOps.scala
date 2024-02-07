@@ -122,8 +122,8 @@ trait FormRunnerSectionTemplateOps {
     fr.XMLNames.XFInstanceTest        find
     (_.id == instanceId)
 
-  // Find top-level xf:bind, which is the one without a `ref`
-  // (there is a xf:bind making instance('fr-form-instance') readonly in certain cases; is it really needed?)
+  // Find top-level `xf:bind`, which is the one without a `ref`
+  // Q: There is a `xf:bind` making `instance('fr-form-instance')` readonly in certain cases; is it really needed?
   def findXblBinds(bindingElem: NodeInfo): Seq[NodeInfo] = {
     val els =
       bindingElem                         /
@@ -153,7 +153,7 @@ trait FormRunnerSectionTemplateOps {
     ctx.bodyElemOpt.toList descendant * filter frc.IsSection filter (_ / * exists isSectionTemplateContent)
 
   // Find the binding's first URI qualified name
-  // For now takes the first CSS rule and assume the form foo|bar.
+  // For now takes the first CSS rule and assume the form `foo|bar`.
   def bindingFirstURIQualifiedName(bindingElem: NodeInfo): URIQualifiedName = {
     val firstElementCSSName = (bindingElem attValue "element").splitTo[List](",").head
     val elementQName        = firstElementCSSName.replace('|', ':')

@@ -20,6 +20,7 @@ import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.{findMigrationForVersion, findMigrationOps}
 import org.orbeon.oxf.fr.datamigration.PathElem
+import org.orbeon.oxf.util.ContentTypes.HtmlContentType
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace
@@ -33,6 +34,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
 import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.XFormsNames.MEDIATYPE_QNAME
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.compat._
@@ -190,7 +192,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     }
 
   def hasHTMLMediatype(nodes: Iterable[NodeInfo]): Boolean =
-    nodes exists (element => (element attValue "mediatype") == "text/html")
+    nodes exists (element => (element attValue MEDIATYPE_QNAME) == HtmlContentType)
 
   //@XPathFunction
   def isSingleSelectionControl(localName: String): Boolean =

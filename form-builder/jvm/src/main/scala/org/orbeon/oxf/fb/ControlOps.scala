@@ -21,6 +21,7 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerRename, FormRunnerTemplatesOps, Names}
+import org.orbeon.oxf.util.ContentTypes.HtmlContentType
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
@@ -555,9 +556,9 @@ trait ControlOps extends ResourcesOps {
   def setHTMLMediatype(lhhaElems: Iterable[NodeInfo], isHTML: Boolean): Unit =
     lhhaElems foreach { lhhaElem =>
       if (isHTML)
-        insert(into = lhhaElem, origin = attributeInfo("mediatype", "text/html"))
+        insert(into = lhhaElem, origin = attributeInfo(MEDIATYPE_QNAME, HtmlContentType))
       else
-        delete(lhhaElem /@ "mediatype")
+        delete(lhhaElem /@ MEDIATYPE_QNAME)
     }
 
   def setAutomatic(lhhaElems: Iterable[NodeInfo], isAutomaticOpt: Option[Boolean]): Unit =

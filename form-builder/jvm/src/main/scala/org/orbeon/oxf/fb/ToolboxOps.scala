@@ -62,7 +62,7 @@ object ToolboxOps {
 
   // Insert a new control in a cell
   //@XPathFunction
-  def insertNewControl(binding: NodeInfo): Option[String] = {
+  def insertNewControl(bindingElem: NodeInfo): Option[String] = {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -73,7 +73,7 @@ object ToolboxOps {
 
           // Insert control template
           val newControlElem: NodeInfo =
-            findViewTemplate(binding, forEnclosingSection = false) match {
+            findViewTemplate(bindingElem, forEnclosingSection = false) match {
               case Some(viewTemplate) =>
                 // There is a specific template available
                 val controlElem = insert(into = gridTd, origin = viewTemplate).head
@@ -85,7 +85,7 @@ object ToolboxOps {
                 val controlElem =
                   insert(
                     into   = gridTd,
-                    origin = elementInfo(bindingFirstURIQualifiedName(binding))
+                    origin = elementInfo(bindingFirstURIQualifiedName(bindingElem))
                   ).head
 
                 insert(
@@ -100,7 +100,7 @@ object ToolboxOps {
           setvalue(newControlElem / "*:alert" /@ "ref", OldStandardAlertRef)
 
           // Data holder may contain file attributes
-          val dataHolder = FormRunnerTemplatesOps.newDataHolder(newControlName, binding)
+          val dataHolder = FormRunnerTemplatesOps.newDataHolder(newControlName, bindingElem)
 
           // Create resource holder for all form languages
           val resourceHolders = {
@@ -108,7 +108,7 @@ object ToolboxOps {
             formLanguages map { formLang =>
 
               // Resource holders from XBL metadata
-              val xblResourceEls     = binding / FBMetadataTest / FBTemplatesTest / FBResourcesTest / *
+              val xblResourceEls     = bindingElem / FBMetadataTest / FBTemplatesTest / FBResourcesTest / *
               val xblResourceElNames = xblResourceEls map (_.localname) toSet
 
               // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
@@ -166,7 +166,7 @@ object ToolboxOps {
           ensureAttribute(newControlElem, XFormsNames.BIND_QNAME.localName, bind.id)
 
           // Set bind attributes if any
-          insert(into = bind, origin = findBindAttributesTemplate(binding, forEnclosingSection = false))
+          insert(into = bind, origin = findBindAttributesTemplate(bindingElem, forEnclosingSection = false))
 
           // This can impact templates
           updateTemplatesCheckContainers(findAncestorRepeatNames(gridTd).to(Set))
@@ -337,11 +337,11 @@ object ToolboxOps {
 
   // Insert a new section template
   //@XPathFunction
-  def insertNewSectionTemplate(inDoc: NodeInfo, binding: NodeInfo): Unit = {
+  def insertNewSectionTemplate(bindingElem: NodeInfo): Unit = {
 
     implicit val ctx = FormBuilderDocContext()
 
-    val xblSectionName = bindingFirstURIQualifiedName(binding).localName
+    val xblSectionName = bindingFirstURIQualifiedName(bindingElem).localName
 
     val suggestedSectionName = {
 
@@ -364,14 +364,14 @@ object ToolboxOps {
           .getOrElse(throw new IllegalStateException)
 
       // Insert template into section
-      findViewTemplate(binding, forEnclosingSection = false) foreach { template =>
+      findViewTemplate(bindingElem, forEnclosingSection = false) foreach { template =>
         val control     = insert(into = section, after = section / *, origin = template)
         val contentName = formSectionName + TemplateContentSuffix
         val idAttribute = NodeInfoFactory.attributeInfo(ID_QNAME, controlId(contentName))
         insert(into = control, origin = idAttribute)
       }
 
-      findViewTemplate(binding, forEnclosingSection = true) foreach { template =>
+      findViewTemplate(bindingElem, forEnclosingSection = true) foreach { template =>
         // Propagate `class` from the template to the control
         insert(into = section, origin = template /@ "class")
 
@@ -383,7 +383,7 @@ object ToolboxOps {
 
       // Propagate label and help values
       val xblResourcesRootElem =
-        (findXblInstance(binding, Names.FormResources).toList / *)
+        (findXblInstance(bindingElem, Names.FormResources).toList / *)
           .headOption
           .getOrElse(throw new IllegalStateException)
 
@@ -398,9 +398,9 @@ object ToolboxOps {
       triples.toList.groupByKeepOrder(_._1).foreach { case (resourceName, list) =>
         setControlResourcesWithLang(formSectionName, resourceName, list.map(t => (t._2, List(t._3))))
       }
-      
+
       // Propagate bind attributes to the `bind` element if present
-      insert(into = bind, origin = findBindAttributesTemplate(binding, forEnclosingSection = true))
+      insert(into = bind, origin = findBindAttributesTemplate(bindingElem, forEnclosingSection = true))
 
       UndoAction.InsertSectionTemplate(section.id)
     }
@@ -679,8 +679,6 @@ object ToolboxOps {
         val containerName       = getControlName(containerElem)
         val sectionTemplateName = bindingFirstURIQualifiedName(bindingElem).localName
 
-        val model = bindingElem / XBLImplementationTest / XFModelTest
-
         val resourcesWithLangElems = {
 
           val sectionLangResources    = findResourceHoldersWithLang(containerName, resourcesRoot)
@@ -688,7 +686,7 @@ object ToolboxOps {
 
           val nestedResources = {
 
-            val resourcesInstanceElem = model / XFInstanceTest find (_.hasIdValue(Names.FormResources))
+            val resourcesInstanceElem = findXblInstance(bindingElem, Names.FormResources)
             val resourceElems         = resourcesInstanceElem.toList flatMap (_ child * child *)
 
             // NOTE: For some reason, there is a resource with the name of the section template. That should
@@ -734,7 +732,7 @@ object ToolboxOps {
 
         val newDataHolderElem = {
 
-          val dataTemplateInstanceElem = model / XFInstanceTest find (_.hasIdValue("fr-form-template"))
+          val dataTemplateInstanceElem = findXblInstance(bindingElem, Names.FormTemplate)
           val nestedDataHolderElems    = dataTemplateInstanceElem.toList flatMap (_ child * take 1 child *)
 
           val newElem = elementInfo(containerName)
@@ -744,7 +742,7 @@ object ToolboxOps {
 
         val newBindElem = {
 
-          val nestedBindElems = model / XFBindTest / *
+          val nestedBindElems = findXblBinds(bindingElem) / *
 
           val newElem = TransformerUtils.extractAsMutableDocument(findBindByName(containerName).get).rootElement
           XFormsAPI.delete(newElem / *)

@@ -300,7 +300,7 @@
                                         </xf:label>
                                         <xf:action ev:event="DOMActivate">
                                             <xf:action if="$is-section-component" type="xpath">
-                                                toolboxOps:insertNewSectionTemplate($model, $binding)
+                                                toolboxOps:insertNewSectionTemplate($binding)
                                             </xf:action>
                                             <xf:action if="not($is-section-component)">
                                                 <xf:action type="xpath">

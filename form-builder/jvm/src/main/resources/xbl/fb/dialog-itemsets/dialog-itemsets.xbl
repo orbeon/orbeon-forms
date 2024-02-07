@@ -151,7 +151,7 @@
                     </fr:checkbox-input>
 
                     <xf:group ref="$i/items">
-                        <xf:var name="control-element" value="fbf:findControlByNameOrEmpty($i/control-name)"/>
+<!--                        <xf:var name="control-element" value="fbf:findControlByNameOrEmpty($i/control-name)"/>-->
                         <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
                              decide to remove support for legacy mode. -->
                         <fr:grid id="fb-itemset-repeat" repeat="true" ref="item" template="$i/template/item">

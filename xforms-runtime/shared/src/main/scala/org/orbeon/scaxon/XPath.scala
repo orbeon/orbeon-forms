@@ -65,7 +65,8 @@ object XPath {
       expr,
       namespaces,
       if (variables eq null) null else variables.asJava,
-      library, functionContext,
+      library,
+      functionContext,
       null,
       null,
       reporter

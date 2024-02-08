@@ -15,7 +15,6 @@ package org.orbeon.xbl
 
 import org.orbeon.facades.Select2
 import org.orbeon.facades.Select2.{Success, toJQuerySelect2}
-import org.orbeon.jquery._
 import org.orbeon.web.DomSupport
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
@@ -38,14 +37,14 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
   private val    DataPlaceholder           = "data-placeholder"
   private val    DataServicePerformsSearch = "data-service-performs-search"
-  private val    DataInitialLabel          = "data-initial-label"
-  private val    DataInitialValue          = "data-initial-value"
+  private val    DataValue                 = "data-value"
+  private val    DataLabel                 = "data-label"
+  private val    DataIsOpenSelection       = "data-is-open-selection"
   private val    DataMinimumInputLength    = "data-min-input-length"
   private val    DataboundClass            = "xbl-fr-databound-select1-search"
   private object EventSupport              extends EventListenerSupport
 
   private val select2SuccessCallbacks      : mutable.Queue[(String, Success)] = new mutable.Queue[(String, Success)]
-  private var allResultsOpt                : Option[js.Array[Select2.Option]] = None
   private var onXFormsSelect1ValueChangeJs : Option[js.Function]              = None
   private var mutationObservers            : List[MutationObserver]           = Nil
   private var inputElementOpt              : Option[dom.Element]              = None
@@ -146,9 +145,13 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       }
 
       if (isDatabound) {
-        initOrUpdatePlaceholderCurrent()
-        onAttributeChange(elementWithData, DataPlaceholder,  initOrUpdatePlaceholderCurrent)
-        onAttributeChange(elementWithData, DataInitialLabel, initOrUpdatePlaceholderCurrent)
+        updateValueLabel()
+        updateOpenSelection()
+        onAttributeChange(elementWithData, DataValue          , updateValueLabel)
+        onAttributeChange(elementWithData, DataLabel          , updateValueLabel)
+        onAttributeChange(elementWithData, DataIsOpenSelection, updateOpenSelection)
+        // TODO:
+        // onAttributeChange(elementWithData, DataPlaceholder,  initOrUpdatePlaceholderCurrent)
       } else {
         // Register and remember listener on value change
         val listener: js.Function = onXFormsSelect1ValueChange _
@@ -182,10 +185,6 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
   def updateSuggestions(results: String, isLastPage: String): Unit = {
     val parsedResults = js.JSON.parse(results).asInstanceOf[js.Array[Select2.Option]]
-    if (! servicePerformsSearch) {
-      // Cache results so we don't have to call the service again
-      allResultsOpt = Some(parsedResults)
-    }
     val (searchValue, success) = select2SuccessCallbacks.dequeue()
     callSelect2Success(
       results     = parsedResults,
@@ -195,37 +194,37 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     )
   }
 
-  // XBL tells us about a new label due to value or resource change, requiring an update
-  def updateLabel(label: String): Unit = {
+  // Keep current item in sync with `data-value`/`data-label`
+  private def updateValueLabel(): Unit = {
     val select = querySelect
     while (select.hasChildNodes())
       select.removeChild(select.firstChild)
-    val initialOption = dom.document.createElement("option").asInstanceOf[html.Option]
-    initialOption.text     = label
-    initialOption.value    = "_"
-    initialOption.selected = true
-    select.appendChild(initialOption)
-  }
-
-  // XBL tells us the itemset might have changed due to the resource changing
-  def invalidateCachedItemset(): Unit = {
-    allResultsOpt = None
-    // To prevent Select2 from flashing old options during retrieval, we should also invalidate its cache
+    val value = queryElementWithData.getAttribute(DataValue)
+    if (value.nonEmpty) {
+      val initialOption = dom.document.createElement("option").asInstanceOf[html.Option]
+      initialOption.value    = value
+      initialOption.text     = queryElementWithData.getAttribute(DataLabel)
+      initialOption.selected = true
+      select.appendChild(initialOption)
+    }
   }
 
   // Called from `databound-select1-search.xbl` to tell use if the `selection` AVT evaluates to `open`
-  def updateOpenSelection(newIsOpenSelection: Boolean): Unit =
+  private def updateOpenSelection(): Unit = {
+    val newIsOpenSelection = queryElementWithData.getAttribute(DataIsOpenSelection).toBoolean
     if (newIsOpenSelection != isOpenSelection) {
       for {
         select  <- Option(querySelect)
         options <- if (newIsOpenSelection) optionsWithTagsOpt else optionsWithoutTagsOpt
       } {
+        org.scalajs.dom.console.log("updateOpenSelection", newIsOpenSelection, containerElem.id)
         val jSelect = $(select)
         jSelect.select2("destroy")
         jSelect.select2(options)
         isOpenSelection = newIsOpenSelection
       }
     }
+  }
 
   private def callSelect2Success(
     results     : js.Array[Select2.Option],
@@ -249,21 +248,6 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private def queryElementWithData  = containerElem.querySelector(s":scope > [$DataPlaceholder]")
   private def querySelect           = containerElem.querySelector("select").asInstanceOf[html.Select]
   private def servicePerformsSearch = Option(queryElementWithData.getAttribute(DataServicePerformsSearch)).contains("true")
-
-  private def initOrUpdatePlaceholderCurrent(): Unit = {
-    val select = querySelect
-    for {
-      initialLabel <- Option(queryElementWithData.getAttribute(DataInitialLabel))
-      initialValue <- Option(queryElementWithData.getAttribute(DataInitialValue))
-      if (! initialValue.isBlank)
-    } locally {
-      val initialOption = dom.document.createElement("option").asInstanceOf[html.Option]
-      initialOption.text     = initialLabel
-      initialOption.value    = initialValue
-      initialOption.selected = true
-      select.appendChild(initialOption)
-    }
-  }
 
   // TODO: not specific to the autocomplete, should be moved to a utility class
   private def onAttributeChange(element: Element, attributeName: String, listener: () => Unit): Unit = {
@@ -364,27 +348,17 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       val searchValue = params.data.term.getOrElse("")
       val searchPage  = params.data.page.getOrElse(1)
 
-      allResultsOpt match {
-        case Some(cachedAllResults) =>
-          callSelect2Success(
-            results     = cachedAllResults,
-            isLastPage  = true,
-            searchValue = searchValue,
-            success     = success
+      select2SuccessCallbacks.enqueue((searchValue, success))
+      AjaxClient.fireEvent(
+        AjaxEvent(
+          eventName  = "fr-search",
+          targetId   = containerElem.id,
+          properties = Map(
+            "fr-search-value" -> searchValue,
+            "fr-search-page"  -> searchPage.toString
           )
-        case None =>
-          select2SuccessCallbacks.enqueue((searchValue, success))
-          AjaxClient.fireEvent(
-            AjaxEvent(
-              eventName  = "fr-search",
-              targetId   = containerElem.id,
-              properties = Map(
-                "fr-search-value" -> searchValue,
-                "fr-search-page"  -> searchPage.toString
-              )
-            )
-          )
-      }
+        )
+      )
     }
   }
 }

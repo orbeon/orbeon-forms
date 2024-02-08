@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.saxon.functions.FunctionLibrary
@@ -61,8 +62,27 @@ trait SimpleProcessCommon
 
   // All XPath runs in the context of the main form instance's root element
   def xpathContext: Item = formInstance.rootElement
-  def xpathFunctionLibrary: FunctionLibrary = inScopeContainingDocumentOpt map (_.functionLibrary) getOrElse XFormsFunctionLibrary // don't depend on in-scope document for tests
-  def xpathFunctionContext: FunctionContext = XPath.functionContext.orNull
+
+  def xpathFunctionLibrary: FunctionLibrary =
+    inScopeContainingDocumentOpt map (_.functionLibrary) getOrElse XFormsFunctionLibrary // don't depend on in-scope document for tests
+
+  // Use the in-scope context if present. This is the case if the process is called from XPath. If not, use a top-level
+  // context. This is the case if the process is called from an async continuation. It is a unclear whether any
+  // processes make use, or should make use of a context other than the top-level context.
+  // https://github.com/orbeon/orbeon-forms/issues/6148
+  def xpathFunctionContext: FunctionContext =
+    XPath.functionContext.orElse(
+      inScopeContainingDocumentOpt.map { doc =>
+        XFormsFunction.Context(
+          container         = doc,
+          bindingContext    = doc.getDefaultModel.getDefaultEvaluationContext,
+          sourceEffectiveId = doc.effectiveId,
+          modelOpt          = doc.findDefaultModel,
+          bindNodeOpt       = None
+        )
+      }
+    ).getOrElse(throw new IllegalStateException("No XPath function context available"))
+
 
   override def processError(t: Throwable): Unit =
     tryErrorMessage(Map(Some("resource") -> "process-error"))

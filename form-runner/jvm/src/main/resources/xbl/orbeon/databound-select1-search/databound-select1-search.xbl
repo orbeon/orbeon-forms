@@ -415,13 +415,11 @@
                                          if ($label-from = 'bound-label') then $binding/@label
                                     else if ($label-from = 'bound-value') then $binding
                                     else                                       ()">
-                                <xf:action  >
                                 <xf:setvalue
                                     if="exists($bound-label-or-value)"
                                     event="xforms-value-changed xforms-enabled"
                                     ref="instance('local')/label"
                                     value="$bound-label-or-value"/>
-                                </xf:action>
                             </xf:var>
                             <xf:group xxf:appearance="internal" xxbl:scope="outer">
                                 <xf:var name="fr-search-value"/>

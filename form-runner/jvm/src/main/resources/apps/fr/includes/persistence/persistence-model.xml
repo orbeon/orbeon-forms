@@ -468,8 +468,21 @@
         <xf:action if="exists($process-property-value)">
 
             <xf:var
+                name="url-param-process"
+                value="if ($is-background) then xxf:get-request-parameter('fr-process-name') else ()"/>
+
+            <xf:var
+                name="url-param-process-present"
+                value="exists($url-param-process) and xxf:non-blank($url-param-process)"/>
+
+            <!-- Override the process retrieved from the property with the one from the URL parameter if present -->
+            <xf:var
+                name="process"
+                value="if ($url-param-process-present) then $url-param-process else $process-property-value"/>
+
+            <xf:var
                 name="process-result"
-                value="fr:run-process('oxf.fr.detail.process', $process-property-value)"/>
+                value="fr:run-process('oxf.fr.detail.process', $process)"/>
 
             <xf:setvalue
                 if="exists($process-result)"
@@ -478,13 +491,24 @@
 
             <!-- Log error if any -->
             <xf:message
-                if="not($process-result)"
+                if="not($url-param-process-present) and not($process-result)"
                 level="xxf:log-error"
                 value="concat('Process failed with error for property: `', $process-property-name, '`')"/>
 
             <xf:message
+                if="not($url-param-process-present)"
                 level="xxf:log-debug"
                 value="concat('Result of running process with property: `', $process-property-name, '`: ', $process-result)"/>
+
+            <xf:message
+                if="$url-param-process-present and not($process-result)"
+                level="xxf:log-error"
+                value="concat('Process failed with error for URL param value: `', $url-param-process, '`')"/>
+
+            <xf:message
+                if="$url-param-process-present"
+                level="xxf:log-debug"
+                value="concat('Result of running process with URL param value: `', $url-param-process, '`: ', $process-result)"/>
 
         </xf:action>
 

@@ -217,7 +217,6 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         select  <- Option(querySelect)
         options <- if (newIsOpenSelection) optionsWithTagsOpt else optionsWithoutTagsOpt
       } {
-        org.scalajs.dom.console.log("updateOpenSelection", newIsOpenSelection, containerElem.id)
         val jSelect = $(select)
         jSelect.select2("destroy")
         jSelect.select2(options)

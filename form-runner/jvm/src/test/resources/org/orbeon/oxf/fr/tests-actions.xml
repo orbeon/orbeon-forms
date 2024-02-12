@@ -255,12 +255,12 @@
                    <xf:action
                            event="xforms-submit-error"
                            observer="my-service-gaga-submission my-service-toto-submission my-service-get-attachment-submission"
-                           type="xpath">xxf:remove-document-attributes(event('fr-action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')</xf:action>
+                           type="xpath">if (exists(event('fr-action-id'))) then xxf:remove-document-attributes(event('fr-action-id')) else (), fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')</xf:action>
                    <xf:action
                            event="xxforms-action-error" target="#observer" propagate="stop">
                        <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
                        <xf:message level="xxf:log-error" value="event('element')"/>
-                       <xf:action type="xpath" if="exists(event('fr-action-id'))">xxf:remove-document-attributes(event('fr-action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
+                       <xf:action type="xpath">if (exists(event('fr-action-id'))) then xxf:remove-document-attributes(event('fr-action-id')) else (), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
                    </xf:action>
                 </xf:model>
         </output>
@@ -333,7 +333,7 @@
                         event="xxforms-action-error" target="#observer" propagate="stop">
                    <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
                    <xf:message level="xxf:log-error" value="event('element')"/>
-                   <xf:action type="xpath" if="exists(event('fr-action-id'))">xxf:remove-document-attributes(event('fr-action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
+                   <xf:action type="xpath">if (exists(event('fr-action-id'))) then xxf:remove-document-attributes(event('fr-action-id')) else (), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
                </xf:action>
            </xf:model>
         </output>
@@ -501,12 +501,12 @@
                 <xf:action
                         event="xforms-submit-error"
                         observer="my-service-1-submission my-service-2-submission my-service-3-submission my-service-4-submission"
-                        type="xpath">xxf:remove-document-attributes(event('fr-action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')</xf:action>
+                        type="xpath">if (exists(event('fr-action-id'))) then xxf:remove-document-attributes(event('fr-action-id')) else (), fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')</xf:action>
                 <xf:action
                         event="xxforms-action-error" target="#observer" propagate="stop">
                    <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
                    <xf:message level="xxf:log-error" value="event('element')"/>
-                   <xf:action type="xpath" if="exists(event('fr-action-id'))">xxf:remove-document-attributes(event('fr-action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
+                   <xf:action type="xpath">if (exists(event('fr-action-id'))) then xxf:remove-document-attributes(event('fr-action-id')) else (), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
                </xf:action>
            </xf:model>
         </output>
@@ -629,12 +629,12 @@
                    </xf:dispatch>
                </xf:action>
                 <xf:action
-                        event="xforms-submit-error" observer="echo-submission" type="xpath">xxf:remove-document-attributes(event('fr-action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')</xf:action>
+                        event="xforms-submit-error" observer="echo-submission" type="xpath">if (exists(event('fr-action-id'))) then xxf:remove-document-attributes(event('fr-action-id')) else (), fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')</xf:action>
                 <xf:action
                         event="xxforms-action-error" target="#observer" propagate="stop">
                    <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
                    <xf:message level="xxf:log-error" value="event('element')"/>
-                   <xf:action type="xpath" if="exists(event('fr-action-id'))">xxf:remove-document-attributes(event('fr-action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
+                   <xf:action type="xpath">if (exists(event('fr-action-id'))) then xxf:remove-document-attributes(event('fr-action-id')) else (), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
                </xf:action>
            </xf:model>
         </output>
@@ -709,7 +709,7 @@
                         event="xxforms-action-error" target="#observer" propagate="stop">
                    <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
                    <xf:message level="xxf:log-error" value="event('element')"/>
-                   <xf:action type="xpath" if="exists(event('fr-action-id'))">xxf:remove-document-attributes(event('fr-action-id')), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
+                   <xf:action type="xpath">if (exists(event('fr-action-id'))) then xxf:remove-document-attributes(event('fr-action-id')) else (), fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')</xf:action>
                </xf:action>
            </xf:model>å
         </output>

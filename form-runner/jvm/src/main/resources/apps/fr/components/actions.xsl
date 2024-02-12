@@ -299,7 +299,7 @@
             <xf:action event="xxforms-action-error" target="#observer" propagate="stop">
                 <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>
                 <xf:message level="xxf:log-error" value="event('element')"/>
-                <xf:action type="xpath" if="exists(event('fr-action-id'))">
+                <xf:action type="xpath">
                     if (exists(event('fr-action-id'))) then xxf:remove-document-attributes(event('fr-action-id')) else (),
                     fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')
                 </xf:action>

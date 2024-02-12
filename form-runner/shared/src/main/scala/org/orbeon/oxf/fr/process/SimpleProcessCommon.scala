@@ -70,6 +70,9 @@ trait SimpleProcessCommon
   // context. This is the case if the process is called from an async continuation. It is a unclear whether any
   // processes make use, or should make use of a context other than the top-level context.
   // https://github.com/orbeon/orbeon-forms/issues/6148
+  // TODO: How should these examples work? What context should be available for example to the `bind()` function?
+  // - inside XBL: xxf:run-process('...', 'save then xf:setvalue(ref = "//my-value", value = "bind('bar')")')
+  // - inside XBL: xxf:run-process-by-name('...', 'foobar')
   def xpathFunctionContext: FunctionContext =
     XPath.functionContext.orElse(
       inScopeContainingDocumentOpt.map { doc =>

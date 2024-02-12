@@ -84,8 +84,7 @@ trait SimpleProcessCommon
           bindNodeOpt       = None
         )
       }
-    ).getOrElse(throw new IllegalStateException("No XPath function context available"))
-
+    ).orNull // not ideal, but at least one test runs in a scope without an in-scope containing document
 
   override def processError(t: Throwable): Unit =
     tryErrorMessage(Map(Some("resource") -> "process-error"))

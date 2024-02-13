@@ -1689,7 +1689,7 @@
                     1&lt;tiene {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
                     {0,choice,
                         0#Corrija los errores e intente nuevamente|
-                        0&lt;Pueder optar por revisarlos {1,choice,1#it|1&lt;them} primero o ignorar {1,choice,1#it|1&lt;them} y continuar la opración}.
+                        0&lt;Pueder optar por revisarlos '{1,choice,1#it|1&lt;them}' primero o ignorar '{1,choice,1#it|1&lt;them}' y continuar la opración}.
                 </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Haga click aquí para abrir el documento. La información ingresada será mostrada por la herramienta de la misma forma que cuando se guardo.</saved-locally-open>
@@ -2373,7 +2373,7 @@
                     1&lt;té {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}.
                     {0,choice,
                         0#Corregeixi els errors i intenti novament|
-                        0&lt;Pot revisar-los si vol {1,choice,1#it|1&lt;them} primer o ingorar-los {1,choice,1#it|1&lt;them} i continuar amb l'operació}.
+                        0&lt;Pot revisar-los si vol '{1,choice,1#it|1&lt;them}' primer o ingorar-los '{1,choice,1#it|1&lt;them}' i continuar amb l'operació}.
                 </validation-dialog-message>
                 <buttons-message />
                 <saved-locally-open> Fes click aquí per obrir el document. La informació ingressada és
@@ -5787,7 +5787,7 @@
                     1&lt;sisältää {1,number,integer} '{0,choice,0#virhettä|1#varoitusta|2#tiedottavaa viestiä|3#viestiä}'}.
                     {0,choice,
                         0#Yritä uudelleen kun kaikki kentät on täytetty asianmukaisesti|
-                        0&lt;Voit valita käytkö läpi {1,choice,1#sen|1&lt;ne} ensin vai sivuutatko {1,choice,1#sen|1&lt;ne} ja jatkat operaatiota}.
+                        0&lt;Voit valita käytkö läpi '{1,choice,1#sen|1&lt;ne}' ensin vai sivuutatko '{1,choice,1#sen|1&lt;ne}' ja jatkat operaatiota}.
                 </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klikkaa tästä dokumentin avataksesi. Syöttämäsi tiedot näytetään siten, kuin ne olivat tallentaessasi työsi.</saved-locally-open>
@@ -7151,7 +7151,7 @@
                     1&lt;bevat {1,number,integer} '{0,choice,0#fouten|1#waarschuwingen|2#meldingen ter info|3#meldingen}'}.
                     {0,choice,
                         0#Probeer het opnieuw als alle velden correct zijn gevuld|
-                        0&lt;U kunt {1,choice,1#deze|1&lt;deze} eerst bekijken of negerenen doorgaan met de bewerking}.
+                        0&lt;U kunt '{1,choice,1#deze|1&lt;deze}' eerst bekijken of negerenen doorgaan met de bewerking}.
                 </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klik hier om het document te openen. De informatie die u hebt ingevoerd wordt weergegeven zoals deze was toen u uw werk heeft opgeslagen.</saved-locally-open>
@@ -7833,7 +7833,7 @@
                     1&lt;contém {1,number,integer} '{0,choice,0#erros|1#avisos|2#mensagens informativas|3#mensagens}'}.
                     {0,choice,
                         0#Por favor, tente novamente quando todos os campos forem devidamente preenchidos|
-                        0&lt;Pode optar por revê-{1,choice,1#lo(a)|1&lt;los(as)} primeiro ou ignorá-{1,choice,1#lo(a)|1&lt;los(as)} e continuar com a operação}.
+                        0&lt;Pode optar por revê-'{1,choice,1#lo(a)|1&lt;los(as)}' primeiro ou ignorá-'{1,choice,1#lo(a)|1&lt;los(as)}' e continuar com a operação}.
                 </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Clique aqui para abrir o documento. A informação que introduziu será exibida na ferramenta como estava no momento em que guardou o seu trabalho.</saved-locally-open>
@@ -8509,7 +8509,7 @@
                     1&lt;indehoder {1,number,integer} '{0,choice,0#fejl|1#advarsler|2#informationer|3#beskeder}'}.
                     {0,choice,
                         0#Ret venligst fejlene før du prøver at sende igen|
-                        0&lt;Du kan vælge at checke {1,choice,1#den|1&lt;dem} først eller ignorere {1,choice,1#den|1&lt;dem} og fortsætte}.
+                        0&lt;Du kan vælge at checke '{1,choice,1#den|1&lt;dem}' først eller ignorere '{1,choice,1#den|1&lt;dem}' og fortsætte}.
                 </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klik her for at åbne dokument. Informationer du har skrevet i blanketten vil blive vist som da den blev gemt.</saved-locally-open>
@@ -9188,7 +9188,7 @@
                     1&lt;contains {1,number,integer} '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'}.
                     {0,choice,
                         0#Proszę sprawdzić, czy wszystkie pola zostały wypełnione poprawnie|
-                        0&lt;Możesz dokonać przeglądu {1,choice,1#it|1&lt;them} najpierw lub zignoruj {1,choice,1#it|1&lt;them} i kontynuuj uzupełnianie}.
+                        0&lt;Możesz dokonać przeglądu '{1,choice,1#it|1&lt;them}' najpierw lub zignoruj '{1,choice,1#it|1&lt;them}' i kontynuuj uzupełnianie}.
                 </validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Kliknij tutaj, by otworzyć dokument. Dane wprowadzone przez Ciebie będą zaprezentowane w takiej formie, w jakiej je zapisałeś.</saved-locally-open>

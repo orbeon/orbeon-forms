@@ -20,7 +20,6 @@ import org.orbeon.oxf.properties.{PropertySet, PropertyStore}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
@@ -28,6 +27,8 @@ import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
+
+import scala.util.Try
 
 
 // NOTE: Test this in the `form-builder` module as we depend on Form Builder's `resources.xml`.
@@ -40,7 +41,7 @@ class ResourcesPatcherTest
   val emptyFormMetadata = <_/>.toDocument
 
   describe("Patching scenarios") {
-    it(s"must patch resources as expected (properties only)") {
+    it("must patch resources as expected (properties only)") {
 
       val propertySet = {
         val properties =
@@ -120,7 +121,7 @@ class ResourcesPatcherTest
       assertXMLDocumentsIgnoreNamespacesInScope(expected, initial)
     }
 
-    it(s"must patch resources as expected (properties and metadata)") {
+    it("must patch resources as expected (properties and metadata)") {
 
       val propertySet = {
         val properties =
@@ -281,26 +282,27 @@ class ResourcesPatcherTest
     }
   }
 
+  private val resourcesUrls = Seq(
+    "oxf:/apps/fr/i18n/resources.xml",
+    "oxf:/forms/orbeon/builder/form/resources.xml"
+  )
+
+  private def resourcesDoc(url: String) = useAndClose(URLFactory.createURL(url).openStream()) { is =>
+    TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
+  }
+
   describe("Resources consistency") {
-    it(s"must ensure that resources in multiple languages are consistent") {
+    it("must ensure that resources in multiple languages are consistent") {
 
       def hasLang(lang: String)(e: NodeInfo) = (e attValue "*:lang") == lang
-
-      val urls = Seq(
-        "oxf:/apps/fr/i18n/resources.xml",
-        "oxf:/forms/orbeon/builder/form/resources.xml"
-      )
 
       // - allow "item" and "choices" because we use this for itemsets
       // - allow "type" because it's used for the FB list of types
       val AllowedDuplicateNames = Set("item", "choices", "type")
 
-      for (url <- urls) {
+      for (url <- resourcesUrls) {
 
-        val doc =
-          useAndClose(URLFactory.createURL(url).openStream()) { is =>
-            TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
-          }
+        val doc = resourcesDoc(url)
 
         // Baseline is "en"
         val englishResource = doc / * / "resource" filter hasLang("en") head
@@ -358,7 +360,7 @@ class ResourcesPatcherTest
   }
 
   describe("Untranslated resources") {
-    it(s"must bracket as needed") {
+    it("must bracket as needed") {
 
       def newDoc =
         <resources>
@@ -444,6 +446,40 @@ class ResourcesPatcherTest
       ResourcesPatcher.transform(initial, emptyFormMetadata, AppForm("*", "*"))(props)
 
       assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
+    }
+  }
+
+  describe("Valid HTML resources") {
+    it("must ensure that any HTML in resources is valid") {
+      for (url <- resourcesUrls) {
+        val root = resourcesDoc(url).rootElement
+
+        def checkHtmlIn(node: NodeInfo, path: List[String] = Nil): Unit = {
+          val currentPath       = node.name :: path
+          val currentPathString = currentPath.reverse.mkString("/")
+
+          val children = node / *
+
+          if (children.isEmpty) {
+            val value = node.stringValue
+
+            // Heuristic to detect HTML and avoid false positives
+            if (value.contains("<") && !value.contains("1<") && !value.contains("0<")) {
+              val xmlParsable = Try(
+                TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, s"<span>$value</span>", false, false)
+              ).isSuccess
+
+              assert(xmlParsable, s"Invalid HTML in $currentPathString: $value")
+            }
+          }
+
+          for (child <- children) {
+            checkHtmlIn(child, path = currentPath)
+          }
+        }
+
+        checkHtmlIn(root)
+      }
     }
   }
 }

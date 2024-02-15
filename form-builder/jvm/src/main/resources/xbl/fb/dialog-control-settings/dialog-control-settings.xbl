@@ -29,7 +29,8 @@
             <!-- Read data upon dialog open -->
             <xbl:handler event="fb-show-dialog fb-load" phase="target" defaultAction="cancel">
 
-                <xf:var name="form" value="xxf:binding('fb-dialog-control-settings')"/>
+                <xf:var name="form"              value="xxf:binding('fb-dialog-control-settings')"/>
+                <xf:var name="metadata-instance" value="frf:metadataInstanceRootOpt($form)"/>
 
                 <xf:action type="xpath">fbf:selectCellForControlId(event('control-id'))</xf:action>
                 <xf:action type="javascript">ORBEON.builder.private.API.moveFocusedCellIntoView();</xf:action>
@@ -94,8 +95,52 @@
                         <xf:setvalue if="not($column) and     $search"  ref="$instance-element/@legacy"  value="'search-only'"/>
                         <xf:setvalue if="not($column) and not($search)" ref="$instance-element/@enabled" value="'false'"/>
                     </xf:action>
+
+                    <!-- Bulk edit action -->
+                    <xf:setvalue ref="$instance-element/@action"  value="if (xxf:is-blank($control-element/@process)) then 'save-data' else 'run-process'"/>
+                    <xf:setvalue ref="$instance-element/@process" value="$control-element/@process"/>
                 </xf:action>
                 <xf:setvalue ref="$i/fr-encrypt/@enabled" value="exists($control/fr:encrypt)"/>
+
+                <!-- TODO: move this logic, also found in workflow20201, to a common component -->
+                <xf:var
+                    name="process-names"
+                    value="
+                        let $prefix        := 'oxf.fr.detail.process',
+                            $excluded      := (
+                                                'refresh', 'workflow-review', 'workflow-edit', 'workflow-send',
+                                                'save-import', 'validation-dialog-review', 'validation-dialog-continue', 'autosave',
+                                                'save',
+                                                'orbeon-home', 'form-runner-home', 'require-uploads', 'require-valid', 'review-messages',
+                                                'validate-all', 'collapse-all', 'expand-all',
+                                                'reset-form-data',
+                                                'action-service-error', 'action-action-error',
+                                                'relinquish-lease'
+                                              ),
+                            $properties    := xxf:properties-start-with($prefix),
+                            $process-names := distinct-values(for $v in $properties return tokenize($v, '\.')[5]),
+                            $app           := $metadata-instance/application-name,
+                            $form          := $metadata-instance/form-name
+                        return
+                            $process-names[not (. = $excluded) and exists(xxf:property(string-join(($prefix, ., $app, $form), '.')))]
+                "/>
+
+                <xf:delete ref="instance('processes')/*"/>
+                <xf:action iterate="$process-names">
+                    <xf:var name="process-name" value="."/>
+                    <xf:var
+                        name="process-label"
+                        value="
+                            let $label := xxf:r(concat('buttons.', $process-name), '|fr-fr-resources|')
+                            return
+                                if (exists($label)) then
+                                    concat($label, ' (', $process-name, ')')
+                                else
+                                   $process-name"/>
+                    <xf:insert
+                        context="instance('processes')"
+                        origin="xf:element($process-name, xxf:trim(string(xf:parse(concat('&lt;span>', $process-label, '&lt;/span>')))))"/>
+                </xf:action>
 
                 <!-- Figure which one of label, hint, help, or text the control supports -->
                 <xf:action>
@@ -229,7 +274,7 @@
                 <xf:dispatch name="fb-initialize" targetid="fb-custom-control-settings">
                     <xf:property name="form"                  value="$form/root()"/>
                     <xf:property name="form-instance"         value="frf:formInstanceRoot($form)"/>
-                    <xf:property name="metadata-instance"     value="frf:metadataInstanceRootOpt($form)"/>
+                    <xf:property name="metadata-instance"     value="$metadata-instance"/>
                     <xf:property name="original-control-id"   value="event('control-id')"/>
                     <xf:property name="original-control-name" value="$i/original-control-name"/>
                     <xf:property name="data-holders"          value="fbf:findDataHolders($i/original-control-name)"/>
@@ -453,6 +498,10 @@
                                                     xf:attribute('column', 'false')
                                                 else if ($current = 'summary-show' and $instance-element/@legacy = 'column-only') then
                                                     xf:attribute('search', 'false')
+                                                else
+                                                    (),
+                                                if ($instance-element/@action = 'run-process' and xxf:non-blank($instance-element/@process)) then
+                                                    xf:attribute('process', $instance-element/@process)
                                                 else
                                                     ()
                                             )
@@ -705,7 +754,7 @@
                         <fr-summary-show    enabled="" role-required="" require-role-constraint="" legacy="">
                             <!--<require-role/>-->
                         </fr-summary-show>
-                        <fr-allow-bulk-edit enabled="" role-required="" require-role-constraint="">
+                        <fr-allow-bulk-edit enabled="" role-required="" require-role-constraint="" action="" process="">
                             <!--<require-role/>-->
                         </fr-allow-bulk-edit>
                         <fr-encrypt         enabled=""/>
@@ -998,6 +1047,12 @@
                     </xf:bind>
                 </xf:bind>
                 <xf:bind ref="$i/fr-encrypt/@enabled" type="xs:boolean"/>
+
+                <xf:instance id="processes">
+                    <_>
+                        <process label="" value=""/>
+                    </_>
+                </xf:instance>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -1239,6 +1294,29 @@
                                                                             </fr:dnd-repeat>
                                                                         </xh:div>
                                                                     </xh:div>
+                                                                    <xf:switch caseref="$current-value = 'fr-allow-bulk-edit' and $i/fr-allow-bulk-edit/@enabled = true()" class="fb-save-or-process">
+                                                                        <xf:case value="true()">
+                                                                            <!-- Bulk edit: save data or run process -->
+                                                                            <xf:select1 appearance="full xxf:horizontal" ref="$i/fr-allow-bulk-edit/@action">
+                                                                                <xf:item>
+                                                                                    <xf:label ref="$resources/dialog-control-settings/bulk-edit-actions/save-data"/>
+                                                                                    <xf:value>save-data</xf:value>
+                                                                                </xf:item>
+                                                                                <xf:item>
+                                                                                    <xf:label ref="$resources/dialog-control-settings/bulk-edit-actions/run-process"/>
+                                                                                    <xf:value>run-process</xf:value>
+                                                                                </xf:item>
+                                                                            </xf:select1>
+                                                                            <!-- Available processes to run -->
+                                                                            <fr:open-select1 appearance="minimal" ref="$i/fr-allow-bulk-edit/@process[$i/fr-allow-bulk-edit/@action = 'run-process']">
+                                                                                <xf:itemset ref="xxf:sort(instance('processes')/*, (string(.)), 'text', 'ascending')">
+                                                                                    <xf:label ref="string(.)" />
+                                                                                    <xf:value ref="local-name(.)"/>
+                                                                                </xf:itemset>
+                                                                            </fr:open-select1>
+                                                                        </xf:case>
+                                                                        <xf:case value="false()"/>
+                                                                    </xf:switch>
                                                                 </xf:case>
                                                                 <xf:case value="false()"/>
                                                             </xf:switch>

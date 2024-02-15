@@ -37,38 +37,82 @@
 
         <xf:var name="app"           value="event('app')"/>
         <xf:var name="form"          value="event('form')"/>
-        <xf:var name="documents"     value="event('documents')"/>
-
-        <xf:setvalue ref="instance('fr-bulk-edit-control')/path"  value="event('control-path')"/>
-        <xf:setvalue ref="instance('fr-bulk-edit-control')/value" value="event('control-value')"/>
 
         <xf:delete ref="instance('fr-bulk-edit-errors')/error"/>
 
-        <xf:action iterate="xxf:split($documents)" if="count(instance('fr-bulk-edit-errors')/error)=0">
-            <xf:var name="document" value="."/>
-            <xf:var name="url"      value="concat('/fr/service/persistence/crud/', $app, '/', $form, '/', $document, '/data.xml')"/>
+        <!-- Iterate over documents, which follow this format: "data/doc1 data/doc2 data/doc3 ..." -->
+        <xf:action
+            iterate="xxf:split(event('documents'))"
+            if="count(instance('fr-bulk-edit-errors')/error)=0">
+
+            <xf:var name="document-type-and-id" value="."/>
+            <xf:var name="document-id"          value="xxf:split($document-type-and-id, '/')[position() = last()]"/>
+
+            <xf:var
+                name="url"
+                value="
+                    concat(
+                        '/fr/service/persistence/crud/',
+                        $app,
+                        '/',
+                        $form,
+                        '/',
+                        $document-type-and-id,
+                        '/data.xml')"/>
 
             <!-- Retrieve form data for current document -->
             <xf:send submission="form-data">
                 <xf:property name="url"           value="$url"/>
-                <xf:property name="method"        value="'get'"/>
+                <xf:property name="method"        value="'get'"                  xxf:tunnel="true"/>
                 <xf:property name="serialization" value="'none'"/>
                 <xf:property name="replace"       value="'instance'"/>
+                <xf:property name="app"           value="$app"                   xxf:tunnel="true"/>
+                <xf:property name="form"          value="$form"                  xxf:tunnel="true"/>
+                <xf:property name="document-id"   value="$document-id"           xxf:tunnel="true"/>
+                <xf:property name="control-path"  value="event('control-path')"  xxf:tunnel="true"/>
+                <xf:property name="control-value" value="event('control-value')" xxf:tunnel="true"/>
+                <xf:property name="process"       value="event('process')"       xxf:tunnel="true"/>
             </xf:send>
         </xf:action>
     </xf:action>
 
-    <xf:action observer="form-data" event="xforms-submit-done" if="event('response-status-code') = 200">
+    <!-- Process form data if retrieved successfully -->
+    <xf:action
+        observer="form-data"
+        event="xforms-submit-done"
+        if="event('method') = 'get' and event('response-status-code') = 200">
 
         <!-- Locally modify form data -->
         <xf:setvalue
-            ref="xxf:evaluate(concat('instance(''fr-bulk-edit-form-data'')/', instance('fr-bulk-edit-control')/path))"
-            value="instance('fr-bulk-edit-control')/value"/>
+            ref="xxf:evaluate(concat('instance(''fr-bulk-edit-form-data'')/', event('control-path')))"
+            value="event('control-value')"/>
 
-        <!-- Update form data -->
+        <xf:var name="process" value="event('process')"/>
+
+        <xf:var
+            name="url"
+            value="
+                if (xxf:is-blank($process)) then
+                    (: Save updated data :)
+                    event('resource-uri')
+                else
+                    (: Send updated data to background process :)
+                    concat(
+                        '/fr/service/',
+                        event('app'),
+                        '/',
+                        event('form'),
+                        '/edit/',
+                        event('document-id'),
+                        '?fr-process-name=',
+                        $process)"/>
+        <xf:var
+            name="method"
+            value="if (xxf:is-blank($process)) then 'put' else 'post'"/>
+
         <xf:send submission="form-data">
-            <xf:property name="url"            value="event('resource-uri')"/>
-            <xf:property name="method"         value="'put'"/>
+            <xf:property name="url"            value="$url"/>
+            <xf:property name="method"         value="$method"/>
             <xf:property name="serialization"  value="'application/xml'"/>
             <xf:property name="replace"        value="'none'"/>
             <xf:property name="workflow-stage" value="event('response-headers')[lower-case(name) = 'orbeon-workflow-stage']/value"/>
@@ -86,13 +130,6 @@
 
         <xf:message value="xxf:r('summary.bulk-edit.submission-error', '|fr-fr-resources|')"/>
     </xf:action>
-
-    <xf:instance id="fr-bulk-edit-control">
-        <_ xmlns="">
-            <path/>
-            <value/>
-        </_>
-    </xf:instance>
 
     <xf:instance id="fr-bulk-edit-form-data">
         <_ xmlns=""/>

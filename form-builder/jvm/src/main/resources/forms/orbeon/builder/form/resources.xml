@@ -546,6 +546,10 @@
                 <empty>Empty role</empty>
                 <duplicate>Duplicate role</duplicate>
             </role>
+            <bulk-edit-actions>
+                <save-data>Save data</save-data>
+                <run-process>Run Process</run-process>
+            </bulk-edit-actions>
             <control-appearance>
                 <label>Control Appearance</label>
             </control-appearance>
@@ -1947,6 +1951,10 @@
                 <empty>Rôle vide</empty>
                 <duplicate>Rôle à double</duplicate>
             </role>
+            <bulk-edit-actions>
+                <save-data>Sauvegarder les données</save-data>
+                <run-process>Exécuter le processus</run-process>
+            </bulk-edit-actions>
             <control-appearance>
                 <label>Apparence du contrôle</label>
             </control-appearance>
@@ -3331,6 +3339,10 @@
                 <empty todo="true">[Empty role]</empty>
                 <duplicate todo="true">[Duplicate role]</duplicate>
             </role>
+            <bulk-edit-actions>
+                <save-data todo="true">[Save data]</save-data>
+                <run-process todo="true">[Run Process]</run-process>
+            </bulk-edit-actions>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -4743,6 +4755,10 @@
                 <empty todo="true">[Empty role]</empty>
                 <duplicate todo="true">[Duplicate role]</duplicate>
             </role>
+            <bulk-edit-actions>
+                <save-data todo="true">[Save data]</save-data>
+                <run-process todo="true">[Run Process]</run-process>
+            </bulk-edit-actions>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -6155,6 +6171,10 @@
                 <empty todo="true">[Empty role]</empty>
                 <duplicate todo="true">[Duplicate role]</duplicate>
             </role>
+            <bulk-edit-actions>
+                <save-data todo="true">[Save data]</save-data>
+                <run-process todo="true">[Run Process]</run-process>
+            </bulk-edit-actions>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -7531,6 +7551,10 @@
                 <empty todo="true">[Empty role]</empty>
                 <duplicate todo="true">[Duplicate role]</duplicate>
             </role>
+            <bulk-edit-actions>
+                <save-data todo="true">[Save data]</save-data>
+                <run-process todo="true">[Run Process]</run-process>
+            </bulk-edit-actions>
             <control-appearance>
                 <label>Erscheinungsbild der Steuerelemente</label>
             </control-appearance>
@@ -8910,6 +8934,10 @@
                 <empty todo="true">[Empty role]</empty>
                 <duplicate todo="true">[Duplicate role]</duplicate>
             </role>
+            <bulk-edit-actions>
+                <save-data todo="true">[Save data]</save-data>
+                <run-process todo="true">[Run Process]</run-process>
+            </bulk-edit-actions>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -10314,6 +10342,10 @@
                 <empty todo="true">[Empty role]</empty>
                 <duplicate todo="true">[Duplicate role]</duplicate>
             </role>
+            <bulk-edit-actions>
+                <save-data todo="true">[Save data]</save-data>
+                <run-process todo="true">[Run Process]</run-process>
+            </bulk-edit-actions>
             <control-appearance>
                 <label>Presentación del Control</label>
             </control-appearance>
@@ -11719,6 +11751,10 @@
                 <empty todo="true">[Empty role]</empty>
                 <duplicate todo="true">[Duplicate role]</duplicate>
             </role>
+            <bulk-edit-actions>
+                <save-data todo="true">[Save data]</save-data>
+                <run-process todo="true">[Run Process]</run-process>
+            </bulk-edit-actions>
             <control-appearance>
                 <label>Control weergave</label>
             </control-appearance>
@@ -13103,6 +13139,10 @@
                 <empty todo="true">[Empty role]</empty>
                 <duplicate todo="true">[Duplicate role]</duplicate>
             </role>
+            <bulk-edit-actions>
+                <save-data todo="true">[Save data]</save-data>
+                <run-process todo="true">[Run Process]</run-process>
+            </bulk-edit-actions>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -14514,6 +14554,10 @@
                 <empty todo="true">[Empty role]</empty>
                 <duplicate todo="true">[Duplicate role]</duplicate>
             </role>
+            <bulk-edit-actions>
+                <save-data todo="true">[Save data]</save-data>
+                <run-process todo="true">[Run Process]</run-process>
+            </bulk-edit-actions>
             <control-appearance>
                 <label>Kontrollens utseende</label>
             </control-appearance>

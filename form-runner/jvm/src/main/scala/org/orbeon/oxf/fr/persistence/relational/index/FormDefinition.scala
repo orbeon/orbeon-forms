@@ -222,18 +222,20 @@ trait FormDefinition {
 
         SummarySettings(
           // #5994: keep show/search separate for now (for compatibility reasons), but we'd like to have a single setting ideally
-          show   = show,
-          search = search,
+          show        = show,
+          search      = search,
           // #6010: edit setting enabled only if show and/or search enabled as well
-          edit   = (show || search) && edit
+          edit        = (show || search) && edit,
+          editProcess = (index / "*:allow-bulk-edit" /@ "process").headOption.map(_.stringValue)
         )
 
       case None =>
         // Control sub-elements not present, use control classes (legacy)
         SummarySettings(
-          show   = control.attClasses(FRSummaryShow),
-          search = control.attClasses(FRSummarySearch),
-          edit   = false
+          show        = control.attClasses(FRSummaryShow),
+          search      = control.attClasses(FRSummarySearch),
+          edit        = false,
+          editProcess = None
         )
     }
   }

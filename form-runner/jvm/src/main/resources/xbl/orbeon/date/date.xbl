@@ -161,7 +161,11 @@
                 name="view"
                 value="
                     (: Q: Do we need to test for `xxf:is-control-readonly('fr-number')` like `fr:number`? :)
-                    property('xxf:readonly-appearance') = 'static' or
+                    (
+                        property('xxf:readonly-appearance') = 'static' and
+                        (: Still use the native picker if static readonly, to have consistent output format :)
+                        not(fr:component-param-value('native-picker') = 'always')
+                    ) or
                     fr:mode() = 'pdf'
                 "/>
             <xf:var

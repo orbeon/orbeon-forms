@@ -85,7 +85,7 @@ class ServletEmbeddingContextWithResponse(
 }
 
 // For backward compatibility
-trait ServletFilter extends JavaxServletFilter
+class ServletFilter extends JavaxServletFilter
 
 class JavaxServletFilter   extends JavaxFilter  (new ServletFilterImpl)
 class JakartaServletFilter extends JakartaFilter(new ServletFilterImpl)

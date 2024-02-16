@@ -106,7 +106,7 @@
                         '/edit/',
                         event('document-id'),
                         '?fr-process-name=',
-                        $process)"/>
+                        encode-for-uri($process))"/>
         <xf:var
             name="method"
             value="if (xxf:is-blank($process)) then 'put' else 'post'"/>

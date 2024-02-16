@@ -106,23 +106,14 @@
                 <xf:var
                     name="process-names"
                     value="
-                        let $prefix        := 'oxf.fr.detail.process',
-                            $excluded      := (
-                                                'refresh', 'workflow-review', 'workflow-edit', 'workflow-send',
-                                                'save-import', 'validation-dialog-review', 'validation-dialog-continue', 'autosave',
-                                                'save',
-                                                'orbeon-home', 'form-runner-home', 'require-uploads', 'require-valid', 'review-messages',
-                                                'validate-all', 'collapse-all', 'expand-all',
-                                                'reset-form-data',
-                                                'action-service-error', 'action-action-error',
-                                                'relinquish-lease'
-                                              ),
+                        let $app           := $metadata-instance/application-name,
+                            $form          := $metadata-instance/form-name,
+                            $prefix        := 'oxf.fr.detail.process',
+                            $included      := xxf:split(xxf:property(string-join(('oxf.fr.summary.bulk-processes', $app, $form), '.'))),
                             $properties    := xxf:properties-start-with($prefix),
-                            $process-names := distinct-values(for $v in $properties return tokenize($v, '\.')[5]),
-                            $app           := $metadata-instance/application-name,
-                            $form          := $metadata-instance/form-name
+                            $process-names := distinct-values(for $v in $properties return tokenize($v, '\.')[5])
                         return
-                            $process-names[not (. = $excluded) and exists(xxf:property(string-join(($prefix, ., $app, $form), '.')))]
+                            $process-names[. = $included and exists(xxf:property(string-join(($prefix, ., $app, $form), '.')))]
                 "/>
 
                 <xf:delete ref="instance('processes')/*"/>
@@ -1308,12 +1299,19 @@
                                                                                 </xf:item>
                                                                             </xf:select1>
                                                                             <!-- Available processes to run -->
-                                                                            <fr:open-select1 appearance="minimal" ref="$i/fr-allow-bulk-edit/@process[$i/fr-allow-bulk-edit/@action = 'run-process']">
-                                                                                <xf:itemset ref="xxf:sort(instance('processes')/*, (string(.)), 'text', 'ascending')">
-                                                                                    <xf:label ref="string(.)" />
-                                                                                    <xf:value ref="local-name(.)"/>
-                                                                                </xf:itemset>
-                                                                            </fr:open-select1>
+                                                                            <xf:switch caseref="count(instance('processes')/*) gt 0">
+                                                                                <xf:case value="true()">
+                                                                                    <fr:open-select1 appearance="minimal" ref="$i/fr-allow-bulk-edit/@process[$i/fr-allow-bulk-edit/@action = 'run-process']">
+                                                                                        <xf:itemset ref="xxf:sort(instance('processes')/*, (string(.)), 'text', 'ascending')">
+                                                                                            <xf:label ref="string(.)" />
+                                                                                            <xf:value ref="local-name(.)"/>
+                                                                                        </xf:itemset>
+                                                                                    </fr:open-select1>
+                                                                                </xf:case>
+                                                                                <xf:case value="false()" class="fb-custom-process">
+                                                                                    <xf:input ref="$i/fr-allow-bulk-edit/@process[$i/fr-allow-bulk-edit/@action = 'run-process']"/>
+                                                                                </xf:case>
+                                                                            </xf:switch>
                                                                         </xf:case>
                                                                         <xf:case value="false()"/>
                                                                     </xf:switch>

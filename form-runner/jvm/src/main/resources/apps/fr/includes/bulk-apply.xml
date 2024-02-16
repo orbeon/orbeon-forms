@@ -31,6 +31,10 @@
             <xf:name>Orbeon-Workflow-Stage</xf:name>
             <xf:value value="."/>
         </xf:header>
+        <xf:header ref="event('operations')">
+            <xf:name>Orbeon-Operations</xf:name>
+            <xf:value value="."/>
+        </xf:header>
     </xf:submission>
 
     <xf:action event="apply">
@@ -40,13 +44,9 @@
 
         <xf:delete ref="instance('fr-bulk-edit-errors')/error"/>
 
-        <!-- Iterate over documents, which follow this format: "data/doc1 data/doc2 data/doc3 ..." -->
-        <xf:action
-            iterate="xxf:split(event('documents'))"
-            if="count(instance('fr-bulk-edit-errors')/error)=0">
-
-            <xf:var name="document-type-and-id" value="."/>
-            <xf:var name="document-id"          value="xxf:split($document-type-and-id, '/')[position() = last()]"/>
+        <xf:action iterate="event('documents')" if="count(instance('fr-bulk-edit-errors')/error)=0">
+            <xf:var name="document-id"         value="@name"/>
+            <xf:var name="document-operations" value="@operations"/>
 
             <xf:var
                 name="url"
@@ -56,22 +56,23 @@
                         $app,
                         '/',
                         $form,
-                        '/',
-                        $document-type-and-id,
+                        '/data/',
+                        $document-id,
                         '/data.xml')"/>
 
             <!-- Retrieve form data for current document -->
             <xf:send submission="form-data">
-                <xf:property name="url"           value="$url"/>
-                <xf:property name="method"        value="'get'"                  xxf:tunnel="true"/>
-                <xf:property name="serialization" value="'none'"/>
-                <xf:property name="replace"       value="'instance'"/>
-                <xf:property name="app"           value="$app"                   xxf:tunnel="true"/>
-                <xf:property name="form"          value="$form"                  xxf:tunnel="true"/>
-                <xf:property name="document-id"   value="$document-id"           xxf:tunnel="true"/>
-                <xf:property name="control-path"  value="event('control-path')"  xxf:tunnel="true"/>
-                <xf:property name="control-value" value="event('control-value')" xxf:tunnel="true"/>
-                <xf:property name="process"       value="event('process')"       xxf:tunnel="true"/>
+                <xf:property name="url"                 value="$url"/>
+                <xf:property name="method"              value="'get'"                  xxf:tunnel="true"/>
+                <xf:property name="serialization"       value="'none'"/>
+                <xf:property name="replace"             value="'instance'"/>
+                <xf:property name="app"                 value="$app"                   xxf:tunnel="true"/>
+                <xf:property name="form"                value="$form"                  xxf:tunnel="true"/>
+                <xf:property name="document-id"         value="$document-id"           xxf:tunnel="true"/>
+                <xf:property name="document-operations" value="$document-operations"   xxf:tunnel="true"/>
+                <xf:property name="control-path"        value="event('control-path')"  xxf:tunnel="true"/>
+                <xf:property name="control-value"       value="event('control-value')" xxf:tunnel="true"/>
+                <xf:property name="process"             value="event('process')"       xxf:tunnel="true"/>
             </xf:send>
         </xf:action>
     </xf:action>
@@ -116,6 +117,7 @@
             <xf:property name="serialization"  value="'application/xml'"/>
             <xf:property name="replace"        value="'none'"/>
             <xf:property name="workflow-stage" value="event('response-headers')[lower-case(name) = 'orbeon-workflow-stage']/value"/>
+            <xf:property name="operations"     value="event('document-operations')"/>
         </xf:send>
     </xf:action>
 

@@ -1482,10 +1482,17 @@
                                                         <xf:dispatch name="apply" targetid="fr-bulk-apply">
                                                             <xf:property name="app"           value="$app"/>
                                                             <xf:property name="form"          value="$form"/>
-                                                            <xf:property name="documents"     value="instance('fr-selection-instance')"/>
                                                             <xf:property name="process"       value="$control-edit-process"/>
                                                             <xf:property name="control-path"  value="$control-path"/>
                                                             <xf:property name="control-value" value="."/>
+                                                            <xf:property name="documents"     value="
+                                                                for        $document-type-and-id in xxf:split(instance('fr-selection-instance'))
+                                                                return
+                                                                    let    $document-id := xxf:split($document-type-and-id, '/')[position() = last()]
+                                                                    return xf:element(
+                                                                        'document',
+                                                                        instance('fr-search-results-instance')/document[@name = $document-id]/@*[local-name() = ('name', 'operations')]
+                                                                    )"/>
                                                         </xf:dispatch>
                                                     </xf:action>
                                                     <xf:message event="DOMActivate" if="not($apply-allowed)" value="xxf:r('summary.bulk-edit.value-required', '|fr-fr-resources|')"/>

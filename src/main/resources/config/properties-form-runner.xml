@@ -150,6 +150,7 @@
     <property as="xs:string"  name="oxf.fr.summary.buttons.*.*">
         home review pdf delete duplicate new
     </property>
+    <property as="xs:string"  name="oxf.fr.summary.bulk-processes.*.*"                          value=""/>
 
     <!-- Whether simple data migration takes place by default -->
     <property as="xs:string"  name="oxf.fr.detail.data-migration.*.*"                           value="disabled"/>

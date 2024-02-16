@@ -1172,6 +1172,10 @@
                                                                             <xf:setvalue ref="$base-binding/@role-required" value="false()"/>
                                                                             <xf:delete   ref="$base-binding/require-role"/>
                                                                         </xf:action>
+                                                                        <xf:action event="xforms-deselect" if="$current-value = 'fr-allow-bulk-edit'">
+                                                                            <xf:setvalue ref="$base-binding/@action" value="'save-data'"/>
+                                                                            <xf:setvalue ref="$base-binding/@process"/>
+                                                                        </xf:action>
                                                                     </fr:checkbox-input>
                                                                 </xf:case>
                                                                 <xf:case value="false()">
@@ -1297,6 +1301,9 @@
                                                                                     <xf:label ref="$resources/dialog-control-settings/bulk-edit-actions/run-process"/>
                                                                                     <xf:value>run-process</xf:value>
                                                                                 </xf:item>
+                                                                                <xf:action event="xforms-value-changed">
+                                                                                    <xf:setvalue ref="$i/fr-allow-bulk-edit/@process"/>
+                                                                                </xf:action>
                                                                             </xf:select1>
                                                                             <!-- Available processes to run -->
                                                                             <xf:switch caseref="count(instance('processes')/*) gt 0">

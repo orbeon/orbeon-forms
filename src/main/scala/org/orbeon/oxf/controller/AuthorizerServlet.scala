@@ -16,7 +16,7 @@ package org.orbeon.oxf.controller
 import org.orbeon.oxf.servlet._
 
 // For backward compatibility
-trait AuthorizerServlet extends JavaxAuthorizerServlet
+class AuthorizerServlet extends JavaxAuthorizerServlet
 
 class JavaxAuthorizerServlet   extends JavaxServiceHttpServlet  (new AuthorizerServletImpl)
 class JakartaAuthorizerServlet extends JakartaServiceHttpServlet(new AuthorizerServletImpl)

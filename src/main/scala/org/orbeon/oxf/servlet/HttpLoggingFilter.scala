@@ -21,7 +21,7 @@ import scala.jdk.CollectionConverters._
 // </filter-mapping>
 
 // For backward compatibility
-trait HttpLoggingFilter extends JavaxHttpLoggingFilter
+class HttpLoggingFilter extends JavaxHttpLoggingFilter
 
 class JavaxHttpLoggingFilter   extends JavaxFilter  (new HttpLoggingFilterImpl)
 class JakartaHttpLoggingFilter extends JakartaFilter(new HttpLoggingFilterImpl)

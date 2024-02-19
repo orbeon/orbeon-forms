@@ -75,14 +75,14 @@ private object XHTMLToPDFProcessor {
       }
     }
 
-  def embedDefaultFont(pdfRendererBuilder: CustomPdfRendererBuilder): Unit =
+  private def embedDefaultFont(pdfRendererBuilder: CustomPdfRendererBuilder): Unit =
     pdfRendererBuilder.useFont(
       () => ResourceManagerWrapper.instance.getContentAsStream(DefaultFontPath),
       DefaultFontFamily,
       DefaultFontWeight,
       FontStyle.NORMAL,
       true, // `subset`
-      java.util.EnumSet.of(FSFontUseCase.FALLBACK_PRE)
+      java.util.EnumSet.of(FSFontUseCase.FALLBACK_FINAL)
     )
 
   // NOTE: Default compression level is 0.75:

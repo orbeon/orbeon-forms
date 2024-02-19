@@ -98,7 +98,7 @@ class JavaxHttpServletRequest(httpServletRequest: javax.servlet.http.HttpServlet
 
   override def getAuthType: String = httpServletRequest.getAuthType
   override def getContextPath: String = httpServletRequest.getContextPath
-  override def getCookies: Array[Cookie] = httpServletRequest.getCookies.map(Cookie(_))
+  override def getCookies: Array[Cookie] = if (httpServletRequest.getCookies eq null) null else httpServletRequest.getCookies.map(Cookie(_))
   override def getDateHeader(name: String): Long = httpServletRequest.getDateHeader(name)
   override def getHeader(name: String): String = httpServletRequest.getHeader(name)
   override def getHeaderNames: ju.Enumeration[String] = httpServletRequest.getHeaderNames
@@ -123,7 +123,7 @@ class JakartaHttpServletRequest(val httpServletRequest: jakarta.servlet.http.Htt
 
   override def getAuthType: String = httpServletRequest.getAuthType
   override def getContextPath: String = httpServletRequest.getContextPath
-  override def getCookies: Array[Cookie] = httpServletRequest.getCookies.map(Cookie(_))
+  override def getCookies: Array[Cookie] = if (httpServletRequest.getCookies eq null) null else httpServletRequest.getCookies.map(Cookie(_))
   override def getDateHeader(name: String): Long = httpServletRequest.getDateHeader(name)
   override def getHeader(name: String): String = httpServletRequest.getHeader(name)
   override def getHeaderNames: ju.Enumeration[String] = httpServletRequest.getHeaderNames

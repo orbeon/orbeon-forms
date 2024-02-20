@@ -92,7 +92,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def streamHTMLFragment(
     value        : String,
     locationData : LocationData,
-    xhtmlPrefix  : String)(implicit
+    xhtmlPrefix  : String
+  )(implicit
     xmlReceiver  : XMLReceiver
   ): Unit = {
 
@@ -128,7 +129,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     contentType  : Option[String],
     lastModified : Long,
     customHeaders: Map[String, List[String]],
-    getHeader    : String => Option[List[String]])(implicit
+    getHeader    : String => Option[List[String]]
+  )(implicit
     logger           : IndentedLogger
   ): String = {
 
@@ -174,7 +176,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     filename         : Option[String],
     mediatype        : Option[String],
     evaluatedHeaders : Map[String, List[String]],
-    getHeader        : String => Option[List[String]])(implicit
+    getHeader        : String => Option[List[String]]
+  )(implicit
     logger           : IndentedLogger
   ): String =
     "data:" + mediatype.getOrElse("") + ";base64," + value
@@ -186,20 +189,23 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     JsFileSupport.mapSavedUri(URI.create(beforeUri), URI.create(afterUri))
 
   def renameAndExpireWithSession(
-    existingFileURI  : URI)(implicit
+    existingFileURI  : URI
+  )(implicit
     logger           : IndentedLogger
   ): URI = {
     existingFileURI
   }
 
   def inputStreamToRequestUri(
-    inputStream      : InputStream)(implicit
+    inputStream      : InputStream
+  )(implicit
     logger           : IndentedLogger
   ): Option[URI] =
     throw new NotImplementedError("inputStreamToRequestUri")
 
   def inputStreamToSessionUri(
-    inputStream      : InputStream)(implicit
+    inputStream      : InputStream
+  )(implicit
     logger           : IndentedLogger
   ): Option[URI] =
     throw new NotImplementedError("inputStreamToSessionUri")

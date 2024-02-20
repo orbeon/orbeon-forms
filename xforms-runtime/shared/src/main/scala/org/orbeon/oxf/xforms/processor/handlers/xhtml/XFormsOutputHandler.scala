@@ -376,11 +376,8 @@ class XFormsOutputDownloadHandler(
           XMLUtils.buildQName(formattingPrefix, FORMATTING_URL_TYPE_QNAME.localName),
           CDATA, "resource")
 
-        // Add _blank target in order to prevent:
-        // 1. The browser replacing the current page, and
-        // 2. The browser displaying the "Are you sure you want to navigate away from this page?" warning dialog
-        // This, as of 2009-05, seems to be how most sites handle this
-        containerAttributes.addOrReplace("target", "_blank")
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#download
+        containerAttributes.addOrReplace("download", "download")
 
         // Output xxf:* extension attributes
         if (outputControl ne null)

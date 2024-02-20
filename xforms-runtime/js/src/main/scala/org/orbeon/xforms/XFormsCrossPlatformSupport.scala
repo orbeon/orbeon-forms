@@ -67,7 +67,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     }
 
   def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String =
-    if (url.startsWith("data:") || url.startsWith("javascript:"))
+    if (url.startsWith("data:") || url.startsWith("blob:") || url.startsWith("javascript:"))
       url
     else
       throw new NotImplementedError(s"resolveResourceURL for `$url`")
@@ -139,25 +139,31 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     uri.getScheme match {
       case "data" =>
         urlString
-      case JsFileSupport.UploadUriScheme =>
-        // TODO
-        "javascript:void(0)";
-      case _ =>
-        val cxr =
-          Connection.connectNow(
-            method          = GET,
-            url             = uri,
-            credentials     = None,
-            content         = None,
-            headers         = Map.empty,
-            loadState       = false,
-            saveState       = false,
-            logBody         = false
-          )
+      case scheme =>
+        JsFileSupport.findObjectUrl(uri) match {
+          case Some(objectUrl) =>
+            objectUrl
+          case None if scheme == JsFileSupport.UploadUriScheme =>
+            // Can this happen?
+            "javascript:void(0)"
+          case None            =>
 
-        val baos = new ByteArrayOutputStream
-        IOUtils.copyStreamAndClose(cxr.content.stream, baos)
-        "data:" + contentType.orElse(cxr.mediatype).getOrElse("") + ";base64," + Base64.encode(baos.toByteArray, useLineBreaks = false)
+            val cxr =
+              Connection.connectNow(
+                method          = GET,
+                url             = uri,
+                credentials     = None,
+                content         = None,
+                headers         = Map.empty,
+                loadState       = false,
+                saveState       = false,
+                logBody         = false
+              )
+
+            val baos = new ByteArrayOutputStream
+            IOUtils.copyStreamAndClose(cxr.content.stream, baos)
+            "data:" + contentType.orElse(cxr.mediatype).getOrElse("") + ";base64," + Base64.encode(baos.toByteArray, useLineBreaks = false)
+        }
     }
   }
 
@@ -172,6 +178,12 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger
   ): String =
     "data:" + mediatype.getOrElse("") + ";base64," + value
+
+  def mapSavedUri(
+    beforeUri         : String,
+    afterUri          : String
+  ): Unit =
+    JsFileSupport.mapSavedUri(URI.create(beforeUri), URI.create(afterUri))
 
   def renameAndExpireWithSession(
     existingFileURI  : URI)(implicit

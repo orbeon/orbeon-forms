@@ -573,18 +573,14 @@ trait FormRunnerPersistence {
     val urlsToAttachments =
       attachmentsWithEncryptedAtRest.groupBy(_.fromPath)
 
-    val tripletsIt =
-      for {
-        holder        <- data.descendantOrSelf(*).iterator // TODO: not efficient because we build a `Stream`/`LazyList` in the background!
-        if ! holder.hasChildElement
-        beforeURL     <- holder.stringValue.trimAllToOpt
-        AttachmentWithEncryptedAtRest(_, afterURL, isEncryptedAtRest) :: _ // ignore rest, see comment about duplicate `fromPath` above
-                      <- urlsToAttachments.get(beforeURL)
-      } yield
-        (holder, afterURL, isEncryptedAtRest)
-
-    tripletsIt.foreach { case (holder, afterURL, isEncryptedAtRest) =>
-      updateHolder(holder, afterURL, isEncryptedAtRest)
+    for {
+      holder          <- data.descendantOrSelf(*).iterator // TODO: not efficient because we build a `Stream`/`LazyList` in the background!
+      if ! holder.hasChildElement
+      beforeURL       <- holder.stringValue.trimAllToOpt
+      attachment :: _ <- urlsToAttachments.get(beforeURL) // ignore rest, see comment about duplicate `fromPath` above
+    } locally {
+      XFormsCrossPlatformSupport.mapSavedUri(attachment.fromPath, attachment.toPath)
+      updateHolder(holder, attachment)
     }
   }
 
@@ -902,10 +898,10 @@ trait FormRunnerPersistence {
     // - https://github.com/orbeon/orbeon-forms/issues/3301
   }
 
-  private def updateHolder(holder: NodeInfo, afterURL: String, isEncryptedAtRest: Boolean): Unit = {
-    setvalue(holder, afterURL)
+  private def updateHolder(holder: NodeInfo, attachment: AttachmentWithEncryptedAtRest): Unit = {
+    setvalue(holder, attachment.toPath)
     XFormsAPI.delete(holder /@ AttachmentEncryptedAttributeName)
-    if (isEncryptedAtRest)
+    if (attachment.isEncryptedAtRest)
       XFormsAPI.insert(
         into   = holder,
         origin = AttachmentEncryptedAttribute

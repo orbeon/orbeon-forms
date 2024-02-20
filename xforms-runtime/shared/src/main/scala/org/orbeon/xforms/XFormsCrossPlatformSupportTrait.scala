@@ -153,6 +153,11 @@ trait XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger
   ): String
 
+ def mapSavedUri(
+   beforeUri         : String,
+   afterUri          : String
+ ): Unit
+
   def renameAndExpireWithSession(
     existingFileURI  : URI)(implicit
     logger           : IndentedLogger

@@ -8,6 +8,7 @@ import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger, NetUtils, XPath}
 import org.orbeon.oxf.xml.{DeferredXMLReceiver, DeferredXMLReceiverImpl, TransformerUtils}
@@ -164,7 +165,7 @@ private object History {
              |       ) a
            """.stripMargin
 
-        RelationalUtils.Logger.debug(s"search total query:\n$sql")
+        debug(s"search total query:\n$sql")
         executeQuery(connection, sql, List(StatementPart("", setters))) { rs =>
           rs.next()
           rs.getInt(1)

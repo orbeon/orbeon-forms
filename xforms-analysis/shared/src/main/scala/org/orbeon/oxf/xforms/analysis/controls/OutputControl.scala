@@ -50,7 +50,8 @@ class OutputControl(
   override def isAllowedBoundItem(item: om.Item): Boolean = StaticDataModel.isAllowedBoundItem(item)
 
   override protected val allowedExtensionAttributes: Set[QName] =
-    (isImageMediatype set XXFORMS_ALT_QNAME) ++ (isDownloadAppearance set XXFORMS_TARGET_QNAME)
+    (isImageMediatype set XXFORMS_ALT_QNAME) ++
+      (if (isDownloadAppearance) Set(XXFORMS_TARGET_QNAME, XXFORMS_DOWNLOAD_QNAME) else Set.empty)
 
   override protected def externalEventsDef: Set[String] = super.externalEventsDef ++ Set(XFORMS_HELP, DOM_ACTIVATE, XFORMS_FOCUS, XXFORMS_BLUR)
   override val externalEvents: Set[String] = externalEventsDef

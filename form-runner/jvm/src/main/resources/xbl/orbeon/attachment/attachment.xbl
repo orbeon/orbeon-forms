@@ -352,6 +352,7 @@
 
                         <xf:output
                             appearance="xxf:download"
+                            xxf:download="{@filename}"
                             ref=".[not($disable-download)]"
                             class="fr-attachment-filename">
 

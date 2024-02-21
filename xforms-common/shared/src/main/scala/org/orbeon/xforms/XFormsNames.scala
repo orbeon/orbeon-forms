@@ -185,6 +185,7 @@ object XFormsNames {
 
   val XFORMS_FILENAME_QNAME         = xformsQName("filename")
   val XFORMS_MEDIATYPE_QNAME        = xformsQName("mediatype")
+  val XXFORMS_DOWNLOAD_QNAME        = xxformsQName("download")
   val XXFORMS_SIZE_QNAME            = xxformsQName("size")
   val XXFORMS_TITLE_QNAME           = xxformsQName("title")
   val XXFORMS_ALT_QNAME             = xxformsQName("alt")

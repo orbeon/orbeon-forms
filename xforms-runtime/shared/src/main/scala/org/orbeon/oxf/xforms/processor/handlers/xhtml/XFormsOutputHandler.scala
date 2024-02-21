@@ -377,6 +377,7 @@ class XFormsOutputDownloadHandler(
           CDATA, "resource")
 
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#download
+        // Put a `download` attribute in all cases, and the optional extension attribute will, if needed, set a filename
         containerAttributes.addOrReplace("download", "download")
 
         // Output xxf:* extension attributes

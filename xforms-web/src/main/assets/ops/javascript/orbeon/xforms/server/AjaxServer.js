@@ -470,6 +470,17 @@
                                         var img = jDocumentElement.children('img').first();
                                         img.attr('alt', alt);
                                     }
+
+                                    if ($(documentElement).is('.xforms-output-appearance-xxforms-download')) {
+                                        var download = ORBEON.util.Dom.getAttribute(elem, "download");
+                                        if (download != null) {
+                                            var aElem = YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, documentElement)[0];
+                                            if (aElem)
+                                                aElem.download = download;
+
+                                        }
+                                    }
+
                                 } else if ($(documentElement).is('.xforms-trigger, .xforms-submit')) {
                                     // It isn't a control that can hold a value (e.g. trigger) and there is no point in trying to update it
                                     // NOP

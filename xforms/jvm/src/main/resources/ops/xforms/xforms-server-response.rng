@@ -86,6 +86,9 @@
                                                     <optional>
                                                         <attribute name="filename"/>
                                                     </optional>
+                                                    <optional>
+                                                        <attribute name="download"/>
+                                                    </optional>
                                                 </group>
                                                 <!-- Optional attributes for xf:upload -->
                                                 <group>

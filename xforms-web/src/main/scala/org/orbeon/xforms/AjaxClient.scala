@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms
+import org.orbeon.xforms.AjaxClient.EventQueue
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
 import org.orbeon.xforms.facade.{AjaxServer, Events}
 import org.scalajs.dom
@@ -36,6 +37,7 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers
+import scala.util.{Failure, Success}
 
 
 @JSExportTopLevel("OrbeonAjaxClient")
@@ -312,7 +314,16 @@ object AjaxClient {
           processEvents(currentForm, eventsForCurrentForm.reverse)
       }
 
+<<<<<<< HEAD
     def canSendEvents: Boolean = ! ajaxRequestInProgress && ! paused
+||||||| parent of 22c2c9d83f (Fix #6200: Prevent queue from being blocked on failure)
+    def canSendEvents: Boolean = ! EventQueue.ajaxRequestInProgress
+=======
+    def canSendEvents: Boolean = {
+      logger.debug(s"canSendEvents: ${! EventQueue.ajaxRequestInProgress}")
+      ! EventQueue.ajaxRequestInProgress
+    }
+>>>>>>> 22c2c9d83f (Fix #6200: Prevent queue from being blocked on failure)
 
     var shortDelay       : FiniteDuration = _
     var incrementalDelay : FiniteDuration = _
@@ -550,13 +561,18 @@ object AjaxClient {
         sequenceNumberOpt = sequenceNumberOpt,
         showProgress      = showProgress,
         ignoreErrors      = ignoreErrors
-      ) foreach { responseXml =>
-        handleResponse(
-          responseXML        = responseXml,
-          currentForm        = currentForm,
-          requestSequenceOpt = sequenceNumberOpt,
-          ignoreErrors       = ignoreErrors
-        )
+      ).onComplete {
+        case Success(responseXml) =>
+          handleResponse(
+            responseXML        = responseXml, // Keep the named parameter style
+            currentForm        = currentForm,
+            requestSequenceOpt = sequenceNumberOpt,
+            ignoreErrors       = ignoreErrors
+          )
+        case Failure(throwable) =>
+          logger.debug(s"can't process response: ${throwable.getMessage}")
+          EventQueue.ajaxRequestInProgress = false
+          EventQueue.updateQueueSchedule()
       }
     }
   }

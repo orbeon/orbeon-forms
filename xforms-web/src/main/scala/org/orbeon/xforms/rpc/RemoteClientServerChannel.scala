@@ -111,7 +111,7 @@ object RemoteClientServerChannel extends ClientServerChannel {
               AjaxClient.showLoginDetectedDialog(requestForm.namespacedFormId)
               Page.loadingIndicator().requestEnded(showProgress)
               // The `Failure` is ignored by the caller of `sendEvents()`
-              promise.failure(new Throwable) // TODO: It would be good to return another error type.
+              promise.failure(new Throwable("login detected"))
             case Success((ServiceUnavailable, _, _)) =>
               // The server returns an explicit 503 when the Ajax server is still busy
               retryRequestAfterDelay(requestForm, () =>
@@ -130,7 +130,7 @@ object RemoteClientServerChannel extends ClientServerChannel {
                 // This was handled by showing a dialog or login
                 //   2023-08-21: What does the above comment mean?
                 // The `Failure` is ignored by the caller of `sendEvents()`
-                promise.failure(new Throwable) // TODO: It would be good to return another error type.
+                promise.failure(new Throwable("server returned error")) // TODO: It would be good to return another error type.
               }
             case Failure(_) =>
               retryRequestAfterDelay(requestForm, () =>
@@ -139,7 +139,8 @@ object RemoteClientServerChannel extends ClientServerChannel {
               )
           }
         } else {
-            Page.loadingIndicator().requestEnded(showProgress)
+          Page.loadingIndicator().requestEnded(showProgress)
+          promise.failure(new Throwable("form not found"))
         }
       }
 

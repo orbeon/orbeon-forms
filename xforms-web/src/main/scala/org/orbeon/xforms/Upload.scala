@@ -18,10 +18,13 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames._
 import org.orbeon.xforms.controls.Upload._
-import org.scalajs.dom.html
+import org.scalajs.dom
+import org.scalajs.dom.raw.File
+import org.scalajs.dom.{FileList, html}
 import org.scalajs.jquery.JQueryEventObject
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.scalajs.js.annotation.JSExport
 
@@ -36,6 +39,32 @@ object Upload {
   logger.debug("init object")
 
   Page.registerControlConstructor(() => new Upload, (e: html.Element) => e.classList.contains("xforms-upload"))
+
+  // Sequence the sending of a list of files, see:
+  // https://github.com/orbeon/orbeon-forms/issues/6167
+  def processFileList(fileList: FileList, upload: Upload): Future[List[File]] = {
+
+    val delay = Page.getXFormsFormFromHtmlElemOrThrow(upload.container).configuration.delayBeforeIncrementalRequest.millis
+
+    def processOne(file: dom.raw.File): Future[dom.raw.File] =
+      XFormsApp.clientServerChannel.addFile(
+        upload,
+        file,
+        delay
+      ).map(_ => file)
+
+    def processRemaining(files: List[dom.raw.File]): Future[List[dom.raw.File]] =
+      files match {
+        case Nil =>
+          Future.successful(Nil)
+        case file :: rest =>
+          processOne(file).flatMap { file =>
+            processRemaining(rest).map(file :: _)
+          }
+      }
+
+    processRemaining((0 until fileList.length).map(fileList(_)).toList)
+  }
 }
 
 class Upload {
@@ -84,13 +113,7 @@ class Upload {
   @JSExport
   def change(): Unit = {
     logger.debug("change -> queueing")
-    val files = getInput.files
-    for (i <- 0 until files.length)
-      XFormsApp.clientServerChannel.addFile(
-        self,
-        files(i),
-        Page.getXFormsFormFromHtmlElemOrThrow(self.container).configuration.delayBeforeIncrementalRequest.millis
-      )
+    processFileList(getInput.files, self)
   }
 
   // This method is called when the server sends us a progress update for this upload control. If the upload was

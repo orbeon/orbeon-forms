@@ -60,8 +60,8 @@ object RemoteClientServerChannel extends ClientServerChannel {
     upload: Upload,
     file  : dom.raw.File,
     wait  : FiniteDuration
-  ): Unit =
-    UploaderClient.addFile(upload, file, wait)
+  ): Future[Unit] =
+    Future.successful(UploaderClient.addFile(upload, file, wait))
 
   def cancel(
     doAbort  : Boolean,

@@ -22,8 +22,8 @@ import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
-import scala.concurrent.duration._
 import scala.scalajs.js
+
 
 
 object AttachmentMultiple {
@@ -102,14 +102,7 @@ object AttachmentMultiple {
             if (ev.dataTransfer.types contains "Files") {
               logger.debug(s"${ev.`type`} with files")
               ev.preventDefault()
-
-              val files = ev.dataTransfer.files
-              for (i <- 0 until files.length)
-                XFormsApp.clientServerChannel.addFile(
-                  Page.getUploadControl(uploadControlElem),
-                  files(i),
-                  Page.getXFormsFormFromHtmlElemOrThrow(companion.containerElem).configuration.delayBeforeIncrementalRequest.millis
-                )
+              Upload.processFileList(ev.dataTransfer.files, Page.getUploadControl(uploadControlElem))
             }
           }
         )

@@ -23,7 +23,7 @@ trait ClientServerChannel {
     upload: Upload,
     file  : dom.raw.File,
     wait  : FiniteDuration
-  ): Unit
+  ): Future[Unit]
 
   def cancel(
     doAbort  : Boolean,

@@ -23,7 +23,8 @@ import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.processor.XPLConstants.OXF_PROCESSORS_NAMESPACE
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{LoggerFactory, SecureUtils, URLRewriterUtils}
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, SecureUtils, URLRewriterUtils}
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
@@ -74,6 +75,8 @@ object TestHttpClient {
   ): (ProcessorService, HttpResponse, Option[Session], List[CacheEvent]) = {
 
     require(url.startsWith("/"), "TestHttpClient only supports absolute paths")
+
+    implicit val logger = new IndentedLogger(Logger)
 
     val processorService = {
 
@@ -173,9 +176,12 @@ object TestHttpClient {
         pipelineContext.setAttribute("orbeon.cache.test.tracer", tracer)
         pipelineContext.setAttribute("orbeon.cache.test.initialize-xforms-document", true) // the default
 
-        ProcessorService.withProcessorService(processorService) {
-          processorService.service(pipelineContext, externalContext)
+        withDebug(s"performing `$method` request to `$url` with headers `$headers` and content ${content.isDefined}") {
+          ProcessorService.withProcessorService(processorService) {
+            processorService.service(pipelineContext, externalContext)
+          }
         }
+
 
         (response, Option(externalContext.getRequest.getSession(false)))
       }
@@ -188,6 +194,8 @@ object TestHttpClient {
         lazy val content      = response.streamedContent
         def disconnect()      = content.close()
       }
+
+    debug(s"response status code: ${httpResponse.statusCode}, headers: ${httpResponse.headers}, last modified: ${httpResponse.lastModified}")
 
     (processorService, httpResponse, sessionOpt, events.toList)
   }

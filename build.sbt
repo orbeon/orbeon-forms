@@ -23,7 +23,7 @@ val TimezonesToInclude = Set(
 val includeTimezone: String => Boolean = tz =>
   TimezonesToInclude(tz) || tz.startsWith("Australia/")
 
-val DefaultOrbeonFormsVersion     = "2022.1-SNAPSHOT"
+val DefaultOrbeonFormsVersion     = "2024.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
 // Scala libraries for Scala.js only

@@ -214,13 +214,13 @@ object EmailMetadataParsing {
   }
 
   private def parseParam(paramNodeInfo: NodeInfo): EmailMetadata.Param = {
-    val name            = paramNodeInfo.child(XMLNames.FRNameTest).stringValue
+    val name            = paramNodeInfo.child("name").stringValue
     val paramTypeSource = paramNodeInfo.attValue("type")
     // Fix possible incorrect serialization on migration, done between 2022.1 and 2022.1.4 (fixed in 2022.1.5 per #5923)
     val paramTypeFixed  = paramTypeSource.split("\\(")(0)
     paramTypeFixed match {
-      case "ControlValueParam"      => EmailMetadata.Param.ControlValueParam     (name, paramNodeInfo.child(XMLNames.FRControlNameTest).stringValue)
-      case "ExpressionParam"        => EmailMetadata.Param.ExpressionParam       (name, paramNodeInfo.child(XMLNames.FRExprTest).stringValue)
+      case "ControlValueParam"      => EmailMetadata.Param.ControlValueParam     (name, paramNodeInfo.child("controlName").stringValue)
+      case "ExpressionParam"        => EmailMetadata.Param.ExpressionParam       (name, paramNodeInfo.child("expr"       ).stringValue)
       case "AllControlValuesParam"  => EmailMetadata.Param.AllControlValuesParam (name)
       case "LinkToEditPageParam"    => EmailMetadata.Param.LinkToEditPageParam   (name)
       case "LinkToViewPageParam"    => EmailMetadata.Param.LinkToViewPageParam   (name)

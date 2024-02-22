@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.servlet
 
-import cats.effect.unsafe.IORuntime
 import org.orbeon.oxf.externalcontext.ServletWebAppContext
 import org.orbeon.oxf.http.{PropertiesApacheHttpClient, StatusCode}
 import org.orbeon.oxf.pipeline.api._
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.webapp.ServletPortlet._
 import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet}
 
@@ -70,7 +70,7 @@ abstract class OrbeonServletImpl(servletContextProvider: ServletContextProvider)
       // Unclear whether there is a better place to do this
       webAppContext.addListener(() => {
         PropertiesApacheHttpClient.shutdown()
-        cats.effect.unsafe.implicits.global.shutdown()
+        CoreCrossPlatformSupport.runtime.shutdown()
       })
     }
 

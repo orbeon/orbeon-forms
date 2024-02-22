@@ -1,9 +1,9 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
 import org.orbeon.connection.AsyncConnectionResult
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.runtime
 
 
 object XFormsModelSubmissionSupport extends XFormsModelSubmissionSupportTrait {

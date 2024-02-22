@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import cats.effect.unsafe.IORuntime
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.properties.PropertySet
@@ -25,6 +26,7 @@ trait CoreCrossPlatformSupportTrait {
   type FileItemType
 
   implicit def executionContext: ExecutionContext
+  implicit def runtime: IORuntime
 
   def logger: org.log4s.Logger
   def isPE: Boolean

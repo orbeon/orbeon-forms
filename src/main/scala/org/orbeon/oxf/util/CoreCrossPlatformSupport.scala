@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import cats.effect.unsafe.{IORuntime, IORuntimeConfig}
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.Version
@@ -21,14 +22,54 @@ import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 
+import javax.enterprise.concurrent.ManagedExecutorService
+import javax.naming.InitialContext
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success, Try}
 
 
 object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
   type FileItemType = DiskFileItem
 
-  implicit def executionContext: ExecutionContext = ExecutionContext.global
+  implicit def executionContext: ExecutionContext = runtime.compute
+
+  private val DefaultJndiName = "java:comp/DefaultManagedExecutorService"
+  private val PropertyName    = "oxf.managed-executor-service.jndi-name"
+
+  // If we don't make this lazy, things don't work down the line for some reason!
+  private lazy val _runtime = {
+
+    val buffer = mutable.ListBuffer.empty[String]
+
+    buffer += "IORuntime initialization:"
+
+    def logTry[U](t: Try[U])(m: String): Try[U] = {
+      t match {
+        case Success(b) => buffer += (s"- found $m: $b")
+        case Failure(t) => buffer += (s"- failed to find $m: ${t.getMessage}")
+      }
+      t
+    }
+
+    def fromJndi: Try[IORuntime] =
+      for {
+        jndiName               <- logTry(Try(CoreCrossPlatformSupport.properties.getString(PropertyName, DefaultJndiName)))("JNDI name")
+        managedExecutorService <- logTry(Try((new InitialContext).lookup(jndiName).asInstanceOf[ManagedExecutorService]))("`ManagedExecutorService`")
+        executionContext       = ExecutionContext.fromExecutorService(managedExecutorService)
+        scheduler              = IORuntime.global.scheduler
+      } yield
+        IORuntime(executionContext, executionContext, scheduler, () => (), IORuntimeConfig())
+
+    fromJndi.getOrElse {
+      buffer += s"Using default IORuntime."
+      logger.info(buffer.mkString("\n"))
+      IORuntime.global
+    }
+  }
+
+  implicit def runtime: IORuntime = _runtime
 
   def logger: org.log4s.Logger = Properties.logger
   def isPE: Boolean = Version.isPE

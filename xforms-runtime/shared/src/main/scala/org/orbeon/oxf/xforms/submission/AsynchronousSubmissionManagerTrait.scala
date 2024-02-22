@@ -1,8 +1,7 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.{executionContext, runtime}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.{debug, debugResults, error, withDebug}
 import org.orbeon.oxf.xforms.XFormsContainingDocument

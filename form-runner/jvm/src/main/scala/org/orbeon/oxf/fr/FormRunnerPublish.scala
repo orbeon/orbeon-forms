@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.fr
 
-import cats.effect.unsafe.implicits.global
 import cats.syntax.option._
 import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -21,6 +20,7 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.FormXhtml
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.fr.persistence.relational.Version
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.runtime
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger}

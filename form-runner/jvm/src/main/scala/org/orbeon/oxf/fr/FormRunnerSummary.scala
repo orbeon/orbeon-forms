@@ -13,14 +13,13 @@
  */
 package org.orbeon.oxf.fr
 
-import cats.effect.unsafe.implicits.global
 import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataFormatVersionName, DataXml}
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.process.RenderedFormat
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.{properties, runtime}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import cats.effect.unsafe.IORuntime
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.properties.PropertySet
@@ -26,8 +27,11 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
   type FileItemType = Unit // TODO
 
+  // Q: Could we/should we use `runtime.compute` instead?
   implicit def executionContext: ExecutionContext =
     org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
+
+  implicit def runtime: IORuntime = IORuntime.global
 
   val logger: org.log4s.Logger = LoggerFactory.createLogger("org.orbeon.properties")
 

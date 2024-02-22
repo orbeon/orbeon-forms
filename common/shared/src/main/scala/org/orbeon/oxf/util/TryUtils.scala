@@ -21,8 +21,8 @@ import scala.util.{Failure, Success, Try}
 object TryUtils {
 
   private class OnFailurePF[U](f: PartialFunction[Throwable, Any]) extends PartialFunction[Throwable, Try[U]] {
-    def isDefinedAt(x: Throwable) = f.isDefinedAt(x)
-    def apply(v1: Throwable) = {
+    def isDefinedAt(x: Throwable): Boolean = f.isDefinedAt(x)
+    def apply(v1: Throwable): Try[U] = {
       f.apply(v1)
       Failure(v1)
     }

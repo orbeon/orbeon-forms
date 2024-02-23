@@ -29,6 +29,8 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
   implicit def executionContext: ExecutionContext =
     org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
+  val logger: org.log4s.Logger = LoggerFactory.createLogger("org.orbeon.properties")
+
   def isPE: Boolean = true
   def isJsEnv: Boolean = true
 

@@ -30,6 +30,7 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
   implicit def executionContext: ExecutionContext = ExecutionContext.global
 
+  def logger: org.log4s.Logger = Properties.logger
   def isPE: Boolean = Version.isPE
   def isJsEnv: Boolean = false
   def randomHexId: String = SecureUtils.randomHexId

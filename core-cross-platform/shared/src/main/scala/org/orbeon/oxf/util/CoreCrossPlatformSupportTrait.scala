@@ -26,6 +26,7 @@ trait CoreCrossPlatformSupportTrait {
 
   implicit def executionContext: ExecutionContext
 
+  def logger: org.log4s.Logger
   def isPE: Boolean
   def isJsEnv: Boolean
   def randomHexId: String

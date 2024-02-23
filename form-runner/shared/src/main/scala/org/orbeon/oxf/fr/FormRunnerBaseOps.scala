@@ -22,9 +22,9 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.{Property, PropertySet}
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtils}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtils}
 import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -147,7 +147,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
           case other                       => s"The property `$other` is not defined."
         }
 
-      Loggers.logger.error(
+      CoreCrossPlatformSupport.logger.error(
         s"The following Orbeon Forms configurations are incomplete:\n\n${lines.map(l => s"- $l\n").mkString}"
       )
     }

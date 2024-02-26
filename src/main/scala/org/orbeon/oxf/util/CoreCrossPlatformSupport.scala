@@ -60,7 +60,7 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
         executionContext       = ExecutionContext.fromExecutorService(managedExecutorService)
         scheduler              = IORuntime.global.scheduler
       } yield
-        IORuntime(executionContext, executionContext, scheduler, () => (), IORuntimeConfig())
+        IORuntime(executionContext, executionContext, scheduler, () => (), IORuntimeConfig()) // Q: unclear if we should pass different `ExecutionContext`s to `compute` and `blocking`
 
     fromJndi.getOrElse {
       buffer += s"Using default IORuntime."

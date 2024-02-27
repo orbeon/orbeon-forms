@@ -39,7 +39,7 @@ class ContentHandlerOutputStream(
   private val singleByte                  = new Array[Byte](1)
   private var contentType        : String = null
   private var contentDisposition : String = null
-  private var statusCode         : String = null
+  private var statusCode         : Option[Int] = None
   private var documentStarted             = false
   private var closed                      = false
 
@@ -49,8 +49,11 @@ class ContentHandlerOutputStream(
   def setContentDisposition(contentDisposition: String): Unit =
     this.contentDisposition = contentDisposition
 
-  def setStatusCode(statusCode: String): Unit =
-    this.statusCode = statusCode
+  def setStatusCode(statusCode: Int): Unit =
+    this.statusCode = Some(statusCode)
+
+  def getStatusCode: Option[Int] =
+    this.statusCode
 
   private def outputStartIfNeeded(): Unit =
     if (doStartEndDocument && ! documentStarted) {
@@ -61,8 +64,8 @@ class ContentHandlerOutputStream(
         attributes.addAttribute("", Headers.ContentTypeLower, Headers.ContentTypeLower, "CDATA", contentType)
       if (contentDisposition != null)
         attributes.addAttribute("", Headers.ContentDispositionLower, Headers.ContentDispositionLower, "CDATA", contentDisposition);
-      if (statusCode != null)
-        attributes.addAttribute("", "status-code", "status-code", "CDATA", statusCode)
+      this.statusCode
+        .foreach(sc => attributes.addAttribute("", "status-code", "status-code", "CDATA", sc.toString))
 
       contentHandler.startDocument()
       contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI)

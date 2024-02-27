@@ -17,7 +17,7 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext._
-import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.http.{Headers, HttpMethod, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.CoreUtils._
@@ -349,7 +349,11 @@ class TestExternalContext(
     def setContentLength(len: Int)                                                   = ()
     def setContentType(contentType: String)                                          = ()
     def setHeader(name: String, value: String)                                       = ()
-    def setStatus(status: Int)                                                       = ()
+
+    private var _status = StatusCode.Ok
+    def setStatus(status: Int) = _status = status
+    def getStatus: Int = _status
+
     def setTitle(title: String)                                                      = ()
 
     def getNativeResponse: AnyRef                                                    = null

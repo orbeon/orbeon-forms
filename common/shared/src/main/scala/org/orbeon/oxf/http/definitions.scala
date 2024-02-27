@@ -181,6 +181,9 @@ object StatusCode {
   def isSuccessCode(code: Int): Boolean =
     code >= 200 && code < 300
 
+  def isNonSuccessCode(code: Int): Boolean =
+    code >= 300 // this doesn't catch `code == 0` or `code == -1`
+
   def isRedirectCode(code: Int): Boolean =
     (code >= 301 && code <= 303) || code == 307
 }

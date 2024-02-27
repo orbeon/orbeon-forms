@@ -9,6 +9,7 @@ class ResponseAdapter extends ExternalContext.Response {
   def reset(): Unit = ()
   def setContentType(contentType: String): Unit = ()
   def setStatus(status: Int): Unit = ()
+  def getStatus: Int = 0
   def setContentLength(len: Int): Unit = ()
   def setHeader(name: String, value: String): Unit = ()
   def addHeader(name: String, value: String): Unit = ()

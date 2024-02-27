@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor
 
 import java.io.{OutputStreamWriter, PrintWriter}
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseAdapter, UrlRewriteMode}
-import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.http.{Headers, StatusCode}
 import org.orbeon.oxf.processor.serializer.CachedSerializer
 import org.orbeon.oxf.util.{ContentHandlerOutputStream, ContentTypes}
 import org.orbeon.oxf.xml.XMLReceiver
@@ -54,10 +54,11 @@ object PipelineResponse {
           override def setContentLength(len: Int): Unit =
             setHeader(Headers.ContentLength, Integer.toString(len))
 
-          override def setStatus(status: Int): Unit = {
-            // See: http://wiki.orbeon.com/forms/projects/xforms/better-error-handling-for-replace-all-submission
-            contentHandlerOutputStream.setStatusCode(status.toString)
-          }
+          override def setStatus(status: Int): Unit =
+            contentHandlerOutputStream.setStatusCode(status)
+
+          override def getStatus: Int =
+            contentHandlerOutputStream.getStatusCode.getOrElse(StatusCode.Ok)
 
           override def setHeader(name: String, value: String): Unit = {
             // Handle Content-Type

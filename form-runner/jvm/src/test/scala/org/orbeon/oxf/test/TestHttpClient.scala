@@ -188,7 +188,7 @@ object TestHttpClient {
 
     val httpResponse =
       new HttpResponse {
-        lazy val statusCode   = response.statusCode
+        lazy val statusCode   = response.getStatus
         lazy val headers      = response.capitalizedHeaders
         lazy val lastModified = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
         lazy val content      = response.streamedContent

@@ -35,6 +35,7 @@ trait HttpServletResponse extends ServletResponse {
   def setIntHeader(name: String, value: Int): Unit
   def setLocale(loc: ju.Locale): Unit
   def setStatus(sc: Int): Unit
+  def getStatus: Int
 }
 
 class JavaxHttpServletResponse(httpServletResponse: javax.servlet.http.HttpServletResponse) extends JavaxServletResponse(httpServletResponse) with HttpServletResponse {
@@ -54,6 +55,7 @@ class JavaxHttpServletResponse(httpServletResponse: javax.servlet.http.HttpServl
   override def setIntHeader(name: String, value: Int): Unit = httpServletResponse.setIntHeader(name, value)
   override def setLocale(loc: ju.Locale): Unit = httpServletResponse.setLocale(loc)
   override def setStatus(sc: Int): Unit = httpServletResponse.setStatus(sc)
+  override def getStatus: Int = httpServletResponse.getStatus
 }
 
 class JakartaHttpServletResponse(httpServletResponse: jakarta.servlet.http.HttpServletResponse) extends JakartaServletResponse(httpServletResponse) with HttpServletResponse {
@@ -73,4 +75,5 @@ class JakartaHttpServletResponse(httpServletResponse: jakarta.servlet.http.HttpS
   override def setIntHeader(name: String, value: Int): Unit = httpServletResponse.setIntHeader(name, value)
   override def setLocale(loc: ju.Locale): Unit = httpServletResponse.setLocale(loc)
   override def setStatus(sc: Int): Unit = httpServletResponse.setStatus(sc)
+  override def getStatus: Int = httpServletResponse.getStatus
 }

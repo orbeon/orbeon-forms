@@ -14,9 +14,9 @@
 package org.orbeon.oxf.processor.serializer
 
 import java.io.ByteArrayOutputStream
-
 import org.junit.Test
 import org.orbeon.oxf.externalcontext.ResponseAdapter
+import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Converter._
@@ -57,7 +57,7 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
       assert(contentType === response.contentType)
     }
 
-  def responseWithReceiver = {
+  def responseWithReceiver: (TestResponse, BinaryTextXMLReceiver) = {
     val response = new TestResponse
     (response, new BinaryTextXMLReceiver(Left(response), true, false, None, false, false, None, false, Nil))
   }
@@ -65,10 +65,11 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
   class TestResponse extends ResponseAdapter {
 
     var contentType: String = _
-    var status: Int = -1
+    var status: Int = StatusCode.Ok
 
     override def setContentType(contentType: String): Unit = this.contentType = contentType
     override def setStatus(status: Int): Unit = this.status = status
+    override def getStatus: Int = this.status
 
     override def setPageCaching(lastModified: Long): Unit = super.setPageCaching(lastModified)
     override def setHeader(name: String, value: String): Unit = super.setHeader(name, value)

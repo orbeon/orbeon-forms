@@ -72,8 +72,11 @@ object Portlet2ExternalContext {
     // We are always buffering
     def isCommitted                                                = false
 
+    private var _status = StatusCode.Ok
+
     def setStatus(status: Int): Unit = {
       // Test error
+      _status = status
       if (status == StatusCode.NotFound) {
         throw HttpStatusCodeException(StatusCode.NotFound)
       } else if (status >= 400) {
@@ -81,6 +84,8 @@ object Portlet2ExternalContext {
       }
       // TODO: How to handle NOT_MODIFIED?
     }
+
+    def getStatus: Int = _status
 
     def rewriteActionURL(urlString: String): String =
       urlRewriter.rewriteActionURL(urlString)

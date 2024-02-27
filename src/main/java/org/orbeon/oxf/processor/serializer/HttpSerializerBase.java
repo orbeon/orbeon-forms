@@ -129,7 +129,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
 
                 // If local caching of the data is enabled and if the configuration status code is a success code, use
                 // the caching API. It doesn't make sense in HTTP to allow caching of non-successful responses.
-                if (config.cacheUseLocalCache && StatusCode.isSuccessCode(config.statusCode)) {
+                if (config.cacheUseLocalCache && StatusCode.isSuccessCode(config.statusCode) && ! StatusCode.isNonSuccessCode(response.getStatus())) {
 
                     // We return a ResultStore
                     final boolean[] read = new boolean[1];
@@ -181,7 +181,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                         @Override
                         public boolean allowCaching() {
                             // It doesn't make sense in HTTP to allow caching of non-successful responses
-                            return StatusCode.isSuccessCode(statusCode);
+                            return StatusCode.isSuccessCode(statusCode) && ! StatusCode.isNonSuccessCode(response.getStatus());
                         }
                     });
 

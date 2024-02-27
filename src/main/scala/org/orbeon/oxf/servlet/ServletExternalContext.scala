@@ -254,6 +254,8 @@ class ServletExternalContext(
       nativeResponse.setStatus(status)
     }
 
+    def getStatus: Int = nativeResponse.getStatus
+
     def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean): Unit =
       // Create URL
       if (isServerSide) {

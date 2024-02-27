@@ -24,7 +24,7 @@ import scala.collection.mutable
 
 class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponseSupport {
 
-  private var _statusCode                         = 200
+  private var _statusCode                         = StatusCode.Ok
   private var _serverSideRedirect: Option[String] = None
   private val _lowerCaseHeaders                   = mutable.LinkedHashMap[String, List[String]]()
 
@@ -43,7 +43,6 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
     )
   }
 
-  def statusCode = _statusCode
   def serverSideRedirect = _serverSideRedirect
 
   def capitalizedHeaders =
@@ -120,10 +119,12 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
     }
 
   def setStatus(status: Int): Unit = {
-    if (!StatusCode.isSuccessCode(status))
+    if (! StatusCode.isSuccessCode(status))
         responseCachingDisabled = true
     this._statusCode = status
   }
+
+  def getStatus: Int = this._statusCode
 
   def setContentLength(len: Int): Unit =
     setHeader(Headers.ContentLength, len.toString)

@@ -51,6 +51,8 @@ class ResponseWrapper(var _response: ExternalContext.Response)
   def setStatus(status: Int): Unit =
     _response.setStatus(status)
 
+  def getStatus: Int = _response.getStatus
+
   def setTitle(title: String): Unit =
     _response.setTitle(title)
 

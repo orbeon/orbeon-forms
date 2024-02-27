@@ -95,6 +95,6 @@ object AllReplacer extends Replacer {
       super.setStatus(status)
     }
 
-//    def getStatus: Int = status
+    override def getStatus: Int = status
   }
 }

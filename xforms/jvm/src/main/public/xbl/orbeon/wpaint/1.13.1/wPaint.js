@@ -831,7 +831,7 @@
                         menuContent.append(lineWidth);
                         break;
                     case 'strokeColor':
-                        menuContent.append($('<div class="_wPaint_strokeColorPicker _wPaint_colorPicker" title="' + $canvas.settings.menuTitles.strokeColor + 'r"></div>'));
+                        menuContent.append($('<div class="_wPaint_strokeColorPicker _wPaint_colorPicker" title="' + $canvas.settings.menuTitles.strokeColor + '"></div>'));
                         break;
                 }
             });

@@ -54,18 +54,24 @@ trait PersistenceApiTrait {
   case class Control(path: String, distinctValues: Seq[String])
 
   case class DataHistoryDetails(
-    modifiedTime    : Instant,
-    modifiedUsername: Option[String],
-    ownerUsername   : Option[String],
-    ownerGroup      : Option[String],
-    stage           : Option[String],
-    isDeleted       : Boolean
+
+    total              : Int,
+    minLastModifiedTime: Option[Instant],
+    maxLastModifiedTime: Option[Instant],
+
+    modifiedTime       : Instant,
+    modifiedUsername   : Option[String],
+    ownerUsername      : Option[String],
+    ownerGroup         : Option[String],
+    stage              : Option[String],
+    isDeleted          : Boolean
   )
 
   private def documentsXmlTry(
     servicePath             : String,
     queryXml                : Elem,
-    version                 : Int)(implicit
+    version                 : Int
+  )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Try[DocumentNodeInfoType] =
@@ -254,21 +260,34 @@ trait PersistenceApiTrait {
       documentsXmlTry
     }
 
-    def pageToDataDetails(page: DocumentNodeInfoType): (Iterator[DataHistoryDetails], Int, Int) =
+    def pageToDataDetails(page: DocumentNodeInfoType): (Iterator[DataHistoryDetails], Int, Int) = {
+
+      val rootElem = page.rootElement
+
+      val total        = rootElem.attValue("total").toInt
+      val minLastModifiedTime = rootElem.attValue("min-last-modified-time").trimAllToOpt
+      val maxLastModifiedTime = rootElem.attValue("max-last-modified-time").trimAllToOpt
+
+      val currentTotal = (rootElem / "document").size
+
       (
         (page.rootElement / "document").iterator map { documentElem =>
           DataHistoryDetails(
-            modifiedTime     = Instant.parse(documentElem.attValue("modified-time")),
-            modifiedUsername = documentElem.attValueOpt("modified-username").flatMap(_.trimAllToOpt),
-            ownerUsername    = documentElem.attValueOpt("owner-username").flatMap(_.trimAllToOpt),
-            ownerGroup       = documentElem.attValueOpt("owner-group").flatMap(_.trimAllToOpt),
-            stage            = documentElem.attValueOpt("stage").flatMap(_.trimAllToOpt),
-            isDeleted        = documentElem.attValue("deleted") == true.toString,
+            total               = total,
+            minLastModifiedTime = minLastModifiedTime.map(Instant.parse),
+            maxLastModifiedTime = maxLastModifiedTime.map(Instant.parse),
+            modifiedTime        = Instant.parse(documentElem.attValue("modified-time")),
+            modifiedUsername    = documentElem.attValueOpt("modified-username").flatMap(_.trimAllToOpt),
+            ownerUsername       = documentElem.attValueOpt("owner-username").flatMap(_.trimAllToOpt),
+            ownerGroup          = documentElem.attValueOpt("owner-group").flatMap(_.trimAllToOpt),
+            stage               = documentElem.attValueOpt("stage").flatMap(_.trimAllToOpt),
+            isDeleted           = documentElem.attValue("deleted") == true.toString,
           )
         },
-        page.rootElement.attValue("total").toInt,
-        (page.rootElement / "document").size
+        total,
+        currentTotal
       )
+    }
 
     callPagedService(pageNumber => readPage(pageNumber).map(pageToDataDetails))
   }

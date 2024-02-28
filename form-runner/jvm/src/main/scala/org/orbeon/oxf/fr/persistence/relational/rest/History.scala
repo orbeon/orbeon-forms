@@ -156,10 +156,12 @@ private object History {
           ((ps, i) => ps.setString(i, filename)): Setter
         }
 
-      val searchCount = {
+      val (searchTotal, minLastModifiedTime, maxLastModifiedTime) = {
 
         val sql =
-          s"""SELECT count(*)
+          s"""SELECT count(*) total,
+             |       min(a.last_modified_time) min_last_modified_time,
+             |       max(a.last_modified_time) max_last_modified_time
              |  FROM (
              |       $innerSQL
              |       ) a
@@ -168,7 +170,12 @@ private object History {
         debug(s"search total query:\n$sql")
         executeQuery(connection, sql, List(StatementPart("", setters))) { rs =>
           rs.next()
-          rs.getInt(1)
+
+          (
+            rs.getInt("total"),
+            Option(rs.getTimestamp("min_last_modified_time")).map(_.getTime),
+            Option(rs.getTimestamp("max_last_modified_time")).map(_.getTime)
+          )
         }
       }
 
@@ -200,21 +207,30 @@ private object History {
         withDocument {
           withElement(
             "documents",
-            atts = List(
-              "application-name" -> app,
-              "form-name"        -> form,
-              "document-id"      -> documentId,
-              "total"            -> searchCount.toString,
-              "page-size"        -> request.pageSize.toString,
-              "page-number"      -> request.pageNumber.toString,
-            )
+            atts =
+              List(
+                "application-name"       -> app,
+                "form-name"              -> form,
+                "document-id"            -> documentId,
+                "total"                  -> searchTotal.toString
+              ) :::
+              (searchTotal > 0).flatList(
+                List(
+                  "min-last-modified-time" -> minLastModifiedTime.map(DateUtils.formatIsoDateTimeUtc).getOrElse(throw new IllegalArgumentException),
+                  "max-last-modified-time" -> maxLastModifiedTime.map(DateUtils.formatIsoDateTimeUtc).getOrElse(throw new IllegalArgumentException)
+                )
+              ) :::
+              List(
+                "page-size"              -> request.pageSize.toString,
+                "page-number"            -> request.pageNumber.toString,
+              )
           ) {
             while(rs.next()) {
 
               if (position == 0) {
                 receiver.addAttribute("", "form-version", "form-version", rs.getString("form_version"))
                 receiver.addAttribute("", "created-time", "created-time", DateUtils.formatIsoDateTimeUtc(rs.getTimestamp("created").getTime))
-                receiver.addAttribute("", "created-username", "created-username", "TODO")
+                receiver.addAttribute("", "created-username", "created-username", "TODO") // xxx
               }
 
               val userAndGroup = UserAndGroup.fromStrings(rs.getString("username"), rs.getString("groupname"))

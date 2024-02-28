@@ -33,7 +33,7 @@ import scala.util.Try
 import scala.util.control.NonFatal
 
 
-// NOTE: Should rename to XFormsAssetRewriter?
+// Q: Should rename to `XFormsAssetRewriter`? Only used by `XFormsAssetServer`.
 object XFormsResourceRewriter {
 
   // Generate the resources into the given OutputStream. The stream is flushed and closed when done.

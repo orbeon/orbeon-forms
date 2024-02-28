@@ -183,27 +183,27 @@ object FormRunnerPersistence {
     properties.getNonBlankString(
       PersistenceProviderPropertyPrefix :: appForm.app :: appForm.form :: formOrData.entryName :: AttachmentsSuffix :: Nil mkString "."
     )
-
   // Get all providers that can be used either for form data or for form definitions
-  def getProviders(appOpt: Option[String], formOpt: Option[String], formOrData: FormOrData): List[String] =
+  // 2024-02-28: Called with `None`/`None`/`Data`, or app/form/`Form`
+  def getProviders(appOpt: Option[String], formOpt: Option[String], formOrData: FormOrData): List[String] = {
     (appOpt, formOpt) match {
       case (Some(app), Some(form)) =>
         // Get the specific provider for this app/form
-        findProvider(AppForm(app, form), FormOrData.Form).toList
+        findProvider(AppForm(app, form), formOrData).toList
+      case (appOpt, formOpt) =>
 
-      case _ =>
-        val propertyNamePrefix = appOpt match {
-          case Some(app) => PersistenceProviderPropertyPrefix + s".$app"
-          case None      => PersistenceProviderPropertyPrefix
-        }
+        val propertyName =
+          PersistenceProviderPropertyPrefix ::
+          appOpt.getOrElse("*")             ::
+          formOpt.getOrElse("*")            ::
+          formOrData.entryName              ::
+          Nil mkString "."
 
-        // Get providers using app only or independently from app/form
-        properties.propertiesStartsWith(propertyNamePrefix, matchWildcards = false)
-          .filter(propName => propName.endsWith(".*") || propName.endsWith(s".${formOrData.entryName}"))
+        properties.propertiesStartsWith(propertyName, matchWildcards = true)
           .flatMap(properties.getNonBlankString)
           .distinct
-          .filter(FormRunner.isActiveProvider)
     }
+  }.filter(FormRunner.isActiveProvider)
 
   private def providerPropertyName(provider: String, property: String): String =
     PersistencePropertyPrefix :: provider :: property :: Nil mkString "."

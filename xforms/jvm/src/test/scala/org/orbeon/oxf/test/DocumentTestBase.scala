@@ -20,7 +20,7 @@ import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsContainingDocumentBuilder}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContainingDocumentBuilder}
 
 
 abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSupport with XMLSupport {
@@ -35,7 +35,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
   def setupDocument(xhtml: dom.Document): XFormsContainingDocument = {
 
     // Initialize once
-    ResourceManagerSupport
+    ResourceManagerSupportInitializer
 
     implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
 

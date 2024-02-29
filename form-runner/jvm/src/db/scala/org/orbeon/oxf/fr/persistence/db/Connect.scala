@@ -23,13 +23,24 @@ import java.sql.{Connection, DriverManager}
 import scala.sys.process._
 import scala.util.Try
 
-private[persistence] object Connect {
+object Connect {
 
   val TestDatabaseName = "orbeon_unit_tests"
 
-  val ProvidersTestedAutomatically: List[Provider] = List(
+  lazy val ProvidersTestedAutomatically: List[Provider] = List(
     Provider.withName(sys.env("DB"))
   )
+
+  def createTables(provider: Provider, connection: java.sql.Connection)(implicit logger: IndentedLogger): Unit = {
+    val statement = connection.createStatement
+    val sql = provider match {
+      case MySQL      => "2019.1/mysql-2019_1.sql"
+      case PostgreSQL => "2019.1/postgresql-2019_1.sql"
+      case SQLite     => "2023.1/sqlite-2023_1.sql"
+    }
+    val createDDL = SQL.read(sql)
+    Logging.withDebug("creating tables") { SQL.executeStatements(provider, statement, createDDL) }
+  }
 
   def withOrbeonTables[T]
     (message: String)
@@ -40,15 +51,7 @@ private[persistence] object Connect {
       ProvidersTestedAutomatically.foreach { provider =>
         Logging.withDebug("on database", List("provider" -> provider.entryName)) {
           Connect.withNewDatabase(provider) { connection =>
-            val statement = connection.createStatement
-            // Create tables
-            val sql = provider match {
-              case MySQL      => "2019.1/mysql-2019_1.sql"
-              case PostgreSQL => "2019.1/postgresql-2019_1.sql"
-              case SQLite     => "2023.1/sqlite-2023_1.sql"
-            }
-            val createDDL = SQL.read(sql)
-            Logging.withDebug("creating tables") { SQL.executeStatements(provider, statement, createDDL) }
+            createTables(provider, connection)
             Logging.withDebug("run actual test") { block(connection, provider) }
           }
         }
@@ -60,9 +63,13 @@ private[persistence] object Connect {
     (provider: Provider)
     (block: Connection => T)
     (implicit logger: IndentedLogger)
-  : T = {
+  : T = withNewDatabase(provider, DatasourceDescriptor(provider))(block)
 
-    val datasourceDescriptor = DatasourceDescriptor(provider)
+  def withNewDatabase[T]
+    (provider: Provider, datasourceDescriptor: DatasourceDescriptor)
+    (block: Connection => T)
+    (implicit logger: IndentedLogger)
+  : T = {
 
     def logRunDocker[U](body: => U): U =
       Logging.withDebug("run Docker and wait for connection")(body)

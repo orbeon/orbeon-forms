@@ -1,0 +1,28 @@
+<!--
+  Copyright (C) 2024 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+
+    <xi:include href="oxf:/config/properties-internal.xml"/>
+    <xi:include href="oxf:/config/properties-local.xml"/>
+    <xi:include href="oxf:/config/properties-base.xml"/>
+    <xi:include href="oxf:/config/properties-xforms.xml"/>
+    <xi:include href="oxf:/config/properties-form-runner.xml"/>
+    <xi:include href="oxf:/config/properties-form-builder.xml"/>
+
+    <property as="xs:boolean" name="oxf.fr.persistence.form-definition-cache.enable" value="false"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"               value="sqlite"/>
+    <property as="xs:anyURI"  name="oxf.log4j2-config"                               value="oxf:/log4j2.xml"/>
+</properties>

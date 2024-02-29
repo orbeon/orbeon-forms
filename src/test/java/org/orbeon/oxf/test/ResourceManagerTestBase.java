@@ -33,7 +33,7 @@ public abstract class ResourceManagerTestBase {
 
     @BeforeClass
     public static void staticSetup() throws Exception {
-        ResourceManagerSupport$.MODULE$.initializeJava();
+        ResourceManagerSupportInitializer$.MODULE$.initializeJava();
 	}
 
     private PipelineContext pipelineContext;

@@ -17,7 +17,7 @@ import org.orbeon.oxf.fr.persistence.db.Connect.TestDatabaseName
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL, SQLite}
 
-import java.io.File
+import java.nio.file.{Files, Path, Paths}
 
 case class DatasourceDescriptor(
   name      : String,
@@ -54,19 +54,19 @@ object DatasourceDescriptor {
       case SQLite =>
         // SQLite file will be created in the current directory. This is fine for tests.
 
-        val sqliteFilename = "test-db.sqlite"
-
-        // Delete the file if it exists
-        new File(sqliteFilename).delete()
-
-        DatasourceDescriptor(
-          name      = provider.entryName,
-          driver    = "org.sqlite.JDBC",
-          url       = s"jdbc:sqlite:$sqliteFilename",
-          username  = "",
-          password  = "",
-          switchDB  = None
-        )
+        val sqliteFile = Paths.get("test-db.sqlite")
+        Files.deleteIfExists(sqliteFile)
+        sqliteDatasourceDescriptor(sqliteFile)
     }
   }
+
+  def sqliteDatasourceDescriptor(file: Path): DatasourceDescriptor =
+    DatasourceDescriptor(
+      name      = Provider.SQLite.entryName,
+      driver    = "org.sqlite.JDBC",
+      url       = s"jdbc:sqlite:$file",
+      username  = "",
+      password  = "",
+      switchDB  = None
+    )
 }

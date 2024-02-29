@@ -1,7 +1,5 @@
-import sbt.Keys._
-import org.orbeon.sbt.OrbeonSupport
-import org.orbeon.sbt.OrbeonSupport._
-import org.orbeon.sbt.OrbeonWebappPlugin
+import org.orbeon.sbt.OrbeonSupport.*
+import org.orbeon.sbt.{OrbeonSupport, OrbeonWebappPlugin}
 import org.scalajs.linker.interface.ESVersion
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
@@ -256,13 +254,13 @@ val TestResourceManagerPaths = List(
   "orbeon-war/jvm/src/main/webapp/WEB-INF/resources"
 )
 
-def resourceManagerProperties(buildBaseDirectory: File): List[String] = {
+def resourceManagerProperties(buildBaseDirectory: File, resourceManagerPaths: List[String]): List[String] = {
 
   val pkg = "org.orbeon.oxf.resources"
 
   val props =
     for {
-      (dir, i)    <- TestResourceManagerPaths.zipWithIndex
+      (dir, i)    <- resourceManagerPaths.zipWithIndex
       absoluteDir = buildBaseDirectory / dir
     }
       yield
@@ -289,7 +287,7 @@ def testJavaOptions(buildBaseDirectory: File) =
     // Getting a JDK error, per http://stackoverflow.com/a/13575810/5295
     "-Djava.util.Arrays.useLegacyMergeSort=true"
   ) ++
-    resourceManagerProperties(buildBaseDirectory)
+    resourceManagerProperties(buildBaseDirectory, TestResourceManagerPaths)
 
 def jUnitTestArguments(buildBaseDirectory: File) =
   List(
@@ -299,7 +297,7 @@ def jUnitTestArguments(buildBaseDirectory: File) =
     "-a",
     "-oF"
   ) ++
-    resourceManagerProperties(buildBaseDirectory)
+    resourceManagerProperties(buildBaseDirectory, TestResourceManagerPaths)
 
 def jUnitTestOptions =
   List(
@@ -1238,13 +1236,69 @@ lazy val servletSupport = (project in file("servlet-support"))
 
 // JAR file for dynamic servlet instantiation
 lazy val servletContainerInitializer = (project in file("servlet-container-initializer"))
-  .dependsOn(formRunnerJVM, xformsJVM, servletSupport)
+  .dependsOn(formRunnerJVM)
   .settings(commonSettings: _*)
   .settings(
     name := "servlet-container-initializer",
     libraryDependencies += "javax.servlet"   % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
     libraryDependencies += "jakarta.servlet" % "jakarta.servlet-api" % JakartaServletApiVersion % Provided
   )
+
+val DemoSqliteDatabaseResourceManagerPaths = List(
+  "demo-sqlite-database/src/main/resources",
+  "orbeon-war/jvm/src/main/webapp/WEB-INF/resources"
+)
+
+lazy val demoSqliteDatabase = (project in file("demo-sqlite-database"))
+  .dependsOn(formBuilderJVM, formRunnerJVM % "compile->db; compile->test", core % "compile->test")
+  .settings(commonSettings: _*)
+  .settings(
+    name := "demo-sqlite-database",
+    javaOptions ++= resourceManagerProperties((ThisBuild / baseDirectory).value, DemoSqliteDatabaseResourceManagerPaths),
+    //javaOptions += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=61155",
+    fork := true // Fork so that the Java options are taken into account
+  )
+
+root / Compile / resourceGenerators += Def.taskDyn {
+  import java.nio.file.{Files, StandardCopyOption}
+
+  val rootPath               = Path.absolute((root / baseDirectory).value)
+  val inputFilesDirectory    = rootPath / "data" / "orbeon" / "fr"
+  val sqliteDatabaseFilename = "orbeon-demo.sqlite"
+  val generatedFile          = (Compile / resourceManaged).value / sqliteDatabaseFilename
+  val generatedFileInWebInf  = rootPath / "orbeon-war/jvm/target/webapp/WEB-INF" / sqliteDatabaseFilename
+
+  def allFilesIn(directory: File): Seq[File] = {
+    val files = directory.listFiles
+    files.filter(_.isFile) ++ files.filter(_.isDirectory).flatMap(allFilesIn)
+  }
+
+  // Consider all .xml/.xhtml/.bin files in data/orbeon/fr as input files (do not ignore .DS_Store, etc. for now)
+  val inputFiles = allFilesIn(inputFilesDirectory)
+
+  Def.task {
+    def generateDemoSqliteDatabase(in: Set[File]): Set[File] = {
+      // Running DemoSqliteDatabase here using (demoSqliteDatabase / Compile / runMain).toTask(...).value doesn't work
+
+      (demoSqliteDatabase / Runtime / runner).value.run(
+        "org.orbeon.oxf.util.DemoSqliteDatabase",
+        (demoSqliteDatabase / Runtime / dependencyClasspath).value.files,
+        Seq(inputFilesDirectory.toString, generatedFile.toString),
+        streams.value.log
+      ).get
+
+      // Copy the generated file to WEB-INF
+      Files.createDirectories(generatedFileInWebInf.toPath.getParent)
+      Files.copy(generatedFile.toPath, generatedFileInWebInf.toPath, StandardCopyOption.REPLACE_EXISTING)
+
+      Set(generatedFile)
+    }
+
+    // Generate the file only if it doesn't exist or if any of the input files has changed
+    val cachedFunction = FileFunction.cached(streams.value.cacheDirectory / "sqlite-cache")(generateDemoSqliteDatabase)
+    cachedFunction(inputFiles.toSet).toSeq
+  }
+}.taskValue
 
 lazy val orbeonWar = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Dummy) in file("orbeon-war"))
   .settings(
@@ -1269,22 +1323,7 @@ lazy val orbeonWarJVM = orbeonWar.jvm
   .settings(OrbeonWebappPlugin.projectSettings: _*)
   .settings(commonSettings: _*)
   .settings(
-    exportJars := false,
-
-    // TODO: Integrate SQLite script in a cleaner way, e.g. via dependencies. We should also avoid
-    //    running it on every compile.
-    Compile / compile := {
-      val compileAnalysis = (Compile / compile).value
-
-      import scala.sys.process._
-
-      // Generate SQLite file from demo data files
-      //Seq("amm", "import-sample-data-into-sqlite.sc", (ThisBuild / baseDirectory).value.toString).!
-      Seq("mkdir", "-p", "orbeon-war/jvm/target/webapp/WEB-INF").!
-      Seq("cp", "data/orbeon-demo.sqlite", "orbeon-war/jvm/target/webapp/WEB-INF/orbeon-demo.sqlite").!
-
-      compileAnalysis
-    }
+    exportJars := false
   )
 
 lazy val orbeonWarJS = orbeonWar.js
@@ -1339,6 +1378,7 @@ lazy val root = (project in file("."))
     formRunnerProxyPortlet,
     fullPortlet,
     servletContainerInitializer,
+    demoSqliteDatabase,
     orbeonWarJVM,
     orbeonWarJS
   )

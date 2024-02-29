@@ -33,4 +33,3 @@ trait ResourceManagerSupport extends Suite with BeforeAndAfter {
     after  { pipelineContext foreach (_.destroy(true)) }
   }
 }
-  def newIndentedLogger: IndentedLogger = new IndentedLogger(logger, true)

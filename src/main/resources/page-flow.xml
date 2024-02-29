@@ -19,7 +19,7 @@
 
     <!-- ==== Files ================================================================================================ -->
 
-    <files path="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|map|png|jpg|xsd|ico|html|txt|svg|ttf|eot|woff|woff2)"/>
+    <files path="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|map|png|jpg|xml|xsd|ico|html|txt|svg|ttf|eot|woff|woff2)"/>
 
     <!-- ==== Pages ================================================================================================ -->
 

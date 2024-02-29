@@ -265,9 +265,12 @@ object AssetsAggregator extends Logging {
       def namespace = namespaceOpt map (s"?${Constants.EmbeddingNamespaceParameter}=" + _) getOrElse ""
 
       // Output link to resource
-      val path = "" :: "xforms-server" ::
+      val path =
+        ""                                                                                      ::
+        "xforms-server"                                                                         ::
         (URLRewriterUtils.isResourcesVersioned list URLRewriterUtils.getOrbeonVersionForClient) :::
-        "orbeon-" + resourcesHash + extension + namespace :: Nil mkString "/"
+        "orbeon-" + resourcesHash + extension + namespace                                       ::
+        Nil mkString "/"
 
       debug("aggregating resources", Seq(
         "isCSS"          -> isCSS.toString,

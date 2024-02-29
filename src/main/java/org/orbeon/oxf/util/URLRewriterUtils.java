@@ -158,7 +158,7 @@ public class URLRewriterUtils {
 
             // TODO: get version only once for a run
             final String applicationVersion = getApplicationResourceVersion();
-            if (!isPlatformURL && (applicationVersion == null || isSeparateDeployment(request))) {
+            if (! isPlatformURL && (applicationVersion == null || isSeparateDeployment(request))) {
                 // There is no application version OR we are in separate deployment so do usual rewrite
                 return URLRewriterImpl.rewriteURL(request, urlString, rewriteMode);
             }

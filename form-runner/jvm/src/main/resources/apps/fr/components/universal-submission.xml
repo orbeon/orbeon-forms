@@ -35,7 +35,7 @@
             let $params := xxf:split(event('content'))
             return
                 if ($params = ('pdf-url', 'tiff-url', 'excel-with-named-ranges-url', 'xml-form-structure-and-data-url')) then
-                    xxf:element('url', event('binary-content-url')/string())
+                    xxf:element('url', event('binary-content-url'))
                 else if (xxf:non-blank(event('binary-content-url'))) then
                    event('binary-content-url')
                 else if ($params = 'metadata') then
@@ -55,7 +55,7 @@
         xxf:target="{event('formtarget')}"
         xxf:response-url-type="{'resource'[event('response-is-resource') = 'true']}">
 
-        <xf:header ref="event('headers')/tokenize(., '\r?\n', '')[contains(., ':')]">
+        <xf:header ref="tokenize(event('headers'), '\r?\n', '')[contains(., ':')]">
             <xf:name  value="xxf:trim(substring-before(., ':'))"/>
             <xf:value value="xxf:trim(substring-after(., ':'))"/>
         </xf:header>

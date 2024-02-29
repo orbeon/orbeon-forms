@@ -55,5 +55,6 @@ object Constants {
 
   val EmbeddingNamespaceParameter = "orbeon-embedding-namespace"
   val EmbeddingContextParameter   = "orbeon-embedding-context"
+  val UrlRewriteParameter         = "orbeon-url-rewrite"
   val UpdatesParameter            = "updates"
 }

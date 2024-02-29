@@ -42,12 +42,14 @@ object XFormsResourceRewriter {
     namespaceOpt : Option[String],
     os           : OutputStream,
     isCSS        : Boolean,
-    isMinimal    : Boolean)(implicit
+    isMinimal    : Boolean,
+    isCssNoPrefix: Boolean
+  )(implicit
     logger       : IndentedLogger
   ): Unit =
     useAndClose(os) { _ =>
       if (isCSS)
-        generateCSS(assetPaths, namespaceOpt, os, isMinimal)
+        generateCSS(assetPaths, namespaceOpt, os, isMinimal, isCssNoPrefix)
       else
         generateJS(assetPaths, os, isMinimal)
 
@@ -63,7 +65,9 @@ object XFormsResourceRewriter {
     assetPaths   : List[AssetPath],
     namespaceOpt : Option[String],
     os           : OutputStream,
-    isMinimal    : Boolean)(implicit
+    isMinimal    : Boolean,
+    isCssNoPrefix: Boolean
+  )(implicit
     logger       : IndentedLogger
   ): Unit = {
 
@@ -122,7 +126,7 @@ object XFormsResourceRewriter {
         if (! isMinimal)
           outputWriter.write("/* Original CSS path: " + path + " */\n")
 
-        outputWriter.write(rewriteCSS(originalCSS, path, namespaceOpt, response))
+        outputWriter.write(rewriteCSS(originalCSS, path, namespaceOpt, response, isCssNoPrefix))
     }
 
     outputWriter.flush()
@@ -137,7 +141,9 @@ object XFormsResourceRewriter {
     css          : String,
     resourcePath : String,
     namespaceOpt : Option[String],
-    response     : ExternalContext.Response)(implicit
+    response     : ExternalContext.Response,
+    isCssNoPrefix: Boolean
+  )(implicit
     logger       : IndentedLogger
   ): String = {
 
@@ -151,7 +157,7 @@ object XFormsResourceRewriter {
     def tryRewriteURL(url: String) =
       Try {
         val resolvedURI = NetUtils.resolveURI(url, resourcePath)
-        val rewrittenURI = response.rewriteResourceURL(resolvedURI, UrlRewriteMode.AbsolutePathOrRelative)
+        val rewrittenURI = response.rewriteResourceURL(resolvedURI, if (isCssNoPrefix) UrlRewriteMode.AbsolutePathNoPrefix else UrlRewriteMode.AbsolutePathOrRelative)
         "url(" + rewrittenURI + ")"
       } recover {
         case NonFatal(_) =>

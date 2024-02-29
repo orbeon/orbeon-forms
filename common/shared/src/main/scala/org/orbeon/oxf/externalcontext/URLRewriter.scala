@@ -21,6 +21,7 @@ object UrlRewriteMode {
   case object AbsolutePathNoContext  extends UrlRewriteMode
   case object AbsolutePath           extends UrlRewriteMode
   case object AbsoluteNoContext      extends UrlRewriteMode
+  case object AbsolutePathNoPrefix   extends UrlRewriteMode // no context and no version prefix
 }
 
 trait URLRewriter {

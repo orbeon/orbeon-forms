@@ -64,7 +64,16 @@ class XFormsAssetServer extends ProcessorImpl {
         val isCSS = ext == "css"
 
         def redirect(path: String): Unit = {
-          val pathWithContext = response.rewriteRenderURL(path)
+
+          val pathWithContext =
+            response.rewriteRenderURL(
+              // https://github.com/orbeon/orbeon-forms/issues/6170
+              if (externalContext.getRequest.getFirstParamAsString(Constants.UrlRewriteParameter).contains("noprefix"))
+                PathUtils.recombineQuery(path, List(Constants.UrlRewriteParameter -> "noprefix"))
+              else
+                path
+            )
+
           response.sendRedirect(pathWithContext, isServerSide = false, isExitPortal = false)
         }
 
@@ -334,8 +343,11 @@ class XFormsAssetServer extends ProcessorImpl {
       nsFromParameters orElse nsFromContainer filter (_.nonEmpty)
     }
 
+    val isCssNoPrefix =
+      externalContext.getRequest.getFirstParamAsString(Constants.UrlRewriteParameter).contains("noprefix")
+
     debug("caching not requested, serving directly", Seq("request path" -> externalContext.getRequest.getRequestPath))
-    XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)
+    XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal, isCssNoPrefix)
   }
 }
 

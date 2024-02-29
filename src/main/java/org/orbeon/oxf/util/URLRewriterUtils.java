@@ -164,7 +164,7 @@ public class URLRewriterUtils {
             }
 
             // 3. Iterate through matchers and see if we get a match
-            if (isVersionedURL(absolutePathNoContext, pathMatchers)) {
+            if (rewriteMode != UrlRewriteMode.AbsolutePathNoPrefix$.MODULE$ && isVersionedURL(absolutePathNoContext, pathMatchers)) {
                 // 4. Found a match, perform additional rewrite at the beginning
                 final String version = isPlatformURL ? URLRewriterUtils.getOrbeonVersionForClient() : applicationVersion;
                 // Call full method so that we can get the proper client context path
@@ -173,7 +173,13 @@ public class URLRewriterUtils {
             }
 
             // No match found, perform regular rewrite
-            return URLRewriterImpl.rewriteURL(request, urlString, rewriteMode);
+            return URLRewriterImpl.rewriteURL(
+                request,
+                urlString,
+                rewriteMode == UrlRewriteMode.AbsolutePathNoPrefix$.MODULE$
+                    ? UrlRewriteMode.AbsolutePathNoContext$.MODULE$
+                    : rewriteMode
+            );
         } else {
             // No Page Flow context, perform regular rewrite
             return URLRewriterImpl.rewriteURL(request, urlString, rewriteMode);

@@ -1,3 +1,15 @@
+@import (reference)  "../../../apps/fr/style/form-runner-common";
+
 .xbl-fr-databound-select1 {
     display: inline;
+
+    .fr-service-error select {
+        background: repeating-linear-gradient(
+          -45deg,
+          @wellBackground,
+          @wellBackground 5px,
+          @inputBackground 5px,
+          @inputBackground 10px
+        );
+    }
 }

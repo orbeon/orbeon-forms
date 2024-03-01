@@ -26,6 +26,8 @@ object ResourceManagerSupportInitializer extends WithResourceManagerSupport {
 
 trait ResourceManagerSupport extends Suite with BeforeAndAfter {
 
+  ResourceManagerSupportInitializer
+
   locally {
     var pipelineContext: Option[PipelineContext] = None
 

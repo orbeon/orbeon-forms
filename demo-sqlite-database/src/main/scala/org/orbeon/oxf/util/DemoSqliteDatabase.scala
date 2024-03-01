@@ -47,8 +47,6 @@ object DemoSqliteDatabase {
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(DemoSqliteDatabase.getClass), true)
 
   def importFiles(dataFiles: Path, sqliteFile: Path): Unit = {
-    println(s"$dataFiles -> $sqliteFile")
-
     // Delete any pre-existing SQLite file and make sure the target directory exists
     Files.deleteIfExists(sqliteFile)
     Files.createDirectories(sqliteFile.getParent)

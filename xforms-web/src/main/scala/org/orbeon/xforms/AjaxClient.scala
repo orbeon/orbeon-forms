@@ -314,16 +314,11 @@ object AjaxClient {
           processEvents(currentForm, eventsForCurrentForm.reverse)
       }
 
-<<<<<<< HEAD
-    def canSendEvents: Boolean = ! ajaxRequestInProgress && ! paused
-||||||| parent of 22c2c9d83f (Fix #6200: Prevent queue from being blocked on failure)
-    def canSendEvents: Boolean = ! EventQueue.ajaxRequestInProgress
-=======
     def canSendEvents: Boolean = {
-      logger.debug(s"canSendEvents: ${! EventQueue.ajaxRequestInProgress}")
-      ! EventQueue.ajaxRequestInProgress
+      val canSend = !EventQueue.ajaxRequestInProgress && !paused
+      logger.debug(s"canSendEvents: $canSend")
+      canSend
     }
->>>>>>> 22c2c9d83f (Fix #6200: Prevent queue from being blocked on failure)
 
     var shortDelay       : FiniteDuration = _
     var incrementalDelay : FiniteDuration = _

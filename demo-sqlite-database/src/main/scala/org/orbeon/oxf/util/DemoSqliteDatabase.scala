@@ -60,7 +60,7 @@ object DemoSqliteDatabase {
 
         Connect.createTables(Provider.SQLite, connection)
 
-        val filesToImport = Files.walk(dataFiles)
+        val unsortedFilesToImport = Files.walk(dataFiles)
           .filter(_.toFile.isFile)
           .filter { file =>
             val baseName  = FilenameUtils.getBaseName(file.toString)
@@ -72,7 +72,11 @@ object DemoSqliteDatabase {
           .asScala
           .toSeq
 
-        for (filesToImport <- filesToImport) {
+        // Import form definitions first, then data files
+        val (formFilesToImport, dataFilesToImport) = unsortedFilesToImport.partition(_.toString.endsWith(FormRunnerPersistence.FormXhtml))
+        val sortedFilesToImport                    = formFilesToImport ++ dataFilesToImport
+
+        for (filesToImport <- sortedFilesToImport) {
           importFile(dataFiles, filesToImport)
         }
       }

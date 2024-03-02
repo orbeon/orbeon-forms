@@ -639,8 +639,8 @@ object XFormsServer {
         uri    = XXFORMS_NAMESPACE_URI,
         atts   = List(
           "name"        -> scriptInvocation.script.shared.clientName,
-          "target-id"   -> doc.namespaceId(scriptInvocation.targetEffectiveId),
-          "observer-id" -> doc.namespaceId(scriptInvocation.observerEffectiveId)
+          "target-id"   -> doc.namespaceId(scriptInvocation.targetEffectiveId.getOrElse("")),
+          "observer-id" -> doc.namespaceId(scriptInvocation.observerEffectiveId.getOrElse(""))
         )
       ) {
 

@@ -36,8 +36,8 @@ object ScriptType {
 
 case class ScriptInvocation(
   script              : StaticScript,
-  targetEffectiveId   : String,
-  observerEffectiveId : String,
+  targetEffectiveId   : Option[String],
+  observerEffectiveId : Option[String],
   paramValues         : List[String]
 )
 

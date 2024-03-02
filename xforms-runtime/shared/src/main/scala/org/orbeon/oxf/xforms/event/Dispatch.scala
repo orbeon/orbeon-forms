@@ -118,7 +118,7 @@ object Dispatch extends Logging {
             // All ancestor observers (not filtered by scope) gathered lazily so that if there is nothing
             // to do for capture and bubbling, we don't compute them.
             lazy val ancestorObservers =
-              Iterator.iterate(target.parentEventObserver)(_.parentEventObserver).takeWhile(_ ne null).toList
+              target.iterateAncestorEventTargets(includeSelf = false, includeComponents = false).toList
 
             // Capture phase
             handlers.get(Phase.Capture) foreach (doPhase(ancestorObservers.reverse, _, Phase.Capture))

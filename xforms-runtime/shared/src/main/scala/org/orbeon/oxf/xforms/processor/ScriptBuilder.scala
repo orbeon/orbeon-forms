@@ -181,8 +181,8 @@ object ScriptBuilder {
         yield
           rpc.UserScript(
             functionName = script.script.shared.clientName,
-            targetId     = containingDocument.namespaceId(script.targetEffectiveId),
-            observerId   = containingDocument.namespaceId(script.observerEffectiveId),
+            targetId     = containingDocument.namespaceId(script.targetEffectiveId.getOrElse("")),
+            observerId   = containingDocument.namespaceId(script.observerEffectiveId.getOrElse("")),
             paramValues  = script.paramValues
           ),
       messagesToRun =

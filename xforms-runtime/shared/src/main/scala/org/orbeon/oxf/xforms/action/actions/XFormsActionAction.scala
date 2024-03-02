@@ -21,6 +21,8 @@ import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, VariableAnalysisTra
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsVariableControl
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
+import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.xforms.XFormsNames
 
 /**
@@ -35,27 +37,22 @@ class XFormsActionAction extends XFormsAction {
     val actionAnalysis    = actionContext.analysis
     val bindingContext    = actionContext.bindingContext
 
-    def observerAncestorsOrSelfIterator(observer: XFormsEventTarget) =
-      Iterator.iterate(observer)(_.parentEventObserver) takeWhile (_ ne null)
-
-    def hasClientRepresentation(observer: XFormsEventTarget) =
-      observer match {
-        case _: XFormsVariableControl => false
-        case c: XFormsControl if c.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME) => false
-        case _ => true
-      }
-
-    def firstClientRepresentation(observer: XFormsEventTarget) =
-      observerAncestorsOrSelfIterator(observer) find hasClientRepresentation
-
     actionContext.partAnalysis.scriptsByPrefixedId.get(actionAnalysis.prefixedId) match {
       case Some(script @ StaticScript(_, ScriptType.JavaScript, paramExpressions, _)) =>
         // Evaluate script parameters if any and schedule the script to run
+
+        def firstClientRepresentation(eventTarget: XFormsEventTarget): Option[XFormsEventTarget] =
+          eventTarget.iterateAncestorEventTargets(includeSelf = true, includeComponents = true).find {
+            case _ @ (_: XFormsVariableControl | _: XFormsModelSubmission | _: XFormsModel | _: XFormsInstance) => false
+            case c: XFormsControl if c.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)               => false
+            case _                                                                                              => true
+          }
+
         actionInterpreter.containingDocument.addScriptToRun(
           ScriptInvocation(
             script              = script,
-            targetEffectiveId   = actionContext.interpreter.event.targetObject.getEffectiveId,
-            observerEffectiveId = firstClientRepresentation(actionContext.interpreter.eventObserver) map (_.getEffectiveId) getOrElse "",
+            targetEffectiveId   = firstClientRepresentation(actionContext.interpreter.event.targetObject).map(_.getEffectiveId),
+            observerEffectiveId = firstClientRepresentation(actionContext.interpreter.eventObserver).map(_.getEffectiveId),
             paramValues         = paramExpressions map { expr =>
               // https://github.com/orbeon/orbeon-forms/issues/2499
               actionInterpreter.evaluateAsString(

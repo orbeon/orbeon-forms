@@ -14,8 +14,10 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.datatypes.LocationData
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
@@ -45,4 +47,10 @@ trait XFormsEventTarget extends XFormsObject {
   def addListener(eventName: String, listener: EventListener): Unit
   def removeListener(eventName: String, listener: Option[EventListener]): Unit
   def getListeners(eventName: String): immutable.Seq[EventListener]
+
+  def iterateAncestorEventTargets(includeSelf: Boolean, includeComponents: Boolean): Iterator[XFormsEventTarget] =
+    includeSelf.iterator(this) ++ Iterator.iterate(parentEventObserver){
+        case v: XFormsModel if includeComponents => v.container.associatedControlOpt.orNull
+        case v                                   => v.parentEventObserver
+      }.takeWhile(_ ne null)
 }

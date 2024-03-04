@@ -148,8 +148,8 @@
                         <xf:setvalue ref="instance('status')/@submission-ran" value=". + 1"/>
                     </xf:action>
                     <xf:action event="xforms-submit-error">
-                        <xf:setvalue ref="instance('status')/@submission-status">error</xf:setvalue>
-                        <xf:insert ref="instance('itemset')" origin="xf:element('_', xf:attribute('fr:error', ''))"/>
+                        <xf:setvalue ref="instance('status')/@submission-status">failure</xf:setvalue>
+                        <xf:insert ref="instance('itemset')" origin="xf:element('_')"/>
                         <xf:action type="xpath">
                             fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')
                         </xf:action>
@@ -178,7 +178,7 @@
                 ref="$binding"
                 id="select1"
                 xbl:attr="xxf:encrypt-item-values autocomplete"
-                class="{'fr-service-error'[instance('status')/@submission-status = 'error']}">
+                class="{'fr-service-error'[instance('status')/@submission-status = 'failure']}">
                 <!-- Blank item -->
                 <xf:item>
                     <xf:label/>

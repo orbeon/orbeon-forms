@@ -331,6 +331,7 @@
                                     <itemset-ref><xsl:value-of select="xf:itemset/@ref"/></itemset-ref>
                                     <label-ref><xsl:value-of select="xf:itemset/xf:label/@ref"/></label-ref>
                                     <value-ref><xsl:value-of select="xf:itemset/xf:value/@ref"/></value-ref>
+                                    <submission-status/>
                                 </_>
                             </xf:instance>
 
@@ -359,6 +360,16 @@
                                     <xf:name>User-Agent</xf:name>
                                     <xf:value>OrbeonForms</xf:value>
                                 </xf:header>
+
+                                <xf:action event="xforms-submit-done">
+                                    <xf:setvalue ref="instance('local')/submission-status">success</xf:setvalue>
+                                </xf:action>
+                                <xf:action event="xforms-submit-error">
+                                    <xf:setvalue ref="instance('local')/submission-status">failure</xf:setvalue>
+                                    <xf:action type="xpath">
+                                        fr:run-process-by-name('oxf.fr.detail.process', 'action-action-error')
+                                    </xf:action>
+                                </xf:action>
 
                                 <xf:action event="xforms-submit-done" if="event('fr-for') = 'enabled-or-changed'">
 
@@ -497,6 +508,7 @@
                         <xf:group
                             ref=".[not($view)]"
                             xxf:element="span"
+                            class="{{'fr-service-error'[instance('local')/submission-status = 'failure']}}"
                             data-placeholder="{{xxf:r('select')}}"
                             data-service-performs-search="{$service-performs-search}"
                             data-min-input-length="{{$min-input-length}}"

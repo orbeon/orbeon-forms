@@ -1311,6 +1311,8 @@ lazy val demoSqliteDatabase = (project in file("demo-sqlite-database"))
   .settings(
     name := "demo-sqlite-database",
     javaOptions ++= resourceManagerProperties((ThisBuild / baseDirectory).value, DemoSqliteDatabaseResourceManagerPaths),
+    // See #6104: to avoid reflection warnings, at the cost of a few resource leaks
+    javaOptions += "--illegal-access=deny",
     //javaOptions += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=61155",
     fork := true // Fork so that the Java options are taken into account
   )

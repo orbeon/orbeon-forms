@@ -270,46 +270,8 @@
                 <!-- Call service -->
                 <xf:send submission="get-result">
                     <xf:property name="fr-resource" value="$resource"/>
+                    <xf:property name="fr-for"      value="'fr-search'" xxf:tunnel="true"/>
                 </xf:send>
-
-                <!-- Build JSON for Select2 -->
-                <xf:delete ref="instance('result-json')/*"/>
-                <xf:var name="items" value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
-                <xf:insert
-                    ref="instance('result-json')"
-                    origin="
-                        xf:element(
-                            '_',
-                            (
-                                xf:attribute('type', 'array'),
-                                for $item in $items return
-                                    xf:element(
-                                        '_',
-                                        (
-                                            xf:attribute('type', 'object'),
-                                            xf:element  ('id'  , string($item/xxf:evaluate(instance('local')/value-ref))),
-                                            xf:element  ('text', string($item/xxf:evaluate(instance('local')/label-ref)))
-                                        )
-                                    )
-                            )
-                        )"/>
-
-                <xf:var
-                    name="is-last-page"
-                    value="
-                        if (instance('local')/service-supports-paging = 'true')
-                        then instance('result-raw')/xxf:evaluate(instance('local')/is-last-page-ref)
-                        else 'true'"/>
-
-                <!-- Send JSON to Scala.js, which will pass it to Select2 to update the list of suggestions -->
-                <xf:action type="javascript">
-                    <xf:param name="results"    value="xxf:xml-to-json(instance('result-json'))"/>
-                    <xf:param name="isLastPage" value="$is-last-page"/>
-                    <xf:body>
-                        var i = ORBEON.xforms.XBL.instanceForControl(this);
-                        if (i) i.updateSuggestions(results, isLastPage);
-                    </xf:body>
-                </xf:action>
             </xbl:handler>
 
             <!-- Scala.js tells us that a new value was selected, save the label -->
@@ -374,13 +336,20 @@
 
                             <xf:instance id="result-raw" ><_/></xf:instance>
                             <xf:instance id="result-json"><_/></xf:instance>
+
+                            <xf:var name="binding"                   value="xxf:binding('fr-databound-select1-search')"/>
+                            <xf:var name="auto-select-unique-choice" value="xxf:component-param-value('auto-select-unique-choice') = 'true'"/>
+                            <xf:var name="open-selection"            value="fr:component-param-value('selection')"/>
+                            <xf:var name="is-open-selection"         value="$open-selection = 'open'"/>
+
                             <xf:submission
                                     id="get-result"
                                     method="get"
                                     resource="{{event('fr-resource')}}"
                                     replace="instance"
                                     instance="result-raw"
-                                    serialization="none">
+                                serialization="none"
+                                mode="{{if (fr:is-browser-environment()) then 'asynchronous' else 'synchronous'}}">
                                 <!--
                                     Set user agent for services that require one, like GitHub's API
                                     (we should have more general solution, like setting a User-Agent by default,
@@ -390,13 +359,75 @@
                                     <xf:name>User-Agent</xf:name>
                                     <xf:value>OrbeonForms</xf:value>
                                 </xf:header>
+
+                                <xf:action event="xforms-submit-done" if="event('fr-for') = 'enabled-or-changed'">
+
+                                    <xf:var name="label-from" value="event('label-from')"/>
+
+                                    <xf:var name="items"               value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
+                                    <xf:var name="items-values"        value="$items/xxf:evaluate(instance('local')/value-ref)"/>
+                                    <xf:var name="current-item"        value="$items[xxf:evaluate(instance('local')/value-ref) = $binding]"/>
+                                    <xf:var name="current-impossible"  value="not($is-open-selection) and xxf:non-blank($binding) and empty($current-item)"/>
+                                    <xf:var name="current-label"       value="$current-item/xxf:evaluate(instance('local')/label-ref)"/>
+                                    <xf:var name="unique-choice"       value="count($items) = 1 and $auto-select-unique-choice and
+                                                                              (not($is-open-selection) or xxf:is-blank($binding))"/>
+                                    <xf:var name="unique-choice-value" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/value-ref) else ()"/>
+                                    <xf:var name="unique-choice-label" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/label-ref) else ()"/>
+                                    <xf:setvalue if="$label-from = 'service'" ref="instance('local')/label" value="$current-label"/>
+                                    <xf:action if="$current-impossible">
+                                        <xf:setvalue ref="$binding"/>
+                                        <xf:setvalue ref="instance('local')/label"/>
+                                    </xf:action>
+                                    <xf:action if="$unique-choice">
+                                        <xf:setvalue ref="$binding"                value="$unique-choice-value"/>
+                                        <xf:setvalue ref="instance('local')/label" value="$unique-choice-label"/>
+                                    </xf:action>
+                                </xf:action>
+                                <xf:action event="xforms-submit-done" if="event('fr-for') = 'fr-search'">
+
+                                    <!-- Build JSON for Select2 -->
+                                    <xf:delete ref="instance('result-json')/*"/>
+                                    <xf:var name="items" value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
+                                    <xf:insert
+                                        ref="instance('result-json')"
+                                        origin="
+                                            xf:element(
+                                                '_',
+                                                (
+                                                    xf:attribute('type', 'array'),
+                                                    for $item in $items return
+                                                        xf:element(
+                                                            '_',
+                                                            (
+                                                                xf:attribute('type', 'object'),
+                                                                xf:element  ('id'  , string($item/xxf:evaluate(instance('local')/value-ref))),
+                                                                xf:element  ('text', string($item/xxf:evaluate(instance('local')/label-ref)))
+                                                            )
+                                                        )
+                                                )
+                                            )"/>
+
+                                    <xf:var
+                                        name="is-last-page"
+                                        value="
+                                            if (instance('local')/service-supports-paging = 'true')
+                                            then instance('result-raw')/xxf:evaluate(instance('local')/is-last-page-ref)
+                                            else 'true'"/>
+
+                                    <!-- Send JSON to Scala.js, which will pass it to Select2 to update the list of suggestions -->
+                                    <xf:action type="javascript">
+                                        <xf:param name="results"    value="xxf:xml-to-json(instance('result-json'))"/>
+                                        <xf:param name="isLastPage" value="$is-last-page"/>
+                                        <xf:body>
+                                            var i = ORBEON.xforms.XBL.instanceForControl(this);
+                                            if (i) i.updateSuggestions(results, isLastPage);
+                                        </xf:body>
+                                    </xf:action>
+                                </xf:action>
+
                             </xf:submission>
 
                         </xf:model>
-                        <xf:var name="binding"                   value="xxf:binding('fr-databound-select1-search')"/>
-                        <xf:var name="auto-select-unique-choice" value="xxf:component-param-value('auto-select-unique-choice') = 'true'"/>
-                        <xf:var name="open-selection"            value="fr:component-param-value('selection')"/>
-                        <xf:var name="is-open-selection"         value="$open-selection = 'open'"/>
 
                         <!-- Maintain `instance('local')/label` and do auto-selection -->
                         <xf:group xxf:appearance="internal">
@@ -435,25 +466,9 @@
                                                 <xf:var name="resource"><xxf:value xxbl:scope="outer" value="$resource"/></xf:var>
                                                 <xf:send submission="get-result">
                                                     <xf:property name="fr-resource" value="$resource"/>
+                                                    <xf:property name="fr-for"      value="'enabled-or-changed'" xxf:tunnel="true"/>
+                                                    <xf:property name="label-from"  value="$label-from"          xxf:tunnel="true"/>
                                                 </xf:send>
-                                                <xf:var name="items"               value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
-                                                <xf:var name="items-values"        value="$items/xxf:evaluate(instance('local')/value-ref)"/>
-                                                <xf:var name="current-item"        value="$items[xxf:evaluate(instance('local')/value-ref) = $binding]"/>
-                                                <xf:var name="current-impossible"  value="not($is-open-selection) and xxf:non-blank($binding) and empty($current-item)"/>
-                                                <xf:var name="current-label"       value="$current-item/xxf:evaluate(instance('local')/label-ref)"/>
-                                                <xf:var name="unique-choice"       value="count($items) = 1 and $auto-select-unique-choice and
-                                                                                          (not($is-open-selection) or xxf:is-blank($binding))"/>
-                                                <xf:var name="unique-choice-value" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/value-ref) else ()"/>
-                                                <xf:var name="unique-choice-label" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/label-ref) else ()"/>
-                                                <xf:setvalue if="$label-from = 'service'" ref="instance('local')/label" value="$current-label"/>
-                                                <xf:action if="$current-impossible">
-                                                    <xf:setvalue ref="$binding"/>
-                                                    <xf:setvalue ref="instance('local')/label"/>
-                                                </xf:action>
-                                                <xf:action if="$unique-choice">
-                                                    <xf:setvalue ref="$binding"                value="$unique-choice-value"/>
-                                                    <xf:setvalue ref="instance('local')/label" value="$unique-choice-label"/>
-                                                </xf:action>
                                             </xf:action>
                                         </xf:action>
                                     </xf:action>

@@ -63,10 +63,10 @@ object Connect {
     (provider: Provider)
     (block: Connection => T)
     (implicit logger: IndentedLogger)
-  : T = withNewDatabase(provider, DatasourceDescriptor(provider))(block)
+  : T = withNewDatabase(provider, DatasourceDescriptor(provider), dropDatabase = true)(block)
 
   def withNewDatabase[T]
-    (provider: Provider, datasourceDescriptor: DatasourceDescriptor)
+    (provider: Provider, datasourceDescriptor: DatasourceDescriptor, dropDatabase: Boolean)
     (block: Connection => T)
     (implicit logger: IndentedLogger)
   : T = {
@@ -95,16 +95,18 @@ object Connect {
       }
 
     } finally {
-      Logging.withDebug(s"drop `$TestDatabaseName` objects") {
-        provider match {
-          case MySQL      => runStatements(datasourceDescriptor, List(s"DROP DATABASE  $TestDatabaseName"))
-          case PostgreSQL => runStatements(datasourceDescriptor, List(s"DROP SCHEMA    $TestDatabaseName    CASCADE"))
-          case SQLite     => withConnection(datasourceDescriptor) { connection =>
-                               datasourceDescriptor.switchDB.foreach(switchDB => runStatements(connection, List(switchDB)))
-                               val tables = getTableNames(provider, connection)
-                               val dropStatements = tables.map("DROP TABLE " + _)
+      if (dropDatabase) {
+        Logging.withDebug(s"drop `$TestDatabaseName` objects") {
+          provider match {
+            case MySQL      => runStatements(datasourceDescriptor, List(s"DROP DATABASE  $TestDatabaseName"))
+            case PostgreSQL => runStatements(datasourceDescriptor, List(s"DROP SCHEMA    $TestDatabaseName    CASCADE"))
+            case SQLite     => withConnection(datasourceDescriptor) { connection =>
+                                 datasourceDescriptor.switchDB.foreach(switchDB => runStatements(connection, List(switchDB)))
+                                 val tables = getTableNames(provider, connection)
+                                 val dropStatements = tables.map("DROP TABLE " + _)
                                runStatements(connection, dropStatements)
-                             }
+                               }
+          }
         }
       }
     }

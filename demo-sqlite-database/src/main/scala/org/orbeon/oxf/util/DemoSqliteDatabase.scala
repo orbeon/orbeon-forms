@@ -56,7 +56,7 @@ object DemoSqliteDatabase {
 
       val datasourceDescriptor = DatasourceDescriptor.sqliteDatasourceDescriptor(sqliteFile)
 
-      Connect.withNewDatabase(Provider.SQLite, datasourceDescriptor) { connection =>
+      Connect.withNewDatabase(Provider.SQLite, datasourceDescriptor, dropDatabase = false) { connection =>
 
         Connect.createTables(Provider.SQLite, connection)
 

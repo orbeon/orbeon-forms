@@ -2,6 +2,7 @@ package org.orbeon.oxf.xforms.library
 
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.ContentTypes.XmlContentType
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -210,6 +211,14 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def escapeXmlMinimal(s: Option[String] = null)(implicit xpc: XPathContext): Option[String] =
     stringArgumentOrContextOpt(s) map (_.escapeXmlMinimal)
+
+  @XPathFunction
+  def jsonToXml(jsonString: Option[String])(implicit xpc: XPathContext): om.NodeInfo =
+    Converter.jsonStringToXmlDoc(jsonString.getOrElse(xpc.getContextItem.getStringValue))
+
+  @XPathFunction
+  def xmlToJson(root: Option[om.NodeInfo])(implicit xpc: XPathContext): String =
+    Converter.xmlToJsonString(root.getOrElse(xpc.getContextItem.asInstanceOf[om.NodeInfo]), strict = false)
 
   private def classesFromAttribute(i: Option[om.Item])(implicit xpc: XPathContext): Set[String] =
     itemArgumentOrContextOpt(i) match {

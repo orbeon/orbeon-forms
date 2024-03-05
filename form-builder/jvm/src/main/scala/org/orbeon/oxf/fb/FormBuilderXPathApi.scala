@@ -1012,7 +1012,8 @@ object FormBuilderXPathApi {
               ++
               Iterator(
                 newName,
-                "form-resources" // https://github.com/orbeon/orbeon-forms/issues/5909
+                "form-resources", // Issue #5909
+                "fr-mode"         // Issue #6220
               )
           ).toSet
         )

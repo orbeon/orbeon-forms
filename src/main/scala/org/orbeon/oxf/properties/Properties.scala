@@ -13,16 +13,18 @@
  */
 package org.orbeon.oxf.properties
 
-import java.{util => ju}
-
+import cats.Eval
 import cats.syntax.option._
 import org.log4s.Logger
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
 import org.orbeon.oxf.processor.{DOMSerializer, ProcessorImpl}
+import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.util.{LoggerFactory, PipelineUtils}
 
+import java.util.concurrent.Semaphore
+import java.{util => ju}
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
@@ -46,10 +48,15 @@ object Properties {
   private val DefaultPropertiesUri = "oxf:/properties.xml"
   private val ReloadDelay          = 5 * 1000
 
-  private var _instance: Option[Properties] = None
+  private def newEval: Eval[Properties] =
+    Eval.later {
+      new Properties |!> (_.update())
+    }
+
+  private var _instance: Eval[Properties] = newEval
 
   private var propertiesURI = DefaultPropertiesUri
-  private var initializing = false
+  private val initializingSemaphore = new Semaphore(1)
 
   // Set URI of the resource we will read the properties from and initialize them
   def init(propertiesURI: String): Unit = {
@@ -58,20 +65,24 @@ object Properties {
   }
 
   // Global `Properties`
-  def instance: Properties =
-    _instance getOrElse {
-      val p = new Properties
-      p.update()
-      _instance = p.some
-      p
-    }
+  def instance: Properties = _instance.value
 
   // Invalidate all properties (for testing)
   def invalidate(): Unit =
-    _instance = None
+    _instance = newEval
+
+  def withAcquiredPropertiesOrSkip[T](thunk: => T): Option[T] =
+    if (initializingSemaphore.tryAcquire()) {
+      try
+        Some(thunk)
+      finally
+        initializingSemaphore.release()
+    } else {
+      None
+    }
 }
 
-class Properties private () {
+class Properties private {
   /**
    * The property store.
    */
@@ -92,43 +103,39 @@ class Properties private () {
    * Make sure we have the latest properties, and if we don't (resource changed), reload them.
    */
   private def update(): Unit =
-    if (! Properties.initializing)
+    Properties.withAcquiredPropertiesOrSkip {
+
+      val current = System.currentTimeMillis
+      if (lastUpdate + Properties.ReloadDelay >= current)
+        return
+
       try {
-        Properties.initializing = true
+        withPipelineContext { pipelineContext =>
 
-        val current = System.currentTimeMillis
-        if (lastUpdate + Properties.ReloadDelay >= current)
-          return
+          urlGenerator.reset(pipelineContext)
+          domSerializer.reset(pipelineContext)
 
-        try {
-          withPipelineContext { pipelineContext =>
-
-            urlGenerator.reset(pipelineContext)
-            domSerializer.reset(pipelineContext)
-
-            // Find whether we can skip reloading
-            if (propertyStore.isDefined && domSerializer.findInputLastModified(pipelineContext) <= lastUpdate) {
-              Properties.logger.debug("Not reloading properties because they have not changed.")
-              lastUpdate = current
-              return
-            }
-            Properties.logger.debug("Reloading properties because timestamp indicates they may have changed.")
-
-            // Read updated properties document
-            val document = domSerializer.runGetDocument(pipelineContext)
-            if (document == null || document.content.isEmpty)
-              throw new OXFException("Failure to initialize Orbeon Forms properties")
-
-            propertyStore = PropertyStore.parse(document).some
+          // Find whether we can skip reloading
+          if (propertyStore.isDefined && domSerializer.findInputLastModified(pipelineContext) <= lastUpdate) {
+            Properties.logger.debug("Not reloading properties because they have not changed.")
             lastUpdate = current
+            return
           }
-        } catch {
-          case NonFatal(t) =>
-            Properties.logger.error(t)("")
+          Properties.logger.debug("Reloading properties because timestamp indicates they may have changed.")
+
+          // Read updated properties document
+          val document = domSerializer.runGetDocument(pipelineContext)
+          if (document == null || document.content.isEmpty)
+            throw new OXFException("Failure to initialize Orbeon Forms properties")
+
+          propertyStore = PropertyStore.parse(document).some
+          lastUpdate = current
         }
-      } finally {
-        Properties.initializing = false
+      } catch {
+        case NonFatal(t) =>
+          Properties.logger.error(t)("")
       }
+    }
 
   def getPropertySet: PropertySet =
     propertyStore match {

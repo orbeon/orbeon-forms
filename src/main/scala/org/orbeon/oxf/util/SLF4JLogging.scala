@@ -45,6 +45,9 @@ object SLF4JLogging {
   def debug(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: org.slf4j.Logger): Unit =
     logger.debug(message, flattenParams(parameters))
 
+  def trace(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: org.slf4j.Logger): Unit =
+    logger.trace(message, flattenParams(parameters))
+
   def ifDebug[T](body: => T)(implicit logger: org.slf4j.Logger): Unit =
     if (logger.isDebugEnabled)
       body

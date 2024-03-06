@@ -15,6 +15,11 @@
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
+    <!-- XML parser security manager configuration, see:
+         https://github.com/orbeon/orbeon-forms/issues/6135
+         Setting this to 0 disables entity expansion entirely. -->
+    <property as="xs:integer" name="oxf.xml-parsing.entity-expansion-limit"          value="0"/>
+
     <!-- Encryption properties -->
     <property as="xs:string"  name="oxf.crypto.password"                             value=""/>
     <property as="xs:boolean" name="oxf.crypto.check-password-strength"              value="true"/>

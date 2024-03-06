@@ -342,7 +342,7 @@ object InstanceData {
     }
 }
 
-class InstanceData private () {
+class InstanceData private {
 
   private var locationData: LocationData = null
 

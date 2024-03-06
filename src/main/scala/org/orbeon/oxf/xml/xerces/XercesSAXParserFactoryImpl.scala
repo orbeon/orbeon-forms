@@ -1,16 +1,16 @@
 package org.orbeon.oxf.xml.xerces
 
 import cats.Eval
-import org.slf4j
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.SLF4JLogging._
 import org.orbeon.oxf.xml.ParserConfiguration
+import org.slf4j
 import org.xml.sax.SAXNotRecognizedException
 
-import org.orbeon.oxf.util.SLF4JLogging._
-
-import java.{lang => jl, util => ju}
+import java.{util => ju}
 import javax.xml.parsers.{SAXParser, SAXParserFactory}
+
 
 /**
  * Boasts a couple of improvements over the 'stock' xerces parser factory.
@@ -44,18 +44,14 @@ class XercesSAXParserFactoryImpl(parserConfiguration: ParserConfiguration)
   def getFeature(key: String): Boolean = {
     if (! recognizedFeatures.contains(key))
       throw new SAXNotRecognizedException(key)
-    features.get(key) eq jl.Boolean.TRUE
+    features.get(key)
   }
 
   @throws[SAXNotRecognizedException]
-  def setFeature(key: String, `val`: Boolean): Unit = {
-    if (! recognizedFeatures.contains(key))
-      throw new SAXNotRecognizedException(key)
-    features.put(key, if (`val`)
-      jl.Boolean.TRUE
-    else
-      jl.Boolean.FALSE
-    )
+  def setFeature(name: String, value: Boolean): Unit = {
+    if (! recognizedFeatures.contains(name))
+      throw new SAXNotRecognizedException(name)
+    features.put(name, value)
   }
 
   import XercesSAXParserFactoryImpl._

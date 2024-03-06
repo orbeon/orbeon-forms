@@ -48,7 +48,7 @@ public abstract class Task implements Runnable, Externalizable {
 
 
     // static variables
-    private static Boolean mutex = new Boolean(true);
+    private static Boolean mutex = Boolean.TRUE;
     private static long nextID = 0;
 
 

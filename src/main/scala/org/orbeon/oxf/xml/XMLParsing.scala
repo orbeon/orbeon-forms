@@ -262,7 +262,8 @@ object XMLParsing {
 
     val documentBuilderFactory: DocumentBuilderFactory =
       Class.forName("org.orbeon.apache.xerces.jaxp.DocumentBuilderFactoryImpl")
-        .newInstance
+        .getConstructor()
+        .newInstance()
         .asInstanceOf[DocumentBuilderFactory] |!>
         (_.setNamespaceAware(true))
 

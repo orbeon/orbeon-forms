@@ -82,7 +82,7 @@ object ScriptBuilder {
           controlsToInitialize += c.effectiveId -> None
     }
 
-    controlsToInitialize.result
+    controlsToInitialize.result()
   }
 
   private def findConfigurationProperties(

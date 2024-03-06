@@ -70,7 +70,7 @@ object Language {
         () => Option(dom.document.querySelector(s".orbeon-portlet-div[$HtmlLangAttr]"))
       )
       langElements
-        .map(_.apply)
+        .map(_.apply())
         .collectFirst { case Some(element) if element.hasAttribute(HtmlLangAttr) => element }
     }
   }

@@ -115,7 +115,7 @@ class SAXWriter extends XMLReader {
 
   def getProperty(name: String): AnyRef =
     LexicalHandlerNames find (_ == name) match {
-      case Some(_) => getLexicalHandler
+      case Some(_) => getLexicalHandler()
       case None    => properties.get(name)
     }
 

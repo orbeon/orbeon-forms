@@ -11,7 +11,7 @@ import scala.util.Try
 
 class PermissionsAuthorizationTest extends AnyFunSpec {
 
-  private implicit val Logger =
+  private implicit val Logger: IndentedLogger =
     new IndentedLogger(LoggerFactory.createLogger(classOf[PermissionsAuthorizationTest]), true)
 
   val guest =

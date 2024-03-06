@@ -47,7 +47,7 @@ trait ClientControlResourcesEditorTest extends AssertionsForJUnit with FormBuild
         clickLabel(FirstControlLabel)
         val textfield = eventually {
           val textfield = textField(LabelEditorInput)
-          textfield should be ('displayed)
+          textfield should be ("displayed")
           textfield
         }
         // Enter label

@@ -12,7 +12,7 @@ trait Formatter {
     def getThrowableMessage(t: Throwable): Option[String] = Option(t.getMessage)
     def getAllLocationData(t: Throwable): List[SourceLocation] = Nil
 
-    private lazy val OuterHr      = '+' + "-" * (Width - 2) + '+'
+    private lazy val OuterHr      = "+" + '-' * (Width - 2) + '+'
     private lazy val InnerHr      = withBorder("-" * (Width - 2))
     private lazy val InnerHrLight = withBorder("·" * (Width - 2))
     private lazy val ScissorsHr   = withBorder("---8<-----" * ((Width - 2 + 9) / 10), Width)
@@ -172,7 +172,7 @@ trait Formatter {
     def filterLineCol(i: Int) = Option(i) filter (_ > -1)
 
     private def withBorder(s: String, width: Int): String = s split "\n" map (line => withBorder(padded(Some(line), width - 2))) mkString "\n"
-    private def withBorder(s: String): String = '|' + s + '|'
+    private def withBorder(s: String): String = "|" + s + '|'
     private def paddedInt(i: Option[Int], len: Int): String = padded(Some(i.getOrElse("").toString.reverse), len).reverse
 
     private def padded(s: Option[String], len: Int, alignRight: Boolean = false): String = {

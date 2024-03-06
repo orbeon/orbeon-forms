@@ -488,7 +488,7 @@ object XFormsSingleNodeControl {
     control1Opt match {
       case None =>
         // Add all classes
-        addOrAppend(control2.customMIPsClasses map ('+' + _) mkString " ")
+        addOrAppend(control2.customMIPsClasses map ("+" + _) mkString " ")
       case Some(control1) if control1.customMIPs != customMIPs2 =>
         // Custom MIPs changed
         val customMIPs1 = control1.customMIPs
@@ -499,7 +499,7 @@ object XFormsSingleNodeControl {
             value2         = mips2.get(name)
             if Option(value1) != value2
           } yield
-            plusOrMinusPrefix + MipName.buildExternalCustomMIPName(name) + '-' + value1 // TODO: encode so that there are no spaces
+            plusOrMinusPrefix.toString + MipName.buildExternalCustomMIPName(name) + '-' + value1 // TODO: encode so that there are no spaces
 
         val classesToRemove = diff(customMIPs1, customMIPs2, '-')
         val classesToAdd    = diff(customMIPs2, customMIPs1, '+')

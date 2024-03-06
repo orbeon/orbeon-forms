@@ -153,7 +153,7 @@ trait FormRunnerActionsCommon {
       val appForm       = AppForm(app, form)
       val isDraft       = booleanParamByNameUseAvt(params, "draft", default = false)
       val pruneMetadata = booleanParamByNameUseAvt(params, "prune-metadata", default = false)
-      val querySuffix   = paramByNameUseAvt(params, "query").map('&' + _).getOrElse("")
+      val querySuffix   = paramByNameUseAvt(params, "query").map("&" + _).getOrElse("")
 
       // Notify that the data is about to be saved
       dispatch(name = "fr-data-save-prepare", targetId = FormModel)

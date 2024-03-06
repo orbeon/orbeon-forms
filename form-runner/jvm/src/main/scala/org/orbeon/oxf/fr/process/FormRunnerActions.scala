@@ -21,7 +21,6 @@ import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
-import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
@@ -43,7 +42,9 @@ import scala.language.postfixOps
 import scala.util.Try
 
 
-trait FormRunnerActions extends FormRunnerActionsCommon {
+trait FormRunnerActions
+  extends FormRunnerActionsCommon
+     with SimpleProcessCommon {
 
   self: XFormsActions => // for `tryCallback`
 

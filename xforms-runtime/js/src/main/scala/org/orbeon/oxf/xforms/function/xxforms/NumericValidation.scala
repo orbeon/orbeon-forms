@@ -7,7 +7,7 @@ import org.orbeon.saxon.value._
 object NumericValidation {
 
   def trySignum(value: String): Option[Int] = tryParseAsLongOrBigDecimal(value) map {
-    case Left(long)        => long.signum
+    case Left(long)        => long.sign.toInt
     case Right(bigDecimal) => bigDecimal.signum
   }
 

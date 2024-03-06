@@ -30,10 +30,10 @@ class OXFHandler extends URLStreamHandler {
   protected def openConnection(url: URL): URLConnection =
     new URLConnection(url) {
 
-      require(url.getProtocol == Protocol, s"Orbeon Forms URL must start with `$Protocol:`")
+      require(this.url.getProtocol == Protocol, s"Orbeon Forms URL must start with `$Protocol:`")
 
       private lazy val key: String =
-        url.toExternalForm.substring(Protocol.length + 1)
+        this.url.toExternalForm.substring(Protocol.length + 1)
 
       def connect(): Unit = () // NOP
 

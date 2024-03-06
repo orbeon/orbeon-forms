@@ -348,7 +348,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
         ast.walk(astDocumentHandler)
         debug(
           "created PFC pipeline",
-          Seq("path" -> page.path, "pipeline" -> ('\n' + astDocumentHandler.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
+          Seq("path" -> page.path, "pipeline" -> ("\n" + astDocumentHandler.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
         )
       }
 

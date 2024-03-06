@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.Constants.ComponentSeparator
+import org.orbeon.xforms.Constants.ComponentSeparatorString
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.time._
@@ -99,7 +99,7 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
   //
   // NOTE: This doesn't handle repeat iterations yet.
   def clientId(id: String) = {
-    val withPrefix = ComponentSeparator + id
+    val withPrefix = ComponentSeparatorString + id
     // NOTE: XPath 1 doesn't have ends-with()
     xpath(s"//*[@id = '$id' or contains(@id, '$withPrefix') and @id = concat(substring-before(@id, '$withPrefix'), '$withPrefix')]").element.attribute("id").get
   }
@@ -153,7 +153,7 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
     }
 
     def replaceFieldText(keys: CharSequence): Unit =
-      insertFieldText(Keys.HOME + Keys.chord(Keys.SHIFT, Keys.END) + keys)
+      insertFieldText(Keys.HOME.toString + Keys.chord(Keys.SHIFT, Keys.END) + keys)
 
     def fieldText =
       nativeControlUnder(e.attribute("id").get).underlying.getAttribute("value")

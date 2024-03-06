@@ -138,6 +138,8 @@ class AjaxEvent(args: js.Any*) extends js.Object {
         }
       case (Some(form), Some(targetId)) =>
         form -> Support.adjustIdNamespace(form, targetId)._2.some
+      case (None, None) =>
+        throw new IllegalArgumentException(s"form not found as no form element or target id was passed")
     }
   }
 

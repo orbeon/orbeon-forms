@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
+import org.log4s
 import org.orbeon.oxf.externalcontext.ServletWebAppContext
 import org.orbeon.oxf.http.{PropertiesApacheHttpClient, StatusCode}
 import org.orbeon.oxf.pipeline.api._
@@ -46,7 +47,7 @@ abstract class OrbeonServletImpl(servletContextProvider: ServletContextProvider)
 
   def newServletException(throwable: Throwable): Exception
 
-  private implicit val logger = ProcessorService.Logger
+  private implicit val logger: log4s.Logger = ProcessorService.Logger
 
   val HttpAcceptMethodsParam = "oxf.http.accept-methods"
   val DefaultMethods = "get post head"

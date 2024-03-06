@@ -259,9 +259,9 @@ class CacheableSubmission(submission: XFormsModelSubmission)
           // Since we forced `isReadonly` above, the result must also be a readonly instance
           replacer.deserialize(submission, cxr, updatedSubmissionParameters) match {
             case Right((_: VirtualNodeType, _)) => throw new IllegalStateException
-            case Right((documentInfo, _))       => documentInfo
+            case Right((documentInfo: DocumentNodeInfoType, _))       => documentInfo
             case Left(Left(_))                  => throw new IllegalStateException
-            case Left(Right(documentInfo))      => documentInfo
+            case Left(Right(documentInfo: DocumentNodeInfoType))      => documentInfo
           }
         case ConnectResultT.Failure(_, throwable, _) =>
           throw new CacheableSubmission.ThrowableWrapper(throwable)

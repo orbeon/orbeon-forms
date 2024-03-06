@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
-import org.orbeon.xforms.Constants.ComponentSeparator
+import org.orbeon.xforms.Constants.ComponentSeparatorString
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax.Attributes
@@ -193,5 +193,5 @@ class XFormsInputHandler(
 
 object XFormsInputHandler {
   def firstInputEffectiveIdWithNs(effectiveId: String)(containingDocument: XFormsContainingDocument): String =
-    containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input-1"))
+    containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparatorString + "xforms-input-1"))
 }

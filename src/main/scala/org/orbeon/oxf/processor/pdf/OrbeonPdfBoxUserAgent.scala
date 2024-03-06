@@ -76,7 +76,7 @@ class OrbeonPdfBoxUserAgent(
     var resource = _imageCache.get(uriResolved)
     if (resource != null && resource.getImage.isInstanceOf[PdfBoxImage]) { // Make copy of PdfBoxImage so we don't stuff up the cache.
       val original = resource.getImage.asInstanceOf[PdfBoxImage]
-      val copy = new PdfBoxImage(original.getBytes, original.getUri, original.getWidth, original.getHeight, original.getXObject)
+      val copy = new PdfBoxImage(original.getBytes, original.getUri, original.getWidth.toFloat, original.getHeight.toFloat, original.getXObject)
       return new ImageResource(resource.getImageUri, copy)
     }
 

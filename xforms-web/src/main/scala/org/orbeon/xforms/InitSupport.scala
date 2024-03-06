@@ -325,7 +325,7 @@ object InitSupport {
         val checkEveryMillis = reactAfterMillis / 10
         if (checkEveryMillis > 0) {
           logger.debug(s"checking if getting close to session expiration every $checkEveryMillis ms")
-          js.timers.setInterval(checkEveryMillis)(Session.updateWithLocalNewestEventTime())
+          js.timers.setInterval(checkEveryMillis.toDouble)(Session.updateWithLocalNewestEventTime())
         }
         reactWhenSessionAboutToExpireInitialized = true
       }
@@ -406,7 +406,7 @@ object InitSupport {
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Click,     Events.click)
 
         // Catch logout link clicks to inform other pages on the same session that it is going to be invalidated
-        $(".fr-logout-link").get.foreach { logoutAnchor =>
+        $(".fr-logout-link").get().foreach { logoutAnchor =>
           GlobalEventListenerSupport.addJsListener(logoutAnchor, DomEventNames.Click, (_: dom.raw.Event) => {
             Session.logout()
           })

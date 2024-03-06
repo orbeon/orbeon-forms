@@ -64,7 +64,7 @@ trait ClientOrbeonFormsDemoPathTest extends AssertionsForJUnit with FormRunnerOp
       // Switch language and check a control label
       _ <- click on partialLinkText("Français")
       numberControl <- elementByStaticId("number-control")
-      _ <- assert("Nombre" === numberControl.findAll(By.tagName("label")).next.getText)
+      _ <- assert("Nombre" === numberControl.findAll(By.tagName("label")).next().getText)
       _ <- click on partialLinkText("English")
 
       // RFE: etc.

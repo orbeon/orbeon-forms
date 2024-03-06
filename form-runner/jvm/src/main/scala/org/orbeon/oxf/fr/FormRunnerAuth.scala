@@ -187,7 +187,7 @@ object FormRunnerAuth {
 
           Logger.debug(s"using `$authMethod` method")
 
-          val usernameOpt    = Option(userRoles.getRemoteUser).flatMap(_.trimAllToOpt)
+          val usernameOpt    = Option(userRoles.getRemoteUser()).flatMap(_.trimAllToOpt)
           val rolesStringOpt = propertySet.getNonBlankString(ContainerRolesPropertyName)
 
           Logger.debug(s"usernameOpt: `$usernameOpt`, roles property: `$rolesStringOpt`")

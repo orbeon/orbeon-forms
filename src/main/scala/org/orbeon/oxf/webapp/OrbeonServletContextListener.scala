@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.webapp
 
+import org.log4s
 import org.orbeon.oxf.externalcontext.ServletWebAppContext
 import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
 import org.orbeon.oxf.servlet._
@@ -36,7 +37,7 @@ abstract class OrbeonServletContextListenerImpl extends ServletContextListener w
   private val DestroyProcessorPrefix  = "oxf.context-destroyed-processor."
   private val DestroyInputPrefix      = "oxf.context-destroyed-processor.input."
 
-  private implicit val logger = ProcessorService.Logger
+  private implicit val logger: log4s.Logger = ProcessorService.Logger
 
   def logPrefix = "Context listener"
   def initParameters = Map()

@@ -149,8 +149,8 @@ object Help {
       if (popover.outerHeight() > maxHeight) {
         val title = popover.children(".popover-title")
         val content = popover.children(".popover-content")
-        popover.css("height", maxHeight + "px")
-        content.css("height", (maxHeight - title.outerHeight()) + "px")
+        popover.css("height", maxHeight.toString + "px")
+        content.css("height", (maxHeight - title.outerHeight()).toString + "px")
       }
 
       // Adjust position
@@ -201,13 +201,13 @@ object Help {
           val controlTopDoc = elPos.offset.top + elPos.height / 2
           val controlTopPopover = controlTopDoc - newPopoverOffset.top
           val arrowTop = (controlTopPopover / popover.outerHeight()) * 100
-          popover.children(".arrow").css("top", arrowTop + "%")
+          popover.children(".arrow").css("top", arrowTop.toString + "%")
         case Placement.Top | Placement.Bottom =>
           popover.children(".arrow").css("left", "10%")
           // Smaller max-width to avoid popover having no padding on the right, especially for mobile
           val altMaxWidth = $(dom.window).width() - 2 * newPopoverOffset.left
           if (popover.width() > altMaxWidth)
-            popover.css("max-width", altMaxWidth + "px")
+            popover.css("max-width", altMaxWidth.toString + "px")
         case _ =>
       }
     }

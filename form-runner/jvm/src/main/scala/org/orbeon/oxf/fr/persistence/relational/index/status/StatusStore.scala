@@ -44,7 +44,7 @@ object StatusStore {
           maybeDocumentCount match {
             case None                        => logInfo (s"Indexing $providerInfo")
             case Some(dc) if dc.current == 0 => logInfo (s"Indexing $providerInfo, ${dc.total} documents")
-            case Some(dc) if dc.current != 0 => logDebug(s"Indexing $providerInfo, document ${dc.current}/${dc.total}")
+            case Some(dc)                    => logDebug(s"Indexing $providerInfo, document ${dc.current}/${dc.total}")
           }
       }
     }

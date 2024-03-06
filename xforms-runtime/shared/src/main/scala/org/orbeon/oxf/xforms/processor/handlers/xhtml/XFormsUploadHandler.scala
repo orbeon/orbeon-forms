@@ -25,7 +25,7 @@ import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.Constants.ComponentSeparator
+import org.orbeon.xforms.Constants.ComponentSeparatorString
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax._
@@ -138,5 +138,5 @@ class XFormsUploadHandler(
     computeForEffectiveIdWithNs.some
 
   def computeForEffectiveIdWithNs: String =
-    containingDocument.namespaceId(XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input"))
+    containingDocument.namespaceId(XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparatorString + "xforms-input"))
 }

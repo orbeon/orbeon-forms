@@ -49,7 +49,7 @@ class HttpServletRequestWrapper(var request: HttpServletRequest) extends HttpSer
   override def getReader: BufferedReader = request.getReader
   override def getRemoteAddr: String = request.getRemoteAddr
   override def getRemoteHost: String = request.getRemoteHost
-  override def getRemoteUser: String = request.getRemoteUser
+  override def getRemoteUser(): String = request.getRemoteUser()
   override def getRequestDispatcher(path: String): RequestDispatcher = request.getRequestDispatcher(path)
   override def getRequestURI: String = request.getRequestURI
   override def getRequestURL: StringBuffer = request.getRequestURL

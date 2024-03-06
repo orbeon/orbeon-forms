@@ -394,7 +394,7 @@ trait ContainingDocumentProperties {
       case NoscriptProperty           => false
       case EncryptItemValuesProperty  => encodeItemValues
       case OrderProperty              => lhhacOrder // `(List[String], List[String])` FIXME
-      case _                          => staticState.propertyMaybeAsExpression(propertyName).left.get // `Int | Boolean | String`
+      case _                          => staticState.propertyMaybeAsExpression(propertyName).left.getOrElse(throw new IllegalArgumentException) // `Int | Boolean | String`
     }
 
   private object Memo {

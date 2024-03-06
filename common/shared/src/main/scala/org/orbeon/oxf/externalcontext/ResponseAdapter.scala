@@ -16,7 +16,7 @@ class ResponseAdapter extends ExternalContext.Response {
   def sendError(len: Int): Unit = ()
   def getCharacterEncoding: String = null
   def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean): Unit = ()
-  def setPageCaching(lastModified: Long): Unit = ()
+  def setPageCaching(lastModified: Long, pathTypeOrNull: String): Unit = ()
   def setResourceCaching(lastModified: Long, expires: Long): Unit = ()
   def checkIfModifiedSince(request: ExternalContext.Request, lastModified: Long): Boolean =
     // Always indicate that the resource has been modified. If needed we could use:

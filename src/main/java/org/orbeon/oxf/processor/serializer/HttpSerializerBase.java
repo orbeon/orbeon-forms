@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.serializer;
 
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.controller.PageFlowControllerProcessor$;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.externalcontext.ResponseWrapper;
 import org.orbeon.oxf.http.StatusCode;
@@ -93,7 +94,8 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                     final long lastModified = findInputLastModified(pipelineContext, dataInput, false);
 
                     // Set caching headers and force revalidation
-                    response.setPageCaching(lastModified);
+                    String pathTypeOrNull = (String) pipelineContext.getAttribute(PageFlowControllerProcessor$.MODULE$.PathType());
+                    response.setPageCaching(lastModified, pathTypeOrNull);
 
                     // Check if we are processing a forward. If so, we cannot tell the client that the content has not been modified.
                     final boolean isForward = URLRewriterUtils.isForwarded(externalContext.getRequest());

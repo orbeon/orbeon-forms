@@ -34,13 +34,16 @@ object ServletExternalContext {
   val Logger = LoggerFactory.createLogger(classOf[ServletExternalContext])
 
   private val HttpPageCacheHeadersDefault      = "Cache-Control: private, max-age=0; Pragma:"
+  private val HttpServiceCacheHeadersDefault   = "Cache-Control: no-store"
   private val HttpPageCacheHeadersProperty     = "oxf.http.page.cache-headers"
+  private val HttpServiceCacheHeadersProperty  = "oxf.http.service.cache-headers"
   private val HttpResourceCacheHeadersDefault  = "Cache-Control: public; Pragma:"
   private val HttpResourceCacheHeadersProperty = "oxf.http.resource.cache-headers"
   private val HttpNocacheCacheHeadersDefault   = "Cache-Control: no-cache, no-store, must-revalidate; Pragma: no-cache; Expires: 0"
   private val HttpNocacheCacheHeadersProperty  = "oxf.http.nocache.cache-headers"
 
   lazy val pageCacheHeaders     = decodeCacheString(HttpPageCacheHeadersProperty,     HttpPageCacheHeadersDefault)
+  lazy val serviceCacheHeaders  = decodeCacheString(HttpServiceCacheHeadersProperty,  HttpServiceCacheHeadersDefault)
   lazy val resourceCacheHeaders = decodeCacheString(HttpResourceCacheHeadersProperty, HttpResourceCacheHeadersDefault)
   lazy val nocacheCacheHeaders  = decodeCacheString(HttpNocacheCacheHeadersProperty,  HttpNocacheCacheHeadersDefault)
 

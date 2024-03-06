@@ -71,7 +71,7 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
     override def setStatus(status: Int): Unit = this.status = status
     override def getStatus: Int = this.status
 
-    override def setPageCaching(lastModified: Long): Unit = super.setPageCaching(lastModified)
+    override def setPageCaching(lastModified: Long, pathTypeOrNull: String): Unit = super.setPageCaching(lastModified, pathTypeOrNull)
     override def setHeader(name: String, value: String): Unit = super.setHeader(name, value)
 
     override val getOutputStream = new ByteArrayOutputStream

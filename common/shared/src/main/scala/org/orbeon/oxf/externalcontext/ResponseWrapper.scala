@@ -30,8 +30,8 @@ class ResponseWrapper(var _response: ExternalContext.Response)
   def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean): Unit =
     _response.sendRedirect(location, isServerSide, isExitPortal)
 
-  def setPageCaching(lastModified: Long): Unit =
-    _response.setPageCaching(lastModified)
+  def setPageCaching(lastModified: Long, pathTypeOrNull: String): Unit =
+    _response.setPageCaching(lastModified, pathTypeOrNull)
 
   def setResourceCaching(lastModified: Long, expires: Long): Unit =
     _response.setResourceCaching(lastModified, expires)

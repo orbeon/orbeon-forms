@@ -63,7 +63,7 @@ object Portlet2ExternalContext {
     def setContentLength(len: Int)                                 = ()
     def checkIfModifiedSince(request: Request, lastModified: Long) = true
     def sendError(code: Int)                                       = throw new OXFException(s"Error while processing request: $code")
-    def setPageCaching(lastModified: Long)                         = ()
+    def setPageCaching(lastModified: Long, pathTypeOrNull: String) = ()
     def setResourceCaching(lastModified: Long, expires: Long)      = ()
     def setHeader(name: String, value: String)                     = ()
     def addHeader(name: String, value: String)                     = ()

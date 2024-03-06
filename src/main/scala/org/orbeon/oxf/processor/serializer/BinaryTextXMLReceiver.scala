@@ -120,7 +120,7 @@ class BinaryTextXMLReceiver(
 
         // This will override caching settings which may have taken place before
         attributes.getValue(Headers.LastModifiedLower).trimAllToOpt foreach
-          (validity => response.setPageCaching(DateUtils.parseRFC1123(validity)))
+          (validity => response.setPageCaching(DateUtils.parseRFC1123(validity), null))
 
         attributes.getValue("filename").trimAllToOpt.foreach { fileName =>
           val isInline        = attributes.getValue("disposition-type").trimAllToOpt.contains("inline")

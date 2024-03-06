@@ -31,7 +31,7 @@ trait CachingResponseSupport {
   private def setDateHeader(name: String, value: Long) =
       setHeader(name, DateUtils.formatRfc1123DateTimeGmt(value))
 
-  def setPageCaching(lastModified: Long): Unit =
+  def setPageCaching(lastModified: Long, pathTypeOrNull: String): Unit =
     if (responseCachingDisabled) {
       setResponseHeaders(ServletExternalContext.nocacheCacheHeaders)
     } else {
@@ -44,7 +44,10 @@ trait CachingResponseSupport {
       setDateHeader(Headers.LastModified, _lastModified)
       // Make sure the client does not load from cache without revalidation
       setDateHeader("Expires", now)
-      setResponseHeaders(ServletExternalContext.pageCacheHeaders)
+      val cacheHeaders =
+        if (pathTypeOrNull == "service") ServletExternalContext.serviceCacheHeaders
+        else                             ServletExternalContext.pageCacheHeaders
+      setResponseHeaders(cacheHeaders)
     }
 
   def setResourceCaching(lastModified: Long, expires: Long): Unit =

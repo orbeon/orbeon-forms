@@ -62,6 +62,9 @@
     <property as="xs:string"  name="oxf.http.page.cache-headers">
         Cache-Control: private, max-age=0; Pragma:
     </property>
+    <property as="xs:string"  name="oxf.http.service.cache-headers">
+        Cache-Control: no-store
+    </property>
     <property as="xs:string"  name="oxf.http.resource.cache-headers">
         Cache-Control: public; Pragma:
     </property>

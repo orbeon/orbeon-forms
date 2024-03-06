@@ -344,7 +344,7 @@ class TestExternalContext(
     def reset()                                                                      = ()
     def sendError(len: Int)                                                          = ()
     def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean) = ()
-    def setPageCaching(lastModified: Long)                                           = ()
+    def setPageCaching(lastModified: Long, pathTypeOrNull: String)                   = ()
     def setResourceCaching(lastModified: Long, expires: Long)                        = ()
     def setContentLength(len: Int)                                                   = ()
     def setContentType(contentType: String)                                          = ()

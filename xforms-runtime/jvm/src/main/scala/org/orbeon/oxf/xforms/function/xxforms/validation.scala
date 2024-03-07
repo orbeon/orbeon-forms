@@ -225,6 +225,16 @@ class UploadMaxSizeValidation extends LongValidationFunction {
   }
 }
 
+class UploadMaxSizeControlAggregateValidation extends LongValidationFunction {
+
+  val propertyName = ValidationFunctionNames.UploadMaxSizeControlAggregate
+
+  def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
+    case Some(constraint) => true // for now, don't actually validate, see #6064
+    case None             => true
+  }
+}
+
 class UploadMediatypesValidation extends StringValidationFunction {
 
   val propertyName = ValidationFunctionNames.UploadMediatypes

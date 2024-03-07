@@ -2,7 +2,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsProperties.{UploadMaxSizeAggregateProperty, UploadMaxSizeProperty}
+import org.orbeon.oxf.xforms.XFormsProperties.{UploadMaxSizeFormAggregateProperty, UploadMaxSizeProperty}
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
 
 
@@ -26,8 +26,8 @@ abstract class XFormsStaticStateStaticPropertiesImpl(
       MaximumSize.unapply(globalMaxSizeProperty.toString) getOrElse
       MaximumSize.LimitedSize(0L)
 
-  val uploadMaxSizeAggregate: MaximumSize =
-    staticStringProperty(UploadMaxSizeAggregateProperty).trimAllToOpt flatMap
+  val uploadMaxSizeFormAggregate: MaximumSize =
+    staticStringProperty(UploadMaxSizeFormAggregateProperty).trimAllToOpt flatMap
       MaximumSize.unapply getOrElse
       MaximumSize.UnlimitedSize
 

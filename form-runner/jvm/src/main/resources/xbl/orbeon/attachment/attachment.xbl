@@ -193,6 +193,17 @@
                                 return
                                     xxf:upload-max-size(xs:integer($mip)),
                                 true()
+                            )[1]
+                            and
+                            (
+                                for $mip in
+                                    xxf:custom-mip(
+                                        $binding,
+                                        'upload-max-size-aggregate'
+                                    )[. castable as xs:integer]
+                                return
+                                    xxf:upload-max-size-aggregate(xs:integer($mip)),
+                                true()
                             )[1]"/>
 
                 <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">

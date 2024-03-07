@@ -311,6 +311,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
     )
 
+    Fun(ValidationFunctionNames.UploadMaxSizeControlAggregate, classOf[UploadMaxSizeControlAggregateValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
+    )
+
     Fun(ValidationFunctionNames.UploadMediatypes, classOf[UploadMediatypesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )

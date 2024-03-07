@@ -1081,14 +1081,14 @@ object XFormsStaticStateImpl {
       def allowErrorRecoveryOnInit            : Boolean          = staticProperties.allowErrorRecoveryOnInit
       def isInlineResources                   : Boolean          = staticProperties.isInlineResources
       def uploadMaxSize                       : MaximumSize      = staticProperties.uploadMaxSize
-      def uploadMaxSizeAggregate              : MaximumSize      = staticProperties.uploadMaxSizeAggregate
+      def uploadMaxSizeFormAggregate          : MaximumSize      = staticProperties.uploadMaxSizeFormAggregate
       def staticProperty       (name: String) : Any              = staticProperties.staticProperty       (name)
       def staticStringProperty (name: String) : String           = staticProperties.staticStringProperty (name)
       def staticBooleanProperty(name: String) : Boolean          = staticProperties.staticBooleanProperty(name)
       def staticIntProperty    (name: String) : Int              = staticProperties.staticIntProperty    (name)
       def allowedExternalEvents               : Set[String]      = staticProperties.allowedExternalEvents
 
-      def uploadMaxSizeAggregateExpression        : Option[StaticXPath.CompiledExpression]      = dynamicProperties.uploadMaxSizeAggregateExpression
+      def uploadMaxSizeFormAggregateExpression    : Option[StaticXPath.CompiledExpression]      = dynamicProperties.uploadMaxSizeFormAggregateExpression
       def propertyMaybeAsExpression(name: String) : Either[Any, StaticXPath.CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
     }
   }

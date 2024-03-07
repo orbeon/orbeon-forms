@@ -654,6 +654,12 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   }
 
   @XPathFunction
+  def uploadMaxSizeControlAggregate(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
+    // For now, don't actually validate, see #6064
+    evaluateAndSetConstraint(ValidationFunctionNames.UploadMaxSizeControlAggregate, constraintOpt, _ => true)
+  }
+
+  @XPathFunction
   def uploadMediatypes(constraintOpt: Option[String])(implicit xpc: XPathContext): Boolean = {
     // For now, don't actually validate, see #2956
     evaluateAndSetConstraint(ValidationFunctionNames.UploadMediatypes, constraintOpt, _ => true)

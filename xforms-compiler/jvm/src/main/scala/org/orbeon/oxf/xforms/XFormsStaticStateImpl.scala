@@ -105,14 +105,14 @@ class XFormsStaticStateImpl(
   def allowErrorRecoveryOnInit            : Boolean          = staticProperties.allowErrorRecoveryOnInit
   def isInlineResources                   : Boolean          = staticProperties.isInlineResources
   def uploadMaxSize                       : MaximumSize      = staticProperties.uploadMaxSize
-  def uploadMaxSizeAggregate              : MaximumSize      = staticProperties.uploadMaxSizeAggregate
+  def uploadMaxSizeFormAggregate          : MaximumSize      = staticProperties.uploadMaxSizeFormAggregate
   def staticProperty       (name: String) : Any              = staticProperties.staticProperty       (name)
   def staticStringProperty (name: String) : String           = staticProperties.staticStringProperty (name)
   def staticBooleanProperty(name: String) : Boolean          = staticProperties.staticBooleanProperty(name)
   def staticIntProperty    (name: String) : Int              = staticProperties.staticIntProperty    (name)
   def allowedExternalEvents               : Set[String]      = staticProperties.allowedExternalEvents
 
-  def uploadMaxSizeAggregateExpression        : Option[CompiledExpression]      = dynamicProperties.uploadMaxSizeAggregateExpression
+  def uploadMaxSizeFormAggregateExpression    : Option[CompiledExpression]      = dynamicProperties.uploadMaxSizeFormAggregateExpression
   def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
 
   lazy val sanitizeInput: String => String = StringReplacer(staticProperties.staticStringProperty(P.SanitizeProperty))

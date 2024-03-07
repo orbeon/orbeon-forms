@@ -62,6 +62,8 @@
                 <xf:setvalue ref="$i/control-local-name"      value="local-name($control)"/>
                 <xf:setvalue ref="$i/control-mediatype"       value="$control/@mediatype"/>
 
+                <xf:setvalue ref="$i/multiple-attribute"      value="if ($control/@multiple = 'true') then 'true' else 'false'"/>
+
                 <xf:setvalue ref="$i/fr-index/@enabled"       value="exists($control/fr:index)"/>
                 <xf:action iterate="('summary-show', 'allow-bulk-edit')">
                     <xf:var name="current"          value="."/>
@@ -737,6 +739,7 @@
                         <custom-classes/>           <!-- All custom classes except the standard ones -->
                         <autocomplete-attribute/>   <!-- autocomplete attribute -->
                         <autocomplete-allowed/>
+                        <multiple-attribute/>       <!-- Used to distinguish between single and multiple file attachment(s) controls -->
                         <control-local-name/>
                         <control-mediatype/>
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
@@ -929,6 +932,10 @@
                     value="'upload-max-size', 'upload-mediatypes'"/>
 
                 <xf:var
+                    name="multiple-attachments-constraints"
+                    value="'upload-max-size', 'upload-max-size-aggregate', 'upload-mediatypes'"/>
+
+                <xf:var
                     name="noargs-constraints"
                     value="'required', 'datatype', 'formula', $noargs-integer-constraints"/>
 
@@ -1070,6 +1077,10 @@
                     <xf:var
                         name="is-attachment"
                         value="xxf:split($i/standard-classes) = 'fr-attachment'"/>
+
+                    <xf:var
+                        name="is-multiple-attachments"
+                        value="$is-attachment and $i/multiple-attribute = 'true'"/>
 
                     <fb:language-choice ref="$li/lang"/>
 
@@ -1495,9 +1506,11 @@
                                         value="
                                             'formula',
                                             (
-                                                if ($is-attachment) then
+                                                if ($is-attachment and not($is-multiple-attachments)) then
                                                     (: For #4725: special case as multiple attachment is not an `anyURI` :)
                                                     $attachment-constraints
+                                                else if ($is-multiple-attachments) then
+                                                    $multiple-attachments-constraints
                                                 else if ($builtin-type = ('string', 'email')) then
                                                     $string-constraints
                                                 else if ($builtin-type = 'integer') then
@@ -1522,7 +1535,7 @@
                                             <xf:label ref="$resources/dialog-control-settings/types/label"/>
                                             <xf:value>datatype</xf:value>
                                         </xf:itemset>
-                                        <xf:itemset ref="$resources/dialog-control-settings/constraint/item[@id = $allowed-constraints]">
+                                        <xf:itemset ref="$resources/dialog-control-settings/constraint/item[@id = $allowed-constraints and ((exists(@multiple) and @multiple = $i/multiple-attribute) or @id != 'upload-max-size')]">
                                             <xf:label ref="."/>
                                             <xf:value ref="@id"/>
                                         </xf:itemset>
@@ -1613,12 +1626,14 @@
                                             </xf:textarea>
                                             <fr:number
                                                 ref="constraint/@argument[local-name-from-QName(xxf:type()) = 'integer']"
-                                                suffix="{{'bytes'[$validation-type = 'upload-max-size']}}">
+                                                suffix="{{'bytes'[$validation-type = ('upload-max-size', 'upload-max-size-aggregate')]}}">
                                                 <xf:label
                                                     appearance="minimal"
                                                     ref="
                                                         if ($validation-type = 'upload-max-size') then
                                                             $resources/dialog-form-settings/attachment-max-size/label
+                                                        else if ($validation-type = 'upload-max-size-aggregate') then
+                                                            $resources/dialog-form-settings/attachment-max-size-aggregate/label
                                                         else
                                                             $resources/dialog-control-settings/integer-argument/label"/>
                                                 <xf:alert ref="$resources/dialog-control-settings/integer-argument/alert"/>

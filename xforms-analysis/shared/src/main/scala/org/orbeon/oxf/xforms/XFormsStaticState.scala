@@ -60,7 +60,7 @@ trait XFormsStaticStateStaticProperties {
   def isInlineResources                   : Boolean
 
   def uploadMaxSize                       : MaximumSize
-  def uploadMaxSizeAggregate              : MaximumSize
+  def uploadMaxSizeFormAggregate          : MaximumSize
 
   def staticProperty       (name: String) : Any
   def staticStringProperty (name: String) : String
@@ -72,6 +72,6 @@ trait XFormsStaticStateStaticProperties {
 }
 
 trait XFormsStaticStateDynamicProperties {
-  def uploadMaxSizeAggregateExpression        : Option[CompiledExpression]
+  def uploadMaxSizeFormAggregateExpression    : Option[CompiledExpression]
   def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression]
 }

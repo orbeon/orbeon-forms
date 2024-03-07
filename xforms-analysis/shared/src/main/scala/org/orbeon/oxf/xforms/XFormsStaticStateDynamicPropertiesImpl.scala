@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
-import org.orbeon.oxf.xforms.XFormsProperties.UploadMaxSizeAggregateExpressionProperty
+import org.orbeon.oxf.xforms.XFormsProperties.UploadMaxSizeFormAggregateExpressionProperty
 import org.orbeon.oxf.xforms.analysis.TopLevelPartAnalysis
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
@@ -16,11 +16,11 @@ class XFormsStaticStateDynamicPropertiesImpl(
   logger               : IndentedLogger
 ) extends XFormsStaticStateDynamicProperties {
 
-  val uploadMaxSizeAggregateExpression: Option[CompiledExpression] = {
+  val uploadMaxSizeFormAggregateExpression: Option[CompiledExpression] = {
 
     val compiledExpressionOpt =
       for {
-        rawProperty <- staticProperties.staticStringProperty(UploadMaxSizeAggregateExpressionProperty).trimAllToOpt
+        rawProperty <- staticProperties.staticStringProperty(UploadMaxSizeFormAggregateExpressionProperty).trimAllToOpt
         model       = topLevelPart.getDefaultModel
       } yield
         StaticXPath.compileExpression(
@@ -35,7 +35,7 @@ class XFormsStaticStateDynamicPropertiesImpl(
       case Some(CompiledExpression(expr, _, _)) if StaticXPath.expressionType(expr) == StaticXPath.IntegerType =>
         compiledExpressionOpt
       case Some(_) =>
-        throw new IllegalArgumentException(s"property `$UploadMaxSizeAggregateExpressionProperty` must return `xs:integer` type")
+        throw new IllegalArgumentException(s"property `$UploadMaxSizeFormAggregateExpressionProperty` must return `xs:integer` type")
       case None =>
         None
     }

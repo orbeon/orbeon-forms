@@ -16,13 +16,34 @@ package org.orbeon.datatypes
 import org.orbeon.oxf.util.NumericUtils
 import org.orbeon.oxf.util.StringUtils._
 
-sealed trait MaximumSize
+import scala.annotation.tailrec
+import scala.collection.compat.immutable.LazyList
+
+
+sealed trait MaximumSize {
+  def min(other: MaximumSize): MaximumSize
+  def minus(size: => Long): MaximumSize
+}
 
 object MaximumSize {
 
   // Ideally we would have a [`ULong` type](http://docs.scala-lang.org/sips/rejected/unsigned-integers.html)
-  case class  LimitedSize(size: Long) extends MaximumSize { require(size >= 0) }
-  case object UnlimitedSize           extends MaximumSize
+  case class  LimitedSize(size: Long) extends MaximumSize {
+    require(size >= 0)
+
+    override def min(other: MaximumSize): MaximumSize =
+      other match {
+        case LimitedSize(otherSize) => LimitedSize(math.min(size, otherSize))
+        case UnlimitedSize          => this
+      }
+
+    override def minus(size: => Long): MaximumSize =
+      LimitedSize(math.max(0, this.size - size))
+  }
+  case object UnlimitedSize extends MaximumSize {
+    override def min(other: MaximumSize): MaximumSize = other
+    override def minus(size: => Long): MaximumSize = this
+  }
 
   // Return `None` if blank, not a long number, or lower than -1
   def unapply(s: String): Option[MaximumSize] =
@@ -35,5 +56,21 @@ object MaximumSize {
   def convertToLong(maximumSize: MaximumSize): Long = maximumSize match {
     case LimitedSize(l) => l
     case UnlimitedSize  => -1L
+  }
+
+  def min(maximumSizes: LazyList[MaximumSize]): MaximumSize = {
+    @tailrec
+    def min(currentMin: MaximumSize, remainingMaximumSizes: LazyList[MaximumSize]): MaximumSize =
+      if (remainingMaximumSizes.isEmpty) {
+        currentMin
+      } else {
+        remainingMaximumSizes.head match {
+          // Do not evaluate the rest of the list unless needed
+          case LimitedSize(size) if size <= 0L => LimitedSize(0L)
+          case head                            => min(head min currentMin, remainingMaximumSizes.tail)
+        }
+      }
+
+    min(UnlimitedSize, maximumSizes)
   }
 }

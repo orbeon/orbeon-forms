@@ -104,8 +104,9 @@ class XFormsStaticStateImpl(
   def singleUseStaticState                : Boolean          = staticProperties.singleUseStaticState
   def allowErrorRecoveryOnInit            : Boolean          = staticProperties.allowErrorRecoveryOnInit
   def isInlineResources                   : Boolean          = staticProperties.isInlineResources
-  def uploadMaxSize                       : MaximumSize      = staticProperties.uploadMaxSize
-  def uploadMaxSizeFormAggregate          : MaximumSize      = staticProperties.uploadMaxSizeFormAggregate
+  def uploadMaxSizePerFile                : MaximumSize      = staticProperties.uploadMaxSizePerFile
+  def uploadMaxSizeAggregatePerControl    : MaximumSize      = staticProperties.uploadMaxSizeAggregatePerControl
+  def uploadMaxSizeAggregatePerForm       : MaximumSize      = staticProperties.uploadMaxSizeAggregatePerForm
   def staticProperty       (name: String) : Any              = staticProperties.staticProperty       (name)
   def staticStringProperty (name: String) : String           = staticProperties.staticStringProperty (name)
   def staticBooleanProperty(name: String) : Boolean          = staticProperties.staticBooleanProperty(name)

@@ -137,8 +137,9 @@
     <property as="xs:integer" name="oxf.xforms.delay-before-ajax-timeout"                        value="30000"/>
 
     <!-- Supports: blank, -1 (unlimited), or positive `Long` value (there should be a `xs:integer?` type) -->
-    <property as="xs:string"  name="oxf.xforms.upload.max-size"                                  value=""/>
-    <property as="xs:string"  name="oxf.xforms.upload.max-size-aggregate"                        value=""/>
+    <property as="xs:string"  name="oxf.xforms.upload.max-size-per-file"                         value=""/>
+    <property as="xs:string"  name="oxf.xforms.upload.max-size-aggregate-per-control"            value=""/>
+    <property as="xs:string"  name="oxf.xforms.upload.max-size-aggregate-per-form"               value=""/>
     <property as="xs:string"  name="oxf.xforms.upload.max-size-aggregate-expression"             value=""/>
     <property as="xs:string"  name="oxf.xforms.upload.mediatypes"                                value="*/*"/>
     <property as="xs:integer" name="oxf.xforms.upload.delay-before-xforms-timeout"               value="45000"/>

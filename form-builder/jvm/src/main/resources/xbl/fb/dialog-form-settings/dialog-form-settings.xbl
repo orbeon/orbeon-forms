@@ -52,7 +52,7 @@
                     value="string-join(event('updated-with-versions'), ', ')"/>
 
                 <xf:setvalue
-                    iterate="'attachment-max-size', 'attachment-max-size-aggregate'"
+                    iterate="'attachment-max-size-per-file', 'attachment-max-size-aggregate-per-form'"
                     ref="$i/*[name() = context()]"
                     value="(event(context()), -2)[1]"/>
 
@@ -340,35 +340,35 @@
 
                     <!-- Dispatch event with result -->
                     <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
-                        <xf:property name="app"                           value="$i/app/string()"/>
-                        <xf:property name="form"                          value="$i/form/string()"/>
-                        <xf:property name="title"                         value="$i/title/string()"/>
-                        <xf:property name="description"                   value="$i/description/string()"/>
-                        <xf:property name="description-mediatype"         value="if ($i/description/@isHTML = 'true') then 'text/html' else 'text/plain'"/>
-                        <xf:property name="singleton"                     value="$i/singleton/string()"/>
-                        <xf:property name="attachment-max-size"           value="$i/attachment-max-size/string()"/>
-                        <xf:property name="attachment-max-size-aggregate" value="$i/attachment-max-size-aggregate/string()"/>
-                        <xf:property name="attachment-mediatypes"         value="$i/attachment-mediatypes/string()[. != $unlikely-mediatype]"/>
-                        <xf:property name="wizard"                        value="$i/wizard/string()"/>
-                        <xf:property name="wizard-mode"                   value="$i/wizard-mode/string()"/>
-                        <xf:property name="wizard-subsections-nav"        value="$i/wizard-subsections-nav/string()"/>
-                        <xf:property name="wizard-subsections-toc"        value="$i/wizard-subsections-toc/string()"/>
-                        <xf:property name="wizard-separate-toc"           value="$i/wizard-separate-toc/string()"/>
-                        <xf:property name="wizard-section-status"         value="$i/wizard-section-status/string()"/>
-                        <xf:property name="mode"                          value="$i/mode/string()"/>
-                        <xf:property name="automatic-hints"               value="$i/automatic-hints/string()"/>
-                        <xf:property name="data-migration"                value="$i/data-migration/string()"/>
-                        <xf:property name="available-from"                value="$i/available-from"/>
-                        <xf:property name="available-to"                  value="$i/available-to"/>
-                        <xf:property name="grid-tab-order"                value="$i/grid-tab-order/string()"/>
-                        <xf:property name="rendered-page-orientation"     value="$i/rendered-page-orientation/string()"/>
-                        <xf:property name="rendered-page-size"            value="$i/rendered-page-size/string()"/>
-                        <xf:property name="readonly-disable-calculate"    value="$i/readonly-disable-calculate/string()"/>
-                        <xf:property name="relevant"                      value="$i/relevant/string()"/>
-                        <xf:property name="readonly"                      value="$i/readonly/string()"/>
-                        <xf:property name="html-page-layout"              value="$i/html-page-layout/string()"/>
-                        <xf:property name="analysis-calculate"            value="$i/analysis-calculate/string()"/>
-                        <xf:property name="automatic-hints"               value="$i/automatic-hints/string()"/>
+                        <xf:property name="app"                                    value="$i/app/string()"/>
+                        <xf:property name="form"                                   value="$i/form/string()"/>
+                        <xf:property name="title"                                  value="$i/title/string()"/>
+                        <xf:property name="description"                            value="$i/description/string()"/>
+                        <xf:property name="description-mediatype"                  value="if ($i/description/@isHTML = 'true') then 'text/html' else 'text/plain'"/>
+                        <xf:property name="singleton"                              value="$i/singleton/string()"/>
+                        <xf:property name="attachment-max-size-per-file"           value="$i/attachment-max-size-per-file/string()"/>
+                        <xf:property name="attachment-max-size-aggregate-per-form" value="$i/attachment-max-size-aggregate-per-form/string()"/>
+                        <xf:property name="attachment-mediatypes"                  value="$i/attachment-mediatypes/string()[. != $unlikely-mediatype]"/>
+                        <xf:property name="wizard"                                 value="$i/wizard/string()"/>
+                        <xf:property name="wizard-mode"                            value="$i/wizard-mode/string()"/>
+                        <xf:property name="wizard-subsections-nav"                 value="$i/wizard-subsections-nav/string()"/>
+                        <xf:property name="wizard-subsections-toc"                 value="$i/wizard-subsections-toc/string()"/>
+                        <xf:property name="wizard-separate-toc"                    value="$i/wizard-separate-toc/string()"/>
+                        <xf:property name="wizard-section-status"                  value="$i/wizard-section-status/string()"/>
+                        <xf:property name="mode"                                   value="$i/mode/string()"/>
+                        <xf:property name="automatic-hints"                        value="$i/automatic-hints/string()"/>
+                        <xf:property name="data-migration"                         value="$i/data-migration/string()"/>
+                        <xf:property name="available-from"                         value="$i/available-from"/>
+                        <xf:property name="available-to"                           value="$i/available-to"/>
+                        <xf:property name="grid-tab-order"                         value="$i/grid-tab-order/string()"/>
+                        <xf:property name="rendered-page-orientation"              value="$i/rendered-page-orientation/string()"/>
+                        <xf:property name="rendered-page-size"                     value="$i/rendered-page-size/string()"/>
+                        <xf:property name="readonly-disable-calculate"             value="$i/readonly-disable-calculate/string()"/>
+                        <xf:property name="relevant"                               value="$i/relevant/string()"/>
+                        <xf:property name="readonly"                               value="$i/readonly/string()"/>
+                        <xf:property name="html-page-layout"                       value="$i/html-page-layout/string()"/>
+                        <xf:property name="analysis-calculate"                     value="$i/analysis-calculate/string()"/>
+                        <xf:property name="automatic-hints"                        value="$i/automatic-hints/string()"/>
 
                         <xf:property
                             name="labels"
@@ -437,8 +437,8 @@
 <!--                        <relevant/>-->
                         <readonly/>
                         <html-page-layout/>
-                        <attachment-max-size/>
-                        <attachment-max-size-aggregate/>
+                        <attachment-max-size-per-file/>
+                        <attachment-max-size-aggregate-per-form/>
                         <attachment-mediatypes/>
                         <labels/>
                         <labels-placeholders/>
@@ -503,7 +503,7 @@
                     readonly="false()"
                     type="xs:boolean"/>
                 <xf:bind
-                    ref="attachment-max-size | attachment-max-size-aggregate"
+                    ref="attachment-max-size-per-file | attachment-max-size-aggregate-per-form"
                     type="xs:integer"
                     constraint="xxf:non-negative() or . = -2"/>
                 <xf:bind
@@ -704,14 +704,14 @@
                                     <xh:tr>
                                         <xh:td>
                                             <fr:open-select1
-                                                ref="attachment-max-size"
+                                                ref="attachment-max-size-per-file"
                                                 appearance="full xxf:horizontal"
                                                 type="integer"
                                                 suffix="bytes"
-                                                class="fb-attachment-max-size-control">
+                                                class="fb-attachment-max-size-per-file-control">
 
-                                                <xf:label ref="$resources/dialog-form-settings/attachment-max-size/label"/>
-                                                <xf:hint  ref="$resources/dialog-form-settings/attachment-max-size/hint"/>
+                                                <xf:label ref="$resources/dialog-form-settings/attachment-max-size-per-file/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/attachment-max-size-per-file/hint"/>
                                                 <xf:itemset ref="$resources/dialog-form-settings/property-yes-no/item[@id = 0]">
                                                     <xf:label ref="."/>
                                                     <xf:value>-2</xf:value>
@@ -720,14 +720,14 @@
                                         </xh:td>
                                         <xh:td>
                                             <fr:open-select1
-                                                ref="attachment-max-size-aggregate"
+                                                ref="attachment-max-size-aggregate-per-form"
                                                 appearance="full xxf:horizontal"
                                                 type="integer"
                                                 suffix="bytes"
-                                                class="fb-attachment-max-size-aggregate-control">
+                                                class="fb-attachment-max-size-aggregate-per-form-control">
 
-                                                <xf:label ref="$resources/dialog-form-settings/attachment-max-size-aggregate/label"/>
-                                                <xf:hint  ref="$resources/dialog-form-settings/attachment-max-size-aggregate/hint"/>
+                                                <xf:label ref="$resources/dialog-form-settings/attachment-max-size-aggregate-per-form/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/attachment-max-size-aggregate-per-form/hint"/>
                                                 <xf:itemset ref="$resources/dialog-form-settings/property-yes-no/item[@id = 0]">
                                                     <xf:label ref="."/>
                                                     <xf:value>-2</xf:value>

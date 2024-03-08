@@ -289,7 +289,7 @@ trait ContainingDocumentUpload {
     def attachmentMaxSizeValidationMipFor(controlEffectiveId: String, validationFunctionName: String): Option[String] =
       customMipForControl(controlEffectiveId, validationFunctionName)
 
-    def currentUploadSizeControlAggregate(controlEffectiveId: String): Option[Long] = {
+    def currentUploadSizeAggregateForControl(controlEffectiveId: String): Option[Long] = {
       val sizes = for {
         uploadControl    <- controls.getCurrentControlTree.findControl(controlEffectiveId).collect { case c: XFormsUploadControl    => c }
         componentControl <- uploadControl.container.associatedControlOpt                  .collect { case c: XFormsComponentControl => c }
@@ -300,7 +300,7 @@ trait ContainingDocumentUpload {
       sizes.map(_.sum)
     }
 
-    def currentUploadSizeFormAggregate: Option[Long] = {
+    def currentUploadSizeAggregateForForm: Option[Long] = {
       def evaluateAsLong(expr: CompiledExpression) = {
         val defaultModel   = getDefaultModel
         val bindingContext = defaultModel.getDefaultEvaluationContext
@@ -316,9 +316,9 @@ trait ContainingDocumentUpload {
       staticState.uploadMaxSizeFormAggregateExpression map evaluateAsLong map (0L max _)
     }
 
-    def uploadMaxSizeProperty: MaximumSize              = staticState.uploadMaxSize
-
-    def uploadMaxSizeFormAggregateProperty: MaximumSize = staticState.uploadMaxSizeFormAggregate
+    def uploadMaxSizePerFileProperty: MaximumSize             = staticState.uploadMaxSizePerFile
+    def uploadMaxSizeAggregatePerControlProperty: MaximumSize = staticState.uploadMaxSizeAggregatePerControl
+    def uploadMaxSizeAggregatePerFormProperty: MaximumSize    = staticState.uploadMaxSizeAggregatePerForm
   }
 
   def getUploadConstraintsForControl(controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)] = {

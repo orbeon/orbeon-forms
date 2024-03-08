@@ -2,13 +2,13 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsProperties.{UploadMaxSizeFormAggregateProperty, UploadMaxSizeProperty}
+import org.orbeon.oxf.xforms.XFormsProperties.{UploadMaxSizeAggregatePerControlProperty, UploadMaxSizeAggregatePerFormProperty, UploadMaxSizePerFileProperty}
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
 
 
 abstract class XFormsStaticStateStaticPropertiesImpl(
   val nonDefaultProperties    : Map[String, (String, Boolean)],
-  globalMaxSizeProperty       : Int
+  globalMaxSizePerFileProperty: Int
 ) extends XFormsStaticStateStaticProperties {
 
   val isClientStateHandling   : Boolean     = staticStringProperty(P.StateHandlingProperty) == P.StateHandlingClientValue
@@ -20,14 +20,19 @@ abstract class XFormsStaticStateStaticPropertiesImpl(
   val isInlineResources       : Boolean     = staticBooleanProperty(P.InlineResourcesProperty)
   val allowedExternalEvents   : Set[String] = staticStringProperty(P.ExternalEventsProperty).tokenizeToSet
 
-  val uploadMaxSize: MaximumSize =
-    staticStringProperty(UploadMaxSizeProperty).trimAllToOpt flatMap
+  val uploadMaxSizePerFile: MaximumSize =
+    staticStringProperty(UploadMaxSizePerFileProperty).trimAllToOpt flatMap
       MaximumSize.unapply orElse
-      MaximumSize.unapply(globalMaxSizeProperty.toString) getOrElse
+      MaximumSize.unapply(globalMaxSizePerFileProperty.toString) getOrElse
       MaximumSize.LimitedSize(0L)
 
-  val uploadMaxSizeFormAggregate: MaximumSize =
-    staticStringProperty(UploadMaxSizeFormAggregateProperty).trimAllToOpt flatMap
+  val uploadMaxSizeAggregatePerControl: MaximumSize =
+    staticStringProperty(UploadMaxSizeAggregatePerControlProperty).trimAllToOpt flatMap
+      MaximumSize.unapply getOrElse
+      MaximumSize.UnlimitedSize
+
+  val uploadMaxSizeAggregatePerForm: MaximumSize =
+    staticStringProperty(UploadMaxSizeAggregatePerFormProperty).trimAllToOpt flatMap
       MaximumSize.unapply getOrElse
       MaximumSize.UnlimitedSize
 

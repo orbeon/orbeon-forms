@@ -11,31 +11,32 @@ import scala.collection.compat.immutable.LazyList
 trait UploadCheckerLogic {
 
   def attachmentMaxSizeValidationMipFor(controlEffectiveId: String, validationFunctionName: String): Option[String]
-  def currentUploadSizeControlAggregate(controlEffectiveId: String)                                : Option[Long]
-  def currentUploadSizeFormAggregate                                                               : Option[Long]
-  def uploadMaxSizeProperty                                                                        : MaximumSize
-  def uploadMaxSizeFormAggregateProperty                                                           : MaximumSize
+  def currentUploadSizeAggregateForControl(controlEffectiveId: String)                             : Option[Long]
+  def currentUploadSizeAggregateForForm                                                            : Option[Long]
+  def uploadMaxSizePerFileProperty                                                                 : MaximumSize
+  def uploadMaxSizeAggregatePerControlProperty                                                     : MaximumSize
+  def uploadMaxSizeAggregatePerFormProperty                                                        : MaximumSize
 
   def uploadMaxSizeForControl(controlEffectiveId: String): MaximumSize = {
     val maximumSizePerFile =
       attachmentMaxSizeValidationMipFor(controlEffectiveId, ValidationFunctionNames.UploadMaxSize)
         .flatMap(MaximumSize.unapply)
-        .getOrElse(uploadMaxSizeProperty)
+        .getOrElse(uploadMaxSizePerFileProperty)
 
     lazy val maximumSizeAggregatePerControl: MaximumSize =
       attachmentMaxSizeValidationMipFor(controlEffectiveId, ValidationFunctionNames.UploadMaxSizeControlAggregate)
         .flatMap(MaximumSize.unapply)
-        .getOrElse(UnlimitedSize)
+        .getOrElse(uploadMaxSizeAggregatePerControlProperty)
         .minus(
-          currentUploadSizeControlAggregate(controlEffectiveId).getOrElse {
-            throw new IllegalArgumentException(s"Could not determine current control aggregate upload size")
+          currentUploadSizeAggregateForControl(controlEffectiveId).getOrElse {
+            throw new IllegalArgumentException(s"Could not determine current aggregate upload size for control $controlEffectiveId")
           }
         )
 
     lazy val maximumSizeAggregatePerForm: MaximumSize =
-      uploadMaxSizeFormAggregateProperty.minus(
-        currentUploadSizeFormAggregate.getOrElse {
-          throw new IllegalArgumentException(s"Could not determine current form aggregate upload size")
+      uploadMaxSizeAggregatePerFormProperty.minus(
+        currentUploadSizeAggregateForForm.getOrElse {
+          throw new IllegalArgumentException("Could not determine current aggregate upload size for form")
         }
       )
 

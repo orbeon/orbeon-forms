@@ -51,8 +51,9 @@ object XFormsProperties {
   val StaticReadonlyHintProperty                      = "static-readonly-hint"
   val StaticReadonlyAlertProperty                     = "static-readonly-alert"
 
-  val UploadMaxSizeProperty                           = "upload.max-size"
-  val UploadMaxSizeFormAggregateProperty              = "upload.max-size-aggregate"
+  val UploadMaxSizePerFileProperty                    = "upload.max-size-per-file"
+  val UploadMaxSizeAggregatePerControlProperty        = "upload.max-size-aggregate-per-control"
+  val UploadMaxSizeAggregatePerFormProperty           = "upload.max-size-aggregate-per-form"
   val UploadMaxSizeFormAggregateExpressionProperty    = "upload.max-size-aggregate-expression"
   val UploadMediatypesProperty                        = "upload.mediatypes"
 
@@ -188,8 +189,9 @@ object XFormsProperties {
       PropertyDefinition(A11yFocusOnGroupsProperty,                       true,                        propagateToClient = false),
       PropertyDefinition(StaticReadonlyHintProperty,                      false,                       propagateToClient = false),
       PropertyDefinition(StaticReadonlyAlertProperty,                     false,                       propagateToClient = false),
-      PropertyDefinition(UploadMaxSizeProperty,                           "",                          propagateToClient = false), // blank default (see #2956)
-      PropertyDefinition(UploadMaxSizeFormAggregateProperty,              "",                          propagateToClient = false),
+      PropertyDefinition(UploadMaxSizePerFileProperty,                    "",                          propagateToClient = false), // blank default (see #2956)
+      PropertyDefinition(UploadMaxSizeAggregatePerControlProperty,        "",                          propagateToClient = false),
+      PropertyDefinition(UploadMaxSizeAggregatePerFormProperty,           "",                          propagateToClient = false),
       PropertyDefinition(UploadMaxSizeFormAggregateExpressionProperty,    "",                          propagateToClient = false),
       PropertyDefinition(UploadMediatypesProperty,                        "*/*",                       propagateToClient = false),
       PropertyDefinition(ExternalEventsProperty,                          "",                          propagateToClient = false),

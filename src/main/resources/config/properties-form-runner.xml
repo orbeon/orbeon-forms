@@ -301,70 +301,71 @@
         )
     </property>
 
-    <property as="xs:boolean" name="oxf.fr.detail.view.show-explanation.*.*"                    value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.view.full-update.*.*"                         value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.hide-logo.*.*"                                value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.hide-header.*.*"                              value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.hide-footer.*.*"                              value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.hide-buttons-bar.*.*"                         value="false"/>
-    <property as="xs:integer" name="oxf.fr.detail.autosave-delay.*.*"                           value="5000"/>
-    <property as="xs:boolean" name="oxf.fr.detail.lease.enabled.*.*"                            value="false"/>
-    <property as="xs:integer" name="oxf.fr.detail.lease.duration.*.*.*"                         value="10"/>
-    <property as="xs:integer" name="oxf.fr.detail.lease.renew-threshold.*.*"                    value="1"/>
-    <property as="xs:integer" name="oxf.fr.detail.lease.alert-threshold.*.*"                    value="2"/>
-    <property as="xs:boolean" name="oxf.fr.detail.session-expiration-dialog.enabled.*.*"        value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.view.show-explanation.*.*"                     value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.view.full-update.*.*"                          value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.hide-logo.*.*"                                 value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.hide-header.*.*"                               value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.hide-footer.*.*"                               value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.hide-buttons-bar.*.*"                          value="false"/>
+    <property as="xs:integer" name="oxf.fr.detail.autosave-delay.*.*"                            value="5000"/>
+    <property as="xs:boolean" name="oxf.fr.detail.lease.enabled.*.*"                             value="false"/>
+    <property as="xs:integer" name="oxf.fr.detail.lease.duration.*.*.*"                          value="10"/>
+    <property as="xs:integer" name="oxf.fr.detail.lease.renew-threshold.*.*"                     value="1"/>
+    <property as="xs:integer" name="oxf.fr.detail.lease.alert-threshold.*.*"                     value="2"/>
+    <property as="xs:boolean" name="oxf.fr.detail.session-expiration-dialog.enabled.*.*"         value="false"/>
 
-    <property as="xs:boolean" name="oxf.fr.detail.validate-selection-controls-choices.*.*"      value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.validate-selection-controls-choices.*.*"       value="false"/>
 
-    <property as="xs:integer" name="oxf.fr.access-token.validity.*.*"                           value="0"/>
-    <property as="xs:string"  name="oxf.fr.access-token.password"                               value=""/>
+    <property as="xs:integer" name="oxf.fr.access-token.validity.*.*"                            value="0"/>
+    <property as="xs:string"  name="oxf.fr.access-token.password"                                value=""/>
 
-    <property as="xs:boolean" name="oxf.fr.detail.initial-focus.*.*"                            value="true"/>
-    <property as="xs:string"  name="oxf.fr.detail.focus.includes.*.*"                           value=""/>
-    <property as="xs:string"  name="oxf.fr.detail.focus.excludes.*.*"                           value="xf:trigger xf:output xf:label xf:hint xf:help"/>
+    <property as="xs:boolean" name="oxf.fr.detail.initial-focus.*.*"                             value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.focus.includes.*.*"                            value=""/>
+    <property as="xs:string"  name="oxf.fr.detail.focus.excludes.*.*"                            value="xf:trigger xf:output xf:label xf:hint xf:help"/>
 
     <!-- Supports: blank, -1 (unlimited), or positive `Long` value (there should be a `xs:integer?` type) -->
-    <property as="xs:string"  name="oxf.fr.detail.attachment.max-size.*.*"                      value=""/>
-    <property as="xs:string"  name="oxf.fr.detail.attachment.max-size-aggregate.*.*"            value=""/>
-    <property as="xs:string"  name="oxf.fr.detail.attachment.mediatypes.*.*"                    value="*/*"/>
+    <property as="xs:string"  name="oxf.fr.detail.attachment.max-size-per-file.*.*"              value=""/>
+    <property as="xs:string"  name="oxf.fr.detail.attachment.max-size-aggregate-per-control.*.*" value=""/>
+    <property as="xs:string"  name="oxf.fr.detail.attachment.max-size-aggregate-per-form.*.*"    value=""/>
+    <property as="xs:string"  name="oxf.fr.detail.attachment.mediatypes.*.*"                     value="*/*"/>
 
     <!-- PDF fonts -->
-    <property as="xs:string"  name="oxf.fr.pdf.font.family.inter"                               value="Helvetica Neue"/>
-    <property as="xs:string"  name="oxf.fr.pdf.font.resource.inter"                             value="/apps/fr/print/Inter-Medium.ttf"/>
-    <property as="xs:string"  name="oxf.fr.pdf.template.font.paths"                             value=""/>
+    <property as="xs:string"  name="oxf.fr.pdf.font.family.inter"                                value="Helvetica Neue"/>
+    <property as="xs:string"  name="oxf.fr.pdf.font.resource.inter"                              value="/apps/fr/print/Inter-Medium.ttf"/>
+    <property as="xs:string"  name="oxf.fr.pdf.template.font.paths"                              value=""/>
 
     <!-- Automatic PDF JPEG compression level for image attachments that needs reencoding -->
-    <property as="xs:string"  name="oxf.fr.pdf.jpeg.compression"                                value="0.9"/>
+    <property as="xs:string"  name="oxf.fr.pdf.jpeg.compression"                                 value="0.9"/>
 
     <!-- Automatic PDF accessibility and PDF/A level -->
-    <property as="xs:boolean" name="oxf.fr.pdf.accessibility"                                   value="false"/>
-    <property as="xs:string"  name="oxf.fr.pdf.pdf/a"                                           value="none"/>
+    <property as="xs:boolean" name="oxf.fr.pdf.accessibility"                                    value="false"/>
+    <property as="xs:string"  name="oxf.fr.pdf.pdf/a"                                            value="none"/>
 
     <!-- Email configuration -->
-    <property as="xs:string"  name="oxf.fr.email.smtp.host.*.*"                                 value=""/>
-    <property as="xs:string"  name="oxf.fr.email.smtp.port.*.*"                                 value=""/>
-    <property as="xs:string"  name="oxf.fr.email.smtp.username.*.*"                             value=""/>
-    <property as="xs:string"  name="oxf.fr.email.smtp.credentials.*.*"                          value=""/>
+    <property as="xs:string"  name="oxf.fr.email.smtp.host.*.*"                                  value=""/>
+    <property as="xs:string"  name="oxf.fr.email.smtp.port.*.*"                                  value=""/>
+    <property as="xs:string"  name="oxf.fr.email.smtp.username.*.*"                              value=""/>
+    <property as="xs:string"  name="oxf.fr.email.smtp.credentials.*.*"                           value=""/>
     <!-- Blank, tls, or ssl -->
-    <property as="xs:string"  name="oxf.fr.email.smtp.encryption.*.*"                           value=""/>
-    <property as="xs:string"  name="oxf.fr.email.from.*.*"                                      value=""/>
-    <property as="xs:string"  name="oxf.fr.email.reply-to.*.*"                                  value=""/>
-    <property as="xs:string"  name="oxf.fr.email.to.*.*"                                        value=""/>
-    <property as="xs:string"  name="oxf.fr.email.cc.*.*"                                        value=""/>
-    <property as="xs:string"  name="oxf.fr.email.bcc.*.*"                                       value=""/>
-    <property as="xs:boolean" name="oxf.fr.email.attach-pdf.*.*"                                value="true"/>
-    <property as="xs:boolean" name="oxf.fr.email.attach-tiff.*.*"                               value="false"/>
-    <property as="xs:boolean" name="oxf.fr.email.attach-xml.*.*"                                value="true"/>
-    <property as="xs:string"  name="oxf.fr.email.attach-files.*.*"                              value="all"/>
+    <property as="xs:string"  name="oxf.fr.email.smtp.encryption.*.*"                            value=""/>
+    <property as="xs:string"  name="oxf.fr.email.from.*.*"                                       value=""/>
+    <property as="xs:string"  name="oxf.fr.email.reply-to.*.*"                                   value=""/>
+    <property as="xs:string"  name="oxf.fr.email.to.*.*"                                         value=""/>
+    <property as="xs:string"  name="oxf.fr.email.cc.*.*"                                         value=""/>
+    <property as="xs:string"  name="oxf.fr.email.bcc.*.*"                                        value=""/>
+    <property as="xs:boolean" name="oxf.fr.email.attach-pdf.*.*"                                 value="true"/>
+    <property as="xs:boolean" name="oxf.fr.email.attach-tiff.*.*"                                value="false"/>
+    <property as="xs:boolean" name="oxf.fr.email.attach-xml.*.*"                                 value="true"/>
+    <property as="xs:string"  name="oxf.fr.email.attach-files.*.*"                               value="all"/>
 
     <!-- Configuration of built-in forms -->
     <!-- Be specific, as user might change the default persistence layer -->
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="sqlite"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"            value="sqlite"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"           value="sqlite"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="sqlite"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.w9.form"                 value="sqlite"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"             value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"           value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"             value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"            value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"              value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.w9.form"                  value="sqlite"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"              value="sqlite"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf">
         home summary clear pdf wizard-toc wizard-prev wizard-next save-final review
@@ -377,17 +378,17 @@
         fr:is-wizard-last-page()
     </property>
 
-    <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.controls"              value="wizard"/>
+    <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.controls"               value="wizard"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.dmv-14">
         home summary clear save-final review
     </property>
-    <property as="xs:string"  name="oxf.fr.resource.orbeon.dmv-14.*.print.formats.date"         value="[Y0001]-[M01]-[D01]"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.dmv-14.fr-us-state.*"                 value="select-value"/>
-    <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.dmv-14"                value="wizard"/>
+    <property as="xs:string"  name="oxf.fr.resource.orbeon.dmv-14.*.print.formats.date"          value="[Y0001]-[M01]-[D01]"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.dmv-14.fr-us-state.*"                  value="select-value"/>
+    <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.dmv-14"                 value="wizard"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.w9"                    value="wizard"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.w9.xforms-select1.*"                  value="select-value"/>
+    <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.w9"                     value="wizard"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.w9.xforms-select1.*"                   value="select-value"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w9"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.inner.orbeon.w9">
@@ -401,7 +402,7 @@
         home review pdf delete duplicate import new
     </property>
 
-    <property as="xs:boolean" name="oxf.fr.export.page.enable.orbeon.contact"                   value="false"/>
+    <property as="xs:boolean" name="oxf.fr.export.page.enable.orbeon.contact"                    value="false"/>
 
     <property as="xs:string" name="oxf.fr.detail.buttons.orbeon.travel">
         home wizard-prev wizard-next pdf save
@@ -427,18 +428,18 @@
         home summary clear pdf save-final review
     </property>
 
-    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.orbeon.*"             value="2"/>
-    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.*"                 value="none"/>
-    <property as="xs:string"  name="oxf.fr.detail.toc.modes.orbeon.*"                    value="new edit view"/>
+    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.orbeon.*"                     value="2"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.*"                         value="none"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.modes.orbeon.*"                            value="new edit view"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.controls"          value="left"/>
-    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.dmv-14"            value="left"/>
-    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.w9"                value="left"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.controls"                  value="left"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.dmv-14"                    value="left"/>
+    <property as="xs:string"  name="oxf.fr.detail.toc.position.orbeon.w9"                        value="left"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>
+    <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                           value=""/>
 
     <!-- Button processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.home.*.*"                             value='form-runner-home'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.home.*.*"                              value='form-runner-home'/>
     <property as="xs:string"  name="oxf.fr.detail.process.summary.*.*">
         relinquish-lease
         then navigate(
@@ -454,12 +455,12 @@
     <property as="xs:string"  name="oxf.fr.detail.process.new.*.*">
         navigate(uri = "/fr/{fr:app-name()}/{fr:form-name()}/new")
     </property>
-    <property as="xs:string"  name="oxf.fr.detail.process.validate.*.*"                         value='validate-all'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.validate.*.*"                          value='validate-all'/>
 
     <!-- Define processes with the name as the corresponding action so we can run those actions with `process:runProcessByName()` -->
-    <property as="xs:string"  name="oxf.fr.detail.process.collapse-all.*.*"                     value='collapse-all'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.expand-all.*.*"                       value='expand-all'/>
-    <property as="xs:string" name="oxf.fr.detail.process.new-to-edit.*.*"                       value='new-to-edit'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.collapse-all.*.*"                      value='collapse-all'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.expand-all.*.*"                        value='expand-all'/>
+    <property as="xs:string" name="oxf.fr.detail.process.new-to-edit.*.*"                        value='new-to-edit'/>
 
     <property as="xs:string"  name="oxf.fr.detail.process.edit.*.*">
         if ("xxf:get-request-method() = 'GET'") then
@@ -537,7 +538,7 @@
     </property>
 
     <!-- Legacy buttons and processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.save.*.*"                             value='save-final'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.save.*.*"                              value='save-final'/>
     <property as="xs:string"  name="oxf.fr.detail.process.submit.*.*">
         require-uploads
         then validate-all
@@ -547,10 +548,10 @@
         then result-dialog
         recover error-message("database-error")
     </property>
-    <property as="xs:string"  name="oxf.fr.detail.process.workflow-review.*.*"                  value='review'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.workflow-edit.*.*"                    value='edit'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.workflow-review.*.*"                   value='review'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.workflow-edit.*.*"                     value='edit'/>
     <!-- If empty, process is generated based on legacy properties -->
-    <property as="xs:string"  name="oxf.fr.detail.process.workflow-send.*.*"                    value=''/>
+    <property as="xs:string"  name="oxf.fr.detail.process.workflow-send.*.*"                     value=''/>
 
     <property as="xs:string"  name="oxf.fr.detail.process.action-service-error.*.*">
         error-message("service-error")
@@ -561,37 +562,37 @@
     </property>
 
     <!-- Default send parameters -->
-    <property as="xs:string"  name="oxf.fr.detail.send.success.replace.*.*"                     value="all"/>
-    <property as="xs:string"  name="oxf.fr.detail.send.success.method.*.*"                      value="post"/>
-    <property as="xs:boolean" name="oxf.fr.detail.send.success.prune.*.*"                       value="true"/>
-    <property as="xs:string"  name="oxf.fr.detail.send.success.annotate.*.*"                    value=""/>
-    <property as="xs:string"  name="oxf.fr.detail.send.success.content.*.*"                     value="xml"/>
-    <property as="xs:string"  name="oxf.fr.detail.send.error.replace.*.*"                       value="all"/>
-    <property as="xs:boolean" name="oxf.fr.detail.send.error.prune.*.*"                         value="true"/>
-    <property as="xs:string"  name="oxf.fr.detail.send.error.annotate.*.*"                      value=""/>
-    <property as="xs:string"  name="oxf.fr.detail.send.error.method.*.*"                        value="get"/>
-    <property as="xs:string"  name="oxf.fr.detail.send.error.content.*.*"                       value="xml"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.success.replace.*.*"                      value="all"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.success.method.*.*"                       value="post"/>
+    <property as="xs:boolean" name="oxf.fr.detail.send.success.prune.*.*"                        value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.success.annotate.*.*"                     value=""/>
+    <property as="xs:string"  name="oxf.fr.detail.send.success.content.*.*"                      value="xml"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.error.replace.*.*"                        value="all"/>
+    <property as="xs:boolean" name="oxf.fr.detail.send.error.prune.*.*"                          value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.error.annotate.*.*"                       value=""/>
+    <property as="xs:string"  name="oxf.fr.detail.send.error.method.*.*"                         value="get"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.error.content.*.*"                        value="xml"/>
 
-    <property as="xs:anyURI"  name="oxf.fr.detail.close.uri.*.*"                                value=""/>
+    <property as="xs:anyURI"  name="oxf.fr.detail.close.uri.*.*"                                 value=""/>
 
-    <property as="xs:boolean" name="oxf.fr.detail.submit.content-from-persistence.*.*"          value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.submit.content-from-persistence.*.*"           value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.submit.buttons.*.*">
         clear keep go
     </property>
     <!--<property as="xs:string"  name="oxf.fr.detail.submit.go.uri-xpath.*.*"                      value="/book/details/link"/>-->
 
     <!-- For global pages like the Form Runner Home page, restrict list of languages to those that have full support -->
-    <property as="xs:string"  name="oxf.fr.available-languages"                                 value="en es fr it de pt sv fi nl da"/>
+    <property as="xs:string"  name="oxf.fr.available-languages"                                  value="en es fr it de pt sv fi nl da"/>
     <!-- For forms, don't restrict the list of languages by default: https://github.com/orbeon/orbeon-forms/issues/1223 -->
-    <property as="xs:string"  name="oxf.fr.available-languages.*.*"                             value="*"/>
+    <property as="xs:string"  name="oxf.fr.available-languages.*.*"                              value="*"/>
 
     <!-- Service processes -->
-    <property as="xs:string"  name="oxf.fr.service.duplicate.transform.*.*"                     value=""/>
+    <property as="xs:string"  name="oxf.fr.service.duplicate.transform.*.*"                      value=""/>
 
-    <property as="xs:string"  name="oxf.fr.landing.cards"                                       value="quick-links published-forms form-builder-forms demo-forms"/>
+    <property as="xs:string"  name="oxf.fr.landing.cards"                                        value="quick-links published-forms form-builder-forms demo-forms"/>
 
-    <property as="xs:integer" name="oxf.fr.home.page-size"                                      value="20"/>
-    <property as="xs:string"  name="oxf.fr.home.table.link-to"                                  value="summary new"/>
+    <property as="xs:integer" name="oxf.fr.home.page-size"                                       value="20"/>
+    <property as="xs:string"  name="oxf.fr.home.table.link-to"                                   value="summary new"/>
 
     <!-- Example:
         [
@@ -599,38 +600,38 @@
             { "label": "Prod 2", "url": "http://prod2.acme.org/orbeon" }
         ]
     -->
-    <property as="xs:string"  name="oxf.fr.home.remote-servers" value='[]'/>
+    <property as="xs:string"  name="oxf.fr.home.remote-servers"                                  value='[]'/>
 
-    <property as="xs:boolean" name="oxf.fr.import.allow-invalid-documents.*.*"                  value="false"/>
-    <property as="xs:boolean" name="oxf.fr.import.restrict-to-latest-version.*.*"               value="false"/>
-    <property as="xs:string"  name="oxf.fr.import.allowed-formats.*.*"                          value="excel-headings xml-form-structure-and-data"/>
-    <property as="xs:boolean" name="oxf.fr.import.show-app-form-names.*.*"                      value="true"/>
-    <property as="xs:string"  name="oxf.fr.import.forward-parameters.*.*"                       value=""/>
-    <property as="xs:string"  name="oxf.fr.import.buttons.*.*"                                  value="home summary close"/>
+    <property as="xs:boolean" name="oxf.fr.import.allow-invalid-documents.*.*"                   value="false"/>
+    <property as="xs:boolean" name="oxf.fr.import.restrict-to-latest-version.*.*"                value="false"/>
+    <property as="xs:string"  name="oxf.fr.import.allowed-formats.*.*"                           value="excel-headings xml-form-structure-and-data"/>
+    <property as="xs:boolean" name="oxf.fr.import.show-app-form-names.*.*"                       value="true"/>
+    <property as="xs:string"  name="oxf.fr.import.forward-parameters.*.*"                        value=""/>
+    <property as="xs:string"  name="oxf.fr.import.buttons.*.*"                                   value="home summary close"/>
 
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                      value="free"/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.separate-toc.*.*"                  value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.subsections-nav.*.*"               value="false"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.subsections-toc.*.*"               value="active"/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.lazy-section-relevance.*.*"        value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.full-update.*.*"                   value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.allow-url-param.*.*"               value="true"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                       value="free"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.separate-toc.*.*"                   value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.subsections-nav.*.*"                value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.subsections-toc.*.*"                value="active"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.lazy-section-relevance.*.*"         value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.full-update.*.*"                    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.allow-url-param.*.*"                value="true"/>
 
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"                value="lax"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"                 value="lax"/>
 
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.animate.*.*"                      value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.collapsible.*.*"                  value="true"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.section.appearance.*.*"                   value=""/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.section.insert.*.*"                       value="index"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.animate.*.*"                       value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.collapsible.*.*"                   value="true"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.section.appearance.*.*"                    value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.section.insert.*.*"                        value="index"/>
 
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.appearance.*.*"                      value=""/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.markup.*.*"                          value="css-grid"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.insert.*.*"                          value="index"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.tab-order.*.*"                       value="rows"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.appearance.*.*"                       value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.markup.*.*"                           value="css-grid"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.insert.*.*"                           value="index"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.tab-order.*.*"                        value="rows"/>
 
     <!-- Blank string means `if (fr:created-with-or-newer('2018.2')) then 'full' else 'minimal'`. But we cannot
          actually use that expression, since the logic runs in XSLT. So that behavior is implicit. -->
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.calculated-value.appearance.*.*"          value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.calculated-value.appearance.*.*"           value=""/>
 
     <!-- Process for the publish API -->
     <property as="xs:string"  name="oxf.fr.detail.process.before-publish.*.*"/>
@@ -724,8 +725,8 @@
         }
     </property>
 
-    <property as="xs:boolean" name="oxf.fr.export.page.enable.*.*"                 value="false"/>
+    <property as="xs:boolean" name="oxf.fr.export.page.enable.*.*"                               value="false"/>
 
-    <property as="xs:boolean" name="oxf.fr.upload.reject-empty-files"              value="true"/>
+    <property as="xs:boolean" name="oxf.fr.upload.reject-empty-files"                            value="true"/>
 
 </properties>

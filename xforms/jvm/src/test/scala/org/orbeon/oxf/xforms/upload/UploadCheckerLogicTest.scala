@@ -25,9 +25,10 @@ class UploadCheckerLogicTest extends AnyFunSpec {
     controlIdToMaxSize                           : Map[String, Long],
     controlIdToMaxSizeControlAggregate           : Map[String, Long],
     controlIdToCurrentUploadSizeControlAggregate : Map[String, Long],
-    currentUploadSizeFormAggregate               : Option[Long],
-    uploadMaxSizeProperty                        : MaximumSize,
-    uploadMaxSizeFormAggregateProperty           : MaximumSize
+    currentUploadSizeAggregateForForm            : Option[Long],
+    uploadMaxSizePerFileProperty                 : MaximumSize,
+    uploadMaxSizeAggregatePerControlProperty     : MaximumSize,
+    uploadMaxSizeAggregatePerFormProperty        : MaximumSize
   ) extends UploadCheckerLogic {
     def attachmentMaxSizeValidationMipFor(controlEffectiveId: String, validationFunctionName: String): Option[String] =
       validationFunctionName match {
@@ -36,25 +37,26 @@ class UploadCheckerLogicTest extends AnyFunSpec {
         case _                                                     => throw new IllegalArgumentException(s"Unexpected validation function name: $validationFunctionName")
       }
 
-    def currentUploadSizeControlAggregate(controlEffectiveId: String): Option[Long] =
+    def currentUploadSizeAggregateForControl(controlEffectiveId: String): Option[Long] =
       controlIdToCurrentUploadSizeControlAggregate.get(controlEffectiveId)
   }
 
-  describe("With `upload.max-size` property only") {
+  describe("With `upload.max-size-per-file` property only") {
     for (limit <- List(LimitedSize(0L), LimitedSize(1000L), UnlimitedSize))
       it(s"limit = `$limit`") {
         assert(limit === TestUploadCheckerLogic(
           controlIdToMaxSize                           = Map(),
           controlIdToMaxSizeControlAggregate           = Map(),
           controlIdToCurrentUploadSizeControlAggregate = Map(),
-          currentUploadSizeFormAggregate               = None,
-          uploadMaxSizeFormAggregateProperty           = UnlimitedSize,
-          uploadMaxSizeProperty                        = limit
+          currentUploadSizeAggregateForForm            = None,
+          uploadMaxSizePerFileProperty                 = limit,
+          uploadMaxSizeAggregatePerControlProperty     = UnlimitedSize,
+          uploadMaxSizeAggregatePerFormProperty        = UnlimitedSize
         ).uploadMaxSizeForControl("dummy"))
       }
   }
 
-  describe("With `upload.max-size` property and limit per control") {
+  describe("With `upload.max-size-per-file` property and limit per control") {
 
     val expectations = List(
       LimitedSize(0L) -> List(
@@ -85,15 +87,16 @@ class UploadCheckerLogicTest extends AnyFunSpec {
           controlIdToMaxSize                           = Map("control1" -> 1000L, "control2" -> 2000L),
           controlIdToMaxSizeControlAggregate           = Map(),
           controlIdToCurrentUploadSizeControlAggregate = Map(),
-          currentUploadSizeFormAggregate               = None,
-          uploadMaxSizeFormAggregateProperty           = UnlimitedSize,
-          uploadMaxSizeProperty                        = limit
+          currentUploadSizeAggregateForForm            = None,
+          uploadMaxSizePerFileProperty                 = limit,
+          uploadMaxSizeAggregatePerControlProperty     = UnlimitedSize,
+          uploadMaxSizeAggregatePerFormProperty        = UnlimitedSize
         ).uploadMaxSizeForControl(controlId))
       }
     }
   }
 
-  describe("With `upload.max-size` property and form aggregate limit") {
+  describe("With `upload.max-size-per-file` property and form aggregate limit") {
 
     val expectations = List(
       (1000L, LimitedSize(0L), List(
@@ -137,9 +140,10 @@ class UploadCheckerLogicTest extends AnyFunSpec {
           controlIdToMaxSize                           = Map("control1" -> 1000L, "control2" -> 2000L),
           controlIdToMaxSizeControlAggregate           = Map(),
           controlIdToCurrentUploadSizeControlAggregate = Map(),
-          currentUploadSizeFormAggregate               = Some(currentUploadSizeFormAggregate),
-          uploadMaxSizeFormAggregateProperty           = formAggregateLimit,
-          uploadMaxSizeProperty                        = LimitedSize(3000)
+          currentUploadSizeAggregateForForm            = Some(currentUploadSizeFormAggregate),
+          uploadMaxSizePerFileProperty                 = LimitedSize(3000),
+          uploadMaxSizeAggregatePerControlProperty     = UnlimitedSize,
+          uploadMaxSizeAggregatePerFormProperty        = formAggregateLimit
         ).uploadMaxSizeForControl(controlId))
       }
     }
@@ -150,9 +154,10 @@ class UploadCheckerLogicTest extends AnyFunSpec {
           controlIdToMaxSize                           = Map("control1" -> 1000L, "control2" -> 2000L),
           controlIdToMaxSizeControlAggregate           = Map(),
           controlIdToCurrentUploadSizeControlAggregate = Map(),
-          currentUploadSizeFormAggregate               = None,
-          uploadMaxSizeFormAggregateProperty           = LimitedSize(10000),
-          uploadMaxSizeProperty                        = LimitedSize(3000)
+          currentUploadSizeAggregateForForm            = None,
+          uploadMaxSizePerFileProperty                 = LimitedSize(3000),
+          uploadMaxSizeAggregatePerControlProperty     = UnlimitedSize,
+          uploadMaxSizeAggregatePerFormProperty        = LimitedSize(10000)
         ).uploadMaxSizeForControl("control1")
       }
     }
@@ -209,9 +214,10 @@ class UploadCheckerLogicTest extends AnyFunSpec {
           controlIdToMaxSize                           = Map(),
           controlIdToMaxSizeControlAggregate           = Map("control1" -> 1000L, "control2" -> 1000L, "control3" -> 3000L),
           controlIdToCurrentUploadSizeControlAggregate = controlIdToCurrentUploadSizeControlAggregate,
-          currentUploadSizeFormAggregate               = Some(currentUploadSizeFormAggregate),
-          uploadMaxSizeFormAggregateProperty           = LimitedSize(4000L),
-          uploadMaxSizeProperty                        = LimitedSize(1000L)
+          currentUploadSizeAggregateForForm            = Some(currentUploadSizeFormAggregate),
+          uploadMaxSizePerFileProperty                 = LimitedSize(1000L),
+          uploadMaxSizeAggregatePerControlProperty     = UnlimitedSize,
+          uploadMaxSizeAggregatePerFormProperty        = LimitedSize(4000L)
         ).uploadMaxSizeForControl(controlId))
       }
     }

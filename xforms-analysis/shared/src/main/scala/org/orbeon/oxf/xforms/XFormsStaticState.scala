@@ -59,8 +59,9 @@ trait XFormsStaticStateStaticProperties {
 
   def isInlineResources                   : Boolean
 
-  def uploadMaxSize                       : MaximumSize
-  def uploadMaxSizeFormAggregate          : MaximumSize
+  def uploadMaxSizePerFile                : MaximumSize
+  def uploadMaxSizeAggregatePerControl    : MaximumSize
+  def uploadMaxSizeAggregatePerForm       : MaximumSize
 
   def staticProperty       (name: String) : Any
   def staticStringProperty (name: String) : String

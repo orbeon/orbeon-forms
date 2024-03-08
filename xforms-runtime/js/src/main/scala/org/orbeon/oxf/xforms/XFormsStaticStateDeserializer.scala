@@ -1036,14 +1036,14 @@ object XFormsStaticStateDeserializer {
 object XFormsStaticStateImpl {
 
   def apply(
-    _nonDefaultProperties : Map[String, (String, Boolean)],
-    globalMaxSizeProperty : Int,
-    _topLevelPart         : TopLevelPartAnalysis,
-    _template             : Option[AnnotatedTemplate])(implicit
-    _logger               : IndentedLogger
+    _nonDefaultProperties        : Map[String, (String, Boolean)],
+    globalMaxSizePerFileProperty : Int,
+    _topLevelPart                : TopLevelPartAnalysis,
+    _template                    : Option[AnnotatedTemplate])(implicit
+    _logger                      : IndentedLogger
   ): XFormsStaticState = {
 
-    val staticProperties = new XFormsStaticStateStaticPropertiesImpl(_nonDefaultProperties, globalMaxSizeProperty) {
+    val staticProperties = new XFormsStaticStateStaticPropertiesImpl(_nonDefaultProperties, globalMaxSizePerFileProperty) {
       def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean = featureRequested
     }
 
@@ -1080,8 +1080,9 @@ object XFormsStaticStateImpl {
       def singleUseStaticState                : Boolean          = staticProperties.singleUseStaticState
       def allowErrorRecoveryOnInit            : Boolean          = staticProperties.allowErrorRecoveryOnInit
       def isInlineResources                   : Boolean          = staticProperties.isInlineResources
-      def uploadMaxSize                       : MaximumSize      = staticProperties.uploadMaxSize
-      def uploadMaxSizeFormAggregate          : MaximumSize      = staticProperties.uploadMaxSizeFormAggregate
+      def uploadMaxSizePerFile                : MaximumSize      = staticProperties.uploadMaxSizePerFile
+      def uploadMaxSizeAggregatePerControl    : MaximumSize      = staticProperties.uploadMaxSizeAggregatePerControl
+      def uploadMaxSizeAggregatePerForm       : MaximumSize      = staticProperties.uploadMaxSizeAggregatePerForm
       def staticProperty       (name: String) : Any              = staticProperties.staticProperty       (name)
       def staticStringProperty (name: String) : String           = staticProperties.staticStringProperty (name)
       def staticBooleanProperty(name: String) : Boolean          = staticProperties.staticBooleanProperty(name)

@@ -406,14 +406,14 @@
             <wizard-section-status>
                 <label>Always Show Wizard Section Status</label>
             </wizard-section-status>
-            <attachment-max-size>
+            <attachment-max-size-per-file>
                 <label>Maximum Attachment Size per File</label>
                 <hint>Can also be set on a per-control basis in Control Settings</hint>
-            </attachment-max-size>
-            <attachment-max-size-aggregate>
+            </attachment-max-size-per-file>
+            <attachment-max-size-aggregate-per-form>
                 <label>Maximum Aggregate Attachment Size</label>
                 <hint>Applies to all attachment controls in this form</hint>
-            </attachment-max-size-aggregate>
+            </attachment-max-size-aggregate-per-form>
             <attachment-mediatypes>
                 <label>Allowed File Types</label>
                 <hint>For example "image/* application/pdf"</hint>
@@ -1813,14 +1813,14 @@
             <wizard-section-status>
                 <label>Toujours montrer l'état des sections du wizard</label>
             </wizard-section-status>
-            <attachment-max-size>
-                <label>Taille maximale des fichiers joints par contrôle</label>
+            <attachment-max-size-per-file>
+                <label>Taille maximale de chaque fichier joint</label>
                 <hint>Peut aussi être spécifié pour chaque contrôle via "Paramètres du contrôle"</hint>
-            </attachment-max-size>
-            <attachment-max-size-aggregate>
+            </attachment-max-size-per-file>
+            <attachment-max-size-aggregate-per-form>
                 <label>Taille maximale agrégée des fichiers joints</label>
                 <hint>S'applique à tous les fichiers joints de ce formulaire</hint>
-            </attachment-max-size-aggregate>
+            </attachment-max-size-aggregate-per-form>
             <attachment-mediatypes>
                 <label>Types de fichiers supportés</label>
                 <hint>Par exemple "image/* application/pdf"</hint>
@@ -3203,14 +3203,14 @@
             <wizard-section-status>
                 <label todo="true">Always Show Wizard Section Status</label>
             </wizard-section-status>
-            <attachment-max-size>
+            <attachment-max-size-per-file>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
-            </attachment-max-size>
-            <attachment-max-size-aggregate>
+            </attachment-max-size-per-file>
+            <attachment-max-size-aggregate-per-form>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
-            </attachment-max-size-aggregate>
+            </attachment-max-size-aggregate-per-form>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -4621,14 +4621,14 @@
             <wizard-section-status>
                 <label todo="true">Always Show Wizard Section Status</label>
             </wizard-section-status>
-            <attachment-max-size>
+            <attachment-max-size-per-file>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
-            </attachment-max-size>
-            <attachment-max-size-aggregate>
+            </attachment-max-size-per-file>
+            <attachment-max-size-aggregate-per-form>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
-            </attachment-max-size-aggregate>
+            </attachment-max-size-aggregate-per-form>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -6039,14 +6039,14 @@
             <wizard-section-status>
                 <label todo="true">Always Show Wizard Section Status</label>
             </wizard-section-status>
-            <attachment-max-size>
+            <attachment-max-size-per-file>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
-            </attachment-max-size>
-            <attachment-max-size-aggregate>
+            </attachment-max-size-per-file>
+            <attachment-max-size-aggregate-per-form>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
-            </attachment-max-size-aggregate>
+            </attachment-max-size-aggregate-per-form>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -7421,14 +7421,14 @@
             <wizard-section-status>
                 <label todo="true">Always Show Wizard Section Status</label>
             </wizard-section-status>
-            <attachment-max-size>
+            <attachment-max-size-per-file>
                 <label>Maximale Größe des Dateianhangs pro Steuerelement</label>
                 <hint>Kann auch pro Steuerelement konfiguriert werden (in den Steuerelement-Einstellungen)</hint>
-            </attachment-max-size>
-            <attachment-max-size-aggregate>
+            </attachment-max-size-per-file>
+            <attachment-max-size-aggregate-per-form>
                 <label>Maximale Dateigröße aller Anhänge</label>
                 <hint>Beinhaltet alle Steuerelemente dieses Formulars</hint>
-            </attachment-max-size-aggregate>
+            </attachment-max-size-aggregate-per-form>
             <attachment-mediatypes>
                 <label>Erlaubte Dateitypen</label>
                 <hint>Zum Beispiel "image/* application/pdf"</hint>
@@ -8806,14 +8806,14 @@
             <wizard-section-status>
                 <label todo="true">Always Show Wizard Section Status</label>
             </wizard-section-status>
-            <attachment-max-size>
+            <attachment-max-size-per-file>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
-            </attachment-max-size>
-            <attachment-max-size-aggregate>
+            </attachment-max-size-per-file>
+            <attachment-max-size-aggregate-per-form>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
-            </attachment-max-size-aggregate>
+            </attachment-max-size-aggregate-per-form>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -10216,14 +10216,14 @@
             <wizard-section-status>
                 <label todo="true">Always Show Wizard Section Status</label>
             </wizard-section-status>
-            <attachment-max-size>
+            <attachment-max-size-per-file>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
-            </attachment-max-size>
-            <attachment-max-size-aggregate>
+            </attachment-max-size-per-file>
+            <attachment-max-size-aggregate-per-form>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
-            </attachment-max-size-aggregate>
+            </attachment-max-size-aggregate-per-form>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -11627,14 +11627,14 @@
             <wizard-section-status>
                 <label todo="true">Always Show Wizard Section Status</label>
             </wizard-section-status>
-            <attachment-max-size>
+            <attachment-max-size-per-file>
                 <label>Maximum bijlagegrootte per control</label>
                 <hint>Kan ook per control worden ingesteld in de control-instellingen</hint>
-            </attachment-max-size>
-            <attachment-max-size-aggregate>
+            </attachment-max-size-per-file>
+            <attachment-max-size-aggregate-per-form>
                 <label>Maximum totale bijlagegrootte</label>
                 <hint>Van toepassing op alle bijlage-controles in dit form</hint>
-            </attachment-max-size-aggregate>
+            </attachment-max-size-aggregate-per-form>
             <attachment-mediatypes>
                 <label>Toegestane bestandstypen</label>
                 <hint>Bijvoorbeeld "image/* application/pdf"</hint>
@@ -13017,14 +13017,14 @@
             <wizard-section-status>
                 <label todo="true">Always Show Wizard Section Status</label>
             </wizard-section-status>
-            <attachment-max-size>
+            <attachment-max-size-per-file>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
-            </attachment-max-size>
-            <attachment-max-size-aggregate>
+            </attachment-max-size-per-file>
+            <attachment-max-size-aggregate-per-form>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
-            </attachment-max-size-aggregate>
+            </attachment-max-size-aggregate-per-form>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
@@ -14434,14 +14434,14 @@
             <wizard-section-status>
                 <label todo="true">Always Show Wizard Section Status</label>
             </wizard-section-status>
-            <attachment-max-size>
+            <attachment-max-size-per-file>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
-            </attachment-max-size>
-            <attachment-max-size-aggregate>
+            </attachment-max-size-per-file>
+            <attachment-max-size-aggregate-per-form>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
-            </attachment-max-size-aggregate>
+            </attachment-max-size-aggregate-per-form>
             <attachment-mediatypes>
                 <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>

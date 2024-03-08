@@ -332,22 +332,45 @@
             )[1]"/>
 
     <xsl:variable
-        name="valid-attachment-max-size-or-empty"
+        name="valid-attachment-max-size-per-file-or-empty"
         as="xs:string?"
         select="
-            p:property(string-join(('oxf.fr.detail.attachment.max-size', $app, $form), '.'))[
+            (
+                (: Backward compatibility :)
+                p:property(string-join(('oxf.fr.detail.attachment.max-size', $app, $form), '.'))[
+                    (: Allow -1 to mean 'unlimited' :)
+                    . castable as xs:integer and xs:integer(.) ge -1
+                ],
+                p:property(string-join(('oxf.fr.detail.attachment.max-size-per-file', $app, $form), '.'))[
+                    (: Allow -1 to mean 'unlimited' :)
+                    . castable as xs:integer and xs:integer(.) ge -1
+                ]
+            )[1]"/>
+
+    <xsl:variable
+        name="valid-attachment-max-size-aggregate-per-control-or-empty"
+        as="xs:string?"
+        select="
+            p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate-per-control', $app, $form), '.'))[
                 (: Allow -1 to mean 'unlimited' :)
                 . castable as xs:integer and xs:integer(.) ge -1
             ]"/>
 
     <xsl:variable
-        name="valid-attachment-max-size-aggregate-or-empty"
+        name="valid-attachment-max-size-aggregate-per-form-or-empty"
         as="xs:string?"
         select="
-            p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate', $app, $form), '.'))[
-                (: Allow -1 to mean 'unlimited' :)
-                . castable as xs:integer and xs:integer(.) ge -1
-            ]"/>
+            (
+                (: Backward compatibility :)
+                p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate', $app, $form), '.'))[
+                    (: Allow -1 to mean 'unlimited' :)
+                    . castable as xs:integer and xs:integer(.) ge -1
+                ],
+                p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate-per-form', $app, $form), '.'))[
+                    (: Allow -1 to mean 'unlimited' :)
+                    . castable as xs:integer and xs:integer(.) ge -1
+                ]
+            )[1]"/>
 
     <xsl:variable
         name="attachment-mediatypes"
@@ -889,23 +912,42 @@
 
             <xsl:choose>
                 <xsl:when test="exists(@xxf:upload.max-size)">
-                    <!-- Use if explicitly specified -->
-                    <xsl:copy-of select="@xxf:upload.max-size"/>
+                    <!-- Use if explicitly specified (backward compatibility) -->
+                    <xsl:attribute name="xxf:upload.max-size-per-file" select="@xxf:upload.max-size"/>
                 </xsl:when>
-                <xsl:when test="exists($valid-attachment-max-size-or-empty)">
+                <xsl:when test="exists(@xxf:upload.max-size-per-file)">
+                    <!-- Use if explicitly specified -->
+                    <xsl:copy-of select="@xxf:upload.max-size-per-file"/>
+                </xsl:when>
+                <xsl:when test="exists($valid-attachment-max-size-per-file-or-empty)">
                     <!-- Else use Form Runner property if specified and valid -->
-                    <xsl:attribute name="xxf:upload.max-size" select="$valid-attachment-max-size-or-empty"/>
+                    <xsl:attribute name="xxf:upload.max-size-per-file" select="$valid-attachment-max-size-per-file-or-empty"/>
+                </xsl:when>
+            </xsl:choose>
+
+            <xsl:choose>
+                <xsl:when test="exists(@xxf:upload.max-size-aggregate-per-control)">
+                    <!-- Use if explicitly specified -->
+                    <xsl:copy-of select="@xxf:upload.max-size-aggregate-per-control"/>
+                </xsl:when>
+                <xsl:when test="exists($valid-attachment-max-size-aggregate-per-control-or-empty)">
+                    <!-- Else use Form Runner property if specified and valid -->
+                    <xsl:attribute name="xxf:upload.max-size-aggregate-per-control" select="$valid-attachment-max-size-aggregate-per-control-or-empty"/>
                 </xsl:when>
             </xsl:choose>
 
             <xsl:choose>
                 <xsl:when test="exists(@xxf:upload.max-size-aggregate)">
-                    <!-- Use if explicitly specified -->
-                    <xsl:copy-of select="@xxf:upload.max-size-aggregate"/>
+                    <!-- Use if explicitly specified (backward compatibility) -->
+                    <xsl:attribute name="xxf:upload.max-size-aggregate-per-form" select="@xxf:upload.max-size-aggregate"/>
                 </xsl:when>
-                <xsl:when test="exists($valid-attachment-max-size-aggregate-or-empty)">
+                <xsl:when test="exists(@xxf:upload.max-size-aggregate-per-form)">
+                    <!-- Use if explicitly specified -->
+                    <xsl:copy-of select="@xxf:upload.max-size-aggregate-per-form"/>
+                </xsl:when>
+                <xsl:when test="exists($valid-attachment-max-size-aggregate-per-form-or-empty)">
                     <!-- Else use Form Runner property if specified and valid -->
-                    <xsl:attribute name="xxf:upload.max-size-aggregate" select="$valid-attachment-max-size-aggregate-or-empty"/>
+                    <xsl:attribute name="xxf:upload.max-size-aggregate-per-form" select="$valid-attachment-max-size-aggregate-per-form-or-empty"/>
                 </xsl:when>
             </xsl:choose>
 

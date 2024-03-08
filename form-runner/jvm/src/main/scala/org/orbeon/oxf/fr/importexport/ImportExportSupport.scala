@@ -27,6 +27,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
 
+import scala.collection.mutable.ListBuffer
 import scala.util.matching.Regex
 
 
@@ -144,9 +145,9 @@ object ImportExportSupport {
     // Remove rows without visible content
     // This matches what we do in HTML/CSS, where rows that are empty or that don't contain relevant controls
     // don't take up vertical space.
-    def rowIsNonRelevant(row: List[Cell[om.NodeInfo]]) =
+    def rowIsNonRelevant(row: List[Cell[om.NodeInfo]]): Boolean =
       row forall {
-        case Cell(Some(u), _, _, _, _, _) => u firstChildOpt * exists filterOut
+        case Cell(Some(u), _, _, _, _, _) => FormRunner.findCellNestedControl(u).exists(filterOut)
         case Cell(None, _, _, _, _, _)    => false
       }
 
@@ -159,23 +160,27 @@ object ImportExportSupport {
       gridModel
   }
 
-  // Take a grid with possibly multiple rows and transform it into a grid with a single row
-  def flattenGrids(gridModels: Iterable[GridModel[om.NodeInfo]]): GridModel[om.NodeInfo] = {
+  // Take grids with possibly multiple rows and transform them into a grid with a single row, juxtaposing the cells
+  def flattenGrids(
+    gridModels: Iterable[GridModel[om.NodeInfo]],
+    keep      : Cell[om.NodeInfo] => Boolean
+  ): GridModel[om.NodeInfo] = {
 
     val (_, cells) =
-      gridModels.foldLeft((0, Nil: List[Cell[om.NodeInfo]])) { case ((sizeSoFar, cellsSoFar), gridModel) =>
-
-        val newList =
-          for {
-              (row, rowIndex) <- gridModel.cells.zipWithIndex
-              cell            <- row
-            } yield
-              cell.copy(y = 1, h = 1, x = cell.x + rowIndex * 12)(12 * gridModel.cells.size)
-
-        (sizeSoFar + gridModel.cells.size * 12, cellsSoFar ::: newList)
+      gridModels
+        .flatMap(_.cells)
+        .flatten
+        .filter(_.origin.isEmpty)
+        .filter(keep)
+        .foldLeft((0, ListBuffer.empty[Cell[om.NodeInfo]])) {
+        case ((positionSoFar, cellsSoFar), currentCell) =>
+          (
+            positionSoFar + currentCell.w,
+            cellsSoFar += currentCell.copy(y = 1, h = 1, x = positionSoFar + 1)(Int.MaxValue)
+          )
       }
 
-    GridModel(List(cells))
+    GridModel(List(cells.toList))
   }
 
   // A named range can be up to 255 characters long and can contain letters, numbers, periods and underscores (no spaces or special punctuation characters).
@@ -334,8 +339,8 @@ object ImportExportSupport {
       }
     }
 
-  def filterCellsWithControls(updatedGridModel: GridModel[om.NodeInfo]): List[List[(Cell[om.NodeInfo], om.NodeInfo)]] =
-    updatedGridModel.cells.map (_ flatMap {
+  def filterCellsWithControls(cells: List[List[Cell[om.NodeInfo]]]): List[List[(Cell[om.NodeInfo], om.NodeInfo)]] =
+    cells.map (_ flatMap {
       case c @ Cell(Some(u), None, _, _, _, _) => FormRunner.findCellNestedControl(u).filterNot(isExcludedControl).map(c ->)
       case _                                   => None
     })

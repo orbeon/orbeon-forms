@@ -199,10 +199,10 @@
                                 for $mip in
                                     xxf:custom-mip(
                                         $binding,
-                                        'upload-max-size-aggregate'
+                                        'upload-max-size-aggregate-per-control'
                                     )[. castable as xs:integer]
                                 return
-                                    xxf:upload-max-size-aggregate(xs:integer($mip)),
+                                    xxf:upload-max-size-aggregate-per-control(xs:integer($mip)),
                                 true()
                             )[1]"/>
 

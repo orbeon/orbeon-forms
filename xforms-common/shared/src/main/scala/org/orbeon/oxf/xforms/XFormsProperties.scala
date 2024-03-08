@@ -51,6 +51,10 @@ object XFormsProperties {
   val StaticReadonlyHintProperty                      = "static-readonly-hint"
   val StaticReadonlyAlertProperty                     = "static-readonly-alert"
 
+  // Backward compatibility
+  val UploadMaxSizeProperty                           = "upload.max-size"
+  val UploadMaxSizeAggregateProperty                  = "upload.max-size-aggregate"
+
   val UploadMaxSizePerFileProperty                    = "upload.max-size-per-file"
   val UploadMaxSizeAggregatePerControlProperty        = "upload.max-size-aggregate-per-control"
   val UploadMaxSizeAggregatePerFormProperty           = "upload.max-size-aggregate-per-form"
@@ -189,6 +193,8 @@ object XFormsProperties {
       PropertyDefinition(A11yFocusOnGroupsProperty,                       true,                        propagateToClient = false),
       PropertyDefinition(StaticReadonlyHintProperty,                      false,                       propagateToClient = false),
       PropertyDefinition(StaticReadonlyAlertProperty,                     false,                       propagateToClient = false),
+      PropertyDefinition(UploadMaxSizeProperty,                           "",                          propagateToClient = false), // backward compatibility
+      PropertyDefinition(UploadMaxSizeAggregateProperty,                  "",                          propagateToClient = false), // backward compatibility
       PropertyDefinition(UploadMaxSizePerFileProperty,                    "",                          propagateToClient = false), // blank default (see #2956)
       PropertyDefinition(UploadMaxSizeAggregatePerControlProperty,        "",                          propagateToClient = false),
       PropertyDefinition(UploadMaxSizeAggregatePerFormProperty,           "",                          propagateToClient = false),

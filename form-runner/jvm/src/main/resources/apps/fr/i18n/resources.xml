@@ -369,7 +369,7 @@
             </labels>
             <hints>
                 <upload-max-size>Files must be under {0}.</upload-max-size>
-                <upload-max-size-aggregate>Total file size in control must be under {0}.</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control>Total file size in control must be under {0}.</upload-max-size-aggregate-per-control>
                 <upload-mediatypes>Only {0} files are accepted.</upload-mediatypes>
                 <upload-image>image</upload-image>
                 <upload-video>video</upload-video>
@@ -1056,7 +1056,7 @@
             </labels>
             <hints>
                 <upload-max-size>La taille des fichiers doit être inférieurs à {0}.</upload-max-size>
-                <upload-max-size-aggregate>La taille totale des fichiers pour ce contrôle doit être inférieure à {0}.</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control>La taille totale des fichiers pour ce contrôle doit être inférieure à {0}.</upload-max-size-aggregate-per-control>
                 <upload-mediatypes>Seuls les {0} sont acceptés.</upload-mediatypes>
                 <upload-image>image</upload-image>
                 <upload-video>vidéo</upload-video>
@@ -1735,7 +1735,7 @@
             </labels>
             <hints>
                 <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
-                <upload-max-size-aggregate todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
                 <upload-video todo="true">[video]</upload-video>
@@ -2431,7 +2431,7 @@
             </labels>
             <hints>
                 <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
-                <upload-max-size-aggregate todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
                 <upload-video todo="true">[video]</upload-video>
@@ -3120,7 +3120,7 @@
             </labels>
             <hints>
                 <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
-                <upload-max-size-aggregate todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
                 <upload-video todo="true">[video]</upload-video>
@@ -3794,7 +3794,7 @@
             </labels>
             <hints>
                 <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
-                <upload-max-size-aggregate todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
                 <upload-video todo="true">[video]</upload-video>
@@ -4473,7 +4473,7 @@
             </labels>
             <hints>
                 <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
-                <upload-max-size-aggregate todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
                 <upload-video todo="true">[video]</upload-video>
@@ -5156,7 +5156,7 @@
             </labels>
             <hints>
                 <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
-                <upload-max-size-aggregate todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
                 <upload-video todo="true">[video]</upload-video>
@@ -5839,7 +5839,7 @@
             </labels>
             <hints>
                 <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
-                <upload-max-size-aggregate todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
                 <upload-video todo="true">[video]</upload-video>
@@ -6522,7 +6522,7 @@
             </labels>
             <hints>
                 <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
-                <upload-max-size-aggregate todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
                 <upload-video todo="true">[video]</upload-video>
@@ -7205,7 +7205,7 @@
             </labels>
             <hints>
                 <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
-                <upload-max-size-aggregate todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
                 <upload-video todo="true">[video]</upload-video>
@@ -7888,7 +7888,7 @@
             </labels>
             <hints>
                 <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
-                <upload-max-size-aggregate todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
                 <upload-video todo="true">[video]</upload-video>
@@ -8565,7 +8565,7 @@
             </labels>
             <hints>
                 <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
-                <upload-max-size-aggregate todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
                 <upload-video todo="true">[video]</upload-video>
@@ -9245,7 +9245,7 @@
             </labels>
             <hints>
                 <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
-                <upload-max-size-aggregate todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate>
+                <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
                 <upload-video todo="true">[video]</upload-video>

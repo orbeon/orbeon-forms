@@ -24,7 +24,7 @@ trait UploadCheckerLogic {
         .getOrElse(uploadMaxSizePerFileProperty)
 
     lazy val maximumSizeAggregatePerControl: MaximumSize =
-      attachmentMaxSizeValidationMipFor(controlEffectiveId, ValidationFunctionNames.UploadMaxSizeControlAggregate)
+      attachmentMaxSizeValidationMipFor(controlEffectiveId, ValidationFunctionNames.UploadMaxSizeAggregatePerControl)
         .flatMap(MaximumSize.unapply)
         .getOrElse(uploadMaxSizeAggregatePerControlProperty)
         .minus(

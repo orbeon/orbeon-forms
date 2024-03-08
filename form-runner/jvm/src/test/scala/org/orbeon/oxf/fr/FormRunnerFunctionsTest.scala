@@ -277,21 +277,21 @@ class FormRunnerFunctionsTest
     //val Logger  = new IndentedLogger(LoggerFactory.createLogger(classOf[FormBuilderFunctionsTest]), true)
 
     val data = List(
-      (Some("max-length"                -> Some("5"))                                             , "xxf:max-length(5)"),
-      (Some("min-length"                -> Some("5"))                                             , "xxf:min-length(5)"),
-      (Some("min-length"                -> Some("5"))                                             , "xxf:min-length('5')"),
-      (Some("min-length"                -> Some("5"))                                             , "(xxf:min-length(5))"),
-      (Some("non-negative"              -> None)                                                  , "(xxf:non-negative())"),
-      (Some("negative"                  -> None)                                                  , "(xxf:negative())"),
-      (Some("non-positive"              -> None)                                                  , "(xxf:non-positive())"),
-      (Some("positive"                  -> None)                                                  , "(xxf:positive())"),
-      (Some("upload-max-size"           -> Some("3221225472"))                                    , "xxf:upload-max-size(3221225472)"),
-      (Some("upload-max-size-aggregate" -> Some("3221225472"))                                    , "xxf:upload-max-size-aggregate(3221225472)"),
-      (Some("upload-mediatypes"         -> Some("image/jpeg application/pdf"))                    , "xxf:upload-mediatypes('image/jpeg application/pdf')"),
-      (Some("min-length"                -> Some("foo"))                                           , "xxf:min-length(foo)"),
-      (Some("excluded-dates"            -> Some("xs:date('2018-11-29')"))                         , "xxf:excluded-dates(xs:date('2018-11-29'))"),
-      (Some("excluded-dates"            -> Some("xs:date('2018-11-29')"))                         , "xxf:excluded-dates((xs:date('2018-11-29')))"),
-      (Some("excluded-dates"            -> Some("xs:date('2018-11-29'), xs:date('2018-12-02')"))  , "xxf:excluded-dates((xs:date('2018-11-29'), xs:date('2018-12-02')))"),
+      (Some("max-length"                            -> Some("5"))                                             , "xxf:max-length(5)"),
+      (Some("min-length"                            -> Some("5"))                                             , "xxf:min-length(5)"),
+      (Some("min-length"                            -> Some("5"))                                             , "xxf:min-length('5')"),
+      (Some("min-length"                            -> Some("5"))                                             , "(xxf:min-length(5))"),
+      (Some("non-negative"                          -> None)                                                  , "(xxf:non-negative())"),
+      (Some("negative"                              -> None)                                                  , "(xxf:negative())"),
+      (Some("non-positive"                          -> None)                                                  , "(xxf:non-positive())"),
+      (Some("positive"                              -> None)                                                  , "(xxf:positive())"),
+      (Some("upload-max-size"                       -> Some("3221225472"))                                    , "xxf:upload-max-size(3221225472)"),
+      (Some("upload-max-size-aggregate-per-control" -> Some("3221225472"))                                    , "xxf:upload-max-size-aggregate-per-control(3221225472)"),
+      (Some("upload-mediatypes"                     -> Some("image/jpeg application/pdf"))                    , "xxf:upload-mediatypes('image/jpeg application/pdf')"),
+      (Some("min-length"                            -> Some("foo"))                                           , "xxf:min-length(foo)"),
+      (Some("excluded-dates"                        -> Some("xs:date('2018-11-29')"))                         , "xxf:excluded-dates(xs:date('2018-11-29'))"),
+      (Some("excluded-dates"                        -> Some("xs:date('2018-11-29')"))                         , "xxf:excluded-dates((xs:date('2018-11-29')))"),
+      (Some("excluded-dates"                        -> Some("xs:date('2018-11-29'), xs:date('2018-12-02')"))  , "xxf:excluded-dates((xs:date('2018-11-29'), xs:date('2018-12-02')))"),
       (None                                                                              , "xxf:foobar(5)")
     )
 

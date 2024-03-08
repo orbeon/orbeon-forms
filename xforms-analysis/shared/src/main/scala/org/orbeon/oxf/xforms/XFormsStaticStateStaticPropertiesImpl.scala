@@ -2,7 +2,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsProperties.{UploadMaxSizeAggregatePerControlProperty, UploadMaxSizeAggregatePerFormProperty, UploadMaxSizePerFileProperty}
+import org.orbeon.oxf.xforms.XFormsProperties.{UploadMaxSizeAggregatePerControlProperty, UploadMaxSizeAggregatePerFormProperty, UploadMaxSizeAggregateProperty, UploadMaxSizePerFileProperty, UploadMaxSizeProperty}
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
 
 
@@ -21,7 +21,8 @@ abstract class XFormsStaticStateStaticPropertiesImpl(
   val allowedExternalEvents   : Set[String] = staticStringProperty(P.ExternalEventsProperty).tokenizeToSet
 
   val uploadMaxSizePerFile: MaximumSize =
-    staticStringProperty(UploadMaxSizePerFileProperty).trimAllToOpt flatMap
+    (staticStringProperty(UploadMaxSizeProperty       ).trimAllToOpt orElse // For backward compatibility
+     staticStringProperty(UploadMaxSizePerFileProperty).trimAllToOpt) flatMap
       MaximumSize.unapply orElse
       MaximumSize.unapply(globalMaxSizePerFileProperty.toString) getOrElse
       MaximumSize.LimitedSize(0L)
@@ -32,7 +33,8 @@ abstract class XFormsStaticStateStaticPropertiesImpl(
       MaximumSize.UnlimitedSize
 
   val uploadMaxSizeAggregatePerForm: MaximumSize =
-    staticStringProperty(UploadMaxSizeAggregatePerFormProperty).trimAllToOpt flatMap
+    (staticStringProperty(UploadMaxSizeAggregateProperty       ).trimAllToOpt orElse // For backward compatibility
+     staticStringProperty(UploadMaxSizeAggregatePerFormProperty).trimAllToOpt) flatMap
       MaximumSize.unapply getOrElse
       MaximumSize.UnlimitedSize
 

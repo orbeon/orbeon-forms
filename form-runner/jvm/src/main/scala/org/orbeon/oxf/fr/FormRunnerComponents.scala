@@ -60,7 +60,7 @@ trait FormRunnerComponents {
     }
 
     val hints = constraints.flatMap {
-      case (constraintName @ (ValidationFunctionNames.UploadMaxSize | ValidationFunctionNames.UploadMaxSizeControlAggregate), Some(value)) =>
+      case (constraintName @ (ValidationFunctionNames.UploadMaxSize | ValidationFunctionNames.UploadMaxSizeAggregatePerControl), Some(value)) =>
         val displaySizeOpt = value.toLongOption.map(FileUtils.byteCountToDisplaySize)
         displaySizeOpt.map(displaySize => hintMessageXPath(constraintName, s"'$displaySize'"))
       case (constraintName @ ValidationFunctionNames.UploadMediatypes,Some(mediatype)) =>

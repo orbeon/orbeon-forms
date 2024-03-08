@@ -933,7 +933,7 @@
 
                 <xf:var
                     name="multiple-attachments-constraints"
-                    value="'upload-max-size', 'upload-max-size-aggregate', 'upload-mediatypes'"/>
+                    value="'upload-max-size', 'upload-max-size-aggregate-per-control', 'upload-mediatypes'"/>
 
                 <xf:var
                     name="noargs-constraints"
@@ -1626,14 +1626,14 @@
                                             </xf:textarea>
                                             <fr:number
                                                 ref="constraint/@argument[local-name-from-QName(xxf:type()) = 'integer']"
-                                                suffix="{{'bytes'[$validation-type = ('upload-max-size', 'upload-max-size-aggregate')]}}">
+                                                suffix="{{'bytes'[$validation-type = ('upload-max-size', 'upload-max-size-aggregate-per-control')]}}">
                                                 <xf:label
                                                     appearance="minimal"
                                                     ref="
                                                         if ($validation-type = 'upload-max-size') then
-                                                            $resources/dialog-form-settings/attachment-max-size/label
-                                                        else if ($validation-type = 'upload-max-size-aggregate') then
-                                                            $resources/dialog-form-settings/attachment-max-size-aggregate/label
+                                                            $resources/dialog-form-settings/attachment-max-size-per-file/label
+                                                        else if ($validation-type = 'upload-max-size-aggregate-per-control') then
+                                                            $resources/dialog-form-settings/attachment-max-size-aggregate-per-control/label
                                                         else
                                                             $resources/dialog-control-settings/integer-argument/label"/>
                                                 <xf:alert ref="$resources/dialog-control-settings/integer-argument/alert"/>

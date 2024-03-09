@@ -266,6 +266,11 @@ class PropertySet private (
     result.toList
   }
 
+  def propertiesMatch(name: String, matchWildcards: Boolean = true): List[String] = {
+    val tokensCount = name.splitTo[List](".").size
+    propertiesStartsWith(name, matchWildcards).filter(_.splitTo[List](".").size == tokensCount)
+  }
+
   private def getPropertyOptThrowIfTypeMismatch(name: String, typ: QName): Option[Property] = {
 
     def wildcardSearch(

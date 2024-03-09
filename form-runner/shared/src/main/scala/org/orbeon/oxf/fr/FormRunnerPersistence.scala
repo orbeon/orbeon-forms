@@ -199,7 +199,7 @@ object FormRunnerPersistence {
           formOrData.entryName              ::
           Nil mkString "."
 
-        properties.propertiesStartsWith(propertyName, matchWildcards = true)
+        properties.propertiesMatch(propertyName, matchWildcards = true)
           .flatMap(properties.getNonBlankString)
           .distinct
     }

@@ -929,11 +929,11 @@
 
                 <xf:var
                     name="attachment-constraints"
-                    value="'upload-max-size', 'upload-mediatypes'"/>
+                    value="'upload-max-size-per-file', 'upload-mediatypes'"/>
 
                 <xf:var
                     name="multiple-attachments-constraints"
-                    value="'upload-max-size', 'upload-max-size-aggregate-per-control', 'upload-mediatypes'"/>
+                    value="'upload-max-size-per-file', 'upload-max-size-aggregate-per-control', 'upload-mediatypes'"/>
 
                 <xf:var
                     name="noargs-constraints"
@@ -1535,7 +1535,7 @@
                                             <xf:label ref="$resources/dialog-control-settings/types/label"/>
                                             <xf:value>datatype</xf:value>
                                         </xf:itemset>
-                                        <xf:itemset ref="$resources/dialog-control-settings/constraint/item[@id = $allowed-constraints and ((exists(@multiple) and @multiple = $i/multiple-attribute) or @id != 'upload-max-size')]">
+                                        <xf:itemset ref="$resources/dialog-control-settings/constraint/item[@id = $allowed-constraints and ((exists(@multiple) and @multiple = $i/multiple-attribute) or @id != 'upload-max-size-per-file')]">
                                             <xf:label ref="."/>
                                             <xf:value ref="@id"/>
                                         </xf:itemset>
@@ -1626,11 +1626,11 @@
                                             </xf:textarea>
                                             <fr:number
                                                 ref="constraint/@argument[local-name-from-QName(xxf:type()) = 'integer']"
-                                                suffix="{{'bytes'[$validation-type = ('upload-max-size', 'upload-max-size-aggregate-per-control')]}}">
+                                                suffix="{{'bytes'[$validation-type = ('upload-max-size-per-file', 'upload-max-size-aggregate-per-control')]}}">
                                                 <xf:label
                                                     appearance="minimal"
                                                     ref="
-                                                        if ($validation-type = 'upload-max-size') then
+                                                        if ($validation-type = 'upload-max-size-per-file') then
                                                             $resources/dialog-form-settings/attachment-max-size-per-file/label
                                                         else if ($validation-type = 'upload-max-size-aggregate-per-control') then
                                                             $resources/dialog-form-settings/attachment-max-size-aggregate-per-control/label

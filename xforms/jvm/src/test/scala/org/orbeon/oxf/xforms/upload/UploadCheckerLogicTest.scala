@@ -32,7 +32,7 @@ class UploadCheckerLogicTest extends AnyFunSpec {
   ) extends UploadCheckerLogic {
     def attachmentMaxSizeValidationMipFor(controlEffectiveId: String, validationFunctionName: String): Option[String] =
       validationFunctionName match {
-        case ValidationFunctionNames.UploadMaxSize                    => controlIdToMaxSizePerFile            .get(controlEffectiveId) map (_.toString)
+        case ValidationFunctionNames.UploadMaxSizePerFile             => controlIdToMaxSizePerFile            .get(controlEffectiveId) map (_.toString)
         case ValidationFunctionNames.UploadMaxSizeAggregatePerControl => controlIdToMaxSizeAggregatePerControl.get(controlEffectiveId) map (_.toString)
         case _                                                        => throw new IllegalArgumentException(s"Unexpected validation function name: $validationFunctionName")
       }

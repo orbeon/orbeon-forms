@@ -515,9 +515,9 @@
                     <xf:bind id="pdf-attachments-bind"  ref="pdf" type="xs:anyURI"/>
                 </xf:bind>
                 <!-- Properties on main form model -->
-                <xf:bind id="attachment-max-size-per-file-bind"              ref="@xxf:upload.max-size"/>
+                <xf:bind id="attachment-max-size-per-file-bind"              ref="@xxf:upload.max-size-per-file"/>
                 <xf:bind id="attachment-max-size-aggregate-per-control-bind" ref="@xxf:upload.max-size-aggregate-per-control"/>
-                <xf:bind id="attachment-max-size-aggregate-per-form-bind"    ref="@xxf:upload.max-size-aggregate"/>
+                <xf:bind id="attachment-max-size-aggregate-per-form-bind"    ref="@xxf:upload.max-size-aggregate-per-form"/>
                 <xf:bind id="attachment-mediatypes-bind"                     ref="@xxf:upload.mediatypes"/>
                 <xf:bind id="labels-bind"                                    ref="@xxf:label.appearance"/>
                 <xf:bind id="hints-bind"                                     ref="@xxf:hint.appearance"/>

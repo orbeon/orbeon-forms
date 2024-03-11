@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -24,6 +23,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
+import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.xforms.xbl.Scope
 
 
@@ -58,7 +58,6 @@ object XFormsStaticStateImpl {
     val dynamicProperties =
       new XFormsStaticStateDynamicPropertiesImpl(
         staticStateDocument.nonDefaultProperties,
-        staticProperties,
         topLevelPart
       )
 
@@ -113,7 +112,6 @@ class XFormsStaticStateImpl(
   def staticIntProperty    (name: String) : Int              = staticProperties.staticIntProperty    (name)
   def allowedExternalEvents               : Set[String]      = staticProperties.allowedExternalEvents
 
-  def uploadMaxSizeFormAggregateExpression    : Option[CompiledExpression]      = dynamicProperties.uploadMaxSizeFormAggregateExpression
   def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
 
   lazy val sanitizeInput: String => String = StringReplacer(staticProperties.staticStringProperty(P.SanitizeProperty))

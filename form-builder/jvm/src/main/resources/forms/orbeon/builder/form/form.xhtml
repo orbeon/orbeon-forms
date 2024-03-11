@@ -616,7 +616,7 @@
                                             if="event('attachment-max-size-per-file') castable as xs:integer and
                                                 xs:integer(event('attachment-max-size-per-file')) ge 0"
                                             context="bind('fb-form-model-bind')"
-                                            origin="xf:attribute('xxf:upload.max-size', event('attachment-max-size-per-file'))"/>
+                                            origin="xf:attribute('xxf:upload.max-size-per-file', event('attachment-max-size-per-file'))"/>
 
                                         <xf:delete
                                             bind="attachment-max-size-aggregate-per-control-bind"/>
@@ -632,7 +632,7 @@
                                             if="event('attachment-max-size-aggregate-per-form') castable as xs:integer and
                                                 xs:integer(event('attachment-max-size-aggregate-per-form')) ge 0"
                                             context="bind('fb-form-model-bind')"
-                                            origin="xf:attribute('xxf:upload.max-size-aggregate', event('attachment-max-size-aggregate-per-form'))"/>
+                                            origin="xf:attribute('xxf:upload.max-size-aggregate-per-form', event('attachment-max-size-aggregate-per-form'))"/>
 
                                         <xf:delete
                                             bind="attachment-mediatypes-bind"/>

@@ -815,16 +815,6 @@
             xxf:label.appearance="{$label-appearance}"
             xxf:hint.appearance="{$hint-appearance}"
             xxf:assets.baseline.updates="{$assets-baseline-updates}"
-            xxf:upload.max-size-aggregate-expression="
-                sum(
-                    xxf:instance('fr-form-instance')//*[
-                        @filename and @mediatype and @size
-                    ]/@size[
-                        . castable as xs:integer
-                    ]/xs:integer(.),
-                    0
-                )
-            "
             xxf:static-readonly-hint="{
                 if ($mode = 'test-pdf') then
                     '{

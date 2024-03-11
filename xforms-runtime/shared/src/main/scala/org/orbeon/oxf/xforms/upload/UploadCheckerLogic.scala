@@ -19,7 +19,7 @@ trait UploadCheckerLogic {
 
   def uploadMaxSizeForControl(controlEffectiveId: String): MaximumSize = {
     val maximumSizePerFile =
-      attachmentMaxSizeValidationMipFor(controlEffectiveId, ValidationFunctionNames.UploadMaxSize)
+      attachmentMaxSizeValidationMipFor(controlEffectiveId, ValidationFunctionNames.UploadMaxSizePerFile)
         .flatMap(MaximumSize.unapply)
         .getOrElse(uploadMaxSizePerFileProperty)
 

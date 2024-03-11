@@ -73,6 +73,5 @@ trait XFormsStaticStateStaticProperties {
 }
 
 trait XFormsStaticStateDynamicProperties {
-  def uploadMaxSizeFormAggregateExpression    : Option[CompiledExpression]
   def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression]
 }

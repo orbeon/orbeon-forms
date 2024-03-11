@@ -60,9 +60,15 @@ trait FormRunnerComponents {
     }
 
     val hints = constraints.flatMap {
-      case (constraintName @ (ValidationFunctionNames.UploadMaxSize | ValidationFunctionNames.UploadMaxSizeAggregatePerControl), Some(value)) =>
+      case (constraintName @ (ValidationFunctionNames.UploadMaxSizePerFile |
+                              ValidationFunctionNames.UploadMaxSizeAggregatePerControl |
+                              // Backward compatibility
+                              ValidationFunctionNames.UploadMaxSize), Some(value)) =>
         val displaySizeOpt = value.toLongOption.map(FileUtils.byteCountToDisplaySize)
-        displaySizeOpt.map(displaySize => hintMessageXPath(constraintName, s"'$displaySize'"))
+        displaySizeOpt.map { displaySize =>
+          hintMessageXPath(ValidationFunctionNames.currentName(constraintName), s"'$displaySize'")
+        }
+
       case (constraintName @ ValidationFunctionNames.UploadMediatypes,Some(mediatype)) =>
         val slashPosition     = mediatype.indexOf('/')
         val isProperMediatype = slashPosition > 1 && slashPosition < mediatype.length - 1

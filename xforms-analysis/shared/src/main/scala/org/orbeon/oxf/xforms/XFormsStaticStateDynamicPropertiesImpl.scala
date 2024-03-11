@@ -1,45 +1,17 @@
 package org.orbeon.oxf.xforms
 
-import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
-import org.orbeon.oxf.xforms.XFormsProperties.UploadMaxSizeFormAggregateExpressionProperty
-import org.orbeon.oxf.xforms.analysis.TopLevelPartAnalysis
-import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
+import org.orbeon.oxf.xforms.analysis.TopLevelPartAnalysis
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
+import org.orbeon.oxf.xml.XMLUtils
 
 
 class XFormsStaticStateDynamicPropertiesImpl(
   nonDefaultProperties : Map[String, (String, Boolean)],
-  staticProperties     : XFormsStaticStateStaticProperties,
   topLevelPart         : TopLevelPartAnalysis)(implicit
   logger               : IndentedLogger
 ) extends XFormsStaticStateDynamicProperties {
-
-  val uploadMaxSizeFormAggregateExpression: Option[CompiledExpression] = {
-
-    val compiledExpressionOpt =
-      for {
-        rawProperty <- staticProperties.staticStringProperty(UploadMaxSizeFormAggregateExpressionProperty).trimAllToOpt
-        model       = topLevelPart.getDefaultModel
-      } yield
-        StaticXPath.compileExpression(
-          xpathString      = rawProperty,
-          namespaceMapping = model.namespaceMapping,
-          locationData     = null,
-          functionLibrary  = topLevelPart.functionLibrary,
-          avt              = false
-        )
-
-    compiledExpressionOpt match {
-      case Some(CompiledExpression(expr, _, _)) if StaticXPath.expressionType(expr) == StaticXPath.IntegerType =>
-        compiledExpressionOpt
-      case Some(_) =>
-        throw new IllegalArgumentException(s"property `$UploadMaxSizeFormAggregateExpressionProperty` must return `xs:integer` type")
-      case None =>
-        None
-    }
-  }
 
   private val nonDefaultPropertiesOnly: Map[String, Either[Any, CompiledExpression]] =
     nonDefaultProperties map { case (name, (rawPropertyValue, isInline)) =>

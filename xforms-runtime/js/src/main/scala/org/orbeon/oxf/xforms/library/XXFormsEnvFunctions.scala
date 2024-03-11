@@ -647,10 +647,17 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     evaluateAndSetConstraint("fraction-digits", constraintOpt, evaluate)
   }
 
+  // Backward compatibility
   @XPathFunction
   def uploadMaxSize(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
     // For now, don't actually validate, see #2956
     evaluateAndSetConstraint(ValidationFunctionNames.UploadMaxSize, constraintOpt, _ => true)
+  }
+
+  @XPathFunction
+  def uploadMaxSizePerFile(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
+    // For now, don't actually validate, see #2956
+    evaluateAndSetConstraint(ValidationFunctionNames.UploadMaxSizePerFile, constraintOpt, _ => true)
   }
 
   @XPathFunction

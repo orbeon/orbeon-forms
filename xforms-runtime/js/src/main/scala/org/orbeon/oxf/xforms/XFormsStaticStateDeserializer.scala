@@ -1047,7 +1047,7 @@ object XFormsStaticStateImpl {
       def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean = featureRequested
     }
 
-    val dynamicProperties = new XFormsStaticStateDynamicPropertiesImpl(_nonDefaultProperties, staticProperties, _topLevelPart)
+    val dynamicProperties = new XFormsStaticStateDynamicPropertiesImpl(_nonDefaultProperties, _topLevelPart)
 
     new XFormsStaticState {
 
@@ -1089,7 +1089,6 @@ object XFormsStaticStateImpl {
       def staticIntProperty    (name: String) : Int              = staticProperties.staticIntProperty    (name)
       def allowedExternalEvents               : Set[String]      = staticProperties.allowedExternalEvents
 
-      def uploadMaxSizeFormAggregateExpression    : Option[StaticXPath.CompiledExpression]      = dynamicProperties.uploadMaxSizeFormAggregateExpression
       def propertyMaybeAsExpression(name: String) : Either[Any, StaticXPath.CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
     }
   }

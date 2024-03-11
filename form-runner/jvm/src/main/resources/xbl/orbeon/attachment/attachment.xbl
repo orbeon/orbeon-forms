@@ -185,6 +185,7 @@
                             )[1]
                             and
                             (
+                                (: Backward compatibility :)
                                 for $mip in
                                     xxf:custom-mip(
                                         $binding,
@@ -192,6 +193,17 @@
                                     )[. castable as xs:integer]
                                 return
                                     xxf:upload-max-size(xs:integer($mip)),
+                                true()
+                            )[1]
+                            and
+                            (
+                                for $mip in
+                                    xxf:custom-mip(
+                                        $binding,
+                                        'upload-max-size-per-file'
+                                    )[. castable as xs:integer]
+                                return
+                                    xxf:upload-max-size-per-file(xs:integer($mip)),
                                 true()
                             )[1]
                             and

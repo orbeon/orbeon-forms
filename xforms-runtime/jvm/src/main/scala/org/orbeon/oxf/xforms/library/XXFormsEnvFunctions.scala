@@ -307,7 +307,12 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
     )
 
+    // Backward compatibility
     Fun(ValidationFunctionNames.UploadMaxSize, classOf[UploadMaxSizeValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
+    )
+
+    Fun(ValidationFunctionNames.UploadMaxSizePerFile, classOf[UploadMaxSizePerFileValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
     )
 

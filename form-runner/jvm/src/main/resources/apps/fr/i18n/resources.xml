@@ -368,7 +368,7 @@
                 <captcha-alert>Please check your answer to the CAPTCHA challenge</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size>Files must be under {0}.</upload-max-size>
+                <upload-max-size-per-file>Files must be under {0}.</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control>Total file size in control must be under {0}.</upload-max-size-aggregate-per-control>
                 <upload-mediatypes>Only {0} files are accepted.</upload-mediatypes>
                 <upload-image>image</upload-image>
@@ -1055,7 +1055,7 @@
                 <captcha-alert>Veuillez vérifier votre réponse au défi CAPTCHA</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size>La taille des fichiers doit être inférieurs à {0}.</upload-max-size>
+                <upload-max-size-per-file>La taille des fichiers doit être inférieurs à {0}.</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control>La taille totale des fichiers pour ce contrôle doit être inférieure à {0}.</upload-max-size-aggregate-per-control>
                 <upload-mediatypes>Seuls les {0} sont acceptés.</upload-mediatypes>
                 <upload-image>image</upload-image>
@@ -1734,7 +1734,7 @@
                 <captcha-alert>El valor ingresado es diferente a la imagen, intentelo nuevamente</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
@@ -2430,7 +2430,7 @@
                 <captcha-alert>El valor ingressat és diferent de la imatge, torni a intentar-lo</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
@@ -3119,7 +3119,7 @@
                 <captcha-alert todo="true">[The value you entered didn't match the image, please try again]</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
@@ -3793,7 +3793,7 @@
                 <captcha-alert todo="true">Введенное значение не совпадает с картинкой. Попробуйте еще раз.</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
@@ -4472,7 +4472,7 @@
                 <captcha-alert todo="true">Il valore inserito no è uguale a quello visualizzato nell'immagine</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
@@ -5155,7 +5155,7 @@
                 <captcha-alert todo="true">Der eingegebene Wert entspricht nicht dem auf dem Bild. Bitte versuchen Sie es erneut!</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
@@ -5838,7 +5838,7 @@
                 <captcha-alert todo="true">Antamasi arvo ei täsmännyt kuvan kanssa, ole hyvä ja yritä uudelleen</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
@@ -6521,7 +6521,7 @@
                 <captcha-alert todo="true">Inmatningen motsvarade inte bilden. Vänligen försök igen.</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
@@ -7204,7 +7204,7 @@
                 <captcha-alert>De ingevoerde waarde komt niet overeen met de afbeelding, probeer opnieuw</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
@@ -7887,7 +7887,7 @@
                 <captcha-alert todo="true">O valor inserido não corresponde à imagem, por favor, tente novamente</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
@@ -8564,7 +8564,7 @@
                 <captcha-alert>De tegn du indtastede passede ikke med billedet - prøv igen</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>
@@ -9244,7 +9244,7 @@
                 <captcha-alert>Wprowadzona wartość nie zgadza się z obrazem, spróbuj ponownie.</captcha-alert>
             </labels>
             <hints>
-                <upload-max-size todo="true">[Files must be under {0}.]</upload-max-size>
+                <upload-max-size-per-file todo="true">[Files must be under {0}.]</upload-max-size-per-file>
                 <upload-max-size-aggregate-per-control todo="true">[Total file size in control must be under {0}.]</upload-max-size-aggregate-per-control>
                 <upload-mediatypes todo="true">[Only {0} files are accepted.]</upload-mediatypes>
                 <upload-image todo="true">[image]</upload-image>

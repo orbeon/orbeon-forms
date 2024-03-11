@@ -285,7 +285,7 @@ class FormRunnerFunctionsTest
       (Some("negative"                              -> None)                                                  , "(xxf:negative())"),
       (Some("non-positive"                          -> None)                                                  , "(xxf:non-positive())"),
       (Some("positive"                              -> None)                                                  , "(xxf:positive())"),
-      (Some("upload-max-size"                       -> Some("3221225472"))                                    , "xxf:upload-max-size(3221225472)"),
+      (Some("upload-max-size-per-file"              -> Some("3221225472"))                                    , "xxf:upload-max-size-per-file(3221225472)"),
       (Some("upload-max-size-aggregate-per-control" -> Some("3221225472"))                                    , "xxf:upload-max-size-aggregate-per-control(3221225472)"),
       (Some("upload-mediatypes"                     -> Some("image/jpeg application/pdf"))                    , "xxf:upload-mediatypes('image/jpeg application/pdf')"),
       (Some("min-length"                            -> Some("foo"))                                           , "xxf:min-length(foo)"),

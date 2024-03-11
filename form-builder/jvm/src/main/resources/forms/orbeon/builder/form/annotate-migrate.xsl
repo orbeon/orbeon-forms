@@ -524,4 +524,35 @@
 
         <xsl:apply-templates select="$output" mode="#current"/>
     </xsl:template>
+
+    <xsl:template match="xf:model/@xxf:upload.max-size-aggregate" mode="within-model">
+        <xsl:attribute name="xxf:upload.max-size-aggregate-per-form">
+            <xsl:value-of select="."/>
+        </xsl:attribute>
+    </xsl:template>
+
+    <xsl:template match="xf:model/@xxf:upload.max-size" mode="within-model">
+        <xsl:attribute name="xxf:upload.max-size-per-file">
+            <xsl:value-of select="."/>
+        </xsl:attribute>
+    </xsl:template>
+
+    <xsl:template match="xf:constraint/@value[contains(., 'xxf:upload-max-size(')]" mode="within-model">
+        <xsl:attribute name="{name()}">
+            <xsl:value-of select="replace(., 'xxf:upload-max-size\(', 'xxf:upload-max-size-per-file(')"/>
+        </xsl:attribute>
+    </xsl:template>
+
+    <xsl:template match="xf:bind[contains(@constraint, 'xxf:upload-max-size(')]" mode="within-model" priority="10">
+        <xsl:variable name="output">
+            <xsl:copy>
+                <xsl:copy-of select="@* | node() except @constraint"/>
+                <xsl:attribute name="constraint">
+                    <xsl:value-of select="replace(@constraint, 'xxf:upload-max-size\(', 'xxf:upload-max-size-per-file(')"/>
+                </xsl:attribute>
+            </xsl:copy>
+        </xsl:variable>
+
+        <xsl:apply-templates select="$output" mode="#current"/>
+    </xsl:template>
 </xsl:stylesheet>

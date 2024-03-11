@@ -140,7 +140,6 @@
     <property as="xs:string"  name="oxf.xforms.upload.max-size-per-file"                         value=""/>
     <property as="xs:string"  name="oxf.xforms.upload.max-size-aggregate-per-control"            value=""/>
     <property as="xs:string"  name="oxf.xforms.upload.max-size-aggregate-per-form"               value=""/>
-    <property as="xs:string"  name="oxf.xforms.upload.max-size-aggregate-expression"             value=""/>
     <property as="xs:string"  name="oxf.xforms.upload.mediatypes"                                value="*/*"/>
     <property as="xs:integer" name="oxf.xforms.upload.delay-before-xforms-timeout"               value="45000"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-upload-progress-refresh"             value="2000"/>

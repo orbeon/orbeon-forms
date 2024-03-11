@@ -32,8 +32,7 @@ import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.action.actions.XFormsDispatchAction
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.event.ClientEvents._
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent._
@@ -44,10 +43,9 @@ import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.state.{LockResponse, RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, TwoPassSubmissionParameters}
-import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
+import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, FormRunnerUploadSupport, UploadCheckerLogic, UploadSupport}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xforms.Constants.FormId
 import org.orbeon.xforms._
 import org.orbeon.xforms.runtime.{DelayedEvent, XFormsObject}
@@ -286,35 +284,19 @@ trait ContainingDocumentUpload {
 
   private object UploadChecker extends UploadCheckerLogic {
 
-    def attachmentMaxSizeValidationMipFor(controlEffectiveId: String, validationFunctionName: String): Option[String] =
+    private lazy val uploadSupport: UploadSupport = FormRunnerUploadSupport
+
+    def attachmentMaxSizeValidationMipFor(controlEffectiveId: String, validationFunctionName: String): Option[String] = {
+      // Try an optional old validation name first, for backward compatibility
+      ValidationFunctionNames.oldName(validationFunctionName).flatMap(customMipForControl(controlEffectiveId, _)) orElse
       customMipForControl(controlEffectiveId, validationFunctionName)
-
-    def currentUploadSizeAggregateForControl(controlEffectiveId: String): Option[Long] = {
-      val sizes = for {
-        uploadControl    <- controls.getCurrentControlTree.findControl(controlEffectiveId).collect { case c: XFormsUploadControl    => c }
-        componentControl <- uploadControl.container.associatedControlOpt                  .collect { case c: XFormsComponentControl => c }
-        if componentControl.staticControl.element.getName == "attachment"
-        boundNode        <- componentControl.boundNodeOpt
-      } yield boundNode.child("_").flatMap(_.attValueOpt("size").map(_.toLong))
-
-      sizes.map(_.sum)
     }
 
-    def currentUploadSizeAggregateForForm: Option[Long] = {
-      def evaluateAsLong(expr: CompiledExpression) = {
-        val defaultModel   = getDefaultModel
-        val bindingContext = defaultModel.getDefaultEvaluationContext
-        XPath.evaluateSingle(
-          contextItems       = bindingContext.nodeset,
-          contextPosition    = bindingContext.position,
-          compiledExpression = expr,
-          functionContext    = defaultModel.getContextStack.getFunctionContext(defaultModel.getEffectiveId, bindingContext),
-          variableResolver   = defaultModel.variableResolver
-        )(getRequestStats.getReporter).asInstanceOf[Long] // we statically ensure that the expression returns an `xs:integer`
-      }
+    def currentUploadSizeAggregateForControl(controlEffectiveId: String): Option[Long] =
+      uploadSupport.currentUploadSizeAggregateForControl(controls, controlEffectiveId)
 
-      staticState.uploadMaxSizeFormAggregateExpression map evaluateAsLong map (0L max _)
-    }
+    def currentUploadSizeAggregateForForm: Option[Long] =
+      uploadSupport.currentUploadSizeAggregateForForm(controls)
 
     def uploadMaxSizePerFileProperty: MaximumSize             = staticState.uploadMaxSizePerFile
     def uploadMaxSizeAggregatePerControlProperty: MaximumSize = staticState.uploadMaxSizeAggregatePerControl

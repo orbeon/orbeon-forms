@@ -215,9 +215,14 @@ class MaxFractionDigitsValidation extends LongValidationFunction {
   }
 }
 
-class UploadMaxSizeValidation extends LongValidationFunction {
+// Backward compatibility
+class UploadMaxSizeValidation extends UploadMaxSizePerFileValidation {
+  override val propertyName = ValidationFunctionNames.UploadMaxSize
+}
 
-  val propertyName = ValidationFunctionNames.UploadMaxSize
+class UploadMaxSizePerFileValidation extends LongValidationFunction {
+
+  val propertyName = ValidationFunctionNames.UploadMaxSizePerFile
 
   def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
     case Some(constraint) => true // for now, don't actually validate, see #2956

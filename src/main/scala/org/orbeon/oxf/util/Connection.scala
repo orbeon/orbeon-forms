@@ -451,8 +451,7 @@ object Connection extends ConnectionTrait {
           case scheme if method == GET && SupportedNonHttpReadonlySchemes(scheme) =>
             try {
               // Create URL connection object
-              val url           = URLFactory.createURL(normalizedUrlString)
-              val urlConnection = url.openConnection
+              val urlConnection = URLFactory.createURL(normalizedUrl).openConnection()
               urlConnection.connect()
 
               // NOTE: The data: scheme doesn't have a path but can have a content type in the URL. Do this for the
@@ -474,8 +473,8 @@ object Connection extends ConnectionTrait {
 
               // Take care of HTTP ranges with local files
               val (statusCode, rangeHeaders, inputStream) =
-                if (url.getProtocol == "file") { // xxx scheme == UriScheme.File
-                  val streamedFile = HttpRanges(headers).get.streamedFile(new File(url.toURI), urlConnection.getInputStream).get
+                if (scheme == UriScheme.File) { // must be a temp file
+                  val streamedFile = HttpRanges(headers).get.streamedFile(new File(normalizedUrl), urlConnection.getInputStream).get
                   (streamedFile.statusCode, streamedFile.headers, streamedFile.inputStream)
                 } else {
                   (StatusCode.Ok,           Map(),                urlConnection.getInputStream)

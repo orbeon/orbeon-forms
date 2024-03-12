@@ -280,10 +280,6 @@ object ControlLabelHintTextEditor {
             Underscore.clone(TinyMceDefaultConfig)
         }
 
-        // Force these important settings
-        tinyMceConfig.inline       = true
-        tinyMceConfig.hidden_input = false
-
         tinyMceConfig.plugins                  += ",autoresize"  // Auto-size MCE height based on the content
         tinyMceConfig.autoresize_min_height    =  100.0          // Min height of 100px
         tinyMceConfig.autoresize_bottom_margin =  16.0           // Default padding for autoresize adds too much empty space at the bottom

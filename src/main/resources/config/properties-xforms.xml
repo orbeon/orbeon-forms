@@ -217,6 +217,26 @@
         fr:autosize-textarea
     </property>
 
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.tinymce.config">
+        {{
+            "inline"             : true,
+            "hidden_input"       : false,
+            "language"           : "en",
+            "statusbar"          : false,
+            "menubar"            : false,
+            "plugins"            : "lists link",
+            "toolbar"            : "bold italic | bullist numlist outdent indent | link",
+            "browser_spellcheck" : true,
+            "encoding"           : "xml",
+            "entity_encoding"    : "raw",
+            "forced_root_block"  : "div",
+            "visual_table_class" : "fr-tinymce-table",
+            "skin"               : false,
+            "convert_urls"       : false,
+            "content_css"        : "default"
+        }}
+    </property>
+
     <!-- Automatically search for XBL components in fr:* namespace -->
     <property as="xs:string"  name="oxf.xforms.xbl.mapping.orbeon">
         http://orbeon.org/oxf/xml/form-runner

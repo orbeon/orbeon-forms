@@ -58,7 +58,19 @@
                 </fr:index>
             </xf:output>
             <!-- Expose property -->
-            <xf:output class="fb-tinymce-config" value="xxf:property('oxf.fb.tinymce.config')"/>
+            <xf:output
+                class="fb-tinymce-config"
+                value="
+                    (
+                        (: Backward compatibility :)
+                        xxf:property('oxf.fb.tinymce.config')[xxf:non-blank()],
+                        (: AVT as that's how the component parameter behaves :)
+                        xxf:evaluate-avt(
+                            xxf:property(
+                                'oxf.xforms.xbl.fr.tinymce.config.orbeon.builder'
+                            )
+                        )
+                    )[1]"/>
         </xh:div>
 
         <xh:div class="fb-navbar navbar navbar-fixed-top">

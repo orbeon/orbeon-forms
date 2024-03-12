@@ -110,16 +110,18 @@
                  NOTE: Don't put '/' before 1b713b2e6d7fd45753f4b8a6270b776e because TinyMCE will automatically
                  append a leading '/', and this causes paths to have '//', which some servers like Jetty don't like.
                  See: https://github.com/orbeon/orbeon-forms/pull/896
+
+                 `Also` place the config as a `data-*` attribute:
+                 See: https://github.com/orbeon/orbeon-forms/issues/6225
              -->
             <xh:a
                 f:url-type="resource"
+                data-tinymce-config="{fr:component-param-value('config')}"
                 href="/xbl/orbeon/tinymce/js/tinymce1b713b2e6d7fd45753f4b8a6270b776e.js"
                 class="tinymce-base-url xforms-hidden"/>
 
             <!-- This is a workaround for the lack of https://github.com/orbeon/orbeon-forms/issues/5366.
-                 The `<xf:switch>` must never switch during the lifetime of the form. With TinyMCE, the content of the
-                 switch, which
-                 creating a swi-->
+                 The `<xf:switch>` must never switch during the lifetime of the form. -->
             <xf:switch id="tinymce-div" xxf:element="div" caseref="$script" xxf:update="full" class="xbl-fr-tinymce-div xbl-html-input" role="textbox">
                 <xf:case value="true()"/>
                 <xf:case value="false()">

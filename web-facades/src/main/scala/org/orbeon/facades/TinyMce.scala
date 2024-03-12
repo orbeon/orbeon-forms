@@ -24,11 +24,11 @@ import scala.scalajs.js.annotation.JSGlobal
 object TinyMce {
 
   // Since Scala.js 1.0, the method we used before didn't work when `TINYMCE_CUSTOM_CONFIG` is missing
-  val TinyMceCustomConfig: js.UndefOr[TinyMceConfig] =
+  lazy val GlobalJsTinyMceCustomConfig: Option[TinyMceConfig] =
     if (js.typeOf(g.TINYMCE_CUSTOM_CONFIG) != "undefined")
-      g.TINYMCE_CUSTOM_CONFIG.asInstanceOf[TinyMceConfig]
+      (g.TINYMCE_CUSTOM_CONFIG.asInstanceOf[TinyMceConfig]: js.UndefOr[TinyMceConfig]).toOption
     else
-      js.undefined
+      None
 
   @js.native
   @JSGlobal("tinymce")
@@ -72,7 +72,6 @@ object TinyMce {
     var encoding                 : js.UndefOr[String]  = js.undefined
     var entity_encoding          : js.UndefOr[String]  = js.undefined
     var forced_root_block        : js.UndefOr[String]  = js.undefined
-    var verify_html              : js.UndefOr[Boolean] = js.undefined
     var visual_table_class       : js.UndefOr[String]  = js.undefined
     var skin                     : js.UndefOr[Boolean] = js.undefined
     var content_css              : js.UndefOr[String]  = js.undefined
@@ -96,7 +95,6 @@ object TinyMce {
     encoding           = "xml"
     entity_encoding    = "raw"
     forced_root_block  = "div"
-    verify_html        = true
     visual_table_class = "fr-tinymce-table" // Override default TinyMCE class on tables, which adds borders
                                             // We can't leave this just empty, otherwise TinyMCE puts its own CSS class
     skin               = false              // Disable skin (see https://github.com/orbeon/orbeon-forms/issues/3473)

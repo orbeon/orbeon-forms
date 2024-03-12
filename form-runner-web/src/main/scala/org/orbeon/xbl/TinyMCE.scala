@@ -14,6 +14,7 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.TinyMce._
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, DocumentAPI, Page}
 import org.scalajs.dom
@@ -48,7 +49,7 @@ object TinyMCE {
         if (! baseUrlInitialized) {
           // Tell TinyMCE about base URL, which it can't guess in combined resources
 
-          val href = dom.document.querySelector(".tinymce-base-url").getAttribute("href")
+          val href = containerElem.querySelector(".tinymce-base-url").getAttribute("href")
           // Remove the magic number and extension at the end of the URL. The magic number was added to allow for
           // URL post-processing for portlets. The extension is added so that the version number is added to the URL.
           val baseURL = href.substring(0, href.length - "1b713b2e6d7fd45753f4b8a6270b776e.js".length)
@@ -57,11 +58,18 @@ object TinyMCE {
           baseUrlInitialized = true
         }
 
-        val tinyMceConfig = TinyMceCustomConfig.getOrElse(TinyMceDefaultConfig)
+        def fromDataAtt: Option[TinyMceConfig] =
+          containerElem.querySelector(".tinymce-base-url")
+            .asInstanceOf[html.Element]
+            .dataset
+            .get("tinymceConfig")
+            .flatMap(_.trimAllToOpt)
+            .map(js.JSON.parse(_).asInstanceOf[TinyMceConfig])
 
-        // Force these important settings
-        tinyMceConfig.inline       = true
-        tinyMceConfig.hidden_input = false
+        val tinyMceConfig =
+          GlobalJsTinyMceCustomConfig
+            .orElse(fromDataAtt)
+            .getOrElse(TinyMceDefaultConfig)
 
         // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
         // TinyMCE tried to load `silver/theme.js`, which doesn't exist

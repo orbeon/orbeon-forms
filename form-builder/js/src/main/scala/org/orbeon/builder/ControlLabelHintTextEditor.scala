@@ -23,6 +23,7 @@ import org.orbeon.builder.facade._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
@@ -274,7 +275,7 @@ object ControlLabelHintTextEditor {
         // TinyMCE config from property, if defined
         val tinyMceConfig = {
           val customConfigJS = $(".fb-tinymce-config .xforms-output-output").text()
-          if (customConfigJS.trim != "")
+          if (customConfigJS.nonAllBlank)
             js.JSON.parse(customConfigJS).asInstanceOf[TinyMceConfig]
           else
             Underscore.clone(TinyMceDefaultConfig)

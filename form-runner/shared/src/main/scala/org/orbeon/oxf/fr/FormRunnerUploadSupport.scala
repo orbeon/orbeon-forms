@@ -11,15 +11,15 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.upload
+package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.xforms.XFormsControls
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.upload.UploadSupport
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 
 
-// TODO: move this logic to Form Runner
 object FormRunnerUploadSupport extends UploadSupport {
 
   def currentUploadSizeAggregateForControl(controls: XFormsControls, controlEffectiveId: String): Option[Long] = {

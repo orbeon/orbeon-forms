@@ -43,7 +43,7 @@ import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.state.{LockResponse, RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, TwoPassSubmissionParameters}
-import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, FormRunnerUploadSupport, UploadCheckerLogic, UploadSupport}
+import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic, UploadSupport}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.Constants.FormId
@@ -271,6 +271,7 @@ trait ContainingDocumentUpload {
   def staticState    : XFormsStaticState
   def getDefaultModel: XFormsModel
   def getRequestStats: RequestStats
+  def uploadSupport  : UploadSupport
 
   def getUploadChecker: UploadCheckerLogic = UploadChecker
 
@@ -283,8 +284,6 @@ trait ContainingDocumentUpload {
       (_.boundNodeOpt) flatMap (InstanceData.findCustomMip(_, mipName))
 
   private object UploadChecker extends UploadCheckerLogic {
-
-    private lazy val uploadSupport: UploadSupport = FormRunnerUploadSupport
 
     def attachmentMaxSizeValidationMipFor(controlEffectiveId: String, validationFunctionName: String): Option[String] = {
       // Try an optional old validation name first, for backward compatibility

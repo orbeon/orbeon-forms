@@ -20,3 +20,10 @@ trait UploadSupport {
   def currentUploadSizeAggregateForControl(controls: XFormsControls, controlEffectiveId: String): Option[Long]
   def currentUploadSizeAggregateForForm   (controls: XFormsControls                            ): Option[Long]
 }
+
+object UploadSupport {
+  def noUploadSupport: UploadSupport = new UploadSupport {
+    def currentUploadSizeAggregateForControl(controls: XFormsControls, controlEffectiveId: String): Option[Long] = None
+    def currentUploadSizeAggregateForForm   (controls: XFormsControls                            ): Option[Long] = None
+  }
+}

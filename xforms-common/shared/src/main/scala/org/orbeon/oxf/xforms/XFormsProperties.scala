@@ -19,6 +19,7 @@ object XFormsProperties {
   // Document properties
   val FunctionLibraryProperty                         = "function-library"
   val XblSupportProperty                              = "xbl-support"
+  val UploadSupportProperty                           = "upload-support"
 
   val StateHandlingProperty                           = "state-handling"
   val StateHandlingServerValue                        = "server"
@@ -178,6 +179,7 @@ object XFormsProperties {
       ),
       PropertyDefinition(FunctionLibraryProperty,                         "",                          propagateToClient = false),
       PropertyDefinition(XblSupportProperty,                              "",                          propagateToClient = false),
+      PropertyDefinition(UploadSupportProperty,                           "",                          propagateToClient = false),
       PropertyDefinition(ReadonlyAppearanceStaticSelectProperty,          "full",                      propagateToClient = false),
       PropertyDefinition(ReadonlyAppearanceStaticSelect1Property,         "full",                      propagateToClient = false),
       PropertyDefinition(OrderProperty,                                   DefaultOrderProperty,        propagateToClient = false),

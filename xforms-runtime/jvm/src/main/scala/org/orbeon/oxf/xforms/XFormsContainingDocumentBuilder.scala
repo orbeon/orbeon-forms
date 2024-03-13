@@ -21,12 +21,14 @@ import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.ReflectionUtils.loadClassByName
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, PathMatcher, StringConversions}
-import org.orbeon.oxf.xforms.XFormsProperties.NoUpdates
+import org.orbeon.oxf.xforms.XFormsProperties.{NoUpdates, UploadSupportProperty}
 import org.orbeon.oxf.xforms.analysis.{Metadata, StaticStateDocument}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplateBuilder, XFormsState, XFormsStaticStateCache}
+import org.orbeon.oxf.xforms.upload.UploadSupport
 import org.orbeon.oxf.xml.EncodeDecode
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.xforms.xbl.Scope
@@ -67,7 +69,7 @@ object XFormsContainingDocumentBuilder {
       if (staticState.propertyMaybeAsExpression(NoUpdates).fold(_.toString != "true" , _ => true))
         LifecycleLogger.eventAssumingRequest("xforms", "new form session", List("uuid" -> uuid))
 
-      val doc = new XFormsContainingDocument(staticState, uuid, disableUpdates = false)
+      val doc = new XFormsContainingDocument(staticState, uploadSupportFromProperty(staticState), uuid, disableUpdates = false)
       withDebug("initialization: creating new ContainingDocument (static state object provided).", List("uuid" -> uuid)) {
 
         doc.setRequestInformation(createInitialRequestInformation)
@@ -157,7 +159,7 @@ object XFormsContainingDocumentBuilder {
       // 2. Restore the dynamic state
       val dynamicState = xformsState.dynamicState getOrElse (throw new IllegalStateException)
 
-      val doc = new XFormsContainingDocument(staticState, dynamicState.uuid, disableUpdates)
+      val doc = new XFormsContainingDocument(staticState, uploadSupportFromProperty(staticState), dynamicState.uuid, disableUpdates)
       withDebug("initialization: restoring containing document") {
 
         val requestHeaders     = dynamicState.requestHeaders.toMap
@@ -266,4 +268,12 @@ object XFormsContainingDocumentBuilder {
           forceEncryption = forceEncryption
         ) ensuring (_.isClientStateHandling)
     }
+
+  private def uploadSupportFromProperty(staticState: XFormsStaticState): UploadSupport = {
+    val className = staticState.staticStringProperty(UploadSupportProperty)
+
+    loadClassByName[UploadSupport](className).getOrElse {
+      throw new IllegalStateException(s"Could not find class `$className`")
+    }
+  }
 }

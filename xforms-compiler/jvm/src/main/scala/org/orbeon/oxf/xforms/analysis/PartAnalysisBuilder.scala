@@ -19,18 +19,19 @@ import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.ReflectionUtils.loadClassByName
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, NumberUtils, WhitespaceMatching}
 import org.orbeon.oxf.xforms.XFormsProperties.{FunctionLibraryProperty, XblSupportProperty}
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{XBLBindingBuilder, XBLSupport}
-import org.orbeon.oxf.xforms.{StaticStateBits, XFormsGlobalProperties, XFormsStaticStateImpl, _}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
-import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.xforms.XFormsNames.XFORMS_BIND_QNAME
@@ -40,7 +41,6 @@ import org.xml.sax.Attributes
 
 import scala.collection.mutable
 import scala.reflect.ClassTag
-import scala.util.Try
 
 
 object PartAnalysisBuilder {
@@ -274,24 +274,6 @@ object PartAnalysisBuilder {
       (_._1)             flatMap
       (_.trimAllToOpt)   flatMap
       loadClassByName[T]
-
-  private def loadClassByName[T <: AnyRef : ClassTag](className: String): Option[T] = {
-
-      def tryFromScalaObject: Try[AnyRef] = Try {
-        Class.forName(className + "$").getDeclaredField("MODULE$").get(null)
-      }
-
-      def fromJavaClass: AnyRef =
-        Class.forName(className).getDeclaredMethod("instance").invoke(null)
-
-      tryFromScalaObject getOrElse fromJavaClass match {
-        case instance: T => Some(instance)
-        case _ =>
-          throw new ClassCastException(
-            s"class `$className` does not refer to a ${implicitly[ClassTag[T]].runtimeClass.getName}"
-          )
-      }
-    }
 
   // Analyze a subtree of controls (for `xxf:dynamic` and components with lazy bindings)
   def analyzeSubtree(partAnalysisCtx: NestedPartAnalysis, container: ComponentControl)(implicit logger: IndentedLogger): Unit = {

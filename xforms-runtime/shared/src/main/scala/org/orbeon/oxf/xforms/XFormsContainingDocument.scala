@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.state.InstancesControls
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager
+import org.orbeon.oxf.xforms.upload.UploadSupport
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.xforms.DeploymentType
@@ -62,6 +63,7 @@ case class RequestInformation(
  */
 class XFormsContainingDocument(
   val staticState    : XFormsStaticState,
+  val uploadSupport  : UploadSupport,
   val uuid           : String,
   val disableUpdates : Boolean,
 ) extends XFormsContainingDocumentSupport {

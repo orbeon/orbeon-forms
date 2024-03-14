@@ -34,6 +34,7 @@ import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits
 import org.orbeon.xforms.Namespaces
 
+
 import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 
@@ -188,9 +189,19 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
       item
   }
 
-  // TODO: Should be `Iterator`?
   @XPathFunction
-  def valid(items: Iterable[om.Item], relevant: Boolean = true, recurse: Boolean = true): Boolean = throw new NotImplementedError("valid")
+  def valid(
+    items           : Option[Iterable[om.Item]] = None,
+    pruneNonRelevant: Boolean                   = true,
+    recurse         : Boolean                   = true
+  )(implicit
+    xpc             : XPathContext
+  ): Boolean =
+    ValidSupport.isValid(
+      items.map(_.iterator).getOrElse(Option(xpc.getContextItem).iterator),
+      pruneNonRelevant,
+      recurse
+    )
 
   // So we can call as `bind()` and `xxf:bind()`
   def bindImpl(bindId: String, searchAncestors: Boolean)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] = { // should be `om.NodeInfo`?

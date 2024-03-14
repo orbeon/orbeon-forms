@@ -14,12 +14,9 @@
 package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsMIPFunction
-import org.orbeon.oxf.xforms.model.InstanceData
-import org.orbeon.oxf.xml.AttributesAndElementsIterator
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
 
 /**
  * xf:valid() as xs:boolean
@@ -27,16 +24,16 @@ import org.orbeon.scaxon.SimplePath._
  * xf:valid($items as item()*, $relevant as xs:boolean) as xs:boolean
  * xf:valid($items as item()*, $relevant as xs:boolean, $recurse as xs:boolean) as xs:boolean
  */
-class XFormsValid extends XXFormsMIPFunction with ValidSupport {
+class XFormsValid extends XXFormsMIPFunction {
 
-  override def evaluateItem(xpathContext: XPathContext) = {
+  override def evaluateItem(xpathContext: XPathContext): BooleanValue = {
 
     implicit val xpc = xpathContext
 
     val pruneNonRelevant = booleanArgument(1, default = true)
     val recurse          = booleanArgument(2, default = true)
 
-    isValid(pruneNonRelevant, recurse)
+    ValidSupport.isValid(asScalaIterator(itemsArgumentOrContextOpt(0)), pruneNonRelevant, recurse)
   }
 }
 
@@ -46,44 +43,15 @@ class XFormsValid extends XXFormsMIPFunction with ValidSupport {
  * xxf:valid($item as item()*, $recurse as xs:boolean) as xs:boolean
  * xxf:valid($item as item()*, $recurse as xs:boolean, $relevant as xs:boolean) as xs:boolean
  */
-class XXFormsValid extends XXFormsMIPFunction with ValidSupport {
+class XXFormsValid extends XXFormsMIPFunction {
 
-  override def evaluateItem(xpathContext: XPathContext) = {
+  override def evaluateItem(xpathContext: XPathContext): BooleanValue = {
 
     implicit val xpc = xpathContext
 
     val recurse          = booleanArgument(1, default = false)
     val pruneNonRelevant = booleanArgument(2, default = false)
 
-    isValid(pruneNonRelevant, recurse)
-  }
-}
-
-trait ValidSupport extends XFormsFunction {
-
-  def isValid(pruneNonRelevant: Boolean, recurse: Boolean)(implicit xpathContext: XPathContext): Boolean = {
-
-    val items = itemsArgumentOrContextOpt(0)
-
-    if (recurse)
-      ! (asScalaIterator(items) exists (i => ! isTreeValid(i, pruneNonRelevant)))
-    else
-      ! (asScalaIterator(items) exists (i => ! isItemValid(i, pruneNonRelevant)))
-  }
-
-  // Item is valid unless it is a relevant (unless relevance is ignored) element/attribute and marked as invalid
-  private def isItemValid(item: Item, pruneNonRelevant: Boolean): Boolean = item match {
-    case nodeInfo: NodeInfo if nodeInfo.isElementOrAttribute =>
-      pruneNonRelevant && ! InstanceData.getInheritedRelevant(nodeInfo) || InstanceData.getValid(nodeInfo)
-    case _ =>
-      true
-  }
-
-  // Tree is valid unless one of its descendant-or-self nodes is invalid
-  private def isTreeValid(item: Item, pruneNonRelevant: Boolean): Boolean = item match {
-    case nodeInfo: NodeInfo if nodeInfo.isElementOrAttribute =>
-      ! (AttributesAndElementsIterator(nodeInfo) exists (! isItemValid(_, pruneNonRelevant)))
-    case _ =>
-      true
+    ValidSupport.isValid(asScalaIterator(itemsArgumentOrContextOpt(0)), pruneNonRelevant, recurse)
   }
 }

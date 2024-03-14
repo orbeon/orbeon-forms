@@ -78,7 +78,7 @@ class AttributesAndElementsIterator(start: NodeInfo, includeSelf: Boolean = true
 }
 
 object AttributesAndElementsIterator {
-  def apply(start: NodeInfo, includeSelf: Boolean = true) =
+  def apply(start: NodeInfo, includeSelf: Boolean = true): AttributesAndElementsIterator =
     new AttributesAndElementsIterator(start, includeSelf)
 }
 

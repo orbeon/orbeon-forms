@@ -36,6 +36,7 @@
     <property as="xs:QName"   processor-name="oxf:xml-converter"  name="default-method"     value="xml"/>
 
     <property as="xs:string"  name="oxf.xforms.location-mode"                               value="smart"/>
+    <property as="xs:string"  name="oxf.xforms.upload-support"                              value=""/>
 
     <property as="xs:string"  name="oxf.fr.authentication.method"                           value="header"/>
     <property as="xs:string"  name="oxf.fr.authentication.header.username"                  value="Orbeon-Liferay-User-Email"/>

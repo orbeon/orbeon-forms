@@ -18,6 +18,7 @@ import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata.LastModified
 
 import java.time.Instant
 
@@ -31,27 +32,57 @@ trait SearchRequestCommon {
   def isInternalAdminUser: Boolean
 }
 
-object OrderColumn {
-  def apply(s: String): OrderColumn = s.toLowerCase.trim match {
-    case "created"          => Created
-    case "created-by"       => CreatedBy
-    case "last-modified"    => LastModified
-    case "last-modified-by" => LastModifiedBy
-    case "workflow-stage"   => WorkflowStage
-    case controlPath        => ControlColumn(controlPath)
+sealed trait FilterType
+sealed trait ControlFilterType  extends FilterType
+sealed trait MetadataFilterType extends FilterType { def sql: String }
+
+object ControlFilterType {
+  case class Substring(filter: String)       extends ControlFilterType
+  case class Exact    (filter: String)       extends ControlFilterType
+  case class Token    (filter: List[String]) extends ControlFilterType
+}
+
+object MetadataFilterType {
+  sealed trait InstantFilterType extends MetadataFilterType { def filter: Instant }
+  sealed trait StringFilterType  extends MetadataFilterType { def filter: String }
+
+  case class GreaterThanOrEqual(filter: Instant) extends InstantFilterType { override val sql = ">=" }
+  case class LowerThan         (filter: Instant) extends InstantFilterType { override val sql = "<" }
+  case class Exact             (filter: String)  extends StringFilterType  { override val sql = "=" }
+}
+
+sealed trait Metadata {
+  def string   : String
+  def sqlColumn: String
+}
+
+object Metadata {
+  case object Created        extends Metadata {
+    override val string    = "created"
+    override val sqlColumn = "created"
   }
-}
+  case object CreatedBy      extends Metadata {
+    override val string    = "created-by"
+    override val sqlColumn = "username"
+  }
+  case object LastModified   extends Metadata {
+    override val string    = "last-modified"
+    override val sqlColumn = "last_modified_time"
+  }
+  case object LastModifiedBy extends Metadata {
+    override val string    = "last-modified-by"
+    override val sqlColumn = "last_modified_by"
+  }
+  case object WorkflowStage  extends Metadata {
+    override val string    = "workflow-stage"
+    override val sqlColumn = "stage"
+  }
 
-sealed trait OrderColumn {
-  val sql: String
-}
+  val values: Seq[Metadata] = Seq(Created, CreatedBy, LastModified, LastModifiedBy, WorkflowStage)
 
-case object Created                    extends OrderColumn { override val sql = "created" }
-case object CreatedBy                  extends OrderColumn { override val sql = "username" }
-case object LastModified               extends OrderColumn { override val sql = "last_modified_time" }
-case object LastModifiedBy             extends OrderColumn { override val sql = "last_modified_by" }
-case object WorkflowStage              extends OrderColumn { override val sql = "stage" }
-case class ControlColumn(path: String) extends OrderColumn { override val sql = "val" }
+  def apply(string: String): Metadata =
+    values.find(_.string == string).getOrElse(throw new IllegalArgumentException(s"Invalid metadata: $string"))
+}
 
 object OrderDirection {
   def apply(s: String): OrderDirection = s.toLowerCase.trim match {
@@ -67,7 +98,29 @@ sealed trait OrderDirection {
 case object Ascending  extends OrderDirection { override val sql = "ASC" }
 case object Descending extends OrderDirection { override val sql = "DESC" }
 
-case class OrderBy(column: OrderColumn, direction: OrderDirection)
+sealed trait Query {
+  type FT <: FilterType
+  def filterType    : Option[FT]
+  def sqlColumn     : String
+  def orderDirection: Option[OrderDirection]
+}
+
+case class ControlQuery (
+  path          : String,
+  filterType    : Option[ControlFilterType],
+  orderDirection: Option[OrderDirection]
+) extends Query {
+  type FT = ControlFilterType
+  override val sqlColumn: String = "val"
+}
+case class MetadataQuery(
+  metadata      : Metadata,
+  filterType    : Option[MetadataFilterType],
+  orderDirection: Option[OrderDirection]
+) extends Query {
+  type FT = MetadataFilterType
+  override val sqlColumn: String = metadata.sqlColumn
+}
 
 case class SearchRequest(
   provider           : Provider,
@@ -77,33 +130,18 @@ case class SearchRequest(
   isInternalAdminUser: Boolean,
   pageSize           : Int,
   pageNumber         : Int,
-  orderBy            : OrderBy,
-  createdGteOpt      : Option[Instant],
-  createdLtOpt       : Option[Instant],
-  createdBy          : Set[String],
-  lastModifiedGteOpt : Option[Instant],
-  lastModifiedLtOpt  : Option[Instant],
-  lastModifiedBy     : Set[String],
-  workflowStage      : Set[String],
-  controls           : List[Control],
+  queries            : List[Query],
   drafts             : Drafts,
   freeTextSearch     : Option[String],
   anyOfOperations    : Option[Set[Operation]]
-) extends SearchRequestCommon
-
-sealed trait FilterType
-
-object FilterType {
-  case object None                             extends FilterType
-  case class  Substring (filter: String)       extends FilterType
-  case class  Exact     (filter: String)       extends FilterType
-  case class  Token     (filter: List[String]) extends FilterType
+) extends SearchRequestCommon {
+  val orderQuery: Query =
+    queries.filter(_.orderDirection.isDefined) match {
+      case headQuery :: Nil => headQuery
+      case Nil              => MetadataQuery(LastModified, filterType = None, Some(Descending)) // Default order
+      case _                => throw new IllegalArgumentException("Only one order query is allowed")
+    }
 }
-
-case class Control(
-  path       : String,
-  filterType : FilterType
-)
 
 sealed trait Drafts
 

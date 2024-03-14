@@ -14,7 +14,8 @@
 package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.Statement.{Setter, StatementPart}
-import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchRequest
+import org.orbeon.oxf.fr.persistence.relational.search.adt.MetadataFilterType.{InstantFilterType, StringFilterType}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{MetadataQuery, SearchRequest}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 
 import java.sql.Timestamp
@@ -23,28 +24,25 @@ import java.time.Instant
 object metadataPart {
 
   def apply(request: SearchRequest): Option[StatementPart] = {
-    def timestamp(column: String, operator: String, valueOpt: Option[Instant]) =
-      valueOpt.map { value =>
-        (s"AND c.$column $operator ?", List[Setter](_.setTimestamp(_, Timestamp.from(value))))
-      }
+    def timestamp(column: String, operator: String, value: Instant) =
+      (
+        s"AND c.$column $operator ?",
+        List[Setter](_.setTimestamp(_, Timestamp.from(value)))
+      )
 
-    def stringIn(column: String, valuesOrEmpty: Set[String]) =
-      Option(valuesOrEmpty.toList).filter(_.nonEmpty).map { values =>
-        (
-          s"AND c.$column IN (${values.map(_ => "?").mkString(", ")})",
-          values.map(s => (_.setString(_, s)): Setter)
-        )
-      }
+    def string(column: String, operator: String, value: String) =
+      (
+        s"AND c.$column $operator ?",
+        List[Setter](_.setString(_, value))
+      )
 
-    val sqlStatementsAndSetters = List(
-      timestamp("created"           , ">=", request.createdGteOpt     ),
-      timestamp("created"           , "<" , request.createdLtOpt      ),
-      stringIn ("username"                , request.createdBy         ),
-      timestamp("last_modified_time", ">=", request.lastModifiedGteOpt),
-      timestamp("last_modified_time", "<" , request.lastModifiedLtOpt ),
-      stringIn ("last_modified_by"        , request.lastModifiedBy    ),
-      stringIn ("stage"                   , request.workflowStage     )
-    ).flatten
+    val sqlStatementsAndSetters = request.queries.collect {
+      case MetadataQuery(metadata, Some(metadataFilterType), _) =>
+        metadataFilterType match {
+          case instantFilterType: InstantFilterType => timestamp(metadata.sqlColumn, metadataFilterType.sql, instantFilterType.filter)
+          case stringFilterType : StringFilterType  => string   (metadata.sqlColumn, metadataFilterType.sql, stringFilterType .filter)
+        }
+    }
 
     val sql     = sqlStatementsAndSetters.map(" " + _._1).mkString("\n")
     val setters = sqlStatementsAndSetters.flatMap(_._2)

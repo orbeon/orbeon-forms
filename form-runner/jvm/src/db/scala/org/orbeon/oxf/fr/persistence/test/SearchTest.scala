@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.persistence.test
 
 import org.orbeon.dom.Document
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.HttpCall
 import org.orbeon.oxf.fr.persistence.http.HttpCall.assertCall
@@ -22,7 +23,7 @@ import org.orbeon.oxf.fr.persistence.relational.Version.{Specific, Unspecified}
 import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.scaxon.NodeConversions
@@ -46,6 +47,14 @@ class SearchTest
   private val controlPath = "section-1/control-1"
 
   describe("Search API") {
+    val baseParams =
+      <_>
+        <query/>
+        <drafts>include</drafts>
+        <page-size>10</page-size>
+        <page-number>1</page-number>
+        <lang>en</lang>
+      </_>
 
     it("returns an empty result when there are no documents") {
       withTestExternalContext { implicit externalContext =>
@@ -236,20 +245,11 @@ class SearchTest
         workflowStageOpt : Option[String] = None
       ) =
         <search>{
-          val baseParams =
-            <_>
-              <query/>
-              <query path={controlPath} match="substring">test</query>
-              <drafts>include</drafts>
-              <page-size>10</page-size>
-              <page-number>1</page-number>
-              <lang>en</lang>
-            </_>
-
           baseParams.child ++
-            createdByOpt     .map(createdBy      => <created-by>{createdBy}</created-by>                 ).getOrElse(Seq.empty) ++
-            lastModifiedByOpt.map(lastModifiedBy => <last-modified-by>{lastModifiedBy}</last-modified-by>).getOrElse(Seq.empty) ++
-            workflowStageOpt .map(workflowStage  => <workflow-stage>{workflowStage}</workflow-stage>     ).getOrElse(Seq.empty)
+            <query path={controlPath} match="substring">test</query> ++
+            createdByOpt     .map(createdBy      => <query metadata="created-by"       match="exact">{createdBy     }</query>).getOrElse(Seq.empty) ++
+            lastModifiedByOpt.map(lastModifiedBy => <query metadata="last-modified-by" match="exact">{lastModifiedBy}</query>).getOrElse(Seq.empty) ++
+            workflowStageOpt .map(workflowStage  => <query metadata="workflow-stage"   match="exact">{workflowStage }</query>).getOrElse(Seq.empty)
         }</search>.toDocument
 
       val formData = Seq(
@@ -289,21 +289,12 @@ class SearchTest
          lastModifiedLtOpt : Option[Instant] = None
        ) =
         <search>{
-          val baseParams =
-            <_>
-              <query/>
-              <query path={controlPath} match="substring">test</query>
-              <drafts>include</drafts>
-              <page-size>10</page-size>
-              <page-number>1</page-number>
-              <lang>en</lang>
-            </_>
-
           baseParams.child ++
-            createdGteOpt     .map(createdGte      => <created-gte>{createdGte}</created-gte>                 ).getOrElse(Seq.empty) ++
-            createdLtOpt      .map(createdLt       => <created-lt>{createdLt}</created-lt>                    ).getOrElse(Seq.empty) ++
-            lastModifiedGteOpt.map(lastModifiedGte => <last-modified-gte>{lastModifiedGte}</last-modified-gte>).getOrElse(Seq.empty) ++
-            lastModifiedLtOpt .map(lastModifiedLt  => <last-modified-lt>{lastModifiedLt}</last-modified-lt>   ).getOrElse(Seq.empty)
+            <query path={controlPath} match="substring">test</query> ++
+            createdGteOpt     .map(createdGte      => <query metadata="created"       match="gte">{createdGte     }</query>).getOrElse(Seq.empty) ++
+            createdLtOpt      .map(createdLt       => <query metadata="created"       match="lt" >{createdLt      }</query>).getOrElse(Seq.empty) ++
+            lastModifiedGteOpt.map(lastModifiedGte => <query metadata="last-modified" match="gte">{lastModifiedGte}</query>).getOrElse(Seq.empty) ++
+            lastModifiedLtOpt .map(lastModifiedLt  => <query metadata="last-modified" match="lt" >{lastModifiedLt }</query>).getOrElse(Seq.empty)
           }</search>.toDocument
 
       val formData = Seq(
@@ -347,17 +338,16 @@ class SearchTest
     }
 
     it("returns correct results when sorting") {
-      def searchRequest(column: String, direction: String) =
-        <search>
-          <query/>
-          <query path={controlPath} match="substring">test</query>
-          <drafts>include</drafts>
-          <order-by-column>{column}</order-by-column>
-          <order-by-direction>{direction}</order-by-direction>
-          <page-size>10</page-size>
-          <page-number>1</page-number>
-          <lang>en</lang>
-        </search>.toDocument
+      def searchRequest(columnToSort: String, direction: String) =
+        <search>{
+            if (columnToSort == controlPath)
+              baseParams.child ++
+                <query path={controlPath} match="substring" sort={direction}>test</query>
+            else
+              baseParams.child ++
+                <query path={controlPath} match="substring">test</query> ++
+                <query metadata={columnToSort} sort={direction}/>
+        }</search>.toDocument
 
       val formData = Seq(
         FormData("1", "test2", createdByOpt = Some("created-by-4"), lastModifiedByOpt = Some("last-modified-by-4"), workflowStageOpt = Some("workflow-stage-3")),
@@ -449,6 +439,162 @@ class SearchTest
         testDocumentOrder     = true,
         formData              = formData
       )
+    }
+
+    def expectStatusCode(
+      path                    : String,
+      searchRequest           : Document,
+      code                    : Int)(implicit
+      externalContext         : ExternalContext,
+      coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    ): Unit =
+      HttpCall.assertCall(
+        HttpCall.SolicitedRequest(
+          path    = path,
+          version = Specific(1),
+          method  = POST,
+          body    = Some(HttpCall.XML(searchRequest))
+        ),
+        HttpCall.ExpectedResponse(code)
+      )
+
+    it("returns an error when specifying an invalid metadata attribute") {
+      withTestExternalContext { implicit externalContext =>
+        Connect.withOrbeonTables("form definition") { (connection, provider) =>
+
+          val SearchURL = HttpCall.searchURLPrefix(provider)
+
+          val searchRequest =
+            <search>{
+              baseParams.child ++
+                <query path={controlPath} match="substring">test</query> ++
+                <query metadata="invalid-metadata" match="exact">test</query>
+            }</search>.toDocument
+
+          expectStatusCode(SearchURL, searchRequest, StatusCode.BadRequest)
+        }
+      }
+    }
+
+    it("returns an error when specifying an invalid match attribute") {
+      withTestExternalContext { implicit externalContext =>
+        Connect.withOrbeonTables("form definition") { (connection, provider) =>
+
+          val SearchURL = HttpCall.searchURLPrefix(provider)
+
+          def searchRequest(metadata: String, `match`: String, value: String) =
+            <search>{
+              baseParams.child ++
+                <query path={controlPath} match="substring">test</query> ++
+                <query metadata={metadata} match={`match`}>{value}</query>
+              }</search>.toDocument
+
+          val TestString = "string"
+
+          for (metadata <- Seq("created-by", "last-modified-by", "workflow-stage")) {
+            expectStatusCode(SearchURL, searchRequest(metadata, "gte",   TestString), StatusCode.BadRequest)
+            expectStatusCode(SearchURL, searchRequest(metadata, "lt",    TestString), StatusCode.BadRequest)
+            expectStatusCode(SearchURL, searchRequest(metadata, "exact", TestString), StatusCode.Ok)
+          }
+
+          val TestDateTime = "2024-12-31T01:30:00.000Z"
+
+          for (metadata <- Seq("created", "last-modified")) {
+            expectStatusCode(SearchURL, searchRequest(metadata, "gte",   TestDateTime), StatusCode.Ok)
+            expectStatusCode(SearchURL, searchRequest(metadata, "lt",    TestDateTime), StatusCode.Ok)
+            expectStatusCode(SearchURL, searchRequest(metadata, "exact", TestDateTime), StatusCode.BadRequest)
+          }
+        }
+      }
+    }
+
+    it("returns an error when specifying an invalid sort attribute") {
+      withTestExternalContext { implicit externalContext =>
+        Connect.withOrbeonTables("form definition") { (connection, provider) =>
+
+          val SearchURL = HttpCall.searchURLPrefix(provider)
+
+          val searchRequest =
+            <search>{
+              baseParams.child ++
+                <query path={controlPath} match="substring" sort="sort">test</query>
+              }</search>.toDocument
+
+          expectStatusCode(SearchURL, searchRequest, StatusCode.BadRequest)
+        }
+      }
+    }
+
+    it("returns an error when specifying more than one sort attributes") {
+      withTestExternalContext { implicit externalContext =>
+        Connect.withOrbeonTables("form definition") { (connection, provider) =>
+
+          val SearchURL = HttpCall.searchURLPrefix(provider)
+
+          val searchRequestSortByControl =
+            <search>{
+              baseParams.child ++
+                <query path={controlPath} match="substring" sort="desc">test</query> ++
+                <query metadata="created-by" match="exact">test</query>
+              }</search>.toDocument
+
+          expectStatusCode(SearchURL, searchRequestSortByControl, StatusCode.Ok)
+
+          val searchRequestSortByMetadata =
+            <search>{
+              baseParams.child ++
+                <query path={controlPath} match="substring">test</query> ++
+                <query metadata="created-by" match="exact" sort="asc">test</query>
+              }</search>.toDocument
+
+          expectStatusCode(SearchURL, searchRequestSortByMetadata, StatusCode.Ok)
+
+          val searchRequestSortByBoth =
+            <search>{
+              baseParams.child ++
+                <query path={controlPath} match="substring" sort="asc">test</query> ++
+                <query metadata="created-by" match="exact" sort="desc">test</query>
+              }</search>.toDocument
+
+          expectStatusCode(SearchURL, searchRequestSortByBoth, StatusCode.BadRequest)
+        }
+      }
+    }
+
+    it("returns an error when specifying a metadata query value without a match operator") {
+      withTestExternalContext { implicit externalContext =>
+        Connect.withOrbeonTables("form definition") { (connection, provider) =>
+
+          val SearchURL = HttpCall.searchURLPrefix(provider)
+
+          val searchRequestSortOnly =
+            <search>{
+              baseParams.child ++
+                <query path={controlPath} match="substring">test</query> ++
+                <query metadata="created-by" sort="asc"/>
+              }</search>.toDocument
+
+          expectStatusCode(SearchURL, searchRequestSortOnly, StatusCode.Ok)
+
+          val searchRequestValueOnly =
+            <search>{
+              baseParams.child ++
+                <query path={controlPath} match="substring">test</query> ++
+                <query metadata="created-by">test</query>
+              }</search>.toDocument
+
+          expectStatusCode(SearchURL, searchRequestValueOnly, StatusCode.BadRequest)
+
+          val searchRequestBoth =
+            <search>{
+              baseParams.child ++
+                <query path={controlPath} match="substring">test</query> ++
+                <query metadata="created-by" sort="desc">test</query>
+              }</search>.toDocument
+
+          expectStatusCode(SearchURL, searchRequestBoth, StatusCode.BadRequest)
+        }
+      }
     }
   }
 

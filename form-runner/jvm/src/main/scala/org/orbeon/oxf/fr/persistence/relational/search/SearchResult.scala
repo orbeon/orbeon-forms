@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, SearchRequest}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{ControlQuery, Document, SearchRequest}
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{DateUtils, IndentedLogger}
 import org.orbeon.oxf.xml.XMLReceiver
@@ -47,17 +47,17 @@ trait SearchResult extends SearchRequestParser {
             operations          ={doc.operations}>{
 
             <details>{
-              request.controls.map { requestColumn =>
+              request.queries.collect { case controlQuery: ControlQuery =>
                   val columnValue = doc.values
                     // For all the value for the current doc, get the ones for the current column
-                    .filter(_.control == requestColumn.path)
+                    .filter(_.control == controlQuery.path)
                     // Sort them in the order in which they appear in the document
                     .sortBy(_.pos)
                     // Just get the string value
                     .map(_.value)
                     // Return values as comma separated list, to be compatible with 2016.1 and earlier
                     .mkString(", ")
-                  <detail path={requestColumn.path}>{columnValue}</detail>
+                  <detail path={controlQuery.path}>{columnValue}</detail>
               }
             }</details>
 

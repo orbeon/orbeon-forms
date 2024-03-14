@@ -20,6 +20,7 @@ import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationId, OrganizationSupport}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata.LastModified
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.fr.persistence.relational.search.part._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
@@ -78,7 +79,7 @@ object SearchLogic {
 
   def doSearch[T, R <: SearchRequestCommon](
     request           : R,
-    controls          : List[Control],
+    queries           : List[Query],
     freeTextSearch    : Option[String],
     noPermissionValue : T
   )(
@@ -102,14 +103,13 @@ object SearchLogic {
       RelationalUtils.withConnection { connection =>
 
         val commonAndPermissionsParts = List(
-          commonPart     (request.appForm, version, controls, freeTextSearch),
+          commonPart     (request.appForm, version, queries, freeTextSearch),
           permissionsPart(permissions)
         )
 
         body(connection, commonAndPermissionsParts, permissions)
       }
     }
-
 }
 
 trait SearchLogic extends SearchRequestParser {
@@ -117,7 +117,7 @@ trait SearchLogic extends SearchRequestParser {
   def doSearch(request: SearchRequest)(implicit indentedLogger: IndentedLogger): (List[Document], Int) =
     SearchLogic.doSearch(
       request           = request,
-      controls          = request.controls,
+      queries           = request.queries,
       freeTextSearch    = request.freeTextSearch,
       noPermissionValue = (List[Document](), 0)
     ) {
@@ -146,25 +146,25 @@ trait SearchLogic extends SearchRequestParser {
         }
 
         // To order the results by control value, we need to join with orbeon_i_control_text
-        val (orderByJoin, orderByStatementPartOpt) = request.orderBy.column match {
-          case ControlColumn(controlPath) => (
+        val (orderByJoin, orderByStatementPartOpt) = request.orderQuery match {
+          case ControlQuery(controlPath, _, _) => (
             "LEFT JOIN orbeon_i_control_text t ON t.data_id = s.data_id AND t.control = ?",
             Some(StatementPart("", List[Setter]((ps, i) => ps.setString(i, controlPath))))
           )
-          case _                          => ("", None)
+          case _                               => ("", None)
         }
 
         // We'll refer to the order by column as "sort_column"
-        val orderByTableAlias = request.orderBy.column match {
-          case ControlColumn(_) => "t" // Control value => comes from orbeon_i_control_text t
-          case _                => "c" // Form metadata => comes from orbeon_i_current c
+        val orderByTableAlias = request.orderQuery match {
+          case _: ControlQuery => "t" // Control value => comes from orbeon_i_control_text t
+          case _               => "c" // Form metadata => comes from orbeon_i_current c
         }
-        val orderByAliasing   = s"$orderByTableAlias.${request.orderBy.column.sql} AS sort_column"
+        val orderByAliasing   = s"$orderByTableAlias.${request.orderQuery.sqlColumn} AS sort_column"
 
         // First order by clause (specified by request), with CAST if necessary
         val firstOrderByColumn         = "d.sort_column"
-        val firstOrderByColumnWithCast = request.orderBy.column match {
-          case ControlColumn(_) =>
+        val firstOrderByColumnWithCast = request.orderQuery match {
+          case  _: ControlQuery =>
             // DB2, Oracle, and SQL Server use CLOB/NTEXT data types for control values, which cannot be used in ORDER
             // BY clauses, so we cast them to VARCHAR.
             request.provider match {
@@ -173,12 +173,12 @@ trait SearchLogic extends SearchRequestParser {
           case _                =>
             firstOrderByColumn
         }
-        val firstOrderByClause         = s"$firstOrderByColumnWithCast ${request.orderBy.direction.sql}"
+        val firstOrderByClause         = s"$firstOrderByColumnWithCast ${request.orderQuery.orderDirection.get.sql}"
 
         // Second order by clause (we order by last_modified_time DESC as well, if it makes sense)
-        val secondOrderByClause = request.orderBy.column match {
-          case LastModified => ""
-          case _            => ", d.last_modified_time DESC"
+        val secondOrderByClause = request.orderQuery match {
+          case MetadataQuery(LastModified, _, _) => ""
+          case _                                 => ", d.last_modified_time DESC"
         }
 
         val orderByClauses = firstOrderByClause + secondOrderByClause

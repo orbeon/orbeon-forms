@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
@@ -40,16 +41,21 @@ class SearchProcessor
 
           implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
 
-          val searchDocument = readInputAsTinyTree(
-            pipelineContext,
-            getInputByName(ProcessorImpl.INPUT_DATA),
-            XPath.GlobalConfiguration
-          )
-          val request = parseRequest(searchDocument, SearchLogic.searchVersion(httpRequest))
+          try {
+            val searchDocument = readInputAsTinyTree(
+              pipelineContext,
+              getInputByName(ProcessorImpl.INPUT_DATA),
+              XPath.GlobalConfiguration
+            )
+            val request = parseRequest(searchDocument, SearchLogic.searchVersion(httpRequest))
 
-          val (result, count) = doSearch(request)
+            val (result, count) = doSearch(request)
 
-          outputResult(request, result, count, xmlReceiver)
+            outputResult(request, result, count, xmlReceiver)
+          } catch {
+            case e: IllegalArgumentException =>
+              throw HttpStatusCodeException(StatusCode.BadRequest, throwable = Some(e))
+          }
         }
       }
     )

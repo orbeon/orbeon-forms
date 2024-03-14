@@ -15,20 +15,22 @@ package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{Control, FilterType, SearchRequest}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{ControlFilterType, ControlQuery, SearchRequest}
 
 
 object columnFilterPart {
 
-  def apply(request: SearchRequest): StatementPart =
-    if (! request.controls.exists(_.filterType != FilterType.None))
+  def apply(request: SearchRequest): StatementPart = {
+    val controlQueries = request.queries.collect { case controlQuery: ControlQuery => controlQuery }
+
+    if (! controlQueries.exists(_.filterType.isDefined))
         NilPart
     else
         StatementPart(
           sql =
-            request.controls
+            controlQueries
               // Only consider column with a filter
-              .filter(_.filterType != FilterType.None)
+              .filter(_.filterType.isDefined)
               // Add index, used to refer the appropriate tf table
               .zipWithIndex
               .flatMap { case (column, i) =>
@@ -38,10 +40,10 @@ object columnFilterPart {
                      |""".stripMargin
                 val valueWhere =
                   column.filterType match {
-                    case FilterType.None              => List.empty
-                    case FilterType.Exact    (_)      => List("AND " + Provider.textEquals  (request.provider, s"tf$i.val"))
-                    case FilterType.Substring(_)      => List("AND " + Provider.textContains(request.provider, s"tf$i.val"))
-                    case FilterType.Token    (tokens) =>
+                    case None                                      => List.empty
+                    case Some(ControlFilterType.Exact    (_))      => List("AND " + Provider.textEquals  (request.provider, s"tf$i.val"))
+                    case Some(ControlFilterType.Substring(_))      => List("AND " + Provider.textContains(request.provider, s"tf$i.val"))
+                    case Some(ControlFilterType.Token    (tokens)) =>
                       tokens.map { _ =>
                         "AND " + Provider.textContains(request.provider, Provider.concat(request.provider, "' '", s"tf$i.val", "' '"))
                       }
@@ -51,15 +53,16 @@ object columnFilterPart {
               .mkString(" "),
           setters = {
             val values =
-              request.controls.flatMap { case Control(path, matchType) =>
-                matchType match {
-                  case FilterType.None              => List.empty
-                  case FilterType.Exact(filter)     => path :: List(Provider.textEqualsParam  (request.provider, filter))
-                  case FilterType.Substring(filter) => path :: List(Provider.textContainsParam(request.provider, filter))
-                  case FilterType.Token(tokens)     => path :: tokens.map(token => Provider.textContainsParam(request.provider, s" $token "))
+              controlQueries.flatMap { case ControlQuery(path, filterType, _) =>
+                filterType match {
+                  case None                                      => List.empty
+                  case Some(ControlFilterType.Exact    (filter)) => path :: List(Provider.textEqualsParam  (request.provider, filter))
+                  case Some(ControlFilterType.Substring(filter)) => path :: List(Provider.textContainsParam(request.provider, filter))
+                  case Some(ControlFilterType.Token    (tokens)) => path :: tokens.map(token => Provider.textContainsParam(request.provider, s" $token "))
                 }
               }
             values.map(value => (_.setString(_, value)): Setter)
           }
         )
+  }
 }

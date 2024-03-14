@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.parsePositiveIntParamOrThrow
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
+import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider, RelationalUtils}
@@ -27,10 +28,9 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.DocumentInfo
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 
-import java.time.Instant
 import scala.util.{Failure, Success}
 
 
@@ -52,88 +52,15 @@ trait SearchRequestParser {
     httpRequest.getRequestPath match {
       case SearchPath(provider, app, form) =>
 
-        val appForm             = AppForm(app, form)
-        val searchElement       = searchDocument.rootElement
-        val queryEls            = searchElement.child("query").toList
-        val freeTextElOpt       = queryEls.find(! _.hasAtt("path"))
-        val structuredSearchEls = queryEls.filter(_.hasAtt("path"))
-        val draftsElOpt         = searchElement.child("drafts").headOption
-        val credentials         = PermissionsAuthorization.findCurrentCredentialsFromSession
-        val allControls         = searchElement.attValueOpt("return-all-indexed-fields").contains(true.toString)
-
-        val specificControls =
-          structuredSearchEls
-            .map { c =>
-              val filterOpt = trimAllToOpt(c.stringValue)
-              Control(
-                // Filter `[1]` predicates (see https://github.com/orbeon/orbeon-forms/issues/2922)
-                path        = c.attValue("path").replace("[1]", ""),
-                filterType  = filterOpt match {
-                  case None => FilterType.None
-                  case Some(filter) =>
-
-                    def fromMatch: Option[FilterType] =
-                      c.attValueOpt("match") map {
-                        case "substring" => FilterType.Substring(filter)
-                        case "token"     => FilterType.Token(filter.splitTo[List]())
-                        case "exact"     => FilterType.Exact(filter)
-                        case other       => throw new IllegalArgumentException(other)
-                      }
-
-                    def fromControl: Option[FilterType] =
-                      c.attValueOpt("control") map Index.matchForControl map {
-                        case "substring" => FilterType.Substring(filter)
-                        case "token"     => FilterType.Token(filter.splitTo[List]())
-                        case _           => FilterType.Exact(filter)
-                      }
-
-                    fromMatch     orElse
-                      fromControl getOrElse
-                      FilterType.Exact(filter)
-                }
-              )
-            }
-
-        val controls =
-          if (allControls) {
-
-            // Use specific controls to merge with explicit controls passed
-            val specificControlsByPath =
-              specificControls.map(c => c.path -> c).toMap
-
-            PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(appForm, version)) match {
-              case Success(EncryptionAndIndexDetails(_, indexedControlsXPaths)) =>
-                indexedControlsXPaths.value map { indexedControlXPath =>
-                  Control(
-                    indexedControlXPath,
-                    specificControlsByPath.get(indexedControlXPath).map(_.filterType).getOrElse(FilterType.None)
-                  )
-                }
-              case Failure(_) =>
-                // TODO: throw or log?
-                //throw new IllegalArgumentException(s"Form not found: $appForm")
-                Nil
-            }
-          } else
-            specificControls
-
-        def instant(elem: String): Option[Instant] = {
-          // Blank means no search
-          searchElement.elemValueOpt(elem).flatMap(trimAllToOpt).map(RelationalUtils.instantFromString)
-        }
-
-        def stringSet(elem: String): Set[String] = {
-          // Blank means no search
-          searchElement.elemValues(elem).flatMap(trimAllToOpt).toSet
-        }
-
-        val orderBy =
-          (for {
-            column    <- searchElement.elemValueOpt("order-by-column").map(OrderColumn.apply)
-            direction <- searchElement.elemValueOpt("order-by-direction").map(OrderDirection.apply)
-          } yield OrderBy(column, direction)).getOrElse {
-            OrderBy(LastModified, Descending)
-          }
+        val appForm          = AppForm(app, form)
+        val searchElement    = searchDocument.rootElement
+        val queryEls         = searchElement.child("query").toList
+        val freeTextElOpt    = queryEls.find(nodeInfo => ! nodeInfo.hasAtt("path") && ! nodeInfo.hasAtt("metadata"))
+        val controlQueryEls  = queryEls.filter(_.hasAtt("path"))
+        val metadataQueryEls = queryEls.filter(_.hasAtt("metadata"))
+        val draftsElOpt      = searchElement.child("drafts").headOption
+        val credentials      = PermissionsAuthorization.findCurrentCredentialsFromSession
+        val allControls      = searchElement.attValueOpt("return-all-indexed-fields").contains(true.toString)
 
         SearchRequest(
           provider            = Provider.withName(provider),
@@ -143,43 +70,134 @@ trait SearchRequestParser {
           isInternalAdminUser = PersistenceMetadataSupport.isInternalAdminUser(httpRequest.getFirstParamAsString),
           pageSize            = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-size"),  10),
           pageNumber          = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-number"), 1),
-          orderBy             = orderBy,
-          createdGteOpt       = instant  ("created-gte"),
-          createdLtOpt        = instant  ("created-lt"),
-          createdBy           = stringSet("created-by"),
-          lastModifiedGteOpt  = instant  ("last-modified-gte"),
-          lastModifiedLtOpt   = instant  ("last-modified-lt"),
-          lastModifiedBy      = stringSet("last-modified-by"),
-          workflowStage       = stringSet("workflow-stage"),
+          queries             = controlQueries(appForm, version, controlQueryEls, allControls) ::: metadataQueries(metadataQueryEls),
+          drafts              = drafts(draftsElOpt, credentials),
           freeTextSearch      = freeTextElOpt.map(_.stringValue).flatMap(trimAllToOpt), // Blank means no search
-          controls            = controls,
-          drafts              =
-            credentials match {
-              case None =>
-                ExcludeDrafts
-              case Some(_) =>
-                draftsElOpt match {
-                  case None =>
-                    IncludeDrafts
-                  case Some(draftsEl) =>
-                    draftsEl.stringValue match {
-                      case "exclude" => ExcludeDrafts
-                      case "include" => IncludeDrafts
-                      case "only"    => OnlyDrafts(
-                        draftsEl.attValueOpt("for-document-id") match {
-                          case Some(documentId) => DraftsForDocumentId(documentId)
-                          case None =>
-                            draftsEl.attValueOpt("for-never-saved-document") match {
-                              case Some(_) => DraftsForNeverSavedDocs
-                              case None    => AllDrafts
-                            }
-                        }
-                      )
-                    }
-                }
-            },
-          anyOfOperations = SearchLogic.anyOfOperations(searchElement)
+          anyOfOperations     = SearchLogic.anyOfOperations(searchElement)
         )
     }
   }
+
+  private def drafts(draftsElOpt: Option[NodeInfo], credentials: Option[Credentials]): Drafts = credentials match {
+    case None =>
+      ExcludeDrafts
+    case Some(_) =>
+      draftsElOpt match {
+        case None =>
+          IncludeDrafts
+        case Some(draftsEl) =>
+          draftsEl.stringValue match {
+            case "exclude" => ExcludeDrafts
+            case "include" => IncludeDrafts
+            case "only"    => OnlyDrafts(
+              draftsEl.attValueOpt("for-document-id") match {
+                case Some(documentId) => DraftsForDocumentId(documentId)
+                case None =>
+                  draftsEl.attValueOpt("for-never-saved-document") match {
+                    case Some(_) => DraftsForNeverSavedDocs
+                    case None    => AllDrafts
+                  }
+              }
+            )
+          }
+      }
+  }
+
+  private def orderDirection(queryEl: NodeInfo): Option[OrderDirection] =
+    queryEl.attValueOpt("sort").map(OrderDirection.apply)
+
+  private def controlQueries(
+    appForm        : AppForm,
+    version        : SearchVersion,
+    controlQueryEls: List[NodeInfo],
+    allControls    : Boolean
+  )(implicit
+    indentedLogger : IndentedLogger
+  ): List[ControlQuery] = {
+    val specificControls =
+      controlQueryEls
+        .map { controlQueryEl =>
+          val filterOpt = trimAllToOpt(controlQueryEl.stringValue)
+          ControlQuery(
+            // Filter `[1]` predicates (see https://github.com/orbeon/orbeon-forms/issues/2922)
+            path        = controlQueryEl.attValue("path").replace("[1]", ""),
+            filterType  = filterOpt map { filter =>
+
+              def fromMatch: Option[ControlFilterType] =
+                controlQueryEl.attValueOpt("match") map {
+                  case "substring" => ControlFilterType.Substring(filter)
+                  case "token"     => ControlFilterType.Token    (filter.splitTo[List]())
+                  case "exact"     => ControlFilterType.Exact    (filter)
+                  case other       => throw new IllegalArgumentException(other)
+                }
+
+              def fromControl: Option[ControlFilterType] =
+                controlQueryEl.attValueOpt("control") map Index.matchForControl map {
+                  case "substring" => ControlFilterType.Substring(filter)
+                  case "token"     => ControlFilterType.Token    (filter.splitTo[List]())
+                  case _           => ControlFilterType.Exact    (filter)
+                }
+
+              fromMatch     orElse
+                fromControl getOrElse
+                ControlFilterType.Exact(filter)
+            },
+            orderDirection = orderDirection(controlQueryEl)
+          )
+        }
+
+    if (allControls) {
+
+      // Use specific controls to merge with explicit controls passed
+      val specificControlsByPath =
+        specificControls.map(c => c.path -> c).toMap
+
+      PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(appForm, version)) match {
+        case Success(EncryptionAndIndexDetails(_, indexedControlsXPaths)) =>
+          indexedControlsXPaths.value map { indexedControlXPath =>
+            ControlQuery(
+              indexedControlXPath,
+              specificControlsByPath.get(indexedControlXPath).flatMap(_.filterType),
+              orderDirection = None
+            )
+          }
+        case Failure(_) =>
+          // TODO: throw or log?
+          //throw new IllegalArgumentException(s"Form not found: $appForm")
+          Nil
+      }
+    } else
+      specificControls
+  }
+
+  private def metadataQueries(metadataQueryEls: List[NodeInfo]): List[MetadataQuery] =
+    metadataQueryEls
+      .map { metadataQueryEl =>
+        val metadata   = Metadata.apply(metadataQueryEl.attValue("metadata"))
+        val filterType = trimAllToOpt(metadataQueryEl.stringValue) map { filter =>
+          metadataQueryEl.attValue("match") match {
+            case "gte"   => MetadataFilterType.GreaterThanOrEqual(RelationalUtils.instantFromString(filter))
+            case "lt"    => MetadataFilterType.LowerThan         (RelationalUtils.instantFromString(filter))
+            case "exact" => MetadataFilterType.Exact             (filter)
+            case other   => throw new IllegalArgumentException(other)
+          }
+        }
+
+        // Check metadata vs match operator compatibility
+        filterType.map {
+          case _: MetadataFilterType.StringFilterType  => Set[Metadata](CreatedBy, LastModifiedBy, WorkflowStage)
+          case _: MetadataFilterType.InstantFilterType => Set[Metadata](Created, LastModified)
+        }.foreach {
+          allowedMetadata =>
+            if (! allowedMetadata.contains(metadata)) {
+              throw new IllegalArgumentException(s"Invalid match type `${filterType.get}` for metadata `$metadata`")
+            }
+        }
+
+        MetadataQuery(
+          metadata       = metadata,
+          filterType     = filterType,
+          orderDirection = orderDirection(metadataQueryEl)
+        )
+      }
 }

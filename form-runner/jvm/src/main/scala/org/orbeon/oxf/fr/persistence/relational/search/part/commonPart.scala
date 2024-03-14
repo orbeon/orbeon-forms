@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.Statement.{Setter, StatementPart}
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{Control, FilterType}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{ControlQuery, Query}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.util.CoreUtils._
 
@@ -24,15 +24,16 @@ object commonPart  {
   def apply(
     appForm       : AppForm,
     version       : FormDefinitionVersion,
-    controls      : List[Control],
+    queries       : List[Query],
     freeTextSearch: Option[String]
   ): StatementPart = {
 
     StatementPart(
       sql = {
         val controlFilterTables =
-          controls
-            .filter(_.filterType != FilterType.None)
+          queries
+            .collect { case controlQuery: ControlQuery => controlQuery }
+            .filter(_.filterType.isDefined)
             .zipWithIndex
             .map { case (_, i) => s", orbeon_i_control_text tf$i" }
             .mkString(" ")

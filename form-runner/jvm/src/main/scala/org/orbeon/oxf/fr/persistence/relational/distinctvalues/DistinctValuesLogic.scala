@@ -38,7 +38,7 @@ trait DistinctValuesLogic {
     // Re-use part of the search API logic (permissions, SQL generation)
     SearchLogic.doSearch(
       request           = request,
-      controls          = Nil,
+      queries           = Nil,
       freeTextSearch    = None,
       noPermissionValue = DistinctValues()
     ) {

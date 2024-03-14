@@ -23,6 +23,8 @@
     <xi:include href="oxf:/config/properties-form-runner.xml"/>
     <xi:include href="oxf:/config/properties-form-builder.xml"/>
 
+    <property as="xs:integer" name="oxf.xml-parsing.entity-expansion-limit"                 value="100000"/>
+
     <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                      value="mysql"/>
     <property as="xs:anyURI"  name="oxf.log4j-config"                                       value="oxf:/ops/unit-tests/log4j.xml"/>
     <property as="xs:anyURI"  name="oxf.log4j2-config"                                      value="oxf:/ops/unit-tests/log4j2.xml"/>

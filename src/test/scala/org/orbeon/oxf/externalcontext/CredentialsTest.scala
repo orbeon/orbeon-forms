@@ -13,13 +13,13 @@
   */
 package org.orbeon.oxf.externalcontext
 
-import org.orbeon.oxf.test.XMLSupport
+import org.orbeon.oxf.test.{ResourceManagerSupport, XMLSupport}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.funspec.AnyFunSpec
 
 
-class CredentialsTest extends AnyFunSpec with XMLSupport {
+class CredentialsTest extends AnyFunSpec with ResourceManagerSupport with XMLSupport {
 
   val TestCredentials =
     Credentials(

@@ -272,12 +272,12 @@ object XFormsContainingDocumentBuilder {
   private def uploadSupportFromProperty(staticState: XFormsStaticState): UploadSupport = {
     val className = staticState.staticStringProperty(UploadSupportProperty)
 
-    loadClassByName[UploadSupport](className).getOrElse {
-      if (className.nonEmpty) {
+    if (className.nonEmpty) {
+      loadClassByName[UploadSupport](className).getOrElse {
         throw new IllegalStateException(s"Could not find class `$className`")
-      } else {
-        UploadSupport.noUploadSupport
       }
+    } else {
+      UploadSupport.noUploadSupport
     }
   }
 }

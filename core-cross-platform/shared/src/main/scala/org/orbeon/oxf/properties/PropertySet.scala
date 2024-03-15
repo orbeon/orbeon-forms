@@ -225,43 +225,31 @@ class PropertySet private (
   }
 
   // Return all the properties starting with the given name
-  def propertiesStartsWith(name: String, matchWildcards: Boolean = true): List[String] = {
+  def propertiesStartsWith(incomingPropertyName: String, matchWildcards: Boolean = true): List[String] = {
 
     val result = mutable.Buffer[String]()
 
-    def processNode(propertyNode: PropertyNode, consumed: String, tokens: List[String], currentTokenPosition: Int): Unit = {
+    def processNode(propertyNode: PropertyNode, foundTokens: List[String], incomingTokens: List[String]): Unit =
+      incomingTokens.headOption match {
+        case None if propertyNode.children.isEmpty =>
 
-      def appendToConsumed(s: String) = if (consumed.isEmpty) s else consumed + "." + s
+          result += foundTokens.reverse.mkString(".")
 
-      tokens.lift(currentTokenPosition) match {
-        case x @ (Some("*") | None) =>
+        case Some("*") | None if propertyNode.children.nonEmpty =>
 
-          if (propertyNode.children.isEmpty && x.isEmpty)
-            result += consumed
-          else if (propertyNode.children.nonEmpty) {
-            for ((key, value) <- propertyNode.children) {
-              val newConsumed = appendToConsumed(key)
-              processNode(value, newConsumed, tokens, currentTokenPosition + 1)
-            }
-          }
+          for ((key, value) <- propertyNode.children)
+            processNode(value, key :: foundTokens, incomingTokens.drop(1))
 
-        case Some(token) =>
-          // Regular token
+        case Some(currentToken) =>
 
-          // Find 1. property node with exact name 2. property node with *
-          val newPropertyNodes = propertyNode.children.get(token) :: (matchWildcards list propertyNode.children.get("*"))
-          for {
-            (newPropertyNodeOpt, index) <- newPropertyNodes.zipWithIndex
-            newPropertyNode             <- newPropertyNodeOpt
-            actualToken                 = if (index == 0) token else "*"
-            newConsumed                 = appendToConsumed(actualToken)
-          } locally {
-            processNode(newPropertyNode, newConsumed, tokens, currentTokenPosition + 1)
-          }
+          def findChild(t: String): List[(String, PropertyNode)] =
+            propertyNode.children.get(t).map(t -> _).toList
+
+          for ((key, value) <- findChild(currentToken) ::: (matchWildcards flatList findChild("*")))
+            processNode(value, key :: foundTokens, incomingTokens.drop(1))
       }
-    }
 
-    processNode(wildcardProperties, "", name.splitTo[List]("."), 0)
+    processNode(wildcardProperties, Nil, incomingPropertyName.splitTo[List]("."))
 
     result.toList
   }

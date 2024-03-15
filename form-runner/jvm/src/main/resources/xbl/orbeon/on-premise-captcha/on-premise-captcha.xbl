@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2012 Orbeon, Inc.
+  Copyright (C) 2024 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,20 +15,15 @@
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:SimpleCaptcha="java:org.orbeon.xbl.SimpleCaptcha">
+         xmlns:OnPremiseCaptcha="java:org.orbeon.xbl.OnPremiseCaptcha">
 
-    <xbl:binding id="fr-simple-captcha" element="fr|simple-captcha" xxbl:mode="binding lhha">
+    <xbl:binding id="fr-on-premise-captcha" element="fr|on-premise-captcha" xxbl:mode="binding lhha">
         <xbl:resources>
-             <xbl:style src="/xbl/orbeon/simple-captcha/simple-captcha.css"/>
+             <xbl:style src="/xbl/orbeon/on-premise-captcha/on-premise-captcha.css"/>
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-verify" phase="target">
@@ -37,7 +32,7 @@
         </xbl:handlers>
         <xbl:implementation>
             <!-- Local model -->
-            <xf:model id="simple-captcha-model">
+            <xf:model id="on-premise-captcha-model">
                 <xf:instance id="instance">
                     <_>
                         <user-answer/>
@@ -65,14 +60,13 @@
         <xbl:template>
             <xf:group id="component-inner-group" appearance="xxf:internal">
                 <xf:action ev:event="xforms-enabled">
-                    <xf:var name="captcha" value="SimpleCaptcha:createCaptcha()"/>
-                    <xf:setvalue ref="instance()/image" value="SimpleCaptcha:image($captcha)"/>
-                    <xf:setvalue ref="instance()/expected-answer" value="SimpleCaptcha:answer($captcha)"/>
+                    <xf:setvalue ref="instance()/expected-answer" value="OnPremiseCaptcha:answer()"/>
+                    <xf:setvalue ref="instance()/image"           value="OnPremiseCaptcha:image(instance()/expected-answer)"/>
                 </xf:action>
                 <xf:action ev:event="fr-verify xforms-value-changed">
-                    <xf:var name="correct" value="instance()/user-answer = instance()/expected-answer"/>
-                    <xf:dispatch if="not($correct)" name="fr-verify-error" targetid="fr-simple-captcha"/>
-                    <xf:dispatch if="$correct" name="fr-verify-done" targetid="fr-simple-captcha"/>
+                    <xf:var      name="correct"     value="instance()/user-answer = instance()/expected-answer"/>
+                    <xf:dispatch if="not($correct)" name="fr-verify-error" targetid="fr-on-premise-captcha"/>
+                    <xf:dispatch if="$correct"      name="fr-verify-done"  targetid="fr-on-premise-captcha"/>
                 </xf:action>
                 <xh:div>
                     <xf:output ref="instance()/image" mediatype="image/png"/>

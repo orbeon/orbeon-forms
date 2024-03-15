@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fr
 
-import cats.NonEmptyTraverse.ops.toAllNonEmptyTraverseOps
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi

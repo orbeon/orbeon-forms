@@ -82,4 +82,22 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
       }
       }
   }
+
+  describe("Properties starting with a prefix") {
+
+    val expected =
+      List(
+        ("test.orbeon",   true)  -> Set("test.orbeon.builder.form", "test.orbeon.builder.*", "test.orbeon.*.form", "test.orbeon.*.*", "test.*.builder.form", "test.*.builder.*", "test.*.*.form", "test.*.*.*"),
+        ("test.orbeon",   false) -> Set("test.orbeon.builder.form", "test.orbeon.builder.*", "test.orbeon.*.form", "test.orbeon.*.*"),
+        ("test.orbeon.*", true)  -> Set("test.orbeon.builder.form", "test.orbeon.builder.*", "test.orbeon.*.form", "test.orbeon.*.*", "test.*.builder.form", "test.*.builder.*", "test.*.*.form", "test.*.*.*"),
+        ("test.orbeon.*", false) -> Set("test.orbeon.builder.form", "test.orbeon.builder.*", "test.orbeon.*.form", "test.orbeon.*.*"),
+      )
+
+    val propertySet = PropertiesTest.newProperties.getGlobalPropertySet
+
+    for (((name, wildcards), value) <- expected)
+      it(s"must find properties starting with `$name` with wildcards = `$wildcards`") {
+        assert(propertySet.propertiesStartsWith(name, matchWildcards = wildcards).toSet == value)
+      }
+  }
 }

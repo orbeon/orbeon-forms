@@ -13,14 +13,18 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.syntax.option._
 import org.orbeon.dom
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
+import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.XMLConstants.{XS_BOOLEAN_QNAME, XS_STRING_QNAME}
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
@@ -298,6 +302,60 @@ class FormRunnerFunctionsTest
     for ((expected, expr) <- data)
       it(s"must pass checking `$expr`") {
         assert(expected === analyzeKnownConstraint(expr, Mapping, Library))
+      }
+  }
+
+  describe("`getProviders()` function") {
+
+    val properties: PropertySet =
+      PropertySet(
+        List(
+          PropertyParams(Map.empty, "oxf.fr.persistence.*.active",                       XS_BOOLEAN_QNAME, "true"), // this is the default, not strictly needed here
+          PropertyParams(Map.empty, "oxf.fr.persistence.my-inactive-provider.active",    XS_BOOLEAN_QNAME, "false"),
+
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*.attachments",     XS_STRING_QNAME,  "filesystem"),
+
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*",                 XS_STRING_QNAME,  "mysql"),
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.orbeon.bookshelf.form", XS_STRING_QNAME,  "sqlite"),
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.*",        XS_STRING_QNAME,  "postgresql"),
+
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.foo.*.*",               XS_STRING_QNAME,  "p1"),
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.foo.bar.*",             XS_STRING_QNAME,  "p2"),
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.foo.*.form",            XS_STRING_QNAME,  "p3"),
+
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.baz.*.*",               XS_STRING_QNAME,  "my-inactive-provider"),
+        )
+      )
+
+    val expected =
+      List(
+        ("orbeon".some,     "bookshelf".some, FormOrData.Form) -> Set("sqlite"),
+        ("orbeon".some,     "bookshelf".some, FormOrData.Data) -> Set("mysql"),
+
+        ("acme".some,       "sales".some,     FormOrData.Form) -> Set("mysql"),
+        ("acme".some,       "sales".some,     FormOrData.Data) -> Set("mysql"),
+
+        ("postgresql".some, "foo".some,       FormOrData.Form) -> Set("postgresql"),
+        ("postgresql".some, "foo".some,       FormOrData.Data) -> Set("postgresql"),
+
+        ("postgresql".some, None,             FormOrData.Form) -> Set("postgresql"),
+        ("postgresql".some, None,             FormOrData.Data) -> Set("postgresql"),
+
+        ("acme".some,       None,             FormOrData.Form) -> Set("mysql"),
+        ("acme".some,       None,             FormOrData.Data) -> Set("mysql"),
+
+        ("foo".some,        None,             FormOrData.Data) -> Set("p1", "p2"),
+        ("foo".some,        "bar".some,       FormOrData.Data) -> Set("p2"),
+        ("foo".some,        None,             FormOrData.Form) -> Set("p2", "p3"),
+        ("foo".some,        "bar".some,       FormOrData.Form) -> Set("p2"),
+
+        ("baz".some,        None,             FormOrData.Form) -> Set.empty,
+        ("baz".some,        "qux".some,       FormOrData.Form) -> Set.empty,
+      )
+
+    for (((appOpt, formOpt, formOrData), expected) <- expected)
+      it(s"must return `$expected` for `$appOpt`/`$formOpt`/`$formOrData`") {
+        assert(getProviders(appOpt, formOpt, formOrData, properties).toSet == expected)
       }
   }
 }

@@ -29,7 +29,7 @@ import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod}
-import org.orbeon.oxf.properties.Property
+import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.ContentTypes.isTextOrXMLOrJSONContentType
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.CoreUtils._
@@ -37,7 +37,7 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, _}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
@@ -174,7 +174,7 @@ object FormRunnerPersistence {
   val StandardProviderProperties          = Set("uri", "autosave", "active", "permissions")
   val AttachmentAttributeNames            = List("filename", "mediatype", "size")
 
-  def findProvider(appForm: AppForm, formOrData: FormOrData): Option[String] =
+  def findProvider(appForm: AppForm, formOrData: FormOrData, properties: PropertySet = CoreCrossPlatformSupport.properties): Option[String] =
     properties.getNonBlankString(
       PersistenceProviderPropertyPrefix :: appForm.app :: appForm.form :: formOrData.entryName :: Nil mkString "."
     )
@@ -184,12 +184,16 @@ object FormRunnerPersistence {
       PersistenceProviderPropertyPrefix :: appForm.app :: appForm.form :: formOrData.entryName :: AttachmentsSuffix :: Nil mkString "."
     )
   // Get all providers that can be used either for form data or for form definitions
-  // 2024-02-28: Called with `None`/`None`/`Data`, or app/form/`Form`
-  def getProviders(appOpt: Option[String], formOpt: Option[String], formOrData: FormOrData): List[String] = {
+  // 2024-02-28: Called with `None`/`None`/`Data`, or appOpt/formOpt/`Form`
+  def getProviders(
+    appOpt    : Option[String],
+    formOpt   : Option[String],
+    formOrData: FormOrData,
+    properties: PropertySet = CoreCrossPlatformSupport.properties
+  ): List[String] = {
     (appOpt, formOpt) match {
       case (Some(app), Some(form)) =>
-        // Get the specific provider for this app/form
-        findProvider(AppForm(app, form), formOrData).toList
+        findProvider(AppForm(app, form), formOrData, properties).toList
       case (appOpt, formOpt) =>
 
         val propertyName =
@@ -199,11 +203,11 @@ object FormRunnerPersistence {
           formOrData.entryName              ::
           Nil mkString "."
 
-        properties.propertiesMatch(propertyName, matchWildcards = true)
+        properties.propertiesMatching(propertyName)
           .flatMap(properties.getNonBlankString)
           .distinct
     }
-  }.filter(FormRunner.isActiveProvider)
+  }.filter(FormRunner.isActiveProvider(_, properties))
 
   private def providerPropertyName(provider: String, property: String): String =
     PersistencePropertyPrefix :: provider :: property :: Nil mkString "."
@@ -440,7 +444,7 @@ trait FormRunnerPersistence {
   def getAttachmentPathFilenameRemoveQuery(pathQuery: String): String =
     splitQuery(pathQuery)._1.split('/').last
 
-  def providerPropertyAsBoolean(provider: String, property: String, default: Boolean): Boolean =
+  def providerPropertyAsBoolean(provider: String, property: String, default: Boolean, properties: PropertySet = CoreCrossPlatformSupport.properties): Boolean =
     properties.getBoolean(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
 
   // 2020-12-23: If the provider is not configured, return `false` (for offline FIXME).
@@ -464,8 +468,8 @@ trait FormRunnerPersistence {
   def isSortSupported(app: String, form: String): Boolean =
     providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Data).get, "sort", default = false)
 
-  def isActiveProvider(provider: String): Boolean =
-    providerPropertyAsBoolean(provider, "active", default = true)
+  def isActiveProvider(provider: String, properties: PropertySet = CoreCrossPlatformSupport.properties): Boolean =
+    providerPropertyAsBoolean(provider, "active", default = true, properties)
 
   // Whether the form data is valid as per the error summary
   // We use instance('fr-error-summary-instance')/valid and not valid() because the instance validity may not be

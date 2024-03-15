@@ -61,10 +61,10 @@ object PropertySet {
 
   val PasswordPlaceholder = "xxxxxxxx"
 
-  private class PropertyNode {
-    var property: Option[Property] = None
-    val children: mutable.Map[String, PropertyNode] = mutable.LinkedHashMap[String, PropertyNode]()
-  }
+  private case class PropertyNode(
+    var property: Option[Property] = None,
+    children    : mutable.Map[String, PropertyNode] = mutable.LinkedHashMap[String, PropertyNode]()
+  )
 
   def empty: PropertySet = new PropertySet(Map.empty, new PropertyNode)
 
@@ -72,26 +72,21 @@ object PropertySet {
 
   def apply(globalProperties: Iterable[PropertyParams]): PropertySet = {
 
-    var exactProperties    = Map[String, Property]()
-    val wildcardProperties = new PropertyNode
+    var propertiesByName = Map[String, Property]()
+    val propertiesTree   = new PropertyNode
 
     def setProperty(namespaces: Map[String, String], name: String, typeQName: QName, value: AnyRef): Unit = {
 
       val property = Property(typeQName, value, if (namespaces eq null) Map.empty else namespaces, name) // shouldn't be null!
 
       // Store exact property name anyway
-      exactProperties += name -> property
+      propertiesByName += name -> property
 
       // Also store in tree (in all cases, not only when contains wildcard, so we get find all the properties
       // that start with some token)
-      var currentNode = wildcardProperties
-      for (currentToken <- name.splitTo[List](".")) {
-        currentNode = currentNode.children.getOrElse(currentToken, {
-          val newPropertyNode = new PropertyNode
-          currentNode.children += currentToken -> newPropertyNode
-          newPropertyNode
-        })
-      }
+      var currentNode = propertiesTree
+      for (currentToken <- name.splitTo[List]("."))
+        currentNode = currentNode.children.getOrElseUpdate(currentToken, new PropertyNode)
 
       // Store value
       currentNode.property = property.some
@@ -101,7 +96,7 @@ object PropertySet {
       setProperty(namespaces, name, typ, getObjectFromStringValue(stringValue, typ, namespaces))
     }
 
-    new PropertySet(exactProperties, wildcardProperties)
+    new PropertySet(propertiesByName, propertiesTree)
   }
 
   def isSupportedType(typeQName: QName): Boolean =
@@ -174,15 +169,15 @@ object PropertySet {
 }
 
 class PropertySet private (
-  exactProperties    : Map[String, Property],
-  wildcardProperties : PropertyNode // this contains mutable nodes, but they don't mutate after construction
+  propertiesByName: Map[String, Property],
+  propertiesTree  : PropertyNode // this contains mutable nodes, but they don't mutate after construction
 ) {
 
-  def keySet: Set[String] = exactProperties.keySet
-  def size: Int = exactProperties.size
+  def keySet: Set[String] = propertiesByName.keySet
+  def size: Int = propertiesByName.size
 
   def propertyParams: Iterable[PropertyParams] =
-    exactProperties map { case (name, prop) =>
+    propertiesByName map { case (name, prop) =>
 
       // Custom serialization to String, not ideal
       val stringValue = {
@@ -199,7 +194,7 @@ class PropertySet private (
 
     val jsonProperties =
       for {
-        (name, prop) <- exactProperties.toList.sortBy(_._1)
+        (name, prop) <- propertiesByName.toList.sortBy(_._1)
         propType     = prop.typ.toString
         propValue    = if (name.toLowerCase.contains("password")) PasswordPlaceholder else prop.stringValue
       } yield
@@ -215,7 +210,7 @@ class PropertySet private (
   def getBooleanProperties: ju.Map[String, jl.Boolean] = {
     val tuples =
       for {
-        key          <- exactProperties.keys
+        key          <- propertiesByName.keys
         value        <- getObjectOpt(key)
         booleanValue <- CollectionUtils.collectByErasedType[java.lang.Boolean](value)
       } yield
@@ -249,14 +244,46 @@ class PropertySet private (
             processNode(value, key :: foundTokens, incomingTokens.drop(1))
       }
 
-    processNode(wildcardProperties, Nil, incomingPropertyName.splitTo[List]("."))
+    processNode(propertiesTree, Nil, incomingPropertyName.splitTo[List]("."))
 
     result.toList
   }
 
-  def propertiesMatch(name: String, matchWildcards: Boolean = true): List[String] = {
-    val tokensCount = name.splitTo[List](".").size
-    propertiesStartsWith(name, matchWildcards).filter(_.splitTo[List](".").size == tokensCount)
+  def propertiesMatching(incomingPropertyName: String): List[String] = {
+
+    def processNode(propertyNode: PropertyNode, foundTokens: List[String], incomingTokens: List[String]): List[String] = {
+
+      val children = propertyNode.children
+
+      (incomingTokens.headOption, propertyNode.property) match {
+        case (None, Some(property)) =>
+          // Found
+          List(property.name)
+        case (Some(_), _) if children.isEmpty =>
+          // Not found because requested property is longer
+          Nil
+        case (None, _) if children.nonEmpty =>
+          // Not found because requested property is shorter
+          Nil
+        case (Some(currentToken), _) =>
+
+          def findChild(t: String): Option[(String, PropertyNode)] =
+            children.get(t).map(t -> _)
+
+          val relevantChildren: Iterable[(String, PropertyNode)] =
+            if (currentToken == "*")
+              children
+            else
+              findChild(currentToken).orElse(findChild("*")).toList
+
+          relevantChildren.toList.flatMap {
+            case (key, value) =>
+              processNode(value, key :: foundTokens, incomingTokens.drop(1))
+          }
+      }
+    }
+
+    processNode(propertiesTree, Nil, incomingPropertyName.splitTo[List]("."))
   }
 
   private def getPropertyOptThrowIfTypeMismatch(name: String, typ: QName): Option[Property] = {
@@ -280,10 +307,10 @@ class PropertySet private (
       }
 
     def getExact: Option[Property] =
-      exactProperties.get(name)
+      propertiesByName.get(name)
 
     def getWildcard: Option[Property] =
-      wildcardSearch(Some(wildcardProperties), name.splitTo[List]("."))
+      wildcardSearch(Some(propertiesTree), name.splitTo[List]("."))
 
     def checkType(p: Property): Property =
       if ((typ ne null) && typ != p.typ)

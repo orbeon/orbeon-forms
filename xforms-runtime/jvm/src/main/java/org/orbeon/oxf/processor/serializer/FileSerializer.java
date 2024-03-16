@@ -248,7 +248,7 @@ public class FileSerializer extends ProcessorImpl {
                             logger.debug("Output not cached");
                         try {
                             ResultStoreOutputStream resultStoreOutputStream = new ResultStoreOutputStream(fileOutputStream);
-                            readInputAsSAX(context, input, new BinaryTextXMLReceiver(null, resultStoreOutputStream, true,
+                            readInputAsSAX(context, input, new BinaryTextXMLReceiver(null, null, resultStoreOutputStream, true,
                                     config.forceContentType, config.requestedContentType, config.ignoreDocumentContentType,
                                     config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding, null));
                             resultStoreOutputStream.close();
@@ -267,7 +267,7 @@ public class FileSerializer extends ProcessorImpl {
                 }
             } else {
                 // Caching is not enabled
-                readInputAsSAX(context, dataInput, new BinaryTextXMLReceiver(null, fileOutputStream, true,
+                readInputAsSAX(context, dataInput, new BinaryTextXMLReceiver(null, null, fileOutputStream, true,
                         config.forceContentType, config.requestedContentType, config.ignoreDocumentContentType,
                         config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding, null));
 

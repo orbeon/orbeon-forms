@@ -35,7 +35,7 @@ import scala.collection.mutable
  * ContentHandler able to serialize text or binary documents to an output stream.
  */
 class BinaryTextXMLReceiver(
-  output                    : Either[Response, OutputStream], // one of those is required
+  output                    : Either[(Response, PathType), OutputStream], // one of those is required
   closeStream               : Boolean,                        // whether to close the stream upon endDocument()
   forceContentType          : Boolean,
   requestedContentType      : Option[String],
@@ -50,8 +50,8 @@ class BinaryTextXMLReceiver(
   require(! forceContentType || requestedContentType.get.nonAllBlank)
   require(! forceEncoding    || requestedEncoding.get.nonAllBlank)
 
-  val responseOpt  = output.left.toOption
-  val outputStream = responseOpt map (_.getOutputStream) getOrElse output.getOrElse(throw new NoSuchElementException)
+  private val responsePathTypeOpt: Option[(Response, PathType)] = output.left.toOption
+  val outputStream: OutputStream = responsePathTypeOpt map (_._1.getOutputStream) getOrElse output.getOrElse(throw new NoSuchElementException)
 
   private val prefixMappings = new mutable.HashMap[String, String]
 
@@ -62,6 +62,7 @@ class BinaryTextXMLReceiver(
   // For Java callers
   def this(
     response                  : ExternalContext.Response,
+    pathType                  : PathType,
     outputStream              : OutputStream,
     closeStream               : Boolean,
     forceContentType          : Boolean,
@@ -73,7 +74,7 @@ class BinaryTextXMLReceiver(
     headersToForward          : String
   ) =
     this(
-      if (response ne null) Left(response) else Right(outputStream),
+      if (response ne null) Left(response, pathType) else Right(outputStream),
       closeStream,
       forceContentType,
       requestedContentType.trimAllToOpt,
@@ -116,11 +117,11 @@ class BinaryTextXMLReceiver(
       }
 
       // Set Last-Modified, Content-Disposition and status code when available
-      responseOpt foreach { response =>
+      responsePathTypeOpt foreach { case (response, pathType) =>
 
         // This will override caching settings which may have taken place before
         attributes.getValue(Headers.LastModifiedLower).trimAllToOpt foreach
-          (validity => response.setPageCaching(DateUtils.parseRFC1123(validity), PathType.Page)) // TODO: determine path type based on parameter
+          (validity => response.setPageCaching(DateUtils.parseRFC1123(validity), pathType)) // TODO: determine path type based on parameter
 
         attributes.getValue("filename").trimAllToOpt.foreach { fileName =>
           val isInline        = attributes.getValue("disposition-type").trimAllToOpt.contains("inline")
@@ -143,7 +144,7 @@ class BinaryTextXMLReceiver(
       val contentTypeAttribute        = Option(attributes.getValue(Headers.ContentTypeLower))
       val contentDispositionAttribute = Option(attributes.getValue(Headers.ContentDispositionLower)) flatMap (_.trimAllToOpt)
       if (isBinaryInput) {
-        responseOpt foreach { response =>
+        responsePathTypeOpt foreach { case (response, _) =>
           // Get content-type and encoding
 
           if (! forceContentType          &&
@@ -176,7 +177,7 @@ class BinaryTextXMLReceiver(
         val contentType = getContentType(contentTypeAttribute, DefaultTextContentType)
         val encoding    = getEncoding(contentTypeAttribute, CachedSerializer.DEFAULT_ENCODING)
 
-        responseOpt foreach { response =>
+        responsePathTypeOpt foreach { case (response, _) =>
           // Always set the content type with a charset attribute (with a default)
           response.setContentType(contentType + "; charset=" + encoding)
           contentDispositionAttribute map Headers.buildContentDispositionHeader foreach (response.setHeader _).tupled
@@ -205,7 +206,7 @@ class BinaryTextXMLReceiver(
   override def processingInstruction(target: String, data: String): Unit =
     parseSerializerPI(target, data) match {
       case Some(("status-code", Some(code))) =>
-        responseOpt foreach (_.setStatus(code.toInt))
+        responsePathTypeOpt foreach (_._1.setStatus(code.toInt))
       case Some(("flush", _)) =>
         if (writer ne null)
           writer.flush()

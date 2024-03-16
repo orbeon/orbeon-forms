@@ -59,7 +59,7 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
 
   def responseWithReceiver: (TestResponse, BinaryTextXMLReceiver) = {
     val response = new TestResponse
-    (response, new BinaryTextXMLReceiver(Left(response), true, false, None, false, false, None, false, Nil))
+    (response, new BinaryTextXMLReceiver(Left(response, PathType.Page), true, false, None, false, false, None, false, Nil))
   }
 
   class TestResponse extends ResponseAdapter {

@@ -14,7 +14,9 @@
 package org.orbeon.oxf.processor.serializer;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.controller.PageFlowControllerProcessor$;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.http.PathType;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 
@@ -36,11 +38,10 @@ public class HttpSerializer extends HttpSerializerBase {
     protected void readInput(PipelineContext context, ExternalContext.Response response, ProcessorInput input, Object config) {
         try {
             final Config httpConfig = (Config) config;
-
-            readInputAsSAX(context, input, new BinaryTextXMLReceiver(response, null, true,
+            final PathType pathType = (PathType) context.getAttribute(PageFlowControllerProcessor$.MODULE$.PathTypeKey());
+            readInputAsSAX(context, input, new BinaryTextXMLReceiver(response, pathType, null, true,
                     httpConfig.forceContentType, httpConfig.contentType, httpConfig.ignoreDocumentContentType,
                     httpConfig.forceEncoding, httpConfig.encoding, httpConfig.ignoreDocumentEncoding, httpConfig.headersToForward));
-
         } catch (Exception e) {
             throw new OXFException(e);
         }

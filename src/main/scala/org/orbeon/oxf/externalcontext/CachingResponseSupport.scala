@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.externalcontext
 
-import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.http.{Headers, PathType}
 import org.orbeon.oxf.servlet.ServletExternalContext
 import org.orbeon.oxf.util.{DateUtils, NetUtils}
 import ExternalContext.Request
@@ -31,7 +31,7 @@ trait CachingResponseSupport {
   private def setDateHeader(name: String, value: Long) =
       setHeader(name, DateUtils.formatRfc1123DateTimeGmt(value))
 
-  def setPageCaching(lastModified: Long, pathTypeOrNull: String): Unit =
+  def setPageCaching(lastModified: Long, pathType: PathType): Unit =
     if (responseCachingDisabled) {
       setResponseHeaders(ServletExternalContext.nocacheCacheHeaders)
     } else {
@@ -44,9 +44,10 @@ trait CachingResponseSupport {
       setDateHeader(Headers.LastModified, _lastModified)
       // Make sure the client does not load from cache without revalidation
       setDateHeader("Expires", now)
-      val cacheHeaders =
-        if (pathTypeOrNull == "service") ServletExternalContext.serviceCacheHeaders
-        else                             ServletExternalContext.pageCacheHeaders
+      val cacheHeaders = pathType match {
+        case PathType.Service => ServletExternalContext.serviceCacheHeaders
+        case PathType.Page    => ServletExternalContext.pageCacheHeaders
+      }
       setResponseHeaders(cacheHeaders)
     }
 

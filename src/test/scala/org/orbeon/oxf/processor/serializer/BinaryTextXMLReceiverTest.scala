@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.serializer
 import java.io.ByteArrayOutputStream
 import org.junit.Test
 import org.orbeon.oxf.externalcontext.ResponseAdapter
-import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.http.{PathType, StatusCode}
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Converter._
@@ -71,7 +71,7 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
     override def setStatus(status: Int): Unit = this.status = status
     override def getStatus: Int = this.status
 
-    override def setPageCaching(lastModified: Long, pathTypeOrNull: String): Unit = super.setPageCaching(lastModified, pathTypeOrNull)
+    override def setPageCaching(lastModified: Long, pathType: PathType): Unit = super.setPageCaching(lastModified, pathType)
     override def setHeader(name: String, value: String): Unit = super.setHeader(name, value)
 
     override val getOutputStream = new ByteArrayOutputStream

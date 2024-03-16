@@ -17,7 +17,7 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext._
-import org.orbeon.oxf.http.{Headers, HttpMethod, StatusCode}
+import org.orbeon.oxf.http.{Headers, HttpMethod, PathType, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.CoreUtils._
@@ -344,7 +344,7 @@ class TestExternalContext(
     def reset()                                                                      = ()
     def sendError(len: Int)                                                          = ()
     def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean) = ()
-    def setPageCaching(lastModified: Long, pathTypeOrNull: String)                   = ()
+    def setPageCaching(lastModified: Long, pathType: PathType)                       = ()
     def setResourceCaching(lastModified: Long, expires: Long)                        = ()
     def setContentLength(len: Int)                                                   = ()
     def setContentType(contentType: String)                                          = ()

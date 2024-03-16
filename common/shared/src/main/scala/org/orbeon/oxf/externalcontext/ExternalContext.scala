@@ -19,7 +19,7 @@ import java.{util => ju}
 import enumeratum.{Enum, EnumEntry}
 import enumeratum.values.{IntEnum, IntEnumEntry}
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.http.{Headers, HttpMethod, PathType}
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.jdk.CollectionConverters._
@@ -192,7 +192,7 @@ object ExternalContext {
 
     def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean): Unit
 
-    def setPageCaching(lastModified: Long, pathTypeOrNull: String): Unit
+    def setPageCaching(lastModified: Long, pathType: PathType): Unit
 
     /**
       * Set expiration headers for resources.

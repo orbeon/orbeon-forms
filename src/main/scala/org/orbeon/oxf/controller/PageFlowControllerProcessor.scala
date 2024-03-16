@@ -21,7 +21,7 @@ import org.orbeon.errorified.Exceptions._
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.http.{HttpMethod, HttpRedirectException, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.http.{HttpMethod, HttpRedirectException, HttpStatusCodeException, PathType, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.processor.XPLConstants.{NULL_SERIALIZER_PROCESSOR_QNAME, OXF_PROCESSORS_NAMESPACE}
@@ -188,7 +188,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
       case Some((route: PageOrServiceRoute, matchResult)) =>
         debug("processing page/service", logParams)
         // The path type, `page` or `service`, can be used by the serializer to determine the appropriate `Cache-Control` header
-        pc.setAttribute(PathType, if (route.isPage) "page" else "service")
+        pc.setAttribute(PathTypeKey, if (route.isPage) PathType.Page else PathType.Service)
         // Run the given route and handle "not found" and error conditions
         try
           route.process(pc, ec, matchResult)
@@ -456,7 +456,7 @@ object PageFlowControllerProcessor {
   val DefaultInstancePassing       = PageFlowControllerBuilder.INSTANCE_PASSING_REDIRECT
 
   val PathMatchers                 = "path-matchers"
-  val PathType                     = "path-type"
+  val PathTypeKey                  = "path-type"
 
   val PagePublicMethods            = Set(HttpMethod.GET, HttpMethod.POST): Set[HttpMethod]
   val ServicePublicMethods         = Set.empty[String]

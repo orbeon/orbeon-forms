@@ -1,5 +1,7 @@
 package org.orbeon.oxf.externalcontext
 
+import org.orbeon.oxf.http.PathType
+
 import java.io.{OutputStream, PrintWriter}
 
 
@@ -30,8 +32,8 @@ class ResponseWrapper(var _response: ExternalContext.Response)
   def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean): Unit =
     _response.sendRedirect(location, isServerSide, isExitPortal)
 
-  def setPageCaching(lastModified: Long, pathTypeOrNull: String): Unit =
-    _response.setPageCaching(lastModified, pathTypeOrNull)
+  def setPageCaching(lastModified: Long, pathType: PathType): Unit =
+    _response.setPageCaching(lastModified, pathType)
 
   def setResourceCaching(lastModified: Long, expires: Long): Unit =
     _response.setResourceCaching(lastModified, expires)

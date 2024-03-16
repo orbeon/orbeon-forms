@@ -17,7 +17,7 @@ import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
-import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.http.{Headers, PathType}
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver._
 import org.orbeon.oxf.util.ContentTypes.{getContentTypeCharset, getContentTypeMediaType}
 import org.orbeon.oxf.util.StringUtils._
@@ -120,7 +120,7 @@ class BinaryTextXMLReceiver(
 
         // This will override caching settings which may have taken place before
         attributes.getValue(Headers.LastModifiedLower).trimAllToOpt foreach
-          (validity => response.setPageCaching(DateUtils.parseRFC1123(validity), null))
+          (validity => response.setPageCaching(DateUtils.parseRFC1123(validity), PathType.Page)) // TODO: determine path type based on parameter
 
         attributes.getValue("filename").trimAllToOpt.foreach { fileName =>
           val isInline        = attributes.getValue("disposition-type").trimAllToOpt.contains("inline")

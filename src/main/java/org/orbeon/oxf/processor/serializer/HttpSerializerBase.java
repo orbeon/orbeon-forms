@@ -95,9 +95,8 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                     final long lastModified = findInputLastModified(pipelineContext, dataInput, false);
 
                     // Set caching headers and force revalidation
-                    PathType pathTypeFromContext = (PathType) pipelineContext.getAttribute(PageFlowControllerProcessor$.MODULE$.PathTypeKey());
-                    PathType pathType = pathTypeFromContext != null ? pathTypeFromContext : PathType.Page$.MODULE$;
-                    response.setPageCaching(lastModified, pathType);
+                    PathType pathType = (PathType) pipelineContext.getAttribute(PageFlowControllerProcessor$.MODULE$.PathTypeKey());
+                    response.setPageCaching(lastModified, (pathType != null) ? pathType : PathType.Page$.MODULE$);
 
                     // Check if we are processing a forward. If so, we cannot tell the client that the content has not been modified.
                     final boolean isForward = URLRewriterUtils.isForwarded(externalContext.getRequest());

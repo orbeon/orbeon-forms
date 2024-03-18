@@ -39,7 +39,7 @@ public class HttpSerializer extends HttpSerializerBase {
         try {
             final Config httpConfig = (Config) config;
             final PathType pathType = (PathType) context.getAttribute(PageFlowControllerProcessor$.MODULE$.PathTypeKey());
-            readInputAsSAX(context, input, new BinaryTextXMLReceiver(response, pathType, null, true,
+            readInputAsSAX(context, input, new BinaryTextXMLReceiver(response, (pathType != null) ? pathType : PathType.Page$.MODULE$, null, true,
                     httpConfig.forceContentType, httpConfig.contentType, httpConfig.ignoreDocumentContentType,
                     httpConfig.forceEncoding, httpConfig.encoding, httpConfig.ignoreDocumentEncoding, httpConfig.headersToForward));
         } catch (Exception e) {

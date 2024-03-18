@@ -23,18 +23,28 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.XPLConstants;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.ExpirationScope;
+import org.orbeon.oxf.util.FileItemSupport;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.*;
 
 
@@ -589,20 +599,17 @@ public class RequestGenerator extends ProcessorImpl {
     // TODO: Should be a `long`.
     public static int getMaxSizeProperty() {
         PropertySet propertySet = Properties.instance().getPropertySet(XPLConstants.REQUEST_PROCESSOR_QNAME());
-        Integer maxSizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_SIZE_PROPERTY);
-        return (maxSizeProperty != null) ? maxSizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_SIZE;
+        return propertySet.getInteger(RequestGenerator.MAX_UPLOAD_SIZE_PROPERTY, RequestGenerator.DEFAULT_MAX_UPLOAD_SIZE);
     }
 
     public static int getMaxFilesProperty() {
         PropertySet propertySet = Properties.instance().getPropertySet(XPLConstants.REQUEST_PROCESSOR_QNAME());
-        Integer maxFilesProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_FILES_PROPERTY);
-        return (maxFilesProperty != null) ? maxFilesProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_FILES;
+        return propertySet.getInteger(RequestGenerator.MAX_UPLOAD_FILES_PROPERTY, RequestGenerator.DEFAULT_MAX_UPLOAD_FILES);
     }
 
     public static int getMaxMemorySizeProperty() {
         PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet(XPLConstants.REQUEST_PROCESSOR_QNAME());
-        Integer maxMemorySizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_MEMORY_SIZE_PROPERTY);
-        return (maxMemorySizeProperty != null) ? maxMemorySizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE;
+        return propertySet.getInteger(RequestGenerator.MAX_UPLOAD_MEMORY_SIZE_PROPERTY, RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE);
     }
 
     public static scala.Option<String> getRequestBody(PipelineContext pipelineContext) {

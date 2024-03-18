@@ -150,10 +150,10 @@ object FilesystemCRUD {
 
     val DirectoryProperty = "directory"
 
-    val rawDirectory = Option(FormRunnerPersistence.providerPropertyAsURL(
+    val rawDirectory = FormRunnerPersistence.providerPropertyAsUrlOpt(
       provider,
       DirectoryProperty
-    )).getOrElse {
+    ).getOrElse {
       throw new OXFException(s"Could not find directory property for provider `$provider`")
     }
 

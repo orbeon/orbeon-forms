@@ -204,7 +204,7 @@ object FormRunnerPersistence {
           Nil mkString "."
 
         properties.propertiesMatching(propertyName)
-          .flatMap(properties.getNonBlankString)
+          .flatMap(_.nonBlankStringValue)
           .distinct
     }
   }.filter(FormRunner.isActiveProvider(_, properties))
@@ -215,8 +215,8 @@ object FormRunnerPersistence {
   def providerPropertyOpt(provider: String, property: String): Option[Property] =
     properties.getPropertyOpt(providerPropertyName(provider, property))
 
-  def providerPropertyAsURL(provider: String, property: String): String =
-    properties.getStringOrURIAsString(providerPropertyName(provider, property))
+  def providerPropertyAsUrlOpt(provider: String, property: String): Option[String] =
+    properties.getStringOrURIAsStringOpt(providerPropertyName(provider, property))
 
   def getPersistenceURLHeaders(appForm: AppForm, formOrData: FormOrData): (String, Map[String, String]) = {
 
@@ -242,7 +242,7 @@ object FormRunnerPersistence {
       } yield
         headerName -> headerValue.toString) toMap
 
-    val uri = Option(providerPropertyAsURL(provider, "uri")) getOrElse
+    val uri = providerPropertyAsUrlOpt(provider, "uri") getOrElse
       (throw new OXFException(s"no base URL specified for requested persistence provider `$provider` (check properties)"))
 
     (uri, headers)

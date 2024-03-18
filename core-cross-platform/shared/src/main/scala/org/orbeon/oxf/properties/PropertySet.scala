@@ -45,8 +45,10 @@ case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String], 
   def associateValue[U](associatedValue: U): Unit =
     _associatedValue = Option(associatedValue)
 
-  def stringValue: String = value.toString
   def namespaceMapping: NamespaceMapping = NamespaceMapping(namespaces)
+
+  def stringValue        : String         = value.toString
+  def nonBlankStringValue: Option[String] = stringValue.trimAllToOpt
 }
 
 /**
@@ -65,6 +67,14 @@ object PropertySet {
     var property: Option[Property] = None,
     children    : mutable.Map[String, PropertyNode] = mutable.LinkedHashMap[String, PropertyNode]()
   )
+
+  private val SomeXsStringQname   = XMLConstants.XS_STRING_QNAME.some
+  private val SomeXsIntegerQname  = XMLConstants.XS_INTEGER_QNAME.some
+  private val SomeXsBooleanQname  = XMLConstants.XS_BOOLEAN_QNAME.some
+  private val SomeXsNmtokensQname = XMLConstants.XS_NMTOKENS_QNAME.some
+  private val SomeXsDateQname     = XMLConstants.XS_DATE_QNAME.some
+  private val SomeXsDatetimeQname = XMLConstants.XS_DATETIME_QNAME.some
+  private val SomeXsQnameQname    = XMLConstants.XS_QNAME_QNAME.some
 
   def empty: PropertySet = new PropertySet(Map.empty, new PropertyNode)
 
@@ -158,13 +168,6 @@ object PropertySet {
           throw new ValidationException(s"Not an NMTOKENS: $value" , null)
       tokens.asJava
     }
-
-//    def convertNonNegativeInteger(value: String, namespaces: Map[String, String]): jl.Integer = {
-//      val ret = convertInteger(value, element)
-//      if (ret < 0)
-//        throw new ValidationException(s"Not a non-negative integer: $value", null)
-//      ret
-//    }
   }
 }
 
@@ -249,16 +252,16 @@ class PropertySet private (
     result.toList
   }
 
-  def propertiesMatching(incomingPropertyName: String): List[String] = {
+  def propertiesMatching(incomingPropertyName: String): List[Property] = {
 
-    def processNode(propertyNode: PropertyNode, foundTokens: List[String], incomingTokens: List[String]): List[String] = {
+    def processNode(propertyNode: PropertyNode, foundTokens: List[String], incomingTokens: List[String]): List[Property] = {
 
       val children = propertyNode.children
 
       (incomingTokens.headOption, propertyNode.property) match {
         case (None, Some(property)) =>
           // Found
-          List(property.name)
+          List(property)
         case (Some(_), _) if children.isEmpty =>
           // Not found because requested property is longer
           Nil
@@ -286,7 +289,7 @@ class PropertySet private (
     processNode(propertiesTree, Nil, incomingPropertyName.splitTo[List]("."))
   }
 
-  private def getPropertyOptThrowIfTypeMismatch(name: String, typ: QName): Option[Property] = {
+  private def getPropertyOptThrowIfTypeMismatch(name: String, typeToCheck: Option[QName]): Option[Property] = {
 
     def wildcardSearch(
       propertyNodeOpt : Option[PropertyNode],
@@ -313,46 +316,25 @@ class PropertySet private (
       wildcardSearch(Some(propertiesTree), name.splitTo[List]("."))
 
     def checkType(p: Property): Property =
-      if ((typ ne null) && typ != p.typ)
-        throw new OXFException(
-          s"Invalid attribute type requested for property `$name`: expected `${typ.qualifiedName}`, found `${p.typ.qualifiedName}`"
-        )
-      else
-        p
+      typeToCheck match {
+        case Some(t) if t != p.typ =>
+            throw new OXFException(
+              s"Invalid attribute type requested for property `$name`: expected `${t.qualifiedName}`, found `${p.typ.qualifiedName}`"
+            )
+        case _ =>
+          p
+      }
 
-    getExact orElse getWildcard map checkType
+     getExact orElse getWildcard map checkType
   }
 
   /* All getters */
 
-  private def getPropertyValueOpt(name: String, typ: QName): Option[AnyRef] =
-    getPropertyOptThrowIfTypeMismatch(name, typ) map (_.value)
-
-  private def getPropertyValueOrNull(name: String, typ: QName): AnyRef =
-    getPropertyValueOpt(name, typ).orNull
-
-  def getPropertyOrThrow(name: String): Property =
-    getPropertyOpt(name) getOrElse (throw new OXFException(s"property `$name` not found"))
-
-  def getPropertyOpt(name: String): Option[Property] =
-    getPropertyOptThrowIfTypeMismatch(name, null)
-
-  def getObjectOpt(name: String): Option[AnyRef] =
-    getPropertyValueOpt(name, null)
-
-  def getObject(name: String, default: Any): Any =
-    getObjectOpt(name) getOrElse default
-
-  def getStringOrURIAsString(name: String, allowEmpty: Boolean = false): String =
-    getObjectOpt(name) match {
-      case Some(p: String) => if (allowEmpty) p.trimAllToEmpty else p.trimAllToNull
-      case Some(p: URI)    => if (allowEmpty) p.toString.trimAllToEmpty else p.toString.trimAllToNull
-      case None            => null
-      case _               => throw new OXFException(s"Invalid attribute type requested for property `$name`: expected `${XMLConstants.XS_STRING_QNAME.qualifiedName}` or `${XMLConstants.XS_ANYURI_QNAME.qualifiedName}`")
-    }
+  def getPropertyOpt    (name: String): Option[Property] = getPropertyOptThrowIfTypeMismatch(name, None)
+  def getPropertyOrThrow(name: String): Property         = getPropertyOpt(name).getOrElse(throw new OXFException(s"property `$name` not found"))
 
   def getStringOrURIAsStringOpt(name: String, allowEmpty: Boolean = false): Option[String] =
-    getObjectOpt(name) flatMap {
+    getObjectOpt(name).flatMap {
       case p: String if allowEmpty => Some(p.trimAllToEmpty)
       case p: String               => p.trimAllToOpt
       case p: URI    if allowEmpty => Some(p.toString.trimAllToEmpty)
@@ -360,52 +342,39 @@ class PropertySet private (
       case _                       => throw new OXFException(s"Invalid attribute type requested for property `$name`: expected `${XMLConstants.XS_STRING_QNAME.qualifiedName}` or `${XMLConstants.XS_ANYURI_QNAME.qualifiedName}`")
     }
 
-  def getStringOrURIAsString(name: String, default: String, allowEmpty: Boolean): String =
-    getStringOrURIAsStringOpt(name, allowEmpty) getOrElse default
+  // Should be `getNonBlankString`
+  def getString             (name: String, default: String)                     : String  = getNonBlankString(name)                    .getOrElse(default)
+  def getStringOrURIAsString(name: String, default: String, allowEmpty: Boolean): String  = getStringOrURIAsStringOpt(name, allowEmpty).getOrElse(default)
+  def getInteger            (name: String, default: Int)                        : Int     = getIntOpt(name).map(_.intValue)            .getOrElse(default)
+  def getBoolean            (name: String, default: Boolean)                    : Boolean = getBooleanOpt(name)                        .getOrElse(default)
+  def getQName              (name: String, default: QName)                      : QName   = getQNameOpt(name)                          .getOrElse(default)
+  def getObject             (name: String, default: Any)                        : Any     = getObjectOpt(name)                         .getOrElse(default)
 
-  def getNonBlankString(name: String): Option[String] =
-    getPropertyValueOrNull(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String].trimAllToOpt
+  // Should be `getNonBlankStringOpt`
+  def getNonBlankString(name: String): Option[String]         = getPropertyValueOpt(name, SomeXsStringQname)  .flatMap(_.asInstanceOf[String].trimAllToOpt)
+  def getIntOpt        (name: String): Option[Int]            = getPropertyValueOpt(name, SomeXsIntegerQname) .map(_.asInstanceOf[jl.Integer].intValue)
+  def getBooleanOpt    (name: String): Option[Boolean]        = getPropertyValueOpt(name, SomeXsBooleanQname) .map(_.asInstanceOf[jl.Boolean].booleanValue)
+  def getNmtokensOpt   (name: String): Option[ju.Set[String]] = getPropertyValueOpt(name, SomeXsNmtokensQname).map(_.asInstanceOf[ju.Set[String]])
+  def getDateOpt       (name: String): Option[ju.Date]        = getPropertyValueOpt(name, SomeXsDateQname)    .map(_.asInstanceOf[ju.Date])
+  def getDateTimeOpt   (name: String): Option[ju.Date]        = getPropertyValueOpt(name, SomeXsDatetimeQname).map(_.asInstanceOf[ju.Date])
+  def getQNameOpt      (name: String): Option[QName]          = getPropertyValueOpt(name, SomeXsQnameQname)   .map(_.asInstanceOf[QName])
+  def getObjectOpt     (name: String): Option[AnyRef]         = getPropertyValueOpt(name, null)
 
+  private def getPropertyValueOpt(name: String, typeToCheck: Option[QName]): Option[AnyRef] =
+    getPropertyOptThrowIfTypeMismatch(name, typeToCheck).map(_.value)
+
+  // 2024-03-18: 14 legacy Java callers
   def getString(name: String): String =
-    getPropertyValueOrNull(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String].trimAllToNull
+    getPropertyValueOrNull(name, SomeXsStringQname).asInstanceOf[String].trimAllToNull
 
-  def getString(name: String, default: String): String =
-    getNonBlankString(name) getOrElse default
-
-  def getNmtokensOpt(name: String): Option[ju.Set[String]] =
-    getPropertyValueOpt(name, XMLConstants.XS_NMTOKENS_QNAME).map(_.asInstanceOf[ju.Set[String]])
-
+  // 2024-03-18: 1 legacy Java caller
   def getInteger(name: String): jl.Integer =
-    getPropertyValueOrNull(name, XMLConstants.XS_INTEGER_QNAME).asInstanceOf[jl.Integer]
+    getPropertyValueOrNull(name, SomeXsIntegerQname).asInstanceOf[jl.Integer]
 
-  def getInteger(name: String, default: Int): Int =
-    Option(getInteger(name)) map (_.intValue) getOrElse default
-
+  // 2024-03-18: 1 legacy Java caller
   def getBoolean(name: String): jl.Boolean =
-    getPropertyValueOrNull(name, XMLConstants.XS_BOOLEAN_QNAME).asInstanceOf[jl.Boolean]
+    getPropertyValueOrNull(name, SomeXsBooleanQname).asInstanceOf[jl.Boolean]
 
-  def getBoolean(name: String, default: Boolean): Boolean =
-    Option(getBoolean(name)) map (_.booleanValue) getOrElse default
-
-  def getDate(name: String): ju.Date =
-    getPropertyValueOrNull(name, XMLConstants.XS_DATE_QNAME).asInstanceOf[ju.Date]
-
-  def getDateTime(name: String): ju.Date =
-    getPropertyValueOrNull(name, XMLConstants.XS_DATETIME_QNAME).asInstanceOf[ju.Date]
-
-  def getQName(name: String): QName =
-    getPropertyValueOrNull(name, XMLConstants.XS_QNAME_QNAME).asInstanceOf[QName]
-
-  def getQName(name: String, default: QName): QName =
-    Option(getQName(name)) getOrElse default
-
-  // 2019-05-03: 1 Java caller
-  def getURI(name: String): URI =
-    getPropertyValueOrNull(name, XMLConstants.XS_ANYURI_QNAME).asInstanceOf[URI]
-
-  def getIntOpt     (name: String): Option[Int]     = Option(getInteger(name)) map (_.intValue)
-  def getBooleanOpt (name: String): Option[Boolean] = Option(getBoolean(name)) map (_.booleanValue)
-  def getDateOpt    (name: String): Option[ju.Date] = Option(getDate(name))
-  def getDateTimeOpt(name: String): Option[ju.Date] = Option(getDateTime(name))
-  def getQNameOpt   (name: String): Option[QName]   = Option(getQName(name))
+  private def getPropertyValueOrNull(name: String, typeToCheck: Option[QName]): AnyRef =
+    getPropertyValueOpt(name, typeToCheck).orNull
 }

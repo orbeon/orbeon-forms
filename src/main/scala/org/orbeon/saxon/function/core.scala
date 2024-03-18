@@ -99,7 +99,7 @@ trait EnvironmentVariable extends DefaultFunctionSupport with RuntimeDependentFu
 
 class EnvironmentVariableEnabledByProperty extends EnvironmentVariable {
   override def enabled: Boolean =
-    Properties.instance.getPropertySet.getBoolean("oxf.xpath.environment-variable.enabled")
+    Properties.instance.getPropertySet.getBooleanOpt("oxf.xpath.environment-variable.enabled").contains(true)
 }
 
 class EnvironmentVariableAlwaysEnabled extends EnvironmentVariable {

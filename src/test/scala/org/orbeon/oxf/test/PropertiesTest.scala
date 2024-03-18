@@ -56,7 +56,7 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
 
     for ((name, value) <- expected)
       it(s"must match property `$name` with value `$value`") {
-        assert(propertySet.getString(name) == value)
+        assert(propertySet.getNonBlankString(name).contains(value))
       }
   }
 
@@ -78,7 +78,7 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
 
     for ((name, value) <- expected)
       it(s"must match property `$name` with value `$value`") {
-        assert(propertySet.getString(name) == value)
+        assert(propertySet.getNonBlankString(name).contains(value))
       }
   }
 

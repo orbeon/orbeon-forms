@@ -80,7 +80,6 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
       it(s"must match property `$name` with value `$value`") {
         assert(propertySet.getString(name) == value)
       }
-      }
   }
 
   describe("Properties starting with a prefix") {

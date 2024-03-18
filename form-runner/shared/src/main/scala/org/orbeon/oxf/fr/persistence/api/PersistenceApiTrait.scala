@@ -183,27 +183,44 @@ trait PersistenceApiTrait {
     if (providerPropertyAsBoolean(provider, "distinct", default  = false)) {
       val servicePath = s"/fr/service/persistence/distinct-values/${appFormVersion._1.app}/${appFormVersion._1.form}"
 
+      // Ideally, we'd like to use the distinct values ADT, but we don't depend on it from here
+      val CreatedBy      = "created-by"
+      val LastModifiedBy = "last-modified-by"
+      val WorkflowStage  = "workflow-stage"
+
+      val metadataValues = Seq(CreatedBy, LastModifiedBy, WorkflowStage)
+
       val queryXml =
-        <distinct-values include-created-by="true" include-last-modified-by="true" include-workflow-stage="true">{
+        <distinct-values>{
           controlPaths.map { controlPath =>
-            <control path={controlPath}/>
+            <query path={controlPath}/>
+          } ++
+          metadataValues.map { metadata =>
+            <query metadata={metadata}/>
           }
         }</distinct-values>
 
       val result = documentsXmlTry(servicePath, queryXml, appFormVersion._2).get.rootElement
 
-      val controls = (result / "control") map { controlElem =>
-        Control(
-          path           = controlElem.attValue("path"),
-          distinctValues = (controlElem / "value").map(_.getStringValue)
-        )
-      }
+      val controls = for {
+        query <- result / "query"
+        path  <- query.attValueOpt("path")
+      } yield Control(
+        path           = path,
+        distinctValues = (query / "value").map(_.getStringValue)
+      )
+
+      val metadata = (for {
+        query    <- result / "query"
+        metadata <- query.attValueOpt("metadata")
+        if metadataValues.contains(metadata)
+      } yield metadata -> (query / "value").map(_.getStringValue)).toMap
 
       DistinctValues(
         controls       = controls,
-        createdBy      = result / "created-by"       / "value" map (_.getStringValue),
-        lastModifiedBy = result / "last-modified-by" / "value" map (_.getStringValue),
-        workflowStage  = result / "workflow-stage"   / "value" map (_.getStringValue))
+        createdBy      = metadata.getOrElse(CreatedBy     , Seq.empty),
+        lastModifiedBy = metadata.getOrElse(LastModifiedBy, Seq.empty),
+        workflowStage  = metadata.getOrElse(WorkflowStage , Seq.empty))
     } else {
       // For providers that don't support distinct values, we return empty lists
       DistinctValues(

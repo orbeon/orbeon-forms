@@ -17,7 +17,7 @@ import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization
 import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt.DistinctValuesRequest
+import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt.{DistinctValuesRequest, Metadata}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xml.TransformerUtils
@@ -32,8 +32,8 @@ trait DistinctValuesRequestParser {
   private val DistinctValuesPath = "/fr/service/([^/]+)/distinct-values/([^/]+)/([^/]+)".r
 
   def parseRequest(
-    document      : DocumentInfo,
-    version       : SearchVersion
+    document: DocumentInfo,
+    version : SearchVersion
   )(implicit
     indentedLogger: IndentedLogger
   ): DistinctValuesRequest = {
@@ -42,20 +42,15 @@ trait DistinctValuesRequestParser {
 
     httpRequest.getRequestPath match {
       case DistinctValuesPath(providerName, app, form) =>
-
-        val rootElement = document.rootElement
-
         DistinctValuesRequest(
-          provider              = Provider.withName(providerName),
-          appForm               = AppForm(app, form),
-          version               = version,
-          credentials           = PermissionsAuthorization.findCurrentCredentialsFromSession,
-          anyOfOperations       = None,
-          isInternalAdminUser   = false,
-          controlPaths          = rootElement.rootElement.child("control").flatMap(_.attValueOpt("path")).toList,
-          includeCreatedBy      = rootElement.rootElement.attValue("include-created-by"      ) == "true",
-          includeLastModifiedBy = rootElement.rootElement.attValue("include-last-modified-by") == "true",
-          includeWorkflowStage  = rootElement.rootElement.attValue("include-workflow-stage"  ) == "true"
+          provider            = Provider.withName(providerName),
+          appForm             = AppForm(app, form),
+          version             = version,
+          credentials         = PermissionsAuthorization.findCurrentCredentialsFromSession,
+          anyOfOperations     = None,
+          isInternalAdminUser = false,
+          controlPaths        = document.rootElement.child("query").flatMap(_.attValueOpt("path")).toList,
+          metadata            = document.rootElement.child("query").flatMap(_.attValueOpt("metadata")).map(Metadata.apply).toList
         )
     }
   }

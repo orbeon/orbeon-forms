@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.distinctvalues
 
-import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt.DistinctValues
+import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt.{ControlValues, DistinctValues, MetadataValues}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xml.XMLReceiver
@@ -29,42 +29,27 @@ trait DistinctValuesResult {
     indentedLogger: IndentedLogger
   ): Unit = {
 
-    val controlsElems =
+    val distinctValuesElem =
       <distinct-values>{
-        List(
-          distinctValues.controlValues.map { controlValues =>
-            <control path={controlValues.path}>{
-                controlValues.distinctValues.map { value =>
-                  <value>{value}</value>
-                }
-            }</control>
-          },
-          distinctValues.createdByValues.toSeq.map { values =>
-            <created-by>{
-              values.map { value =>
+        distinctValues.values.map {
+          case ControlValues(path, distinctValues) =>
+            <query path={path}>{
+              distinctValues.map { value =>
                 <value>{value}</value>
               }
-            }</created-by>
-          },
-          distinctValues.lastModifiedByValues.toSeq.map { values =>
-            <last-modified-by>{
-              values.map { value =>
+            }</query>
+
+          case MetadataValues(metadata, distinctValues) =>
+            <query metadata={metadata.string}>{
+              distinctValues.map { value =>
                 <value>{value}</value>
               }
-            }</last-modified-by>
-          },
-          distinctValues.workflowStageValues.toSeq.map { values =>
-            <workflow-stage>{
-              values.map { value =>
-                <value>{value}</value>
-              }
-            }</workflow-stage>
-          }
-        ).flatten
+            }</query>
+        }
       }</distinct-values>
 
-    debug(s"distinct values result: ${controlsElems.toString}")
+    debug(s"distinct values result: ${distinctValuesElem.toString}")
 
-    NodeConversions.elemToSAX(controlsElems, receiver)
+    NodeConversions.elemToSAX(distinctValuesElem, receiver)
   }
 }

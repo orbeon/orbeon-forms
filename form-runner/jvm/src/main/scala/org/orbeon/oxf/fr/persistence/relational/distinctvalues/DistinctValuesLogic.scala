@@ -15,11 +15,10 @@ package org.orbeon.oxf.fr.persistence.relational.distinctvalues
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt.{ControlValues, DistinctValues, DistinctValuesRequest}
+import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt._
 import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
-import org.orbeon.oxf.fr.persistence.relational.search.adt._
+import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchPermissions
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.IndentedLogger
 
 import java.sql.Connection
@@ -48,66 +47,62 @@ trait DistinctValuesLogic {
 
         implicit val requestContext = RequestContext(request.provider, connection, commonAndPermissionsParts, innerSQL)
 
-        DistinctValues(
-          controlValues        = controlValues(request.controlPaths),
-          createdByValues      = request.includeCreatedBy     .option(distinctColumnValues("username")),
-          lastModifiedByValues = request.includeLastModifiedBy.option(distinctColumnValues("last_modified_by")),
-          workflowStageValues  = request.includeWorkflowStage .option(distinctColumnValues("stage"))
-        )
+        val controlValues  = request.controlPaths.map(distinctControlValues)
+        val metadataValues = request.metadata.map(distinctMetadataValues)
+
+        DistinctValues(controlValues ::: metadataValues)
     }
   }
 
-  private def controlValues(
-    controlPaths: List[String])(implicit
-    ctx: RequestContext
-  ): List[ControlValues] = {
-    // Retrieve distinct values for all queried controls
-    controlPaths.map { controlPath =>
+  private def distinctControlValues(
+    controlPath: String)(implicit
+    ctx        : RequestContext
+  ): ControlValues = {
+    // We can't use DISTINCT on CLOB columns, so we cast to VARCHAR. A more correct approach would be to
+    // retrieve all values and then make them distinct in Scala. At the moment, the Distinct Values API is used
+    // to display dropdown values in the UI, so the CAST approach should be good enough.
 
-      // We can't use DISTINCT on CLOB columns, so we cast to VARCHAR. A more correct approach would be to
-      // retrieve all values and then make them distinct in Scala. At the moment, the Distinct Values API is used
-      // to display dropdown values in the UI, so the CAST approach should be good enough.
-
-      val sql =
-        s"""SELECT
-           |    ${Provider.distinctVal(ctx.provider, "t.val", "val")}
-           |FROM
-           |    (${ctx.innerSQL}) c
-           |LEFT JOIN
-           |    orbeon_i_control_text t
-           |    ON t.data_id = c.data_id
-           |WHERE
-           |    t.control = ?
-           |""".stripMargin
-
-      val controlPathPart = StatementPart("", List[Setter]((ps, i) => ps.setString(i, controlPath)))
-
-      val distinctValues = executeQuery(ctx.connection, sql, ctx.commonParts :+ controlPathPart) { valuesResultSet =>
-        Iterator.iterateWhile(
-          cond = valuesResultSet.next(),
-          elem = valuesResultSet.getString("val")
-        ).toList
-      }
-
-      ControlValues(controlPath, distinctValues)
-    }
-  }
-
-  private def distinctColumnValues(
-    column: String)(implicit
-    ctx   : RequestContext
-  ): List[String] = {
     val sql =
-      s"""SELECT ${Provider.distinctVal(ctx.provider, column, column)}
+      s"""SELECT
+         |    ${Provider.distinctVal(ctx.provider, "t.val", "val")}
+         |FROM
+         |    (${ctx.innerSQL}) c
+         |LEFT JOIN
+         |    orbeon_i_control_text t
+         |    ON t.data_id = c.data_id
+         |WHERE
+         |    t.control = ?
+         |""".stripMargin
+
+    val controlPathPart = StatementPart("", List[Setter]((ps, i) => ps.setString(i, controlPath)))
+
+    val distinctValues = executeQuery(ctx.connection, sql, ctx.commonParts :+ controlPathPart) { valuesResultSet =>
+      Iterator.iterateWhile(
+        cond = valuesResultSet.next(),
+        elem = valuesResultSet.getString("val")
+      ).toList
+    }
+
+    ControlValues(controlPath, distinctValues)
+  }
+
+  private def distinctMetadataValues(
+    metadata: Metadata)(implicit
+    ctx     : RequestContext
+  ): MetadataValues = {
+    val sql =
+      s"""SELECT ${Provider.distinctVal(ctx.provider, metadata.sqlColumn, metadata.sqlColumn)}
          |FROM   orbeon_i_current
          |WHERE  data_id IN (${ctx.innerSQL})
          |""".stripMargin
 
-    executeQuery(ctx.connection, sql, ctx.commonParts) { valuesResultSet =>
+    val distinctValues = executeQuery(ctx.connection, sql, ctx.commonParts) { valuesResultSet =>
       Iterator.iterateWhile(
         cond = valuesResultSet.next(),
-        elem = valuesResultSet.getString(column)
+        elem = valuesResultSet.getString(metadata.sqlColumn)
       ).toList
     }
+
+    MetadataValues(metadata, distinctValues)
   }
 }

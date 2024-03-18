@@ -13,11 +13,35 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt
 
-case class ControlValues(path: String, distinctValues: Seq[String])
 
-case class DistinctValues(
-  controlValues       : Seq[ControlValues] = Seq.empty,
-  createdByValues     : Option[Seq[String]] = None,
-  lastModifiedByValues: Option[Seq[String]] = None,
-  workflowStageValues : Option[Seq[String]] = None
-)
+sealed trait Values { def distinctValues: Seq[String] }
+
+case class ControlValues (path: String,       distinctValues: Seq[String]) extends Values
+case class MetadataValues(metadata: Metadata, distinctValues: Seq[String]) extends Values
+
+case class DistinctValues(values: Seq[Values] = Seq.empty)
+
+sealed trait Metadata {
+  def string   : String
+  def sqlColumn: String
+}
+
+object Metadata {
+  case object CreatedBy      extends Metadata {
+    override val string    = "created-by"
+    override val sqlColumn = "username"
+  }
+  case object LastModifiedBy extends Metadata {
+    override val string    = "last-modified-by"
+    override val sqlColumn = "last_modified_by"
+  }
+  case object WorkflowStage  extends Metadata {
+    override val string    = "workflow-stage"
+    override val sqlColumn = "stage"
+  }
+
+  val values: Seq[Metadata] = Seq(CreatedBy, LastModifiedBy, WorkflowStage)
+
+  def apply(string: String): Metadata =
+    values.find(_.string == string).getOrElse(throw new IllegalArgumentException(s"Invalid metadata: $string"))
+}

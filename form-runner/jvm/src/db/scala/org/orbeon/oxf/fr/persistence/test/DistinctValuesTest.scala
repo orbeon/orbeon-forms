@@ -35,6 +35,14 @@ class DistinctValuesTest
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[DistinctValuesTest]), true)
   private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
+  object Metadata {
+    val CreatedBy      = "created-by"
+    val LastModifiedBy = "last-modified-by"
+    val WorkflowStage  = "workflow-stage"
+
+    val values: Seq[String] = Seq(CreatedBy, LastModifiedBy, WorkflowStage)
+  }
+
   describe("Distinct Values API") {
 
     it("must work with no form data") {
@@ -73,18 +81,16 @@ class DistinctValuesTest
       )
 
       testWithControlValues(
-        formData                = formData,
-        expectedControlValues   = Seq("a", "b", "c"),
-        includeCreatedBy        = true,
-        expectedCreatedByValues = Seq("user1", "user2", "user3")
+        formData               = formData,
+        expectedControlValues  = Seq("a", "b", "c"),
+        expectedMetadataValues = Map(Metadata.CreatedBy -> Seq("user1", "user2", "user3"))
       )
 
       // Test that distinct created by values are not returned if not required
       testWithControlValues(
-        formData                = formData,
-        expectedControlValues   = Seq("a", "b", "c"),
-        includeCreatedBy        = false,
-        expectedCreatedByValues = Seq()
+        formData               = formData,
+        expectedControlValues  = Seq("a", "b", "c"),
+        expectedMetadataValues = Map()
       )
     }
 
@@ -96,22 +102,19 @@ class DistinctValuesTest
       )
 
       testWithControlValues(
-        formData                     = formData,
-        expectedControlValues        = Seq("a", "b", "c"),
-        includeCreatedBy             = true,
-        expectedCreatedByValues      = Seq("user1", "user2", "user3"),
-        includeLastModifiedBy        = true,
-        expectedLastModifiedByValues = Seq("user4", "user5", "user6")
+        formData               = formData,
+        expectedControlValues  = Seq("a", "b", "c"),
+        expectedMetadataValues = Map(
+          Metadata.CreatedBy      -> Seq("user1", "user2", "user3"),
+          Metadata.LastModifiedBy -> Seq("user4", "user5", "user6")
+        )
       )
 
       // Test that distinct last modified by values are not returned if not required
       testWithControlValues(
-        formData                     = formData,
-        expectedControlValues        = Seq("a", "b", "c"),
-        includeCreatedBy             = false,
-        expectedCreatedByValues      = Seq(),
-        includeLastModifiedBy        = false,
-        expectedLastModifiedByValues = Seq()
+        formData               = formData,
+        expectedControlValues  = Seq("a", "b", "c"),
+        expectedMetadataValues = Map()
       )
     }
 
@@ -123,30 +126,23 @@ class DistinctValuesTest
       )
 
       testWithControlValues(
-        formData                    = formData,
-        expectedControlValues       = Seq("a", "b", "c"),
-        includeWorkflowStage        = true,
-        expectedWorkflowStageValues = Seq("stage-1", "stage-2", "stage-3")
+        formData               = formData,
+        expectedControlValues  = Seq("a", "b", "c"),
+        expectedMetadataValues = Map(Metadata.WorkflowStage -> Seq("stage-1", "stage-2", "stage-3"))
       )
 
       // Test that distinct workflow stage values are not returned if not required
       testWithControlValues(
-        formData                    = formData,
-        expectedControlValues       = Seq("a", "b", "c"),
-        includeWorkflowStage        = false,
-        expectedWorkflowStageValues = Seq()
+        formData               = formData,
+        expectedControlValues  = Seq("a", "b", "c"),
+        expectedMetadataValues = Map()
       )
     }
 
     def testWithControlValues(
-      formData                    : Seq[FormData],
-      expectedControlValues       : Seq[String],
-      includeCreatedBy            : Boolean = false,
-      expectedCreatedByValues     : Seq[String] = Seq(),
-      includeLastModifiedBy       : Boolean = false,
-      expectedLastModifiedByValues: Seq[String] = Seq(),
-      includeWorkflowStage        : Boolean = false,
-      expectedWorkflowStageValues : Seq[String] = Seq()
+      formData              : Seq[FormData],
+      expectedControlValues : Seq[String],
+      expectedMetadataValues: Map[String, Seq[String]] = Map()
     ): Unit = withTestExternalContext { implicit externalContext =>
       Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
@@ -154,12 +150,11 @@ class DistinctValuesTest
         val controlPath = testForm.controlPath(0)
 
         val request =
-          <distinct-values
-              include-created-by      ={ if (includeCreatedBy)      "true" else "false" }
-              include-last-modified-by={ if (includeLastModifiedBy) "true" else "false" }
-              include-workflow-stage  ={ if (includeWorkflowStage)  "true" else "false" }>
-            <control path={controlPath}/>
-          </distinct-values>.toDocument
+          <distinct-values>{
+            <query path={controlPath}/> ++ expectedMetadataValues.keys.map { metadata =>
+              <query metadata={metadata}/>
+            }
+          }</distinct-values>.toDocument
 
         val version = Specific(1)
 
@@ -191,7 +186,7 @@ class DistinctValuesTest
 
           val distinctControlValues =
             for {
-              control <- result.rootElement / "control"
+              control <- result.rootElement / "query"
               if control.attValue("path") == controlPath
               value   <- control / "value"
             } yield value.stringValue
@@ -199,32 +194,17 @@ class DistinctValuesTest
           // Ignore order
           assert(distinctControlValues.sorted == expectedControlValues.sorted)
 
-          val createdByValues =
-            for {
-              createdBy <- result.rootElement / "created-by"
-              value     <- createdBy / "value"
-            } yield value.stringValue
+          expectedMetadataValues.keys.foreach { metadata =>
+            val metadataValues =
+              for {
+                metadataElement <- result.rootElement / "query"
+                if metadataElement.attValue("metadata") == metadata
+                value           <- metadataElement / "value"
+              } yield value.stringValue
 
-          // Ignore order
-          assert(createdByValues.sorted == expectedCreatedByValues.sorted)
-
-          val lastModifiedByValues =
-            for {
-              lastModifiedBy <- result.rootElement / "last-modified-by"
-              value          <- lastModifiedBy / "value"
-            } yield value.stringValue
-
-          // Ignore order
-          assert(lastModifiedByValues.sorted == expectedLastModifiedByValues.sorted)
-
-          val workflowStageValues =
-            for {
-              workflowStage <- result.rootElement / "workflow-stage"
-              value         <- workflowStage / "value"
-            } yield value.stringValue
-
-          // Ignore order
-          assert(workflowStageValues.sorted == expectedWorkflowStageValues.sorted)
+            // Ignore order
+            assert(metadataValues.sorted == expectedMetadataValues(metadata).sorted)
+          }
         }
       }
     }

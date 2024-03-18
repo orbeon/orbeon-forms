@@ -22,14 +22,12 @@ import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchRequestCommon
 
 
 case class DistinctValuesRequest(
-  provider             : Provider,
-  appForm              : AppForm,
-  version              : SearchVersion,
-  credentials          : Option[Credentials],
-  anyOfOperations      : Option[Set[Operation]],
-  isInternalAdminUser  : Boolean,
-  controlPaths         : List[String],
-  includeCreatedBy     : Boolean,
-  includeLastModifiedBy: Boolean,
-  includeWorkflowStage : Boolean
+  provider           : Provider,
+  appForm            : AppForm,
+  version            : SearchVersion,
+  credentials        : Option[Credentials],
+  anyOfOperations    : Option[Set[Operation]],
+  isInternalAdminUser: Boolean,
+  controlPaths       : List[String],
+  metadata           : List[Metadata]
 ) extends SearchRequestCommon

@@ -191,23 +191,19 @@ object FormRunnerPersistence {
     formOrData: FormOrData,
     properties: PropertySet = CoreCrossPlatformSupport.properties
   ): List[String] = {
-    (appOpt, formOpt) match {
-      case (Some(app), Some(form)) =>
-        findProvider(AppForm(app, form), formOrData, properties).toList
-      case (appOpt, formOpt) =>
 
-        val propertyName =
-          PersistenceProviderPropertyPrefix ::
-          appOpt.getOrElse("*")             ::
-          formOpt.getOrElse("*")            ::
-          formOrData.entryName              ::
-          Nil mkString "."
+    val propertyName =
+      PersistenceProviderPropertyPrefix ::
+      appOpt.getOrElse("*")             ::
+      formOpt.getOrElse("*")            ::
+      formOrData.entryName              ::
+      Nil mkString "."
 
-        properties.propertiesMatching(propertyName)
-          .flatMap(_.nonBlankStringValue)
-          .distinct
-    }
-  }.filter(FormRunner.isActiveProvider(_, properties))
+    properties.propertiesMatching(propertyName)
+      .flatMap(_.nonBlankStringValue)
+      .distinct
+      .filter(FormRunner.isActiveProvider(_, properties))
+  }
 
   private def providerPropertyName(provider: String, property: String): String =
     PersistencePropertyPrefix :: provider :: property :: Nil mkString "."

@@ -28,6 +28,7 @@ import org.orbeon.xml.NamespaceMapping
 
 import java.net.URI
 import java.{lang => jl, util => ju}
+import scala.collection.compat.immutable.LazyList
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
@@ -268,21 +269,22 @@ class PropertySet private (
         case (None, _) if children.nonEmpty =>
           // Not found because requested property is shorter
           Nil
+        case (Some("*"), _) =>
+          // Return all branches
+          children.toList.flatMap {
+            case (key, value) =>
+              processNode(value, key :: foundTokens, incomingTokens.drop(1))
+          }
         case (Some(currentToken), _) =>
+          // Take results from exact match if present and any, else take results from wildcard match
 
           def findChild(t: String): Option[(String, PropertyNode)] =
             children.get(t).map(t -> _)
 
-          val relevantChildren: Iterable[(String, PropertyNode)] =
-            if (currentToken == "*")
-              children
-            else
-              findChild(currentToken).orElse(findChild("*")).toList
-
-          relevantChildren.toList.flatMap {
+          (findChild(currentToken) #:: findChild("*") #:: LazyList.empty).flatten.map {
             case (key, value) =>
               processNode(value, key :: foundTokens, incomingTokens.drop(1))
-          }
+          }.find(_.nonEmpty).toList.flatten
       }
     }
 

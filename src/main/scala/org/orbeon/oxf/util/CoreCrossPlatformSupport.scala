@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import cats.effect.unsafe.{IORuntime, IORuntimeConfig}
+import cats.effect.unsafe.{IORuntime, IORuntimeBuilder, IORuntimeConfig}
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.Version
@@ -55,17 +55,23 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
     def fromJndi: Try[IORuntime] =
       for {
-        jndiName               <- logTry(Try(CoreCrossPlatformSupport.properties.getString(PropertyName, DefaultJndiName)))("JNDI name")
-        managedExecutorService <- logTry(Try((new InitialContext).lookup(jndiName).asInstanceOf[ManagedExecutorService]))("`ManagedExecutorService`")
-        executionContext       = ExecutionContext.fromExecutorService(managedExecutorService)
-        scheduler              = IORuntime.global.scheduler
+        jndiName                       <- logTry(Try(CoreCrossPlatformSupport.properties.getString(PropertyName, DefaultJndiName)))("JNDI name")
+        managedExecutorService         <- logTry(Try((new InitialContext).lookup(jndiName).asInstanceOf[ManagedExecutorService]))("`ManagedExecutorService`")
+        executionContext               = ExecutionContext.fromExecutorService(managedExecutorService)
+        (scheduler, schedulerShutdown) = IORuntime.createDefaultScheduler()
       } yield
-        IORuntime(executionContext, executionContext, scheduler, () => (), IORuntimeConfig()) // Q: unclear if we should pass different `ExecutionContext`s to `compute` and `blocking`
+        IORuntime(
+          executionContext,
+          executionContext, // Q: unclear if we should pass different `ExecutionContext`s to `compute` and `blocking`
+          scheduler,
+          () => schedulerShutdown(),
+          IORuntimeConfig()
+        )
 
     fromJndi.getOrElse {
       buffer += s"Using default IORuntime."
       logger.info(buffer.mkString("\n"))
-      IORuntime.global
+      IORuntimeBuilder().build() // https://github.com/orbeon/orbeon-forms/issues/6089
     }
   }
 

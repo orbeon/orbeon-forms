@@ -64,10 +64,13 @@ object PropertySet {
 
   val PasswordPlaceholder = "xxxxxxxx"
 
+  val StarToken = "*"
+
   private case class PropertyNode(
     var property: Option[Property] = None,
     children    : mutable.Map[String, PropertyNode] = mutable.LinkedHashMap[String, PropertyNode]()
   )
+
 
   private val SomeXsStringQname   = XMLConstants.XS_STRING_QNAME.some
   private val SomeXsIntegerQname  = XMLConstants.XS_INTEGER_QNAME.some
@@ -234,7 +237,7 @@ class PropertySet private (
 
           result += foundTokens.reverse.mkString(".")
 
-        case Some("*") | None if propertyNode.children.nonEmpty =>
+        case Some(StarToken) | None if propertyNode.children.nonEmpty =>
 
           for ((key, value) <- propertyNode.children)
             processNode(value, key :: foundTokens, incomingTokens.drop(1))
@@ -244,7 +247,7 @@ class PropertySet private (
           def findChild(t: String): List[(String, PropertyNode)] =
             propertyNode.children.get(t).map(t -> _).toList
 
-          for ((key, value) <- findChild(currentToken) ::: (matchWildcards flatList findChild("*")))
+          for ((key, value) <- findChild(currentToken) ::: (matchWildcards flatList findChild(StarToken)))
             processNode(value, key :: foundTokens, incomingTokens.drop(1))
       }
 
@@ -269,7 +272,7 @@ class PropertySet private (
         case (None, _) if children.nonEmpty =>
           // Not found because requested property is shorter
           Nil
-        case (Some("*"), _) =>
+        case (Some(StarToken), _) =>
           // Return all branches
           children.toList.flatMap {
             case (key, value) =>
@@ -281,7 +284,7 @@ class PropertySet private (
           def findChild(t: String): Option[(String, PropertyNode)] =
             children.get(t).map(t -> _)
 
-          (findChild(currentToken) #:: findChild("*") #:: LazyList.empty).flatten.map {
+          (findChild(currentToken) #:: findChild(StarToken) #:: LazyList.empty).flatten.map {
             case (key, value) =>
               processNode(value, key :: foundTokens, incomingTokens.drop(1))
           }.find(_.nonEmpty).toList.flatten
@@ -306,7 +309,7 @@ class PropertySet private (
             case head :: tail =>
               propertyNode.children match {
                 case c if c.isEmpty => None
-                case c              => wildcardSearch(c.get(head), tail) orElse wildcardSearch(c.get("*"), tail)
+                case c              => wildcardSearch(c.get(head), tail) orElse wildcardSearch(c.get(StarToken), tail)
               }
           }
       }

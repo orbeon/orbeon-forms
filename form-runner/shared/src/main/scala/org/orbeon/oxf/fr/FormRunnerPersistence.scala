@@ -193,10 +193,10 @@ object FormRunnerPersistence {
   ): List[String] = {
 
     val propertyName =
-      PersistenceProviderPropertyPrefix ::
-      appOpt.getOrElse("*")             ::
-      formOpt.getOrElse("*")            ::
-      formOrData.entryName              ::
+      PersistenceProviderPropertyPrefix        ::
+      appOpt.getOrElse(PropertySet.StarToken)  ::
+      formOpt.getOrElse(PropertySet.StarToken) ::
+      formOrData.entryName                     ::
       Nil mkString "."
 
     properties.propertiesMatching(propertyName)

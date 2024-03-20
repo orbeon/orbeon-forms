@@ -17,23 +17,9 @@
 
         .fr-component-group {
             width: 100%;
-            display: table;
-
-            .xforms-select1, .xforms-input {
-                display: table-cell;
-            }
-
-            .xforms-select1 {
-                padding-right: 10px;
-
-                select {
-                    width: auto;
-                }
-            }
-
-            .xforms-input {
-                width: 100%;
-            }
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
         }
     }
 

@@ -94,22 +94,22 @@
                 <xf:delete ref="$i/namespace::node()"/>
                 <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($i/control-name)/namespace::node()"/>
 
-                <!-- Read Label/Help if we are a section -->
-                <xf:action iterate="$i/(label, help, short-label, iteration-label, add-iteration-label)">
+                <!-- Read Label/Help if we are a section/grid -->
+                <xf:action iterate="$i/(label, help, short-label, iteration-label, add-iteration-label, remove-iteration-label)">
 
                     <xf:delete ref="fr:param"/>
 
+                    <xf:var name="lhh" value="local-name()"/>
+
                     <xf:setvalue
                         ref="@supported"
-                        value="$i/container-type = 'section'"/>
+                        value="($i/container-type = 'section') or ($i/container-type = 'grid' and $lhh = ('add-iteration-label', 'remove-iteration-label'))"/>
 
                     <xf:setvalue
                         ref="@isHTML"
                         value="false()"/>
 
                     <xf:action if="@supported = 'true'">
-
-                        <xf:var name="lhh" value="local-name()"/>
 
                         <xf:setvalue
                             ref="value"
@@ -210,7 +210,7 @@
                             $i/apply-defaults = true(),
                             if ($i/initial-iterations = true()) then 'first' else ''
                         ),
-                        for $lh in $i/(label, help, short-label, iteration-label, add-iteration-label)[@supported = 'true'] return
+                        for $lh in $i/(label, help, short-label, iteration-label, add-iteration-label, remove-iteration-label)[@supported = 'true'] return
                             fbf:setControlLabelHintHelpOrText(
                                 $i/control-name,
                                 local-name($lh),
@@ -410,6 +410,10 @@
                             <value/>
                             <!--<fr:param/>-->
                         </add-iteration-label>
+                        <remove-iteration-label isHTML="" supported="">
+                            <value/>
+                            <!--<fr:param/>-->
+                        </remove-iteration-label>
 
                         <prev-control-id/>
                         <next-control-id/>
@@ -556,7 +560,7 @@
                     readonly="xxf:is-blank()"/>
 
                 <xf:bind
-                    ref="label | help | short-label | iteration-label | add-iteration-label"
+                    ref="label | help | short-label | iteration-label | add-iteration-label | remove-iteration-label"
                     readonly="not(@supported = 'true')"/>
 
                 <!-- We could do this but the issue is that things will look inconsistent when switching between repeated and
@@ -643,7 +647,7 @@
                                     <xh:td colspan="2">
                                         <xf:select1 ref="collapsible" appearance="full xxf:horizontal">
                                             <xf:label ref="$resources/dialog-container-settings/collapsible/label"/>
-                                            <xf:itemset ref="$resources/default-always-never/item">
+                                            <xf:itemset ref="$resources/property-yes-no/item">
                                                 <xf:label ref="."/>
                                                 <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
                                             </xf:itemset>
@@ -791,7 +795,7 @@
                                             <xf:select1 ref="appearance" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-container-settings/appearance-minimal/label"/>
                                                 <xf:hint  ref="$resources/dialog-container-settings/appearance-minimal/hint"/>
-                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                <xf:itemset ref="$resources/property-yes-no/item">
                                                     <xf:label ref="."/>
                                                     <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'minimal' else 'full'"/>
                                                 </xf:itemset>
@@ -838,7 +842,7 @@
                             </xf:group>
                         </fr:tab>
 
-                        <fr:tab id="label-help-tab" ref="(label, help, short-label, iteration-label, add-iteration-label)[true() or @supported = 'true']">
+                        <fr:tab id="label-help-tab" ref="(label, help, short-label, iteration-label, add-iteration-label, remove-iteration-label)[true() or @supported = 'true']">
                             <fr:label
                                 ref="
                                     $resources/dialog-control-settings/*[

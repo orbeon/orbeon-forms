@@ -106,13 +106,14 @@ object XMLNames {
 
   val FRContainerTest          : Test      = FRSectionTest || FRGridTest
 
-  val FRItemsetIdQName         : QName     = QName("itemsetid",           FRNamespace)
-  val FRDataFormatVersionQName : QName     = QName("data-format-version", FRNamespace)
-  val FRTextQName              : QName     = QName("text",                FRNamespace)
-  val FRShortLabelQName        : QName     = QName("short-label",         FRNamespace)
-  val FRIterationLabelQName    : QName     = QName("iteration-label",     FRNamespace)
-  val FRAddIterationLabelQName : QName     = QName("add-iteration-label", FRNamespace)
-  val FRSectionQName           : QName     = QName("section",             FRNamespace)
+  val FRItemsetIdQName            : QName  = QName("itemsetid",              FRNamespace)
+  val FRDataFormatVersionQName    : QName  = QName("data-format-version",    FRNamespace)
+  val FRTextQName                 : QName  = QName("text",                   FRNamespace)
+  val FRShortLabelQName           : QName  = QName("short-label",            FRNamespace)
+  val FRIterationLabelQName       : QName  = QName("iteration-label",        FRNamespace)
+  val FRAddIterationLabelQName    : QName  = QName("add-iteration-label",    FRNamespace)
+  val FRRemoveIterationLabelQName : QName  = QName("remove-iteration-label", FRNamespace)
+  val FRSectionQName              : QName  = QName("section",                FRNamespace)
 
   val FRYesNoInputQName             : QName = QName("yesno-input",              FRNamespace)
   val FRCheckboxInputQName          : QName = QName("checkbox-input",           FRNamespace)

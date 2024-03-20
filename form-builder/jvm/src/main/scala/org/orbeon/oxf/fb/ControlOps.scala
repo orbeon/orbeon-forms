@@ -63,7 +63,7 @@ trait ControlOps extends ResourcesOps {
       .toMap
 
   private val FRResourceElemLocalNamesToQNames =
-    List(FRTextQName, FRShortLabelQName, FRIterationLabelQName, FRAddIterationLabelQName)
+    List(FRTextQName, FRShortLabelQName, FRIterationLabelQName, FRAddIterationLabelQName, FRRemoveIterationLabelQName)
       .map(v => v.localName -> v)
       .toMap
 

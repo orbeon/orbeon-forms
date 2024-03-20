@@ -229,7 +229,8 @@ object FormBuilderXPathApi {
       lhht == LHHA.Help.entryName ||
         lhht == fr.XMLNames.FRShortLabelQName.localName ||
         lhht == fr.XMLNames.FRIterationLabelQName.localName ||
-        lhht == fr.XMLNames.FRAddIterationLabelQName.localName
+        lhht == fr.XMLNames.FRAddIterationLabelQName.localName ||
+        lhht == fr.XMLNames.FRRemoveIterationLabelQName.localName
 
     // Make sure an optional element is present while we set content or attributes
     if (isOptionalLHHAT) {

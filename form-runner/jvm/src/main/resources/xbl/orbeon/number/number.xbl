@@ -159,11 +159,11 @@
                                 <digits-after-decimal>Digits after decimal</digits-after-decimal>
                                 <round-when-formatting>Round when formatting</round-when-formatting>
                                 <round-when-storing>Round when storing</round-when-storing>
-                                <default-always-never>
+                                <default-yes-no>
                                     <item id="0">Use default</item>
-                                    <item id="1">Always</item>
-                                    <item id="2">Never</item>
-                                </default-always-never>
+                                    <item id="1">Yes</item>
+                                    <item id="2">No</item>
+                                </default-yes-no>
                                 <decimal-separators>
                                     <item id="0">Use default</item>
                                     <item id="4">Comma (,)</item>
@@ -186,11 +186,11 @@
                                 <digits-after-decimal>Chiffres après la virgule</digits-after-decimal>
                                 <round-when-formatting>Arrondir au formattage</round-when-formatting>
                                 <round-when-storing>Arrondir au stockage</round-when-storing>
-                                <default-always-never>
+                                <default-yes-no>
                                     <item id="0">Utiliser le défaut</item>
-                                    <item id="1">Toujours</item>
-                                    <item id="2">Jamais</item>
-                                </default-always-never>
+                                    <item id="1">Oui</item>
+                                    <item id="2">Non</item>
+                                </default-yes-no>
                                 <decimal-separators>
                                     <item id="0">Utiliser le défaut</item>
                                     <item id="4">Virgule (,)</item>
@@ -276,7 +276,7 @@
                             <xf:select1 ref="instance('local')/round-when-formatting" appearance="full" id="round-when-formatting-control">
                                 <xf:label ref="xxf:r('round-when-formatting')"/>
                                 <xf:alert/>
-                                <xf:itemset ref="xxf:resource-elements('default-always-never.item')">
+                                <xf:itemset ref="xxf:resource-elements('default-yes-no.item')">
                                     <xf:label ref="."/>
                                     <xf:value ref="if (@id = 0) then '' else if (@id = 1) then 'true' else 'false'"/>
                                 </xf:itemset>
@@ -286,7 +286,7 @@
                             <xf:select1 ref="instance('local')/round-when-storing" appearance="full" id="round-when-storing-control">
                                 <xf:label ref="xxf:r('round-when-storing')"/>
                                 <xf:alert/>
-                                <xf:itemset ref="xxf:resource-elements('default-always-never.item')">
+                                <xf:itemset ref="xxf:resource-elements('default-yes-no.item')">
                                     <xf:label ref="."/>
                                     <xf:value ref="if (@id = 0) then '' else if (@id = 1) then 'true' else 'false'"/>
                                 </xf:itemset>

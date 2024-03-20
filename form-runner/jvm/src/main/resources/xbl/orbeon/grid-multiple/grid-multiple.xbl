@@ -763,6 +763,36 @@
 
                         <xsl:copy-of select="fr:bottom-div()"/>
 
+                        <xsl:variable name="add-iteration-label-content" as="element()">
+                            <xsl:choose>
+                                <xsl:when test="exists(fr:add-iteration-label)">
+                                    <xsl:for-each select="fr:add-iteration-label[1]">
+                                        <xf:label value="{@ref}" xxbl:scope="outer">
+                                            <xsl:copy-of select="@mediatype"/>
+                                        </xf:label>
+                                    </xsl:for-each>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xf:label value="xxf:r('components.grid.add-another.label', '|fr-fr-resources|')"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:variable>
+
+                        <xsl:variable name="remove-iteration-label-content" as="element()">
+                            <xsl:choose>
+                                <xsl:when test="exists(fr:remove-iteration-label)">
+                                    <xsl:for-each select="fr:remove-iteration-label[1]">
+                                        <xf:label value="{@ref}" xxbl:scope="outer">
+                                            <xsl:copy-of select="@mediatype"/>
+                                        </xf:label>
+                                    </xsl:for-each>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xf:label value="xxf:r('components.grid.remove.label', '|fr-fr-resources|')"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:variable>
+
                         <xsl:if test="$appearance = 'minimal' and not($readonly)">
                             <xf:group ref="$repeat-context[not($view-mode)]" class="fr-grid-bottom-buttons">
                                 <xf:trigger
@@ -770,7 +800,7 @@
                                     id="fr-grid-add-bottom"
                                     ref="$repeat-context[$can-add]"
                                     xxf:title="{{xxf:r('components.grid.add-another.hint',  '|fr-fr-resources|')}}">
-                                    <xf:label value="xxf:r('components.grid.add-another.label', '|fr-fr-resources|')"/>
+                                    <xsl:copy-of select="$add-iteration-label-content"/>
                                 </xf:trigger>
 
                                 <xsl:if test="$remove-at-bottom">
@@ -786,8 +816,8 @@
                                         appearance="minimal"
                                         id="fr-grid-remove-bottom"
                                         ref="$repeat-context[$can-remove]"
-                                        xxf:title="{{xxf:r('components.grid.remove.hint',  '|fr-fr-resources|')}}">
-                                        <xf:label value="xxf:r('components.grid.remove.label', '|fr-fr-resources|')"/>
+                                        xxf:title="{{xxf:r('components.grid.remove.hint', '|fr-fr-resources|')}}">
+                                        <xsl:copy-of select="$remove-iteration-label-content"/>
                                     </xf:trigger>
                                 </xsl:if>
                             </xf:group>

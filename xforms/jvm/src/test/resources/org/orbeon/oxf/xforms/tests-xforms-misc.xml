@@ -701,26 +701,6 @@
                         <xh:input type="hidden" name="$uuid" value="4A00AF98-7464-2F85-9AF6-291447DCC6F8"/>
                         <xh:input type="hidden" name="$static-state" value="X29xIUN8Mudjr..."/>
                         <xh:input type="hidden" name="$dynamic-state" value="X29xIUN8Mudjr..."/>
-                        <xh:span id="xforms-select-full-template" class="xforms-template">
-                            <xh:span class="xforms-deselected">
-                                <xh:label class="checkbox">
-                                    <xh:input id="$xforms-item-id-select$" type="checkbox" name="$xforms-item-name$" value="$xforms-template-value$"/>
-                                    <xh:span class="xforms-hint-region">$xforms-template-label$</xh:span>
-                                    <xh:span class="xforms-help">$xforms-template-help$</xh:span>
-                                    <xh:span class="xforms-hint">$xforms-template-hint$</xh:span>
-                                </xh:label>
-                            </xh:span>
-                        </xh:span>
-                        <xh:span id="xforms-select1-full-template" class="xforms-template">
-                            <xh:span class="xforms-deselected">
-                                <xh:label class="radio">
-                                    <xh:input id="$xforms-item-id-select1$" type="radio" name="$xforms-item-name$" value="$xforms-template-value$"/>
-                                    <xh:span class="xforms-hint-region">$xforms-template-label$</xh:span>
-                                    <xh:span class="xforms-help">$xforms-template-help$</xh:span>
-                                    <xh:span class="xforms-hint">$xforms-template-hint$</xh:span>
-                                </xh:label>
-                            </xh:span>
-                        </xh:span>
                         <noscript xmlns="http://www.w3.org/1999/xhtml">
                             <div class="xforms-noscript-panel">
                                 <p>Your browser does not appear to support JavaScript. You may want to try one of the following:</p>

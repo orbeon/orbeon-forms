@@ -91,6 +91,7 @@ object XBL extends js.Object {
 @JSGlobal("ORBEON.xforms.Controls")
 @js.native
 object Controls extends js.Object {
+  def isReadonly(control: html.Element)                                                                  : Boolean                                      = js.native
   def setCurrentValue(control: html.Element, newControlValue: String, force: Boolean)                    : js.UndefOr[js.Promise[Unit] | JQueryPromise] = js.native
   def getCurrentValue(elem: html.Element)                                                                : js.UndefOr[String]                           = js.native
   def setFocus(controlId: String)                                                                        : Unit                                         = js.native

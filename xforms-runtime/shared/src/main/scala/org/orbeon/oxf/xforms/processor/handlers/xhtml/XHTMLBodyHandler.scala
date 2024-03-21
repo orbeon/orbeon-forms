@@ -13,8 +13,6 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import java.{lang => jl}
-
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler._
@@ -25,7 +23,8 @@ import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Constants
 import org.xml.sax.Attributes
-import org.xml.sax.helpers.AttributesImpl
+
+import java.{lang => jl}
 
 
 private object XHTMLBodyHandler {
@@ -125,22 +124,6 @@ class XHTMLBodyHandler(
 
       XFormsStateManager.getClientEncodedDynamicState(containingDocument) foreach
         (outputHiddenField(htmlPrefix, "$dynamic-state", _))
-    }
-
-    // HACK: We would be ok with just one template, but IE 6 doesn't allow setting the input/@type attribute properly
-    // `xf:select[@appearance = 'full']`, `xf:input[@type = 'xs:boolean']`
-    val newAtts = new AttributesImpl
-    List(true, false) foreach { isMultiple =>
-      XFormsSelect1Handler.outputItemFullTemplate(
-        this,
-        htmlPrefix,
-        containingDocument,
-        newAtts,
-        s"xforms-select${if (isMultiple) "" else "1"}-full-template",
-        "$xforms-item-name$",
-        isMultiple,
-        if (isMultiple) "checkbox" else "radio"
-      )
     }
   }
 

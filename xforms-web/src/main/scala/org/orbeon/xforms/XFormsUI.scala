@@ -15,22 +15,26 @@ package org.orbeon.xforms
 
 import org.log4s.Logger
 import org.orbeon.datatypes.BasicLocationData
-import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomSupport
 import org.orbeon.xforms.facade.{Controls, Init, Utils, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.URL
+import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
 import org.scalajs.dom.ext._
+import org.scalajs.dom.html.Span
 import org.scalajs.dom.{MouseEvent, html, raw, window}
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import scalatags.JsDom
+import scalatags.JsDom.all._
 import shapeless.syntax.typeable._
 
 import scala.collection.immutable
-import scala.concurrent.duration._
+import scala.concurrent.duration.{span => _, _}
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
@@ -671,17 +675,38 @@ object XFormsUI {
 
   @js.native trait ItemsetItem extends js.Object {
     def attributes: js.UndefOr[js.Dictionary[String]] = js.native
-    def children: js.UndefOr[js.Array[ItemsetItem]] = js.native
-    def label: String = js.native
-    def value: String = js.native
+    def children  : js.UndefOr[js.Array[ItemsetItem]] = js.native
+    def label     : String                            = js.native
+    def value     : String                            = js.native
+    def help      : js.UndefOr[String]                = js.native
+    def hint      : js.UndefOr[String]                = js.native
   }
+
+  @JSExport
+  def updateItemset(
+    documentElement: html.Element,
+    controlId      : String,
+    itemsetTree    : js.Array[ItemsetItem],
+    groupName      : String
+  ): Unit =
+    if (
+      documentElement.classList.contains("xforms-select1-appearance-compact") ||
+      documentElement.classList.contains("xforms-select-appearance-compact")  ||
+      documentElement.classList.contains("xforms-select1-appearance-minimal")
+    )
+      updateSelectItemset(documentElement, itemsetTree)
+    else
+      updateFullAppearanceItemset(documentElement, controlId, itemsetTree, groupName)
 
   // TODO:
   //  - Resolve nested `optgroup`s.
   //  - use direct serialization/deserialization instead of custom JSON.
   //    See `XFormsSelect1Control.outputAjaxDiffUseClientValue()`.
-  @JSExport
-  def updateSelectItemset(documentElement: html.Element, itemsetTree: js.Array[ItemsetItem]): Unit =
+
+  private def updateSelectItemset(
+    documentElement: html.Element,
+    itemsetTree    : js.Array[ItemsetItem]
+  ): Unit =
     ((documentElement.getElementsByTagName("select")(0): js.UndefOr[raw.Element]): Any) match {
         case select: html.Select =>
 
@@ -717,6 +742,79 @@ object XFormsUI {
           // once we have migrated `AjaxServer.js` entirely to Scala.
           logger.error(s"`<select>` element not found when attempting to update itemset")
       }
+
+  private def updateFullAppearanceItemset(
+    documentElement: html.Element,
+    controlId      : String,
+    itemsetTree    : js.Array[ItemsetItem],
+    groupName      : String
+  ): Unit = {
+
+    // - https://github.com/orbeon/orbeon-forms/issues/5595
+    // - https://github.com/orbeon/orbeon-forms/issues/5427
+    val isReadonly = Controls.isReadonly(documentElement)
+    val isSelect   = documentElement.classList.contains("xforms-select")
+
+    val spanContainer = documentElement.querySelector("span.xforms-items")
+
+    // Remove spans and store current checked value
+    val checkedValues =
+      spanContainer.children.flatMap { elem =>
+        val input = elem.querySelector("input").asInstanceOf[dom.html.Input]
+        input.checked option input.value
+      }.toSet
+
+    spanContainer.replaceChildren()
+
+    val domParser = new DOMParser
+
+    itemsetTree.zipWithIndex.foreach { case (itemElement, itemIndex) =>
+      spanContainer.appendChild {
+
+        val classOpt = itemElement.attributes.toOption.flatMap(_.get("class"))
+
+        val itemLabelNodes =
+          domParser
+            .parseFromString(itemElement.label, SupportedType.`text/html`)
+            .querySelector("html > body")
+            .childNodes
+
+        val helpOpt: Option[JsDom.TypedTag[Span]] = itemElement.help.toOption.filter(_.nonAllBlank).map { helpString =>
+          span(cls := "xforms-help")(helpString)
+        }
+
+        val hintOpt: Option[JsDom.TypedTag[Span]] = itemElement.hint.toOption.filter(_.nonAllBlank).map { hintString =>
+          span(cls := "xforms-hint") {
+            domParser
+              .parseFromString(hintString, SupportedType.`text/html`)
+              .querySelector("html > body")
+              .childNodes
+              .toList
+          }
+        }
+
+        span(cls := ("xforms-deselected" :: classOpt.toList mkString " ")) {
+          label(cls := (if (isSelect) "checkbox" else "radio"))(
+            input(
+              id       := XFormsId.appendToEffectiveId(controlId, Constants.LhhacSeparator + "e" + itemIndex),
+              tpe      := (if (isSelect) "checkbox" else "radio"),
+              name     := (if (groupName ne null) groupName else controlId),
+              value    := itemElement.value,
+              checked  := checkedValues(itemElement.value)
+            )(
+              isReadonly.option(disabled := true)
+            )
+          )(
+            span(hintOpt.isDefined.option(cls := "xforms-hint-region"))(itemLabelNodes.toList)
+          )(
+            helpOpt
+          )(
+            hintOpt
+          )
+        }.render
+      }
+    }
+  }
 
   private object Private {
 

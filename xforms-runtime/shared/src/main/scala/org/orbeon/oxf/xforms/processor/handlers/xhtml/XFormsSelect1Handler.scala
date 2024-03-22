@@ -168,6 +168,12 @@ object XFormsSelect1Handler {
     // Add item attributes to span
     addItemAttributes(item, spanAttributes)
 
+    if (isStaticReadonly) {
+      spanAttributes.addOrReplace(XFormsNames.ROLE_QNAME, fullItemType)
+      spanAttributes.addOrReplace("aria-checked", isSelected.toString)
+      spanAttributes.addOrReplace("aria-readonly", true.toString)
+    }
+
     withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML, atts = spanAttributes) {
 
       val itemNamespacedId = xformsHandlerContextForItem.containingDocument.namespaceId(itemEffectiveId)
@@ -176,7 +182,7 @@ object XFormsSelect1Handler {
       if (! isBooleanInput) {
         val atts = new AttributesImpl
         // Add Bootstrap classes
-        atts.addOrReplace(XFormsNames.CLASS_QNAME, if (isMultiple) "checkbox" else "radio")
+        atts.addOrReplace(XFormsNames.CLASS_QNAME, fullItemType)
         // No need for @for as the input, if any, is nested
         outputLabelForStart(
           handlerContext        = xformsHandlerContextForItem,

@@ -706,7 +706,7 @@
                 <label>Repetition Label</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label>Add Repetition Text</label>
+                <label>Add Repetition Label</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
                 <label>Remove Repetition Text</label>
@@ -3500,7 +3500,7 @@
                 <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">[Add Repetition Text]</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
                 <label todo="true">[Remove Repetition Text]</label>
@@ -4915,7 +4915,7 @@
                 <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">[Add Repetition Text]</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
                 <label todo="true">[Remove Repetition Text]</label>
@@ -6331,7 +6331,7 @@
                 <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">[Add Repetition Text]</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
                 <label todo="true">[Remove Repetition Text]</label>
@@ -7711,7 +7711,7 @@
                 <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">[Add Repetition Text]</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
                 <label todo="true">[Remove Repetition Text]</label>
@@ -9094,7 +9094,7 @@
                 <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">[Add Repetition Text]</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
                 <label todo="true">[Remove Repetition Text]</label>
@@ -10502,7 +10502,7 @@
                 <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">[Add Repetition Text]</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
                 <label todo="true">[Remove Repetition Text]</label>
@@ -11911,7 +11911,7 @@
                 <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">[Add Repetition Text]</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
                 <label todo="true">[Remove Repetition Text]</label>
@@ -13299,7 +13299,7 @@
                 <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">[Add Repetition Text]</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
                 <label todo="true">[Remove Repetition Text]</label>
@@ -14714,7 +14714,7 @@
                 <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">[Add Repetition Text]</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <control-remove-iteration-label>
                 <label todo="true">[Remove Repetition Text]</label>

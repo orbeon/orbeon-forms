@@ -4,6 +4,7 @@ import org.scalajs.linker.interface.ESVersion
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 import scala.jdk.CollectionConverters.asScalaIteratorConverter
+import scala.util.Properties.isJavaAtLeast
 
 // For our GitHub packages
 resolvers += Resolver.githubPackages("orbeon")
@@ -1313,7 +1314,7 @@ lazy val demoSqliteDatabase = (project in file("demo-sqlite-database"))
     name := "demo-sqlite-database",
     javaOptions ++= resourceManagerProperties((ThisBuild / baseDirectory).value, DemoSqliteDatabaseResourceManagerPaths),
     // See #6104: to avoid reflection warnings, at the cost of a few resource leaks
-    javaOptions += "--illegal-access=deny",
+    javaOptions ++= (if (isJavaAtLeast("17")) Seq() else Seq("--illegal-access=deny")),
     //javaOptions += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=61155",
     fork := true // Fork so that the Java options are taken into account
   )

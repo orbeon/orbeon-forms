@@ -48,7 +48,7 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
     def logTry[U](t: Try[U])(m: String): Try[U] = {
       t match {
         case Success(b) => buffer += (s"- found $m: $b")
-        case Failure(t) => buffer += (s"- failed to find $m: ${t.getMessage}")
+        case Failure(t) => buffer += (s"- did not find $m: ${t.getMessage}")
       }
       t
     }

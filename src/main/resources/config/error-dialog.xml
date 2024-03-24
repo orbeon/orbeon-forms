@@ -1,63 +1,63 @@
-<div xmlns="http://www.w3.org/1999/xhtml" class="xforms-error-dialogs">
-    <div class="xforms-error-panel xforms-initially-hidden" role="dialog" aria-labelledby="error-dialog-title">
-        <div class="hd" id="error-dialog-title">An error has occurred</div>
-        <div class="bd">
-            <p>
+<xh:div xmlns:xh="http://www.w3.org/1999/xhtml" class="xforms-error-dialogs">
+    <xh:div class="xforms-error-panel xforms-initially-hidden" role="dialog" aria-labelledby="error-dialog-title">
+        <xh:div class="hd" id="error-dialog-title">An error has occurred</xh:div>
+        <xh:div class="bd">
+            <xh:p>
                 You may want to try one of the following:
-            </p>
-            <ul>
-                <li><a class="xforms-error-panel-close">Close this dialog</a> and continue to use this page.</li>
-                <li><a class="xforms-error-panel-reload">Reload this page</a>. Note that you will lose any unsaved changes.</li>
-                <li>
-                    <p>
+            </xh:p>
+            <xh:ul>
+                <xh:li><xh:a class="xforms-error-panel-close">Close this dialog</xh:a> and continue to use this page.</xh:li>
+                <xh:li><xh:a class="xforms-error-panel-reload">Reload this page</xh:a>. Note that you will lose any unsaved changes.</xh:li>
+                <xh:li>
+                    <xh:p>
                         If the above does not work, try reloading the page yourself. Note that you will lose any unsaved changes:
-                    </p>
-                    <ul>
-                        <li>
-                            With Firefox: hold down the <code>shift</code> key and click the Reload button in your browser toolbar.
-                        </li>
-                        <li>
+                    </xh:p>
+                    <xh:ul>
+                        <xh:li>
+                            With Firefox: hold down the <xh:code>shift</xh:code> key and click the Reload button in your browser toolbar.
+                        </xh:li>
+                        <xh:li>
                             With Safari and Chrome: click the Reload button in your browser toolbar.
-                        </li>
-                        <li>
-                            With Internet Explorer: hold down the <code>control</code> key and click the Reload button in your browser toolbar.
-                        </li>
-                    </ul>
-                </li>
-                <li>Return <a href="/">home</a>.</li>
-            </ul>
-            <div class="xforms-error-panel-details-hidden">
-                <p>
-                    <a class="xforms-error-panel-show-details">
-                        <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
-                        <span>Show details</span>
-                    </a>
-                </p>
-            </div>
-            <div class="xforms-error-panel-details-shown xforms-disabled">
-                <p>
-                    <a class="xforms-error-panel-hide-details">
-                        <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
-                        <span>Hide details</span>
-                    </a>
-                </p>
-                <div class="xforms-error-panel-details"/>
-            </div>
-        </div>
-    </div>
-    <div class="xforms-login-detected-dialog modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-header">
-            <h4>Reloading form</h4>
-        </div>
-        <div class="modal-body">
-            <p>
+                        </xh:li>
+                        <xh:li>
+                            With Internet Explorer: hold down the <xh:code>control</xh:code> key and click the Reload button in your browser toolbar.
+                        </xh:li>
+                    </xh:ul>
+                </xh:li>
+                <xh:li>Return <xh:a href="/">home</xh:a>.</xh:li>
+            </xh:ul>
+            <xh:div class="xforms-error-panel-details-hidden">
+                <xh:p>
+                    <xh:a class="xforms-error-panel-show-details">
+                        <xh:img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
+                        <xh:span>Show details</xh:span>
+                    </xh:a>
+                </xh:p>
+            </xh:div>
+            <xh:div class="xforms-error-panel-details-shown xforms-disabled">
+                <xh:p>
+                    <xh:a class="xforms-error-panel-hide-details">
+                        <xh:img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
+                        <xh:span>Hide details</xh:span>
+                    </xh:a>
+                </xh:p>
+                <xh:div class="xforms-error-panel-details"/>
+            </xh:div>
+        </xh:div>
+    </xh:div>
+    <xh:div class="xforms-login-detected-dialog modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <xh:div class="modal-header">
+            <xh:h4>Reloading form</xh:h4>
+        </xh:div>
+        <xh:div class="modal-body">
+            <xh:p>
                 This form has to be reloaded. This most likely happened because your session has expired, which might
                 take you to the login page. (If you think that you shouldn't see this message and that the problem
                 persists, please contact support.)
-            </p>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary">OK</button>
-        </div>
-    </div>
-</div>
+            </xh:p>
+        </xh:div>
+        <xh:div class="modal-footer">
+            <xh:button class="btn btn-primary">OK</xh:button>
+        </xh:div>
+    </xh:div>
+</xh:div>

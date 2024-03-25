@@ -428,11 +428,12 @@ trait ControlOps extends ResourcesOps {
   def writeAndNormalizeMip(
     controlNameOpt : Option[String],
     mip            : MIP, // `CalculateMIP | ValidateMIP` depending on caller
-    mipValue       : String)(implicit
+    mipValue       : String,
+    iteration      : Boolean)(implicit
     ctx            : FormBuilderDocContext
   ): Unit = {
 
-    val bindElemOpt =
+    val controlBindElemOpt =
       controlNameOpt match {
         case Some(controlName) =>
           findControlByName(controlName) map { control =>
@@ -442,7 +443,9 @@ trait ControlOps extends ResourcesOps {
           FormRunner.findInBindsTryIndex(Names.FormBinds)
       }
 
-    bindElemOpt foreach {bindElem =>
+    val bindElemOpt = if (iteration) controlBindElemOpt.flatMap(_ / XFBindTest headOption) else controlBindElemOpt
+
+    bindElemOpt foreach { bindElem =>
       val valueOpt =
         normalizeMipValue(
           mip          = mip,

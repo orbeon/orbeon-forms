@@ -24,7 +24,7 @@ import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.{allLangs, findControlByName, formRunnerProperty}
 import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.XMLNames.{FRServiceCallTest, XFSendTest}
+import org.orbeon.oxf.fr.XMLNames.{FRServiceCallTest, XFBindTest, XFSendTest}
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.process.SimpleProcess.{currentXFormsDocumentId, evaluateString}
@@ -117,18 +117,26 @@ object FormBuilderXPathApi {
   // Get the normalized value of a computed MIP for the given control name and computed MIP name
   // If `controlName` is `null`, try the top-level bind (`fr-form-binds`).
   //@XPathFunction
-  def readDenormalizedCalculatedMip(controlName: String, mipName: String): String = {
+  def readDenormalizedCalculatedMip(controlName: String, mipName: String): String =
+    readDenormalizedCalculatedMip(controlName, mipName, iteration = false)
+
+  //@XPathFunction
+  def readDenormalizedCalculatedMipForIteration(controlName: String, mipName: String): String =
+    readDenormalizedCalculatedMip(controlName, mipName, iteration = true)
+
+  private def readDenormalizedCalculatedMip(controlName: String, mipName: String, iteration: Boolean): String = {
 
     implicit val ctx = FormBuilderDocContext()
 
     val resultOpt =
       for {
-        mip      <- ModelDefs.AllComputedMipsByName.get(mipName)
-        bindElem <-
+        mip             <- ModelDefs.AllComputedMipsByName.get(mipName)
+        controlBindElem <-
           if (controlName ne null)
             FormRunner.findBindByName(controlName)
           else
             FormRunner.findInBindsTryIndex(FormBinds)
+        bindElem        <- if (iteration) controlBindElem / XFBindTest headOption else Some(controlBindElem)
       } yield
         FormRunner.readDenormalizedCalculatedMip(bindElem, mip, mipToFBMIPQNames(mip)._1)
 
@@ -136,7 +144,19 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def writeAndNormalizeCalculatedMip(controlName: String, mipName: String, mipValue: String): Unit = {
+  def writeAndNormalizeCalculatedMip(controlName: String, mipName: String, mipValue: String): Unit =
+    writeAndNormalizeCalculatedMip(controlName, mipName, mipValue, iteration = false)
+
+  //@XPathFunction
+  def writeAndNormalizeCalculatedMipForIteration(controlName: String, mipName: String, mipValue: String): Unit =
+    writeAndNormalizeCalculatedMip(controlName, mipName, mipValue, iteration = true)
+
+  private def writeAndNormalizeCalculatedMip(
+    controlName: String,
+    mipName    : String,
+    mipValue   : String,
+    iteration  : Boolean
+  ): Unit = {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -144,7 +164,7 @@ object FormBuilderXPathApi {
       for {
         mip <- ModelDefs.AllComputedMipsByName.get(mipName)
       } yield
-        FormBuilder.writeAndNormalizeMip(Option(controlName), mip, mipValue)
+        FormBuilder.writeAndNormalizeMip(Option(controlName), mip, mipValue, iteration = iteration)
 
     resultOpt getOrElse (throw new IllegalArgumentException)
   }

@@ -147,7 +147,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         // Single validation without custom alert: set @fb:mipAttName and remove all nested elements
         // See also: https://github.com/orbeon/orbeon-forms/issues/1829
         // NOTE: We could optimize further by taking this branch if there is no type or required validation.
-        writeAndNormalizeMip(controlName.some, mip, value)
+        writeAndNormalizeMip(controlName.some, mip, value, iteration = false)
         delete(existingElementValidations)
       case _ =>
         val nestedValidations =

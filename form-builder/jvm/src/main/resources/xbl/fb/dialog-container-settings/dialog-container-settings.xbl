@@ -66,6 +66,9 @@
                 <xf:setvalue ref="$i/original-custom-iteration-name" value="if ($i/was-custom-iteration-name = true()) then fbf:findRepeatIterationNameOrEmpty($form, $i/control-name) else ''"/>
                 <xf:setvalue ref="$i/custom-iteration-name"          value="$i/original-custom-iteration-name"/>
 
+                <xf:setvalue ref="$i/iteration-relevant"             value="fbf:readDenormalizedCalculatedMipForIteration($i/control-name, 'relevant')"/>
+                <xf:setvalue ref="$i/iteration-readonly"             value="fbf:readDenormalizedCalculatedMipForIteration($i/control-name, 'readonly')"/>
+
                 <xf:setvalue ref="$i/appearance"                     value="($control/@appearance, 'default')[1]"/>
 
                 <xf:setvalue ref="$i/min-repeat"                     value="fbf:getNormalizedMin($form, $i/control-name)"/>
@@ -210,6 +213,8 @@
                             $i/apply-defaults = true(),
                             if ($i/initial-iterations = true()) then 'first' else ''
                         ),
+                        fbf:writeAndNormalizeCalculatedMipForIteration($new-name, 'relevant', $i/iteration-relevant),
+                        fbf:writeAndNormalizeCalculatedMipForIteration($new-name, 'readonly', $i/iteration-readonly),
                         for $lh in $i/(label, help, short-label, iteration-label, add-iteration-label)[@supported = 'true'] return
                             fbf:setControlLabelHintHelpOrText(
                                 $i/control-name,
@@ -293,11 +298,13 @@
                     fbf:renameControlReferences(
                         (: All values that can be XPath expressions :)
                         $i/(
-                            relevant   |
-                            readonly   |
-                            min-repeat |
-                            max-repeat |
-                            freeze
+                            relevant           |
+                            readonly           |
+                            min-repeat         |
+                            max-repeat         |
+                            freeze             |
+                            iteration-relevant |
+                            iteration-readonly
                         ),
                         false(),
                         $i/last-valid-control-name,
@@ -377,6 +384,9 @@
                         <original-custom-iteration-name/>
                         <custom-iteration-name/>
 
+                        <iteration-relevant/>
+                        <iteration-readonly/>
+
                         <apply-defaults/>
                         <initial-iterations/>
 
@@ -447,7 +457,7 @@
                         )"/>
 
                 <xf:bind
-                    ref="relevant | readonly"
+                    ref="relevant | readonly | iteration-relevant | iteration-readonly"
                     type="xxf:XPath2"
                     required="false()"
                     constraint="not(fbf:hasUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"/>
@@ -688,6 +698,8 @@
                                             <xf:action event="xforms-value-changed">
                                                 <xf:setvalue ref="$i/is-custom-iteration-name" value="false()"/>
                                                 <xf:setvalue ref="$i/custom-iteration-name"    value="''"/>
+                                                <xf:setvalue ref="$i/iteration-relevant"       value="'true()'"/>
+                                                <xf:setvalue ref="$i/iteration-readonly"       value="'false()'"/>
                                                 <xf:setvalue ref="$i/min-repeat"               value="1"/>
                                                 <xf:setvalue ref="$i/max-repeat"               value="''"/>
                                                 <xf:setvalue ref="$i/freeze"                   value="0"/>
@@ -832,6 +844,21 @@
                                                 <xf:hint  ref="$resources/dialog-container-settings/iteration-name/hint"/>
                                                 <xf:alert ref="$resources/dialog-container-settings/iteration-name/alert"/>
                                             </xf:input>
+                                        </xh:td>
+                                    </xh:tr>
+
+                                    <xh:tr>
+                                        <xh:td>
+                                            <fb:boolean-or-formula ref="iteration-relevant" resources-ref="$resources">
+                                                <xf:label ref="$resources/dialog-container-settings/visibility/label"/>
+                                                <xf:hint  ref="$resources/dialog-container-settings/visibility/hint"/>
+                                            </fb:boolean-or-formula>
+                                        </xh:td>
+                                        <xh:td>
+                                            <fb:boolean-or-formula ref="iteration-readonly" resources-ref="$resources">
+                                                <xf:label ref="$resources/dialog-container-settings/readonly/label"/>
+                                                <xf:hint  ref="$resources/dialog-container-settings/readonly/hint"/>
+                                            </fb:boolean-or-formula>
                                         </xh:td>
                                     </xh:tr>
                                 </fr:grid>

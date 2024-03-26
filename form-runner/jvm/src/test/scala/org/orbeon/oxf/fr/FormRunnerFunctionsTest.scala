@@ -317,6 +317,7 @@ class FormRunnerFunctionsTest
 
           PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*",                 XS_STRING_QNAME,  "mysql"),
           PropertyParams(Map.empty, "oxf.fr.persistence.provider.orbeon.bookshelf.form", XS_STRING_QNAME,  "sqlite"),
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.form",     XS_STRING_QNAME,  "postgresql"),
           PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.*",        XS_STRING_QNAME,  "postgresql"),
 
           PropertyParams(Map.empty, "oxf.fr.persistence.provider.foo.*.*",               XS_STRING_QNAME,  "p1"),
@@ -329,6 +330,11 @@ class FormRunnerFunctionsTest
 
     val expected =
       List(
+
+        ("orbeon".some,     None,             FormOrData.Form) -> Set("sqlite", "mysql"),
+        ("orbeon".some,     "contact".some,   FormOrData.Form) -> Set("mysql"),
+        ("orbeon".some,     "contact".some,   FormOrData.Data) -> Set("mysql"),
+
         ("orbeon".some,     "bookshelf".some, FormOrData.Form) -> Set("sqlite"),
         ("orbeon".some,     "bookshelf".some, FormOrData.Data) -> Set("mysql"),
 

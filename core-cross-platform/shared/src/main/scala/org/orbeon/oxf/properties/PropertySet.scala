@@ -28,7 +28,6 @@ import org.orbeon.xml.NamespaceMapping
 
 import java.net.URI
 import java.{lang => jl, util => ju}
-import scala.collection.compat.immutable.LazyList
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
@@ -258,11 +257,12 @@ class PropertySet private (
 
   def propertiesMatching(incomingPropertyName: String): List[Property] = {
 
-    def processNode(propertyNode: PropertyNode, foundTokens: List[String], incomingTokens: List[String]): List[Property] = {
-
-      val children = propertyNode.children
-
-      (incomingTokens.headOption, propertyNode.property) match {
+    def processNode(
+      children      : collection.Map[String, PropertyNode],
+      property      : Option[Property],
+      incomingTokens: List[String]
+    ): List[Property] =
+      (incomingTokens.headOption, property) match {
         case (None, Some(property)) =>
           // Found
           List(property)
@@ -273,25 +273,38 @@ class PropertySet private (
           // Not found because requested property is shorter
           Nil
         case (Some(StarToken), _) =>
-          // Return all branches
-          children.toList.flatMap {
-            case (key, value) =>
-              processNode(value, key :: foundTokens, incomingTokens.drop(1))
-          }
+          // Return all branches, but first the ones that are not wildcard if any, so that the resulting list is sorted
+          (children.view.filter(_._1 != StarToken) ++ children.view.filter(_._1 == StarToken))
+            .map(_._2)
+            .flatMap(value => processNode(value.children, value.property, incomingTokens.drop(1)))
+            .toList
         case (Some(currentToken), _) =>
-          // Take results from exact match if present and any, else take results from wildcard match
+          // Return an exact branch if any and a wildcard branch if any
+          (children.get(currentToken) :: children.get(StarToken) :: Nil)
+            .flatten
+            .flatMap(value => processNode(value.children, value.property, incomingTokens.drop(1)))
+      }
 
-          def findChild(t: String): Option[(String, PropertyNode)] =
-            children.get(t).map(t -> _)
+    val incomingTokens = incomingPropertyName.splitTo[List](".")
 
-          (findChild(currentToken) #:: findChild(StarToken) #:: LazyList.empty).flatten.map {
-            case (key, value) =>
-              processNode(value, key :: foundTokens, incomingTokens.drop(1))
-          }.find(_.nonEmpty).toList.flatten
+    def filterOutShadowedProperties(sortedProperties: List[Property]): List[Property] = {
+
+      def shadows(p1: Property): Boolean =
+        p1.name.splitTo[List](".").zip(incomingTokens)
+          .forall { case (t1, incoming) =>
+            t1 == incoming || t1 == StarToken
+          }
+
+      sortedProperties match {
+        case Nil | _ :: Nil             => sortedProperties
+        case head :: _ if shadows(head) => List(head)
+        case head :: tail               => head :: filterOutShadowedProperties(tail)
       }
     }
 
-    processNode(propertiesTree, Nil, incomingPropertyName.splitTo[List]("."))
+    filterOutShadowedProperties(
+      processNode(propertiesTree.children, propertiesTree.property, incomingTokens)
+    )
   }
 
   private def getPropertyOptThrowIfTypeMismatch(name: String, typeToCheck: Option[QName]): Option[Property] = {

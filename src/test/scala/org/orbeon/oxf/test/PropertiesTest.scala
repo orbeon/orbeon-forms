@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.test
 
-import org.orbeon.oxf.properties.PropertyStore
+import org.orbeon.oxf.properties.PropertySet.PropertyParams
+import org.orbeon.oxf.properties.{PropertySet, PropertyStore}
+import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -97,6 +99,53 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
     for (((name, wildcards), value) <- expected)
       it(s"must find properties starting with `$name` with wildcards = `$wildcards`") {
         assert(propertySet.propertiesStartsWith(name, matchWildcards = wildcards).toSet == value)
+      }
+  }
+
+  describe("Properties matching") {
+
+    val propertySetWithXx =
+      PropertySet(
+        List(
+          PropertyParams(Map.empty, "x.x", XS_STRING_QNAME,  "00"),
+          PropertyParams(Map.empty, "x.*", XS_STRING_QNAME,  "01"),
+          PropertyParams(Map.empty, "*.x", XS_STRING_QNAME,  "10"),
+          PropertyParams(Map.empty, "*.*", XS_STRING_QNAME,  "11"),
+        )
+      )
+
+    val propertySetWithAb =
+      PropertySet(
+        List(
+          PropertyParams(Map.empty, "a.b.form", XS_STRING_QNAME,  "v1"),
+          PropertyParams(Map.empty, "d.*.form", XS_STRING_QNAME,  "v2"),
+          PropertyParams(Map.empty, "*.*.*",    XS_STRING_QNAME,  "v3"),
+        )
+      )
+
+    val expected =
+      List(
+        (propertySetWithXx, "x.x",      Set("00")),
+        (propertySetWithXx, "x.*",      Set("00", "01")),
+        (propertySetWithXx, "*.x",      Set("00", "01", "10")),
+        (propertySetWithXx, "*.*",      Set("00", "01", "10", "11")),
+
+        (propertySetWithXx, "y.y",      Set("11")),
+        (propertySetWithXx, "y.*",      Set("10", "11")),
+        (propertySetWithXx, "*.y",      Set("01", "11")),
+        (propertySetWithXx, "x.y",      Set("01")),
+        (propertySetWithXx, "y.x",      Set("10")),
+
+        (propertySetWithAb, "a.b.form", Set("v1")),
+        (propertySetWithAb, "a.b.data", Set("v3")),
+        (propertySetWithAb, "a.*.form", Set("v1", "v3")),
+        (propertySetWithAb, "d.*.form", Set("v2")),
+        (propertySetWithAb, "c.*.form", Set("v3")),
+      )
+
+    for ((propertySet, name, value) <- expected)
+      it(s"must find properties matching with `$name`") {
+        assert(propertySet.propertiesMatching(name).map(_.stringValue).toSet == value)
       }
   }
 }

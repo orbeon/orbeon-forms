@@ -116,7 +116,8 @@ object ErrorSummary {
   def removeUpdateOrInsertError(
     errorsInstanceDoc : DocumentNodeInfoType,
     stateInstanceDoc  : DocumentNodeInfoType,
-    visitValueChanged : Boolean
+    visitValueChanged : Boolean,
+    visitInvalid      : Boolean
   ): Unit = {
 
     // This can happen if the caller receives `xforms-disabled` when the dialog is closing, which causes
@@ -178,25 +179,23 @@ object ErrorSummary {
       )
 
     // https://github.com/orbeon/orbeon-forms/issues/5934
-    def updateFieldVisitedStatus(): Unit =
-      if (visitValueChanged)
-        event.targetObject match {
-          case valueControl: XFormsValueControl with VisitableTrait
-            if valueControl.visible => valueControl.visited = true
-          case _ =>
-        }
+    def markVisited(): Unit =
+      event.targetObject match {
+        case valueControl: XFormsValueControl with VisitableTrait
+          if valueControl.visible => valueControl.visited = true
+        case _ =>
+      }
 
     (event, currentErrorOpt, eventLevelOpt, alertOpt) match {
-      case (_: XFormsValueChangedEvent, Some(currentError), _, Some(alert)) =>
+      case (_: XFormsValueChangedEvent, currentErrorOpt, _, alertOpt) =>
 
-        // Just update the alert
-        XFormsAPI.setvalue(currentError /@ AlertAttName        , alert)
+        // Maybe update the alert
+        (currentErrorOpt, alertOpt).zipped.foreach { (currentError, alert) =>
+          XFormsAPI.setvalue(currentError /@ AlertAttName, alert)
+        }
 
-        updateFieldVisitedStatus()
-
-      case (_: XFormsValueChangedEvent, _, _, _) =>
-
-        updateFieldVisitedStatus()
+        if (visitValueChanged)
+          markVisited()
 
       case (_, Some(currentError), Some(actualEventLevel), Some(alert)) =>
 
@@ -235,6 +234,9 @@ object ErrorSummary {
             requiredEmpty    = requiredEmpty
           )
         )
+
+        if (visitInvalid)
+          markVisited()
 
         if (previousStatusIsValid && actualEventLevel == ValidationLevel.ErrorLevel)
           updateValidStatus(false)

@@ -192,6 +192,13 @@
                             xs:boolean(xs:string(xxf:component-param-value('visit-value-changed'))[. = ('true', 'false')]),
                             false() (: default :)
                         )[1]"/>
+                <xf:var
+                    name="visit-invalid"
+                    value="
+                        (
+                            xs:boolean(xs:string(xxf:component-param-value('visit-invalid'))[. = ('true', 'false')]),
+                            false() (: default :)
+                        )[1]"/>
 
             </xf:model>
         </xbl:implementation>
@@ -237,9 +244,8 @@
                             <xf:recalculate xxbl:scope="inner" xxf:deferred="true"/>
                         </xf:action>
 
-                        <xf:var name="fr-visit-value-changed">
-                            <xxf:value value="$visit-value-changed" xxbl:scope="inner"/>
-                        </xf:var>
+                        <xf:var name="fr-visit-value-changed"><xxf:value value="$visit-value-changed" xxbl:scope="inner"/></xf:var>
+                        <xf:var name="fr-visit-invalid"      ><xxf:value value="$visit-invalid"       xxbl:scope="inner"/></xf:var>
 
                         <!-- Control changes validity -->
                         <xf:action
@@ -252,7 +258,8 @@
                             ErrorSummary:removeUpdateOrInsertError(
                                 xxf:instance('fr-errors-instance')/root(),
                                 xxf:instance('fr-state-instance')/root(),
-                                ($fr-visit-value-changed, false())[1]
+                                ($fr-visit-value-changed, false())[1],
+                                ($fr-visit-invalid      , false())[1]
                             )
                         </xf:action>
 

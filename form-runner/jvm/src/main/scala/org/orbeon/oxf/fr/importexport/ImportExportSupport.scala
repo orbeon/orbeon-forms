@@ -106,6 +106,12 @@ object ImportExportSupport {
     controlQName == QName("explanation", XMLNames.FRNamespace)
   }
 
+  def isBooleanInput(controlElem: om.NodeInfo, bindElem: om.NodeInfo): Boolean = {
+    val controlQName = controlElem.resolveQName(controlElem.name)
+    controlQName == XFORMS_INPUT_QNAME &&
+      findDatatype(bindElem).exists(_.localName == "boolean")
+  }
+
   def isExcludedControl(controlElem: om.NodeInfo): Boolean =
     controlElem.name.endsWith("attachment")
 
@@ -360,24 +366,21 @@ object ImportExportSupport {
   ): (List[(Int, Int, Seq[(String, String)], Boolean)], Int) = {
 
     val items =
-      gridRow collect {
-        case (cell, leafControl) if isSelectionControl(leafControl) =>
-          (cell.x - 1, cell.w, leafControl, isMultipleSelectionControl(leafControl))
-      } flatMap {
-        case (cellX, cellW, leafControl, multiple) =>
-          controlDetailsWithRelevantAndVisible(leafControl) map ((cellX, cellW, _, multiple))
+      gridRow.flatMap { case (cell, leafControl) =>
+        controlDetailsWithRelevantAndVisible(leafControl).map((cell, _))
       } collect {
-        case (cellX, cellW, (ControlBindPathHoldersResources(leafControl, _, _, _, resources), true), multiple) =>
+        case (cell, (details, true)) if isSelectionControl(details.control) || isBooleanInput(details.control, details.bind) =>
           (
-            cellX,
-            cellW,
+            cell.x - 1,
+            cell.w,
             getItemsForControl(
-              leafControl                 = leafControl,
-              resources                   = resources,
+              leafControl                 = details.control,
+              bind                        = details.bind,
+              resources                   = details.resources,
               requestedLang               = requestedLang,
               frResourcesForRequestedLang = frResourcesForRequestedLang
             ),
-            multiple
+            isMultipleSelectionControl(details.control)
         )
       }
 
@@ -388,11 +391,12 @@ object ImportExportSupport {
 
   def getItemsForControl(
     leafControl                 : om.NodeInfo,
+    bind                        : om.NodeInfo,
     resources                   : Seq[(String, om.NodeInfo)],
     requestedLang               : String,
     frResourcesForRequestedLang : om.NodeInfo
   ): Seq[(String, String)] =
-    if (FormRunner.isYesNoInput(leafControl) || FormRunner.isCheckboxInput(leafControl)) {
+    if (FormRunner.isYesNoInput(leafControl) || FormRunner.isCheckboxInput(leafControl) || isBooleanInput(leafControl, bind)) {
       // Special behavior
 
       val yesLabel = frResourcesForRequestedLang / "components" / "labels" / "yes"

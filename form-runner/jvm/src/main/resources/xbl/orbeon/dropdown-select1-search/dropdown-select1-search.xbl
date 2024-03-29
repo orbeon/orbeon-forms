@@ -171,12 +171,14 @@
 
         <xbl:template>
             <xf:var name="disable-placeholder" value="fr:component-param-value('disable-placeholder') = 'true'"/>
+            <xf:var name="min-input-length"    value="fr:component-param-value('min-input-length')"/>
 
             <xf:select1
                 appearance="minimal"
                 ref="xxf:binding('fr-dropdown-select1-search')"
                 id="select1"
                 data-placeholder="{if ($disable-placeholder) then '' else xxf:r('select')}"
+                data-min-input-length="{$min-input-length}"
             >
                 <xf:itemset ref="''[not($disable-placeholder)]">
                     <xf:label/>

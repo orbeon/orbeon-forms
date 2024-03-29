@@ -35,29 +35,15 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                 <xsl:template match="/">
-                    <xh:html>
+                    <xh:html>/
                         <xh:head>
                             <xh:meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
                             <xh:script src="/xforms-server/baseline.js?updates=offline" defer="defer"/>
                             <xh:link rel="stylesheet" href="/xforms-server/baseline.css?updates=offline"/>
-                            <xh:script>
-                                window.addEventListener('DOMContentLoaded', function() {
-                                   window.ORBEON.fr.FormRunnerOffline.renderFormFromBase64(
-                                       document.querySelector(".orbeon-wrapper"),
-                                       document.querySelector("#fr-compiled-form").content.textContent,
-                                       {
-                                            "appName"    : "<xsl:value-of select="doc('input:parameters')/*/app"/>",
-                                            "formName"   : "<xsl:value-of select="doc('input:parameters')/*/form"/>",
-                                            "formVersion": 1,
-                                            "mode"       : "test"
-                                       }
-                                   );
-                                });
-                            </xh:script>
                         </xh:head>
                         <xh:body class="orbeon">
-                            <xh:div class="orbeon-wrapper"/>
-                            <xh:template id="fr-compiled-form">
+                            <xh:div class="fb-form-wrapper"/>
+                            <xh:template id="fb-compiled-form" data-fr-app="{doc('input:parameters')/*/app}" data-fr-form="{doc('input:parameters')/*/form}">
                                 <xh:div><xsl:value-of select="/*"/></xh:div>
                             </xh:template>
                             <xh:div class="orbeon-loader loader loader-default is-active" data-text="Loading…"/>

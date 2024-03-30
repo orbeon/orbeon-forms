@@ -212,6 +212,9 @@ object ErrorSummary {
             updateValidStatus(false)
           else if (! previousStatusIsValid && actualEventLevel != ValidationLevel.ErrorLevel)
             updateValidStatusByScanning()
+
+          if (actualEventLevel == ValidationLevel.ErrorLevel && visitInvalid)
+            markVisited()
         }
 
       case (_, Some(currentError), _, _) =>

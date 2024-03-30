@@ -187,6 +187,7 @@
 
                 <xf:var
                     name="visit-value-changed"
+                    as="xs:boolean"
                     value="
                         (
                             xs:boolean(xs:string(xxf:component-param-value('visit-value-changed'))[. = ('true', 'false')]),
@@ -194,6 +195,7 @@
                         )[1]"/>
                 <xf:var
                     name="visit-invalid"
+                    as="xs:boolean"
                     value="
                         (
                             xs:boolean(xs:string(xxf:component-param-value('visit-invalid'))[. = ('true', 'false')]),
@@ -256,10 +258,17 @@
                             type="xpath">
 
                             ErrorSummary:removeUpdateOrInsertError(
-                                xxf:instance('fr-errors-instance')/root(),
-                                xxf:instance('fr-state-instance')/root(),
-                                ($fr-visit-value-changed, false())[1],
-                                ($fr-visit-invalid      , false())[1]
+                                (: errorsInstanceDoc = :)   xxf:instance('fr-errors-instance')/root(),
+                                (: stateInstanceDoc  = :)   xxf:instance('fr-state-instance')/root(),
+                                (: visitValueChanged = :)   $fr-visit-value-changed,
+                                (: visitInvalid      = :)   if (event('xxf:type') = 'xforms-enabled') then
+                                                                false()
+                                                            else if (event('xxf:type') = 'xforms-invalid') then
+                                                                event('creation') = false()
+                                                            else if (event('xxf:type') = 'xxforms-constraints-changed') then
+                                                                true()
+                                                            else
+                                                                false()
                             )
                         </xf:action>
 

@@ -401,13 +401,13 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     // MIP events
     if (isRequired)
-      Dispatch.dispatchEvent(new XFormsRequiredEvent(this), collector)
+      Dispatch.dispatchEvent(new XFormsRequiredEvent(this, creation = true), collector)
 
     if (isReadonly)
-      Dispatch.dispatchEvent(new XFormsReadonlyEvent(this), collector)
+      Dispatch.dispatchEvent(new XFormsReadonlyEvent(this, creation = true), collector)
 
     if (! isValid)
-      Dispatch.dispatchEvent(new XFormsInvalidEvent(this), collector)
+      Dispatch.dispatchEvent(new XFormsInvalidEvent(this, creation = true), collector)
   }
 
   // NOTE: For the purpose of dispatching value change and MIP events, we used to make a
@@ -447,13 +447,13 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     // MIP change
     if (isRelevant && validityChanged)
-      Dispatch.dispatchEvent(if (isValid) new XFormsValidEvent(this) else new XFormsInvalidEvent(this), collector)
+      Dispatch.dispatchEvent(if (isValid) new XFormsValidEvent(this) else new XFormsInvalidEvent(this, creation = false), collector)
 
     if (isRelevant && requiredChanged)
-      Dispatch.dispatchEvent(if (isRequired) new XFormsRequiredEvent(this) else new XFormsOptionalEvent(this), collector)
+      Dispatch.dispatchEvent(if (isRequired) new XFormsRequiredEvent(this, creation = false) else new XFormsOptionalEvent(this), collector)
 
     if (isRelevant && readonlyChanged)
-      Dispatch.dispatchEvent(if (isReadonly) new XFormsReadonlyEvent(this) else new XFormsReadwriteEvent(this), collector)
+      Dispatch.dispatchEvent(if (isReadonly) new XFormsReadonlyEvent(this, creation = false) else new XFormsReadwriteEvent(this), collector)
 
     if (isRelevant && validationsChanged)
       Dispatch.dispatchEvent(new XXFormsConstraintsChangedEvent(this, alertLevel, previousValidations, failedValidations), collector)

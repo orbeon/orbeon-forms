@@ -79,7 +79,7 @@ class XFormsDisabledEvent(target: XFormsEventTarget, properties: PropertyGetter)
 
 class XFormsReadonlyEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsUIEvent(XFORMS_READONLY, target.asInstanceOf[XFormsControl], properties) {
-  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  def this(target: XFormsEventTarget, creation: Boolean) = this(target, XFormsCreationEvents.properties(creation))
 }
 
 class XFormsReadwriteEvent(target: XFormsEventTarget, properties: PropertyGetter)
@@ -94,12 +94,12 @@ class XFormsValidEvent(target: XFormsEventTarget, properties: PropertyGetter)
 
 class XFormsInvalidEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsUIEvent(XFORMS_INVALID, target.asInstanceOf[XFormsControl], properties) {
-  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  def this(target: XFormsEventTarget, creation: Boolean) = this(target, XFormsCreationEvents.properties(creation))
 }
 
 class XFormsRequiredEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsUIEvent(XFORMS_REQUIRED, target.asInstanceOf[XFormsControl], properties) {
-  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  def this(target: XFormsEventTarget, creation: Boolean) = this(target, XFormsCreationEvents.properties(creation))
 }
 
 class XFormsOptionalEvent(target: XFormsEventTarget, properties: PropertyGetter)
@@ -173,5 +173,10 @@ private object XXFormsConstraintsChangedEvent {
     case "removed-warnings" => Some(diffValidations(current, previous, ValidationLevel.WarningLevel))
     case "added-infos"      => Some(diffValidations(previous, current, ValidationLevel.InfoLevel))
     case "removed-infos"    => Some(diffValidations(current, previous, ValidationLevel.InfoLevel))
+  }
+}
+private object XFormsCreationEvents {
+  def properties(creation: Boolean): PropertyGetter = {
+    case "creation" => Some(creation)
   }
 }

@@ -42,8 +42,8 @@
                             <xh:link rel="stylesheet" href="/xforms-server/baseline.css?updates=offline"/>
                         </xh:head>
                         <xh:body class="orbeon">
-                            <xh:div class="fb-form-wrapper"/>
-                            <xh:template id="fb-compiled-form" data-fr-app="{doc('input:parameters')/*/app}" data-fr-form="{doc('input:parameters')/*/form}">
+                            <xh:div class="fr-form-wrapper"/>
+                            <xh:template class="fr-compiled-form-template" data-fr-app="{doc('input:parameters')/*/app}" data-fr-form="{doc('input:parameters')/*/form}">
                                 <xh:div><xsl:value-of select="/*"/></xh:div>
                             </xh:template>
                             <xh:div class="orbeon-loader loader loader-default is-active" data-text="Loading…"/>

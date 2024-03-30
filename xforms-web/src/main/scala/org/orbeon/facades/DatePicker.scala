@@ -45,6 +45,4 @@ object DatePicker {
     def showDatepicker()                    : Unit              = datePicker.datepicker("show")
     def options                             : DatePickerOptions = datePicker.data("datepicker").o.asInstanceOf[DatePickerOptions]
   }
-
-
 }

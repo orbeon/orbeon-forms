@@ -121,7 +121,7 @@ object Wizard {
 
   //@XPathFunction
   def caseIdsForTopLevelSection(topLevelSectionId: String): om.SequenceIterator =
-  caseIdsForTopLevelSectionAsList(topLevelSectionId)
+    caseIdsForTopLevelSectionAsList(topLevelSectionId)
 
   def caseIdsForTopLevelSectionAsList(topLevelSectionId: String): List[String] =
     for {

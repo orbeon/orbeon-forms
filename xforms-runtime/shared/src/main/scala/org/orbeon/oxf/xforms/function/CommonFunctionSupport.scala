@@ -127,7 +127,7 @@ trait CommonFunctionSupport {
   }
 
   // Resolve an object by id
-  def resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: Context): Option[XFormsObject] =
+  def resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId: String)(implicit xfc: Context): Option[XFormsObject] =
     context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticOrAbsoluteId)
 
   def resolveStaticOrAbsoluteId(

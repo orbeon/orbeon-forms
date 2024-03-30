@@ -77,59 +77,6 @@ object XFormsSelect1Handler {
         false
     }
 
-  def outputItemFullTemplate(
-    baseHandler        : XFormsBaseHandlerXHTML,
-    xhtmlPrefix        : String,
-    containingDocument : XFormsContainingDocument,
-    attributes         : Attributes,
-    templateId         : String,
-    itemName           : String,
-    isMultiple         : Boolean,
-    fullItemType       : String)(implicit
-    xmlReceiver        : XMLReceiver
-  ): Unit =
-    withElement(
-      localName = "span",
-      prefix    = xhtmlPrefix,
-      uri       = XHTML,
-      atts      = List("id" -> templateId, "class" -> "xforms-template") // The client queries template by id without namespace,
-    ) {                                                                  // so output that even though it's not ideal (FIXME)
-      handleItemFull(
-        baseHandler        = baseHandler,
-        attributes         = attributes,
-        xhtmlPrefix        = xhtmlPrefix,
-        containingDocument = containingDocument,
-        control            = null,
-        itemName           = itemName,
-        itemEffectiveId    = "$xforms-item-id-select" + (if (isMultiple) "" else "1") + "$", // create separate id for `select`/`select1`
-        isMultiple         = isMultiple,
-        fullItemType       = fullItemType,
-        item               = Item.ValueNode(
-          LHHAValue(
-            "$xforms-template-label$",
-            isHTML = false
-          ),
-          LHHAValue(
-            "$xforms-template-help$",
-            isHTML = false
-          ).some,
-          LHHAValue(
-            "$xforms-template-hint$",
-            isHTML = false
-          ).some,
-          Left("$xforms-template-value$"),
-          Nil
-        )( // make sure the value "$xforms-template-value$" is not encrypted
-          0
-        ),
-        isFirst          = true,
-        isBooleanInput   = false,
-        isStaticReadonly = false,
-        encode           = false,
-        handlerContext   = baseHandler.handlerContext
-      )
-    }
-
   private def handleItemFull(
     baseHandler        : XFormsBaseHandlerXHTML,
     attributes         : Attributes,

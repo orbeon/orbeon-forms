@@ -51,7 +51,7 @@ object FormRunnerAuth {
         result
       case None =>
         // Don't set any headers in case there is no username
-        Logger.info(s"not setting credentials headers because credentials are not found")
+        Logger.debug(s"not setting credentials headers because credentials are not found")
         Nil
     }
 

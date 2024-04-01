@@ -41,6 +41,11 @@ object TinyMce {
   trait TinyMceEditorManager extends js.Object
 
   @js.native
+  trait TinyMceEditorMode extends js.Object {
+    def set(mode: String): Unit = js.native
+  }
+
+  @js.native
   @JSGlobal("tinymce.Editor")
   class TinyMceEditor(
     containerId   : String,
@@ -57,7 +62,7 @@ object TinyMce {
     def hide(): Unit = js.native
     def focus(): Unit = js.native
     def getBody(): html.Element = js.native
-    def setMode(mode: String): Unit = js.native
+    val mode: TinyMceEditorMode = js.native
   }
 
   trait TinyMceConfig extends js.Object {

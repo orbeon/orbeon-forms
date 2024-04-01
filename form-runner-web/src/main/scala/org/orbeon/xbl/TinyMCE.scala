@@ -167,7 +167,7 @@ object TinyMCE {
     override def xformsUpdateReadonly(readonly: Boolean): Unit =
       withInitializedTinyMce { tinyMceObject =>
         tinyMceObject.getBody().contentEditable = (! readonly).toString
-        tinyMceObject.setMode(if (readonly) "readonly" else "design")
+        tinyMceObject.mode.set(if (readonly) "readonly" else "design")
       }
 
     // trait TinyMceInit extends js.Object {

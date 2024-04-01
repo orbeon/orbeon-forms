@@ -49,21 +49,14 @@
 }
 
 body {
-    .tox-tinymce-inline {
-        .tox-tbtn {
-            height: 25px;                   // Make icons smaller
-            margin: 3px 0 3px 0;            // Default margin isn't the same on top and bottom
-        }
-
-        .tox-toolbar__primary {
-            border: 1px solid #ccc;
-            border-radius: @baseBorderRadius;
-            margin-bottom: 4px;
-        }
-
+    .tox.tox-tinymce-inline {
         .tox-editor-header {
-            border: none;
             z-index: 1500; // so it shows in front of modals
         }
+    }
+
+    .tox:not(.tox-tinymce-inline) .tox-editor-header {
+        box-shadow: none;
+        padding-top: 0;
     }
 }

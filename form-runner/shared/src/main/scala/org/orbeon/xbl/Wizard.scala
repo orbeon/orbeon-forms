@@ -14,11 +14,12 @@
 package org.orbeon.xbl
 
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.library.FRComponentParamSupport.closestAncestorSectionName
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
-import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.control.controls.{XFormsSwitchControl, XFormsVariableControl}
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -129,6 +130,12 @@ object Wizard {
       subsectionCaseControl <- switchControl.getChildrenCases
     } yield
       subsectionCaseControl.getId
+
+  //@XPathFunction
+  def closestAncestorSectionNameForControlId(controlId: String): Option[String] =
+    inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, controlId).collect {
+      case control: XFormsControl => closestAncestorSectionName(control)
+    }.flatten
 
   case class SectionStatus(
     name                       : String,

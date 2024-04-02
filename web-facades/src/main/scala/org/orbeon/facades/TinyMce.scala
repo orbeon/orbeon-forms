@@ -85,24 +85,28 @@ object TinyMce {
     var autoresize_bottom_margin : js.UndefOr[Double]  = js.undefined
     var suffix                   : js.UndefOr[String]  = js.undefined
     var convert_urls             : js.UndefOr[Boolean] = js.undefined
+    var sandbox_iframes          : js.UndefOr[Boolean] = js.undefined
+    var convert_unsafe_embeds    : js.UndefOr[Boolean] = js.undefined
   }
 
   object TinyMceDefaultConfig extends TinyMceConfig {
-    inline             = true
-    hidden_input       = false
-    language           = "en"
-    statusbar          = false
-    menubar            = false
-    plugins            = "lists link"
-    toolbar            = "bold italic | bullist numlist outdent indent | link"
-    browser_spellcheck = true
-    doctype            = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
-    encoding           = "xml"
-    entity_encoding    = "raw"
-    forced_root_block  = "div"
-    visual_table_class = "fr-tinymce-table" // Override default TinyMCE class on tables, which adds borders
-                                            // We can't leave this just empty, otherwise TinyMCE puts its own CSS class
-    skin               = false              // Disable skin (see https://github.com/orbeon/orbeon-forms/issues/3473)
-    convert_urls       = false              // Don't convert an absolute URL to a relative path, which might not work after publish
+    inline                = true
+    hidden_input          = false
+    language              = "en"
+    statusbar             = false
+    menubar               = false
+    plugins               = "lists link"
+    toolbar               = "bold italic | bullist numlist outdent indent | link"
+    browser_spellcheck    = true
+    doctype               = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
+    encoding              = "xml"
+    entity_encoding       = "raw"
+    forced_root_block     = "div"
+    visual_table_class    = "fr-tinymce-table" // Override default TinyMCE class on tables, which adds borders
+                                               // We can't leave this just empty, otherwise TinyMCE puts its own CSS class
+    skin                  = false              // Disable skin (see https://github.com/orbeon/orbeon-forms/issues/3473)
+    convert_urls          = false              // Don't convert an absolute URL to a relative path, which might not work after publish
+    sandbox_iframes       = true
+    convert_unsafe_embeds = true
   }
 }

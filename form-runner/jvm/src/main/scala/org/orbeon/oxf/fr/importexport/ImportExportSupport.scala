@@ -77,24 +77,11 @@ object ImportExportSupport {
   def isValueControl(controlElem: om.NodeInfo): Boolean = {
     val controlQName = controlElem.resolveQName(controlElem.name)
     ValueControlQNames(controlQName)                          ||
-      isSelectionControl(controlElem)                         ||
+      FormRunner.isSelectionControl(controlElem, None)        || // won't catch Boolean `xf:input` specifically, but `xf:input` is caught by `ValueControlQNames`
       controlQName == QName("date", XMLNames.FRNamespace)     ||
       controlQName == QName("time", XMLNames.FRNamespace)     ||
-      controlQName == QName("datetime", XMLNames.FRNamespace) ||
-      FormRunner.isYesNoInput(controlElem)                    ||
-      FormRunner.isCheckboxInput(controlElem)
+      controlQName == QName("datetime", XMLNames.FRNamespace)
   }
-
-  def isSelectionControl(controlElem: om.NodeInfo): Boolean = {
-    val localname = controlElem.localname
-    FormRunner.isSingleSelectionControl(localname)     ||
-      FormRunner.isMultipleSelectionControl(localname) ||
-      FormRunner.isYesNoInput(controlElem)             ||
-      FormRunner.isCheckboxInput(controlElem)
-  }
-
-  def isMultipleSelectionControl(controlElem: om.NodeInfo): Boolean =
-    FormRunner.isMultipleSelectionControl(controlElem.localname)
 
   def isTextAreaControl(controlElem: om.NodeInfo): Boolean = {
     val controlQName = controlElem.resolveQName(controlElem.name)
@@ -104,12 +91,6 @@ object ImportExportSupport {
   def isExplanationControl(controlElem: om.NodeInfo): Boolean = {
     val controlQName = controlElem.resolveQName(controlElem.name)
     controlQName == QName("explanation", XMLNames.FRNamespace)
-  }
-
-  def isBooleanInput(controlElem: om.NodeInfo, bindElem: om.NodeInfo): Boolean = {
-    val controlQName = controlElem.resolveQName(controlElem.name)
-    controlQName == XFORMS_INPUT_QNAME &&
-      findDatatype(bindElem).exists(_.localName == "boolean")
   }
 
   def isExcludedControl(controlElem: om.NodeInfo): Boolean =
@@ -200,9 +181,6 @@ object ImportExportSupport {
   // They are case insensitive. You cannot have another named range with the same letters but in a different case.
   // By default named ranges are created as absolute references.
   // It is possible for a cell (or range) to have more than one named range so typing a new name using the Name Box will not change the named range but will create a new one.
-
-  def findDatatype(bind: om.NodeInfo): Option[QName] =
-    bind.attValueOpt(TYPE_QNAME) map bind.resolveQName
 
   def ancestorRepeatNames(controlName: String)(implicit ctx: FormRunnerDocContext): List[String] =
     FormRunner.findControlByName(controlName).toList flatMap
@@ -369,7 +347,7 @@ object ImportExportSupport {
       gridRow.flatMap { case (cell, leafControl) =>
         controlDetailsWithRelevantAndVisible(leafControl).map((cell, _))
       } collect {
-        case (cell, (details, true)) if isSelectionControl(details.control) || isBooleanInput(details.control, details.bind) =>
+        case (cell, (details, true)) if FormRunner.isSelectionControl(details.control, details.bind.some) =>
           (
             cell.x - 1,
             cell.w,
@@ -380,7 +358,7 @@ object ImportExportSupport {
               requestedLang               = requestedLang,
               frResourcesForRequestedLang = frResourcesForRequestedLang
             ),
-            isMultipleSelectionControl(details.control)
+            FormRunner.isMultipleSelectionControl(details.control.localname)
         )
       }
 
@@ -396,7 +374,7 @@ object ImportExportSupport {
     requestedLang               : String,
     frResourcesForRequestedLang : om.NodeInfo
   ): Seq[(String, String)] =
-    if (FormRunner.isYesNoInput(leafControl) || FormRunner.isCheckboxInput(leafControl) || isBooleanInput(leafControl, bind)) {
+    if (FormRunner.isBooleanSelectionControl(leafControl, bind.some)) {
       // Special behavior
 
       val yesLabel = frResourcesForRequestedLang / "components" / "labels" / "yes"

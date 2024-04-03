@@ -1189,10 +1189,13 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xsl:variable
+                 name="xbl-model"
+                 select="../xbl:implementation/xf:model"/>
+            <xsl:variable
                 name="itemset-action-control-names"
                 select="
                     if (not($is-form-builder)) then
-                        fr:choices-validation-selection-controls(., ../xbl:implementation/xf:model, false())/frf:controlNameFromId(@id)
+                        fr:choices-validation-selection-controls(., $xbl-model, false())/frf:controlNameFromId(@id)
                     else
                         ()"/>
             <xsl:variable
@@ -1201,8 +1204,9 @@
                     if ($validate-selection-controls-choices) then
                         distinct-values(
                             (
-                                fr:choices-validation-selection-controls(., ../xbl:implementation/xf:model, true())/frf:controlNameFromId(@id),
-                                $itemset-action-control-names
+                                fr:choices-validation-selection-controls(., $xbl-model, true())/frf:controlNameFromId(@id),
+                                $itemset-action-control-names,
+                                fr:find-boolean-selection-controls(., $xbl-model)/frf:controlNameFromId(@id)
                             )
                         )
                     else
@@ -1222,7 +1226,7 @@
                     tunnel="yes"/>
                 <xsl:with-param
                     name="binds-root"
-                    select="../xbl:implementation/xf:model/xf:bind[@id = 'fr-form-binds']"
+                    select="$xbl-model/xf:bind[@id = 'fr-form-binds']"
                     tunnel="yes"/>
             </xsl:apply-templates>
         </xsl:copy>
@@ -1265,6 +1269,8 @@
                     generate-id() = $candidate-action-models-ids
                 ]/xf:bind[1]">
 
+        <xsl:variable name="model" select="parent::xf:model"/>
+
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
 
@@ -1278,7 +1284,7 @@
                     if (not($is-form-builder)) then
                         fr:choices-validation-selection-controls(
                             $controls-root,
-                            parent::xf:model,
+                            $model,
                             false()
                         )/frf:controlNameFromId(@id)
                     else
@@ -1290,7 +1296,7 @@
                     if ($validate-selection-controls-choices) then
                         fr:choices-validation-selection-controls(
                             $controls-root,
-                            parent::xf:model,
+                            $model,
                             true()
                         )
                     else
@@ -1315,6 +1321,14 @@
                                     true()
                                 )/frf:controlNameFromId(@id)"
                             tunnel="yes"/>
+                        <xsl:with-param
+                            name="boolean-selection-control-names"
+                            select="
+                                fr:find-boolean-selection-controls(
+                                    $controls-root,
+                                    $model
+                                )/frf:controlNameFromId(@id)"
+                            tunnel="yes"/>
                     </xsl:apply-templates>
                 </xsl:when>
                 <xsl:when test="$validate-selection-controls-choices">
@@ -1333,6 +1347,14 @@
                                 fr:find-single-selection-controls(
                                     $controls-root,
                                     true()
+                                )/frf:controlNameFromId(@id)"
+                            tunnel="yes"/>
+                        <xsl:with-param
+                            name="boolean-selection-control-names"
+                            select="
+                                fr:find-boolean-selection-controls(
+                                    $controls-root,
+                                    $model
                                 )/frf:controlNameFromId(@id)"
                             tunnel="yes"/>
                     </xsl:apply-templates>
@@ -1354,6 +1376,7 @@
         <xsl:param name="itemset-action-control-names"                as="xs:string*" tunnel="yes"/>
         <xsl:param name="static-choice-validation-selection-controls" as="element()*" tunnel="yes"/>
         <xsl:param name="single-selection-control-names"              as="xs:string*" tunnel="yes"/>
+        <xsl:param name="boolean-selection-control-names"             as="xs:string*" tunnel="yes"/>
 
         <xsl:variable
             name="bind-name"
@@ -1364,16 +1387,16 @@
             select="$static-choice-validation-selection-controls[frf:controlNameFromId(@id) = $bind-name]"/>
 
         <xsl:variable
-            name="matches-itemset-action-control"
+            name="is-for-itemset-action"
             select="$bind-name = $itemset-action-control-names"/>
 
         <xsl:variable
-            name="must-validate-choices"
-            select="exists($static-choice-validation-selection-control) or $matches-itemset-action-control"/>
+            name="is-for-boolean-selection-control"
+            select="$bind-name = $boolean-selection-control-names"/>
 
         <xsl:variable
-            name="is-for-itemset-action"
-            select="$must-validate-choices and $matches-itemset-action-control"/>
+            name="must-validate-choices"
+            select="exists($static-choice-validation-selection-control) or $is-for-itemset-action or $is-for-boolean-selection-control"/>
 
         <xsl:variable
             name="is-for-single-selection-control"
@@ -1385,22 +1408,6 @@
         <xsl:variable
             name="itemset-resource-name"
             select="$static-choice-validation-selection-control/frf:findItemsetResourceName(.)"/>
-
-        <xsl:if test="@name = 'control-1'">
-            <xsl:message>
-                xxx
-                itemset-action-control-names:
-                <xsl:copy-of select="$itemset-action-control-names"/>
-                static-choice-validation-selection-controls:
-                <xsl:copy-of select="$static-choice-validation-selection-controls"/>
-                static-choice-validation-selection-control:
-                <xsl:copy-of select="$static-choice-validation-selection-control"/>
-                single-selection-control-names:
-                <xsl:copy-of select="$single-selection-control-names"/>
-                itemset-resource-name:
-                <xsl:copy-of select="$itemset-resource-name"/>
-            </xsl:message>
-        </xsl:if>
 
         <xsl:choose>
             <xsl:when test="$must-validate-choices and $is-for-itemset-action and $is-for-single-selection-control">
@@ -1419,6 +1426,19 @@
                                 return
                                     string(.) = $values
                             )"/>
+                </xsl:copy>
+            </xsl:when>
+            <xsl:when test="$must-validate-choices and $is-for-boolean-selection-control">
+                <!--
+                    Boolean selection controls:
+                    - can't be the target of `fr:control-setitems`
+                    - don't have a static itemset
+                -->
+                <xsl:copy>
+                    <xsl:apply-templates select="@* | node()"/>
+                    <xf:constraint
+                        id="{$bind-name}-choice-constraint"
+                        value="xxf:is-blank() or string(.) = ('false', 'true')"/>
                 </xsl:copy>
             </xsl:when>
             <xsl:when test="$must-validate-choices and $is-for-single-selection-control">

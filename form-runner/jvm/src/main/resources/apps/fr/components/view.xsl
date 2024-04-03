@@ -469,7 +469,8 @@
                         distinct-values(
                             (
                                 fr:choices-validation-selection-controls($body, $fr-form-model, true())/frf:controlNameFromId(@id),
-                                $itemset-action-control-names
+                                $itemset-action-control-names,
+                                fr:find-boolean-selection-controls($body, $fr-form-model)/frf:controlNameFromId(@id)
                             )
                         )
                     else

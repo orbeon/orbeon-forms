@@ -118,6 +118,7 @@
         We add an alert, and we need to target:
 
         - controls with static items but that are NOT open selection
+        - Boolean selection controls
         - controls that can be the target of itemset actions, INCLUDING open selection
 
         The combination of those is included in `$choice-validation-selection-control-names`.
@@ -126,7 +127,7 @@
      -->
     <xsl:template
         mode="within-controls"
-        match="*[$validate-selection-controls-choices and frf:isSelectionControl(.)]">
+        match="*[$validate-selection-controls-choices and frf:isMaybeSelectionControl(.)]">
         <xsl:param name="choice-validation-selection-control-names" tunnel="yes"/>
         <xsl:variable name="is-multiple" select="frf:isMultipleSelectionControl(local-name(.))"/>
         <xsl:choose>

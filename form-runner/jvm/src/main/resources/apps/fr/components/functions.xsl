@@ -76,6 +76,18 @@
                 ]"/>
     </xsl:function>
 
+    <xsl:function name="fr:find-boolean-selection-controls" as="element()*">
+        <xsl:param name="controls-root"          as="element()"/>
+        <xsl:param name="model"                  as="element(xf:model)"/>
+
+        <xsl:sequence
+            select="
+                $controls-root//*[
+                    exists(@id) and
+                    frf:isBooleanSelectionControlXPath(., $model)
+                ]"/>
+    </xsl:function>
+
     <xsl:function name="fr:find-multiple-selection-controls" as="element()*">
         <xsl:param name="controls-root"          as="element()"/>
         <xsl:param name="include-open-selection" as="xs:boolean"/>

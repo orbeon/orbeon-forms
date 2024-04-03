@@ -29,12 +29,13 @@ import org.orbeon.oxf.xforms.action.XFormsAPI.insert
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
+import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
 import org.orbeon.xforms.XFormsNames
-import org.orbeon.xforms.XFormsNames.MEDIATYPE_QNAME
+import org.orbeon.xforms.XFormsNames.{MEDIATYPE_QNAME, TYPE_QNAME, XFORMS_INPUT_QNAME}
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.compat._
@@ -203,13 +204,29 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     localName == "select" || localName.endsWith("-select")
 
   //@XPathFunction
-  def isSelectionControl(controlElem: NodeInfo): Boolean = {
+  def isMaybeSelectionControl(controlElem: NodeInfo): Boolean =
+    isSelectionControl(controlElem, None) ||
+      controlElem.resolveQName(controlElem.name) == XFORMS_INPUT_QNAME // allow `xf:input`, just in case it is a Boolean type input
+
+  def isSelectionControl(controlElem: NodeInfo, bindElem: Option[om.NodeInfo]): Boolean = {
     val localname = controlElem.localname
     isSingleSelectionControl(localname)     ||
       isMultipleSelectionControl(localname) ||
-      isYesNoInput(controlElem)             ||
-      isCheckboxInput(controlElem)
+      isBooleanSelectionControl(controlElem, bindElem)
   }
+
+  //@XPathFunction
+  def isBooleanSelectionControlXPath(controlElem: om.NodeInfo, passedModelElem: om.NodeInfo): Boolean =
+    isBooleanSelectionControl(controlElem, findBindByName(getControlName(controlElem))(
+      new InDocFormRunnerDocContext(passedModelElem) {
+        override lazy val modelElem = passedModelElem
+      }
+    ))
+
+  def isBooleanSelectionControl(controlElem: om.NodeInfo, bindElem: => Option[om.NodeInfo]): Boolean =
+    FormRunner.isYesNoInput(controlElem)      ||
+      FormRunner.isCheckboxInput(controlElem) ||
+      bindElem.forall(FormRunner.isBooleanInput(controlElem, _))
 
   def isYesNoInput(controlElem: NodeInfo): Boolean =
     controlElem.resolveQName(controlElem.name) == FRYesNoInputQName
@@ -226,6 +243,15 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       controlPredicate  = (nodeInfo: NodeInfo) => subElements.exists(elem => (nodeInfo / elem).nonEmpty),
       dataFormatVersion = dataFormatVersion
     )
+
+  def isBooleanInput(controlElem: om.NodeInfo, bindElem: => om.NodeInfo): Boolean = {
+    val controlQName = controlElem.resolveQName(controlElem.name)
+    controlQName == XFORMS_INPUT_QNAME &&
+      findDatatype(bindElem).exists(_.localName == "boolean")
+  }
+
+  def findDatatype(bind: om.NodeInfo): Option[QName] =
+    bind.attValueOpt(TYPE_QNAME) map bind.resolveQName
 
   def searchControlsInFormByClass(
     classes           : Set[String],

@@ -860,7 +860,6 @@ object FormBuilderXPathApi {
       DatatypeValidation.fromXml(
         validationElem  = newDatatypeValidationElem,
         newIds          = nextTmpIds(token = Names.Validation, count = 1).iterator,
-        inDoc           = ctx.formDefinitionRootElem,
         controlName     = controlName
       ).datatypeQName
 

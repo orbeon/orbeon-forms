@@ -130,12 +130,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
     ctx         : FormBuilderDocContext
   ): Unit = {
 
-    val inDoc = ctx.formDefinitionRootElem
+    val bindElem = findBindByName(controlName).get
 
-    val bind = findBindByName(controlName).get
-
-    val existingAttributeValidations = mipAtts (bind, mip)
-    val existingElementValidations   = mipElems(bind, mip)
+    val existingAttributeValidations = mipAtts (bindElem, mip)
+    val existingElementValidations   = mipElems(bindElem, mip)
 
     val (_, mipElemQName) = mipToFBMIPQNames(mip)
 
@@ -167,7 +165,17 @@ trait AlertsAndConstraintsOps extends ControlOps {
                     level={if (level != ValidationLevel.ErrorLevel) level.entryName else null}
                     value={if (mip != Type) nonEmptyValue else null}
                     xmlns:xf={XF}
-                    xmlns:fb={XMLNames.FB}>{if (mip == Type) nonEmptyValue else null}</xf:dummy>
+                    xmlns:fb={XMLNames.FB}>{
+                    if (mip == Type) // https://github.com/orbeon/orbeon-forms/issues/6252
+                      normalizeMipValue(
+                        mip          = Type,
+                        mipValue     = nonEmptyValue,
+                        hasCalculate = throw new IllegalArgumentException, // unused here as we pass `mip == Type`
+                        isTypeString = isTypeStringUpdateNsIfNeeded(bindElem, _)
+                      ).orNull
+                    else
+                      null
+                  }</xf:dummy>
 
                 List(dummyMIPElem.copy(prefix = prefix, label = mipElemQName.localName): NodeInfo)
               case None =>
@@ -176,7 +184,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           }
 
         delete(existingAttributeValidations ++ existingElementValidations)
-        insertElementsImposeOrder(into = bind, origin = nestedValidations, AllMIPNamesInOrder)
+        insertElementsImposeOrder(into = bindElem, origin = nestedValidations, AllMIPNamesInOrder)
     }
   }
 
@@ -407,7 +415,13 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
       findMIPs(controlName, Type).headOption map {
         case (idOpt, _, value, alertOpt) =>
-          DatatypeValidation(idOpt, builtinOrSchemaType(value), alertOpt)
+          // If the value is blank, use `xs:string` as the default
+          // https://github.com/orbeon/orbeon-forms/issues/6252
+          DatatypeValidation(
+           idOpt,
+           value.trimAllToOpt.map(builtinOrSchemaType).getOrElse(DefaultDataTypeValidation.datatype),
+           alertOpt
+        )
       } getOrElse
         DefaultDataTypeValidation
     }

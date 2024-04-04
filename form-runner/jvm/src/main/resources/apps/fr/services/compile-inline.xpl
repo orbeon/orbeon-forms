@@ -35,7 +35,7 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                 <xsl:template match="/">
-                    <xh:html>/
+                    <xh:html>
                         <xh:head>
                             <xh:meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
                             <xh:script src="/xforms-server/baseline.js?updates=offline" defer="defer"/>

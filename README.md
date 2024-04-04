@@ -23,6 +23,7 @@ For more information about Orbeon Forms, please visit [orbeon.com](https://www.o
 What's new
 ----------
 
+- [Orbeon Forms 2022.1.7](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1.7)
 - [Orbeon Forms 2023.1.1](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.1)
 - [Orbeon Forms 2022.1.6](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1.6)
 - [Orbeon Forms 2023.1](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1)

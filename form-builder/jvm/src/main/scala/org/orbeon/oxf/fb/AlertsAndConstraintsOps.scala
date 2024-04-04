@@ -16,8 +16,8 @@ package org.orbeon.oxf.fb
 import cats.syntax.option._
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.{FormRunnerCommonConstraint, Names}
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.{FormRunnerCommonConstraint, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory
@@ -39,6 +39,7 @@ import org.orbeon.xforms.analysis.model.ValidationLevel
 
 import scala.collection.compat._
 import scala.{xml => sx}
+
 
 trait AlertsAndConstraintsOps extends ControlOps {
 
@@ -82,7 +83,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     val defaultAlert = AlertDetails.fromXML(defaultAlertElem, None)
 
-    // We expect only one "required" validation
+    // We expect exactly one "required" validation
     allValidations collectFirst {
       case v: RequiredValidation => v
     } foreach { v =>
@@ -93,8 +94,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
       )
     }
 
-    // We expect only one "datatype" validation
-    allValidations collect {
+    // We expect exactly one "datatype" validation
+    allValidations collectFirst {
       case v: DatatypeValidation => v
     } foreach { v =>
 
@@ -265,10 +266,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
   object Validation {
 
-    def unapply(v: Validation) =
+    def unapply(v: Validation): Option[(Option[String], ValidationLevel, String, Option[AlertDetails])] =
       Some((v.idOpt, v.level, v.stringValue, v.alert))
 
-    def levelFromXML(validationElem: NodeInfo) =
+    def levelFromXML(validationElem: NodeInfo): ValidationLevel =
       ValidationLevel.LevelByName(validationElem attValue "level")
   }
 
@@ -281,8 +282,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     import RequiredValidation._
 
-    def level       = ValidationLevel.ErrorLevel
-    def stringValue = eitherToXPath(required)
+    def level      : ValidationLevel = ValidationLevel.ErrorLevel
+    def stringValue: String          = eitherToXPath(required)
 
     def toXML(implicit ctx: FormBuilderDocContext): sx.Elem =
       <validation type={Required.name} level={level.entryName} default-alert={alert.isEmpty.toString}>
@@ -293,7 +294,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
   object RequiredValidation {
 
-    val DefaultRequireValidation = RequiredValidation(None, Left(false), None)
+    private val DefaultRequireValidation = RequiredValidation(None, Left(false), None)
 
     def fromForm(controlName: String)(implicit ctx: FormBuilderDocContext): RequiredValidation =
       findMIPs(controlName, Required).headOption map {
@@ -336,10 +337,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
     alert    : Option[AlertDetails]
   ) extends Validation {
 
-    val datatypeQName = datatype.fold(_._1, identity)
+    val datatypeQName: QName = datatype.fold(_._1, identity)
 
-    def level       = ValidationLevel.ErrorLevel
-    def stringValue = XMLUtils.buildQName(datatypeQName.namespace.prefix, datatypeQName.localName)
+    def level      : ValidationLevel = ValidationLevel.ErrorLevel
+    def stringValue: String          = XMLUtils.buildQName(datatypeQName.namespace.prefix, datatypeQName.localName)
 
     // Rename control element if needed when the datatype changes
     def renameControlIfNeeded(
@@ -483,7 +484,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     alert      : Option[AlertDetails]
   ) extends Validation {
 
-    def stringValue = expression
+    def stringValue: String = expression
 
     def toXML(implicit ctx: FormBuilderDocContext): sx.Elem = {
 
@@ -549,7 +550,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     require(! (global && forValidationId.isDefined))
 
-    def default = forValidationId.isEmpty
+    def default: Boolean = forValidationId.isEmpty
 
     // XML representation used by Form Builder
     def toXML: sx.Elem = {
@@ -562,13 +563,13 @@ trait AlertsAndConstraintsOps extends ControlOps {
     }
   }
 
-  def isGlobalAlertRef(refAtt: String): Boolean =
+  private def isGlobalAlertRef(refAtt: String): Boolean =
     refAtt == OldStandardAlertRef
 
   // - If the attribute matches a non-global alert path, return `Some`, otherwise `None`.
   // - If there is an explicit index such as as `[1]`, then return a nested `Some` index, otherwise `None.
   // - The index, if any, is 0-based.
-  def findZeroBasedIndexFromAlertRef(refAtt: String, resourceName: String): Option[Option[Int]] = {
+  private def findZeroBasedIndexFromAlertRef(refAtt: String, resourceName: String): Option[Option[Int]] = {
 
     def normalizeIndex(index: String) =
       Option(index) map (_.toInt - 1)
@@ -632,7 +633,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       controlElem child "alert" flatMap alertFromElement toList
     }
 
-    def fromXML(alertElem: NodeInfo, forValidationId: Option[String])(implicit ctx: FormBuilderDocContext) = {
+    def fromXML(alertElem: NodeInfo, forValidationId: Option[String])(implicit ctx: FormBuilderDocContext): AlertDetails = {
 
       val messagesElems = (alertElem child "message" toList) map {
         message => (message attValue "lang", message attValue "value")
@@ -643,7 +644,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       AlertDetails(forValidationId, messagesElems, isGlobal)
     }
 
-    def fromValidationXML(validationElem: NodeInfo, forValidationId: Option[String])(implicit ctx: FormBuilderDocContext) = {
+    def fromValidationXML(validationElem: NodeInfo, forValidationId: Option[String])(implicit ctx: FormBuilderDocContext): Option[AlertDetails] = {
 
       val useDefaultAlert = validationElem /@ "default-alert" === "true"
 
@@ -657,7 +658,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     }
   }
 
-  private def findMIPs(controlName: String, mip: MIP)(implicit ctx: FormBuilderDocContext) = {
+  private def findMIPs(controlName: String, mip: MIP)(implicit ctx: FormBuilderDocContext): List[(Option[String], ValidationLevel, String, Option[AlertDetails])] = {
 
     val bind            = findBindByName(controlName).get // require the bind
     val supportedAlerts = AlertDetails.fromForm(controlName)

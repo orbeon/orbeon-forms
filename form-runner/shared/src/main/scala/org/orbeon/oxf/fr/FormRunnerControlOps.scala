@@ -487,6 +487,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       ! isDefault option trimmed
     }
 
+  // 2024-04-04: This only checks the attribute, but it is ok as only `constraint`, `required`, and `type` support
+  // nested elements.
   def hasCalculate(bindElem: NodeInfo): Boolean =
     bindElem.attValueOpt(ModelDefs.Calculate.name).isDefined
 

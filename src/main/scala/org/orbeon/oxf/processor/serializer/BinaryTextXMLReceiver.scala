@@ -74,7 +74,7 @@ class BinaryTextXMLReceiver(
     headersToForward          : String
   ) =
     this(
-      if (response ne null) Left(response, pathType) else Right(outputStream),
+      Either.cond(response eq null, outputStream, (response, pathType)),
       closeStream,
       forceContentType,
       requestedContentType.trimAllToOpt,

@@ -79,7 +79,7 @@ trait ResourcesOps extends BaseOps {
   // - only touches the specified languages
   // - simplicity and consistency, all existing resources are first deleted
   // - the maximum number of values across langs is determined to create a consistent number of resources
-  // - if values are missing for a given lang, the remaining resources will exist bug be empty
+  // - if values are missing for a given lang, the remaining resources will exist but be empty
   //
   def setControlResourcesWithLang(
     controlName  : String,

@@ -233,6 +233,14 @@
         </xsl:element>
     </xsl:template>
 
+    <!-- https://github.com/orbeon/orbeon-forms/issues/6252 -->
+    <xsl:template match="xf:bind/xf:type[. = ('xf:string', 'xs:string')]"
+                  mode="within-model">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- Remove unneeded help elements -->
     <xsl:template match="xf:help[generate-id() = $unneeded-elements]"
                   mode="within-body"/>

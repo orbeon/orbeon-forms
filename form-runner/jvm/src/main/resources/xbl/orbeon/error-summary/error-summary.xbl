@@ -261,14 +261,14 @@
                                 (: errorsInstanceDoc = :)   xxf:instance('fr-errors-instance')/root(),
                                 (: stateInstanceDoc  = :)   xxf:instance('fr-state-instance')/root(),
                                 (: visitValueChanged = :)   $fr-visit-value-changed,
-                                (: visitInvalid      = :)   if (event('xxf:type') = 'xforms-enabled') then
-                                                                false()
-                                                            else if (event('xxf:type') = 'xforms-invalid') then
-                                                                event('creation') = false()
-                                                            else if (event('xxf:type') = 'xxforms-constraints-changed') then
-                                                                true()
-                                                            else
-                                                                false()
+                                (: visitInvalid      = :)   $fr-visit-invalid and (
+                                                                if (event('xxf:type') = 'xforms-invalid') then
+                                                                    event('xxf:creation') = false()
+                                                                else if (event('xxf:type') = 'xxforms-constraints-changed') then
+                                                                    true()
+                                                                else
+                                                                    false()
+                                                            )
                             )
                         </xf:action>
 

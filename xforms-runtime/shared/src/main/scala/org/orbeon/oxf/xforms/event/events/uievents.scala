@@ -176,7 +176,10 @@ private object XXFormsConstraintsChangedEvent {
   }
 }
 private object XFormsCreationEvents {
+
+  val XXCreation = xxfName("creation")
+
   def properties(creation: Boolean): PropertyGetter = {
-    case "creation" => Some(creation)
+    case XXCreation => Some(creation)
   }
 }

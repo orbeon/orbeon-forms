@@ -36,7 +36,7 @@ trait ResourcesOps extends BaseOps {
   def currentLang     (implicit ctx: FormBuilderDocContext): String   = currentResources attValue XMLLangQName
   def resourcesRoot   (implicit ctx: FormBuilderDocContext): NodeInfo = currentResources.parentUnsafe
 
-  def resourcesInLang(lang: String)(implicit ctx: FormBuilderDocContext): NodeInfo =
+  def resourcesElemForLangOrDefault(lang: String)(implicit ctx: FormBuilderDocContext): NodeInfo =
     allResources(resourcesRoot) find (_.attValue(XMLLangQName) == lang) getOrElse currentResources
 
   // Find the current resource holder for the given name
@@ -212,21 +212,15 @@ trait ResourcesOps extends BaseOps {
     ctx          : FormBuilderDocContext
   ): Seq[NodeInfo] = {
 
-    val resources = resourcesInLang(lang)
+    val rootResourceElemForLang = resourcesElemForLangOrDefault(lang)
 
     // Create holder for control if missing
-    if (resources / controlName isEmpty) {
+    if (rootResourceElemForLang / controlName isEmpty) {
+      // TODO: Better order of elements? This will insert last.
       XFormsAPI.insert(
-        into   = Seq(resources),
-        origin = Seq(NodeInfoFactory.elementInfo(QName(controlName)))
-      )
-    }
-
-    // Create holder for resource if missing
-    if (resources / controlName / resourceName isEmpty) {
-      XFormsAPI.insert(
-        into   = Seq(resources / controlName head),
-        origin = Seq(NodeInfoFactory.elementInfo(QName(resourceName)))
+        into   = Seq(rootResourceElemForLang),
+        after  = rootResourceElemForLang / *,
+        origin = Seq(elementInfo(QName(controlName)))
       )
     }
 

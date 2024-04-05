@@ -546,10 +546,11 @@
     <xsl:template match="xf:bind[contains(@constraint, 'xxf:upload-max-size(')]" mode="within-model" priority="10">
         <xsl:variable name="output">
             <xsl:copy>
-                <xsl:copy-of select="@* | node() except @constraint"/>
+                <xsl:copy-of select="@* except @constraint"/>
                 <xsl:attribute name="constraint">
                     <xsl:value-of select="replace(@constraint, 'xxf:upload-max-size\(', 'xxf:upload-max-size-per-file(')"/>
                 </xsl:attribute>
+                <xsl:copy-of select="node()"/>
             </xsl:copy>
         </xsl:variable>
 

@@ -73,12 +73,12 @@
                             <xxf:default value="43"/>
                             <xf:constraint value="string-length() le 100" id="validation-1-validation"/>
                             <xf:constraint value="string-length() ge 10" id="validation-2-validation"/>
-                            <xf:type id="validation-3-validation">xf:string</xf:type>
+                            <xf:type id="validation-3-validation"/>
                             <xf:required value="true()" id="validation-4-validation"/>
                             <xxf:default value="43"/>
                             <xf:constraint value="string-length() le 100" id="validation-5-validation"/>
                             <xf:constraint value="string-length() ge 10" id="validation-6-validation"/>
-                            <xf:type id="validation-7-validation">xf:string</xf:type>
+                            <xf:type id="validation-7-validation"/>
                             <xf:required value="true()" id="validation-8-validation"/>
                         </xf:bind>
                     </xf:bind>

@@ -17,6 +17,7 @@ import org.orbeon.dom.Document
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.SchemaOps.findSchemaPrefix
+import org.orbeon.oxf.fr.XMLNames.XF
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
@@ -558,7 +559,48 @@ class AlertsAndConstraintsTest
     }
   }
 
-  private def globalAlert     (implicit ctx: FormBuilderDocContext) = AlertDetails(None, Nil, global = true)
+  describe("Writing `*:string` type with custom alert") {
+
+    for (required <- List(true, false))
+      it(s"must not write the `*:string` type for required = $required") {
+        withActionAndFBDoc(AlertsDoc) { implicit ctx =>
+
+          val newValidations = List(
+            <validation type="required" level="error" default-alert="true">
+              <required>{required}()</required>
+              <alert global="false"/>
+            </validation>,
+            <validation type="datatype" id="" level="error" default-alert="false">
+              <builtin-type>string</builtin-type>
+              <builtin-type-required>{required}</builtin-type-required>
+              <schema-type/>
+              <alert global="false">
+                <message lang="en" value="Incorrect datatype"/>
+              </alert>
+            </validation>
+          )
+
+          writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
+
+          val xfTypeElem =
+            ctx.topLevelBindElem.get.descendant(XF -> "type").head
+
+          assert(xfTypeElem.id == "validation-2-validation")
+          assert(xfTypeElem.stringValue.isEmpty)
+
+          val expected =
+            DatatypeValidation(
+              Some("validation-2-validation"),
+              Left((XMLConstants.XS_STRING_QNAME, false)), // always `false` even for `xs:string`
+              Some(AlertDetails(Some("validation-2-validation"), List(("en", "Incorrect datatype"), ("fr", "")), global = false))
+            )
+
+          assert(expected == DatatypeValidation.fromForm(Control1))
+        }
+      }
+  }
+
+  private def globalAlert                                           = AlertDetails(None, Nil, global = true)
   private def globalAlertAsXML(implicit ctx: FormBuilderDocContext) = globalAlert.toXML
 
   private def readConstraintValidationsAsXML(controlName: String)(implicit ctx: FormBuilderDocContext) =

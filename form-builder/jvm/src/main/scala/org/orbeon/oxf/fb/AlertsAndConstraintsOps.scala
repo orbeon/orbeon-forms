@@ -392,6 +392,12 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
   object DatatypeValidation {
 
+    // `xs:string` is special since the empty string is still a valid `xs:string`, so `xs:string` is the same as
+    // `xf:string`. We shouldn't ever have to write `xf:string`. (XForms 2.0 even removes those `xf:*` types as
+    // they are not needed anymore, since `required` has precedence.) Here, we decide to return `xs:string` as the
+    // default datatype (`DefaultDataTypeValidation`), but we always mark it as not implying requiredness. The UI
+    // will show it as required only if the `required` validation implies it. However, for other `xs:*` types, we
+    // imply requiredness unless there is a `required` validation that implies otherwise.
     private val DefaultDataTypeValidation =
       DatatypeValidation(None, Left(XMLConstants.XS_STRING_QNAME -> false), None)
 
@@ -405,7 +411,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         val isBuiltinType = Set(XF, XS)(qName.namespace.uri)
 
         if (isBuiltinType)
-          Left(qName -> (qName.namespace.uri == XS))
+          Left(qName -> (qName != XMLConstants.XS_STRING_QNAME && qName.namespace.uri == XS)) // see `DefaultDataTypeValidation`
         else
           Right(qName)
       }
@@ -416,7 +422,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           // https://github.com/orbeon/orbeon-forms/issues/6252
           DatatypeValidation(
            idOpt,
-           value.trimAllToOpt.map(builtinOrSchemaType).getOrElse(DefaultDataTypeValidation.datatype),
+           value.trimAllToOpt.map(builtinOrSchemaType).getOrElse(DefaultDataTypeValidation.datatype), // see `DefaultDataTypeValidation`
            alertOpt
         )
       } getOrElse

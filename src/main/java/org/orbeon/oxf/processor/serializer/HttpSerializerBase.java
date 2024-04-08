@@ -79,40 +79,45 @@ public abstract class HttpSerializerBase extends CachedSerializer {
             final ExternalContext.Response response = externalContext.getResponse();
 
             try {
-                // Compute headers
+                // Set status code and headers
                 if (externalContext != null) {
 
                     // Send an error if needed and return immediately
+                    // 2024-04-08: No uses of this in the codebase.
                     int errorCode = config.errorCode;
                     if (errorCode != DEFAULT_ERROR_CODE) {
                         response.sendError(errorCode);
                         return;
                     }
 
-                    // Get last modification date and compute last modified if possible
-                    // NOTE: It is not clear if this is right! We had a discussion to "remove serializer last modified,
-                    // and use oxf:request-generator default validity".
-                    final long lastModified = findInputLastModified(pipelineContext, dataInput, false);
+                    // Don't output caching headers or new status code if a non-success status code has been set
+                    if (! StatusCode.isNonSuccessCode(response.getStatus())) {
 
-                    // Set caching headers and force revalidation
-                    PathType pathType = (PathType) pipelineContext.getAttribute(PageFlowControllerProcessor$.MODULE$.PathTypeKey());
-                    response.setPageCaching(lastModified, (pathType != null) ? pathType : PathType.Page$.MODULE$);
+                        // Get last modification date and compute last modified if possible
+                        // NOTE: It is not clear if this is right! We had a discussion to "remove serializer last modified,
+                        // and use oxf:request-generator default validity".
+                        final long lastModified = findInputLastModified(pipelineContext, dataInput, false);
 
-                    // Check if we are processing a forward. If so, we cannot tell the client that the content has not been modified.
-                    final boolean isForward = URLRewriterUtils.isForwarded(externalContext.getRequest());
-                    if (!isForward) {
-                        // Check If-Modified-Since (conditional GET) and don't return content if condition is met
-                        if (!response.checkIfModifiedSince(externalContext.getRequest(), lastModified)) {
-                            response.setStatus(StatusCode.NotModified());
-                            if (logger.isDebugEnabled())
-                                logger.debug("Sending SC_NOT_MODIFIED");
-                            return;
+                        // Set caching headers and force revalidation
+                        PathType pathType = (PathType) pipelineContext.getAttribute(PageFlowControllerProcessor$.MODULE$.PathTypeKey());
+                        response.setPageCaching(lastModified, (pathType != null) ? pathType : PathType.Page$.MODULE$);
+
+                        // Check if we are processing a forward. If so, we cannot tell the client that the content has not been modified.
+                        final boolean isForward = URLRewriterUtils.isForwarded(externalContext.getRequest());
+                        if (! isForward) {
+                            // Check If-Modified-Since (conditional GET) and don't return content if condition is met
+                            if (! response.checkIfModifiedSince(externalContext.getRequest(), lastModified)) {
+                                response.setStatus(StatusCode.NotModified());
+                                if (logger.isDebugEnabled())
+                                    logger.debug("Sending SC_NOT_MODIFIED");
+                                return;
+                            }
                         }
-                    }
 
-                    // STATUS CODE: Set status code based on the configuration
-                    // An XML processing instruction may override this when the input is being read
-                    response.setStatus(config.statusCode);
+                        // STATUS CODE: Set status code based on the configuration
+                        // An XML processing instruction may override this when the input is being read
+                        response.setStatus(config.statusCode);
+                    }
 
                     // Set custom headers
                     if (config.headers != null) {

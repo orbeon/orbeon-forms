@@ -1240,7 +1240,7 @@
                     not($left-repeat-names[$i] != '0' and $right-repeat-names[$i] = '0')
             )">
             <xsl:message terminate="yes">
-                <xsl:text>fr:copy-content: no fr:map can copy from a repeated control to a non-repeatd control</xsl:text>
+                <xsl:text>fr:copy-content: no fr:map can copy from a repeated control to a non-repeated control</xsl:text>
             </xsl:message>
         </xsl:if>
 

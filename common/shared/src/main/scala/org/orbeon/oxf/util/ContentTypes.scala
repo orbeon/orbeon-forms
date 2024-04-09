@@ -84,7 +84,7 @@ object ContentTypes {
   }
 
   def getContentTypeCharset(contentTypeOrNull: String): Option[String] =
-      getContentTypeParameters(contentTypeOrNull).get(CharsetParameter)
+    getContentTypeParameters(contentTypeOrNull).get(CharsetParameter)
 
   def getContentTypeParameters(contentTypeOrNull: String): Map[String, String] = {
 

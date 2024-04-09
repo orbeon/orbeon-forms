@@ -93,13 +93,19 @@ object XPathUtils {
       null
   }
 
-  // 22 usages
+  // 21 usages
   def selectStringValue(node: odom.Node, expr: String): String =
     selectStringValueOrNull(node, expr, EmptyNamespaces, null, null)
 
-  // 150 usages
+  // 128 usages
   def selectStringValueNormalize(node: odom.Node, expr: String): String =
     trimAllToNull(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null))
+
+  def selectStringValueNormalizeOpt(node: odom.Node, expr: String): Option[String] =
+    trimAllToOpt(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null))
+
+  def selectStringValueNormalize(node: odom.Node, expr: String, default: String): String =
+    selectStringValueNormalizeOpt(node, expr).getOrElse(default)
 
   // 3 external usages from SQL interpreter
   // Expects: List<Node>, Node, Number (Float, Double, Long, any other?), String.
@@ -166,9 +172,12 @@ object XPathUtils {
   }
 
   // IMPORTANT: If the XPath expressions select an empty node set, return `null`!
-  // 26 usages
+  // 23 usages
   def selectIntegerValue(node: odom.Node, expr: String): Integer =
     Option(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null)) map jl.Integer.valueOf orNull
+
+  def selectIntegerValue(node: odom.Node, expr: String, default: Int): Int =
+    Option(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null)).map(_.toInt).getOrElse(default)
 
   // 1 caller from SQL interpreter, implication is that expressions must return xs:boolean
   def selectBooleanValue(

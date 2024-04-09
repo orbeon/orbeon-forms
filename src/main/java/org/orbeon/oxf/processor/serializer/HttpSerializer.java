@@ -27,11 +27,13 @@ public class HttpSerializer extends HttpSerializerBase {
 
     public static final String HTTP_SERIALIZER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/http-serializer";
 
-    protected String getDefaultContentType() {
+//    protected
+    public String getDefaultContentType() {
         return BinaryTextXMLReceiver.DefaultBinaryContentType();
     }
 
-    protected String getConfigSchemaNamespaceURI() {
+//    protected
+    public String getConfigSchemaNamespaceURI() {
         return HTTP_SERIALIZER_CONFIG_NAMESPACE_URI;
     }
 
@@ -39,9 +41,23 @@ public class HttpSerializer extends HttpSerializerBase {
         try {
             final Config httpConfig = (Config) config;
             final PathType pathType = (PathType) context.getAttribute(PageFlowControllerProcessor$.MODULE$.PathTypeKey());
-            readInputAsSAX(context, input, new BinaryTextXMLReceiver(response, (pathType != null) ? pathType : PathType.Page$.MODULE$, null, true,
-                    httpConfig.forceContentType, httpConfig.contentType, httpConfig.ignoreDocumentContentType,
-                    httpConfig.forceEncoding, httpConfig.encoding, httpConfig.ignoreDocumentEncoding, httpConfig.headersToForward));
+            readInputAsSAX(
+                context,
+                input,
+                new BinaryTextXMLReceiver(
+                    response,
+                    (pathType != null) ? pathType : PathType.Page$.MODULE$,
+                    null,
+                    true,
+                    httpConfig.forceContentType(),
+                    httpConfig.contentTypeOrNull(),
+                    httpConfig.ignoreDocumentContentType(),
+                    httpConfig.forceEncoding(),
+                    httpConfig.encodingOrNull(),
+                    httpConfig.ignoreDocumentEncoding(),
+                    httpConfig.headersToForward()
+                )
+            );
         } catch (Exception e) {
             throw new OXFException(e);
         }

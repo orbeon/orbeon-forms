@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.StringUtils._
 object ContentTypes {
 
   val XmlContentType              = "application/xml"
+  val XmlTextContentType          = "text/xml"
   val JsonContentType             = "application/json"
   val HtmlContentType             = "text/html"
   val XhtmlContentType            = "application/xhtml+xml"
@@ -35,10 +36,10 @@ object ContentTypes {
   val CharsetParameter            = "charset"
   val ActionParameter             = "action"
 
-  val CssContentTypeWithCharset        = s"$CssContentType; $CharsetParameter=UTF-8"
-  val JavaScriptContentTypeWithCharset = s"$JavaScriptContentType; $CharsetParameter=UTF-8"
+  val CssContentTypeWithCharset        = makeContentTypeCharset(CssContentType,        Some("UTF-8"))
+  val JavaScriptContentTypeWithCharset = makeContentTypeCharset(JavaScriptContentType, Some("UTF-8"))
+  val TextHtmlContentTypeWithCharset   = makeContentTypeCharset(XmlTextContentType,    Some("UTF-8"))
 
-  private val XmlTextContentType    = "text/xml"
   private val TextContentTypePrefix = "text/"
   private val XmlContentTypeSuffix  = "+xml"
   private val JsonContentTypeSuffix = "+json"
@@ -85,6 +86,12 @@ object ContentTypes {
 
   def getContentTypeCharset(contentTypeOrNull: String): Option[String] =
     getContentTypeParameters(contentTypeOrNull).get(CharsetParameter)
+
+  def makeContentTypeCharset(contentType: String, charsetOpt: Option[String]): String =
+    charsetOpt match {
+      case Some(charset) => s"$contentType; $CharsetParameter=$charset"
+      case None          => contentType
+    }
 
   def getContentTypeParameters(contentTypeOrNull: String): Map[String, String] = {
 

@@ -38,11 +38,11 @@ public abstract class HttpTextSerializer extends HttpSerializerBase {
     protected final void readInput(PipelineContext pipelineContext, ExternalContext.Response response, ProcessorInput input, Object _config) {
         Config config = (Config) _config;
 
-        String encoding = getEncoding(config, null, DEFAULT_ENCODING);
+        String encoding = config.encodingOrDefaultOrNull(DEFAULT_ENCODING);
         // Set content-type and encoding
-        String contentType = getContentType(config, null, getDefaultContentType());
-        if (contentType != null)
-            response.setContentType(contentType + "; charset=" + encoding);
+        scala.Option<String> contentType = config.contentTypeOrDefault(getDefaultContentType());
+        if (contentType.isDefined())
+            response.setContentType(contentType.get() + "; charset=" + encoding);
 
         // Read input into a Writer
         try {
@@ -78,15 +78,15 @@ public abstract class HttpTextSerializer extends HttpSerializerBase {
 
                 // Read configuration input
                 final Config config = readConfig(pipelineContext);
-                final String encoding = getEncoding(config, null, DEFAULT_ENCODING);
-                final String contentType = getContentType(config, null, getDefaultContentType());
+                final String encoding = config.encodingOrDefaultOrNull(DEFAULT_ENCODING);
+                final scala.Option<String> contentType = config.contentTypeOrDefault(getDefaultContentType());
 
                 try {
                     // Start document
                     final AttributesImpl attributes = new AttributesImpl();
                     attributes.addAttribute(XMLConstants.XSI_URI(), "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME().qualifiedName());
-                    if (contentType != null)
-                        attributes.addAttribute("", Headers.ContentTypeLower(), Headers.ContentTypeLower(), "CDATA", contentType + "; charset=" + encoding);
+                    if (contentType.isDefined())
+                        attributes.addAttribute("", Headers.ContentTypeLower(), Headers.ContentTypeLower(), "CDATA", contentType.get() + "; charset=" + encoding);
 
                     // Start document
                     xmlReceiver.startDocument();

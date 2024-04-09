@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import cats.effect.IO
-import org.orbeon.connection.{AsyncConnectionResult, AsyncStreamedContent, ConnectionResult, ConnectionContextSupport, StreamedContent}
+import org.orbeon.connection._
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.Headers._
@@ -132,15 +132,17 @@ trait ConnectionTrait {
     // appended to the application/soap+xml MIME type." and "the charset MIME parameter is appended . The charset
     // parameter value from the mediatype attribute is used if it is specified. Otherwise, the value of the encoding
     // attribute (or its default) is used."
-    def charsetSuffix(charset: Option[String]) =
-      "; charset=" + charset.getOrElse(encoding)
+
+    def charsetOrDefault(charset: Option[String]) =
+      charset.orElse(Option(encoding))
 
     val newHeaders =
       method match {
         case GET if contentTypeMediaType contains SoapContentType =>
           // Set an Accept header
 
-          val acceptHeader = SoapContentType + charsetSuffix(mediatypeMaybeWithCharset flatMap getContentTypeCharset)
+          val acceptHeader =
+            makeContentTypeCharset(SoapContentType, charsetOrDefault(mediatypeMaybeWithCharset flatMap getContentTypeCharset))
 
           // Accept header with optional charset
           List(Accept -> List(acceptHeader))
@@ -149,7 +151,7 @@ trait ConnectionTrait {
           // Set Content-Type and optionally SOAPAction headers
 
           val parameters            = mediatypeMaybeWithCharset map getContentTypeParameters getOrElse Map.empty
-          val overriddenContentType = "text/xml" + charsetSuffix(parameters.get(ContentTypes.CharsetParameter))
+          val overriddenContentType = makeContentTypeCharset(XmlTextContentType, charsetOrDefault(parameters.get(ContentTypes.CharsetParameter)))
           val actionParameter       = parameters.get(ContentTypes.ActionParameter)
 
           // Content-Type with optional charset and SOAPAction header if any

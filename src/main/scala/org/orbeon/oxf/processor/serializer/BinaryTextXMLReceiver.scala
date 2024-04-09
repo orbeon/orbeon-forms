@@ -19,7 +19,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.http.{Headers, PathType}
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver._
-import org.orbeon.oxf.util.ContentTypes.{getContentTypeCharset, getContentTypeMediaType}
+import org.orbeon.oxf.util.ContentTypes.{getContentTypeCharset, getContentTypeMediaType, makeContentTypeCharset}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Base64XMLReceiver, ContentTypes, DateUtils, TextXMLReceiver}
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
@@ -71,7 +71,7 @@ class BinaryTextXMLReceiver(
     forceEncoding             : Boolean,
     requestedEncoding         : String,
     ignoreDocumentEncoding    : Boolean,
-    headersToForward          : String
+    headersToForward          : List[String]
   ) =
     this(
       Either.cond(response eq null, outputStream, (response, pathType)),
@@ -82,7 +82,7 @@ class BinaryTextXMLReceiver(
       forceEncoding,
       requestedEncoding.trimAllToOpt,
       ignoreDocumentEncoding,
-      Option(headersToForward) map (_.splitTo[List]()) getOrElse Nil
+      headersToForward
     )
 
   // Simple constructor to write to a stream and close it
@@ -163,7 +163,7 @@ class BinaryTextXMLReceiver(
             // NOTE: The "binary" mode doesn't mean the content is binary, it could be text as well. So we
             // output a charset when possible.
             if (ContentTypes.isTextOrJSONContentType(contentType))
-              response.setContentType(contentType + "; charset=" + encoding)
+              response.setContentType(makeContentTypeCharset(contentType, Some(encoding)))
             else
               response.setContentType(contentType)
           }

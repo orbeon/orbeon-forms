@@ -272,7 +272,7 @@ class EmailProcessor extends ProcessorImpl {
       val mediatype = ContentTypes.getContentTypeMediaType(contentTypeAttribute) getOrElse (throw new IllegalArgumentException)
       val charset   = ContentTypes.getContentTypeCharset(contentTypeAttribute) getOrElse DefaultCharacterEncoding
 
-      val contentTypeWithCharset = mediatype + "; charset=" + charset
+      val contentTypeWithCharset = ContentTypes.makeContentTypeCharset(mediatype, Some(charset))
 
       // Either a String or a FileItem
       val content =

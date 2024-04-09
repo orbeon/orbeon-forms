@@ -41,7 +41,8 @@ public class BarcodeProcessor extends HttpBinarySerializer {// TODO: HttpBinaryS
 
     public static String DEFAULT_CONTENT_TYPE = "image/png";
 
-    protected String getDefaultContentType() {
+//	protected
+    public String getDefaultContentType() {
         return DEFAULT_CONTENT_TYPE;
     }
 

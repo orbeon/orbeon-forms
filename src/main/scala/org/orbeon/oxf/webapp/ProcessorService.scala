@@ -14,7 +14,6 @@
 package org.orbeon.oxf.webapp
 
 import java.io.{BufferedWriter, OutputStreamWriter, PrintWriter}
-
 import javax.naming.InitialContext
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -23,6 +22,7 @@ import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.util.ContentTypes.TextHtmlContentTypeWithCharset
 import org.orbeon.oxf.util.{DynamicVariable, LoggerFactory}
 import org.orbeon.oxf.webapp.ProcessorService._
 
@@ -89,7 +89,7 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
     if (! response.isCommitted) {
       // Send new headers and HTML prologue
       response.reset()
-      response.setContentType("text/html; charset=utf-8")
+      response.setContentType(TextHtmlContentTypeWithCharset)
       response.setStatus(StatusCode.InternalServerError)
     } else {
       // Try to close table that may still be open

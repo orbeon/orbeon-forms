@@ -35,9 +35,9 @@ public abstract class HttpBinarySerializer extends HttpSerializerBase {
         Config config = (Config) _config;
 
         // Set content type
-        String contentType = getContentType(config, null, getDefaultContentType());
-        if (contentType != null)
-            response.setContentType(contentType);
+        scala.Option<String> contentType = config.contentTypeOrDefault(getDefaultContentType());
+        if (contentType.isDefined())
+            response.setContentType(contentType.get());
 
         // Read input into an OutputStream
         readInput(pipelineContext, input, config, response.getOutputStream());
@@ -64,11 +64,12 @@ public abstract class HttpBinarySerializer extends HttpSerializerBase {
 
                 // Read configuration input
                 Config config = readConfig(pipelineContext);
-                String contentType = getContentType(config, null, getDefaultContentType());
+                scala.Option<String> contentType = config.contentTypeOrDefault(getDefaultContentType());
 
                 try {
                     // Start document
-                    outputStream.setContentType(contentType);
+                    if (contentType.isDefined())
+                        outputStream.setContentType(contentType.get());
 
                     // Write content
                     readInput(pipelineContext, getInputByName(INPUT_DATA), config, outputStream);

@@ -15,10 +15,10 @@ package org.orbeon.oxf.processor.serializer.legacy;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.stream.StreamResult;
@@ -34,15 +34,16 @@ public class HTMLSerializer extends HttpTextSerializer {
         // Create an identity transformer and start the transformation
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         TransformerUtils.applyOutputProperties(identity.getTransformer(),
-                config.method != null ? config.method : DEFAULT_METHOD,
-                config.version != null ? config.version : null,
-                config.publicDoctype != null ? config.publicDoctype : null,
-                config.systemDoctype != null ? config.systemDoctype : null,
-                getEncoding(config, null, DEFAULT_ENCODING),
-                config.omitXMLDeclaration,
-                config.standalone,
-                config.indent,
-                config.indentAmount);
+            config.methodOr(DEFAULT_METHOD),
+            config.versionOr(null),
+            config.publicDoctypeOrNull(),
+            config.systemDoctypeOrNull(),
+            config.encodingOrDefaultOrNull(DEFAULT_ENCODING),
+            config.omitXMLDeclaration(),
+            config.standaloneOrNull(),
+            config.indent(),
+            config.indentAmount()
+        );
 
         identity.setResult(new StreamResult(writer));
         ProcessorImpl.readInputAsSAX(context, input, new StripNamespaceXMLReceiver(identity, writer, isSerializeXML11()));
@@ -62,7 +63,8 @@ public class HTMLSerializer extends HttpTextSerializer {
         }
     }
 
-    protected String getDefaultContentType() {
+//    protected
+    public String getDefaultContentType() {
         return DEFAULT_CONTENT_TYPE;
     }
 }

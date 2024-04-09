@@ -100,7 +100,8 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
 
   addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
 
-  protected def getDefaultContentType: String = XHTMLToPDFProcessor.DefaultContentType
+//  protected
+  def getDefaultContentType: String = XHTMLToPDFProcessor.DefaultContentType
 
   protected def readInput(
     pipelineContext : PipelineContext,

@@ -26,7 +26,8 @@ public class TextSerializer extends HttpTextSerializer {
     public static String DEFAULT_CONTENT_TYPE = "text/plain";
     public static String DEFAULT_METHOD = "text";
 
-    protected String getDefaultContentType() {
+//    protected
+    public String getDefaultContentType() {
         return DEFAULT_CONTENT_TYPE;
     }
 
@@ -35,15 +36,16 @@ public class TextSerializer extends HttpTextSerializer {
         // Create an identity transformer and start the transformation
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         TransformerUtils.applyOutputProperties(identity.getTransformer(),
-                config.method != null ? config.method : DEFAULT_METHOD,
-                null,
-                null,
-                null,
-                getEncoding(config, null, DEFAULT_ENCODING),
-                true,
-                null,
-                false,
-                DEFAULT_INDENT_AMOUNT);
+            config.methodOr(DEFAULT_METHOD),
+            null,
+            null,
+            null,
+            config.encodingOrDefaultOrNull(DEFAULT_ENCODING),
+            true,
+            null,
+            false,
+            DEFAULT_INDENT_AMOUNT
+        );
         identity.setResult(new StreamResult(writer));
         readInputAsSAX(context, INPUT_DATA, new SerializerXMLReceiver(identity, writer, isSerializeXML11()));
     }

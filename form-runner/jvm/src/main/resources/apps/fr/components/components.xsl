@@ -168,7 +168,7 @@
     <xsl:variable
         name="validate-selection-controls-choices"
         select="
-            if (not($is-readonly-mode) and not($is-form-builder)) then
+            if ($is-detail and not($is-readonly-mode) and not($is-form-builder)) then
                 (
                     $validate-selection-controls-choices-param-opt,
                     $fr-form-metadata/validate-selection-controls-choices = 'true' or (

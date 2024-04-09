@@ -217,11 +217,11 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   //@XPathFunction
   def isBooleanSelectionControlXPath(controlElem: om.NodeInfo, passedModelElem: om.NodeInfo): Boolean =
-    isBooleanSelectionControl(controlElem, findBindByName(getControlName(controlElem))(
+    isBooleanSelectionControl(controlElem, getControlNameOpt(controlElem).flatMap(findBindByName(_)(
       new InDocFormRunnerDocContext(passedModelElem) {
         override lazy val modelElem = passedModelElem
       }
-    ))
+    )))
 
   def isBooleanSelectionControl(controlElem: om.NodeInfo, bindElem: => Option[om.NodeInfo]): Boolean =
     FormRunner.isYesNoInput(controlElem)      ||

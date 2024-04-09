@@ -482,7 +482,7 @@ trait PersistenceApiTrait {
         url              = resolvedUri,
         hasCredentials   = false,
         customHeaders    = customHeaders ++ (formVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString))),
-        headersToForward = Set.empty, // xxx Connection.headersToForwardFromProperty ?
+        headersToForward = Connection.headersToForwardFromProperty,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
         getHeader        = Connection.getHeaderFromRequest(ec.getRequest)
       )

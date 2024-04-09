@@ -42,7 +42,8 @@ object URLRewriterImpl {
             request.getServerName,
             request.getServerPort,
             request.getClientContextPath(urlString),
-            request.getRequestPath, urlString,
+            request.getRequestPath,
+            urlString,
             rewriteMode
           )
         case Some(baseURIProperty) =>

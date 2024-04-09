@@ -71,6 +71,7 @@ object XFormsApp extends App {
     org.orbeon.xbl.Date
     org.orbeon.xbl.Time
     org.orbeon.xbl.Range
+    org.orbeon.xbl.CodeMirror
 
     org.orbeon.xforms.ItemHint
     org.orbeon.xforms.Help

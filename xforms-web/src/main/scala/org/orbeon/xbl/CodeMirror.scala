@@ -5,12 +5,12 @@ import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryPromise
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.|
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 object CodeMirror {
 
@@ -24,6 +24,7 @@ object CodeMirror {
     private var userChangedSinceLastBlur : Boolean = false
 
     override def init(): Unit = {
+      println("CodeMirrorCompanion.init")
       val editorElement = containerElem.querySelector(".xbl-fr-code-mirror-editor")
       this.editor = new facades.CodeMirror(
         editorElement,

@@ -1121,6 +1121,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
   .dependsOn(
     commonJS % "test->test;compile->compile",
     webSupport,
+    webFacades,
     xformsClientServerJS
   )
   .settings(

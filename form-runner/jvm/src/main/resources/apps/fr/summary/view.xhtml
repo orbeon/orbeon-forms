@@ -455,8 +455,8 @@
                     value="xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
 
                 <!-- Reset order by directive to default -->
-                <xf:set ref="instance('fr-order-by-instance')/column"    value="'last-modified'"/>
-                <xf:set ref="instance('fr-order-by-instance')/direction" value="'desc'"/>
+                <xf:setvalue ref="instance('fr-order-by-instance')/column"    value="'last-modified'"/>
+                <xf:setvalue ref="instance('fr-order-by-instance')/direction" value="'desc'"/>
 
                 <!-- Create elements holding structured search data -->
                 <xf:delete

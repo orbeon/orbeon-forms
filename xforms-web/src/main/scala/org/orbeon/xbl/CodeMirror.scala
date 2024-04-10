@@ -24,7 +24,6 @@ object CodeMirror {
     private var userChangedSinceLastBlur : Boolean = false
 
     override def init(): Unit = {
-      println("CodeMirrorCompanion.init")
       val editorElement = containerElem.querySelector(".xbl-fr-code-mirror-editor")
       this.editor = new facades.CodeMirror(
         editorElement,

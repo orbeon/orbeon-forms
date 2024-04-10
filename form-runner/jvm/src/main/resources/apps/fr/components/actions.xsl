@@ -545,7 +545,7 @@
                             <!-- https://github.com/orbeon/orbeon-forms/issues/5919 -->
                             <xsl:attribute
                                 name="if"
-                                select="frf:replaceVarReferencesWithFunctionCalls($action/@if, $action/@if, false(), (), $library-name)"/>
+                                select="frf:replaceVarReferencesWithFunctionCalls($action/@if, $action/@if, false(), $library-name, ())"/>
                         </xsl:when>
                     </xsl:choose>
 

@@ -433,11 +433,13 @@
         <xsl:variable
             name="add-request-parameters-to-resource"
             select="@serialization = 'application/x-www-form-urlencoded'"/>
-        <xsl:if test="$add-request-parameters-to-resource">
-            <xf:var name="{concat(@id, '-resource')}">
-                <xsl:value-of select="@resource"/>
-            </xf:var>
-        </xsl:if>
+        <xsl:variable
+            name="library-name"
+            select="ancestor::xbl:binding[1]/frf:findAppFromSectionTemplateUri(namespace-uri-for-prefix('component', .))"/>
+        <xf:var name="{concat(@id, '-resource')}">
+            <xsl:value-of select="frf:replaceVarReferencesWithFunctionCalls(@resource, @resource, true(), $library-name, ())"/>
+        </xf:var>
+        <xsl:variable name="resource" select="concat('$', @id, '-resource')"/>
         <xsl:copy>
             <xsl:copy-of select="@* except (@resource | @ref | @replace | @instance | @xxf:instance | @serialization)"/>
             <xsl:choose>
@@ -449,7 +451,7 @@
                     <xsl:attribute name="serialization" select="'none'"/>
                     <xsl:attribute name="resource">{
                         let
-                            $resource-without-params := xxf:evaluate-avt(<xsl:value-of select="concat('$', @id, '-resource')"/>),
+                            $resource-without-params := xxf:evaluate-avt(<xsl:value-of select="$resource"/>),
                             $parameters-separator    := if (contains($resource-without-params, '?')) then '&amp;' else '?',
                             $parameters-list         :=
                                 for $param-element in xxf:instance('fr-service-request-instance')/*
@@ -472,7 +474,8 @@
                     }</xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:copy-of select="@resource | @serialization"/>
+                    <xsl:copy-of select="@serialization"/>
+                    <xsl:attribute name="resource">{xxf:evaluate-avt(<xsl:value-of select="$resource"/>)}</xsl:attribute>
                     <xsl:attribute name="ref">xxf:instance('fr-service-request-instance')</xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>

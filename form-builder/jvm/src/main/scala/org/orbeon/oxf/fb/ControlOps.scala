@@ -822,10 +822,9 @@ trait ControlOps extends ResourcesOps {
         (renameNodeContent(_, avt = false))
     }
 
-    // Controls
-    locally {
-      RenameMappings foreach { case (test, filter, avtAtts, atts) =>
-        ctx.bodyElem descendant test filter filter foreach { elem =>
+    def renameInNode(nodeInfo: NodeInfo, renameMappings: List[(Test, NodeInfo => Boolean, List[String], List[String])]): Unit =
+      renameMappings foreach { case (test, filter, avtAtts, atts) =>
+        nodeInfo descendant test filter filter foreach { elem =>
           avtAtts foreach { avtAtt =>
             elem.att(avtAtt).foreach(renameNodeContent(_, avt = true))
           }
@@ -834,14 +833,23 @@ trait ControlOps extends ResourcesOps {
           }
         }
       }
-    }
+
+    // In model (submissions)
+    renameInNode(ctx.modelElem, ModelRenameMappings)
+
+    // In body (controls)
+    renameInNode(ctx.bodyElem, BodyRenameMappings)
 
     countOfUpdatedValues
   }
 
   private val ExpressionsVarNames = Set("control-value", "response-items", "item-label", "item-value", "item-hint")
 
-  private val RenameMappings: List[(Test, NodeInfo => Boolean, List[String], List[String])] = List(
+  private val ModelRenameMappings: List[(Test, NodeInfo => Boolean, List[String], List[String])] = List(
+    (FBSubmissionTest                                                     , _ => true, List("resource")                                                     , Nil),
+  )
+
+  private val BodyRenameMappings: List[(Test, NodeInfo => Boolean, List[String], List[String])] = List(
     // These should match what's in `controls.xsl`
     (FRContainerTest                                                      , isRepeat,  List("min", "max", "freeze", "remove-constraint", "clear-constraint"), Nil),
     (FRNumberTest || FRCurrencyTest                                       , _ => true, List("prefix", "suffix")                                             , Nil),

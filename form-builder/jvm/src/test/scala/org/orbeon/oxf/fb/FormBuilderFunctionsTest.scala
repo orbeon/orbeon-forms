@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.Namespaces
 import org.orbeon.xml.NamespaceMapping
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -769,6 +770,31 @@ class FormBuilderFunctionsTest
           assertXMLElementsIgnoreNamespacesInScope(
             left  = RenamedDataboundSelect1,
             right = ctx.bodyElem descendant * filter (_.id == "dynamic-drodpown-control") head
+          )
+        }
+      }
+    }
+
+    describe("Submissions") {
+      withActionAndFBDoc(FormulasDoc) { implicit ctx =>
+
+        val RenamedSubmission: NodeInfo =
+            <fb:submission
+              xmlns:xf={Namespaces.XF}
+              xmlns:fb={XMLNames.FB}
+              id="echo-submission"
+              class="fr-service"
+              resource="/fr/service/custom/orbeon/echo?ping={$read-write-control}"
+              method="get"
+              serialization="none"
+              mediatype=""/>
+
+        FormBuilder.renameControlReferences("readonly-control", "read-write-control", None)
+
+        it("must rename references from `resource` attribute") {
+          assertXMLElementsIgnoreNamespacesInScope(
+            left = RenamedSubmission,
+            right = ctx.modelElem descendant * filter (_.id == "echo-submission") head
           )
         }
       }

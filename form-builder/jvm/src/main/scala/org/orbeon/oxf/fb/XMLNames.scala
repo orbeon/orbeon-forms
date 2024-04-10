@@ -31,6 +31,7 @@ object XMLNames {
   val FBResourcesTest             : Test  = FB -> "resources"
   val FBDatatypeTest              : Test  = FB -> "datatype"
   val FBBindTest                  : Test  = FB -> "bind"
+  val FBSubmissionTest            : Test  = FB -> "submission"
 
   val FBEnclosingSectionTemplatesTest: Test  = FB -> "enclosing-section-templates"
 

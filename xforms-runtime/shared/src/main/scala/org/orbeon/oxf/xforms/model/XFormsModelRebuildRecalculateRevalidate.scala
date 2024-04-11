@@ -59,14 +59,14 @@ trait XFormsModelRebuildRecalculateRevalidate {
   def doRebuildIfNeeded(): Unit =
     if (deferredActionContext.rebuild) {
       try {
+        EventCollector.withBufferCollector { collector =>
+          Dispatch.dispatchEvent(new XXFormsRebuildStartedEvent(selfModel), collector)
+        }
+        EventCollector.withBufferCollector { collector =>
+          resetAndEvaluateVariables(collector)
+        }
         bindsIfInstance match {
           case Some(binds) =>
-            EventCollector.withBufferCollector { collector =>
-              Dispatch.dispatchEvent(new XXFormsRebuildStartedEvent(selfModel), collector)
-            }
-            EventCollector.withBufferCollector { collector =>
-              resetAndEvaluateVariables(collector)
-            }
             // NOTE: `contextStack.resetBindingContext(this)` called in `evaluateVariables()`
             binds.rebuild()
             // Controls may have @bind or bind() references, so we need to mark them as dirty. Will need dependencies for
@@ -94,7 +94,6 @@ trait XFormsModelRebuildRecalculateRevalidate {
           EventCollector.withBufferCollector { collector =>
             resetAndEvaluateVariables(collector)
           }
-
           bindsIfInstance match {
             case Some(binds) =>
               EventCollector.withBufferCollector { collector =>

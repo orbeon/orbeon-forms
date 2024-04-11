@@ -841,14 +841,9 @@
         <xf:setvalue ref="validate-errors">0</xf:setvalue>
     </xf:action>
 
-    <xf:action ev:event="fb-xforms-recalculate" context="$variables">
+    <xf:action ev:event="fb-xxforms-recalculate-started" context="$variables">
         <xf:setvalue ref="rr">calculate</xf:setvalue>
         <xf:setvalue ref="calculate-errors">0</xf:setvalue>
-    </xf:action>
-
-    <xf:action ev:event="fb-xforms-revalidate" context="$variables">
-        <xf:setvalue ref="rr">validate</xf:setvalue>
-        <xf:setvalue ref="validate-errors">0</xf:setvalue>
     </xf:action>
 
     <xf:action ev:event="fb-xxforms-xpath-error" context="$variables">

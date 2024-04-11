@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.model
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent, XXFormsInvalidEvent, XXFormsValidEvent}
+import org.orbeon.oxf.xforms.event.events.{XXFormsInvalidEvent, XXFormsRebuildStartedEvent, XXFormsRecalculateStartedEvent, XXFormsValidEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.saxon.om
 
@@ -50,24 +50,23 @@ trait XFormsModelRebuildRecalculateRevalidate {
       containingDocument.xpathDependencies.markValueChanged(selfModel, nodeInfo)
   }
 
-  // NOP now that deferredActionContext is always created
-  def startOutermostActionHandler(): Unit = ()
-
+  // Only called by `XBLContainer.rebuildRecalculateRevalidateIfNeeded()`
   def rebuildRecalculateRevalidateIfNeeded(): Unit = {
+
     // Process deferred behavior
     val currentDeferredActionContext = deferredActionContext
 
     // NOTE: We used to clear `deferredActionContext`, but this caused events to be dispatched in a different
     // order. So we are now leaving the flag as is, and waiting until they clear themselves.
-    if (currentDeferredActionContext.rebuild)
-      containingDocument.withOutermostActionHandler {
-        Dispatch.dispatchEvent(new XFormsRebuildEvent(selfModel), EventCollector.ToReview)
-      }
+    if (currentDeferredActionContext.rebuild) {
+        Dispatch.dispatchEvent(new XXFormsRebuildStartedEvent(selfModel), EventCollector.ToReview)
+        selfModel.doRebuild()
+    }
 
-    if (currentDeferredActionContext.recalculateRevalidate)
-      containingDocument.withOutermostActionHandler {
-        Dispatch.dispatchEvent(new XFormsRecalculateEvent(selfModel), EventCollector.ToReview)
-      }
+    if (currentDeferredActionContext.recalculateRevalidate) {
+        Dispatch.dispatchEvent(new XXFormsRecalculateStartedEvent(selfModel), EventCollector.ToReview)
+        selfModel.doRecalculateRevalidate()
+    }
   }
 
   def doRebuild(): Unit = {

@@ -272,7 +272,11 @@ trait RefreshSupport {
   // - Then we check again, as refresh events might have changed things
   //
   // TODO: We might want to implement some code to detect excessive loops/recursion
-  def synchronizeAndRefresh(): Unit =
+  def synchronizeAndRefresh(): Unit = {
+
+    def needRebuildRecalculateRevalidate: Boolean =
+      allModels.exists(_.needRebuildRecalculateRevalidate)
+
     if (! containingDocument.controls.isInRefresh) // see https://github.com/orbeon/orbeon-forms/issues/1550
       while (needRebuildRecalculateRevalidate || containingDocument.controls.isRequireRefresh) {
 
@@ -280,17 +284,16 @@ trait RefreshSupport {
           rebuildRecalculateRevalidateIfNeeded()
 
         if (containingDocument.controls.isRequireRefresh)
-          containingDocument.controls.doRefresh()
+          containingDocument.controls.doRefresh() // only call to `doRefresh()`
       }
-
-  def needRebuildRecalculateRevalidate: Boolean =
-    allModels exists (_.needRebuildRecalculateRevalidate)
+  }
 
   // NOTE: It used to be (Java implementation) that childrenContainers could be modified down the line and cause a
   // ConcurrentModificationException. This should no longer happen as once we obtain a reference to
   // childrenXBLContainers, that collection doesn't change.
-  def rebuildRecalculateRevalidateIfNeeded(): Unit =
-    allModels foreach (_.rebuildRecalculateRevalidateIfNeeded())
+  def rebuildRecalculateRevalidateIfNeeded(): Unit = {
+    allModels.foreach(_.rebuildRecalculateRevalidateIfNeeded())
+  }
 
   def requireRefresh(): Unit = {
     // Note that we don't recurse into children container as for now refresh is global

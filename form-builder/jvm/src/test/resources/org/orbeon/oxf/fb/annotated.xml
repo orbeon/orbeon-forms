@@ -291,11 +291,8 @@
             <xf:action event="xforms-model-construct" target="#observer" class="fb-annotation">
                 <xf:dispatch name="fb-xforms-model-construct" targetid="|fr-form-model|"/>
             </xf:action>
-            <xf:action event="xforms-recalculate" target="#observer" class="fb-annotation">
-                <xf:dispatch name="fb-xforms-recalculate" targetid="|fr-form-model|"/>
-            </xf:action>
-            <xf:action event="xforms-revalidate" target="#observer" class="fb-annotation">
-                <xf:dispatch name="fb-xforms-revalidate" targetid="|fr-form-model|"/>
+            <xf:action event="xxforms-recalculate-started" target="#observer" class="fb-annotation">
+                <xf:dispatch name="fb-xxforms-recalculate-started" targetid="|fr-form-model|"/>
             </xf:action>
             <xf:action event="xxforms-xpath-error" target="#observer" class="fb-annotation" defaultAction="cancel">
                 <xf:dispatch name="fb-xxforms-xpath-error" targetid="|fr-form-model|"/>

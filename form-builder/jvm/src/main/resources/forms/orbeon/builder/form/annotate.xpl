@@ -86,7 +86,7 @@
                             mode="within-model"/>
 
                         <!-- Upon model creation, recalculation and revalidation, notify Form Builder -->
-                        <xsl:for-each select="('xforms-model-construct', 'xforms-recalculate', 'xforms-revalidate', 'xxforms-xpath-error')">
+                        <xsl:for-each select="('xforms-model-construct', 'xxforms-recalculate-started', 'xxforms-xpath-error')">
                             <xf:action event="{.}" target="#observer" class="fb-annotation">
                                 <!-- Upon MIP XPath error cancel the default error behavior (which otherwise can open an
                                      error dialog at inopportune times.) -->

@@ -255,6 +255,16 @@ class XFormsRebuildEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
+class XXFormsRebuildStartedEvent(target: XFormsEventTarget, properties: PropertyGetter)
+  extends XFormsEvent(XXFORMS_REBUILD_STARTED, target, properties, bubbles = true, cancelable = true) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
+class XXFormsRecalculateStartedEvent(target: XFormsEventTarget, properties: PropertyGetter)
+  extends XFormsEvent(XXFORMS_RECALCULATE_STARTED, target, properties, bubbles = true, cancelable = true) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
 class XFormsRefreshEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XFORMS_REFRESH, target, properties, bubbles = true, cancelable = true) {
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)

@@ -506,7 +506,7 @@
                         <xf:var       name="min-input-length"        value="fr:component-param-value('min-input-length')"/>
 
                         <xf:group
-                            ref=".[not($view)]"
+                            ref="if (not($view)) then . else ()"
                             xxf:element="span"
                             class="{{'fr-service-error'[instance('local')/submission-status = 'failure']}}"
                             data-placeholder="{{xxf:r('select')}}"
@@ -519,7 +519,7 @@
                             <xh:select id="select1"/>
 
                         </xf:group>
-                        <xf:input ref="$binding[$view]/@label"/>
+                        <xf:input ref="if ($view) then instance('local')/label/string() else ()"/>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

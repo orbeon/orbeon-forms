@@ -53,115 +53,117 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private var isOpenSelection              : Boolean                          = false
 
   override def init(): Unit = {
-    for (select <- Option(querySelect)) {
-      val elementWithData = queryElementWithData
-      val isDatabound     = containerElem.classList.contains(DataboundClass)
+    val isStaticReadonly = containerElem.querySelector(".xforms-static") != null
+    if (! isStaticReadonly)
+      for (select <- Option(querySelect)) {
+        val elementWithData = queryElementWithData
+        val isDatabound     = containerElem.classList.contains(DataboundClass)
 
-      // Prevent the propagation of `focusout` so the client doesn't send an `xxforms-value` event when users click on the dropdown,
-      // as at that point the `<span class="select2-selection--single">` looses the focus, and since Select2 places that element inside
-      // the element that represents the `<xf:select1>`, if that event is left to propagate, the XForms code takes that event as the
-      // `<xf:select1>` having lost the focus
-      Support.stopFocusOutPropagation(select.parentNode.asInstanceOf[html.Element], _.target, "select2-selection--single")
+        // Prevent the propagation of `focusout` so the client doesn't send an `xxforms-value` event when users click on the dropdown,
+        // as at that point the `<span class="select2-selection--single">` looses the focus, and since Select2 places that element inside
+        // the element that represents the `<xf:select1>`, if that event is left to propagate, the XForms code takes that event as the
+        // `<xf:select1>` having lost the focus
+        Support.stopFocusOutPropagation(select.parentNode.asInstanceOf[html.Element], _.target, "select2-selection--single")
 
-      locally {
-        val placeholderOpt = Option(elementWithData.getAttribute(DataPlaceholder)).filter(_.nonEmpty).map { placeholder =>
-          new Select2.Option {
-            val id   = "0"
-            val text = placeholder
-          }
-        }
-
-        def options(open: Boolean): Select2.Options =
-          new Select2.Options {
-            val allowClear         = placeholderOpt.isDefined // allowClear can be enabled only if a placeholder is defined
-            val dropdownParent     = js.undefined
-            val ajax               = if (isDatabound) Select2Ajax else null
-            val width              = "100%" // For Select2 width to update as the viewport width changes
-            val tags               = open
-            val minimumInputLength = Option(queryElementWithData.getAttribute(DataMinimumInputLength)).filter(_.nonEmpty).map(_.toInt).getOrElse(0)
-            val placeholder        = placeholderOpt.orUndefined
-          }
-        optionsWithTagsOpt    = Some(options(open = true))
-        optionsWithoutTagsOpt = Some(options(open = false))
-      }
-
-      // Init Select2
-      val jSelect = $(select)
-      optionsWithoutTagsOpt.foreach(jSelect.select2)
-
-      // Register event listeners
-      if (isDatabound) {
-        // Listen on `select2:close` instead of `change` as the latter is not triggered the first time an open value is selected
-        jSelect.on("select2:close", onChangeDispatchFrChange _)
-      }
-      jSelect.on("select2:open", onOpen _)
-      jSelect.data("select2").on("results:focus", onResultsFocus _)
-
-      // Add `aria-labelledby` pointing to the label, `aria-describedby` pointing to the help and hint
-      val comboboxElement = containerElem.querySelector(".select2-selection")
-      val LhhaSelectorAriaAttrs = List(
-        ".xforms-label"              -> "aria-labelledby",
-        ".xforms-help, .xforms-hint" -> "aria-describedby"
-      )
-      LhhaSelectorAriaAttrs.foreach { case (selector, ariaAttr) =>
-        val lhhaElems = containerElem.querySelectorAll(selector).toList.asInstanceOf[List[html.Element]]
-        if (lhhaElems.nonEmpty) {
-          val lhhaIds = lhhaElems.map(DomSupport.generateIdIfNeeded).mkString(" ")
-          comboboxElement.setAttribute(ariaAttr, lhhaIds)
-        }
-      }
-
-      // Open the dropdown on up/down arrow key press
-      containerElem
-        .querySelector(".select2-selection")
-        .addEventListener(
-          "keydown",
-          (event: dom.KeyboardEvent) => {
-            if (Set("ArrowUp", "ArrowDown")(event.key)) {
-              jSelect.select2("open")
-              event.stopPropagation() // Prevent scrolling the page
+        locally {
+          val placeholderOpt = Option(elementWithData.getAttribute(DataPlaceholder)).filter(_.nonEmpty).map { placeholder =>
+            new Select2.Option {
+              val id   = "0"
+              val text = placeholder
             }
           }
-        )
 
-      // Make the clear button accessible with the keyboard
-      def makeClearAccessible(): Unit = {
-        val clearElementOpt = Option(containerElem.querySelector(".select2-selection__clear"))
-        clearElementOpt.foreach { clearElement =>
-          clearElement.setAttribute("tabindex", "0")
-          clearElement.setAttribute("role", "button")
-          EventSupport.addListener(
-            clearElement,
-            "keydown", // Instead of `keyup`, so our listeners runs before Select2's
-            (event: dom.KeyboardEvent) =>
-              if (Set(10, 13, 32)(event.keyCode)) { // Enter and space
-                event.stopPropagation() // Prevent Select2 from opening the dropdown
-                jSelect.value("").trigger("change")
-                onChangeDispatchFrChange()
-                xformsFocus() // Move the focus from the "x", which disappeared, to the dropdown
-              }
-          )
+          def options(open: Boolean): Select2.Options =
+            new Select2.Options {
+              val allowClear         = placeholderOpt.isDefined // allowClear can be enabled only if a placeholder is defined
+              val dropdownParent     = js.undefined
+              val ajax               = if (isDatabound) Select2Ajax else null
+              val width              = "100%" // For Select2 width to update as the viewport width changes
+              val tags               = open
+              val minimumInputLength = Option(queryElementWithData.getAttribute(DataMinimumInputLength)).filter(_.nonEmpty).map(_.toInt).getOrElse(0)
+              val placeholder        = placeholderOpt.orUndefined
+            }
+          optionsWithTagsOpt    = Some(options(open = true))
+          optionsWithoutTagsOpt = Some(options(open = false))
         }
-      }
 
-      if (isDatabound) {
-        updateValueLabel()
-        updateOpenSelection()
-        onAttributeChange(elementWithData, DataValue          , updateValueLabel)
-        onAttributeChange(elementWithData, DataLabel          , updateValueLabel)
-        onAttributeChange(elementWithData, DataIsOpenSelection, updateOpenSelection)
-        // TODO:
-        // onAttributeChange(elementWithData, DataPlaceholder,  initOrUpdatePlaceholderCurrent)
-      } else {
-        // Register and remember listener on value change
-        val listener: js.Function = onXFormsSelect1ValueChange _
-        onXFormsSelect1ValueChangeJs = Some(listener)
-        Controls.afterValueChange.subscribe(listener)
-      }
+        // Init Select2
+        val jSelect = $(select)
+        optionsWithoutTagsOpt.foreach(jSelect.select2)
 
-      makeClearAccessible()
-      onElementAdded(containerElem, ".select2-selection__clear", makeClearAccessible)
-    }
+        // Register event listeners
+        if (isDatabound) {
+          // Listen on `select2:close` instead of `change` as the latter is not triggered the first time an open value is selected
+          jSelect.on("select2:close", onChangeDispatchFrChange _)
+        }
+        jSelect.on("select2:open", onOpen _)
+        jSelect.data("select2").on("results:focus", onResultsFocus _)
+
+        // Add `aria-labelledby` pointing to the label, `aria-describedby` pointing to the help and hint
+        val comboboxElement = containerElem.querySelector(".select2-selection")
+        val LhhaSelectorAriaAttrs = List(
+          ".xforms-label"              -> "aria-labelledby",
+          ".xforms-help, .xforms-hint" -> "aria-describedby"
+        )
+        LhhaSelectorAriaAttrs.foreach { case (selector, ariaAttr) =>
+          val lhhaElems = containerElem.querySelectorAll(selector).toList.asInstanceOf[List[html.Element]]
+          if (lhhaElems.nonEmpty) {
+            val lhhaIds = lhhaElems.map(DomSupport.generateIdIfNeeded).mkString(" ")
+            comboboxElement.setAttribute(ariaAttr, lhhaIds)
+          }
+        }
+
+        // Open the dropdown on up/down arrow key press
+        containerElem
+          .querySelector(".select2-selection")
+          .addEventListener(
+            "keydown",
+            (event: dom.KeyboardEvent) => {
+              if (Set("ArrowUp", "ArrowDown")(event.key)) {
+                jSelect.select2("open")
+                event.stopPropagation() // Prevent scrolling the page
+              }
+            }
+          )
+
+        // Make the clear button accessible with the keyboard
+        def makeClearAccessible(): Unit = {
+          val clearElementOpt = Option(containerElem.querySelector(".select2-selection__clear"))
+          clearElementOpt.foreach { clearElement =>
+            clearElement.setAttribute("tabindex", "0")
+            clearElement.setAttribute("role", "button")
+            EventSupport.addListener(
+              clearElement,
+              "keydown", // Instead of `keyup`, so our listeners runs before Select2's
+              (event: dom.KeyboardEvent) =>
+                if (Set(10, 13, 32)(event.keyCode)) { // Enter and space
+                  event.stopPropagation() // Prevent Select2 from opening the dropdown
+                  jSelect.value("").trigger("change")
+                  onChangeDispatchFrChange()
+                  xformsFocus() // Move the focus from the "x", which disappeared, to the dropdown
+                }
+            )
+          }
+        }
+
+        if (isDatabound) {
+          updateValueLabel()
+          updateOpenSelection()
+          onAttributeChange(elementWithData, DataValue          , updateValueLabel)
+          onAttributeChange(elementWithData, DataLabel          , updateValueLabel)
+          onAttributeChange(elementWithData, DataIsOpenSelection, updateOpenSelection)
+          // TODO:
+          // onAttributeChange(elementWithData, DataPlaceholder,  initOrUpdatePlaceholderCurrent)
+        } else {
+          // Register and remember listener on value change
+          val listener: js.Function = onXFormsSelect1ValueChange _
+          onXFormsSelect1ValueChangeJs = Some(listener)
+          Controls.afterValueChange.subscribe(listener)
+        }
+
+        makeClearAccessible()
+        onElementAdded(containerElem, ".select2-selection__clear", makeClearAccessible)
+      }
   }
 
   override def destroy(): Unit = {

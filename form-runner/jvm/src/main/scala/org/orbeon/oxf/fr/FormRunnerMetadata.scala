@@ -211,7 +211,7 @@ object FormRunnerMetadata {
     val collector: ErrorEventCollector = EventCollector.Throw
 
     def instanceInScope(control: XFormsSingleNodeControl, staticId: String): Option[XFormsInstance] =
-      control.container.resolveObjectByIdInScope(control.getEffectiveId, staticId, None) flatMap
+      control.container.resolveObjectByIdInScope(control.effectiveId, staticId, None) flatMap
         (_.narrowTo[XFormsInstance])
 
     def resourcesInstance(control: XFormsSingleNodeControl): Option[XFormsInstance] =
@@ -319,7 +319,7 @@ object FormRunnerMetadata {
     val controls = doc.controls.getCurrentControlTree.effectiveIdsToControls
 
     def instanceInScope(control: XFormsSingleNodeControl, staticId: String): Option[XFormsInstance] =
-      control.container.resolveObjectByIdInScope(control.getEffectiveId, staticId, None) flatMap
+      control.container.resolveObjectByIdInScope(control.effectiveId, staticId, None) flatMap
         (_.narrowTo[XFormsInstance])
 
     def resourcesInstance(control: XFormsSingleNodeControl): Option[XFormsInstance] =

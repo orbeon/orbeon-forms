@@ -106,7 +106,7 @@ class EchoSubmission(submission: XFormsModelSubmission)
 
     Left(
       ConnectResultT(
-        submission.getEffectiveId,
+        submission.effectiveId,
         Success((submission.getReplacer(cxr, submissionParameters)(submission.getIndentedLogger), cxr)))
     ).some
   }

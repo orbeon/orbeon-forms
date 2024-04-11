@@ -100,7 +100,7 @@ class ItemsetActionTest
 
             val (cityControl, zipControl) = resolveCityAndZipControls(indexes)
 
-            setControlValueWithEventSearchNested(cityControl.getEffectiveId, cityToSet)
+            setControlValueWithEventSearchNested(cityControl.effectiveId, cityToSet)
             setControlValueWithEventSearchNested(zipControl.effectiveId, zipToSet)
 
             assertRowValues(indexes, cityToSet, zipToSet)
@@ -152,7 +152,7 @@ class ItemsetActionTest
 
             // Switch to CA
             withAssertNewCountsAndWindowsAndOrphans(List("itemsetid" -> 1, "itemsetmap" -> 1)) {
-              setControlValueWithEventSearchNested(stateControl.getEffectiveId, stateValue)
+              setControlValueWithEventSearchNested(stateControl.effectiveId, stateValue)
               assert(stateValue === getControlValue(stateControl.effectiveId))
             }
 
@@ -180,7 +180,7 @@ class ItemsetActionTest
             }
 
             // Change state
-            setControlValueWithEventSearchNested(stateControl.getEffectiveId, "AK")
+            setControlValueWithEventSearchNested(stateControl.effectiveId, "AK")
             assert("AK" === getControlValue(stateControl.effectiveId))
 
             // Check that all values are cleared on all iterations, and that the city itemsets are updated

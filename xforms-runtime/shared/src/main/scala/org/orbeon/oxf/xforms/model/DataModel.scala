@@ -152,7 +152,7 @@ object DataModel {
   }
 
   private def findInstanceEffectiveId(containingDocument: XFormsContainingDocument, nodeInfo: NodeInfo) =
-    containingDocument.instanceForNodeOpt(nodeInfo) map (_.getEffectiveId)
+    containingDocument.instanceForNodeOpt(nodeInfo) map (_.effectiveId)
 
   private def logValueChange(
     source              : String,

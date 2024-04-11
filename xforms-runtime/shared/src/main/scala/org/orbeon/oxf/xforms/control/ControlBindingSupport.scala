@@ -100,14 +100,14 @@ trait ControlBindingSupport {
 
   // Default binding evaluation
   protected def computeBinding(parentContext: BindingContext, collector: ErrorEventCollector): BindingContext = {
-    val contextStack = container.getContextStack
+    val contextStack = container.contextStack
     contextStack.setBinding(parentContext)
     contextStack.pushBinding(element, effectiveId, staticControl.scope, this, collector) // xxx event won't reach non-relevant control
     contextStack.getCurrentBindingContext
   }
 
   final protected def computeBindingCopy(context: BindingContext): BindingContext = {
-    val contextStack = container.getContextStack
+    val contextStack = container.contextStack
     contextStack.setBinding(context)
     contextStack.pushCopy()
   }

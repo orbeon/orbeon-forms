@@ -23,8 +23,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
  *
  * TODO: Use inheritance/interface to make this a single-node control that doesn't hold a value.
  */
-class XFormsTriggerControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-    extends XFormsSingleNodeControl(container, parent, element, id)
+class XFormsTriggerControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
+    extends XFormsSingleNodeControl(container, parent, element, _effectiveId)
     with SingleNodeFocusableTrait {
 
   import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl._

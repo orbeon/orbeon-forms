@@ -30,5 +30,5 @@ case class DynamicActionContext(
   def container          = interpreter.actionXPathContext.container
   def containingDocument = interpreter.containingDocument
   def bindingContext     = interpreter.actionXPathContext.getCurrentBindingContext
-  def partAnalysis       = container.getPartAnalysis
+  def partAnalysis       = container.partAnalysis
 }

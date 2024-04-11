@@ -28,7 +28,7 @@ class XXFormsListModels extends XFormsFunction {
     val it =
       for {
         model       <- XFormsFunction.getContainingDocument.allModels
-        effectiveId = model.getEffectiveId
+        effectiveId = model.effectiveId
         absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
       } yield
         absoluteId

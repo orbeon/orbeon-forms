@@ -146,7 +146,7 @@ object XFormsModelBinds {
       contextItems        = bindNode.parentBind.items,
       contextPosition     = bindNode.position,
       compiledExpression  = xpathMIP.compiledExpression,
-      functionContext     = model.getContextStack.getFunctionContext(model.getEffectiveId, Some(bindNode)),
+      functionContext     = model.getContextStack.getFunctionContext(model.effectiveId, Some(bindNode)),
       variableResolver    = model.variableResolver
     ).asInstanceOf[Boolean]
 
@@ -160,7 +160,7 @@ object XFormsModelBinds {
       contextItems       = bindNode.parentBind.items,
       contextPosition    = bindNode.position,
       compiledExpression = xpathMIP.compiledExpression,
-      functionContext    = model.getContextStack.getFunctionContext(model.getEffectiveId, Some(bindNode)),
+      functionContext    = model.getContextStack.getFunctionContext(model.effectiveId, Some(bindNode)),
       variableResolver   = model.variableResolver
     )
 

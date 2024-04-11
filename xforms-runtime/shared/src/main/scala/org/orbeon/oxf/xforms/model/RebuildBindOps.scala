@@ -34,7 +34,7 @@ trait RebuildBindOps {
 
   // Rebuild all binds, computing all bind nodesets (but not computing the MIPs)
   def rebuild(): Unit =
-    withDebug("performing rebuild", List("model id" -> model.getEffectiveId)) {
+    withDebug("performing rebuild", List("model id" -> model.effectiveId)) {
 
       // NOTE: Assume that model.getContextStack().resetBindingContext(model) was called
 

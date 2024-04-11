@@ -143,7 +143,7 @@ trait CommonFunctionSupport {
         // Otherwise resolve the id passed against the source id
         val staticOrAbsoluteId = expr.evaluateAsString(xpc).toString
         resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map
-          (_.getEffectiveId)
+          (_.effectiveId)
     }
 
   def sourceScope(implicit xpc: XPathContext, xfc: Context): Scope =
@@ -163,7 +163,7 @@ trait CommonFunctionSupport {
     elementAnalysisForSource flatMap (XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, _))
 
   def getContainingDocument(implicit xpc: XPathContext): XFormsContainingDocument =
-    Option(context) map (_.container.getContainingDocument) orNull
+    Option(context) map (_.container.containingDocument) orNull
 
   def getQNameFromItem(
     evaluatedExpression: om.Item)(implicit

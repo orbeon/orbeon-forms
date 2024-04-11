@@ -446,7 +446,7 @@ object XFormsServer {
                     }
 
                   val afterFocusEffectiveIdOpt =
-                    afterFocusedControlOpt map (_.getEffectiveId)
+                    afterFocusedControlOpt map (_.effectiveId)
 
                   (beforeFocusEffectiveIdOpt, afterFocusEffectiveIdOpt) match {
                     case (Some(beforeFocusEffectiveId), None) =>

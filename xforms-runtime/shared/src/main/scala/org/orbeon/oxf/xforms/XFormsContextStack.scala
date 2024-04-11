@@ -95,14 +95,14 @@ class XFormsContextStack {
   def this(container: XBLContainer) = {
     this()
     this.container = container
-    this.containingDocument = container.getContainingDocument
+    this.containingDocument = container.containingDocument
   }
 
   // Constructor for `XFormsModelAction` and `XFormsActionInterpreter`
   def this(container: XBLContainer, parentBindingContext: BindingContext) = {
     this()
     this.container = container
-    this.containingDocument = this.container.getContainingDocument
+    this.containingDocument = this.container.containingDocument
     this.parentBindingContext = parentBindingContext
     // Push a copy of the parent binding
     this.head = pushCopy(parentBindingContext)
@@ -205,7 +205,7 @@ class XFormsContextStack {
 
       val variableInfos =
         variables map { variable =>
-          variable.name -> scopeVariable(variable, model.getEffectiveId, model, collector).value
+          variable.name -> scopeVariable(variable, model.effectiveId, model, collector).value
         } toMap
 
       val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)

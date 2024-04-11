@@ -40,11 +40,11 @@ import scala.util.control.NonFatal
  * Represents an xf:output control.
  */
 class XFormsOutputControl(
-  container : XBLContainer,
-  parent    : XFormsControl,
-  element   : Element,
-  id        : String
-) extends XFormsSingleNodeControl(container, parent, element, id)
+  container   : XBLContainer,
+  parent      : XFormsControl,
+  element     : Element,
+  _effectiveId: String
+) extends XFormsSingleNodeControl(container, parent, element, _effectiveId)
   with XFormsValueControl
   with ReadonlySingleNodeFocusableTrait
   with VisitableTrait
@@ -134,7 +134,7 @@ class XFormsOutputControl(
       Map.empty[String, List[String]]
     ) { failFastCollector =>
       SubmissionHeaders.evaluateHeaders(
-        getEffectiveId,
+        effectiveId,
         staticControl,
         headersToForward,
         this,

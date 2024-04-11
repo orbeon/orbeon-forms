@@ -248,7 +248,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   def listModels()(implicit xfc: XFormsFunction.Context): Iterator[String] =
     for {
       model       <- xfc.containingDocument.allModels
-      effectiveId = model.getEffectiveId
+      effectiveId = model.effectiveId
       absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
     } yield
       absoluteId
@@ -262,7 +262,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     for {
       model       <- modelOpt.iterator
       instance    <- model.instancesIterator
-      effectiveId = instance.getEffectiveId
+      effectiveId = instance.effectiveId
       absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
     } yield
       absoluteId
@@ -456,11 +456,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
   def absoluteId(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
-    resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map (_.getEffectiveId) map XFormsId.effectiveIdToAbsoluteId
+    resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map (_.effectiveId) map XFormsId.effectiveIdToAbsoluteId
 
   @XPathFunction
   def clientId(staticOrAbsoluteId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
-    resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map (_.getEffectiveId)
+    resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map (_.effectiveId)
 
   @XPathFunction
   def controlElement(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[om.NodeInfo] =

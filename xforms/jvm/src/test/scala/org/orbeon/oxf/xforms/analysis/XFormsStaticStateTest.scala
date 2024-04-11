@@ -119,7 +119,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
     val mockModel = Mockito.mock(classOf[XFormsModel])
     Mockito.when(mockModel.getPrefixedId).thenReturn(XFormsId.getPrefixedId(effectiveId))
     Mockito.when(mockModel.effectiveId).thenReturn(effectiveId)
-    Mockito.when(mockModel.getEffectiveId).thenReturn(effectiveId)
+    Mockito.when(mockModel.effectiveId).thenReturn(effectiveId)
     Mockito.when(mockModel.sequenceNumber).thenReturn(sequenceNumber)
     mockModel
   }
@@ -127,7 +127,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
   private def mockInstance(effectiveId: String, model: XFormsModel) = {
     val mockInstance = Mockito.mock(classOf[XFormsInstance])
     Mockito.when(mockInstance.getPrefixedId).thenReturn(XFormsId.getPrefixedId(effectiveId))
-    Mockito.when(mockInstance.getEffectiveId).thenReturn(effectiveId)
+    Mockito.when(mockInstance.effectiveId).thenReturn(effectiveId)
     Mockito.when(mockInstance.model).thenReturn(model)
     mockInstance
   }

@@ -220,7 +220,7 @@ class PathMapXPathDependencies(
 
           val matchesRepeatIterations =
             ! controlIsWithinRepeat ||
-            controlIndexes.startsWith(XFormsId.getEffectiveIdSuffixParts(instancesByKey(instanceKey).getEffectiveId))
+            controlIndexes.startsWith(XFormsId.getEffectiveIdSuffixParts(instancesByKey(instanceKey).effectiveId))
 
           matchesRepeatIterations &&
             setsHaveIntersection(

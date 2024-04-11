@@ -213,14 +213,14 @@ object XFormsEvent {
     "target"                       -> (e => Option(e.targetObject.getId)),
     xxfName("target")              -> (e => Option(e.targetObject.getId)),
     xxfName("targetid")            -> (e => Option(e.targetObject.getId)),
-    xxfName("absolute-targetid")   -> (e => Option(XFormsId.effectiveIdToAbsoluteId(e.targetObject.getEffectiveId))),
+    xxfName("absolute-targetid")   -> (e => Option(XFormsId.effectiveIdToAbsoluteId(e.targetObject.effectiveId))),
     "event"                        -> (e => Option(e.name)),
     xxfName("type")                -> (e => Option(e.name)),
     xxfName("bubbles")             -> (e => Option(e.bubbles)),
     xxfName("cancelable")          -> (e => Option(e.cancelable)),
     xxfName("phase")               -> (e => Option(e.currentPhase.name)),
     xxfName("observerid")          -> (e => Option(e.currentObserver.getId)),
-    xxfName("absolute-observerid") -> (e => Option(XFormsId.effectiveIdToAbsoluteId(e.currentObserver.getEffectiveId))),
+    xxfName("absolute-observerid") -> (e => Option(XFormsId.effectiveIdToAbsoluteId(e.currentObserver.effectiveId))),
     "repeat-indexes"               -> repeatIndexes,
     xxfName("repeat-indexes")      -> repeatIndexes,
     xxfName("repeat-ancestors")    -> repeatAncestors,
@@ -229,15 +229,15 @@ object XFormsEvent {
 
   // NOTE: should ideally be Option[Seq[Int]]. At this time XForms callers assume Option[Seq[String]].
   private def repeatIndexes(e: XFormsEvent): Option[Seq[String]] = {
-    val result = Some(XFormsId.getEffectiveIdSuffixParts(e.targetObject.getEffectiveId).toList map (_.toString))
+    val result = Some(XFormsId.getEffectiveIdSuffixParts(e.targetObject.effectiveId).toList map (_.toString))
     result
   }
 
   private def repeatAncestors(e: XFormsEvent): Option[Seq[String]] =
-    if (XFormsId.hasEffectiveIdSuffix(e.targetObject.getEffectiveId)) {
+    if (XFormsId.hasEffectiveIdSuffix(e.targetObject.effectiveId)) {
       // There is a suffix so compute
       val ancestorRepeats =
-        e.containingDocument.staticOps.getAncestorRepeatIds(XFormsId.getPrefixedId(e.targetObject.getEffectiveId))
+        e.containingDocument.staticOps.getAncestorRepeatIds(XFormsId.getPrefixedId(e.targetObject.effectiveId))
 
       Some(ancestorRepeats map XFormsId.getStaticIdFromId)
     } else
@@ -245,5 +245,5 @@ object XFormsEvent {
       None
 
   private def targetPrefixes(e: XFormsEvent): Option[Seq[String]] =
-    Some(XFormsId.getEffectiveIdPrefixParts(e.targetObject.getEffectiveId).toList)
+    Some(XFormsId.getEffectiveIdPrefixParts(e.targetObject.effectiveId).toList)
 }

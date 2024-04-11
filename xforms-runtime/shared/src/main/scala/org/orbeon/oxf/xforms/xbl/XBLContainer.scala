@@ -69,9 +69,9 @@ class XBLContainer(
     parentXBLContainer : XBLContainer,
     innerScope         : Scope
   ) = this(
-      associatedControl.getEffectiveId,
-      XFormsId.getPrefixedId(associatedControl.getEffectiveId),
-      XFormsId.getPrefixedId(associatedControl.getEffectiveId) + ComponentSeparator,
+      associatedControl.effectiveId,
+      XFormsId.getPrefixedId(associatedControl.effectiveId),
+      XFormsId.getPrefixedId(associatedControl.effectiveId) + ComponentSeparator,
       Some(parentXBLContainer ensuring (_ ne null)),
       Some(associatedControl  ensuring (_ ne null)),
       innerScope
@@ -98,16 +98,10 @@ class XBLContainer(
   private var _childrenXBLContainers: mutable.Buffer[XBLContainer] = mutable.ArrayBuffer()
   def childrenXBLContainers = _childrenXBLContainers.iterator
 
-  def effectiveId = _effectiveId
-  def partAnalysis: PartAnalysis = parentXBLContainer map (_.partAnalysis) orNull
+  def effectiveId: String = _effectiveId
+  def partAnalysis: PartAnalysis = parentXBLContainer.map(_.partAnalysis).orNull
 
-  // Legacy getters/setters
-  def getEffectiveId        = _effectiveId
-//  def getPrefixedId         = prefixedId
-  def getFullPrefix         = fullPrefix
-  def getContainingDocument = containingDocument
-  def getContextStack       = contextStack
-  final def getPartAnalysis = partAnalysis
+  def getEffectiveId = _effectiveId // for `XFormsObject` trait only
 
   // Create a new container child of the given control
   // NOTE: Require passing the `ConcreteBinding` to help ensure that the control does have it.
@@ -135,7 +129,7 @@ class XBLContainer(
     for (currentModel <- models) {
 
       val newModelEffectiveId =
-        XFormsId.getPrefixedId(currentModel.getEffectiveId) +
+        XFormsId.getPrefixedId(currentModel.effectiveId) +
           XFormsId.getEffectiveIdSuffixWithSeparator(effectiveId)
 
       currentModel.updateEffectiveId(newModelEffectiveId)
@@ -358,7 +352,7 @@ trait ContainerResolver {
       val scope = partAnalysis.scopeForPrefixedId(sourcePrefixedId)
       val repeatPrefixedId = scope.prefixedIdForStaticId(repeatStaticId)
 
-      getPartAnalysis.findControlAnalysis(repeatPrefixedId) match {
+      partAnalysis.findControlAnalysis(repeatPrefixedId) match {
         case Some(_: RepeatControl) => Some(0)
         case _                      => None
       }
@@ -457,9 +451,9 @@ trait ContainerResolver {
           followIndexes
         )
 
-      controls find (c => ! isEffectiveIdResolvableByThisContainer(c.getEffectiveId)) foreach { c =>
+      controls find (c => ! isEffectiveIdResolvableByThisContainer(c.effectiveId)) foreach { c =>
         // This should not happen!
-        throw new OXFException(s"Resulting control is not in proper scope: `${c.getEffectiveId}`")
+        throw new OXFException(s"Resulting control is not in proper scope: `${c.effectiveId}`")
       }
 
       controls
@@ -506,7 +500,7 @@ trait ContainerResolver {
 
   def findFirstControlEffectiveId: Option[String] =
     // We currently don't have a real notion of a "root" control, so we resolve against the first control if any
-    getChildrenControls(containingDocument.controls).headOption map (_.getEffectiveId)
+    getChildrenControls(containingDocument.controls).headOption map (_.effectiveId)
 
   def getChildrenControls(controls: XFormsControls): Iterable[XFormsControl] =
     associatedControlOpt match {

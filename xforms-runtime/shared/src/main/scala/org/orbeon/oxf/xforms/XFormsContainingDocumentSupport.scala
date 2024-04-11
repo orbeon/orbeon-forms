@@ -428,7 +428,7 @@ trait ContainingDocumentProperties {
         contextItems       = bindingContext.nodeset,
         contextPosition    = bindingContext.position,
         compiledExpression = expr,
-        functionContext    = defaultModel.getContextStack.getFunctionContext(defaultModel.getEffectiveId, bindingContext),
+        functionContext    = defaultModel.getContextStack.getFunctionContext(defaultModel.effectiveId, bindingContext),
         variableResolver   = defaultModel.variableResolver
       )(getRequestStats.getReporter)
     }

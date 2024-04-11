@@ -247,11 +247,11 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     // - that the target is not a non-relevant or readonly control
     def checkEventTarget(event: XFormsEvent): Boolean = {
       val eventTarget = event.targetObject
-      val newReference = doc.getObjectByEffectiveId(eventTarget.getEffectiveId)
+      val newReference = doc.getObjectByEffectiveId(eventTarget.effectiveId)
 
       def warn(condition: String) = {
         debug("ignoring invalid client event on " + condition, Seq(
-          "control id" -> eventTarget.getEffectiveId,
+          "control id" -> eventTarget.effectiveId,
           "event name" -> event.name)
         )(doc.indentedLogger)
         false
@@ -320,7 +320,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     implicit val CurrentLogger = doc.getIndentedLogger(LOGGING_CATEGORY)
 
     val target            = event.targetObject
-    val targetEffectiveId = target.getEffectiveId
+    val targetEffectiveId = target.effectiveId
     val eventName         = event.name
 
     withDebug("handling external event", Seq("target id" -> targetEffectiveId, "event name" -> eventName)) {
@@ -406,7 +406,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
           if (! explicitlyAllowed)
             debug(
               "ignoring invalid client event on target",
-              List("id" -> eventTarget.getEffectiveId, "event name" -> event.eventName)
+              List("id" -> eventTarget.effectiveId, "event name" -> event.eventName)
             )
           explicitlyAllowed
         }
@@ -417,7 +417,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         // Event is trusted, don't check if it is allowed
         debug(
           "processing trusted event",
-          List("target id" -> eventTarget.getEffectiveId, "event name" -> event.eventName)
+          List("target id" -> eventTarget.effectiveId, "event name" -> event.eventName)
         )
       else if (! checkAllowedExternalEvents)
         return None // event is not trusted and is not allowed

@@ -55,7 +55,7 @@ object XFormsError {
 
   // `xxforms-binding-error` in model and on controls
   def handleNonFatalBindingError(target: XFormsEventTarget, locationData: Option[LocationData], reason: Option[BindingErrorReason]): Unit = {
-    val containingDocument = target.container.getContainingDocument
+    val containingDocument = target.container.containingDocument
     val message            = reason.map(_.message).getOrElse("exception while setting value")
     containingDocument.indentedLogger.logInfo("", message)
     containingDocument.addServerError(ServerError(message, locationData))
@@ -108,17 +108,17 @@ object XFormsError {
   ): Unit = {
 
     if (
-      container.getPartAnalysis.isTopLevelPart     &&   // LATER: Other sub-parts could be fatal, depending on settings on `xxf:dynamic`.
-      container.getContainingDocument.initializing && (
+      container.partAnalysis.isTopLevelPart     &&   // LATER: Other sub-parts could be fatal, depending on settings on `xxf:dynamic`.
+      container.containingDocument.initializing && (
         mustNotRecoverOnInit || (
           ! isNormallyRecoverableOnInit &&
-          ! container.getContainingDocument.allowErrorRecoveryOnInit
+          ! container.containingDocument.allowErrorRecoveryOnInit
         )
       )
     ) {
       throw throwableOpt.getOrElse(new OXFException(serverError.message))
     } else {
-      val containingDocument = container.getContainingDocument
+      val containingDocument = container.containingDocument
       containingDocument.indentedLogger.logInfo("", serverError.message)
       containingDocument.addServerError(serverError)
     }

@@ -153,7 +153,7 @@ object XFormsSelect1Handler {
         // Get group name from selection control if possible
         val name =
           control match {
-            case c: XFormsSelect1Control => c.getGroupName.getOrElse(c.getEffectiveId)
+            case c: XFormsSelect1Control => c.getGroupName.getOrElse(c.effectiveId)
             case _                       => itemName // `$xforms-item-name$` or `effectiveId`
           }
 

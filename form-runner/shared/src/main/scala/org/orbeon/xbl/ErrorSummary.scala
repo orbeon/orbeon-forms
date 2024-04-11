@@ -131,7 +131,7 @@ object ErrorSummary {
     val event =
       inScopeContainingDocument.currentEventOpt getOrElse (throw new IllegalStateException)
 
-    val absoluteTargetId = XFormsId.effectiveIdToAbsoluteId(event.targetObject.getEffectiveId)
+    val absoluteTargetId = XFormsId.effectiveIdToAbsoluteId(event.targetObject.effectiveId)
 
     val currentErrorOpt = SaxonUtils.selectID(errorsInstanceDoc, absoluteTargetId)
 

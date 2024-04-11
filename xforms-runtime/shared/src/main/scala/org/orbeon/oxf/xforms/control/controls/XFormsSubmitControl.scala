@@ -29,8 +29,8 @@ import org.orbeon.xforms.XFormsNames.SUBMISSION_QNAME
 /**
  * xf:submit control.
  */
-class XFormsSubmitControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-    extends XFormsTriggerControl(container, parent, element, id) {
+class XFormsSubmitControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
+    extends XFormsTriggerControl(container, parent, element, _effectiveId) {
 
   override def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
     // Do the default stuff upon receiving a DOMActivate event

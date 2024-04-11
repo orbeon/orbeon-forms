@@ -159,9 +159,9 @@ object FileMetadata {
     XFormsCrossPlatformSupport.getUploadProgress(
       XFormsCrossPlatformSupport.externalContext.getRequest,
       metadata.containingDocument.uuid,
-      metadata.getEffectiveId
+      metadata.effectiveId
     ) filter
-      (_.fieldName == metadata.getEffectiveId)
+      (_.fieldName == metadata.effectiveId)
 
   private def getMetadataValue(
     m                : FileMetadata,
@@ -170,7 +170,7 @@ object FileMetadata {
   ): String = {
     val contextStack = m.getContextStack
     contextStack.setBinding(m.bindingContext)
-    contextStack.pushBinding(singleItemBinding, m.getEffectiveId, m, collector)
+    contextStack.pushBinding(singleItemBinding, m.effectiveId, m, collector)
     DataModel.getValue(contextStack.getCurrentBindingContext.getSingleItemOrNull)
   }
 
@@ -186,7 +186,7 @@ object FileMetadata {
 
     val contextStack = m.getContextStack
     contextStack.setBinding(m.bindingContext)
-    contextStack.pushBinding(singleItemBinding, m.getEffectiveId, m, collector)
+    contextStack.pushBinding(singleItemBinding, m.effectiveId, m, collector)
 
     contextStack.getCurrentBindingContext.singleNodeOpt foreach { currentSingleNode =>
       DataModel.setValueIfChanged(

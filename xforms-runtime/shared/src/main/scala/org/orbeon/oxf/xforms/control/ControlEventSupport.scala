@@ -34,7 +34,7 @@ trait ControlEventSupport extends ListenersTrait {
       // Find current path through ancestor xf:repeat elements, if any
       val repeatIterationsToModify =
         new AncestorOrSelfIterator(self) collect
-          { case ri: XFormsRepeatIterationControl if ! ri.isCurrentIteration => ri.getEffectiveId }
+          { case ri: XFormsRepeatIterationControl if ! ri.isCurrentIteration => ri.effectiveId }
 
       // NOTE: It would be nice to review whether it makes sense to re-obtain controls by id in the code below. Is
       // there a use case for it? Events can be dispatched via setIndex(), which means that repeats and relevance
@@ -78,7 +78,7 @@ trait ControlEventSupport extends ListenersTrait {
       }
 
     case _: XFormsHelpEvent =>
-      containingDocument.setClientHelpEffectiveControlId(getEffectiveId)
+      containingDocument.setClientHelpEffectiveControlId(effectiveId)
     case ev: XXFormsXPathErrorEvent =>
       XFormsError.handleNonFatalXPathError(container, ev.throwableOpt, ev.combinedMessage)
     case ev: XXFormsBindingErrorEvent =>

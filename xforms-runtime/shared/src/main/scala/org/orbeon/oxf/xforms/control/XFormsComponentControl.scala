@@ -46,12 +46,12 @@ class XFormsValueComponentControl(
   container   : XBLContainer,
   parent      : XFormsControl,
   element     : Element,
-  effectiveId : String
+  _effectiveId: String
 ) extends XFormsComponentControl(
   container,
   parent,
   element,
-  effectiveId
+  _effectiveId
 ) with XFormsValueControl {
 
   // TODO: Fix hierarchy! We don't necessarily have `StaticLHHASupport`, in particular.
@@ -177,8 +177,8 @@ class XFormsComponentControl(
   container   : XBLContainer,
   parent      : XFormsControl,
   element     : Element,
-  effectiveId : String
-) extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
+  _effectiveId: String
+) extends XFormsSingleNodeContainerControl(container, parent, element, _effectiveId) {
 
   override type Control <: ComponentControl
 
@@ -244,7 +244,7 @@ class XFormsComponentControl(
       // Start with inner context
       // For nested event handlers, this still works, because the nested handler can never match the inner scope. So
       // the context goes inner context -> component binding.
-      val contextStack = nestedContainer.getContextStack
+      val contextStack = nestedContainer.contextStack
       contextStack.setParentBindingContext(bindingContext)
       contextStack.resetBindingContext(collector)
       contextStack.getCurrentBindingContext
@@ -494,7 +494,7 @@ class XFormsComponentControl(
     super.updateEffectiveId()
 
     // Update container with new effective id
-    nestedContainerOpt foreach (_.updateEffectiveId(getEffectiveId))
+    nestedContainerOpt foreach (_.updateEffectiveId(effectiveId))
   }
 
   override def iterationRemoved(): Unit = {

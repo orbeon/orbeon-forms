@@ -109,10 +109,10 @@ object XFormsControlFactory {
   // Create a new XForms control. The control returned may be a built-in standard control, a built-in extension
   // control, or a custom component.
   def createXFormsControl(
-    container     : XBLContainer,
-    parent        : XFormsControl,
-    staticElement : ElementAnalysis,
-    effectiveId   : String
+    container    : XBLContainer,
+    parent       : XFormsControl,
+    staticElement: ElementAnalysis,
+    effectiveId  : String
   ): Option[XFormsControl] = {
 
     val factory =

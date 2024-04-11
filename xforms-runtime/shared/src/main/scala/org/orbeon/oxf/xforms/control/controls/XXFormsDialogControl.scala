@@ -186,7 +186,7 @@ class XXFormsDialogControl(
       var doOutputElement = false
 
       val atts = new AttributesImpl
-      atts.addAttribute("", "id", "id", CDATA, containingDocument.namespaceId(getEffectiveId))
+      atts.addAttribute("", "id", "id", CDATA, containingDocument.namespaceId(effectiveId))
 
       val visible = isDialogVisible
       if (previousControl.isEmpty || previousDialog.exists(_.wasDialogVisible != visible)) {

@@ -32,7 +32,7 @@ class XFormsControlsTest
   private def getContainingDocument(id: String): XFormsContainingDocument = {
 
     val doc = Mockito.mock(classOf[XFormsContainingDocument])
-    Mockito.when(doc.getContainingDocument).thenReturn(doc)
+    Mockito.when(doc.containingDocument).thenReturn(doc)
 
     val elementAnalysis = Mockito.mock(classOf[ElementAnalysis])
     Mockito.when(elementAnalysis.staticId).thenReturn(id)
@@ -40,7 +40,7 @@ class XFormsControlsTest
 
     val partAnalysis = Mockito.mock(classOf[PartAnalysis])
     Mockito.when(partAnalysis.getControlAnalysis(ArgumentMatchers.anyString)).thenReturn(elementAnalysis)
-    Mockito.when(doc.getPartAnalysis).thenReturn(partAnalysis)
+    Mockito.when(doc.partAnalysis).thenReturn(partAnalysis)
 
     doc
   }

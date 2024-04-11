@@ -205,7 +205,7 @@ object InstanceReplacer extends Replacer {
 
                   debug(
                     s"replacing instance with ${if (submissionParameters.isReadonly) "read-only" else "mutable"} instance",
-                    List("instance"-> instanceToUpdate.getEffectiveId)
+                    List("instance"-> instanceToUpdate.effectiveId)
                   )
 
                   // Obtain root element to insert

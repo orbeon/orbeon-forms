@@ -85,7 +85,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
         coreCrossPlatformSupport = CoreCrossPlatformSupport
       )
 
-    val submissionEffectiveId = submission.getEffectiveId
+    val submissionEffectiveId = submission.effectiveId
 
     val messageBody: Option[Array[Byte]] =
       if (HttpMethodsWithRequestBody(submissionParameters.httpMethod))

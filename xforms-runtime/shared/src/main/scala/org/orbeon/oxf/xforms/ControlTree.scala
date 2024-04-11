@@ -56,10 +56,10 @@ private class ControlIndex {
   // Index a single controls
   def indexControl(control: XFormsControl): Unit = {
     // Remember by effective id
-    _effectiveIdsToControls.put(control.getEffectiveId, control)
+    _effectiveIdsToControls.put(control.effectiveId, control)
     // Also index children actions
     for (actionControl <- control.childrenActions)
-      _effectiveIdsToControls.put(actionControl.getEffectiveId, actionControl)
+      _effectiveIdsToControls.put(actionControl.effectiveId, actionControl)
 
     // Remember by control type (for certain controls we know we need)
     if (mustMapControl(control)) {
@@ -69,10 +69,10 @@ private class ControlIndex {
         controlsMap = new ju.LinkedHashMap[String, XFormsControl] // need for order here!
         _controlTypes.put(controlQName, controlsMap)
       }
-      controlsMap.put(control.getEffectiveId, control)
+      controlsMap.put(control.effectiveId, control)
     } else {
       collectSectionContentControl(control) foreach { componentControl =>
-        _sectionTemplateControls.put(componentControl.getEffectiveId, componentControl)
+        _sectionTemplateControls.put(componentControl.effectiveId, componentControl)
       }
     }
   }
@@ -81,20 +81,20 @@ private class ControlIndex {
   def deindexControl(control: XFormsControl): Unit = {
 
     // Remove by effective id
-    _effectiveIdsToControls.remove(control.getEffectiveId)
+    _effectiveIdsToControls.remove(control.effectiveId)
     // Also remove children actions
     for (actionControl <- control.childrenActions)
-      _effectiveIdsToControls.remove(actionControl.getEffectiveId)
+      _effectiveIdsToControls.remove(actionControl.effectiveId)
 
     // Remove by control type (for certain controls we know we need)
     if (mustMapControl(control)) {
       val controlQName = control.staticControl.element.getQName
       val controlsMap = _controlTypes.get(controlQName)
       if (controlsMap ne null)
-        controlsMap.remove(control.getEffectiveId)
+        controlsMap.remove(control.effectiveId)
     } else {
       collectSectionContentControl(control) foreach { componentControl =>
-        _sectionTemplateControls.remove(componentControl.getEffectiveId)
+        _sectionTemplateControls.remove(componentControl.effectiveId)
       }
     }
   }
@@ -221,7 +221,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
           def startVisitControl(control: XFormsControl, collector: ErrorEventCollector): Boolean = {
             // Don't handle container controls here
             if (! control.isInstanceOf[XFormsContainerControl])
-              controlsEffectiveIds += control.getEffectiveId
+              controlsEffectiveIds += control.effectiveId
 
             true
           }
@@ -229,7 +229,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
           def endVisitControl(control: XFormsControl): Unit = {
             // Add container control after all its children have been added
             if (control.isInstanceOf[XFormsContainerControl])
-              controlsEffectiveIds += control.getEffectiveId
+              controlsEffectiveIds += control.effectiveId
           }
         },
         includeCurrent,

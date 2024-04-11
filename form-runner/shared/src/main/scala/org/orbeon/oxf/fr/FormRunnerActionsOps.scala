@@ -384,7 +384,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
         controlId(targetControlName)
       )
 
-    controlsIt map (_.getEffectiveId) map XFormsId.effectiveIdToAbsoluteId toList
+    controlsIt map (_.effectiveId) map XFormsId.effectiveIdToAbsoluteId toList
   }
 
   //@XPathFunction

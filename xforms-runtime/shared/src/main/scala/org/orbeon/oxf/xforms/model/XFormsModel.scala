@@ -66,12 +66,12 @@ class XFormsModel(
   def updateEffectiveId(effectiveId: String): Unit =
     selfModel.effectiveId = effectiveId
 
-  val containingDocument: XFormsContainingDocument = container.getContainingDocument
+  val containingDocument: XFormsContainingDocument = container.containingDocument
   val sequenceNumber: Int = containingDocument.nextModelSequenceNumber()
 
   implicit val indentedLogger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
 
-  def getResolutionScope: Scope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)
+  def getResolutionScope: Scope = container.partAnalysis.scopeForPrefixedId(getPrefixedId)
 
   private val _submissions: Map[String, XFormsModelSubmission] =
     Map(
@@ -104,8 +104,8 @@ class XFormsModel(
 
     // If prefixes or suffixes don't match, object can't be found here
     if (
-      ! (container.getFullPrefix == XFormsId.getEffectiveIdPrefix(effectiveId)) ||
-        !(XFormsId.getEffectiveIdSuffix(container.getEffectiveId) == XFormsId.getEffectiveIdSuffix(effectiveId)))
+      ! (container.fullPrefix == XFormsId.getEffectiveIdPrefix(effectiveId)) ||
+        !(XFormsId.getEffectiveIdSuffix(container.effectiveId) == XFormsId.getEffectiveIdSuffix(effectiveId)))
       return None
 
     // Find by static id
@@ -244,7 +244,6 @@ trait XFormsModelEventTarget
 
   def getId: String = staticModel.staticId
   def getPrefixedId: String = staticModel.prefixedId
-  def getEffectiveId: String = effectiveId
 
   def getLocationData: LocationData = staticModel.locationData
 
@@ -389,7 +388,7 @@ trait XFormsModelInstances {
     // This can happen if the instance is not replaced, readonly and inline
     val missingInstancesIt =
       for {
-        instance <- container.getPartAnalysis.getInstances(getPrefixedId).iterator
+        instance <- container.partAnalysis.getInstances(getPrefixedId).iterator
         if _instancesMap.get(instance.staticId) eq null
       } yield
         instance

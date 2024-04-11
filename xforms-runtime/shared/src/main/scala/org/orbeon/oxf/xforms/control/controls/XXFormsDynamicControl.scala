@@ -64,8 +64,8 @@ import scala.jdk.CollectionConverters._
  *
  * In the future the hope is to make any change fully incremental.
  */
-class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-  extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
+class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
+  extends XFormsSingleNodeContainerControl(container, parent, element, _effectiveId) {
 
   case class Nested(container: XBLContainer, partAnalysis: NestedPartAnalysis, template: SAXStore, outerListener: EventListener)
 
@@ -85,7 +85,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   // TODO: This might blow if the control is non-relevant
   override def bindingContextForChildOpt(collector: ErrorEventCollector): Option[BindingContext] =
     _nested map { case Nested(container, _, _, _) =>
-      val contextStack = container.getContextStack
+      val contextStack = container.contextStack
       contextStack.setParentBindingContext(bindingContext)
       contextStack.resetBindingContext(collector)
       contextStack.getCurrentBindingContext
@@ -307,7 +307,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   // We want to remember the state of switches
   private def gatherRelevantSwitchState(start: XFormsControl) =
     ControlsIterator(start, includeSelf = false) collect
-      { case switch: XFormsSwitchControl if switch.isRelevant => switch.getEffectiveId -> switch.controlState.get } toMap
+      { case switch: XFormsSwitchControl if switch.isRelevant => switch.effectiveId -> switch.controlState.get } toMap
 
   private def gatherInstanceControls(containerOpt: Option[XBLContainer], start: XFormsControl): InstancesControls = {
 

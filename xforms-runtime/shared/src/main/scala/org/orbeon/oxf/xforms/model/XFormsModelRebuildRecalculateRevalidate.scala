@@ -136,7 +136,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
           for {
             instance           <- instancesIterator
             previouslyValid    = instance.valid
-            newlyValid         = ! invalidInstanceEffectiveIds(instance.getEffectiveId)
+            newlyValid         = ! invalidInstanceEffectiveIds(instance.effectiveId)
             if previouslyValid != newlyValid
           } yield {
             instance.valid = newlyValid // side-effect!
@@ -199,7 +199,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
             if instance.isSchemaValidation                   // we don't support validating read-only instances
             if ! _schemaValidator.validateInstance(instance) // apply schema
           } locally {
-            invalidInstanceEffectiveIds += instance.getEffectiveId
+            invalidInstanceEffectiveIds += instance.effectiveId
           }
       }
 

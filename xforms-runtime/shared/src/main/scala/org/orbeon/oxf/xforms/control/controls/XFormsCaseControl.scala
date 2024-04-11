@@ -24,8 +24,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
  *
  * NOTE: This doesn't keep the "currently selected flag". Instead, the parent xf:switch holds this information.
  */
-class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId)
+class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
+    extends XFormsNoSingleNodeContainerControl(container, parent, element, _effectiveId)
        with VisibilityTrait {
 
   override type Control <: CaseControl
@@ -37,7 +37,7 @@ class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element:
     super.computeRelevant && (! getSwitch.isXForms11Switch || isSelected)
 
   // Whether this is the currently selected case within the current switch.
-  def isSelected: Boolean = getEffectiveId == getSwitch.getSelectedCaseEffectiveId
+  def isSelected: Boolean = effectiveId == getSwitch.getSelectedCaseEffectiveId
 
   // Whether to show this case.
   def isCaseVisible: Boolean = isSelected || getSwitch.isStaticReadonly

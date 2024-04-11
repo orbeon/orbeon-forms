@@ -32,15 +32,15 @@ import scala.collection.compat._
 import scala.collection.{mutable, Set => CSet}
 
 class XFormsSelectControl(
-  container : XBLContainer,
-  parent    : XFormsControl,
-  element   : Element,
-  id        : String
+  container   : XBLContainer,
+  parent      : XFormsControl,
+  element     : Element,
+  _effectiveId: String
 ) extends XFormsSelect1Control( // TODO: bad inheritance; use shared trait if needed
   container,
   parent,
   element,
-  id
+  _effectiveId
 ) {
 
   selfControl =>

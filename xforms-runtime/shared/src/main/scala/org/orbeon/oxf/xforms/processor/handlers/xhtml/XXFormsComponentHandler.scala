@@ -111,7 +111,7 @@ class XXFormsComponentHandler(
   // NOTE: Used by `handleLabel()` above only if there is a local LHHA, and by `findTargetControlForEffectiveId`.
   override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] =
     mustFindLabelForEffectiveId(lhhaAnalysis.lhhaPlacementType) flatOption {
-      val currentControlSuffix = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
+      val currentControlSuffix = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.effectiveId)
       XFormsLHHAHandler.findLabelForEffectiveIdWithNs(lhhaAnalysis, currentControlSuffix, handlerContext)
     }
 }

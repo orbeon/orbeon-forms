@@ -12,7 +12,7 @@ case class ErrorInfo(
 )
 
 trait XFormsObject {
-  def getEffectiveId     : String
+  def effectiveId        : String
   def containingDocument : XFormsContainingDocument
 }
 

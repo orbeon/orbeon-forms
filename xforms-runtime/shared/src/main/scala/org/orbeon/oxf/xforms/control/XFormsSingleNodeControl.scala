@@ -39,8 +39,8 @@ import scala.collection.{immutable => i}
 /**
 * Control with a single-node binding (possibly optional). Such controls can have MIPs (properties coming from a model).
 */
-abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsControl(container, parent, element, effectiveId)
+abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
+    extends XFormsControl(container, parent, element, _effectiveId)
        with VisibilityTrait {
 
   import XFormsSingleNodeControl._
@@ -423,7 +423,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     // gather all events upon onCreate/onDestroy/onBindingUpdate. The behavior can change if a new refresh is
     // triggered when processing one of the events below. The order of events in that case is hard to predict.
     val valueChanged        = isValueChangedCommit()
-    val iterationMoved      = previousEffectiveIdCommit() != getEffectiveId && part.observerHasHandlerForEvent(getPrefixedId, XXFORMS_ITERATION_MOVED)
+    val iterationMoved      = previousEffectiveIdCommit() != effectiveId && part.observerHasHandlerForEvent(getPrefixedId, XXFORMS_ITERATION_MOVED)
     val validityChanged     = wasValidCommit()            != isValid
     val requiredChanged     = wasRequiredCommit()         != isRequired
     val readonlyChanged     = wasReadonlyCommit()         != isReadonly

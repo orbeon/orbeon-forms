@@ -21,15 +21,15 @@ import org.orbeon.saxon.om
 
 
 class XFormsTextareaControl(
-  container : XBLContainer,
-  parent    : XFormsControl,
-  element   : Element,
-  id        : String
+  container   : XBLContainer,
+  parent      : XFormsControl,
+  element     : Element,
+  _effectiveId: String
 ) extends XFormsSingleNodeControl(
   container,
   parent,
   element,
-  id
+  _effectiveId
 ) with XFormsValueControl with ReadonlySingleNodeFocusableTrait {
 
   // Replacement-based input sanitation

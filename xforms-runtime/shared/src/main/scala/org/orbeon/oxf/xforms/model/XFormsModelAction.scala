@@ -20,10 +20,12 @@ import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
 
-class XFormsModelAction(parent: XFormsEventTarget, eventHandler: EventHandler) extends XFormsEventHandler with XFormsObject {
+class XFormsModelAction(parent: XFormsEventTarget, eventHandler: EventHandler)
+  extends XFormsEventHandler
+  with XFormsObject {
 
-  val getEffectiveId = XFormsId.getRelatedEffectiveId(parent.getEffectiveId, eventHandler.staticId)
-  def container = parent.container
+  val effectiveId        = XFormsId.getRelatedEffectiveId(parent.effectiveId, eventHandler.staticId)
+  def container          = parent.container
   def containingDocument = parent.containingDocument
 
   // This is called by `Dispatch`
@@ -38,7 +40,7 @@ class XFormsModelAction(parent: XFormsEventTarget, eventHandler: EventHandler) e
         val contextStack = new XFormsContextStack(submission.container, submission.model.getDefaultEvaluationContext)
         contextStack.pushBinding(
           submission.staticSubmission.element,
-          submission.getEffectiveId,
+          submission.effectiveId,
           submission.model.getResolutionScope,
           submission,
           EventCollector.ToReview

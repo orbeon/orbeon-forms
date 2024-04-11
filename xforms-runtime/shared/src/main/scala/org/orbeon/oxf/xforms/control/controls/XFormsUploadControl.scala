@@ -43,8 +43,8 @@ import scala.util.control.NonFatal
 /**
  * Represents an xf:upload control.
  */
-class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-    extends XFormsSingleNodeControl(container, parent, element, id)
+class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
+    extends XFormsSingleNodeControl(container, parent, element, _effectiveId)
     with XFormsValueControl
     with SingleNodeFocusableTrait
     with FileMetadata {
@@ -128,7 +128,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 
   // TODO: Need to move to using actual unique ids here, see:
   // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Improvement-to-client-side-server-s
-  def getUploadUniqueId: String = getEffectiveId
+  def getUploadUniqueId: String = effectiveId
 
   private def handleUploadedFile(
     value    : String,
@@ -229,7 +229,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   }
 
   override def findAriaByControlEffectiveIdWithNs: Option[String] =
-    containingDocument.namespaceId(XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input")).some
+    containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input")).some
 
   override def getBackCopy(collector: ErrorEventCollector): AnyRef = {
     val cloned = super.getBackCopy(collector).asInstanceOf[XFormsUploadControl]

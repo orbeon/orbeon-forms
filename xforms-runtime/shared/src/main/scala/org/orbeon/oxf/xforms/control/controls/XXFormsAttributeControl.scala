@@ -32,12 +32,12 @@ class XXFormsAttributeControl(
   container   : XBLContainer,
   parent      : XFormsControl,
   element     : Element,
-  effectiveId : String
+  _effectiveId: String
 ) extends XFormsSingleNodeControl(
   container,
   parent,
   element,
-  effectiveId
+  _effectiveId
 ) with XFormsValueControl {
 
   import XXFormsAttributeControl._
@@ -93,7 +93,7 @@ class XXFormsAttributeControl(
   def getAttributeName: String = attributeName
 
   def getEffectiveForAttribute: String =
-    XFormsId.getRelatedEffectiveId(getEffectiveId, attributeControl.forStaticId)
+    XFormsId.getRelatedEffectiveId(effectiveId, attributeControl.forStaticId)
 
   override def getNonRelevantEscapedExternalValue: String =
     attributeName match {

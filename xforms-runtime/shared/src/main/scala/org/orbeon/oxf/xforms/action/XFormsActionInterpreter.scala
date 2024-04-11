@@ -51,7 +51,7 @@ class XFormsActionInterpreter(
   val indentedLogger     : IndentedLogger
 ) {
 
-  val containingDocument: XFormsContainingDocument = container.getContainingDocument
+  val containingDocument: XFormsContainingDocument = container.containingDocument
 
   // Return the source against which id resolutions are made for the given action element.
   def getSourceEffectiveId(actionAnalysis: ElementAnalysis): String =

@@ -412,7 +412,7 @@ object SubmissionParameters {
     val contextStack = model.getContextStack
     contextStack.pushBinding(
       staticSubmission.element,
-      dynamicSubmission.getEffectiveId,
+      dynamicSubmission.effectiveId,
       model.getResolutionScope,
       dynamicSubmission,
       EventCollector.Throw
@@ -429,7 +429,7 @@ object SubmissionParameters {
           namespaceMapping   = staticSubmission.namespaceMapping,
           variableToValueMap = bindingContext.getInScopeVariables,
           functionLibrary    = containingDocument.functionLibrary,
-          functionContext    = model.getContextStack.getFunctionContext(dynamicSubmission.getEffectiveId),
+          functionContext    = model.getContextStack.getFunctionContext(dynamicSubmission.effectiveId),
           baseURI            = null,
           locationData       = staticSubmission.locationData
         )

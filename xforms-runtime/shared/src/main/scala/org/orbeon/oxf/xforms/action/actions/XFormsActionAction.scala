@@ -51,8 +51,8 @@ class XFormsActionAction extends XFormsAction {
         actionInterpreter.containingDocument.addScriptToRun(
           ScriptInvocation(
             script              = script,
-            targetEffectiveId   = firstClientRepresentation(actionContext.interpreter.event.targetObject).map(_.getEffectiveId),
-            observerEffectiveId = firstClientRepresentation(actionContext.interpreter.eventObserver).map(_.getEffectiveId),
+            targetEffectiveId   = firstClientRepresentation(actionContext.interpreter.event.targetObject).map(_.effectiveId),
+            observerEffectiveId = firstClientRepresentation(actionContext.interpreter.eventObserver).map(_.effectiveId),
             paramValues         = paramExpressions map { expr =>
               // https://github.com/orbeon/orbeon-forms/issues/2499
               actionInterpreter.evaluateAsString(

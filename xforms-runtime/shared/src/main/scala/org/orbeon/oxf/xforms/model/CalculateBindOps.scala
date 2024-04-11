@@ -31,9 +31,9 @@ trait CalculateBindOps {
 
   def applyDefaultAndCalculateBinds(defaultsStrategy: DefaultsStrategy, collector: ErrorEventCollector): Unit = {
     if (! staticModel.mustRecalculate) {
-      debug("skipping bind recalculate", List("model id" -> model.getEffectiveId, "reason" -> "no recalculation binds"))
+      debug("skipping bind recalculate", List("model id" -> model.effectiveId, "reason" -> "no recalculation binds"))
     } else {
-      withDebug("performing bind recalculate", List("model id" -> model.getEffectiveId)) {
+      withDebug("performing bind recalculate", List("model id" -> model.effectiveId)) {
 
         if (staticModel.hasNonPreserveWhitespace)
           applyWhitespaceBinds(collector)

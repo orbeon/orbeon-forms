@@ -36,7 +36,7 @@ trait AsynchronousSubmissionManagerTrait {
   protected def addClientPollEventIfNeeded(containingDocument: XFormsContainingDocument, delayMs: Int): Unit =
     containingDocument.addDelayedEvent(
       eventName         = EventNames.XXFormsPoll,
-      targetEffectiveId = containingDocument.getEffectiveId,
+      targetEffectiveId = containingDocument.effectiveId,
       bubbles           = false,
       cancelable        = false,
       time              = System.currentTimeMillis + delayMs,

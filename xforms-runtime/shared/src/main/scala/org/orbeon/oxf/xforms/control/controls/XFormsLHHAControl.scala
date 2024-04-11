@@ -33,8 +33,8 @@ class XFormsLHHAControl(
   container   : XBLContainer,
   parent      : XFormsControl,
   element     : Element,
-  effectiveId : String
-) extends XFormsSingleNodeControl(container, parent, element, effectiveId)
+  _effectiveId: String
+) extends XFormsSingleNodeControl(container, parent, element, _effectiveId)
   with XFormsValueControl
   with NoLHHATrait {
 

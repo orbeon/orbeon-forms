@@ -35,12 +35,12 @@ class XFormsRepeatIterationControl(
   container   : XBLContainer,
   parent      : XFormsControl,
   element     : Element,
-  effectiveId : String
+  _effectiveId: String
 ) extends XFormsSingleNodeContainerControl(
   container,
   parent,
   element,
-  effectiveId
+  _effectiveId
 ) with NoLHHATrait {
 
   override type Control <: RepeatIterationControl
@@ -74,7 +74,7 @@ class XFormsRepeatIterationControl(
   // Update this control's effective id and its descendants based on the parent's effective id.
   override def updateEffectiveId(): Unit = {
     // Update this iteration's effective id
-    setEffectiveId(XFormsId.getIterationEffectiveId(parent.getEffectiveId, _iterationIndex))
+    effectiveId = XFormsId.getIterationEffectiveId(parent.effectiveId, _iterationIndex)
     children foreach (_.updateEffectiveId())
   }
 
@@ -113,7 +113,7 @@ class XFormsRepeatIterationControl(
       val atts = new AttributesImpl
 
       // Use the effective id of the parent repeat
-      atts.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, containingDocument.namespaceId(parent.getEffectiveId))
+      atts.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, containingDocument.namespaceId(parent.effectiveId))
 
       // Relevance
       atts.addAttribute("", XFormsNames.RELEVANT_ATTRIBUTE_NAME, XFormsNames.RELEVANT_ATTRIBUTE_NAME, XMLReceiverHelper.CDATA, isRelevant.toString)
@@ -125,7 +125,7 @@ class XFormsRepeatIterationControl(
   }
 
   override def computeBinding(parentContext: BindingContext, collector: ErrorEventCollector): BindingContext = {
-    val contextStack = container.getContextStack
+    val contextStack = container.contextStack
     contextStack.setBinding(parentContext)
     contextStack.pushIteration(iterationIndex)
   }

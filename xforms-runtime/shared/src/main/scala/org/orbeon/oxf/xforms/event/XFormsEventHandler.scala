@@ -13,14 +13,12 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.BindingContext
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 // Runtime event handler
 trait XFormsEventHandler {
-
-  def getEffectiveId: String
-
+  def effectiveId: String
   def container: XBLContainer
   def bindingContext: BindingContext
 }

@@ -67,7 +67,7 @@ class XFormsModelSubmission(
 
   import Private._
 
-  val containingDocument: XFormsContainingDocument = container.getContainingDocument
+  val containingDocument: XFormsContainingDocument = container.containingDocument
 
   // All the submission types in the order they must be checked
   val submissions: List[BaseSubmission] =
@@ -81,7 +81,7 @@ class XFormsModelSubmission(
   def getId               : String            = staticSubmission.staticId
   def getPrefixedId       : String            = staticSubmission.prefixedId
   def scope               : Scope             = staticSubmission.scope
-  def getEffectiveId      : String            = XFormsId.getRelatedEffectiveId(model.getEffectiveId, getId)
+  def effectiveId         : String            = XFormsId.getRelatedEffectiveId(model.effectiveId, getId)
   def getLocationData     : LocationData      = staticSubmission.locationData
   def parentEventObserver : XFormsEventTarget = model
 
@@ -170,7 +170,7 @@ class XFormsModelSubmission(
           warn(
             "instance or text replacement did not take place upon successful response because no body was provided.",
             List(
-              "submission id" -> getEffectiveId
+              "submission id" -> effectiveId
             )
           )
         }
@@ -298,7 +298,7 @@ class XFormsModelSubmission(
           "submission first pass"
         else
           "submission",
-        List("id" -> getEffectiveId)
+        List("id" -> effectiveId)
       ) {
         try {
 
@@ -353,7 +353,7 @@ class XFormsModelSubmission(
             // Create (but abandon) document to submit here because in case of error, an Ajax response will still be produced
             if (submissionParameters.serialize)
               createUriOrDocumentToSubmit(submissionParameters)
-            containingDocument.addTwoPassSubmitEvent(TwoPassSubmissionParameters(getEffectiveId, submissionParameters))
+            containingDocument.addTwoPassSubmitEvent(TwoPassSubmissionParameters(effectiveId, submissionParameters))
             (ReplaceResult.None, None).some // TODO: could introduce `ReplaceResult.ScheduleSecondPass`
           } else {
             doSubmitSecondPass(submissionParameters)
@@ -380,7 +380,7 @@ class XFormsModelSubmission(
           "submission second pass"
         else
           "submission",
-        List("id" -> getEffectiveId)
+        List("id" -> effectiveId)
       ) {
         try {
 
@@ -466,11 +466,11 @@ class XFormsModelSubmission(
                   containingDocument
                     .getAsynchronousSubmissionManager
                     .addAsynchronousCompletion(
-                      description   = s"submission id: `${thisSubmission.getEffectiveId}`",
+                      description   = s"submission id: `${thisSubmission.effectiveId}`",
                       computation   = connectResultIo.flatMap(convertConnectResult), // running asynchronously
                       continuation  = (connectResultTry: Try[ConnectResult]) =>      // running synchronously when we process the completed submission
                         containingDocument
-                          .getObjectByEffectiveId(thisSubmission.getEffectiveId).asInstanceOf[XFormsModelSubmission]
+                          .getObjectByEffectiveId(thisSubmission.effectiveId).asInstanceOf[XFormsModelSubmission]
                           .processAsyncSubmissionResponse(
                             connectResultTry,
                             submissionParameters

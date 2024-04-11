@@ -129,7 +129,7 @@ object XFormsDispatchAction {
 
         XFormsAPI.inScopeContainingDocument.addDelayedEvent(
           eventName         = eventName,
-          targetEffectiveId = target.getEffectiveId,
+          targetEffectiveId = target.effectiveId,
           bubbles           = bubbles,
           cancelable        = cancelable,
           time              = System.currentTimeMillis + delay,

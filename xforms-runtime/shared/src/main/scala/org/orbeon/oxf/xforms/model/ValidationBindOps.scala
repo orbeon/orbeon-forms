@@ -42,7 +42,7 @@ trait ValidationBindOps extends Logging {
 
   def applyValidationBinds(invalidInstances: m.Set[String], collector: ErrorEventCollector): Unit = {
     if (! staticModel.mustRevalidate) {
-      debug("skipping bind revalidate", List("model id" -> model.getEffectiveId, "reason" -> "no validation binds"))
+      debug("skipping bind revalidate", List("model id" -> model.effectiveId, "reason" -> "no validation binds"))
     } else {
 
       // Reset context stack just to re-evaluate the variables
@@ -148,7 +148,7 @@ trait ValidationBindOps extends Logging {
       // Remember invalid instances
       if (! typeValidity || ! requiredValidity) {
         containingDocument.instanceForNodeOpt(currentNodeInfo) foreach
-          (invalidInstances += _.getEffectiveId)
+          (invalidInstances += _.effectiveId)
       }
     }
 
@@ -298,7 +298,7 @@ trait ValidationBindOps extends Logging {
       // Remember invalid instances
       if (! bindNode.constraintsSatisfiedForLevel(ValidationLevel.ErrorLevel)) {
         containingDocument.instanceForNodeOpt(currentNode) foreach
-          (invalidInstances += _.getEffectiveId)
+          (invalidInstances += _.effectiveId)
       }
     }
 
@@ -310,7 +310,7 @@ trait ValidationBindOps extends Logging {
       try {
         // LATER: If we implement support for allowing binds to receive events, source must be bind id.
         val functionContext =
-          model.getContextStack.getFunctionContext(model.getEffectiveId, Some(bindNode))
+          model.getContextStack.getFunctionContext(model.effectiveId, Some(bindNode))
 
         val result =
           XPath.evaluateSingle(

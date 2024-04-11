@@ -48,12 +48,12 @@ class XFormsRepeatControl(
   container   : XBLContainer,
   parent      : XFormsControl,
   element     : Element,
-  effectiveId : String
+  _effectiveId: String
 ) extends XFormsNoSingleNodeContainerControl(
   container,
   parent,
   element,
-  effectiveId
+  _effectiveId
 ) with NoLHHATrait {
 
   override type Control <: RepeatControl
@@ -222,7 +222,7 @@ class XFormsRepeatControl(
 
   // Push binding but ignore non-relevant iterations
   override protected def computeBinding(parentContext: BindingContext, collector: ErrorEventCollector): BindingContext = {
-    val contextStack = container.getContextStack
+    val contextStack = container.contextStack
     contextStack.setBinding(parentContext)
     contextStack.pushBinding(element, effectiveId, staticControl.scope, this, collector)
 
@@ -283,7 +283,7 @@ class XFormsRepeatControl(
             val isRemoved = currentNewIndex == -1
             val movedOrRemovedIteration = oldChildren(i)
             if (isRemoved) {
-              withDebug("removing iteration", Seq("id" -> getEffectiveId, "index" -> (i + 1).toString)) {
+              withDebug("removing iteration", Seq("id" -> effectiveId, "index" -> (i + 1).toString)) {
 
                 // If focused control is in removed iteration, remember this repeat and partially remove
                 // focus before deindexing the iteration. The idea here is that we don't want to dispatch
@@ -334,7 +334,7 @@ class XFormsRepeatControl(
             if (newRepeatIndex != oldRepeatIndex) {
 
               debug("adjusting index for new item", Seq(
-                "id"        -> getEffectiveId,
+                "id"        -> effectiveId,
                 "old index" -> oldRepeatIndex.toString,
                 "new index" -> newRepeatIndex.toString
               ))
@@ -348,7 +348,7 @@ class XFormsRepeatControl(
             if (newRepeatIndex != oldRepeatIndex) {
 
               debug("adjusting index for existing item", Seq(
-                "id"        -> getEffectiveId,
+                "id"        -> effectiveId,
                 "old index" -> oldRepeatIndex.toString,
                 "new index" -> newRepeatIndex.toString
               ))
@@ -363,7 +363,7 @@ class XFormsRepeatControl(
               // collection."
 
               debug("setting index to the size of the new sequence", Seq(
-                "id"        -> getEffectiveId,
+                "id"        -> effectiveId,
                 "new index" -> newRepeatItems.size.toString
               ))
 
@@ -376,7 +376,7 @@ class XFormsRepeatControl(
           } else {
             // Old index was out of bounds?
             setIndexInternal(getStartIndex)
-            debug("resetting index", Seq("id" -> getEffectiveId, "new index" -> getIndex.toString))
+            debug("resetting index", Seq("id" -> effectiveId, "new index" -> getIndex.toString))
           }
         }
 
@@ -395,7 +395,7 @@ class XFormsRepeatControl(
             // Add new iteration
             newChildren +=
               withDebug("creating new iteration", Seq(
-                "id"    -> getEffectiveId,
+                "id"    -> effectiveId,
                 "index" -> repeatIndex.toString
               )) {
 
@@ -416,7 +416,7 @@ class XFormsRepeatControl(
             if (newIterationOldIndex != repeatIndex) {
               // Iteration index changed
               debug("moving iteration", Seq(
-                "id"        -> getEffectiveId,
+                "id"        -> effectiveId,
                 "old index" -> newIterationOldIndex.toString,
                 "new index" -> repeatIndex.toString
               ))
@@ -458,7 +458,7 @@ class XFormsRepeatControl(
         for (removedIteration <- children) {
 
           withDebug("removing iteration", Seq(
-            "id"    -> getEffectiveId,
+            "id"    -> effectiveId,
             "index" -> removedIteration.iterationIndex.toString
           )) {
             // Dispatch destruction events and deindex old iteration
@@ -472,7 +472,7 @@ class XFormsRepeatControl(
         }
 
         if (getIndex != 0)
-          debug("setting index to 0", Seq("id" -> getEffectiveId))
+          debug("setting index to 0", Seq("id" -> effectiveId))
 
         clearChildren()
         setIndexInternal(0)

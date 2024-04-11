@@ -112,12 +112,12 @@ object ItemsetSupport {
         ) { failFastCollector =>
 
           val container         = select1Control.container
-          val parentEffectiveId = select1Control.getEffectiveId
+          val parentEffectiveId = select1Control.effectiveId
           val result            = newEmptyItemset(staticControl)
 
           // Set binding on this control, after saving the current context because the context stack must
           // remain unmodified.
-          implicit val contextStack: XFormsContextStack = container.getContextStack
+          implicit val contextStack: XFormsContextStack = container.contextStack
           val savedBindingContext = contextStack.getCurrentBindingContext
           contextStack.setBinding(select1Control.bindingContext)
 
@@ -371,11 +371,11 @@ object ItemsetSupport {
                           xpathString        = attributeValue,
                           namespaceMapping   = itemChoiceItemsetElem.namespaceMapping,
                           variableToValueMap = contextStack.getCurrentBindingContext.getInScopeVariables,
-                          functionLibrary    = container.getContainingDocument.functionLibrary,
+                          functionLibrary    = container.containingDocument.functionLibrary,
                           functionContext    = contextStack.getFunctionContext(elemEffectiveId),
                           baseURI            = null,
                           locationData       = itemChoiceItemsetElem.element.getData.asInstanceOf[LocationData],
-                          reporter           = container.getContainingDocument.getRequestStats.getReporter
+                          reporter           = container.containingDocument.getRequestStats.getReporter
                         )
                       } catch {
                         case NonFatal(t) =>

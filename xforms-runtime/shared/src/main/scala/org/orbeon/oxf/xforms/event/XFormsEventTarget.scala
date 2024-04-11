@@ -33,7 +33,7 @@ trait XFormsEventTarget extends XFormsObject {
 
   def getId: String
   def getPrefixedId: String
-  def getEffectiveId: String
+  def effectiveId: String
 
   def getLocationData: LocationData
 

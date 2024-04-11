@@ -44,10 +44,10 @@ import org.xml.sax.Attributes
  * The implementation is split into a series of traits to make each chunk more palatable.
  */
 class XFormsControl(
-    val container   : XBLContainer,
-    var parent      : XFormsControl, // var just so we can null it upon clone
-    val element     : Element,
-    var effectiveId : String         // var because can be updated upon iteration change
+    val container  : XBLContainer,
+    var parent     : XFormsControl, // var just so we can null it upon clone
+    val element    : Element,
+    var effectiveId: String         // var because can be updated upon iteration change
 ) extends ControlXPathSupport
      with Cloneable
      with ControlAjaxSupport
@@ -66,10 +66,10 @@ class XFormsControl(
 
   require(container ne null)
 
-  implicit final val containingDocument: XFormsContainingDocument = container.getContainingDocument
+  implicit final val containingDocument: XFormsContainingDocument = container.containingDocument
   implicit final def logger            : IndentedLogger = containingDocument.controls.indentedLogger
 
-  final def part: PartAnalysis = container.getPartAnalysis
+  final def part: PartAnalysis = container.partAnalysis
 
   // Static information (never changes for the lifetime of the containing document)
   // TODO: Pass staticControl during construction (find which callers don't pass the necessary information)
@@ -93,28 +93,25 @@ class XFormsControl(
   final def scope: Scope = staticControl.scope
   final def localName: String = staticControl.localName
 
-  def getContextStack: XFormsContextStack = container.getContextStack
+  def getContextStack: XFormsContextStack = container.contextStack
 
   final def getResolutionScope: Scope =
     part.scopeForPrefixedId(prefixedId)
 
   // Resolve an object relative to this control
   final def resolve(staticId: String, contextItem: Option[om.Item] = None): Option[XFormsObject] =
-    container.resolveObjectByIdInScope(getEffectiveId, staticId, contextItem)
+    container.resolveObjectByIdInScope(effectiveId, staticId, contextItem)
 
   // Update this control's effective id based on the parent's effective id
-  def updateEffectiveId(): Unit = {
+  def updateEffectiveId(): Unit =
     if (staticControl.isWithinRepeat) {
-      val parentEffectiveId = parent.getEffectiveId
+      val parentEffectiveId = parent.effectiveId
       val parentSuffix = XFormsId.getEffectiveIdSuffix(parentEffectiveId)
       effectiveId = XFormsId.getPrefixedId(effectiveId) + RepeatSeparatorString + parentSuffix
       if (_childrenActions.nonEmpty)
         for (actionControl <- _childrenActions)
           actionControl.updateEffectiveId()
     }
-  }
-
-  def getEffectiveId: String = effectiveId
 
   // Used by repeat iterations
   def setEffectiveId(effectiveId: String): Unit =

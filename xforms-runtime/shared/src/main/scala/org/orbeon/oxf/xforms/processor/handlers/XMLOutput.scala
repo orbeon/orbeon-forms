@@ -188,7 +188,7 @@ object XMLOutput extends XMLReceiverSupport {
     case _ =>
 
       val baseAttributes = List(
-        "id"       -> c.getEffectiveId,
+        "id"       -> c.effectiveId,
         "type"     -> c.staticControl.localName,
         "relevant" -> c.isRelevant.toString
       )

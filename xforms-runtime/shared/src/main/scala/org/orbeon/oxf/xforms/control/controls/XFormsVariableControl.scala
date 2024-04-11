@@ -33,8 +33,8 @@ class XFormsVariableControl(
   container   : XBLContainer,
   parent      : XFormsControl,
   element     : Element,
-  effectiveId : String
-) extends XFormsSingleNodeControl(container, parent, element, effectiveId)
+  _effectiveId: String
+) extends XFormsSingleNodeControl(container, parent, element, _effectiveId)
   with NoLHHATrait {
 
   override type Control <: VariableControl
@@ -89,10 +89,10 @@ class XFormsVariableControl(
         variable.staticVariable.expressionOrConstant match {
           case Left(expression) =>
             containingDocument.getRequestStats.withXPath(expression) {
-              _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, this, collector)
+              _value = variable.valueEvaluateIfNeeded(contextStack, effectiveId, pushOuterContext = false, this, collector)
             }
           case Right(_) =>
-            _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, this, collector)
+            _value = variable.valueEvaluateIfNeeded(contextStack, effectiveId, pushOuterContext = false, this, collector)
         }
       }
     } else {

@@ -36,8 +36,8 @@ case class InstanceState(
 
   def this(instance: XFormsInstance) =
     this(
-      instance.getEffectiveId,
-      instance.parent.getEffectiveId,
+      instance.effectiveId,
+      instance.parent.effectiveId,
       instance.instanceCaching.toLeft(instance.contentAsInstanceDocument),
       instance.readonly,
       instance.modified,

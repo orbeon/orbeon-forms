@@ -157,8 +157,8 @@ class XFormsInstance(
   def rootElement: om.NodeInfo = DataModel.firstChildElement(_documentInfo)
 
   def getId = instance.staticId
-  def getPrefixedId = XFormsId.getPrefixedId(getEffectiveId)
-  def getEffectiveId = XFormsId.getRelatedEffectiveId(parent.getEffectiveId, instance.staticId)
+  def getPrefixedId = XFormsId.getPrefixedId(effectiveId)
+  def effectiveId = XFormsId.getRelatedEffectiveId(parent.effectiveId, instance.staticId)
 
   def scope = model.staticModel.scope
   def container = model.container
@@ -201,7 +201,7 @@ class XFormsInstance(
           case None =>
             warn(
               "xxforms-instance-invalidate event dispatched to non-cached instance",
-              Seq("instance id" -> getEffectiveId)
+              Seq("instance id" -> effectiveId)
             )
         }
       case ev: XXFormsActionErrorEvent =>
@@ -261,8 +261,8 @@ class XFormsInstance(
   def logContent(indentedLogger: IndentedLogger, message: String): Unit = {
     implicit val logger = indentedLogger
     debug(message, Seq(
-      "model effective id"    -> parent.getEffectiveId,
-      "instance effective id" -> getEffectiveId,
+      "model effective id"    -> parent.effectiveId,
+      "instance effective id" -> effectiveId,
       "instance"              -> StaticXPath.tinyTreeToString(rootElement)
     ))
   }

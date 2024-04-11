@@ -299,7 +299,7 @@ object XFormsInsertAction {
           "xf:insert: inserted nodes",
           List(
             "count"    -> insertedNodes.size.toString,
-            "instance" -> modifiedInstanceOpt.map(_.getEffectiveId).orNull
+            "instance" -> modifiedInstanceOpt.map(_.effectiveId).orNull
           )
         )
       else

@@ -215,7 +215,7 @@ object DynamicState {
       containerType      = Option(document.getContainerType),
       containerNamespace = Option(document.getContainerNamespace),
       pathMatchers       = toByteSeq(document.getVersionedPathMatchers),
-      focusedControl     = document.controls.getFocusedControl map (_.getEffectiveId),
+      focusedControl     = document.controls.getFocusedControl map (_.effectiveId),
       pendingUploads     = toByteSeq(document.getPendingUploads),
       lastAjaxResponse   = toByteSeq(document.lastAjaxResponse),
       instances          = toByteSeq(Controls.iterateInstancesToSerialize(findStartContainer(startOpt.toLeft(document)), XFormsInstance.mustSerialize).toList),

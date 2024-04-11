@@ -37,8 +37,8 @@ import java.{util => ju}
  *
  * NOTE: This keep the "currently selected flag" for all children xf:case.
  */
-class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
+class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
+    extends XFormsSingleNodeContainerControl(container, parent, element, _effectiveId) {
 
   override type Control <: SwitchControl
 
@@ -249,7 +249,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     if (isRelevant) {
       val local = getCurrentLocal.asInstanceOf[XFormsSwitchControlLocal]
       require(local.selectedCaseControlId ne null, s"Selected case was not set for xf:switch: $effectiveId")
-      XFormsId.getRelatedEffectiveId(getEffectiveId, local.selectedCaseControlId)
+      XFormsId.getRelatedEffectiveId(effectiveId, local.selectedCaseControlId)
     } else
       null
 
@@ -333,9 +333,9 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
           // Control was not relevant, send all deselected to be sure
           // TODO: This should not be needed because the repeat template should have a reasonable default.
           // TODO: 2020-02-27: There are no more repeat templates. Check this.
-          getChildrenCases filter (_.getEffectiveId != selectedCaseEffectiveId) foreach { caseControl =>
+          getChildrenCases filter (_.effectiveId != selectedCaseEffectiveId) foreach { caseControl =>
             ch.element("xxf", XXFORMS_NAMESPACE_URI, "case", Array(
-              "id", containingDocument.namespaceId(caseControl.getEffectiveId ensuring (_ ne null)),
+              "id", containingDocument.namespaceId(caseControl.effectiveId ensuring (_ ne null)),
               "visibility", "hidden")
             )
           }
@@ -354,7 +354,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       case Some(control) if control.isRelevant =>
         val selectedCaseId = control.getInitialLocal.asInstanceOf[XFormsSwitchControlLocal].selectedCaseControlId
         assert(selectedCaseId ne null)
-        XFormsId.getRelatedEffectiveId(control.getEffectiveId, selectedCaseId)
+        XFormsId.getRelatedEffectiveId(control.effectiveId, selectedCaseId)
       case _ =>
         null
     }

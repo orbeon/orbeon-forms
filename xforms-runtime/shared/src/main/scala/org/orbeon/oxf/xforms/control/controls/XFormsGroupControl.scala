@@ -23,12 +23,12 @@ class XFormsGroupControl(
   container   : XBLContainer,
   parent      : XFormsControl,
   element     : Element,
-  effectiveId : String
+  _effectiveId: String
 ) extends XFormsSingleNodeContainerControl(
   container,
   parent,
   element,
-  effectiveId
+  _effectiveId
 ) {
 
   // Static readonly doesn't seem to make much sense for xf:group, and we don't want to see the

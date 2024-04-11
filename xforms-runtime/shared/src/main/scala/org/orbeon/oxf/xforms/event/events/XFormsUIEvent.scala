@@ -72,7 +72,7 @@ private object XFormsUIEvent {
   def binding(e: XFormsUIEvent) = Option(e.targetControl.bindingEvenIfNonRelevant)
 
   def controlPosition(e: XFormsUIEvent) =
-    e.targetControl.container.getPartAnalysis.getControlPosition(e.targetControl.getPrefixedId)
+    e.targetControl.container.partAnalysis.getControlPosition(e.targetControl.getPrefixedId)
 
   def label(e: XFormsUIEvent) = Option(e.targetControl.getLabel(EventCollector.Throw))
   def help(e: XFormsUIEvent)  = Option(e.targetControl.getHelp(EventCollector.Throw))

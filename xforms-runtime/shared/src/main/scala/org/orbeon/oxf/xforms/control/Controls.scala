@@ -45,7 +45,7 @@ object Controls {
     collector          : ErrorEventCollector
   ): Option[XFormsControl] = {
 
-    val bindingContext = containingDocument.getContextStack.resetBindingContext(collector)
+    val bindingContext = containingDocument.contextStack.resetBindingContext(collector)
     val rootControl    = containingDocument.staticState.topLevelPart.getTopLevelControls.head
 
     buildTree(
@@ -69,13 +69,13 @@ object Controls {
     collector     : ErrorEventCollector
   ): XFormsRepeatIterationControl = {
 
-    val idSuffix = XFormsId.getEffectiveIdSuffixParts(repeatControl.getEffectiveId).toSeq :+ iterationIndex
+    val idSuffix = XFormsId.getEffectiveIdSuffixParts(repeatControl.effectiveId).toSeq :+ iterationIndex
 
     // This is the context of the iteration
     // buildTree() does a pushBinding(), but that won't change the context (no @ref, etc. on the iteration itself)
     val container = repeatControl.container
     val bindingContext =
-      container.getContextStack.setBinding(repeatControl.bindingContext)
+      container.contextStack.setBinding(repeatControl.bindingContext)
 
     // This has to be the case at this point, otherwise it's a bug in our code
     assert(repeatControl.staticControl.iteration.isDefined)
@@ -106,7 +106,7 @@ object Controls {
     collector        : ErrorEventCollector
   ): Option[XFormsControl] = {
 
-    val idSuffix = XFormsId.getEffectiveIdSuffixParts(containerControl.getEffectiveId).toSeq
+    val idSuffix = XFormsId.getEffectiveIdSuffixParts(containerControl.effectiveId).toSeq
     val bindingContext = containerControl.bindingContextForChildOrEmpty(collector)
 
     buildTree(
@@ -343,7 +343,7 @@ object Controls {
     collector         : ErrorEventCollector
   ): BindingUpdater = {
 
-    val updater = new BindingUpdater(containingDocument, containingDocument.getContextStack.resetBindingContext(collector))
+    val updater = new BindingUpdater(containingDocument, containingDocument.contextStack.resetBindingContext(collector))
     visitSiblings(updater, containingDocument.controls.getCurrentControlTree.children, collector)
 
     containingDocument.controls.getCurrentControlTree.rootOpt foreach
@@ -443,7 +443,7 @@ object Controls {
             //
             // NOTE: don't call ControlTree.initializeRepeatIterationTree() here because refresh evaluates
             // controls and dispatches events
-            this.newIterationsIds = newIterations map (_.getEffectiveId) toSet
+            this.newIterationsIds = newIterations map (_.effectiveId) toSet
 
           case _ =>
 

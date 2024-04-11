@@ -181,16 +181,16 @@ class ActionsFormat20182Test
               newValue      = s"$controlNumber-$index"
             } locally {
               document.withOutermostActionHandler {
-                setControlValue(resolveObject[XFormsValueControl](controlId, indexes = List(index)).get.getEffectiveId, newValue)
+                setControlValue(resolveObject[XFormsValueControl](controlId, indexes = List(index)).get.effectiveId, newValue)
               }
             }
 
             document.withOutermostActionHandler {
-              setControlValue(resolveObject[XFormsValueControl]("non-repeated-control-control").get.getEffectiveId, "43")
+              setControlValue(resolveObject[XFormsValueControl]("non-repeated-control-control").get.effectiveId, "43")
             }
 
             document.withOutermostActionHandler {
-              dispatch(name = "DOMActivate", effectiveId = resolveObject[XFormsControl]("copy-data-button-no-warning-control").get.getEffectiveId)
+              dispatch(name = "DOMActivate", effectiveId = resolveObject[XFormsControl]("copy-data-button-no-warning-control").get.effectiveId)
             }
 
             for {

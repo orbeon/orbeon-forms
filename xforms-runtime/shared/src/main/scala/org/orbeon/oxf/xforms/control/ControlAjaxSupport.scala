@@ -62,7 +62,7 @@ trait ControlAjaxSupport {
     var added = false
 
     // Control id
-    attributesImpl.addOrReplace(XFormsNames.ID_QNAME, containingDocument.namespaceId(getEffectiveId))
+    attributesImpl.addOrReplace(XFormsNames.ID_QNAME, containingDocument.namespaceId(effectiveId))
 
     // This is handled specially because it's a list of tokens, some of which can be added and removed
     added |= addAjaxClasses(attributesImpl, previousControlOpt, this)

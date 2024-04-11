@@ -94,11 +94,11 @@ object SubmissionHeaders {
                       avtCombine,
                       headerElem.namespaceMapping,
                       contextStack.getCurrentBindingContext.getInScopeVariables,
-                      xblContainer.getContainingDocument.functionLibrary,
+                      xblContainer.containingDocument.functionLibrary,
                       contextStack.getFunctionContext(parentEffectiveId),
                       null,
                       headerElem.locationData,
-                      xblContainer.getContainingDocument.getRequestStats.getReporter
+                      xblContainer.containingDocument.getRequestStats.getReporter
                     )
                 catch {
                   case NonFatal(t) =>

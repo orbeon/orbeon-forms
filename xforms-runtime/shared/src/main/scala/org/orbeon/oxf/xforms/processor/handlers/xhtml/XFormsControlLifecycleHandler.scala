@@ -209,7 +209,7 @@ abstract class XFormsControlLifecycleHandler(
     containingDocument.getControlByEffectiveId(getEffectiveId) ensuring (_ ne null)
 
   final protected def handleAriaByAtts(atts: AttributesImpl, condition: LHHAAnalysis => Boolean): Boolean = {
-    val it = ControlAjaxSupport.iterateAriaByAtts(elementAnalysis, currentControl.getEffectiveId, condition)(containingDocument)
+    val it = ControlAjaxSupport.iterateAriaByAtts(elementAnalysis, currentControl.effectiveId, condition)(containingDocument)
     val nonEmpty = it.nonEmpty
     it foreach { case (attName, attValues) =>
       atts.addOrReplace(attName, attValues.mkString(" "))

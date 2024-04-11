@@ -216,7 +216,7 @@ object SubmissionUtils {
       )
     ) { failFastCollector =>
       SubmissionHeaders.evaluateHeaders(
-        parentEffectiveId  = submission.getEffectiveId,
+        parentEffectiveId  = submission.effectiveId,
         enclosingElement   = submission.staticSubmission,
         initialHeaders     = clientHeadersToForward(submission.containingDocument.getRequestHeaders, forwardClientHeaders),
         eventTarget        = submission,

@@ -22,8 +22,8 @@ import org.orbeon.oxf.xforms.event.XFormsEventHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 
-class XFormsActionControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-  extends XFormsControl(container, parent, element, effectiveId) with XFormsEventHandler {
+class XFormsActionControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
+  extends XFormsControl(container, parent, element, _effectiveId) with XFormsEventHandler {
 
   // Tell the parent about us if the parent is not a container
   Option(parent) foreach {

@@ -208,7 +208,7 @@ object XFormsDeleteAction extends Logging {
         debugAllowNull(
           "deleted nodes for instance",
           List(
-            "instance" -> modifiedInstance.getEffectiveId,
+            "instance" -> modifiedInstance.effectiveId,
             "count"    -> descriptors.size.toString)
         )
 

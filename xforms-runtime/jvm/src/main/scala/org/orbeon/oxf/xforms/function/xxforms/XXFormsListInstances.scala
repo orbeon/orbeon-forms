@@ -33,7 +33,7 @@ class XXFormsListInstances extends XFormsFunction {
         case model: XFormsModel =>
           for {
             instance    <- model.instancesIterator
-            effectiveId = instance.getEffectiveId
+            effectiveId = instance.effectiveId
             absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
           } yield
             absoluteId

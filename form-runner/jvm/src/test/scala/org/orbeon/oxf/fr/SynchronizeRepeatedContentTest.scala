@@ -46,7 +46,7 @@ class SynchronizeRepeatedContentTest
           def travelerReadonlyControl(index: Int) =
             resolveObject[XFormsControl]("traveler-name-readonly-control", indexes = List(index)).get
 
-          setControlValueWithEventSearchNested(travelerControl(index = 1).getEffectiveId, BobValue)
+          setControlValueWithEventSearchNested(travelerControl(index = 1).effectiveId, BobValue)
 
           def assertBothValues(index: Int, value: String): Unit = {
             assert(value === getControlValue(travelerControl(index).effectiveId))
@@ -63,7 +63,7 @@ class SynchronizeRepeatedContentTest
           doc.synchronizeAndRefresh()
           assertBothValues(index = 2, BobValue)
 
-          setControlValueWithEventSearchNested(controlEffectiveId = travelerControl(index = 3).getEffectiveId, value = AliceValue)
+          setControlValueWithEventSearchNested(controlEffectiveId = travelerControl(index = 3).effectiveId, value = AliceValue)
 
           assertBothValues(index = 2, BobValue)
           assertBothValues(index = 3, AliceValue)

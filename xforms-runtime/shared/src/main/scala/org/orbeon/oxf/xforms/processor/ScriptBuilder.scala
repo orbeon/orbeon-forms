@@ -65,7 +65,7 @@ object ScriptBuilder {
           val abstractBinding = c.staticControl.commonBinding
           if (abstractBinding.modeJavaScriptLifecycle)
             controlsToInitialize +=
-              c.getEffectiveId -> (
+              c.effectiveId -> (
                 if (includeValue && abstractBinding.modeExternalValue)
                   c.externalValueOpt(EventCollector.ToReview)
                 else
@@ -74,12 +74,12 @@ object ScriptBuilder {
         }
       case c: XFormsComponentControl =>
         if (c.isRelevant && c.staticControl.commonBinding.modeJavaScriptLifecycle)
-          controlsToInitialize += c.getEffectiveId -> None
+          controlsToInitialize += c.effectiveId -> None
       case c =>
         // Legacy JavaScript initialization
         // As of 2022-12-12: `xf:select1[appearance = compact]`
         if (c.hasJavaScriptInitialization && ! c.isStaticReadonly)
-          controlsToInitialize += c.getEffectiveId -> None
+          controlsToInitialize += c.effectiveId -> None
     }
 
     controlsToInitialize.result
@@ -194,12 +194,12 @@ object ScriptBuilder {
             if dialogControl.isDialogVisible
           } yield
             rpc.Dialog(
-              id         = containingDocument.namespaceId(dialogControl.getEffectiveId),
+              id         = containingDocument.namespaceId(dialogControl.effectiveId),
               neighborId = dialogControl.neighborControlId.map(containingDocument.namespaceId)
             )
         ).toList,
       focusElementId =
-        containingDocument.controls.getFocusedControl.map(c => containingDocument.namespaceId(c.getEffectiveId)),
+        containingDocument.controls.getFocusedControl.map(c => containingDocument.namespaceId(c.effectiveId)),
       errorsToShow =
         containingDocument.getServerErrors.nonEmpty option
           rpc.Error(

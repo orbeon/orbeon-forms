@@ -63,7 +63,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
     val requestBodyHash =
       serializationParameters.messageBody.map(XFormsCrossPlatformSupport.digestBytes(_, ByteEncoding.Hex))
 
-    val submissionEffectiveId = submission.getEffectiveId
+    val submissionEffectiveId = submission.effectiveId
 
     // Find and check replacement location
     val instanceToUpdate = checkInstanceToUpdate(detailsLogger, submissionParameters)
@@ -125,7 +125,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
         // Create deferred evaluation for synchronous or asynchronous loading
         maybeWithDebug(
           "running asynchronous submission",
-          List("id" -> submission.getEffectiveId, "cacheable" -> "true"),
+          List("id" -> submission.effectiveId, "cacheable" -> "true"),
           condition = submissionParameters.isAsynchronous
         ) {
           try {
@@ -186,7 +186,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
           case Some(updatedInstance) if updatedInstance.rootElement.isSameNodeInfo(destinationNodeInfo) =>
             debug(
               "using instance from application shared instance cache",
-              List("instance" -> updatedInstance.getEffectiveId)
+              List("instance" -> updatedInstance.effectiveId)
             )(indentedLogger)
             updatedInstance
           case _ =>

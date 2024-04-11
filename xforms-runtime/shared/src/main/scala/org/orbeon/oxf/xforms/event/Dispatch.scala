@@ -65,13 +65,13 @@ object Dispatch extends Logging {
       def eventLogging =
         List(
           "name"     -> event.name,
-          "target"   -> target.getEffectiveId,
+          "target"   -> target.effectiveId,
           "location" -> Option(event.locationData).map(_.toString).orNull
         )
 
       // Ask the target for the handlers associated with the event name
       val (performDefaultAction, handlers) = {
-        val staticTarget = target.container.getPartAnalysis.getControlAnalysis(target.getPrefixedId)
+        val staticTarget = target.container.partAnalysis.getControlAnalysis(target.getPrefixedId)
 
         // https://github.com/orbeon/orbeon-forms/issues/898
         if (staticTarget eq null) {
@@ -79,7 +79,7 @@ object Dispatch extends Logging {
           return
         }
 
-        staticTarget.handlersForEvent(event.name, handlersForEventImpl(target.container.getPartAnalysis, staticTarget, _))
+        staticTarget.handlersForEvent(event.name, handlersForEventImpl(target.container.partAnalysis, staticTarget, _))
       }
 
       // Call native listeners on target if any
@@ -109,7 +109,7 @@ object Dispatch extends Logging {
                 event.currentObserver = observer
                 event.currentPhase = phase
 
-                withDebug("handler", Seq("name" -> event.name, "phase" -> phase.name, "observer" -> observer.getEffectiveId)) {
+                withDebug("handler", Seq("name" -> event.name, "phase" -> phase.name, "observer" -> observer.effectiveId)) {
                   handleEvent(handler, observer, event, collector)
                   statHandleEvent += 1
                 }
@@ -171,7 +171,7 @@ object Dispatch extends Logging {
             Some("dispatching XForms event"),
             List(
               "event"     -> event.name,
-              "target id" -> target.getEffectiveId)
+              "target id" -> target.effectiveId)
             ))
     }
   }
@@ -201,12 +201,12 @@ object Dispatch extends Logging {
 
     // Repeat indexes in current scope
     val resolutionScopeContainer = container.findScopeRoot(sourcePrefixedId)
-    val containerParts = XFormsId.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId)
+    val containerParts = XFormsId.getEffectiveIdSuffixParts(resolutionScopeContainer.effectiveId)
 
     // Append new indexes
     val newSuffix = appendSuffixes(containerParts, repeatIndexes)
 
-    replaceIdSuffix(result.getEffectiveId, newSuffix)
+    replaceIdSuffix(result.effectiveId, newSuffix)
   }
 
   private def handleEvent(
@@ -237,11 +237,11 @@ object Dispatch extends Logging {
           if (componentControl.canRunEventHandlers(event)) {
 
             val xblContainer = componentControl.nestedContainerOpt.get // TODO: What if None?
-            xblContainer.getContextStack.resetBindingContext(collector)
-            val stack = new XFormsContextStack(xblContainer, xblContainer.getContextStack.getCurrentBindingContext)
+            xblContainer.contextStack.resetBindingContext(collector)
+            val stack = new XFormsContextStack(xblContainer, xblContainer.contextStack.getCurrentBindingContext)
 
             val handlerEffectiveId =
-              xblContainer.getFullPrefix + eventHandler.staticId + XFormsId.getEffectiveIdSuffixWithSeparator(componentControl.getEffectiveId)
+              xblContainer.fullPrefix + eventHandler.staticId + XFormsId.getEffectiveIdSuffixWithSeparator(componentControl.effectiveId)
 
             (xblContainer, handlerEffectiveId, stack)
           } else {
@@ -260,7 +260,7 @@ object Dispatch extends Logging {
             case Some(concreteHandler) =>
 
               val handlerContainer   = concreteHandler.container
-              val handlerEffectiveId = concreteHandler.getEffectiveId
+              val handlerEffectiveId = concreteHandler.effectiveId
               val stack              = new XFormsContextStack(handlerContainer, concreteHandler.bindingContext)
 
               (handlerContainer, handlerEffectiveId, stack)
@@ -306,7 +306,7 @@ object Dispatch extends Logging {
     } else {
       debug("skipping non-relevant handler", List(
         "event"        -> event.name,
-        "observer"     -> event.targetObject.getEffectiveId,
+        "observer"     -> event.targetObject.effectiveId,
         "handler name" -> eventHandler.localName,
         "handler id"   -> handlerEffectiveId
       ))
@@ -324,7 +324,7 @@ object Dispatch extends Logging {
     val resolvedObject =
       if (targetObject.scope == handler.scope) {
         // The scopes match so we can resolve the id relative to the target
-        targetObject.container.resolveObjectByIdInScope(targetObject.getEffectiveId, handler.staticId)
+        targetObject.container.resolveObjectByIdInScope(targetObject.effectiveId, handler.staticId)
       } else if (handler.isPhantom && ! handler.isWithinRepeat) {
         // Optimize for non-repeated phantom handler
         containingDocument.findObjectByEffectiveId(handler.prefixedId)
@@ -338,7 +338,7 @@ object Dispatch extends Logging {
               Controls.resolveControlsEffectiveIds(
                 containingDocument.staticOps,
                 controls.getCurrentControlTree,
-                targetObject.getEffectiveId,
+                targetObject.effectiveId,
                 handler.staticId,
                 followIndexes = true // so this will return 0 or 1 element
               )
@@ -353,9 +353,9 @@ object Dispatch extends Logging {
         warn(
           "skipping event in different scope (see issue #243)",
           List(
-            "target id"             -> targetObject.getEffectiveId,
+            "target id"             -> targetObject.effectiveId,
             "handler id"            -> handler.prefixedId,
-            "observer id"           -> eventObserver.getEffectiveId,
+            "observer id"           -> eventObserver.effectiveId,
             "target scope"          -> targetObject.scope.scopeId,
             "handler scope"         -> handler.scope.scopeId,
             "observer scope"        -> eventObserver.scope.scopeId

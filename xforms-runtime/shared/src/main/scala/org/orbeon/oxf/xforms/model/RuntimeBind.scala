@@ -34,12 +34,12 @@ class RuntimeBind(
   // TODO: Construction should be done in `RuntimeBind.apply()`.
 
   def containingDocument = model.containingDocument
-  def getEffectiveId     = XFormsId.getRelatedEffectiveId(model.getEffectiveId, staticId)
+  def effectiveId        = XFormsId.getRelatedEffectiveId(model.effectiveId, staticId)
   def staticId           = staticBind.staticId
 
   val (items, bindNodes) = {
     val contextStack = model.getContextStack
-    contextStack.pushBinding(staticBind.element, model.getEffectiveId, model.getResolutionScope, model, collector)
+    contextStack.pushBinding(staticBind.element, model.effectiveId, model.getResolutionScope, model, collector)
 
     // NOTE: This should probably go into XFormsContextStack
     val bindingContext = contextStack.getCurrentBindingContext

@@ -36,12 +36,12 @@ class XFormsInputControl(
   container   : XBLContainer,
   parent      : XFormsControl,
   element     : Element,
-  effectiveId : String
+  _effectiveId: String
 ) extends XFormsSingleNodeControl(
   container,
   parent,
   element,
-  effectiveId
+  _effectiveId
 ) with XFormsValueControl
   with ReadonlySingleNodeFocusableTrait {
 

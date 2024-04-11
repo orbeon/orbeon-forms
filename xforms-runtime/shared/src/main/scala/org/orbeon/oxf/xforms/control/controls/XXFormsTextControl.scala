@@ -29,19 +29,19 @@ class XXFormsTextControl(
   container   : XBLContainer,
   parent      : XFormsControl,
   element     : Element,
-  effectiveId : String
+  _effectiveId: String
 ) extends XFormsOutputControl(
   container,
   parent,
   element,
-  effectiveId
+  _effectiveId
 ) {
 
   private val forAttribute = element.attributeValue(XFormsNames.FOR_QNAME)
 
   // A kind of hacky way of getting the effective id of the HTML element
-  def getEffectiveForAttribute =
-    forAttribute + getEffectiveId.substring(getId.length)
+  def getEffectiveForAttribute: String =
+    forAttribute + effectiveId.substring(getId.length)
 
   final override def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
@@ -50,7 +50,7 @@ class XXFormsTextControl(
     collector       : ErrorEventCollector
   )(implicit
     ch              : XMLReceiverHelper
-  ) = {
+  ): Unit = {
 
     // If we get here, it means that `super.compareExternalUseExternalValue()` returned `false`, which means that either
     // `previousControl.isEmpty == true` or that there is a difference in value (or other aspects which don't matter here).
@@ -67,7 +67,7 @@ class XXFormsTextControl(
       isDefaultValue       = false
     )
 
-    atts.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, containingDocument.namespaceId(this.getEffectiveId))
+    atts.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, containingDocument.namespaceId(this.effectiveId))
 
     outputValueElement(
       attributesImpl = atts,

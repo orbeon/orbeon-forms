@@ -101,11 +101,11 @@ object XFormsContextStackSupport {
               xpathString        = expr,
               namespaceMapping   = childElem.namespaceMapping,
               variableToValueMap = currentBindingContext.getInScopeVariables,
-              functionLibrary    = contextStack.container.getContainingDocument.functionLibrary,
+              functionLibrary    = contextStack.container.containingDocument.functionLibrary,
               functionContext    = contextStack.getFunctionContext(getElementEffectiveId(parentEffectiveId, childElem)),
               baseURI            = null,
               locationData       = childElem.locationData,
-              reporter           = contextStack.container.getContainingDocument.getRequestStats.getReporter
+              reporter           = contextStack.container.containingDocument.getRequestStats.getReporter
             )
           ).map(_.toString)
 

@@ -68,6 +68,8 @@ class XFormsContainingDocument(
   val disableUpdates : Boolean,
 ) extends XFormsContainingDocumentSupport {
 
+  self =>
+
   // Members that depends from `staticState`
   val functionLibrary   : FunctionLibrary      = staticState.topLevelPart.functionLibrary
   val staticOps         : StaticStateGlobalOps = new StaticStateGlobalOps(staticState.topLevelPart)
@@ -211,7 +213,7 @@ class XFormsContainingDocument(
 
     findControlByEffectiveId(effectiveId)        orElse // controls first because that's the fast way
       super.findObjectByEffectiveId(effectiveId) orElse // parent (models and this)
-      (effectiveId == getEffectiveId option this)       // container id
+      (effectiveId == self.effectiveId option self)     // container id
 
     // TODO: "container id" check above should no longer be needed since we have a root control, right? In which case, the document would
     // no longer need to be an `XFormsObject`.

@@ -373,8 +373,8 @@ class XFormsComponentControl(
 
       // Do RRR as xforms-model-construct didn't do it
       for (model <- nestedContainer.models) {
-        model.doRebuild()
-        model.doRecalculateRevalidate()
+        model.doRebuildIfNeeded()
+        model.doRecalculateRevalidateIfNeeded()
       }
 
       // `xforms-model-construct-done`
@@ -388,8 +388,8 @@ class XFormsComponentControl(
       initializeMirrorListenerIfNeeded(dispatch = false)
       // Do RRR as isRestoringDynamicState() didn't do it
       for (model <- nestedContainer.models) {
-        model.doRebuild()
-        model.doRecalculateRevalidate()
+        model.doRebuildIfNeeded()
+        model.doRecalculateRevalidateIfNeeded()
       }
     }
 
@@ -481,8 +481,8 @@ class XFormsComponentControl(
       destroyMirrorListenerIfNeeded()
       initializeMirrorListenerIfNeeded(dispatch = true) foreach { mirrorInstance =>
         // If the instance was updated, it is due for an RRR, but nobody will check that before the refresh is done, so do it here.
-        mirrorInstance.model.doRebuild()
-        mirrorInstance.model.doRecalculateRevalidate()
+        mirrorInstance.model.doRebuildIfNeeded()
+        mirrorInstance.model.doRecalculateRevalidateIfNeeded()
       }
     }
   }

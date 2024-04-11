@@ -52,109 +52,106 @@ trait XFormsModelRebuildRecalculateRevalidate {
 
   // Only called by `XBLContainer.rebuildRecalculateRevalidateIfNeeded()`
   def rebuildRecalculateRevalidateIfNeeded(): Unit = {
-
-    // Process deferred behavior
-    val currentDeferredActionContext = deferredActionContext
-
-    // NOTE: We used to clear `deferredActionContext`, but this caused events to be dispatched in a different
-    // order. So we are now leaving the flag as is, and waiting until they clear themselves.
-    if (currentDeferredActionContext.rebuild) {
-        Dispatch.dispatchEvent(new XXFormsRebuildStartedEvent(selfModel), EventCollector.ToReview)
-        selfModel.doRebuild()
-    }
-
-    if (currentDeferredActionContext.recalculateRevalidate) {
-        Dispatch.dispatchEvent(new XXFormsRecalculateStartedEvent(selfModel), EventCollector.ToReview)
-        selfModel.doRecalculateRevalidate()
-    }
+    doRebuildIfNeeded()
+    doRecalculateRevalidateIfNeeded()
   }
 
-  def doRebuild(): Unit = {
+  def doRebuildIfNeeded(): Unit =
     if (deferredActionContext.rebuild) {
       try {
-        EventCollector.withBufferCollector { collector =>
-          resetAndEvaluateVariables(collector)
-        }
-        bindsIfInstance foreach { binds =>
-          // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
-          binds.rebuild()
-
-          // Controls may have @bind or bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
-          // TODO: Handle XPathDependencies
-          container.requireRefresh()
+        bindsIfInstance match {
+          case Some(binds) =>
+            EventCollector.withBufferCollector { collector =>
+              Dispatch.dispatchEvent(new XXFormsRebuildStartedEvent(selfModel), collector)
+            }
+            EventCollector.withBufferCollector { collector =>
+              resetAndEvaluateVariables(collector)
+            }
+            // NOTE: `contextStack.resetBindingContext(this)` called in `evaluateVariables()`
+            binds.rebuild()
+            // Controls may have @bind or bind() references, so we need to mark them as dirty. Will need dependencies for
+            // controls to fix this.
+            // TODO: Handle XPathDependencies
+            container.requireRefresh()
+          case None =>
         }
       } finally {
         deferredActionContext.resetRebuild()
       }
+      containingDocument.xpathDependencies.rebuildDone(selfModel)
     }
-    containingDocument.xpathDependencies.rebuildDone(selfModel)
-  }
 
   // Recalculate and revalidate are a combined operation
   // See https://github.com/orbeon/orbeon-forms/issues/1650
-  def doRecalculateRevalidate(): Unit = {
+  def doRecalculateRevalidateIfNeeded(): Unit =
+    if (deferredActionContext.recalculateRevalidate) {
 
-    // We don't want to dispatch events while we are performing the actual recalculate/revalidate operation,
-    // so we collect them here and dispatch them altogether once everything is done.
-    val validationEvents =
-      EventCollector.withBufferCollector { collector =>
+      def performRecalculateRevalidate(): m.Set[String] =
+        try {
+          EventCollector.withBufferCollector { collector =>
+            Dispatch.dispatchEvent(new XXFormsRecalculateStartedEvent(selfModel), collector)
+          }
+          EventCollector.withBufferCollector { collector =>
+            resetAndEvaluateVariables(collector)
+          }
 
-        def recalculateRevalidate: Option[collection.Set[String]] =
-          if (deferredActionContext.recalculateRevalidate) {
-            try {
+          bindsIfInstance match {
+            case Some(binds) =>
+              EventCollector.withBufferCollector { collector =>
+                  try {
+                    doRecalculate(binds, deferredActionContext.defaultsStrategy, collector)
+                    containingDocument.xpathDependencies.recalculateDone(selfModel)
 
-              doRecalculate(deferredActionContext.defaultsStrategy, collector)
-              containingDocument.xpathDependencies.recalculateDone(selfModel)
+                    val invalidInstanceEffectiveIds = m.LinkedHashSet[String]()
+                    doRevalidateWithSchema(invalidInstanceEffectiveIds)
+                    doRevalidateWithBinds(binds, invalidInstanceEffectiveIds, collector)
 
-              // Validate only if needed, including checking the flags, because if validation state is clean, validation
-              // being idempotent, revalidating is not needed.
-              val mustRevalidate = bindsIfInstance.isDefined || hasSchema
-
-              mustRevalidate option {
-                val invalidInstanceEffectiveIds = doRevalidate(collector)
-                containingDocument.xpathDependencies.revalidateDone(selfModel)
-                invalidInstanceEffectiveIds
+                    containingDocument.xpathDependencies.revalidateDone(selfModel)
+                    invalidInstanceEffectiveIds
+                  } finally {
+                    for {
+                      instanceId <- deferredActionContext.flaggedInstances
+                      doc        <- getInstance(instanceId).underlyingDocumentOpt
+                    } locally {
+                      InstanceDataOps.clearRequireDefaultValueRecursively(doc)
+                    }
+                }
               }
-            } finally {
-
-              for {
-                instanceId <- deferredActionContext.flaggedInstances
-                doc        <- getInstance(instanceId).underlyingDocumentOpt
-              } locally {
-                InstanceDataOps.clearRequireDefaultValueRecursively(doc)
-              }
-
-              deferredActionContext.resetRecalculateRevalidate()
-            }
-          } else
-            None
-
-        // Gather events to dispatch, at most one per instance, and only if validity has changed
-        // NOTE: It is possible, with binds and the use of xxf:instance(), that some instances in
-        // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
-        // algorithm below.
-        def createAndCommitValidationEvents(invalidInstanceEffectiveIds: collection.Set[String]): List[XFormsEvent] = {
-
-          val changedInstancesIt =
-            for {
-              instance           <- instancesIterator
-              previouslyValid    = instance.valid
-              newlyValid         = ! invalidInstanceEffectiveIds(instance.getEffectiveId)
-              if previouslyValid != newlyValid
-            } yield {
-              instance.valid = newlyValid // side-effect!
-              if (newlyValid) new XXFormsValidEvent(instance) else new XXFormsInvalidEvent(instance)
-            }
-
-          changedInstancesIt.toList
+            case None =>
+              val invalidInstanceEffectiveIds = m.LinkedHashSet[String]()
+              doRevalidateWithSchema(invalidInstanceEffectiveIds)
+              containingDocument.xpathDependencies.revalidateDone(selfModel)
+              invalidInstanceEffectiveIds
+          }
+        } finally {
+          deferredActionContext.resetRecalculateRevalidate()
         }
 
-        recalculateRevalidate map createAndCommitValidationEvents getOrElse Nil
+      // Gather events to dispatch, at most one per instance, and only if validity has changed
+      // NOTE: It is possible, with binds and the use of `xxf:instance()`, that some instances in
+      // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
+      // algorithm below.
+      def createAndCommitValidationEvents(invalidInstanceEffectiveIds: collection.Set[String]): List[XFormsEvent] = {
+
+        val changedInstancesIt =
+          for {
+            instance           <- instancesIterator
+            previouslyValid    = instance.valid
+            newlyValid         = ! invalidInstanceEffectiveIds(instance.getEffectiveId)
+            if previouslyValid != newlyValid
+          } yield {
+            instance.valid = newlyValid // side-effect!
+            if (newlyValid) new XXFormsValidEvent(instance) else new XXFormsInvalidEvent(instance)
+          }
+
+        changedInstancesIt.toList
       }
 
-    for (event <- validationEvents.iterator)
-      Dispatch.dispatchEvent(event, EventCollector.ToReview)
-  }
+      // We don't want to dispatch events while we are performing the actual recalculate/revalidate operation,
+      // so we collect them and dispatch them altogether once everything is done.
+      for (event <- createAndCommitValidationEvents(performRecalculateRevalidate()).iterator)
+        Dispatch.dispatchEvent(event, EventCollector.ToReview)
+    }
 
   def needRebuildRecalculateRevalidate: Boolean =
     deferredActionContext.rebuild || deferredActionContext.recalculateRevalidate
@@ -175,53 +172,36 @@ trait XFormsModelRebuildRecalculateRevalidate {
     lazy val _schemaValidator: XFormsModelSchemaValidator =
       new XFormsModelSchemaValidator(staticModel.element, indentedLogger) |!> (_.loadSchemas(containingDocument))
 
-    def doRecalculate(defaultsStrategy: DefaultsStrategy, collector: ErrorEventCollector): Unit =
+    def doRecalculate(binds: XFormsModelBinds, defaultsStrategy: DefaultsStrategy, collector: ErrorEventCollector): Unit =
       withDebug("performing recalculate", List("model" -> effectiveId)) {
-
-        val hasVariables = staticModel.variablesSeq.nonEmpty
-
-        // Re-evaluate top-level variables if needed
-        if (bindsIfInstance.isDefined || hasVariables)
-          resetAndEvaluateVariables(collector)
-
-        // Apply calculate binds
-        bindsIfInstance foreach { binds =>
-          binds.applyDefaultAndCalculateBinds(defaultsStrategy, collector)
-        }
+        binds.applyDefaultAndCalculateBinds(defaultsStrategy, collector)
       }
 
-    def doRevalidate(collector: ErrorEventCollector): collection.Set[String] =
-      withDebug("performing revalidate", List("model" -> effectiveId)) {
+    def doRevalidateWithBinds(binds: XFormsModelBinds, invalidInstanceEffectiveIds: m.Set[String], collector: ErrorEventCollector): Unit =
+      withDebug("performing revalidate with binds", List("model" -> effectiveId)) {
+        binds.applyValidationBinds(invalidInstanceEffectiveIds, collector)
+      }
 
-        val invalidInstanceEffectiveIds = m.LinkedHashSet[String]()
+    def doRevalidateWithSchema(invalidInstanceEffectiveIds: m.Set[String]): Unit =
+      if (hasSchema)
+        withDebug("performing revalidate with schema", List("model" -> effectiveId)) {
 
-        // Clear schema validation state
-        // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
-        for {
-          instance                       <- instancesIterator
-          instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation
-          if instanceMightBeSchemaValidated
-        } locally {
-          DataModel.visitElement(instance.rootElement, InstanceData.clearSchemaState)
-        }
+          // Clear schema validation state
+          // NOTE: This could possibly be moved to `rebuild()`, but we must be careful about the presence of a schema
+          for {
+            instance <- instancesIterator
+            if instance.isSchemaValidation
+          } locally {
+            DataModel.visitElement(instance.rootElement, InstanceData.clearSchemaState)
+          }
 
-        // Validate using schemas if needed
-        if (hasSchema)
           for {
             instance <- instancesIterator
             if instance.isSchemaValidation                   // we don't support validating read-only instances
             if ! _schemaValidator.validateInstance(instance) // apply schema
           } locally {
-            // Remember that instance is invalid
             invalidInstanceEffectiveIds += instance.getEffectiveId
           }
-
-        // Validate using binds if needed
-        modelBindsOpt foreach { binds =>
-          binds.applyValidationBinds(invalidInstanceEffectiveIds, collector)
-        }
-
-        invalidInstanceEffectiveIds
       }
 
     def bindsIfInstance: Option[XFormsModelBinds] =

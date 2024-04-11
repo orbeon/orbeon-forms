@@ -337,11 +337,11 @@ class XFormsModelSubmission(
 
             // Rebuild impacts validation, relevance and calculated values (set by recalculate)
             if (submissionParameters.validate || submissionParameters.relevanceHandling != RelevanceHandling.Keep || submissionParameters.xxfCalculate)
-              modelForInstance.doRebuild()
+              modelForInstance.doRebuildIfNeeded()
 
             // Recalculate impacts relevance and calculated values
             if (submissionParameters.relevanceHandling != RelevanceHandling.Keep || submissionParameters.xxfCalculate)
-              modelForInstance.doRecalculateRevalidate()
+              modelForInstance.doRecalculateRevalidateIfNeeded()
           }
 
           /* ***** Handle deferred submission ********************************************************************* */
@@ -590,7 +590,7 @@ class XFormsModelSubmission(
       // can impact serializations that use type information, for example multipart. But in that case, here we decide
       // the optimization is worth it anyway.
       if (validate)
-        currentInstance foreach (_.model.doRecalculateRevalidate())
+        currentInstance foreach (_.model.doRecalculateRevalidateIfNeeded())
 
       // Get selected nodes (re-root and handle relevance)
       val documentToSubmit =

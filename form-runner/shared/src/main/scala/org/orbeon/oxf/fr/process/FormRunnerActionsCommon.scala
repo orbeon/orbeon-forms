@@ -134,7 +134,7 @@ trait FormRunnerActionsCommon {
   // It makes sense to update all calculations as needed before saving data
   // https://github.com/orbeon/orbeon-forms/issues/3591
   protected def ensureDataCalculationsAreUpToDate(): Unit =
-    frc.formInstance.model.doRecalculateRevalidate()
+    frc.formInstance.model.doRecalculateRevalidateIfNeeded()
 
   def trySaveAttachmentsAndData(params: ActionParams): ActionResult =
     ActionResult.tryAsync {

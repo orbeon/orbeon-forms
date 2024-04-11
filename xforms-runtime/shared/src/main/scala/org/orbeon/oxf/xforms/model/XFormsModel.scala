@@ -135,8 +135,8 @@ class XFormsModel(
     // recalculations not depend on the number of times they run anyway?
     deferredActionContext.markStructuralChange(NoDefaultsStrategy, None)
     if (! deferRRR) {
-      doRebuild()
-      doRecalculateRevalidate()
+      doRebuildIfNeeded()
+      doRecalculateRevalidateIfNeeded()
     }
   }
 
@@ -155,7 +155,7 @@ class XFormsModel(
       case _: XFormsRebuildEvent =>
         // 4.3.7 The xforms-rebuild Event
         // Bubbles: Yes / Cancelable: Yes / Context Info: None
-        doRebuild()
+        doRebuildIfNeeded()
       case _: XFormsModelDestructEvent =>
         containingDocument.xpathDependencies.modelDestruct(selfModel)
       case _: XFormsRecalculateEvent | _: XFormsRevalidateEvent =>
@@ -163,7 +163,7 @@ class XFormsModel(
         // 4.3.6 The xforms-recalculate Event
         // Recalculate and revalidate are unified
         // See https://github.com/orbeon/orbeon-forms/issues/1650
-        doRecalculateRevalidate()
+        doRecalculateRevalidateIfNeeded()
       case _: XFormsRefreshEvent =>
         // 4.3.4 The xforms-refresh Event
         doRefresh()
@@ -228,8 +228,8 @@ class XFormsModel(
 
     // 3. A rebuild, recalculate, and revalidate are then performed in sequence for this mode
     if (rrr) {
-      doRebuild()
-      doRecalculateRevalidate()
+      doRebuildIfNeeded()
+      doRecalculateRevalidateIfNeeded()
     }
   }
 }
@@ -285,12 +285,12 @@ trait XFormsModelVariables {
 
   // Evaluate all top-level variables
   def resetAndEvaluateVariables(collector: ErrorEventCollector): Unit = {
-    // NOTE: This method is called during RRR and by submission processing. Need to do dependency handling.
-    // Reset context to this model, including evaluating the model variables
-    contextStack.resetBindingContext(selfModel.some, collector)
-    // Remember context and variables
-    defaultEvaluationContext = contextStack.getCurrentBindingContext
-  }
+      // NOTE: This method is called during RRR and by submission processing. Need to do dependency handling.
+      // Reset context to this model, including evaluating the model variables
+      contextStack.resetBindingContext(selfModel.some, collector)
+      // Remember context and variables
+      defaultEvaluationContext = contextStack.getCurrentBindingContext
+    }
 
   val variableResolver: (om.StructuredQName, XPathContext) => ValueRepresentationType =
     (variableQName: om.StructuredQName, xpathContext: XPathContext) =>

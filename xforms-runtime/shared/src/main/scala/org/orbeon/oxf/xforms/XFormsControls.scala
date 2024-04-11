@@ -49,16 +49,19 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
     markDirtySinceLastRequest(true)
   }
 
-  def refreshStart(): Unit = {
+  def withRefresh[A](thunk: => A): A = {
     Private.requireRefresh = false
-    inRefresh = true
+    Private.inRefresh = true
     containingDocument.getRequestStats.refreshes += 1
     containingDocument.xpathDependencies.refreshStart()
-  }
-
-  def refreshDone(): Unit = {
-    inRefresh = false
-    containingDocument.xpathDependencies.refreshDone()
+    try
+      thunk
+    finally {
+      // TODO: Why a `finally` block here? If an exception happened, do we really need to do a `refreshDone()`?
+      // 2023-12-08: Maybe ok as this cleans-up the XPath dependencies state.
+      Private.inRefresh = false
+      containingDocument.xpathDependencies.refreshDone()
+    }
   }
 
   // Create the controls, whether upon initial creation of restoration of the controls.
@@ -169,26 +172,18 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
       return
     }
 
-    // This method implements the new refresh event algorithm:
-    // http://wiki.orbeon.com/forms/doc/developer-guide/xforms-refresh-events
-    // Don't do anything if there are no children controls
     if (getCurrentControlTree.children.isEmpty) {
       debug("controls: not performing refresh because no controls are available")
-      refreshStart()
-      refreshDone()
+      withRefresh(())
     } else {
       withDebug("controls: performing refresh") {
-
-        // Notify dependencies
-        refreshStart()
 
         // Focused control before updating bindings
         val focusedBeforeOpt = focusedControlOpt
 
-
         val resultOpt =
           EventCollector.withBufferCollector { collector =>
-            try {
+            withRefresh {
 
               // Update control bindings
               // NOTE: During this process, ideally, no events are dispatched. However, at this point, the code
@@ -204,10 +199,6 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
               for (updater <- updateControlBindings(collector))
                 yield updater -> gatherControlsForRefresh
 
-            } finally {
-              // TODO: Why a `finally` block here? If an exception happened, do we really need to do a `refreshDone()`?
-              // 2023-12-08: Maybe ok as this cleans-up the XPath dependencies state.
-              refreshDone()
             }
           }
 

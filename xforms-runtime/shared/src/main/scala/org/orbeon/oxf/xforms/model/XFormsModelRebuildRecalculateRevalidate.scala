@@ -112,9 +112,9 @@ trait XFormsModelRebuildRecalculateRevalidate {
               val mustRevalidate = bindsIfInstance.isDefined || hasSchema
 
               mustRevalidate option {
-                val invalidInstances = doRevalidate(collector)
+                val invalidInstanceEffectiveIds = doRevalidate(collector)
                 containingDocument.xpathDependencies.revalidateDone(selfModel)
-                invalidInstances
+                invalidInstanceEffectiveIds
               }
             } finally {
 
@@ -134,13 +134,13 @@ trait XFormsModelRebuildRecalculateRevalidate {
         // NOTE: It is possible, with binds and the use of xxf:instance(), that some instances in
         // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
         // algorithm below.
-        def createAndCommitValidationEvents(invalidInstancesIds: collection.Set[String]): List[XFormsEvent] = {
+        def createAndCommitValidationEvents(invalidInstanceEffectiveIds: collection.Set[String]): List[XFormsEvent] = {
 
           val changedInstancesIt =
             for {
               instance           <- instancesIterator
               previouslyValid    = instance.valid
-              newlyValid         = ! invalidInstancesIds(instance.getEffectiveId)
+              newlyValid         = ! invalidInstanceEffectiveIds(instance.getEffectiveId)
               if previouslyValid != newlyValid
             } yield {
               instance.valid = newlyValid // side-effect!
@@ -194,7 +194,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
     def doRevalidate(collector: ErrorEventCollector): collection.Set[String] =
       withDebug("performing revalidate", List("model" -> effectiveId)) {
 
-        val invalidInstancesIds = m.LinkedHashSet[String]()
+        val invalidInstanceEffectiveIds = m.LinkedHashSet[String]()
 
         // Clear schema validation state
         // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
@@ -214,15 +214,15 @@ trait XFormsModelRebuildRecalculateRevalidate {
             if ! _schemaValidator.validateInstance(instance) // apply schema
           } locally {
             // Remember that instance is invalid
-            invalidInstancesIds += instance.getEffectiveId
+            invalidInstanceEffectiveIds += instance.getEffectiveId
           }
 
         // Validate using binds if needed
         modelBindsOpt foreach { binds =>
-          binds.applyValidationBinds(invalidInstancesIds, collector)
+          binds.applyValidationBinds(invalidInstanceEffectiveIds, collector)
         }
 
-        invalidInstancesIds
+        invalidInstanceEffectiveIds
       }
 
     def bindsIfInstance: Option[XFormsModelBinds] =

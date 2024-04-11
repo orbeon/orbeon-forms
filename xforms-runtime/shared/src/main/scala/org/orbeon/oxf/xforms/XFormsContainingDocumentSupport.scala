@@ -360,27 +360,17 @@ trait ContainingDocumentEvent {
   def currentEventOpt                     : Option[XFormsEvent] = eventStack.headOption
 
   def withOutermostActionHandler[T](block: => T): T = {
-    startOutermostActionHandler()
     val r = block
-    endOutermostActionHandler()
-    r
-  }
-
-  def maybeWithOutermostActionHandler[T](cond: Boolean)(block: => T): T = {
-    if (cond)
-      startOutermostActionHandler()
-    val r = block
-    if (cond)
-      endOutermostActionHandler()
-    r
-  }
-
-  def startOutermostActionHandler(): Unit = // Q: What about relevance?
-    allModels foreach (_.startOutermostActionHandler())
-
-  def endOutermostActionHandler(): Unit =
     if (isRelevant)
       synchronizeAndRefresh()
+    r
+  }
+
+  def maybeWithOutermostActionHandler[T](cond: Boolean)(block: => T): T =
+    if (cond)
+      withOutermostActionHandler(block)
+    else
+      block
 }
 
 trait ContainingDocumentProperties {

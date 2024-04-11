@@ -27,7 +27,7 @@ trait RebuildBindOps {
   // TEMP: Picked a different name or `fullOptJS` fails!
   import Private1._
 
-  final def topLevelBinds = _topLevelBinds
+  final def topLevelBinds: List[RuntimeBind] = _topLevelBinds
 
   final val singleNodeContextBinds   = m.HashMap[String, RuntimeBind]()
   final val iterationsForContextItem = m.HashMap[om.Item, List[BindIteration]]()

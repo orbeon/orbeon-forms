@@ -112,6 +112,12 @@
                 <xh:link href="/config/theme/error.css" class="xforms-baseline"/>
                 <xh:link href="/ops/nprogress-0.2.0/nprogress.css" class="xforms-baseline"/>
                 <xh:link href="/ops/css-loader/css-loader.css" class="xforms-baseline"/>
+                <xh:link href="/xbl/orbeon/code-mirror/codemirror-5.65.5/lib/codemirror.css" class="xforms-baseline"/>
+                <xh:link href="/xbl/orbeon/code-mirror/codemirror-5.65.5/theme/solarized.css" class="xforms-baseline"/>
+                <xh:link href="/xbl/orbeon/code-mirror/code-mirror.css" class="xforms-baseline"/>
+                <xh:link href="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/fold/foldgutter.css" class="xforms-baseline"/>
+                <xh:link href="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/dialog/dialog.css" class="xforms-baseline"/>
+                <xh:link href="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/search/matchesonscrollbar.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/date/date.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/css/bootstrap-datepicker.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/number/number.css" class="xforms-baseline"/>
@@ -138,6 +144,17 @@
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Placeholder.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/scalajs/orbeon-xforms-web.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/lib/codemirror.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/mode/xml/xml.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/fold/foldcode.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/fold/foldgutter.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/fold/xml-fold.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/dialog/dialog.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/search/searchcursor.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/search/search.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/scroll/annotatescrollbar.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/search/matchesonscrollbar.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/search/jump-to-line.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.fr.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.sv.min.js" class="xforms-baseline"/>

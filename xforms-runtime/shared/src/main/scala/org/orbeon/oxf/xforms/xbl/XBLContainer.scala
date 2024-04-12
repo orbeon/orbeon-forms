@@ -38,6 +38,7 @@ import shapeless.syntax.typeable.typeableOps
 import scala.collection.compat._
 import scala.collection.mutable
 
+
 /**
  * Represent an XBL container of models and controls.
  *
@@ -96,7 +97,7 @@ class XBLContainer(
       .getOrElse(containingDocument.getDefaultModel)
 
   private var _childrenXBLContainers: mutable.Buffer[XBLContainer] = mutable.ArrayBuffer()
-  def childrenXBLContainers = _childrenXBLContainers.iterator
+  def childrenXBLContainers: Iterator[XBLContainer] = _childrenXBLContainers.iterator
 
   def effectiveId: String = _effectiveId
   def partAnalysis: PartAnalysis = parentXBLContainer.map(_.partAnalysis).orNull
@@ -170,7 +171,7 @@ class XBLContainer(
 
   // Whether this container is relevant, i.e. either is a top-level container OR is within a relevant container
   // control componentControl will be null if we are at the top-level
-  def isRelevant: Boolean = ! (associatedControlOpt exists (! _.isRelevant))
+  def isRelevant: Boolean = associatedControlOpt.forall(_.isRelevant)
 }
 
 trait ModelContainer {
@@ -178,7 +179,7 @@ trait ModelContainer {
   self: XBLContainer =>
 
   private var _models = Seq.empty[XFormsModel]
-  def models = _models
+  def models: Seq[XFormsModel] = _models
 
   // Create and index models corresponding to this container's scope
   def addAllModels(): Unit =
@@ -302,7 +303,7 @@ trait RefreshSupport {
     for (model <- models)
       // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
       //currentModel.getBinds.rebuild()
-      model.markValueChange(null, false)
+      model.markValueChange(null, isCalculate = false)
 }
 
 trait ContainerResolver {
@@ -493,12 +494,9 @@ trait ContainerResolver {
       allModels flatMap (_.instancesIterator) find (_.getId == instanceStaticId)
     }
 
-  // For Java callers
-  def findInstanceOrNull(instanceId: String) = findInstance(instanceId).orNull
-
   protected def initializeNestedControls(collector: ErrorEventCollector): Unit = ()
 
-  def findFirstControlEffectiveId: Option[String] =
+  private def findFirstControlEffectiveId: Option[String] =
     // We currently don't have a real notion of a "root" control, so we resolve against the first control if any
     getChildrenControls(containingDocument.controls).headOption map (_.effectiveId)
 

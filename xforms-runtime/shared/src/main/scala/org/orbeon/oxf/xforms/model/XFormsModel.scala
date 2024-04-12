@@ -63,9 +63,6 @@ class XFormsModel(
 
   selfModel =>
 
-  def updateEffectiveId(effectiveId: String): Unit =
-    selfModel.effectiveId = effectiveId
-
   val containingDocument: XFormsContainingDocument = container.containingDocument
   val sequenceNumber: Int = containingDocument.nextModelSequenceNumber()
 

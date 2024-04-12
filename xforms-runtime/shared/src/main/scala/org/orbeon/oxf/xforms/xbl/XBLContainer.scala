@@ -133,7 +133,7 @@ class XBLContainer(
         XFormsId.getPrefixedId(currentModel.effectiveId) +
           XFormsId.getEffectiveIdSuffixWithSeparator(effectiveId)
 
-      currentModel.updateEffectiveId(newModelEffectiveId)
+      currentModel.effectiveId = newModelEffectiveId
     }
   }
 

@@ -221,7 +221,10 @@
                   mode="within-model">
         <xsl:element name="xf:type">
             <xsl:apply-templates select="@* except @type" mode="#current"/>
-            <xsl:value-of select="@type"/>
+            <!-- https://github.com/orbeon/orbeon-forms/issues/6252 -->
+            <xsl:if test="not(@type = ('xf:string', 'xs:string'))">
+                <xsl:value-of select="@type"/>
+            </xsl:if>
         </xsl:element>
     </xsl:template>
 

@@ -58,7 +58,7 @@ val ScalatagsVersion              = "0.9.4"
 val SbinaryVersion                = "0.5.1"
 val Log4sVersion                  = "1.10.0"
 val ScalaCollectionCompatVersion  = "2.11.0"
-val PPrintVersion                 = "0.7.3"
+val PPrintVersion                 = "0.8.1"
 
 // Java libraries
 val SaxonJvmVersion               = "9.1.0.8.3"

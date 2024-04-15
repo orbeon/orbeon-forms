@@ -58,7 +58,8 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
 //  protected
   def getDefaultContentType: String = ContentTypes.PdfContentType
 
-  protected def readInput(
+//  protected
+  def readInput(
     pipelineContext : PipelineContext,
     input           : ProcessorInput,
     config          : HttpSerializerBase.Config,

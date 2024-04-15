@@ -19,8 +19,6 @@ import org.orbeon.oxf.xml.SaxSupport.{AttributesImplOps, EmptyAttributes}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
-import scala.collection.immutable.Seq
-
 
 trait XMLReceiverSupport {
 

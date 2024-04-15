@@ -40,7 +40,7 @@ object PipelineResponse {
           private var charset: Option[String] = None
 
           private val contentHandlerOutputStream = new ContentHandlerOutputStream(xmlReceiver, true)
-          private lazy val printWriter = new PrintWriter(new OutputStreamWriter(contentHandlerOutputStream, charset.getOrElse(CachedSerializer.DEFAULT_ENCODING)))
+          private lazy val printWriter = new PrintWriter(new OutputStreamWriter(contentHandlerOutputStream, charset.getOrElse(CachedSerializer.DefaultEncoding)))
           private val originalResponse = externalContext.getResponse
 
           override def getOutputStream = contentHandlerOutputStream

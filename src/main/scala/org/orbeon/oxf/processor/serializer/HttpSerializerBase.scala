@@ -25,7 +25,7 @@ import org.orbeon.oxf.processor.serializer.CachedSerializer._
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream
 import org.orbeon.oxf.processor.{CacheableInputReader, ProcessorInput, ProcessorInputOutputInfo}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{LoggerFactory, URLRewriterUtils}
+import org.orbeon.oxf.util.{ContentTypes, LoggerFactory, URLRewriterUtils}
 import org.orbeon.oxf.xml.XPathUtils._
 
 import java.io.OutputStream
@@ -85,20 +85,20 @@ object HttpSerializerBase {
     def systemDoctypeOrNull: String     = systemDoctypeOpt.orNull
     def standaloneOrNull   : jl.Boolean = standalone.map(Boolean.box).orNull
 
-    def contentTypeOrDefault(default: String): Option[String] =
+    def contentTypeOrDefault(default: String): String =
       if (forceContentType)
-        contentTypeOpt
+        contentTypeOpt.getOrElse(throw new IllegalStateException)
       else
-        contentTypeOpt.orElse(Some(default))
+        contentTypeOpt.getOrElse(default)
 
-    def encodingOrDefault(default: String): Option[String] =
+    def encodingOrDefault(default: String): String =
       if (forceEncoding)
-        encodingOpt
+        encodingOpt.getOrElse(throw new IllegalStateException)
       else
-        encodingOpt.orElse(Some(default))
+        encodingOpt.getOrElse(default)
 
-    def encodingOrDefaultOrNull(default: String): String =
-      encodingOrDefault(default).orNull
+    def encodingWithCharset(defaultContentType: String, defaultCharset: String): String =
+      ContentTypes.makeContentTypeCharset(encodingOrDefault(defaultContentType), Some(encodingOrDefault(defaultCharset)))
   }
 
   /**
@@ -125,7 +125,8 @@ object HttpSerializerBase {
 /**
  * Base class for all HTTP serializers.
  */
-abstract class HttpSerializerBase protected extends CachedSerializer {
+abstract class HttpSerializerBase protected
+  extends CachedSerializer[HttpSerializerBase.Config] {
 
   import HttpSerializerBase._
 
@@ -141,7 +142,7 @@ abstract class HttpSerializerBase protected extends CachedSerializer {
    * Return the namespace URI of the schema validating the config input. Can be overridden by
    * subclasses.
    */
-  protected def getConfigSchemaNamespaceURI: String = SERIALIZER_CONFIG_NAMESPACE_URI
+  protected def getConfigSchemaNamespaceURI: String = SerializerConfigNamespaceUri
 
   override def start(pipelineContext: PipelineContext): Unit = {
 
@@ -157,7 +158,7 @@ abstract class HttpSerializerBase protected extends CachedSerializer {
       // Send an error if needed and return immediately
       // 2024-04-08: No uses of this in the codebase.
       val errorCode = config.errorCode
-      if (errorCode != DEFAULT_ERROR_CODE) {
+      if (errorCode != DefaultErrorCode) {
         response.sendError(errorCode)
         return
       }
@@ -298,7 +299,7 @@ abstract class HttpSerializerBase protected extends CachedSerializer {
 
         if (forceContentType && contentTypeOpt.isEmpty)
           throw new OXFException("The force-content-type element requires a content-type element.")
-        if (forceEncoding && encodingOpt.isDefined)
+        if (forceEncoding && encodingOpt.isEmpty)
           throw new OXFException("The force-encoding element requires an encoding element.")
 
         val headersIt =
@@ -313,7 +314,7 @@ abstract class HttpSerializerBase protected extends CachedSerializer {
         Config(
           // HTTP configuration
           statusCode                = selectIntegerValue           (configElement, "/config/status-code",                   DefaultStatusCode),
-          errorCode                 = selectIntegerValue           (configElement, "/config/error-code",                    DEFAULT_ERROR_CODE),
+          errorCode                 = selectIntegerValue           (configElement, "/config/error-code",                    DefaultErrorCode),
           contentTypeOpt            = contentTypeOpt,
           forceContentType          = forceContentType,
           ignoreDocumentContentType = selectBooleanValue           (configElement, "/config/ignore-document-content-type",  DefaultIgnoreDocumentContentType),
@@ -322,18 +323,18 @@ abstract class HttpSerializerBase protected extends CachedSerializer {
           ignoreDocumentEncoding    = selectBooleanValue           (configElement, "/config/ignore-document-encoding",      DefaultIgnoreDocumentEncoding),
           headers                   = headersIt.toList,
           headersToForward          = selectStringValueNormalizeOpt(configElement, "/config/forward-headers").map(_.splitTo[List]()).getOrElse(Nil),
-          cacheUseLocalCache        = selectBooleanValue           (configElement, "/config/cache-control/use-local-cache", DEFAULT_CACHE_USE_LOCAL_CACHE),
-          empty                     = selectBooleanValue           (configElement, "/config/empty-content",                 DEFAULT_EMPTY),
+          cacheUseLocalCache        = selectBooleanValue           (configElement, "/config/cache-control/use-local-cache", DefaultCacheUseLocalCache),
+          empty                     = selectBooleanValue           (configElement, "/config/empty-content",                 DefaultEmpty),
 
           // XML / HTML / Text configuration
           methodOpt                 = selectStringValueNormalizeOpt(configElement, "/config/method"),
           versionOpt                = selectStringValueNormalizeOpt(configElement, "/config/version"),
           publicDoctypeOpt          = selectStringValueNormalizeOpt(configElement, "/config/public-doctype"),
           systemDoctypeOpt          = selectStringValueNormalizeOpt(configElement, "/config/system-doctype"),
-          omitXMLDeclaration        = selectBooleanValue           (configElement, "/config/omit-xml-declaration",          DEFAULT_OMIT_XML_DECLARATION),
+          omitXMLDeclaration        = selectBooleanValue           (configElement, "/config/omit-xml-declaration",          DefaultOmitXmlDeclaration),
           standalone                = selectStringValueNormalizeOpt(configElement, "/config/standalone").map(_.toBoolean),
-          indent                    = selectBooleanValue           (configElement, "/config/indent",                        DEFAULT_INDENT),
-          indentAmount              = selectIntegerValue           (configElement, "/config/indent-amount",                 DEFAULT_INDENT_AMOUNT),
+          indent                    = selectBooleanValue           (configElement, "/config/indent",                        DefaultIndent),
+          indentAmount              = selectIntegerValue           (configElement, "/config/indent-amount",                 DefaultIndentAmount),
         )
       }
     )

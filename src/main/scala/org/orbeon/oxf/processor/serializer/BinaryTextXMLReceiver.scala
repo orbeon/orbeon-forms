@@ -157,7 +157,7 @@ class BinaryTextXMLReceiver(
           } else {
             // Otherwise try some funky logic based on the configuration
             val contentType = getContentType(contentTypeAttribute, DefaultBinaryContentType)
-            val encoding    = getEncoding(contentTypeAttribute, CachedSerializer.DEFAULT_ENCODING)
+            val encoding    = getEncoding(contentTypeAttribute, CachedSerializer.DefaultEncoding)
 
             // Output encoding only for text content types, defaulting to utf-8
             // NOTE: The "binary" mode doesn't mean the content is binary, it could be text as well. So we
@@ -175,7 +175,7 @@ class BinaryTextXMLReceiver(
       } else {
         // Get content-type and encoding
         val contentType = getContentType(contentTypeAttribute, DefaultTextContentType)
-        val encoding    = getEncoding(contentTypeAttribute, CachedSerializer.DEFAULT_ENCODING)
+        val encoding    = getEncoding(contentTypeAttribute, CachedSerializer.DefaultEncoding)
 
         responsePathTypeOpt foreach { case (response, _) =>
           // Always set the content type with a charset attribute (with a default)
@@ -244,7 +244,7 @@ object BinaryTextXMLReceiver {
 
   private val StatusCodeRE = """status-code="([^"]*)"""".r
 
-  def parseSerializerPI(target: String, data: String): Option[(String, Option[String])] = {
+  private def parseSerializerPI(target: String, data: String): Option[(String, Option[String])] = {
     if (PITargets(target)) {
       Option(data) collect {
         case StatusCodeRE(code) => "status-code" -> Some(code)
@@ -254,6 +254,6 @@ object BinaryTextXMLReceiver {
       None
   }
 
-  def isSerializerPI(target: String, data: String) =
+  def isSerializerPI(target: String, data: String): Boolean =
     parseSerializerPI(target, data).isDefined
 }

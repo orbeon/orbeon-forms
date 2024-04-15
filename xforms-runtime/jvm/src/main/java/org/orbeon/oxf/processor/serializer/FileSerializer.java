@@ -111,7 +111,7 @@ public class FileSerializer extends ProcessorImpl {
             url = XPathUtils.selectStringValueNormalize(document, "/config/url");
 
             // Cache control
-            cacheUseLocalCache = ProcessorUtils.selectBooleanValue(document, "/config/cache-control/use-local-cache", CachedSerializer.DEFAULT_CACHE_USE_LOCAL_CACHE);
+            cacheUseLocalCache = ProcessorUtils.selectBooleanValue(document, "/config/cache-control/use-local-cache", CachedSerializer.DefaultCacheUseLocalCache());
 
             // Whether to append or not
             append = ProcessorUtils.selectBooleanValue(document, "/config/append", DEFAULT_APPEND);

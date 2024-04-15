@@ -16,10 +16,11 @@ package org.orbeon.oxf.processor.barcode;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.tools.ant.filters.StringInputStream;
-import org.orbeon.dom.Document;
 import org.krysalis.barcode4j.BarcodeGenerator;
 import org.krysalis.barcode4j.BarcodeUtil;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -28,7 +29,6 @@ import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 
 import java.awt.image.BufferedImage;
@@ -51,7 +51,8 @@ public class BarcodeProcessor extends HttpBinarySerializer {// TODO: HttpBinaryS
 		addInputInfo(new ProcessorInputOutputInfo("data"));
 	}
 
-	protected void readInput(PipelineContext context, ProcessorInput input, Config config, OutputStream outputStream) {
+//	protected
+	public void readInput(PipelineContext context, ProcessorInput input, Config config, OutputStream outputStream) {
 
         // Read inputs
         final Document configDocument = readCacheInputAsOrbeonDom(context, "barcode");

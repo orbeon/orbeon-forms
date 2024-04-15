@@ -73,8 +73,8 @@ public class SchemaRepository {
         SCHEMAS.put(XMLProcessorRegistry.PROCESSOR_REGISTRY_CONFIG_NAMESPACE_URI, "schemas/processor-registry.rng");
 
         // Serializers schemas
-        SCHEMAS.put(CachedSerializer.SERIALIZER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "serializer/legacy-serializer-config.rng");
-        SCHEMAS.put(HttpSerializer.HTTP_SERIALIZER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "serializer/http-serializer-config.rng");
+        SCHEMAS.put(CachedSerializer.SerializerConfigNamespaceUri(), PROCESSORS_SCHEMA_PATH + "serializer/legacy-serializer-config.rng");
+        SCHEMAS.put(HttpSerializer.HttpSerializerConfigNamespaceUri(), PROCESSORS_SCHEMA_PATH + "serializer/http-serializer-config.rng");
         SCHEMAS.put("http://orbeon.org/oxf/xml/file-serializer-config", "schemas/file-serializer-config.rng");
 
         // Converter schemas

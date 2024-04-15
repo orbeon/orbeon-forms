@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xml;
 
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
@@ -29,11 +28,6 @@ public class NamespaceCleanupXMLReceiver extends ForwardingXMLReceiver {
 
     public NamespaceCleanupXMLReceiver(XMLReceiver xmlReceiver, boolean serializeXML11) {
         super(xmlReceiver);
-        this.filterNamespaceEvents = !serializeXML11;
-    }
-
-    public NamespaceCleanupXMLReceiver(ContentHandler contentHandler, boolean serializeXML11) {
-        super(contentHandler);
         this.filterNamespaceEvents = !serializeXML11;
     }
 

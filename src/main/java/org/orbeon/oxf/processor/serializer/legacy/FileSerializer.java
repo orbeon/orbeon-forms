@@ -140,7 +140,7 @@ public class FileSerializer extends ProcessorImpl {
             // Cache control
             String cacheUseLocalCacheString = XPathUtils.selectStringValueNormalize(document, "/config/cache-control/use-local-cache");
             if (cacheUseLocalCacheString == null)
-                cacheUseLocalCache = CachedSerializer.DEFAULT_CACHE_USE_LOCAL_CACHE;
+                cacheUseLocalCache = CachedSerializer.DefaultCacheUseLocalCache();
             else
                 cacheUseLocalCache = Boolean.parseBoolean(cacheUseLocalCacheString);
         }

@@ -79,24 +79,23 @@ public class FileSerializer extends ProcessorImpl {
 
     private static class Config {
 
-        private String directory;
-        private String file;
-        private String scope;
-        private boolean proxyResult;
-        private String url;
-        private boolean append;
-        private boolean makeDirectories;
+        private final String directory;
+        private final String file;
+        private final String scope;
+        private final boolean proxyResult;
+        private final String url;
+        private final boolean append;
+        private final boolean makeDirectories;
 
-        private boolean cacheUseLocalCache;
+        private final boolean cacheUseLocalCache;
 
-        private boolean forceContentType;
-        private String requestedContentType;
-        private boolean ignoreDocumentContentType;
+        private final boolean forceContentType;
+        private final String requestedContentType;
+        private final boolean ignoreDocumentContentType;
 
-        private boolean forceEncoding;
-        private String requestedEncoding;
-        private boolean ignoreDocumentEncoding;
-
+        private final boolean forceEncoding;
+        private final String requestedEncoding;
+        private final boolean ignoreDocumentEncoding;
 
         public Config(Document document) {
             // Directory and file
@@ -135,63 +134,6 @@ public class FileSerializer extends ProcessorImpl {
                 throw new OXFException("The force-encoding element requires an encoding element.");
             ignoreDocumentEncoding = ProcessorUtils.selectBooleanValue(document, "/config/ignore-document-encoding", DEFAULT_IGNORE_DOCUMENT_ENCODING);
         }
-
-
-        public String getDirectory() {
-            return directory;
-        }
-
-        public String getFile() {
-            return file;
-        }
-
-        public String getScope() {
-            return scope;
-        }
-
-        public boolean isProxyResult() {
-            return proxyResult;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-
-        public boolean isAppend() {
-            return append;
-        }
-
-        public boolean isMakeDirectories() {
-            return makeDirectories;
-        }
-
-        public boolean isCacheUseLocalCache() {
-            return cacheUseLocalCache;
-        }
-
-        public boolean isForceContentType() {
-            return forceContentType;
-        }
-
-        public boolean isForceEncoding() {
-            return forceEncoding;
-        }
-
-        public boolean isIgnoreDocumentContentType() {
-            return ignoreDocumentContentType;
-        }
-
-        public boolean isIgnoreDocumentEncoding() {
-            return ignoreDocumentEncoding;
-        }
-
-        public String getRequestedContentType() {
-            return requestedContentType;
-        }
-
-        public String getRequestedEncoding() {
-            return requestedEncoding;
-        }
     }
 
     @Override
@@ -207,8 +149,8 @@ public class FileSerializer extends ProcessorImpl {
             final ProcessorInput dataInput = getInputByName(INPUT_DATA);
 
             // Get file object
-            final String directory = config.getDirectory() != null ? config.getDirectory() : getPropertySet().getString(FileProcessor.DIRECTORY_PROPERTY);
-            final File file = NetUtils.getFile(directory, config.getFile(), config.getUrl(), getLocationData(), config.isMakeDirectories());
+            final String directory = config.directory != null ? config.directory : getPropertySet().getString(FileProcessor.DIRECTORY_PROPERTY);
+            final File file = NetUtils.getFile(directory, config.file, config.url, getLocationData(), config.makeDirectories);
 
             // NOTE: Caching here is broken, so we never cache. This is what we should do in case
             // we want caching:
@@ -217,7 +159,7 @@ public class FileSerializer extends ProcessorImpl {
             //   AND the validity
 
             // Delete file if it exists, unless we append
-            if (!config.isAppend() && file.exists()) {
+            if (!config.append && file.exists()) {
                 final boolean deleted = file.delete();
                 // We test on file.exists() here again so we don't complain that the file can't be deleted if it got
                 // deleted just between our last test and the delete operation.
@@ -227,7 +169,7 @@ public class FileSerializer extends ProcessorImpl {
 
             // Create file if needed
             file.createNewFile();
-            FileOutputStream fileOutputStream = new FileOutputStream(file, config.isAppend());
+            FileOutputStream fileOutputStream = new FileOutputStream(file, config.append);
             writeToFile(context, config, dataInput, fileOutputStream);
 
         } catch (Exception e) {
@@ -296,14 +238,14 @@ public class FileSerializer extends ProcessorImpl {
 
                     // Determine scope
                     final int scope;
-                    if ("request".equals(config.getScope())) {
+                    if ("request".equals(config.scope)) {
                         scope = NetUtils.REQUEST_SCOPE;
-                    } else if ("session".equals(config.getScope())) {
+                    } else if ("session".equals(config.scope)) {
                         scope = NetUtils.SESSION_SCOPE;
-                    } else if ("application".equals(config.getScope())) {
+                    } else if ("application".equals(config.scope)) {
                         scope = NetUtils.APPLICATION_SCOPE;
                     } else {
-                        throw new OXFException("Invalid context requested: " + config.getScope());
+                        throw new OXFException("Invalid context requested: " + config.scope);
                     }
 
                     // We use the commons fileupload utilities to write to file
@@ -319,8 +261,8 @@ public class FileSerializer extends ProcessorImpl {
                     final String resultURL;
                     {
                         final String localURL = ((DiskFileItem) fileItem).getStoreLocation().toURI().toString();
-                        if ("session".equals(config.getScope()) && config.isProxyResult())
-                            resultURL = XFormsAssetServer.jProxyURI(localURL, config.getRequestedContentType());
+                        if ("session".equals(config.scope) && config.proxyResult)
+                            resultURL = XFormsAssetServer.jProxyURI(localURL, config.requestedContentType);
                         else
                             resultURL = localURL;
                     }

@@ -114,7 +114,8 @@ class JavaxHttpServletRequest(httpServletRequest: javax.servlet.http.HttpServlet
   override def getRequestURL: StringBuffer = httpServletRequest.getRequestURL
   override def getRequestedSessionId: String = httpServletRequest.getRequestedSessionId
   override def getServletPath: String = httpServletRequest.getServletPath
-  override def getSession(create: Boolean): HttpSession = HttpSession(httpServletRequest.getSession(create))
+  // #6019: make sure we return null if the native session is null
+  override def getSession(create: Boolean): HttpSession = Option(httpServletRequest.getSession(create)).map(HttpSession.apply).orNull
   override def isRequestedSessionIdValid: Boolean = httpServletRequest.isRequestedSessionIdValid
   override def isUserInRole(role: String): Boolean = httpServletRequest.isUserInRole(role)
 }
@@ -139,7 +140,8 @@ class JakartaHttpServletRequest(val httpServletRequest: jakarta.servlet.http.Htt
   override def getRequestURL: StringBuffer = httpServletRequest.getRequestURL
   override def getRequestedSessionId: String = httpServletRequest.getRequestedSessionId
   override def getServletPath: String = httpServletRequest.getServletPath
-  override def getSession(create: Boolean): HttpSession = HttpSession(httpServletRequest.getSession(create))
+  // #6019: make sure we return null if the native session is null
+  override def getSession(create: Boolean): HttpSession = Option(httpServletRequest.getSession(create)).map(HttpSession.apply).orNull
   override def isRequestedSessionIdValid: Boolean = httpServletRequest.isRequestedSessionIdValid
   override def isUserInRole(role: String): Boolean = httpServletRequest.isUserInRole(role)
 }

@@ -20,7 +20,7 @@
                 <short-date>[M01]/[D01]/[Y01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration>Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration>Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -704,7 +704,7 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration>Votre configuration Orbeon Forms est incomplète. Veuillez vérifier vos fichiers de log Orbeon Forms pour les détails.</incomplete-configuration>
+                <incomplete-configuration>Votre configuration Orbeon Forms est incomplète. Veuillez vérifier vos fichiers de log Orbeon Forms pour les détails, ainsi que &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;la documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -1392,7 +1392,7 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -2069,7 +2069,7 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -2777,7 +2777,7 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -3451,7 +3451,7 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -4124,7 +4124,7 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -4807,7 +4807,7 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -5490,7 +5490,7 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -6173,7 +6173,7 @@
                 <short-date>[Y0001]-[M01]-[D01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -6856,7 +6856,7 @@
                 <short-date>[D01]-[M01]-[Y01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -7539,7 +7539,7 @@
                 <short-date>[M01]/[Y01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -8222,7 +8222,7 @@
                 <short-date>[D01]-[M01]-[Y01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>
@@ -8896,7 +8896,7 @@
                 <short-date>[Y01]-[M01]-[D01]</short-date>
             </formats>
             <messages>
-                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. Please check your Orbeon Forms log file for details.</incomplete-configuration>
+                <incomplete-configuration todo="true">Your Orbeon Forms configuration is incomplete. For more details, please check your Orbeon Forms log file and visit &lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;the documentation&lt;/a&gt;.</incomplete-configuration>
             </messages>
         </common>
         <buttons>

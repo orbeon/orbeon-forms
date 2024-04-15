@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
+import org.log4s
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.Names._
@@ -140,18 +141,30 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
 
       val lines =
         tokens.map {
-          case "password.general"          => "The password for the `oxf.crypto.password` property is missing or not strong enough."
-          case "password.token"            => "The password for the `oxf.fr.access-token.password` property is missing or not strong enough."
-          case "password.field-encryption" => "The password for the `oxf.fr.field-encryption.password` property is missing or not strong enough."
-          case "database.configuration"    => "The database configuration is missing or incomplete."
-          case other                       => s"The property `$other` is not defined."
+          case ("password.general"         , _) => "The password for the `oxf.crypto.password` property is missing or not strong enough."
+          case ("password.token"           , _) => "The password for the `oxf.fr.access-token.password` property is missing or not strong enough (optional)."
+          case ("password.field-encryption", _) => "The password for the `oxf.fr.field-encryption.password` property is missing or not strong enough (optional)."
+          case ("database.configuration"   , _) => "The database configuration is missing or incomplete."
+          case (other                      , _) => s"The property `$other` is not defined."
         }
 
-      CoreCrossPlatformSupport.logger.error(
-        s"The following Orbeon Forms configurations are incomplete:\n\n${lines.map(l => s"- $l\n").mkString}"
-      )
+      val message =
+        s"The following Orbeon Forms configurations are incomplete:\n\n${
+          lines.map(l => s"- $l\n").mkString
+        }\nPlease visit this page for more: https://doc.orbeon.com/installation/configuration-banner\n"
+
+      val hasErrorLevel =
+        tokens.exists {
+          case (_, log4s.Error) => true
+          case _                => false
+        }
+
+      if (hasErrorLevel)
+        CoreCrossPlatformSupport.logger.error(message)
+      else
+        CoreCrossPlatformSupport.logger.info(message)
     }
-    tokens
+    tokens.map(_._1)
   }
 
   //@XPathFunction

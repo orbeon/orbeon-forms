@@ -78,7 +78,9 @@ object FormRunnerAuthFilterImpl {
 
   def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {
 
-    val httpSession    = new ServletSessionImpl(servletRequest.getSession(true))
+    // Do not create a session for fonts, source maps, or OPTIONS requests
+    val createSession  = ! (servletRequest.isFont || servletRequest.isSourceMap || servletRequest.isOptions)
+    val httpSession    = new ServletSessionImpl(servletRequest.getSession(createSession))
     val getHttpHeaders = (name: String) => servletRequest.getHeaders(name).asScala.to(List)
 
     def headersAsString(r: HttpServletRequest) = {

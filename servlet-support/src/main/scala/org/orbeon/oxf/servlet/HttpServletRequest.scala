@@ -15,6 +15,7 @@ package org.orbeon.oxf.servlet
 
 import org.orbeon.oxf.util.PathUtils._
 
+import java.net.URI
 import java.{util => ju}
 
 
@@ -90,6 +91,15 @@ trait HttpServletRequest extends ServletRequest {
         servletPath + pathInfo
 
     requestPath.prependSlash
+  }
+
+  def isOptions: Boolean   = getMethod.toUpperCase == "OPTIONS"
+  def isFont: Boolean      = hasFileExtension(Set("otf", "ttf", "woff", "woff2"))
+  def isSourceMap: Boolean = hasFileExtension(Set("map"))
+
+  private def hasFileExtension(extensions: Set[String]): Boolean = {
+    val urlPath = URI.create(getRequestURL.toString).getPath
+    extensions.exists(ext => urlPath.endsWith(s".$ext"))
   }
 }
 

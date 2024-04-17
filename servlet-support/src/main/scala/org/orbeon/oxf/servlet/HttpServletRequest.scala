@@ -93,14 +93,15 @@ trait HttpServletRequest extends ServletRequest {
     requestPath.prependSlash
   }
 
-  def isOptions: Boolean   = getMethod.toUpperCase == "OPTIONS"
+  def isOptions: Boolean   = Option(getMethod).exists(_.toUpperCase == "OPTIONS")
   def isFont: Boolean      = hasFileExtension(Set("otf", "ttf", "woff", "woff2"))
   def isSourceMap: Boolean = hasFileExtension(Set("map"))
 
-  private def hasFileExtension(extensions: Set[String]): Boolean = {
-    val urlPath = URI.create(getRequestURL.toString).getPath
-    extensions.exists(ext => urlPath.endsWith(s".$ext"))
-  }
+  private def hasFileExtension(extensions: Set[String]): Boolean =
+    (for {
+      url  <- Option(getRequestURL)
+      path <- Option(URI.create(url.toString).getPath)
+    } yield extensions.exists(ext => path.endsWith(s".$ext"))).getOrElse(false)
 }
 
 class JavaxHttpServletRequest(httpServletRequest: javax.servlet.http.HttpServletRequest) extends JavaxServletRequest(httpServletRequest) with HttpServletRequest {

@@ -72,7 +72,9 @@ class XFormsGroupDefaultHandler(
     //
     // So remains the case of an external LHHA. This is where it makes sense to add the `aria-*` attributes.
     //
-    if (handleAriaByAtts(atts, _ => true)) {
+    // 2024-04-17: Don't add `role="group"` if the element is not a `div`.
+    //
+    if (handleAriaByAtts(atts, _ => true) && getContainingElementName == "div") {
       // There is at least one reference with `aria-*`, so add new attributes
       atts.addOrReplace(XFormsNames.ROLE_QNAME, "group")
       if (handlerContext.a11yFocusOnGroups)

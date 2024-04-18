@@ -222,6 +222,16 @@ object FRComponentParamSupport {
       case cc: XFormsComponentControl if cc.staticControl.element.getQName == XMLNames.FRSectionQName => cc
     }
 
+  private val ContainerQNames = Set(XMLNames.FRSectionQName, XMLNames.FRGridQName)
+
+  def ancestorContainersIt(control: XFormsControl): Iterator[XFormsComponentControl] =
+    new AncestorOrSelfIterator(control.parent) collect {
+      case cc: XFormsComponentControl if ContainerQNames(cc.staticControl.element.getQName) => cc
+    }
+
+  def ancestorContainerNamesIt(control: XFormsControl): Iterator[String] =
+    ancestorContainersIt(control).map(s => frc.controlNameFromId(s.staticControl.staticId))
+
   def topLevelSectionNameForControlId(absoluteControlId: String): Option[String] =
     inScopeContainingDocument.findControlByEffectiveId(XFormsId.absoluteIdToEffectiveId(absoluteControlId))
       .flatMap(topLevelAncestorSectionName)

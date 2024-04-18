@@ -113,6 +113,7 @@ object XMLNames {
   val FRIterationLabelQName       : QName  = QName("iteration-label",        FRNamespace)
   val FRAddIterationLabelQName    : QName  = QName("add-iteration-label",    FRNamespace)
   val FRRemoveIterationLabelQName : QName  = QName("remove-iteration-label", FRNamespace)
+  val FRGridQName                 : QName  = QName("grid",                   FRNamespace)
   val FRSectionQName              : QName  = QName("section",                FRNamespace)
 
   val FRYesNoInputQName             : QName = QName("yesno-input",              FRNamespace)

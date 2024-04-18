@@ -13,14 +13,16 @@
  */
 package org.orbeon.xbl
 
+import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.library.FRComponentParamSupport.closestAncestorSectionName
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams}
+import org.orbeon.oxf.fr.library.FRComponentParamSupport.{ancestorContainerNamesIt, closestAncestorSectionName}
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.control.controls.{XFormsSwitchControl, XFormsVariableControl}
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
@@ -30,8 +32,6 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.Constants
 import shapeless.syntax.typeable._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 
 import scala.collection.compat._
 
@@ -136,6 +136,12 @@ object Wizard {
     inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, controlId).collect {
       case control: XFormsControl => closestAncestorSectionName(control)
     }.flatten
+
+  //@XPathFunction
+  def ancestorContainerNamesForControlId(controlId: String): Array[String] =
+    inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, controlId).iterator.collect {
+      case control: XFormsControl => ancestorContainerNamesIt(control)
+    }.flatten.toArray
 
   case class SectionStatus(
     name                       : String,

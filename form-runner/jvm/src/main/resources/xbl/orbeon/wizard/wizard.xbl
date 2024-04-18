@@ -114,17 +114,33 @@
             </xbl:handler>
             <!-- For client-side API -->
             <xbl:handler event="fr-wizard-focus" phase="target">
-
-                <!-- TODO: Support `lax` and `strict` modes. -->
+                <xf:var
+                    xxbl:scope="outer"
+                    name="control-id"
+                    value="concat(event('fr-control-name'), '-control')">
+                </xf:var>
+                <xf:var
+                    xxbl:scope="outer"
+                    name="first-repeat-index-opt"
+                    value="xxf:split(event('fr-repeat-indexes'))[1]/xs:integer(.)">
+                </xf:var>
                 <xf:action if="xxf:instance('local')/validate/data(.) = 'free'">
-
                     <xf:setfocus
-                        control="{event('fr-control-name')}-control"
-                        xxf:repeat-indexes="{event('fr-repeat-indexes')}"
-                        xxbl:scope="outer"/>
-
+                        xxbl:scope="outer"
+                        control="{$control-id}"
+                        xxf:repeat-indexes="{event('fr-repeat-indexes')}"/>
                 </xf:action>
-
+                <xf:action if="not(xxf:instance('local')/validate/data(.) = 'free')">
+                    <xf:dispatch
+                        xxbl:scope="outer"
+                        name="fr-toggle-section-validate"
+                        targetid="fr-wizard-outer-group">
+                        <xf:property name="requested-control-id-opt" value="$control-id"/>
+                        <xf:property name="requested-page-index-opt" value="$first-repeat-index-opt"/>
+                        <xf:property name="setfocus-control-id"      value="$control-id"/>
+                        <xf:property name="setfocus-repeat-indexes"  value="event('fr-repeat-indexes')"/>
+                    </xf:dispatch>
+                </xf:action>
             </xbl:handler>
             <!-- When a page/section is shown, create the associated `fr:section-status` attribute if needed -->
             <!-- NOTE: 2018-08-07: This is done only for *top-level* pages. -->
@@ -756,13 +772,36 @@
                                         as="xs:string?"
                                         value="event('last-available-and-visited-top-level-section-id-opt')"/>
                                     <xf:var
+                                        name="requested-control-id-opt"
+                                        as="xs:string?"
+                                        value="event('requested-control-id-opt')"/>
+                                    <xf:var
                                         name="requested-page-name-opt"
                                         as="xs:string?"
-                                        value="event('requested-page-name-opt')"/>
+                                        value="
+                                            if (exists($requested-control-id-opt)) then
+                                                Wizard:ancestorContainerNamesForControlId($requested-control-id-opt)[
+                                                    . = (
+                                                        for $i in $relevant-nav-section-or-grid-ids
+                                                        return frf:controlNameFromId($i)
+                                                    )
+                                                ]
+                                            else
+                                                event('requested-page-name-opt')"/>
                                     <xf:var
                                         name="requested-page-index-opt"
                                         as="xs:integer?"
                                         value="event('requested-page-index-opt')"/>
+
+                                    <xf:var
+                                        name="setfocus-control-id-opt"
+                                        as="xs:string?"
+                                        value="event('setfocus-control-id')"/>
+
+                                    <xf:var
+                                        name="setfocus-repeat-indexes-opt"
+                                        as="xs:string?"
+                                        value="event('setfocus-repeat-indexes')"/>
 
                                     <xf:var
                                         name="initial-case-id-with-index-opt"
@@ -825,46 +864,56 @@
                                                         $i
                                                     ),
                                                 (: Regular top-level section scenario :)
-                                                array:append(
-                                                    array:join(()),
-                                                    concat($last-available-and-visited-top-level-section-id-opt, '-case')
-                                                )
+                                                for $last-available-and-visited-top-level-section-id in $last-available-and-visited-top-level-section-id-opt
+                                                return
+                                                    array:append(
+                                                        array:join(()),
+                                                        concat($last-available-and-visited-top-level-section-id, '-case')
+                                                    )
                                             )[1]"/>
 
-                                    <xf:var
-                                        name="new-case-id"
-                                        value="array:get($initial-case-id-with-index-opt, 1)"/>
+                                    <xf:action if="exists($initial-case-id-with-index-opt)">
+                                        <xf:var
+                                            name="new-case-id"
+                                            value="array:get($initial-case-id-with-index-opt, 1)"/>
 
-                                    <xf:setvalue
-                                        ref="xxf:instance('local')/current-case-id"
-                                        value="$new-case-id"/>
-
-                                    <xf:setvalue
-                                        ref="xxf:instance('local')/current-top-level-case-id"
-                                        value="
-                                            concat(
-                                                $nav-matching-top-level-section-ids[
-                                                    index-of(
-                                                        $nav-section-or-grid-ids,
-                                                        Wizard:sectionIdFromCaseIdOpt($new-case-id)
-                                                    )
-                                                ],
-                                                '-case'
-                                            )"/>
-
-                                    <!-- See https://github.com/orbeon/orbeon-forms/issues/3433 -->
-                                    <xf:toggle
-                                        case="{{$new-case-id}}"/>
-
-                                    <!-- Set initial index if present -->
-                                    <xf:action if="array:size($initial-case-id-with-index-opt) ge 2">
-                                        <xf:var name="new-index" value="array:get($initial-case-id-with-index-opt, 2)"/>
                                         <xf:setvalue
-                                            ref="xxf:instance('local')/current-index"
-                                            value="$new-index"/>
-                                        <xf:setindex
-                                            repeat="{{concat(Wizard:sectionIdFromCaseIdOpt($new-case-id), '-repeater-repeat')}}"
-                                            index="$new-index"/>
+                                            ref="xxf:instance('local')/current-case-id"
+                                            value="$new-case-id"/>
+
+                                        <xf:setvalue
+                                            ref="xxf:instance('local')/current-top-level-case-id"
+                                            value="
+                                                concat(
+                                                    $nav-matching-top-level-section-ids[
+                                                        index-of(
+                                                            $nav-section-or-grid-ids,
+                                                            Wizard:sectionIdFromCaseIdOpt($new-case-id)
+                                                        )
+                                                    ],
+                                                    '-case'
+                                                )"/>
+
+                                        <!-- See https://github.com/orbeon/orbeon-forms/issues/3433 -->
+                                        <xf:toggle
+                                            case="{{$new-case-id}}"/>
+
+                                        <!-- Set initial index if present -->
+                                        <xf:action if="array:size($initial-case-id-with-index-opt) ge 2">
+                                            <xf:var name="new-index" value="array:get($initial-case-id-with-index-opt, 2)"/>
+                                            <xf:setvalue
+                                                ref="xxf:instance('local')/current-index"
+                                                value="$new-index"/>
+                                            <xf:setindex
+                                                repeat="{{concat(Wizard:sectionIdFromCaseIdOpt($new-case-id), '-repeater-repeat')}}"
+                                                index="$new-index"/>
+                                        </xf:action>
+
+                                        <xf:setfocus
+                                            if="exists($setfocus-control-id-opt)"
+                                            control="{{$setfocus-control-id-opt}}"
+                                            xxf:repeat-indexes="{{$setfocus-repeat-indexes-opt}}"/>
+
                                     </xf:action>
 
                                 </xf:action>

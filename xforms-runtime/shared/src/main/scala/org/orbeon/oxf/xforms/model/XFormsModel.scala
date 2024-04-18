@@ -281,12 +281,12 @@ trait XFormsModelVariables {
 
   // Evaluate all top-level variables
   def resetAndEvaluateVariables(collector: ErrorEventCollector): Unit = {
-      // NOTE: This method is called during RRR and by submission processing. Need to do dependency handling.
-      // Reset context to this model, including evaluating the model variables
-      contextStack.resetBindingContext(selfModel.some, collector)
-      // Remember context and variables
-      defaultEvaluationContext = contextStack.getCurrentBindingContext
-    }
+    // NOTE: This method is called during RRR and by submission processing. Need to do dependency handling.
+    // Reset context to this model, including evaluating the model variables
+    contextStack.resetBindingContext(selfModel.some, collector)
+    // Remember context and variables
+    defaultEvaluationContext = contextStack.getCurrentBindingContext
+  }
 
   val variableResolver: (om.StructuredQName, XPathContext) => ValueRepresentationType =
     (variableQName: om.StructuredQName, xpathContext: XPathContext) =>

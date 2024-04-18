@@ -16,6 +16,7 @@ package org.orbeon.fr
 import org.orbeon.oxf.fr.Names
 import org.orbeon.xforms._
 import org.scalajs.dom.html
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
@@ -107,7 +108,7 @@ object FormRunnerWizardAPI extends js.Object {
     controlName       : String,
     repeatIndexes     : js.UndefOr[js.Array[Int]] = js.undefined,
     elemOrNamespacedId: js.UndefOr[html.Element | String] = js.undefined
-  ): Unit = {
+  ): js.Promise[Unit] = {
 
     // Separate variable due to type inference fail when put inline below
     val indexesString = repeatIndexes map (_.mkString(" ")) getOrElse ""
@@ -123,5 +124,6 @@ object FormRunnerWizardAPI extends js.Object {
         )
       )
     )
+    AjaxClient.allEventsProcessedF("activateControl").toJSPromise
   }
 }

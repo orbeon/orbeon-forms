@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms">
+    <xh:head>
+        <xh:title>Untitled Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1><grid-1><control-1/></grid-1><s1.1section-1><s1.1grid-1><s1.1control-1/></s1.1grid-1>
+
+                    </s1.1section-1><s1.2section-1><s1.2grid-1><s1.2control-1/></s1.2grid-1>
+
+                    </s1.2section-1>
+
+                    </section-1><section-2><grid-2><control-2/></grid-2><s2.1section-2><s2.1grid-2><control-5/><control-3/></s2.1grid-2></s2.1section-2><s2.2section-2><s2.2grid-2><control-6/><control-4/></s2.2grid-2></s2.2section-2></section-2>
+                </form>
+            </xf:instance>
+
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1"><xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"><xf:bind id="control-1-bind" name="control-1" ref="control-1" xxf:whitespace="trim" required="true()"/></xf:bind><xf:bind id="s1.1section-1-bind" name="s1.1section-1" ref="s1.1section-1"><xf:bind id="s1.1grid-1-bind" ref="s1.1grid-1" name="s1.1grid-1"><xf:bind id="s1.1control-1-bind" name="s1.1control-1" ref="s1.1control-1" xxf:whitespace="trim"/></xf:bind>
+
+                </xf:bind><xf:bind id="s1.2section-1-bind" name="s1.2section-1" ref="s1.2section-1"><xf:bind id="s1.2grid-1-bind" ref="s1.2grid-1" name="s1.2grid-1"><xf:bind id="s1.2control-1-bind" name="s1.2control-1" ref="s1.2control-1" xxf:whitespace="trim"/></xf:bind>
+
+                </xf:bind>
+
+                </xf:bind><xf:bind id="section-2-bind" ref="section-2" name="section-2"><xf:bind id="grid-2-bind" ref="grid-2" name="grid-2"><xf:bind id="control-2-bind" name="control-2" ref="control-2" xxf:whitespace="trim" required="true()"/></xf:bind><xf:bind id="s2.1section-2-bind" ref="s2.1section-2" name="s2.1section-2"><xf:bind id="s2.1grid-2-bind" ref="s2.1grid-2" name="s2.1grid-2"><xf:bind id="control-3-bind" name="control-3" ref="control-3" xxf:whitespace="trim"/><xf:bind id="control-5-bind" ref="control-5" name="control-5"/></xf:bind></xf:bind><xf:bind id="s2.2section-2-bind" ref="s2.2section-2" name="s2.2section-2"><xf:bind id="s2.2grid-2-bind" ref="s2.2grid-2" name="s2.2grid-2"><xf:bind id="control-4-bind" name="control-4" ref="control-4" xxf:whitespace="trim"/><xf:bind id="control-6-bind" ref="control-6" name="control-6"/></xf:bind></xf:bind></xf:bind>
+            </xf:bind>
+
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>wizard</form-name>
+                    <title xml:lang="en">Untitled Form</title>
+                    <description xml:lang="en"/><created-with-version>2022.1-SNAPSHOT PE</created-with-version>
+                <library-versions><orbeon>3</orbeon><app>3</app></library-versions><wizard>true</wizard><wizard-subsections-nav>true</wizard-subsections-nav><wizard-section-status>true</wizard-section-status><wizard-mode>lax</wizard-mode><wizard-subsections-toc>all</wizard-subsections-toc><grid-tab-order>default</grid-tab-order><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2022.1-SNAPSHOT PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"control-1"}],"topLevel":true},{"containerPath":[{"value":"section-1"},{"value":"s1.1section-1"}],"newGridElem":{"value":"s1.1grid-1"},"afterElem":null,"content":[{"value":"s1.1control-1"}],"topLevel":true},{"containerPath":[{"value":"section-1"},{"value":"s1.2section-1"}],"newGridElem":{"value":"s1.2grid-1"},"afterElem":null,"content":[{"value":"s1.2control-1"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"control-2"}],"topLevel":true},{"containerPath":[{"value":"section-2"},{"value":"s2.1section-2"}],"newGridElem":{"value":"s2.1grid-2"},"afterElem":null,"content":[{"value":"control-5"},{"value":"control-3"}],"topLevel":true},{"containerPath":[{"value":"section-2"},{"value":"s2.2section-2"}],"newGridElem":{"value":"s2.2grid-2"},"afterElem":null,"content":[{"value":"control-6"},{"value":"control-4"}],"topLevel":true}]}</migration></metadata>
+            </xf:instance>
+
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en"><control-6><label>Checkboxes</label><hint/><item>
+                    <label>First choice</label>
+                    <value>1</value>
+                    <hint/>
+                </item><item>
+                    <label>Second choice</label>
+                    <value>2</value>
+                    <hint/>
+                </item><item>
+                    <label>Third choice</label>
+                    <value>3</value>
+                    <hint/>
+                </item></control-6><control-5><label>Checkboxes</label><hint/><item>
+                    <label>First choice</label>
+                    <value>1</value>
+                    <hint/>
+                </item><item>
+                    <label>Second choice</label>
+                    <value>2</value>
+                    <hint/>
+                </item><item>
+                    <label>Third choice</label>
+                    <value>3</value>
+                    <hint/>
+                </item></control-5><control-4><label>s22</label><hint/>
+
+
+
+                        </control-4><control-3><label>s21</label><hint/>
+
+
+
+                        </control-3><s2.2section-2><label>S2.2</label><help/></s2.2section-2><control-2><label>s2</label><hint/>
+
+
+
+                        </control-2><s2.1section-2><label>S2.1</label><help/></s2.1section-2>
+                        <section-1>
+                            <label>S1</label>
+                        </section-1><section-2><label>S2</label><help/></section-2><s1.2control-1><label>s12</label><hint/>
+
+
+
+                        </s1.2control-1><s1.1control-1><label>s11</label><hint/>
+
+
+
+                        </s1.1control-1><s1.2section-1>
+                            <label>S1.2</label>
+                        </s1.2section-1>
+                        <control-1><label>s1</label><hint/>
+
+
+
+                        </control-1><s1.1section-1>
+                            <label>S1.1</label>
+                        </s1.1section-1>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind"><fr:c y="1" x="1" w="6">
+                                <xf:input id="control-1-control" bind="control-1-bind">
+                                    <xf:label ref="$form-resources/control-1/label"/>
+                                    <xf:hint ref="$form-resources/control-1/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input>
+                            </fr:c><fr:c y="1" x="7" w="6"/></fr:grid><fr:section id="s1.1section-1-section" bind="s1.1section-1-bind">
+                    <xf:label ref="$form-resources/s1.1section-1/label"/>
+                    <fr:grid id="s1.1grid-1-grid" bind="s1.1grid-1-bind"><fr:c y="1" x="1" w="6">
+                                <xf:input id="s1.1control-1-control" bind="s1.1control-1-bind">
+                                    <xf:label ref="$form-resources/s1.1control-1/label"/>
+                                    <xf:hint ref="$form-resources/s1.1control-1/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input>
+                            </fr:c><fr:c y="1" x="7" w="6"/></fr:grid>
+                </fr:section><fr:section id="s1.2section-1-section" bind="s1.2section-1-bind">
+                    <xf:label ref="$form-resources/s1.2section-1/label"/>
+                    <fr:grid id="s1.2grid-1-grid" bind="s1.2grid-1-bind"><fr:c y="1" x="1" w="6">
+                                <xf:input id="s1.2control-1-control" bind="s1.2control-1-bind">
+                                    <xf:label ref="$form-resources/s1.2control-1/label"/>
+                                    <xf:hint ref="$form-resources/s1.2control-1/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input>
+                            </fr:c><fr:c y="1" x="7" w="6"/></fr:grid>
+                </fr:section>
+                </fr:section><fr:section id="section-2-section" bind="section-2-bind">
+          <xf:label ref="$form-resources/section-2/label"/><fr:grid id="grid-2-grid" bind="grid-2-bind">
+              <fr:c x="1" y="1" w="6"><xf:input id="control-2-control" bind="control-2-bind">
+                                    <xf:label ref="$form-resources/control-2/label"/>
+                                    <xf:hint ref="$form-resources/control-2/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input></fr:c><fr:c x="7" y="1" w="6"/>
+            </fr:grid><fr:section id="s2.1section-2-section" bind="s2.1section-2-bind">
+          <xf:label ref="$form-resources/s2.1section-2/label"/><fr:grid id="s2.1grid-2-grid" bind="s2.1grid-2-bind">
+              <fr:c x="1" y="1" w="6"><xf:select id="control-5-control" appearance="full" bind="control-5-bind">
+                        <xf:label ref="$form-resources/control-5/label"/>
+                        <xf:hint ref="$form-resources/control-5/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                        <xf:itemset ref="$form-resources/control-5/item">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                            <xf:hint ref="hint"/>
+                        </xf:itemset>
+                    </xf:select></fr:c><fr:c x="7" y="1" w="6"/><fr:c x="1" y="2" w="6"><xf:input id="control-3-control" bind="control-3-bind">
+                                    <xf:label ref="$form-resources/control-3/label"/>
+                                    <xf:hint ref="$form-resources/control-3/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input></fr:c><fr:c x="7" y="2" w="6"/>
+            </fr:grid></fr:section><fr:section id="s2.2section-2-section" bind="s2.2section-2-bind">
+          <xf:label ref="$form-resources/s2.2section-2/label"/><fr:grid id="s2.2grid-2-grid" bind="s2.2grid-2-bind">
+              <fr:c x="1" y="1" w="6"><xf:select id="control-6-control" appearance="full" bind="control-6-bind">
+                        <xf:label ref="$form-resources/control-6/label"/>
+                        <xf:hint ref="$form-resources/control-6/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                        <xf:itemset ref="$form-resources/control-6/item">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                            <xf:hint ref="hint"/>
+                        </xf:itemset>
+                    </xf:select></fr:c><fr:c x="7" y="1" w="6"/><fr:c x="1" y="2" w="6"><xf:input id="control-4-control" bind="control-4-bind">
+                                    <xf:label ref="$form-resources/control-4/label"/>
+                                    <xf:hint ref="$form-resources/control-4/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input></fr:c><fr:c x="7" y="2" w="6"/>
+            </fr:grid></fr:section></fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

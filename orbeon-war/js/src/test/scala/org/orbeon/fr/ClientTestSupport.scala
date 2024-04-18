@@ -41,6 +41,15 @@ trait DocumentApiTrait extends js.Object {
 
 trait FormRunnerApiTrait extends js.Object {
   def getForm(elemOrNamespacedId: js.UndefOr[html.Element | String]): FormRunnerFormTrait
+  val wizard      : FormRunnerWizardAPITrait
+}
+
+trait FormRunnerWizardAPITrait extends js.Object {
+  def focus(
+    controlName       : String,
+    repeatIndexes     : js.UndefOr[js.Array[Int]] = js.undefined,
+    elemOrNamespacedId: js.UndefOr[html.Element | String] = js.undefined
+  ): js.Promise[Unit]
 }
 
 trait FormRunnerFormTrait extends js.Object {

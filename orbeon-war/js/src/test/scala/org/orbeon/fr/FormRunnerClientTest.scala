@@ -1,10 +1,8 @@
 package org.orbeon.fr
 
-import org.orbeon.oxf.util.FutureUtils._
 import org.scalatest.funspec.AsyncFunSpec
 
 import scala.async.Async._
-import scala.concurrent.duration._
 import scala.scalajs.js
 
 
@@ -15,24 +13,12 @@ class FormRunnerClientTest extends AsyncFunSpec with ClientTestSupport {
 
   describe("Form Runner client tests") {
     it("must find form controls by name") {
-      withRunTomcatContainer("FormRunnerTomcat", ServerExternalPort, checkImageRunning = true, network = None) {
+      withFormReady("control-names") { case FormRunnerWindow(_, formRunnerApi) =>
         async {
 
-          val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
-          assert(sessionCookie.isSuccess)
+          val form = formRunnerApi.getForm(js.undefined)
 
-          val window =
-            FormRunnerWindow(await(loadDocumentViaJSDOM("/fr/tests/control-names/new", OrbeonServerUrl, sessionCookie.toOption)))
-
-          lazy val form = window.formRunnerApi.getForm(js.undefined)
-
-          // For the first one, we wait if needed so that the initialization completes. Ideally, we'd use an API to know
-          // whether the forms are loaded.
-          await {
-            eventually(1.second, 10.seconds) {
-              assert(form.findControlsByName("first-name").head.classList.contains("xforms-control"))
-            }
-          }
+          assert(form.findControlsByName("first-name").head.classList.contains("xforms-control"))
 
           assert(form.findControlsByName("last-name").head.classList.contains("xforms-control"))
           assert(form.findControlsByName("i-dont-exist").isEmpty)

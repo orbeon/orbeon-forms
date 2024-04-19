@@ -1,7 +1,7 @@
 package org.orbeon.fr
 
 import org.orbeon.fr.DockerSupport.{removeContainerByImage, runContainer}
-import org.orbeon.oxf.util.FutureUtils.eventuallyAsTry
+import org.orbeon.oxf.util.FutureUtils.{eventually, eventuallyAsTry}
 import org.orbeon.web
 import org.scalajs.dom
 import org.scalajs.dom.experimental.{HttpMethod, RequestInit, RequestRedirect, Response}
@@ -97,6 +97,30 @@ trait ClientTestSupport {
 
   implicit override def executionContext: scala.concurrent.ExecutionContext =
     org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
+
+  private val ServerExternalPort = 8888
+  private val OrbeonServerUrl    = s"http://localhost:$ServerExternalPort/orbeon"
+
+  def withFormReady[T](formName: String)(body: FormRunnerWindow => Future[T]): Future[T] =
+    withRunTomcatContainer("FormRunnerTomcat", ServerExternalPort, checkImageRunning = true, network = None) {
+      async {
+
+        val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
+        assert(sessionCookie.isSuccess)
+
+        val window =
+          FormRunnerWindow(await(loadDocumentViaJSDOM(s"/fr/tests/$formName/new", OrbeonServerUrl, sessionCookie.toOption)))
+
+        // Wait until there is a form returned by the API
+        await {
+          eventually(1.second, 10.seconds) {
+            assert(window.formRunnerApi.getForm(js.undefined).asInstanceOf[js.UndefOr[FormRunnerFormTrait]].isDefined)
+          }
+        }
+
+        await(body(window))
+      }
+    }
 
   def runTomcatContainer(
     containerName    : String,

@@ -799,10 +799,10 @@ object XFormsUI {
               id       := XFormsId.appendToEffectiveId(controlId, Constants.LhhacSeparator + "e" + itemIndex),
               tpe      := (if (isSelect) "checkbox" else "radio"),
               name     := (if (groupName ne null) groupName else controlId),
-              value    := itemElement.value,
-              checked  := checkedValues(itemElement.value)
+              value    := itemElement.value
             )(
-              isReadonly.option(disabled := true)
+              checkedValues(itemElement.value).option(checked),
+              isReadonly                      .option(disabled)
             )
           )(
             span(hintOpt.isDefined.option(cls := "xforms-hint-region"))(itemLabelNodes.toList)

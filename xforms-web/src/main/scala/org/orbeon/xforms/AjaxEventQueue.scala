@@ -150,7 +150,7 @@ trait AjaxEventQueue[EventType] {
       }
 
       // There is only *one* timer set at a time at most
-      def createNewSchedule = {
+      def createNewSchedule: EventSchedule = {
         val p = Promise[Unit]()
         EventSchedule(
           handle = timers.setTimeout(newScheduleTimeAtLeastCurrentTime - currentTime) { p.success(())},

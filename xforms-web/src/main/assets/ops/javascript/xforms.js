@@ -222,33 +222,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             },
 
             /**
-             * A safe way to focus on a form element, as IE can complains when we try to set the focus on non-visible
-             * control. This can happen because of error in the XForms code, or in cases where we try to restore
-             * the focus to a control which in the meantime has disappeared or became readonly. The precise IE error
-             * we would get if we didn't catch the exception would be: "Can't move focus to the control because it is
-             * invisible, not enabled, or if a type that does not accept the focus."
-             *
-             * We don't use jQuery to set the focus, as this would trigger our listener on the focus event to be [called
-             * twice][1]. Since we use a mask to avoid telling the server about a focus the server just told us about,
-             * the focus listener running twice would [send the focus event to the server on the second run][2], which
-             * we don't want. We'll be able to simply use jQuery when we [implement code keeping track of the control
-             * that has the focus from the server's perspective][3].
-             *
-             *   [1]: http://jquery.com/upgrade-guide/1.9/#order-of-triggered-focus-events
-             *   [2]: https://github.com/orbeon/orbeon-forms/issues/747
-             *   [3]: https://github.com/orbeon/orbeon-forms/issues/755
-             */
-            focus: function(element) { // 2020-04-23: 2 usages.
-                try { element.focus(); }
-                catch (e) { /* NOP */ }
-            },
-
-            blur: function(element) { // 2020-04-23: 2 usages.
-                try { element.blur(); }
-                catch (e) { /* NOP */ }
-            },
-
-            /**
              * Use W3C DOM API to get the content of an element.
              */
             getStringValue: function(element) {
@@ -1230,7 +1203,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         }
                     }
                     // Set focus on either selected item if we found one or on first item otherwise
-                    ORBEON.util.Dom.focus(formInputs[foundSelected ? itemIndex : 0]);
+                    formInputs[foundSelected ? itemIndex : 0].focus();
                 }
             } else if (ORBEON.xforms.XFormsXbl.isFocusable(control)) {
                 var instance = ORBEON.xforms.XBL.instanceForControl(control);
@@ -1250,7 +1223,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     htmlControl = $(control).find("[tabindex]:not([tabindex = '-1']):visible");
 
                 if (htmlControl.is('*'))
-                    ORBEON.util.Dom.focus(htmlControl.get(0));
+                    htmlControl.get(0).focus();
                 else
                     // We haven't found anything to set the focus on, so don't mask the focus event, since we won't receive it
                     ORBEON.xforms.Globals.maskFocusEvents = false;
@@ -1282,7 +1255,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     // Blur all of them (can we know which one has focus if any?)
                     for (; itemIndex < formInputs.length; itemIndex++) {
                         var formInput = formInputs[itemIndex];
-                        ORBEON.util.Dom.blur(formInput);
+                        formInput.blur();
                     }
                 }
             } else if (ORBEON.xforms.XFormsXbl.isFocusable(control)) {
@@ -1296,7 +1269,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 var htmlControlNames = ["input", "textarea", "select", "button", "a"];
                 var htmlControl = ORBEON.util.Dom.getElementByTagName(control, htmlControlNames);
                 // If we found a control set the focus on it
-                if (htmlControl != null) ORBEON.util.Dom.blur(htmlControl);
+                if (htmlControl != null)
+                    htmlControl.blur();
             }
 
             // Mark that no control has the focus

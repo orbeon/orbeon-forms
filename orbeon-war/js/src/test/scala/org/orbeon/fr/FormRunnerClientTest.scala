@@ -1,51 +1,108 @@
 package org.orbeon.fr
 
-import org.scalatest.funspec.AsyncFunSpec
+import org.orbeon.fr.DockerSupport.removeContainerByImage
+import org.scalatest._
+import org.scalatest.funspec.FixtureAsyncFunSpecLike
 
+import java.util.concurrent.atomic.AtomicInteger
 import scala.async.Async._
 import scala.scalajs.js
 
 
-class FormRunnerClientTest extends AsyncFunSpec with ClientTestSupport {
+class FormRunnerClientTest extends FixtureAsyncFunSpecLike with ClientTestSupport {
 
   val ServerExternalPort = 8888
   val OrbeonServerUrl    = s"http://localhost:$ServerExternalPort/orbeon"
 
+  type FixtureParam = Unit
+
+  val testsStarted = new AtomicInteger(0)
+
+  def withFixture(test: OneArgAsyncTest): FutureOutcome = {
+    if (testsStarted.incrementAndGet() == 1)
+      async {
+        val r = await(runTomcatContainer("FormRunnerTomcat", ServerExternalPort, checkImageRunning = true, network = None, ehcacheFilename = "ehcache.xml"))
+        assert(r.isSuccess)
+      }
+
+    complete {
+      withFixture(test.toNoArgAsyncTest(()))
+    } lastly {
+      if (testsStarted.get() == testNames.size) {
+        removeContainerByImage(TomcatImageName)
+      }
+    }
+  }
+
   describe("Form Runner client tests") {
-    it("must find form controls by name") {
-      withFormReady("control-names") { case FormRunnerWindow(_, formRunnerApi) =>
+    it("must find form controls by name") { foo =>
+      withFormRunnerSessionOnly {
+        withFormReadyNoTomcat("control-names") { case FormRunnerWindow(_, formRunnerApi) =>
+          async {
+
+            val form = formRunnerApi.getForm(js.undefined)
+
+            assert(form.findControlsByName("first-name").head.classList.contains("xforms-control"))
+
+            assert(form.findControlsByName("last-name").head.classList.contains("xforms-control"))
+            assert(form.findControlsByName("i-dont-exist").isEmpty)
+
+            assert(form.findControlsByName("comments").length == 1)
+            assert(form.findControlsByName("comments").forall(_.classList.contains("xforms-textarea")))
+
+            await(form.setControlValue("comments", "Hello world!").map(_.toFuture).get)
+
+            // Use same value to make sure that we get a resolving `Promise` in this case as well
+            await(form.setControlValue("comments", "Hello world!").map(_.toFuture).get)
+            await(form.setControlValue("comments", "Hello world!").map(_.toFuture).get)
+
+            assert(form.getControlValue("comments").contains("Hello world!"))
+
+            await(form.activateControl("add-comment").map(_.toFuture).get)
+
+            // Only one "Add Comment" button
+            assert(form.activateControl("add-comment", 1).isEmpty)
+
+            assert(form.findControlsByName("comments").length == 2)
+            assert(form.findControlsByName("comments").forall(_.classList.contains("xforms-textarea")))
+
+            await(form.setControlValue("comments", "Hello world, again!", 1).map(_.toFuture).get)
+            assert(form.getControlValue("comments", 1).contains("Hello world, again!"))
+
+            assert(form.findControlsByName("comments").map(_.id).sameElements(List("message-section≡grid-3-grid≡comments-control⊙1", "message-section≡grid-3-grid≡comments-control⊙2")))
+          }
+        }
+      }
+    }
+
+    it("must pass the strict Wizard focus rules") { foo =>
+      withFormReadyNoTomcat("wizard") { case FormRunnerWindow(_, formRunnerApi) =>
         async {
 
           val form = formRunnerApi.getForm(js.undefined)
 
-          assert(form.findControlsByName("first-name").head.classList.contains("xforms-control"))
+          // Initial test of control visibility
+          assert(form.findControlsByName("control-1").nonEmpty)
+          assert(form.findControlsByName("control-2").isEmpty)
 
-          assert(form.findControlsByName("last-name").head.classList.contains("xforms-control"))
-          assert(form.findControlsByName("i-dont-exist").isEmpty)
+          // This must work because the field is visible
+          await(formRunnerApi.wizard.focus("control-1").toFuture)
 
-          assert(form.findControlsByName("comments").length == 1)
-          assert(form.findControlsByName("comments").forall(_.classList.contains("xforms-textarea")))
+          // NOTE: `document.activeElement` seems to remain at the `body` element, so we cannot test on that. This might
+          // be a JSDOM-specific issue.
 
-          await(form.setControlValue("comments", "Hello world!").map(_.toFuture).get)
+          // This must fail because the field is not visible and not reachable
+          await(formRunnerApi.wizard.focus("control-2").toFuture)
 
-          // Use same value to make sure that we get a resolving `Promise` in this case as well
-          await(form.setControlValue("comments", "Hello world!").map(_.toFuture).get)
-          await(form.setControlValue("comments", "Hello world!").map(_.toFuture).get)
+          // `control-2` is not visible
+          assert(form.findControlsByName("control-2").isEmpty)
 
-          assert(form.getControlValue("comments").contains("Hello world!"))
+          // After filling `control-1`, `control-2` will be reachable
+          form.setControlValue("control-1", "value-1")
+          await(formRunnerApi.wizard.focus("control-2").toFuture)
 
-          await(form.activateControl("add-comment").map(_.toFuture).get)
-
-          // Only one "Add Comment" button
-          assert(form.activateControl("add-comment", 1).isEmpty)
-
-          assert(form.findControlsByName("comments").length == 2)
-          assert(form.findControlsByName("comments").forall(_.classList.contains("xforms-textarea")))
-
-          await(form.setControlValue("comments", "Hello world, again!", 1).map(_.toFuture).get)
-          assert(form.getControlValue("comments", 1).contains("Hello world, again!"))
-
-          assert(form.findControlsByName("comments").map(_.id).sameElements(List("message-section≡grid-3-grid≡comments-control⊙1", "message-section≡grid-3-grid≡comments-control⊙2")))
+          // `control-2` is visible
+          assert(form.findControlsByName("control-2").nonEmpty)
         }
       }
     }

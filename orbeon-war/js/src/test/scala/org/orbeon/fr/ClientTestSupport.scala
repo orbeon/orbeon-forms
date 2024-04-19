@@ -7,7 +7,7 @@ import org.scalajs.dom
 import org.scalajs.dom.experimental.{HttpMethod, RequestInit, RequestRedirect, Response}
 import org.scalajs.dom.html
 import org.scalajs.dom.raw.Window
-import org.scalatest.funspec.AsyncFunSpec
+import org.scalatest.AsyncTestSuite
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -42,6 +42,7 @@ trait DocumentApiTrait extends js.Object {
 trait FormRunnerApiTrait extends js.Object {
   def getForm(elemOrNamespacedId: js.UndefOr[html.Element | String]): FormRunnerFormTrait
   val wizard      : FormRunnerWizardAPITrait
+//  val errorSummary: FormRunnerErrorSummaryAPI.type = FormRunnerErrorSummaryAPI
 }
 
 trait FormRunnerWizardAPITrait extends js.Object {
@@ -94,7 +95,7 @@ object FormRunnerWindow {
 
 trait ClientTestSupport {
 
-  self: AsyncFunSpec =>
+  self: AsyncTestSuite =>
 
   val TomcatImageName         = "tomcat:8.5-jdk8-openjdk-slim"
   val LocalResourcesDir       = "$BASE_DIRECTORY/orbeon-war/js/src/test/resources"
@@ -129,6 +130,43 @@ trait ClientTestSupport {
 
         await(body(window))
       }
+    }
+
+  def withFormRunnerSessionOnly[T](body: => Future[T]): Future[T] =
+    async {
+      val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
+      assert(sessionCookie.isSuccess)
+      await(body)
+    }
+
+  def withFormRunnerSession[T](body: => Future[T]): Future[T] =
+    withRunTomcatContainer("FormRunnerTomcat", ServerExternalPort, checkImageRunning = true, network = None) {
+      async {
+
+        val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
+        assert(sessionCookie.isSuccess)
+
+        await(body)
+      }
+    }
+
+  def withFormReadyNoTomcat[T](formName: String)(body: FormRunnerWindow => Future[T]): Future[T] =
+    async {
+
+      val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
+      assert(sessionCookie.isSuccess)
+
+      val window =
+        FormRunnerWindow(await(loadDocumentViaJSDOM(s"/fr/tests/$formName/new", OrbeonServerUrl, sessionCookie.toOption)))
+
+      // Wait until there is a form returned by the API
+      await {
+        eventually(1.second, 10.seconds) {
+          assert(window.formRunnerApi.getForm(js.undefined).asInstanceOf[js.UndefOr[FormRunnerFormTrait]].isDefined)
+        }
+      }
+
+      await(body(window))
     }
 
   def runTomcatContainer(

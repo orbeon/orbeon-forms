@@ -49,7 +49,7 @@ class Cookie extends js.Object
 @js.native
 @JSImport("jsdom", "VirtualConsole")
 class VirtualConsole extends js.Object {
-  def sendTo(anyConsole: js.Object, options: UndefOr[Nothing] = js.undefined): VirtualConsole = js.native
+  def sendTo(anyConsole: js.Object, options: UndefOr[js.Object] = js.undefined): VirtualConsole = js.native
 }
 
 // 2020-10-06: Fetch API is not supported by JSDOM out of the box. We use `node-fetch` as

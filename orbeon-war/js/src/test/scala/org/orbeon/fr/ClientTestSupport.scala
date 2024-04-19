@@ -98,7 +98,13 @@ trait ClientTestSupport {
   implicit override def executionContext: scala.concurrent.ExecutionContext =
     org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
-  def runTomcatContainer(containerName: String, port: Int, checkImageRunning: Boolean, network: Option[String]): Future[Try[List[String]]] =
+  def runTomcatContainer(
+    containerName    : String,
+    port             : Int,
+    checkImageRunning: Boolean,
+    network          : Option[String],
+    ehcacheFilename  : String
+  ): Future[Try[List[String]]] =
     runContainer(
       TomcatImageName,
       s"""
@@ -108,6 +114,7 @@ trait ClientTestSupport {
         |-v $$HOME/.orbeon/license.xml:/root/.orbeon/license.xml:delegated
         |-v $$BASE_DIRECTORY/orbeon-war/js/src/test/resources/tomcat/orbeon.xml:$ImageTomcatDir/webapps/orbeon/META-INF/context.xml:delegated
         |-v $LocalOrbeonResourcesDir:/usr/local/tomcat/webapps/orbeon/WEB-INF/test-resources:delegated
+        |-v $LocalOrbeonResourcesDir/config/$ehcacheFilename:/usr/local/tomcat/webapps/orbeon/WEB-INF/test-resources/config/ehcache.xml:delegated
         |-v $LocalResourcesDir/tomcat/server.xml:$ImageTomcatDir/conf/server.xml:delegated
         |-v $LocalResourcesDir/tomcat/setenv.sh:$ImageTomcatDir/bin/setenv.sh:delegated
         |-p $port:8080""".stripMargin,
@@ -115,7 +122,7 @@ trait ClientTestSupport {
     )
 
   def withRunTomcatContainer[T](containerName: String, port: Int, checkImageRunning: Boolean, network: Option[String])(block: => Future[T]): Future[T] = async {
-    val r = await(runTomcatContainer(containerName, port, checkImageRunning, network))
+    val r = await(runTomcatContainer(containerName, port, checkImageRunning, network, ehcacheFilename = "ehcache.xml"))
     assert(r.isSuccess)
     val result = await(block)
     await(removeContainerByImage(TomcatImageName))

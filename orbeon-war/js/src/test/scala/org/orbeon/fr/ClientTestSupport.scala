@@ -111,8 +111,15 @@ trait ClientTestSupport {
   private val ServerExternalPort = 8888
   private val OrbeonServerUrl    = s"http://localhost:$ServerExternalPort/orbeon"
 
+  def withFormRunnerSession[T](body: => Future[T]): Future[T] =
+    async {
+      val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
+      assert(sessionCookie.isSuccess)
+      await(body)
+    }
+
   def withFormReady[T](formName: String)(body: FormRunnerWindow => Future[T]): Future[T] =
-    withRunTomcatContainer("FormRunnerTomcat", ServerExternalPort, checkImageRunning = true, network = None) {
+    withFormRunnerSession {
       async {
 
         val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
@@ -130,43 +137,6 @@ trait ClientTestSupport {
 
         await(body(window))
       }
-    }
-
-  def withFormRunnerSessionOnly[T](body: => Future[T]): Future[T] =
-    async {
-      val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
-      assert(sessionCookie.isSuccess)
-      await(body)
-    }
-
-  def withFormRunnerSession[T](body: => Future[T]): Future[T] =
-    withRunTomcatContainer("FormRunnerTomcat", ServerExternalPort, checkImageRunning = true, network = None) {
-      async {
-
-        val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
-        assert(sessionCookie.isSuccess)
-
-        await(body)
-      }
-    }
-
-  def withFormReadyNoTomcat[T](formName: String)(body: FormRunnerWindow => Future[T]): Future[T] =
-    async {
-
-      val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
-      assert(sessionCookie.isSuccess)
-
-      val window =
-        FormRunnerWindow(await(loadDocumentViaJSDOM(s"/fr/tests/$formName/new", OrbeonServerUrl, sessionCookie.toOption)))
-
-      // Wait until there is a form returned by the API
-      await {
-        eventually(1.second, 10.seconds) {
-          assert(window.formRunnerApi.getForm(js.undefined).asInstanceOf[js.UndefOr[FormRunnerFormTrait]].isDefined)
-        }
-      }
-
-      await(body(window))
     }
 
   def runTomcatContainer(

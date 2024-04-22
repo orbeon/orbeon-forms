@@ -39,6 +39,7 @@ object CoreUtils {
     def string(s: => String)           : String      = if (b) s           else ""
     def list[A](a: => A)               : List[A]     = if (b) List(a)     else Nil
     def flatList[A](a: => List[A])     : List[A]     = if (b) a           else Nil
+    def seq[A](a: => A)                : Seq[A]      = if (b) Seq(a)      else Nil
     def set[A](a: => A)                : Set[A]      = if (b) Set(a)      else Set.empty[A]
     def iterator[A](a: => A)           : Iterator[A] = if (b) Iterator(a) else Iterator.empty
   }

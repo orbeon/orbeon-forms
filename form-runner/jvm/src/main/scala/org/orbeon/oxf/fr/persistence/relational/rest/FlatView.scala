@@ -14,9 +14,11 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.fr.{AppForm, FormRunner}
+import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 
@@ -27,148 +29,340 @@ import scala.collection.mutable
 
 private object FlatView {
 
-  case class Col(extractExpression: String, colName: String)
-  val MetadataPairs           =
-    List("document_id", "created", "last_modified_time", "last_modified_by")
-        .map(_.toUpperCase)
-        .map(col => Col(s"d.$col", s"METADATA_$col"))
-  val PrefixedMetadataColumns = MetadataPairs.map{case Col(_, colName) => colName}
-  val MaxNameLength           = 30
-  val TablePrefix             = "ORBEON_F_"
+  val CompatibilityMaxIdentifierLength = 30
 
-  def viewName(appForm: AppForm, version: Int): String = {
-    val app  = xmlToSQLId(appForm.app)
-    val form = xmlToSQLId(appForm.form)
-    TablePrefix + joinParts(List(app, form, version.toString), MaxNameLength - TablePrefix.length)
+  case class Column(expression: String, nameOpt: Option[String]) {
+    def sql: String = expression + nameOpt.map(name => " " + xmlToSQLId(name)).getOrElse("")
   }
 
+  private val TablePrefix        = "orbeon_f_"
+  private val FormDataTableAlias = "d"
+
+  private def metadataColumns(tableAlias: String, includeAll: Boolean, includeAlias: Boolean): Seq[Column] =
+    ("document_id" :: (if (includeAll) List("created", "last_modified_time", "last_modified_by") else Nil))
+      .map(name => Column(s"$tableAlias.$name", if (includeAlias) Some(s"metadata_$name") else None))
+
   def deleteViewIfExists(provider: Provider, connection: Connection, viewName: String): Unit = {
-    if (Provider.flatViewDelete(provider)) {
-      val viewExists = {
-        useAndClose(connection.prepareStatement(Provider.flatViewExistsQuery(provider))) { ps =>
-          ps.setString(1, Provider.flatViewExistsParam(provider, viewName))
-          useAndClose(ps.executeQuery())(_.next())
-        }
+    val viewExists = {
+      useAndClose(connection.prepareStatement(Provider.flatViewExistsQuery(provider))) { ps =>
+        ps.setString(1, Provider.flatViewExistsParam(provider, viewName))
+        useAndClose(ps.executeQuery())(_.next())
       }
-      if (viewExists)
-        useAndClose(connection.prepareStatement(s"DROP VIEW $viewName"))(_.executeUpdate())
     }
+    if (viewExists)
+      useAndClose(connection.prepareStatement(s"DROP VIEW $viewName"))(_.executeUpdate())
   }
 
   // Create a flat relational view. See related issues:
   //
   // - https://github.com/orbeon/orbeon-forms/issues/1069
   // - https://github.com/orbeon/orbeon-forms/issues/1571
-  def createFlatViewForDocument(
-    req            : CrudRequest,
-    version        : Int,
-    connection     : Connection,
-    documentInfoOpt: Option[DocumentInfo]
-  ): Unit = {
+  def createFlatViews(
+    req                : CrudRequest,
+    version            : Int,
+    connection         : Connection,
+    fullyQualifiedNames: Boolean,
+    maxIdentifierLength: Int
+  ): Unit =
+    RequestReader.xmlDocument().foreach { documentInfo =>
+      createFlatViewsForDocument(req, version, connection, documentInfo, fullyQualifiedNames, maxIdentifierLength)
+    }
 
-    val viewName = this.viewName(req.appForm, version)
+  def createFlatViewsForDocument(
+    req                : CrudRequest,
+    version            : Int,
+    connection         : Connection,
+    documentInfo       : DocumentInfo,
+    fullyQualifiedNames: Boolean,
+    maxIdentifierLength: Int
+  ): Unit =
+    FlatView.views(documentInfo, req.provider, req.appForm, version).foreach { view =>
+      val viewName = view.name(fullyQualifiedNames, maxIdentifierLength)
 
-    deleteViewIfExists(req.provider, connection, viewName)
-
-    // Compute columns in the view
-    val cols = {
-      val userCols  = documentInfoOpt.map(extractPathsCols).getOrElse(Nil).map { case (path, col) =>
-        Col(Provider.flatViewExtractFunction(req.provider, path), col)
+      if (Provider.flatViewDelete(req.provider)) {
+        deleteViewIfExists(req.provider, connection, viewName)
       }
-      MetadataPairs.iterator ++ userCols
+
+      val viewSelectQuery = view.sql(fullyQualifiedNames, maxIdentifierLength)
+      val createViewQuery = Provider.flatViewCreateView(req.provider, viewName, viewSelectQuery)
+
+      useAndClose(connection.prepareStatement(createViewQuery))(_.executeUpdate())
     }
 
-    // Create view
-    // - Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations.
-    locally {
-      val query =
-        Provider.flatViewCreateView(
-          req.provider,
-          req.appForm,
-          version.toString,
-          viewName,
-          cols map { case Col(col, name) => col + " " + name} mkString ", "
-        )
-      useAndClose(connection.prepareStatement(query))(_.executeUpdate())
-    }
+  sealed trait FormNode {
+    def nameOpt : Option[String]
+    def path    : List[String]
+    def repeated: Boolean
+    def children: List[FormNode]
   }
 
-  def createFlatView(req: CrudRequest, version: Int, connection: Connection): Unit =
-    createFlatViewForDocument(req, version, connection, RequestReader.xmlDocument())
+  case class Root(children: List[FormNode]) extends FormNode {
+    override val nameOpt : Option[String] = None
+    override val path    : List[String]   = Nil
+    override val repeated: Boolean        = false
+  }
 
-  // Returns a list with for each control to be included in the flat view, the parts of the path
-  // to that control, e.g.:
-  //
-  //     List(
-  //         List("top-section", "sub-section", "control-a"),
-  //         List("top-section", "sub-section", "control-b")
-  //     )
-  def collectControlPaths(outerSectionNames: List[String], document: DocumentInfo): List[List[String]] = {
+  case class Section(
+    nameOpt : Option[String],
+    path    : List[String],
+    repeated: Boolean,
+    children: List[FormNode]
+  ) extends FormNode
 
-    import FormRunner._
+  case class Grid(
+    nameOpt : Option[String],
+    path    : List[String],
+    repeated: Boolean,
+    children: List[FormNode]
+  ) extends FormNode
 
-    val root = document.rootElement
-    val head = root.child(XHHeadTest).head
-    val body = root.child(XHBodyTest).head
+  case class Control(nameOpt: Option[String], path: List[String]) extends FormNode {
+    override val repeated: Boolean        = false
+    override val children: List[FormNode] = Nil
+  }
+
+  def formTree(document: DocumentInfo): Root = {
+
+    val root        = document.rootElement
+    val head        = root.child(XHHeadTest).head
+    val body        = root.child(XHBodyTest).head
     val xblMappings = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
 
-    // `outerSectionNames` lists the name of the ancestor sections of the current node,
-    // e.g. List("top-section", "sub-section")
-    def collectFromNode(outerSectionNames: List[String],  node: NodeInfo): List[List[String]] = {
+    def formNodes(node: NodeInfo, path: List[String]): List[FormNode] = {
 
-      def isControl(n: NodeInfo) = isIdForControl(node.id)
-      def collectFromChildren(sectionNames: List[String]) = {
-        val children = node child *
-        children.toList.flatMap(collectFromNode(sectionNames, _))
-      }
+      val section  = IsSection(node)
+      val grid     = IsGrid(node)
+      val repeated = isRepeat(node)
+      val control  = isIdForControl(node.id)
 
-      node match {
-        case _ if isRepeat(node) =>
-          // Don't go into repeats, as we don't them yet for flat views
-          Nil
-        case _ if IsSection(node) =>
-          val sectionNames = outerSectionNames :+ controlNameFromId(node.id)
-          collectFromChildren(sectionNames)
-        case _ if IsGrid(node) =>
-          collectFromChildren(outerSectionNames)
-        case _ if isSectionTemplateContent(node) =>
-          xblMappings.get(node.uriQualifiedName) match {
-            case None =>
-              Nil
-            case Some(xblBindingNode) =>
-              val xblTemplate = xblBindingNode.rootElement.child(XBLTemplateTest).head
-              collectFromNode(outerSectionNames, xblTemplate)
-          }
-        case _ if isControl(node) =>
-          List(outerSectionNames :+ controlNameFromId(node.id))
-        case _ =>
-          collectFromChildren(outerSectionNames)
+      // Do not include grid names in paths, unless they're repeated grids
+      val addNameToPath          = ! grid || repeated
+      val nameOpt                = Option(controlNameFromId(node.id))
+      val nameToAddToPathOpt     = addNameToPath.flatOption(nameOpt)
+      val addIterationNameToPath = section && repeated
+      val iterationNameOpt       = addIterationNameToPath.flatOption(nameToAddToPathOpt.map(_ + DefaultIterationSuffix))
+      val currentPath            = path ++ nameToAddToPathOpt.toList ++ iterationNameOpt.toList
+      val childrenNodes          = (node child *).toList.flatMap(formNodes(_, currentPath))
+
+      if (section) {
+        List(Section(nameOpt, currentPath, repeated, childrenNodes))
+      } else if (grid) {
+        List(Grid(nameOpt, currentPath, repeated, childrenNodes))
+      } else if (isSectionTemplateContent(node)) {
+        xblMappings.get(node.uriQualifiedName).map { xblBindingNode =>
+          // Follow XBL binding to the template
+          formNodes(xblBindingNode.rootElement.child(XBLTemplateTest).head, currentPath)
+        }.getOrElse(Nil)
+      } else if (control) {
+        List(Control(nameOpt, currentPath))
+      } else {
+        childrenNodes
       }
     }
 
-    collectFromNode(Nil, body)
+    Root(children = formNodes(body, path = Nil))
   }
 
-  def extractPathsCols(document: DocumentInfo): List[(String, String)] = {
+  private def relativePath(fullPath: Seq[String], referencePath: Seq[String]): Seq[String] = {
+    assert(fullPath.take(referencePath.size) == referencePath, "Path prefixes do not match")
+    fullPath.drop(referencePath.size)
+  }
 
-    val paths = collectControlPaths(Nil, document)
-    val seen = mutable.HashSet[String](PrefixedMetadataColumns: _*)
+  case class ViewControl(name: String, relativePath: Seq[String]) {
+    def columnNamePath(fullyQualifiedNames: Boolean): Seq[String] = if (fullyQualifiedNames) relativePath else Seq(name)
+    def xpath                                       : String      = "/*/" + relativePath.mkString("/") + "/text()"
+  }
 
-    for {
-      path: List[String]  <- paths
+  case class View(
+    formNode     : FormNode,
+    parentViewOpt: Option[View],
+    provider     : Provider,
+    appForm      : AppForm,
+    version      : Int,
+    controls     : Seq[ViewControl]
+  ) {
+
+    private def level: Int = parentViewOpt.map(_.level + 1).getOrElse(0)
+    private val tableAlias = s"view_$level"
+
+    private val relativePath: Seq[String] = parentViewOpt match {
+      case None         => formNode.path
+      case Some(parent) => FlatView.relativePath(formNode.path, parent.formNode.path)
+    }
+
+    private val repetitionColumnNameOpt: Option[String] = formNode.nameOpt.map(name => xmlToSQLId(name + "_repetition"))
+    private val repetitionColumnNames: Seq[String]      = parentViewOpt.toSeq.flatMap(_.repetitionColumnNames) ++ repetitionColumnNameOpt.toSeq
+
+    def name(fullyQualifiedNames: Boolean, maxIdentifierLength: Int): String = {
+
+      val viewParts = if (fullyQualifiedNames) {
+        // Include all segments from path relative to parent view (if any)
+        relativePath
+      } else {
+        // Only include name of section/grid
+        formNode.nameOpt.toSeq
+      }
+
+      TablePrefix + joinParts(
+        (List(appForm.app, appForm.form, version.toString) ++ viewParts).map(xmlToSQLId),
+        maxIdentifierLength - TablePrefix.length
+      )
+    }
+
+    def sql(fullyQualifiedNames: Boolean, maxIdentifierLength: Int): String = {
+
+      val deduplicatedColumnNames = FlatView.deduplicatedColumnNames(
+        controls.map(_.columnNamePath(fullyQualifiedNames)),
+        maxIdentifierLength
+      )
+
+      val controlColumns = controls.map { control =>
+        val columnName = deduplicatedColumnNames(control.columnNamePath(fullyQualifiedNames))
+
+        Column(Provider.flatViewExtractFunction(provider, s"$tableAlias.xml", control.xpath), Some(columnName))
+      }
+
+      sql(
+        columns              = controlColumns.map(_.sql),
+        xmlTable             = "",
+        includeAllMetadata   = parentViewOpt.isEmpty,
+        includeMetadataAlias = true
+      )
+    }
+
+    private def sql(
+      columns             : Seq[String],
+      xmlTable            : String,
+      includeAllMetadata  : Boolean,
+      includeMetadataAlias: Boolean
+    ): String = {
+
+      val (fromStatement, repetitionColumns) = parentViewOpt match {
+        case None =>
+          val metadataColumns = FlatView.metadataColumns(
+            tableAlias   = FormDataTableAlias,
+            includeAll   = includeAllMetadata,
+            includeAlias = false
+          )
+
+          // Top-level query on orbeon_form_data table
+          val fromStatement = Provider.flatViewFormDataSelectStatement(
+            appForm    = appForm,
+            version    = version,
+            tableAlias = FormDataTableAlias,
+            columns    = metadataColumns.map(_.sql) :+ s"$FormDataTableAlias.xml"
+          )
+
+          (fromStatement, Seq())
+
+        case Some(parentView) =>
+          // Repetition columns logic
+          val canUnnestArray     = Provider.flatViewCanUnnestArray(provider)
+          val docIdTableAlias    = if (canUnnestArray) tableAlias else parentView.tableAlias
+          val docIdColumn        = s"$docIdTableAlias.document_id"
+          val partitionBy        = s"PARTITION BY ${(docIdColumn +: parentView.repetitionColumnNames).mkString(", ")}"
+          val orderBy            = Provider.flatViewRowNumberOrderBy(provider)
+          val rowNumberStatement = s"row_number() OVER ($partitionBy $orderBy) AS ${repetitionColumnNameOpt.get}"
+          val rowNumberInParent  = ! canUnnestArray
+          val repetitionColumn   = if (rowNumberInParent) repetitionColumnNameOpt.get else rowNumberStatement
+          val repetitionColumns  = parentView.repetitionColumnNames :+ repetitionColumn
+
+          // XML XPath extraction logic (repeated sections/grids)
+          val xpath           = s"/*/${relativePath.mkString("/")}"
+          val parentXmlColumn = Provider.flatViewRepeatedXmlColumn(provider, parentView.tableAlias, xpath)
+          val parentXmlTable  = Provider.flatViewRepeatedXmlTable (provider, parentView.tableAlias, xpath)
+          val parentColumns   = Seq(parentXmlColumn) ++ rowNumberInParent.seq(rowNumberStatement)
+
+          val fromStatement = parentView.sql(
+            columns              = parentColumns,
+            xmlTable             = parentXmlTable,
+            includeAllMetadata   = includeAllMetadata,
+            includeMetadataAlias = false
+          )
+
+          (fromStatement, repetitionColumns)
+      }
+
+      val metadataColumns = FlatView.metadataColumns(
+        tableAlias   = tableAlias,
+        includeAll   = includeAllMetadata,
+        includeAlias = includeMetadataAlias
+      ).map(_.sql)
+
+      s"""|SELECT
+          |  ${(metadataColumns ++ repetitionColumns ++ columns).mkString(", ")}
+          |FROM
+          |  (
+          |    $fromStatement
+          |  ) $tableAlias$xmlTable
+          |""".stripMargin
+    }
+  }
+
+  def viewControls(formNode: FormNode, referencePath: List[String]): Seq[ViewControl] =
+    formNode match {
+      case _: Section | _: Grid if formNode.repeated =>
+        // Stop collecting controls for a view when we encounter a repeated section/grid, which will be covered by a separate view
+        Seq.empty
+      case Control(name, path) =>
+        // Make path relative to the reference path (i.e. root or repeated section/grid)
+        Seq(ViewControl(name.get, FlatView.relativePath(path, referencePath)))
+      case _ =>
+        formNode.children.flatMap(viewControls(_, referencePath))
+    }
+
+  def views(
+    formNode     : FormNode,
+    parentViewOpt: Option[View],
+    provider     : Provider,
+    appForm      : AppForm,
+    version      : Int
+  ): Seq[View] = {
+
+    // We generate a view for the root of the form, as well as for every repeated section/grid
+    val generateView = formNode match {
+      case _: Root              => true
+      case _: Section | _: Grid => formNode.repeated
+      case _                    => false
+    }
+
+    val viewOpt = generateView.option {
+      // Collect all controls under the current view
+      val controls = formNode.children.flatMap(viewControls(_, formNode.path))
+
+      View(formNode, parentViewOpt, provider, appForm, version, controls)
+    }
+
+    // Propagate any currently active view towards the child views (serves as a reference)
+    val childParentViewOpt = viewOpt orElse parentViewOpt
+
+    viewOpt.toSeq ++ formNode.children.flatMap(views(_, childParentViewOpt, provider, appForm, version))
+  }
+
+  def views(document: DocumentInfo, provider: Provider, appForm: AppForm, version: Int): Seq[View] =
+    views(formNode = formTree(document), parentViewOpt = None, provider, appForm, version)
+
+  def deduplicatedColumnNames(columnNamesAsPaths: Seq[Seq[String]], maxIdentifierLength: Int): Map[Seq[String], String] = {
+
+    val seen  = mutable.HashSet[String](
+      metadataColumns(tableAlias = FormDataTableAlias, includeAll = true, includeAlias = true).flatMap(_.nameOpt): _*
+    )
+
+    (for {
+      path: Seq[String]  <- columnNamesAsPaths
       sqlPath            = path map xmlToSQLId
-      col                = joinParts(sqlPath, MaxNameLength)
-      uniqueCol          = resolveDuplicate(col, MaxNameLength)(seen)
+      col                = joinParts(sqlPath, maxIdentifierLength)
+      uniqueCol          = resolveDuplicate(col, maxIdentifierLength)(seen)
     } yield
-      path.mkString("/") -> uniqueCol
+      path -> uniqueCol).toMap
   }
 
-  def resolveDuplicate(value: String, maxLength: Int)(seen: mutable.HashSet[String]): String = {
+  def resolveDuplicate(value: String, maxIdentifierLength: Int)(seen: mutable.HashSet[String]): String = {
 
     @tailrec def nextValue(value: String, counter: Int = 1): String = {
 
       val guessCounterString = counter.toString
-      val guess = s"${value take (maxLength - guessCounterString.length)}$guessCounterString"
+      val guess = s"${value take (maxIdentifierLength - guessCounterString.length)}$guessCounterString"
 
       if (! seen(guess))
         guess
@@ -189,22 +383,23 @@ private object FlatView {
 
   // Create an acceptable SQL name from an XML NCName (but accept any input)
   // On Oracle names: http://docs.oracle.com/cd/E11882_01/server.112/e10592/sql_elements008.htm
-  def xmlToSQLId(id: String) =
+  def xmlToSQLId(id: String): String =
     id
-    .replace("-", "_")                // dash to underscore
-    .toUpperCase                      // to uppercase
-    .replaceAll("""[^A-Z0-9_]""", "") // only keep alphanumeric or underscore
-    .dropWhile(_ == '_')              // remove starting underscores
+    .replace("-", "_")                   // dash to underscore
+    .replaceAll("""[^A-Za-z0-9_]""", "") // only keep alphanumeric or underscore
+    .dropWhile(_ == '_')                 // remove starting underscores
     .reverse
-    .dropWhile(_ == '_')              // remove trailing underscores
+    .dropWhile(_ == '_')                 // remove trailing underscores
     .reverse
 
   // Try to truncate reasonably smartly when needed to maximize the characters we keep
-  def fitParts(parts: List[String], max: Int): List[String] = {
+  private def fitParts(parts: Seq[String], maxIdentifierLength: Int): Seq[String] = {
 
-    val usable = max - parts.length + 1
+    val usable = maxIdentifierLength - parts.length + 1
 
-    @tailrec def shaveParts(parts: List[String]): List[String] = {
+    @tailrec def shaveParts(parts: Seq[String]): Seq[String] = {
+      // The limit imposed by some databases is on the number of bytes, not characters, but we don't need to compute the
+      // UTF-8-encoded length here as we limit identifiers to ASCII.
       val partsLength = parts.map(_.length)
       val totalLength = partsLength.sum
 
@@ -228,6 +423,6 @@ private object FlatView {
     shaveParts(parts)
   }
 
-  def joinParts(parts: List[String], max: Int) =
-    fitParts(parts, max) mkString "_"
+  def joinParts(parts: Seq[String], maxIdentifierLength: Int): String =
+    fitParts(parts, maxIdentifierLength) mkString "_"
 }

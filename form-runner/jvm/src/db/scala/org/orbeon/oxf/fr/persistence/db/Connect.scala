@@ -98,14 +98,14 @@ object Connect {
       if (dropDatabase) {
         Logging.withDebug(s"drop `$TestDatabaseName` objects") {
           provider match {
-            case MySQL      => runStatements(datasourceDescriptor, List(s"DROP DATABASE  $TestDatabaseName"))
-            case PostgreSQL => runStatements(datasourceDescriptor, List(s"DROP SCHEMA    $TestDatabaseName    CASCADE"))
-            case SQLite     => withConnection(datasourceDescriptor) { connection =>
-                                 datasourceDescriptor.switchDB.foreach(switchDB => runStatements(connection, List(switchDB)))
-                                 val tables = getTableNames(provider, connection)
-                                 val dropStatements = tables.map("DROP TABLE " + _)
-                               runStatements(connection, dropStatements)
-                               }
+            case MySQL        => runStatements(datasourceDescriptor, List(s"DROP DATABASE  $TestDatabaseName"))
+            case PostgreSQL   => runStatements(datasourceDescriptor, List(s"DROP SCHEMA    $TestDatabaseName    CASCADE"))
+            case SQLite       => withConnection(datasourceDescriptor) { connection =>
+                                    datasourceDescriptor.switchDB.foreach(switchDB => runStatements(connection, List(switchDB)))
+                                    val tables = getTableNames(provider, connection)
+                                    val dropStatements = tables.map("DROP TABLE IF EXISTS " + _)
+                                    runStatements(connection, dropStatements)
+                                   }
           }
         }
       }

@@ -1,0 +1,100 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:saxon="http://saxon.sf.net/" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>Form with simple repeated sections</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <company-section><company-section-iteration><grid-1><company-name></company-name></grid-1><office-section><office-section-iteration><grid-2><office-name></office-name></grid-2><employee-section><employee-section-iteration><grid-3><employee-name></employee-name></grid-3></employee-section-iteration></employee-section></office-section-iteration></office-section></company-section-iteration>
+
+                    </company-section><non-repeated-section><grid-4><control-1></control-1><control-2></control-2></grid-4></non-repeated-section>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="company-section-bind" name="company-section" ref="company-section"><xf:bind id="company-section-iteration-bind" ref="company-section-iteration" name="company-section-iteration"><xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"><xf:bind id="company-name-bind" name="company-name" ref="company-name" xxf:whitespace="trim"></xf:bind></xf:bind><xf:bind id="office-section-bind" ref="office-section" name="office-section"><xf:bind id="office-section-iteration-bind" ref="office-section-iteration" name="office-section-iteration"><xf:bind id="grid-2-bind" ref="grid-2" name="grid-2"><xf:bind id="office-name-bind" ref="office-name" name="office-name" xxf:whitespace="trim"></xf:bind></xf:bind><xf:bind id="employee-section-bind" ref="employee-section" name="employee-section"><xf:bind id="employee-section-iteration-bind" ref="employee-section-iteration" name="employee-section-iteration"><xf:bind id="grid-3-bind" ref="grid-3" name="grid-3"><xf:bind id="employee-name-bind" ref="employee-name" name="employee-name" xxf:whitespace="trim"></xf:bind></xf:bind></xf:bind></xf:bind></xf:bind></xf:bind></xf:bind>
+
+                </xf:bind><xf:bind id="non-repeated-section-bind" ref="non-repeated-section" name="non-repeated-section"><xf:bind id="grid-4-bind" ref="grid-4" name="grid-4"><xf:bind id="control-1-bind" ref="control-1" name="control-1" xxf:whitespace="trim"></xf:bind><xf:bind id="control-2-bind" ref="control-2" name="control-2" xxf:whitespace="trim"></xf:bind></xf:bind></xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>a</application-name>
+                    <form-name>flat-views-repetitions</form-name>
+                    <title xml:lang="en">Untitled Form</title>
+                    <description xml:lang="en"></description><created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <grid-tab-order>default</grid-tab-order><library-versions><orbeon>1</orbeon><app>1</app></library-versions><email><templates><template name="default"><headers></headers><exclude-from-all-control-values></exclude-from-all-control-values></template></templates><parameters></parameters></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"company-section"},{"value":"company-section-iteration"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"company-name"}],"topLevel":true},{"containerPath":[{"value":"company-section"},{"value":"company-section-iteration"},{"value":"office-section"},{"value":"office-section-iteration"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"office-name"}],"topLevel":true},{"containerPath":[{"value":"company-section"},{"value":"company-section-iteration"},{"value":"office-section"},{"value":"office-section-iteration"},{"value":"employee-section"},{"value":"employee-section-iteration"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"employee-name"}],"topLevel":true},{"containerPath":[{"value":"non-repeated-section"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"control-1"},{"value":"control-2"}],"topLevel":true}]}</migration></metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments></attachments>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en"><control-1><label>Control 1</label><hint></hint></control-1><control-2><label>Control 2</label><hint></hint></control-2><employee-name><label>Employee name</label><hint></hint></employee-name><non-repeated-section><label>Non-repeated section</label></non-repeated-section><office-name><label>Office name</label><hint></hint></office-name><employee-section><label>Employee</label></employee-section>
+                        <company-section>
+                            <label>Company</label>
+                        </company-section>
+                        <company-name><label>Company name</label><hint></hint>
+
+
+
+                        </company-name><office-section><label>Office</label></office-section>
+                    </resource>
+                </resources>
+            </xf:instance><xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="company-section-template"><company-section-iteration><grid-1><company-name></company-name></grid-1><office-section><office-section-iteration><grid-2><office-name></office-name></grid-2><employee-section><employee-section-iteration><grid-3><employee-name></employee-name></grid-3></employee-section-iteration></employee-section></office-section-iteration></office-section></company-section-iteration></xf:instance><xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="office-section-template"><office-section-iteration><grid-2><office-name></office-name></grid-2><employee-section><employee-section-iteration><grid-3><employee-name></employee-name></grid-3></employee-section-iteration></employee-section></office-section-iteration></xf:instance><xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="employee-section-template"><employee-section-iteration><grid-3><employee-name></employee-name></grid-3></employee-section-iteration></xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="company-section-section" bind="company-section-bind" repeat="content" number-rows="true" min="1" template="instance('company-section-template')" apply-defaults="true" fb:initial-iterations="first">
+                    <xf:label ref="$form-resources/company-section/label"></xf:label>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind"><fr:c y="1" x="1" w="6">
+                        <xf:input id="company-name-control" bind="company-name-bind">
+                            <xf:label ref="$form-resources/company-name/label"></xf:label>
+                            <xf:hint ref="$form-resources/company-name/hint"></xf:hint><xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+                        </xf:input>
+                    </fr:c><fr:c y="1" x="7" w="6"></fr:c></fr:grid><fr:section id="office-section-section" bind="office-section-bind" repeat="content" number-rows="true" min="1" template="instance('office-section-template')" apply-defaults="true" fb:initial-iterations="first">
+                    <xf:label ref="$form-resources/office-section/label"></xf:label><fr:grid id="grid-2-grid" bind="grid-2-bind">
+                    <fr:c x="1" y="1" w="6"><xf:input id="office-name-control" bind="office-name-bind">
+                        <xf:label ref="$form-resources/office-name/label"></xf:label>
+                        <xf:hint ref="$form-resources/office-name/hint"></xf:hint><xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                    </xf:input></fr:c><fr:c x="7" y="1" w="6"></fr:c>
+                </fr:grid><fr:section id="employee-section-section" bind="employee-section-bind" repeat="content" number-rows="true" min="1" template="instance('employee-section-template')" apply-defaults="true" fb:initial-iterations="first">
+                    <xf:label ref="$form-resources/employee-section/label"></xf:label><fr:grid id="grid-3-grid" bind="grid-3-bind">
+                    <fr:c x="1" y="1" w="6"><xf:input id="employee-name-control" bind="employee-name-bind">
+                        <xf:label ref="$form-resources/employee-name/label"></xf:label>
+                        <xf:hint ref="$form-resources/employee-name/hint"></xf:hint><xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                    </xf:input></fr:c><fr:c x="7" y="1" w="6"></fr:c>
+                </fr:grid></fr:section></fr:section>
+                </fr:section><fr:section id="non-repeated-section-section" bind="non-repeated-section-bind">
+                <xf:label ref="$form-resources/non-repeated-section/label"></xf:label><fr:grid id="grid-4-grid" bind="grid-4-bind">
+                <fr:c x="1" y="1" w="6"><xf:input id="control-1-control" bind="control-1-bind">
+                    <xf:label ref="$form-resources/control-1/label"></xf:label>
+                    <xf:hint ref="$form-resources/control-1/hint"></xf:hint>
+
+                    <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                </xf:input></fr:c><fr:c x="7" y="1" w="6"><xf:input id="control-2-control" bind="control-2-bind">
+                <xf:label ref="$form-resources/control-2/label"></xf:label>
+                <xf:hint ref="$form-resources/control-2/hint"></xf:hint>
+
+                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+            </xf:input></fr:c>
+            </fr:grid></fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

@@ -485,7 +485,20 @@ trait CreateUpdateDelete {
           ! delete                                          &&
           req.appForm.form != Names.LibraryFormName
         ) withDebug("CRUD: creating flat view") {
-          FlatView.createFlatView(req, versionToSet, connection)
+
+          val fullyQualifiedNames = FormRunner.providerPropertyAsBoolean(
+            req.provider.entryName,
+            "flat-view.fully-qualified-names",
+            default = true
+          )
+
+          val maxIdentifierLength = FormRunner.providerPropertyAsInteger(
+            req.provider.entryName,
+            "flat-view.max-identifier-length",
+            default = FlatView.CompatibilityMaxIdentifierLength
+          )
+
+          FlatView.createFlatViews(req, versionToSet, connection, fullyQualifiedNames, maxIdentifierLength)
         }
       }
 

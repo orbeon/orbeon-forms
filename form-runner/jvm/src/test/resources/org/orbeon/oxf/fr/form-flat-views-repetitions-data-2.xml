@@ -1,0 +1,62 @@
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <company-section>
+        <company-section-iteration>
+            <company-name>Acme 2</company-name>
+            <office-section>
+                <office-section-iteration>
+                    <office-name>Lausanne 2</office-name>
+                    <employee-section>
+                        <employee-section-iteration>
+                            <employee-name>John 2</employee-name>
+                        </employee-section-iteration>
+                        <employee-section-iteration>
+                            <employee-name>Bob 2</employee-name>
+                        </employee-section-iteration>
+                    </employee-section>
+                </office-section-iteration>
+                <office-section-iteration>
+                    <office-name>Geneva 2</office-name>
+                    <employee-section>
+                        <employee-section-iteration>
+                            <employee-name>Ada 2</employee-name>
+                        </employee-section-iteration>
+                        <employee-section-iteration>
+                            <employee-name>Clara 2</employee-name>
+                        </employee-section-iteration>
+                    </employee-section>
+                </office-section-iteration>
+            </office-section>
+        </company-section-iteration>
+        <company-section-iteration>
+            <company-name>Wayne Industries 2</company-name>
+            <office-section>
+                <office-section-iteration>
+                    <office-name>Gotham City 2</office-name>
+                    <employee-section>
+                        <employee-section-iteration>
+                            <employee-name>Batman 2</employee-name>
+                        </employee-section-iteration>
+                        <employee-section-iteration>
+                            <employee-name>Robin 2</employee-name>
+                        </employee-section-iteration>
+                    </employee-section>
+                </office-section-iteration>
+                <office-section-iteration>
+                    <office-name>New York City 2</office-name>
+                    <employee-section>
+                        <employee-section-iteration>
+                            <employee-name>Cat Woman 2</employee-name>
+                        </employee-section-iteration>
+                        <employee-section-iteration>
+                            <employee-name>Joker 2</employee-name>
+                        </employee-section-iteration>
+                    </employee-section>
+                </office-section-iteration>
+            </office-section>
+        </company-section-iteration>
+    </company-section>
+    <non-repeated-section>
+        <control-1>Control 1.2</control-1>
+        <control-2>Control 2.2</control-2>
+    </non-repeated-section>
+</form>

@@ -39,12 +39,6 @@ object Provider extends Enum[Provider] {
   case object PostgreSQL extends Provider
 
   case object SQLite     extends Provider
-  
-  def xmlCol(provider: Provider, tableName: String): String =
-    provider match {
-      case PostgreSQL | SQLite => s"$tableName.xml as xml"
-      case _                   => s"$tableName.xml xml"
-    }
 
   def xmlColSelect(provider: Provider, tableName: String): String =
     provider match {
@@ -164,10 +158,10 @@ object Provider extends Enum[Provider] {
     thunk      : () => Unit
   ): Unit = {
     val lockSQLOpt = provider match {
-      case MySQL      => Some(s"LOCK TABLES $tableName WRITE")
-      case PostgreSQL => Some(s"LOCK TABLE $tableName IN EXCLUSIVE MODE")
-      case SQLite     => None // SQLite doesn't support locking tables
-      case _          => throw new UnsupportedOperationException
+      case MySQL                      => Some(s"LOCK TABLES $tableName WRITE")
+      case PostgreSQL                 => Some(s"LOCK TABLE $tableName IN EXCLUSIVE MODE")
+      case SQLite                     => None // SQLite doesn't support locking tables
+      case _                          => throw new UnsupportedOperationException
     }
     // See https://github.com/orbeon/orbeon-forms/issues/3866
     lockSQLOpt.foreach(lockSQL => useAndClose(connection.createStatement())(_.execute(lockSQL)))
@@ -194,10 +188,10 @@ object Provider extends Enum[Provider] {
 
   def dateIn(provider: Provider): String =
     provider match {
-      case MySQL      => "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? second)"
-      case PostgreSQL => "CURRENT_TIMESTAMP + (interval '1' second * ?)"
-      case SQLite     => "DATETIME(CURRENT_TIMESTAMP, format('+%f seconds', ?))"
-      case _          => throw new UnsupportedOperationException
+      case MySQL       => "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? second)"
+      case PostgreSQL  => "CURRENT_TIMESTAMP + (interval '1' second * ?)"
+      case SQLite      => "DATETIME(CURRENT_TIMESTAMP, format('+%f seconds', ?))"
+      case _           => throw new UnsupportedOperationException
     }
 
   case class RowNumSQL(
@@ -243,7 +237,7 @@ object Provider extends Enum[Provider] {
     }
   }
 
-  private val FlatViewMustDelete: Set[Provider] = Set(PostgreSQL, SQLite)
+  private val FlatViewMustDelete: Set[Provider] = Set(PostgreSQL)
 
   def flatViewDelete(provider: Provider): Boolean =
     FlatViewMustDelete(provider)
@@ -263,41 +257,62 @@ object Provider extends Enum[Provider] {
   def flatViewExistsParam(provider: Provider, viewName: String): String =
     if (provider == PostgreSQL) viewName.toLowerCase else viewName
 
-  def flatViewExtractFunction(provider: Provider, path: String): String =
+  def flatViewExtractFunction(provider: Provider, xmlColumn: String, xpath: String): String =
     provider match {
-      case PostgreSQL => s"(xpath('/*/$path/text()', d.xml))[1]::text"
+      case PostgreSQL => s"(xpath('$xpath', $xmlColumn))[1]::text"
       case _          => throw new UnsupportedOperationException
     }
 
-  def flatViewCreateView(provider: Provider, appForm: AppForm, version: String, viewName: String, cols: String): String = {
+  def flatViewCanUnnestArray(provider: Provider): Boolean =
+    provider match {
+      case PostgreSQL => true
+      case _          => false
+    }
 
-    def escapeSQL(s: String): String =
-      s.replace("'", "''")
+  def flatViewRepeatedXmlColumn(provider: Provider, xmlTable: String, xpath: String): String =
+    provider match {
+      case PostgreSQL   => s"unnest(xpath('$xpath', $xmlTable.xml)) xml"
+      case _            => throw new UnsupportedOperationException
+    }
 
-    val orReplace =
-      provider match {
-        case _          => ""
-      }
+  def flatViewRepeatedXmlTable(provider: Provider, xmlTable: String, xpath: String): String =
+    provider match {
+      case PostgreSQL => s""
+      case _          => throw new UnsupportedOperationException
+    }
 
-    s"""|CREATE  $orReplace VIEW $viewName AS
-        |SELECT  $cols
-        |  FROM  orbeon_form_data d,
-        |        (
-        |            SELECT   max(last_modified_time) last_modified_time,
-        |                     app, form, form_version, document_id
-        |              FROM   orbeon_form_data d
-        |             WHERE       app          = '${escapeSQL(appForm.app)}'
-        |                     AND form         = '${escapeSQL(appForm.form)}'
-        |                     AND form_version = $version
-        |                     AND draft        = 'N'
-        |            GROUP BY app, form, form_version, document_id
-        |        ) m
-        | WHERE      d.last_modified_time = m.last_modified_time
-        |        AND d.app                = m.app
-        |        AND d.form               = m.form
-        |        AND d.form_version       = m.form_version
-        |        AND d.document_id        = m.document_id
-        |        AND d.deleted            = 'N'
+  def flatViewRowNumberOrderBy(provider: Provider): String =
+    provider match {
+      case PostgreSQL       => ""
+      case _                => throw new UnsupportedOperationException
+    }
+
+  def flatViewCreateView(provider: Provider, viewName: String, selectStatement: String): String = {
+
+    val orReplace = provider match {
+      case _          => ""
+    }
+
+    s"""|CREATE $orReplace VIEW $viewName AS
+        |$selectStatement
+        |""".stripMargin
+  }
+
+  def flatViewFormDataSelectStatement(
+    appForm   : AppForm,
+    version   : Int,
+    tableAlias: String,
+    columns   : Seq[String]
+  ): String = {
+
+    def escapeSQL(s: String): String = s.replace("'", "''")
+
+    s"""|      SELECT ${columns.mkString(", ")}
+        |        FROM orbeon_form_data $tableAlias
+        |  INNER JOIN orbeon_i_current c ON $tableAlias.id = c.data_id
+        |       WHERE $tableAlias.app          = '${escapeSQL(appForm.app)}'
+        |         AND $tableAlias.form         = '${escapeSQL(appForm.form)}'
+        |         AND $tableAlias.form_version = $version
         |""".stripMargin
   }
 

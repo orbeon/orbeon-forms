@@ -443,6 +443,9 @@ trait FormRunnerPersistence {
   def providerPropertyAsBoolean(provider: String, property: String, default: Boolean, properties: PropertySet = CoreCrossPlatformSupport.properties): Boolean =
     properties.getBoolean(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
 
+  def providerPropertyAsInteger(provider: String, property: String, default: Int, properties: PropertySet = CoreCrossPlatformSupport.properties): Int =
+    properties.getInteger(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
+
   // 2020-12-23: If the provider is not configured, return `false` (for offline FIXME).
   //@XPathFunction
   def isAutosaveSupported(app: String, form: String): Boolean =

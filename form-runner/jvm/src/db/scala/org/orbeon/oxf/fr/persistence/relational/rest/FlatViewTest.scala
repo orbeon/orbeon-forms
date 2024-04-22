@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Version.{Specific, Unspecified}
+import org.orbeon.oxf.fr.persistence.relational.Version.Specific
 import org.orbeon.oxf.http.{HttpRanges, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.util.CollectionUtils.fromIteratorExt
@@ -33,6 +33,8 @@ import org.scalatest.funspec.AnyFunSpecLike
 import java.io.ByteArrayInputStream
 import java.net.URI
 import java.sql.{Connection, ResultSet}
+import scala.util.Try
+
 
 class FlatViewTest
   extends DocumentTestBase
@@ -40,112 +42,279 @@ class FlatViewTest
     with ResourceManagerSupport
     with AnyFunSpecLike {
 
-  private implicit val Logger                   = new IndentedLogger(LoggerFactory.createLogger(classOf[FlatViewTest]), true)
-  private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+  private object Private {
 
-  private val UrlPrefix = "oxf:/org/orbeon/oxf/fr/"
+    implicit val Logger                   = new IndentedLogger(LoggerFactory.createLogger(classOf[FlatViewTest]), true)
+    implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
-  private def xmlBody(resourceFile: String): HttpCall.XML = {
-    val formDefinition = readTinyTreeFromUrl(URI.create(UrlPrefix + resourceFile))
-    val formDocument   = IOSupport.readOrbeonDom(tinyTreeToOrbeonDom(formDefinition.getRoot).serializeToString())
-    HttpCall.XML(formDocument)
+    val UrlPrefix = "oxf:/org/orbeon/oxf/fr/"
+
+    def xmlBody(resourceFile: String): HttpCall.XML = {
+      val formDefinition = readTinyTreeFromUrl(URI.create(UrlPrefix + resourceFile))
+      val formDocument   = IOSupport.readOrbeonDom(tinyTreeToOrbeonDom(formDefinition.getRoot).serializeToString())
+      HttpCall.XML(formDocument)
+    }
+
+    def documentInfo(url: String, version: Int)(implicit ec: ExternalContext): DocumentInfo = {
+      val formDefinitionByteArray = HttpCall.get(url, Specific(version))._3.get
+      val formDefinitionDocument  = IOSupport.readOrbeonDom(new ByteArrayInputStream(formDefinitionByteArray))
+      orbeonDomToTinyTree(formDefinitionDocument)
+    }
+
+    def crudRequest(provider: Provider, appForm: AppForm, version: Int) = CrudRequest(
+      provider        = provider,
+      appForm         = appForm,
+      version         = Some(version),
+      filename        = None,
+      dataPart        = None,
+      lastModifiedOpt = None,
+      username        = None,
+      groupname       = None,
+      flatView        = true,
+      credentials     = None,
+      workflowStage   = None,
+      ranges          = HttpRanges()
+    )
+
+    case class Form(
+      definitionFile : String,
+      name           : String,
+      version        : Int,
+      data           : Seq[Data],
+      expectedResults: Seq[ExpectedResult]
+    )
+
+    case class Data(doc: String, dataFile: String)
+
+    case class ExpectedResult(fullyQualifiedNames: Boolean, maxIdentifierLength: Int, views: Seq[View])
+
+    case class View(
+      name                  : Provider => String,
+      createdColumn         : Boolean,
+      lastModifiedTimeColumn: Boolean,
+      lastModifiedByColumn  : Boolean,
+      columns               : Seq[String],
+      values                : Seq[Seq[String]]
+    )
+
+    val forms = Seq(
+      Form(
+        "form-flat-views-no-repetition.xhtml",
+        "my-form-1",
+        version = 2,
+        Seq(
+          Data("1", "form-flat-views-no-repetition-data-1.xml"),
+          Data("2", "form-flat-views-no-repetition-data-2.xml")
+        ),
+        Seq(
+          ExpectedResult(
+            fullyQualifiedNames = true,
+            maxIdentifierLength = FlatView.CompatibilityMaxIdentifierLength,
+            Seq(
+              View(
+                name                   = (provider: Provider) => s"orbeon_f_${provider.entryName.take(9)}_my_form_1_2",
+                createdColumn          = true,
+                lastModifiedTimeColumn = true,
+                lastModifiedByColumn   = true,
+                columns                = Seq(
+                  "section_1_control_1",
+                  "section_1_control_2",
+                  "section_1_section_2_control_3",
+                  "section_1_section_2_control_4",
+                  "sectio_section_section_control",
+                  "sectio_section_section_contro1",
+                ),
+                values                = Seq(
+                  Seq("1", "a", "b", "c", "d", "e", "f"),
+                  Seq("2", "g", "h", "i", "j", "k", "l")
+                )
+              )
+            )
+          )
+        )
+      ),
+      Form(
+        "form-flat-views-repetitions.xhtml",
+        "my-form-2",
+        version = 3,
+        Seq(
+          Data("1", "form-flat-views-repetitions-data-1.xml"),
+          Data("2", "form-flat-views-repetitions-data-2.xml")
+        ),
+        Seq(
+          ExpectedResult(
+            fullyQualifiedNames = false,
+            maxIdentifierLength = 63,
+            Seq(
+              View(
+                name                   = (provider: Provider) => s"orbeon_f_${provider.entryName}_my_form_2_3",
+                createdColumn          = true,
+                lastModifiedTimeColumn = true,
+                lastModifiedByColumn   = true,
+                columns                = Seq("control_1", "control_2"),
+                values                 = Seq(
+                  Seq("1", "Control 1.1", "Control 2.1"),
+                  Seq("2", "Control 1.2", "Control 2.2")
+                )
+              ),
+              View(
+                name                   = (provider: Provider) => s"orbeon_f_${provider.entryName}_my_form_2_3_company_section",
+                createdColumn          = false,
+                lastModifiedTimeColumn = false,
+                lastModifiedByColumn   = false,
+                columns                = Seq("company_section_repetition", "company_name"),
+                values                 = Seq(
+                  Seq("1", "1", "Acme 1"),
+                  Seq("1", "2", "Wayne Industries 1"),
+                  Seq("2", "1", "Acme 2"),
+                  Seq("2", "2", "Wayne Industries 2")
+                )
+              ),
+              View(
+                name                   = (provider: Provider) => s"orbeon_f_${provider.entryName}_my_form_2_3_office_section",
+                createdColumn          = false,
+                lastModifiedTimeColumn = false,
+                lastModifiedByColumn   = false,
+                columns                = Seq("company_section_repetition", "office_section_repetition", "office_name"),
+                values                 = Seq(
+                  Seq("1", "1", "1", "Lausanne 1"),
+                  Seq("1", "1", "2", "Geneva 1"),
+                  Seq("1", "2", "1", "Gotham City 1"),
+                  Seq("1", "2", "2", "New York City 1"),
+                  Seq("2", "1", "1", "Lausanne 2"),
+                  Seq("2", "1", "2", "Geneva 2"),
+                  Seq("2", "2", "1", "Gotham City 2"),
+                  Seq("2", "2", "2", "New York City 2")
+                )
+              ),
+              View(
+                name                   = (provider: Provider) => s"orbeon_f_${provider.entryName}_my_form_2_3_employee_section",
+                createdColumn          = false,
+                lastModifiedTimeColumn = false,
+                lastModifiedByColumn   = false,
+                columns                = Seq("company_section_repetition", "office_section_repetition", "employee_section_repetition", "employee_name"),
+                values                 = Seq(
+                  Seq("1", "1", "1", "1", "John 1"),
+                  Seq("1", "1", "1", "2", "Bob 1"),
+                  Seq("1", "1", "2", "1", "Ada 1"),
+                  Seq("1", "1", "2", "2", "Clara 1"),
+                  Seq("1", "2", "1", "1", "Batman 1"),
+                  Seq("1", "2", "1", "2", "Robin 1"),
+                  Seq("1", "2", "2", "1", "Cat Woman 1"),
+                  Seq("1", "2", "2", "2", "Joker 1"),
+                  Seq("2", "1", "1", "1", "John 2"),
+                  Seq("2", "1", "1", "2", "Bob 2"),
+                  Seq("2", "1", "2", "1", "Ada 2"),
+                  Seq("2", "1", "2", "2", "Clara 2"),
+                  Seq("2", "2", "1", "1", "Batman 2"),
+                  Seq("2", "2", "1", "2", "Robin 2"),
+                  Seq("2", "2", "2", "1", "Cat Woman 2"),
+                  Seq("2", "2", "2", "2", "Joker 2")
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+
+    // Assumption: we're comparing sequences of same length (i.e. view rows)
+    implicit val seqStringOrdering: Ordering[Seq[String]] =
+      (x: Seq[String], y: Seq[String]) => x.view.zip(y).map { case (a, b) => a.compareTo(b) }.find(_ != 0).getOrElse(0)
   }
 
-  private def documentInfo(url: String, version: Int)(implicit ec: ExternalContext): DocumentInfo = {
-    val formDefinitionByteArray = HttpCall.get(url, Specific(version))._3.get
-    val formDefinitionDocument  = IOSupport.readOrbeonDom(new ByteArrayInputStream(formDefinitionByteArray))
-    orbeonDomToTinyTree(formDefinitionDocument)
-  }
-
-  private def crudRequest(provider: Provider, appForm: AppForm, version: Int) = CrudRequest(
-    provider        = provider,
-    appForm         = appForm,
-    version         = Some(version),
-    filename        = None,
-    dataPart        = None,
-    lastModifiedOpt = None,
-    username        = None,
-    groupname       = None,
-    flatView        = true,
-    credentials     = None,
-    workflowStage   = None,
-    ranges          = HttpRanges()
-  )
+  import Private._
 
   describe("Flat views") {
-
-    it("expose forms with no repetition") {
+    it("expose forms with or without repetitions") {
       withTestExternalContext { implicit externalContext =>
-        Connect.withOrbeonTables("form definition") { (connection, provider) =>
-
+        Connect.withOrbeonTables("flat views") { (connection, provider) =>
           if (Provider.FlatViewSupportedProviders.contains(provider)) {
-            putDataAndReadBackFromView(provider, connection)
+            forms.foreach(testForm(provider, connection, _))
           }
         }
       }
     }
 
-    def putDataAndReadBackFromView(provider: Provider, connection: Connection)(implicit ec: ExternalContext): Unit = {
-      val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
-      HttpAssert.put(formURL, Unspecified, xmlBody("form-flat-views-no-repetition.xhtml"), StatusCode.Created)
+    def testForm(
+      provider  : Provider,
+      connection: Connection,
+      form      : Form)(implicit
+      ec        : ExternalContext
+    ): Unit = {
+      // Create form definition
+      val formURL = HttpCall.crudURLPrefix(provider, form.name) + "form/form.xhtml"
+      HttpAssert.put(formURL, Specific(form.version), xmlBody(form.definitionFile), StatusCode.Created)
 
-      val dataURL1 = HttpCall.crudURLPrefix(provider) + "data/1/data.xml"
-      HttpAssert.put(dataURL1, Specific(1), xmlBody("form-flat-views-no-repetition-data-1.xml"), StatusCode.Created)
-
-      val dataURL2 = HttpCall.crudURLPrefix(provider) + "data/2/data.xml"
-      HttpAssert.put(dataURL2, Specific(1), xmlBody("form-flat-views-no-repetition-data-2.xml"), StatusCode.Created)
-
-      val appForm = AppForm(provider.entryName, HttpCall.DefaultFormName)
-      val version = 1
-
-      FlatView.createFlatViewForDocument(
-        crudRequest(provider, appForm, version),
-        version,
-        connection,
-        Some(documentInfo(formURL, version))
-      )
-
-      val viewName           = FlatView.viewName(appForm, version)
-      val query              = s"SELECT * FROM $viewName"
-      val controlColumnNames = Seq(
-        "section_1_control_1",
-        "section_1_control_2",
-        "section_1_section_2_control_3",
-        "section_1_section_2_control_4",
-        "sectio_section_section_control",
-        "sectio_section_section_contro1",
-      )
-
-      val viewRows = useAndClose(connection.createStatement.executeQuery(query)) { resultSet =>
-        Iterator.iterateWhile(resultSet.next(), ViewRow(resultSet, controlColumnNames)).toList.sortBy(_.documentId)
+      // Create form data
+      form.data.foreach { data =>
+        val dataURL = HttpCall.crudURLPrefix(provider, form.name) + s"data/${data.doc}/data.xml"
+        HttpAssert.put(dataURL, Specific(form.version), xmlBody(data.dataFile), StatusCode.Created)
       }
 
-      assert(viewRows(0).documentId == "1")
-      assert(viewRows(0).controls == Seq("a", "b", "c", "d", "e", "f"))
+      val appForm = AppForm(provider.entryName, form.name)
 
-      assert(viewRows(1).documentId == "2")
-      assert(viewRows(1).controls == Seq("g", "h", "i", "j", "k", "l"))
+      form.expectedResults.foreach { expectedResult =>
+        // Create views
+        FlatView.createFlatViewsForDocument(
+          crudRequest(provider, appForm, form.version),
+          form.version,
+          connection,
+          documentInfo(formURL, form.version),
+          expectedResult.fullyQualifiedNames,
+          expectedResult.maxIdentifierLength
+        )
 
-      FlatView.deleteViewIfExists(provider, connection, viewName)
+        // Parse all views
+        expectedResult.views.foreach { view =>
+          val viewName = view.name(provider)
+
+          val query = s"SELECT * FROM $viewName"
+
+          // Retrieve view rows
+          val viewRows = useAndClose(connection.createStatement.executeQuery(query)) { resultSet =>
+            Iterator.iterateWhile(resultSet.next(), ViewRow(resultSet, view.columns))
+              .toList
+              .sortBy(row => row.documentId +: row.values)
+          }
+
+          assert(viewRows.size == view.values.size)
+
+          // Check view row values
+          viewRows.zip(view.values).foreach { case (viewRow, expectedValues) =>
+
+            // Check presence of metadata columns
+            assert(viewRow.createdOpt.isDefined          == view.createdColumn)
+            assert(viewRow.lastModifiedTimeOpt.isDefined == view.lastModifiedTimeColumn)
+            assert(viewRow.lastModifiedByOpt.isDefined   == view.lastModifiedByColumn)
+
+            // Compare document ID, repetition values, and control values
+            assert(viewRow.documentId +: viewRow.values == expectedValues)
+          }
+
+          FlatView.deleteViewIfExists(provider, connection, viewName)
+        }
+      }
     }
   }
 
   case class ViewRow(
     documentId      : String,
-    created         : String,
-    lastModifiedTime: String,
-    lastModifiedBy  : String,
-    controls        : Seq[String]
+    createdOpt         : Option[String],
+    lastModifiedTimeOpt: Option[String],
+    lastModifiedByOpt  : Option[String],
+    values          : Seq[String]
  )
 
   object ViewRow {
-    def apply(resultSet: ResultSet, controlColumnNames: Seq[String]): ViewRow = {
-      val documentId       = resultSet.getString("metadata_document_id")
-      val created          = resultSet.getString("metadata_created")
-      val lastModifiedTime = resultSet.getString("metadata_last_modified_time")
-      val lastModifiedBy   = resultSet.getString("metadata_last_modified_by")
-      val controls         = controlColumnNames.map(resultSet.getString)
-      ViewRow(documentId, created, lastModifiedTime, lastModifiedBy, controls)
+    def apply(resultSet: ResultSet, columnNames: Seq[String]): ViewRow = {
+      val documentId          = resultSet.getString("metadata_document_id")
+      val createdOpt          = Try(resultSet.getString("metadata_created")).toOption
+      val lastModifiedTimeOpt = Try(resultSet.getString("metadata_last_modified_time")).toOption
+      val lastModifiedByOpt   = Try(resultSet.getString("metadata_last_modified_by")).toOption
+      val values              = columnNames.map(resultSet.getString)
+
+      ViewRow(documentId, createdOpt, lastModifiedTimeOpt, lastModifiedByOpt, values)
     }
   }
 }

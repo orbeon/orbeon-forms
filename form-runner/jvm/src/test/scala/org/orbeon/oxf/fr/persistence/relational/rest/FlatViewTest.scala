@@ -14,14 +14,15 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.junit.Test
+import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatestplus.junit.AssertionsForJUnit
 
 import java.net.URI
-import scala.collection.immutable.Seq
-import scala.collection.mutable
 import scala.collection.compat._
+import scala.collection.mutable
 
 
 class FlatViewTest extends ResourceManagerTestBase with XMLSupport with AssertionsForJUnit {
@@ -41,43 +42,57 @@ class FlatViewTest extends ResourceManagerTestBase with XMLSupport with Assertio
     assert(expected === result.to(List))
   }
 
-  @Test def extractPathsColsTest(): Unit = {
+  @Test def deduplicatedColumnNamesTest(): Unit = {
 
     val expectedForDocuments = List(
       "oxf:/org/orbeon/oxf/fr/form-with-itemsets.xhtml"             -> List(
-        "section-1/dropdown"                                                   -> "SECTION_1_DROPDOWN",
-        "section-1/radios"                                                     -> "SECTION_1_RADIOS"
+        "section-1/dropdown"                                                   -> "section_1_dropdown",
+        "section-1/radios"                                                     -> "section_1_radios"
       ),
       "oxf:/org/orbeon/oxf/fr/template-for-repeated-sections.xhtml" -> List(
-        "my-section/my-input"                                                  -> "MY_SECTION_MY_INPUT",
-        "other-section/other-input"                                            -> "OTHER_SECTION_OTHER_INPUT"
+        "my-section/my-input"                                                  -> "my_section_my_input",
+        "other-section/other-input"                                            -> "other_section_other_input"
       ),
       "oxf:/org/orbeon/oxf/fr/form-with-long-control-names.xhtml"   -> List(
-        "my-first-section/my-input"                                            -> "MY_FIRST_SECTION_MY_INPUT",
-        "section-with-long-name/my-control-with-a-pretty-long-name"            -> "SECTION_WITH_L_MY_CONTROL_WITH",
-        "section-with-long-name/my-control-with-a-pretty-long-name-too"        -> "SECTION_WITH_L_MY_CONTROL_WIT1",
-        "section-with-long-name-too/short"                                     -> "SECTION_WITH_LONG_NAME_T_SHORT",
-        "section-with-long-name-too/my-control-with-a-pretty-long-name-really" -> "SECTION_WITH_L_MY_CONTROL_WIT2"
+        "my-first-section/my-input"                                            -> "my_first_section_my_input",
+        "section-with-long-name/my-control-with-a-pretty-long-name"            -> "section_with_l_my_control_with",
+        "section-with-long-name/my-control-with-a-pretty-long-name-too"        -> "section_with_l_my_control_wit1",
+        "section-with-long-name-too/short"                                     -> "section_with_long_name_t_short",
+        "section-with-long-name-too/my-control-with-a-pretty-long-name-really" -> "section_with_l_my_control_wit2"
       ),
       "oxf:/org/orbeon/oxf/fr/form-using-section-template.xhtml"    -> List(
-        "top-section-a/form-section-b/form-field-a"                            -> "TOP_SECTI_FORM_SECT_FORM_FIELD",
-        "top-section-a/form-section-b/form-field-b"                            -> "TOP_SECTI_FORM_SECT_FORM_FIEL1",
-        "top-section-a/lib-section-a/lib-field-a"                              -> "TOP_SECTI_LIB_SECTIO_LIB_FIELD",
-        "top-section-a/lib-section-a/lib-field-b"                              -> "TOP_SECTI_LIB_SECTIO_LIB_FIEL1"
+        "top-section-a/form-section-b/form-field-a"                            -> "top_secti_form_sect_form_field",
+        "top-section-a/form-section-b/form-field-b"                            -> "top_secti_form_sect_form_fiel1",
+        "top-section-a/lib-section-a/lib-field-a"                              -> "top_secti_lib_sectio_lib_field",
+        "top-section-a/lib-section-a/lib-field-b"                              -> "top_secti_lib_sectio_lib_fiel1"
       )
     )
 
-    for ((url, expected) <- expectedForDocuments)
-      assert(expected === FlatView.extractPathsCols(readTinyTreeFromUrl(URI.create(url))))
+    for ((url, expected) <- expectedForDocuments) {
+
+      val view = FlatView.views(
+        readTinyTreeFromUrl(URI.create(url)),
+        Provider.PostgreSQL,
+        AppForm("app", "form"),
+        version = 1
+      ).head
+
+      val actual = FlatView.deduplicatedColumnNames(
+        view.controls.map(_.columnNamePath(fullyQualifiedNames = true)),
+        maxIdentifierLength = FlatView.CompatibilityMaxIdentifierLength
+      ).toList.map(kv => kv._1.mkString("/") -> kv._2).sortBy(_._1)
+
+      assert(expected.sortBy(_._1) === actual)
+    }
   }
 
   @Test def xmlToSQLIdTest(): Unit = {
 
     val expectedForValues = List(
-      "FIRST_NAME"     -> "first-name",
-      "FIRST___NAME"   -> "___first___name___",
-      "0FIRST_NAME0"   -> "0first-name0",
-      "FIRSTNAME"      -> "first$n%a.m/e "
+      "first_name"     -> "first-name",
+      "first___name"   -> "___first___name___",
+      "0first_name0"   -> "0first-name0",
+      "firstname"      -> "first$n%a.m/e "
     )
 
     for ((expected, xml) <- expectedForValues)

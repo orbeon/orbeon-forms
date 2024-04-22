@@ -57,7 +57,7 @@ val AutowireVersion               = "0.3.3"
 val ScalatagsVersion              = "0.9.4"
 val SbinaryVersion                = "0.5.1"
 val Log4sVersion                  = "1.10.0"
-val ScalaCollectionCompatVersion  = "2.11.0"
+val ScalaCollectionCompatVersion  = "2.12.0"
 val PPrintVersion                 = "0.9.0"
 
 // Java libraries

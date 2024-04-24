@@ -40,7 +40,12 @@ private object FlatView {
   //
   // - https://github.com/orbeon/orbeon-forms/issues/1069
   // - https://github.com/orbeon/orbeon-forms/issues/1571
-  def createFlatView(req: CrudRequest, version: Int, connection: Connection): Unit = {
+  def createFlatViewForDocument(
+    req            : CrudRequest,
+    version        : Int,
+    connection     : Connection,
+    documentInfoOpt: Option[DocumentInfo]
+  ): Unit = {
 
     val viewName = {
       val app  = xmlToSQLId(req.appForm.app)
@@ -62,7 +67,7 @@ private object FlatView {
 
     // Compute columns in the view
     val cols = {
-      val userCols  = RequestReader.xmlDocument().map(extractPathsCols).getOrElse(Nil).map { case (path, col) =>
+      val userCols  = documentInfoOpt.map(extractPathsCols).getOrElse(Nil).map { case (path, col) =>
         Col(Provider.flatViewExtractFunction(req.provider, path), col)
       }
       MetadataPairs.iterator ++ userCols
@@ -82,6 +87,9 @@ private object FlatView {
       useAndClose(connection.prepareStatement(query))(_.executeUpdate())
     }
   }
+
+  def createFlatView(req: CrudRequest, version: Int, connection: Connection): Unit =
+    createFlatViewForDocument(req, version, connection, RequestReader.xmlDocument())
 
   // Returns a list with for each control to be included in the flat view, the parts of the path
   // to that control, e.g.:

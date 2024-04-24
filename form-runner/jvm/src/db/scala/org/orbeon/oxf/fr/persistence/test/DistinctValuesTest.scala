@@ -26,6 +26,7 @@ import org.scalatest.concurrent.Futures.{interval, timeout}
 import org.scalatest.funspec.AnyFunSpecLike
 import org.scalatest.time.{Second, Seconds, Span}
 
+
 class DistinctValuesTest
   extends DocumentTestBase
     with XFormsSupport

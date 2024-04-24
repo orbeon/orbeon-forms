@@ -35,6 +35,7 @@ import org.scalatest.time.{Second, Seconds, Span}
 import java.io.ByteArrayInputStream
 import java.time.Instant
 
+
 class SearchTest
     extends DocumentTestBase
      with XFormsSupport

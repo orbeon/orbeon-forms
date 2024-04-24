@@ -1,0 +1,14 @@
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <section-1>
+        <control-1>a</control-1>
+        <control-2>b</control-2>
+        <section-2>
+            <control-3>c</control-3>
+            <control-4>d</control-4>
+            <section-3>
+                <control-5>e</control-5>
+                <control-6>f</control-6>
+            </section-3>
+        </section-2>
+    </section-1>
+</form>

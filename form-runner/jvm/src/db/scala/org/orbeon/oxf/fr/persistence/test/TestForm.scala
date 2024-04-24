@@ -16,6 +16,7 @@ import org.orbeon.oxf.xml.dom.Converter.ScalaElemConverterOps
 
 import java.time.Instant
 
+
 object TestForm {
   def apply(provider: Provider, controls: Seq[TestForm.Control], formName: String = DefaultFormName): TestForm =
     TestForm(AppForm(provider.entryName, formName), title = formName, controls)

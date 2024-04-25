@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, DocumentAPI, Page}
 import org.scalajs.dom
-import org.scalajs.dom.html
+import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import org.orbeon.polyfills.HTMLPolyfills._
@@ -92,17 +92,18 @@ object TinyMCE {
           Events.componentChangedLayoutEvent.fire()
         }
 
-        // Render the component when visible (see https://github.com/orbeon/orbeon-forms/issues/172)
-        // - unfortunately, we need to use polling can't use Ajax response e.g. if in Bootstrap tab, as
-        //   in FB Control Settings dialog
-        def renderIfVisible(): Unit = {
-          if ($(tinyMceDiv).is(":visible")) {
-            tinyMceObject.render()
-          } else {
-            val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
-            js.timers.setTimeout(shortDelay)(renderIfVisible())
-          }
-        }
+        // - Unfortunately, we need to use polling; we can't rely on an Ajax response, e.g. if in Bootstrap tab as in
+        //   the Form Builder Control Settings dialog
+        // - As `destroy()` isn't called when the component is a repeat, which is the case for the Form Builder Control
+        //   Settings dialog, we stop trying to render if we notice `containerElem` isn't in the document anymore
+        def renderIfVisible(): Unit =
+          if (document.getElementById(containerElem.id) == containerElem)
+            if ($(tinyMceDiv).is(":visible")) {
+              tinyMceObject.render()
+            } else {
+              val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
+              js.timers.setTimeout(shortDelay)(renderIfVisible())
+            }
         renderIfVisible()
       }
     }

@@ -686,7 +686,7 @@ object Connection extends ConnectionTrait {
     ): Unit = {
 
       stateAttributes(stateScope, createSession = true) foreach
-        (_._2(HttpCookieStoreAttribute, cookieStore))
+        (_._2.apply(HttpCookieStoreAttribute, cookieStore))
 
       debugStore(cookieStore.some, stateScope, "saved HTTP state", "did not save HTTP state")
     }

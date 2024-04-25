@@ -32,7 +32,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.ByteArrayInputStream
 import java.net.URI
-import java.sql.ResultSet
+import java.sql.{Connection, ResultSet}
 
 class FlatViewTest
   extends DocumentTestBase
@@ -78,47 +78,55 @@ class FlatViewTest
       withTestExternalContext { implicit externalContext =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
-          val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
-          HttpAssert.put(formURL, Unspecified, xmlBody("form-flat-views-no-repetition.xhtml"), StatusCode.Created)
-
-          val dataURL1 = HttpCall.crudURLPrefix(provider) + "data/1/data.xml"
-          HttpAssert.put(dataURL1, Specific(1), xmlBody("form-flat-views-no-repetition-data-1.xml"), StatusCode.Created)
-
-          val dataURL2 = HttpCall.crudURLPrefix(provider) + "data/2/data.xml"
-          HttpAssert.put(dataURL2, Specific(1), xmlBody("form-flat-views-no-repetition-data-2.xml"), StatusCode.Created)
-
-          val appForm = AppForm(provider.entryName, HttpCall.DefaultFormName)
-          val version = 1
-
-          FlatView.createFlatViewForDocument(
-            crudRequest(provider, appForm, version),
-            version,
-            connection,
-            Some(documentInfo(formURL, version))
-          )
-
-          val query = "SELECT * FROM orbeon_f_postgresql_my_form_1"
-
-          val controlColumnNames = Seq(
-            "section_1_control_1",
-            "section_1_control_2",
-            "section_1_section_2_control_3",
-            "section_1_section_2_control_4",
-            "sectio_section_section_control",
-            "sectio_section_section_contro1",
-          )
-
-          val viewRows = useAndClose(connection.createStatement.executeQuery(query)) { resultSet =>
-            Iterator.iterateWhile(resultSet.next(), ViewRow(resultSet, controlColumnNames)).toList.sortBy(_.documentId)
+          if (Provider.FlatViewSupportedProviders.contains(provider)) {
+            putDataAndReadBackFromView(provider, connection)
           }
-
-          assert(viewRows(0).documentId == "1")
-          assert(viewRows(0).controls == Seq("a", "b", "c", "d", "e", "f"))
-
-          assert(viewRows(1).documentId == "2")
-          assert(viewRows(1).controls == Seq("g", "h", "i", "j", "k", "l"))
         }
       }
+    }
+
+    def putDataAndReadBackFromView(provider: Provider, connection: Connection)(implicit ec: ExternalContext): Unit = {
+      val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
+      HttpAssert.put(formURL, Unspecified, xmlBody("form-flat-views-no-repetition.xhtml"), StatusCode.Created)
+
+      val dataURL1 = HttpCall.crudURLPrefix(provider) + "data/1/data.xml"
+      HttpAssert.put(dataURL1, Specific(1), xmlBody("form-flat-views-no-repetition-data-1.xml"), StatusCode.Created)
+
+      val dataURL2 = HttpCall.crudURLPrefix(provider) + "data/2/data.xml"
+      HttpAssert.put(dataURL2, Specific(1), xmlBody("form-flat-views-no-repetition-data-2.xml"), StatusCode.Created)
+
+      val appForm = AppForm(provider.entryName, HttpCall.DefaultFormName)
+      val version = 1
+
+      FlatView.createFlatViewForDocument(
+        crudRequest(provider, appForm, version),
+        version,
+        connection,
+        Some(documentInfo(formURL, version))
+      )
+
+      val viewName           = FlatView.viewName(appForm, version)
+      val query              = s"SELECT * FROM $viewName"
+      val controlColumnNames = Seq(
+        "section_1_control_1",
+        "section_1_control_2",
+        "section_1_section_2_control_3",
+        "section_1_section_2_control_4",
+        "sectio_section_section_control",
+        "sectio_section_section_contro1",
+      )
+
+      val viewRows = useAndClose(connection.createStatement.executeQuery(query)) { resultSet =>
+        Iterator.iterateWhile(resultSet.next(), ViewRow(resultSet, controlColumnNames)).toList.sortBy(_.documentId)
+      }
+
+      assert(viewRows(0).documentId == "1")
+      assert(viewRows(0).controls == Seq("a", "b", "c", "d", "e", "f"))
+
+      assert(viewRows(1).documentId == "2")
+      assert(viewRows(1).controls == Seq("g", "h", "i", "j", "k", "l"))
+
+      FlatView.deleteViewIfExists(provider, connection, viewName)
     }
   }
 

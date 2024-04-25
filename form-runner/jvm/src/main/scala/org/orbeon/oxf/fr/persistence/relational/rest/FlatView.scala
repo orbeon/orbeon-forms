@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.{AppForm, FormRunner}
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
@@ -36,6 +36,25 @@ private object FlatView {
   val MaxNameLength           = 30
   val TablePrefix             = "ORBEON_F_"
 
+  def viewName(appForm: AppForm, version: Int): String = {
+    val app  = xmlToSQLId(appForm.app)
+    val form = xmlToSQLId(appForm.form)
+    TablePrefix + joinParts(List(app, form, version.toString), MaxNameLength - TablePrefix.length)
+  }
+
+  def deleteViewIfExists(provider: Provider, connection: Connection, viewName: String): Unit = {
+    if (Provider.flatViewDelete(provider)) {
+      val viewExists = {
+        useAndClose(connection.prepareStatement(Provider.flatViewExistsQuery(provider))) { ps =>
+          ps.setString(1, Provider.flatViewExistsParam(provider, viewName))
+          useAndClose(ps.executeQuery())(_.next())
+        }
+      }
+      if (viewExists)
+        useAndClose(connection.prepareStatement(s"DROP VIEW $viewName"))(_.executeUpdate())
+    }
+  }
+
   // Create a flat relational view. See related issues:
   //
   // - https://github.com/orbeon/orbeon-forms/issues/1069
@@ -47,23 +66,9 @@ private object FlatView {
     documentInfoOpt: Option[DocumentInfo]
   ): Unit = {
 
-    val viewName = {
-      val app  = xmlToSQLId(req.appForm.app)
-      val form = xmlToSQLId(req.appForm.form)
-      TablePrefix + joinParts(List(app, form, version.toString), MaxNameLength - TablePrefix.length)
-    }
+    val viewName = this.viewName(req.appForm, version)
 
-    // Delete view if it exists
-    if (Provider.flatViewDelete(req.provider)) {
-      val viewExists = {
-        useAndClose(connection.prepareStatement(Provider.flatViewExistsQuery(req.provider))) { ps =>
-          ps.setString(1, Provider.flatViewExistsParam(req.provider, viewName))
-          useAndClose(ps.executeQuery())(_.next())
-        }
-      }
-      if (viewExists)
-        useAndClose(connection.prepareStatement(s"DROP VIEW $viewName"))(_.executeUpdate())
-    }
+    deleteViewIfExists(req.provider, connection, viewName)
 
     // Compute columns in the view
     val cols = {

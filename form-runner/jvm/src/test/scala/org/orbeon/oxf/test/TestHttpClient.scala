@@ -127,7 +127,7 @@ object TestHttpClient {
             override val getLocales                              = null
             override val getServerName                           = ServerState.Host
             override def getClientContextPath(urlString: String) = URLRewriterUtils.getClientContextPath(this, URLRewriterUtils.isPlatformPath(urlString))
-            override def sessionInvalidate()                     = session foreach (_.invalidate())
+            override def sessionInvalidate()                     = session.invalidate()
             override val getRequestedSessionId                   = null
 
             override val credentials                             = connectionCredentials
@@ -138,17 +138,11 @@ object TestHttpClient {
             override val getAuthType                             = "BASIC" // some processors read it but result is unused
 
             // Session handling
-            private var session: Option[Session] = None
+            private val session: Session =
+              new SimpleSession(SecureUtils.randomHexId) |!>
+                XFormsStateManager.sessionCreated
 
-            override def getSession(create: Boolean): Session =
-              session getOrElse {
-                if (create)
-                  new SimpleSession(SecureUtils.randomHexId) |!>
-                    XFormsStateManager.sessionCreated        |!>
-                    (newSession => session = Some(newSession))
-                else
-                  null
-              }
+            override def getSession(create: Boolean): Session = session
           }
 
           val request = LocalRequest(

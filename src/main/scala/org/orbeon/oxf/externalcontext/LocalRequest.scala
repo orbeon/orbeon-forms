@@ -183,12 +183,9 @@ object LocalRequest {
       allHeadersLowercaseIt.toMap.asJava
     }
 
-    val attributesMap = {
-      // See https://github.com/orbeon/orbeon-forms/issues/5081
-      val newMap = new ju.HashMap[String, AnyRef]
-      newMap.asScala ++= incomingRequest.getAttributesMap.asScala
-      ju.Collections.synchronizedMap(newMap)
-    }
+    // See https://github.com/orbeon/orbeon-forms/issues/5081
+    val attributesMap =
+      ju.Collections.synchronizedMap(new ju.HashMap[String, AnyRef](incomingRequest.getAttributesMap))
 
     val queryAndBodyParameters = {
       // Query string

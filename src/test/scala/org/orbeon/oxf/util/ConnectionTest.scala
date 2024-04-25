@@ -13,20 +13,20 @@
  */
 package org.orbeon.oxf.util
 
-import java.net.URI
-import java.{util => ju}
 import cats.syntax.option._
 import org.mockito.Mockito
 import org.orbeon.connection.StreamedContent
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAdapter, UrlRewriteMode, WebAppContext}
+import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.jdk.CollectionConverters._
+import java.net.URI
+import java.{util => ju}
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 
 class ConnectionTest
@@ -36,12 +36,15 @@ class ConnectionTest
   def newMockExternalContext: ExternalContext = {
 
     val incomingRequest = new RequestAdapter {
+
       override val getHeaderValuesMap: ju.Map[String, Array[String]] = mutable.LinkedHashMap(
         "user-agent"    -> Array("Mozilla 12.1"),
         "authorization" -> Array("xsifj1skf3"),
         "host"          -> Array("localhost"),
         "cookie"        -> Array("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C")
       ).asJava
+
+      override def getAttributesMap: ju.Map[String, AnyRef] = new ju.HashMap
     }
 
     val webAppContext = Mockito.mock(classOf[WebAppContext])

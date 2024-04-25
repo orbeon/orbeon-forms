@@ -83,7 +83,7 @@ class ConnectionTest
         )
 
       val request =
-        new LocalRequest(
+        LocalRequest(
           incomingRequest         = externalContext.getRequest,
           contextPath             = "/orbeon",
           pathQuery               = "/foo/bar",
@@ -140,7 +140,7 @@ class ConnectionTest
         )
 
       val wrapper =
-        new LocalRequest(
+        LocalRequest(
           incomingRequest         = externalContext.getRequest,
           contextPath             = "/orbeon",
           pathQuery               = s"/foobar?$queryString",

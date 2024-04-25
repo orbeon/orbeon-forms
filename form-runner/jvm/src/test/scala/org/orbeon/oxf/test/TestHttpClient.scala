@@ -151,7 +151,7 @@ object TestHttpClient {
               }
           }
 
-          val request = new LocalRequest(
+          val request = LocalRequest(
             incomingRequest         = baseRequest,
             contextPath             = ServerState.ContextPath,
             pathQuery               = url,

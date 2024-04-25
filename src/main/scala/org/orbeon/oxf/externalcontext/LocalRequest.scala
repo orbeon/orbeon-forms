@@ -16,13 +16,14 @@ package org.orbeon.oxf.externalcontext
 import org.apache.commons.io.IOUtils
 import org.orbeon.connection.{StreamedContent, StreamedContentT}
 import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
 import org.orbeon.oxf.http.HttpMethod.{HttpMethodsWithRequestBody, POST}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 
+import java.io.InputStream
 import java.{util => ju}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -33,103 +34,67 @@ import scala.jdk.CollectionConverters._
 // Used by:
 //
 // - InternalHttpClient
-// - RequestDispatcherSubmission
+// - tests
 //
-class LocalRequest(
-  incomingRequest         : Request,
-  contextPath             : String,
-  pathQuery               : String,
-  method                  : HttpMethod,
-  headersMaybeCapitalized : Map[String, List[String]],
-  content                 : Option[StreamedContent]
+class LocalRequest private (
+
+  val getContainerType: String,
+  val getContainerNamespace: String,
+
+  val getPathInfo: String,
+  val getContextPath: String,
+  val getServletPath: String,
+
+  val getAttributesMap: ju.Map[String, AnyRef],
+  val getHeaderValuesMap: ju.Map[String, Array[String]],
+  val getParameterMap: ju.Map[String, Array[AnyRef]],
+
+  val getContentLength: Int,
+  val getContentType: String,
+  val getInputStream: InputStream,
+
+  val getProtocol: String,
+  val getRemoteHost: String,
+  val getRemoteAddr: String,
+  val getScheme: String,
+  val getMethod: HttpMethod,
+  val getServerName: String,
+  val getServerPort: Int,
+
+  val isRequestedSessionIdValid: Boolean,
+  val getRequestedSessionId: String,
+
+  val getAuthType: String,
+  val isSecure: Boolean,
+
+  val credentials: Option[Credentials],
+
+  val getLocale: ju.Locale,
+  val getLocales: ju.Enumeration[_],
+
+  val getPathTranslated: String,
+  val getQueryString: String,
+
+  val getPortletMode: String,
+  val getWindowState: String,
+)(
+  val _incomingRequestURL: String,
+  val _sessionOpt: Option[Session],
 ) extends Request {
 
-  private val _contentLengthOpt = content flatMap (_.contentLength)
-  private val _contentTypeOpt   = content flatMap (_.contentType)
+  def getCharacterEncoding: String = null // not used by our code
+  def getNativeRequest: Any        = null // should only be used for cookies forwarding
 
-  private val _headersIncludingAuthBodyLowercase = {
-
-    def requestHeadersIt =
-      headersMaybeCapitalized.iterator map { case (k, v) => k.toLowerCase -> v.toArray }
-
-    def credentialsHeadersIt =
-      incomingRequest.credentials match {
-        case Some(credentials) => CredentialsSerializer.toHeaders[Array](credentials).iterator
-        case None              => Iterator.empty
-      }
-
-    def bodyHeadersIt =
-      if (HttpMethodsWithRequestBody(method)) {
-        (_contentLengthOpt.iterator map (value => Headers.ContentLengthLower -> Array(value.toString))) ++
-        (_contentTypeOpt.iterator   map (value => Headers.ContentTypeLower   -> Array(value)))
-      } else
-        Iterator.empty
-
-    def allHeadersLowercaseIt =
-      requestHeadersIt     ++
-      credentialsHeadersIt ++
-      bodyHeadersIt
-
-    allHeadersLowercaseIt.toMap.asJava
+  def getSession(create: Boolean): Session = _sessionOpt.getOrElse {
+    if (create)
+      throw new UnsupportedOperationException("`getSession(true)` not supported in `LocalRequest` if session is absent")
+    else
+      null
   }
 
-  private val (_pathInfo, _queryString) =
-    splitQuery(pathQuery)
-
-  private lazy val _queryAndBodyParameters = {
-    // Query string
-    // SRV.4.1: "Query string data is presented before post body data."
-    def queryParameters = Option(getQueryString) map decodeSimpleQuery getOrElse Seq()
-
-    // POST body form parameters
-    // SRV.4.1.1 When Parameters Are Available
-    // NOTE: Remember, the servlet container does not help us decoding the body: the "other side" will just end up here
-    // when asking for parameters.
-    def bodyParameters =
-      if (method == POST)
-        content collect {
-          case StreamedContentT(is, Some("application/x-www-form-urlencoded"), _, _) =>
-            useAndClose(is) { is =>
-              decodeSimpleQuery(IOUtils.toString(is, ExternalContext.StandardFormCharacterEncoding))
-            }
-        }
-      else
-        None
-
-    // Make sure to keep order
-    mutable.LinkedHashMap() ++ combineValues[String, AnyRef, Array](queryParameters ++ bodyParameters.getOrElse(Nil)) asJava
-  }
-
-  /* SUPPORTED: methods called by ExternalContextToHttpServletRequestWrapper */
-
-  def getMethod            = method
-  def getParameterMap      = _queryAndBodyParameters
-  def getQueryString       = _queryString.orNull
-  def getCharacterEncoding = null;//TODO? // not used by our code
-  def getContentLength     = _contentLengthOpt map (_.toInt) getOrElse -1
-  def getContentType       = _contentTypeOpt.orNull
-  def getInputStream       = content map (_.stream) getOrElse EmptyInputStream
-  def getHeaderValuesMap   = _headersIncludingAuthBodyLowercase
-
-  lazy val getAttributesMap = {
-    // See https://github.com/orbeon/orbeon-forms/issues/5081
-    val newMap = new ju.HashMap[String, AnyRef]
-    newMap.asScala ++= incomingRequest.getAttributesMap.asScala
-    ju.Collections.synchronizedMap(newMap)
-  }
-
-  /*
-  * NOTE: All the path methods are handled by the request dispatcher implementation in the servlet container upon
-  * forward, but upon include we must provide them.
-  *
-  * NOTE: Checked 2009-02-12 that none of the methods below are called when forwarding through
-  * spring/JSP/filter/Orbeon in Tomcat 5.5.27. HOWEVER they are called when including.
-  *
-  * NOTE: 2014-09-22: Checked that getServletPath and getPathInfo are called by JspServlet in tomcat-7.0.47 at least.
-  */
-  def getPathInfo = _pathInfo
-  def getServletPath = ""
-  def getContextPath = contextPath // return the context path passed to this wrapper
+  def sessionInvalidate(): Unit =
+    if (_sessionOpt.isDefined)
+      throw new UnsupportedOperationException("`sessionInvalidate(true)` not supported in `LocalRequest` if session is present")
 
   def getRequestPath: String = {
     // Get servlet path and path info
@@ -147,59 +112,153 @@ class LocalRequest(
     requestPath.prependSlash
   }
 
-  def getRequestURI: String = {
-    // Must return the path including the context
-    val contextPath = getContextPath
-    if (contextPath == "/")
+  // Must return the path including the context
+  def getRequestURI: String =
+    if (getContextPath == "/")
       getRequestPath
     else
       getContextPath + getRequestPath
+
+  // 2014-09-10: Only used by `XHTMLToPDFProcessor`
+  // Get absolute URL w/o query string e.g. `http://foo.com/a/b/c`
+  // Resolving request URI against incoming absolute URL, e.g. `/d/e/f` -> `http://foo.com/d/e/f`
+  def getRequestURL: String =
+    NetUtils.resolveURI(getRequestURI, _incomingRequestURL)
+
+  def isUserInRole(role: String): Boolean =
+    credentials.exists(_.roles.exists(_.roleName == role))
+
+  private lazy val platformClientContextPath: String =
+    URLRewriterUtils.getClientContextPath(this, true)
+
+  private lazy val applicationClientContextPath: String =
+    URLRewriterUtils.getClientContextPath(this, false)
+
+  def getClientContextPath(urlString: String): String =
+    if (URLRewriterUtils.isPlatformPath(urlString))
+      platformClientContextPath
+    else
+      applicationClientContextPath
+}
+
+object LocalRequest {
+
+  def apply(
+    incomingRequest         : Request,
+    contextPath             : String,
+    pathQuery               : String,
+    method                  : HttpMethod,
+    headersMaybeCapitalized : Map[String, List[String]],
+    content                 : Option[StreamedContent]
+  ): LocalRequest = {
+
+    val (pathInfo, queryStringOpt) = splitQuery(pathQuery)
+
+    val contentLengthOpt = content.flatMap(_.contentLength)
+    val contentTypeOpt   = content.flatMap(_.contentType)
+
+    val headersIncludingAuthBodyLowercase = {
+
+      def requestHeadersIt =
+        headersMaybeCapitalized.iterator map { case (k, v) => k.toLowerCase -> v.toArray }
+
+      def credentialsHeadersIt =
+        incomingRequest.credentials match {
+          case Some(credentials) => CredentialsSerializer.toHeaders[Array](credentials).iterator
+          case None              => Iterator.empty
+        }
+
+      def bodyHeadersIt =
+        if (HttpMethodsWithRequestBody(method)) {
+          (contentLengthOpt.iterator map (value => Headers.ContentLengthLower -> Array(value.toString))) ++
+          (contentTypeOpt.iterator   map (value => Headers.ContentTypeLower   -> Array(value)))
+        } else
+          Iterator.empty
+
+      def allHeadersLowercaseIt =
+        requestHeadersIt     ++
+        credentialsHeadersIt ++
+        bodyHeadersIt
+
+      allHeadersLowercaseIt.toMap.asJava
+    }
+
+    val attributesMap = {
+      // See https://github.com/orbeon/orbeon-forms/issues/5081
+      val newMap = new ju.HashMap[String, AnyRef]
+      newMap.asScala ++= incomingRequest.getAttributesMap.asScala
+      ju.Collections.synchronizedMap(newMap)
+    }
+
+    val queryAndBodyParameters = {
+      // Query string
+      // SRV.4.1: "Query string data is presented before post body data."
+      def queryParameters = queryStringOpt.map(decodeSimpleQuery).getOrElse(Nil)
+
+      // POST body form parameters
+      // SRV.4.1.1 When Parameters Are Available
+      // NOTE: Remember, the servlet container does not help us decoding the body: the "other side" will just end up here
+      // when asking for parameters.
+      def bodyParameters =
+        if (method == POST)
+          content collect {
+            case StreamedContentT(is, Some("application/x-www-form-urlencoded"), _, _) =>
+              useAndClose(is) { is =>
+                decodeSimpleQuery(IOUtils.toString(is, ExternalContext.StandardFormCharacterEncoding))
+              }
+          }
+        else
+          None
+
+      // Make sure to keep order
+      mutable.LinkedHashMap() ++ combineValues[String, AnyRef, Array](queryParameters ++ bodyParameters.getOrElse(Nil)) asJava
+    }
+
+    new LocalRequest(
+
+      getContainerType                        = incomingRequest.getContainerType,
+      getContainerNamespace                   = incomingRequest.getContainerNamespace,
+
+      getPathInfo                             = pathInfo,
+      getContextPath                          = contextPath,
+      getServletPath                          = "",
+
+      getAttributesMap                        = attributesMap,
+      getHeaderValuesMap                      = headersIncludingAuthBodyLowercase,
+      getParameterMap                         = queryAndBodyParameters,
+
+      getContentLength                        = contentLengthOpt map (_.toInt) getOrElse -1,
+      getContentType                          = contentTypeOpt.orNull,
+      getInputStream                          = content map (_.stream) getOrElse EmptyInputStream,
+
+      // Client and server are preserved, assuming all those relate to knowledge about URL rewriting
+      getProtocol                             = incomingRequest.getProtocol,
+      getRemoteHost                           = incomingRequest.getRemoteHost,
+      getRemoteAddr                           = incomingRequest.getRemoteAddr,
+      getScheme                               = incomingRequest.getScheme,
+      getMethod                               = method,
+      getServerName                           = incomingRequest.getServerName,
+      getServerPort                           = incomingRequest.getServerPort,
+
+      isRequestedSessionIdValid               = incomingRequest.isRequestedSessionIdValid,
+      getRequestedSessionId                   = incomingRequest.getRequestedSessionId,
+
+      getAuthType                             = incomingRequest.getAuthType,
+      isSecure                                = incomingRequest.isSecure,
+
+      credentials                             = incomingRequest.credentials,
+
+      getLocale                               = incomingRequest.getLocale,
+      getLocales                              = incomingRequest.getLocales,
+
+      getPathTranslated                       = incomingRequest.getPathTranslated, // should really not be used
+      getQueryString                          = queryStringOpt.orNull,
+
+      getPortletMode                          = incomingRequest.getPortletMode,
+      getWindowState                          = incomingRequest.getWindowState,
+    )(
+      _incomingRequestURL                     = incomingRequest.getRequestURL,
+      _sessionOpt                             = Option(incomingRequest.getSession(create = false))
+    )
   }
-
-  // 2014-09-10: Only used by XHTMLToPDFProcessor
-  def getRequestURL: String = {
-    // Get absolute URL w/o query string e.g. http://foo.com/a/b/c
-    val incomingRequestURL = incomingRequest.getRequestURL
-    // Resolving request URI against incoming absolute URL, e.g. /d/e/f -> http://foo.com/d/e/f
-    NetUtils.resolveURI(getRequestURI, incomingRequestURL)
-  }
-
-  // ==== Properties which are delegated =============================================================================
-
-  // TODO: Check against ExternalContextToHttpServletRequestWrapper
-
-  // Container is preserved
-  def getContainerType                        = incomingRequest.getContainerType
-  def getContainerNamespace                   = incomingRequest.getContainerNamespace
-
-  def getPortletMode                          = incomingRequest.getPortletMode    // submission does not change portlet mode
-  def getWindowState                          = incomingRequest.getWindowState    // submission does not change window state
-
-  def getNativeRequest                        = incomingRequest.getNativeRequest  // should not have mainstream uses; see RequestDispatcherSubmission, and cookies forwarding
-  def getPathTranslated                       = incomingRequest.getPathTranslated // should really not be called
-
-  // Client and server are preserved, assuming all those relate to knowledge about URL rewriting
-  def getProtocol                             = incomingRequest.getProtocol
-  def getServerPort                           = incomingRequest.getServerPort
-  def getScheme                               = incomingRequest.getScheme
-  def getRemoteHost                           = incomingRequest.getRemoteHost
-  def getRemoteAddr                           = incomingRequest.getRemoteAddr
-  def isSecure                                = incomingRequest.isSecure
-  def getLocale                               = incomingRequest.getLocale
-  def getLocales                              = incomingRequest.getLocales
-
-  def getServerName                           = incomingRequest.getServerName
-  def getClientContextPath(urlString: String) = incomingRequest.getClientContextPath(urlString)
-
-  // Session information is preserved
-  def isRequestedSessionIdValid               = incomingRequest.isRequestedSessionIdValid
-  def sessionInvalidate()                     = incomingRequest.sessionInvalidate()
-  def getSession(create: Boolean)             = incomingRequest.getSession(create)
-  def getRequestedSessionId                   = incomingRequest.getRequestedSessionId
-
-  // User information is preserved
-  def credentials                             = incomingRequest.credentials
-  def isUserInRole(role: String)              = incomingRequest.isUserInRole(role)
-
-  def getAuthType                             = incomingRequest.getAuthType
 }

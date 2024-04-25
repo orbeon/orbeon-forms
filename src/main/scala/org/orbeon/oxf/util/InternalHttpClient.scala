@@ -67,8 +67,8 @@ object InternalHttpClient extends HttpClient[CookieStore] {
         content   : Option[StreamedContent]
       ): LocalResponse = {
 
-        val request =
-          new LocalRequest(
+        val localRequest =
+          LocalRequest(
             incomingRequest         = incomingRequest,
             contextPath             = incomingRequest.getContextPath,
             pathQuery               = pathQuery,
@@ -81,9 +81,9 @@ object InternalHttpClient extends HttpClient[CookieStore] {
         val urlRewriter =
           Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) match {
             case Some(client) if Headers.EmbeddedClientValues(client) =>
-              new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, wsrpEncodeResources = true)
+              new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, localRequest, wsrpEncodeResources = true)
             case _ =>
-              new ServletURLRewriter(request)
+              new ServletURLRewriter(localRequest)
             // We used to have `incomingExternalContext.getResponse: URLRewriter`, but this must not be done for async
             // submissions. In practice, either we use the WSRP rewriter when in embedded mode, or we use the servlet
             // rewriter, so we should never have to use the response rewriter.
@@ -96,7 +96,7 @@ object InternalHttpClient extends HttpClient[CookieStore] {
           new PipelineContext,
           new LocalExternalContext(
             incomingExternalContext.getWebAppContext,
-            request,
+            localRequest,
             response
           )
         )

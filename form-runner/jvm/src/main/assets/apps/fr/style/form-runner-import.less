@@ -18,10 +18,6 @@
         display: none;
     }
 
-    .xbl-fr-grid .fr-grid .fr-grid-body .fr-grid-td > .xforms-trigger {
-        display: inline-block;
-    }
-
     .progress {
         margin-top: 9px;
     }
@@ -33,11 +29,21 @@
     }
 
     // Center cancel buttons
-    .import-cancel-validation-trigger, import-cancel-import-trigger {
+    .import-cancel-validation-trigger, .import-cancel-import-trigger {
         button {
             display: block;
             margin-left: auto;
             margin-right: auto;
+        }
+    }
+
+    .import-start-validation-trigger,
+    .import-cancel-validation-trigger,
+    .import-start-import-trigger,
+    .import-cancel-import-trigger,
+    .import-start-over-trigger{
+        button {
+            width: 100%;
         }
     }
 }

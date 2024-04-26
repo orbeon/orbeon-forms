@@ -47,7 +47,7 @@
     <!-- Determine whether we use the 12-column layout by the presence of a nested `<fr:c>` -->
     <xsl:variable name="is-12or24col-input"       select="exists($root/fr:c)"/>
 
-    <!-- NOTE: Later, CSS grids can be used at runtime too -->
+    <!-- `section-and-grid.xsl` handles the `markup` attribute -->
     <xsl:variable name="markup"                   select="/*/@markup/string()"/>
     <xsl:variable name="use-css-grids-output"     select="$is-editable or $markup = 'css-grid'"/>
 

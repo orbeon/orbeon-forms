@@ -65,9 +65,11 @@ abstract class XFormsControlLifecycleHandler(
 
   import Private._
 
+  // TODO: Should be in static hierarchy
   // By default, controls are enclosed with a <span>
   def getContainingElementName = "span"
 
+  // TODO: Should be from static hierarchy with updated XHTML prefix if needed
   protected def getContainingElementQName: String =
     XMLUtils.buildQName(handlerContext.findXHTMLPrefix, getContainingElementName)
 

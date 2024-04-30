@@ -45,20 +45,11 @@ class XFormsGroupDefaultHandler(
 
   // Use explicit container element name if present, otherwise use default
   override def getContainingElementName: String =
-    matched match {
-      case control: ContainerControl =>
-        control.elementQName map (_.localName) getOrElse super.getContainingElementName
-      case _ =>
-        super.getContainingElementName
-    }
+    matched.asInstanceOf[ContainerControl].elementQNameOrDefault.localName
 
   override def getContainingElementQName: String =
-    matched match {
-      case control: ContainerControl =>
-        control.elementQName map (_.qualifiedName) getOrElse super.getContainingElementQName
-      case _ =>
-        super.getContainingElementQName
-    }
+    matched.asInstanceOf[ContainerControl].elementQName.map(_.qualifiedName)
+      .getOrElse(super.getContainingElementQName)
 
   protected def handleControlStart(): Unit = ()
 

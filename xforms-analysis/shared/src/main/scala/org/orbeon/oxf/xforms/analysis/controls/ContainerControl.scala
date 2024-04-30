@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.XFormsNames.XhtmlSpanQname
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
@@ -53,4 +54,7 @@ class ContainerControl(
       element.attributeValue(XFormsNames.XXFORMS_ELEMENT_QNAME),
       unprefixedIsNoNamespace = true
     )
+
+  def elementQNameOrDefault: QName =
+    elementQName.getOrElse(XhtmlSpanQname)
 }

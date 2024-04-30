@@ -23,8 +23,6 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModelBinds}
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper}
@@ -358,12 +356,6 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       collector
     )
   }
-
-  // Can be overridden by subclasses
-  // This is the effective id of the element which may have an `aria-labelledby`, etc. attribute. So an `<input>`, `<textarea>`,
-  // etc. HTML element id. This is needed so that the Ajax update can know how to update the attribute.
-  def findAriaByControlEffectiveIdWithNs: Option[String] =
-    Some(XFormsBaseHandler.getLHHACIdWithNs(containingDocument, effectiveId, XFormsBaseHandlerXHTML.ControlCode))
 
   protected def outputValueElement(
     attributesImpl : AttributesImpl,

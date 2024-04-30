@@ -159,9 +159,6 @@ class XFormsValueComponentControl(
     fromBinding orElse super.translateExternalValue(boundItem, externalValue, collector)
   }
 
-  // TODO
-  override def findAriaByControlEffectiveIdWithNs: Option[String] = None
-
   override def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
     previousControl : Option[XFormsValueControl],

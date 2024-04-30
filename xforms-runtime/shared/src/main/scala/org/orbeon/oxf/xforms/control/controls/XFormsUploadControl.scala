@@ -31,9 +31,8 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverAdapter
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
-import org.orbeon.xforms.Constants.ComponentSeparator
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.xml.sax.helpers.AttributesImpl
 
 import java.net.URI
@@ -227,9 +226,6 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     added |= addFileMetadataAttributes(attributesImpl, previousControlOpt.asInstanceOf[Option[FileMetadata]], collector)
     added
   }
-
-  override def findAriaByControlEffectiveIdWithNs: Option[String] =
-    containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input")).some
 
   override def getBackCopy(collector: ErrorEventCollector): AnyRef = {
     val cloned = super.getBackCopy(collector).asInstanceOf[XFormsUploadControl]

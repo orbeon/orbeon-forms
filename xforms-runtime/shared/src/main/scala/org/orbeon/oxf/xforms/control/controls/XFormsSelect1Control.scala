@@ -389,10 +389,6 @@ class XFormsSelect1Control(
     )
   }
 
-  // https://github.com/orbeon/orbeon-forms/issues/3383
-  override def findAriaByControlEffectiveIdWithNs: Option[String] =
-    super.findAriaByControlEffectiveIdWithNs
-
   // Don't accept focus if we have the internal appearance
   override def isDirectlyFocusableMaybeWithToggle: Boolean =
     ! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME) && super.isDirectlyFocusableMaybeWithToggle

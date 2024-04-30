@@ -14,14 +14,12 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls.InputControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsInputHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
@@ -171,10 +169,6 @@ class XFormsInputControl(
 
     added
   }
-
-  // Input needs to point to another element
-  override def findAriaByControlEffectiveIdWithNs: Option[String] =
-    getBuiltinTypeName != "boolean" option XFormsInputHandler.firstInputEffectiveIdWithNs(effectiveId)(containingDocument)
 }
 
 object XFormsInputControl {

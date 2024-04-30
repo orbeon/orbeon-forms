@@ -69,7 +69,8 @@ class XFormsLHHAHandler(
 
         // This duplicates code in `XFormsControlLifecycleHandler` as this handler doesn't derive from it.
         val currentControl =
-          containingDocument.getControlByEffectiveId(lhhaEffectiveId) ensuring (_ ne null)
+          containingDocument.findControlByEffectiveId(lhhaEffectiveId)
+            .getOrElse(throw new IllegalStateException(s"control not found for effective id: `$lhhaEffectiveId`"))
 
         // Case where the LHHA is external and in a shallower level of nesting of repeats.
         // NOTE: In this case, we don't output a `for` attribute. Instead, the repeated control will use

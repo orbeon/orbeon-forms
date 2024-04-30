@@ -123,7 +123,7 @@ object XXFormsComponentHandler {
 
   // Below, restrict to `CoreControl`, which is our approximation of our native "labelable" controls.
   // https://github.com/orbeon/orbeon-forms/issues/5367
-  def mustFindLabelForEffectiveId(lhhaPlacementType: LhhaPlacementType): Boolean =
+  private def mustFindLabelForEffectiveId(lhhaPlacementType: LhhaPlacementType): Boolean =
     lhhaPlacementType match {
       case LhhaPlacementType.Local(_, LhhaControlRef.Control(_: AttributeControl)) => false
       case LhhaPlacementType.Local(directTargetControl, LhhaControlRef.Control(targetControl: CoreControl))

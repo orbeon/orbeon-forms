@@ -100,10 +100,10 @@ object XFormsControlFactory {
   private val ControlOrActionFactory = ControlFactory orElse ActionFactory lift
 
   private val ComponentFactories: Map[(Boolean, Boolean), ControlFactory] = Map(
-    (false, false) -> (new XFormsComponentControl     (_, _, _, _)                         ),
-    (false, true)  -> (new XFormsComponentControl     (_, _, _, _) with SingleNodeFocusableTrait), // `ReadonlyFocusableTrait`?
-    (true,  false) -> (new XFormsValueComponentControl(_, _, _, _)                    ),
-    (true,  true)  -> (new XFormsValueComponentControl(_, _, _, _) with ReadonlySingleNodeFocusableTrait)
+    (false -> false) -> (new XFormsComponentControl     (_, _, _, _)                                      ),
+    (false -> true)  -> (new XFormsComponentControl     (_, _, _, _) with SingleNodeFocusableTrait        ), // `ReadonlyFocusableTrait`?
+    (true  -> false) -> (new XFormsValueComponentControl(_, _, _, _)                                      ),
+    (true  -> true)  -> (new XFormsValueComponentControl(_, _, _, _) with ReadonlySingleNodeFocusableTrait)
   )
 
   // Create a new XForms control. The control returned may be a built-in standard control, a built-in extension
@@ -118,7 +118,7 @@ object XFormsControlFactory {
     val factory =
       staticElement match {
         case component: ComponentControl =>
-          ComponentFactories.get(component.isInstanceOf[ValueTrait], component.commonBinding.modeFocus)
+          ComponentFactories.get(component.isInstanceOf[ValueTrait] -> component.commonBinding.modeFocus)
         case lhhaAnalysis: LHHAAnalysis =>
           if (! lhhaAnalysis.isLocal)
             Some(new XFormsLHHAControl(_, _, _, _))

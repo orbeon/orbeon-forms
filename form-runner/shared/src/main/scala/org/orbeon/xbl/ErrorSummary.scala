@@ -374,7 +374,7 @@ object ErrorSummary {
 
     def findErrorSummaryControl = (
       ErrorSummaryIds
-      flatMap      { id => Option(inScopeContainingDocument.getControlByEffectiveId(id)) }
+      flatMap      { id => inScopeContainingDocument.findControlByEffectiveId(id) }
       collectFirst { case c: XFormsComponentControl => c }
     )
 

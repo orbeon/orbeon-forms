@@ -272,7 +272,7 @@ object ControlAjaxSupport {
   ): Iterator[(String, List[String])] =
     for {
       (attName, lhhaSet) <- ControlAjaxSupport.AriaAttsWithLhha.iterator
-      attValue           = lhhaSet.flatMap(lhha => ControlAjaxSupport.findAriaByWithNs(staticControl, controlEffectiveId, lhha, condition)(containingDocument))
+      attValue           = lhhaSet.flatMap(lhha => findAriaByWithNs(staticControl, controlEffectiveId, lhha, condition)(containingDocument))
       if attValue.nonEmpty
     } yield
       attName -> attValue
@@ -280,7 +280,7 @@ object ControlAjaxSupport {
   // We want the same id that is placed on the `<label>` or `<span>` element in the markup, so follow the logic
   // present in `XFormsLHHAHandler`.
   // TODO: We don't want this duplication of logic!
-  def findAriaByWithNs(
+  private def findAriaByWithNs(
     staticControl      : ElementAnalysis,
     controlEffectiveId : String,
     lhha               : LHHA,

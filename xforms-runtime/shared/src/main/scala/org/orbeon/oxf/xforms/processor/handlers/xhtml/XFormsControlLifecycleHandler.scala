@@ -206,7 +206,8 @@ abstract class XFormsControlLifecycleHandler(
 
   // See https://github.com/orbeon/orbeon-forms/issues/4046
   final lazy val currentControl: XFormsControl =
-    containingDocument.getControlByEffectiveId(getEffectiveId) ensuring (_ ne null)
+    containingDocument.findControlByEffectiveId(getEffectiveId)
+      .getOrElse(throw new IllegalStateException(s"control not found for effective id: `$getEffectiveId`"))
 
   final protected def handleAriaByAtts(atts: AttributesImpl, condition: LHHAAnalysis => Boolean): Boolean = {
     val it = ControlAjaxSupport.iterateAriaByAtts(elementAnalysis, currentControl.effectiveId, condition)(containingDocument)

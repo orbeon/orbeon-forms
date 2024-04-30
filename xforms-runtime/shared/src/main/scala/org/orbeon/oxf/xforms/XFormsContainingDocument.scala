@@ -124,7 +124,7 @@ class XFormsContainingDocument(
     controls.getObjectByEffectiveId(effectiveId)
 
   def findControlByEffectiveId(effectiveId: String): Option[XFormsControl] =
-    Option(getControlByEffectiveId(effectiveId))
+    controls.findObjectByEffectiveId(effectiveId)
 
   def isDirtySinceLastRequest: Boolean = controls.isDirtySinceLastRequest
 

@@ -59,8 +59,8 @@ class XXFormsDynamicHandler(
     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, attributes, classes, effectiveId.some))
     handlerContext.pushComponentContext(prefixedId)
 
-    containingDocument.getControlByEffectiveId(effectiveId) match {
-      case control: XXFormsDynamicControl =>
+    containingDocument.findControlByEffectiveId(effectiveId) match {
+      case Some(control: XXFormsDynamicControl) =>
         // Output new scripts upon update if any
         // NOTE: Not implemented as of 2016-01-18.
         if (! containingDocument.initializing && control.newScripts.nonEmpty && containingDocument.isServeInlineResources) {

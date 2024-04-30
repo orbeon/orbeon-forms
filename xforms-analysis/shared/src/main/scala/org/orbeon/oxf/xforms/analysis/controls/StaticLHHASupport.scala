@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, XPathAnalysis}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaControlRef, LhhaPlacementType, XPathAnalysis}
 import org.orbeon.xforms.XFormsNames
+
+import scala.collection.compat._
 
 
 // Control support for nested or external LHHA elements
@@ -77,6 +79,39 @@ trait StaticLHHASupport extends ElementAnalysis {
   // Make `var` for `fullOpt` error "Assignment to immutable field beforeAfterTokensOpt"
   var beforeAfterTokensOpt: Option[(List[String], List[String])] =
     element.attributeValueOpt(XFormsNames.XXFORMS_ORDER_QNAME) map LHHA.getBeforeAfterOrderTokens
+
+  // https://github.com/orbeon/orbeon-forms/issues/6279
+  // If this is nested within an XBL component that is the target of an `xxf:label-for`, find the outermost control
+  // that references it. Ideally, we wouldn't actually need the presence of any LHHA for that outer control, but we
+  // create that relationship only if there is at least one LHHA. This covers the concrete scenarios anyway. But just
+  // in case, we iterate through all the LHHA and find the first one. At the time of writing, all LHHA follow
+  // `xxf:label-for`, not only `<xf:label>`.
+  def findReferencingControl: Option[StaticLHHASupport] =
+    LHHA.values
+      .iterator
+      .flatMap(firstLhhaBy)
+      .map(_.lhhaPlacementType)
+      .collectFirst {
+        case LhhaPlacementType.Local   (directTargetControl, LhhaControlRef.Control(_))    => directTargetControl
+        case LhhaPlacementType.External(directTargetControl, LhhaControlRef.Control(_), _) => directTargetControl
+      }
+
+  // https://github.com/orbeon/orbeon-forms/issues/6279
+  def findReferencedControl: Option[StaticLHHASupport] =
+    LHHA.values
+      .iterator
+      .flatMap(firstLhha)
+      .map(_.lhhaPlacementType)
+      .flatMap { lhhaPlacementType =>
+        lhhaPlacementType.lhhaControlRef match {
+          case LhhaControlRef.Control(group: GroupControl)
+            if (group ne lhhaPlacementType.directTargetControl) && group.elementQNameOrDefault.localName != "div" => // see `XFormsGroupDefaultHandler`
+            Some(group)
+          case _ =>
+            None
+        }
+      }
+      .nextOption()
 
   // analyzeXPath(): this is done as part of control analysis, see:
   // https://github.com/orbeon/orbeon-forms/issues/2185

@@ -1,6 +1,7 @@
 package org.orbeon.oxf.xforms.processor.handlers
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport.{AriaInvalid, AriaRequired}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.oxf.xml.SaxSupport._
@@ -99,9 +100,9 @@ object XFormsBaseHandler {
 
   def handleAriaAttributes(required: Boolean, valid: Boolean, visited: Boolean, destAttributes: AttributesImpl): Unit = {
     if (required)
-      destAttributes.addOrReplace("aria-required", "true")
+      destAttributes.addOrReplace(AriaRequired, true.toString)
     if (! valid && visited)
-      destAttributes.addOrReplace("aria-invalid", "true")
+      destAttributes.addOrReplace(AriaInvalid, true.toString)
   }
 
   def getIdClassXHTMLAttributes(

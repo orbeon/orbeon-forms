@@ -258,6 +258,9 @@ object ControlAjaxSupport {
   val AriaDescribedbyQName = QName("aria-describedby")
 //  val AriaDetails     = "aria-details"
 
+  val AriaRequired    = "aria-required"
+  val AriaInvalid     = "aria-invalid"
+
   val AriaAttsWithLhha: List[(String, List[LHHA])] = List(
     AriaLabelledby   -> List(LHHA.Label),
     AriaDescribedby  -> List(LHHA.Hint, LHHA.Help),
@@ -283,7 +286,7 @@ object ControlAjaxSupport {
   private def findAriaByWithNs(
     staticControl      : ElementAnalysis,
     controlEffectiveId : String,
-    lhha               : LHHA,
+    lhha               : LHHA, // 2024-04-29: AriaLabelledby / AriaDescribedby / AriaErrorMessage
     condition          : LHHAAnalysis => Boolean)(
     containingDocument : XFormsContainingDocument
   ): Option[String] =

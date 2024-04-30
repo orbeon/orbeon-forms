@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, NestedPartAnalysis}
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport.{AriaInvalid, AriaRequired}
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.{InstanceMirror, XXFormsComponentRootControl, XXFormsDynamicControl}
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
@@ -30,10 +31,14 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance, XFormsInstanceSupport}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiverHelper}
+import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver, XMLReceiverHelper, XMLReceiverSupport}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits.stringToStringValue
 import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
+import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_URI
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node.ELEMENT_NODE
 import shapeless.syntax.typeable._
@@ -55,6 +60,8 @@ class XFormsValueComponentControl(
 ) with XFormsValueControl {
 
   // TODO: Fix hierarchy! We don't necessarily have `StaticLHHASupport`, in particular.
+  // 2024-04-30: `staticControl` without `StaticLHHASupport` can be passed, but we claim it has `StaticLHHASupport`.
+  // Concrete value controls always have LHHA support, while static value controls don't.
   override type Control <: ComponentControl with ValueComponentTrait with ViewTrait with StaticLHHASupport
 
   // Don't expose an external value unless explicitly allowed
@@ -162,7 +169,7 @@ class XFormsValueComponentControl(
     collector       : ErrorEventCollector
   )(implicit
     ch              : XMLReceiverHelper
-  ): Unit =
+  ): Unit = {
     // NOTE: Don't output any nested content. The value is handled separately, see:
     // https://github.com/orbeon/orbeon-forms/issues/3909
     super.outputAjaxDiff(
@@ -170,6 +177,56 @@ class XFormsValueComponentControl(
       None,
       collector
     )
+
+    // https://github.com/orbeon/orbeon-forms/issues/6279
+    // When the component uses `xxf:label-for`, find the target control if any, and output updates for that control's
+    // `aria-required` and `aria-invalid` attributes.
+    staticControl
+      .cast[StaticLHHASupport]
+      .flatMap(_.findReferencedControl)
+      .flatMap(c => containingDocument.findControlByEffectiveId(
+        XFormsId.buildEffectiveId(c.prefixedId, XFormsId.getEffectiveIdSuffixParts(this.effectiveId))
+      ))
+      .foreach { referencedControl =>
+
+      implicit val xmlReceiver: XMLReceiver = ch.getXmlReceiver
+
+      val control1Opt = previousControl.asInstanceOf[Option[XFormsSingleNodeControl]]
+      val control2    = this
+
+      def outputXxfAttributeIf(name: String, fn: XFormsSingleNodeControl => Boolean): Unit = {
+
+        val updateAtt =
+          control1Opt match {
+            case None if fn(control2)                           => true
+            case Some(control1) if fn(control1) != fn(control2) => true
+            case _                                              => false
+          }
+
+        if (updateAtt)
+          XMLReceiverSupport.element(
+            "attribute",
+            prefix = "xxf",
+            uri    = XXFORMS_NAMESPACE_URI,
+            atts   = List(
+              "name"  -> name,
+              "for"   -> referencedControl.effectiveId
+            ),
+            text   = fn(control2).toString
+          )
+      }
+
+      outputXxfAttributeIf(
+        AriaRequired,
+        _.isRequired
+      )
+
+      outputXxfAttributeIf(
+        AriaInvalid,
+        c => c.visited && c.alertLevel.contains(ValidationLevel.ErrorLevel)
+      )
+    }
+  }
 }
 
 // A component control with or without a value

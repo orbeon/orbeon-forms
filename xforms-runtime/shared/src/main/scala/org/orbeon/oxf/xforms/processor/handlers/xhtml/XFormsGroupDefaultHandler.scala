@@ -15,14 +15,15 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{ContainerControl, LHHA, LHHAAnalysis}
+import org.orbeon.oxf.xforms.analysis.controls.{ContainerControl, LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.forwardAccessibilityAttributes
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.{forwardAccessibilityAttributes, handleAriaAttributes}
+import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.xml.SaxSupport._
-import org.orbeon.xforms.XFormsNames
+import shapeless.syntax.typeable._
 
 
 // Default group handler
@@ -31,7 +32,7 @@ class XFormsGroupDefaultHandler(
   localname      : String,
   qName          : String,
   localAtts      : Attributes,
-  matched        : ElementAnalysis,
+  matched        : ElementAnalysis, // `ContainerControl`, specifically `GroupControl` but also `SwitchControl`!
   handlerContext : HandlerContext
 ) extends
   XFormsGroupHandler(
@@ -71,6 +72,21 @@ class XFormsGroupDefaultHandler(
       if (handlerContext.a11yFocusOnGroups)
         atts.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
     }
+
+    // https://github.com/orbeon/orbeon-forms/issues/6279
+    // The scenario is that this group is used to implement an `xf:input` or other `xxf:control="true"` HTML markup.
+    // If this group is the target of an `xxf:label-for`, find the outermost control that references it, and use the
+    // associated concrete control's information to output `aria-required` and `aria-invalid`.
+    if (getContainingElementName != "div")
+      currentControl
+        .staticControl
+        .asInstanceOf[StaticLHHASupport]
+        .findReferencingControl
+        .map(c => XFormsId.buildEffectiveId(c.prefixedId, XFormsId.getEffectiveIdSuffixParts(currentControl.effectiveId)))
+        .flatMap(containingDocument.findControlByEffectiveId)
+        .flatMap(_.cast[XFormsSingleNodeControl])
+        .foreach(c => handleAriaAttributes(c.isRequired, c.isValid, c.visited, atts))
+
     // After the above so that attributes can be overridden
     forwardAccessibilityAttributes(attributes, atts)
   }

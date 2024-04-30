@@ -14,6 +14,7 @@
 package org.orbeon.xforms
 
 import org.orbeon.dom.{Namespace, QName}
+import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI, XHTML_SHORT_PREFIX}
 
 
 // Names useful for the XForms engine.
@@ -375,4 +376,8 @@ object XFormsNames {
 
   // TODO: Move to handlers
   val DUMMY_SCRIPT_URI   = "data:text/javascript;base64,KGZ1bmN0aW9uKCl7fSgpKTsK"                       // empty self-calling function
+
+  val XhtmlNamespace = Namespace(XHTML_SHORT_PREFIX, XHTML_NAMESPACE_URI)
+  val XhtmlDivQname  = QName("div",  XhtmlNamespace)
+  val XhtmlSpanQname = QName("span", XhtmlNamespace)
 }

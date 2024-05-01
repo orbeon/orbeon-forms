@@ -81,7 +81,7 @@ class XFormsGroupDefaultHandler(
       currentControl
         .staticControl
         .asInstanceOf[StaticLHHASupport]
-        .findReferencingControl
+        .referencingControl
         .map(c => XFormsId.buildEffectiveId(c.prefixedId, XFormsId.getEffectiveIdSuffixParts(currentControl.effectiveId)))
         .flatMap(containingDocument.findControlByEffectiveId)
         .flatMap(_.cast[XFormsSingleNodeControl])

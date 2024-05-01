@@ -180,7 +180,7 @@ class XFormsValueComponentControl(
     // `aria-required` and `aria-invalid` attributes.
     staticControl
       .cast[StaticLHHASupport]
-      .flatMap(_.findReferencedControl)
+      .flatMap(_.referencedControl)
       .flatMap(c => containingDocument.findControlByEffectiveId(
         XFormsId.buildEffectiveId(c.prefixedId, XFormsId.getEffectiveIdSuffixParts(this.effectiveId))
       ))

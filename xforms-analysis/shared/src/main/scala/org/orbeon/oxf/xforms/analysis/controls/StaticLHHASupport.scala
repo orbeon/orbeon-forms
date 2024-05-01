@@ -86,7 +86,7 @@ trait StaticLHHASupport extends ElementAnalysis {
   // create that relationship only if there is at least one LHHA. This covers the concrete scenarios anyway. But just
   // in case, we iterate through all the LHHA and find the first one. At the time of writing, all LHHA follow
   // `xxf:label-for`, not only `<xf:label>`.
-  def findReferencingControl: Option[StaticLHHASupport] =
+  lazy val referencingControl: Option[StaticLHHASupport] =
     LHHA.values
       .iterator
       .flatMap(firstLhhaBy)
@@ -97,7 +97,7 @@ trait StaticLHHASupport extends ElementAnalysis {
       }
 
   // https://github.com/orbeon/orbeon-forms/issues/6279
-  def findReferencedControl: Option[StaticLHHASupport] =
+  lazy val referencedControl: Option[StaticLHHASupport] =
     LHHA.values
       .iterator
       .flatMap(firstLhha)

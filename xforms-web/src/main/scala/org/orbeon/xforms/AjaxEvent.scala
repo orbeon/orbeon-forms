@@ -147,8 +147,9 @@ class AjaxEvent(args: js.Any*) extends js.Object {
     // are passed, they are an object
     val dict = argsDict
         .get("properties")
-        // Handle both the case where no `properties` where passed, and where `undefined` was passed
-        .flatMap(p => if (js.isUndefined(p)) None else Some(p))
+        // Handle both the case where no `properties` where passed, and where `undefined` or `null` was passed,
+        // which can happen as `argsDict` can be provided by callers of `DocumentAPI.dispatchEvent()`
+        .flatMap(p => if (p == null || js.isUndefined(p)) None else Some(p))
         .getOrElse(new js.Object)
         .asInstanceOf[js.Dictionary[js.Any]]
     dict ++= checkArgOpt[String]("value") map (v => "value" -> (v: js.Any)) // `value` is now a property

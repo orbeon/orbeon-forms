@@ -3693,11 +3693,13 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="my-foo≡foo-group" class="xforms-group">
-                    <xh:span id="my-foo≡my-output" class="xforms-control xforms-output">
-                        <xh:span id="my-foo≡my-output≡≡c" class="xforms-output-output">Hello</xh:span>
+                <xh:div id="my-foo" class="xbl-component xbl-fr-foo">
+                    <xh:span id="my-foo≡foo-group" class="xforms-group">
+                        <xh:span id="my-foo≡my-output" class="xforms-control xforms-output">
+                            <xh:span id="my-foo≡my-output≡≡c" class="xforms-output-output">Hello</xh:span>
+                        </xh:span>
                     </xh:span>
-                </xh:span>
+                </xh:div>
             </controls>
         </output>
     </test>
@@ -3728,9 +3730,11 @@
         </input>
         <output name="response">
             <controls>
-                <xh:div class="xxforms-test-preserve-content">
-                    <xh:a id="my-foo≡outer-a" href="/outer/1" xxbl:scope="outer"/>
-                    <xh:a id="my-foo≡inner-a" href="/inner/1"/>
+                <xh:div id="my-foo" class="xbl-component xbl-fr-foo">
+                    <xh:div class="xxforms-test-preserve-content">
+                        <xh:a id="my-foo≡outer-a" href="/outer/1" xxbl:scope="outer"/>
+                        <xh:a id="my-foo≡inner-a" href="/inner/1"/>
+                    </xh:div>
                 </xh:div>
             </controls>
         </output>

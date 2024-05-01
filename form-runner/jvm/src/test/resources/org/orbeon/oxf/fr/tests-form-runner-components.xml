@@ -193,9 +193,11 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="my-input≡xf-3" class="xforms-control xforms-input">
-                    <xh:input id="my-input≡xf-3≡xforms-input-1" type="text" name="my-input≡xf-3≡xforms-input-1" value="" class="xforms-input-input"/>
-                </xh:span>
+                <xh:div id="my-input" class="xbl-component xbl-fr-tutorial-input">
+                    <xh:span id="my-input≡xf-3" class="xforms-control xforms-input">
+                        <xh:input id="my-input≡xf-3≡xforms-input-1" type="text" name="my-input≡xf-3≡xforms-input-1" value="" class="xforms-input-input"/>
+                    </xh:span>
+                </xh:div>
             </controls>
         </output>
     </test>

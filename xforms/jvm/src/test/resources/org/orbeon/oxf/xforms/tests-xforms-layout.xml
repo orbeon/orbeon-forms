@@ -2658,4 +2658,101 @@
             </controls>
         </output>
     </test>
+
+    <test description="#6279: output `aria-required` and `aria-invalid` via `xxf:label-for`" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <_>
+                                <required/>
+                                <invalid/>
+                                <invalid-visited/>
+                            </_>
+                        </xf:instance>
+                        <xf:bind ref="required"         required="true()"/>
+                        <xf:bind ref="invalid"          constraint="false()"/>
+                        <xf:bind ref="invalid-visited"  constraint="false()"/>
+                        <xxf:setvisited
+                            event="xforms-ready"
+                            control="wrapped-input-invalid-visited"/>
+                        <xxf:setvisited
+                            event="xforms-ready"
+                            control="wrapped-div-invalid-visited"/>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding
+                            id="fr-wrapped-input"
+                            element="fr|wrapped-input"
+                            xxbl:mode="binding lhha"
+                            xxbl:label-for="my-input">
+                            <xbl:template>
+                                <xh:input xxf:control="true" id="my-input"/>
+                            </xbl:template>
+                        </xbl:binding>
+                        <xbl:binding
+                            id="fr-wrapped-div"
+                            element="fr|wrapped-div"
+                            xxbl:mode="binding lhha"
+                            xxbl:label-for="my-div">
+                            <xbl:template>
+                                <xh:div xxf:control="true" id="my-div"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:wrapped-input id="wrapped-input-required" ref="required">
+                        <xf:label>My label</xf:label>
+                    </fr:wrapped-input>
+                    <fr:wrapped-input id="wrapped-input-invalid" ref="invalid">
+                        <xf:label>My label</xf:label>
+                    </fr:wrapped-input>
+                    <fr:wrapped-input id="wrapped-input-invalid-visited" ref="invalid-visited">
+                        <xf:label>My label</xf:label>
+                    </fr:wrapped-input>
+                    <!-- `div` behaves differently -->
+                    <fr:wrapped-div id="wrapped-div-required" ref="required">
+                        <xf:label>My label</xf:label>
+                    </fr:wrapped-div>
+                    <fr:wrapped-div id="wrapped-div-invalid" ref="invalid">
+                        <xf:label>My label</xf:label>
+                    </fr:wrapped-div>
+                    <fr:wrapped-div id="wrapped-div-invalid-visited" ref="invalid-visited">
+                        <xf:label>My label</xf:label>
+                    </fr:wrapped-div>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xh:div id="wrapped-input-required" class="xforms-invalid xforms-required xbl-component xbl-fr-wrapped-input">
+                    <xh:span class="xforms-label" id="wrapped-input-required≡≡l">My label</xh:span>
+                    <xh:input id="wrapped-input-required≡my-input" class="xforms-group" aria-labelledby="wrapped-input-required≡≡l" aria-required="true"/>
+                </xh:div>
+                <xh:div id="wrapped-input-invalid" class="xforms-invalid xbl-component xbl-fr-wrapped-input">
+                    <xh:span class="xforms-label" id="wrapped-input-invalid≡≡l">My label</xh:span>
+                    <xh:input id="wrapped-input-invalid≡my-input" class="xforms-group" aria-labelledby="wrapped-input-invalid≡≡l"/>
+                </xh:div>
+                <xh:div id="wrapped-input-invalid-visited" class="xforms-visited xforms-invalid xbl-component xbl-fr-wrapped-input">
+                    <xh:span class="xforms-label" id="wrapped-input-invalid-visited≡≡l">My label</xh:span>
+                    <xh:input id="wrapped-input-invalid-visited≡my-input" class="xforms-group" aria-labelledby="wrapped-input-invalid-visited≡≡l" aria-invalid="true"/>
+                </xh:div>
+                <xh:div id="wrapped-div-required" class="xforms-invalid xforms-required xbl-component xbl-fr-wrapped-div">
+                    <xh:span class="xforms-label" id="wrapped-div-required≡≡l">My label</xh:span>
+                    <xh:div id="wrapped-div-required≡my-div" class="xforms-group" aria-labelledby="wrapped-div-required≡≡l" role="group" tabindex="0"/>
+                </xh:div>
+                <xh:div id="wrapped-div-invalid" class="xforms-invalid xbl-component xbl-fr-wrapped-div">
+                    <xh:span class="xforms-label" id="wrapped-div-invalid≡≡l">My label</xh:span>
+                    <xh:div id="wrapped-div-invalid≡my-div" class="xforms-group" aria-labelledby="wrapped-div-invalid≡≡l" role="group" tabindex="0"/>
+                </xh:div>
+                <xh:div id="wrapped-div-invalid-visited" class="xforms-visited xforms-invalid xbl-component xbl-fr-wrapped-div">
+                    <xh:span class="xforms-label" id="wrapped-div-invalid-visited≡≡l">My label</xh:span>
+                    <xh:div id="wrapped-div-invalid-visited≡my-div" class="xforms-group" aria-labelledby="wrapped-div-invalid-visited≡≡l" role="group" tabindex="0"/>
+                </xh:div>
+          </controls>
+        </output>
+    </test>
 </group>

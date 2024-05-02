@@ -257,9 +257,9 @@ object Provider extends Enum[Provider] {
   def flatViewExistsParam(provider: Provider, viewName: String): String =
     if (provider == PostgreSQL) viewName.toLowerCase else viewName
 
-  def flatViewExtractFunction(provider: Provider, xmlColumn: String, xpath: String): String =
+  def flatViewExtractFunction(provider: Provider, xmlTable: String, xpath: String): String =
     provider match {
-      case PostgreSQL => s"(xpath('$xpath', $xmlColumn))[1]::text"
+      case PostgreSQL => s"(xpath('$xpath', $xmlTable.extracted_xml))[1]::text"
       case _          => throw new UnsupportedOperationException
     }
 
@@ -271,7 +271,7 @@ object Provider extends Enum[Provider] {
 
   def flatViewRepeatedXmlColumn(provider: Provider, xmlTable: String, xpath: String): String =
     provider match {
-      case PostgreSQL   => s"unnest(xpath('$xpath', $xmlTable.xml)) xml"
+      case PostgreSQL   => s"unnest(xpath('$xpath', $xmlTable.extracted_xml)) extracted_xml"
       case _            => throw new UnsupportedOperationException
     }
 

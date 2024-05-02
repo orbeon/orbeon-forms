@@ -219,7 +219,7 @@ private object FlatView {
       val controlColumns = controls.map { control =>
         val columnName = deduplicatedColumnNames(control.columnNamePath(fullyQualifiedNames))
 
-        Column(Provider.flatViewExtractFunction(provider, s"$tableAlias.xml", control.xpath), Some(columnName))
+        Column(Provider.flatViewExtractFunction(provider, tableAlias, control.xpath), Some(columnName))
       }
 
       sql(
@@ -250,7 +250,7 @@ private object FlatView {
             appForm    = appForm,
             version    = version,
             tableAlias = FormDataTableAlias,
-            columns    = metadataColumns.map(_.sql) :+ s"$FormDataTableAlias.xml"
+            columns    = metadataColumns.map(_.sql) :+ s"$FormDataTableAlias.xml extracted_xml"
           )
 
           (fromStatement, Seq())

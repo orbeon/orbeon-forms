@@ -1783,13 +1783,13 @@
                                                     <xf:var name="detail-position" value="."/>
                                                     <!-- Set context to current detail -->
                                                     <xf:group context="$document/details/detail[$detail-position]" appearance="xxf:internal">
-                                                        <xh:td class="fr-summary-td {'fr-align-right'[instance('fr-search-instance')/query[@name and @summary-show = 'true'][$detail-position + 1]/@control = ('number', 'currency')]}">
+                                                        <xh:td class="fr-summary-td {'fr-align-right'[instance('fr-search-instance')/query[@name and @summary-show = 'true'][$detail-position]/@control = ('number', 'currency')]}">
                                                             <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
                                                             <xf:var
                                                                 name="detail"
                                                                 value="
                                                                     for $raw     in . return
-                                                                    for $query   in instance('fr-search-instance')/query[@name and @summary-show = 'true'][$detail-position + 1] return
+                                                                    for $query   in instance('fr-search-instance')/query[@name and @summary-show = 'true'][$detail-position] return
                                                                     for $control in $query/@control return
                                                                         if ($control = 'textarea') then
                                                                             if (string-length($raw) > 20) then

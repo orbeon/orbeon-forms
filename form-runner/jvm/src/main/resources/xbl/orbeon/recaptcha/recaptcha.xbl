@@ -30,6 +30,13 @@
             <xbl:handler event="fr-verify" phase="target">
                 <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
             </xbl:handler>
+            <xbl:handler event="fr-reload" phase="target">
+                <xf:setvalue ref="response"/>
+                <xf:action type="javascript" >
+                    var i = ORBEON.xforms.XBL.instanceForControl(this);
+                    if (i) i.reset();
+                </xf:action>
+            </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <!-- Local model -->

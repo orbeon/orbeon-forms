@@ -45,7 +45,7 @@ object Recaptcha {
       }
     }
 
-    def renderRecaptcha(publicKey: String, theme: String): Unit = {
+    private def renderRecaptcha(publicKey: String, theme: String): Unit = {
 
       val grecaptcha = window.asInstanceOf[js.Dynamic].grecaptcha
       val reCaptchaNotFullyLoaded =
@@ -69,6 +69,12 @@ object Recaptcha {
           )
         )
       }
+    }
+
+    def reset(): Unit = {
+      org.scalajs.dom.console.log("Resetting reCAPTCHA")
+      val grecaptcha = window.asInstanceOf[js.Dynamic].grecaptcha
+      grecaptcha.reset()
     }
   }
 }

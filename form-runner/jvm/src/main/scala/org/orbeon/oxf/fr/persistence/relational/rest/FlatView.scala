@@ -333,10 +333,10 @@ private object FlatView {
     version      : Int
   ): Seq[View] = {
 
-    // We generate a view for the root of the form, as well as for every repeated section/grid
+    // We generate a view for the root of the form, as well as for every repeated section/grid (except with MySQL)
     val generateView = formNode match {
       case _: Root              => true
-      case _: Section | _: Grid => formNode.repeated
+      case _: Section | _: Grid => formNode.repeated && (provider != Provider.MySQL)
       case _                    => false
     }
 

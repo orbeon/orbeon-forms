@@ -237,13 +237,19 @@ object Provider extends Enum[Provider] {
     }
   }
 
-  private val FlatViewMustDelete: Set[Provider] = Set(PostgreSQL)
+  private val FlatViewMustDelete: Set[Provider] = Set(MySQL, PostgreSQL)
 
   def flatViewDelete(provider: Provider): Boolean =
     FlatViewMustDelete(provider)
 
   def flatViewExistsQuery(provider: Provider): String =
     provider match{
+      case MySQL        =>
+                          s"""|SELECT *
+                              |  FROM information_schema.views
+                              | WHERE     table_name   = ?
+                              |       AND table_schema = database()
+                              |""".stripMargin
       case PostgreSQL   =>
                           s"""|SELECT *
                               |  FROM information_schema.views
@@ -259,6 +265,7 @@ object Provider extends Enum[Provider] {
 
   def flatViewExtractFunction(provider: Provider, xmlTable: String, xpath: String): String =
     provider match {
+      case MySQL      => s"extractvalue($xmlTable.extracted_xml, '$xpath')"
       case PostgreSQL => s"(xpath('$xpath', $xmlTable.extracted_xml))[1]::text"
       case _          => throw new UnsupportedOperationException
     }
@@ -316,8 +323,7 @@ object Provider extends Enum[Provider] {
         |""".stripMargin
   }
 
-
-  val FlatViewSupportedProviders: Set[Provider] = Set(PostgreSQL)
+  val FlatViewSupportedProviders: Set[Provider] = Set(MySQL, PostgreSQL)
 
   def idColGetter(provider: Provider): Option[String] =
     provider match {

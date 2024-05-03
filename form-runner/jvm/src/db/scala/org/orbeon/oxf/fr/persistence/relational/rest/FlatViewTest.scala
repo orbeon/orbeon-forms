@@ -89,6 +89,7 @@ class FlatViewTest
     case class ExpectedResult(fullyQualifiedNames: Boolean, maxIdentifierLength: Int, views: Seq[View])
 
     case class View(
+      providers             : Set[Provider] = Provider.FlatViewSupportedProviders,
       name                  : Provider => String,
       createdColumn         : Boolean,
       lastModifiedTimeColumn: Boolean,
@@ -158,6 +159,7 @@ class FlatViewTest
                 )
               ),
               View(
+                providers              = Provider.FlatViewSupportedProviders - Provider.MySQL,
                 name                   = (provider: Provider) => s"orbeon_f_${provider.entryName}_my_form_2_3_company_section",
                 createdColumn          = false,
                 lastModifiedTimeColumn = false,
@@ -171,6 +173,7 @@ class FlatViewTest
                 )
               ),
               View(
+                providers              = Provider.FlatViewSupportedProviders - Provider.MySQL,
                 name                   = (provider: Provider) => s"orbeon_f_${provider.entryName}_my_form_2_3_office_section",
                 createdColumn          = false,
                 lastModifiedTimeColumn = false,
@@ -188,6 +191,7 @@ class FlatViewTest
                 )
               ),
               View(
+                providers              = Provider.FlatViewSupportedProviders - Provider.MySQL,
                 name                   = (provider: Provider) => s"orbeon_f_${provider.entryName}_my_form_2_3_employee_section",
                 createdColumn          = false,
                 lastModifiedTimeColumn = false,
@@ -266,7 +270,7 @@ class FlatViewTest
         )
 
         // Parse all views
-        expectedResult.views.foreach { view =>
+        expectedResult.views.filter(_.providers.contains(provider)).foreach { view =>
           val viewName = view.name(provider)
 
           val query = s"SELECT * FROM $viewName"

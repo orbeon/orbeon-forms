@@ -72,7 +72,6 @@ object Recaptcha {
     }
 
     def reset(): Unit = {
-      org.scalajs.dom.console.log("Resetting reCAPTCHA")
       val grecaptcha = window.asInstanceOf[js.Dynamic].grecaptcha
       grecaptcha.reset()
     }

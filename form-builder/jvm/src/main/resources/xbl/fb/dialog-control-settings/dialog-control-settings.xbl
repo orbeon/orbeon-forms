@@ -1063,7 +1063,15 @@
                 </xf:var>
 
                 <xxf:dialog id="dialog" level="modal" class="fb-dialog-control-settings">
-                    <xf:label ref="$resources/dialog-control-settings/label"/>
+                    <xf:label
+                        ref="
+                            xxf:format-message(
+                                $resources/dialog-control-settings/label,
+                                (
+                                    $i/label/value[@lang = $li/lang]/string(),
+                                    $i/control-name/string()
+                                )
+                            )"/>
 
                     <xf:var name="form" value="xxf:binding('fb-dialog-control-settings')"/>
 

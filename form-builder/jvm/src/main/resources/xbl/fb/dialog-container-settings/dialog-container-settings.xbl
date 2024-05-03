@@ -589,7 +589,15 @@
 
                 <!-- Actual dialog -->
                 <xxf:dialog id="dialog" appearance="full" level="modal" class="fb-dialog-container-settings">
-                    <xf:label ref="$resources/dialog-container-settings/label"/>
+                    <xf:label
+                        ref="
+                            xxf:format-message(
+                                $resources/dialog-container-settings/label,
+                                (
+                                    (: $i/label/value[@lang = $li/lang]/string(), :)
+                                    $i/control-name/string()
+                                )
+                            )"/>
 
                     <fr:tabbable id="fb-tabbable">
                         <fr:tab id="base-tab">

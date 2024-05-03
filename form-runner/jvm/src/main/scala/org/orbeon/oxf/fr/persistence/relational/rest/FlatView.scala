@@ -116,7 +116,11 @@ private object FlatView {
     children: List[FormNode]
   ) extends FormNode
 
-  case class Control(nameOpt: Option[String], path: List[String]) extends FormNode {
+  case class Control(
+    nameOpt               : Option[String],
+    path                  : List[String],
+    templateSectionNameOpt: Option[String]
+  ) extends FormNode {
     override val repeated: Boolean        = false
     override val children: List[FormNode] = Nil
   }
@@ -128,7 +132,7 @@ private object FlatView {
     val body        = root.child(XHBodyTest).head
     val xblMappings = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
 
-    def formNodes(node: NodeInfo, path: List[String]): List[FormNode] = {
+    def formNodes(node: NodeInfo, path: List[String], templateSectionNameOpt: Option[String]): List[FormNode] = {
 
       val section  = IsSection(node)
       val grid     = IsGrid(node)
@@ -142,7 +146,7 @@ private object FlatView {
       val addIterationNameToPath = section && repeated
       val iterationNameOpt       = addIterationNameToPath.flatOption(nameToAddToPathOpt.map(_ + DefaultIterationSuffix))
       val currentPath            = path ++ nameToAddToPathOpt.toList ++ iterationNameOpt.toList
-      val childrenNodes          = (node child *).toList.flatMap(formNodes(_, currentPath))
+      val childrenNodes          = (node child *).toList.flatMap(formNodes(_, currentPath, templateSectionNameOpt))
 
       if (section) {
         List(Section(nameOpt, currentPath, repeated, childrenNodes))
@@ -151,16 +155,20 @@ private object FlatView {
       } else if (isSectionTemplateContent(node)) {
         xblMappings.get(node.uriQualifiedName).map { xblBindingNode =>
           // Follow XBL binding to the template
-          formNodes(xblBindingNode.rootElement.child(XBLTemplateTest).head, currentPath)
+          formNodes(
+            node                   = xblBindingNode.rootElement.child(XBLTemplateTest).head,
+            path                   = currentPath.reverse.dropWhile(_.endsWith(TemplateContentSuffix)).reverse,
+            templateSectionNameOpt = Some(currentPath.reverse(1))
+          )
         }.getOrElse(Nil)
       } else if (control) {
-        List(Control(nameOpt, currentPath))
+        List(Control(nameOpt, currentPath, templateSectionNameOpt))
       } else {
         childrenNodes
       }
     }
 
-    Root(children = formNodes(body, path = Nil))
+    Root(children = formNodes(body, path = Nil, templateSectionNameOpt = None))
   }
 
   private def relativePath(fullPath: Seq[String], referencePath: Seq[String]): Seq[String] = {
@@ -168,9 +176,15 @@ private object FlatView {
     fullPath.drop(referencePath.size)
   }
 
-  case class ViewControl(name: String, relativePath: Seq[String]) {
-    def columnNamePath(fullyQualifiedNames: Boolean): Seq[String] = if (fullyQualifiedNames) relativePath else Seq(name)
-    def xpath                                       : String      = "/*/" + relativePath.mkString("/") + "/text()"
+  case class ViewControl(name: String, relativePath: Seq[String], templateSectionNameOpt: Option[String]) {
+    def columnNamePath(fullyQualifiedNames: Boolean): Seq[String] =
+      if (fullyQualifiedNames)
+        relativePath
+      else
+        templateSectionNameOpt.toSeq :+ name
+
+    def xpath: String =
+      "/*/" + relativePath.mkString("/") + "/text()"
   }
 
   case class View(
@@ -304,9 +318,9 @@ private object FlatView {
       case _: Section | _: Grid if formNode.repeated =>
         // Stop collecting controls for a view when we encounter a repeated section/grid, which will be covered by a separate view
         Seq.empty
-      case Control(name, path) =>
+      case Control(name, path, templateSectionNameOpt) =>
         // Make path relative to the reference path (i.e. root or repeated section/grid)
-        Seq(ViewControl(name.get, FlatView.relativePath(path, referencePath)))
+        Seq(ViewControl(name.get, FlatView.relativePath(path, referencePath), templateSectionNameOpt))
       case _ =>
         formNode.children.flatMap(viewControls(_, referencePath))
     }

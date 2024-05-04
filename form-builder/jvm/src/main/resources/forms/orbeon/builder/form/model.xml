@@ -222,9 +222,6 @@
         <xf:setvalue
             ref="$metadata/title"
             value="$form-resources/template/untitled-form"/>
-        <xf:setvalue
-            ref="frf:resourcesInstanceRootElemOpt($template)/resource/section-1/label"
-            value="$form-resources/template/untitled-section"/>
 
         <!-- Annotate data -->
         <!-- NOTE: RRR done by fr-annotate-data -->

@@ -20,11 +20,11 @@ import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.RpcClient
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
-
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+
 import scala.scalajs.js
 
 object LabelEditor {

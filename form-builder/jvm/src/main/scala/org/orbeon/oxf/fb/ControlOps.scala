@@ -481,8 +481,9 @@ trait ControlOps extends ResourcesOps {
     controlName : String,
     lhht        : String,
     value       : String,
-    params      : Option[Seq[NodeInfo]],
-    isHTML      : Boolean)(implicit
+    params      : Option[Seq[NodeInfo]], // `None` means don't update the params
+    isHTML      : Boolean
+  )(implicit
     ctx         : FormBuilderDocContext
   ): Boolean = {
     val resourceChanged  = setControlResource(controlName, lhht, value.trimAllToEmpty)

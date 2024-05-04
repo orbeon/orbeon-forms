@@ -151,8 +151,17 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   }
 
   def sectionUpdateLabel(sectionId: String, label: String): Unit = {
-    implicit val ctx = FormBuilderDocContext()
-    XFormsAPI.setvalue(FormBuilder.currentResources / FormRunner.controlNameFromId(sectionId) / LHHA.Label.entryName, label)
+    val controlName = FormRunner.controlNameFromId(sectionId)
+    val lhht        = LHHA.Label.entryName
+    FormBuilderXPathApi.settingControlLabelHintHelpOrText(controlName, lhht, forceOptional = true) { implicit ctx: FormBuilderDocContext =>
+      FormBuilder.setControlLabelHintHelpOrText(
+        controlName = controlName,
+        lhht        = lhht,
+        value       = label,
+        params      = None, // don't update params
+        isHTML      = FormBuilder.isControlLhhatHtmlMediatype(controlName, lhht) // don't update mediatype
+      )
+    }
   }
 
   def containerEditDetails(containerId: String): Unit =

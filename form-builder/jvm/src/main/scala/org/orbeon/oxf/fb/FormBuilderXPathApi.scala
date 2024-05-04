@@ -238,24 +238,27 @@ object FormBuilderXPathApi {
     FormBuilder.setControlLhhatMediatype(controlName, lhha, isHTML)(FormBuilderDocContext())
 
   // Do the pre/post insertions/deletions needed for optional LHHT elements
-  private def settingControlLabelHintHelpOrText[T](
-    controlName: String,
-    lhht: String)(
+  def settingControlLabelHintHelpOrText[T](
+    controlName  : String,
+    lhht         : String,
+    forceOptional: Boolean
+  )(
     controlSetter: FormBuilderDocContext => T
   ): T = {
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
-    val isOptionalLHHAT =
-      lhht == LHHA.Help.entryName ||
-        lhht == fr.XMLNames.FRShortLabelQName.localName ||
-        lhht == fr.XMLNames.FRIterationLabelQName.localName ||
-        lhht == fr.XMLNames.FRAddIterationLabelQName.localName ||
-        lhht == fr.XMLNames.FRRemoveIterationLabelQName.localName
+    val isOptionalLHHAT = {
+      forceOptional                                          ||
+      lhht == LHHA.Help.entryName                            ||
+      lhht == fr.XMLNames.FRShortLabelQName.localName        ||
+      lhht == fr.XMLNames.FRIterationLabelQName.localName    ||
+      lhht == fr.XMLNames.FRAddIterationLabelQName.localName ||
+      lhht == fr.XMLNames.FRRemoveIterationLabelQName.localName
+    }
 
     // Make sure an optional element is present while we set content or attributes
-    if (isOptionalLHHAT) {
+    if (isOptionalLHHAT)
       FormBuilder.ensureCleanLHHAElements(controlName, lhht, count = 1, replace = true)
-    }
 
     val t = controlSetter(ctx)
 
@@ -273,6 +276,7 @@ object FormBuilderXPathApi {
     t
   }
 
+  // Called by `dialog-container-settings.xbl`.
   //@XPathFunction
   def setControlLabelHintHelpOrText(
     controlName : String,
@@ -280,10 +284,10 @@ object FormBuilderXPathApi {
     value       : String,
     params      : Array[NodeInfo],
     isHTML      : Boolean
-  ): Unit = settingControlLabelHintHelpOrText(controlName, lhht) { implicit ctx: FormBuilderDocContext =>
-
-    FormBuilder.setControlLabelHintHelpOrText(controlName, lhht, value, Some(params), isHTML)
-  }
+  ): Unit =
+    settingControlLabelHintHelpOrText(controlName, lhht, forceOptional = lhht == LHHA.Label.entryName) { implicit ctx: FormBuilderDocContext =>
+      FormBuilder.setControlLabelHintHelpOrText(controlName, lhht, value, Some(params), isHTML)
+    }
 
   //@XPathFunction
   def setControlLabelHintHelpOrTextForAllLangs(
@@ -293,7 +297,7 @@ object FormBuilderXPathApi {
     params      : Array[NodeInfo],
     isHTML      : Boolean,
     automatic   : String
-  ): Unit = settingControlLabelHintHelpOrText(controlName, lhht) { implicit ctx: FormBuilderDocContext =>
+  ): Unit = settingControlLabelHintHelpOrText(controlName, lhht, forceOptional = false) { implicit ctx: FormBuilderDocContext =>
 
     val langValues = values.map { nodeInfo =>
       val lang = nodeInfo.attValue("lang")

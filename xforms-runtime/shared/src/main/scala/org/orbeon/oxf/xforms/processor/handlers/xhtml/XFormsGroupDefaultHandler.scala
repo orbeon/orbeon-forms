@@ -77,15 +77,14 @@ class XFormsGroupDefaultHandler(
     // The scenario is that this group is used to implement an `xf:input` or other `xxf:control="true"` HTML markup.
     // If this group is the target of an `xxf:label-for`, find the outermost control that references it, and use the
     // associated concrete control's information to output `aria-required` and `aria-invalid`.
-    if (getContainingElementName != "div")
-      currentControl
-        .staticControl
-        .asInstanceOf[StaticLHHASupport]
-        .referencingControl
-        .map(c => XFormsId.buildEffectiveId(c.prefixedId, XFormsId.getEffectiveIdSuffixParts(currentControl.effectiveId)))
-        .flatMap(containingDocument.findControlByEffectiveId)
-        .flatMap(_.cast[XFormsSingleNodeControl])
-        .foreach(c => handleAriaAttributes(c.isRequired, c.isValid, c.visited, atts))
+    currentControl
+      .staticControl
+      .asInstanceOf[StaticLHHASupport]
+      .referencingControl
+      .map(c => XFormsId.buildEffectiveId(c.prefixedId, XFormsId.getEffectiveIdSuffixParts(currentControl.effectiveId)))
+      .flatMap(containingDocument.findControlByEffectiveId)
+      .flatMap(_.cast[XFormsSingleNodeControl])
+      .foreach(c => handleAriaAttributes(c.isRequired, c.isValid, c.visited, atts))
 
     // After the above so that attributes can be overridden
     forwardAccessibilityAttributes(attributes, atts)

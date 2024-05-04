@@ -2713,7 +2713,7 @@
                     <fr:wrapped-input id="wrapped-input-invalid-visited" ref="invalid-visited">
                         <xf:label>My label</xf:label>
                     </fr:wrapped-input>
-                    <!-- `div` behaves differently -->
+                    <!-- `div` behaves the same -->
                     <fr:wrapped-div id="wrapped-div-required" ref="required">
                         <xf:label>My label</xf:label>
                     </fr:wrapped-div>
@@ -2742,7 +2742,7 @@
                 </xh:div>
                 <xh:div id="wrapped-div-required" class="xforms-invalid xforms-required xbl-component xbl-fr-wrapped-div">
                     <xh:span class="xforms-label" id="wrapped-div-required≡≡l">My label</xh:span>
-                    <xh:div id="wrapped-div-required≡my-div" class="xforms-group" aria-labelledby="wrapped-div-required≡≡l" role="group" tabindex="0"/>
+                    <xh:div id="wrapped-div-required≡my-div" class="xforms-group" aria-labelledby="wrapped-div-required≡≡l" role="group" tabindex="0" aria-required="true"/>
                 </xh:div>
                 <xh:div id="wrapped-div-invalid" class="xforms-invalid xbl-component xbl-fr-wrapped-div">
                     <xh:span class="xforms-label" id="wrapped-div-invalid≡≡l">My label</xh:span>
@@ -2750,7 +2750,7 @@
                 </xh:div>
                 <xh:div id="wrapped-div-invalid-visited" class="xforms-visited xforms-invalid xbl-component xbl-fr-wrapped-div">
                     <xh:span class="xforms-label" id="wrapped-div-invalid-visited≡≡l">My label</xh:span>
-                    <xh:div id="wrapped-div-invalid-visited≡my-div" class="xforms-group" aria-labelledby="wrapped-div-invalid-visited≡≡l" role="group" tabindex="0"/>
+                    <xh:div id="wrapped-div-invalid-visited≡my-div" class="xforms-group" aria-labelledby="wrapped-div-invalid-visited≡≡l" role="group" tabindex="0" aria-invalid="true"/>
                 </xh:div>
           </controls>
         </output>

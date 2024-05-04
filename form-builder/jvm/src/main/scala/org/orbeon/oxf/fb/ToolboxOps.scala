@@ -215,7 +215,6 @@ object ToolboxOps {
               xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-          <xf:label ref={FormBuilder.buildResourcePointer(newSectionName, LHHA.Label.entryName, None)}/>{
           if (withGrid)
             <fr:grid
               edit-ref=""

@@ -214,7 +214,7 @@ object ToolboxOps {
               xmlns:xf="http://www.w3.org/2002/xforms"
               xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-              xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+              xmlns:fr="http://orbeon.org/oxf/xml/form-runner">{
           if (withGrid)
             <fr:grid
               edit-ref=""

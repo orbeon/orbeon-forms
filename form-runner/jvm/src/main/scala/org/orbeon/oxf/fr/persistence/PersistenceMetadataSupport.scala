@@ -105,7 +105,7 @@ object PersistenceMetadataSupport {
     // TODO: Check if/why we are not using the caching mechanism.
     (
       if (isInternalAdminUser)
-        Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Operation.Read)))))
+        Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Operation.Read, Operation.Delete)))))
       else
         FormRunner.permissionsFromElemOrProperties(
           readFormPermissions(appForm, version),

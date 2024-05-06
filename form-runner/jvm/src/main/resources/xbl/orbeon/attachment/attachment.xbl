@@ -331,11 +331,20 @@
             <xh:div id="fr-attachment-elem" xxf:control="true" tabindex="-1">
                 <fr:dnd-repeat
                     ref="
-                        if ($multiple) then
-                            (: Using `*:_` to support `_` in the instance being in non-empty default namespace :)
-                            $binding/*:_[xxf:non-blank(string(.))]
-                        else
-                            $binding[xxf:non-blank(string(.))]">
+                        (
+                            if ($multiple) then
+                                (: Using `*:_` to support `_` in the instance being in non-empty default namespace :)
+                                $binding/*:_[xxf:non-blank(string(.))]
+                            else
+                                $binding[xxf:non-blank(string(.))]
+                        )[
+                            (: Don't show the attachment metadata if the control is readonly and the metadata is all
+                               missing: https://github.com/orbeon/orbeon-forms/issues/6298 :)
+                            not(
+                                $readonly and
+                                empty((@filename, @mediatype, @size)[xxf:non-blank()])
+                            )
+                        ]">
 
                     <xh:div class="xforms-dnd-item xforms-dnd-moves">
 

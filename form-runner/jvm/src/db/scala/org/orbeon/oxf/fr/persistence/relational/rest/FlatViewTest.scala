@@ -219,7 +219,45 @@ class FlatViewTest
             )
           )
         )
-      )
+      ),
+      Form(
+        "form-flat-views-long-name.xhtml",
+        "my-form-3",
+        version = 1,
+        Seq(Data("1", "form-flat-views-long-name-data-1.xml")),
+        Seq(
+          ExpectedResult(
+            fullyQualifiedNames = false,
+            maxIdentifierLength = 64,
+            Seq(
+              View(
+                providers              = Set(Provider.MySQL),
+                name                   = (_: Provider) => s"orbeon_f_mysql_my_form_3_1",
+                createdColumn          = true,
+                lastModifiedTimeColumn = true,
+                lastModifiedByColumn   = true,
+                columns                = Seq("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz01"),
+                values                 = Seq(Seq("1", "Value"))
+              )
+            )
+          ),
+          ExpectedResult(
+            fullyQualifiedNames = false,
+            maxIdentifierLength = 63,
+            Seq(
+              View(
+                providers              = Set(Provider.PostgreSQL),
+                name                   = (_: Provider) => s"orbeon_f_postgresql_my_form_3_1",
+                createdColumn          = true,
+                lastModifiedTimeColumn = true,
+                lastModifiedByColumn   = true,
+                columns                = Seq("abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0"),
+                values                 = Seq(Seq("1", "Value"))
+              )
+            )
+          )
+        )
+      ),
     )
 
     // Assumption: we're comparing sequences of same length (i.e. view rows)
@@ -258,7 +296,11 @@ class FlatViewTest
 
       val appForm = AppForm(provider.entryName, form.name)
 
-      form.expectedResults.foreach { expectedResult =>
+      for {
+        expectedResult <- form.expectedResults
+        providers = expectedResult.views.flatMap(_.providers)
+        if providers.contains(provider)
+      } {
         // Create views
         FlatView.createFlatViewsForDocument(
           crudRequest(provider, appForm, form.version),

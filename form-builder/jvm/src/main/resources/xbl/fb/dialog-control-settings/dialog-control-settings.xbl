@@ -1068,8 +1068,8 @@
                             xxf:format-message(
                                 $resources/dialog-control-settings/label,
                                 (
-                                    $i/label/value[@lang = $li/lang]/string(),
-                                    $i/control-name/string()
+                                    $i/control-name/string(),
+                                    $i/label/value[@lang = $li/lang]/string()
                                 )
                             )"/>
 

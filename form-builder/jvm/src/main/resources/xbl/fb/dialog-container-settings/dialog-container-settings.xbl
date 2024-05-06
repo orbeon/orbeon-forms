@@ -594,8 +594,9 @@
                             xxf:format-message(
                                 $resources/dialog-container-settings/label,
                                 (
-                                    (: $i/label/value[@lang = $li/lang]/string(), :)
-                                    $i/control-name/string()
+                                    if ($i/container-type = 'section') then 0 else 1,
+                                    $i/control-name/string(),
+                                    $i/label/value/string()
                                 )
                             )"/>
 

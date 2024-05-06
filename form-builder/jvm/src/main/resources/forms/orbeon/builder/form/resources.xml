@@ -494,7 +494,7 @@
             <updated-with-versions>Updated with Versions</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-settings>
-            <label>Control Settings: "{0}" / "{1}"</label>
+            <label>Control Settings: "{1}" / "{0}"</label>
             <tab-base><label>Basic Settings</label></tab-base>
             <tab-validations><label>Validations and Alerts</label></tab-validations>
             <tab-formulas><label>Formulas</label></tab-formulas>
@@ -745,7 +745,7 @@
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
-            <label>Section/Grid Settings: "{0}"</label>
+            <label>{0,choice,0#Section Settings: "{2}" / "{1}"|1#Grid Settings: "{1}"}</label>
             <control-name>
                 <label>Name</label>
                 <alert>Name is already in use or incorrect</alert>
@@ -1899,7 +1899,7 @@
             <updated-with-versions>Mis à jour avec les versions</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-settings>
-            <label>Paramètres du contrôle: "{0}" / "{1}"</label>
+            <label>Paramètres du contrôle: "{1}" / "{0}"</label>
             <tab-base><label>Paramètres de base</label></tab-base>
             <tab-validations><label>Validations et alertes</label></tab-validations>
             <tab-formulas><label>Formules</label></tab-formulas>
@@ -2150,7 +2150,7 @@
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
-            <label>Paramètres de la section/grille: "{0}"</label>
+            <label>Paramètres de la {0,choice,0#section: "{2}" / "{1}"|1#grille: "{1}"}</label>
             <control-name>
                 <label>Nom</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
@@ -3287,7 +3287,7 @@
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-settings>
-            <label>Rediger elementdetaljer: "{0}" / "{1}"</label>
+            <label>Rediger elementdetaljer: "{1}" / "{0}"</label>
             <tab-base><label todo="true">[Basic Settings]</label></tab-base>
             <tab-validations><label todo="true">[Validations and Alerts]</label></tab-validations>
             <tab-formulas><label todo="true">[Formulas]</label></tab-formulas>
@@ -3539,7 +3539,7 @@
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
-            <label todo="true">Rediger seksjonsdetaljer: "{0}"</label>
+            <label todo="true">Rediger seksjonsdetaljer: {0,choice,0#"{2}" / "{1}"|1#"{1}"}</label>
             <control-name>
                 <label todo="true">Seksjonsnavn</label>
                 <alert>Navnet er galt eller allerede i bruk.</alert>
@@ -4703,7 +4703,7 @@
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-settings>
-            <label>Настройки элемента: "{0}" / "{1}"</label>
+            <label>Настройки элемента: "{1}" / "{0}"</label>
             <tab-base><label todo="true">[Basic Settings]</label></tab-base>
             <tab-validations><label todo="true">[Validations and Alerts]</label></tab-validations>
             <tab-formulas><label todo="true">[Formulas]</label></tab-formulas>
@@ -4954,7 +4954,7 @@
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
-            <label todo="true">Настройки раздела: "{0}"</label>
+            <label todo="true">Настройки раздела: {0,choice,0#"{2}" / "{1}"|1#"{1}"}</label>
             <control-name>
                 <label todo="true">Название раздела</label>
                 <alert>Название уже используется или некорректно</alert>
@@ -6119,7 +6119,7 @@
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-settings>
-            <label>Impostazioni di controllo: "{0}" / "{1}"</label>
+            <label>Impostazioni di controllo: "{1}" / "{0}"</label>
             <tab-base><label>Impostazioni di base</label></tab-base>
             <tab-validations><label>Convalide e avvisi</label></tab-validations>
             <tab-formulas><label>Formule</label></tab-formulas>
@@ -6370,7 +6370,7 @@
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
-            <label>Impostazioni sezione/griglia: "{0}"</label>
+            <label>{0,choice,0#Impostazioni sezione: "{2}" / "{1}"|1#Impostazioni griglia: "{1}"}</label>
             <control-name>
                 <label>Nome</label>
                 <alert>Il nome é già in uso o non è valido</alert>
@@ -7499,7 +7499,7 @@
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-settings>
-            <label>Einstellungen Steuerelemente: "{0}" / "{1}"</label>
+            <label>Einstellungen Steuerelemente: "{1}" / "{0}"</label>
             <tab-base><label>Grundeinstellungen</label></tab-base>
             <tab-validations><label>Validierungen und Benachrichtigungen</label></tab-validations>
             <tab-formulas><label>Formeln</label></tab-formulas>
@@ -7750,7 +7750,7 @@
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
-            <label>Abschnitteigenschaften/Tabelleneigenschaften: "{0}"</label>
+            <label>{0,choice,0#Abschnitteigenschaften: "{2}" / "{1}"|1#Tabelleneigenschaften: "{1}"}</label>
             <control-name>
                 <label>Name</label>
                 <alert>Name ist bereits vergeben oder ungültig</alert>
@@ -8882,7 +8882,7 @@
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-settings>
-            <label>Kontrolliyksityiskohdat: "{0}" / "{1}"</label>
+            <label>Kontrolliyksityiskohdat: "{1}" / "{0}"</label>
             <tab-base><label>Perusasetukset</label></tab-base>
             <tab-validations><label>Vahvistukset ja hälytykset</label></tab-validations>
             <tab-formulas><label>Kaavat</label></tab-formulas>
@@ -9133,7 +9133,7 @@
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
-            <label todo="true">Lohkon yksityiskohdat: "{0}"</label>
+            <label todo="true">Lohkon yksityiskohdat: {0,choice,0#"{2}" / "{1}"|1#"{1}"}</label>
             <control-name>
                 <label todo="true">Lohkon nimi</label>
                 <alert>Nimi on virheellinen tai se on jo käytössä</alert>
@@ -10290,7 +10290,7 @@
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-settings>
-            <label>Configuración de Controles: "{0}" / "{1}"</label>
+            <label>Configuración de Controles: "{1}" / "{0}"</label>
             <tab-base><label>Configuración Básica</label></tab-base>
             <tab-validations><label>Validaciones y Alertas</label></tab-validations>
             <tab-formulas><label>Formulas</label></tab-formulas>
@@ -10541,7 +10541,7 @@
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
-            <label>Detalles de Sección/Grilla: "{0}"</label>
+            <label>{0,choice,0#Detalles de Sección: "{2}" / "{1}"|1#Detalles de Grilla: "{1}"}</label>
             <control-name>
                 <label>Nombre</label>
                 <alert>Nombre ya usado o incorrecto</alert>
@@ -11699,7 +11699,7 @@
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-settings>
-            <label>Control-instellingen: "{0}" / "{1}"</label>
+            <label>Control-instellingen: "{1}" / "{0}"</label>
             <tab-base><label>Basis-instellingen</label></tab-base>
             <tab-validations><label>Validatie en waarschuwingen</label></tab-validations>
             <tab-formulas><label>Formules</label></tab-formulas>
@@ -11950,7 +11950,7 @@
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
-            <label>Sectie/grid instellingen: "{0}"</label>
+            <label>{0,choice,0#Sectie instellingen: "{2}" / "{1}"|1#Grid instellingen: "{1}"}</label>
             <control-name>
                 <label>Naam</label>
                 <alert>Naam is al in gebruik of ongeldig</alert>
@@ -13087,7 +13087,7 @@
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-settings>
-            <label>Configurações do Controlo: "{0}" / "{1}"</label>
+            <label>Configurações do Controlo: "{1}" / "{0}"</label>
             <tab-base><label>Configurações Básicas</label></tab-base>
             <tab-validations><label>Validações e Alertas</label></tab-validations>
             <tab-formulas><label>Fórmulas</label></tab-formulas>
@@ -13338,7 +13338,7 @@
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
-            <label>Configurações da Secção/Grelha: "{0}"</label>
+            <label>{0,choice,0#Configurações da Secção: "{2}" / "{1}"|1#Configurações da Grelha: "{1}"}</label>
             <control-name>
                 <label>Nome</label>
                 <alert>O Nome é incorrecto ou já existe</alert>
@@ -14502,7 +14502,7 @@
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
         <dialog-control-settings>
-            <label>Inställningar för kontroll: "{0}" / "{1}"</label>
+            <label>Inställningar för kontroll: "{1}" / "{0}"</label>
             <tab-base><label>Basinställningar</label></tab-base>
             <tab-validations><label>Valideringar och aviseringar</label></tab-validations>
             <tab-formulas><label>Formler</label></tab-formulas>
@@ -14753,7 +14753,7 @@
             </default-yes-no>
         </dialog-control-settings>
         <dialog-container-settings>
-            <label>Sektions-/rutnätsinställningar: "{0}"</label>
+            <label>{0,choice,0#Sektionsinställningar: "{2}" / "{1}"|1#Rutnätsinställningar: "{1}"}</label>
             <control-name>
                 <label>Namn</label>
                 <alert>Namnet är felaktigt eller redan definierat</alert>

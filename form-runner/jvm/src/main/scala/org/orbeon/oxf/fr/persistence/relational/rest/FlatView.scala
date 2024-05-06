@@ -270,6 +270,12 @@ private object FlatView {
           (fromStatement, Seq())
 
         case Some(parentView) =>
+          // In PostgreSQL, we extract single and multiple XML nodes/values using a single 'xpath' function. We can
+          // then "unnest" that array to get individual rows, in the "SELECT" part of the SQL query. In Oracle, SQL
+          // Server, and DB2, we will instead explicitly generate an "XML table", in the "FROM" part of the SQL query.
+          // This means that the row_number() function will have to be called at different levels of the SQL query
+          // depending on whether we're unnesting an array or using an XML table.
+
           // Repetition columns logic
           val canUnnestArray     = Provider.flatViewCanUnnestArray(provider)
           val docIdTableAlias    = if (canUnnestArray) tableAlias else parentView.tableAlias

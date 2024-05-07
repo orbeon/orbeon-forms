@@ -426,19 +426,6 @@
                     <xf:group>
                         <xf:label value="$form-resources/attachments/label"/>
                         <xh:div class="fb-tool">
-                            <xf:group bind="fb-toolbox-schema-bind">
-                                <!-- Upload XML Schema -->
-                                <xf:trigger>
-                                    <xf:label>
-                                        <xh:i class="fa fa-fw fa-file-code-o"/>
-                                        <xh:span>
-                                            <xf:output value="if (exists($model/xs:schema)) then $form-resources/change-schema/label else $form-resources/upload-schema/label"/>
-                                        </xh:span>
-                                    </xf:label>
-                                    <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-schema-upload-dialog"/>
-                                    <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
-                                </xf:trigger>
-                            </xf:group>
                             <xf:group bind="fb-toolbox-pdf-bind">
                                 <!-- Upload PDF Template -->
                                 <xf:trigger>
@@ -454,6 +441,19 @@
                                         </xf:dispatch>
                                         <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog"/>
                                     </xf:action>
+                                </xf:trigger>
+                            </xf:group>
+                            <xf:group bind="fb-toolbox-schema-bind">
+                                <!-- Upload XML Schema -->
+                                <xf:trigger>
+                                    <xf:label>
+                                        <xh:i class="fa fa-fw fa-file-code-o"/>
+                                        <xh:span>
+                                            <xf:output value="if (exists($model/xs:schema)) then $form-resources/change-schema/label else $form-resources/upload-schema/label"/>
+                                        </xh:span>
+                                    </xf:label>
+                                    <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-schema-upload-dialog"/>
+                                    <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                                 </xf:trigger>
                             </xf:group>
                         </xh:div>

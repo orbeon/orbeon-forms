@@ -33,8 +33,8 @@
             <xh:div class="fb-toolbox-icons-tools fb-toolbox-top-icons">
 
                 <!-- Form settings -->
-                <xf:trigger appearance="minimal" class="fb-form-settings-button">
-                    <xf:label><xh:i class="fa fa-cogs fa-fw" title="{$form-resources/dialog-form-settings/open/label}"/></xf:label>
+                <xf:trigger appearance="minimal" class="fb-form-settings-button" id="open-form-settings-trigger">
+                    <xf:label><xh:i class="fa fa-cogs fa-fw" title="{$form-resources/dialog-form-settings/open/label} (O F)"/></xf:label>
                     <xf:action ev:event="DOMActivate">
                         <!-- Open the dialog in "edit" mode -->
                         <xxf:show dialog="dialog-form-settings">
@@ -344,10 +344,21 @@
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog"/>
                             </xf:action>
                         </xf:trigger>
+                        <xf:trigger id="open-form-settings-trigger-full">
+                            <xf:label>
+                                <xh:i class="fa fa-cogs fa-fw"/>
+                                <xf:output value="$form-resources/dialog-form-settings/open/label"/>
+                                <xh:kbd>O F</xh:kbd>
+                            </xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch name="DOMActivate" targetid="open-form-settings-trigger"/>
+                            </xf:action>
+                        </xf:trigger>
                         <xf:trigger bind="fb-toolbox-permissions-bind" id="open-permissions-trigger">
                             <xf:label>
                                 <xh:i class="fa fa-lock fa-fw"/>
                                 <xf:output value="$form-resources/dialog-permissions/label"/>
+                                <xh:kbd>O P</xh:kbd>
                             </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="fb-permissions-dialog"/>
@@ -358,6 +369,7 @@
                             <xf:label>
                                 <xh:i class="fa fa-envelope fa-fw"/>
                                 <xf:output value="$form-resources/dialog-email-settings/label"/>
+                                <xh:kbd>O E</xh:kbd>
                             </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-email-settings">
@@ -384,6 +396,7 @@
                             <xf:label>
                                 <xh:i class="fa fa-code fa-fw"/>
                                 <xf:output value="$form-resources/edit-source/label"/>
+                                <xh:kbd>O S</xh:kbd>
                             </xf:label>
                             <xxf:show ev:event="DOMActivate" dialog="dialog-edit-source"/>
                         </xf:trigger>

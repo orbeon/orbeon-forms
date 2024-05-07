@@ -325,10 +325,6 @@ body.orbeon {
         padding-top: 1.5em;
     }
 
-    .fb-toolbox .fb-tool .fb-add-control button {
-        cursor: grab;
-    }
-
     // ***** Toolbox ***************************************************************************************************
 
     .fb-toolbox {
@@ -338,6 +334,14 @@ body.orbeon {
         bottom: @fbBottomHeight + @fbGutter;
         width: @fbToolbarWidth;
         box-sizing: border-box;
+
+        kbd {
+            float: right;
+        }
+
+        .fb-tool .fb-add-control button {
+            cursor: grab;
+        }
 
         .fb-toolbox-inside {
             width: 100%;
@@ -1723,6 +1727,17 @@ body.orbeon {
         border: 1px solid #ddd;
         border-radius: 2px;
         background-color: #d3eeff;
+    }
+
+    kbd {
+        background-color: #ddd;
+        display: inline-block;
+        border: 1px solid gray;
+        border-radius: 2px;
+        padding: 0 8px;
+        font-family: system-ui;
+        font-size: 6pt;
+        margin-left: 1em;
     }
 }
 

@@ -205,7 +205,7 @@ object FormRunnerPersistence {
       .filter(FormRunner.isActiveProvider(_, properties))
   }
 
-  private def providerPropertyName(provider: String, property: String): String =
+  def providerPropertyName(provider: String, property: String): String =
     PersistencePropertyPrefix :: provider :: property :: Nil mkString "."
 
   def providerPropertyOpt(provider: String, property: String): Option[Property] =
@@ -213,6 +213,10 @@ object FormRunnerPersistence {
 
   def providerPropertyAsUrlOpt(provider: String, property: String): Option[String] =
     properties.getStringOrURIAsStringOpt(providerPropertyName(provider, property))
+
+  // https://github.com/orbeon/orbeon-forms/issues/6300
+  def isInternalProvider(provider: String): Boolean =
+    providerPropertyOpt(provider, "uri").flatMap(_.nonBlankStringValue).exists(_.startsWith("/"))
 
   def getPersistenceURLHeaders(appForm: AppForm, formOrData: FormOrData): (String, Map[String, String]) = {
 

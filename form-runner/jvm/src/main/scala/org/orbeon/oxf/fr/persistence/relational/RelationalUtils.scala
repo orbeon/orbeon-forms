@@ -18,7 +18,7 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.FormRunner.providerPropertyAsBoolean
-import org.orbeon.oxf.fr.FormRunnerPersistence.PersistencePropertyPrefix
+import org.orbeon.oxf.fr.FormRunnerPersistence.{PersistenceProviderPropertyPrefix, isInternalProvider, providerPropertyName, providerPropertyOpt}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.processor.DatabaseContext
 import org.orbeon.oxf.properties.Properties
@@ -43,37 +43,42 @@ object RelationalUtils extends Logging {
     new IndentedLogger(Logger)
 
   def databaseConfigurationPresent(implicit indentedLogger: IndentedLogger): Boolean = {
+
     val propertySet = Properties.instance.getPropertySet
 
-    val propertiesByProvider = propertySet
-      .propertiesStartsWith("oxf.fr.persistence.provider", matchWildcards = false)
-      .flatMap(p => propertySet.getNonBlankString(p).map(_ -> p))
-      .filter(_._1 != "resource")
-      .groupBy(_._1)
-      .mapValues(_.map(_._2).sorted)
+    val propertiesByProvider =
+      propertySet
+        .propertiesStartsWith(PersistenceProviderPropertyPrefix, matchWildcards = false)
+        .flatMap(p => propertySet.getNonBlankString(p).map(_ -> p))
+        .filter(_._1 != "resource")
+        .groupBy(_._1)
+        .mapValues(_.map(_._2).sorted)
 
     val providers = propertiesByProvider.keys.toSet
 
-    val activeDataSources = providers.filter(providerPropertyAsBoolean(_, "active", default = true))
+    val activeInternalProviders =
+      providers
+        .filter(providerPropertyAsBoolean(_, "active", default = true))
+        .filter(isInternalProvider)
 
-    val problematicDataSources = activeDataSources.filter { provider =>
-      val dataSourceName   = propertySet.getNonBlankString(s"$PersistencePropertyPrefix.$provider.datasource")
+    val problematicDataSources = activeInternalProviders.filter { provider =>
+
+      val dataSourceName = providerPropertyOpt(provider, "datasource").flatMap(_.nonBlankStringValue)
 
       dataSourceName match {
-        case Some(name) =>
-          val dataSourceNotFound = getDataSourceNoFallback(name).isEmpty
-          if (dataSourceNotFound) {
-            error(s"Data source `$name` referenced by provider `$provider` not configured")
+        case Some(name) if getDataSourceNoFallback(name).isEmpty =>
+          error(s"Data source `$name` referenced by provider `$provider` not configured")
 
-            val propertiesWithProvider = propertiesByProvider.get(provider).toSeq.flatten
+          val propertiesWithProvider = propertiesByProvider.get(provider).toSeq.flatten
 
-            error(s"Provider `$provider` is used by the following properties:")
-            propertiesWithProvider.foreach(property => error(s" - $property"))
+          error(s"Provider `$provider` is used by the following properties:")
+          propertiesWithProvider.foreach(property => error(s" - $property"))
 
-            val activeProperty = PersistencePropertyPrefix :: provider :: "active" :: Nil mkString "."
-            error(s"Provider `$provider` can be disabled by setting property `$activeProperty` to `false`")
-          }
-          dataSourceNotFound
+          val activeProperty = providerPropertyName(provider, "active")
+          error(s"Provider `$provider` can be disabled by setting property `$activeProperty` to `false`")
+          true
+        case Some(_) =>
+          false
         case None =>
           error(s"No data source configured for provider `$provider`")
           true

@@ -650,15 +650,24 @@
                     <xf:var name="current-appearance"    value="$appearances/@selection/string()"/>
 
                     <xf:delete ref="$appearances/node()"/>
-                    <xf:insert
-                        context="$appearances"
-                        origin="
+
+                    <xf:var
+                        name="description-and-appearances"
+                        value="
                             fbf:possibleAppearancesByControlNameAsXML(
                                 $i/control-name,
                                 $is-initial-load,
                                 $new-builtin-type,
                                 $current-appearance
                             )"/>
+
+                    <xf:setvalue
+                        ref="$i/description"
+                        value="$description-and-appearances/self::description"/>
+
+                    <xf:insert
+                        context="$appearances"
+                        origin="$description-and-appearances/self::appearance"/>
                     <!--  Assume there is only one active appearance at a given time for now. At the XForms level there
                           can be multiple appearances. We do have fr:character-counter which could wrap a control with an
                           appearance, for example we could have `<xf:textarea appearance="xxf:autosize character-counter">`. -->
@@ -758,6 +767,7 @@
                             global-default-alert-message=""
                             readonly-alert-message=""/>
 
+                        <description/>
                         <appearances selection=""/>
                         <validations/>
 
@@ -1069,7 +1079,19 @@
                                 $resources/dialog-control-settings/label,
                                 (
                                     $i/control-name/string(),
-                                    $i/label/value[@lang = $li/lang]/string()
+                                    let $label := $i/label[@supported = 'true']
+                                    return
+                                        if (exists($label)) then
+                                            $label/value[@lang = $li/lang]/string()
+                                        else
+                                            '',
+                                    (
+                                        let $appearances := $i/appearances,
+                                            $selection   := $appearances/@selection/string()
+                                        return
+                                            $appearances/appearance[value = $selection]/full-label,
+                                        $i/description
+                                    )[1]/string()
                                 )
                             )"/>
 

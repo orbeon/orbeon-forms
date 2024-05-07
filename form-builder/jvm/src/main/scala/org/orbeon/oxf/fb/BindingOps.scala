@@ -19,13 +19,15 @@ import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
-import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
+
 import scala.collection.compat._
 
 
@@ -42,17 +44,37 @@ trait BindingOps {
     val descriptors = getAllRelevantDescriptors(ctx.componentBindings)
     val lang        = FormRunner.currentLang
 
-    for {
-      controlElem                  <- findControlByName(controlName).toList
-      originalDatatype             = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
-      (virtualName, appearanceOpt) = findVirtualNameAndAppearance(
-          searchElemName    = controlElem.uriQualifiedName,
-          searchDatatype    = originalDatatype,
-          searchAppearances = controlElem attTokens APPEARANCE_QNAME,
-          descriptors       = descriptors
+    val detailsOpt =
+      for {
+        controlElem                  <- findControlByName(controlName)
+        originalDatatype             = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
+        (virtualName, appearanceOpt) = findVirtualNameAndAppearance(
+            searchElemName    = controlElem.uriQualifiedName,
+            searchDatatype    = originalDatatype,
+            searchAppearances = controlElem attTokens APPEARANCE_QNAME,
+            descriptors       = descriptors
+          )
+        newDatatype                  = ModelDefs.qNameForBuiltinTypeName(builtinDatatype, required = false)
+      } yield
+        (virtualName, appearanceOpt, newDatatype)
+
+    val descriptionOpt =
+      for {
+        (virtualName, appearanceOpt, newDatatype) <- detailsOpt
+        description <- findControlDescriptionAsXml(
+          elemName                = virtualName,
+          builtinType             = newDatatype,
+          appearancesForSelection = if (isInitialLoad) appearanceOpt.to(Set) else Set(desiredAppearance),
+          lang                    = lang,
+          descriptors             = descriptors
         )
-      newDatatype                  = ModelDefs.qNameForBuiltinTypeName(builtinDatatype, required = false)
-      appearanceElem               <- possibleAppearancesWithLabelAsXML(
+      } yield
+        description
+
+    val appearanceElems =
+      for {
+        (virtualName, appearanceOpt, newDatatype) <- detailsOpt.toList
+        appearanceElem                            <- possibleAppearancesWithLabelAsXML(
           elemName                = virtualName,
           builtinType             = newDatatype,
           // Upon initial load, we want to select as current the original appearance. Later, we want to try
@@ -62,19 +84,50 @@ trait BindingOps {
           // first appearance listed as current.
           appearancesForSelection = if (isInitialLoad) appearanceOpt.to(Set) else Set(desiredAppearance),
           lang                    = lang,
-          bindings                = ctx.componentBindings
+          descriptors             = descriptors
         )
-    } yield
-      appearanceElem
+      } yield
+        appearanceElem
+
+    descriptionOpt.toList ::: appearanceElems
   }
 
-  def possibleAppearancesWithLabelAsXML(
+  private def findControlDescription(
     elemName                : QName,
     builtinType             : QName,
     appearancesForSelection : Set[String],
     lang                    : String,
-    bindings                : Seq[NodeInfo]
-  ): Array[NodeInfo] = {
+    descriptors             : Iterable[BindingDescriptor]
+  ): Option[String] =
+    findMostSpecificMaybeWithDatatype(elemName, builtinType, appearancesForSelection, descriptors)
+      .flatMap(_.binding)
+      .flatMap(bindingMetadata(_).headOption)
+      .flatMap(metadata => findMetadata(lang, metadata / FBDisplayNameTest))
+
+  private def findControlDescriptionAsXml(
+    elemName                : QName,
+    builtinType             : QName,
+    appearancesForSelection : Set[String],
+    lang                    : String,
+    descriptors             : Iterable[BindingDescriptor]
+  ): Option[NodeInfo] =
+    findControlDescription(
+      elemName,
+      builtinType,
+      appearancesForSelection,
+      lang,
+      descriptors
+    ).map { description =>
+      <description>{description}</description>
+    }.map(elemToNodeInfo)
+
+  private def possibleAppearancesWithLabelAsXML(
+    elemName                : QName,
+    builtinType             : QName,
+    appearancesForSelection : Set[String],
+    lang                    : String,
+    descriptors             : Iterable[BindingDescriptor]
+  ): List[NodeInfo] = {
 
     def appearanceMatches(appearanceOpt: Option[String]) = appearanceOpt match {
       case Some(appearance) => appearancesForSelection contains appearance
@@ -83,14 +136,15 @@ trait BindingOps {
 
     val appearancesXML =
       for {
-        (valueOpt, label, iconPathOpt, iconClasses) <- possibleAppearancesWithLabel(
+        (valueOpt, fullLabelOpt, label, iconPathOpt, iconClasses) <- possibleAppearancesWithLabel(
             elemName,
             builtinType,
             lang,
-            bindings
+            descriptors
           )
       } yield
         <appearance current={appearanceMatches(valueOpt).toString}>
+          <full-label>{fullLabelOpt.getOrElse("")}</full-label>
           <label>{label}</label>
           <value>{valueOpt.getOrElse("")}</value>
           {
@@ -101,7 +155,15 @@ trait BindingOps {
           <icon-class>{iconClasses}</icon-class>
         </appearance>
 
-    appearancesXML map elemToNodeInfo toArray
+    appearancesXML.map(elemToNodeInfo).toList
+  }
+
+  private def findMetadata(lang: String, elems: Iterable[NodeInfo]): Option[String] = {
+
+    def fromLang  = elems find (_.attValue("lang") == lang)
+    def fromFirst = elems.headOption
+
+    fromLang orElse fromFirst map (_.stringValue) flatMap trimAllToOpt
   }
 
   // Find the possible appearances and descriptions for the given control with the given datatype. Only return
@@ -110,43 +172,35 @@ trait BindingOps {
   // - `None` represents no appearance (default appearance)
   // - `Some(appearance)` represents a specific appearance
   def possibleAppearancesWithLabel(
-    elemName : QName,
-    datatype : QName,
-    lang     : String,
-    bindings : Iterable[NodeInfo]
-  ): Iterable[(Option[String], String, Option[String], String)] = {
+    elemName   : QName,
+    datatype   : QName,
+    lang       : String,
+    descriptors: Iterable[BindingDescriptor]
+  ): Iterable[(Option[String], Option[String], String, Option[String], String)] = {
 
-    def metadataOpt(bindingOpt: Option[NodeInfo]) =
+    def metadataOpt(bindingOpt: Option[NodeInfo]): Option[NodeInfo] =
       bindingOpt.toList flatMap bindingMetadata headOption
 
-    possibleAppearancesWithBindings(elemName, datatype, bindings) map {
+    possibleAppearancesWithBindings(elemName, datatype, descriptors) map {
       case (appearanceOpt, bindingOpt, _) =>
         (appearanceOpt, metadataOpt(bindingOpt))
     } collect {
       case (appearanceOpt, Some(metadata)) =>
 
-        def findMetadata(elems: Iterable[NodeInfo]) = {
-
-          def fromLang  = elems find (_.attValue("lang") == lang)
-          def fromFirst = elems.headOption
-
-          fromLang orElse fromFirst map (_.stringValue) flatMap trimAllToOpt
-        }
-
         // See also toolbox.xml which duplicates some of this logic
-        val displayNameOpt           = findMetadata(metadata / FBDisplayNameTest)
-        val iconClasses              = findMetadata(metadata / FBIconTest / FBIconClassTest) getOrElse "fa fa-fw fa-puzzle-piece"
-        val iconPathOpt              = findMetadata(metadata / FBIconTest / FBSmallIconTest)
-        val appearanceDisplayNameOpt = findMetadata(metadata / FBAppearanceDisplayNameTest)
+        val fullDisplayNameOpt       = findMetadata(lang, metadata / FBDisplayNameTest)
+        val iconClasses              = findMetadata(lang, metadata / FBIconTest / FBIconClassTest) getOrElse "fa fa-fw fa-puzzle-piece"
+        val iconPathOpt              = findMetadata(lang, metadata / FBIconTest / FBSmallIconTest)
+        val appearanceDisplayNameOpt = findMetadata(lang, metadata / FBAppearanceDisplayNameTest)
 
-        (appearanceOpt, appearanceDisplayNameOpt orElse displayNameOpt, iconPathOpt, iconClasses)
+        (appearanceOpt, fullDisplayNameOpt, appearanceDisplayNameOpt orElse fullDisplayNameOpt, iconPathOpt, iconClasses)
     } collect {
-      case (appearanceOpt, Some(displayName), iconPathOpt, iconClasses) =>
-        (appearanceOpt, displayName, iconPathOpt, iconClasses)
+      case (appearanceOpt, fullDisplayNameOpt, Some(displayName), iconPathOpt, iconClasses) =>
+        (appearanceOpt, fullDisplayNameOpt, displayName, iconPathOpt, iconClasses)
     }
   }
 
-  private def bindingMetadata(binding: NodeInfo) =
+  private def bindingMetadata(binding: NodeInfo): Seq[NodeInfo] =
     binding / FBMetadataTest
 
   // From an `<xbl:binding>`, return the view template (say `<fr:autocomplete>`)

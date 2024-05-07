@@ -125,16 +125,16 @@ object BindingDescriptor {
   }
 
   def possibleAppearancesWithBindings(
-    elemName : QName,
-    datatype : QName,
-    bindings : Iterable[NodeInfo]
+    elemName    : QName,
+    datatype    : QName,
+    descriptors : Iterable[BindingDescriptor]
   ): Iterable[(Option[String], Option[NodeInfo], Boolean)] = {
 
     val Datatype1 = datatype
     val Datatype2 = ModelDefs.getVariationTypeOrKeep(datatype)
 
     val appearancesToBindingMaybeMultiple =
-      getAllRelevantDescriptors(bindings) collect {
+      descriptors collect {
         case b @ BindingDescriptor(
             Some(`elemName`),
             d @ (None | Some(Datatype1 | Datatype2)),

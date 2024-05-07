@@ -43,7 +43,7 @@ class BindingDescriptorTest
           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
           xmlns:xbl="http://www.w3.org/ns/xbl">
       <xbl:xbl>
-        <xbl:binding element="xf|input">
+        <xbl:binding element="xf|input, xf|input:xxf-type('xs:anyURI')">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Input Field</display-name>
           </metadata>
@@ -169,7 +169,7 @@ class BindingDescriptorTest
         for {
           newT <- List(dataType, ModelDefs.getVariationTypeOrKeep(dataType))
         } locally {
-          assert(expected === (possibleAppearancesWithLabel(elemName, newT, "en", Bindings) map (t => t._1 -> t._2)))
+          assert(expected === (possibleAppearancesWithLabel(elemName, newT, "en", getAllRelevantDescriptors(Bindings)) map (t => t._1 -> t._3)))
         }
       }
 

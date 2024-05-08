@@ -50,7 +50,7 @@ object XFormsSelect1Handler {
     )
 
   // Support `XFormsValueControl` only for the legacy boolean `xf:input`
-  def dataValueFromControl(control: XFormsValueControl, handlerContext: HandlerContext): Option[(Item.Value[om.NodeInfo], Boolean)] =
+  private def dataValueFromControl(control: XFormsValueControl, handlerContext: HandlerContext): Option[(Item.Value[om.NodeInfo], Boolean)] =
     control match {
       case c: XFormsSelect1Control =>
         c.boundItemOpt.map(i => c.getCurrentItemValueFromData(i, handlerContext.collector) -> c.staticControl.excludeWhitespaceTextNodesForCopy)
@@ -61,7 +61,7 @@ object XFormsSelect1Handler {
     }
 
   // Support `XFormsValueControl` only for the legacy boolean `xf:input`
-  def isItemSelected(control: XFormsValueControl, itemNode: ItemNode, isMultiple: Boolean, handlerContext: HandlerContext): Boolean =
+  private def isItemSelected(control: XFormsValueControl, itemNode: ItemNode, isMultiple: Boolean, handlerContext: HandlerContext): Boolean =
     itemNode match {
       case item: Item.ValueNode =>
         dataValueFromControl(control, handlerContext) exists { case (dataValue, excludeWhitespaceTextNodes) =>
@@ -456,7 +456,7 @@ class XFormsSelect1Handler(
     //   needed for the case where we only have one
     containerAttributes.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-items xforms-help-popover-control")
 
-    // Keep the group/radiogroup role even if there is no label. It probably doesn't hurt, although if there is only
+    // Keep the `group`/`radiogroup` role even if there is no label. It probably doesn't hurt, although if there is only
     // one item inside the group, those roles are not doing much.
     containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, if (isMultiple) "group" else "radiogroup")
     // When a form author explicitly uses a single checkbox, it generally doesn't make sense to have a label on the
@@ -466,7 +466,7 @@ class XFormsSelect1Handler(
     // that. So below we don't place a `tabindex` on the group when we don't have a label or hint. From an end user
     // perspective, an additional drawback of keeping the `tabindex` is that the user needs to tab twice to reach the
     // checkbox for no obvious reason.
-    // Remains the case of dynamic checkboxes (with a dynamic itemset), where the form author would place a lable on
+    // Remains the case of dynamic checkboxes (with a dynamic itemset), where the form author would place a label on
     // the control: in case the itemset has only one item, then we would have the double label and double tab issue.
     // But we leave this problem for another time, as that would require adding the tabindex dynamically depending on
     // the size of the itemset and we don't have a good mechanism to do that.

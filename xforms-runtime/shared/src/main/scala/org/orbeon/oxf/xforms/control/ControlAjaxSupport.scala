@@ -43,7 +43,8 @@ trait ControlAjaxSupport {
   def supportAjaxUpdates = true
 
   // Whether this control got structural changes during the current request
-  final def hasStructuralChange = containingDocument.getControlsStructuralChanges.contains(prefixedId)
+  final def hasStructuralChange: Boolean =
+    containingDocument.getControlsStructuralChanges.contains(prefixedId)
 
   // Whether the control support full Ajax updates
   def supportFullAjaxUpdates = true
@@ -83,7 +84,7 @@ trait ControlAjaxSupport {
   }
 
   // Label, help, hint, alert
-  final def addAjaxLHHA(
+  private final def addAjaxLHHA(
     attributesImpl    : AttributesImpl,
     previousControlOpt: Option[XFormsControl],
     collector         : ErrorEventCollector
@@ -157,7 +158,7 @@ object ControlAjaxSupport {
   private def tokenize(value: String) = value.splitTo[mutable.LinkedHashSet]()
 
   // Diff two sets of classes
-  def diffClasses(class1: String, class2: String) =
+  def diffClasses(class1: String, class2: String): String =
     if (class1.isEmpty)
       tokenize(class2) mkString " "
     else {

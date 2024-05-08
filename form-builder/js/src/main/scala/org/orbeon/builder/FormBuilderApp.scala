@@ -55,39 +55,39 @@ object FormBuilderApp extends App {
     BlockCache
   }
 
-  private def registerFormBuilderKeyboardShortcuts(): Unit = {
-    case class Shortcut(
-      shift     : Boolean = false,
-      key       : String,
-      target    : String,
-      condition : Option[js.Function0[Boolean]] = None
-    )
-    val shortcuts = List(
-      Shortcut(              key = "z", target = "undo-trigger"                                                                    ),
-      Shortcut(shift = true, key = "z", target = "redo-trigger"                                                                    ),
-      Shortcut(              key = "x", target = "cut-trigger"                                                                     ),
-      Shortcut(              key = "c", target = "copy-trigger", condition = Some(() => dom.window.getSelection().toString.isEmpty)),
-      Shortcut(              key = "v", target = "paste-trigger"                                                                   ),
-    )
-    shortcuts.foreach(shortcut => {
+  private case class Shortcut(
+    shift     : Boolean = false,
+    key       : String,
+    target    : String,
+    condition : Option[js.Function0[Boolean]] = None
+  )
+
+  private val shortcuts = List(
+    Shortcut(              key = "z", target = "undo-trigger"                                                                    ),
+    Shortcut(shift = true, key = "z", target = "redo-trigger"                                                                    ),
+    Shortcut(              key = "x", target = "cut-trigger"                                                                     ),
+    Shortcut(              key = "c", target = "copy-trigger", condition = Some(() => dom.window.getSelection().toString.isEmpty)),
+    Shortcut(              key = "v", target = "paste-trigger"                                                                   ),
+  )
+
+  private def registerFormBuilderKeyboardShortcuts(): Unit =
+    shortcuts.foreach { case Shortcut(shift, key, target, condition) =>
       List("command", "ctrl").foreach(modifier => {
-        val keyCombination = (List(modifier) ++ shortcut.shift.list("shift") ++ List(shortcut.key)).mkString("+")
+        val keyCombination = (List(modifier) ++ shift.list("shift") ++ List(key)).mkString("+")
         Mousetrap.bind(command = keyCombination, callback = { (e: dom.KeyboardEvent, combo: String) =>
-          val conditionPasses = shortcut.condition.forall(_())
-          if (conditionPasses) {
+          if (condition.forall(_.apply())) {
             e.preventDefault()
             AjaxClient.fireEvent(
               AjaxEvent(
-                eventName  = DomEventNames.DOMActivate,
-                targetId   = shortcut.target,
-                form       = Support.allFormElems.headOption, // 2023-09-01: only used by Form Builder, so presumably only one
+                eventName = DomEventNames.DOMActivate,
+                targetId  = target,
+                form      = Support.allFormElems.headOption, // 2023-09-01: only used by Form Builder, so presumably only one
               )
             )
           }
         })
       })
-    })
-  }
+    }
 
   private def updateKeyboardShortcutHints(): Unit =
     if (! Set("macOS", "iOS")(Bowser.osname))

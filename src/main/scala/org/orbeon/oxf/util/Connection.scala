@@ -20,7 +20,7 @@ import org.apache.http.impl.client.BasicCookieStore
 import org.log4s
 import org.orbeon.connection._
 import org.orbeon.datatypes.BasicLocationData
-import org.orbeon.io.UriScheme
+import org.orbeon.io.{UriScheme, UriUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext._
@@ -474,7 +474,8 @@ object Connection extends ConnectionTrait {
               // Take care of HTTP ranges with local files
               val (statusCode, rangeHeaders, inputStream) =
                 if (scheme == UriScheme.File) { // must be a temp file
-                  val streamedFile = HttpRanges(headers).get.streamedFile(new File(normalizedUrl), urlConnection.getInputStream).get
+                  val streamedFile =
+                    HttpRanges(headers).get.streamedFile(new File(UriUtils.removeQueryAndFragment(normalizedUrl)), urlConnection.getInputStream).get
                   (streamedFile.statusCode, streamedFile.headers, streamedFile.inputStream)
                 } else {
                   (StatusCode.Ok,           Map(),                urlConnection.getInputStream)

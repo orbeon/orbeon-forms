@@ -1,5 +1,6 @@
 package org.orbeon.oxf.util
 
+import org.orbeon.io.UriUtils.removeQueryAndFragment
 import org.orbeon.sjsdom
 import org.scalajs.dom
 
@@ -67,11 +68,5 @@ object JsFileSupport {
 
     def getFileDetails(uri: URI): Option[FileDetails] =
       temporaryFiles.get(removeQueryAndFragment(uri))
-
-    def removeQueryAndFragment(uri: URI): URI =
-      if (uri.isOpaque)
-        new URI(uri.getScheme, PathUtils.splitQuery(uri.getSchemeSpecificPart)._1, null)
-      else
-        new URI(uri.getScheme, uri.getAuthority, uri.getPath, null)
   }
 }

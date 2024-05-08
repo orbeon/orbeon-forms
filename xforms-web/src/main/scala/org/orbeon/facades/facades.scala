@@ -54,6 +54,7 @@ object Bowser extends js.Object {
   val mobile  : js.UndefOr[Boolean] = js.native
   val version : String              = js.native
   val name    : String              = js.native
+  val osname  : String              = js.native
 }
 
 object HTMLFacades {

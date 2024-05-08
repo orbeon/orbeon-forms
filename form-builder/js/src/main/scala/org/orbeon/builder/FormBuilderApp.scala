@@ -13,12 +13,14 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.facades.Mousetrap
+import org.orbeon.facades.{Bowser, Mousetrap}
 import org.orbeon.fr._
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms._
 import org.scalajs.dom
+import org.scalajs.dom.ext._
+import org.scalajs.dom.html
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
@@ -47,6 +49,7 @@ object FormBuilderApp extends App {
 
     builderPrivateDyn.API = FormBuilderPrivateAPI
     registerFormBuilderKeyboardShortcuts()
+    updateKeyboardShortcutHints()
 
     // Other initializations
     BlockCache
@@ -85,6 +88,16 @@ object FormBuilderApp extends App {
       })
     })
   }
+
+  private def updateKeyboardShortcutHints(): Unit =
+    if (! Set("macOS", "iOS")(Bowser.osname))
+      dom.window.document.querySelectorAll(".orbeon *[title], .orbeon kbd").foreach {
+        case elem: html.Element if (elem.title ne null) && elem.title.contains("⌘") =>
+          elem.title = elem.title.replace("⌘", "⌃")
+        case elem: html.Element if elem.tagName.equalsIgnoreCase("kbd") && elem.innerHTML.contains("⌘") =>
+          elem.innerHTML = elem.innerHTML.replace("⌘", "⌃")
+        case _ =>
+      }
 
   def onPageContainsFormsMarkup(): Unit = {
 

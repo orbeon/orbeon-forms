@@ -82,7 +82,7 @@
                 <xf:trigger appearance="minimal" class="fb-cut-button" ref="$xcv/cut-trigger" id="cut-trigger">
                     <xf:label>
                         <xh:i
-                            title="{$form-resources/cut/label}"
+                            title="{$form-resources/cut/label} (⌘X)"
                             class="fa fa-cut fa-fw"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
@@ -92,7 +92,7 @@
                 <xf:trigger appearance="minimal" class="fb-copy-button" ref="$xcv/copy-trigger" id="copy-trigger">
                     <xf:label>
                         <xh:i
-                            title="{$form-resources/copy/label}"
+                            title="{$form-resources/copy/label} (⌘C)"
                             class="fa fa-copy fa-fw"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
@@ -102,7 +102,7 @@
                 <xf:trigger appearance="minimal" class="fb-paste-button" ref="$xcv/paste-trigger" id="paste-trigger">
                     <xf:label>
                         <xh:i
-                            title="{$form-resources/paste/label}"
+                            title="{$form-resources/paste/label} (⌘V)"
                             class="fa fa-paste fa-fw"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
@@ -128,7 +128,7 @@
 
                 <xf:trigger appearance="minimal" class="fb-undo-button" ref="$undo/undo-trigger" id="undo-trigger">
                     <xf:label>
-                        <xh:i title="{$undo-title}" class="fa fa-undo fa-fw"/>
+                        <xh:i title="{$undo-title} (⌘Z)" class="fa fa-undo fa-fw"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
                         fbf:undoAction(),
@@ -149,7 +149,7 @@
 
                 <xf:trigger appearance="minimal" class="fb-redo-button" ref="$undo/redo-trigger" id="redo-trigger">
                     <xf:label>
-                        <xh:i title="{$redo-title}" class="fa fa-repeat fa-fw"/>
+                        <xh:i title="{$redo-title} (⌘⇧Z)" class="fa fa-repeat fa-fw"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
                         fbf:redoAction(),

@@ -19,7 +19,8 @@ import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.analysis.controls.{SelectionControl, SelectionControlTrait}
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectionControl, SelectionControlTrait}
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport.outputAriaDiff
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -27,6 +28,8 @@ import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEven
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, ItemsetSupport, StaticItemsetSupport}
 import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
@@ -386,6 +389,15 @@ class XFormsSelect1Control(
       previousControl,
       hasNestedContent option outputNestedContent,
       collector
+    )
+
+    // https://github.com/orbeon/orbeon-forms/issues/6302
+    outputAriaDiff(
+      previousControl,
+      this,
+      XFormsBaseHandler.getLHHACIdWithNs(containingDocument, effectiveId, XFormsBaseHandlerXHTML.ControlCode)
+    )(
+      ch.getXmlReceiver
     )
   }
 

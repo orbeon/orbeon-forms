@@ -319,7 +319,6 @@ class XFormsSelect1Handler(
     implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.controller.output
 
     val containingDocument   = xformsHandlerContext.containingDocument
-    val containerAttributes  = getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, ! isFull)
     val xhtmlPrefix          = xformsHandlerContext.findXHTMLPrefix
     val isStaticReadonly     = XFormsBaseHandler.isStaticReadonly(control)
 
@@ -340,6 +339,8 @@ class XFormsSelect1Handler(
       outputFull(attributes, effectiveId, control, itemsetOpt, isMultiple, isBooleanInput, isStaticReadonly, encode)
     } else if (! isStaticReadonly) {
       // Create `xh:select`
+
+      val containerAttributes  = getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, ! isFull)
 
       // This was necessary for noscript mode
       // Q: Can remove now?
@@ -448,7 +449,7 @@ class XFormsSelect1Handler(
     implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
 
     val containerAttributes =
-      getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, ! findAppearanceTrait.exists(_.isFull))
+      getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, addId = true)
 
     // CSS classes:
     // - `xforms-items` for styling
@@ -475,6 +476,10 @@ class XFormsSelect1Handler(
         containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
 
     handleAriaByAtts(containerAttributes, _ => true)
+
+    // https://github.com/orbeon/orbeon-forms/issues/6302
+    if (control ne null)
+      XFormsBaseHandler.handleAriaAttributes(control.isRequired, control.isValid, control.visited, containerAttributes)
 
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
     val fullItemType = if (isMultiple) "checkbox" else "radio"

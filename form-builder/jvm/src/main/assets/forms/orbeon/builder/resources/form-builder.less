@@ -1557,6 +1557,10 @@ body.orbeon {
         // In regular grid content
         .fr-grid-td {
             & > .xbl-component, & > .xforms-control {
+                // At design-time, the cells have internal padding for the icons, so we don't want a margin. This also
+                // helps with sizing the content to 100% width consistently.
+                margin: 0;
+
                 & > .xforms-label, & > .xforms-hint {
                     min-height: 20px; // Use min-height instead of height so text wraps if it doesn't fit on 1 line
                     display: block;

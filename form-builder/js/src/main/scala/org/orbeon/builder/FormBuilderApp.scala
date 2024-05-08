@@ -99,6 +99,16 @@ object FormBuilderApp extends App {
         case _ =>
       }
 
+  private def updateKeyboardShortcutHints(): Unit =
+    if (! Set("macOS", "iOS")(Bowser.osname))
+      dom.window.document.querySelectorAll(".orbeon *[title], .orbeon kbd").foreach {
+        case elem: html.Element if (elem.title ne null) && elem.title.contains("⌘") =>
+          elem.title = elem.title.replace("⌘", "⌃")
+        case elem: html.Element if elem.tagName.equalsIgnoreCase("kbd") && elem.innerHTML.contains("⌘") =>
+          elem.innerHTML = elem.innerHTML.replace("⌘", "⌃")
+        case _ =>
+      }
+
   def onPageContainsFormsMarkup(): Unit = {
 
     FormRunnerApp.onPageContainsFormsMarkup()

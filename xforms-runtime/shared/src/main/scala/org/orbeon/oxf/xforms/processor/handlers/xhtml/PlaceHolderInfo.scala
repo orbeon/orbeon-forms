@@ -11,16 +11,14 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.xforms.control.controls
+package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.EventCollector
 
 
-// TODO: Move to handlers as it's only used there
 case class PlaceHolderInfo(isLabelPlaceholder: Boolean, value: String)
 
 object PlaceHolderInfo {
@@ -31,32 +29,26 @@ object PlaceHolderInfo {
   // - `Some("")` if there is a placeholder for a non-concrete control
   // - `Some(placeHolderValue)` otherwise
   def placeHolderValueOpt(
-    staticControl : ElementAnalysis,
-    control       : XFormsControl
+    lhhaSupport : StaticLHHASupport,
+    control     : XFormsControl
   ): Option[PlaceHolderInfo] = {
 
-    staticControl match {
-      case lhhaSupport: StaticLHHASupport =>
+      val isLabelPlaceholder = lhhaSupport.hasLHHAPlaceholder(LHHA.Label)
+      val isHintPlaceholder  = ! isLabelPlaceholder && lhhaSupport.hasLHHAPlaceholder(LHHA.Hint)
 
-        val isLabelPlaceholder = lhhaSupport.hasLHHAPlaceholder(LHHA.Label)
-        val isHintPlaceholder  = ! isLabelPlaceholder && lhhaSupport.hasLHHAPlaceholder(LHHA.Hint)
+      (isLabelPlaceholder || isHintPlaceholder) option {
 
-        (isLabelPlaceholder || isHintPlaceholder) option {
+        val placeholderValue =
+          if (control.isRelevant) {
+            if (isLabelPlaceholder)
+              control.getLabel(EventCollector.Throw)
+            else
+              control.getHint(EventCollector.Throw)
+          } else {
+            ""
+          }
 
-          val placeholderValue =
-            if (control.isRelevant) {
-              if (isLabelPlaceholder)
-                control.getLabel(EventCollector.Throw)
-              else
-                control.getHint(EventCollector.Throw)
-            } else {
-              ""
-            }
-
-          PlaceHolderInfo(isLabelPlaceholder, placeholderValue)
-        }
-      case _ =>
-        None
-    }
+        PlaceHolderInfo(isLabelPlaceholder, placeholderValue)
+      }
   }
 }

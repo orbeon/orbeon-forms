@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaPlacementType}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.{PlaceHolderInfo, XFormsBaseHandlerXHTML}
 import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.orbeon.oxf.xml.XMLReceiverSupport._
@@ -320,22 +320,20 @@ object ControlAjaxSupport {
       }
 
   def outputAriaDiff(
-    previousControl             : Option[XFormsValueControl],
+    previousControlOpt          : Option[XFormsValueControl],
     currentControl              : XFormsValueControl,
     referencedControlEffectiveId: String
   )(implicit
     xmlReceiver: XMLReceiver
   ): Unit = {
 
-    val control1Opt = previousControl.asInstanceOf[Option[XFormsSingleNodeControl]]
-
     def outputXxfAttributeIf(name: String, fn: XFormsSingleNodeControl => Boolean): Unit = {
 
       val updateAtt =
-        control1Opt match {
+        previousControlOpt match {
           case None if fn(currentControl)                           => true
           case Some(control1) if fn(control1) != fn(currentControl) => true
-          case _                                              => false
+          case _                                                    => false
         }
 
       if (updateAtt)
@@ -360,5 +358,26 @@ object ControlAjaxSupport {
       AriaInvalid,
       c => c.visited && c.alertLevel.contains(ValidationLevel.ErrorLevel)
     )
+  }
+
+  def outputPlaceholderDiff(
+    previousControlOpt          : Option[XFormsValueControl],
+    currentControl              : XFormsValueControl,
+    referencedControlEffectiveId: String
+  )(implicit
+    xmlReceiver: XMLReceiver
+  ): Unit = {
+    lazy val placeHolderValueOpt = PlaceHolderInfo.placeHolderValueOpt(currentControl.staticControl, currentControl).map(_.value)
+    if (previousControlOpt.forall(pc => PlaceHolderInfo.placeHolderValueOpt(currentControl.staticControl, pc).map(_.value) != placeHolderValueOpt))
+      element(
+        "attribute",
+        prefix = "xxf",
+        uri    = XXFORMS_NAMESPACE_URI,
+        atts   = List(
+          "name"  -> "placeholder",
+          "for"   -> referencedControlEffectiveId,
+        ),
+        text   = placeHolderValueOpt.getOrElse("")
+      )
   }
 }

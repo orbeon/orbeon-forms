@@ -91,7 +91,7 @@
                     </xf:instance>
 
                 </xf:model>
-                <fr:grid xmlns="" id="fb-editor-download-grid">
+                <fr:grid xmlns="" id="fb-editor-attachment-grid">
                     <fr:c x="1" y="1" w="12">
                         <fr:checkbox-input ref="instance('local')/allow-download" id="allow-download-control">
                             <xf:label ref="xxf:r('allow-download')"/>

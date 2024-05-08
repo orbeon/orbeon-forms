@@ -13,9 +13,8 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
-import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsTextareaControl}
+import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, TextareaControl}
+import org.orbeon.oxf.xforms.control.controls.XFormsTextareaControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.forwardAutocompleteAttribute
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.SaxSupport._
@@ -31,7 +30,7 @@ class XFormsTextareaHandler(
   localname       : String,
   qName           : String,
   localAtts       : Attributes,
-  elementAnalysis : ElementAnalysis,
+  elementAnalysis : TextareaControl,
   handlerContext  : HandlerContext
 ) extends
   XFormsControlLifecycleHandler(

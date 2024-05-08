@@ -16,9 +16,8 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
-import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
+import org.orbeon.oxf.xforms.analysis.controls.{InputControl, LHHAAnalysis}
+import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
@@ -43,7 +42,7 @@ class XFormsInputHandler(
   localname       : String,
   qName           : String,
   localAtts       : Attributes,
-  elementAnalysis : ElementAnalysis,
+  elementAnalysis : InputControl,
   handlerContext  : HandlerContext
 ) extends
   XFormsControlLifecycleHandler(

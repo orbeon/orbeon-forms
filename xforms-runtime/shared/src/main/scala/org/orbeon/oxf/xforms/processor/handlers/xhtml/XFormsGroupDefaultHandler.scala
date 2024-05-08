@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{ContainerControl, LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
@@ -32,7 +31,7 @@ class XFormsGroupDefaultHandler(
   localname      : String,
   qName          : String,
   localAtts      : Attributes,
-  matched        : ElementAnalysis, // `ContainerControl`, specifically `GroupControl` but also `SwitchControl`!
+  matched        : ContainerControl with StaticLHHASupport,
   handlerContext : HandlerContext
 ) extends
   XFormsGroupHandler(
@@ -46,16 +45,19 @@ class XFormsGroupDefaultHandler(
 
   // Use explicit container element name if present, otherwise use default
   override def getContainingElementName: String =
-    matched.asInstanceOf[ContainerControl].elementQNameOrDefault.localName
+    matched.elementQNameOrDefault.localName
 
   override def getContainingElementQName: String =
-    matched.asInstanceOf[ContainerControl].elementQName.map(_.qualifiedName)
+    matched.elementQName.map(_.qualifiedName)
       .getOrElse(super.getContainingElementQName)
 
   protected def handleControlStart(): Unit = ()
 
   override protected def addCustomAtts(atts: AttributesImpl): Unit = {
     super.addCustomAtts(atts)
+
+    val containingElementName = getContainingElementName
+
     // This handler is used when the group:
     //
     // - is not internal
@@ -66,7 +68,7 @@ class XFormsGroupDefaultHandler(
     //
     // 2024-04-17: Don't add `role="group"` if the element is not a `div`.
     //
-    if (handleAriaByAtts(atts, _ => true) && getContainingElementName == "div") {
+    if (handleAriaByAtts(atts, _ => true) && containingElementName == "div") {
       // There is at least one reference with `aria-*`, so add new attributes
       atts.addOrReplace(XFormsNames.ROLE_QNAME, "group")
       if (handlerContext.a11yFocusOnGroups)
@@ -77,14 +79,18 @@ class XFormsGroupDefaultHandler(
     // The scenario is that this group is used to implement an `xf:input` or other `xxf:control="true"` HTML markup.
     // If this group is the target of an `xxf:label-for`, find the outermost control that references it, and use the
     // associated concrete control's information to output `aria-required` and `aria-invalid`.
-    currentControl
-      .staticControl
-      .asInstanceOf[StaticLHHASupport]
-      .referencingControl
-      .map(c => XFormsId.buildEffectiveId(c.prefixedId, XFormsId.getEffectiveIdSuffixParts(currentControl.effectiveId)))
-      .flatMap(containingDocument.findControlByEffectiveId)
-      .flatMap(_.cast[XFormsSingleNodeControl])
-      .foreach(c => handleAriaAttributes(c.isRequired, c.isValid, c.visited, atts))
+    for {
+      staticRc              <- matched.referencingControl
+      concreteRcEffectiveId = XFormsId.buildEffectiveId(staticRc.prefixedId, XFormsId.getEffectiveIdSuffixParts(currentControl.effectiveId))
+      concreteRc            <- containingDocument.findControlByEffectiveId(concreteRcEffectiveId)
+      concreteSnRc          <- concreteRc.cast[XFormsSingleNodeControl]
+    } locally {
+      handleAriaAttributes(concreteSnRc.isRequired, concreteSnRc.isValid, concreteRc.visited, atts)
+      // https://github.com/orbeon/orbeon-forms/issues/6304
+      if (containingElementName == "input" || containingElementName == "textarea")
+        PlaceHolderInfo.placeHolderValueOpt(staticRc, concreteRc)
+          .foreach(info => atts.addOrReplace("placeholder", info.value))
+    }
 
     // After the above so that attributes can be overridden
     forwardAccessibilityAttributes(attributes, atts)

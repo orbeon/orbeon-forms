@@ -213,7 +213,7 @@
                         </_>
                     </xf:instance>
                 </xf:model>
-                <fr:grid xmlns="" id="fb-editor-number-grid">
+                <fr:grid xmlns="" id="fb-editor-currency-grid">
                     <xh:tr>
                         <xh:td colspan="2">
                             <xf:input ref="instance('local')/prefix" id="prefix-control">

@@ -103,7 +103,7 @@
                         </_>
                     </xf:instance>
                 </xf:model>
-                <fr:grid xmlns="" id="fb-editor-dropdown-select1-grid">
+                <fr:grid xmlns="" id="fb-editor-dropdown-select1-search-grid">
                     <xh:tr>
                         <xh:td colspan="6">
                             <xf:select1 ref="instance('local')/pdf-appearance" appearance="full" id="show-all-items-control">

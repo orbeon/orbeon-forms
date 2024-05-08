@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, NestedPartAnalysis}
-import org.orbeon.oxf.xforms.control.ControlAjaxSupport.outputAriaDiff
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport.{outputAriaDiff, outputPlaceholderDiff}
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.{InstanceMirror, XXFormsComponentRootControl, XXFormsDynamicControl}
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance, XFormsInstanceSupport}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits.stringToStringValue
 import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
@@ -175,13 +175,24 @@ class XFormsValueComponentControl(
     // https://github.com/orbeon/orbeon-forms/issues/6279
     // When the component uses `xxf:label-for`, find the target control if any, and output updates for that control's
     // `aria-required` and `aria-invalid` attributes.
-    staticControl
-      .cast[StaticLHHASupport]
-      .flatMap(_.referencedControl)
-      .flatMap(c => containingDocument.findControlByEffectiveId(
-        XFormsId.buildEffectiveId(c.prefixedId, XFormsId.getEffectiveIdSuffixParts(this.effectiveId))
-      ))
-      .foreach(c => outputAriaDiff(previousControl, this, c.effectiveId)(ch.getXmlReceiver))
+    for {
+      staticLhhaSupport     <- staticControl.cast[StaticLHHASupport]
+      staticRc              <- staticLhhaSupport.referencedControl
+      concreteRcEffectiveId = XFormsId.buildEffectiveId(staticRc.prefixedId, XFormsId.getEffectiveIdSuffixParts(this.effectiveId))
+      concreteRc            <- containingDocument.findControlByEffectiveId(concreteRcEffectiveId)
+    } locally {
+      
+      implicit val receiver: XMLReceiver = ch.getXmlReceiver
+
+      outputAriaDiff(previousControl, this, concreteRc.effectiveId)
+
+      // https://github.com/orbeon/orbeon-forms/issues/6304
+      staticRc.cast[GroupControl].foreach { staticRg =>
+        val containingElementName = staticRg.elementQNameOrDefault.localName
+        if (containingElementName == "input" || containingElementName == "textarea")
+          outputPlaceholderDiff(previousControl, this, concreteRc.effectiveId)
+      }
+    }
   }
 }
 

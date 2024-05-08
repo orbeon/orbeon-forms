@@ -15,30 +15,31 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaControlRef, LhhaPlacementType}
+import org.orbeon.oxf.xforms.analysis.{LhhaControlRef, LhhaPlacementType}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.{Attributes, Locator}
+import shapeless.syntax.typeable._
 
 import java.{lang => jl}
 
 
 class XXFormsComponentHandler(
-  uri             : String,
-  localname       : String,
-  qName           : String,
-  localAtts       : Attributes,
-  elementAnalysis : ElementAnalysis,
-  handlerContext  : HandlerContext
+  uri           : String,
+  localname     : String,
+  qName         : String,
+  localAtts     : Attributes,
+  matched       : ComponentControl,
+  handlerContext: HandlerContext
 ) extends
   XFormsControlLifecycleHandler(
     uri,
     localname,
     qName,
     localAtts,
-    elementAnalysis,
+    matched,
     handlerContext,
     repeating  = false,
     forwarding = false
@@ -46,20 +47,20 @@ class XXFormsComponentHandler(
 
   import XXFormsComponentHandler._
 
-  private lazy val staticControl =
-    handlerContext.getPartAnalysis.getControlAnalysis(getPrefixedId).asInstanceOf[ComponentControl]
+  private lazy val placeHolderInfo: Option[PlaceHolderInfo] =
+    matched.cast[StaticLHHASupport].flatMap(PlaceHolderInfo.placeHolderValueOpt(_, currentControl))
 
   override def getContainingElementName: String =
-    staticControl.commonBinding.containerElementName
+    matched.commonBinding.containerElementName
 
   protected override def getContainingElementQName: String =
-    XMLUtils.buildQName(handlerContext.findXHTMLPrefix, staticControl.commonBinding.containerElementName)
+    XMLUtils.buildQName(handlerContext.findXHTMLPrefix, matched.commonBinding.containerElementName)
 
   protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit = {
     if (classes.length != 0)
       classes.append(' ')
 
-    classes.append(staticControl.commonBinding.cssClasses)
+    classes.append(matched.commonBinding.cssClasses)
   }
 
   // This scenario is probably not useful right now, see:
@@ -79,7 +80,7 @@ class XXFormsComponentHandler(
     handlerContext.pushComponentContext(prefixedId)
 
     // Process shadow content
-    staticControl.bindingOpt foreach { binding =>
+    matched.bindingOpt foreach { binding =>
       XXFormsComponentHandler.processShadowTree(controller, binding.templateTree)
     }
   }
@@ -88,7 +89,7 @@ class XXFormsComponentHandler(
     handlerContext.popComponentContext()
 
   protected override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
-    if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Label)) { // also implied: label is local (from `XFormsControlLifecycleHandler`)
+    if (matched.commonBinding.standardLhhaAsSet(LHHA.Label) && ! (placeHolderInfo exists (_.isLabelPlaceholder))) { // also implied: label is local (from `XFormsControlLifecycleHandler`)
 
       val staticReadonly          = XFormsBaseHandler.isStaticReadonly(currentControl)
       val forEffectiveIdWithNsOpt = if (staticReadonly) None else getForEffectiveIdWithNs(lhhaAnalysis)
@@ -103,9 +104,12 @@ class XXFormsComponentHandler(
       )
     }
 
-  protected override def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Alert)) super.handleAlert(lhhaAnalysis)
-  protected override def handleHint(lhhaAnalysis: LHHAAnalysis) : Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Hint))  super.handleHint(lhhaAnalysis)
-  protected override def handleHelp(lhhaAnalysis: LHHAAnalysis) : Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Help))  super.handleHelp(lhhaAnalysis)
+  protected override def handleHint(lhhaAnalysis: LHHAAnalysis): Unit =
+    if (matched.commonBinding.standardLhhaAsSet(LHHA.Hint) && placeHolderInfo.forall(_.isLabelPlaceholder))
+      super.handleHint(lhhaAnalysis)
+
+  protected override def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit = if (matched.commonBinding.standardLhhaAsSet(LHHA.Alert)) super.handleAlert(lhhaAnalysis)
+  protected override def handleHelp(lhhaAnalysis: LHHAAnalysis) : Unit = if (matched.commonBinding.standardLhhaAsSet(LHHA.Help))  super.handleHelp(lhhaAnalysis)
 
   // If there is a `label-for`, use that, otherwise don't use `@for` as we are not pointing to an HTML form control
   // NOTE: Used by `handleLabel()` above only if there is a local LHHA, and by `findTargetControlForEffectiveId`.

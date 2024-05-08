@@ -84,7 +84,7 @@
                         </_>
                     </xf:instance>
                 </xf:model>
-                <fr:grid xmlns="" id="fb-editor-datetime-grid">
+                <fr:grid xmlns="" id="fb-editor-us-phone-grid">
                     <xh:tr>
                         <xh:td colspan="6">
                             <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">

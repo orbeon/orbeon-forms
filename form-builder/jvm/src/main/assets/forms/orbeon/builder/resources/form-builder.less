@@ -280,9 +280,20 @@ body.orbeon {
         }
     }
 
-    // Highlight the grid cell when dragging over
-    .fb-main .fr-grid-td:has(.gu-transit) {
-        background-color: #ccc;
+    .fb-main .fr-grid-td {
+
+        // Highlight the grid cell when dragging over
+        &:has(.gu-transit) {
+            background-color: #ccc;
+        }
+
+        // D&D from the toolbox
+        .gu-transit.fb-tool {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            padding-top: 1.5em;
+        }
     }
 
     // Use copy or move cursor during D&D
@@ -318,14 +329,6 @@ body.orbeon {
         position: absolute;
         background-color: #ccc;
         z-index: 1;                                                         // For shadow to be above controls
-    }
-
-    // D&D from the toolbox
-    .fb-main .fr-grid-td .gu-transit.fb-tool {
-        width: 100%;
-        height: 100%;
-        text-align: center;
-        padding-top: 1.5em;
     }
 
     // ***** Toolbox ***************************************************************************************************
@@ -1702,10 +1705,10 @@ body.orbeon {
                 opacity: 0.7;
             }
         }
-    }
 
-    .navbar .fr-language-choice .nav {
-        margin-right: 0;
+        .fr-language-choice .nav {
+            margin-right: 0;
+        }
     }
 
     .xforms-dialog {

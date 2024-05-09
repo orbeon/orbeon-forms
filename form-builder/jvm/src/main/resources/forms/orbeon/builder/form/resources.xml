@@ -438,7 +438,7 @@
                 <item id="2">Tooltip</item>
             </appearances>
             <placeholders>
-                <label>Use Placeholder for Text Fields and Text Areas</label>
+                <label>Use Placeholder for Fields and Text Areas</label>
             </placeholders>
             <data-migration>
                 <label>Simple Data Migration</label>
@@ -3231,7 +3231,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
+                <label todo="true">[Use Placeholder for Fields and Text Areas]</label>
             </placeholders>
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
@@ -4647,7 +4647,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
+                <label todo="true">[Use Placeholder for Fields and Text Areas]</label>
             </placeholders>
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
@@ -6063,7 +6063,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
+                <label todo="true">[Use Placeholder for Fields and Text Areas]</label>
             </placeholders>
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
@@ -7443,7 +7443,7 @@
                 <item id="2">Tooltip</item>
             </appearances>
             <placeholders>
-                <label>Platzhalter für Textfelder und mehrzeilige Textfelder benutzen</label>
+                <label>Platzhalter für Felder und mehrzeilige Textfelder benutzen</label>
             </placeholders>
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
@@ -8826,7 +8826,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
+                <label todo="true">[Use Placeholder for Fields and Text Areas]</label>
             </placeholders>
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
@@ -10234,7 +10234,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
+                <label todo="true">[Use Placeholder for Fields and Text Areas]</label>
             </placeholders>
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
@@ -11643,7 +11643,7 @@
                 <item id="2">Tooltip</item>
             </appearances>
             <placeholders>
-                <label>Gebruik placeholder voor tekstvelden en 'text areas'</label>
+                <label todo="true">Gebruik placeholder voor tekstvelden en 'text areas'</label>
             </placeholders>
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
@@ -13031,7 +13031,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
+                <label todo="true">[Use Placeholder for Fields and Text Areas]</label>
             </placeholders>
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>
@@ -14446,7 +14446,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
+                <label todo="true">[Use Placeholder for Fields and Text Areas]</label>
             </placeholders>
             <data-migration>
                 <label todo="true">[Simple Data Migration]</label>

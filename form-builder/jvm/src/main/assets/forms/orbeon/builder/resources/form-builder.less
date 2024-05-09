@@ -271,7 +271,6 @@ body.orbeon {
     .fb-control-editor-right
     .fb-control-handle {
         cursor: grab;
-        cursor: -webkit-grab; // Chrome 49 and Safari 10 still don't support the un-prefixed `grab`
     }
 
     // Hide the icons while the control moved
@@ -287,8 +286,8 @@ body.orbeon {
     }
 
     // Use copy or move cursor during D&D
-    .gu-mirror.fb-dnd-copy { cursor: copy; cursor: -webkit-copy }
-    .gu-mirror.fb-dnd-move { cursor: move; cursor: -webkit-move }
+    .gu-mirror.fb-dnd-copy { cursor: copy }
+    .gu-mirror.fb-dnd-move { cursor: move }
     // So the cursor is inside the element, and picking the cursor works
     .gu-mirror { padding-right: 24px }
 

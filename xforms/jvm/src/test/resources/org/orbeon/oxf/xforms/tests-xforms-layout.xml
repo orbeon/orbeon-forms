@@ -2755,4 +2755,62 @@
           </controls>
         </output>
     </test>
+
+    <test description="#6304: Number and currency don't support minimal labels" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <_/>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding
+                            id="fr-wrapped-input"
+                            element="fr|wrapped-input"
+                            xxbl:mode="binding lhha"
+                            xxbl:label-for="my-input">
+                            <xbl:template>
+                                <xh:input xxf:control="true" id="my-input"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:wrapped-input id="wrapped-input-full-label" ref=".">
+                        <xf:label>My label</xf:label>
+                        <xf:hint>My hint</xf:hint>
+                    </fr:wrapped-input>
+                    <fr:wrapped-input id="wrapped-input-minimal-label" ref=".">
+                        <xf:label appearance="minimal">My label</xf:label>
+                        <xf:hint>My hint</xf:hint>
+                    </fr:wrapped-input>
+                    <fr:wrapped-input id="wrapped-input-minimal-hint" ref=".">
+                        <xf:label>My label</xf:label>
+                        <xf:hint appearance="minimal">My hint</xf:hint>
+                    </fr:wrapped-input>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xh:div id="wrapped-input-full-label" class="xbl-component xbl-fr-wrapped-input">
+                    <xh:span class="xforms-label" id="wrapped-input-full-label≡≡l">My label</xh:span>
+                    <xh:input id="wrapped-input-full-label≡my-input" class="xforms-group" aria-labelledby="wrapped-input-full-label≡≡l" aria-describedby="wrapped-input-full-label≡≡t"/>
+                    <xh:span class="xforms-hint" id="wrapped-input-full-label≡≡t">My hint</xh:span>
+                </xh:div>
+                <xh:div id="wrapped-input-minimal-label" class="xbl-component xbl-fr-wrapped-input">
+                    <xh:input id="wrapped-input-minimal-label≡my-input" class="xforms-group" aria-describedby="wrapped-input-minimal-label≡≡t" placeholder="My label"/>
+                    <xh:span class="xforms-hint" id="wrapped-input-minimal-label≡≡t">My hint</xh:span>
+                </xh:div>
+                <xh:div id="wrapped-input-minimal-hint" class="xbl-component xbl-fr-wrapped-input">
+                    <xh:span class="xforms-label" id="wrapped-input-minimal-hint≡≡l">My label</xh:span>
+                    <xh:input id="wrapped-input-minimal-hint≡my-input" class="xforms-group" aria-labelledby="wrapped-input-minimal-hint≡≡l" placeholder="My hint"/>
+                </xh:div>
+          </controls>
+        </output>
+    </test>
+
 </group>

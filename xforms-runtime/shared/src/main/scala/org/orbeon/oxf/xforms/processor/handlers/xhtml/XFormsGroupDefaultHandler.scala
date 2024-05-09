@@ -64,11 +64,10 @@ class XFormsGroupDefaultHandler(
     // - is not a separator
     // - is not a fieldset (legacy explicit `xxf:fieldset` appearance OR local LHHA)
     //
-    // So remains the case of an external LHHA. This is where it makes sense to add the `aria-*` attributes.
+    // So remains the case of an external LHHA, where it makes sense to add the `aria-*` attributes.
     //
     // 2024-04-17: Don't add `role="group"` if the element is not a `div`.
-    //
-    if (handleAriaByAtts(atts, _ => true) && containingElementName == "div") {
+    if (handleAriaByAtts(atts, XFormsLHHAHandler.placeholderLhhaByCondition) && containingElementName == "div") {
       // There is at least one reference with `aria-*`, so add new attributes
       atts.addOrReplace(XFormsNames.ROLE_QNAME, "group")
       if (handlerContext.a11yFocusOnGroups)

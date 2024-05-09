@@ -142,7 +142,13 @@ class XFormsLHHAHandler(
 object XFormsLHHAHandler {
 
   def coreControlLhhaByCondition(lhhaAnalysis: LHHAAnalysis): Boolean =
-    lhhaAnalysis.isForRepeat || lhhaAnalysis.lhhaType != LHHA.Label
+    (lhhaAnalysis.isForRepeat || lhhaAnalysis.lhhaType != LHHA.Label) && placeholderLhhaByCondition(lhhaAnalysis)
+
+  def placeholderLhhaByCondition(lhhaAnalysis: LHHAAnalysis): Boolean =
+    lhhaAnalysis.lhhaType match {
+      case LHHA.Label | LHHA.Hint if lhhaAnalysis.isPlaceholder => false
+      case _                                                    => true
+    }
 
   def findLabelForEffectiveIdWithNs(
     lhhaAnalysis        : LHHAAnalysis,

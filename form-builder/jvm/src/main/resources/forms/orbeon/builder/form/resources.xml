@@ -1399,7 +1399,6 @@
         </alerts>
         <template>
             <untitled-form>Untitled Form</untitled-form>
-            <untitled-section>Untitled Section</untitled-section>
             <items>
                 <item>
                     <label>First choice</label>
@@ -2805,7 +2804,6 @@
         </alerts>
         <template>
             <untitled-form>Formulaire sans titre</untitled-form>
-            <untitled-section>Section sans titre</untitled-section>
             <items>
                 <item>
                     <label>Premier choix</label>
@@ -4221,7 +4219,6 @@
         </alerts>
         <template>
             <untitled-form>Uten tittel</untitled-form>
-            <untitled-section>Uten tittel</untitled-section>
             <items>
                 <item>
                     <label todo="true">[First choice]</label>
@@ -5636,7 +5633,6 @@
         </alerts>
         <template>
             <untitled-form>Новая форма</untitled-form>
-            <untitled-section>Новый раздел</untitled-section>
             <items>
                 <item>
                     <label todo="true">[First choice]</label>
@@ -7016,7 +7012,6 @@
         </alerts>
         <template>
             <untitled-form>Modulo senza nome</untitled-form>
-            <untitled-section>Sezione senza nome</untitled-section>
             <items>
                 <item>
                     <label>Prima scelta</label>
@@ -8398,7 +8393,6 @@
         </alerts>
         <template>
             <untitled-form>Unbenanntes Formular</untitled-form>
-            <untitled-section>Unbenannter Abschnitt</untitled-section>
             <items>
                 <item>
                     <label>Erster Auswahlpunkt</label>
@@ -9808,7 +9802,6 @@
         </alerts>
         <template>
             <untitled-form>Nimetön lomake</untitled-form>
-            <untitled-section>Nimetön lohko</untitled-section>
             <items>
                 <item>
                     <label>Ensimmäinen valinta</label>
@@ -11216,7 +11209,6 @@
         </alerts>
         <template>
             <untitled-form>Formulario sin título</untitled-form>
-            <untitled-section>Sección sin título</untitled-section>
             <items>
                 <item>
                     <label>Primera opción</label>
@@ -12604,7 +12596,6 @@
         </alerts>
         <template>
             <untitled-form>Naamloos form</untitled-form>
-            <untitled-section>Naamloze sectie</untitled-section>
             <items>
                 <item>
                     <label>Eerste keuze</label>
@@ -14019,7 +14010,6 @@
         </alerts>
         <template>
             <untitled-form>Formulário sem título</untitled-form>
-            <untitled-section>Secção sem título</untitled-section>
             <items>
                 <item>
                     <label>Primeira opção</label>
@@ -15435,7 +15425,6 @@
         </alerts>
         <template>
             <untitled-form>Formulär utan titel</untitled-form>
-            <untitled-section>Sektion utan titel</untitled-section>
             <items>
                 <item>
                     <label>Första val</label>

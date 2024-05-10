@@ -101,7 +101,7 @@ object ControlLabelHintTextEditor {
                 parents.first()
               }
             )
-          resourceEditorStartEdit()
+          resourceEditorStartEdit(resourceEditorCurrentLabelHint)
         })
 
         // New control added
@@ -116,7 +116,7 @@ object ControlLabelHintTextEditor {
               } else
                 container.find(".xforms-label, .xforms-text .xforms-output-output").first()
           if (resourceEditorCurrentLabelHint.is("*"))
-              resourceEditorStartEdit()
+              resourceEditorStartEdit(resourceEditorCurrentLabelHint)
         }
       )
 
@@ -124,29 +124,28 @@ object ControlLabelHintTextEditor {
     }
 
     // Show editor on click on label
-    def resourceEditorStartEdit(): Unit = {
+    def resourceEditorStartEdit(currentLabelHint: JQuery): Unit = {
 
       // Remove `for` so browser doesn't set the focus to the control on click
-      resourceEditorCurrentLabelHint.removeAttr("for")
+      currentLabelHint.removeAttr("for")
       // Show, position, and populate editor
       // Get position before showing editor, so showing doesn't move things in the page
-      Private.containerDiv.width(resourceEditorCurrentLabelHint.outerWidth())
+      Private.containerDiv.width(currentLabelHint.outerWidth())
       // Cannot just use `show()` because we have `display: none` originally, which would default to `display: block`.
       // This is because we can't use an inline `style` attribute anymore, see https://github.com/orbeon/orbeon-forms/issues/3565
       Private.containerDiv.css("display", "flex")
       Private.startEdit()
-      val labelHintOffset = resourceEditorCurrentLabelHint.offset()
-      Private.containerDiv.offset(labelHintOffset)
-      Private.setValue(Private.labelHintValue)
+      Private.containerDiv.offset(currentLabelHint.offset())
+      Private.setValue(Private.labelHintValue(currentLabelHint))
       Private.checkboxInput.prop("checked", Private.isLabelHintHtml)
       // Set tooltip for checkbox and HTML5 placeholders (don't do this once for all, as the language can change)
       Private.checkboxInput.tooltip(new JQueryTooltipConfig {
         val title = $(".fb-message-lhha-checkbox").text()
       })
-      val labelTextOrHint = Private.getEditorType.entryName
+      val labelTextOrHint = Private.getEditorType.entryName // TODO: pass `resourceEditorCurrentLabelHint`
       Private.textInput.attr("placeholder", $(s".fb-message-type-$labelTextOrHint").text())
       // Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
-      resourceEditorCurrentLabelHint.css("visibility", "hidden")
+      currentLabelHint.css("visibility", "hidden")
       // Add class telling if this is a label or hint editor
       Private.annotateWithLhhaClass(true)
     }
@@ -176,7 +175,7 @@ object ControlLabelHintTextEditor {
           resourceEditorCurrentLabelHint.css("visibility", "")
           // Update values in the DOM, without waiting for the server to send us the value
           Private.setLabelHintHtml(isHTML)
-          Private.labelHintValue(newValue)
+          Private.labelHintValue(resourceEditorCurrentLabelHint, newValue)
           // Clean state
           resourceEditorCurrentControlOpt = None
           resourceEditorCurrentLabelHint = null
@@ -236,12 +235,13 @@ object ControlLabelHintTextEditor {
       def setLabelHintHtml(isHtml: Boolean): Unit = resourceEditorCurrentControlOpt foreach (_.toggleClass(htmlClass, isHtml))
       def annotateWithLhhaClass(add: Boolean): JQuery = containerDiv.toggleClass(s"fb-label-editor-for-${getEditorType.entryName}", add)
 
-      def labelHintValue: String =
-        if (isLabelHintHtml) resourceEditorCurrentLabelHint.html()
-        else                 resourceEditorCurrentLabelHint.text()
-      def labelHintValue(value: String): Unit =
-        if (isLabelHintHtml) resourceEditorCurrentLabelHint.html(value)
-        else                 resourceEditorCurrentLabelHint.text(value)
+      def labelHintValue(labelHint: JQuery): String =
+        if (isLabelHintHtml) labelHint.html()
+        else                 labelHint.text()
+
+      def labelHintValue(labelHint: JQuery, value: String): Unit =
+        if (isLabelHintHtml) labelHint.html(value)
+        else                 labelHint.text(value)
 
       def withInitializedTinyMce(thunk: TinyMceEditor => Unit): Unit =
         if (tinyMceInitialized)
@@ -256,7 +256,7 @@ object ControlLabelHintTextEditor {
 
       // Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
       def makeSpaceForTinyMce(): Unit =
-        resourceEditorCurrentLabelHint.height(tinyMceContainerDiv.height())
+        Option(resourceEditorCurrentLabelHint).foreach(_.height(tinyMceContainerDiv.height()))
 
       // Function to initialize the TinyMCE, memoized so it runs at most once
       val initTinyMce: Eval[TinyMceEditor] = Eval.later {

@@ -39,7 +39,12 @@ object EmailMetadataSerialization {
           QName("headers"),
           template.headers.map((serializeHeader _).tupled)
         )),
-        //template.subject.map(subject => <subject mediatype={subject.isHTML.option("text/html").orNull}>{ subject.text }</subject>).orNull,
+        template.enableIfTrue.map(enableIfTrue =>
+          NodeInfoFactory.elementInfo(
+            QName("enable-if-true"),
+            List(StringValue.makeStringValue(enableIfTrue))
+          )
+        ),
         template.subject.map(subject =>
           NodeInfoFactory.elementInfo(
             QName("subject"),

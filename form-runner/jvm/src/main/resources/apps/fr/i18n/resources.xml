@@ -1483,7 +1483,7 @@
                 <move-up>Mover Arriba</move-up>
                 <move-down>Mover Debajo</move-down>
                 <clear>
-                    <label todo="true">[Clear Line]</label>
+                    <label todo="true">Limpiar fila</label>
                 </clear>
                 <remove>
                     <label>Remover</label>
@@ -1491,7 +1491,7 @@
                 </remove>
                 <add-another>
                     <label>Agregar Otro</label>
-                    <hint>Agregar Fila a Grilla Repetible</hint>
+                    <hint>Añadir nuevo elemento</hint>
                 </add-another>
             </grid>
             <section>

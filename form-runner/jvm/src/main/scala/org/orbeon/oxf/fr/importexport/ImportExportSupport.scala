@@ -3,6 +3,7 @@ package org.orbeon.oxf.fr.importexport
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.QName
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
@@ -12,9 +13,10 @@ import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.permission.{ModeType, ModeTypeAndOps, Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.proxy.Transforms
+import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.CollectionUtils.IteratorExt._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
@@ -22,6 +24,7 @@ import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import org.orbeon.saxon.om
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
@@ -452,5 +455,15 @@ object ImportExportSupport {
       s"${config.prefix}$phase1"
     else
       phase1
+  }
+
+  def frResourcesForRequestedLang(requestedLang: String): NodeInfo = {
+
+    val frResources =
+      useAndClose(ResourceManagerWrapper.instance.getContentAsStream("/apps/fr/i18n/resources.xml")) { is =>
+        TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
+      }
+
+    FormRunner.formResourcesInGivenLangOrFirst(frResources.rootElement, requestedLang)
   }
 }

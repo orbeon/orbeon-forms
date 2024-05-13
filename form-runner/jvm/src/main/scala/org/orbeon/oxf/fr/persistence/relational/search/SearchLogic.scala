@@ -43,10 +43,8 @@ object SearchLogic {
   //  here, as they're more closely associated with the search API, or move them elsewhere (e.g. in the parent package),
   //  in which case some classes/methods should be renamed (SearchVersion, SearchPermissions, doSearch, etc.)?
 
-  def searchVersion(httpRequest: ExternalContext.Request): SearchVersion = {
-    val formDefinitionVersionHeader = httpRequest.getFirstHeaderIgnoreCase(OrbeonFormDefinitionVersion)
-    SearchVersion(formDefinitionVersionHeader)
-  }
+  def searchVersion(httpRequest: ExternalContext.Request): SearchVersion =
+    SearchVersion(httpRequest.getFirstHeaderIgnoreCase(OrbeonFormDefinitionVersion))
 
   def anyOfOperations(rootElement: NodeInfo): Option[Set[Operation]] =
     rootElement.child("operations").headOption.map(_.attValue("any-of").splitTo[Set]().map(Operation.withName))

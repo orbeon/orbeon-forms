@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
+import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
@@ -55,7 +55,7 @@ class SearchProcessor
 
             val request =
               SearchRequestParser.parseRequest(
-                provider,
+                Provider.withName(provider),
                 app,
                 form,
                 PersistenceMetadataSupport.isInternalAdminUser(httpRequest.getFirstParamAsString),

@@ -243,6 +243,12 @@
                     show="new"/>
             </xf:action>
 
+            <xf:action event="fr-summary-export-with-search">
+                <xf:send submission="fr-summary-export-with-search-submission">
+                    <xf:property name="fr-export-format" value="event('fr-export-format')"/>
+                </xf:send>
+            </xf:action>
+
             <!-- Instance to track search results and paging -->
             <!-- NOTE: As of 2011-11-28, `app` and `form` are not set by us. We leave them in for now because the
                  built-in eXist, Oracle and MySQL implementations rely on them in the Form Runner page flow. -->
@@ -672,6 +678,7 @@
                     <pdf/>
                     <tiff/>
                     <excel-export/>
+                    <excel-export-with-search/>
                     <xml-export/>
                     <delete/>
                     <import/>
@@ -724,6 +731,31 @@
                 <!-- Set language upon submitting -->
                 <xf:action event="xforms-submit">
                     <!-- This works now that #122 is fixed https://github.com/orbeon/orbeon-forms/issues/122 -->
+                    <!-- NOTE: xxf:lang() doesn't seem to work here -->
+                    <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
+                </xf:action>
+                <xf:action event="xforms-submit-error">
+                    <xf:message ref="$fr-resources/errors/search"/>
+                </xf:action>
+            </xf:submission>
+
+            <!-- This submission doesn't validate as we allow sending incomplete date, time and dateTime -->
+            <xf:submission
+                id="fr-summary-export-with-search-submission"
+                ref="instance('fr-search-instance')"
+                validate="false"
+                method="post"
+                resource="/fr/service/{$app}/{$form}/export-with-search?export-format={event('fr-export-format')}"
+                replace="all"
+                xxf:show-progress="false">
+
+                <xf:header>
+                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                    <xf:value value="if ($show-version-selector) then fr:form-version() else 'all'"/>
+                </xf:header>
+
+                <!-- Set language upon submitting -->
+                <xf:action event="xforms-submit">
                     <!-- NOTE: xxf:lang() doesn't seem to work here -->
                     <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
                 </xf:action>

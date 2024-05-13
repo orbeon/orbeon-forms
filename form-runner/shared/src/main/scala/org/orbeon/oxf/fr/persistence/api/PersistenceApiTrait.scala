@@ -16,8 +16,10 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Connection, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, PathUtils, URLRewriterUtils, XPath}
+import org.orbeon.oxf.util.{Connection, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, PathUtils, StaticXPath, URLRewriterUtils, XPath}
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om
+import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
@@ -25,7 +27,6 @@ import java.net.URI
 import java.time.Instant
 import java.{util => ju}
 import scala.util.Try
-import scala.xml.Elem
 
 
 // Provide a simple API to access the persistence layer from Scala
@@ -38,17 +39,22 @@ trait PersistenceApiTrait {
   private val SearchPageSize = 100
 
   case class DataDetails(
-    createdTime : Instant,
-    modifiedTime: Instant,
-    documentId  : String,
-    isDraft     : Boolean
+    createdTime       : Instant,
+    createdBy         : Option[String],
+    createdByGroupname: Option[String],
+    modifiedTime      : Instant,
+    lastModifiedBy    : Option[String],
+    workflowStage     : Option[String],
+    documentId        : String,
+    isDraft           : Boolean,
+    details           : List[String],
   )
 
   case class DistinctValues(
-     controls      : Seq[Control],
-     createdBy     : Seq[String],
-     lastModifiedBy: Seq[String],
-     workflowStage : Seq[String]
+   controls      : Seq[Control],
+   createdBy     : Seq[String],
+   lastModifiedBy: Seq[String],
+   workflowStage : Seq[String]
   )
 
   case class Control(path: String, distinctValues: Seq[String])
@@ -69,7 +75,7 @@ trait PersistenceApiTrait {
 
   private def documentsXmlTry(
     servicePath             : String,
-    queryXml                : Elem,
+    queryXml                : Array[Byte],
     version                 : Int
   )(implicit
     logger                  : IndentedLogger,
@@ -79,7 +85,7 @@ trait PersistenceApiTrait {
       connectPersistence(
         method             = HttpMethod.POST,
         pathQuery          = servicePath,
-        requestBodyContent = StreamedContent.fromBytes(queryXml.toString.getBytes(CharsetNames.Utf8), ContentTypes.XmlContentType.some).some,
+        requestBodyContent = StreamedContent.fromBytes(queryXml, ContentTypes.XmlContentType.some).some,
         formVersionOpt     = version.some
       ),
       closeOnSuccess = true
@@ -122,10 +128,12 @@ trait PersistenceApiTrait {
   }
 
   def search(
-    appFormVersion     : AppFormVersion,
-    isInternalAdminUser: Boolean,
+    appFormVersion          : AppFormVersion,
+    isInternalAdminUser     : Boolean,
+    searchQueryOpt          : Option[DocumentNodeInfoType],
+    returnDetails           : Boolean
   )(implicit
-    logger             : IndentedLogger,
+    logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Iterator[DataDetails] = {
 
@@ -142,24 +150,40 @@ trait PersistenceApiTrait {
 
       debug(s"reading search page `$pageNumber`")
 
-      val queryXml =
+      def fromIncomingSearchQuery: Option[Array[Byte]] =
+        searchQueryOpt.map { searchQuery =>
+
+          val searchElem = NodeInfoConversions.extractAsMutableDocument(searchQuery).rootElement
+
+          XFormsAPI.setvalue(searchElem / "page-size", SearchPageSize.toString)
+          XFormsAPI.setvalue(searchElem / "page-number", pageNumber.toString)
+
+          StaticXPath.tinyTreeToString(searchElem).getBytes(CharsetNames.Utf8)
+        }
+
+      def fromBasicSearchQuery: Array[Byte] =
         <search>
             <query/>
             <page-size>{SearchPageSize}</page-size>
             <page-number>{pageNumber}</page-number>
-        </search>
+        </search>.toString.getBytes(CharsetNames.Utf8)
 
-      documentsXmlTry(servicePathQuery, queryXml, appFormVersion._2)
+      documentsXmlTry(servicePathQuery, fromIncomingSearchQuery.getOrElse(fromBasicSearchQuery), appFormVersion._2)
     }
 
     def pageToDataDetails(page: DocumentNodeInfoType): (Iterator[DataDetails], Int, Int) =
       (
         (page.rootElement / "document").iterator map { documentElem =>
           DataDetails(
-            createdTime      = Instant.parse(documentElem.attValue("created")),
-            modifiedTime = Instant.parse(documentElem.attValue("last-modified")),
-            documentId       = documentElem.attValue("name"),
-            isDraft          = documentElem.attValue("draft") == "true"
+            createdTime        = Instant.parse(documentElem.attValue("created")),
+            createdBy          = documentElem.attValueNonBlankOpt("created-by"),
+            createdByGroupname = documentElem.attValueNonBlankOpt("created-by-groupname"),
+            modifiedTime       = Instant.parse(documentElem.attValue("last-modified")),
+            lastModifiedBy     = documentElem.attValueNonBlankOpt("last-modified-by"),
+            workflowStage      = documentElem.attValueNonBlankOpt("workflow-stage"),
+            documentId         = documentElem.attValue("name"),
+            isDraft            = documentElem.attValue("draft") == "true",
+            details            = if (returnDetails) (documentElem / "details" / "detail").map(_.getStringValue).toList else Nil,
           )
         },
         page.rootElement.attValue("search-total").toInt,
@@ -200,7 +224,7 @@ trait PersistenceApiTrait {
           }
         }</distinct-values>
 
-      val result = documentsXmlTry(servicePath, queryXml, appFormVersion._2).get.rootElement
+      val result = documentsXmlTry(servicePath, queryXml.toString.getBytes(CharsetNames.Utf8), appFormVersion._2).get.rootElement
 
       val controls = for {
         query <- result / "query"

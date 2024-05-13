@@ -37,7 +37,7 @@ import scala.util.{Failure, Success}
 object SearchRequestParser {
 
   def parseRequest(
-    provider           : String,
+    provider           : Provider,
     app                : String,
     form               : String,
     isInternalAdminUser: Boolean,
@@ -60,7 +60,7 @@ object SearchRequestParser {
     val allControls      = searchElement.attValueOpt("return-all-indexed-fields").contains(true.toString)
 
     SearchRequest(
-      provider            = Provider.withName(provider),
+      provider            = provider,
       appForm             = appForm,
       version             = version,
       credentials         = credentials,

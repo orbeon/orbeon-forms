@@ -83,6 +83,7 @@
             <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
             <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
+            <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
             <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish</publish>
@@ -767,6 +768,7 @@
             <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspecter formules (expérimental)</test-formulas>
             <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Tester hors ligne (expérimental)</test-offline>
             <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Export Excel</excel-export>
+            <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Export Excel</excel-export-with-search>
             <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Export XML</xml-export>
             <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Export XHTML</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publier</publish>
@@ -1455,6 +1457,7 @@
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
+            <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
@@ -2137,7 +2140,8 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testejar</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspeccionar fòrmules (Beta)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
-            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Exportar a excel</excel-export>
+            <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Exportar a excel</excel-export>
+            <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Exportar a excel</excel-export-with-search>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
@@ -2846,6 +2850,7 @@
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
+            <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiser…</publish>
@@ -3520,6 +3525,7 @@
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
+            <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Публиковать</publish>
@@ -4193,6 +4199,7 @@
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
+            <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Pubblica</publish>
@@ -4876,6 +4883,7 @@
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
+            <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Veröffentlichen</publish>
@@ -5559,6 +5567,7 @@
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
+            <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Julkaise</publish>
@@ -6242,6 +6251,7 @@
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
+            <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicera</publish>
@@ -6925,6 +6935,7 @@
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
+            <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiceren</publish>
@@ -7608,6 +7619,7 @@
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
+            <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
@@ -8291,6 +8303,7 @@
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
+            <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Offentliggør...</publish>
@@ -8965,6 +8978,7 @@
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Beta)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Beta)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export>
+            <excel-export-with-search todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel Export</excel-export-with-search>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML Export</xml-export>
             <form-definition-xhtml-export todo="true">&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML Export</form-definition-xhtml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publikuj</publish>

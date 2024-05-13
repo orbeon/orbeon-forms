@@ -1546,12 +1546,18 @@
         </components>
         <untitled-form>Formulario sin Título</untitled-form>
         <errors>
-            <summary-title>Su formulario {1,choice,0#no tiene ningún mensaje|1#tiene los siguientes '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;tiene los siguientes '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}]</summary-title>
-            <form-title>[{1,choice,0#|1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational Message|3#Message}' - |1&lt;{1,number,integer} '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}]</form-title>
+            <summary-title>Su formulario {1,choice,
+                0#no tiene ningún mensaje|
+                1#tiene el siguiente '{0,choice,0#mensaje de error|1#mensaje de advertencia|2#mensaje de información|3#mensaje}'|
+                1&lt;tiene los siguientes '{0,choice,0#mensajes de error|1#mensajes de advertencia|2#mensajes de información|3#mensajes}'}</summary-title>
+            <form-title>{1,choice,
+                0#|
+                1#{1,number,integer} '{0,choice,0#Error|1#Advertencia|2#Mensaje de Información|3#Mensaje}' - |
+                1&lt;{1,number,integer} '{0,choice,0#Errores|1#Advertencias|2#Mensajes de Información|3#Mensajes}' - }{2}</form-title>
             <none>No hay errores en el formulario</none>
-            <unsaved>Cambios sin salvar</unsaved>
-            <canvas-not-supported>Para realizar anotaciones en imagenes, su explorador tiene que soportar HTML5</canvas-not-supported>
-            <search todo="true">[Error performing search]</search>
+            <unsaved>Cambios sin guardar</unsaved>
+            <canvas-not-supported>Para realizar anotaciones en imágenes, su explorador tiene que soportar HTML5</canvas-not-supported>
+            <search>Error al realizar la búsqueda</search>
         </errors>
         <email>
             <subject>Confirmación de formulario Orbeon</subject>

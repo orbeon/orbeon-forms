@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
+import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.parsePositiveIntParamOrThrow
@@ -24,8 +24,8 @@ import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider, RelationalUtils}
 import org.orbeon.oxf.fr.persistence.{PersistenceMetadataSupport, SearchVersion}
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
@@ -34,48 +34,44 @@ import org.orbeon.scaxon.SimplePath._
 import scala.util.{Failure, Success}
 
 
-trait SearchRequestParser {
-
-  private val SearchPath = "/fr/service/([^/]+)/search/([^/]+)/([^/]+)".r
-
-  def httpRequest: ExternalContext.Request = NetUtils.getExternalContext.getRequest
+object SearchRequestParser {
 
   def parseRequest(
-    searchDocument: DocumentInfo,
-    version       : SearchVersion
+    provider           : String,
+    app                : String,
+    form               : String,
+    isInternalAdminUser: Boolean,
+    searchDocument     : DocumentInfo,
+    version            : SearchVersion
   )(implicit
     indentedLogger: IndentedLogger
   ): SearchRequest = {
 
     debug(s"search request: ${TransformerUtils.tinyTreeToString(searchDocument)}")
 
-    httpRequest.getRequestPath match {
-      case SearchPath(provider, app, form) =>
+    val appForm          = AppForm(app, form)
+    val searchElement    = searchDocument.rootElement
+    val queryEls         = searchElement.child("query").toList
+    val freeTextElOpt    = queryEls.find(nodeInfo => ! nodeInfo.hasAtt("path") && ! nodeInfo.hasAtt("metadata"))
+    val controlQueryEls  = queryEls.filter(_.hasAtt("path"))
+    val metadataQueryEls = queryEls.filter(_.hasAtt("metadata"))
+    val draftsElOpt      = searchElement.child("drafts").headOption
+    val credentials      = PermissionsAuthorization.findCurrentCredentialsFromSession
+    val allControls      = searchElement.attValueOpt("return-all-indexed-fields").contains(true.toString)
 
-        val appForm          = AppForm(app, form)
-        val searchElement    = searchDocument.rootElement
-        val queryEls         = searchElement.child("query").toList
-        val freeTextElOpt    = queryEls.find(nodeInfo => ! nodeInfo.hasAtt("path") && ! nodeInfo.hasAtt("metadata"))
-        val controlQueryEls  = queryEls.filter(_.hasAtt("path"))
-        val metadataQueryEls = queryEls.filter(_.hasAtt("metadata"))
-        val draftsElOpt      = searchElement.child("drafts").headOption
-        val credentials      = PermissionsAuthorization.findCurrentCredentialsFromSession
-        val allControls      = searchElement.attValueOpt("return-all-indexed-fields").contains(true.toString)
-
-        SearchRequest(
-          provider            = Provider.withName(provider),
-          appForm             = appForm,
-          version             = version,
-          credentials         = credentials,
-          isInternalAdminUser = PersistenceMetadataSupport.isInternalAdminUser(httpRequest.getFirstParamAsString),
-          pageSize            = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-size"),  10),
-          pageNumber          = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-number"), 1),
-          queries             = controlQueries(appForm, version, controlQueryEls, allControls) ::: metadataQueries(metadataQueryEls),
-          drafts              = drafts(draftsElOpt, credentials),
-          freeTextSearch      = freeTextElOpt.map(_.stringValue).flatMap(trimAllToOpt), // Blank means no search
-          anyOfOperations     = SearchLogic.anyOfOperations(searchElement)
-        )
-    }
+    SearchRequest(
+      provider            = Provider.withName(provider),
+      appForm             = appForm,
+      version             = version,
+      credentials         = credentials,
+      isInternalAdminUser = isInternalAdminUser,
+      pageSize            = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-size"),  10),
+      pageNumber          = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-number"), 1),
+      queries             = controlQueries(appForm, version, controlQueryEls, allControls) ::: metadataQueries(metadataQueryEls),
+      drafts              = drafts(draftsElOpt, credentials),
+      freeTextSearch      = freeTextElOpt.map(_.stringValue).flatMap(trimAllToOpt), // Blank means no search
+      anyOfOperations     = SearchLogic.anyOfOperations(searchElement)
+    )
   }
 
   private def drafts(draftsElOpt: Option[NodeInfo], credentials: Option[Credentials]): Drafts = credentials match {

@@ -13,23 +13,24 @@
   */
 package org.orbeon.oxf.fr.persistence.relational.search
 
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorOutput}
-import org.orbeon.oxf.util.{IndentedLogger, XPath}
+import org.orbeon.oxf.util.{IndentedLogger, NetUtils, XPath}
 import org.orbeon.oxf.xml.XMLReceiver
 
 
 class SearchProcessor
   extends ProcessorImpl
-    with SearchRequestParser
     with SearchLogic
     with SearchResult {
 
   self =>
+
 
   addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA))
   addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA))
@@ -47,7 +48,20 @@ class SearchProcessor
               getInputByName(ProcessorImpl.INPUT_DATA),
               XPath.GlobalConfiguration
             )
-            val request = parseRequest(searchDocument, SearchLogic.searchVersion(httpRequest))
+
+            val httpRequest = NetUtils.getExternalContext.getRequest
+
+            val SearchProcessor.SearchPath(provider, app, form) = httpRequest.getRequestPath
+
+            val request =
+              SearchRequestParser.parseRequest(
+                provider,
+                app,
+                form,
+                PersistenceMetadataSupport.isInternalAdminUser(httpRequest.getFirstParamAsString),
+                searchDocument,
+                SearchLogic.searchVersion(httpRequest)
+              )
 
             val (result, count) = doSearch(request)
 
@@ -59,4 +73,8 @@ class SearchProcessor
         }
       }
     )
+}
+
+private object SearchProcessor {
+  val SearchPath = "/fr/service/([^/]+)/search/([^/]+)/([^/]+)".r
 }

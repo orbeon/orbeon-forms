@@ -112,7 +112,7 @@ object SearchLogic {
     }
 }
 
-trait SearchLogic extends SearchRequestParser {
+trait SearchLogic {
 
   def doSearch(request: SearchRequest)(implicit indentedLogger: IndentedLogger): (List[Document], Int) =
     SearchLogic.doSearch(

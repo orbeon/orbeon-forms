@@ -20,7 +20,7 @@ import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.scaxon.NodeConversions
 
 
-trait SearchResult extends SearchRequestParser {
+trait SearchResult {
 
   def outputResult(
     request   : SearchRequest,

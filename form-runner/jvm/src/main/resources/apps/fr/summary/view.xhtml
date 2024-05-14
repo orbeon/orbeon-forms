@@ -247,16 +247,17 @@
             <!-- NOTE: As of 2011-11-28, `app` and `form` are not set by us. We leave them in for now because the
                  built-in eXist, Oracle and MySQL implementations rely on them in the Form Runner page flow. -->
             <!-- Don't use `xxf:exclude-result-prefixes="#all"` as eXist search needs the `xh` and `xf` namespaces -->
+            <!-- 2024-05-10: Above comment still relevant, given that we don't support eXist anymore? -->
             <xf:instance id="fr-search-instance">
                 <search>
                     <query/>
-                    <query metadata="created" match="gte"/>
-                    <query metadata="created" match="lt"/>
-                    <query metadata="created-by" match="exact"/>
-                    <query metadata="last-modified" match="gte" sort="desc"/>
-                    <query metadata="last-modified" match="lt"/>
+                    <query metadata="created"          match="gte"/>
+                    <query metadata="created"          match="lt"/>
+                    <query metadata="created-by"       match="exact"/>
+                    <query metadata="last-modified"    match="gte" sort="desc"/>
+                    <query metadata="last-modified"    match="lt"/>
                     <query metadata="last-modified-by" match="exact"/>
-                    <query metadata="workflow-stage" match="exact"/>
+                    <query metadata="workflow-stage"   match="exact"/>
                     <page-size>5</page-size>
                     <page-number>1</page-number>
                     <lang/>

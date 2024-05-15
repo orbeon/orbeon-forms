@@ -508,6 +508,12 @@
     <property as="xs:string"  name="oxf.fr.summary.button.excel-export.enabled.*.*">
         not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/excel-export))
     </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.excel-export-with-search.visible.*.*">
+        xxf:relevant(xxf:instance('fr-buttons-logic-instance')/excel-export-with-search)
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.button.excel-export-with-search.enabled.*.*">
+        not(xxf:readonly(xxf:instance('fr-buttons-logic-instance')/excel-export-with-search))
+    </property>
     <property as="xs:string"  name="oxf.fr.summary.button.xml-export.visible.*.*">
         xxf:relevant(xxf:instance('fr-buttons-logic-instance')/xml-export)
     </property>
@@ -556,6 +562,9 @@
     </property>
     <property as="xs:string"  name="oxf.fr.summary.process.excel-export.*.*">
         xf:dispatch(name = "fr-summary-export", targetid = "fr-form-model", fr-export-format = "excel-export")
+    </property>
+    <property as="xs:string"  name="oxf.fr.summary.process.excel-export-with-search.*.*">
+        xf:dispatch(name = "fr-summary-export-with-search", targetid = "fr-form-model", fr-export-format = "excel-headings")
     </property>
     <property as="xs:string"  name="oxf.fr.summary.process.xml-export.*.*">
         xf:dispatch(name = "fr-summary-export", targetid = "fr-form-model", fr-export-format = "xml-export")

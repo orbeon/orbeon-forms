@@ -16,11 +16,11 @@
 ==================================================================== */
 package org.orbeon.oxf.fr.excel
 
-import java.{util => ju}
-
 import org.orbeon.oxf.fr.excel.ExcelDateUtils.FormatType
 import org.orbeon.oxf.util.CoreUtils._
 import org.scalatest.funspec.AnyFunSpecLike
+
+import java.{util => ju}
 
 // ORBEON: Moved subset of original Apache POI class to Scala.
 class ExcelDateUtilsTest extends AnyFunSpecLike {
@@ -236,5 +236,27 @@ class ExcelDateUtilsTest extends AnyFunSpecLike {
       val dateIf1904 = (createCalendar(2000, ju.Calendar.JANUARY, 1) |!> (_.add(ju.Calendar.YEAR, 4)) |!> (_.add(ju.Calendar.DATE, 1))).getTime
       assertDate(excelDate, use1904windowing = true, dateIf1904)
     }
+  }
+
+  describe("Format conversions") {
+
+    val Expected = List(
+      "[MNn] [D], [Y] [H01]:[m01]:[s01]"    -> """mmmm d", "yyyy hh:mm:ss""",
+      "[h]:[m01] [P,*-2]"                   -> """h:mm AM/PM""",
+      "[MNn,*-3] [D]"                       -> """mmm d""",
+      "[M01]/[D01]/[Y01]"                   -> """mm/dd/yy""",
+      "[MNn] [D], [Y]"                      -> """mmmm d", "yyyy""",
+      "[H01]:[m01]:[s01]"                   -> """hh:mm:ss""",
+      "[D] [MNn]"                           -> """d mmmm""",
+      "[D01]/[M01]/[Y01]"                   -> """dd/mm/yy""",
+      "Le [D] [Mn] [Y]"                     -> """"Le "d mmmm yyyy""",
+      "Le [D] [Mn] [Y] à [H01]:[m01]:[s01]" -> """"Le "d mmmm yyyy" à "hh:mm:ss""",
+      "[D].[M].[Y] [H01]:[m01]:[s01]"       -> """d"."m"."yyyy hh:mm:ss""",
+    )
+
+    for ((xpath, excel) <- Expected)
+      it(s"must convert `$xpath` to `$excel`") {
+        assert(ExcelNumberFormat.convertFromXPathFormat(xpath) == excel)
+      }
   }
 }

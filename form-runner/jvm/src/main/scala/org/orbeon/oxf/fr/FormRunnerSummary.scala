@@ -73,11 +73,12 @@ trait FormRunnerSummary {
   //@XPathFunction
   def searchableValues(formDoc: DocumentInfo, app: String, form: String, version: Int): NodeInfo = {
     implicit val indentedLogger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("form-runner")
+    val appForm = AppForm(app, form)
     Index.searchableValues(
       formDoc,
-      AppForm(app, form),
+      appForm,
       Some(version),
-      FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
+      FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
     ).toXML
   }
 

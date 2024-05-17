@@ -37,11 +37,11 @@
                 if ($params = ('pdf-url', 'tiff-url', 'excel-with-named-ranges-url', 'xml-form-structure-and-data-url')) then
                     xxf:element('url', event('binary-content-url'))
                 else if (xxf:non-blank(event('binary-content-url'))) then
-                   event('binary-content-url')
+                    xxf:element('url', event('binary-content-url'))
                 else if ($params = 'metadata') then
-                   metadata:createFormMetadataDocument()
+                    metadata:createFormMetadataDocument()
                 else
-                   grid-migration:dataMaybeMigratedFromEdge(
+                    grid-migration:dataMaybeMigratedFromEdge(
                        fr:app-name(),
                        fr:form-name(),
                        xxf:instance('fr-form-instance')/root(),

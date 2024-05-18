@@ -105,7 +105,7 @@
                         <xf:var
                             name="view"
                             value="
-                                property('xxf:readonly-appearance') = 'static' or
+                                xxf:is-control-static-readonly('fr-open-select1') or
                                 fr:mode() = 'pdf'
                             "/>
 
@@ -120,7 +120,7 @@
                         <xh:div id="fr-open-select1-elem" class="fr-component-group" xxf:control="true">
                             <xf:select1
                                 id         = "select1"
-                                ref        = "$binding"
+                                ref        = "$binding[not($view and property('xxf:readonly-appearance.static.select1') = 'minimal' and not($closed-value))]"
                                 appearance = "{(/*/@appearance, 'full')[1]}"
                                 xbl:attr   = "appearance xxf:encrypt-item-values"
                                 class      = "xxforms-events-mode-default">
@@ -130,10 +130,10 @@
                                     <xf:hint  ref="hint"/>
                                     <xf:value ref="value"/>
                                 </xf:itemset>
-                                <xf:item>
+                                <xf:itemset ref=".[not($view and xxf:is-blank($binding))]">
                                     <xf:label ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
-                                    <xf:value ref="if ($closed-value) then '' else ."/>
-                                </xf:item>
+                                    <xf:value ref="if ($closed-value) then '' else $binding"/>
+                                </xf:itemset>
                                 <!-- Focus asynchronously because the input is not visible yet and a plain `setfocus` would fail -->
                                 <xf:dispatch
                                     event="xforms-select"
@@ -151,10 +151,11 @@
                                 }">
                                 <xsl:attribute name="id">input</xsl:attribute>
                                 <xsl:attribute name="ref">
-                                    if    ($closed-value)
+                                    if    ($closed-value or ($view and xxf:is-blank($binding)))
                                     then  if ($view) then () else ''
                                     else  $binding
                                 </xsl:attribute>
+                                <xsl:copy-of select="@fr:static-readonly"/>
                                 <xsl:if test="@type = ('integer', 'decimal')">
                                     <xsl:copy-of
                                         select="

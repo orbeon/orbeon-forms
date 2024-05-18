@@ -351,7 +351,7 @@
                 value="xxf:binding('fr-dropdown-year-binding')"/>
             <xf:var
                 name="view"
-                value="is-readonly = 'true' and property('xxf:readonly-appearance') = 'static'"/>
+                value="xxf:is-control-static-readonly('fr-dropdown-year-binding')"/>
             <xf:var name="value" as="xs:string" value="xxf:value('fr-dropdown-year-binding')">
                 <xf:action event="xforms-value-changed xforms-enabled">
                     <xf:setvalue

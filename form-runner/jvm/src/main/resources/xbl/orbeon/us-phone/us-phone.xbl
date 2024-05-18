@@ -138,7 +138,7 @@
             <xf:var name="binding"
                     value="xxf:binding('fr-us-phone')"/>
             <xf:var name="view"
-                    value="xxf:is-control-readonly('fr-us-phone') and property('xxf:readonly-appearance') = 'static'"/>
+                    value="xxf:is-control-static-readonly('fr-us-phone')"/>
 
             <!-- Edit mode -->
             <xf:group ref="$binding[not($view)]">

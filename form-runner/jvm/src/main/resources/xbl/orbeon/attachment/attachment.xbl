@@ -724,7 +724,7 @@
                 value="xxf:readonly($binding)"/>
             <xf:var
                 name="view"
-                value="xxf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
+                value="xxf:is-control-static-readonly('fr-attachment')"/>
             <xf:var
                 name="cant-take-upload"
                 value="

@@ -44,4 +44,122 @@
             min-width: 9.5em;
         }
     }
+
+    .fr-dynamic {
+        .fr-align-right {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .fr-summary-cell-value {
+            // Keep inner control links (`fr:url`, `fr:hyperlink`, rich-text `<a>`) interactive above `.fr-summary-cell-link::after`
+            a[href] {
+                position: relative;
+                z-index: 2;
+                color: var(--orbeon-link-color);
+                text-decoration: underline;
+
+                &:hover {
+                    color: var(--orbeon-link-hover-color);
+                    text-decoration: underline;
+                }
+
+                &:focus-visible {
+                    outline: 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: 1px;
+                }
+            }
+
+            // Neutralize boxed `.xforms-field` and static output chrome inside compact Summary table cells
+            .xforms-field,
+            .xforms-output.xforms-output-appearance-minimal output[role = "textbox"],
+            .xforms-output.xforms-static output {
+                display: inline;
+                width: auto;
+                min-height: 0;
+                padding: 0;
+                border: 0;
+                background-color: transparent;
+                box-shadow: none;
+                color: inherit;
+                cursor: inherit;
+                white-space: nowrap;
+            }
+
+            // Single-line visual ellipsis for plain textareas while preserving full text in the DOM
+            .xforms-textarea.xforms-static > pre {
+                display: block;
+                max-width: 40ch;
+                margin: 0;
+                padding: 0;
+                border: 0;
+                background-color: transparent;
+                font-family: inherit;
+                font-size: inherit;
+                line-height: inherit;
+                color: inherit;
+                cursor: inherit;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            // Single-line compact display for rich text (`fr:tinymce`, HTML Form Builder descriptions)
+            .xforms-output.xforms-mediatype-text-html .xforms-output-output {
+                display: block;
+                max-width: 45ch;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                p, h1, h2, h3, h4, h5, h6, blockquote, pre {
+                    display: inline;
+                    margin: 0;
+                    padding: 0;
+                    font-size: inherit;
+                    font-weight: inherit;
+                }
+            }
+
+            // Compact static-readonly boolean checkboxes/switches
+            .xforms-select-appearance-full.xforms-static,
+            .xforms-select1-appearance-full.xforms-static,
+            .xforms-input.xforms-type-boolean.xforms-static {
+                .xforms-items {
+                    display: inline-flex;
+                    align-items: center;
+                }
+                .xforms-selected,
+                .xforms-deselected {
+                    min-height: 0;
+                    cursor: inherit;
+                    &::before {
+                        margin-top: 0;
+                    }
+                }
+            }
+
+            // Compact `fr:tags-input` pills without input container border/padding
+            .fr-open-select-tags-container.fr-open-select-tags-disabled {
+                min-height: 0;
+                padding: 0;
+                border: 0;
+                background-color: transparent;
+                box-shadow: none;
+            }
+
+            // Keep signatures and image outputs compact within table rows
+            .xbl-fr-handwritten-signature img,
+            .xbl-fr-wpaint img,
+            .xforms-mediatype-image img,
+            .xforms-mediatype-text-html img {
+                max-height: 1.5rem;
+                width: auto !important;
+                vertical-align: middle;
+            }
+
+            .xforms-mediatype-text-html img {
+                margin-right: 0.35em;
+            }
+        }
+    }
 }

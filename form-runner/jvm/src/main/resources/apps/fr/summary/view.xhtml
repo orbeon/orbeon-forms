@@ -32,7 +32,11 @@
         <xi:include href="oxf:/apps/fr/includes/bulk-apply.xml" xxi:omit-xml-base="true"/>
 
         <!-- FR Summary page XForms model -->
-        <xf:model id="fr-form-model" xxf:xpath-analysis="true">
+        <xf:model
+            id="fr-form-model"
+            xxf:xpath-analysis="true"
+            xxf:readonly-appearance.static.select="minimal"
+            xxf:readonly-appearance.static.select1="minimal">
 
             <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
 
@@ -253,7 +257,7 @@
                         frf:buildSummaryLinkButton(
                             $app,
                             $form,
-                            event('fr-export-format'),
+                            event('fr-export-format'),  (: TODO: weird to pass a button name here :)
                             $selection-document-id,
                             xxf:instance('fr-language-instance')
                         )
@@ -408,6 +412,239 @@
 
             <xf:instance id="fr-selection-instance" xxf:exclude-result-prefixes="#all">
                 <_/>
+            </xf:instance>
+
+            <xf:instance id="fr-dynamic-instance">
+                <_/>
+            </xf:instance>
+
+            <xf:instance id="fr-dynamic-instance-template" xxf:readonly="true">
+                <xh:html
+                    lang="{xxf:instance('fr-language-instance')}"
+                    xml:lang="{xxf:instance('fr-language-instance')}">
+                    <xh:head>
+                        <xf:model id="fr-summary-dynamic-model">
+                            <xf:instance id="fr-form-instance">
+                                <documents/>
+                            </xf:instance>
+                            <xf:instance id="fr-form-resources">
+                                <resources/>
+                            </xf:instance>
+                            <xf:bind ref="instance('fr-form-instance')">
+                                <xf:bind ref="document" id="fr-document-bind">
+                                    <xf:bind ref="details" id="fr-details-bind" readonly="true()"/>
+                                </xf:bind>
+                            </xf:bind>
+                        </xf:model>
+                    </xh:head>
+                    <xh:body>
+                        <xf:var name="fr-resources"   value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')"/>
+                        <xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]"/>
+                        <xf:var name="parameters"     value="xxf:instance('fr-parameters-instance')"/>
+                        <xf:var name="app"            value="$parameters/app/string()"/>
+                        <xf:var name="form"           value="$parameters/form/string()"/>
+                        <xf:var
+                            name="tz"
+                            value="
+                                for $offset in frf:defaultTimezoneToOffsetString()
+                                return xs:dayTimeDuration($offset)"/>
+                        <xf:var
+                            name="global-operations"
+                            value="xxf:split(xxf:instance('fr-authorized-operations'))"/>
+                        <xf:var
+                            name="source-form-metadata"
+                            value="xxf:instance('fr-source-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/*"/>
+                        <xf:var name="show-created"          value="frf:showSummaryMetadataColumn($source-form-metadata, 'created',          $app, $form)"/>
+                        <xf:var name="show-last-modified"    value="frf:showSummaryMetadataColumn($source-form-metadata, 'last-modified',    $app, $form)"/>
+                        <xf:var name="show-workflow-stage"   value="frf:showSummaryMetadataColumn($source-form-metadata, 'workflow-stage',   $app, $form)"/>
+                        <xf:var name="show-created-by"       value="frf:showSummaryMetadataColumn($source-form-metadata, 'created-by',       $app, $form)"/>
+                        <xf:var name="show-last-modified-by" value="frf:showSummaryMetadataColumn($source-form-metadata, 'last-modified-by', $app, $form)"/>
+                        <xf:var
+                            name="metadata-columns"
+                            value="(
+                                'created'         [$show-created],
+                                'last-modified'   [$show-last-modified],
+                                'created-by'      [$show-created-by],
+                                'last-modified-by'[$show-last-modified-by],
+                                'workflow-stage'  [$show-workflow-stage]
+                            )"/>
+                        <xf:var name="sort-supported" value="frf:isSortSupported($app, $form)"/>
+                        <xf:var
+                            name="datelang"
+                            value="(xxf:lang()[frf:hasXPathNumberer(.)], 'en')[1]"/>
+
+                        <xf:group ref="instance('fr-form-instance')[exists(document)]">
+                            <xf:var name="documents"      value="document"/>
+                            <xf:var name="have-drafts"    value="exists($documents[@draft = 'true'])"/>
+                            <xf:var name="have-read-only" value="exists($documents[not(xxf:split(@operations) = ('*', 'update'))])"/>
+                            <xf:var name="labels-class"   value="string-join(('fr-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
+
+                            <xh:div class="fr-search-results fr-table-frame">
+                                <xh:table class="table table-condensed">
+                                    <xh:thead>
+                                        <xh:tr id="fr-summary-header-row">
+                                            <xh:th class="fr-repeat-selection-checkbox" scope="col"/>
+                                            <xh:th class="{$labels-class}" scope="col"/>
+
+                                            <xf:repeat ref="$metadata-columns">
+                                                <xf:var name="column" value="."/>
+                                                <xf:group>
+                                                    <fr:sortable-th
+                                                        class="{concat('fr-', $column)}"
+                                                        label="($fr-resources/summary/titles/*[local-name() = $column], $fr-resources/home-summary/titles/*[local-name() = $column])[1]"
+                                                        sort-supported="{$sort-supported}"
+                                                        instance="xxf:instance('fr-order-by')"
+                                                        column="{$column}"/>
+                                                </xf:group>
+                                            </xf:repeat>
+                                        </xh:tr>
+                                    </xh:thead>
+                                    <xh:tbody>
+                                        <xf:repeat bind="fr-document-bind" id="documents-repeat">
+                                            <xf:var name="document" value="."/>
+                                            <xf:var name="current-document-name" value="@name" as="xs:string"/>
+                                            <xf:var
+                                                name="selection-token"
+                                                value="concat(if ($document/@draft = 'true') then 'draft' else 'data', '/', $current-document-name)"/>
+                                            <xf:var
+                                                name="current-document-operations"
+                                                value="if (exists(@operations)) then xxf:split(@operations) else $global-operations"
+                                                as="xs:string*"/>
+                                            <xf:var
+                                                name="edit-view-opt"
+                                                value="
+                                                    if ($current-document-operations = ('*', 'update')) then
+                                                        'edit'
+                                                    else if ($current-document-operations = 'read') then
+                                                        'view'
+                                                    else
+                                                        ()"/>
+                                            <xf:var
+                                                name="req-parameters-opt"
+                                                value="if ($document/@draft = 'true') then 'draft=true' else ()"/>
+                                            <xf:var
+                                                name="current-document-href-opt"
+                                                value="
+                                                    if (exists($edit-view-opt)) then
+                                                        concat(
+                                                            string-join(
+                                                                (
+                                                                    '/fr',
+                                                                    $app,
+                                                                    $form,
+                                                                    $edit-view-opt,
+                                                                    $current-document-name
+                                                                ),
+                                                                '/'
+                                                            ),
+                                                            if (exists($req-parameters-opt)) then
+                                                                concat('?', string-join($req-parameters-opt, '&amp;'))
+                                                            else
+                                                                ''
+                                                        )
+                                                    else
+                                                        ()"/>
+                                            <xh:tr
+                                                id="fr-summary-body-row"
+                                                class="{if (xxf:split(xxf:instance('fr-selection-instance')) = $selection-token) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
+                                                <xh:td class="fr-repeat-selection-checkbox">
+                                                    <xf:select appearance="full" ref="xxf:instance('fr-selection-instance')" id="document-selection">
+                                                        <xf:item>
+                                                            <xf:label/>
+                                                            <xf:value value="$selection-token"/>
+                                                        </xf:item>
+                                                    </xf:select>
+                                                </xh:td>
+                                                <xh:td class="{$labels-class}">
+                                                    <xf:output ref=".[$document/@draft = 'true']" value="$fr-resources/summary/labels/draft" class="label"/>
+                                                    <xf:output ref=".[not(xxf:split($document/@operations) = ('*', 'update'))]" value="$fr-resources/summary/labels/read-only" class="label"/>
+                                                </xh:td>
+                                                <xf:group ref="''[$show-created]">
+                                                    <xf:var
+                                                        name="created"
+                                                        value="
+                                                            for $v in
+                                                                if (exists($tz)) then
+                                                                    adjust-dateTime-to-timezone(
+                                                                        xs:dateTime($document/@created[. castable as xs:dateTime]),
+                                                                        $tz
+                                                                    )
+                                                                else
+                                                                    adjust-dateTime-to-timezone(
+                                                                        xs:dateTime($document/@created[. castable as xs:dateTime])
+                                                                    )
+                                                            return
+                                                                if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
+                                                                then format-dateTime($v, $fr-resources/common/formats/within-day, $datelang, (), ())
+                                                                else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
+                                                                then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
+                                                                else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
+                                                    <xh:td class="fr-created">
+                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
+                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$created"/>
+                                                        </xh:a>
+                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$created"/>
+                                                    </xh:td>
+                                                </xf:group>
+                                                <xf:group ref="''[$show-last-modified]">
+                                                    <xf:var
+                                                        name="last-modified"
+                                                        value="
+                                                            for $v in
+                                                                if (exists($tz)) then
+                                                                    adjust-dateTime-to-timezone(
+                                                                        xs:dateTime($document/@last-modified[. castable as xs:dateTime]),
+                                                                        $tz
+                                                                    )
+                                                                else
+                                                                    adjust-dateTime-to-timezone(
+                                                                        xs:dateTime($document/@last-modified[. castable as xs:dateTime])
+                                                                    )
+                                                            return
+                                                                if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
+                                                                then format-dateTime($v, $fr-resources/common/formats/within-day, $datelang, (), ())
+                                                                else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
+                                                                then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
+                                                                else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
+                                                    <xh:td class="fr-modified">
+                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
+                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$last-modified"/>
+                                                        </xh:a>
+                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$last-modified"/>
+                                                    </xh:td>
+                                                </xf:group>
+                                                <xf:group ref="''[$show-created-by]">
+                                                    <xh:td class="fr-td">
+                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
+                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$document/@created-by"/>
+                                                        </xh:a>
+                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$document/@created-by"/>
+                                                    </xh:td>
+                                                </xf:group>
+                                                <xf:group ref="''[$show-last-modified-by]">
+                                                    <xh:td class="fr-td">
+                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
+                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$document/@last-modified-by"/>
+                                                        </xh:a>
+                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$document/@last-modified-by"/>
+                                                    </xh:td>
+                                                </xf:group>
+                                                <xf:group ref="''[$show-workflow-stage]">
+                                                    <xh:td class="fr-td">
+                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
+                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$document/@workflow-stage"/>
+                                                        </xh:a>
+                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$document/@workflow-stage"/>
+                                                    </xh:td>
+                                                </xf:group>
+                                            </xh:tr>
+                                        </xf:repeat>
+                                    </xh:tbody>
+                                </xh:table>
+                            </xh:div>
+                        </xf:group>
+                    </xh:body>
+                </xh:html>
             </xf:instance>
 
             <!-- 1. Load form metadata -->
@@ -591,6 +828,19 @@
                     </xf:action>
                 </xf:action>
 
+                <!-- Create dynamic form -->
+                <xf:insert
+                    ref="instance('fr-dynamic-instance')"
+                    origin="
+                        frf:buildSummaryDynamicForm(
+                            instance('fr-source-form-instance')/root(),
+                            instance('fr-dynamic-instance-template'),
+                            $app,
+                            $form,
+                            $version,
+                            instance('fr-form-resources')
+                        )"/>
+
                 <!-- Form Builder only for now: set search parameters if they are on the URL -->
                 <xf:action if="$is-fb">
 
@@ -688,7 +938,6 @@
             <!-- Reset search selection and navigation -->
             <xf:action event="fr-reset-search">
 
-                <xf:setindex repeat="documents-repeat" index="1"/>
                 <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
 
                 <xf:send submission="fr-summary-search-submission"/>
@@ -841,6 +1090,14 @@
                     <!-- This works now that #122 is fixed https://github.com/orbeon/orbeon-forms/issues/122 -->
                     <!-- NOTE: xxf:lang() doesn't seem to work here -->
                     <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
+                </xf:action>
+                <xf:action event="xforms-submit-done">
+                    <xf:var name="i" value="instance('fr-dynamic-instance')//xf:instance[@id = 'fr-form-instance']/*"/>
+                    <xf:delete
+                        ref="$i/*"/>
+                    <xf:insert
+                        context="$i"
+                        origin="instance('fr-search-results-instance')/*"/>
                 </xf:action>
                 <xf:action event="xforms-submit-error">
                     <xf:message ref="$fr-resources/errors/search"/>
@@ -1061,18 +1318,7 @@
                                     <xf:value ref="."/>
                                 </xf:itemset>
                                 <xf:action event="xforms-value-changed">
-
-                                    <xf:send submission="fr-get-source-form-submission">
-                                        <xf:property name="form-definition-version" value="fr:form-version()"/>
-                                    </xf:send>
-
-                                    <xf:dispatch name="fr-reset-search" targetid="fr-form-model"/>
-
-                                    <xf:action type="javascript">
-                                        <xf:param name="version" value="fr:form-version()"/>
-                                        <xf:body>ORBEON.fr.private.API.updateLocationFormVersion(Number(version))</xf:body>
-                                    </xf:action>
-
+                                    <xf:load resource="/fr/{$app}/{$form}/summary?form-version={fr:form-version()}"/>
                                 </xf:action>
                             </xf:select1>
 
@@ -1273,9 +1519,6 @@
                                 page-number-ref="instance('fr-search-instance')/page-number">
 
                                 <xf:action event="fr-pager-changed">
-                                    <xf:setindex
-                                        repeat="documents-repeat"
-                                        index="1"/>
                                     <xf:send
                                         submission="fr-summary-search-submission"/>
                                 </xf:action>
@@ -1755,411 +1998,65 @@
                         </xf:switch>
                     </xf:group>
 
-                    <xf:group ref="instance('fr-search-results-instance')" xxf:update="full">
-
-                        <xh:div class="fr-search-results fr-table-frame">
-                            <xf:var name="documents"        value="document"/>
-                            <xf:var name="have-drafts"      value="exists($documents[@draft = 'true'])"/>
-                            <xf:var name="have-read-only"   value="exists($documents[not(xxf:split(@operations) = ('*', 'update'))])"/>
-                            <xf:var name="labels-class"     value="string-join(('fr-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
-                            <!-- One column for each detail -->
-                            <xf:var name="detail-positions" value="instance('fr-search-instance')/query[@name and @summary-show = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
-
+                    <xh:div class="fr-dynamic">
+                        <xxf:dynamic id="fr-summary-dynamic" ref="instance('fr-dynamic-instance')"/>
+                    </xh:div>
+                    <xf:group ref="instance('fr-search-results-instance')[empty(document)]">
+                        <xh:div class="fr-search-results">
+                            <!-- Logic from `fr:buttons-bar`, specialized -->
+                            <!-- TODO: Duplication is not desirable and this should ideally be a function. -->
                             <xf:var
-                                name="metadata-columns"
-                                value="(
-                                    'created'         [$show-created],
-                                    'last-modified'   [$show-last-modified],
-                                    'created-by'      [$show-created-by],
-                                    'last-modified-by'[$show-last-modified-by],
-                                    'workflow-stage'  [$show-workflow-stage]
-                                )"/>
+                                name="ref"
+                                value="
+                                    let $buttons-property           := 'oxf.fr.summary.buttons',
+                                        $visibility-property-prefix := 'oxf.fr.summary.button',
+                                        $part                       := 'new'
+                                    return
+                                        let $visible-opt :=
+                                                xs:boolean(
+                                                    xxf:instance('fr-form-instance')/fr:evaluate-from-property(
+                                                        xxf:instance('fr-form-instance'),
+                                                        string-join(
+                                                            ($visibility-property-prefix, $part, 'visible', fr:app-name(), fr:form-name()),
+                                                            '.'
+                                                        ),
+                                                        'fr-form-instance'
+                                                    )
+                                                ),
+                                            $enabled-opt :=
+                                                xs:boolean(
+                                                    xxf:instance('fr-form-instance')/fr:evaluate-from-property(
+                                                        xxf:instance('fr-form-instance'),
+                                                        string-join(
+                                                            ($visibility-property-prefix, $part, 'enabled', fr:app-name(), fr:form-name()),
+                                                            '.'
+                                                        ),
+                                                        'fr-form-instance'
+                                                    )
+                                                )
+                                        return
+                                            for $ref in
+                                                if (exists($visible-opt) or exists($enabled-opt)) then
+                                                    (
+                                                        if (exists($enabled-opt) and not($enabled-opt)) then
+                                                            ''
+                                                        else
+                                                            xxf:instance('fr-triggers-instance')/other
+                                                    )[
+                                                        empty($visible-opt) or $visible-opt
+                                                    ]
+                                                else
+                                                    xxf:instance('fr-triggers-instance')/other
+                                            return
+                                                $ref[xxf:relevant()]
+                            "/>
 
-                            <xh:table class="table table-condensed {'fr-table-no-form-data'[empty($documents)]}">
-                                <!-- scrollable="horizontal" width="940px" -->
-                                <xh:thead>
-                                    <xh:tr>
-                                        <xh:th class="fr-repeat-selection-checkbox"/>
-                                        <xh:th class="{$labels-class}"/>
-
-                                        <xf:var name="sort-supported" value="frf:isSortSupported($app, $form)"/>
-
-                                        <xf:repeat ref="$metadata-columns">
-                                            <xf:var name="column" value="."/>
-
-                                            <xf:group>
-                                                <fr:sortable-th
-                                                    class="{concat('fr-', $column)}"
-                                                    label="($fr-resources/summary/titles/*[local-name() = $column], $fr-resources/home-summary/titles/*[local-name() = $column])[1]"
-                                                    sort-supported="{$sort-supported}"
-                                                    instance="instance('fr-order-by')"
-                                                    column="{$column}"/>
-                                            </xf:group>
-                                        </xf:repeat>
-                                        <xf:group ref="''[empty($detail-positions)]">
-                                            <xh:th/>
-                                        </xf:group>
-                                        <xf:repeat ref="instance('fr-search-labels-instance')/query[@summary-show = 'true']" id="fr-summary-repeat-column-number">
-                                            <fr:sortable-th
-                                                class="{if (@control = ('number', 'currency', 'percentage')) then 'fr-align-right' else ''}"
-                                                label="resources[@lang = xxf:instance('fr-language-instance')]/label"
-                                                sort-supported="{$sort-supported}"
-                                                instance="instance('fr-order-by')"
-                                                column="{@path}"/>
-                                        </xf:repeat>
-                                    </xh:tr>
-                                </xh:thead>
-                                <xh:tbody>
-
-                                    <xf:var
-                                        name="datelang"
-                                        value="(xxf:lang()[frf:hasXPathNumberer(.)], 'en')[1]"/>
-
-                                    <xf:repeat ref="1 to count($documents)" id="documents-repeat"><!-- iterate over positions so that repeat iterations are not recreated  -->
-                                        <!-- 1-based position in the current page -->
-                                        <xf:var name="position" value="position()"/>
-                                        <!-- Set context to current document -->
-                                        <xf:group context="instance('fr-search-results-instance')/document[$position]" appearance="xxf:internal">
-                                            <xf:var name="document" value="."/>
-
-                                            <!-- Document name and href for edition -->
-                                            <xf:var name="current-document-name" value="@name" as="xs:string"/>
-                                            <!-- TODO: remove this once we can assume that all the persistence API implementations return @operations -->
-                                            <!-- 2024-12-18: The persistence proxy returns that, right? -->
-                                            <xf:var
-                                                name="current-document-operations"
-                                                value="if (exists(@operations)) then xxf:split(@operations) else $global-operations" as="xs:string*"/>
-                                            <xf:var
-                                                name="edit-view-opt"
-                                                value="
-                                                    if ($current-document-operations = ('*', 'update')) then
-                                                        'edit'
-                                                    else if ($current-document-operations = 'read') then
-                                                        'view'
-                                                    else
-                                                        ()"/>
-                                            <xf:var
-                                                name="req-parameters-opt"
-                                                value="if ($document/@draft = 'true') then 'draft=true' else ()"/>
-                                            <xf:var
-                                                name="current-document-href-opt"
-                                                value="
-                                                    if (exists($edit-view-opt)) then
-                                                        concat(
-                                                            string-join(
-                                                                (
-                                                                    '/fr',
-                                                                    $app,
-                                                                    $form,
-                                                                    $edit-view-opt,
-                                                                    $current-document-name
-                                                                ),
-                                                                '/'
-                                                            ),
-                                                            if (exists($req-parameters-opt)) then
-                                                                concat('?', string-join($req-parameters-opt, '&amp;'))
-                                                            else
-                                                                ''
-                                                        )
-                                                    else
-                                                        ()"
-                                            />
-                                            <xh:tr class="{if (xxf:split(instance('fr-selection-instance')) = $current-document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
-                                                <xh:td class="fr-repeat-selection-checkbox">
-                                                    <xf:select appearance="full" ref="instance('fr-selection-instance')" id="document-selection">
-                                                        <xf:item>
-                                                            <xf:label/>
-                                                            <xf:value value="concat(if ($document/@draft = 'true') then 'draft' else 'data', '/', $current-document-name)"/>
-                                                        </xf:item>
-                                                    </xf:select>
-                                                </xh:td>
-                                                <xh:td class="{$labels-class}">
-                                                    <xf:output ref=".[$document/@draft = 'true']" value="$fr-resources/summary/labels/draft" class="label"/>
-                                                    <xf:output ref=".[not(xxf:split($document/@operations) = ('*', 'update'))]" value="$fr-resources/summary/labels/read-only" class="label"/>
-                                                </xh:td>
-                                                <xf:group ref="''[$show-created]">
-                                                    <xf:var
-                                                        name="created"
-                                                        value="
-                                                            for $v in
-                                                                if (exists($tz)) then
-                                                                    adjust-dateTime-to-timezone(
-                                                                        xs:dateTime($document/@created[. castable as xs:dateTime]),
-                                                                        $tz
-                                                                    )
-                                                                else
-                                                                    adjust-dateTime-to-timezone(
-                                                                        xs:dateTime($document/@created[. castable as xs:dateTime])
-                                                                    )
-                                                            return
-                                                                if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                                                                then format-dateTime($v, $fr-resources/common/formats/within-day, $datelang, (), ())
-                                                                else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                                                                then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
-                                                                else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
-                                                    <xh:td class="fr-created">
-                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
-                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$created"/>
-                                                        </xh:a>
-                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$created"/>
-                                                    </xh:td>
-                                                </xf:group>
-                                                <xf:group ref="''[$show-last-modified]">
-                                                    <xf:var
-                                                        name="last-modified"
-                                                        value="
-                                                            for $v in
-                                                                if (exists($tz)) then
-                                                                    adjust-dateTime-to-timezone(
-                                                                        xs:dateTime($document/@last-modified[. castable as xs:dateTime]),
-                                                                        $tz
-                                                                    )
-                                                                else
-                                                                    adjust-dateTime-to-timezone(
-                                                                        xs:dateTime($document/@last-modified[. castable as xs:dateTime])
-                                                                    )
-                                                            return
-                                                                if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                                                                then format-dateTime($v, $fr-resources/common/formats/within-day, $datelang, (), ())
-                                                                else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                                                                then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
-                                                                else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
-                                                    <xh:td class="fr-modified">
-                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
-                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$last-modified"/>
-                                                        </xh:a>
-                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$last-modified"/>
-                                                    </xh:td>
-                                                </xf:group>
-                                                <xf:group ref="''[$show-created-by]">
-                                                    <xh:td class="fr-td">
-                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
-                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$document/@created-by"/>
-                                                        </xh:a>
-                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$document/@created-by"/>
-                                                    </xh:td>
-                                                </xf:group>
-                                                <xf:group ref="''[$show-last-modified-by]">
-                                                    <xh:td class="fr-td">
-                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
-                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$document/@last-modified-by"/>
-                                                        </xh:a>
-                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$document/@last-modified-by"/>
-                                                    </xh:td>
-                                                </xf:group>
-                                                <xf:group ref="''[$show-workflow-stage]">
-                                                    <xh:td class="fr-td">
-                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
-                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$document/@workflow-stage"/>
-                                                        </xh:a>
-                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$document/@workflow-stage"/>
-                                                    </xh:td>
-                                                </xf:group>
-                                                <!-- Empty column if no summary fields looks nicer -->
-                                                <xf:group ref="if (empty($detail-positions)) then '' else ()">
-                                                    <xh:td>
-                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">&#160;</xh:a>
-                                                    </xh:td>
-                                                </xf:group>
-                                                <!-- Iterate over detail-positions so that repeat iterations are not recreated  -->
-                                                <xf:repeat ref="$detail-positions" id="document-details-repeat">
-                                                    <xf:var name="detail-position" value="."/>
-                                                    <!-- Set context to current detail -->
-                                                    <xf:group context="$document/details/detail[$detail-position]" appearance="xxf:internal">
-                                                        <xh:td class="fr-td {'fr-align-right'[instance('fr-search-instance')/query[@name][$detail-position]/@control = ('number', 'currency', 'percentage')]}">
-                                                            <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
-                                                            <xf:var
-                                                                name="detail"
-                                                                value="
-                                                                    for $raw     in . return
-                                                                    for $query   in instance('fr-search-instance')/query[@name][$detail-position] return
-                                                                    for $control in $query/@control return
-                                                                        if ($control = 'textarea') then
-                                                                            if (string-length($raw) > 20) then
-                                                                                concat(substring($raw, 1, 20), '...')
-                                                                            else
-                                                                                $raw
-                                                                        else if (frf:isMultipleSelectionControl($control)) then
-                                                                            string-join(
-                                                                                for $code in xxf:split($raw) return
-                                                                                    (
-                                                                                        $form-resources/*[local-name() = $query/@name]/item[value = $code]/label,
-                                                                                        if ($control = 'open-select') then OpenSelectSupport:decodeToken($code) else $code
-                                                                                    )[1],
-                                                                                ', '
-                                                                            )
-                                                                        else if ($control = 'tags-input') then
-                                                                            string-join(
-                                                                                for $code in xxf:split($raw) return
-                                                                                    OpenSelectSupport:decodeToken($code),
-                                                                                ', '
-                                                                            )
-                                                                        else if ($control = 'date-range') then
-                                                                            let $parts := tokenize($raw, '/') return
-                                                                            if (count($parts) = 2 and $parts[1] castable as xs:date and $parts[2] castable as xs:date) then
-                                                                                concat(
-                                                                                    format-date(xs:date($parts[1]), $fr-resources/summary/formats/date, $datelang, (), ()),
-                                                                                    ' – ',
-                                                                                    format-date(xs:date($parts[2]), $fr-resources/summary/formats/date, $datelang, (), ())
-                                                                                )
-                                                                            else
-                                                                                $raw
-                                                                        else if (frf:isSingleSelectionControl($control)) then
-                                                                            for $code in $raw return
-                                                                                ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1]
-                                                                        else if ($control = 'secret') then
-                                                                            if (normalize-space($raw) = '') then
-                                                                                ''
-                                                                            else
-                                                                                '••••••••'
-                                                                        else
-                                                                            for $type in substring-after($query/@type, ':') return
-                                                                                if ($type = 'date') then
-                                                                                    if ($raw castable as xs:date) then
-                                                                                        format-date(
-                                                                                            xs:date($raw),
-                                                                                            $fr-resources/summary/formats/date,
-                                                                                            $datelang,
-                                                                                            (),
-                                                                                            ()
-                                                                                        )
-                                                                                    else
-                                                                                        $raw
-                                                                                else if ($type = 'time') then
-                                                                                    if ($raw castable as xs:time) then
-                                                                                        format-time(
-                                                                                            xs:time($raw),
-                                                                                            $fr-resources/summary/formats/time,
-                                                                                            $datelang,
-                                                                                            (),
-                                                                                            ()
-                                                                                        )
-                                                                                    else
-                                                                                        $raw
-                                                                                else if ($type = 'dateTime') then
-                                                                                    if ($raw castable as xs:dateTime) then
-                                                                                        format-dateTime(
-                                                                                            xs:dateTime($raw),
-                                                                                            $fr-resources/summary/formats/dateTime,
-                                                                                            $datelang,
-                                                                                            (),
-                                                                                            ()
-                                                                                        )
-                                                                                    else
-                                                                                        $raw
-                                                                                else if ($type = 'dayTimeDuration') then
-                                                                                    if ($raw castable as xs:dayTimeDuration) then
-                                                                                        let $parts := (
-                                                                                            if (days-from-duration($raw) = 0) then
-                                                                                                ()
-                                                                                            else
-                                                                                                concat(days-from-duration($raw), ' d'),
-                                                                                            if (hours-from-duration($raw) = 0) then
-                                                                                                ()
-                                                                                            else
-                                                                                                concat(hours-from-duration($raw), ' h'),
-                                                                                            if (minutes-from-duration($raw) = 0) then
-                                                                                                ()
-                                                                                            else
-                                                                                                concat(minutes-from-duration($raw), ' min'),
-                                                                                            if (seconds-from-duration($raw) = 0) then
-                                                                                                ()
-                                                                                            else
-                                                                                                concat(seconds-from-duration($raw), ' sec')
-                                                                                        )
-                                                                                        return
-                                                                                            if (empty($parts)) then
-                                                                                                '0 min'
-                                                                                            else
-                                                                                                string-join($parts, ' ')
-                                                                                    else
-                                                                                        $raw
-                                                                                else
-                                                                                    $raw
-                                                                "/>
-                                                            <!-- https://github.com/orbeon/orbeon-forms/issues/2955 -->
-                                                            <!-- https://github.com/orbeon/orbeon-forms/issues/6550 -->
-                                                            <xh:a href="{$current-document-href-opt}">
-                                                                <xf:switch
-                                                                    caseref="starts-with(normalize-space($detail), '&lt;div')"
-                                                                    xxf:update="full">
-                                                                    <xf:case value="true()">
-                                                                        <xf:output mediatype="text/html" value="frf:maybeFilterHtml($detail)"/>
-                                                                    </xf:case>
-                                                                    <xf:case value="false()">
-                                                                        <xf:output value="$detail"/>
-                                                                    </xf:case>
-                                                                </xf:switch>
-                                                            </xh:a>
-                                                        </xh:td>
-                                                    </xf:group>
-                                                </xf:repeat>
-                                            </xh:tr>
-                                        </xf:group>
-                                    </xf:repeat>
-                                    <xf:group ref=".[empty($documents)]">
-                                        <xh:tr>
-                                            <xh:td colspan="{7 + count(instance('fr-search-instance')/*[@summary-show = 'true'])}">
-
-                                                <!-- Logic from `fr:buttons-bar`, specialized -->
-                                                <!-- TODO: Duplication is not desirable and this should ideally be a function. -->
-                                                <xf:var
-                                                    name="ref"
-                                                    value="
-                                                        let $buttons-property           := 'oxf.fr.summary.buttons',
-                                                            $visibility-property-prefix := 'oxf.fr.summary.button',
-                                                            $part                       := 'new'
-                                                        return
-                                                            let $visible-opt :=
-                                                                    xs:boolean(
-                                                                        xxf:instance('fr-form-instance')/fr:evaluate-from-property(
-                                                                            xxf:instance('fr-form-instance'),
-                                                                            string-join(
-                                                                                ($visibility-property-prefix, $part, 'visible', fr:app-name(), fr:form-name()),
-                                                                                '.'
-                                                                            ),
-                                                                            'fr-form-instance'
-                                                                        )
-                                                                    ),
-                                                                $enabled-opt :=
-                                                                    xs:boolean(
-                                                                        xxf:instance('fr-form-instance')/fr:evaluate-from-property(
-                                                                            xxf:instance('fr-form-instance'),
-                                                                            string-join(
-                                                                                ($visibility-property-prefix, $part, 'enabled', fr:app-name(), fr:form-name()),
-                                                                                '.'
-                                                                            ),
-                                                                            'fr-form-instance'
-                                                                        )
-                                                                    )
-                                                            return
-                                                                for $ref in
-                                                                    if (exists($visible-opt) or exists($enabled-opt)) then
-                                                                        (
-                                                                            if (exists($enabled-opt) and not($enabled-opt)) then
-                                                                                ''
-                                                                            else
-                                                                                xxf:instance('fr-triggers-instance')/other
-                                                                        )[
-                                                                            empty($visible-opt) or $visible-opt
-                                                                        ]
-                                                                    else
-                                                                        xxf:instance('fr-triggers-instance')/other
-                                                                return
-                                                                    $ref[xxf:relevant()]
-                                                "/>
-
-                                                <xh:div class="fr-no-form-data alert">
-                                                    <xf:output mediatype="text/html" value="xxf:serialize($fr-resources/summary/messages/no-form-data-found/node(), 'html')"/>
-                                                    <fr:process-button name="new" ref="$ref">
-                                                        <xf:label value="xxf:r('buttons.new-long', '|fr-fr-resources|')" mediatype="text/html"/>
-                                                    </fr:process-button>
-                                                </xh:div>
-                                            </xh:td>
-                                        </xh:tr>
-                                    </xf:group>
-                                </xh:tbody>
-                            </xh:table>
+                            <xh:div class="fr-no-form-data alert">
+                                <xf:output mediatype="text/html" value="xxf:serialize($fr-resources/summary/messages/no-form-data-found/node(), 'html')"/>
+                                <fr:process-button name="new" ref="$ref">
+                                    <xf:label value="xxf:r('buttons.new-long', '|fr-fr-resources|')" mediatype="text/html"/>
+                                </fr:process-button>
+                            </xh:div>
                         </xh:div>
                     </xf:group>
                 </fr:body>

@@ -65,48 +65,49 @@ case class SearchableValues(
 }
 
 case class IndexedControl(
-    name               : String,
-    xpath              : String,
-    xsType             : String,
-    control            : String,
-    summarySettings    : SummarySettings,
-    staticallyRequired : Boolean,
-    htmlLabel          : Boolean,
-    resources          : List[(String, NodeInfo)]
-  ) {
-    def toXML: Elem =
-      <query
-        name={name}
-        path={xpath}
-        type={xsType}
-        control={control}
-        summary-show={summarySettings.show.toString}
-        summary-search={summarySettings.search.toString}
-        summary-edit={summarySettings.edit.toString}
-        summary-edit-process={summarySettings.editProcess.getOrElse("")}
-        summary-sort-direction={summarySettings.sortDirection.orNull}
-        statically-required={staticallyRequired.toString}
-        match={matchForControl(control)}
-        html-label={htmlLabel.toString}>{
-        for ((lang, resourceHolder) <- resources)
-          yield
-            <resources lang={lang}>{
-              val labelElemOpt =
-                resourceHolder elemValueOpt "label" map { label =>
+  name               : String,
+  xpath              : String,
+  xsType             : String,
+  control            : String,
+  summarySettings    : SummarySettings,
+  staticallyRequired : Boolean,
+  htmlLabel          : Boolean,
+  resources          : List[(String, NodeInfo)],
+  controlElem        : Option[NodeInfo] = None
+) {
+  def toXML: Elem =
+    <query
+      name={name}
+      path={xpath}
+      type={xsType}
+      control={control}
+      summary-show={summarySettings.show.toString}
+      summary-search={summarySettings.search.toString}
+      summary-edit={summarySettings.edit.toString}
+      summary-edit-process={summarySettings.editProcess.getOrElse("")}
+      summary-sort-direction={summarySettings.sortDirection.orNull}
+      statically-required={staticallyRequired.toString}
+      match={matchForControl(control)}
+      html-label={htmlLabel.toString}>{
+      for ((lang, resourceHolder) <- resources)
+        yield
+          <resources lang={lang}>{
+            val labelElemOpt =
+              resourceHolder elemValueOpt "label" map { label =>
                   if (htmlLabel)
                     <label mediatype="text/html">{label}</label>
                   else
                     <label>{label.escapeXmlMinimal}</label>
                 }
 
-              val itemElems = resourceHolder child "item" map { item =>
-                <item>{
-                  <label>{item elemValue "label"}</label>
-                  <value>{item elemValue "value"}</value>
-                }</item>
-              }
+            val itemElems = resourceHolder child "item" map { item =>
+              <item>{
+                <label>{item elemValue "label"}</label>
+                <value>{item elemValue "value"}</value>
+              }</item>
+            }
 
-              labelElemOpt.toList ++ itemElems
-            }</resources>
-      }</query>
-  }
+            labelElemOpt.toList ++ itemElems
+          }</resources>
+    }</query>
+}

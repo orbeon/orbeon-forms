@@ -734,7 +734,7 @@
     </xsl:template>
 
     <!-- Insert stylesheets -->
-    <xsl:template match="xh:head">
+    <xsl:template match="xh:head[not(exists(parent::*/parent::xf:instance))]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
 

@@ -335,7 +335,7 @@ class XFormsSelect1Handler(
       isMultiple && containingDocument.isReadonlyAppearanceStaticSelectFull ||
         (! isMultiple && containingDocument.isReadonlyAppearanceStaticSelect1Full)
 
-    val mustOutputFull = isBooleanInput || (isFull && (allowFullStaticReadonly || !isStaticReadonly))
+    val mustOutputFull = isBooleanInput || (isFull && (isSingleItemItemset || allowFullStaticReadonly || ! isStaticReadonly))
 
     val encode =
       elementAnalysis match {

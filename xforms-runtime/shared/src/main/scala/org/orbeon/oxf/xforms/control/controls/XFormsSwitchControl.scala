@@ -42,6 +42,11 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
   override type Control <: SwitchControl
 
+  // On `xf:switch`, `xxf:readonly-appearance` controls whether all `xf:case`s are shown in static-readonly mode
+  // (e.g. `fr:section` sets `xxf:readonly-appearance="dynamic"` on its internal `xf:switch` so collapsed sections
+  // stay hidden in `view` mode), and must not override `xxf:readonly-appearance` for descendant controls.
+  override protected def propagatesStaticReadonlyAppearanceToDescendants: Boolean = false
+
   // Initial local state
   setLocal(new XFormsSwitchControlLocal)
 

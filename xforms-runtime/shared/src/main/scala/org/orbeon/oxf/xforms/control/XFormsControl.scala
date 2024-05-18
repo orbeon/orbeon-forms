@@ -34,7 +34,7 @@ import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.RepeatSeparatorString
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId, XFormsNames}
 
 
 /**
@@ -83,6 +83,29 @@ class XFormsControl(
 
   // Whether the control has been visited
   def visited = false
+
+  protected def propagatesStaticReadonlyAppearanceToDescendants: Boolean = true
+
+  final def hasStaticReadonlyAppearance: Boolean = {
+    @scala.annotation.tailrec
+    def findInherited(ancestor: XFormsControl): Boolean =
+      if (ancestor eq null)
+        containingDocument.staticReadonly
+      else if (! ancestor.propagatesStaticReadonlyAppearanceToDescendants)
+        findInherited(ancestor.parent)
+      else
+        ancestor.element.attributeValue(XFormsNames.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME) match {
+          case XFormsProperties.ReadonlyAppearanceStaticValue  => true
+          case XFormsProperties.ReadonlyAppearanceDynamicValue => false
+          case _                                               => findInherited(ancestor.parent)
+        }
+
+    element.attributeValue(XFormsNames.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME) match {
+      case XFormsProperties.ReadonlyAppearanceStaticValue  => true
+      case XFormsProperties.ReadonlyAppearanceDynamicValue => false
+      case _                                               => findInherited(parent)
+    }
+  }
 
   parent match {
     case container: XFormsContainerControl => container.addChild(self)

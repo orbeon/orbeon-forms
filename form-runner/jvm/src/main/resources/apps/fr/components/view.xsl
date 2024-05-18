@@ -414,7 +414,7 @@
     </xsl:template>
 
     <!-- Main entry point -->
-    <xsl:template match="xh:body">
+    <xsl:template match="xh:body[not(exists(parent::*/parent::xf:instance))]">
         <xsl:copy>
             <!-- .orbeon is here to scope all Orbeon CSS rules -->
             <xsl:attribute

@@ -51,7 +51,7 @@ case class DynamicState(
   lastAjaxResponse  : Seq[Byte],
   instances         : Seq[Byte],
   controls          : Seq[Byte],
-  initializationData: Option[(Option[String], String)],
+  initializationData: Option[(Option[String], String, Option[String])],
   delayedEvents     : Seq[Byte],
   openDialogs       : Int
 ) extends SizedCacheable {

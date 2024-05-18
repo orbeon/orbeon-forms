@@ -22,6 +22,7 @@ import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
 import org.orbeon.oxf.fr.permission.SimpleConstraint
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SearchableValues, SummarySettings}
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.om
@@ -76,6 +77,7 @@ trait FormDefinition {
     appForm                     : AppForm,
     searchVersionOpt            : Option[SearchVersion],
     databaseDataFormatVersion   : DataFormatVersion,
+    includeControlElem          : Boolean          = false,
     providedResourcesRootElemOpt: Option[NodeInfo] = None // present for the Form Builder Summary page only
   )(implicit
     indentedLogger: IndentedLogger
@@ -151,7 +153,8 @@ trait FormDefinition {
         summarySettings    = summarySettings(control),
         staticallyRequired = isBindRequired(bind),
         htmlLabel          = FormRunner.hasHTMLMediatype(control / (XF -> "label")),
-        resources          = resourcesWithDynamicItems.toList
+        resources          = resourcesWithDynamicItems.toList,
+        controlElem        = includeControlElem option control
       )
     }
 

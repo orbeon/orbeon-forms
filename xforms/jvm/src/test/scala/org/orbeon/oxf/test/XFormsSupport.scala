@@ -132,12 +132,16 @@ trait XFormsSupport extends MockitoSugar {
             vc
         } foreach { target =>
           ClientEvents.processEvent(document, new XXFormsValueEvent(target, value))
-          document.afterExternalEvents(None)
-          document.afterUpdateResponse()
-          document.beforeExternalEvents(null, submissionIdOpt = None)
+          separateClientEvents()
         }
       case _ =>
     }
+
+  def separateClientEvents(): Unit = {
+    document.afterExternalEvents(None)
+    document.afterUpdateResponse()
+    document.beforeExternalEvents(null, submissionIdOpt = None)
+  }
 
   // TODO: Move to XFormsSupport2?
   def activateControlWithEvent(controlEffectiveId: String)(implicit ec: ExternalContext): Unit =

@@ -77,7 +77,7 @@
 
             <xf:var
                 name="is-view-mode"
-                value="xxf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
+                value="xxf:is-control-static-readonly('fr-tree-select1')"/>
 
             <xf:select1
                 id="hidden-select1"

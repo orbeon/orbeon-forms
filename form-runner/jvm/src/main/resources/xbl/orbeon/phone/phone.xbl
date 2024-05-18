@@ -418,7 +418,7 @@
                 value="xxf:binding('fr-phone')"/>
             <xf:var
                 name="view"
-                value="instance('local')/is-readonly = 'true' and property('xxf:readonly-appearance') = 'static'"/>
+                value="xxf:is-control-static-readonly('fr-phone')"/>
 
             <xf:var
                 name="default-country"

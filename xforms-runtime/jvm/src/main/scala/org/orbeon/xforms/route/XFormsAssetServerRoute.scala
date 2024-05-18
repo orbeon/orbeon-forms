@@ -136,7 +136,7 @@ object XFormsAssetServerRoute extends NativeRoute {
             // the cost of getting the state from cache.
             // 2022-10-13: Returns `None` if the state is not found in the state store, so we can produce an appropriate
             // error without logging an exception.
-            def fromInitialStateOpt: Option[Option[(Option[String], String)]] =
+            def fromInitialStateOpt: Option[Option[(Option[String], String, Option[String])]] =
               XFormsStateManager.getStateFromParamsOrStore(
                 RequestParameters(uuid, None, None, None, None),
                 isInitialState = true
@@ -154,10 +154,12 @@ object XFormsAssetServerRoute extends NativeRoute {
             IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
               fromCurrentStateOpt.map(Some.apply) orElse fromInitialStateOpt match {
                 case Some(initializationDateOpt) =>
-                  initializationDateOpt foreach { case (initializationScriptsOpt, jsonInitializationData) =>
+                  initializationDateOpt foreach { case (initializationScriptsOpt, jsonInitializationData, dynamicShareableScriptsOpt) =>
 
                     val namespaceOpt   = ec.getRequest.getFirstParamAsString(Constants.EmbeddingNamespaceParameter)
                     val contextPathOpt = ec.getRequest.getFirstParamAsString(Constants.EmbeddingContextParameter)
+
+                    dynamicShareableScriptsOpt foreach writer.write
 
                     initializationScriptsOpt foreach { initializationScripts =>
                       writer.write(

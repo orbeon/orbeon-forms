@@ -83,7 +83,7 @@ class XHTMLHeadHandler(
       }
 
     val XFormsAssets(baselineCss, baselineJs) = containingDocument.staticState.baselineAssets
-    val XBLAssets(css, js)                    = containingDocument.staticState.bindingAssets
+    val XBLAssets(css, js)                    = containingDocument.staticOps.bindingAssets
 
     // Stylesheets
     AssetsSupport.outputCssAssets(xhtmlPrefix, baselineCss, css, isMinimal)
@@ -97,7 +97,7 @@ class XHTMLHeadHandler(
       if (! containingDocument.isServeInlineResources) {
 
         // Static resources
-        if (containingDocument.staticOps.uniqueJsScripts.nonEmpty)
+        if (containingDocument.staticState.topLevelPart.uniqueJsScripts.nonEmpty)
           element(
             localName = "script",
             prefix    = xhtmlPrefix,

@@ -588,7 +588,7 @@
 
                         <xsl:variable name="service-performs-search" select="@service-performs-search/string() = 'true'"/>
                         <xf:var       name="binding"                 value="xxf:binding('{$binding-id}')"/>
-                        <xf:var       name="view"                    value="property('xxf:readonly-appearance') = 'static' or fr:mode() = ('view', 'pdf')"/>
+                        <xf:var       name="view"                    value="xxf:is-control-static-readonly('{$binding-id}') or fr:mode() = ('view', 'pdf')"/>
                         <xf:var       name="disable-placeholder"     value="fr:component-param-value('disable-placeholder') = 'true'"/>
                         <xf:var       name="min-input-length"        value="fr:component-param-value('min-input-length')"/>
                         <xf:var

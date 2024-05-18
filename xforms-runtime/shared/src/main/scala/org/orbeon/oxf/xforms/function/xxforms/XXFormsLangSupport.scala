@@ -20,8 +20,9 @@ object XXFormsLangSupport {
       case LangRef.Literal(value) =>
         Some(value)
       case LangRef.AVT(att) =>
-        val attributeControl = containingDocument.getControlByEffectiveId(att.staticId).asInstanceOf[XXFormsAttributeControl]
-        Option(attributeControl.getExternalValue(EventCollector.Throw))
+        containingDocument.findControlByEffectiveId(att.prefixedId)
+          .collect { case attributeControl: XXFormsAttributeControl => attributeControl }
+          .flatMap(attributeControl => Option(attributeControl.getExternalValue(EventCollector.Throw)))
       case _ =>
         None
     }

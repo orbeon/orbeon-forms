@@ -89,7 +89,7 @@
                         string($label)
                 "/>
 
-            <xf:trigger appearance="minimal" class="{'fr-sortable-th'[$sort-supported]}">
+            <xf:trigger appearance="minimal" class="{'fr-sortable-th'[$sort-supported]}" xxf:readonly-appearance="dynamic">
                 <xf:label>
                     <xf:output value="$plain-label"/>
                     <xh:span
@@ -104,7 +104,7 @@
                     </xh:span>
                 </xf:label>
                 <xf:action event="DOMActivate" if="$sort-supported">
-                    <xf:dispatch name="fr-order-by" targetid="fr-form-model" xxbl:scope="outer">
+                    <xf:dispatch name="fr-order-by" targetid="|fr-form-model|">
                         <xf:property name="local-or-remote" value="$local-or-remote" xxbl:scope="inner"/>
                         <xf:property name="table"           value="$table"           xxbl:scope="inner"/>
                         <xf:property name="column"          value="$column"          xxbl:scope="inner"/>

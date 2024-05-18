@@ -879,9 +879,9 @@ trait ContainingDocumentClientState {
 
   self: XFormsContainingDocument =>
 
-  private var _initializationData : Option[(Option[String], String)] = None
+  private var _initializationData : Option[(Option[String], String, Option[String])] = None
 
-  def getInitializationData: Option[(Option[String], String)] = _initializationData
+  def getInitializationData: Option[(Option[String], String, Option[String])] = _initializationData
 
   def setInitializationData(): Unit = {
 
@@ -891,6 +891,21 @@ trait ContainingDocumentClientState {
 
     val initializationScripts =
       ScriptBuilder.findOtherScriptInvocations(this)
+
+    val topLevelScriptDigests =
+      staticState.topLevelPart.uniqueJsScripts.iterator.map(_.digest).toSet
+
+    val dynamicPartScripts =
+      staticOps.uniqueJsScripts.filterNot(s => topLevelScriptDigests(s.digest))
+
+    val dynamicShareableScriptsOpt =
+      if (dynamicPartScripts.nonEmpty) {
+        val sb = new StringBuilder
+        ScriptBuilder.writeScripts(dynamicPartScripts, sb.append(_))
+        Some(sb.toString)
+      } else {
+        None
+      }
 
     val jsonInitializationData =
       ScriptBuilder.buildJsonInitializationData(
@@ -903,7 +918,7 @@ trait ContainingDocumentClientState {
         sessionId                 = externalContext.getSessionOpt(create = false).map(_.getId).getOrElse("")
       )
 
-    _initializationData = (initializationScripts, jsonInitializationData).some
+    _initializationData = (initializationScripts, jsonInitializationData, dynamicShareableScriptsOpt).some
   }
 
   def clearInitialClientScript(): Unit =

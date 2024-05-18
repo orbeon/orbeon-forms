@@ -22,6 +22,8 @@ import org.orbeon.xforms.HeadElement
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.immutable as i
+import scala.collection.immutable.SortedMap
+import scala.collection.mutable
 
 // Global operations on parts including top-level part and descendant parts
 class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
@@ -91,9 +93,17 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
   def iterateGlobals = iterateInParts(_.iterateGlobals)
 
   def scriptsByPrefixedId = collectInParts(_.scriptsByPrefixedId) toMap
-  def uniqueJsScripts = collectInParts(_.uniqueJsScripts)
+  def uniqueJsScripts = collectInPartsReverse(_.uniqueJsScripts).distinctBy(_.digest)
 
-  def allXblAssetsMaybeDuplicates: Iterable[(QName, XBLAssets)] = collectInParts(_.allXblAssetsMaybeDuplicates)
+  def allXblAssetsMaybeDuplicates: Iterable[(QName, XBLAssets)] = collectInPartsReverse(_.allXblAssetsMaybeDuplicates)
+
+  def bindingAssets: XBLAssets = {
+    val orderedBindings = SortedMap[QName, XBLAssets]() ++ allXblAssetsMaybeDuplicates
+    XBLAssets(
+      css = orderedBindings.values.iterator.flatMap(_.css).to(mutable.LinkedHashSet).toList,
+      js  = orderedBindings.values.iterator.flatMap(_.js) .to(mutable.LinkedHashSet).toList
+    )
+  }
 
   /**
    * Get prefixed ids of all of the start control's repeat ancestors, stopping at endPrefixedId if not null. If

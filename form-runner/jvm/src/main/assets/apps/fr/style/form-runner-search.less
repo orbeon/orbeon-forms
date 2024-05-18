@@ -282,11 +282,15 @@
 
     td {
 
-      &:has(a:not(.xforms-hidden)) {
+      &:has(> a:not(.fr-summary-cell-link):not(.xforms-hidden)) {
         padding: 0;
       }
 
-      & > a {
+      &:has(> a.fr-summary-cell-link) {
+        padding: 5px 10px;
+      }
+
+      & > a:not(.fr-summary-cell-link) {
         display: block;
         width: 100%;
         box-sizing: border-box;
@@ -302,6 +306,21 @@
         // https://github.com/orbeon/orbeon-forms/issues/7097
         span.xforms-output-output:empty::before {
           content: "\00A0";  // &nbsp;
+        }
+      }
+
+      & > a.fr-summary-cell-link {
+        position: static;
+
+        &::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+        }
+
+        &:focus-visible::after {
+          box-shadow: inset 0 0 0 2px var(--orbeon-focus-border-color);
         }
       }
     }

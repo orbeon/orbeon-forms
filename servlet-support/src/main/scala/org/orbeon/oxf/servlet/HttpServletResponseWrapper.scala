@@ -13,11 +13,13 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.io.{OutputStream, PrintWriter}
+import java.io.{ByteArrayOutputStream, OutputStream, PrintWriter}
 import java.{util => ju}
 
-class HttpServletResponseWrapper(response: HttpServletResponse) extends HttpServletResponse {
-  override def getNativeServletResponse: AnyRef = response.getNativeServletResponse
+
+class HttpServletResponseWrapper(var response: HttpServletResponse) extends HttpServletResponse {
+  override def getNativeServletResponse: AnyRef = response.wrappedWith(this)
+
   override def addDateHeader(name: String, date: Long): Unit = response.addDateHeader(name, date)
   override def addHeader(name: String, value: String): Unit = response.addHeader(name, value)
   override def addIntHeader(name: String, value: Int): Unit = response.addIntHeader(name, value)
@@ -44,4 +46,8 @@ class HttpServletResponseWrapper(response: HttpServletResponse) extends HttpServ
   override def setLocale(loc: ju.Locale): Unit = response.setLocale(loc)
   override def setStatus(sc: Int): Unit = response.setStatus(sc)
   override def getStatus: Int = response.getStatus
+
+  override def servletOutputStream(byteArrayOutputStream: ByteArrayOutputStream): OutputStream = response.servletOutputStream(byteArrayOutputStream)
+
+  override def wrappedWith(wrapper: HttpServletResponseWrapper): AnyRef = response.wrappedWith(wrapper)
 }

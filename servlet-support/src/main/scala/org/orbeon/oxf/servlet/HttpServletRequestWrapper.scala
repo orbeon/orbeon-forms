@@ -16,8 +16,10 @@ package org.orbeon.oxf.servlet
 import java.io.{BufferedReader, InputStream}
 import java.{util => ju}
 
-class HttpServletRequestWrapper(request: HttpServletRequest) extends HttpServletRequest {
-  override def getNativeServletRequest: AnyRef = request.getNativeServletRequest
+
+class HttpServletRequestWrapper(var request: HttpServletRequest) extends HttpServletRequest {
+  override def getNativeServletRequest: AnyRef = request.wrappedWith(this)
+
   override def getAttribute(name: String): AnyRef = request.getAttribute(name)
   override def getAttributeNames: ju.Enumeration[String] = request.getAttributeNames
   override def getAuthType: String = request.getAuthType
@@ -64,4 +66,6 @@ class HttpServletRequestWrapper(request: HttpServletRequest) extends HttpServlet
   override def removeAttribute(name: String): Unit = request.removeAttribute(name)
   override def setAttribute(name: String, o: AnyRef): Unit = request.setAttribute(name, o)
   override def setCharacterEncoding(env: String): Unit = request.setCharacterEncoding(env)
+
+  override def wrappedWith(wrapper: HttpServletRequestWrapper): AnyRef = request.wrappedWith(wrapper)
 }

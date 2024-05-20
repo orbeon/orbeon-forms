@@ -15,6 +15,7 @@ package org.orbeon.oxf.servlet
 
 import org.orbeon.oxf.util.PathUtils._
 
+import java.io.BufferedReader
 import java.net.URI
 import java.{util => ju}
 
@@ -55,6 +56,9 @@ trait HttpServletRequest extends ServletRequest {
   def getSession(create: Boolean): HttpSession
   def isRequestedSessionIdValid: Boolean
   def isUserInRole(role: String): Boolean
+
+  // javax/jakarta.servlet.http.HttpServletRequestWrapper
+  def wrappedWith(wrapper: HttpServletRequestWrapper): AnyRef
 
   /**
    * Return a request path info that looks like what one would expect. The path starts with a "/", relative to the
@@ -129,8 +133,68 @@ class JavaxHttpServletRequest(httpServletRequest: javax.servlet.http.HttpServlet
   override def getSession(create: Boolean): HttpSession = Option(httpServletRequest.getSession(create)).map(HttpSession.apply).orNull
   override def isRequestedSessionIdValid: Boolean = httpServletRequest.isRequestedSessionIdValid
   override def isUserInRole(role: String): Boolean = httpServletRequest.isUserInRole(role)
+
+  override def wrappedWith(wrapper: HttpServletRequestWrapper): javax.servlet.http.HttpServletRequestWrapper =
+    new javax.servlet.http.HttpServletRequestWrapper(httpServletRequest) {
+      // Handle mutable behavior
+      override def setRequest(servletRequest: javax.servlet.ServletRequest): Unit = {
+        super.setRequest(servletRequest)
+        servletRequest match {
+          case httpServletRequest: javax.servlet.http.HttpServletRequest =>
+            wrapper.request = HttpServletRequest(httpServletRequest)
+        }
+      }
+
+      override def getAttribute(name: String): AnyRef = wrapper.getAttribute(name)
+      override def getAttributeNames: ju.Enumeration[String] = wrapper.getAttributeNames
+      override def getAuthType: String = wrapper.getAuthType
+      override def getCharacterEncoding: String = wrapper.getCharacterEncoding
+      override def getContentLength: Int = wrapper.getContentLength
+      override def getContentType: String = wrapper.getContentType
+      override def getContextPath: String = wrapper.getContextPath
+      override def getCookies: Array[javax.servlet.http.Cookie] = wrapper.getCookies.map(_.getNativeCookie.asInstanceOf[javax.servlet.http.Cookie])
+      override def getDateHeader(name: String): Long = wrapper.getDateHeader(name)
+      override def getHeader(name: String): String = wrapper.getHeader(name)
+      override def getHeaderNames: ju.Enumeration[String] = wrapper.getHeaderNames
+      override def getHeaders(name: String): ju.Enumeration[String] = wrapper.getHeaders(name)
+      // See comment in ServletRequest trait
+      override def getInputStream: javax.servlet.ServletInputStream = wrapper.getInputStream.asInstanceOf[javax.servlet.ServletInputStream]
+      override def getIntHeader(name: String): Int = wrapper.getIntHeader(name)
+      override def getLocalName: String = wrapper.getLocalName
+      override def getLocale: ju.Locale = wrapper.getLocale
+      override def getLocales: ju.Enumeration[ju.Locale] = wrapper.getLocales
+      override def getMethod: String = wrapper.getMethod
+      override def getParameter(name: String): String = wrapper.getParameter(name)
+      override def getParameterNames: ju.Enumeration[String] = wrapper.getParameterNames
+      override def getParameterMap: ju.Map[String, Array[String]] = wrapper.getParameterMap
+      override def getParameterValues(name: String): Array[String] = wrapper.getParameterValues(name)
+      override def getPathInfo: String = wrapper.getPathInfo
+      override def getPathTranslated: String = wrapper.getPathTranslated
+      override def getProtocol: String = wrapper.getProtocol
+      override def getQueryString: String = wrapper.getQueryString
+      override def getReader: BufferedReader = wrapper.getReader
+      override def getRemoteAddr: String = wrapper.getRemoteAddr
+      override def getRemoteHost: String = wrapper.getRemoteHost
+      override def getRemoteUser: String = wrapper.getRemoteUser
+      override def getRequestDispatcher(path: String): javax.servlet.RequestDispatcher = wrapper.getRequestDispatcher(path).getNativeRequestDispatcher.asInstanceOf[javax.servlet.RequestDispatcher]
+      override def getRequestURI: String = wrapper.getRequestURI
+      override def getRequestURL: StringBuffer = wrapper.getRequestURL
+      override def getRequestedSessionId: String = wrapper.getRequestedSessionId
+      override def getScheme: String = wrapper.getScheme
+      override def getServerName: String = wrapper.getServerName
+      override def getServerPort: Int = wrapper.getServerPort
+      override def getServletContext: javax.servlet.ServletContext = wrapper.getServletContext.getNativeServletContext.asInstanceOf[javax.servlet.ServletContext]
+      override def getServletPath: String = wrapper.getServletPath
+      override def getSession(create: Boolean): javax.servlet.http.HttpSession = wrapper.getSession(create).getNativeHttpSession.asInstanceOf[javax.servlet.http.HttpSession]
+      override def isRequestedSessionIdValid: Boolean = wrapper.isRequestedSessionIdValid
+      override def isSecure: Boolean = wrapper.isSecure
+      override def isUserInRole(role: String): Boolean = wrapper.isUserInRole(role)
+      override def removeAttribute(name: String): Unit = wrapper.removeAttribute(name)
+      override def setAttribute(name: String, o: AnyRef): Unit = wrapper.setAttribute(name, o)
+      override def setCharacterEncoding(env: String): Unit = wrapper.setCharacterEncoding(env)
+    }
 }
-class JakartaHttpServletRequest(val httpServletRequest: jakarta.servlet.http.HttpServletRequest) extends JakartaServletRequest(httpServletRequest) with HttpServletRequest {
+class JakartaHttpServletRequest(httpServletRequest: jakarta.servlet.http.HttpServletRequest) extends JakartaServletRequest(httpServletRequest) with HttpServletRequest {
   override def getNativeServletRequest: jakarta.servlet.http.HttpServletRequest = httpServletRequest
 
   override def getAuthType: String = httpServletRequest.getAuthType
@@ -155,4 +219,64 @@ class JakartaHttpServletRequest(val httpServletRequest: jakarta.servlet.http.Htt
   override def getSession(create: Boolean): HttpSession = Option(httpServletRequest.getSession(create)).map(HttpSession.apply).orNull
   override def isRequestedSessionIdValid: Boolean = httpServletRequest.isRequestedSessionIdValid
   override def isUserInRole(role: String): Boolean = httpServletRequest.isUserInRole(role)
+
+  override def wrappedWith(wrapper: HttpServletRequestWrapper): jakarta.servlet.http.HttpServletRequestWrapper =
+    new jakarta.servlet.http.HttpServletRequestWrapper(httpServletRequest) {
+      // Handle mutable behavior
+      override def setRequest(servletRequest: jakarta.servlet.ServletRequest): Unit = {
+        super.setRequest(servletRequest)
+        servletRequest match {
+          case httpServletRequest: jakarta.servlet.http.HttpServletRequest =>
+            wrapper.request = HttpServletRequest(httpServletRequest)
+        }
+      }
+
+      override def getAttribute(name: String): AnyRef = wrapper.getAttribute(name)
+      override def getAttributeNames: ju.Enumeration[String] = wrapper.getAttributeNames
+      override def getAuthType: String = wrapper.getAuthType
+      override def getCharacterEncoding: String = wrapper.getCharacterEncoding
+      override def getContentLength: Int = wrapper.getContentLength
+      override def getContentType: String = wrapper.getContentType
+      override def getContextPath: String = wrapper.getContextPath
+      override def getCookies: Array[jakarta.servlet.http.Cookie] = wrapper.getCookies.map(_.getNativeCookie.asInstanceOf[jakarta.servlet.http.Cookie])
+      override def getDateHeader(name: String): Long = wrapper.getDateHeader(name)
+      override def getHeader(name: String): String = wrapper.getHeader(name)
+      override def getHeaderNames: ju.Enumeration[String] = wrapper.getHeaderNames
+      override def getHeaders(name: String): ju.Enumeration[String] = wrapper.getHeaders(name)
+      // See comment in ServletRequest trait
+      override def getInputStream: jakarta.servlet.ServletInputStream = wrapper.getInputStream.asInstanceOf[jakarta.servlet.ServletInputStream]
+      override def getIntHeader(name: String): Int = wrapper.getIntHeader(name)
+      override def getLocalName: String = wrapper.getLocalName
+      override def getLocale: ju.Locale = wrapper.getLocale
+      override def getLocales: ju.Enumeration[ju.Locale] = wrapper.getLocales
+      override def getMethod: String = wrapper.getMethod
+      override def getParameter(name: String): String = wrapper.getParameter(name)
+      override def getParameterNames: ju.Enumeration[String] = wrapper.getParameterNames
+      override def getParameterMap: ju.Map[String, Array[String]] = wrapper.getParameterMap
+      override def getParameterValues(name: String): Array[String] = wrapper.getParameterValues(name)
+      override def getPathInfo: String = wrapper.getPathInfo
+      override def getPathTranslated: String = wrapper.getPathTranslated
+      override def getProtocol: String = wrapper.getProtocol
+      override def getQueryString: String = wrapper.getQueryString
+      override def getReader: BufferedReader = wrapper.getReader
+      override def getRemoteAddr: String = wrapper.getRemoteAddr
+      override def getRemoteHost: String = wrapper.getRemoteHost
+      override def getRemoteUser: String = wrapper.getRemoteUser
+      override def getRequestDispatcher(path: String): jakarta.servlet.RequestDispatcher = wrapper.getRequestDispatcher(path).getNativeRequestDispatcher.asInstanceOf[jakarta.servlet.RequestDispatcher]
+      override def getRequestURI: String = wrapper.getRequestURI
+      override def getRequestURL: StringBuffer = wrapper.getRequestURL
+      override def getRequestedSessionId: String = wrapper.getRequestedSessionId
+      override def getScheme: String = wrapper.getScheme
+      override def getServerName: String = wrapper.getServerName
+      override def getServerPort: Int = wrapper.getServerPort
+      override def getServletContext: jakarta.servlet.ServletContext = wrapper.getServletContext.getNativeServletContext.asInstanceOf[jakarta.servlet.ServletContext]
+      override def getServletPath: String = wrapper.getServletPath
+      override def getSession(create: Boolean): jakarta.servlet.http.HttpSession = wrapper.getSession(create).getNativeHttpSession.asInstanceOf[jakarta.servlet.http.HttpSession]
+      override def isRequestedSessionIdValid: Boolean = wrapper.isRequestedSessionIdValid
+      override def isSecure: Boolean = wrapper.isSecure
+      override def isUserInRole(role: String): Boolean = wrapper.isUserInRole(role)
+      override def removeAttribute(name: String): Unit = wrapper.removeAttribute(name)
+      override def setAttribute(name: String, o: AnyRef): Unit = wrapper.setAttribute(name, o)
+      override def setCharacterEncoding(env: String): Unit = wrapper.setCharacterEncoding(env)
+    }
 }

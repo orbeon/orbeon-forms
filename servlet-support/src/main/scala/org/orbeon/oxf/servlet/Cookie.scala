@@ -19,16 +19,23 @@ object Cookie {
 }
 
 trait Cookie {
+  // javax/jakarta.servlet.http.Cookie
+  def getNativeCookie: AnyRef
+
   def getName: String
   def getValue: String
 }
 
 class JavaxCookie(cookie: javax.servlet.http.Cookie) extends Cookie {
+  override def getNativeCookie: javax.servlet.http.Cookie = cookie
+
   override def getName: String = cookie.getName
   override def getValue: String = cookie.getValue
 }
 
 class JakartaCookie(cookie: jakarta.servlet.http.Cookie) extends Cookie {
+  override def getNativeCookie: jakarta.servlet.http.Cookie = cookie
+
   override def getName: String = cookie.getName
   override def getValue: String = cookie.getValue
 }

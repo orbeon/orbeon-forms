@@ -16,6 +16,7 @@ package org.orbeon.oxf.servlet
 import java.io.{OutputStream, PrintWriter}
 import java.{util => ju}
 
+
 object ServletResponse {
   def apply(servletResponse: javax.servlet.ServletResponse): ServletResponse =
     servletResponse match {

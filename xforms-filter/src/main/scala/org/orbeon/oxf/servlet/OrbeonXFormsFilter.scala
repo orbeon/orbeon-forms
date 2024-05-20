@@ -247,6 +247,7 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
   def statusCode = _statusCode
 
   private var _byteArrayOutputStream: ByteArrayOutputStream = null
+  // javax/jakarta.servlet.ServletOutputStream
   private var _servletOutputStream: OutputStream            = null
   private var _stringWriter: StringWriter                   = null
   private var _printWriter: PrintWriter                     = null
@@ -276,9 +277,7 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
   override def getOutputStream = {
     if (_byteArrayOutputStream eq null) {
       _byteArrayOutputStream = new ByteArrayOutputStream
-      _servletOutputStream = new OutputStream {
-        def write(i: Int) = _byteArrayOutputStream.write(i)
-      }
+      _servletOutputStream   = response.servletOutputStream(_byteArrayOutputStream)
     }
     _servletOutputStream
   }

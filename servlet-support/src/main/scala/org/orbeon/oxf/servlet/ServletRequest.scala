@@ -16,6 +16,7 @@ package org.orbeon.oxf.servlet
 import java.io.{BufferedReader, InputStream}
 import java.{util => ju}
 
+
 object ServletRequest {
   def apply(servletRequest: javax.servlet.ServletRequest): ServletRequest =
     servletRequest match {
@@ -71,63 +72,63 @@ trait ServletRequest {
 }
 
 class JavaxServletRequest(servletRequest: javax.servlet.ServletRequest) extends ServletRequest {
-  def getNativeServletRequest: javax.servlet.ServletRequest = servletRequest
+  override def getNativeServletRequest: javax.servlet.ServletRequest = servletRequest
 
-  def getAttribute(name: String): AnyRef = servletRequest.getAttribute(name)
-  def getAttributeNames: ju.Enumeration[String] = servletRequest.getAttributeNames
-  def getCharacterEncoding: String = servletRequest.getCharacterEncoding
-  def getContentLength: Int = servletRequest.getContentLength
-  def getContentType: String = servletRequest.getContentType
-  def getInputStream: InputStream = servletRequest.getInputStream
-  def getLocalName: String = servletRequest.getLocalName
-  def getLocale: ju.Locale = servletRequest.getLocale
-  def getLocales: ju.Enumeration[ju.Locale] = servletRequest.getLocales
-  def getParameter(name: String): String = servletRequest.getParameter(name)
-  def getParameterMap: ju.Map[String, Array[String]] = servletRequest.getParameterMap
-  def getParameterNames: ju.Enumeration[String] = servletRequest.getParameterNames
-  def getParameterValues(name: String): Array[String] = servletRequest.getParameterValues(name)
-  def getProtocol: String = servletRequest.getProtocol
-  def getReader: BufferedReader = servletRequest.getReader
-  def getRemoteAddr: String = servletRequest.getRemoteAddr
-  def getRemoteHost: String = servletRequest.getRemoteHost
-  def getRequestDispatcher(path: String): RequestDispatcher = RequestDispatcher(servletRequest.getRequestDispatcher(path))
-  def getScheme: String = servletRequest.getScheme
-  def getServerName: String = servletRequest.getServerName
-  def getServerPort: Int = servletRequest.getServerPort
-  def getServletContext: ServletContext = ServletContext(servletRequest.getServletContext)
-  def isSecure: Boolean = servletRequest.isSecure
-  def removeAttribute(name: String): Unit = servletRequest.removeAttribute(name)
-  def setAttribute(name: String, o: AnyRef): Unit = servletRequest.setAttribute(name, o)
-  def setCharacterEncoding(env: String): Unit = servletRequest.setCharacterEncoding(env)
+  override def getAttribute(name: String): AnyRef = servletRequest.getAttribute(name)
+  override def getAttributeNames: ju.Enumeration[String] = servletRequest.getAttributeNames
+  override def getCharacterEncoding: String = servletRequest.getCharacterEncoding
+  override def getContentLength: Int = servletRequest.getContentLength
+  override def getContentType: String = servletRequest.getContentType
+  override def getInputStream: InputStream = servletRequest.getInputStream
+  override def getLocalName: String = servletRequest.getLocalName
+  override def getLocale: ju.Locale = servletRequest.getLocale
+  override def getLocales: ju.Enumeration[ju.Locale] = servletRequest.getLocales
+  override def getParameter(name: String): String = servletRequest.getParameter(name)
+  override def getParameterMap: ju.Map[String, Array[String]] = servletRequest.getParameterMap
+  override def getParameterNames: ju.Enumeration[String] = servletRequest.getParameterNames
+  override def getParameterValues(name: String): Array[String] = servletRequest.getParameterValues(name)
+  override def getProtocol: String = servletRequest.getProtocol
+  override def getReader: BufferedReader = servletRequest.getReader
+  override def getRemoteAddr: String = servletRequest.getRemoteAddr
+  override def getRemoteHost: String = servletRequest.getRemoteHost
+  override def getRequestDispatcher(path: String): RequestDispatcher = RequestDispatcher(servletRequest.getRequestDispatcher(path))
+  override def getScheme: String = servletRequest.getScheme
+  override def getServerName: String = servletRequest.getServerName
+  override def getServerPort: Int = servletRequest.getServerPort
+  override def getServletContext: ServletContext = ServletContext(servletRequest.getServletContext)
+  override def isSecure: Boolean = servletRequest.isSecure
+  override def removeAttribute(name: String): Unit = servletRequest.removeAttribute(name)
+  override def setAttribute(name: String, o: AnyRef): Unit = servletRequest.setAttribute(name, o)
+  override def setCharacterEncoding(env: String): Unit = servletRequest.setCharacterEncoding(env)
 }
 
 class JakartaServletRequest(servletRequest: jakarta.servlet.ServletRequest) extends ServletRequest {
-  def getNativeServletRequest: jakarta.servlet.ServletRequest = servletRequest
+  override def getNativeServletRequest: jakarta.servlet.ServletRequest = servletRequest
 
-  def getAttribute(name: String): AnyRef = servletRequest.getAttribute(name)
-  def getAttributeNames: ju.Enumeration[String] = servletRequest.getAttributeNames
-  def getCharacterEncoding: String = servletRequest.getCharacterEncoding
-  def getContentLength: Int = servletRequest.getContentLength
-  def getContentType: String = servletRequest.getContentType
-  def getInputStream: InputStream = servletRequest.getInputStream
-  def getLocalName: String = servletRequest.getLocalName
-  def getLocale: ju.Locale = servletRequest.getLocale
-  def getLocales: ju.Enumeration[ju.Locale] = servletRequest.getLocales
-  def getParameter(name: String): String = servletRequest.getParameter(name)
-  def getParameterMap: ju.Map[String, Array[String]] = servletRequest.getParameterMap
-  def getParameterNames: ju.Enumeration[String] = servletRequest.getParameterNames
-  def getParameterValues(name: String): Array[String] = servletRequest.getParameterValues(name)
-  def getProtocol: String = servletRequest.getProtocol
-  def getReader: BufferedReader = servletRequest.getReader
-  def getRemoteAddr: String = servletRequest.getRemoteAddr
-  def getRemoteHost: String = servletRequest.getRemoteHost
-  def getRequestDispatcher(path: String): RequestDispatcher = RequestDispatcher(servletRequest.getRequestDispatcher(path))
-  def getScheme: String = servletRequest.getScheme
-  def getServerName: String = servletRequest.getServerName
-  def getServerPort: Int = servletRequest.getServerPort
-  def getServletContext: ServletContext = ServletContext(servletRequest.getServletContext)
-  def isSecure: Boolean = servletRequest.isSecure
-  def removeAttribute(name: String): Unit = servletRequest.removeAttribute(name)
-  def setAttribute(name: String, o: AnyRef): Unit = servletRequest.setAttribute(name, o)
-  def setCharacterEncoding(env: String): Unit = servletRequest.setCharacterEncoding(env)
+  override def getAttribute(name: String): AnyRef = servletRequest.getAttribute(name)
+  override def getAttributeNames: ju.Enumeration[String] = servletRequest.getAttributeNames
+  override def getCharacterEncoding: String = servletRequest.getCharacterEncoding
+  override def getContentLength: Int = servletRequest.getContentLength
+  override def getContentType: String = servletRequest.getContentType
+  override def getInputStream: InputStream = servletRequest.getInputStream
+  override def getLocalName: String = servletRequest.getLocalName
+  override def getLocale: ju.Locale = servletRequest.getLocale
+  override def getLocales: ju.Enumeration[ju.Locale] = servletRequest.getLocales
+  override def getParameter(name: String): String = servletRequest.getParameter(name)
+  override def getParameterMap: ju.Map[String, Array[String]] = servletRequest.getParameterMap
+  override def getParameterNames: ju.Enumeration[String] = servletRequest.getParameterNames
+  override def getParameterValues(name: String): Array[String] = servletRequest.getParameterValues(name)
+  override def getProtocol: String = servletRequest.getProtocol
+  override def getReader: BufferedReader = servletRequest.getReader
+  override def getRemoteAddr: String = servletRequest.getRemoteAddr
+  override def getRemoteHost: String = servletRequest.getRemoteHost
+  override def getRequestDispatcher(path: String): RequestDispatcher = RequestDispatcher(servletRequest.getRequestDispatcher(path))
+  override def getScheme: String = servletRequest.getScheme
+  override def getServerName: String = servletRequest.getServerName
+  override def getServerPort: Int = servletRequest.getServerPort
+  override def getServletContext: ServletContext = ServletContext(servletRequest.getServletContext)
+  override def isSecure: Boolean = servletRequest.isSecure
+  override def removeAttribute(name: String): Unit = servletRequest.removeAttribute(name)
+  override def setAttribute(name: String, o: AnyRef): Unit = servletRequest.setAttribute(name, o)
+  override def setCharacterEncoding(env: String): Unit = servletRequest.setCharacterEncoding(env)
 }

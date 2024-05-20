@@ -19,10 +19,15 @@ object RequestDispatcher {
 }
 
 trait RequestDispatcher {
+  // javax/jakarta.servlet.RequestDispatcher
+  def getNativeRequestDispatcher: AnyRef
+
   def forward(request: ServletRequest, response: ServletResponse): Unit
 }
 
 class JavaxRequestDispatcher(requestDispatcher: javax.servlet.RequestDispatcher) extends RequestDispatcher {
+  override def getNativeRequestDispatcher: javax.servlet.RequestDispatcher = requestDispatcher
+
   override def forward(request: ServletRequest, response: ServletResponse): Unit =
     requestDispatcher.forward(
       request.getNativeServletRequest.asInstanceOf[javax.servlet.ServletRequest],
@@ -31,6 +36,8 @@ class JavaxRequestDispatcher(requestDispatcher: javax.servlet.RequestDispatcher)
 }
 
 class JakartaRequestDispatcher(requestDispatcher: jakarta.servlet.RequestDispatcher) extends RequestDispatcher {
+  override def getNativeRequestDispatcher: jakarta.servlet.RequestDispatcher = requestDispatcher
+
   override def forward(request: ServletRequest, response: ServletResponse): Unit =
     requestDispatcher.forward(
       request.getNativeServletRequest.asInstanceOf[jakarta.servlet.ServletRequest],

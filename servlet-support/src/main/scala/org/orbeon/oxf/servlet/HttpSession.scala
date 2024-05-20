@@ -21,6 +21,9 @@ object HttpSession {
 }
 
 sealed trait HttpSession {
+  // javax/jakarta.servlet.http.HttpSession
+  def getNativeHttpSession: AnyRef
+
   def getAttribute(name: String): AnyRef
   def getAttributeNames: ju.Enumeration[String]
   def getCreationTime: Long
@@ -36,6 +39,8 @@ sealed trait HttpSession {
 }
 
 class JavaxHttpSession(httpSession: javax.servlet.http.HttpSession) extends HttpSession {
+  override def getNativeHttpSession: javax.servlet.http.HttpSession = httpSession
+
   override def getAttribute(name: String): AnyRef = httpSession.getAttribute(name)
   override def getAttributeNames: ju.Enumeration[String] = httpSession.getAttributeNames
   override def getCreationTime: Long = httpSession.getCreationTime
@@ -51,6 +56,8 @@ class JavaxHttpSession(httpSession: javax.servlet.http.HttpSession) extends Http
 }
 
 class JakartaHttpSession(httpSession: jakarta.servlet.http.HttpSession) extends HttpSession {
+  override def getNativeHttpSession: jakarta.servlet.http.HttpSession = httpSession
+
   override def getAttribute(name: String): AnyRef = httpSession.getAttribute(name)
   override def getAttributeNames: ju.Enumeration[String] = httpSession.getAttributeNames
   override def getCreationTime: Long = httpSession.getCreationTime

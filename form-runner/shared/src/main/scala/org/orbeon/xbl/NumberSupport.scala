@@ -94,7 +94,7 @@ trait NumberSupport[Binding] {
         .translate(".,", params.decimalSeparatorString + params.groupingSeparatorString.getOrElse(""))
 
     (NumericValidation.tryParseAsLongOrBigDecimal(getStringValue(binding)), precisionForRoundingOpt) match {
-      case (Some(sl @ Left(l)),  _      ) => format(sl,                           picture(fractionDigitsOpt getOrElse 0))
+      case (Some(sl @ Left(_)),  _      ) => format(sl,                           picture(fractionDigitsOpt getOrElse 0))
       case (Some(Right(d)) ,     Some(p)) => format(Right(roundBigDecimal(d, p)), picture(p))
       case (Some(sd @ Right(d)), None   ) => format(sd,                           picture(significantFractionalDigits(d).max(fractionDigitsOpt getOrElse 0)))
       case (None,                _      ) => editValue(getStringValue(binding))

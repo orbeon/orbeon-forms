@@ -89,7 +89,7 @@ class XXFormsComponentHandler(
     handlerContext.popComponentContext()
 
   protected override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
-    if (matched.commonBinding.standardLhhaAsSet(LHHA.Label) && ! (placeHolderInfo exists (_.isLabelPlaceholder))) { // also implied: label is local (from `XFormsControlLifecycleHandler`)
+    if (matched.commonBinding.standardLhhaAsSet(LHHA.Label) && ! placeHolderInfo.exists(_.isLabelPlaceholder)) { // also implied: label is local (from `XFormsControlLifecycleHandler`)
 
       val staticReadonly          = XFormsBaseHandler.isStaticReadonly(currentControl)
       val forEffectiveIdWithNsOpt = if (staticReadonly) None else getForEffectiveIdWithNs(lhhaAnalysis)

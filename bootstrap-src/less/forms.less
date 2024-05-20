@@ -118,6 +118,9 @@ input[type="tel"],
 input[type="color"],
 .uneditable-input {
   background-color: @inputBackground;
+  &::placeholder {
+    color: @controlPlaceholderColor; // ORBEON
+  }
 }
 
 // Position radios and checkboxes better

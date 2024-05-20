@@ -1,5 +1,11 @@
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
 .orbeon {
     .xbl-fr-dropdown-select1 {
         display: inline-block;
+
+        select:has(option[value = "0"]:checked) {
+            color: @controlPlaceholderColor;
+        }
     }
 }

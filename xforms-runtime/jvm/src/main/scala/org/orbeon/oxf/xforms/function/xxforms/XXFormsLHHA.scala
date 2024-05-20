@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
@@ -38,5 +39,27 @@ class XXFormsLHHA extends XFormsFunction with RuntimeDependentFunction {
       case 3 => _.getAlert(EventCollector.Throw)
       case _ => throw new UnsupportedOperationException
     })
+  }
+}
+
+class XXFLabelAppearance extends XFormsFunction with RuntimeDependentFunction {
+
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+
+    implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
+
+    LHHAFunctionSupport.labelHintAppearance(arguments.head.evaluateAsString(ctx).toString, LHHA.Label)
+  }
+}
+
+class XXFHintAppearance extends XFormsFunction with RuntimeDependentFunction {
+
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+
+    implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
+
+    LHHAFunctionSupport.labelHintAppearance(arguments.head.evaluateAsString(ctx).toString, LHHA.Hint)
   }
 }

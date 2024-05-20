@@ -229,6 +229,14 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE)
     )
 
+    Fun("label-appearance", classOf[XXFLabelAppearance], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("hint-appearance", classOf[XXFHintAppearance], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
+
     Fun("visited", classOf[XXFormsVisited], op = 0, min = 1, BOOLEAN, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE)
     )

@@ -18,7 +18,12 @@
             // Select2 sets `line-height: 28px`, which is 2px too much, since the parent also
             // has a `line-height: 28px` and a `border: 1px`, which caused an irregularity in
             // the bottom part of the highlight on Safari
-            .select2-selection__rendered { line-height: 26px }
+            .select2-selection__rendered {
+                line-height: 26px;
+                .select2-selection__placeholder {
+                    color: @controlPlaceholderColor;
+                }
+            }
             .focusHighlight();
         }
         // Dropdown to be always above everything else

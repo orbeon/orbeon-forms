@@ -24,7 +24,7 @@
         id="fr-dropdown-select1"
         element="fr|dropdown-select1, xf|select1[appearance ~= dropdown]"
         xxbl:container="span"
-        xxbl:mode="lhha binding value selection"
+        xxbl:mode="lhha binding value selection allow-minimal-label-hint"
         xxbl:label-for="select1">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -125,6 +125,10 @@
             </control-details>
         </metadata>
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/dropdown-select1/dropdown-select1.css"/>
+        </xbl:resources>
+
         <xbl:implementation>
             <xf:model>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
@@ -156,7 +160,14 @@
                 <!-- Alternate behavior: remove title item if a value is selected -->
                 <!--<xf:itemset ref=".[not(exf:required() and xxf:non-blank())]">-->
                 <xf:itemset ref=".">
-                    <xf:label value="if (xxf:readonly() or xxf:non-blank()) then '' else xxf:r('select')"/>
+                    <xf:label
+                        value="
+                            if (xxf:readonly() or xxf:non-blank()) then
+                                ''
+                            else if (xxf:label-appearance('fr-dropdown-select1') = 'minimal') then
+                                xxf:label('fr-dropdown-select1')
+                            else
+                                xxf:r('select')"/>
                     <xf:value/>
                 </xf:itemset>
                 <!-- Copy user items -->

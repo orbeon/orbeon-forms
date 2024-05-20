@@ -6,6 +6,7 @@ import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{MessageFormatCache, MessageFormatter, XPathCache}
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector
@@ -13,7 +14,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction._
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang.resolveXMLangHandleAVTs
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport.{findResourceElementForLang, pathFromTokens, splitResourceName}
-import org.orbeon.oxf.xforms.function.xxforms.{ComponentParamSupport, NumericValidation, ValidationFunctionNames, XXFormsLang}
+import org.orbeon.oxf.xforms.function.xxforms._
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.library.XFormsEnvFunctions.findIndexForRepeatId
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
@@ -437,6 +438,14 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def alert(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     relevantControl(controlId) map (_.getAlert(EventCollector.Throw))
+
+  @XPathFunction
+  def labelAppearance(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
+    LHHAFunctionSupport.labelHintAppearance(controlId, LHHA.Label)
+
+  @XPathFunction
+  def hintAppearance(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
+    LHHAFunctionSupport.labelHintAppearance(controlId, LHHA.Hint)
 
   @XPathFunction
   def visited(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[Boolean] =

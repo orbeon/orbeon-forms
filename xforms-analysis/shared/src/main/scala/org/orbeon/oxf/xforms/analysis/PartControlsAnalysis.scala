@@ -43,7 +43,7 @@ trait PartControlsAnalysis extends TransientState {
   // Special handling of attributes
   var _attributeControls: Map[String, Map[String, AttributeControl]] = Map.empty
 
-  def indexAttributeControls(attributes: Buffer[AttributeControl]): Unit =
+  def indexAttributeControls(attributes: Iterable[AttributeControl]): Unit =
     if (attributes.nonEmpty) {
 
       case class AttributeDetails(forPrefixedId: String, attributeName: String, attributeControl: AttributeControl)

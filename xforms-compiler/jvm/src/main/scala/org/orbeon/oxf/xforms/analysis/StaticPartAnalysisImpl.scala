@@ -88,7 +88,7 @@ trait PartAnalysisContextAfterTree extends PartAnalysisContextForTree {
   def indexModel(model: Model): Unit
   def registerEventHandlers(eventHandlers: Iterable[EventHandler])(implicit logger: IndentedLogger): Unit
   def gatherScripts(): Unit
-  def indexAttributeControls(attributes: mutable.Buffer[AttributeControl]): Unit
+  def indexAttributeControls(attributes: Iterable[AttributeControl]): Unit
 
   def iterateControlsNoModels: Iterator[ElementAnalysis]
   def iterateModels: Iterator[Model]

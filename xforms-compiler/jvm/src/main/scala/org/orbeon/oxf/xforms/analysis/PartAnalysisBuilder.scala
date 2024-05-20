@@ -293,21 +293,39 @@ object PartAnalysisBuilder {
         ElementAnalysisTreeBuilder.componentChildrenForBindingUpdate(partAnalysisCtx, container).some // explicit children
       )
 
-      for (model <- models)
-        partAnalysisCtx.indexModel(model)
-
-      for (lhha <- lhhas)
-        PartAnalysisSupport.attachToControl(partAnalysisCtx.findControlAnalysis, lhha)
-
-      partAnalysisCtx.registerEventHandlers(eventHandlers)
-      partAnalysisCtx.gatherScripts()
-      partAnalysisCtx.indexAttributeControls(attributes)
+      indexTree(
+        partAnalysisCtx,
+        models,
+        lhhas,
+        eventHandlers,
+        attributes
+      )
 
       ElementAnalysisTreeBuilder.setModelAndLangOnAllDescendants(partAnalysisCtx, container)
 
       // NOTE: doesn't handle globals, models nested within UI, update to resources
       // NOTE: No XPath analysis in nested parts.
     }
+  }
+
+  private def indexTree(
+    partAnalysisCtx: PartAnalysisContextAfterTree,
+    models         : Iterable[Model],
+    lhhas          : Iterable[LHHAAnalysis],
+    eventHandlers  : Iterable[EventHandler],
+    attributes     : Iterable[AttributeControl]
+  )(implicit
+    logger         : IndentedLogger
+  ): Unit = {
+    for (model <- models)
+      partAnalysisCtx.indexModel(model)
+
+    for (lhha <- lhhas)
+      PartAnalysisSupport.attachToControl(partAnalysisCtx.findControlAnalysis, lhha)
+
+    partAnalysisCtx.registerEventHandlers(eventHandlers)
+    partAnalysisCtx.gatherScripts()
+    partAnalysisCtx.indexAttributeControls(attributes)
   }
 
   def rebuildBindTree(
@@ -426,15 +444,13 @@ object PartAnalysisBuilder {
       } else if (partAnalysisCtx.iterateGlobals.nonEmpty)
         warn(s"There are ${partAnalysisCtx.iterateGlobals.size} `xxbl:global` in a child part. Those won't be processed.")
 
-      for (model <- models)
-        partAnalysisCtx.indexModel(model)
-
-      for (lhha <- lhhas)
-        PartAnalysisSupport.attachToControl(partAnalysisCtx.findControlAnalysis, lhha)
-
-      partAnalysisCtx.registerEventHandlers(eventHandlers)
-      partAnalysisCtx.gatherScripts()
-      partAnalysisCtx.indexAttributeControls(attributes)
+      indexTree(
+        partAnalysisCtx,
+        models,
+        lhhas,
+        eventHandlers,
+        attributes
+      )
 
       // Language on the root element is handled differently, but it must be done after the tree has been built
       // as we need access to attribute controls

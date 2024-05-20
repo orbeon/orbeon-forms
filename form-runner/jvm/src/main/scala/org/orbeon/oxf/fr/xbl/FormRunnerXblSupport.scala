@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.{AppForm, XMLNames}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisForXblSupport
-import org.orbeon.oxf.xforms.xbl.XBLSupport
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLSupport}
 import org.orbeon.saxon.function.Property
 
 
@@ -29,10 +29,11 @@ object FormRunnerXblSupport extends XBLSupport {
   private val FRKeepIfDesignTimeQName          = QName("keep-if-design-time",          XMLNames.FRNamespace)
 
   def keepElement(
-    partAnalysisCtx : PartAnalysisForXblSupport,
-    boundElement    : Element,
-    directNameOpt   : Option[QName],
-    elem            : Element
+    partAnalysisCtx   : PartAnalysisForXblSupport,
+    boundElement      : Element,
+    abstractBindingOpt: Option[AbstractBinding],
+    directNameOpt     : Option[QName],
+    elem              : Element
   ): Boolean = {
 
     def fromAttribute(paramName: QName): Option[String] =

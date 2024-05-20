@@ -18,9 +18,10 @@ import org.orbeon.oxf.xforms.analysis.PartAnalysisForXblSupport
 
 trait XBLSupport {
   def keepElement(
-    partAnalysisCtx : PartAnalysisForXblSupport,
-    boundElement    : Element,
-    directNameOpt   : Option[QName],
-    elem            : Element
+    partAnalysisCtx   : PartAnalysisForXblSupport,
+    boundElement      : Element,
+    abstractBindingOpt: Option[AbstractBinding],
+    directNameOpt     : Option[QName],
+    elem              : Element
   ): Boolean
 }

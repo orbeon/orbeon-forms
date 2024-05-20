@@ -46,10 +46,11 @@ object XBLTransformer {
   private object DefaultXblSupport extends XBLSupport {
 
     def keepElement(
-      partAnalysisCtx : PartAnalysisForXblSupport,
-      boundElement    : Element,
-      directNameOpt   : Option[QName],
-      elem            : Element
+      partAnalysisCtx   : PartAnalysisForXblSupport,
+      boundElement      : Element,
+      abstractBindingOpt: Option[AbstractBinding],
+      directNameOpt     : Option[QName],
+      elem              : Element
     ): Boolean = {
 
       def keepIfAttr: Boolean =
@@ -224,11 +225,11 @@ object XBLTransformer {
             setAttribute(resultingNodes, XXBL_SCOPE_QNAME, "outer", None)
           }
           true
-        } else if (! DefaultXblSupport.keepElement(partAnalysisCtx, boundElement, directNameOpt, currentElem)) {
+        } else if (! DefaultXblSupport.keepElement(partAnalysisCtx, boundElement, abstractBindingOpt, directNameOpt, currentElem)) {
           // Skip this element
           currentElem.detach()
           false
-        } else if (xblSupport exists (! _.keepElement(partAnalysisCtx, boundElement, directNameOpt, currentElem))) {
+        } else if (xblSupport exists (! _.keepElement(partAnalysisCtx, boundElement, abstractBindingOpt, directNameOpt, currentElem))) {
           // Skip this element
           currentElem.detach()
           false

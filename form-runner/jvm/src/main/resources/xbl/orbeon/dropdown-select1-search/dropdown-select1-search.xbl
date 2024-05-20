@@ -28,7 +28,7 @@
             xf|select1[appearance ~= search]"
         xxbl:container="span"
         xxbl:label-for="select1"
-        xxbl:mode="lhha binding value focus selection javascript-lifecycle">
+        xxbl:mode="lhha binding value focus selection javascript-lifecycle allow-minimal-label-hint">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Dropdown with Search</display-name>
@@ -177,7 +177,14 @@
                 appearance="minimal"
                 ref="xxf:binding('fr-dropdown-select1-search')"
                 id="select1"
-                data-placeholder="{if ($disable-placeholder) then '' else xxf:r('select')}"
+                data-placeholder="{
+                    if ($disable-placeholder) then
+                        ''
+                    else if (xxf:label-appearance('fr-dropdown-select1-search') = 'minimal') then
+                        xxf:label('fr-dropdown-select1-search')
+                    else
+                        xxf:r('select')
+                }"
                 data-min-input-length="{$min-input-length}"
             >
                 <xf:itemset ref="''[not($disable-placeholder)]">

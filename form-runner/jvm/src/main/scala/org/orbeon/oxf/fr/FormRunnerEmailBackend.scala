@@ -151,7 +151,7 @@ trait FormRunnerEmailBackend {
     )
 
     XPathCache.evaluate(
-      contextItem        = ctx.modelElem,
+      contextItem        = frc.formInstance.rootElement,
       xpathString        = expression,
       namespaceMapping   = namespaceMapping,
       variableToValueMap = null,

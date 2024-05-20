@@ -23,7 +23,9 @@ abstract class CoreControl(
   containerScope   : Scope
 ) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with ViewTrait
-     with StaticLHHASupport
+     with StaticLHHASupport {
+  override def allowMinimalLabelHint: Boolean = false
+}
 
 abstract class ValueControl(
   index            : Int,
@@ -173,6 +175,7 @@ class InputControl(
   scope            : Scope,
   containerScope   : Scope
 ) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
+  override def allowMinimalLabelHint: Boolean = true
   override protected def allowedExtensionAttributes: Set[QName] = InputControl.AllowedExtensionAttributes
 }
 
@@ -248,6 +251,8 @@ class SwitchControl(
      with StaticLHHASupport
      with AppearanceTrait {
 
+  override def allowMinimalLabelHint: Boolean = false
+
   val caseref           = element.attributeValueOpt(CASEREF_QNAME)
   val hasFullUpdate     = element.attributeValueOpt(XXFORMS_UPDATE_QNAME).contains(XFORMS_FULL_UPDATE)
 
@@ -271,6 +276,8 @@ class CaseControl(
      with OptionalSingleNode
      with StaticLHHASupport {
 
+  override def allowMinimalLabelHint: Boolean = false
+
   val selected: Option[String] = element.attributeValueOpt(SELECTED_QNAME)
 }
 
@@ -287,6 +294,8 @@ class GroupControl(
 ) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with OptionalSingleNode
      with StaticLHHASupport {
+
+  override def allowMinimalLabelHint: Boolean = false
 
   // Extension attributes depend on the name of the element
   override protected val allowedExtensionAttributes: Set[QName] =
@@ -315,6 +324,8 @@ class DialogControl(
 ) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
    with OptionalSingleNode
    with StaticLHHASupport {
+
+  override def allowMinimalLabelHint: Boolean = false
 
   override val externalEvents =
     super.externalEvents + XXFORMS_DIALOG_CLOSE // allow xxforms-dialog-close

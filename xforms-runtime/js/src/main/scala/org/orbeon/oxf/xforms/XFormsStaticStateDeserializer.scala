@@ -216,6 +216,7 @@ object XFormsStaticStateDeserializer {
         modeSelection               <- c.getOrElse[Boolean]("modeSelection")(false)
         modeHandlers                <- c.getOrElse[Boolean]("modeHandlers")(false)
         standardLhhaAsSeq           <- c.getOrElse[Seq[LHHA]]("standardLhhaAsSeq")(Nil)
+        allowMinimalLabelHint       <- c.getOrElse[Boolean]("allowMinimalLabelHint")(false)
         labelFor                    <- c.getOrElse[Option[String]]("labelFor")(None)
         formatOpt                   <- c.getOrElse[Option[String]]("formatOpt")(None)
         serializeExternalValueOpt   <- c.getOrElse[Option[String]]("serializeExternalValueOpt")(None)
@@ -240,6 +241,7 @@ object XFormsStaticStateDeserializer {
           modeSelection,
           modeHandlers,
           standardLhhaAsSeq,
+          allowMinimalLabelHint,
           labelFor,
           formatOpt,
           serializeExternalValueOpt,
@@ -433,9 +435,13 @@ object XFormsStaticStateDeserializer {
                   val componentControl =
                     (commonBinding.modeValue, commonBinding.modeLHHA) match {
                       case (false, false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding)
-                      case (false, true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding) with                          StaticLHHASupport
+                      case (false, true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding) with                          StaticLHHASupport {
+                        override def allowMinimalLabelHint: Boolean = commonBinding.allowMinimalLabelHint
+                      }
                       case (true,  false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding) with ValueComponentTrait
-                      case (true,  true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding) with ValueComponentTrait with StaticLHHASupport
+                      case (true,  true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding) with ValueComponentTrait with StaticLHHASupport {
+                        override def allowMinimalLabelHint: Boolean = commonBinding.allowMinimalLabelHint
+                      }
                     }
 
                   // We don't serialize the attributes separately as we have them on the bound element, so we

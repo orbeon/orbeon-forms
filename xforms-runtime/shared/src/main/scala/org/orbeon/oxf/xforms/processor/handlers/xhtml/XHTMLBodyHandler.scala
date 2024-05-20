@@ -77,7 +77,7 @@ class XHTMLBodyHandler(
       // - `xforms-hint-appearance-full xforms-hint-appearance-minimal`
       // - `xforms-hint-appearance-tooltip xforms-hint-appearance-minimal`
       //
-      // That's because the `minimal` appearance doesn't apply to all controls, but only (as of 2016.2) to input fields.
+      // That's because the `minimal` appearance doesn't apply to all controls.
 
       AppearanceTrait.encodeAndAppendAppearances(sb, "label", containingDocument.getLabelAppearances)
 

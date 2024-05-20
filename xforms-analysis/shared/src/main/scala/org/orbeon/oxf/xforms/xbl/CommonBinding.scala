@@ -22,6 +22,7 @@ case class CommonBinding(
   modeSelection               : Boolean,
   modeHandlers                : Boolean,
   standardLhhaAsSeq           : Seq[LHHA],
+  allowMinimalLabelHint       : Boolean,
   labelFor                    : Option[String],
   formatOpt                   : Option[String],
   serializeExternalValueOpt   : Option[String],

@@ -2770,7 +2770,7 @@
                         <xbl:binding
                             id="fr-wrapped-input"
                             element="fr|wrapped-input"
-                            xxbl:mode="binding lhha"
+                            xxbl:mode="binding lhha allow-minimal-label-hint"
                             xxbl:label-for="my-input">
                             <xbl:template>
                                 <xh:input xxf:control="true" id="my-input"/>

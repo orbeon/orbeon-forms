@@ -87,6 +87,8 @@ object CommonBindingBuilder {
       }
     }
 
+    val allowMinimalLabelHint = xblMode("allow-minimal-label-hint")
+
     // CSS classes to put in the markup
     val cssClasses: String =
       "xbl-component"                                            ::
@@ -128,6 +130,7 @@ object CommonBindingBuilder {
       modeSelection               = xblMode("selection"), // to indicate that the control acts as a selection control
       modeHandlers                = ! xblMode("nohandlers"),
       standardLhhaAsSeq           = standardLhhaAsSeq,
+      allowMinimalLabelHint       = allowMinimalLabelHint,
       labelFor                    = bindingElem.attributeValueOpt(XXBL_LABEL_FOR_QNAME),
       formatOpt                   = bindingElem.attributeValueOpt(XXBL_FORMAT_QNAME),
       serializeExternalValueOpt   = bindingElem.attributeValueOpt(XXBL_SERIALIZE_EXTERNAL_VALUE_QNAME),

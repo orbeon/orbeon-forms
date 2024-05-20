@@ -38,6 +38,8 @@ trait StaticLHHASupport extends ElementAnalysis {
       case _          => _lhhBy     += lhhaAnalysis.lhhaType -> lhhaAnalysis
     }
 
+  def allowMinimalLabelHint: Boolean
+
   def lhh(lhhaType: LHHA)  : Option[LHHAAnalysis] = _lhh.get(lhhaType)
   def lhhBy(lhhaType: LHHA): Option[LHHAAnalysis] = _lhhBy.get(lhhaType)
   def alerts               : List[LHHAAnalysis]   = _alerts
@@ -72,7 +74,7 @@ trait StaticLHHASupport extends ElementAnalysis {
 
   def hasLHHAPlaceholder(lhhaType: LHHA): Boolean =
     lhh(lhhaType) match {
-      case Some(lhh) => lhh.isPlaceholder
+      case Some(lhh) => lhh.isPlaceholder && allowMinimalLabelHint
       case None      => false
     }
 

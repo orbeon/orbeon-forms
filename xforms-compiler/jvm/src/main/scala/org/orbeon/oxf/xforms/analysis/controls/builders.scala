@@ -136,8 +136,7 @@ object LHHAAnalysisBuilder {
     val hasLocalFullAppearance    = appearances(XFORMS_FULL_APPEARANCE_QNAME)
     val hasLocalLeftAppearance    = appearances(XXFORMS_LEFT_APPEARANCE_QNAME)
 
-    // Placeholder is only supported for label or hint. This in fact only makes sense for a limited set
-    // of controls, namely text fields or text areas at this point.
+    // Placeholder is only supported for label or hint
     val isPlaceholder: Boolean =
       lhhaType match {
         case LHHA.Label | LHHA.Hint =>
@@ -755,9 +754,13 @@ object ComponentControlBuilder {
   ): ComponentControl =
     (modeValue, modeLHHA) match {
       case (false, false) => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding)
-      case (false, true)  => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding) with                          StaticLHHASupport
+      case (false, true)  => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding) with                          StaticLHHASupport {
+        override def allowMinimalLabelHint: Boolean = commonBinding.allowMinimalLabelHint
+      }
       case (true,  false) => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding) with ValueComponentTrait
-      case (true,  true)  => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding) with ValueComponentTrait with StaticLHHASupport
+      case (true,  true)  => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding) with ValueComponentTrait with StaticLHHASupport {
+        override def allowMinimalLabelHint: Boolean = commonBinding.allowMinimalLabelHint
+      }
     }
 }
 

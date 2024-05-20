@@ -339,6 +339,8 @@ object XFormsStaticStateSerializer {
           b += "modeHandlers"                -> Json.fromBoolean(a.modeHandlers)
         if (a.standardLhhaAsSeq.nonEmpty)
           b += "standardLhhaAsSeq"           -> a.standardLhhaAsSeq.asJson
+        if (a.allowMinimalLabelHint)
+          b += "allowMinimalLabelHint"       -> Json.fromBoolean(a.allowMinimalLabelHint)
         if (a.labelFor.isDefined)
           b += "labelFor"                    -> a.labelFor.asJson
         if (a.formatOpt.isDefined)

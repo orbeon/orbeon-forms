@@ -26,7 +26,7 @@
         element="
             fr|currency,
             xf|input[appearance = 'xxf:currency']:xxf-type('xs:decimal')"
-        xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle allow-minimal-label-hint"
         xxf:external-events="DOMActivate"
         xxbl:label-for="html-input"
         xxbl:format="

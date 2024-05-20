@@ -348,7 +348,7 @@
                             <xf:label>
                                 <xh:i class="fa fa-cogs fa-fw"/>
                                 <xf:output value="$form-resources/dialog-form-settings/open/label"/>
-                                <xh:kbd>O F</xh:kbd>
+                                <xh:kbd title="Keyboard shortcut">⌨️ O F</xh:kbd>
                             </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:dispatch name="DOMActivate" targetid="open-form-settings-trigger"/>
@@ -358,7 +358,7 @@
                             <xf:label>
                                 <xh:i class="fa fa-lock fa-fw"/>
                                 <xf:output value="$form-resources/dialog-permissions/label"/>
-                                <xh:kbd>O P</xh:kbd>
+                                <xh:kbd title="Keyboard shortcut">⌨️ O P</xh:kbd>
                             </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="fb-permissions-dialog"/>
@@ -369,7 +369,7 @@
                             <xf:label>
                                 <xh:i class="fa fa-envelope fa-fw"/>
                                 <xf:output value="$form-resources/dialog-email-settings/label"/>
-                                <xh:kbd>O E</xh:kbd>
+                                <xh:kbd title="Keyboard shortcut">⌨️️ O E</xh:kbd>
                             </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-email-settings">
@@ -396,7 +396,7 @@
                             <xf:label>
                                 <xh:i class="fa fa-code fa-fw"/>
                                 <xf:output value="$form-resources/edit-source/label"/>
-                                <xh:kbd>O S</xh:kbd>
+                                <xh:kbd title="Keyboard shortcut">⌨️ O S</xh:kbd>
                             </xf:label>
                             <xxf:show ev:event="DOMActivate" dialog="dialog-edit-source"/>
                         </xf:trigger>

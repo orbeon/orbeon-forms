@@ -343,6 +343,12 @@ body.orbeon {
 
         kbd {
             float: right;
+            display: none;
+            line-height: 18px; // try not to cause the enclosing button to become taller
+        }
+
+        .tab-content:hover kbd {
+            display: block;
         }
 
         .fb-tool .fb-add-control button {
@@ -1748,6 +1754,9 @@ body.orbeon {
         font-family: system-ui;
         font-size: 6pt;
         margin-left: 1em;
+        &:empty {
+            display: none;
+        }
     }
 }
 

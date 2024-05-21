@@ -144,9 +144,9 @@ trait FormRunnerEmailBackend {
 
     val functionContext = XFormsFunction.Context(
       container         = doc,
-      bindingContext    = doc.getDefaultModel.getDefaultEvaluationContext,
+      bindingContext    = frc.formModelOpt.get.getDefaultEvaluationContext,
       sourceEffectiveId = doc.effectiveId,
-      modelOpt          = doc.findDefaultModel,
+      modelOpt          = frc.formModelOpt,
       bindNodeOpt       = None
     )
 

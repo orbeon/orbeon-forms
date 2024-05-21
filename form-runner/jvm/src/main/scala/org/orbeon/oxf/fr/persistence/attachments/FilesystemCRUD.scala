@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
 import org.orbeon.oxf.fr.{AppForm, FormOrData, FormRunnerPersistence}
 import org.orbeon.oxf.http.{HttpRanges, StatusCode}
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary
-import org.orbeon.oxf.util.{LoggerFactory, XPathCache}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory, XPathCache}
 import org.orbeon.saxon.function.{EnvironmentVariable, EnvironmentVariableAlwaysEnabled}
 import org.orbeon.xml.NamespaceMapping
 
@@ -158,7 +158,7 @@ object FilesystemCRUD {
     }
 
     val directoryNamespaces = NamespaceMapping(
-      FormRunnerPersistence.providerPropertyOpt(provider, DirectoryProperty)
+      FormRunnerPersistence.providerPropertyOpt(provider, DirectoryProperty, CoreCrossPlatformSupport.properties)
         .map(_.namespaces)
         .getOrElse(Map[String, String]())
     )

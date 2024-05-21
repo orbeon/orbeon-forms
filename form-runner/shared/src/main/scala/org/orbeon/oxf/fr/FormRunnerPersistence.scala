@@ -190,33 +190,49 @@ object FormRunnerPersistence {
     formOpt   : Option[String],
     formOrData: FormOrData,
     properties: PropertySet = CoreCrossPlatformSupport.properties
-  ): List[String] = {
+  ): List[String] =
+    getProvidersWithProperties(
+      appOpt,
+      formOpt,
+      formOrData.some,
+      properties
+    ).keys.toList
+
+  def getProvidersWithProperties(
+    appOpt    : Option[String],
+    formOpt   : Option[String],
+    formOrData: Option[FormOrData],
+    properties: PropertySet = CoreCrossPlatformSupport.properties
+  ): Map[String, List[Property]] = {
 
     val propertyName =
-      PersistenceProviderPropertyPrefix        ::
-      appOpt.getOrElse(PropertySet.StarToken)  ::
-      formOpt.getOrElse(PropertySet.StarToken) ::
-      formOrData.entryName                     ::
+      PersistenceProviderPropertyPrefix                            ::
+      appOpt.getOrElse(PropertySet.StarToken)                      ::
+      formOpt.getOrElse(PropertySet.StarToken)                     ::
+      formOrData.map(_.entryName).getOrElse(PropertySet.StarToken) ::
       Nil mkString "."
 
     properties.propertiesMatching(propertyName)
-      .flatMap(_.nonBlankStringValue)
-      .distinct
-      .filter(FormRunner.isActiveProvider(_, properties))
+      .flatMap(p => p.nonBlankStringValue.map(_ -> p))
+      .groupBy(_._1)
+      .mapValues(_.map(_._2))
+      .filter(kv => FormRunner.isActiveProvider(kv._1, properties))
   }
 
   def providerPropertyName(provider: String, property: String): String =
     PersistencePropertyPrefix :: provider :: property :: Nil mkString "."
 
-  def providerPropertyOpt(provider: String, property: String): Option[Property] =
+  def providerPropertyOpt(provider: String, property: String, properties: PropertySet): Option[Property] =
     properties.getPropertyOpt(providerPropertyName(provider, property))
 
   def providerPropertyAsUrlOpt(provider: String, property: String): Option[String] =
     properties.getStringOrURIAsStringOpt(providerPropertyName(provider, property))
 
   // https://github.com/orbeon/orbeon-forms/issues/6300
-  def isInternalProvider(provider: String): Boolean =
-    providerPropertyOpt(provider, "uri").flatMap(_.nonBlankStringValue).exists(_.startsWith("/"))
+  def isInternalProvider(provider: String, properties: PropertySet): Boolean =
+    providerPropertyOpt(provider, "uri", properties)
+      .flatMap(_.nonBlankStringValue)
+      .exists(_.startsWith("/"))
 
   def getPersistenceURLHeaders(appForm: AppForm, formOrData: FormOrData): (String, Map[String, String]) = {
 
@@ -444,7 +460,12 @@ trait FormRunnerPersistence {
   def getAttachmentPathFilenameRemoveQuery(pathQuery: String): String =
     splitQuery(pathQuery)._1.split('/').last
 
-  def providerPropertyAsBoolean(provider: String, property: String, default: Boolean, properties: PropertySet = CoreCrossPlatformSupport.properties): Boolean =
+  def providerPropertyAsBoolean(
+    provider  : String,
+    property  : String,
+    default   : Boolean,
+    properties: PropertySet = CoreCrossPlatformSupport.properties
+  ): Boolean =
     properties.getBoolean(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
 
   def providerPropertyAsInteger(provider: String, property: String, default: Int, properties: PropertySet = CoreCrossPlatformSupport.properties): Int =

@@ -17,11 +17,10 @@ import org.log4s
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.fr.FormRunner.providerPropertyAsBoolean
-import org.orbeon.oxf.fr.FormRunnerPersistence.{PersistenceProviderPropertyPrefix, isInternalProvider, providerPropertyName, providerPropertyOpt}
+import org.orbeon.oxf.fr.FormRunnerPersistence.{getProvidersWithProperties, isInternalProvider, providerPropertyName, providerPropertyOpt}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.processor.DatabaseContext
-import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtilsUsingSaxon, IndentedLogger, LoggerFactory, Logging, NetUtils}
@@ -42,37 +41,33 @@ object RelationalUtils extends Logging {
   def newIndentedLogger: IndentedLogger =
     new IndentedLogger(Logger)
 
-  def databaseConfigurationPresent(implicit indentedLogger: IndentedLogger): Boolean = {
-
-    val propertySet = Properties.instance.getPropertySet
+  def databaseConfigurationPresent(
+    properties            : PropertySet,
+    isDataSourceConfigured: String => Boolean = getDataSourceNoFallback(_).isDefined
+  )(implicit
+    indentedLogger        : IndentedLogger
+  ): Boolean = {
 
     val propertiesByProvider =
-      propertySet
-        .propertiesStartsWith(PersistenceProviderPropertyPrefix, matchWildcards = false)
-        .flatMap(p => propertySet.getNonBlankString(p).map(_ -> p))
-        .filter(_._1 != "resource")
-        .groupBy(_._1)
-        .mapValues(_.map(_._2).sorted)
+      getProvidersWithProperties(
+        None,
+        None,
+        None,
+        properties
+      )
+      .filter { case (provider, _) => provider != "resource" && isInternalProvider(provider, properties) }
+      .mapValues(_.sortBy(_.name))
 
-    val providers = propertiesByProvider.keys.toSet
+    val problematicDataSources = propertiesByProvider.filter { case (provider, propertiesWithProvider) =>
 
-    val activeInternalProviders =
-      providers
-        .filter(providerPropertyAsBoolean(_, "active", default = true))
-        .filter(isInternalProvider)
-
-    val problematicDataSources = activeInternalProviders.filter { provider =>
-
-      val dataSourceName = providerPropertyOpt(provider, "datasource").flatMap(_.nonBlankStringValue)
+      val dataSourceName = providerPropertyOpt(provider, "datasource", properties).flatMap(_.nonBlankStringValue)
 
       dataSourceName match {
-        case Some(name) if getDataSourceNoFallback(name).isEmpty =>
+        case Some(name) if ! isDataSourceConfigured(name) =>
           error(s"Data source `$name` referenced by provider `$provider` not configured")
 
-          val propertiesWithProvider = propertiesByProvider.get(provider).toSeq.flatten
-
           error(s"Provider `$provider` is used by the following properties:")
-          propertiesWithProvider.foreach(property => error(s" - $property"))
+          propertiesWithProvider.foreach(property => error(s" - `${property.name}`"))
 
           val activeProperty = providerPropertyName(provider, "active")
           error(s"Provider `$provider` can be disabled by setting property `$activeProperty` to `false`")

@@ -17,6 +17,7 @@ import cats.syntax.option._
 import org.orbeon.dom
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
+import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
@@ -24,7 +25,7 @@ import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.XMLConstants.{XS_BOOLEAN_QNAME, XS_STRING_QNAME}
+import org.orbeon.oxf.xml.XMLConstants.{XS_ANYURI_QNAME, XS_BOOLEAN_QNAME, XS_STRING_QNAME}
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
@@ -362,6 +363,181 @@ class FormRunnerFunctionsTest
     for (((appOpt, formOpt, formOrData), expected) <- expected)
       it(s"must return `$expected` for `$appOpt`/`$formOpt`/`$formOrData`") {
         assert(getProviders(appOpt, formOpt, formOrData, properties).toSet == expected)
+      }
+  }
+
+  describe("`databaseConfigurationPresent()` function") {
+
+    val properties: PropertySet =
+      PropertySet(
+        List(
+          PropertyParams(Map.empty, "oxf.fr.persistence.*.active",                       XS_BOOLEAN_QNAME, "true"), // this is the default, not strictly needed here
+          PropertyParams(Map.empty, "oxf.fr.persistence.my-inactive-provider.active",    XS_BOOLEAN_QNAME, "false"),
+
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*.attachments",     XS_STRING_QNAME,  "filesystem"),
+
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*",                 XS_STRING_QNAME,  "mysql"),
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.orbeon.bookshelf.form", XS_STRING_QNAME,  "sqlite"),
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.form",     XS_STRING_QNAME,  "postgresql"),
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.*",        XS_STRING_QNAME,  "postgresql"),
+
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.foo.*.*",               XS_STRING_QNAME,  "p1"),
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.foo.bar.*",             XS_STRING_QNAME,  "p2"),
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.foo.*.form",            XS_STRING_QNAME,  "p3"),
+
+          PropertyParams(Map.empty, "oxf.fr.persistence.provider.baz.*.*",               XS_STRING_QNAME,  "my-inactive-provider"),
+        )
+      )
+
+    val expected: List[(String, Boolean, String => Boolean, List[PropertyParams])] =
+      List(
+        (
+          "no properties",
+          true,
+          _ => true,
+          Nil
+        ),
+        (
+          "single provider has datasource",
+          true,
+          Set("postgresql"),
+          List(
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.*",        XS_STRING_QNAME,  "postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.uri",                 XS_ANYURI_QNAME,  "/fr/service/postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.datasource",          XS_STRING_QNAME,  "postgresql"),
+          )
+        ),
+        (
+          "single provider doesn't have datasource",
+          false,
+          Set.empty,
+          List(
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.*",        XS_STRING_QNAME,  "postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.uri",                 XS_ANYURI_QNAME,  "/fr/service/postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.datasource",          XS_STRING_QNAME,  "postgresql"),
+          )
+        ),
+        (
+          "single provider has datasource and `filesystem` attachment is present",
+          true,
+          Set("postgresql"),
+          List(
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.*",        XS_STRING_QNAME,  "postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.uri",                 XS_ANYURI_QNAME,  "/fr/service/postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.datasource",          XS_STRING_QNAME,  "postgresql"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*.attachments",     XS_STRING_QNAME,  "filesystem"),
+          )
+        ),
+        (
+          "multiple providers all have datasources and `filesystem` attachment is present",
+          true,
+          Set("postgresql", "mysql", "sqlite"),
+          List(
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.*",        XS_STRING_QNAME,  "postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.uri",                 XS_ANYURI_QNAME,  "/fr/service/postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.datasource",          XS_STRING_QNAME,  "postgresql"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.mysql.*.*",             XS_STRING_QNAME,  "mysql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.mysql.uri",                      XS_ANYURI_QNAME,  "/fr/service/mysql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.mysql.datasource",               XS_STRING_QNAME,  "mysql"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.sqlite.*.form",         XS_STRING_QNAME,  "sqlite"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.sqlite.uri",                      XS_ANYURI_QNAME,  "/fr/service/sqlite"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.sqlite.datasource",              XS_STRING_QNAME,  "sqlite"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*.attachments",     XS_STRING_QNAME,  "filesystem"),
+          )
+        ),
+        (
+          "multiple providers, one missing datasource, and `filesystem` attachment is present",
+          false,
+          Set("postgresql", "mysql"),
+          List(
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.*",        XS_STRING_QNAME,  "postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.uri",                 XS_ANYURI_QNAME,  "/fr/service/postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.datasource",          XS_STRING_QNAME,  "postgresql"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.mysql.*.*",             XS_STRING_QNAME,  "mysql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.mysql.uri",                      XS_ANYURI_QNAME,  "/fr/service/mysql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.mysql.datasource",               XS_STRING_QNAME,  "mysql"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.sqlite.*.form",         XS_STRING_QNAME,  "sqlite"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.sqlite.uri",                      XS_ANYURI_QNAME,  "/fr/service/sqlite"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.sqlite.datasource",              XS_STRING_QNAME,  "sqlite"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*.attachments",     XS_STRING_QNAME,  "filesystem"),
+          )
+        ),
+        (
+          "multiple providers, one missing datasource but inactive, and `filesystem` attachment is present",
+          true,
+          Set("postgresql", "mysql"),
+          List(
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.*",        XS_STRING_QNAME,  "postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.uri",                 XS_ANYURI_QNAME,  "/fr/service/postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.datasource",          XS_STRING_QNAME,  "postgresql"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.mysql.*.*",             XS_STRING_QNAME,  "mysql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.uri",                 XS_ANYURI_QNAME,  "/fr/service/mysql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.mysql.datasource",               XS_STRING_QNAME,  "mysql"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.sqlite.*.form",         XS_STRING_QNAME,  "sqlite"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.sqlite.uri",                     XS_ANYURI_QNAME,  "/fr/service/sqlite"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.sqlite.datasource",              XS_STRING_QNAME,  "sqlite"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*.attachments",     XS_STRING_QNAME,  "filesystem"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.sqlite.active",                  XS_BOOLEAN_QNAME, "false"),
+          )
+        ),
+        (
+          "multiple providers, one missing datasource but external, and `filesystem` attachment is present",
+          true,
+          Set("postgresql", "mysql"),
+          List(
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.*",        XS_STRING_QNAME,  "postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.uri",                 XS_ANYURI_QNAME,  "/fr/service/postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.datasource",          XS_STRING_QNAME,  "postgresql"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.mysql.*.*",             XS_STRING_QNAME,  "mysql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.uri",                 XS_ANYURI_QNAME,  "/fr/service/mysql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.mysql.datasource",               XS_STRING_QNAME,  "mysql"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.sqlite.*.form",         XS_STRING_QNAME,  "my-provider"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.sqlite.uri",                     XS_ANYURI_QNAME,  "/fr/service/sqlite"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.sqlite.datasource",              XS_STRING_QNAME,  "sqlite"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*.attachments",     XS_STRING_QNAME,  "filesystem"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.my-provider.uri",                XS_ANYURI_QNAME,  "https://example.com/orbeon/my-provider"),
+          )
+        ),
+        (
+          "multiple providers, one missing datasource and internal, and `filesystem` attachment is present",
+          false,
+          Set("postgresql", "mysql"),
+          List(
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.postgresql.*.*",        XS_STRING_QNAME,  "postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.uri",                 XS_ANYURI_QNAME,  "/fr/service/postgresql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.datasource",          XS_STRING_QNAME,  "postgresql"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.mysql.*.*",             XS_STRING_QNAME,  "mysql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.postgresql.uri",                 XS_ANYURI_QNAME,  "/fr/service/mysql"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.mysql.datasource",               XS_STRING_QNAME,  "mysql"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.sqlite.*.form",         XS_STRING_QNAME,  "my-provider"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.sqlite.uri",                     XS_ANYURI_QNAME,  "/fr/service/sqlite"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.sqlite.datasource",              XS_STRING_QNAME,  "sqlite"),
+
+            PropertyParams(Map.empty, "oxf.fr.persistence.provider.*.*.*.attachments",     XS_STRING_QNAME,  "filesystem"),
+            PropertyParams(Map.empty, "oxf.fr.persistence.my-provider.uri",                XS_ANYURI_QNAME,  "/fr/service/my-provider"),
+          )
+        ),
+      )
+
+    for ((desc, expected, get, properties) <- expected)
+      it(s"must return `$expected` for `$desc`") {
+        assert(RelationalUtils.databaseConfigurationPresent(PropertySet(properties), get) == expected)
       }
   }
 }

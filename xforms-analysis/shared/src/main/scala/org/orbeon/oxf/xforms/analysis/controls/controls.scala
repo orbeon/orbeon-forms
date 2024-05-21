@@ -224,6 +224,7 @@ class TextareaControl(
   scope            : Scope,
   containerScope   : Scope
 ) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
+  override def allowMinimalLabelHint: Boolean = true
   override protected def allowedExtensionAttributes: Set[QName] = TextareaControl.AllowedExtensionAttributes
 }
 

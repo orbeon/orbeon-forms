@@ -18,7 +18,7 @@
   (function() {
     return Controls.lhhaChangeEvent.subscribe(function(event) {
       var inputOrTextarea, labelHint;
-      if ((event.type === 'label' || event.type === 'hint') && $(event.control).is('.xforms-input, .xforms-textarea')) {
+      if ((event.type === 'label' || event.type === 'hint') && $(event.control).is('.xforms-input, .xforms-textarea, .xforms-secret')) {
         labelHint = Controls.getControlLHHA(event.control, event.type);
         if (labelHint == null) {
           inputOrTextarea = findInputOrTextarea(event.control);

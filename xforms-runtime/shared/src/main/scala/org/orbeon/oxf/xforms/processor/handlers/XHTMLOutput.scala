@@ -126,7 +126,7 @@ object XHTMLOutput {
     case (ns @ XF,  ln @ "case"            , qn, atts, c                  , hc)                                                      => new XFormsCaseHandler           (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "repeat"          , qn, atts, c                  , hc)                                                      => new XFormsRepeatHandler         (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "repeat-iteration", qn, atts, _                  , hc)                                                      => new TransparentHandler          (ns, ln, qn, atts,    hc)
-    case (ns @ XF,  ln @ "secret"          , qn, atts, c                  , hc)                                                      => new XFormsSecretHandler         (ns, ln, qn, atts, c, hc)
+    case (ns @ XF,  ln @ "secret"          , qn, atts, c: SecretControl   , hc)                                                      => new XFormsSecretHandler         (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "upload"          , qn, atts, c                  , hc)                                                      => new XFormsUploadHandler         (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "textarea"        , qn, atts, c: TextareaControl , hc)                                                      => new XFormsTextareaHandler       (ns, ln, qn, atts, c, hc)
     case (ns @ XXF, ln @ "dialog"          , qn, atts, c                  , hc)                                                      => new XXFormsDialogHandler        (ns, ln, qn, atts, c, hc)

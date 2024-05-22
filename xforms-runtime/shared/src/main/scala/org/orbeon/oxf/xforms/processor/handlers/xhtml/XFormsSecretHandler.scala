@@ -1,6 +1,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SecretControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.forwardAutocompleteAttribute
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
@@ -15,7 +16,7 @@ class XFormsSecretHandler(
   localname      : String,
   qName          : String,
   attributes     : Attributes,
-  matched        : ElementAnalysis,
+  elementAnalysis: SecretControl,
   handlerContext : HandlerContext
 ) extends
   XFormsControlLifecycleHandler(
@@ -23,11 +24,14 @@ class XFormsSecretHandler(
     localname,
     qName,
     attributes,
-    matched,
+    elementAnalysis,
     handlerContext,
     repeating  = false,
     forwarding = false
   ) {
+
+  private lazy val placeHolderInfo: Option[PlaceHolderInfo] =
+    PlaceHolderInfo.placeHolderValueOpt(elementAnalysis, currentControl)
 
   def handleControlStart(): Unit = {
 
@@ -49,6 +53,13 @@ class XFormsSecretHandler(
       // Output all extension attributes
       // Output `xxf:*` extension attributes
       secretControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XFormsNames.XXFORMS_NAMESPACE_URI)
+
+      // Add attribute even if the control is not concrete
+      placeHolderInfo foreach { placeHolderInfo =>
+        if (placeHolderInfo.value ne null) // unclear whether this can ever be null
+          containerAttributes.addOrReplace("placeholder", placeHolderInfo.value)
+      }
+
       if (isXFormsReadonlyButNotStaticReadonly(secretControl))
         XFormsBaseHandlerXHTML.outputReadonlyAttribute(containerAttributes)
       XFormsBaseHandler.handleAriaAttributes(secretControl.isRequired, secretControl.isValid, secretControl.visited, containerAttributes)
@@ -66,4 +77,12 @@ class XFormsSecretHandler(
       }
     }
   }
+
+  protected override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
+    if (! (placeHolderInfo exists (_.isLabelPlaceholder)))
+      super.handleLabel(lhhaAnalysis)
+
+  protected override def handleHint(lhhaAnalysis: LHHAAnalysis): Unit =
+    if (placeHolderInfo forall (_.isLabelPlaceholder))
+      super.handleHint(lhhaAnalysis)
 }

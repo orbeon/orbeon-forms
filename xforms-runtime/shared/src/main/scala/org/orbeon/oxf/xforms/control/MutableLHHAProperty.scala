@@ -27,7 +27,7 @@ class MutableLHHProperty(control: XFormsControl, lhhaType: LHHA, supportsHTML: B
 
   protected def evaluateValueImpl(collector: ErrorEventCollector): Option[(String, Boolean)] =
     for {
-      lhh   <- control.staticControl.asInstanceOf[StaticLHHASupport].lhh(lhhaType)
+      lhh   <- control.staticControl.asInstanceOf[StaticLHHASupport].firstDirectLhha(lhhaType)
       value <- evaluateOne(lhh, collector)
     } yield
       value -> lhh.containsHTML

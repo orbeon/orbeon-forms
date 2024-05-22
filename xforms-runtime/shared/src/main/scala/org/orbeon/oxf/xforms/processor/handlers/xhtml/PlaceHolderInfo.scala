@@ -32,10 +32,8 @@ object PlaceHolderInfo {
     control     : XFormsControl
   ): Option[PlaceHolderInfo] = {
 
-    val isLabelPlaceholder = lhhaSupport.hasLHHAPlaceholder(LHHA.Label)
-    val isHintPlaceholder  = ! isLabelPlaceholder && lhhaSupport.hasLHHAPlaceholder(LHHA.Hint)
-
-    println(s"xxx isLabelPlaceholder for ${control.effectiveId}: $isLabelPlaceholder, isHintPlaceholder: $isHintPlaceholder")
+    val isLabelPlaceholder = lhhaSupport.hasLhhaPlaceholder(LHHA.Label)
+    val isHintPlaceholder  = ! isLabelPlaceholder && lhhaSupport.hasLhhaPlaceholder(LHHA.Hint)
 
     (isLabelPlaceholder || isHintPlaceholder) option {
 
@@ -50,7 +48,7 @@ object PlaceHolderInfo {
           }
           .getOrElse("")
 
-      PlaceHolderInfo(isLabelPlaceholder, placeholderValue) .kestrel(x => println(s"xxx PlaceHolderInfo: $x"))
+      PlaceHolderInfo(isLabelPlaceholder, placeholderValue)
     }
   }
 }

@@ -278,7 +278,7 @@ class XFormsOutputControl(
   //     more correct, we should restrict this to focusable HTML content.
   //     See https://github.com/orbeon/orbeon-forms/issues/4773
   override def isDirectlyFocusableMaybeWithToggle: Boolean =
-    (staticControl.hasDirectLHHA(LHHA.Label) || staticControl.isHtmlMediatype) &&
+    (staticControl.hasDirectLhha(LHHA.Label) || staticControl.isHtmlMediatype) &&
     super.isDirectlyFocusableMaybeWithToggle
 
   override def addAjaxExtensionAttributes(

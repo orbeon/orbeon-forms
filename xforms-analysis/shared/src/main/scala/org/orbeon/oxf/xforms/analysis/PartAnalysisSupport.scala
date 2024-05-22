@@ -89,13 +89,13 @@ object PartAnalysisSupport {
 
     // We attach the LHHA to one, and possibly two target controls:
     // 1. The control to which the LHHA is directly attached, via `for` or direct nesting
-    lhhaPlacementType.directTargetControl.attachLHHA(lhhaAnalysis)
+    lhhaPlacementType.directTargetControl.attachDirectLhha(lhhaAnalysis)
 
     // 2. The control to which the LHHA is attached indirectly via `xxbl:label-for`, provided it's not the same control
     //    we already attached the LHHA to.
     lhhaPlacementType.lhhaControlRef match {
       case LhhaControlRef.Control(targetControl) if targetControl ne lhhaPlacementType.directTargetControl =>
-        targetControl.attachLHHABy(lhhaAnalysis)
+        targetControl.attachByLhha(lhhaAnalysis)
       case _ =>
     }
   }

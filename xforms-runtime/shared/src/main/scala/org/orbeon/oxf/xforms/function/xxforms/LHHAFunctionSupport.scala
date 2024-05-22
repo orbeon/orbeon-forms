@@ -32,7 +32,7 @@ object LHHAFunctionSupport {
     relevantControl(controlId)
       .map(_.staticControl)
       .flatMap(_.cast[StaticLHHASupport])
-      .flatMap(_.directOrByLhhOpt(lhha))
+      .flatMap(_.firstByOrDirectLhhaOpt(lhha))
       .collect {
         case lh if lh.isPlaceholder => "minimal"
         case _                      => "full"

@@ -99,7 +99,7 @@ trait ControlAjaxSupport {
       // Also: we can have multiple `staticLhhaSupport` for `LHHA.Alert`, but only one `lhhaProperty`! Some `LHHA`s
       // could be nested, some external, but in the end we only get one value. For now (2022-06-09) the constraint
       // remains that we should either have all local alerts, or all separate.
-      if staticLhhaSupport.hasLocal(lhha) || staticLhhaSupport.hasLHHAPlaceholder(lhha)
+      if staticLhhaSupport.hasLocal(lhha) || staticLhhaSupport.hasLhhaPlaceholder(lhha)
       value1            = previousControlOpt.map(_.lhhaProperty(lhha).value(collector)).orNull
       lhha2             = self.lhhaProperty(lhha)
       value2            = lhha2.value(collector)
@@ -295,7 +295,7 @@ object ControlAjaxSupport {
   ): Option[String] =
     for {
       staticLhhaSupport <- staticControl.narrowTo[StaticLHHASupport]
-      staticLhha        <- staticLhhaSupport.directOrByLhhOpt(lhha)
+      staticLhha        <- staticLhhaSupport.firstByOrDirectLhhaOpt(lhha)
       if condition(staticLhha)
     } yield
       staticLhha.lhhaPlacementType match {

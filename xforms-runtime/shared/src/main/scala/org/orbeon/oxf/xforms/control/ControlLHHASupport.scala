@@ -128,8 +128,8 @@ trait ControlLHHASupport {
   def lhhaValue(lhha: LHHA): Option[String] =
     (
       self.staticControl match { // Scala 3: `.match`
-        case s: StaticLHHASupport if s.hasDirectLHHA(lhha) => Some(self)
-        case s: StaticLHHASupport if s.hasByLHHA(lhha)     => self.referencingControl.map(_._2)
+        case s: StaticLHHASupport if s.hasDirectLhha(lhha) => Some(self)
+        case s: StaticLHHASupport if s.hasByLhha(lhha)     => self.referencingControl.map(_._2)
         case _                                             => None
       }
     )

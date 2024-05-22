@@ -242,7 +242,7 @@ object FormRunnerMetadata {
       val lhhas =
         for {
           lhha     <- LHHA.values.toList
-          if staticControl.hasDirectLHHA(lhha)
+          if staticControl.hasDirectLhha(lhha)
           lhhaName = lhha.entryName
           holder   <- enclosingHolder child lhhaName
         } yield

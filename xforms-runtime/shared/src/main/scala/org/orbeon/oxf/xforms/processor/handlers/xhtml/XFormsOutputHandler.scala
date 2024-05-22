@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, OutputControl}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaReadonly
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
@@ -55,7 +55,7 @@ class XFormsOutputDefaultHandler(
   localname       : String,
   qName           : String,
   localAtts       : Attributes,
-  elementAnalysis : ElementAnalysis,
+  elementAnalysis : OutputControl,
   handlerContext  : HandlerContext
 ) extends
   XFormsControlLifecycleHandler(
@@ -69,8 +69,8 @@ class XFormsOutputDefaultHandler(
     forwarding = false
   ) with XFormsOutputHandler {
 
-  private val hasLabel =
-    findStaticLhhaOrLhhaBy(LHHA.Label).isDefined
+  private val hasDirectOrByLabel =
+    elementAnalysis.firstByOrDirectLhhaOpt(LHHA.Label).isDefined
 
   protected def handleControlStart(): Unit = {
 
@@ -82,11 +82,11 @@ class XFormsOutputDefaultHandler(
       XFormsControl.appearances(elementAnalysis)(XFORMS_MINIMAL_APPEARANCE_QNAME)
 
     val containerAttributes =
-      getContainerAttributes(getEffectiveId, outputControl, isField = hasLabel && ! isMinimal)
+      getContainerAttributes(getEffectiveId, outputControl, isField = hasDirectOrByLabel && ! isMinimal)
 
     // Handle accessibility attributes on control element
     XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
-    if (hasLabel) {
+    if (hasDirectOrByLabel) {
 
       // NOTE: No need to handle `LHHA.Alert` as that's not handled by `handleAriaByAtts`
       def ariaByCondition(lhhaAnalysis: LHHAAnalysis): Boolean =
@@ -106,7 +106,7 @@ class XFormsOutputDefaultHandler(
       containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, "textbox")
     }
 
-    withElement(if (hasLabel) "output" else "span", prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
+    withElement(if (hasDirectOrByLabel) "output" else "span", prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       val mediatypeValue = attributes.getValue("mediatype")
       val textValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue, handlerContext.collector)
       if ((textValue ne null) && textValue.nonEmpty)
@@ -130,7 +130,7 @@ class XFormsOutputDefaultHandler(
     if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyHint)
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
-        controlEffectiveIdOpt   = hasLabel option getEffectiveId, // change from default
+        controlEffectiveIdOpt   = hasDirectOrByLabel option getEffectiveId, // change from default
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
         controlOrNull           = currentControl,
@@ -141,7 +141,7 @@ class XFormsOutputDefaultHandler(
     if (! XFormsBaseHandler.isStaticReadonly(currentControl))
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
-        controlEffectiveIdOpt   = hasLabel option getEffectiveId, // change from default
+        controlEffectiveIdOpt   = hasDirectOrByLabel option getEffectiveId, // change from default
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
         controlOrNull           = currentControl,

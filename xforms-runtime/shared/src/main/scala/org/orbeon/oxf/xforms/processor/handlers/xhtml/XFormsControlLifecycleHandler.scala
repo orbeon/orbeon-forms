@@ -222,7 +222,7 @@ abstract class XFormsControlLifecycleHandler(
 
   final protected def findStaticLhhaOrLhhaBy(lhhaType: LHHA): Option[LHHAAnalysis] =
     elementAnalysis.narrowTo[StaticLHHASupport]
-      .flatMap(lhhaSupport => lhhaSupport.firstLhha(lhhaType).orElse(lhhaSupport.firstLhhaBy(lhhaType)))
+      .flatMap(lhhaSupport => lhhaSupport.firstByOrDirectLhhaOpt(lhhaType))
 
   def outputStaticReadonlyField[T](xhtmlPrefix: String, localName: String = "span")(body: => T)(implicit xmlReceiver: XMLReceiver): T = {
 
@@ -261,6 +261,6 @@ abstract class XFormsControlLifecycleHandler(
       handlerContext.documentOrder
 
     def lhhaIfLocal(lhhaType: LHHA): Option[LHHAAnalysis] =
-      elementAnalysis.narrowTo[StaticLHHASupport].flatMap(_.firstLhha(lhhaType)).filter(_.isLocal)
+      elementAnalysis.narrowTo[StaticLHHASupport].flatMap(_.firstDirectLhha(lhhaType)).filter(_.isLocal)
   }
 }

@@ -111,7 +111,7 @@ object XHTMLOutput {
     case (ns @ XF,  ln @ "output"          , qn, atts, c: OutputControl   , hc) if c.isImageMediatype                                => new XFormsOutputImageHandler    (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "output"          , qn, atts, c: OutputControl   , hc) if c.isVideoMediatype                                => new XFormsOutputVideoHandler    (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "output"          , qn, atts, c: OutputControl   , hc) if c.isHtmlMediatype                                 => new XFormsOutputHTMLHandler     (ns, ln, qn, atts, c, hc)
-    case (ns @ XF,  ln @ "output"          , qn, atts, c                  , hc)                                                      => new XFormsOutputDefaultHandler  (ns, ln, qn, atts, c, hc)
+    case (ns @ XF,  ln @ "output"          , qn, atts, c: OutputControl   , hc)                                                      => new XFormsOutputDefaultHandler  (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "group"           , qn, atts, c: AppearanceTrait , hc) if c.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME)  => new TransparentHandler          (ns, ln, qn, atts,    hc)
     case (ns @ XF,  ln @ "group"           , qn, atts, c: AppearanceTrait , hc) if c.appearances(XXFORMS_SEPARATOR_APPEARANCE_QNAME) => new XFormsGroupSeparatorHandler (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "group"           , qn, atts, c: GroupControl    , hc) if isFieldSet(c)                                     => new XFormsGroupFieldsetHandler  (ns, ln, qn, atts, c, hc)

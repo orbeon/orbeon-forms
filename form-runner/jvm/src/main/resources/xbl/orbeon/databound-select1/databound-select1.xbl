@@ -23,7 +23,7 @@
     <xbl:binding
         id="fr-databound-select1"
         element="fr|databound-select1"
-        xxbl:mode="lhha binding value selection"
+        xxbl:mode="lhha binding value selection allow-minimal-label-hint"
         xxbl:label-for="select1">
 
         <metadata
@@ -177,13 +177,9 @@
             <xf:select1
                 ref="$binding"
                 id="select1"
+                appearance="dropdown"
                 xbl:attr="xxf:encrypt-item-values autocomplete"
                 class="{'fr-service-error'[instance('status')/@submission-status = 'failure']}">
-                <!-- Blank item -->
-                <xf:item>
-                    <xf:label/>
-                    <xf:value/>
-                </xf:item>
                 <!-- Switch to the outer scope so that a nested `xf:itemset` evaluates in that scope.
                      https://github.com/orbeon/orbeon-forms/issues/4595 -->
                 <xf:choices context="$itemset" xxbl:scope="outer">

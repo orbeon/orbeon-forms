@@ -425,19 +425,19 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
   def label(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
-    relevantControl(controlId) map (_.getLabel(EventCollector.Throw))
+    LHHAFunctionSupport.lhhaValue(controlId, LHHA.Label)
 
   @XPathFunction
   def help(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
-    relevantControl(controlId) map (_.getHelp(EventCollector.Throw))
+    LHHAFunctionSupport.lhhaValue(controlId, LHHA.Help)
 
   @XPathFunction
   def hint(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
-    relevantControl(controlId) map (_.getHint(EventCollector.Throw))
+    LHHAFunctionSupport.lhhaValue(controlId, LHHA.Hint)
 
   @XPathFunction
   def alert(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
-    relevantControl(controlId) map (_.getAlert(EventCollector.Throw))
+    LHHAFunctionSupport.lhhaValue(controlId, LHHA.Alert)
 
   @XPathFunction
   def labelAppearance(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =

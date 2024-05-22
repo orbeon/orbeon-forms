@@ -17,8 +17,11 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport._
 import org.orbeon.oxf.xforms.control.XFormsControl._
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
+import shapeless.syntax.typeable._
 
 import scala.collection.compat._
 
@@ -100,7 +103,7 @@ trait ControlLHHASupport {
   def htmlLhhaSupport: Set[LHHA] = LHHA.DefaultLHHAHTMLSupport
   def ajaxLhhaSupport: Seq[LHHA] = LHHA.values
 
-  def compareLHHA(other: XFormsControl, collector: ErrorEventCollector) =
+  def compareLHHA(other: XFormsControl, collector: ErrorEventCollector): Boolean =
     ajaxLhhaSupport forall (lhha => lhhaProperty(lhha).value(collector) == other.lhhaProperty(lhha).value(collector))
 
   // Convenience accessors
@@ -110,6 +113,28 @@ trait ControlLHHASupport {
   final def getHint    (collector: ErrorEventCollector) = lhhaProperty(LHHA.Hint).value(collector)
   final def getAlert   (collector: ErrorEventCollector) = lhhaProperty(LHHA.Alert).value(collector)
   final def isHTMLAlert(collector: ErrorEventCollector) = lhhaProperty(LHHA.Alert).isHTML(collector)
+
+  lazy val referencingControl: Option[(StaticLHHASupport, XFormsSingleNodeControl)] = {
+    for {
+      lhhaSupport           <- self.staticControl.cast[StaticLHHASupport]
+      staticRc              <- lhhaSupport.referencingControl
+      concreteRcEffectiveId = XFormsId.buildEffectiveId(staticRc.prefixedId, XFormsId.getEffectiveIdSuffixParts(self.effectiveId))
+      concreteRc            <- containingDocument.findControlByEffectiveId(concreteRcEffectiveId)
+      concreteSnRc          <- concreteRc.cast[XFormsSingleNodeControl]
+    } yield
+      staticRc -> concreteSnRc
+  }
+
+  def lhhaValue(lhha: LHHA): Option[String] =
+    (
+      self.staticControl match { // Scala 3: `.match`
+        case s: StaticLHHASupport if s.hasDirectLHHA(lhha) => Some(self)
+        case s: StaticLHHASupport if s.hasByLHHA(lhha)     => self.referencingControl.map(_._2)
+        case _                                             => None
+      }
+    )
+    .flatMap(_.lhhaProperty(lhha)
+    .valueOpt(EventCollector.Throw))
 }
 
 // NOTE: Use name different from trait so that the Java compiler is happy

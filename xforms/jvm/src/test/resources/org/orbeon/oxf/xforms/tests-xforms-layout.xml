@@ -2813,4 +2813,65 @@
         </output>
     </test>
 
+    <test description="#6333: `fr:dropdown-select1` to support minimal label" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <_/>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding
+                            id="fr-wrapped-inner"
+                            element="fr|wrapped-inner"
+                            xxbl:mode="binding lhha allow-minimal-label-hint"
+                            xxbl:label-for="my-input">
+                            <xbl:template>
+                                <xf:output value="xxf:label-appearance('my-input')"/>
+                                <xf:output value="xxf:label('my-input')"/>
+                                <xf:input id="my-input" ref="xxf:binding('fr-wrapped-inner')"/>
+                            </xbl:template>
+                        </xbl:binding>
+                        <xbl:binding
+                            id="fr-wrapped-outer"
+                            element="fr|wrapped-outer"
+                            xxbl:mode="binding lhha allow-minimal-label-hint"
+                            xxbl:label-for="my-wrapped-inner">
+                            <xbl:template>
+                                 <fr:wrapped-inner id="my-wrapped-inner" ref="xxf:binding('fr-wrapped-outer')"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:wrapped-outer id="my-wrapped-outer" ref=".">
+                        <xf:label appearance="minimal">My label</xf:label>
+                    </fr:wrapped-outer>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xh:div id="my-wrapped-outer" class="xbl-component xbl-fr-wrapped-outer">
+                    <xh:div id="my-wrapped-outer≡my-wrapped-inner" class="xbl-component xbl-fr-wrapped-inner">
+                        <xh:span id="my-wrapped-outer≡my-wrapped-inner≡xf-5" class="xforms-control xforms-output">
+                            <xh:span id="my-wrapped-outer≡my-wrapped-inner≡xf-5≡≡c" class="xforms-output-output">minimal</xh:span>
+                        </xh:span>
+                        <xh:span id="my-wrapped-outer≡my-wrapped-inner≡xf-6" class="xforms-control xforms-output">
+                            <xh:span id="my-wrapped-outer≡my-wrapped-inner≡xf-6≡≡c" class="xforms-output-output">My label</xh:span>
+                        </xh:span>
+                        <xh:span id="my-wrapped-outer≡my-wrapped-inner≡my-input" class="xforms-control xforms-input">
+                            <xh:input id="my-wrapped-outer≡my-wrapped-inner≡my-input≡xforms-input-1" type="text"
+                                      name="my-wrapped-outer≡my-wrapped-inner≡my-input≡xforms-input-1" value=""
+                                      placeholder="My label" class="xforms-input-input"/>
+                        </xh:span>
+                    </xh:div>
+                </xh:div>
+            </controls>
+        </output>
+    </test>
+
 </group>

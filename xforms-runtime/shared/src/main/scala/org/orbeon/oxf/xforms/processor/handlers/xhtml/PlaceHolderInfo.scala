@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.event.EventCollector
 
 
 case class PlaceHolderInfo(isLabelPlaceholder: Boolean, value: String)
@@ -33,22 +32,25 @@ object PlaceHolderInfo {
     control     : XFormsControl
   ): Option[PlaceHolderInfo] = {
 
-      val isLabelPlaceholder = lhhaSupport.hasLHHAPlaceholder(LHHA.Label)
-      val isHintPlaceholder  = ! isLabelPlaceholder && lhhaSupport.hasLHHAPlaceholder(LHHA.Hint)
+    val isLabelPlaceholder = lhhaSupport.hasLHHAPlaceholder(LHHA.Label)
+    val isHintPlaceholder  = ! isLabelPlaceholder && lhhaSupport.hasLHHAPlaceholder(LHHA.Hint)
 
-      (isLabelPlaceholder || isHintPlaceholder) option {
+    println(s"xxx isLabelPlaceholder for ${control.effectiveId}: $isLabelPlaceholder, isHintPlaceholder: $isHintPlaceholder")
 
-        val placeholderValue =
-          if (control.isRelevant) {
+    (isLabelPlaceholder || isHintPlaceholder) option {
+
+      val placeholderValue =
+        control
+          .isRelevant
+          .flatOption {
             if (isLabelPlaceholder)
-              control.getLabel(EventCollector.Throw)
+              control.lhhaValue(LHHA.Label)
             else
-              control.getHint(EventCollector.Throw)
-          } else {
-            ""
+              control.lhhaValue(LHHA.Hint)
           }
+          .getOrElse("")
 
-        PlaceHolderInfo(isLabelPlaceholder, placeholderValue)
-      }
+      PlaceHolderInfo(isLabelPlaceholder, placeholderValue) .kestrel(x => println(s"xxx PlaceHolderInfo: $x"))
+    }
   }
 }

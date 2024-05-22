@@ -45,7 +45,7 @@ trait StaticLHHASupport extends ElementAnalysis {
   def alerts               : List[LHHAAnalysis]   = _alerts
   def alertsBy             : List[LHHAAnalysis]   = _alertsBy
 
-  def anyByOpt(lhhaType: LHHA): Option[LHHAAnalysis] =
+  def directOrByLhhOpt(lhhaType: LHHA): Option[LHHAAnalysis] =
     lhhaType match {
       case LHHA.Alert => alertsBy.headOption orElse alerts.headOption
       case _          => lhhBy(lhhaType)     orElse lhh(lhhaType)
@@ -63,8 +63,11 @@ trait StaticLHHASupport extends ElementAnalysis {
     else
       lhhBy(lhhaType)
 
-  def hasLHHA(lhhaType: LHHA): Boolean =
+  def hasDirectLHHA(lhhaType: LHHA): Boolean =
     if (lhhaType == LHHA.Alert) alerts.nonEmpty else lhh(lhhaType).nonEmpty
+
+  def hasByLHHA(lhhaType: LHHA): Boolean =
+    if (lhhaType == LHHA.Alert) alertsBy.nonEmpty else lhhBy(lhhaType).nonEmpty
 
   def hasLocal(lhhaType: LHHA): Boolean =
     lhhaAsList(lhhaType) exists (_.isLocal)
@@ -73,7 +76,7 @@ trait StaticLHHASupport extends ElementAnalysis {
     lhhaAsList(lhhaType) flatMap (_.valueAnalysis)
 
   def hasLHHAPlaceholder(lhhaType: LHHA): Boolean =
-    lhh(lhhaType) match {
+    directOrByLhhOpt(lhhaType) match {
       case Some(lhh) => lhh.isPlaceholder && allowMinimalLabelHint
       case None      => false
     }

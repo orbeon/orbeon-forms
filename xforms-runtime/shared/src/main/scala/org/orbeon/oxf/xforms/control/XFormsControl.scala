@@ -340,6 +340,8 @@ object XFormsControl {
     def value(collector: ErrorEventCollector): T
     def handleMarkDirty(force: Boolean = false): Unit
     def copy: ControlProperty[T]
+
+    def valueOpt(collector: ErrorEventCollector): Option[T] = Option(value(collector))
   }
 
   // Immutable control property

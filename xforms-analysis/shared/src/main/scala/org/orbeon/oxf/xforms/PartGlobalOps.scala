@@ -84,5 +84,5 @@ trait PartGlobalOps {
 
   // LHHA
   def hasLHHA(prefixedId: String, lhha: LHHA): Boolean =
-    collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) exists (_.hasLHHA(lhha))
+    collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) exists (_.hasDirectLHHA(lhha))
 }

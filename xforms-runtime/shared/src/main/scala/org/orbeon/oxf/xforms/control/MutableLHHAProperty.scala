@@ -117,7 +117,6 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
   protected def evaluateValueImpl(collector: ErrorEventCollector): Option[(String, Boolean)]
 
   // Evaluate the value of a LHHA related to this control
-  // Can return null
   protected def evaluateOne(lhhaAnalysis: LHHAAnalysis, collector: ErrorEventCollector): Option[String] =
     if (lhhaAnalysis.isLocal) {
 
@@ -138,8 +137,8 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
         control.effectiveId,
         lhhaAnalysis.staticId,
         followIndexes = true
-      ).headOption collect {
-        case control: XFormsLHHAControl => control.getValue(collector)
-      }
+      )
+      .headOption
+      .collect { case control: XFormsLHHAControl => control.getValue(collector) }
     }
 }

@@ -154,7 +154,11 @@
         </xbl:implementation>
 
         <xbl:template>
-            <xf:select1 appearance="minimal" ref="xxf:binding('fr-dropdown-select1')" id="select1" xbl:attr="xxf:encrypt-item-values autocomplete">
+            <xf:select1
+                appearance="minimal"
+                ref="xxf:binding('fr-dropdown-select1')"
+                id="select1"
+                xbl:attr="xxf:encrypt-item-values autocomplete">
                 <!-- Title item -->
                 <!-- Always present, but blank if the control is readonly OR if a value is already selected -->
                 <!-- Alternate behavior: remove title item if a value is selected -->
@@ -164,8 +168,8 @@
                         value="
                             if (xxf:readonly() or xxf:non-blank()) then
                                 ''
-                            else if (xxf:label-appearance('fr-dropdown-select1') = 'minimal') then
-                                xxf:label('fr-dropdown-select1')
+                            else if (xxf:label-appearance('select1') = 'minimal') then
+                                xxf:label('select1')
                             else
                                 xxf:r('select')"/>
                     <xf:value/>

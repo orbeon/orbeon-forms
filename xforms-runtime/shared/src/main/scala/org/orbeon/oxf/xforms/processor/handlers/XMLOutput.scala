@@ -67,7 +67,7 @@ object XMLOutput extends XMLReceiverSupport {
     for {
       lhhaType <- LHHA.values
       lhhaProp = c.lhhaProperty(lhhaType)
-      text     <- Option(lhhaProp.value(collector))
+      text     <- lhhaProp.valueOpt(collector)
     } locally {
       writeTextOrHTML(lhhaType.entryName, text, lhhaProp.isHTML(collector))(xmlReceiver)
     }

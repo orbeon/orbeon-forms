@@ -14,31 +14,30 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.event.EventCollector
+import org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.RuntimeDependentFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
 
+
 class XXFormsLHHA extends XFormsFunction with RuntimeDependentFunction {
 
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
 
-    implicit val ctx = xpathContext
-    implicit val xfc = XFormsFunction.context
+    implicit val ctx: XPathContext                    = xpathContext
+    implicit val xfc: function.XFormsFunction.Context = XFormsFunction.context
 
-    def evaluateControlItem(f: XFormsControl => String) =
-      relevantControl(0) map f
+    val lhha =
+      operation match {
+        case 0 => LHHA.Label
+        case 1 => LHHA.Help
+        case 2 => LHHA.Hint
+        case 3 => LHHA.Alert
+      }
 
-    evaluateControlItem(operation match {
-      case 0 => _.getLabel(EventCollector.Throw)
-      case 1 => _.getHelp(EventCollector.Throw)
-      case 2 => _.getHint(EventCollector.Throw)
-      case 3 => _.getAlert(EventCollector.Throw)
-      case _ => throw new UnsupportedOperationException
-    })
+    LHHAFunctionSupport.lhhaValue(arguments.head.evaluateAsString(ctx).toString, lhha)
   }
 }
 

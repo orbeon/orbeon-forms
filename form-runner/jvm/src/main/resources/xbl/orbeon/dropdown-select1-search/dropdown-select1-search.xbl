@@ -180,8 +180,8 @@
                 data-placeholder="{
                     if ($disable-placeholder) then
                         ''
-                    else if (xxf:label-appearance('fr-dropdown-select1-search') = 'minimal') then
-                        xxf:label('fr-dropdown-select1-search')
+                    else if (xxf:label-appearance('select1') = 'minimal') then
+                        xxf:label('select1')
                     else
                         xxf:r('select')
                 }"

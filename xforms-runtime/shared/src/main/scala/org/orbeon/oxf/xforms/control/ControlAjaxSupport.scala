@@ -295,7 +295,7 @@ object ControlAjaxSupport {
   ): Option[String] =
     for {
       staticLhhaSupport <- staticControl.narrowTo[StaticLHHASupport]
-      staticLhha        <- staticLhhaSupport.anyByOpt(lhha)
+      staticLhha        <- staticLhhaSupport.directOrByLhhOpt(lhha)
       if condition(staticLhha)
     } yield
       staticLhha.lhhaPlacementType match {

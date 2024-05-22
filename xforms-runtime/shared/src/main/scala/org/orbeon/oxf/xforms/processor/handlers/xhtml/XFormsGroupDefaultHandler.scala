@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.{forwardAccessibilityAttributes, handleAriaAttributes}
 import org.orbeon.oxf.xml.SaxSupport._
-import org.orbeon.xforms.{XFormsId, XFormsNames}
+import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 import shapeless.syntax.typeable._
@@ -79,10 +79,8 @@ class XFormsGroupDefaultHandler(
     // If this group is the target of an `xxf:label-for`, find the outermost control that references it, and use the
     // associated concrete control's information to output `aria-required` and `aria-invalid`.
     for {
-      staticRc              <- matched.referencingControl
-      concreteRcEffectiveId = XFormsId.buildEffectiveId(staticRc.prefixedId, XFormsId.getEffectiveIdSuffixParts(currentControl.effectiveId))
-      concreteRc            <- containingDocument.findControlByEffectiveId(concreteRcEffectiveId)
-      concreteSnRc          <- concreteRc.cast[XFormsSingleNodeControl]
+      (staticRc, concreteRc) <- currentControl.referencingControl
+      concreteSnRc           <- concreteRc.cast[XFormsSingleNodeControl]
     } locally {
       handleAriaAttributes(concreteSnRc.isRequired, concreteSnRc.isValid, concreteRc.visited, atts)
       // https://github.com/orbeon/orbeon-forms/issues/6304

@@ -307,6 +307,7 @@
 
             .fr-grid-head, .fr-grid-body {
                 display: grid;
+                grid-gap: 10px 20px; // Spacing between controls
                 .fr-grid-td {
                     grid-column-end: span  1;
                     grid-column-end: span  1;
@@ -346,6 +347,7 @@
             }
 
             .xforms-label {
+                font-weight: 600;                           // Help label stand out
                 margin-top: 2px;                            // Nicer to have a bit of space at the top to separate controls a bit more, esp. when outside grid cells
                 margin-bottom: @frGridCellPadding;          // Insert some space between the label / help and the control (we add spacing below the label rather
                                                             // than above the control to make the CSS more generally applicable to XBL components)

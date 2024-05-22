@@ -96,10 +96,6 @@ body.orbeon { background-color: @frBackground }
         position: static;
     }
 
-    label, .xforms-label {
-        color: @textColor;
-    }
-
     .table {
         &> thead, &> tbody, &> tfoot {
             &> tr {
@@ -159,7 +155,7 @@ body.orbeon { background-color: @frBackground }
     .fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
         border-radius: @inputBorderRadius;
         background-color: @inputBackground;
-        border: 1px solid @inputBorder;
+        border: 1px solid @fieldBorderColor;
         padding: 4px 6px;
     }
 
@@ -216,7 +212,7 @@ body.orbeon { background-color: @frBackground }
         text-align: center;
         font-size: smaller;
         padding: 10px;
-        color: #6E6E6E;
+        color: @minGrayOnWhite;
     }
 
     .fr-explanation .xforms-output {
@@ -282,7 +278,7 @@ body.orbeon { background-color: @frBackground }
 
     .xforms-hint {
         font-size: smaller;
-        color: #6E6E6E;
+        color: @minGrayOnWhite;
         margin-top: .2em;
         margin-left: 0;// used to have margin here but with new colors no margin seems better
     }

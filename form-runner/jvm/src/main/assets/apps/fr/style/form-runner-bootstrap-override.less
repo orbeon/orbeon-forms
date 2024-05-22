@@ -161,7 +161,7 @@ body.orbeon {
         line-height: @baseLineHeight;
         font-size: @frFontSize;         // Use our own preferred font size
 
-        color: black;                   // Make text inside the fields stand out, as this is the most important information
+        color: @textColor;              // Darker than Bootstrap default of #555
         background-image: none;         // Liferay adds background images which don't mix well with Bootstrap
 
         // Let content wrap otherwise the user has no option to see the content
@@ -345,6 +345,7 @@ body.orbeon {
         margin-bottom: 0;                   // Not sure why Bootstrap adds a @baseLineHeight / 2 margin here
         .add-on {
             height: @baseLineHeight - 2px;
+            border: 1px solid @fieldBorderColor;
         }
     }
 
@@ -406,7 +407,7 @@ body.orbeon {
             font-size: @baseFontSize - 1;       // 14px to 13px
             line-height: @baseLineHeight;
             background-color: darken(@inputBackground, 5%);
-            border: 1px solid @inputBorder;
+            border: 1px solid @fieldBorderColor;
             border-radius: @inputBorderRadius;
         }
 
@@ -591,6 +592,10 @@ body.orbeon {
         &.disabled, &[disabled] {
             background-color: darken(@wellBackground, 5%); // restore default color or buttons are too dark when disabled
         }
+    }
+
+    .label {
+        background-color: @minGrayOnWhite;
     }
 
     // Make color consistent with primary button color

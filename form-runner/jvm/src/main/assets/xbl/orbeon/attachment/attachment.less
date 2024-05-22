@@ -18,7 +18,7 @@
         .xforms-dnd-item {
 
             border-radius: @inputBorderRadius;
-            border: 1px solid @inputBorder;
+            border: 1px solid @fieldBorderColor;
             padding: 4px 6px;
             margin: 2px 0;
 
@@ -52,11 +52,11 @@
         .fr-attachment-drop, .fr-attachment-empty {
             display: block;
             border-width: 2px;
-            border-color: @inputBorder;
+            border-color: @fieldBorderColor;
             border-radius: @inputBorderRadius;
             margin: 3px 0;
             padding: 1em;
-            color: @inputBorder;
+            color: @fieldBorderColor;
             text-align: center;
         }
 
@@ -65,7 +65,7 @@
             border-style: dashed;
 
             &.fr-attachment-dragover {
-                background-color: @inputBorder;
+                background-color: @fieldBorderColor;
                 color: white;
             }
         }

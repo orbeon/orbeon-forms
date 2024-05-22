@@ -68,6 +68,7 @@
                             else if (empty($buttons-property-opt) and $fr-mode = 'test') then
                                 (
                                     ('wizard-toc', 'wizard-prev', 'wizard-next')[fr:is-wizard-body-shown()],
+                                    'clear',
                                     'validate',
                                     'save'[fr:is-browser-environment()]
                                 )

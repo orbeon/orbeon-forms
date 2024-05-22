@@ -22,8 +22,9 @@ case class HttpStatusCodeException(
   resource  : Option[String]    = None,
   throwable : Option[Throwable] = None
 ) extends HttpStatusCode {
-  override def toString =
-    s"HttpStatusCodeException(code = $code, resource = $resource, throwable = ${throwable map OrbeonFormatter.message getOrElse ""})"
+  override def getMessage: String = s"HttpStatusCodeException(code = $code, resource = $resource, throwable = ${throwable map OrbeonFormatter.message getOrElse ""})"
+  override def toString: String = getMessage
+
 }
 
 case class HttpRedirectException(
@@ -31,11 +32,13 @@ case class HttpRedirectException(
   serverSide : Boolean = false,
   exitPortal : Boolean = false
 ) extends HttpStatusCode {
-  val code = StatusCode.Found // using 302 instead of 303 as 302 is still the de facto standard
-  override def toString = s"HttpRedirectException(location = $location, serverSide = $serverSide, exitPortal = $exitPortal)"
+  val code: Int = StatusCode.Found // using 302 instead of 303 as 302 is still the de facto standard
+  override def getMessage = s"HttpRedirectException(location = $location, serverSide = $serverSide, exitPortal = $exitPortal)"
+  override def toString: String = getMessage
 }
 
 case class SessionExpiredException(message: String) extends HttpStatusCode {
-  val code = StatusCode.LoginTimeOut
-  override def toString = s"SessionExpiredException(message= $message)"
+  val code: Int = StatusCode.LoginTimeOut
+  override def getMessage = s"SessionExpiredException(message= $message)"
+  override def toString: String = getMessage
 }

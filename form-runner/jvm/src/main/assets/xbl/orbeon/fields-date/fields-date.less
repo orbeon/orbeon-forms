@@ -10,6 +10,10 @@
             // All the inputs on the same line
             display: inline-block;
 
+            // Don't show placeholders as they are too large and get truncated
+            input::placeholder {
+                color: transparent;
+            }
             // By default, don't show labels, but don't hide to screen readers
             // Particularly strong rule for Form Builder, to override its `display: table`
             &.xforms-control .xforms-label,

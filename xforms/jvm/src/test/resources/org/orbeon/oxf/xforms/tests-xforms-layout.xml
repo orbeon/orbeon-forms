@@ -2820,7 +2820,7 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <_/>
+                            <_>Hello, world!</_>
                         </xf:instance>
                     </xf:model>
                     <xbl:xbl>
@@ -2830,9 +2830,9 @@
                             xxbl:mode="binding lhha allow-minimal-label-hint"
                             xxbl:label-for="my-input">
                             <xbl:template>
-                                <xf:output value="xxf:label-appearance('my-input')"/>
-                                <xf:output value="xxf:label('my-input')"/>
-                                <xf:input id="my-input" ref="xxf:binding('fr-wrapped-inner')"/>
+                                <xf:output id="my-label-appearance" value="xxf:label-appearance('my-input')"/>
+                                <xf:output id="my-label-value"      value="xxf:label('my-input')"/>
+                                <xf:input  id="my-input"            ref="xxf:binding('fr-wrapped-inner')"/>
                             </xbl:template>
                         </xbl:binding>
                         <xbl:binding
@@ -2857,15 +2857,15 @@
             <controls>
                 <xh:div id="my-wrapped-outer" class="xbl-component xbl-fr-wrapped-outer">
                     <xh:div id="my-wrapped-outer≡my-wrapped-inner" class="xbl-component xbl-fr-wrapped-inner">
-                        <xh:span id="my-wrapped-outer≡my-wrapped-inner≡xf-5" class="xforms-control xforms-output">
-                            <xh:span id="my-wrapped-outer≡my-wrapped-inner≡xf-5≡≡c" class="xforms-output-output">minimal</xh:span>
+                        <xh:span id="my-wrapped-outer≡my-wrapped-inner≡my-label-appearance" class="xforms-control xforms-output">
+                            <xh:span id="my-wrapped-outer≡my-wrapped-inner≡my-label-appearance≡≡c" class="xforms-output-output">minimal</xh:span>
                         </xh:span>
-                        <xh:span id="my-wrapped-outer≡my-wrapped-inner≡xf-6" class="xforms-control xforms-output">
-                            <xh:span id="my-wrapped-outer≡my-wrapped-inner≡xf-6≡≡c" class="xforms-output-output">My label</xh:span>
+                        <xh:span id="my-wrapped-outer≡my-wrapped-inner≡my-label-value" class="xforms-control xforms-output">
+                            <xh:span id="my-wrapped-outer≡my-wrapped-inner≡my-label-value≡≡c" class="xforms-output-output">My label</xh:span>
                         </xh:span>
                         <xh:span id="my-wrapped-outer≡my-wrapped-inner≡my-input" class="xforms-control xforms-input">
                             <xh:input id="my-wrapped-outer≡my-wrapped-inner≡my-input≡xforms-input-1" type="text"
-                                      name="my-wrapped-outer≡my-wrapped-inner≡my-input≡xforms-input-1" value=""
+                                      name="my-wrapped-outer≡my-wrapped-inner≡my-input≡xforms-input-1" value="Hello, world!"
                                       placeholder="My label" class="xforms-input-input"/>
                         </xh:span>
                     </xh:div>

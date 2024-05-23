@@ -2874,7 +2874,6 @@
         </output>
     </test>
 
-
     <test description="#6303: Single checkbox input is missing ARIA attributes" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
@@ -2949,7 +2948,6 @@
                     </xh:span>
                     <xh:span class="xforms-hint" id="my-multiple-checkbox≡≡t">My hint</xh:span>
                 </xh:span>
-
             </controls>
         </output>
     </test>

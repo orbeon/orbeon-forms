@@ -468,12 +468,12 @@ class XFormsSelect1Handler(
 
     implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
 
-    val outputContainerElement = ! isBooleanInput // && ! isSingleItemItemset
+    val mustOutputContainerElement = ! isBooleanInput
 
     val containingElementName = "span"
     val xhtmlPrefix           = handlerContext.findXHTMLPrefix
 
-    if (outputContainerElement) {
+    if (mustOutputContainerElement) {
 
       val containerAttributes =
         getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, addId = true)
@@ -535,10 +535,8 @@ class XFormsSelect1Handler(
         )
       }
     }
-    if (outputContainerElement)
+    if (mustOutputContainerElement)
       closeElement(localName = containingElementName, prefix = xhtmlPrefix, uri = XHTML)
-
-    // NOTE: Templates for full items are output globally in `XHTMLBodyHandler`
   }
 
   private def handleItemCompact(

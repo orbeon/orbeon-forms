@@ -874,7 +874,7 @@
                             </xf:group>
                         </fr:tab>
 
-                        <fr:tab id="label-help-tab" ref="(label, help, short-label, iteration-label, add-iteration-label)[true() or @supported = 'true']">
+                        <fr:tab id="label-help-tab" ref="(label, help, short-label, iteration-label, add-iteration-label)[@supported = 'true']">
                             <fr:label
                                 ref="
                                     $resources/dialog-control-settings/*[

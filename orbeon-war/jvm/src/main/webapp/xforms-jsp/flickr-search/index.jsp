@@ -13,11 +13,12 @@
 --%>
 <xh:html
     xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:xh="http://www.w3.org/1999/xhtml">
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
     <xh:head>
         <xh:title>Flickr Search</xh:title>
-        <xf:model>
+        <xf:model xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
             <xf:instance id="photos" src="/xforms-jsp/flickr-search/service-search.jsp"/>
             <xf:instance id="query">
                 <query>red</query>

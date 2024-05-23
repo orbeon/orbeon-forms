@@ -75,6 +75,7 @@ class SelectionControl(
   containerScope       : Scope
 )(
   val staticItemset    : Option[Itemset],
+  val singleItemItemset: Boolean,
   val useCopy          : Boolean,
   val mustEncodeValues : Option[Boolean]
 ) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)

@@ -26,7 +26,9 @@
         id="fr-checkbox-input-binding"
         element="fr|checkbox-input, xf|input:xxf-type('xs:boolean')[appearance ~= checkbox]"
         xxbl:mode="lhha custom-lhha -custom-alert -custom-hint binding value selection"
-        xxbl:container="span">
+        xxbl:container="span"
+        xxbl:label-for="select"
+    >
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Single Checkbox</display-name>

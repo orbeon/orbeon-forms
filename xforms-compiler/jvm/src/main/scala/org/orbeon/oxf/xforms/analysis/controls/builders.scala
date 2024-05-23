@@ -186,6 +186,7 @@ object SelectionControlBuilder {
   ): SelectionControl = {
 
     val locationData = ElementAnalysis.createLocationData(element)
+    val isMultiple   = element.getName == "select"
 
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xf:output controls. Check only under xf:choices, xf:item and xf:itemset so that we
@@ -207,7 +208,7 @@ object SelectionControlBuilder {
               ]
             ]
           )
-        """,
+          """,
         namespaceMapping   = BasicNamespaceMapping.Mapping,
         variableToValueMap = null,
         functionLibrary    = null,
@@ -217,7 +218,24 @@ object SelectionControlBuilder {
         reporter           = null
       ).asInstanceOf[Boolean]
 
-    val isMultiple = element.getName == "select"
+    val hasSingleItemItemset: Boolean = {
+      isMultiple && XPathCache.evaluateSingle(
+        contextItem = newElemWrapper(element),
+        xpathString =
+          """
+          empty(xf:choices | xf:itemset) and
+          count(xf:item) = 1 and
+          empty(xf:item/(@ref | @nodeset | @bind))
+          """,
+        namespaceMapping   = BasicNamespaceMapping.Mapping,
+        variableToValueMap = null,
+        functionLibrary    = null,
+        functionContext    = null,
+        baseURI            = null,
+        locationData       = locationData,
+        reporter           = null
+      ).asInstanceOf[Boolean]
+    }
 
     // TODO: Duplication in trait
     val appearances = {
@@ -280,6 +298,7 @@ object SelectionControlBuilder {
       containerScope
     )(
       staticItemset,
+      hasSingleItemItemset,
       useCopy,
       mustEncodeValues
     )

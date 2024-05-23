@@ -2874,4 +2874,83 @@
         </output>
     </test>
 
+
+    <test description="#6303: Single checkbox input is missing ARIA attributes" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <_/>
+                        </xf:instance>
+                        <xf:bind ref="." required="true()"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:select id="my-single-checkbox" ref="." appearance="full">
+                        <xf:label>My label</xf:label>
+                        <xf:hint>My hint</xf:hint>
+                        <xf:item>
+                            <xf:label value="'Yes'"/>
+                            <xf:value>true</xf:value>
+                        </xf:item>
+                    </xf:select>
+                    <xf:select id="my-multiple-checkbox" ref="." appearance="full">
+                        <xf:label>My label</xf:label>
+                        <xf:hint>My hint</xf:hint>
+                        <xf:item>
+                            <xf:label value="'Yes'"/>
+                            <xf:value>true</xf:value>
+                        </xf:item>
+                        <xf:item>
+                            <xf:label value="'No'"/>
+                            <xf:value>false</xf:value>
+                        </xf:item>
+                    </xf:select>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xh:span id="my-single-checkbox"
+                         class="xforms-control xforms-select xforms-incremental xforms-select-appearance-full xforms-invalid xforms-required xforms-empty">
+                    <xh:label class="xforms-label" id="my-single-checkbox≡≡l" for="my-single-checkbox≡≡e0">My label</xh:label>
+                    <xh:span id="my-single-checkbox≡≡c" class="xforms-items xforms-help-popover-control">
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="checkbox">
+                                <xh:input id="my-single-checkbox≡≡e0" type="checkbox" name="my-single-checkbox" value="0" aria-describedby="my-single-checkbox≡≡t" aria-required="true"/>
+                                <xh:span>Yes</xh:span>
+                            </xh:label>
+                        </xh:span>
+                    </xh:span>
+                    <xh:span class="xforms-hint" id="my-single-checkbox≡≡t">My hint</xh:span>
+                </xh:span>
+                <xh:span id="my-multiple-checkbox"
+                         class="xforms-control xforms-select xforms-incremental xforms-select-appearance-full xforms-invalid xforms-required xforms-empty">
+                    <xh:span class="xforms-label" id="my-multiple-checkbox≡≡l">My label</xh:span>
+                    <xh:span id="my-multiple-checkbox≡≡c" class="xforms-items xforms-help-popover-control" role="group"
+                             tabindex="0" aria-labelledby="my-multiple-checkbox≡≡l"
+                             aria-describedby="my-multiple-checkbox≡≡t" aria-required="true">
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="checkbox">
+                                <xh:input id="my-multiple-checkbox≡≡e0" type="checkbox" name="my-multiple-checkbox"
+                                          value="0"/>
+                                <xh:span>Yes</xh:span>
+                            </xh:label>
+                        </xh:span>
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="checkbox">
+                                <xh:input id="my-multiple-checkbox≡≡e1" type="checkbox" name="my-multiple-checkbox"
+                                          value="1"/>
+                                <xh:span>No</xh:span>
+                            </xh:label>
+                        </xh:span>
+                    </xh:span>
+                    <xh:span class="xforms-hint" id="my-multiple-checkbox≡≡t">My hint</xh:span>
+                </xh:span>
+
+            </controls>
+        </output>
+    </test>
 </group>

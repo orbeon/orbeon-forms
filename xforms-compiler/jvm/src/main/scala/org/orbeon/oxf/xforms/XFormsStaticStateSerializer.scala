@@ -563,6 +563,8 @@ object XFormsStaticStateSerializer {
         case c: SelectionControl =>
           if (c.staticItemset.isDefined)
             b += "staticItemset"    -> c.staticItemset.asJson
+          if (c.singleItemItemset)
+            b += "singleItemItemset" -> Json.fromBoolean(c.singleItemItemset)
           if (c.useCopy)
             b += "useCopy"          -> Json.fromBoolean(c.useCopy)
           if (c.mustEncodeValues.isDefined)

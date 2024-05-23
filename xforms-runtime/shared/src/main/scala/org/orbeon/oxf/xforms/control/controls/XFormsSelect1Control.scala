@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, ItemsetSupport, StaticItemsetSupport}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XFormsBaseHandlerXHTML, XFormsSelect1Handler}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
@@ -391,11 +391,17 @@ class XFormsSelect1Control(
       collector
     )
 
+    val ariaElemId =
+      if (staticControl.singleItemItemset)
+        containingDocument.namespaceId(XFormsSelect1Handler.getItemId(effectiveId, 0))
+      else
+        XFormsBaseHandler.getLHHACIdWithNs(containingDocument, effectiveId, XFormsBaseHandlerXHTML.ControlCode)
+
     // https://github.com/orbeon/orbeon-forms/issues/6302
     outputAriaDiff(
       previousControl,
       this,
-      XFormsBaseHandler.getLHHACIdWithNs(containingDocument, effectiveId, XFormsBaseHandlerXHTML.ControlCode)
+      ariaElemId
     )(
       ch.getXmlReceiver
     )

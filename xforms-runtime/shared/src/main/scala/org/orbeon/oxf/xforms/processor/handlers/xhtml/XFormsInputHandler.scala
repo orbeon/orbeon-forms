@@ -104,6 +104,7 @@ class XFormsInputHandler(
           isMultiple           = isMultiple,
           isFull               = true,
           isBooleanInput       = true,
+          isSingleItemItemset  = false,
           xformsHandlerContext = handlerContext
         )
     } else {

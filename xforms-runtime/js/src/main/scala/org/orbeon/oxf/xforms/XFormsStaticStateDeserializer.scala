@@ -691,13 +691,15 @@ object XFormsStaticStateDeserializer {
 
               val select =
                 for {
-                  staticItemset    <- c.getOrElse[Option[Itemset]]("staticItemset")(None)
-                  useCopy          <- c.getOrElse[Boolean]("useCopy")(false)
-                  mustEncodeValues <- c.getOrElse[Option[Boolean]]("mustEncodeValues")(None)
-                  itemsetAnalysis  <- c.getOrElse[Option[XPathAnalysis]]("itemsetAnalysis")(None)
+                  staticItemset     <- c.getOrElse[Option[Itemset]]("staticItemset")(None)
+                  singleItemItemset <- c.getOrElse[Boolean]("singleItemItemset")(false)
+                  useCopy           <- c.getOrElse[Boolean]("useCopy")(false)
+                  mustEncodeValues  <- c.getOrElse[Option[Boolean]]("mustEncodeValues")(None)
+                  itemsetAnalysis   <- c.getOrElse[Option[XPathAnalysis]]("itemsetAnalysis")(None)
                 } yield
                   new SelectionControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)(
                     staticItemset,
+                    singleItemItemset,
                     useCopy,
                     mustEncodeValues
                   ) |!> (_.itemsetAnalysis = itemsetAnalysis)

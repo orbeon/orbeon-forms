@@ -78,7 +78,7 @@ object XFormsSelect1Handler {
     }
 
   private def handleItemFull(
-    baseHandler        : XFormsBaseHandlerXHTML,
+    baseHandler        : XFormsSelect1Handler,
     attributes         : Attributes,
     xhtmlPrefix        : String,
     containingDocument : XFormsContainingDocument,
@@ -90,6 +90,7 @@ object XFormsSelect1Handler {
     item               : Item.ValueNode,
     isFirst            : Boolean,
     isBooleanInput     : Boolean,
+    isSingleItemItemset: Boolean,
     isStaticReadonly   : Boolean,
     encode             : Boolean,
     handlerContext     : HandlerContext
@@ -174,6 +175,12 @@ object XFormsSelect1Handler {
           outputDisabledAttribute(atts)
 
         forwardAutocompleteAttribute(attributes, elementName, atts)
+
+        if (isSingleItemItemset) {
+          baseHandler.handleAriaByAtts(atts, XFormsLHHAHandler.coreControlLhhaByCondition)
+          if (control ne null)
+            XFormsBaseHandler.handleAriaAttributes(control.isRequired, control.isValid, control.visited, atts)
+        }
 
         element(localName = elementName, prefix = xhtmlPrefix, uri = XHTML, atts = atts)
       }
@@ -301,19 +308,21 @@ class XFormsSelect1Handler(
       isMultiple           = staticSelectionControl.isMultiple,
       isFull               = staticSelectionControl.isFull,
       isBooleanInput       = false,
+      isSingleItemItemset  = staticSelectionControl.singleItemItemset,
       xformsHandlerContext = handlerContext
     )
   }
 
   def outputContent(
-    attributes           : Attributes,
-    effectiveId          : String,
-    control              : XFormsValueControl,
-    itemsetOpt           : Option[Itemset],
-    isMultiple           : Boolean,
-    isFull               : Boolean,
-    isBooleanInput       : Boolean,
-    xformsHandlerContext : HandlerContext
+    attributes          : Attributes,
+    effectiveId         : String,
+    control             : XFormsValueControl,
+    itemsetOpt          : Option[Itemset],
+    isMultiple          : Boolean,
+    isFull              : Boolean,
+    isBooleanInput      : Boolean,
+    isSingleItemItemset : Boolean,
+    xformsHandlerContext: HandlerContext
   ): Unit = {
 
     implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.controller.output
@@ -336,7 +345,17 @@ class XFormsSelect1Handler(
 
     if (mustOutputFull) {
       // full appearance, also in static readonly mode
-      outputFull(attributes, effectiveId, control, itemsetOpt, isMultiple, isBooleanInput, isStaticReadonly, encode)
+      outputFull(
+        attributes,
+        effectiveId,
+        control,
+        itemsetOpt,
+        isMultiple,
+        isBooleanInput,
+        isSingleItemItemset,
+        isStaticReadonly,
+        encode
+      )
     } else if (! isStaticReadonly) {
       // Create `xh:select`
 
@@ -436,93 +455,83 @@ class XFormsSelect1Handler(
   }
 
   private def outputFull(
-    attributes       : Attributes,
-    effectiveId      : String,
-    control          : XFormsValueControl,
-    itemsetOpt       : Option[Itemset],
-    isMultiple       : Boolean,
-    isBooleanInput   : Boolean,
-    isStaticReadonly : Boolean,
-    encode           : Boolean
+    attributes         : Attributes,
+    effectiveId        : String,
+    control            : XFormsValueControl,
+    itemsetOpt         : Option[Itemset],
+    isMultiple         : Boolean,
+    isBooleanInput     : Boolean,
+    isSingleItemItemset: Boolean,
+    isStaticReadonly   : Boolean,
+    encode             : Boolean
   ): Unit = {
 
     implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
 
-    val containerAttributes =
-      getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, addId = true)
+    val outputContainerElement = ! isBooleanInput // && ! isSingleItemItemset
 
-    // CSS classes:
-    // - `xforms-items` for styling
-    // - `xforms-help-popover-control` tells the help popover the element relative to which it should positioned,
-    //   needed for the case where we only have one
-    containerAttributes.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-items xforms-help-popover-control")
-
-    // Keep the `group`/`radiogroup` role even if there is no label. It probably doesn't hurt, although if there is only
-    // one item inside the group, those roles are not doing much.
-    containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, if (isMultiple) "group" else "radiogroup")
-    // When a form author explicitly uses a single checkbox, it generally doesn't make sense to have a label on the
-    // control itself, as the label of the single item is sufficient. Also, it is when we have multiple checkboxes
-    // that it makes sense to, at least optionally, give the user a chance to tab to the group of checkboxes, and have
-    // the label and/or hint read if a screen reader is used. When there is no external label, there is no need for
-    // that. So below we don't place a `tabindex` on the group when we don't have a label or hint. From an end user
-    // perspective, an additional drawback of keeping the `tabindex` is that the user needs to tab twice to reach the
-    // checkbox for no obvious reason.
-    // Remains the case of dynamic checkboxes (with a dynamic itemset), where the form author would place a label on
-    // the control: in case the itemset has only one item, then we would have the double label and double tab issue.
-    // But we leave this problem for another time, as that would require adding the tabindex dynamically depending on
-    // the size of the itemset and we don't have a good mechanism to do that.
-    if (findStaticLhhaOrLhhaBy(LHHA.Label).isDefined || findStaticLhhaOrLhhaBy(LHHA.Hint).isDefined)
-      if (handlerContext.a11yFocusOnGroups)
-        containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
-
-    handleAriaByAtts(containerAttributes, _ => true)
-
-    // https://github.com/orbeon/orbeon-forms/issues/6302
-    if (control ne null)
-      XFormsBaseHandler.handleAriaAttributes(control.isRequired, control.isValid, control.visited, containerAttributes)
-
-    val xhtmlPrefix = handlerContext.findXHTMLPrefix
-    val fullItemType = if (isMultiple) "checkbox" else "radio"
-
-    // TODO: Should we always use fieldset, or make this an option?
     val containingElementName = "span"
-    // Output container <span>/<fieldset> for select/select1
-    val outputContainerElement = ! isBooleanInput
+    val xhtmlPrefix           = handlerContext.findXHTMLPrefix
 
-    if (outputContainerElement)
+    if (outputContainerElement) {
+
+      val containerAttributes =
+        getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, addId = true)
+
+      // CSS classes:
+      // - `xforms-items` for styling
+      // - `xforms-help-popover-control` tells the help popover the element relative to which it should positioned,
+      //   needed for the case where we only have one
+      containerAttributes.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-items xforms-help-popover-control")
+
+      if (! isSingleItemItemset) {
+        // Keep the `group`/`radiogroup` role even if there is no label. It probably doesn't hurt, although if there is only
+        // one item inside the group, those roles are not doing much.
+        containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, if (isMultiple) "group" else "radiogroup")
+        // When a form author explicitly uses a single checkbox, it generally doesn't make sense to have a label on the
+        // control itself, as the label of the single item is sufficient. Also, it is when we have multiple checkboxes
+        // that it makes sense to, at least optionally, give the user a chance to tab to the group of checkboxes, and have
+        // the label and/or hint read if a screen reader is used. When there is no external label, there is no need for
+        // that. So below we don't place a `tabindex` on the group when we don't have a label or hint. From an end user
+        // perspective, an additional drawback of keeping the `tabindex` is that the user needs to tab twice to reach the
+        // checkbox for no obvious reason.
+        // Remains the case of dynamic checkboxes (with a dynamic itemset), where the form author would place a label on
+        // the control: in case the itemset has only one item, then we would have the double label and double tab issue.
+        // But we leave this problem for another time, as that would require adding the tabindex dynamically depending on
+        // the size of the itemset and we don't have a good mechanism to do that.
+        if (findStaticLhhaOrLhhaBy(LHHA.Label).isDefined || findStaticLhhaOrLhhaBy(LHHA.Hint).isDefined)
+          if (handlerContext.a11yFocusOnGroups)
+            containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
+
+        handleAriaByAtts(containerAttributes, _ => true)
+
+        // https://github.com/orbeon/orbeon-forms/issues/6302
+        if (control ne null)
+          XFormsBaseHandler.handleAriaAttributes(control.isRequired, control.isValid, control.visited, containerAttributes)
+      }
+
       openElement(localName = containingElementName, prefix = xhtmlPrefix, uri = XHTML, atts = containerAttributes)
-    // {
-    //     // Output <legend>
-    //     final String legendName = "legend";
-    //     final String legendQName = XMLUtils.buildQName(xhtmlPrefix, legendName);
-    //     reusableAttributes.clear();
-    //     // TODO: handle other attributes? xforms-disabled?
-    //     reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-label");
-    //     xmlReceiver.startElement(XHTML, legendName, legendQName, reusableAttributes);
-    //     if (control != null) {
-    //         final boolean mustOutputHTMLFragment = xformsControl.isHTMLLabel();
-    //         outputLabelText(xmlReceiver, xformsControl, xformsControl.getLabel(), xhtmlPrefix, mustOutputHTMLFragment);
-    //     }
-    //     xmlReceiver.endElement(XHTML, legendName, legendQName);
-    // }
+    }
+
     itemsetOpt foreach { itemset =>
       for (((item, _), itemIndex) <- itemset.allItemsWithValueIterator(reverse = false).zipWithIndex) {
         XFormsSelect1Handler.handleItemFull(
-          baseHandler        = this,
-          attributes         = attributes,
-          xhtmlPrefix        = xhtmlPrefix,
-          containingDocument = containingDocument,
-          control            = control,
-          itemName           = effectiveId,
-          itemEffectiveId    = XFormsSelect1Handler.getItemId(effectiveId, itemIndex),
-          isMultiple         = isMultiple,
-          fullItemType       = fullItemType,
-          item               = item,
-          isFirst            = itemIndex == 0,
-          isBooleanInput     = isBooleanInput,
-          isStaticReadonly   = isStaticReadonly,
-          encode             = encode,
-          handlerContext     = handlerContext
+          baseHandler         = this,
+          attributes          = attributes,
+          xhtmlPrefix         = xhtmlPrefix,
+          containingDocument  = containingDocument,
+          control             = control,
+          itemName            = effectiveId,
+          itemEffectiveId     = XFormsSelect1Handler.getItemId(effectiveId, itemIndex),
+          isMultiple          = isMultiple,
+          fullItemType        = if (isMultiple) "checkbox" else "radio",
+          item                = item,
+          isFirst             = itemIndex == 0,
+          isBooleanInput      = isBooleanInput,
+          isSingleItemItemset = isSingleItemItemset,
+          isStaticReadonly    = isStaticReadonly,
+          encode              = encode,
+          handlerContext      = handlerContext
         )
       }
     }
@@ -577,17 +586,22 @@ class XFormsSelect1Handler(
     else
       super.getForEffectiveIdWithNs(lhhaAnalysis)
 
-  // For full appearance produce `span` with an `id`
   override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
-    if (findAppearanceTrait.exists(_.isFull))
+    if (findAppearanceTrait.exists(_.isFull)) {
+
+      val isSingleItemItemset = currentControl.asInstanceOf[XFormsSelect1Control].staticControl.singleItemItemset
+
+      // For `full` appearance produce `span` with an `id`, but no `for`, as we will use `aria-*` attributes. But in
+      // the case of a static single checkbox, still output a `label` with `for`.
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
         controlEffectiveIdOpt   = getEffectiveId.some,
-        forEffectiveIdWithNsOpt = None,
-        requestedElementNameOpt = "span".some, // make element name a `span`, as a label would need a `for`
+        forEffectiveIdWithNsOpt = isSingleItemItemset.option(containingDocument.namespaceId(XFormsSelect1Handler.getItemId(getEffectiveId, 0))),
+        requestedElementNameOpt = (! isSingleItemItemset).option("span"),
         controlOrNull           = currentControl,
         isExternal              = false
       )
-    else
+    } else {
       super.handleLabel(lhhaAnalysis)
+    }
 }

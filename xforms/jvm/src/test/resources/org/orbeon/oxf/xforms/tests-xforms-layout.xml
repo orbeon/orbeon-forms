@@ -2907,6 +2907,26 @@
                             <xf:value>false</xf:value>
                         </xf:item>
                     </xf:select>
+                    <xf:label id="my-single-checkbox-external-label" for="my-single-checkbox-with-external-label">My label</xf:label>
+                    <xf:select id="my-single-checkbox-with-external-label" ref="." appearance="full">
+                        <xf:hint>My hint</xf:hint>
+                        <xf:item>
+                            <xf:label value="'Yes'"/>
+                            <xf:value>true</xf:value>
+                        </xf:item>
+                    </xf:select>
+                    <xf:label id="my-multiple-checkbox-external-label" for="my-multiple-checkbox-with-external-label">My label</xf:label>
+                    <xf:select id="my-multiple-checkbox-with-external-label" ref="." appearance="full">
+                        <xf:hint>My hint</xf:hint>
+                        <xf:item>
+                            <xf:label value="'Yes'"/>
+                            <xf:value>true</xf:value>
+                        </xf:item>
+                        <xf:item>
+                            <xf:label value="'No'"/>
+                            <xf:value>false</xf:value>
+                        </xf:item>
+                    </xf:select>
                 </xh:body>
             </xh:html>
         </input>
@@ -2947,6 +2967,64 @@
                         </xh:span>
                     </xh:span>
                     <xh:span class="xforms-hint" id="my-multiple-checkbox≡≡t">My hint</xh:span>
+                </xh:span>
+                <xh:label
+                        class="xforms-label"
+                        id="my-single-checkbox-external-label"
+                        for="my-single-checkbox-with-external-label≡≡e0">My label
+                </xh:label>
+                <xh:span
+                        id="my-single-checkbox-with-external-label"
+                        class="xforms-control xforms-select xforms-incremental xforms-select-appearance-full xforms-invalid xforms-required xforms-empty">
+                    <xh:span id="my-single-checkbox-with-external-label≡≡c" class="xforms-items xforms-help-popover-control">
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="checkbox">
+                                <xh:input id="my-single-checkbox-with-external-label≡≡e0"
+                                          type="checkbox"
+                                          name="my-single-checkbox-with-external-label"
+                                          value="0"
+                                          aria-describedby="my-single-checkbox-with-external-label≡≡t"
+                                          aria-required="true"/>
+                                <xh:span>Yes</xh:span>
+                            </xh:label>
+                        </xh:span>
+                    </xh:span>
+                    <xh:span class="xforms-hint" id="my-single-checkbox-with-external-label≡≡t">My hint</xh:span>
+                </xh:span>
+                <xh:label
+                        class="xforms-label"
+                        id="my-multiple-checkbox-external-label">My label
+                </xh:label>
+                <xh:span
+                        id="my-multiple-checkbox-with-external-label"
+                        class="xforms-control xforms-select xforms-incremental xforms-select-appearance-full xforms-invalid xforms-required xforms-empty">
+                    <xh:span id="my-multiple-checkbox-with-external-label≡≡c"
+                             class="xforms-items xforms-help-popover-control"
+                             role="group"
+                             tabindex="0"
+                             aria-labelledby="my-multiple-checkbox-external-label"
+                             aria-describedby="my-multiple-checkbox-with-external-label≡≡t"
+                             aria-required="true">
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="checkbox">
+                                <xh:input id="my-multiple-checkbox-with-external-label≡≡e0"
+                                          type="checkbox"
+                                          name="my-multiple-checkbox-with-external-label"
+                                          value="0"/>
+                                <xh:span>Yes</xh:span>
+                            </xh:label>
+                        </xh:span>
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="checkbox">
+                                <xh:input id="my-multiple-checkbox-with-external-label≡≡e1"
+                                          type="checkbox"
+                                          name="my-multiple-checkbox-with-external-label"
+                                          value="1"/>
+                                <xh:span>No</xh:span>
+                            </xh:label>
+                        </xh:span>
+                    </xh:span>
+                    <xh:span class="xforms-hint" id="my-multiple-checkbox-with-external-label≡≡t">My hint</xh:span>
                 </xh:span>
             </controls>
         </output>

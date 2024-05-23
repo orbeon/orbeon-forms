@@ -286,7 +286,7 @@ class XFormsSelect1Handler(
   // Incremental mode is the default
   override def isDefaultIncremental = true
 
-  private def findAppearanceTrait =
+  private def findAppearanceTrait: Option[SelectAppearanceTrait] =
     elementAnalysis.narrowTo[SelectAppearanceTrait]
 
   def handleControlStart(): Unit = {
@@ -579,9 +579,10 @@ class XFormsSelect1Handler(
 
   // For full appearance we don't put a `@for` attribute so that selecting the main label doesn't select the item
   override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] =
-    if (findAppearanceTrait.exists(_.isFull))
-      None
-    else
+    if (findAppearanceTrait.exists(_.isFull)) {
+      val isSingleItemItemset = currentControl.asInstanceOf[XFormsSelect1Control].staticControl.singleItemItemset
+      isSingleItemItemset.option(containingDocument.namespaceId(XFormsSelect1Handler.getItemId(getEffectiveId, 0)))
+    } else
       super.getForEffectiveIdWithNs(lhhaAnalysis)
 
   override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =

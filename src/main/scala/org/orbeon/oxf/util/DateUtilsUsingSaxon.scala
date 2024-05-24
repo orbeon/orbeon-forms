@@ -48,7 +48,7 @@ object DateUtilsUsingSaxon {
   // If the date or dateTime doesn't have a timezone, then xxx.
   //
   def parseISODateOrDateTime(date: String): Long =
-    tryParseISODateOrDateTime(date, TimeZone.Default) getOrElse (throw new IllegalArgumentException)
+    tryParseISODateOrDateTime(date, TimeZone.Default) getOrElse (throw new IllegalArgumentException(date))
 
   def tryParseISODateOrDateTime(date: String, defaultTimeZone: TimeZone): Option[Long] = {
 

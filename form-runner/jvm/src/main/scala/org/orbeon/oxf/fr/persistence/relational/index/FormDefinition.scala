@@ -18,6 +18,7 @@ import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
+import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.api.PersistenceApiTrait
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SearchableValues, SummarySettings}
 import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunner, InDocFormRunnerDocContext}
@@ -69,10 +70,10 @@ trait FormDefinition {
 
   // Returns the controls and other values that are searchable from a form definition
   def searchableValues(
-    formDoc                   : DocumentNodeInfoType,
-    appForm                   : AppForm,
-    versionOpt                : Option[Int],
-    databaseDataFormatVersion : DataFormatVersion
+    formDoc                  : DocumentNodeInfoType,
+    appForm                  : AppForm,
+    searchVersionOpt         : Option[SearchVersion],
+    databaseDataFormatVersion: DataFormatVersion
   )(implicit
     indentedLogger: IndentedLogger
   ): SearchableValues = {
@@ -95,7 +96,7 @@ trait FormDefinition {
 
     object PersistenceApi extends PersistenceApiTrait
 
-    val distinctValuesOpt = versionOpt.toSeq.map { version =>
+    val distinctValuesOpt = searchVersionOpt.toSeq.map { searchVersion =>
       val dynamicControlPaths = indexedControlBindPathHolders.filter { controlInfo =>
         // Is the control databound/dynamic?
         databoundControlLocalNames.contains(controlInfo.control.localname)
@@ -104,7 +105,7 @@ trait FormDefinition {
       }
 
       // Retrieve distinct values for all dynamic controls
-      PersistenceApi.distinctValues((appForm, version), dynamicControlPaths)
+      PersistenceApi.distinctValues(appForm, searchVersion, dynamicControlPaths)
     }
 
     val distinctValuesByControlPath = distinctValuesOpt.flatMap(_.controls).map { controlDetails =>

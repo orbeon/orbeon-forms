@@ -372,7 +372,7 @@ class IndexTest
           expected == Index.searchableValues(
             formDoc                   = elemToDocumentInfo(elem),
             appForm                   = appForm,
-            versionOpt                = None,
+            searchVersionOpt                = None,
             databaseDataFormatVersion = dstVersion
           ).controls
         )
@@ -557,7 +557,7 @@ class IndexTest
         expectedIndexedControls == Index.searchableValues(
           formDoc                   = elemToDocumentInfo(formWithSummarySettings),
           appForm                   = appForm,
-          versionOpt                = None,
+          searchVersionOpt                = None,
           databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
         ).controls
       )

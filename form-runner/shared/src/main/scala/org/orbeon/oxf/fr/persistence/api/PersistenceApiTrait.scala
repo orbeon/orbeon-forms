@@ -9,6 +9,7 @@ import org.orbeon.oxf.fr.FormRunner.{createFormDataBasePath, providerPropertyAsB
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml, findProvider}
 import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http._
@@ -76,7 +77,7 @@ trait PersistenceApiTrait {
   private def documentsXmlTry(
     servicePath             : String,
     queryXml                : Array[Byte],
-    version                 : Int
+    version                 : Either[Int, SearchVersion]
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -86,7 +87,8 @@ trait PersistenceApiTrait {
         method             = HttpMethod.POST,
         pathQuery          = servicePath,
         requestBodyContent = StreamedContent.fromBytes(queryXml, ContentTypes.XmlContentType.some).some,
-        formVersionOpt     = version.some
+        formVersionOpt     = version.left.toOption,
+        customHeaders      = version.toOption.flatMap(SearchVersion.toHeaderString).map(v => Map(OrbeonFormDefinitionVersion -> List(v))).getOrElse(Map.empty)
       ),
       closeOnSuccess = true
     ) { is =>
@@ -128,7 +130,8 @@ trait PersistenceApiTrait {
   }
 
   def search(
-    appFormVersion          : AppFormVersion,
+    appForm                 : AppForm,
+    searchVersion           : SearchVersion,
     isInternalAdminUser     : Boolean,
     searchQueryOpt          : Option[DocumentNodeInfoType],
     returnDetails           : Boolean
@@ -137,11 +140,11 @@ trait PersistenceApiTrait {
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Iterator[DataDetails] = {
 
-    debug(s"calling search for `$appFormVersion`")
+    debug(s"calling search for `$appForm`/`$searchVersion`")
 
     val servicePathQuery =
       PathUtils.recombineQuery(
-        s"/fr/service/persistence/search/${appFormVersion._1.app}/${appFormVersion._1.form}",
+        s"/fr/service/persistence/search/${appForm.app}/${appForm.form}",
         createInternalAdminUserTokenParam(isInternalAdminUser).toList,
         overwrite = true
       )
@@ -168,7 +171,7 @@ trait PersistenceApiTrait {
             <page-number>{pageNumber}</page-number>
         </search>.toString.getBytes(CharsetNames.Utf8)
 
-      documentsXmlTry(servicePathQuery, fromIncomingSearchQuery.getOrElse(fromBasicSearchQuery), appFormVersion._2)
+      documentsXmlTry(servicePathQuery, fromIncomingSearchQuery.getOrElse(fromBasicSearchQuery), Right(searchVersion))
     }
 
     def pageToDataDetails(page: DocumentNodeInfoType): (Iterator[DataDetails], Int, Int) =
@@ -194,18 +197,19 @@ trait PersistenceApiTrait {
   }
 
   def distinctValues(
-    appFormVersion          : AppFormVersion,
+    appForm                 : AppForm,
+    searchVersion           : SearchVersion,
     controlPaths            : Seq[String])(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): DistinctValues = {
 
-    debug(s"calling distinct values for `$appFormVersion`")
+    debug(s"calling distinct values for `$appForm`/`$searchVersion`")
 
-    val provider = findProvider(appFormVersion._1, FormOrData.Data).get
+    val provider = findProvider(appForm, FormOrData.Data).get
 
     if (providerPropertyAsBoolean(provider, "distinct", default  = false)) {
-      val servicePath = s"/fr/service/persistence/distinct-values/${appFormVersion._1.app}/${appFormVersion._1.form}"
+      val servicePath = s"/fr/service/persistence/distinct-values/${appForm.app}/${appForm.form}"
 
       // Ideally, we'd like to use the distinct values ADT, but we don't depend on it from here
       val CreatedBy      = "created-by"
@@ -224,7 +228,7 @@ trait PersistenceApiTrait {
           }
         }</distinct-values>
 
-      val result = documentsXmlTry(servicePath, queryXml.toString.getBytes(CharsetNames.Utf8), appFormVersion._2).get.rootElement
+    val result = documentsXmlTry(servicePath, queryXml.toString.getBytes(CharsetNames.Utf8), Right(searchVersion)).get
 
       val controls = for {
         query <- result / "query"

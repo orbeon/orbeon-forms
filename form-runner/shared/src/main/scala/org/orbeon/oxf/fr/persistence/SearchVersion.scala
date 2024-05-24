@@ -1,7 +1,7 @@
 package org.orbeon.oxf.fr.persistence
 
-sealed trait SearchVersion
 
+sealed trait SearchVersion
 
 object SearchVersion {
 
@@ -15,4 +15,10 @@ object SearchVersion {
       case Some("all")  => All
       case Some(v)      => Specific(v.toInt)
     }
+
+  def toHeaderString(sv: SearchVersion): Option[String] = sv match {
+    case Unspecified => None
+    case All         => Some("all")
+    case Specific(v) => Some(v.toString)
+  }
 }

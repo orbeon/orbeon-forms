@@ -10,9 +10,11 @@ import org.orbeon.oxf.fr.excel.ExcelSupport._
 import org.orbeon.oxf.fr.excel.{ExcelNumberFormat, ExcelSupport}
 import org.orbeon.oxf.fr.importexport.ImportExportSupport
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.buildFilename
+import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi.DataDetails
 import org.orbeon.oxf.fr.persistence.relational.index.Index
+import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SummarySettings}
 import org.orbeon.oxf.util.CoreUtils._
@@ -32,7 +34,8 @@ object ExportWithSearch {
 
   def exportWithSearch(
     form          : DocumentNodeInfoType,
-    appFormVersion: AppFormVersion,
+    appForm       : AppForm,
+    searchVersion : SearchVersion,
     outputStream  : OutputStream,
     setFileName   : String => Unit,
     searchQuery   : DocumentNodeInfoType,
@@ -60,7 +63,7 @@ object ExportWithSearch {
     // or sort attribute set".
     val showableMetadata: List[Metadata] = {
 
-      implicit val formRunnerParams: FormRunnerParams = FormRunnerParams(appFormVersion._1, "summary")
+      implicit val formRunnerParams: FormRunnerParams = FormRunnerParams(appForm, "summary")
 
       (FormRunner.booleanFormRunnerProperty("oxf.fr.summary.show-created")         : Boolean).option(Metadata.Created)       .toList :::
       (FormRunner.booleanFormRunnerProperty("oxf.fr.summary.show-last-modified")   : Boolean).option(Metadata.LastModified)  .toList :::
@@ -74,9 +77,9 @@ object ExportWithSearch {
     val showableValues =
       Index.searchableValues(
         form,
-        appFormVersion._1,
-        Some(appFormVersion._2),
-        FormRunnerPersistence.providerDataFormatVersionOrThrow(appFormVersion._1)
+        appForm,
+        Some(searchVersion),
+        FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
       )
       .controls
       .toList
@@ -107,7 +110,8 @@ object ExportWithSearch {
       }
 
       PersistenceApi.search(
-        appFormVersion      = appFormVersion,
+        appForm             = appForm,
+        searchVersion       = searchVersion,
         isInternalAdminUser = false,
         searchQueryOpt      = Option(searchQuery),
         returnDetails       = true

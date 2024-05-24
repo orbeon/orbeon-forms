@@ -19,4 +19,5 @@ object Namespaces {
   val XXF  = "http://orbeon.org/oxf/xml/xforms"
   val XBL  = "http://www.w3.org/ns/xbl"
   val XXBL = "http://orbeon.org/oxf/xml/xbl"
+  val XS   = "http://www.w3.org/2001/XMLSchema"
 }

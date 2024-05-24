@@ -46,6 +46,8 @@ object Namespace {
       newNamespace
     }
   }
+
+  def unapply(namespace: Namespace): Option[(String, String)] = Some((namespace.prefix, namespace.uri))
 }
 
 // See https://stackoverflow.com/questions/5827510/how-to-override-apply-in-a-case-class-companion/25538287#25538287

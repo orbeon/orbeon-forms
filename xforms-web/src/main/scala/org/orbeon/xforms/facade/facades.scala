@@ -99,6 +99,7 @@ object Controls extends js.Object {
   def getLabelMessage(elem: html.Element)                                                                : String                                       = js.native
   def getHelpMessage(elem: html.Element)                                                                 : String                                       = js.native
   def setRepeatIterationRelevance(formID: String, repeatID: String, iteration: String, relevant: Boolean): Unit                                         = js.native
+  def getControlLHHA(documentElement: html.Element, lhha: String)                                        : js.UndefOr[html.Element]                     = js.native
   val afterValueChange                                                                                   : YUICustomEvent                               = js.native
 }
 

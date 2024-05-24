@@ -165,105 +165,12 @@
                             if (relevant == "true")
                                 ORBEON.xforms.Controls.setRelevant(documentElement, true);
 
-                            // Update input control type
-                            // NOTE: This is not ideal: in the future, we would like a template-based mechanism instead.
-                            if (newSchemaType != null) {
-
-                                if ($(documentElement).is('.xforms-input')) {
-
-                                    // For each supported type, declares the recognized schema types and the class used in the DOM
-                                    var INPUT_TYPES = [
-                                        { type: "boolean",  schemaTypes: [ "{http://www.w3.org/2001/XMLSchema}boolean", "{http://www.w3.org/2002/xforms}boolean" ], className: "xforms-type-boolean" },
-                                        { type: "string",   schemaTypes: null, className: "xforms-type-string" }
-                                    ];
-
-                                    var existingType = _.detect(INPUT_TYPES, function(type) { return type.schemaTypes == null || YAHOO.util.Dom.hasClass(documentElement, type.className); });
-                                    var newType =      _.detect(INPUT_TYPES, function(type) { return type.schemaTypes == null || _.include(type.schemaTypes, newSchemaType); });
-                                    if (newType != existingType) {
-
-                                        // Remember that this input has be recreated which means we need to update its value
-                                        recreatedInput = true;
-                                        recreatedInputs[controlId] = documentElement;
-                                        // Clean-up document element by removing type classes
-                                        _.each(INPUT_TYPES, function(type) { YAHOO.util.Dom.removeClass(documentElement, type.className); });
-
-                                        // Find the position of the last label before the control "actual content" and remove all elements that are not labels
-                                        // A value of -1 means that the content came before any label
-                                        var lastLabelPosition = null;
-                                        _.each(YAHOO.util.Dom.getChildren(documentElement), function(childElement, childIndex) {
-                                            if (! $(childElement).is('.xforms-label, .xforms-help, .xforms-hint, .xforms-alert')) {
-                                                documentElement.removeChild(childElement);
-                                                if (lastLabelPosition == null)
-                                                    lastLabelPosition = childIndex - 1;
-                                            }
-                                        });
-
-                                        function insertIntoDocument(nodes) {
-                                            var childElements = YAHOO.util.Dom.getChildren(documentElement);
-                                            // Insert after "last label" (we remembered the position of the label after which there is real content)
-                                            if (childElements.length == 0) {
-                                                _.each(nodes, function(node) {
-                                                    documentElement.appendChild(node);
-                                                });
-                                            } else if (lastLabelPosition == -1) {
-                                                // Insert before everything else
-                                                var firstChild = childElements[0];
-                                                _.each(nodes, function(node) {
-                                                    YAHOO.util.Dom.insertBefore(node, firstChild);
-                                                });
-                                            } else {
-                                                // Insert after a LHHA
-                                                var lhha = childElements[lastLabelPosition];
-                                                for (var nodeIndex = nodes.length - 1; nodeIndex >= 0; nodeIndex--)
-                                                    YAHOO.util.Dom.insertAfter(nodes[nodeIndex], lhha);
-                                            }
-                                        }
-
-                                        function createInput(typeClassName, inputIndex) {
-                                            var newInputElement = document.createElement("input");
-                                            newInputElement.setAttribute("type", "text");
-                                            newInputElement.className = "xforms-input-input " + typeClassName;
-                                            newInputElement.id = ORBEON.util.Utils.appendToEffectiveId(controlId, "$xforms-input-" + inputIndex);
-
-                                            // In portlet mode, name is not prefixed
-                                            newInputElement.name = ORBEON.xforms.Page.deNamespaceIdIfNeeded(formID, newInputElement.id);
-
-                                            return newInputElement;
-                                        }
-
-                                        var inputLabelElement = ORBEON.xforms.Controls.getControlLHHA(documentElement, "label");
-                                        if (newType.type == "string") {
-                                            var newStringInput = createInput("xforms-type-string", 1);
-                                            insertIntoDocument([newStringInput]);
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-type-string");
-                                            if (inputLabelElement != null) inputLabelElement.htmlFor = newStringInput.id;
-                                        } else if (newType.type == "boolean") {
-                                            ORBEON.xforms.XFormsUi.updateBooleanInputItemset(documentElement, controlId, lastLabelPosition, inputLabelElement);
-                                        }
-                                    }
-                                }
-
-                                // Update type annotation
-                                var typePrefix = "xforms-type-";
-
-                                // Remove existing type classes
-                                _.each(documentElement.className.split(" "), function(currentClass) {
-                                    if (currentClass.indexOf(typePrefix) == 0) {
-                                        YAHOO.util.Dom.removeClass(documentElement, currentClass);
-                                    }
-                                });
-
-                                // Add new class
-                                var typeResult = /{(.*)}(.*)/.exec(newSchemaType);
-                                if (typeResult != null && typeResult.length == 3) {
-                                    var typeNamespace = typeResult[1];
-                                    var typeLocalName = typeResult[2];
-                                    var isBuiltIn = typeNamespace == 'http://www.w3.org/2001/XMLSchema'
-                                                 || typeNamespace == 'http://www.w3.org/2002/xforms';
-                                    var newClass = typePrefix + (isBuiltIn ? '' : 'custom-') + typeLocalName;
-                                    jDocumentElement.addClass(newClass);
-                                }
+                            var newRecreatedInput = ORBEON.xforms.XFormsUi.maybeUpdateSchemaType(documentElement, controlId, newSchemaType, formID);
+                            if (newRecreatedInput) {
+                                recreatedInputs[controlId] = documentElement;
+                                recreatedInput = true;
                             }
+
 
                             // Handle required
                             if (required != null) {

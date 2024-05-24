@@ -5,21 +5,14 @@ import java.{util => ju}
 
 object QName {
 
-  implicit class QNameOps(private val q: QName) extends AnyVal {
+  private val ClarkNamePattern = """\{(.*)}(.*)""".r
 
-    // http://www.w3.org/TR/xpath-30/#doc-xpath30-URIQualifiedName
-    def uriQualifiedName: String =
-      if (q.namespace.uri.isEmpty)
-        q.localName
-      else
-        "Q{" + q.namespace.uri + '}' + q.localName
-
-    def clarkName: String =
-      if (q.namespace.uri.isEmpty)
-        q.localName
-      else
-        "{" + q.namespace.uri + '}' + q.localName
+  def fromClarkName(clarkName: String): Option[QName] = clarkName match {
+    case ClarkNamePattern(uri, localName) => Some(QName(localName, Namespace("", uri)))
+    case _                                => None
   }
+
+  def unapply(qName: QName): Option[(String, Namespace)] = Some((qName.localName, qName.namespace))
 
   // 2017-10-27: 84 usages
   def apply(localName: String): QName = apply(localName, Namespace.EmptyNamespace, localName)
@@ -66,7 +59,7 @@ object QName {
       if (qualifiedNameOrNull ne null)
         qualifiedNameOrNull
       else
-        if (! namespace.prefix.isEmpty) namespace.prefix + ":" + localName else localName
+        if (namespace.prefix.nonEmpty) namespace.prefix + ":" + localName else localName
     )
   }
 
@@ -115,6 +108,19 @@ class QName private (val localName: String, val namespace: Namespace, val qualif
       case _ => false
     }
 
+  // http://www.w3.org/TR/xpath-30/#doc-xpath30-URIQualifiedName
+  def uriQualifiedName: String =
+    if (namespace.uri.isEmpty)
+      localName
+    else
+      s"Q{${namespace.uri}}$localName"
+
+  def clarkName: String =
+    if (namespace.uri.isEmpty)
+      localName
+    else
+      s"{${namespace.uri}}$localName"
+
   override def toString: String =
-    if (namespace.uri == "") localName else s"Q{${namespace.uri}}$localName"
+    uriQualifiedName
 }

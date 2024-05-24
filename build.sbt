@@ -964,12 +964,14 @@ lazy val xformsClientServer = (crossProject(JVMPlatform, JSPlatform).crossType(C
 
 lazy val xformsClientServerJVM = xformsClientServer.jvm
   .dependsOn(
-    commonJVM
+    commonJVM,
+    domJVM
   )
 
 lazy val xformsClientServerJS = xformsClientServer.js
   .dependsOn(
-    commonJS
+    commonJS,
+    domJS
   )
   .settings(commonScalaJsSettings)
   .settings(
@@ -1122,7 +1124,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
     commonJS % "test->test;compile->compile",
     webSupport,
     webFacades,
-    xformsClientServerJS
+    xformsClientServerJS,
   )
   .settings(
     Compile / unmanagedJars      := Nil,

@@ -15,6 +15,7 @@ package org.orbeon.xforms
 
 import org.log4s.Logger
 import org.orbeon.datatypes.BasicLocationData
+import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils._
@@ -702,8 +703,137 @@ object XFormsUI {
         clearChildrenOpt = Some(_.replaceChildren())
       )
 
+  private val TypePrefix = "xforms-type-"
+
+  private val TypeCssClassToInputType: Map[String, InputType] = Map(
+    s"${TypePrefix}boolean" -> InputType.Boolean,
+    s"${TypePrefix}string"  -> InputType.String
+  )
+
+  private val LhhaClasses = List(
+    "xforms-label",
+    "xforms-help",
+    "xforms-hint",
+    "xforms-alert"
+  )
+
+  private sealed trait InputType
+  private object InputType {
+    case object Boolean extends InputType
+    case object String  extends InputType
+  }
+
   @JSExport
-  def updateBooleanInputItemset(
+  def maybeUpdateSchemaType(
+    documentElement: html.Element,
+    controlId      : String,
+    newSchemaType  : String,
+    formID         : String,
+  ): Boolean =
+    if (newSchemaType != null) {
+
+      val newSchemaTypeQName =
+        newSchemaType.trimAllToOpt match {
+          case None    => Names.XsString
+          case Some(s) => QName.fromClarkName(s).getOrElse(throw new IllegalArgumentException(s"Invalid schema type: `$s`"))
+        }
+
+      lazy val newInputType =
+        newSchemaTypeQName match {
+          case Names.XsBoolean | Names.XfBoolean => InputType.Boolean
+          case _                                 => InputType.String
+        }
+
+      lazy val existingInputType =
+        TypeCssClassToInputType
+          .collectFirst { case (className, inputType) if documentElement.classList.contains(className) => inputType }
+          .getOrElse(InputType.String)
+
+      val mustUpdateInputType =
+        documentElement.classList.contains("xforms-input") && existingInputType != newInputType
+
+      if (mustUpdateInputType)
+        updateInputType(documentElement, controlId, newInputType, formID)
+
+      // Remove existing CSS `xforms-type-*` classes
+      documentElement
+        .className
+        .splitTo[List]()
+        .filter(_.startsWith(TypePrefix))
+        .foreach(documentElement.classList.remove)
+
+      // Add new CSS `xforms-type-*` class
+      newSchemaTypeQName match { case QName(localName, Namespace(_, uri)) =>
+        val isBuiltIn = uri == Namespaces.XS || uri == Namespaces.XF
+        val newClass = s"$TypePrefix${if (isBuiltIn) "" else "custom-"}$localName"
+        documentElement.classList.add(newClass)
+      }
+
+      mustUpdateInputType
+    } else {
+      false
+    }
+
+  private def updateInputType(
+    documentElement: html.Element,
+    controlId      : String,
+    newInputType   : InputType,
+    formID         : String
+  ): Unit = {
+
+    // Find the position of the last LHHA before the control "actual content"
+    // A value of -1 means that the content came before any label
+    val lastLhhaPosition =
+      documentElement.children.prefixLength(e => LhhaClasses.exists(e.classList.contains)) - 1
+
+    // Remove all elements that are not labels
+    documentElement.children.filter(e => ! LhhaClasses.exists(e.classList.contains))
+      .foreach(documentElement.removeChild)
+
+    val inputLabelElement = Controls.getControlLHHA(documentElement, "label").asInstanceOf[html.Label]
+
+    newInputType match {
+      case InputType.Boolean =>
+        updateBooleanInput(documentElement, controlId, lastLhhaPosition, inputLabelElement)
+      case InputType.String =>
+        updateStringInput(documentElement, controlId, formID, lastLhhaPosition, inputLabelElement)
+    }
+  }
+
+  private def updateStringInput(
+    documentElement  : html.Element,
+    controlId        : String,
+    formId           : String,
+    lastLhhaPosition : Int,
+    inputLabelElement: html.Label,
+  ): Unit = {
+
+    def insertIntoDocument(nodes: List[html.Element], lastLhhaPosition: Int): Unit = {
+      val childElements = documentElement.children
+      if (childElements.isEmpty)
+        documentElement.asInstanceOf[ElementExt].append(nodes: _*)
+      else if (lastLhhaPosition == -1)
+        documentElement.asInstanceOf[ElementExt].prepend(nodes: _*)
+      else
+        childElements(lastLhhaPosition).asInstanceOf[ElementExt].after(nodes: _*)
+    }
+
+    def createNewInputElem(typeClassName: String): html.Input = {
+      val newInputElementId = XFormsId.appendToEffectiveId(controlId, "$xforms-input-1")
+      input(
+        tpe := "text",
+        cls := s"xforms-input-input $typeClassName",
+        id  := newInputElementId,
+        name := Page.deNamespaceIdIfNeeded(formId, newInputElementId) // in portlet mode, name is not prefixed
+      ).render
+    }
+
+    val newStringInput = createNewInputElem("xforms-type-string")
+    insertIntoDocument(List(newStringInput), lastLhhaPosition)
+    inputLabelElement.htmlFor = newStringInput.id
+  }
+
+  private def updateBooleanInput(
     documentElement  : html.Element,
     controlId        : String,
     lastLabelPosition: Int,
@@ -728,8 +858,6 @@ object XFormsUI {
       groupNameOpt     = None,
       clearChildrenOpt = None // items have already been removed
     )
-
-    documentElement.classList.add("xforms-type-boolean")
 
     Option(inputLabelElement)
       .foreach(_.htmlFor = XFormsId.appendToEffectiveId(controlId, LhhacSeparator + "e0"))

@@ -20,12 +20,13 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomSupport
+import org.orbeon.xforms.Constants.LhhacSeparator
 import org.orbeon.xforms.facade.{Controls, Init, Utils, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.URL
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
 import org.scalajs.dom.ext._
-import org.scalajs.dom.html.Span
+import org.scalajs.dom.html.{Input, Span}
 import org.scalajs.dom.{MouseEvent, html, raw, window}
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
@@ -594,12 +595,6 @@ object XFormsUI {
       )
     }
 
-    // TODO: This is missing from the version of `scala-js-dom` we use, but present in newer versions. Once we upgrade
-    //  we can remove this.
-    trait ElementExt extends js.Object {
-      def prepend(nodes: (raw.Node | String)*): Unit
-    }
-
     formElem.asInstanceOf[ElementExt].prepend(inputElemsToAddAndRemove: _*)
 
     try {
@@ -673,13 +668,13 @@ object XFormsUI {
   def hideModalProgressPanelImmediate(): Unit =
     hideModalProgressPanelRaw()
 
-  @js.native trait ItemsetItem extends js.Object {
-    def attributes: js.UndefOr[js.Dictionary[String]] = js.native
-    def children  : js.UndefOr[js.Array[ItemsetItem]] = js.native
-    def label     : String                            = js.native
-    def value     : String                            = js.native
-    def help      : js.UndefOr[String]                = js.native
-    def hint      : js.UndefOr[String]                = js.native
+  trait ItemsetItem extends js.Object {
+    val attributes: js.UndefOr[js.Dictionary[String]]
+    val children  : js.UndefOr[js.Array[ItemsetItem]]
+    val label     : js.UndefOr[String]
+    val value     : String
+    val help      : js.UndefOr[String]
+    val hint      : js.UndefOr[String]
   }
 
   @JSExport
@@ -696,7 +691,49 @@ object XFormsUI {
     )
       updateSelectItemset(documentElement, itemsetTree)
     else
-      updateFullAppearanceItemset(documentElement, controlId, itemsetTree, groupName)
+      updateFullAppearanceItemset(
+        documentElement  = documentElement,
+        into             = documentElement.querySelector("span.xforms-items").asInstanceOf[html.Element],
+        afterOpt         = None,
+        controlId        = controlId,
+        itemsetTree      = itemsetTree,
+        isSelect         = documentElement.classList.contains("xforms-select"),
+        groupNameOpt     = Option(groupName),
+        clearChildrenOpt = Some(_.replaceChildren())
+      )
+
+  @JSExport
+  def updateBooleanInputItemset(
+    documentElement  : html.Element,
+    controlId        : String,
+    lastLabelPosition: Int,
+    inputLabelElement: html.Label
+  ): Unit = {
+    updateFullAppearanceItemset(
+      documentElement  = documentElement,
+      into             = documentElement,
+      afterOpt         = (lastLabelPosition >= 0).flatOption((documentElement.children(lastLabelPosition).asInstanceOf[html.Element]: js.UndefOr[html.Element]).toOption),
+      controlId        = controlId,
+      itemsetTree      = js.Array(
+        new ItemsetItem {
+          override val attributes = js.undefined // js.UndefOr[js.Dictionary[String]]
+          override val children   = js.undefined
+          override val label      = js.undefined
+          override val value      = "true"
+          override val help       = js.undefined
+          override val hint       = js.undefined
+        }
+      ),
+      isSelect         = true,
+      groupNameOpt     = None,
+      clearChildrenOpt = None // items have already been removed
+    )
+
+    documentElement.classList.add("xforms-type-boolean")
+
+    Option(inputLabelElement)
+      .foreach(_.htmlFor = XFormsId.appendToEffectiveId(controlId, LhhacSeparator + "e0"))
+  }
 
   // TODO:
   //  - Resolve nested `optgroup`s.
@@ -722,12 +759,12 @@ object XFormsUI {
                 dom.document.createElement("option").asInstanceOf[html.Option].kestrel { option =>
                   option.value     = itemElement.value
                   option.selected  = selectedValues.contains(itemElement.value)
-                  option.innerHTML = itemElement.label
+                  option.innerHTML = itemElement.label.getOrElse("")
                   classOpt.foreach(option.className = _)
                 }
               case Some(children) =>
                 dom.document.createElement("optgroup").asInstanceOf[html.OptGroup].kestrel { optgroup =>
-                  optgroup.label = itemElement.label
+                  optgroup.label = itemElement.label.getOrElse("")
                   classOpt.foreach(optgroup.className = _)
                   optgroup.replaceChildren(children.toList.map(generateItem): _*)
                 }
@@ -743,41 +780,51 @@ object XFormsUI {
           logger.error(s"`<select>` element not found when attempting to update itemset")
       }
 
+  // Concrete scenarios:
+  //
+  // - insert into the `span.xforms-items` element (replacing all existing content)
+  // - insert into the control's container element at the beginning
+  // - insert into the control's container element after a given element
   private def updateFullAppearanceItemset(
-    documentElement: html.Element,
-    controlId      : String,
-    itemsetTree    : js.Array[ItemsetItem],
-    groupName      : String
+    documentElement : html.Element,
+    into            : html.Element, // this must be the container of the item elements
+    afterOpt        : Option[html.Element],
+    controlId       : String,
+    itemsetTree     : js.Array[ItemsetItem],
+    isSelect        : Boolean,
+    groupNameOpt    : Option[String],
+    clearChildrenOpt: Option[html.Element => Unit]
   ): Unit = {
 
     // - https://github.com/orbeon/orbeon-forms/issues/5595
     // - https://github.com/orbeon/orbeon-forms/issues/5427
     val isReadonly = Controls.isReadonly(documentElement)
-    val isSelect   = documentElement.classList.contains("xforms-select")
 
-    val spanContainer = documentElement.querySelector("span.xforms-items")
-
-    // Remove spans and store current checked value
+    // Remember currently-checked values
     val checkedValues =
-      spanContainer.children.flatMap { elem =>
-        val input = elem.querySelector("input").asInstanceOf[dom.html.Input]
-        input.checked option input.value
+      into.children.flatMap { elem =>
+        Option(elem.querySelector("input[type = checkbox], input[type = radio]").asInstanceOf[dom.html.Input])
+          .filter(_.checked)
+          .map(input => input.value)
       }.toSet
 
-    spanContainer.replaceChildren()
+    // Clear existing items if needed
+    clearChildrenOpt.foreach(_.apply(into))
 
     val domParser = new DOMParser
 
-    itemsetTree.zipWithIndex.foreach { case (itemElement, itemIndex) =>
-      spanContainer.appendChild {
+    val itemsToInsertIt: Iterator[html.Span] =
+      itemsetTree.iterator.zipWithIndex.map { case (itemElement, itemIndex) =>
 
         val classOpt = itemElement.attributes.toOption.flatMap(_.get("class"))
 
-        val itemLabelNodes =
-          domParser
-            .parseFromString(itemElement.label, SupportedType.`text/html`)
-            .querySelector("html > body")
-            .childNodes
+        val itemLabelNodesOpt =
+          itemElement.label.toOption.map { label =>
+            domParser
+              .parseFromString(label, SupportedType.`text/html`)
+              .querySelector("html > body")
+              .childNodes
+          }
 
         val helpOpt: Option[JsDom.TypedTag[Span]] = itemElement.help.toOption.filter(_.nonAllBlank).map { helpString =>
           span(cls := "xforms-help")(helpString)
@@ -794,29 +841,57 @@ object XFormsUI {
         }
 
         span(cls := ("xforms-deselected" :: classOpt.toList mkString " ")) {
-          label(cls := (if (isSelect) "checkbox" else "radio"))(
+
+          def createInput: JsDom.TypedTag[Input] =
             input(
               id       := XFormsId.appendToEffectiveId(controlId, Constants.LhhacSeparator + "e" + itemIndex),
               tpe      := (if (isSelect) "checkbox" else "radio"),
-              name     := (if (groupName ne null) groupName else controlId),
+              name     := groupNameOpt.getOrElse(controlId),
               value    := itemElement.value
             )(
               checkedValues(itemElement.value).option(checked),
               isReadonly                      .option(disabled)
             )
-          )(
-            span(hintOpt.isDefined.option(cls := "xforms-hint-region"))(itemLabelNodes.toList)
-          )(
-            helpOpt
-          )(
-            hintOpt
-          )
+
+          itemLabelNodesOpt match {
+            case None =>
+              createInput
+            case Some(itemLabelNodes) =>
+              label(cls := (if (isSelect) "checkbox" else "radio"))(
+                createInput
+              )(
+                span(hintOpt.isDefined.option(cls := "xforms-hint-region"))(itemLabelNodes.toList)
+              )(
+                helpOpt
+              )(
+                hintOpt
+              )
+          }
         }.render
       }
+
+    val itemsToInsertAsList = itemsToInsertIt.toList
+
+    afterOpt match {
+      case None if into.firstElementChild eq null =>
+        into.asInstanceOf[ElementExt].append(itemsToInsertAsList: _*)
+      case None =>
+        into.firstElementChild.asInstanceOf[ElementExt].prepend(itemsToInsertAsList: _*)
+      case Some(after) =>
+        after.asInstanceOf[ElementExt].after(itemsToInsertAsList: _*)
     }
   }
 
   private object Private {
+
+    // TODO: This is missing from the version of `scala-js-dom` we use, but present in newer versions. Once we upgrade
+    //  we can remove this.
+    trait ElementExt extends js.Object {
+      def append(nodes: (raw.Node | String)*): Unit
+      def prepend(nodes: (raw.Node | String)*): Unit
+      def after(nodes: (raw.Node | String)*): Unit
+      def before(nodes: (raw.Node | String)*): Unit
+    }
 
     // Global information about the last checkbox to check
     // Q: Should this be by form?

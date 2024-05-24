@@ -240,36 +240,7 @@
                                             YAHOO.util.Dom.addClass(documentElement, "xforms-type-string");
                                             if (inputLabelElement != null) inputLabelElement.htmlFor = newStringInput.id;
                                         } else if (newType.type == "boolean") {
-
-                                            // Make copy of the template
-                                            var booleanTemplate = document.getElementById("xforms-select-full-template");
-                                            booleanTemplate = ORBEON.util.Dom.getChildElementByIndex(booleanTemplate, 0);
-                                            var booleanTemplateClone = booleanTemplate.cloneNode(true);
-
-                                            // Remove the label we have in the template for each individual checkbox/radio button
-                                            // Do this because the checkbox label is actually not used, instead the control label is used
-                                            var templateLabelElement = booleanTemplateClone.getElementsByTagName("label")[0];
-                                            var templateInputElement = booleanTemplateClone.getElementsByTagName("input")[0];
-                                            // Move <input> at level of <label> and get rid of label
-                                            templateLabelElement.parentNode.replaceChild(templateInputElement, templateLabelElement);
-
-                                            // Remove the disabled attribute from the template, which is there so tab would skip over form elements in template
-                                            var booleanInput = ORBEON.util.Dom.getElementByTagName(booleanTemplateClone, "input");
-                                            booleanInput.removeAttribute("disabled");
-
-                                            // Replace placeholders
-                                            insertIntoDocument([booleanTemplateClone]);
-                                            ORBEON.util.Utils.replaceInDOM(booleanTemplateClone, "$xforms-template-value$", "true", false);
-                                            var booleanEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e0", false);
-                                            ORBEON.util.Utils.replaceInDOM(booleanTemplateClone, "$xforms-item-id-select$", booleanEffectiveId, false);
-                                            ORBEON.util.Utils.replaceInDOM(booleanTemplateClone, "$xforms-item-name$", controlId, false);
-
-                                            // Update classes
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-type-boolean");
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-input-appearance-minimal");
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-incremental");
-
-                                            if (inputLabelElement != null) inputLabelElement.htmlFor = booleanEffectiveId;
+                                            ORBEON.xforms.XFormsUi.updateBooleanInputItemset(documentElement, controlId, lastLabelPosition, inputLabelElement);
                                         }
                                     }
                                 }

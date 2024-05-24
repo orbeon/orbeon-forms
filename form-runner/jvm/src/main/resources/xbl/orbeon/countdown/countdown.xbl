@@ -41,10 +41,15 @@
                 value="xs:dateTime($end-time) - current-dateTime()"/>
             <xf:var
                 name="time-left-seconds"
-                value="round(
-                    seconds-from-duration($time-left-duration) +
-                    minutes-from-duration($time-left-duration)*60 +
-                    hours-from-duration($time-left-duration)*60*60
+                value="max(
+                    (
+                        0,
+                        round(
+                            seconds-from-duration($time-left-duration) +
+                            minutes-from-duration($time-left-duration)*60 +
+                            hours-from-duration($time-left-duration)*60*60
+                        )
+                    )
                 )"/>
             <xf:var name="min" value="floor($time-left-seconds div 60)"/>
             <xf:var name="sec" value="$time-left-seconds mod 60"/>

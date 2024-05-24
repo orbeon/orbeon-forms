@@ -307,7 +307,8 @@
           "xbl": [
             "fr:number",
             "fr:date",
-            "fr:code-mirror"
+            "fr:code-mirror",
+            "fr:section"
           ]
         }
     </property>

@@ -482,11 +482,17 @@ trait FormRunnerPersistence {
 
   //@XPathFunction
   def isFormDefinitionVersioningSupported(app: String, form: String): Boolean =
-    providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Form).get, "versioning", default = false)
+    findProvider(AppForm(app, form), FormOrData.Form) match {
+      case Some(provider) => providerPropertyAsBoolean(provider, "versioning", default = false)
+      case None           => false // Needed for case with Form Builder when lease is not acquired
+    }
 
   //@XPathFunction
   def isLeaseSupported(app: String, form: String): Boolean =
-    providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Data).get, "lease", default = false)
+    findProvider(AppForm(app, form), FormOrData.Data) match {
+      case Some(provider) => providerPropertyAsBoolean(provider, "lease", default = false)
+      case None           => false // Needed for case with Form Builder when lease is not acquired
+    }
 
   //@XPathFunction
   def isSortSupported(app: String, form: String): Boolean =

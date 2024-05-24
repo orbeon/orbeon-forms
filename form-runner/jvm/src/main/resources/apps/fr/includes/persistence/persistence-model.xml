@@ -864,6 +864,11 @@
         <xf:rebuild     model="fr-form-model"/>
         <xf:recalculate model="fr-form-model"/>
 
+        <!-- In some cases (Form Builder, lease not acquired when page loaded), we need to refresh the model as well -->
+        <xf:action if="instance('fr-persistence-instance')/lease-refresh-needed = 'true'">
+            <xf:setvalue ref="instance('fr-persistence-instance')/lease-refresh-needed"/>
+            <xf:refresh model="fr-form-model"/>
+        </xf:action>
     </xf:action>
 
     <xf:action
@@ -959,6 +964,7 @@
             <!-- When lease-enabled = 'true': other-user | current-user | relinquished -->
             <lease-state/>
             <lease-load-document/>
+            <lease-refresh-needed/>
             <lease-duration/>
             <lease-renew-threshold/>
             <lease-alert-threshold/>
@@ -1115,6 +1121,7 @@
                 current-dateTime() ge
                     xs:dateTime($persistence-instance/lease-start-time) +
                     xs:dayTimeDuration(concat('PT', $persistence-instance/lease-renew-threshold, 'M'))">
+
             <xf:send submission="fr-acquire-lease-submission"/>
         </xf:action>
     </xf:action>

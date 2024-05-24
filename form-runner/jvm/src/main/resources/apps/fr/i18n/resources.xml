@@ -389,6 +389,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title>Lease</no-lease-title>
                 <renew-lease-title>Renew lease?</renew-lease-title>
                 <renew-lease-message>Your lease is about to expire. Would you like to renew it now?</renew-lease-message>
                 <current-user-left>You own a lease on this document for another </current-user-left>
@@ -1084,6 +1085,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title>Bail</no-lease-title>
                 <renew-lease-title>Renouvellement du bail?</renew-lease-title>
                 <renew-lease-message>Votre bail est sur le point d'expirer. Souhaitez-vous le renouveller?</renew-lease-message>
                 <current-user-left>Votre bail sur ce document encore valable pour </current-user-left>
@@ -1777,6 +1779,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title>Bloqueo</no-lease-title>
                 <renew-lease-title>Renovar Bloqueo</renew-lease-title>
                 <renew-lease-message>Su bloqueo esta por expirar. Desea renovarlo ahora ?</renew-lease-message>
                 <current-user-left>Usted posee un bloqueo sobre este documento para otro</current-user-left>
@@ -2481,6 +2484,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title>Bloqueig</no-lease-title>
                 <renew-lease-title>Renovar bloqueig</renew-lease-title>
                 <renew-lease-message>El seu bloqueig expirarà aviat. Desitja renovar-lo?</renew-lease-message>
                 <current-user-left>Voste disposa d'un bloqueig d'aquest document sobre un altre usuari</current-user-left>
@@ -3178,6 +3182,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title todo="true">[Lease]</no-lease-title>
                 <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
                 <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
                 <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
@@ -3860,6 +3865,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title todo="true">[Lease]</no-lease-title>
                 <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
                 <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
                 <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
@@ -4547,6 +4553,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title todo="true">[Lease]</no-lease-title>
                 <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
                 <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
                 <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
@@ -5238,6 +5245,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title todo="true">[Lease]</no-lease-title>
                 <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
                 <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
                 <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
@@ -5929,6 +5937,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title todo="true">[Lease]</no-lease-title>
                 <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
                 <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
                 <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
@@ -6620,6 +6629,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title todo="true">[Lease]</no-lease-title>
                 <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
                 <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
                 <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
@@ -7311,6 +7321,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title>Lease</no-lease-title>
                 <renew-lease-title>Lease vernieuwen?</renew-lease-title>
                 <renew-lease-message>Uw lease staat op het punt te verlopen. Wilt u deze nu vernieuwen?</renew-lease-message>
                 <current-user-left>U hebt een lease op dit document voor een andere </current-user-left>
@@ -8002,6 +8013,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title todo="true">[Lease]</no-lease-title>
                 <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
                 <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
                 <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
@@ -8687,6 +8699,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title todo="true">[Lease]</no-lease-title>
                 <renew-lease-title todo="true">[Renew lease?]</renew-lease-title>
                 <renew-lease-message todo="true">[Your lease is about to expire. Would you like to renew it now?]</renew-lease-message>
                 <current-user-left todo="true">[You own a lease on this document for another </current-user-left>
@@ -9375,6 +9388,7 @@
                 </explanation>
             </view>
             <lease>
+                <no-lease-title>Uprawnienie do edycji</no-lease-title>
                 <renew-lease-title>Czy przedłużyć możliwość edycji?</renew-lease-title>
                 <renew-lease-message>Twoje uprawnienie do edycji wkrótce wygaśnie. Czy chcesz je przedłużyć?</renew-lease-message>
                 <current-user-left>Posiadasz uprawnienie do edycji na kolejne </current-user-left>

@@ -186,8 +186,6 @@
                                         recreatedInputs[controlId] = documentElement;
                                         // Clean-up document element by removing type classes
                                         _.each(INPUT_TYPES, function(type) { YAHOO.util.Dom.removeClass(documentElement, type.className); });
-                                        // Minimal control content can be different
-                                        var isMinimal = $(documentElement).is('.xforms-input-appearance-minimal');
 
                                         // Find the position of the last label before the control "actual content" and remove all elements that are not labels
                                         // A value of -1 means that the content came before any label

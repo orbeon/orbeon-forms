@@ -615,7 +615,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 if (spanValue == "" && jControl.is('.xforms-input') && jControl.is('.xforms-type-boolean'))
                     spanValue = "false";
                 return spanValue;
-            } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact, .xforms-input-appearance-minimal, .xforms-input-appearance-compact')) {
+            } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact')) {
                 // Drop-down and list
                 var options = control.getElementsByTagName("select")[0].options;
                 var selectValue = "";
@@ -753,7 +753,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
                 // Update classes on control
                 ORBEON.xforms.XFormsUi.setRadioCheckboxClasses(control);
-            } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-compact, .xforms-select1-appearance-minimal, .xforms-input-appearance-compact, .xforms-input-appearance-minimal')) {
+            } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-compact, .xforms-select1-appearance-minimal')) {
                 // Handle lists and comboboxes
                 var selectedValues = jControl.is('.xforms-select-appearance-compact') ? newControlValue.split(" ") : new Array(newControlValue);
                 var select = control.getElementsByTagName("select")[0];
@@ -1066,7 +1066,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     var input = inputs[inputIndex];
                     ORBEON.xforms.Controls.setDisabledOnFormElement(input, isReadonly);
                 }
-            } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact, .xforms-input-appearance-minimal, .xforms-input-appearance-compact')) {
+            } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact')) {
                 // Lists
                 var select = control.getElementsByTagName("select")[0];
                 ORBEON.xforms.Controls.setDisabledOnFormElement(select, isReadonly);

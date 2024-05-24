@@ -154,11 +154,15 @@ private object FlatView {
         List(Grid(nameOpt, currentPath, repeated, childrenNodes))
       } else if (isSectionTemplateContent(node)) {
         xblMappings.get(node.uriQualifiedName).map { xblBindingNode =>
+          // Exclude template content nodes (*-content) from the path
+          val newPath                = currentPath.filterNot(_.endsWith(TemplateContentSuffix))
+          val templateSectionNameOpt = newPath.lastOption
+
           // Follow XBL binding to the template
           formNodes(
             node                   = xblBindingNode.rootElement.child(XBLTemplateTest).head,
-            path                   = currentPath.reverse.dropWhile(_.endsWith(TemplateContentSuffix)).reverse,
-            templateSectionNameOpt = Some(currentPath.reverse(1))
+            path                   = newPath,
+            templateSectionNameOpt = templateSectionNameOpt
           )
         }.getOrElse(Nil)
       } else if (control) {

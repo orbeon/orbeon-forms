@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Element, Namespace, QName}
 import org.orbeon.oxf.xforms.analysis.controls.InputControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.helpers.AttributesImpl
 
@@ -163,7 +164,7 @@ class XFormsInputControl(
         "type",
         attributeValue,
         previousControlOpt.isEmpty,
-        attributeValue == "" || StringQNames(attributeValue)
+        attributeValue == "" || StringClarkNames(attributeValue)
       )
     }
 
@@ -171,9 +172,21 @@ class XFormsInputControl(
   }
 }
 
-object XFormsInputControl {
+private object XFormsInputControl {
 
-  val StringQNames = Set(XS_STRING_EXPLODED_QNAME, XFORMS_STRING_EXPLODED_QNAME)
+  private val XsStringClarkName = {
+
+    // NOTE: Copied from `XMLConstants` for now as we don't yet have a common place for it. Maybe `xml-common` subproject?
+    val XSD_PREFIX = "xs"
+    val XSD_NAMESPACE = Namespace(XSD_PREFIX, Namespaces.XS)
+    val XS_STRING_QNAME = QName("string", XSD_NAMESPACE)
+
+    XS_STRING_QNAME.clarkName
+  }
+
+  private val XFormsStringClarkName = XFORMS_STRING_QNAME.clarkName
+
+  val StringClarkNames = Set(XsStringClarkName, XFormsStringClarkName)
 
   // Anything but "true" is "false"
   private def normalizeBooleanString(s: String) = (s == "true").toString

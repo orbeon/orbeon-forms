@@ -351,19 +351,6 @@ object XFormsNames {
   val XFORMS_STRING_QNAME = xformsQName("string")
   val XFORMS_BASE64BINARY_QNAME = xformsQName("base64Binary")
 
-  val XS_STRING_EXPLODED_QNAME = {
-
-    // NOTE: Copied from `XMLConstants` for now as we don't yet have a common place for it. Maybe `xml-common` subproject?
-    val XSD_PREFIX = "xs"
-    val XSD_URI = "http://www.w3.org/2001/XMLSchema"
-    val XSD_NAMESPACE = Namespace(XSD_PREFIX, XSD_URI)
-    val XS_STRING_QNAME = QName("string", XSD_NAMESPACE)
-
-    XS_STRING_QNAME.clarkName
-  }
-
-  val XFORMS_STRING_EXPLODED_QNAME = XFORMS_STRING_QNAME.clarkName
-
   val XXFORMS_EVENT_MODE_QNAME = xxformsQName("events-mode")
   val XXFORMS_VALIDATION_MODE_QNAME = xxformsQName("validation-mode")
 

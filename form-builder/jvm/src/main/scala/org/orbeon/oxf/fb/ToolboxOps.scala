@@ -47,7 +47,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.{Namespaces, XFormsNames}
 import org.orbeon.xforms.XFormsNames.{ID_QNAME, MEDIATYPE_QNAME}
 
 import java.net.URI
@@ -211,7 +211,7 @@ object ToolboxOps {
       val sectionTemplate: NodeInfo =
         <fr:section id={sectionId(newSectionName)} bind={bindId(newSectionName)} edit-ref="" xxf:update="full"
               xmlns:xh="http://www.w3.org/1999/xhtml"
-              xmlns:xf="http://www.w3.org/2002/xforms"
+              xmlns:xf={Namespaces.XF}
               xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner">{
@@ -1174,7 +1174,7 @@ object ToolboxOps {
 
     // NOTE: Help is added when needed
     val lhhaTemplate: NodeInfo =
-      <template xmlns:xf="http://www.w3.org/2002/xforms">
+      <template xmlns:xf={Namespaces.XF}>
         <xf:label ref=""/>
         <xf:hint  ref=""/>
         <xf:alert ref=""/>

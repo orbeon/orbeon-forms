@@ -12,7 +12,7 @@ import org.orbeon.oxf.xforms.xbl.BindingDescriptor.{findMostSpecificWithoutDatat
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.{Namespaces, XFormsNames}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeInfoConversions
 
@@ -156,7 +156,7 @@ private val AttributeRe = "@(.+)".r
         // Insert template instance if not present
         val template: NodeInfo =
           <xf:instance
-            xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xf={Namespaces.XF}
             xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
             xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             id={templateInstanceId}

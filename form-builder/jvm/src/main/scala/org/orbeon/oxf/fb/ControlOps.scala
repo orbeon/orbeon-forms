@@ -37,7 +37,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.Constants.ComponentSeparator
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{Namespaces, XFormsId}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 
@@ -81,7 +81,7 @@ trait ControlOps extends ResourcesOps {
     <xf:bind
       id={Names.FormBinds}
       ref="instance('fr-form-instance')"
-      xmlns:xf="http://www.w3.org/2002/xforms"/>
+      xmlns:xf={Namespaces.XF}/>
 
   def precedingBoundControlNameInSectionForControl(controlElem: NodeInfo): Option[String] = {
 
@@ -146,7 +146,7 @@ trait ControlOps extends ResourcesOps {
                 id={bindId(bindName)}
                 ref={bindName}
                 name={bindName}
-                xmlns:xf="http://www.w3.org/2002/xforms"/>
+                xmlns:xf={Namespaces.XF}/>
 
             insert(into = containerElem, after = containerElem / XFBindTest, origin = newBind).head
         }

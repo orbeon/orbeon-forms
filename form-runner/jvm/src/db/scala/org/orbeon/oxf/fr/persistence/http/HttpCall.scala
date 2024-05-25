@@ -20,12 +20,12 @@ import org.orbeon.dom.io.XMLWriter
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
-import org.orbeon.oxf.fr.Version.{Specific, Unspecified}
+import org.orbeon.oxf.fr.Version.Unspecified
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
-import org.orbeon.oxf.fr.{AppForm, Version}
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, SearchVersion, Version}
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.test.TestHttpClient
@@ -329,18 +329,26 @@ private[persistence] object HttpCall {
     method                   : HttpMethod,
     path                     : String,
     requestBodyContent       : Option[StreamedContent] = None,
-    formVersionOpt           : Option[Int] = None,
-    customHeaders            : Map[String, List[String]] = Map.empty)(implicit
+    formVersionOpt           : Option[Either[FormDefinitionVersion, SearchVersion]]
+  )(implicit
     logger                   : IndentedLogger,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): ConnectionResult = {
 
     implicit val ec: ExternalContext = coreCrossPlatformSupport.externalContext
 
+    val version = formVersionOpt.map {
+      case Left (FormDefinitionVersion.Latest)      => Version.Unspecified
+      case Left (FormDefinitionVersion.Specific(v)) => Version.Specific(v)
+      case Right(SearchVersion.Unspecified)         => Version.Unspecified
+      case Right(SearchVersion.All)                 => throw new IllegalArgumentException("`SearchVersion.All` not supported")
+      case Right(SearchVersion.Specific(v))         => Version.Specific(v)
+    }.getOrElse(Version.Unspecified)
+
     val chr = HttpCall.request(
       path        = path.stripPrefix(PersistenceBase),
       method      = method,
-      version     = formVersionOpt.map(Specific).getOrElse(Unspecified),
+      version     = version,
       stage       = None,
       body        = requestBodyContent.map(sc => Binary(BufferedContent(sc)(toByteArray).body)),
       credentials = None

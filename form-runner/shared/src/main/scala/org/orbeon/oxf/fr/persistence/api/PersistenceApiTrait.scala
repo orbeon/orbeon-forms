@@ -75,7 +75,7 @@ trait PersistenceApiTrait {
   private def documentsXmlTry(
     servicePath             : String,
     queryXml                : Array[Byte],
-    version                 : Either[Int, SearchVersion]
+    searchVersion           : SearchVersion
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -85,8 +85,7 @@ trait PersistenceApiTrait {
         method             = HttpMethod.POST,
         pathQuery          = servicePath,
         requestBodyContent = StreamedContent.fromBytes(queryXml, ContentTypes.XmlContentType.some).some,
-        formVersionOpt     = version.left.toOption,
-        customHeaders      = version.toOption.flatMap(SearchVersion.toHeaderString).map(v => Map(OrbeonFormDefinitionVersion -> List(v))).getOrElse(Map.empty)
+        formVersionOpt     = Right(searchVersion).some,
       ),
       closeOnSuccess = true
     ) { is =>
@@ -169,7 +168,7 @@ trait PersistenceApiTrait {
             <page-number>{pageNumber}</page-number>
         </search>.toString.getBytes(CharsetNames.Utf8)
 
-      documentsXmlTry(servicePathQuery, fromIncomingSearchQuery.getOrElse(fromBasicSearchQuery), Right(searchVersion))
+      documentsXmlTry(servicePathQuery, fromIncomingSearchQuery.getOrElse(fromBasicSearchQuery), searchVersion)
     }
 
     def pageToDataDetails(page: DocumentNodeInfoType): (Iterator[DataDetails], Int, Int) =
@@ -226,7 +225,7 @@ trait PersistenceApiTrait {
           }
         }</distinct-values>
 
-      val result = documentsXmlTry(servicePath, queryXml.toString.getBytes(CharsetNames.Utf8), Right(searchVersion)).get
+      val result = documentsXmlTry(servicePath, queryXml.toString.getBytes(CharsetNames.Utf8), searchVersion).get
 
       val controls = for {
         query <- result / * / "query"
@@ -286,8 +285,9 @@ trait PersistenceApiTrait {
       val documentsXmlTry =
         ConnectionResult.tryWithSuccessConnection(
           connectPersistence(
-            method    = HttpMethod.GET,
-            pathQuery = servicePathParams
+            method         = HttpMethod.GET,
+            pathQuery      = servicePathParams,
+            formVersionOpt = None
           ),
           closeOnSuccess = true
         ) { is =>
@@ -353,9 +353,8 @@ trait PersistenceApiTrait {
       createInternalAdminUserTokenParam(isInternalAdminUser).toList,
       overwrite = true
     )
-    val customHeaders = Map(OrbeonFormDefinitionVersion -> List(appFormVersion._2.toString))
 
-    readHeadersAndDocument(path, customHeaders).map(_ -> path)
+    readHeadersAndDocument(path, Some(Left(FormDefinitionVersion.Specific(appFormVersion._2)))).map(_ -> path)
   }
 
   def readDocumentFormVersion(
@@ -385,12 +384,8 @@ trait PersistenceApiTrait {
     debug(s"reading published form definition for `$appName`/`$formName`/`$version`")
 
     val path = FormRunner.createFormDefinitionBasePath(appName, formName) + FormXhtml
-    val customHeaders = version match {
-      case FormDefinitionVersion.Latest            => Map.empty[String, List[String]]
-      case FormDefinitionVersion.Specific(version) => Map(OrbeonFormDefinitionVersion -> List(version.toString))
-    }
 
-    readHeadersAndDocument(path, customHeaders).map(_ -> path)
+    readHeadersAndDocument(path, Some(Left(version))).map(_ -> path)
   }
 
   // TODO: This should return a `Try`. Right now it throws if the document cannot be read.
@@ -410,7 +405,7 @@ trait PersistenceApiTrait {
         allVersions = version != FormDefinitionVersion.Latest,
         allForms    = true
       ),
-      Map.empty
+      None
     ).map(_._2)
 
     formsDocTry map { formsDoc =>
@@ -452,7 +447,7 @@ trait PersistenceApiTrait {
       connectPersistence(
         method         = HttpMethod.DELETE,
         pathQuery      = pathWithParams,
-        formVersionOpt = None // xxx TODO
+        formVersionOpt = None // unneeded for `DELETE`
       )
 
     if (cxr.statusCode == StatusCode.NotFound) {
@@ -484,8 +479,8 @@ trait PersistenceApiTrait {
   def connectPersistence(
     method            : HttpMethod,
     pathQuery         : String,
+    formVersionOpt    : Option[Either[FormDefinitionVersion, SearchVersion]],
     requestBodyContent: Option[StreamedContent]   = None,
-    formVersionOpt    : Option[Int]               = None,
     customHeaders     : Map[String, List[String]] = Map.empty
   )(implicit
     logger                  : IndentedLogger,
@@ -503,11 +498,18 @@ trait PersistenceApiTrait {
         )
       )
 
+    val versionHeaderValueOpt =
+      formVersionOpt.flatMap {
+        case Left(FormDefinitionVersion.Latest)      => None
+        case Left(FormDefinitionVersion.Specific(v)) => Some(v.toString)
+        case Right(v)                                => SearchVersion.toHeaderString(v)
+      }
+
     val allHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
         url              = resolvedUri,
         hasCredentials   = false,
-        customHeaders    = customHeaders ++ (formVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString))),
+        customHeaders    = customHeaders ++ versionHeaderValueOpt.toList.map(v => OrbeonFormDefinitionVersion -> List(v)),
         headersToForward = Connection.headersToForwardFromProperty,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
         getHeader        = Connection.getHeaderFromRequest(ec.getRequest)
@@ -540,18 +542,18 @@ trait PersistenceApiTrait {
   // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
   private def readHeadersAndDocument(
     urlString               : String,
-    customHeaders           : Map[String, List[String]]
+    formVersionOpt          : Option[Either[FormDefinitionVersion, SearchVersion]]
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Try[(Map[String, List[String]], DocumentNodeInfoType)] =
-    withDebug("reading document", List("url" -> urlString, "headers" -> customHeaders.toString)) {
+    withDebug("reading document", List("url" -> urlString, "version" -> formVersionOpt.toString)) {
 
     val cxr =
       connectPersistence(
-        method        = HttpMethod.GET,
-        pathQuery     = urlString,
-        customHeaders = customHeaders
+        method         = HttpMethod.GET,
+        pathQuery      = urlString,
+        formVersionOpt = formVersionOpt
       )
 
     // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the test
@@ -579,7 +581,12 @@ trait PersistenceApiTrait {
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Map[String, List[String]] =
-    connectPersistence(HttpMethod.HEAD, urlString, customHeaders = customHeaders).headers
+    connectPersistence(
+     method         = HttpMethod.HEAD,
+     pathQuery      = urlString,
+     formVersionOpt = None,
+     customHeaders  = customHeaders
+    ).headers
 
   private def callPagedService[R](
     readPage: Int => Try[(Iterator[R], Int, Int)]

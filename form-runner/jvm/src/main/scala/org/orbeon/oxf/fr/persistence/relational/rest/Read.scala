@@ -19,7 +19,7 @@ import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.persistence.relational.Provider.{PostgreSQL, SQLite, binarySize, partialBinary}
-import org.orbeon.oxf.fr.persistence.relational.Version._
+import org.orbeon.oxf.fr.Version._
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._

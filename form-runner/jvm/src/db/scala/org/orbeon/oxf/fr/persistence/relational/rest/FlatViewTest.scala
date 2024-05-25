@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Version.Specific
+import org.orbeon.oxf.fr.Version.Specific
 import org.orbeon.oxf.http.{HttpRanges, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.util.CollectionUtils.fromIteratorExt

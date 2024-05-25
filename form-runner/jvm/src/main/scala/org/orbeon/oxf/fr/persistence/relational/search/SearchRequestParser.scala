@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.externalcontext.Credentials
-import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.{AppForm, SearchVersion}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.parsePositiveIntParamOrThrow
 import org.orbeon.oxf.fr.persistence.relational.index.Index
@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider, RelationalUtils}
-import org.orbeon.oxf.fr.persistence.{PersistenceMetadataSupport, SearchVersion}
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._

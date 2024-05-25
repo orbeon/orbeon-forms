@@ -26,7 +26,7 @@ import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.Names.FormModel
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
-import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
+import Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod}
 import org.orbeon.oxf.properties.{Property, PropertySet}
@@ -37,7 +37,7 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, _}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl

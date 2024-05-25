@@ -15,9 +15,9 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.oxf.controller.Authorizer
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
-import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
+import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl

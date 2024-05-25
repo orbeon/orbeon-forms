@@ -1,14 +1,13 @@
 package org.orbeon.oxf.fr.persistence.adt
 
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
 import org.orbeon.oxf.fr.persistence.adt.FormDefinitionOrDataInfo.{FormDataInfo, FormDefinitionInfo}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi.headerFromRFC1123OrIso
 import org.orbeon.oxf.fr.persistence.http.HttpCall
-import org.orbeon.oxf.fr.persistence.relational.Version
-import org.orbeon.oxf.fr.persistence.relational.Version.Specific
+import Version.Specific
 import org.orbeon.oxf.fr.persistence.test.TestForm
 import org.orbeon.oxf.http.{Headers, StatusCode}
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}

@@ -15,11 +15,11 @@ package org.orbeon.oxf.fr.persistence.test
 
 import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr.Version.{Specific, Unspecified}
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.HttpCall
 import org.orbeon.oxf.fr.persistence.http.HttpCall.assertCall
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Version.{Specific, Unspecified}
 import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}

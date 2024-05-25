@@ -2,12 +2,12 @@ package org.orbeon.oxf.fr.persistence.test
 
 import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext, UserAndGroup}
-import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi.headerFromRFC1123OrIso
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
-import org.orbeon.oxf.fr.persistence.relational.{Provider, Version}
+import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.http.{Headers, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps

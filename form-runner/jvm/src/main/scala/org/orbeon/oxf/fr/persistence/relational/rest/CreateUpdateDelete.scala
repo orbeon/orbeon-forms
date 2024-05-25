@@ -18,7 +18,7 @@ import org.orbeon.io.{IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.relational.Version._
+import org.orbeon.oxf.fr.Version._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}

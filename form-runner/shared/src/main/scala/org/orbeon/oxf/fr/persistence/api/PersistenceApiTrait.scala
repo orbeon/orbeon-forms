@@ -9,9 +9,7 @@ import org.orbeon.oxf.fr.FormRunner.{createFormDataBasePath, providerPropertyAsB
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml, findProvider}
 import org.orbeon.oxf.fr._
-import org.orbeon.oxf.fr.persistence.SearchVersion
-import org.orbeon.oxf.fr.persistence.relational.Version
-import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
+import Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._

@@ -14,8 +14,7 @@
 package org.orbeon.oxf.fr.persistence.attachments
 
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
-import org.orbeon.oxf.fr.persistence.relational.Version
-import org.orbeon.oxf.fr.{AppForm, FormOrData}
+import org.orbeon.oxf.fr.{AppForm, FormOrData, Version}
 import org.orbeon.oxf.http.{HttpMethod, HttpRanges, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl

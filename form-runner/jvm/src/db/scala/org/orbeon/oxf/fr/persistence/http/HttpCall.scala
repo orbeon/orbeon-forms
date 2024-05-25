@@ -20,11 +20,11 @@ import org.orbeon.dom.io.XMLWriter
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
-import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.{AppForm, Version}
+import org.orbeon.oxf.fr.Version.{Specific, Unspecified}
 import org.orbeon.oxf.fr.permission.Operations
-import org.orbeon.oxf.fr.persistence.relational.Version.{Specific, Unspecified}
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
-import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
+import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http._

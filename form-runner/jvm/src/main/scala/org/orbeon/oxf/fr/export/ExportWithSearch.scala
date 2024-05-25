@@ -10,7 +10,6 @@ import org.orbeon.oxf.fr.excel.ExcelSupport._
 import org.orbeon.oxf.fr.excel.{ExcelNumberFormat, ExcelSupport}
 import org.orbeon.oxf.fr.importexport.ImportExportSupport
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.buildFilename
-import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi.DataDetails
 import org.orbeon.oxf.fr.persistence.relational.index.Index

@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.test
 
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.HttpCall
-import org.orbeon.oxf.fr.persistence.relational.Version.Specific
+import org.orbeon.oxf.fr.Version.Specific
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, XPath}
 import org.orbeon.oxf.xml.dom.Converter._

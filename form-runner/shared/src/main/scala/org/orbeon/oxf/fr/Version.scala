@@ -1,9 +1,8 @@
-package org.orbeon.oxf.fr.persistence.relational
+package org.orbeon.oxf.fr
 
 
 sealed trait Version
 
-// xxx move to parent package in separate commit
 object Version {
 
   case object Unspecified                                       extends Version
@@ -30,4 +29,35 @@ object Version {
           case Some(v)      => Specific(v.toInt)
         }
     }
+}
+
+
+sealed trait                                  FormDefinitionVersion
+
+object                                        FormDefinitionVersion {
+  case object Latest                  extends FormDefinitionVersion
+  case class  Specific (version: Int) extends FormDefinitionVersion
+}
+
+
+sealed trait SearchVersion
+
+object SearchVersion {
+
+  case object Unspecified               extends SearchVersion
+  case object All                       extends SearchVersion
+  case class  Specific   (version: Int) extends SearchVersion
+
+  def apply(version: Option[String]): SearchVersion =
+    version match {
+      case None         => Unspecified
+      case Some("all")  => All
+      case Some(v)      => Specific(v.toInt)
+    }
+
+  def toHeaderString(sv: SearchVersion): Option[String] = sv match {
+    case Unspecified => None
+    case All         => Some("all")
+    case Specific(v) => Some(v.toString)
+  }
 }

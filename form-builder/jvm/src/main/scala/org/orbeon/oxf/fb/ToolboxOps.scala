@@ -27,7 +27,7 @@ import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr._
-import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
+import Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.processor.XPLConstants

@@ -14,17 +14,17 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.externalcontext.{ExternalContext, Organization, UserAndGroup}
-import org.orbeon.oxf.fr.FormDefinitionVersion
+import org.orbeon.oxf.fr.{FormDefinitionVersion, SearchVersion}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
+import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationId, OrganizationSupport}
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata.LastModified
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.fr.persistence.relational.search.part._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
-import org.orbeon.oxf.fr.persistence.{PersistenceMetadataSupport, SearchVersion}
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger

@@ -13,9 +13,8 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.distinctvalues
 
-import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.{AppForm, SearchVersion}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization
-import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt.{DistinctValuesRequest, Metadata}
 import org.orbeon.oxf.util.IndentedLogger

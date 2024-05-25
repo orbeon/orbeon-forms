@@ -716,12 +716,12 @@ object XFormsUI {
       controlId        = controlId,
       itemsetTree      = js.Array(
         new ItemsetItem {
-          override val attributes = js.undefined // js.UndefOr[js.Dictionary[String]]
-          override val children   = js.undefined
-          override val label      = js.undefined
-          override val value      = "true"
-          override val help       = js.undefined
-          override val hint       = js.undefined
+          val attributes = js.undefined // js.UndefOr[js.Dictionary[String]]
+          val children   = js.undefined
+          val label      = js.undefined
+          val value      = "true"
+          val help       = js.undefined
+          val hint       = js.undefined
         }
       ),
       isSelect         = true,

@@ -257,17 +257,17 @@ object XFormsUI {
 
     val controlId       = attValueOrThrow(elem, "id")
     val documentElement = dom.document.getElementById(controlId).asInstanceOf[html.Element]
-    val relevant        = attValueOpt(elem, "relevant")
-    val readonly        = attValueOpt(elem, "readonly")
+    val relevantOpt     = booleanAttValueOpt(elem, "relevant")
+    val readonlyOpt     = booleanAttValueOpt(elem, "readonly")
 
     Option(XBL.instanceForControl(documentElement)) foreach { instance =>
 
-      val becomesRelevant    = relevant.contains("true")
-      val becomesNonRelevant = relevant.contains("false")
+      val becomesRelevant    = relevantOpt.contains(true)
+      val becomesNonRelevant = relevantOpt.contains(false)
 
       def callXFormsUpdateReadonlyIfNeeded(): Unit =
-        if (readonly.isDefined && XFormsXbl.isObjectWithMethod(instance, "xformsUpdateReadonly"))
-          instance.xformsUpdateReadonly(readonly.contains("true"))
+        if (readonlyOpt.isDefined && XFormsXbl.isObjectWithMethod(instance, "xformsUpdateReadonly"))
+          instance.xformsUpdateReadonly(readonlyOpt.contains(true))
 
       if (becomesRelevant) {
         // NOTE: We don't need to call this right now, because  this is done via `instanceForControl`
@@ -354,13 +354,14 @@ object XFormsUI {
     formID      : String
   ): Unit = {
 
-    val repeatId  = controlElem.getAttribute("id")
-    val iteration = controlElem.getAttribute("iteration")
-    val relevant  = controlElem.getAttribute("relevant")
+    val repeatId    = controlElem.getAttribute("id")
+    val iteration   = controlElem.getAttribute("iteration")
+    val relevantOpt = attValueOpt(controlElem, "relevant")
 
     // Remove or add `xforms-disabled` on elements after this delimiter
-    if (relevant != null)
-      Controls.setRepeatIterationRelevance(formID, repeatId, iteration, relevant == "true")
+    relevantOpt
+      .map(_.toBoolean)
+      .foreach(Controls.setRepeatIterationRelevance(formID, repeatId, iteration, _))
   }
 
   def maybeFutureToScalaFuture(promiseOrUndef: js.UndefOr[js.Promise[Unit] | JQueryPromise]): Future[Unit] = {
@@ -504,7 +505,7 @@ object XFormsUI {
     val urlType         = attValueOrThrow(submissionElement, "url-type")
     val submissionId    = attValueOrThrow(submissionElement, "submission-id")
 
-    val showProgressOpt = attValueOpt(submissionElement, "show-progress")
+    val showProgressOpt = booleanAttValueOpt(submissionElement, "show-progress")
     val targetOpt       = attValueOpt(submissionElement, "target")
 
 
@@ -571,7 +572,7 @@ object XFormsUI {
     )
 
     // Notify the caller (to handle the loading indicator)
-    if (! showProgressOpt.contains("false"))
+    if (! showProgressOpt.contains(true))
       notifyReplace()
 
     // Remove possibly existing hidden fields just in case. In particular, the server should no longer include `$uuid`.
@@ -713,16 +714,16 @@ object XFormsUI {
 
     val controlId           = attValueOrThrow(elem, "id")
     val staticReadonlyOpt   = attValueOpt(elem, "static")
-    val relevantOpt         = attValueOpt(elem, "relevant")
-    val readonlyOpt         = attValueOpt(elem, "readonly")
-    val requiredOpt         = attValueOpt(elem, "required")
+    val relevantOpt         = booleanAttValueOpt(elem, "relevant")
+    val readonlyOpt         = booleanAttValueOpt(elem, "readonly")
+    val requiredOpt         = booleanAttValueOpt(elem, "required")
     val classesOpt          = attValueOpt(elem, "class")
     val newLevelOpt         = attValueOpt(elem, "level")
     val progressStateOpt    = attValueOpt(elem, "progress-state")
     val progressReceivedOpt = attValueOpt(elem, "progress-received")
     val progressExpectedOpt = attValueOpt(elem, "progress-expected")
     val newSchemaTypeOpt    = attValueOpt(elem, "type")
-    val newVisitedOpt       = attValueOpt(elem, "visited")
+    val newVisitedOpt       = booleanAttValueOpt(elem, "visited")
 
     var documentElement = dom.document.getElementById(controlId).asInstanceOf[html.Element]
 
@@ -739,8 +740,6 @@ object XFormsUI {
     }
 
     val isLeafControl = documentElement.classList.contains("xforms-control")
-
-    var recreatedInput = false
 
     // TODO: 2024-05-27: Unsure if this should ever kick in or if the logic is up to date!
     var isStaticReadonly = documentElement.classList.contains("xforms-static")
@@ -760,24 +759,23 @@ object XFormsUI {
     // can fail on IE in some cases. (The details about this issue have been lost.)
 
     // Handle becoming relevant
-    if (relevantOpt.contains("true"))
+    if (relevantOpt.contains(true))
       Controls.setRelevant(documentElement, relevant = true)
 
-    val newRecreatedInput = maybeUpdateSchemaType(documentElement, controlId, newSchemaTypeOpt, formID)
-    if (newRecreatedInput) {
+    val recreatedInput = maybeUpdateSchemaType(documentElement, controlId, newSchemaTypeOpt, formID)
+    if (recreatedInput)
       recreatedInputs(controlId) = documentElement
-      recreatedInput = true
-    }
 
     // Handle required
     requiredOpt.foreach {
-      case "true"  => documentElement.classList.add("xforms-required")
-      case _       => documentElement.classList.remove("xforms-required")
+      case true  => documentElement.classList.add("xforms-required")
+      case false => documentElement.classList.remove("xforms-required")
     }
 
     // Handle readonly
-    if (readonlyOpt != null && ! isStaticReadonly)
-      Controls.setReadonly(documentElement, readonlyOpt.contains("true"))
+    if (! isStaticReadonly)
+      readonlyOpt
+        .foreach(Controls.setReadonly(documentElement, _))
 
     // Handle updates to custom classes
     classesOpt.foreach { classes =>
@@ -828,11 +826,11 @@ object XFormsUI {
     progressStateOpt           : Option[String],
     progressReceivedOpt        : Option[String],
     progressExpectedOpt        : Option[String],
-    newVisitedOpt              : Option[String],
+    newVisitedOpt              : Option[Boolean],
     controlId                  : String,
     recreatedInput             : Boolean,
     controlsWithUpdatedItemsets: js.Dictionary[Boolean],
-    relevantOpt                : Option[String]
+    relevantOpt                : Option[Boolean]
   ): Unit = {
 
     // Store new label message in control attribute
@@ -881,7 +879,7 @@ object XFormsUI {
 
     // Handle visited flag
     newVisitedOpt
-      .foreach(newVisited => Controls.updateVisited(documentElement, newVisited == "true"))
+      .foreach(Controls.updateVisited(documentElement, _))
 
     // Nested elements
     elem.children.foreach { childNode =>
@@ -897,7 +895,7 @@ object XFormsUI {
 
     // Handle becoming non-relevant after everything so that XBL companion class instances
     // are nulled and can be garbage-collected
-    if (relevantOpt.contains("false"))
+    if (relevantOpt.contains(false))
       Controls.setRelevant(documentElement, relevant = false)
   }
 
@@ -929,7 +927,7 @@ object XFormsUI {
     staticReadonlyOpt: Option[String],
     isLeafControl    : Boolean
   ): html.Element =
-    if (! documentElement.classList.contains("xforms-static") && staticReadonlyOpt.contains("true")) {
+    if (! documentElement.classList.contains("xforms-static") && staticReadonlyOpt.map(_.toBoolean).exists(_ == true)) {
       if (isLeafControl) {
         val parentElement = documentElement.parentNode.asInstanceOf[html.Element]
         val newDocumentElement = dom.document.createElement("span").asInstanceOf[html.Element]
@@ -965,23 +963,23 @@ object XFormsUI {
   private def updateCustomAttributes(
     documentElement: html.Element,
     elem           : raw.Element,
-    requiredOpt    : Option[String],
-    newVisitedOpt  : Option[String],
+    requiredOpt    : Option[Boolean],
+    newVisitedOpt  : Option[Boolean],
     newLevelOpt    : Option[String],
   ): Unit = {
     if (AriaControlClasses.exists(documentElement.classList.contains)) {
       Option(documentElement.querySelector("input, textarea, select").asInstanceOf[html.Element]).foreach { firstInput =>
 
         requiredOpt.foreach {
-          case "true"  => firstInput.setAttribute("aria-required", "true")
-          case _       => firstInput.removeAttribute("aria-required")
+          case true  => firstInput.setAttribute("aria-required", true.toString)
+          case false => firstInput.removeAttribute("aria-required")
         }
 
-        val visited = newVisitedOpt.map(_ == "true") .getOrElse(documentElement.classList.contains("xforms-visited"))
-        val invalid = newLevelOpt  .map(_ == "error").getOrElse(documentElement.classList.contains("xforms-invalid"))
+        val visited = newVisitedOpt.getOrElse(documentElement.classList.contains("xforms-visited"))
+        val invalid = newLevelOpt.map(_ == "error").getOrElse(documentElement.classList.contains("xforms-invalid"))
 
         if (invalid && visited)
-          firstInput.setAttribute("aria-invalid", "true")
+          firstInput.setAttribute("aria-invalid", true.toString)
         else
           firstInput.removeAttribute("aria-invalid")
       }
@@ -1246,7 +1244,7 @@ object XFormsUI {
           val attributes = js.undefined // js.UndefOr[js.Dictionary[String]]
           val children   = js.undefined
           val label      = js.undefined
-          val value      = "true"
+          val value      = true.toString
           val help       = js.undefined
           val hint       = js.undefined
         }
@@ -1459,6 +1457,9 @@ object XFormsUI {
         Option(elem.getAttribute(name)) // `Some()` should be ok but just in case...
       else
         None
+
+    def booleanAttValueOpt(elem: raw.Element, name: String): Option[Boolean] =
+      attValueOpt(elem, name).map(_.toBoolean)
 
     def showModalProgressPanelRaw(): Unit = {
       val elem = findLoaderElem getOrElse createLoaderElem

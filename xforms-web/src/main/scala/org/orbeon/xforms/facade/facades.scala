@@ -100,6 +100,19 @@ object Controls extends js.Object {
   def getHelpMessage(elem: html.Element)                                                                 : String                                       = js.native
   def setRepeatIterationRelevance(formID: String, repeatID: String, iteration: String, relevant: Boolean): Unit                                         = js.native
   def getControlLHHA(documentElement: html.Element, lhha: String)                                        : js.UndefOr[html.Element]                     = js.native
+
+  def setLabelMessage(documentElement: html.Element, newLabel: String)                                   : Unit                                         = js.native
+  def setHelpMessage(documentElement: html.Element, newHelp: String)                                     : Unit                                         = js.native
+  def setHintMessage(documentElement: html.Element, newHint: String)                                     : Unit                                         = js.native
+  def setAlertMessage(documentElement: html.Element, newAlert: String)                                   : Unit                                         = js.native
+  def setConstraintLevel(documentElement: html.Element, newLevel: String)                                : Unit                                         = js.native
+  def setRelevant(documentElement: html.Element, relevant: Boolean)                                      : Unit                                         = js.native
+  def setReadonly(documentElement: html.Element, readonly: Boolean)                                      : Unit                                         = js.native
+  def updateVisited(documentElement: html.Element, newVisited: Boolean)                                  : Unit                                         = js.native
+  def updateRequiredEmpty(documentElement: html.Element, emptyAttr: String)                              : Unit                                         = js.native
+
+  def toggleCase(id: String, visible: Boolean)                                                           : Unit                                         = js.native
+
   val afterValueChange                                                                                   : YUICustomEvent                               = js.native
 }
 

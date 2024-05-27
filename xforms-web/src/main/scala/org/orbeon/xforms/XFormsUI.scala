@@ -39,10 +39,11 @@ import scala.collection.immutable
 import scala.concurrent.duration.{span => _, _}
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
+import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers.SetTimeoutHandle
-import scala.scalajs.js.{timers, |}
+import scala.scalajs.js.{JSON, timers, |}
 import scala.util.control.NonFatal
 
 
@@ -678,12 +679,11 @@ object XFormsUI {
     val hint      : js.UndefOr[String]
   }
 
-  @JSExport
-  def updateItemset(
+  private def updateItemset(
     documentElement: html.Element,
     controlId      : String,
     itemsetTree    : js.Array[ItemsetItem],
-    groupName      : String
+    groupName      : Option[String]
   ): Unit =
     if (
       documentElement.classList.contains("xforms-select1-appearance-compact") ||
@@ -699,9 +699,406 @@ object XFormsUI {
         controlId        = controlId,
         itemsetTree      = itemsetTree,
         isSelect         = documentElement.classList.contains("xforms-select"),
-        groupNameOpt     = Option(groupName),
+        groupNameOpt     = groupName,
         clearChildrenOpt = Some(_.replaceChildren())
       )
+
+  @JSExport
+  def handleControl(
+    elem                       : raw.Element,
+    recreatedInputs            : js.Dictionary[html.Element],
+    controlsWithUpdatedItemsets: js.Dictionary[Boolean],
+    formID                     : String
+  ): Unit = {
+
+    val controlId           = attValueOrThrow(elem, "id")
+    val staticReadonlyOpt   = attValueOpt(elem, "static")
+    val relevantOpt         = attValueOpt(elem, "relevant")
+    val readonlyOpt         = attValueOpt(elem, "readonly")
+    val requiredOpt         = attValueOpt(elem, "required")
+    val classesOpt          = attValueOpt(elem, "class")
+    val newLevelOpt         = attValueOpt(elem, "level")
+    val progressStateOpt    = attValueOpt(elem, "progress-state")
+    val progressReceivedOpt = attValueOpt(elem, "progress-received")
+    val progressExpectedOpt = attValueOpt(elem, "progress-expected")
+    val newSchemaTypeOpt    = attValueOpt(elem, "type")
+    val newVisitedOpt       = attValueOpt(elem, "visited")
+
+    var documentElement = dom.document.getElementById(controlId).asInstanceOf[html.Element]
+
+    // Done to fix #2935; can be removed when we have taken care of #2940
+    if (documentElement == null && (controlId  == "fb-static-upload-empty" || controlId == "fb-static-upload-non-empty"))
+      return
+
+    if (documentElement == null) {
+      documentElement = dom.document.getElementById(s"group-begin-$controlId").asInstanceOf[html.Element]
+      if (documentElement == null) {
+        logger.error(s"Can't find element or iteration with ID '$controlId'")
+        // TODO: throw?
+      }
+    }
+
+    val isLeafControl = documentElement.classList.contains("xforms-control")
+
+    var recreatedInput = false
+
+    // TODO: 2024-05-27: Unsure if this should ever kick in or if the logic is up to date!
+    var isStaticReadonly = documentElement.classList.contains("xforms-static")
+    val newDocumentElement =
+      maybeMigrateToStatic(
+        documentElement,
+        controlId,
+        staticReadonlyOpt,
+        isLeafControl
+      )
+    if (newDocumentElement ne documentElement) {
+      documentElement = newDocumentElement
+      isStaticReadonly = true
+    }
+
+    // We update the relevance and readonly before we update the value. If we don't, updating the value
+    // can fail on IE in some cases. (The details about this issue have been lost.)
+
+    // Handle becoming relevant
+    if (relevantOpt.contains("true"))
+      Controls.setRelevant(documentElement, relevant = true)
+
+    val newRecreatedInput = maybeUpdateSchemaType(documentElement, controlId, newSchemaTypeOpt, formID)
+    if (newRecreatedInput) {
+      recreatedInputs(controlId) = documentElement
+      recreatedInput = true
+    }
+
+    // Handle required
+    requiredOpt.foreach {
+      case "true"  => documentElement.classList.add("xforms-required")
+      case _       => documentElement.classList.remove("xforms-required")
+    }
+
+    // Handle readonly
+    if (readonlyOpt != null && ! isStaticReadonly)
+      Controls.setReadonly(documentElement, readonlyOpt.contains("true"))
+
+    // Handle updates to custom classes
+    classesOpt.foreach { classes =>
+      classes.splitTo[List]().foreach { currentClass =>
+        if (currentClass.startsWith("-"))
+          documentElement.classList.remove(currentClass.substring(1))
+        else {
+          // '+' is optional
+          documentElement.classList.add(
+            if (currentClass.charAt(0) == '+')
+              currentClass.substring(1)
+            else
+              currentClass
+          )
+        }
+      }
+    }
+
+    // Update the `required-empty`/`required-full` even if the required has not changed or
+    // is not specified as the value may have changed
+    if (! isStaticReadonly)
+      attValueOpt(elem, "empty")
+        .foreach(Controls.updateRequiredEmpty(documentElement, _))
+
+    // Custom attributes on controls
+    if (isLeafControl)
+      updateCustomAttributes(documentElement, elem, requiredOpt, newVisitedOpt, newLevelOpt)
+
+    updateControlAttributes(
+      documentElement,
+      elem,
+      newLevelOpt,
+      progressStateOpt,
+      progressReceivedOpt,
+      progressExpectedOpt,
+      newVisitedOpt,
+      controlId,
+      recreatedInput,
+      controlsWithUpdatedItemsets,
+      relevantOpt
+    )
+  }
+
+  private def updateControlAttributes(
+    documentElement            : html.Element,
+    elem                       : raw.Element,
+    newLevelOpt                : Option[String],
+    progressStateOpt           : Option[String],
+    progressReceivedOpt        : Option[String],
+    progressExpectedOpt        : Option[String],
+    newVisitedOpt              : Option[String],
+    controlId                  : String,
+    recreatedInput             : Boolean,
+    controlsWithUpdatedItemsets: js.Dictionary[Boolean],
+    relevantOpt                : Option[String]
+  ): Unit = {
+
+    // Store new label message in control attribute
+    attValueOpt(elem, "label") foreach { newLabel =>
+      Controls.setLabelMessage(documentElement, newLabel)
+    }
+
+    // Store new hint message in control attribute
+    // See also https://github.com/orbeon/orbeon-forms/issues/3561
+    attValueOpt(elem, "hint") match {
+      case Some(newHint) =>
+        Controls.setHintMessage(documentElement, newHint)
+      case None =>
+        attValueOpt(elem, "title") foreach { newTitle =>
+          Controls.setHintMessage(documentElement, newTitle)
+        }
+    }
+
+    // Store new help message in control attribute
+    attValueOpt(elem, "help") foreach { newHelp =>
+      Controls.setHelpMessage(documentElement, newHelp)
+    }
+
+    // Store new alert message in control attribute
+    attValueOpt(elem, "alert") foreach { newAlert =>
+      Controls.setAlertMessage(documentElement, newAlert)
+    }
+
+    // Store validity, label, hint, help in element
+    newLevelOpt
+      .foreach(Controls.setConstraintLevel(documentElement, _))
+
+    // Handle progress for upload controls
+    // The attribute `progress-expected="…"` could be missing, even if we have a
+    // progress-received="50591"` (see `expectedSize` which is an `Option` in `UploadProgress`),
+    // in which case we don't have a "progress" to report to the progress bar.
+    (progressStateOpt, progressExpectedOpt) match {
+      case (Some(progressState), Some(progressExpected)) if progressState.nonAllBlank && progressExpected.nonAllBlank =>
+        Page.getUploadControl(documentElement).progress(
+        progressState,
+        progressReceivedOpt.getOrElse(throw new IllegalArgumentException).toInt,
+        progressExpected.toInt
+      )
+      case _ =>
+    }
+
+    // Handle visited flag
+    newVisitedOpt
+      .foreach(newVisited => Controls.updateVisited(documentElement, newVisited == "true"))
+
+    // Nested elements
+    elem.children.foreach { childNode =>
+      Support.getLocalName(childNode) match {
+        case "itemset" => handleItemset(childNode, controlId, controlsWithUpdatedItemsets)
+        case "case"    => handleSwitchCase(childNode)
+        case _         =>
+      }
+    }
+
+    // Must handle `value` after `itemset`
+    handleValues(elem, controlId, recreatedInput, controlsWithUpdatedItemsets)
+
+    // Handle becoming non-relevant after everything so that XBL companion class instances
+    // are nulled and can be garbage-collected
+    if (relevantOpt.contains("false"))
+      Controls.setRelevant(documentElement, relevant = false)
+  }
+
+  private def handleItemset(elem: raw.Element, controlId: String, controlsWithUpdatedItemsets : js.Dictionary[Boolean]): Unit = {
+
+    val itemsetTree     = Option(JSON.parse(elem.textContent).asInstanceOf[js.Array[ItemsetItem]]).getOrElse(js.Array())
+    val documentElement = dom.document.getElementById(controlId).asInstanceOf[html.Element]
+    val groupName       = attValueOpt(elem, "group")
+
+    controlsWithUpdatedItemsets(controlId) = true
+
+    updateItemset(documentElement, controlId, itemsetTree, groupName)
+
+    // Call legacy global custom listener if any
+    if (js.typeOf(g.xformsItemsetUpdatedListener) != "undefined")
+      g.xformsItemsetUpdatedListener.asInstanceOf[js.Function2[String, js.Array[ItemsetItem], js.Any]]
+        .apply(controlId, itemsetTree)
+  }
+
+  private def handleSwitchCase(elem: raw.Element): Unit = {
+    val id      = attValueOrThrow(elem, "id")
+    val visible = attValueOrThrow(elem, "visibility") == "visible"
+    Controls.toggleCase(id, visible)
+  }
+
+  private def maybeMigrateToStatic(
+    documentElement  : html.Element,
+    controlId        : String,
+    staticReadonlyOpt: Option[String],
+    isLeafControl    : Boolean
+  ): html.Element =
+    if (! documentElement.classList.contains("xforms-static") && staticReadonlyOpt.contains("true")) {
+      if (isLeafControl) {
+        val parentElement = documentElement.parentNode.asInstanceOf[html.Element]
+        val newDocumentElement = dom.document.createElement("span").asInstanceOf[html.Element]
+        newDocumentElement.setAttribute("id", controlId)
+
+        newDocumentElement.classList = documentElement.classList;
+        newDocumentElement.classList.add("xforms-static")
+        parentElement.replaceChild(newDocumentElement, documentElement)
+
+        Controls.getControlLHHA(newDocumentElement, "alert")
+          .foreach(parentElement.removeChild)
+
+        Controls.getControlLHHA(newDocumentElement, "hint")
+          .foreach(parentElement.removeChild)
+
+          newDocumentElement
+      } else {
+        documentElement.classList.add("xforms-static")
+        documentElement
+      }
+    } else {
+      documentElement
+    }
+
+  private val AriaControlClasses = Set(
+    "xforms-input",
+    "xforms-textarea",
+    "xforms-secret",
+    "xforms-select1-appearance-compact", // .xforms-select1
+    "xforms-select1-appearance-minimal"  // .xforms-select1
+  )
+
+  private def updateCustomAttributes(
+    documentElement: html.Element,
+    elem           : raw.Element,
+    requiredOpt    : Option[String],
+    newVisitedOpt  : Option[String],
+    newLevelOpt    : Option[String],
+  ): Unit = {
+    if (AriaControlClasses.exists(documentElement.classList.contains)) {
+      Option(documentElement.querySelector("input, textarea, select").asInstanceOf[html.Element]).foreach { firstInput =>
+
+        requiredOpt.foreach {
+          case "true"  => firstInput.setAttribute("aria-required", "true")
+          case _       => firstInput.removeAttribute("aria-required")
+        }
+
+        val visited = newVisitedOpt.map(_ == "true") .getOrElse(documentElement.classList.contains("xforms-visited"))
+        val invalid = newLevelOpt  .map(_ == "error").getOrElse(documentElement.classList.contains("xforms-invalid"))
+
+        if (invalid && visited)
+          firstInput.setAttribute("aria-invalid", "true")
+        else
+          firstInput.removeAttribute("aria-invalid")
+      }
+    }
+
+    if (documentElement.classList.contains("xforms-upload")) {
+      // Additional attributes for xf:upload
+      // <xxf:control id="xforms-control-id"
+      //    state="empty|file"
+      //    accept=".txt"
+      //    filename="filename.txt" mediatype="text/plain" size="23kb"/>
+
+      val fileNameSpan  = documentElement.querySelector(".xforms-upload-filename")
+      val mediatypeSpan = documentElement.querySelector(".xforms-upload-mediatype")
+      val sizeSpan      = documentElement.querySelector(".xforms-upload-size")
+      val uploadSelect  = documentElement.querySelector(".xforms-upload-select").asInstanceOf[html.Input]
+
+      // Set values in DOM
+      val upload = Page.getUploadControl(documentElement)
+
+      val state     = attValueOpt(elem, "state")
+      val fileName  = attValueOpt(elem, "filename")
+      val mediatype = attValueOpt(elem, "mediatype")
+      val size      = attValueOpt(elem, "size")
+      val accept    = attValueOpt(elem, "accept")
+
+      state.foreach(upload.setState)
+      fileName .foreach(fileNameSpan .textContent = _)
+      mediatype.foreach(mediatypeSpan.textContent = _)
+      size     .foreach(sizeSpan     .textContent = _)
+      // NOTE: Server can send a space-separated value but `accept` expects a comma-separated value
+      accept.foreach(a => uploadSelect.accept = a.splitTo[List]().mkString(","))
+
+    } else if (documentElement.classList.contains("xforms-output") || documentElement.classList.contains("xforms-static")) {
+
+      attValueOpt(elem, "alt").foreach { alt =>
+        if (documentElement.classList.contains("xforms-mediatype-image")) {
+          val img = documentElement.querySelector(":scope > img").asInstanceOf[html.Image]
+          img.alt = alt
+        }
+      }
+
+      if (documentElement.classList.contains("xforms-output-appearance-xxforms-download")) {
+        attValueOpt(elem, "download").foreach { download =>
+          val aElem = documentElement.querySelector(".xforms-output-output").asInstanceOf[html.Anchor]
+          aElem.asInstanceOf[js.Dynamic].download = download
+        }
+      }
+    } else if (documentElement.classList.contains("xforms-trigger") || documentElement.classList.contains("xforms-submit")) {
+        // It isn't a control that can hold a value (e.g. trigger) and there is no point in trying to update it
+        // NOP
+    } else if (documentElement.classList.contains("xforms-input") || documentElement.classList.contains("xforms-secret")) {
+        // Additional attributes for xf:input and xf:secret
+
+      val inputSize         = attValueOpt(elem, "size")
+      val maxlength         = attValueOpt(elem, "maxlength")
+      val inputAutocomplete = attValueOpt(elem, "autocomplete")
+
+      // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be
+      // the best thing to do.
+
+      val input = documentElement.querySelector("input").asInstanceOf[html.Input]
+
+      inputSize.foreach { size =>
+        if (size.isEmpty)
+          input.removeAttribute("size")
+        else
+          input.size = size.toInt
+      }
+
+      maxlength.foreach { maxlength =>
+        if (maxlength.isEmpty)
+          input.removeAttribute("maxlength")
+        else
+          input.maxLength = maxlength.toInt
+      }
+
+      inputAutocomplete.foreach { inputAutocomplete =>
+        if (inputAutocomplete.isEmpty)
+          input.removeAttribute("autocomplete")
+        else
+          input.autocomplete = inputAutocomplete
+      }
+
+    } else if (documentElement.classList.contains("xforms-textarea")) {
+      // Additional attributes for xf:textarea
+
+      val maxlength    = attValueOpt(elem, "maxlength")
+      val textareaCols = attValueOpt(elem, "cols")
+      val textareaRows = attValueOpt(elem, "rows")
+
+      val textarea = documentElement.querySelector("textarea").asInstanceOf[html.TextArea]
+
+      // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be
+      // the best thing to do.
+      maxlength.foreach { maxlength =>
+        if (maxlength.isEmpty)
+          textarea.removeAttribute("maxlength")
+        else
+          textarea.maxLength = maxlength.toInt
+      }
+
+      textareaCols.foreach { textareaCols =>
+        if (textareaCols.isEmpty)
+          textarea.removeAttribute("cols")
+        else
+          textarea.cols = textareaCols.toInt
+      }
+
+      textareaRows.foreach { textareaRows =>
+        if (textareaRows.isEmpty)
+          textarea.removeAttribute("rows")
+        else
+          textarea.rows = textareaRows.toInt
+      }
+    }
+  }
 
   private val TypePrefix = "xforms-type-"
 
@@ -723,55 +1120,55 @@ object XFormsUI {
     case object String  extends InputType
   }
 
-  @JSExport
-  def maybeUpdateSchemaType(
+  private def maybeUpdateSchemaType(
     documentElement: html.Element,
     controlId      : String,
-    newSchemaType  : String,
+    newSchemaType  : Option[String],
     formID         : String,
   ): Boolean =
-    if (newSchemaType != null) {
+    newSchemaType match  {
+        case Some(newSchemaType) =>
 
-      val newSchemaTypeQName =
-        newSchemaType.trimAllToOpt match {
-          case None    => Names.XsString
-          case Some(s) => QName.fromClarkName(s).getOrElse(throw new IllegalArgumentException(s"Invalid schema type: `$s`"))
+        val newSchemaTypeQName =
+          newSchemaType.trimAllToOpt match {
+            case None    => Names.XsString
+            case Some(s) => QName.fromClarkName(s).getOrElse(throw new IllegalArgumentException(s"Invalid schema type: `$s`"))
+          }
+
+        lazy val newInputType =
+          newSchemaTypeQName match {
+            case Names.XsBoolean | Names.XfBoolean => InputType.Boolean
+            case _                                 => InputType.String
+          }
+
+        lazy val existingInputType =
+          TypeCssClassToInputType
+            .collectFirst { case (className, inputType) if documentElement.classList.contains(className) => inputType }
+            .getOrElse(InputType.String)
+
+        val mustUpdateInputType =
+          documentElement.classList.contains("xforms-input") && existingInputType != newInputType
+
+        if (mustUpdateInputType)
+          updateInputType(documentElement, controlId, newInputType, formID)
+
+        // Remove existing CSS `xforms-type-*` classes
+        documentElement
+          .className
+          .splitTo[List]()
+          .filter(_.startsWith(TypePrefix))
+          .foreach(documentElement.classList.remove)
+
+        // Add new CSS `xforms-type-*` class
+        newSchemaTypeQName match { case QName(localName, Namespace(_, uri)) =>
+          val isBuiltIn = uri == Namespaces.XS || uri == Namespaces.XF
+          val newClass = s"$TypePrefix${if (isBuiltIn) "" else "custom-"}$localName"
+          documentElement.classList.add(newClass)
         }
 
-      lazy val newInputType =
-        newSchemaTypeQName match {
-          case Names.XsBoolean | Names.XfBoolean => InputType.Boolean
-          case _                                 => InputType.String
-        }
-
-      lazy val existingInputType =
-        TypeCssClassToInputType
-          .collectFirst { case (className, inputType) if documentElement.classList.contains(className) => inputType }
-          .getOrElse(InputType.String)
-
-      val mustUpdateInputType =
-        documentElement.classList.contains("xforms-input") && existingInputType != newInputType
-
-      if (mustUpdateInputType)
-        updateInputType(documentElement, controlId, newInputType, formID)
-
-      // Remove existing CSS `xforms-type-*` classes
-      documentElement
-        .className
-        .splitTo[List]()
-        .filter(_.startsWith(TypePrefix))
-        .foreach(documentElement.classList.remove)
-
-      // Add new CSS `xforms-type-*` class
-      newSchemaTypeQName match { case QName(localName, Namespace(_, uri)) =>
-        val isBuiltIn = uri == Namespaces.XS || uri == Namespaces.XF
-        val newClass = s"$TypePrefix${if (isBuiltIn) "" else "custom-"}$localName"
-        documentElement.classList.add(newClass)
-      }
-
-      mustUpdateInputType
-    } else {
-      false
+        mustUpdateInputType
+      case None =>
+        false
     }
 
   private def updateInputType(

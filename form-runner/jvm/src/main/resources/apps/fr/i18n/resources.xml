@@ -206,6 +206,7 @@
             <titles>
                 <summary-title>Summary</summary-title>
                 <delete-confirmation>Confirm Deletion</delete-confirmation>
+                <document-id>Document Id</document-id>
                 <created>Created</created>
                 <modified>Modified</modified>
                 <last-modified>Modified</last-modified>
@@ -298,6 +299,12 @@
                 <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label>Excel Export Options</label>
+                <headings-labels>Use labels for headings</headings-labels>
+                <selection-controls-labels>Use labels for selection controls</selection-controls-labels>
+                <include-document-id>Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -894,6 +901,7 @@
             <titles>
                 <summary-title>Sommaire</summary-title>
                 <delete-confirmation>Confirmer la suppression</delete-confirmation>
+                <document-id>Document Id</document-id>
                 <created>Création</created>
                 <modified>Modification</modified>
                 <last-modified>Modification</last-modified>
@@ -986,6 +994,12 @@
                 <dateTime>[D] [Mn] [Y] à [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[D] [Mn] [Y] à [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label>Options Export Excel</label>
+                <headings-labels>Utiliser les libellés pour l'en-tête</headings-labels>
+                <selection-controls-labels>Utiliser les libellés pour les contrôles de selection</selection-controls-labels>
+                <include-document-id>Inclure la column identifiant de document</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -1580,6 +1594,7 @@
             <titles>
                 <summary-title>Resumen</summary-title>
                 <delete-confirmation>Confirma Eliminación</delete-confirmation>
+                <document-id todo="true">Document Id</document-id>
                 <created>Creado</created>
                 <modified>Modificación</modified>
                 <last-modified>Modificación</last-modified>
@@ -1672,6 +1687,12 @@
                 <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label todo="true">Excel Export Options</label>
+                <headings-labels todo="true">Use labels for headings</headings-labels>
+                <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
+                <include-document-id todo="true">Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -2262,6 +2283,7 @@
             <titles>
                 <summary-title>Resúm</summary-title>
                 <delete-confirmation>Confirma Eliminació</delete-confirmation>
+                <document-id todo="true">Document Id</document-id>
                 <created>Creat</created>
                 <modified>Modificació</modified>
                 <last-modified>Modificació</last-modified>
@@ -2355,6 +2377,12 @@
                 <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label todo="true">Excel Export Options</label>
+                <headings-labels todo="true">Use labels for headings</headings-labels>
+                <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
+                <include-document-id todo="true">Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -2967,6 +2995,7 @@
             <titles>
                 <summary-title>Oppsummering</summary-title>
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
+                <document-id todo="true">Document Id</document-id>
                 <created>Opprettet</created>
                 <modified>Sist endret</modified>
                 <last-modified>Sist endret</last-modified>
@@ -3059,6 +3088,12 @@
                 <dateTime>[D] [MNn], [Y] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[D] [MNn], [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label todo="true">Excel Export Options</label>
+                <headings-labels todo="true">Use labels for headings</headings-labels>
+                <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
+                <include-document-id todo="true">Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -3642,6 +3677,7 @@
             <titles>
                 <summary-title>Общая информация</summary-title>
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
+                <document-id todo="true">Document Id</document-id>
                 <created>Дата создания</created>
                 <modified>Дата изменения</modified>
                 <last-modified>Дата изменения</last-modified>
@@ -3734,6 +3770,12 @@
                 <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[D] [MNn] [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label todo="true">Excel Export Options</label>
+                <headings-labels todo="true">Use labels for headings</headings-labels>
+                <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
+                <include-document-id todo="true">Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -4322,6 +4364,7 @@
             <titles>
                 <summary-title>Sommario</summary-title>
                 <delete-confirmation>Conferma cancella</delete-confirmation>
+                <document-id todo="true">Document Id</document-id>
                 <created>Creato</created>
                 <modified>Modificato</modified>
                 <last-modified>Modificato</last-modified>
@@ -4414,6 +4457,12 @@
                 <dateTime>[D] [MNn] [Y] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[D] [MNn] [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label todo="true">Excel Export Options</label>
+                <headings-labels todo="true">Use labels for headings</headings-labels>
+                <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
+                <include-document-id todo="true">Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -5006,6 +5055,7 @@
             <titles>
                 <summary-title>Übersicht</summary-title>
                 <delete-confirmation>Löschen bestätigen</delete-confirmation>
+                <document-id todo="true">Document Id</document-id>
                 <created>Erstellt</created>
                 <modified>Änderungsdatum</modified>
                 <last-modified>Änderungsdatum</last-modified>
@@ -5098,6 +5148,12 @@
                 <dateTime>[D]. [Mn] [Y] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[D]. [MNn] [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label todo="true">Excel Export Options</label>
+                <headings-labels todo="true">Use labels for headings</headings-labels>
+                <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
+                <include-document-id todo="true">Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -5690,6 +5746,7 @@
             <titles>
                 <summary-title>Yhteenveto</summary-title>
                 <delete-confirmation>Vahvista poistaminen</delete-confirmation>
+                <document-id todo="true">Document Id</document-id>
                 <created>Luotu</created>
                 <modified>Viimeksi muokattu</modified>
                 <last-modified>Viimeksi muokattu</last-modified>
@@ -5782,6 +5839,12 @@
                 <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label todo="true">Excel Export Options</label>
+                <headings-labels todo="true">Use labels for headings</headings-labels>
+                <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
+                <include-document-id todo="true">Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -6374,6 +6437,7 @@
             <titles>
                 <summary-title>Sammanställning</summary-title>
                 <delete-confirmation>Bekräfta borttag</delete-confirmation>
+                <document-id todo="true">Document Id</document-id>
                 <created>Skapad</created>
                 <modified>Ändrad</modified>
                 <last-modified>Ändrad</last-modified>
@@ -6466,6 +6530,12 @@
                 <dateTime>[Y0001]-[M01]-[D01] [H]:[m]:[s]</dateTime>
                 <save-datetime>[Y0001]-[M01]-[D01] [H]:[m]:[s]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label todo="true">Excel Export Options</label>
+                <headings-labels todo="true">Use labels for headings</headings-labels>
+                <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
+                <include-document-id todo="true">Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -7058,6 +7128,7 @@
             <titles>
                 <summary-title>Samenvatting</summary-title>
                 <delete-confirmation>Verwijderen bevestigen</delete-confirmation>
+                <document-id todo="true">Document Id</document-id>
                 <created>Aangemaakt</created>
                 <modified>Bewerkt</modified>
                 <last-modified>Bewerkt</last-modified>
@@ -7150,6 +7221,12 @@
                 <dateTime>[D] [MNn] [Y] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[D] [MNn] [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label todo="true">Excel Export Options</label>
+                <headings-labels todo="true">Use labels for headings</headings-labels>
+                <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
+                <include-document-id todo="true">Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -7742,6 +7819,7 @@
             <titles>
                 <summary-title>Sumário</summary-title>
                 <delete-confirmation>Deseja apagar</delete-confirmation>
+                <document-id todo="true">Document Id</document-id>
                 <created>Criado</created>
                 <modified>Modificado</modified>
                 <last-modified>Modificado</last-modified>
@@ -7834,6 +7912,12 @@
                 <dateTime>[D] [MNn], [Y] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[D] [MNn], [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label todo="true">Excel Export Options</label>
+                <headings-labels todo="true">Use labels for headings</headings-labels>
+                <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
+                <include-document-id todo="true">Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -8420,6 +8504,7 @@
             <titles>
                 <summary-title>Resumé</summary-title>
                 <delete-confirmation>Bekræft sletning</delete-confirmation>
+                <document-id todo="true">Document Id</document-id>
                 <created>Oprettet</created>
                 <modified>Senest ændret</modified>
                 <last-modified>Senest ændret</last-modified>
@@ -8512,6 +8597,12 @@
                 <dateTime>[D]. [MNn] [Y], [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[D]. [MNn] [Y], [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label todo="true">Excel Export Options</label>
+                <headings-labels todo="true">Use labels for headings</headings-labels>
+                <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
+                <include-document-id todo="true">Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>
@@ -9101,6 +9192,7 @@
             <titles>
                 <summary-title>Podsumowanie</summary-title>
                 <delete-confirmation>Potwierdź usunięcie</delete-confirmation>
+                <document-id todo="true">Document Id</document-id>
                 <created>Utworzony</created>
                 <modified>Zmodyfikowany</modified>
                 <last-modified>Zmodyfikowany</last-modified>
@@ -9193,6 +9285,12 @@
                 <dateTime>[Y]-[M]-[D] [H01]:[m01]:[s01]</dateTime>
                 <save-datetime>[Y]-[M]-[D] [H01]:[m01]:[s01]</save-datetime>
             </formats>
+            <export-with-search-dialog>
+                <label todo="true">Excel Export Options</label>
+                <headings-labels todo="true">Use labels for headings</headings-labels>
+                <selection-controls-labels todo="true">Use labels for selection controls</selection-controls-labels>
+                <include-document-id todo="true">Include document id column</include-document-id>
+            </export-with-search-dialog>
         </summary>
         <detail>
             <messages>

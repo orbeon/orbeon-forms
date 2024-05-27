@@ -229,7 +229,7 @@
                 <xf:dispatch name="fr-reset-search" targetid="fr-form-model"/>
             </xf:action>
 
-            <xf:action event="fr-summary-export">
+            <xf:action event="fr-summary-export-">
                 <xf:load
                     resource="{
                         frf:buildSummaryLinkButton(
@@ -244,10 +244,25 @@
             </xf:action>
 
             <xf:action event="fr-summary-export-with-search">
-                <xf:send submission="fr-summary-export-with-search-submission">
-                    <xf:property name="fr-export-format" value="event('fr-export-format')"/>
-                </xf:send>
+                <xxf:show dialog="fr-export-with-search-dialog">
+                    <xf:property name="export-format" value="event('fr-export-format')"/>
+                </xxf:show>
             </xf:action>
+
+            <xf:instance id="fr-export-with-search-options-instance">
+                <_>
+                    <export-format/>
+                    <headings-labels/>
+                    <selection-controls-labels/>
+                    <include-document-id/>
+                </_>
+            </xf:instance>
+
+            <xf:bind ref="instance('fr-export-with-search-options-instance')">
+                <xf:bind ref="headings-labels"           type="xs:boolean" xxf:default="true()"/>
+                <xf:bind ref="selection-controls-labels" type="xs:boolean" xxf:default="true()"/>
+                <xf:bind ref="include-document-id"       type="xs:boolean" xxf:default="false()"/>
+            </xf:bind>
 
             <!-- Instance to track search results and paging -->
             <!-- NOTE: As of 2011-11-28, `app` and `form` are not set by us. We leave them in for now because the
@@ -745,7 +760,16 @@
                 ref="instance('fr-search-instance')"
                 validate="false"
                 method="post"
-                resource="/fr/service/{$app}/{$form}/export-with-search?export-format={event('fr-export-format')}"
+                resource="
+                    /fr/service/{$app}/{$form}/export-with-search?export-format={
+                        event('fr-export-format')
+                    }&amp;headings-labels={
+                        event('fr-headings-labels')
+                    }&amp;include-document-id={
+                        event('fr-include-document-id')
+                    }&amp;selection-controls-labels={
+                        event('fr-selection-controls-labels')
+                    }"
                 replace="all"
                 xxf:show-progress="false">
 
@@ -1973,5 +1997,66 @@
                 </xf:action>
             </fr:positive-choice>
         </fr:alert-dialog>
+        <!-- Export dialog -->
+        <xxf:dialog
+            id="fr-export-with-search-dialog"
+            class="export"
+            level="modal"
+            close="true"
+            draggable="true"
+
+            model="fr-form-model"
+            context="instance('fr-export-with-search-options-instance')"
+        >
+            <xf:label>Excel Export Options</xf:label>
+
+            <xf:action event="xxforms-dialog-open">
+                <xf:setvalue
+                    ref="instance('fr-export-with-search-options-instance')/export-format"
+                    value="event('export-format')"/>
+            </xf:action>
+
+            <xf:action event="xxforms-dialog-close"/>
+
+            <fr:grid ref="instance('fr-export-with-search-options-instance')">
+                <fr:c x="1" w="12" y="1">
+                    <fr:checkbox-input ref="headings-labels">
+                        <xf:label ref="xxf:r('summary.export-with-search-dialog.headings-labels', '|fr-fr-resources|')"/>
+                    </fr:checkbox-input>
+                </fr:c>
+                <fr:c x="1" w="12" y="2">
+                    <fr:checkbox-input ref="selection-controls-labels">
+                        <xf:label ref="xxf:r('summary.export-with-search-dialog.selection-controls-labels', '|fr-fr-resources|')"/>
+                    </fr:checkbox-input>
+                </fr:c>
+                <fr:c x="1" w="12" y="3">
+                    <fr:checkbox-input ref="include-document-id">
+                        <xf:label ref="xxf:r('summary.export-with-search-dialog.include-document-id', '|fr-fr-resources|')"/>
+                    </fr:checkbox-input>
+                </fr:c>
+            </fr:grid>
+            <xh:div class="fr-dialog-buttons">
+                <xf:trigger>
+                    <xf:label ref="xxf:r('buttons.cancel', '|fr-fr-resources|')" mediatype="text/html"/>
+                    <xf:action event="DOMActivate">
+                        <xxf:hide dialog="fr-export-with-search-dialog"/>
+                    </xf:action>
+                </xf:trigger>
+                <xf:trigger appearance="xxf:primary">
+                    <xf:label ref="xxf:r('buttons.excel-export', '|fr-fr-resources|')" mediatype="text/html"/>
+                    <xf:action event="DOMActivate">
+                        <xf:send
+                                submission="fr-summary-export-with-search-submission"
+                                context="instance('fr-export-with-search-options-instance')">
+                            <xf:property name="fr-export-format"             value="export-format"/>
+                            <xf:property name="fr-headings-labels"           value="headings-labels"/>
+                            <xf:property name="fr-selection-controls-labels" value="selection-controls-labels"/>
+                            <xf:property name="fr-include-document-id"       value="include-document-id"/>
+                        </xf:send>
+                        <xxf:hide dialog="fr-export-with-search-dialog"/>
+                    </xf:action>
+                </xf:trigger>
+            </xh:div>
+        </xxf:dialog>
     </xh:body>
 </xh:html>

@@ -233,7 +233,6 @@
             "visual_table_class"   : "fr-tinymce-table",
             "skin"                 : false,
             "convert_urls"         : false,
-            "content_css"          : "default",
             "sandbox_iframes"      : true,
             "convert_unsafe_embeds": true
         }}

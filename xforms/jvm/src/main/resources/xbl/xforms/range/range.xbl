@@ -30,7 +30,7 @@
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>
             <templates>
-                <bind type="xf:date"/>
+                <bind type="xf:decimal"/>
                 <view>
                     <xf:range id="" ref="" xmlns="">
                         <xf:label  ref=""/>

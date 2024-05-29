@@ -201,7 +201,8 @@
     </xf:submission>
 
     <xf:instance id="fb-toolbox-instance">
-        <toolbox>
+        <_>
+            <relevant/>
             <schema/>
             <css/>
             <pdf/>
@@ -219,10 +220,11 @@
                 <orbeon/>
                 <app/>
             </libraries>
-        </toolbox>
+        </_>
     </xf:instance>
 
     <xf:bind ref="instance('fb-toolbox-instance')">
+        <xf:bind ref="relevant"          id="fb-relevant-bind"/>
         <xf:bind ref="schema"            id="fb-toolbox-schema-bind"            relevant="xxf:property('oxf.fb.menu.schema')"/>
         <xf:bind ref="pdf"               id="fb-toolbox-pdf-bind"               relevant="xxf:property('oxf.fb.menu.pdf')"/>
         <xf:bind ref="edit-source"       id="fb-toolbox-edit-bind"              relevant="xxf:property('oxf.fb.menu.edit-source')"/>

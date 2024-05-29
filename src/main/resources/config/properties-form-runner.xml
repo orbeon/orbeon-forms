@@ -741,4 +741,14 @@
 
     <property as="xs:boolean" name="oxf.fr.upload.reject-empty-files"                              value="true"/>
 
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.save-final"
+        value="⌘S"/>
+
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.save"
+        value="⌘S"/>
+
 </properties>

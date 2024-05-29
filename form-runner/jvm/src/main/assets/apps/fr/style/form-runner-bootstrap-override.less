@@ -583,17 +583,6 @@ body.orbeon {
       cursor: default;
     }
 
-    // Make default button a little darker
-    .btn {
-        background-color: darken(@wellBackground, 5%);
-    }
-
-    .btn {
-        &.disabled, &[disabled] {
-            background-color: darken(@wellBackground, 5%); // restore default color or buttons are too dark when disabled
-        }
-    }
-
     .label {
         background-color: @minGrayOnWhite;
     }
@@ -601,59 +590,6 @@ body.orbeon {
     // Make color consistent with primary button color
     .badge-info {
         background-color: @btnPrimaryBackground;
-    }
-
-    .buttonBackgroundOrbeon(@startColor, @endColor, @textColor: #fff) {
-
-        color: @textColor;
-        background-color: @startColor;
-        background-image: none;
-        text-shadow: none;
-
-        &:hover, &:focus, &:active, &.active, &.disabled, &[disabled] {
-            color: @textColor;
-            background-color: @endColor;
-        }
-    }
-
-
-    // TODO: can we remove the `.xforms-trigger-appearance-xxforms-xxx` selectors?
-    .xforms-trigger-appearance-xxforms-primary .btn, .btn-primary, {
-        .buttonBackgroundOrbeon(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
-    }
-    .xforms-trigger-appearance-xxforms-warning .btn, .btn-warning {
-        .buttonBackgroundOrbeon(@btnWarningBackground, @btnWarningBackgroundHighlight);
-    }
-    .xforms-trigger-appearance-xxforms-danger .btn, .btn-danger {
-        .buttonBackgroundOrbeon(@btnDangerBackground, @btnDangerBackgroundHighlight);
-    }
-    .xforms-trigger-appearance-xxforms-success .btn, .btn-success {
-        .buttonBackgroundOrbeon(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
-    }
-    .xforms-trigger-appearance-xxforms-info .btn, .btn-info {
-        .buttonBackgroundOrbeon(@btnInfoBackground, @btnInfoBackgroundHighlight);
-    }
-    .xforms-trigger-appearance-xxforms-inverse .btn, .btn-inverse {
-        .buttonBackgroundOrbeon(@btnInverseBackground, @btnInverseBackgroundHighlight);
-    }
-
-    button.btn, label.btn {
-        background-image: none;
-        text-shadow: none;
-        border: none;
-    }
-
-    // Updates to Bootstrap btn-link
-    button.btn-link {
-        white-space: normal;
-        text-align: inherit;
-        text-decoration: underline;
-        font-size: inherit;
-        padding: 0 0 2px 0;
-
-        text-decoration-thickness: from-font; // this tends to make the line thinner
-        text-underline-offset: 0.2rem;        // otherwise the line touches the bottom of the characters
-        text-decoration-skip-ink: auto;       // `auto` is the default, but we want to be explicit
     }
 }
 

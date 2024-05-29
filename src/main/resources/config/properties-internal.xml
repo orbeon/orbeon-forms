@@ -172,7 +172,10 @@
         +fr:dnd-repeat
         +fr:tabbable
         +fr:captcha
+        +fr:buttons-bar
         +fr:process-button
+        +fr:trigger
+        +fr:drop-trigger
         +fr:href-button         <!-- not sure if used outside of Summary page now -->
         +fr:ladda-button
         +fr:xforms-inspector
@@ -231,6 +234,55 @@
 
         -/ops/javascript/scalajs/orbeon-xforms-web.js
         +/apps/fr/resources/scalajs/orbeon-form-runner-web.js
+
+        <!-- Core Form Runner XBL components -->
+        +fr:section
+        +fr:grid
+        +fr:grid-single
+        +fr:grid-multiple
+        +fr:repeater
+        +fr:error-summary
+        +fr:wizard
+        +fr:alert-dialog
+        +fr:dnd-repeat
+        +fr:tabbable
+        +fr:captcha
+        +fr:buttons-bar
+        +fr:process-button
+        +fr:trigger
+        +fr:drop-trigger
+        +fr:href-button         <!-- not sure if used outside of Summary page now -->
+        +fr:ladda-button
+        +fr:xforms-inspector
+        +fr:formula-debugger
+
+        <!-- Common controls XBL components -->
+        <!-- NOTE: `fr:number` and `fr:date` are already in the baseline -->
+        +fr:time
+        +fr:datetime
+        +fr:hidden
+        +fr:character-counter
+        +fr:clipboard-copy
+        +fr:dropdown-date
+        +fr:fields-date
+        +fr:date-picker
+        +fr:attachment
+        +fr:attachment-multiple
+        +fr:image-attachment
+        +fr:image
+        +fr:dropdown-select1-search
+        +fr:databound-select1-search
+        +fr:autosize-textarea
+        +fr:tinymce
+        +fr:box-select
+        +fr:checkbox-input
+        +fr:databound-select1
+        +fr:explanation
+        +fr:open-select1
+        +fr:handwritten-signature
+        +fr:us-phone
+        +fr:us-state
+        +fr:yesno-input
     </property>
 
     <!-- Additional CSS/JavaScript for the detail page -->
@@ -590,8 +642,10 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.builder.form"      value="resource"/>
     <property as="xs:string"  name="oxf.fr.detail.captcha.orbeon.builder"                 value=""/>
 
+    <!-- Form Builder baseline updates, which add to the Form Runner baseline updates -->
     <property as="xs:string"  name="oxf.xforms.assets.baseline.updates.fb">
         +/forms/orbeon/builder/resources/form-builder.css
+        +/xbl/orbeon/buttons-bar/buttons-bar.css <!-- Form Builder doesn't yet use `fr:buttons-bar` but needs the styling -->
 
         +/ops/dragula/dragula.min.js
         -/apps/fr/resources/scalajs/orbeon-form-runner-web.js

@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
@@ -50,12 +50,11 @@ abstract class XFormsTriggerHandler(
 
       val hintValue =
         if (control != null)
-          control.getHint(handlerContext.collector)
+          control.lhhaValue(LHHA.Hint)
         else
-          null
+          None
 
-      if (hintValue != null)
-        containerAttributes.addOrReplace("title", hintValue)
+      hintValue.foreach(containerAttributes.addOrReplace("title", _))
     }
 
     XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)

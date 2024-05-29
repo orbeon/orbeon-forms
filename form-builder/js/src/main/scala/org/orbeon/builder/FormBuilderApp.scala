@@ -13,14 +13,8 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.facades.{Bowser, Mousetrap}
 import org.orbeon.fr._
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
-import org.orbeon.web.DomEventNames
 import org.orbeon.xforms._
-import org.scalajs.dom
-import org.scalajs.dom.ext._
-import org.scalajs.dom.html
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
@@ -48,56 +42,10 @@ object FormBuilderApp extends App {
     }
 
     builderPrivateDyn.API = FormBuilderPrivateAPI
-    registerFormBuilderKeyboardShortcuts()
-    updateKeyboardShortcutHints()
 
     // Other initializations
     BlockCache
   }
-
-  private case class Shortcut(
-    shift     : Boolean = false,
-    key       : String,
-    target    : String,
-    condition : Option[js.Function0[Boolean]] = None
-  )
-
-  private val shortcuts = List(
-    Shortcut(              key = "z", target = "undo-trigger"                                                                    ),
-    Shortcut(shift = true, key = "z", target = "redo-trigger"                                                                    ),
-    Shortcut(              key = "x", target = "cut-trigger"                                                                     ),
-    Shortcut(              key = "c", target = "copy-trigger", condition = Some(() => dom.window.getSelection().toString.isEmpty)),
-    Shortcut(              key = "v", target = "paste-trigger"                                                                   ),
-  )
-
-  private def registerFormBuilderKeyboardShortcuts(): Unit =
-    shortcuts.foreach { case Shortcut(shift, key, target, condition) =>
-      List("command", "ctrl").foreach(modifier => {
-        val keyCombination = (List(modifier) ++ shift.list("shift") ++ List(key)).mkString("+")
-        Mousetrap.bind(command = keyCombination, callback = { (e: dom.KeyboardEvent, combo: String) =>
-          if (condition.forall(_.apply())) {
-            e.preventDefault()
-            AjaxClient.fireEvent(
-              AjaxEvent(
-                eventName = DomEventNames.DOMActivate,
-                targetId  = target,
-                form      = Support.allFormElems.headOption, // 2023-09-01: only used by Form Builder, so presumably only one
-              )
-            )
-          }
-        })
-      })
-    }
-
-  private def updateKeyboardShortcutHints(): Unit =
-    if (! Set("macOS", "iOS")(Bowser.osname))
-      dom.window.document.querySelectorAll(".orbeon *[title], .orbeon kbd").foreach {
-        case elem: html.Element if (elem.title ne null) && elem.title.contains("⌘") =>
-          elem.title = elem.title.replace("⌘", "⌃")
-        case elem: html.Element if elem.tagName.equalsIgnoreCase("kbd") && elem.innerHTML.contains("⌘") =>
-          elem.innerHTML = elem.innerHTML.replace("⌘", "⌃")
-        case _ =>
-      }
 
   def onPageContainsFormsMarkup(): Unit = {
 

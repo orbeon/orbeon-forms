@@ -14,6 +14,10 @@
         xxbl:mode="binding javascript-lifecycle"
         xxbl:container="span">
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/drop-trigger/drop-trigger.css"/>
+        </xbl:resources>
+
         <xbl:handlers>
             <xbl:handler
                 event="fr-activate"
@@ -27,9 +31,7 @@
         <xbl:template>
 
             <!-- Hidden select to hold itemset -->
-            <xf:var name="binding" value="xxf:binding('fr-drop-trigger-binding')"/>
-
-            <xf:select ref="$binding" appearance="xxf:internal" id="hidden-select">
+            <xf:select ref="xxf:binding('fr-drop-trigger-binding')" appearance="xxf:internal" id="hidden-select">
                 <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
             </xf:select>
             <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item"/>
@@ -39,13 +41,26 @@
             <xh:div class="btn-group dropup">
               <xh:button class="btn fr-{$items[1]/value}-button" data-orbeon-value="{$items[1]/value}">
                   <xf:output value="$items[1]/label" mediatype="text/html"/>
+                  <xh:kbd
+                      title="Keyboard shortcut"
+                      data-orbeon-keyboard-shortcut="{xxf:property(concat('oxf.fr.detail.button.keyboard-shortcut.', $items[1]/value))}"/>
               </xh:button>
               <xh:button class="btn dropdown-toggle" data-toggle="dropdown">
-                <xh:span class="caret"/>
+                  <xh:span class="caret"/>
               </xh:button>
               <xh:ul class="dropdown-menu">
                   <xf:repeat ref="$items[position() gt 1]">
-                      <xh:li><xh:a href="#" data-orbeon-value="{value}" class="fr-{value}-button"><xf:output value="label" mediatype="text/html"/></xh:a></xh:li>
+                      <xh:li>
+                          <xh:a
+                              href="#"
+                              data-orbeon-value="{value}"
+                              class="fr-{value}-button">
+                              <xf:output value="label" mediatype="text/html"/>
+                              <xh:kbd
+                                  title="Keyboard shortcut"
+                                  data-orbeon-keyboard-shortcut="{xxf:property(concat('oxf.fr.detail.button.keyboard-shortcut.', value))}"/>
+                          </xh:a>
+                      </xh:li>
                   </xf:repeat>
               </xh:ul>
             </xh:div>

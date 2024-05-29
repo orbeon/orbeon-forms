@@ -14,6 +14,10 @@
         xxbl:mode=""
         xxbl:container="span">
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/buttons-bar/buttons-bar.css"/>
+        </xbl:resources>
+
         <xbl:template>
 
             <xf:var name="fr-mode" value="fr:mode()"/>

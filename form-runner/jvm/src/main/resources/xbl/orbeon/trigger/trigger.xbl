@@ -1,0 +1,38 @@
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-trigger-binding"
+        element="fr|trigger"
+        xxbl:mode="lhha custom-lhha binding javascript-lifecycle"
+        xxbl:label-for="trigger"
+        xxbl:container="span">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/trigger/trigger.css"/>
+        </xbl:resources>
+
+        <xbl:template>
+            <xf:trigger id="trigger" ref="xxf:binding('fr-trigger-binding')" xbl:attr="appearance">
+                <xf:label>
+                    <!-- Add span to help with styling -->
+                    <xh:span><xf:output mediatype="text/html" value="xxf:label('fr-trigger-binding')"/></xh:span>
+                    <xh:kbd fr:keep-if-param-non-blank="name"
+                            title="Keyboard shortcut"
+                            data-orbeon-keyboard-shortcut="{xxf:property(concat('oxf.fr.detail.button.keyboard-shortcut.', fr:component-param-value('name')))}"
+                            data-orbeon-keyboard-shortcut-condition="{'clipboard-empty'[fr:component-param-value('name') = 'toolbox.copy']}"/>
+                </xf:label>
+                <xf:dispatch
+                    event="DOMActivate"
+                    name="DOMActivate"
+                    targetid="fr-trigger-binding"/>
+            </xf:trigger>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

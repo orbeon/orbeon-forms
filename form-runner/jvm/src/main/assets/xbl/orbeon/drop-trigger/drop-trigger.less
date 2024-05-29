@@ -1,0 +1,34 @@
+@import (reference)  "../../../apps/fr/style/form-runner-common";
+
+.xbl-fr-drop-trigger {
+
+    & > .btn-group {
+        display: inline-flex;
+        .dropdown-toggle {
+            display: block;
+        }
+    }
+
+    button[class ~= btn]:first-of-type {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        kbd {
+            line-height: 18px;
+        }
+    }
+
+    button[class ~= dropdown-toggle] {
+        margin-bottom : 4px;
+        box-shadow: none;
+    }
+
+    .dropdown-menu li a {
+        display: inline-flex;
+        box-sizing: border-box;
+        width: 100%;
+        div {
+            flex-grow: 1;
+        }
+    }
+}

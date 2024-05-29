@@ -347,7 +347,7 @@ body.orbeon {
             line-height: 18px; // try not to cause the enclosing button to become taller
         }
 
-        .tab-content:hover kbd {
+        .tab-content:hover kbd:not(:empty) {
             display: block;
         }
 
@@ -421,6 +421,7 @@ body.orbeon {
                 &.fb-toolbox-top-icons {
                     display: grid;
                     grid-template-columns: repeat(6, 1fr);
+                    //align-items: center; // no effect
                     border-radius: @baseBorderRadius;
 
                     .fb-form-settings-button     { grid-row-start: 1; grid-column-start: 1; }
@@ -429,9 +430,13 @@ body.orbeon {
                     .fb-paste-button             { grid-row-start: 1; grid-column-start: 4; }
                     .fb-undo-button              { grid-row-start: 1; grid-column-start: 5; }
                     .fb-redo-button              { grid-row-start: 1; grid-column-start: 6; }
+
+                    button {
+                        padding: 2px 0;
+                    }
                 }
 
-                &.fb-toolbox-advanced-icons {
+                &.fb-toolbox-advanced-icons { // 2024-05-29: unused
                     display: grid;
                     grid-template-columns: repeat(3, 1fr);
                     padding: 0;
@@ -445,15 +450,13 @@ body.orbeon {
                 }
 
                 // Zoom effect on icons
-                .xforms-trigger-appearance-minimal:not([class ~= 'xforms-readonly']) {
+                .xforms-trigger-appearance-minimal:not(.xforms-readonly) {
                     button {
-                        padding: 0;
-                        border: none;
                     }
                 }
-                .xforms-trigger-appearance-minimal:not([class ~= 'xforms-readonly']):hover {
+                .xforms-trigger-appearance-minimal:not(.xforms-readonly):hover {
                     button {
-                        margin-top: 4px;
+                        padding: 3px 0 0 0;
                         transition: all ease 100ms;
                     }
                     .fa::before {
@@ -489,6 +492,11 @@ body.orbeon {
                         font-size: 85%;                                                                                     // smaller text next icon
                         width: 100%;                 // to increase clicking area
                         text-align: left;
+                        justify-content: start;
+
+                        & > span {
+                            flex-grow: 1;
+                        }
 
                         i {
                             margin-top: -1px;        // so that Bootstrap icons are better aligned
@@ -1747,16 +1755,6 @@ body.orbeon {
 
     kbd {
         background-color: #ddd;
-        display: inline-block;
-        border: 1px solid gray;
-        border-radius: 2px;
-        padding: 0 8px;
-        font-family: system-ui;
-        font-size: 6pt;
-        margin-left: 1em;
-        &:empty {
-            display: none;
-        }
     }
 }
 

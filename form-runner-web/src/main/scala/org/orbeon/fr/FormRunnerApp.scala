@@ -74,6 +74,7 @@ object FormRunnerApp extends App {
     xbl.AttachmentMultiple
     xbl.Recaptcha
     xbl.ClipboardCopy
+    xbl.Trigger
 
     // TODO: with embedding, unobserve when the form is destroyed
     Events.orbeonLoadedEvent.subscribe(() => {

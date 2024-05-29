@@ -3,7 +3,8 @@ package org.orbeon.xbl
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, KeyboardShortcuts}
+import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
 
@@ -20,6 +21,8 @@ object DropTrigger {
   XBL.declareCompanion("fr|drop-trigger", js.constructorOf[DropTriggerCompanion])
 
   private class DropTriggerCompanion(containerElem: html.Element) extends XBLCompanion {
+
+    private var registered: List[String] = Nil
 
     override def init(): Unit = {
 
@@ -44,10 +47,23 @@ object DropTrigger {
           e.preventDefault()
         }
       }: js.ThisFunction)
+
+      registered =
+        containerElem.querySelectorAll("kbd[data-orbeon-keyboard-shortcut]")
+          .flatMap { e =>
+            val kbd = e.asInstanceOf[html.Element]
+            KeyboardShortcuts.bindShortcutFromKbd(
+              clickElem     = kbd,
+              rawShortcut   = kbd.dataset("orbeonKeyboardShortcut"),
+              updateDisplay = shortcut => kbd.innerHTML = shortcut
+            )
+          }
+          .toList
     }
 
     override def destroy(): Unit = {
       logger.debug("destroy")
+      registered.foreach(KeyboardShortcuts.unbindShortcutFromKbd)
       $(containerElem).off(s"click.$ListenerSuffix", ListenerSelector)
     }
   }

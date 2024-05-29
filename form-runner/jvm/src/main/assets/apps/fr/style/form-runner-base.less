@@ -318,64 +318,6 @@
     // Explanation message if present
     .fr-explanation { padding: 10px }
 
-    // Buttons bar
-    .fr-buttons {
-        display: block;
-        font-size: 0; // Removes space between buttons, see http://stackoverflow.com/a/19038859/5295
-
-        // Make buttons stick to the viewport
-        // https://github.com/orbeon/orbeon-forms/issues/4809
-        position: sticky;
-        bottom: 0;
-        width: 100%;
-        box-sizing: border-box;
-
-        padding: 10px;
-        background-color: white;
-        border-radius: @baseBorderRadius;
-        text-align: center;
-        z-index: 4; // To show above the date `.add-on`, which has a `z-index: 3`
-
-        .fr-buttons-message div {
-            display: inline;
-        }
-
-        // Space between the image and the text in a button, only for the buttons bar
-        //   (not other buttons in the form which might contain just an image)
-        .xforms-trigger button img {
-            margin-right: 10px;
-        }
-
-        .xforms-trigger, .xforms-submit, .xbl-fr-drop-trigger {
-            button[class ~= btn]:first-of-type, input {
-                min-width     : 9.5em;
-                margin-left   : 4px;
-                margin-bottom : 4px;
-            }
-        }
-
-        .xbl-fr-drop-trigger {
-            button[class ~= dropdown-toggle] {
-                margin-bottom : 4px;
-                box-shadow: none;
-            }
-        }
-
-        // Special sizing for expand/collapse/refresh buttons
-        .fr-collapse-all-button.xforms-trigger button, .fr-expand-all-button.xforms-trigger button, .fr-refresh-button.xforms-trigger button {
-            min-width: 2em;
-            width: 2em;
-            padding: 0;
-        }
-
-        // Special sizing for new expand/collapse/refresh buttons
-        .fr-collapse-all-button.xforms-trigger button, .fr-expand-all-button.xforms-trigger button, .fr-refresh-button.xforms-trigger button {
-            min-width: 2em;
-            width: 2em;
-            padding: 3px;
-        }
-    }
-
     .fr-captcha {
         margin-top: 20px;
         display: block;                             // By default captcha is inline

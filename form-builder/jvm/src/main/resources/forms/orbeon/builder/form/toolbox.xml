@@ -33,8 +33,14 @@
             <xh:div class="fb-toolbox-icons-tools fb-toolbox-top-icons">
 
                 <!-- Form settings -->
-                <xf:trigger appearance="minimal" class="fb-form-settings-button" id="open-form-settings-trigger">
-                    <xf:label><xh:i class="fa fa-cogs fa-fw" title="{$form-resources/dialog-form-settings/open/label} (O F)"/></xf:label>
+                <fr:trigger
+                        id="open-form-settings-trigger"
+                        appearance="minimal"
+                        bind="fb-relevant-bind"
+                        class="fb-form-settings-button"
+                        name="toolbox.open-form-settings">
+                    <xf:label><xh:i class="fa fa-cogs fa-fw"/></xf:label>
+                    <xf:hint ref="$form-resources/dialog-form-settings/open/label"/>
                     <xf:action ev:event="DOMActivate">
                         <!-- Open the dialog in "edit" mode -->
                         <xxf:show dialog="dialog-form-settings">
@@ -76,39 +82,45 @@
                             <xf:property name="component-bindings"                        value="$component-bindings"/>
                         </xxf:show>
                     </xf:action>
-                </xf:trigger>
+                </fr:trigger>
 
                 <!-- Clipboard operations -->
-                <xf:trigger appearance="minimal" class="fb-cut-button" ref="$xcv/cut-trigger" id="cut-trigger">
-                    <xf:label>
-                        <xh:i
-                            title="{$form-resources/cut/label} (⌘X)"
-                            class="fa fa-cut fa-fw"/>
-                    </xf:label>
+                <fr:trigger
+                        appearance="minimal"
+                        class="fb-cut-button"
+                        ref="$xcv/cut-trigger"
+                        id="cut-trigger"
+                        name="toolbox.cut">
+                    <xf:label><xh:i class="fa fa-cut fa-fw"/></xf:label>
+                    <xf:hint ref="$form-resources/cut/label"/>
                     <xf:action ev:event="DOMActivate" type="xpath">
                         toolboxOps:cutToClipboard($current-td)
                     </xf:action>
-                </xf:trigger>
-                <xf:trigger appearance="minimal" class="fb-copy-button" ref="$xcv/copy-trigger" id="copy-trigger">
-                    <xf:label>
-                        <xh:i
-                            title="{$form-resources/copy/label} (⌘C)"
-                            class="fa fa-copy fa-fw"/>
-                    </xf:label>
+                </fr:trigger>
+                <fr:trigger
+                        appearance="minimal"
+                        class="fb-copy-button"
+                        ref="$xcv/copy-trigger"
+                        id="copy-trigger"
+                        name="toolbox.copy">
+                    <xf:label><xh:i class="fa fa-copy fa-fw"/></xf:label>
+                    <xf:hint ref="$form-resources/copy/label"/>
                     <xf:action ev:event="DOMActivate" type="xpath">
                         toolboxOps:copyToClipboard($current-td)
                     </xf:action>
-                </xf:trigger>
-                <xf:trigger appearance="minimal" class="fb-paste-button" ref="$xcv/paste-trigger" id="paste-trigger">
-                    <xf:label>
-                        <xh:i
-                            title="{$form-resources/paste/label} (⌘V)"
-                            class="fa fa-paste fa-fw"/>
-                    </xf:label>
+                </fr:trigger>
+                <fr:trigger
+                        appearance="minimal"
+                        class="fb-paste-button"
+                        ref="$xcv/paste-trigger"
+                        id="paste-trigger"
+                        name="toolbox.paste">
+                    <xf:label><xh:i class="fa fa-paste fa-fw"/></xf:label>
+                    <xf:hint ref="$form-resources/paste/label"/>
                     <xf:action ev:event="DOMActivate" type="xpath">
                         toolboxOps:pasteFromClipboard()
                     </xf:action>
-                </xf:trigger>
+                </fr:trigger>
                 <!--<xf:group ref=".[exists($xcv/control/*/@id)]">-->
                     <!--<xh:i-->
                         <!--title="{$form-resources/clipboard/label}"-->
@@ -126,15 +138,19 @@
                         else
                             ''"/>
 
-                <xf:trigger appearance="minimal" class="fb-undo-button" ref="$undo/undo-trigger" id="undo-trigger">
-                    <xf:label>
-                        <xh:i title="{$undo-title} (⌘Z)" class="fa fa-undo fa-fw"/>
-                    </xf:label>
+                <fr:trigger
+                        appearance="minimal"
+                        class="fb-undo-button"
+                        ref="$undo/undo-trigger"
+                        id="undo-trigger"
+                        name="toolbox.undo">
+                    <xf:label><xh:i class="fa fa-undo fa-fw"/></xf:label>
+                    <xf:hint ref="$undo-title"/>
                     <xf:action ev:event="DOMActivate" type="xpath">
                         fbf:undoAction(),
                         fr:run-process('oxf.fr.detail.process', concat('success-message(message = "', $undo-title, '")'))
                     </xf:action>
-                </xf:trigger>
+                </fr:trigger>
 
                 <xf:var
                     name="redo-title"
@@ -147,15 +163,19 @@
                         else
                             ''"/>
 
-                <xf:trigger appearance="minimal" class="fb-redo-button" ref="$undo/redo-trigger" id="redo-trigger">
-                    <xf:label>
-                        <xh:i title="{$redo-title} (⌘⇧Z)" class="fa fa-repeat fa-fw"/>
-                    </xf:label>
+                <fr:trigger
+                        appearance="minimal"
+                        class="fb-redo-button"
+                        ref="$undo/redo-trigger"
+                        id="redo-trigger"
+                        name="toolbox.redo">
+                    <xf:label><xh:i class="fa fa-repeat fa-fw"/></xf:label>
+                    <xf:hint ref="$redo-title"/>
                     <xf:action ev:event="DOMActivate" type="xpath">
                         fbf:redoAction(),
                         fr:run-process('oxf.fr.detail.process', concat('success-message(message = "', $redo-title, '")'))
                     </xf:action>
-                </xf:trigger>
+                </fr:trigger>
 
             </xh:div>
 
@@ -183,7 +203,7 @@
                         </xh:div>
                         <!-- Add grids -->
                         <xh:div class="fb-tool">
-                            <xf:trigger id="insert-new-grid-trigger" ref="instance('fb-variables')/grid-trigger" >
+                            <xf:trigger id="insert-new-grid-trigger" ref="instance('fb-variables')/grid-trigger">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-table"/>
                                     <xf:output value="$form-resources/new-grid/label"/>
@@ -194,7 +214,7 @@
                             </xf:trigger>
                         </xh:div>
                         <xh:div class="fb-tool">
-                            <xf:trigger id="insert-new-repeated-grid-trigger" ref="instance('fb-variables')/grid-trigger" >
+                            <xf:trigger id="insert-new-repeated-grid-trigger" ref="instance('fb-variables')/grid-trigger">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-table"/>
                                     <xf:output value="$form-resources/new-repeated-grid/label"/>
@@ -334,7 +354,9 @@
                     <xh:div class="fb-tool">
 
                         <!-- Workflow and permissions -->
-                        <xf:trigger bind="fb-toolbox-workflow-bind">
+                        <fr:trigger
+                                bind="fb-toolbox-workflow-bind"
+                                name="toolbox.open-workflow-settings">
                             <xf:label>
                                 <xh:i class="fa fa-lock fa-fw"/>
                                 <xf:output value="$form-resources/dialog-workflow/label"/>
@@ -343,33 +365,39 @@
                                 <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="fb-workflow20201-dialog"/>
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog"/>
                             </xf:action>
-                        </xf:trigger>
-                        <xf:trigger id="open-form-settings-trigger-full">
+                        </fr:trigger>
+                        <fr:trigger
+                                id="open-form-settings-trigger-full"
+                                bind="fb-relevant-bind"
+                                name="toolbox.open-form-settings">
                             <xf:label>
                                 <xh:i class="fa fa-cogs fa-fw"/>
                                 <xf:output value="$form-resources/dialog-form-settings/open/label"/>
-                                <xh:kbd title="Keyboard shortcut">⌨️ O F</xh:kbd>
                             </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:dispatch name="DOMActivate" targetid="open-form-settings-trigger"/>
                             </xf:action>
-                        </xf:trigger>
-                        <xf:trigger bind="fb-toolbox-permissions-bind" id="open-permissions-trigger">
+                        </fr:trigger>
+                        <fr:trigger
+                                id="open-permissions-trigger"
+                                bind="fb-toolbox-permissions-bind"
+                                name="toolbox.open-permissions">
                             <xf:label>
                                 <xh:i class="fa fa-lock fa-fw"/>
                                 <xf:output value="$form-resources/dialog-permissions/label"/>
-                                <xh:kbd title="Keyboard shortcut">⌨️ O P</xh:kbd>
                             </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="fb-permissions-dialog"/>
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
                             </xf:action>
-                        </xf:trigger>
-                        <xf:trigger bind="fb-toolbox-email-bind">
+                        </fr:trigger>
+                        <fr:trigger
+                                id="open-email-settings-trigger"
+                                bind="fb-toolbox-email-bind"
+                                name="toolbox.open-email-settings">
                             <xf:label>
                                 <xh:i class="fa fa-envelope fa-fw"/>
                                 <xf:output value="$form-resources/dialog-email-settings/label"/>
-                                <xh:kbd title="Keyboard shortcut">⌨️️ O E</xh:kbd>
                             </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-email-settings">
@@ -379,8 +407,11 @@
                                 </xf:dispatch>
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
                             </xf:action>
-                        </xf:trigger>
-                        <xf:trigger bind="fb-toolbox-messages-bind" id="open-messages-trigger">
+                        </fr:trigger>
+                        <fr:trigger
+                                id="open-messages-trigger"
+                                bind="fb-toolbox-messages-bind"
+                                name="toolbox.open-messages">
                             <xf:label>
                                 <xh:i class="fa fa-commenting fa-fw"/>
                                 <xf:output value="$form-resources/dialog-messages/label"/>
@@ -389,20 +420,27 @@
                                 <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-messages"/>
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
                             </xf:action>
-                        </xf:trigger>
+                        </fr:trigger>
 
                         <!-- Edit Source -->
-                        <xf:trigger class="fb-edit-source-button" bind="fb-toolbox-edit-bind">
+                        <fr:trigger
+                                id="open-edit-source-trigger"
+                                bind="fb-toolbox-edit-bind"
+                                name="toolbox.open-edit-source"
+                                class="fb-edit-source-button">
                             <xf:label>
                                 <xh:i class="fa fa-code fa-fw"/>
                                 <xf:output value="$form-resources/edit-source/label"/>
-                                <xh:kbd title="Keyboard shortcut">⌨️ O S</xh:kbd>
                             </xf:label>
                             <xxf:show ev:event="DOMActivate" dialog="dialog-edit-source"/>
-                        </xf:trigger>
+                        </fr:trigger>
 
                         <!-- Reload components -->
-                        <xf:trigger class="fb-reload-components-button" xxf:modal="true">
+                        <fr:trigger
+                                bind="fb-relevant-bind"
+                                name="toolbox.reload-components"
+                                class="fb-reload-components-button"
+                                xxf:modal="true">
                             <xf:label>
                                 <xh:i class="fb-container-cut fa fa-refresh fa-fw"/>
                                 <xf:output value="$form-resources/reload-components/label"/>
@@ -412,7 +450,7 @@
                                     <xf:property name="deannotate" value="true()"/>
                                 </xf:dispatch>
                             </xf:action>
-                        </xf:trigger>
+                        </fr:trigger>
 
                     </xh:div>
                 </xh:div>

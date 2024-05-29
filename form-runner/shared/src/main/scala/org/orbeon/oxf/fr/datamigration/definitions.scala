@@ -26,7 +26,8 @@ trait MigrationSet {
 }
 
 case class PathElem(value: String) {
-  require(SaxonUtils.isValidNCName(value) || PathElem.SpecialFormBuilderPaths(value))
+  if (! (SaxonUtils.isValidNCName(value) || PathElem.SpecialFormBuilderPaths(value)))
+    throw new IllegalArgumentException(s"Invalid path element: `$value`")
 }
 
 object PathElem {

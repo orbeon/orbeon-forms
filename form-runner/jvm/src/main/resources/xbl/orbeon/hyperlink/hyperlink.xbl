@@ -1,0 +1,281 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:UrlSupport="java:org.orbeon.xbl.UrlSupportJava">
+
+    <xbl:binding
+        id="fr-hyperlink"
+        element="fr|hyperlink"
+        xxbl:container="span"
+        xxbl:mode="lhha +custom-label binding value"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Hyperlink</display-name>
+            <display-name lang="fr">Hyperlien</display-name>
+            <display-name lang="no">Hyperlenke</display-name>
+            <display-name lang="ru">Гиперссылка</display-name>
+            <display-name lang="it">Collegamento ipertestuale</display-name>
+            <display-name lang="de">Hyperlink</display-name>
+            <display-name lang="fi">Hyperlinkki</display-name>
+            <display-name lang="es">Hipervínculo</display-name>
+            <display-name lang="nl">Hyperlink</display-name>
+            <display-name lang="pt">Hiperligação</display-name>
+            <display-name lang="sv">Hyperlänk</display-name>
+            <display-name lang="ar">ارتباط تشعبي</display-name>
+            <display-name lang="pl">Hiperłącze</display-name>
+            <display-name lang="ja">ハイパーリンク</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-link</icon-class>
+            </icon>
+            <templates>
+                <bind fr:persist="false()"/>
+                <view>
+                    <fr:hyperlink id="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:hyperlink>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="href" type="xs:string"/>
+                <setting name="open-in-new-tab" type="xs:boolean" default="true"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-hyperlink-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <href/>
+                            <open-in-new-tab/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="href"
+                            xxf:whitespace="trim"
+                            type="xxf:XPath2ValueTemplate"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <href>URL</href>
+                                <href-hint>Web address or XPath value template, e.g. https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>Open in new tab</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <href>URL</href>
+                                <href-hint>Adresse web ou modèle de valeur XPath, ex. https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>Ouvrir dans un nouvel onglet</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="no">
+                                <href>URL</href>
+                                <href-hint>Nettadresse eller XPath-verdimal, f.eks. https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>Åpne i ny fane</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <href>URL</href>
+                                <href-hint>Веб-адрес или шаблон значения XPath, например https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>Открыть в новой вкладке</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="it">
+                                <href>URL</href>
+                                <href-hint>Indirizzo web o modello di valore XPath, es. https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>Apri in una nuova scheda</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="de">
+                                <href>URL</href>
+                                <href-hint>Webadresse oder XPath-Wertvorlage, z. B. https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>In neuem Tab öffnen</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <href>URL</href>
+                                <href-hint>Verkko-osoite tai XPath-arvomalli, esim. https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>Avaa uudessa välilehdessä</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="es">
+                                <href>URL</href>
+                                <href-hint>Dirección web o plantilla de valor XPath, p. ej. https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>Abrir en una pestaña nueva</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <href>URL</href>
+                                <href-hint>Webadres of XPath-waardesjabloon, bijv. https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>Openen in nieuw tabblad</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <href>URL</href>
+                                <href-hint>Endereço web ou modelo de valor XPath, ex. https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>Abrir num novo separador</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <href>URL</href>
+                                <href-hint>Webbadress eller XPath-värdemall, t.ex. https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>Öppna i ny flik</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <href>عنوان URL</href>
+                                <href-hint>عنوان ويب أو قالب قيمة XPath، مثل https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>فتح في علامة تبويب جديدة</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <href>URL</href>
+                                <href-hint>Adres internetowy lub szablon wartości XPath, np. https://example.com/{$id}</href-hint>
+                                <open-in-new-tab>Otwórz w nowej karcie</open-in-new-tab>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <href>URL</href>
+                                <href-hint>WebアドレスまたはXPath値テンプレート (例: https://example.com/{$id})</href-hint>
+                                <open-in-new-tab>新しいタブで開く</open-in-new-tab>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-hyperlink-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:input ref="instance('local')/href" id="href-control" appearance="xpath-completion">
+                                <xf:label ref="xxf:r('href')"/>
+                                <xf:hint ref="xxf:r('href-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/open-in-new-tab" appearance="full xxf:horizontal" id="open-in-new-tab-control">
+                                <xf:label ref="xxf:r('open-in-new-tab')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
+                                    <xf:value>true</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
+                                    <xf:value>false</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-hyperlink-action"
+                    event="xforms-value-changed"
+                    observer="href-control open-in-new-tab-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/hyperlink/hyperlink.css"/>
+        </xbl:resources>
+
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xf:group xsl:version="2.0" appearance="xxf:internal">
+                <xsl:variable name="root"          select="/*[1]"/>
+                <xsl:variable name="is-html-label" select="$root/xf:label/@mediatype = 'text/html'"/>
+
+                <xf:var
+                    name="href-param"
+                    value="string(fr:component-param-value('href'))"/>
+                <xf:var
+                    name="raw-url"
+                    value="
+                        if (xxf:non-blank($href-param)) then
+                            $href-param
+                        else
+                            string(xxf:binding('fr-hyperlink'))"/>
+                <xf:var
+                    name="safe-url"
+                    value="UrlSupport:sanitizeHyperlinkUrl($raw-url)"/>
+                <xf:var
+                    name="has-safe-url"
+                    value="not(fr:is-design-time()) and xxf:non-blank($safe-url)"/>
+                <xf:var
+                    name="open-in-new-tab"
+                    value="string(fr:component-param-value('open-in-new-tab')) = 'true'"/>
+                <xf:var
+                    name="label-text"
+                    value="xxf:label('fr-hyperlink')"/>
+                <xf:var
+                    name="fallback-url-text"
+                    value="{
+                        if ($is-html-label) then
+                            'replace(replace(replace($safe-url, ''&amp;'', ''&amp;amp;''), ''&lt;'', ''&amp;lt;''), ''&gt;'', ''&amp;gt;'')'
+                        else
+                            '$safe-url'
+                    }"/>
+                <xf:var
+                    name="display-text"
+                    value="
+                        if (fr:is-design-time() or xxf:non-blank($label-text)) then
+                            $label-text
+                        else
+                            $fallback-url-text"/>
+
+                <xf:group ref=".[not($has-safe-url)]" xxf:element="span" class="fr-hyperlink-anchor fr-hyperlink-disabled">
+                    <xf:output class="fr-hyperlink-label" value="$display-text">
+                        <xsl:copy-of select="$root/xf:label/@mediatype"/>
+                    </xf:output>
+                </xf:group>
+
+                <xf:group ref=".[$has-safe-url]" xxf:element="span">
+                    <xh:a
+                        class="fr-hyperlink-anchor"
+                        href="{{$safe-url}}"
+                        target="{{if ($open-in-new-tab) then '_blank' else '_self'}}"
+                        rel="{{if ($open-in-new-tab) then 'noopener noreferrer' else ''}}">
+                        <xf:output class="fr-hyperlink-label" value="$display-text">
+                            <xsl:copy-of select="$root/xf:label/@mediatype"/>
+                        </xf:output>
+                    </xh:a>
+                </xf:group>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

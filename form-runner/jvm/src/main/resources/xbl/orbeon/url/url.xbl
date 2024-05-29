@@ -1,0 +1,164 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:UrlSupport="java:org.orbeon.xbl.UrlSupportJava">
+
+    <xbl:binding
+        id="fr-url"
+        element="fr|url"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value javascript-lifecycle allow-minimal-label-hint"
+        xxbl:label-for="input"
+        xxbl:type="xs:string"
+        xxbl:constraint="UrlSupport:isValidWebUrl(string(.))"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Web Address (URL)</display-name>
+            <display-name lang="fr">Adresse web (URL)</display-name>
+            <display-name lang="no">Nettadresse (URL)</display-name>
+            <display-name lang="ru">Веб-адрес (URL)</display-name>
+            <display-name lang="it">Indirizzo web (URL)</display-name>
+            <display-name lang="de">Webadresse (URL)</display-name>
+            <display-name lang="fi">Verkko-osoite (URL)</display-name>
+            <display-name lang="es">Dirección web (URL)</display-name>
+            <display-name lang="nl">Webadres (URL)</display-name>
+            <display-name lang="pt">Endereço web (URL)</display-name>
+            <display-name lang="sv">Webbadress (URL)</display-name>
+            <display-name lang="ar">عنوان ويب (URL)</display-name>
+            <display-name lang="pl">Adres internetowy (URL)</display-name>
+            <display-name lang="ja">Webアドレス (URL)</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-globe</icon-class>
+            </icon>
+            <templates>
+                <bind type="fr:url" xxf:whitespace="trim"/>
+                <view>
+                    <fr:url id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:url>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/url/url.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en"><open-in-new-tab>Open in new tab</open-in-new-tab></resource>
+                        <resource xml:lang="fr"><open-in-new-tab>Ouvrir dans un nouvel onglet</open-in-new-tab></resource>
+                        <resource xml:lang="ar"><open-in-new-tab>فتح في علامة تبويب جديدة</open-in-new-tab></resource>
+                        <resource xml:lang="ca"><open-in-new-tab>Obre en una pestanya nova</open-in-new-tab></resource>
+                        <resource xml:lang="da"><open-in-new-tab>Åbn i ny fane</open-in-new-tab></resource>
+                        <resource xml:lang="de"><open-in-new-tab>In neuem Tab öffnen</open-in-new-tab></resource>
+                        <resource xml:lang="es"><open-in-new-tab>Abrir en una pestaña nueva</open-in-new-tab></resource>
+                        <resource xml:lang="fi"><open-in-new-tab>Avaa uudessa välilehdessä</open-in-new-tab></resource>
+                        <resource xml:lang="hu"><open-in-new-tab>Megnyitás új lapon</open-in-new-tab></resource>
+                        <resource xml:lang="it"><open-in-new-tab>Apri in una nuova scheda</open-in-new-tab></resource>
+                        <resource xml:lang="ja"><open-in-new-tab>新しいタブで開く</open-in-new-tab></resource>
+                        <resource xml:lang="nl"><open-in-new-tab>Openen in nieuw tabblad</open-in-new-tab></resource>
+                        <resource xml:lang="no"><open-in-new-tab>Åpne i ny fane</open-in-new-tab></resource>
+                        <resource xml:lang="pl"><open-in-new-tab>Otwórz w nowej karcie</open-in-new-tab></resource>
+                        <resource xml:lang="pt"><open-in-new-tab>Abrir num novo separador</open-in-new-tab></resource>
+                        <resource xml:lang="ru"><open-in-new-tab>Открыть в новой вкладке</open-in-new-tab></resource>
+                        <resource xml:lang="sv"><open-in-new-tab>Öppna i ny flik</open-in-new-tab></resource>
+                        <resource xml:lang="tr"><open-in-new-tab>Yeni sekmede aç</open-in-new-tab></resource>
+                        <resource xml:lang="zh-Hans"><open-in-new-tab>在新标签页中打开</open-in-new-tab></resource>
+                        <resource xml:lang="zh-Hant"><open-in-new-tab>在新分頁中開啟</open-in-new-tab></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:var
+                name="binding"
+                value="xxf:binding('fr-url')"/>
+            <xf:var
+                name="normalized-url"
+                value="UrlSupport:normalizeValidWebUrl(string($binding))"/>
+            <xf:var
+                name="can-open"
+                value="not(fr:is-design-time()) and xxf:non-blank($normalized-url)"/>
+
+            <xh:span class="input-append fr-url-field">
+                <xf:input
+                    id="input"
+                    ref="$binding"
+                    xbl:attr="navindex navindex=tabindex autocomplete incremental"/>
+                <xh:a
+                    class="add-on fr-url-open{' fr-url-open-disabled'[not($can-open)]}"
+                    data-href="{if ($can-open) then $normalized-url else ''}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="{fr:r('open-in-new-tab')}"
+                    aria-label="{fr:r('open-in-new-tab')}"
+                    aria-disabled="{not($can-open)}"
+                    tabindex="{if ($can-open) then '0' else '-1'}">
+                    <xh:i class="fa fa-fw fa-external-link"/>
+                </xh:a>
+            </xh:span>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-url-output"
+        element="fr|url[fr|static-readonly = true]"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value allow-minimal-label-hint"
+        xxbl:label-for="input"
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/url/url.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xf:var
+                name="binding"
+                value="xxf:binding('fr-url-output')"/>
+            <xf:var
+                name="normalized-url"
+                value="UrlSupport:normalizeValidWebUrl(string($binding))"/>
+
+            <xh:span id="input" class="xforms-field">
+                <xf:group ref=".[xxf:non-blank($normalized-url)]" xxf:element="span">
+                    <xh:a
+                        class="fr-url-readonly-link"
+                        href="{$normalized-url}"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        <xf:output value="$normalized-url"/>
+                    </xh:a>
+                </xf:group>
+                <xf:group ref=".[xxf:is-blank($normalized-url)]" xxf:element="span">
+                    <xf:output value="$binding"/>
+                </xf:group>
+            </xh:span>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

@@ -1,0 +1,70 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-fr-hyperlink {
+        display: inline-block;
+        line-height: @fluidLineHeight;
+
+        a.fr-hyperlink-anchor[href] {
+            color: var(--orbeon-link-color);
+            text-decoration: underline;
+            cursor: pointer;
+            overflow-wrap: anywhere;
+            word-wrap: break-word;
+
+            &:hover, &:focus {
+                color: var(--orbeon-link-hover-color);
+            }
+        }
+
+        .fr-hyperlink-anchor.fr-hyperlink-disabled {
+            color: var(--orbeon-control-placeholder-color);
+        }
+
+        @media print {
+            display: inline;
+            line-height: @fixedLineHeight;
+        }
+    }
+
+    // Form Builder design-time: make the inline link label full-width for easy click-to-edit while keeping link look
+    .fb-main .fr-editable .xbl-fr-hyperlink {
+        display: block;
+
+        .fr-hyperlink-anchor {
+            display: block;
+
+            &.xforms-disabled {
+                display: none;
+            }
+        }
+
+        .fr-hyperlink-label {
+            display: block;
+
+            .xforms-output-output {
+                display: block;
+                min-height: 20px;
+                color: var(--orbeon-link-color);
+                text-decoration: underline;
+
+                &:empty {
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+}

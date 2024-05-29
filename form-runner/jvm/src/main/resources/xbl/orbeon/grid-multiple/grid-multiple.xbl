@@ -326,7 +326,7 @@
                                                 $c/*[
                                                     exists(xf:label) and
                                                     exists(@id)      and
-                                                    empty(self::xf:trigger | self::xf:submit)
+                                                    empty(self::xf:trigger | self::xf:submit | self::fr:hyperlink)
                                                 ][1]"/>
 
                                         <xsl:variable name="original-class" select="$c/@class"/>

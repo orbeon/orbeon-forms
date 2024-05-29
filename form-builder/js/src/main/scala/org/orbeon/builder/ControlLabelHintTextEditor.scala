@@ -49,10 +49,10 @@ object ControlLabelHintTextEditor {
   val controlAdded: CallbackList[String] = new CallbackList
 
   locally {
-    val LabelHintSelectorList = List(".xforms-label", ".xforms-hint", ".xforms-text .xforms-output-output") map (".fb-main .fr-editable " + _)
-    val LabelHintSelector     = LabelHintSelectorList mkString ","
-    val ControlSelector       = ".xforms-control, .xbl-component"
-    val ExplanationSelector   = ".xbl-component.xbl-fr-explanation"
+    val LabelHintSelectorList  = List(".xforms-label", ".xforms-hint", ".xforms-text .xforms-output-output", ".fr-hyperlink-label .xforms-output-output") map (".fb-main .fr-editable " + _)
+    val LabelHintSelector      = LabelHintSelectorList mkString ","
+    val ControlSelector        = ".xforms-control, .xbl-component"
+    val OuterComponentSelector = ".xbl-component.xbl-fr-explanation, .xbl-component.xbl-fr-hyperlink"
 
     var resourceEditorCurrentControlOpt  : Option[html.Element] = None
     var resourceEditorCurrentLabelHintOpt: Option[html.Element] = None
@@ -94,7 +94,7 @@ object ControlLabelHintTextEditor {
                   // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
                   resourceEditorCurrentLabelHintOpt
                 case None =>
-                  labelHint.closestOpt(ExplanationSelector)
+                  labelHint.closestOpt(OuterComponentSelector)
                     .orElse(labelHint.closestOpt(ControlSelector))
               }
             resourceEditorCurrentLabelHintOpt
@@ -108,13 +108,15 @@ object ControlLabelHintTextEditor {
         val container = dom.document.getElementByIdT(containerId)
         resourceEditorCurrentControlOpt = container.querySelectorOpt(ControlSelector)
         val repeatOpt = container.parentElementOpt.filter(_.matches(".fr-repeat-single-row"))
+        val cellEditableSelector = ".xforms-label, .xforms-text .xforms-output-output, .fr-hyperlink-label .xforms-output-output"
         resourceEditorCurrentLabelHintOpt =
             repeatOpt match {
               case Some(repeat) =>
                 val column = container.index + 1
                 repeat.querySelectorOpt(s".fr-grid-head .fr-grid-th:nth-child($column) .xforms-label")
+                  .orElse(container.querySelectorOpt(cellEditableSelector))
               case None =>
-               container.querySelectorOpt(".xforms-label, .xforms-text .xforms-output-output")
+               container.querySelectorOpt(cellEditableSelector)
             }
         resourceEditorCurrentLabelHintOpt
           .foreach(resourceEditorStartEdit)
@@ -258,9 +260,9 @@ object ControlLabelHintTextEditor {
 
       // Read/write class telling us if the label/hint/text is in HTML, set in grid.xml
       def getEditorType: EditorType =
-        if      (resourceEditorCurrentLabelHintOpt.exists(_.matches(".xforms-label")))              EditorType.Label
-        else if (resourceEditorCurrentLabelHintOpt.exists(_.parentElement.matches(".xforms-text"))) EditorType.Text
-        else                                                                                     EditorType.Hint
+        if      (resourceEditorCurrentLabelHintOpt.exists(_.matches(".xforms-label, .fr-hyperlink-label .xforms-output-output"))) EditorType.Label
+        else if (resourceEditorCurrentLabelHintOpt.exists(_.parentElement.matches(".xforms-text")))                               EditorType.Text
+        else                                                                                                                      EditorType.Hint
 
       def htmlClass: String = s"fb-${getEditorType.entryName}-is-html"
       def isLabelHintHtml: Boolean = resourceEditorCurrentControlOpt.exists(_.hasClass(htmlClass))

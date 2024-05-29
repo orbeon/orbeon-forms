@@ -317,7 +317,8 @@
             ]
             |
             *:span[
-                p:has-class('xforms-field')
+                p:has-class('xforms-field') and
+                empty(.//*:a[not(ancestor-or-self::*[p:has-class('xforms-disabled')])])
             ]"
        >
         <xsl:element name="{local-name()}">

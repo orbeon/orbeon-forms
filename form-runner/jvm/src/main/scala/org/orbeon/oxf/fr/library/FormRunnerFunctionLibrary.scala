@@ -755,8 +755,7 @@ private object FormRunnerFunctions {
   class FRIsDesignTime extends DefaultFunctionSupport with AddToPathMap {
     override def evaluateItem(context: XPathContext): BooleanValue = {
       implicit val xfc: XFormsFunction.Context = XFormsFunction.context
-      implicit val frp: FormRunnerParams       = FormRunnerParams()
-      FormRunner.isDesignTime
+      FormRunnerParamsOpt().exists(FormRunner.isDesignTime(_, xfc))
     }
   }
 

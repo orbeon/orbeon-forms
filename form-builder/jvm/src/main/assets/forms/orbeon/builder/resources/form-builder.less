@@ -706,7 +706,7 @@ body.orbeon {
             }
 
             &:hover {
-                .xforms-label, .xforms-hint, .xforms-text .xforms-output-output {
+                .xforms-label, .xforms-hint, .xforms-text .xforms-output-output, .fr-hyperlink-label .xforms-output-output {
                     &:empty:before {
                         content: attr(placeholder);
                         color: var(--orbeon-fb-placeholder-color);
@@ -3587,7 +3587,7 @@ body.orbeon {
 
                 .generateMinHeight(20);
 
-                .xforms-label, .xforms-hint, .btn span, .xforms-text .xforms-output-output {
+                .xforms-label, .xforms-hint, .btn span, .xforms-text .xforms-output-output, .fr-hyperlink-label .xforms-output-output {
                     &:hover {
                         // Indicate the value can be edited
                         background-color: var(--orbeon-fb-editable-hover-background-color);

@@ -1,0 +1,84 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-fr-url {
+
+        .input-append.fr-url-field {
+            display: flex;
+            width: 100%;
+
+            > .xforms-input {
+                flex: 1 1 auto;
+                min-width: 0;
+
+                input {
+                    width: 100%;
+                    min-width: 0;
+                    border-top-right-radius   : var(--orbeon-add-on-inner-border-radius);
+                    border-bottom-right-radius: var(--orbeon-add-on-inner-border-radius);
+                }
+            }
+
+            .add-on.fr-url-open {
+                flex-shrink: 0;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                color: var(--orbeon-link-color);
+                cursor: pointer;
+
+                &:hover, &:focus {
+                    color: var(--orbeon-link-hover-color);
+                    text-decoration: none;
+                }
+
+                &:focus-visible {
+                    outline: 0;
+                    box-shadow: var(--orbeon-focus-ring);
+                }
+
+                &.fr-url-open-disabled {
+                    color: var(--orbeon-control-placeholder-color);
+                    cursor: default;
+                    pointer-events: none;
+                    opacity: 0.6;
+                }
+            }
+        }
+
+        .xforms-field {
+            a[href] {
+                cursor: pointer;
+                color: var(--orbeon-link-color);
+                text-decoration: underline;
+
+                &:hover, &:focus {
+                    color: var(--orbeon-link-hover-color);
+                }
+            }
+        }
+
+        @media print {
+            display: inline;
+
+            .xforms-field a[href] {
+                color: var(--orbeon-link-color);
+                text-decoration: underline;
+            }
+        }
+    }
+}

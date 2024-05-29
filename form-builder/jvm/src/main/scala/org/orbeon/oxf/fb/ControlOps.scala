@@ -977,6 +977,7 @@ trait ControlOps extends ResourcesOps {
     // These should match what's in `controls.xsl`
     (FRContainerTest                                                      , isRepeat,  List("min", "max", "freeze", "remove-constraint", "clear-constraint"), Nil),
     (FRNumberTest || FRCurrencyTest || FRPercentageTest                   , _ => true, List("prefix", "suffix")                                             , Nil),
+    (FRHyperlinkQName                                                     , _ => true, List("href")                                                         , Nil),
     (FRDataboundSelect1QName || FRDataboundSelect1SearchQName             , _ => true, List("resource")                                                     , Nil),
     // These are a little different from `controls.xsl` as in the XSLT we use a mode, `within-databound-itemset`, and
     // then match on the attributes. So instead we have a different setup below, mostly not not 100% equivalent.

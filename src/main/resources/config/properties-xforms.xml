@@ -270,6 +270,7 @@
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.code-mirror.theme"                         value="solarized dark"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.color.preset-colors"                       value="#000000 #64748b #ef4444 #f97316 #eab308 #22c55e #14b8a6 #3b82f6 #6366f1 #a855f7 #ec4899 #ffffff"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.hyperlink.open-in-new-tab"                 value="true"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
         fr:grid-single
@@ -295,6 +296,7 @@
         fr:databound-select-search
         fr:autosize-textarea
         fb:xpath-completion
+        fr:hyperlink
         <!-- For static readonly output bindings -->
         fr:output-field
         fr:date
@@ -306,6 +308,7 @@
         fr:percentage
         fr:color
         fr:masked-input
+        fr:url
         fr:handwritten-signature
         fr:timestamp
     </property>

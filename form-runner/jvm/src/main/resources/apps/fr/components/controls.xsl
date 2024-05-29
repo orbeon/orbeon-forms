@@ -277,6 +277,30 @@
 
     <!-- See also `fb.ControlOps` for the renaming part -->
     <xsl:template
+        match="fr:hyperlink[exists(@href)]"
+        mode="within-grid">
+        <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
+        <xsl:copy>
+            <xsl:choose>
+                <xsl:when test="$is-static-readonly">
+                    <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                    <xsl:if test="$is-pdf-mode and $has-pdf-automatic-binding">
+                        <xsl:attribute name="fr:pdf-automatic">true</xsl:attribute>
+                    </xsl:if>
+                </xsl:when>
+                <xsl:when test="$use-pdf-template">
+                    <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
+            <!-- As calls below can generate `frf:controlVariableValue()` -->
+            <xsl:namespace name="frf" select="'java:org.orbeon.oxf.fr.FormRunner'"/>
+            <xsl:attribute name="href" select="frf:replaceVarReferencesWithFunctionCallsFromString(@href, @href, true(), $library-name, ())"/>
+            <xsl:apply-templates select="@* except @href | node()" mode="#current"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- See also `fb.ControlOps` for the renaming part -->
+    <xsl:template
         match="fr:databound-select1 | fr:databound-select1-search | fr:databound-select | fr:databound-select-search"
         mode="within-grid">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>

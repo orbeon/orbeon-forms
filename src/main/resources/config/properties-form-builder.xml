@@ -27,6 +27,7 @@
         oxf:/xbl/orbeon/character-counter/character-counter.xbl
         oxf:/xbl/orbeon/content-filter/content-filter.xbl
         oxf:/xbl/orbeon/clipboard-copy/clipboard-copy.xbl
+        oxf:/xbl/orbeon/url/url.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.number.uri.*.*">
@@ -107,6 +108,7 @@
         oxf:/forms/orbeon/builder/xbl/utility-controls.xbl
         oxf:/xbl/orbeon/explanation/explanation.xbl
         oxf:/forms/orbeon/builder/xbl/text-output.xbl
+        oxf:/xbl/orbeon/hyperlink/hyperlink.xbl
         oxf:/xbl/orbeon/hidden/hidden.xbl
     </property>
 

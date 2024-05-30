@@ -19,29 +19,33 @@ class XXFormsInvalidateInstanceAction extends XFormsAction {
 
     val interpreter = actionContext.interpreter
 
-    // Evaluate AVTs
-    val resourceURI             = interpreter.resolveAVT(actionContext.analysis, "resource")
-    val handleXIncludeStringOpt = Option(interpreter.resolveAVT(actionContext.analysis, "xinclude"))
-
-    val ignoreQueryString = actionContext.element.attributeValueOpt(XFormsNames.IGNORE_QUERY_STRING).contains("true")
-
     // Use `XFormsModel` logger because it's what's used by `XFormsServerSharedInstancesCache` in other places
-    def removeImpl(handleXInclude: Boolean): Unit =
+    XXFormsInvalidateInstanceAction.doInvalidateInstance(
+      resourceURI       = interpreter.resolveAVT(actionContext.analysis, "resource"),
+      handleXInclude    = Option(interpreter.resolveAVT(actionContext.analysis, "xinclude")).map(_.toBoolean),
+      ignoreQueryString = actionContext.element.attributeValueOpt(XFormsNames.IGNORE_QUERY_STRING).contains("true")
+    )(interpreter.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory))
+}
+}
+
+object XXFormsInvalidateInstanceAction {
+
+  // If `handleXInclude.isEmpty`, remove all instances matching `resourceURI`.
+  // NOTE: For now, we can't individually invalidate instances obtained through `POST` or `PUT`
+  def doInvalidateInstance(
+    resourceURI      : String,
+    handleXInclude   : Option[Boolean],
+    ignoreQueryString: Boolean
+  )(implicit
+    logger           : IndentedLogger
+  ): Unit =
+    handleXInclude.map(List(_)).getOrElse(List(true, false)).foreach { handleXInclude =>
       XFormsServerSharedInstancesCache.remove(
-        resourceURI,
+        instanceSourceURI = resourceURI,
         requestBodyHash   = None,
         handleXInclude    = handleXInclude,
         ignoreQueryString = ignoreQueryString
-      )(interpreter.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory))
-
-    handleXIncludeStringOpt match {
-      case Some(handleXIncludeString) =>
-        removeImpl(handleXInclude = handleXIncludeString.toBoolean)
-      case None =>
-        // No `@xinclude` attribute specified so remove all instances matching `@resource`
-        // NOTE: For now, we can't individually invalidate instances obtained through `POST` or `PUT`
-        removeImpl(handleXInclude = true)
-        removeImpl(handleXInclude = false)
+      )
     }
-  }
+
 }

@@ -9,8 +9,8 @@ import org.orbeon.xforms.EventNames
 
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
-import scala.concurrent.Future
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Future, Promise}
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -25,13 +25,27 @@ trait AsynchronousSubmissionManagerTrait {
   private var pendingCount        = 0
 
   private val runningCount           = new AtomicInteger(0)
-  private val completionQueue        = new ConcurrentLinkedQueue[(String, Try[Any] => Any, Try[Any])]
-  private var pendingList            = List.empty[Future[Any]]
+  private var pendingList            = List.empty[PendingCompletion]
 
   private var requestRunningCount         = new AtomicInteger(0)
-
   private var requestWithWaitRunningCount = new AtomicInteger(0)
-  private var requestWithWaitPendingList  = List.empty[(Future[Any], Duration)]
+  private var requestWithWaitPendingList  = List.empty[(PendingCompletion, Duration)]
+
+  private val completionQueue = new ConcurrentLinkedQueue[CompletedCompletion]
+
+  protected case class PendingCompletion(
+    sequence    : Int,
+    description : String,
+    future      : Future[Any]
+  )
+
+  private case class CompletedCompletion(
+    description : String,
+    continuation: Try[Any] => Either[Try[Any], Future[Any]],
+    promise     : Promise[Any],
+    result      : Try[Any],
+    sequence    : Int
+  )
 
   protected def addClientPollEventIfNeeded(containingDocument: XFormsContainingDocument, delayMs: Int): Unit =
     containingDocument.addDelayedEvent(
@@ -50,9 +64,9 @@ trait AsynchronousSubmissionManagerTrait {
   def addAsynchronousCompletion[T, U](
     description          : String,
     computation          : IO[T],
-    continuation         : Try[T] => U,
+    continuation         : Try[T] => Either[Try[U], Future[U]],
     awaitInCurrentRequest: Option[Duration]
-  ): Unit = {
+  ): Future[U] = {
 
     totalSubmittedCount += 1
     pendingCount += 1
@@ -71,8 +85,10 @@ trait AsynchronousSubmissionManagerTrait {
     val localRequestRunningCount         = requestRunningCount
     val localRequestWithWaitRunningCount = requestWithWaitRunningCount
 
-    def preProcessFutureCompletion(result: Try[T]): Try[T] = {
-      // This runs asynchronously
+    val p = Promise[U]()
+
+    // This runs asynchronously after the computation completes
+    def preProcessFutureCompletion(sequence: Int)(result: Try[T]): Try[T] = {
 
       // Decrement through copied references so we don't impact future requests
       localRequestRunningCount.decrementAndGet()
@@ -80,18 +96,33 @@ trait AsynchronousSubmissionManagerTrait {
         localRequestWithWaitRunningCount.decrementAndGet()
 
       runningCount.decrementAndGet()
-      completionQueue.add((description, continuation.asInstanceOf[Try[Any] => Any], result))
+      completionQueue.add(
+        CompletedCompletion(
+          description,
+          continuation.asInstanceOf[Try[Any] => Either[Try[Any], Future[Any]]],
+          p.asInstanceOf[Promise[Any]],
+          result,
+          sequence
+        )
+      )
 
       result
     }
 
-    val newFuture = computation.unsafeToFuture().transform(preProcessFutureCompletion)
+    val newPendingCompletion =
+      PendingCompletion(
+        totalSubmittedCount,
+        description,
+        computation.unsafeToFuture().transform(preProcessFutureCompletion(totalSubmittedCount)) // this actually schedules the computation
+      )
 
-    pendingList ::= newFuture
+    pendingList ::= newPendingCompletion
 
     mustWaitDurationOpt.foreach { mustWaitDuration =>
-      requestWithWaitPendingList ::= newFuture -> mustWaitDuration
+      requestWithWaitPendingList ::= (newPendingCompletion, mustWaitDuration)
     }
+
+    p.future
   }
 
   def processCompletedAsynchronousSubmissions(containingDocument: XFormsContainingDocument): Unit = {
@@ -103,13 +134,20 @@ trait AsynchronousSubmissionManagerTrait {
       var failedCount = 0
 
       Iterator.continually(completionQueue.poll()).takeWhile(_ ne null).foreach {
-        case (description, continuation, resultTry) =>
+        case CompletedCompletion(description, continuation, callerPromise, resultTry, sequence) =>
 
           pendingCount -= 1
+          pendingList = pendingList.filterNot(_.sequence == sequence)
 
           debug(s"processing asynchronous result `$description`")
           try {
-            continuation(resultTry)
+            continuation(resultTry) match {
+              case Left(t) =>
+                callerPromise.complete(t)
+              case Right(future) =>
+                future.onComplete(v => callerPromise.complete(v))
+            }
+
             processedCount += 1
           } catch {
             case NonFatal(t) =>
@@ -117,7 +155,8 @@ trait AsynchronousSubmissionManagerTrait {
               // an exception. We still want to log the exception here, as it's likely to be a bug.
               error(s"error processing asynchronous submission `$description`", t)
               failedCount += 1
-              throw t
+              // Fail the caller promise as well instead of throwing here
+              callerPromise.failure(t)
           }
       }
 
@@ -146,10 +185,11 @@ trait AsynchronousSubmissionManagerTrait {
       containingDocument,
       skipDeferredEventHandling = true, // `xxf:join-submissions` already runs within a deferred action handling context
       () => {
-        val r = pendingList.map(_ -> Duration.Inf)
+        val r = pendingList.map(p => (p, Duration.Inf))
         pendingList = Nil
         r
-      })
+      }
+    )
   }
 
   /**
@@ -160,7 +200,9 @@ trait AsynchronousSubmissionManagerTrait {
     skipDeferredEventHandling: Boolean
   ): Unit = {
     implicit val logger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LoggingCategory)
+
     debug("awaiting all pending asynchronous submissions for current request")
+
     awaitPending(
       containingDocument,
       skipDeferredEventHandling,
@@ -183,7 +225,7 @@ trait AsynchronousSubmissionManagerTrait {
   protected def awaitPending(
     containingDocument       : XFormsContainingDocument,
     skipDeferredEventHandling: Boolean,
-    getAndClear              : () => List[(Future[Any], Duration)]
+    getAndClear              : () => List[(PendingCompletion, Duration)]
   )(implicit
     logger                   : IndentedLogger
   ): Unit

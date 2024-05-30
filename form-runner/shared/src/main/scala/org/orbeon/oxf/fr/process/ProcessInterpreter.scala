@@ -31,6 +31,7 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
+import scala.concurrent.Future
 import scala.util.control.NoStackTrace
 import scala.util.{Failure, Success, Try}
 
@@ -51,7 +52,7 @@ trait ProcessInterpreter extends Logging {
   def clearSuspendedProcess(): Unit
   def writeSuspendedProcess(processId: String, process: String): Unit
   def readSuspendedProcess: Try[(String, String)]
-  def submitContinuation[T](computation: IO[T], continuation: Try[T] => Unit): Unit
+  def submitContinuation[T, U](message: String, computation: IO[T], continuation: Try[T] => Either[Try[U], Future[U]]): Future[U]
   def createUniqueProcessId: String = CoreCrossPlatformSupport.randomHexId
   def transactionStart(): Unit
   def transactionRollback(): Unit
@@ -149,8 +150,18 @@ trait ProcessInterpreter extends Logging {
               // TODO: we don't support concurrent processes yet so if someone starts another process in the meanwhile,
               //  some state will be lost.
               val processScope = processStackDyn.value.get.scope
-              submitContinuation(computation, continuation.andThen(initialTry => runProcess(processScope, serializedContinuation._2, initialTry)))
-              ActionResult.Interrupt(None, None)
+              ActionResult.Interrupt(
+                None,
+                Right(
+                  submitContinuation(
+                    s"continuation of process $runningProcessId",
+                    computation,
+                    continuation.andThen { initialTry =>
+                      runProcess(processScope, serializedContinuation._2, initialTry)
+                    }
+                  )
+                )
+              )
             case r @ ActionResult.Interrupt(_, _) =>
               debugResults(List("result" -> "interrupted action"))
               r
@@ -243,39 +254,39 @@ trait ProcessInterpreter extends Logging {
     (throw new IllegalArgumentException(s"Non-existing process: $name in scope $scope"))
 
   // Main entry point for starting a process associated with a named button
-  def runProcessByName(scope: String, name: String): Try[Any] =
+  def runProcessByName(scope: String, name: String): ProcessResult =
     withRunProcess(scope, name) {
       runProcess(scope, rawProcessByName(scope, name))
     }
 
+  type ProcessResult = Either[Try[Any], Future[Any]]
+
   // Main entry point for starting a literal process
-  def runProcess(scope: String, process: String, initialTry: Try[Any] = Success(())): Try[Any] =
+  def runProcess(scope: String, process: String, initialTry: Try[Any] = Success(())): ProcessResult =
     withDebug("process: running", List("process" -> process)) {
       transactionStart()
       // Scope the process (for suspend/resume)
       withEmptyStack(scope) {
-        beforeProcess() flatMap { _ =>
-          runSubProcess(process, initialTry) match {
-            case ActionResult.Sync(tried) =>
-              tried
-            case ActionResult.Interrupt(message, Some(success @ Success(_))) =>
-              debug(s"process: process interrupted with `success` action with message `$message`")
-              success
-            case ActionResult.Interrupt(message, Some(failure @ Failure(_))) =>
-              debug(s"process: process interrupted with `failure` action with message `$message`")
-              failure
-            case ActionResult.Interrupt(message, None) =>
-              debug(s"process: process interrupted due to asynchronous action with message `$message`")
-              Success(())
-          }
-//        } doEitherWay {
-//          afterProcess()
-        } recoverWith { case t =>
+        beforeProcess().map(_ => runSubProcess(process, initialTry)).recoverWith { case t =>
           // Log and send a user error if there is one
           // NOTE: In the future, it would be good to provide the user with an error id.
           error(OrbeonFormatter.format(t))
           Try(processError(t))
           Failure(t)
+        } match {
+          case Success(ActionResult.Sync(tried)) =>
+            Left(tried)
+          case Success(ActionResult.Interrupt(message, Left(success @ Success(_)))) =>
+            debug(s"process: process interrupted with `success` action with message `$message`")
+            Left(success)
+          case Success(ActionResult.Interrupt(message, Left(failure @ Failure(_)))) =>
+            debug(s"process: process interrupted with `failure` action with message `$message`")
+            Left(failure)
+          case Success(ActionResult.Interrupt(message, Right(io))) =>
+            debug(s"process: process interrupted due to asynchronous action with message `$message`")
+            Right(io)
+          case f @ Failure(_) =>
+            Left(f)
         }
       }
       // TODO: `transactionEnd()` to clean transient state?
@@ -286,11 +297,11 @@ trait ProcessInterpreter extends Logging {
 
   // Interrupt the process and complete with a success
   private def trySuccess(params: ActionParams): ActionResult =
-    ActionResult.Interrupt(paramByName(params, "message"), Option(Success(())))
+    ActionResult.Interrupt(paramByName(params, "message"), Left(Success(())))
 
   // Interrupt the process and complete with a failure
   private def tryFailure(params: ActionParams): ActionResult =
-    ActionResult.Interrupt(paramByName(params, "message"), Option(Failure(ProcessFailure())))
+    ActionResult.Interrupt(paramByName(params, "message"), Left(Failure(ProcessFailure())))
 
   // Run a sub-process
   private def tryProcess(params: ActionParams): ActionResult =
@@ -307,7 +318,7 @@ trait ProcessInterpreter extends Logging {
     Try((writeSuspendedProcess _).tupled(serializeContinuation)) match {
       case Success(_) =>
         trySuccess(EmptyActionParams) // this will not be caught by `Try.apply()`
-        ActionResult.Interrupt(None, Option(Success(())))
+        ActionResult.Interrupt(None, Left(Success(())))
       case failure @ Failure(t) =>
         error(s"error suspending process: `${t.getMessage}`")
         ActionResult.Sync(failure)
@@ -415,9 +426,9 @@ object ProcessInterpreter {
   sealed trait ActionResult
   sealed trait InternalActionResult extends ActionResult
   object ActionResult {
-    case class Sync(value: Try[Any])                                       extends InternalActionResult
-    case class Async[T](value: Try[(IO[T], Try[T] => Try[Any])])           extends ActionResult
-    case class Interrupt(message: Option[String], value: Option[Try[Any]]) extends InternalActionResult
+    case class Sync(value: Try[Any])                                                    extends InternalActionResult
+    case class Async[T](value: Try[(IO[T], Try[T] => Try[Any])])                        extends ActionResult
+    case class Interrupt(message: Option[String], value: Either[Try[Any], Future[Any]]) extends InternalActionResult
 
     def trySync(body: => Any): ActionResult = ActionResult.Sync(Try(body))
     def tryAsync[T](body: => (IO[T], Try[T] => Try[Any])): ActionResult = ActionResult.Async(Try(body))

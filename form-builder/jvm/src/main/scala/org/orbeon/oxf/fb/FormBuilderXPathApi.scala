@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.fb
 
+import cats.effect.IO
 import io.circe.parser
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.css.CSSSelectorParser
@@ -29,20 +30,23 @@ import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.process.SimpleProcess.{currentXFormsDocumentId, evaluateString}
 import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.util.{ContentTypes, Mediatypes, PathUtils}
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.actions.XXFormsInvalidateInstanceAction
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
-import org.orbeon.saxon.om.{EmptyIterator, NodeInfo, SequenceIterator}
+import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.QNameValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions
@@ -56,6 +60,51 @@ import scala.util.{Failure, Success, Try}
 
 
 object FormBuilderXPathApi {
+
+  //@XPathFunction
+  def publishForm(
+    doc                  : NodeInfo,
+    documentId           : String,
+    formDefinitionVersion: String,
+    versionComment       : String,
+    available            : Boolean,
+    formName             : String
+  ): Unit = {
+
+    def continuation(t: Try[Any]): Either[Try[Unit], Nothing] = t match {
+      case Failure(t) =>
+        Left(Failure(t))
+      case Success(_) =>
+        Left {
+          Try {
+            XFormsAPI.sendThrowOnError(
+              "fb-publish-submission",
+              List(
+                PropertyValue("doc", Some(doc)),
+                PropertyValue("document-id", Some(documentId)),
+                PropertyValue("form-definition-version", Some(formDefinitionVersion)),
+                PropertyValue("version-comment", Some(versionComment)),
+                PropertyValue("available", Some(available))
+              )
+            )
+
+            if (formName == "library")
+              XXFormsInvalidateInstanceAction.doInvalidateInstance(
+                resourceURI       = "/fr/service/custom/orbeon/builder/toolbox",
+                handleXInclude    = None,
+                ignoreQueryString = true
+              )
+          }
+        }
+    }
+
+    process.SimpleProcess.runProcessByName("oxf.fr.detail.process", "save") match {
+      case Left(t)   =>
+        continuation(t)
+      case Right(future) =>
+        process.SimpleProcess.submitContinuation("continuation of `publishForm()`", IO.fromFuture(IO.pure(future)), continuation)
+    }
+  }
 
   //@XPathFunction
   def buildContentDispositionHeader(doc: NodeInfo, formatName: String): String = {

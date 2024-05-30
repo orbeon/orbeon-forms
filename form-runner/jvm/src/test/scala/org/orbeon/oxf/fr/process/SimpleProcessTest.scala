@@ -29,7 +29,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 import java.util.concurrent.ConcurrentLinkedQueue
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, Future, Promise}
 import scala.util.{Success, Try}
 
 
@@ -53,7 +53,7 @@ trait TestProcessInterpreter extends ProcessInterpreter {
   def writeSuspendedProcess(processId: String, process: String): Unit = _suspendedProcess = Some(processId -> process)
   def readSuspendedProcess: Try[(String, String)] = Try(_suspendedProcess.get)
 
-  def submitContinuation[T](computation: IO[T], continuation: Try[T] => Unit): Unit = ???
+  def submitContinuation[T, U](message: String, computation: IO[T], continuation: Try[T] => Either[Try[U], Future[U]]): Future[U] = ???
 
   // Constant so that we can test properly
   override def createUniqueProcessId: String = ConstantProcessId
@@ -149,7 +149,10 @@ extends DocumentTestBase
         interpreter.runProcessByName("", process)
         assert(interpreter.savedProcess.contains((ConstantProcessId, normalize(continuation))))
         assert(trace == interpreter.trace)
-        interpreter.runProcess("", "resume").get
+        interpreter.runProcess("", "resume") match {
+          case Left(t)  => t.get
+          case Right(_) => throw new IllegalStateException
+        }
       }
     }
   }
@@ -288,15 +291,22 @@ extends DocumentTestBase
       override def extensionActions: List[(String, Action)] =
         super.extensionActions ++: (("my-async" -> myASyncAction("my-async") _) :: Nil)
 
-      val completionQueue = new ConcurrentLinkedQueue[(Try[Any] => Any, Try[Any])]
+      val completionQueue = new ConcurrentLinkedQueue[(Try[Any] => Either[Try[Any], Future[Any]], Promise[Any], Try[Any])]
       var pendingList     = List.empty[Future[Any]]
 
-      override def submitContinuation[T](computation: IO[T], continuation: Try[T] => Unit): Unit = {
-        pendingList ::= computation.unsafeToFuture().transform { result =>
+      override def submitContinuation[T, U](message: String, computation: IO[T], continuation: Try[T] => Either[Try[U], Future[U]]): Future[U] = {
+
+        val p = Promise[U]()
+
+        def preProcessFutureCompletion(result: Try[T]): Try[T] = {
           // Make sure we add to the completion queue before the `Future` in the pendingList is completed
-          completionQueue.add((continuation.asInstanceOf[Try[Any] => Any], result))
+          completionQueue.add((continuation.asInstanceOf[Try[Any] => Either[Try[Any], Future[Any]]], p.asInstanceOf[Promise[Any]], result))
           result
         }
+
+        pendingList ::= computation.unsafeToFuture().transform(preProcessFutureCompletion)
+
+        p.future
       }
 
       def awaitResultAndProcessSingleBatch(): Unit = {
@@ -306,11 +316,15 @@ extends DocumentTestBase
 
         Await.ready(Future.sequence(batch), Duration.Inf)
 
-
         // Do it only once
         Option(completionQueue.poll()).foreach {
-          case (continuation, resultTry) =>
-            continuation(resultTry)
+          case (continuation, callerPromise, resultTry) =>
+            continuation(resultTry) match {
+              case Left(t) =>
+                callerPromise.complete(t)
+              case Right(future) =>
+                future.onComplete(result => callerPromise.complete(result))
+            }
         }
       }
 

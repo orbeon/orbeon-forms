@@ -900,28 +900,18 @@
 
     <!-- Publish form operation -->
     <xf:action ev:event="fb-publish-form">
-
-        <!-- Save -->
         <!-- See https://github.com/orbeon/orbeon-forms/issues/2611 -->
+        <!-- See https://github.com/orbeon/orbeon-forms/issues/6342 -->
         <xf:action type="xpath">
-            fr:run-process-by-name('oxf.fr.detail.process', 'save')
+            fbf:publishForm(
+                event('doc'),
+                event('document-id'),
+                event('form-definition-version'),
+                event('version-comment'),
+                event('available'),
+                bind('form-name-bind')
+            )
         </xf:action>
-
-        <!-- Publish -->
-        <xf:send submission="fb-publish-submission">
-            <xf:property name="doc"                      value="event('doc')"/>
-            <xf:property name="document-id"              value="event('document-id')"/>
-            <xf:property name="form-definition-version"  value="event('form-definition-version')"/>
-            <xf:property name="version-comment"          value="event('version-comment')"/>
-            <xf:property name="available"                value="event('available')"/>
-        </xf:send>
-
-        <xf:action if="bind('form-name-bind') = 'library'">
-            <xxf:invalidate-instance
-                resource="/fr/service/custom/orbeon/builder/toolbox"
-                ignore-query-string="true"/>
-        </xf:action>
-
     </xf:action>
 
     <xf:action event="fb-excel-export">

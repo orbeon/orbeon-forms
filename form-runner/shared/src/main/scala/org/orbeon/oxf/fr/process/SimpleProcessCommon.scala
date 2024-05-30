@@ -35,6 +35,7 @@ import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
 
@@ -103,11 +104,11 @@ trait SimpleProcessCommon
   def clearSuspendedProcess(): Unit =
     setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, "")
 
-  def submitContinuation[T](computation: IO[T], continuation: Try[T] => Unit): Unit =
+  def submitContinuation[T, U](message: String, computation: IO[T], continuation: Try[T] => Either[Try[U], Future[U]]): Future[U] =
     inScopeContainingDocument
       .getAsynchronousSubmissionManager
       .addAsynchronousCompletion(
-        description           = s"process process id: $runningProcessId ",
+        description           = message,
         computation           = computation,
         continuation          = continuation,
         awaitInCurrentRequest = Some(Duration.Inf)

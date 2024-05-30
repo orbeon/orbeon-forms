@@ -256,12 +256,18 @@ private object FormRunnerFunctions {
 
   class FRRunProcessByName extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(context: XPathContext): BooleanValue =
-      SimpleProcess.runProcessByName(stringArgument(0)(context), stringArgument(1)(context)).isSuccess
+      SimpleProcess.runProcessByName(stringArgument(0)(context), stringArgument(1)(context)) match {
+      case Left(t)  => t.isSuccess
+      case Right(_) => true // async result, we can't know if successful yet!
+    }
   }
 
   class FRRunProcess extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(context: XPathContext): BooleanValue =
-      SimpleProcess.runProcess(stringArgument(0)(context), stringArgument(1)(context)).isSuccess
+      SimpleProcess.runProcess(stringArgument(0)(context), stringArgument(1)(context)) match {
+      case Left(t)  => t.isSuccess
+      case Right(_) => true // async result, we can't know if successful yet!
+    }
   }
 
   class FRDataset extends SystemFunction {

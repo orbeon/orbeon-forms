@@ -191,7 +191,7 @@
                         <xf:label class="fb-tools-title" value="$form-resources/form-structure/label"/>
                         <!-- Add new section -->
                         <xh:div class="fb-tool">
-                            <xf:trigger id="insert-new-section-trigger" ref="instance('fb-variables')/section-trigger">
+                            <fr:trigger id="insert-new-section-trigger" ref="instance('fb-variables')/section-trigger" name="toolbox.insert-section">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-newspaper-o"/>
                                     <xf:output value="$form-resources/new-section/label"/>
@@ -199,11 +199,11 @@
                                 <xf:action ev:event="DOMActivate" type="xpath">
                                     toolboxOps:insertNewSection(true(), ())
                                 </xf:action>
-                            </xf:trigger>
+                            </fr:trigger>
                         </xh:div>
                         <!-- Add grids -->
                         <xh:div class="fb-tool">
-                            <xf:trigger id="insert-new-grid-trigger" ref="instance('fb-variables')/grid-trigger">
+                            <fr:trigger id="insert-new-grid-trigger" ref="instance('fb-variables')/grid-trigger" name="toolbox.insert-grid">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-table"/>
                                     <xf:output value="$form-resources/new-grid/label"/>
@@ -211,10 +211,10 @@
                                 <xf:action ev:event="DOMActivate" type="xpath">
                                     toolboxOps:insertNewGrid(false())
                                 </xf:action>
-                            </xf:trigger>
+                            </fr:trigger>
                         </xh:div>
                         <xh:div class="fb-tool">
-                            <xf:trigger id="insert-new-repeated-grid-trigger" ref="instance('fb-variables')/grid-trigger">
+                            <fr:trigger id="insert-new-repeated-grid-trigger" ref="instance('fb-variables')/grid-trigger" name="toolbox.insert-repeated-grid">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-table"/>
                                     <xf:output value="$form-resources/new-repeated-grid/label"/>
@@ -222,7 +222,7 @@
                                 <xf:action ev:event="DOMActivate" type="xpath">
                                     toolboxOps:insertNewGrid(true())
                                 </xf:action>
-                            </xf:trigger>
+                            </fr:trigger>
                         </xh:div>
                     </xf:group>
                 </xh:div>

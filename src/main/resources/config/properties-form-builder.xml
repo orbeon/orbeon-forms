@@ -302,4 +302,16 @@
         as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.redo"
         value="⌘⇧Z ⌃Y"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-section"
+        value="ISS"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-grid"
+        value="ISG"/>
+     <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-repeated-grid"
+        value="ISR"/>
 </properties>

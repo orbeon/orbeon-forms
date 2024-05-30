@@ -345,6 +345,8 @@ body.orbeon {
             float: right;
             display: none;
             line-height: 18px; // try not to cause the enclosing button to become taller
+            min-width: 3.5em;
+            text-align: center;
         }
 
         .tab-content:hover kbd:not(:empty) {
@@ -474,6 +476,10 @@ body.orbeon {
                 margin-bottom: @fbGutter;
                 &:last-child { margin-bottom: 0 }
 
+                fieldset {
+                    min-inline-size: auto; // otherwise the `fieldset` overflows on the right
+                }
+
                 legend {
                     font-size: 11px;
                     margin-bottom: 4px;
@@ -496,6 +502,8 @@ body.orbeon {
 
                         & > span {
                             flex-grow: 1;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
                         }
 
                         i {

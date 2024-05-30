@@ -18,28 +18,31 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.xforms.analysis.TopLevelPartAnalysis
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xforms.xbl.XBLAssets
 
 
 trait XFormsStaticState
   extends XFormsStaticStateStaticProperties
      with XFormsStaticStateDynamicProperties {
 
-  def getIndentedLogger                       : IndentedLogger
+  def getIndentedLogger                   : IndentedLogger
 
   // State
-  def encodedState                            : String
-  def digest                                  : String
+  def encodedState                        : String
+  def digest                              : String
 
   // Static representation
-  def topLevelPart                            : TopLevelPartAnalysis
-  def template                                : Option[AnnotatedTemplate]
+  def topLevelPart                        : TopLevelPartAnalysis
+  def template                            : Option[AnnotatedTemplate]
 
   // Must always return `true` as of 2020-10-29 or handlers will throw an error
-  def isHTMLDocument                          : Boolean
+  def isHTMLDocument                      : Boolean
 
   // Other configurations
-  def assets                                  : XFormsAssets
-  def sanitizeInput                           : String => String
+  def sanitizeInput                       : String => String
+
+  def baselineAssets                      : (List[String], List[String])
+  def bindingAssets                       : XBLAssets
 }
 
 trait XFormsStaticStateStaticProperties {

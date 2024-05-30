@@ -3,6 +3,9 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xml.SAXStore
+import org.orbeon.xforms.HeadElement
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 
@@ -33,3 +36,13 @@ case class CommonBinding(
 ) {
   val standardLhhaAsSet: Set[LHHA] = standardLhhaAsSeq.toSet
 }
+
+// NOTE: 2018-02-23: This is only created if the `AbstractBinding` has a template. Wondering if we should support components with
+// no templates (or creating an empty template in that case) so that we don't have to special-case bindings without templates.
+case class ConcreteBinding(
+  innerScope       : Scope,             // each binding defines a new scope
+  templateTree     : SAXStore,          // template with relevant markup for output, including XHTML when needed
+  boundElementAtts : Map[QName, String] // attributes on the bound element
+)
+
+case class XBLAssets(css: List[HeadElement], js: List[HeadElement])

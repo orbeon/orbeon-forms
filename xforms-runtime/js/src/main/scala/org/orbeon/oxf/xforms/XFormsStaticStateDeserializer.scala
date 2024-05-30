@@ -28,7 +28,7 @@ import org.orbeon.saxon.om
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
+import org.orbeon.xforms.{HeadElement, XFormsCrossPlatformSupport, XFormsId}
 import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable.typeableOps
 
@@ -1070,7 +1070,6 @@ object XFormsStaticStateImpl {
       def isHTMLDocument: Boolean = true // TODO
 
       // TODO: serialize/deserialize
-      val assets: XFormsAssets = XFormsAssets(Nil, Nil, Set.empty) // XXX TODO
       val sanitizeInput: String => String = identity // XXX TODO
 
       def nonDefaultProperties: Map[String, (String, Boolean)] = _nonDefaultProperties
@@ -1098,6 +1097,9 @@ object XFormsStaticStateImpl {
       def allowedExternalEvents               : Set[String]      = staticProperties.allowedExternalEvents
 
       def propertyMaybeAsExpression(name: String) : Either[Any, StaticXPath.CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
+
+      def baselineAssets: (List[String], List[String]) = (Nil, Nil)
+      def bindingAssets: XBLAssets = XBLAssets(Nil, Nil)
     }
   }
 }
@@ -1181,7 +1183,7 @@ object TopLevelPartAnalysisImpl {
 
         def iterateGlobals: Iterator[Global] = _globals.map(Global(_, null)).iterator
 
-        def allXblAssetsMaybeDuplicates: Iterable[XBLAssets] = Nil
+        def allXblAssetsMaybeDuplicates: Iterable[(QName, XBLAssets)] = Nil
 
         def containingScope(prefixedId: String): Scope = throw new NotImplementedError("containingScope")
 
@@ -1192,8 +1194,6 @@ object TopLevelPartAnalysisImpl {
 
         def scriptsByPrefixedId: Map[String, StaticScript] = _scriptsByPrefixedId
         def uniqueJsScripts: List[ShareableScript] = _uniqueJsScripts
-
-        def baselineResources: (List[String], List[String]) = (Nil, Nil) // XXX TODO
       }
 
     for (model <- models)

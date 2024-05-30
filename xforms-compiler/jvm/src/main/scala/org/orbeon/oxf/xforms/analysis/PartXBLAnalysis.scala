@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
@@ -126,9 +127,9 @@ trait PartXBLAnalysis extends TransientState {
   def scopeForPrefixedId(prefixedId: String): Scope =
     prefixedIdToXBLScopeMap.get(prefixedId).orNull // NOTE: only one caller tests for null: XBLContainer.findResolutionScope
 
-  def allXblAssetsMaybeDuplicates: Iterable[XBLAssets] =
-    metadata.allBindingsMaybeDuplicates map { binding =>
-      XBLAssets(binding.commonBinding.cssName, binding.scripts, binding.styles)
+  def allXblAssetsMaybeDuplicates: Iterable[(QName, XBLAssets)] =
+    metadata.allBindingsMaybeDuplicates flatMap { binding =>
+      binding.commonBinding.directName.map(_ -> XBLAssets(css = binding.assets.css, js = binding.assets.js))
     }
 
   override def freeTransientState(): Unit = {

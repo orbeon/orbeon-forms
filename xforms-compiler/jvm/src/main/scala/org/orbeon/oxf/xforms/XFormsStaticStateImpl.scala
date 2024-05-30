@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
+import org.orbeon.dom.QName
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.properties.Property
@@ -22,9 +23,14 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xforms.xbl.{BindingLoader, XBLAssets}
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.xforms.xbl.Scope
+
+import scala.collection.compat._
+import scala.collection.immutable.SortedMap
+import scala.collection.mutable
 
 
 object XFormsStaticStateImpl {
@@ -65,6 +71,7 @@ object XFormsStaticStateImpl {
       encodedState,
       digest,
       topLevelPart,
+      topLevelPart.metadata,
       template,
       staticStateDocument.isHTMLDocument,
       staticStateDocument.nonDefaultProperties,
@@ -79,6 +86,7 @@ class XFormsStaticStateImpl(
   val encodedState                : String,
   val digest                      : String,
   val topLevelPart                : TopLevelPartAnalysis,
+  metadata                        : Metadata,
   val template                    : Option[AnnotatedTemplate],      // for serialization and tests
   val isHTMLDocument              : Boolean,
   val nonDefaultProperties        : Map[String, (String, Boolean)], // for serialization
@@ -114,25 +122,67 @@ class XFormsStaticStateImpl(
 
   def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
 
-  lazy val sanitizeInput: String => String = StringReplacer(staticProperties.staticStringProperty(P.SanitizeProperty))
+  lazy val sanitizeInput: String => String =
+    StringReplacer(staticProperties.staticStringProperty(P.SanitizeProperty))
 
-  lazy val assets: XFormsAssets =
-    XFormsAssetsBuilder.updateAssets(
-      XFormsAssetsBuilder.fromJsonProperty(CoreCrossPlatformSupport.properties),
-      staticProperties.staticStringProperty(P.AssetsBaselineExcludesProperty).trimAllToOpt,
-      staticProperties.staticStringProperty(P.AssetsBaselineUpdatesProperty).trimAllToOpt.map(propValue =>
-        Property(
-          XS_STRING_QNAME,
-          propValue,
-          topLevelPart
-            .getDefaultModel
-            .namespaceMapping.mapping,
+  lazy val baselineAssets: (List[String], List[String]) = {
+
+    val xblBaseline = metadata.xblBaselineAssets
+
+    val updatedAssets =
+      XFormsAssetsBuilder.updateAssets(
+        globalAssetsBaseline = XFormsAssetsBuilder.fromJsonProperty(CoreCrossPlatformSupport.properties),
+        globalXblBaseline    = xblBaseline.keySet,
+        localExcludesProp    = staticProperties.staticStringProperty(P.AssetsBaselineExcludesProperty).trimAllToOpt,
+        localUpdatesProp     = staticProperties.staticStringProperty(P.AssetsBaselineUpdatesProperty).trimAllToOpt.map(propValue =>
+          Property(
+            XS_STRING_QNAME,
+            propValue,
+            topLevelPart.getDefaultModel
+              .namespaceMapping.mapping,
             // FIXME: It's unclear what namespace mapping to use! With Form Runner/Form Builder, the
             //   property value is read and copied over to an attribute on the first model, but the
             //   namespace context from the properties file is lost in this process. Maybe we should
             //   instead convert QNames to EQNames.
-          P.AssetsBaselineUpdatesProperty
+            P.AssetsBaselineUpdatesProperty
+          )
         )
       )
+
+    val allInUseBindingAssets =
+      BindingLoader.collectBindingAssets(metadata.allBindingsMaybeDuplicates)
+
+    // This is in `QName` order
+    val partiallyResolvedXblBaselineAssetPaths =
+      updatedAssets.xbl.toList.sorted.map { qname =>
+        xblBaseline
+          .get(qname)
+          .orElse(allInUseBindingAssets.get(qname))
+          .toLeft(qname)
+      }
+
+    // Do a single call to get the missing bindings
+    val missingBindings =
+      BindingLoader.findXblAssetsUnordered(partiallyResolvedXblBaselineAssetPaths.collect{ case Right(qname) => qname }.toSet)
+
+    // This keeps the `QName` order
+    val resolvedXblBaselineAssetPaths =
+      partiallyResolvedXblBaselineAssetPaths.map {
+        case Left(value)  => value
+        case Right(qname) => missingBindings.getOrElse(qname, throw new IllegalArgumentException(qname.qualifiedName))
+      }
+
+    (
+      (updatedAssets.js  ::: resolvedXblBaselineAssetPaths.flatMap(_.js)) .map(_.assetPath(tryMin = true)),
+      (updatedAssets.css ::: resolvedXblBaselineAssetPaths.flatMap(_.css)).map(_.assetPath(tryMin = true)),
     )
+  }
+
+  lazy val bindingAssets: XBLAssets = {
+    val orderedBindings = SortedMap[QName, XBLAssets]() ++ topLevelPart.allXblAssetsMaybeDuplicates
+    XBLAssets(
+      css = orderedBindings.values.iterator.flatMap(_.css).to(mutable.LinkedHashSet).toList,
+      js  = orderedBindings.values.iterator.flatMap(_.js) .to(mutable.LinkedHashSet).toList
+    )
+  }
 }

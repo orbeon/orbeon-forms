@@ -17,12 +17,11 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.processor.ScriptBuilder._
-import org.orbeon.oxf.xforms.XFormsAssetPaths
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
+import org.orbeon.oxf.xforms.processor.ScriptBuilder._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XHTMLOutput}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.xforms.xbl.XBLAssetsSupport
+import org.orbeon.oxf.xforms.xbl.{XBLAssets, XBLAssetsSupport}
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
@@ -82,19 +81,17 @@ class XHTMLHeadHandler(
         )
       }
 
-    val ops = containingDocument.staticOps
-
-    val (baselineScripts, baselineStyles) = ops.baselineResources
-    val (scripts, styles)                 = ops.bindingResources
+    val (baselineJs, baselineCss) = containingDocument.staticState.baselineAssets
+    val XBLAssets(css, js)        = containingDocument.staticState.bindingAssets
 
     // Stylesheets
-    outputCSSResources(xhtmlPrefix, isMinimal, containingDocument.staticState.assets, styles, baselineStyles)
+    outputCssAssets(xhtmlPrefix, baselineCss, css)
 
     // Scripts
     locally {
 
       // Linked JavaScript resources
-      outputJavaScriptResources(xhtmlPrefix, isMinimal, containingDocument.staticState.assets, scripts, baselineScripts)
+      outputJsAssets(xhtmlPrefix, baselineJs, js)
 
       if (! containingDocument.isServeInlineResources) {
 
@@ -193,15 +190,14 @@ private object XHTMLHeadHandler {
       "media" -> "all"
     )
 
-  def valueOptToList(name: String, value: Option[String]): List[(String, String)] =
+  private def valueOptToList(name: String, value: Option[String]): List[(String, String)] =
     value.toList map (name -> _)
 
-  def outputJavaScriptResources(
-    xhtmlPrefix       : String,
-    minimal           : Boolean,
-    assets            : XFormsAssets,
-    headElements      : List[HeadElement],
-    baselineResources : List[String])(implicit
+  private def outputJsAssets(
+    xhtmlPrefix   : String,
+    baselineAssets: List[String],
+    bindingAssets : List[HeadElement],
+  )(implicit
     receiver          : XMLReceiver
   ): Unit = {
 
@@ -215,25 +211,23 @@ private object XHTMLHeadHandler {
         content foreach text
       }
 
-    XBLAssetsSupport.outputResources(
-      outputElement = outputScriptElement,
-      builtin       = assets.js,
-      headElements  = headElements,
-      xblBaseline   = baselineResources,
-      minimal       = minimal
+    XBLAssetsSupport.outputAssets(
+      outputElement  = outputScriptElement,
+      baselineAssets = baselineAssets,
+      bindingAssets   = bindingAssets,
     )
   }
 
-  def outputCSSResources(
-    xhtmlPrefix       : String,
-    minimal           : Boolean,
-    assets            : XFormsAssets,
-    headElements      : List[HeadElement],
-    baselineResources : List[String])(implicit
+  private def outputCssAssets(
+    xhtmlPrefix   : String,
+    baselineAssets: List[String],
+    bindingAssets : List[HeadElement],
+  )(implicit
     receiver          : XMLReceiver
   ): Unit = {
 
-    def outputLinkOrStyleElement(resource: Option[String], cssClass: Option[String], content: Option[String]): Unit =
+    def outputLinkOrStyleElement(resource: Option[String], cssClass: Option[String], content: Option[String]): Unit = {
+
       withElement(
         localName = resource match {
           case Some(_) => "link"
@@ -248,13 +242,12 @@ private object XHTMLHeadHandler {
       ) {
         content foreach text
       }
+    }
 
-    XBLAssetsSupport.outputResources(
-      outputElement = outputLinkOrStyleElement,
-      builtin       = assets.css,
-      headElements  = headElements,
-      xblBaseline   = baselineResources,
-      minimal       = minimal
+    XBLAssetsSupport.outputAssets(
+      outputElement  = outputLinkOrStyleElement,
+      bindingAssets   = bindingAssets,
+      baselineAssets = baselineAssets
     )
   }
 }

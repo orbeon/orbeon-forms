@@ -18,7 +18,11 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 
 
-case class XFormsAssets(css: List[AssetPath], js: List[AssetPath], xbl: Set[QName])
+case class XFormsAssets(css: List[AssetPath], js: List[AssetPath])
+
+case class XFormsAssetsWithXbl(css: List[AssetPath], js: List[AssetPath], xbl: Set[QName]) {
+  def xformsAssets = XFormsAssets(css, js)
+}
 
 case class AssetPath(full: String, minOpt: Option[String]) {
   def assetPath(tryMin: Boolean): String =

@@ -13,19 +13,22 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.junit.Test
 import org.orbeon.dom.Document
 import org.orbeon.oxf.properties.PropertyStore
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xml.dom.Converter._
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatest.funspec.AnyFunSpecLike
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.mutable
 
-class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
+
+class BindingLoaderTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with AnyFunSpecLike {
 
   def newPropertySet = {
     val properties =
@@ -124,7 +127,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
   }
 
 
-  @Test def testLibraryLoad(): Unit = {
+  describe("Library load") {
 
     implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
 
@@ -134,34 +137,32 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
       Set("foo", "bar", "baz") map (Loader.bindingPathByName("orbeon", _))
 
     val ExpectedScripts =
-      List("bar", "baz") map (Loader.bindingPathByName("orbeon", _)) map (_.replace(".xbl", ".js"))
+      Set("bar", "baz") map (Loader.bindingPathByName("orbeon", _)) map (_.replace(".xbl", ".js"))
 
     val ExpectedStyles =
       ExpectedScripts map (_.replace(".js", ".css"))
 
     var currentIndexOpt: Option[BindingIndex[IndexableBinding]] = None
 
-    // Initial library load
-    locally {
-      val (newIndex, checkedPaths, scripts, styles) =
+    it("initial library load") {
+      val (newIndex, checkedPaths, baseline) =
         Loader.getUpToDateLibraryAndBaseline(currentIndexOpt, checkUpToDate = true)
       currentIndexOpt = Some(newIndex)
 
-      assert(ExpectedCheckedPaths.size === BindingIndex.distinctBindings(newIndex).size)
+      assert(ExpectedCheckedPaths.size == BindingIndex.distinctBindings(newIndex).size)
 
-      assert(2 === newIndex.nameAndAttSelectors.size)
-      assert(1 === newIndex.attOnlySelectors.size)
-      assert(3 === newIndex.nameOnlySelectors.size)
+      assert(2 == newIndex.nameAndAttSelectors.size)
+      assert(1 == newIndex.attOnlySelectors.size)
+      assert(3 == newIndex.nameOnlySelectors.size)
 
-      assert(ExpectedCheckedPaths === checkedPaths)
-      assert(ExpectedScripts      === scripts)
-      assert(ExpectedStyles       === styles)
+      assert(ExpectedCheckedPaths == checkedPaths)
+      assert(ExpectedScripts      == baseline.values.flatMap(_.js.map(_.assetPath(true))).toSet)
+      assert(ExpectedStyles       == baseline.values.flatMap(_.css.map(_.assetPath(true))).toSet)
     }
 
-    // New load without touching last modification dates
-    locally {
+    it("new load without touching last modification dates") {
       Loader.contentRead.clear()
-      val (newIndex, _, _, _) =
+      val (newIndex, _, _) =
         Loader.getUpToDateLibraryAndBaseline(currentIndexOpt, checkUpToDate = true)
 
       // Index object not modified
@@ -172,10 +173,10 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
     }
 
     // New load with new last modification dates
-    locally {
+    it("new load with new last modification dates") {
       Loader.lastModified += 1
       Loader.contentRead.clear()
-      val (newIndex, _, _, _) =
+      val (newIndex, _, _) =
         Loader.getUpToDateLibraryAndBaseline(currentIndexOpt, checkUpToDate = true)
 
       // Index modified
@@ -183,14 +184,13 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
       currentIndexOpt = Some(newIndex)
 
       // All bindings reloaded
-      assert(ExpectedCheckedPaths.size === Loader.contentRead.size)
+      assert(ExpectedCheckedPaths.size == Loader.contentRead.size)
     }
 
-    // Property reload forces library reload
-    locally {
+    it("property reload forces library reload") {
       Loader.propertySet = newPropertySet
       Loader.contentRead.clear()
-      val (newIndex, _, _, _) =
+      val (newIndex, _, _) =
         Loader.getUpToDateLibraryAndBaseline(currentIndexOpt, checkUpToDate = true)
 
       // Index modified
@@ -198,11 +198,11 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
       currentIndexOpt = Some(newIndex)
 
       // All bindings reloaded
-      assert(ExpectedCheckedPaths.size === Loader.contentRead.size)
+      assert(ExpectedCheckedPaths.size == Loader.contentRead.size)
     }
   }
 
-  @Test def testByNameLoad(): Unit = {
+  describe("By name load") {
 
     implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
 
@@ -216,15 +216,14 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
 
     // Initial library load
     locally {
-      val (newIndex, newCheckedPaths, _, _) =
+      val (newIndex, newCheckedPaths, _) =
         Loader.getUpToDateLibraryAndBaseline(None, checkUpToDate = true)
 
       currentIndex = newIndex
       checkedPaths = newCheckedPaths
     }
 
-    // Load additional fr:gaga binding by name
-    locally {
+    it("loading additional `fr:gaga` binding by name") {
 
       Loader.contentRead.clear()
 
@@ -249,10 +248,10 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
       val newBinding = findFrGaga()
 
       // fr:gaga was loaded
-      assert(Set(GagaPath) === Loader.contentRead)
+      assert(Set(GagaPath) == Loader.contentRead)
 
       // One more binding
-      assert(BindingIndex.distinctBindings(currentIndex).size === bindingsCountBefore + 1)
+      assert(BindingIndex.distinctBindings(currentIndex).size == bindingsCountBefore + 1)
       assert(newBinding.isDefined)
 
       // Try again without touching last modification dates
@@ -270,14 +269,13 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
       Loader.contentRead.clear()
       checkedPaths -= GagaPath
       findFrGaga()
-      assert(Set(GagaPath) === Loader.contentRead)
+      assert(Set(GagaPath) == Loader.contentRead)
 
       // Binding number hasn't changed
-      assert(BindingIndex.distinctBindings(currentIndex).size === bindingsCountBefore + 1)
+      assert(BindingIndex.distinctBindings(currentIndex).size == bindingsCountBefore + 1)
     }
 
-    // Missing binding
-    locally {
+    it("missing binding") {
 
       val (newIndex, newCheckedPaths, newBinding) =
         Loader.findMostSpecificBinding(
@@ -295,7 +293,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
       assert(checkedPaths(TotoPath))
 
       // No new binding found
-      assert(None === newBinding)
+      assert(newBinding.isEmpty)
     }
   }
 }

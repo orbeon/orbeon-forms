@@ -192,7 +192,6 @@
         +fr:fields-date
         +fr:date-picker
         +fr:attachment
-        +fr:attachment-multiple
         +fr:image-attachment
         +fr:image
         +fr:dropdown-select1-search
@@ -267,7 +266,6 @@
         +fr:fields-date
         +fr:date-picker
         +fr:attachment
-        +fr:attachment-multiple
         +fr:image-attachment
         +fr:image
         +fr:dropdown-select1-search

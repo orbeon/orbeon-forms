@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.analysis.{NestedPartAnalysis, PartAnalysis, XPathErrorDetails}
@@ -90,15 +91,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
   def scriptsByPrefixedId = collectInParts(_.scriptsByPrefixedId) toMap
   def uniqueJsScripts = collectInParts(_.uniqueJsScripts)
 
-  def allXblAssetsMaybeDuplicates: Iterable[XBLAssets] = collectInParts(_.allXblAssetsMaybeDuplicates)
-
-  def baselineResources =
-    topLevelPart.baselineResources
-
-  def bindingResources: (List[HeadElement], List[HeadElement]) = {
-    val bindings = allXblAssetsMaybeDuplicates
-    (XBLAssets.orderedHeadElements(bindings, _.scripts), XBLAssets.orderedHeadElements(bindings, _.styles))
-  }
+  def allXblAssetsMaybeDuplicates: Iterable[(QName, XBLAssets)] = collectInParts(_.allXblAssetsMaybeDuplicates)
 
   /**
    * Get prefixed ids of all of the start control's repeat ancestors, stopping at endPrefixedId if not null. If

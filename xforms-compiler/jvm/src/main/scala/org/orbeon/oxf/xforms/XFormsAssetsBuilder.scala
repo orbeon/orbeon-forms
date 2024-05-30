@@ -29,13 +29,16 @@ object XFormsAssetsBuilder {
   val AssetsBaselineProperty = "oxf.xforms.assets.baseline"
 
   def updateAssets(
-    assets       : XFormsAssets,
-    excludesProp : Option[String],
-    updatesProp  : Option[Property]
-  ): XFormsAssets = {
+    globalAssetsBaseline: XFormsAssets,
+    globalXblBaseline   : Set[QName],
+    localExcludesProp   : Option[String],
+    localUpdatesProp    : Option[Property],
+  ): XFormsAssetsWithXbl = {
+
+    println(s"xxx XFormsAssetsBuilder.updateAssets: assets = $globalAssetsBaseline, excludesProp = $localExcludesProp, updatesProp = $localUpdatesProp")
 
     def qNameFromString(s: String): QName =
-      updatesProp
+      localUpdatesProp
         .map(_.namespaces.get _)
         .flatMap(Extensions.resolveQName(_, s, unprefixedIsNoNamespace = true))
         .getOrElse(throw new IllegalArgumentException(s"can't resolve QName `$s`"))
@@ -43,7 +46,7 @@ object XFormsAssetsBuilder {
     def isCss(update: String) = update.endsWith(".css")
     def isXbl(update: String) = ! update.startsWith("/")
 
-    def maybeRemoveOne(assets: XFormsAssets, update: String): XFormsAssets =
+    def maybeRemoveOne(assets: XFormsAssetsWithXbl, update: String): XFormsAssetsWithXbl =
       if (isXbl(update))
         assets.copy(xbl = assets.xbl - qNameFromString(update))
       else if (isCss(update))
@@ -51,7 +54,7 @@ object XFormsAssetsBuilder {
       else
         assets.copy(js = assets.js.filter(_.full != update))
 
-    def maybeAddOne(assets: XFormsAssets, update: String): XFormsAssets =
+    def maybeAddOne(assets: XFormsAssetsWithXbl, update: String): XFormsAssetsWithXbl =
       if (isXbl(update)) {
         assets.copy(xbl = assets.xbl + qNameFromString(update))
       } else {
@@ -66,7 +69,7 @@ object XFormsAssetsBuilder {
         }
       }
 
-    def maybeAddOrRemoveOne(assets: XFormsAssets, update: String): XFormsAssets =
+    def maybeAddOrRemoveOne(assets: XFormsAssetsWithXbl, update: String): XFormsAssetsWithXbl =
       if (update.startsWith("-"))
         maybeRemoveOne(assets, update.tail)
       else if (update.startsWith("+"))
@@ -75,22 +78,28 @@ object XFormsAssetsBuilder {
         maybeAddOne(assets, update)
 
     val allUpdates =
-      excludesProp.toList.flatMap(_.splitTo[List]() map ("-" + _)) ::: // translate to "remove" updates
-      updatesProp.toList.flatMap(_.stringValue.splitTo[List]())
+      localExcludesProp.toList.flatMap(_.splitTo[List]() map ("-" + _)) ::: // translate to "remove" updates
+      localUpdatesProp.toList.flatMap(_.stringValue.splitTo[List]())
 
-    allUpdates.foldLeft(assets)(maybeAddOrRemoveOne)
+    val globalAssetsBaselineWithXBl =
+      XFormsAssetsWithXbl(globalAssetsBaseline.css, globalAssetsBaseline.js, globalXblBaseline)
+
+    allUpdates.foldLeft(globalAssetsBaselineWithXBl)(maybeAddOrRemoveOne)
   }
 
-  def fromJsonProperty(propertySet: PropertySet): XFormsAssets = {
+  def fromJsonPropertyWithXbl(propertySet: PropertySet): XFormsAssetsWithXbl = {
     val prop = propertySet.getPropertyOrThrow(AssetsBaselineProperty)
     prop.associatedValue(v => fromJsonString(v.stringValue, prop.namespaces))
   }
 
+  def fromJsonProperty(propertySet: PropertySet): XFormsAssets =
+    fromJsonPropertyWithXbl(propertySet).xformsAssets
+
   // Public for tests
-  def fromJsonString(json: String, namespaces: Map[String, String]): XFormsAssets =
+  def fromJsonString(json: String, namespaces: Map[String, String]): XFormsAssetsWithXbl =
     (parser.parse(json) map (fromJson(_, namespaces))).toTry.getOrElse(throw new IllegalArgumentException(json))
 
-  private def fromJson(json: Json, namespaces: Map[String, String]): XFormsAssets = {
+  private def fromJson(json: Json, namespaces: Map[String, String]): XFormsAssetsWithXbl = {
 
     def collectFullMin(key: String, jsonObject: JsonObject): Vector[AssetPath] =
       jsonObject(key) match {
@@ -129,7 +138,7 @@ object XFormsAssetsBuilder {
         val js  = collectFullMin("js",  jsonObject)
         val xbl = collectXbl    ("xbl", jsonObject)
 
-        XFormsAssets(css.to(List), js.to(List), xbl.toSet)
+        XFormsAssetsWithXbl(css.to(List), js.to(List), xbl.toSet)
 
       case _ => throw new IllegalArgumentException
     }

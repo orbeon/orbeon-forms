@@ -106,13 +106,14 @@ class XFormsAssetsTest extends AnyFunSpec{
   // TODO: Test updating with XBL QNames.
   describe(s"Updating assets") {
 
-    val assets = XFormsAssetsBuilder.fromJsonString(BaselineAssets, Map.empty)
+    val assets = XFormsAssetsBuilder.fromJsonString(BaselineAssets, Map.empty).xformsAssets
 
     val result =
       XFormsAssetsBuilder.updateAssets(
-        assets,
-        Some("/ops/javascript/scalajs/orbeon-xforms.js /ops/yui/container/assets/skins/sam/container.css"),
-        Some(
+        globalAssetsBaseline = assets,
+        globalXblBaseline    = Set.empty,
+        localExcludesProp    = Some("/ops/javascript/scalajs/orbeon-xforms.js /ops/yui/container/assets/skins/sam/container.css"),
+        localUpdatesProp     = Some(
           Property(
             XS_STRING_QNAME,
             """+/apps/fr/resources/scalajs/orbeon-form-runner.js

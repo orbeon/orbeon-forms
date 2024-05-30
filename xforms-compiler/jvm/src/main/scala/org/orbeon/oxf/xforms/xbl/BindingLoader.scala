@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Logging}
-import org.orbeon.oxf.xforms.XFormsAssetsBuilder
+import org.orbeon.oxf.xforms.{AssetPath, XFormsAssets, XFormsAssetsBuilder}
 import org.orbeon.oxf.xforms.xbl.XBLAssetsBuilder.HeadElementBuilder
 import org.orbeon.oxf.xml.ParserConfiguration
 import org.orbeon.oxf.xml.dom.Extensions
@@ -28,6 +28,7 @@ import org.xml.sax.Attributes
 
 import scala.collection.compat._
 import scala.collection.mutable
+
 
 trait BindingLoader extends Logging {
 
@@ -40,7 +41,7 @@ trait BindingLoader extends Logging {
   def existsByPath(path: String)(implicit indentedLogger: IndentedLogger): Boolean
   def contentAsOrbeonDom(path: String)(implicit indentedLogger: IndentedLogger): Document
 
-  def findXblAssets(xbl: Set[QName])(implicit indentedLogger: IndentedLogger): (List[String], List[String]) = {
+  def findXblAssetsUnordered(xbl: Set[QName])(implicit indentedLogger: IndentedLogger): Map[QName, XFormsAssets] = {
 
     val (foundBaselinePaths, _) =
       pathsForQNames(xbl, readURLMappingsCacheAgainstProperty)
@@ -51,7 +52,7 @@ trait BindingLoader extends Logging {
         foundBaselinePaths
       )
 
-    collectResourceBaselines(abstractBindings)
+    collectBindingAssets(abstractBindings)
   }
 
   def getUpToDateLibraryAndBaseline(
@@ -59,11 +60,11 @@ trait BindingLoader extends Logging {
     checkUpToDate : Boolean // 2016-10-06: always set to `true`
   )(implicit
     indentedLogger: IndentedLogger
-  ): (BindingIndex[IndexableBinding], Set[String], List[String], List[String]) = {
+  ): (BindingIndex[IndexableBinding], Set[String], Map[QName, XFormsAssets]) = {
 
     var originalOrUpdatedIndexOpt = indexOpt
 
-    val ((scripts, styles), checkedPaths) = {
+    val (baseline, checkedPaths) = {
 
       val propertySet = getPropertySet
 
@@ -95,7 +96,7 @@ trait BindingLoader extends Logging {
         // 2. `oxf.xforms.assets.baseline` property
         // https://github.com/orbeon/orbeon-forms/issues/4810
         val (foundBaselinePathsStep2, notFoundBaselinePathsStep2) =
-          pathsForQNames(XFormsAssetsBuilder.fromJsonProperty(getPropertySet).xbl, nsUriToPrefix)
+          pathsForQNames(XFormsAssetsBuilder.fromJsonPropertyWithXbl(getPropertySet).xbl, nsUriToPrefix)
 
         val (baselineIndexStep2, baselineBindingsStep2) =
           extractAndIndexFromPaths(
@@ -127,15 +128,15 @@ trait BindingLoader extends Logging {
         (baselineBindingsStep1 ::: baselineBindingsStep2 /* TODO: Check duplicates? */, allCheckedPaths)
       }
 
-      lazy val lazyIndexAndBindings: (List[AbstractBinding], Set[String]) = readAndIndexBindings
+      lazy val lazyIndexAndBindings = readAndIndexBindings
 
       // If the original index is empty, force the evaluation of the library and baseline
       // https://github.com/orbeon/orbeon-forms/issues/3327
       if (indexOpt.isEmpty)
         lazyIndexAndBindings
 
-      def reloadLibraryAndBaseline: ((List[String], List[String]), Set[String]) =
-        (collectResourceBaselines(lazyIndexAndBindings._1), lazyIndexAndBindings._2)
+      def reloadLibraryAndBaseline: (Map[QName, XFormsAssets], Set[String]) =
+        (collectBindingAssets(lazyIndexAndBindings._1), lazyIndexAndBindings._2)
 
       // We read and associate the value with 2 properties, but evaluation occurs at most once
       lazy val lazyEvaluatedValue = reloadLibraryAndBaseline
@@ -161,15 +162,14 @@ trait BindingLoader extends Logging {
       }
 
     debug(
-      "library and baseline paths",
+      "library and baseline details",
       List(
-        "paths"   -> (checkedPaths mkString ", "),
-        "scripts" -> (scripts      mkString ", "),
-        "styles"  -> (styles       mkString ", ")
+        "paths"    -> checkedPaths.mkString(", "),
+        "baseline" -> baseline.toString,
       )
     )
 
-    (originalOrUpdatedIndexOpt getOrElse (throw new IllegalStateException), checkedPaths, scripts, styles)
+    (originalOrUpdatedIndexOpt getOrElse (throw new IllegalStateException), checkedPaths, baseline)
   }
 
   def findMostSpecificBinding(
@@ -282,21 +282,25 @@ trait BindingLoader extends Logging {
       case (found, notFound) => (found map (_._1), notFound map (_._1))
     }
 
-  private def collectResourceBaselines(
-    baselineBindings: Iterable[AbstractBinding]
-  )(
-    implicit         indentedLogger: IndentedLogger
-  ): (List[String], List[String]) = {
+  def collectBindingAssets(
+    bindings      : Iterable[AbstractBinding]
+  )(implicit
+    indentedLogger: IndentedLogger
+  ): Map[QName, XFormsAssets] = {
 
-    debug("collecting resource baselines")
+    debug("collecting assets baselines")
 
-    def collectUniqueReferenceElements(getHeadElements : XBLAssets => Seq[HeadElement]) =
-      XBLAssets.orderedHeadElements(
-        baselineBindings map (binding => XBLAssets(binding.commonBinding.cssName, binding.scripts, binding.styles)), // same in `allXblAssetsMaybeDuplicates`
-        getHeadElements
-      ).iterator.collect{ case e: HeadElement.Reference => e.src }.to(mutable.LinkedHashSet).to(List)
-
-    (collectUniqueReferenceElements(_.scripts), collectUniqueReferenceElements(_.styles))
+    bindings
+      .flatMap { binding =>
+        binding.commonBinding.directName.map { directName =>
+          directName ->
+          XFormsAssets(
+            binding.assets.css .collect{ case e: HeadElement.Reference => AssetPath(e.src, None) },
+            binding.assets.js  .collect{ case e: HeadElement.Reference => AssetPath(e.src, None) },
+          )
+        }
+      }
+      .toMap
   }
 
   private def extractAndIndexFromPaths(
@@ -440,7 +444,7 @@ trait BindingLoader extends Logging {
   ): List[AbstractBinding] = {
 
     // Extract xbl:xbl/xbl:script
-    // TODO: should do this differently, in order to include only the scripts and resources actually used
+    // TODO: should do this differently, in order to include only the scripts and assets actually used
     val scriptElements = xblElement.elements(XBL_SCRIPT_QNAME) map HeadElementBuilder.apply
 
     // Create binding for all xbl:binding[@element]

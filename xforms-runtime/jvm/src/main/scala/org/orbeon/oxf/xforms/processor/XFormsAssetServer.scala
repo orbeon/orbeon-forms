@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.XFormsAssetPaths._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquireLock
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
-import org.orbeon.oxf.xforms.xbl.BindingLoader
+import org.orbeon.oxf.xforms.xbl.{BindingLoader, GlobalBindingIndex}
 import org.orbeon.xforms.{Constants, XFormsCrossPlatformSupport}
 
 import java.io._
@@ -80,23 +80,33 @@ class XFormsAssetServer extends ProcessorImpl {
         val updatesPropOpt =
           for {
             paramValue <- externalContext.getRequest.getFirstParamAsString(Constants.UpdatesParameter)
-            propName   = List(XFormsAssetsBuilder.AssetsBaselineProperty, Constants.UpdatesParameter, paramValue).mkString(".")
+            propName   = (XFormsAssetsBuilder.AssetsBaselineProperty :: Constants.UpdatesParameter :: paramValue :: Nil).mkString(".")
             prop       <- CoreCrossPlatformSupport.properties.getPropertyOpt(propName)
           } yield
             prop
 
-        val assets    = XFormsAssetsBuilder.updateAssets(XFormsAssetsBuilder.fromJsonProperty(CoreCrossPlatformSupport.properties), excludesProp = None, updatesPropOpt)
-        val isMinimal = XFormsGlobalProperties.isMinimalResources
-        val resources = (if (isCSS) assets.css else assets.js).map(_.assetPath(tryMin = isMinimal)).to(ListSet)
+        val updatedAssets =
+          XFormsAssetsBuilder.updateAssets(
+            globalAssetsBaseline = XFormsAssetsBuilder.fromJsonProperty(CoreCrossPlatformSupport.properties),
+            globalXblBaseline    = BindingLoader.getUpToDateLibraryAndBaseline(GlobalBindingIndex.currentIndex, checkUpToDate = true)._3.keySet,
+            localExcludesProp    = None,
+            localUpdatesProp     = updatesPropOpt
+          )
 
-        val xblResources =
-          if (assets.xbl.nonEmpty) {
-            val (scripts, styles) = BindingLoader.findXblAssets(assets.xbl)
-            if (isCSS) styles else scripts
+        val isMinimal = XFormsGlobalProperties.isMinimalResources
+        val assets    = (if (isCSS) updatedAssets.css else updatedAssets.js).map(_.assetPath(tryMin = isMinimal)).to(ListSet)
+
+        val xblAssets =
+          if (updatedAssets.xbl.nonEmpty) {
+            val xblAssets = BindingLoader.findXblAssetsUnordered(updatedAssets.xbl)
+            if (isCSS)
+              xblAssets.flatMap(_._2.css.map(_.assetPath(tryMin = isMinimal)))
+            else
+              xblAssets.flatMap(_._2.js.map(_.assetPath(tryMin = isMinimal)))
           } else
             Nil
 
-        AssetsAggregator.aggregate(resources ++ xblResources, redirect, None, isCSS)
+        AssetsAggregator.aggregate(assets ++ xblAssets, redirect, None, isCSS)
 
       case Constants.FormDynamicResourcesRegex(uuid) =>
 

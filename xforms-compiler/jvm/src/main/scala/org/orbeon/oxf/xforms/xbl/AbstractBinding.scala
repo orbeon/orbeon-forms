@@ -30,11 +30,9 @@ import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLAssetsBuilder.HeadElementBuilder
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.{EventNames, HeadElement}
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.{EventNames, HeadElement}
 import org.orbeon.xml.NamespaceMapping
-
-import scala.collection.compat._
 
 
 trait IndexableBinding {
@@ -148,10 +146,9 @@ case class AbstractBinding(
   bindingElement   : Element,
   path             : Option[String],
   lastModified     : Long,
-  scripts          : Seq[HeadElement],
-  styles           : Seq[HeadElement],
-  handlers         : Seq[Element],
-  modelElements    : Seq[Element],
+  assets           : XBLAssets,
+  handlers         : List[Element],
+  modelElements    : List[Element],
   global           : Option[Document],
   namespaceMapping : NamespaceMapping,
   commonBinding    : CommonBinding
@@ -263,8 +260,7 @@ object AbstractBinding {
       bindingElem,
       path,
       lastModified,
-      scripts,
-      styles,
+      XBLAssets(css = styles.toList, js = scripts.toList),
       handlers,
       modelElements,
       global,

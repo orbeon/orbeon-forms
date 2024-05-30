@@ -240,25 +240,25 @@ object AssetsAggregator extends Logging {
 
   // Output combined resources
   def aggregate[T](
-    resources     : scala.collection.Set[String],
-    outputElement : String => T,
-    namespaceOpt  : Option[String],
-    isCSS         : Boolean
+    assets       : scala.collection.Set[String],
+    outputElement: String => T,
+    namespaceOpt : Option[String],
+    isCSS        : Boolean
   )(implicit
     indentedLogger: IndentedLogger
   ): Option[T] =
-    resources.nonEmpty option {
+    assets.nonEmpty option {
 
       // If there is at least one non-platform path, we also hash the app version number
-      val hasAppResource = ! (resources forall URLRewriterUtils.isPlatformPath)
+      val hasAppResource = ! (assets forall URLRewriterUtils.isPlatformPath)
       val appVersion = URLRewriterUtils.getApplicationResourceVersion
 
       // All resource paths are hashed
-      val itemsToHash = resources ++ (if (hasAppResource && appVersion.nonAllBlank) Set(appVersion) else Set())
+      val itemsToHash = assets ++ (if (hasAppResource && appVersion.nonAllBlank) Set(appVersion) else Set())
       val resourcesHash = SecureUtils.digestStringToHexShort(itemsToHash mkString "|")
 
       // Cache mapping so that resource can be served by resource server
-      Caches.resourcesCache.put(resourcesHash, resources.toArray) // use `Array` which is compact, serializable and usable from Java
+      Caches.resourcesCache.put(resourcesHash, assets.toArray) // use `Array` which is compact, serializable and usable from Java
 
       // Extension and optional namespace parameter
       def extension = if (isCSS) ".css" else ".js"
@@ -278,7 +278,7 @@ object AssetsAggregator extends Logging {
         "appVersion"     -> appVersion,
         "resourcesHash"  -> resourcesHash,
         "namespaceOpt"   -> namespaceOpt.orNull,
-        "resources"      -> (resources mkString " | ")
+        "resources"      -> (assets mkString " | ")
       ))
 
       outputElement(path)

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.controls._
@@ -47,7 +48,7 @@ trait PartGlobalOps {
 
   // XBL
   def iterateGlobals: Iterator[Global]
-  def allXblAssetsMaybeDuplicates: Iterable[XBLAssets]
+  def allXblAssetsMaybeDuplicates: Iterable[(QName, XBLAssets)]
 
   // Return the scope associated with the given prefixed id (the scope is directly associated with the prefix of the id)
   def containingScope(prefixedId: String): Scope
@@ -64,7 +65,6 @@ trait PartGlobalOps {
   // Client-side assets
   def scriptsByPrefixedId: Map[String, StaticScript]
   def uniqueJsScripts: List[ShareableScript]
-  def baselineResources: (List[String], List[String])
 
   // Functions derived from getControlAnalysis
   def hasBinding(prefixedId: String): Boolean = findControlAnalysis(prefixedId) exists (_.hasBinding)

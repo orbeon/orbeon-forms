@@ -15,9 +15,10 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.{ElementWithFiltersSelector, Selector, TypeSelector}
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
+import org.orbeon.oxf.xforms.XFormsAssets
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
@@ -35,14 +36,14 @@ trait BindingMetadata extends Logging {
 
   private var _xblIndex          : Option[BindingIndex[IndexableBinding]] = None
   private var _checkedPaths      : Set[String]= Set.empty
-  private var _baselineResources : (List[String], List[String]) = (Nil, Nil)
+  private var _xblBaselineAssets : Map[QName, XFormsAssets] = Map.empty
 
   def initializeBindingLibraryIfNeeded(implicit indentedLogger: IndentedLogger): Unit =
     if (_xblIndex.isEmpty) {
 
       debug("entering view")
 
-      val (newIndex, newCheckedPaths, scripts, styles) =
+      val (newIndex, newCheckedPaths, baseline) =
         BindingLoader.getUpToDateLibraryAndBaseline(GlobalBindingIndex.currentIndex, checkUpToDate = true)
 
       var currentIndex = newIndex
@@ -58,7 +59,7 @@ trait BindingMetadata extends Logging {
 
       _xblIndex          = Some(currentIndex)
       _checkedPaths      = newCheckedPaths
-      _baselineResources = (scripts, styles)
+      _xblBaselineAssets = baseline
     }
 
   def commitBindingIndex(implicit indentedLogger: IndentedLogger): Unit =
@@ -213,9 +214,9 @@ trait BindingMetadata extends Logging {
 
   // ==== Other API
 
-  def baselineResources          : (List[String], List[String]) = _baselineResources
-  def allBindingsMaybeDuplicates : Iterable[AbstractBinding]    = bindingsByControlPrefixedId.values collect { case b: AbstractBinding => b }
-  def bindingIncludes            : Set[String]                  = bindingsPaths
+  def xblBaselineAssets          : Map[QName, XFormsAssets]  = _xblBaselineAssets
+  def allBindingsMaybeDuplicates : Iterable[AbstractBinding] = bindingsByControlPrefixedId.values collect { case b: AbstractBinding => b }
+  def bindingIncludes            : Set[String]               = bindingsPaths
 
   private def pathExistsAndIsUpToDate(path: String)(implicit rm: ResourceManager) = {
     val last = rm.lastModified(path, true)

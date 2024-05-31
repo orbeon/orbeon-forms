@@ -382,7 +382,7 @@ object XFormsUI {
     }
   }
 
-  def handleValue(
+  private def handleValue(
     elem                        : raw.Element,
     controlId                   : String,
     recreatedInput              : Boolean,
@@ -927,7 +927,7 @@ object XFormsUI {
     staticReadonlyOpt: Option[String],
     isLeafControl    : Boolean
   ): html.Element =
-    if (! documentElement.classList.contains("xforms-static") && staticReadonlyOpt.map(_.toBoolean).exists(_ == true)) {
+    if (! documentElement.classList.contains("xforms-static") && staticReadonlyOpt.exists(_.toBoolean)) {
       if (isLeafControl) {
         val parentElement = documentElement.parentNode.asInstanceOf[html.Element]
         val newDocumentElement = dom.document.createElement("span").asInstanceOf[html.Element]
@@ -1535,8 +1535,8 @@ object XFormsUI {
         yuiDialog.element.style.display = "block"
 
         // 2022-12-12: Not sure who sets those to other values, but we need to control that now
-        yuiDialog.element.style.top = 0;
-        yuiDialog.element.style.left = 0;
+        yuiDialog.element.style.top = 0
+        yuiDialog.element.style.left = 0
 
         // Make sure that this dialog is on top of everything else
         yuiDialog.cfg.setProperty("zIndex", {

@@ -157,7 +157,6 @@
                 name="binding"
                 value="xxf:binding('fr-date')"/>
             <xf:var
-                xxbl:keep-if-function-available="fr:mode"
                 name="view"
                 value="
                     (: Q: Do we need to test for `xxf:is-control-readonly('fr-number')` like `fr:number`? :)
@@ -168,11 +167,6 @@
                     ) or
                     fr:mode() = 'pdf'
                 "/>
-            <xf:var
-                xxbl:keep-if-function-unavailable="fr:mode"
-                name="view"
-                value="false()"/>
-
             <xf:var name="class-field-width"   value="concat('fr-field-width-'  , fr:component-param-value('field-width'))"/>
             <xf:var name="class-native-picker" value="concat('fr-native-picker-', fr:component-param-value('native-picker'))"/>
 

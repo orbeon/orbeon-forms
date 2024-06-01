@@ -89,6 +89,15 @@ object FormRunnerParams {
   type AppFormVersion = (AppForm, Int)
 }
 
+// Like `FormRunnerParams`, but for cases where we want to support a potentially missing `fr-parameters-instance`,
+// because we want that code to also be able to run outside of Form Runner.
+object FormRunnerParamsOpt {
+
+  def apply(): Option[FormRunnerParams] =
+    frc.parametersInstance.map(_.rootElement).map(FormRunnerParams.apply)
+
+}
+
 case class AppForm(app: String, form: String) {
 
   val toList: List[String] = List(app, form)

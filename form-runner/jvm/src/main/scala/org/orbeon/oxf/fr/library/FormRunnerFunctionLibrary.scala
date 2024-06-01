@@ -156,7 +156,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 private object FormRunnerFunctions {
 
   val StringGettersByName: Seq[(String, () => Option[String])] = List(
-    "mode"                        -> (() => Some(FormRunnerParams().mode)),
+    "mode"                        -> (() => FormRunnerParamsOpt().map(_.mode)),
     "app-name"                    -> (() => Some(FormRunnerParams().app)),
     "form-name"                   -> (() => Some(FormRunnerParams().form)),
     "document-id"                 -> (() => FormRunnerParams().document),

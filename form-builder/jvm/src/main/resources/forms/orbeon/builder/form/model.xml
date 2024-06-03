@@ -915,31 +915,21 @@
     </xf:action>
 
     <xf:action event="fb-excel-export">
-
-        <!-- Save -->
         <!-- See https://github.com/orbeon/orbeon-forms/issues/2611 -->
         <xf:action type="xpath">
-            fr:run-process-by-name('oxf.fr.detail.process', 'save')
+            fbf:saveThenExport(
+                'excel-with-named-ranges'
+            )
         </xf:action>
-
-        <!-- Export -->
-        <xf:send submission="fb-export-submission">
-            <xf:property name="export-format" value="'excel-with-named-ranges'"/>
-        </xf:send>
     </xf:action>
 
     <xf:action event="fb-xml-export">
-
-        <!-- Save -->
         <!-- See https://github.com/orbeon/orbeon-forms/issues/2611 -->
         <xf:action type="xpath">
-            fr:run-process-by-name('oxf.fr.detail.process', 'save')
+            fbf:saveThenExport(
+                'xml-form-structure-and-data'
+            )
         </xf:action>
-
-        <!-- Export -->
-        <xf:send submission="fb-export-submission">
-            <xf:property name="export-format" value="'xml-form-structure-and-data'"/>
-        </xf:send>
     </xf:action>
 
     <xf:action event="fb-form-definition-xhtml">

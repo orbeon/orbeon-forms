@@ -744,12 +744,9 @@
                                             value="secure:randomHexId()"/>
                                         <!-- Actually save -->
                                         <xf:action type="xpath">
-                                            fr:run-process-by-name('oxf.fr.detail.process', 'save')
-                                        </xf:action>
-                                        <!-- Change URL to have new document id -->
-                                        <xf:action type="javascript">
-                                            <xf:param name="documentId" value="fr:document-id()"/>
-                                            <xf:body>ORBEON.builder.private.API.updateLocationDocumentId(documentId)</xf:body>
+                                            fbf:saveAs(
+                                                fr:document-id()
+                                            )
                                         </xf:action>
                                     </xf:action>
                                 </fb:dialog-form-settings>

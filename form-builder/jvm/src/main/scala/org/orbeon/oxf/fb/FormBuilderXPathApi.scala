@@ -69,40 +69,61 @@ object FormBuilderXPathApi {
     versionComment       : String,
     available            : Boolean,
     formName             : String
-  ): Unit = {
+  ): Unit =
+    saveThenContinue("publishForm()") {
+
+      XFormsAPI.sendThrowOnError(
+        "fb-publish-submission",
+        List(
+          PropertyValue("doc", Some(doc)),
+          PropertyValue("document-id", Some(documentId)),
+          PropertyValue("form-definition-version", Some(formDefinitionVersion)),
+          PropertyValue("version-comment", Some(versionComment)),
+          PropertyValue("available", Some(available))
+        )
+      )
+
+      if (formName == "library")
+        XXFormsInvalidateInstanceAction.doInvalidateInstance(
+          resourceURI       = "/fr/service/custom/orbeon/builder/toolbox",
+          handleXInclude    = None,
+          ignoreQueryString = true
+        )
+    }
+
+  //@XPathFunction
+  def saveThenExport(exportFormat: String): Unit =
+    saveThenContinue("saveThenExport()") {
+      XFormsAPI.sendThrowOnError(
+        "fb-export-submission",
+        List(
+          PropertyValue("export-format", Some(exportFormat))
+        )
+      )
+    }
+
+  //@XPathFunction
+  def saveAs(documentId: String): Unit =
+    saveThenContinue("saveThenExport()") {
+      // TODO: 2024-06-02: This is not used but should be modified if `save-as` is implemented.
+      //  https://github.com/orbeon/orbeon-forms/issues/6342
+      <xf:action type="javascript">
+        <xf:param name="documentId" value="fr:document-id()"/>
+        <xf:body>ORBEON.builder.private.API.updateLocationDocumentId(documentId)</xf:body>
+      </xf:action>
+      ???
+    }
+
+  private def saveThenContinue(description: String)(body: => Unit): Unit = {
 
     def continuation(t: Try[Any]): Either[Try[Unit], Nothing] = t match {
-      case Failure(t) =>
-        Left(Failure(t))
-      case Success(_) =>
-        Left {
-          Try {
-            XFormsAPI.sendThrowOnError(
-              "fb-publish-submission",
-              List(
-                PropertyValue("doc", Some(doc)),
-                PropertyValue("document-id", Some(documentId)),
-                PropertyValue("form-definition-version", Some(formDefinitionVersion)),
-                PropertyValue("version-comment", Some(versionComment)),
-                PropertyValue("available", Some(available))
-              )
-            )
-
-            if (formName == "library")
-              XXFormsInvalidateInstanceAction.doInvalidateInstance(
-                resourceURI       = "/fr/service/custom/orbeon/builder/toolbox",
-                handleXInclude    = None,
-                ignoreQueryString = true
-              )
-          }
-        }
+      case Failure(t) => Left(Failure(t))
+      case Success(_) => Left(Try(body))
     }
 
     process.SimpleProcess.runProcessByName("oxf.fr.detail.process", "save") match {
-      case Left(t)   =>
-        continuation(t)
-      case Right(future) =>
-        process.SimpleProcess.submitContinuation("continuation of `publishForm()`", IO.fromFuture(IO.pure(future)), continuation)
+      case Left(t)       => continuation(t)
+      case Right(future) => process.SimpleProcess.submitContinuation(s"continuation of `$description`", IO.fromFuture(IO.pure(future)), continuation)
     }
   }
 

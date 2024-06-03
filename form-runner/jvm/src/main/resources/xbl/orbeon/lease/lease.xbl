@@ -128,7 +128,7 @@
                             <xf:label ref="$fr-resources/detail/lease/try-acquire"/>
                             <xf:action event="DOMActivate">
                                 <xf:setvalue ref="$fr-persistence-instance/lease-load-document">true</xf:setvalue>
-                                <xf:setvalue ref="$fr-persistence-instance/lease-refresh-needed" value="$fb-form-not-loaded"/>
+                                <xf:setvalue ref="$fr-persistence-instance/lease-refresh-needed" value="$is-fb"/>
                                 <xf:dispatch name="fr-acquire-lease" targetid="fr-lease"/>
                             </xf:action>
                         </xf:trigger>
@@ -220,7 +220,7 @@
                                     <xf:label ref="$fr-resources/detail/lease/try-acquire"/>
                                     <xf:action event="DOMActivate">
                                         <xf:setvalue ref="$fr-persistence-instance/lease-load-document">true</xf:setvalue>
-                                        <xf:setvalue ref="$fr-persistence-instance/lease-refresh-needed" value="$fb-form-not-loaded"/>
+                                        <xf:setvalue ref="$fr-persistence-instance/lease-refresh-needed" value="$is-fb"/>
                                         <xf:dispatch name="fr-acquire-lease" targetid="fr-lease"/>
                                     </xf:action>
                                 </xf:trigger>

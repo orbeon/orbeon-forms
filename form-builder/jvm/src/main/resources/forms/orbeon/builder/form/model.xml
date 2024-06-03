@@ -153,9 +153,8 @@
         <xf:dispatch name="fb-construct-done-or-refresh" targetid="fr-form-model"/>
     </xf:action>
 
-    <xf:action ev:event="xforms-refresh" if="empty(instance('fb-form-instance')/*)">
-        <!-- Special case: lease not acquired when the page was first loaded, we're now doing a refresh -->
-        <!-- (see xf:refresh in persistence-model.xml, xforms-submit-done action) -->
+    <xf:action ev:event="xforms-refresh" >
+        <!-- Special case: lease acquired in Form Builder (see xf:refresh in persistence-model.xml, xforms-submit-done action) -->
         <xf:dispatch name="fb-construct-done-or-refresh" targetid="fr-form-model"/>
     </xf:action>
 

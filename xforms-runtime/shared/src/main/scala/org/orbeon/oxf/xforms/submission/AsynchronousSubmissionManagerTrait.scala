@@ -40,11 +40,11 @@ trait AsynchronousSubmissionManagerTrait {
   )
 
   private case class CompletedCompletion(
+    sequence    : Int,
     description : String,
-    continuation: Try[Any] => Either[Try[Any], Future[Any]],
-    promise     : Promise[Any],
     result      : Try[Any],
-    sequence    : Int
+    continuation: Try[Any] => Either[Try[Any], Future[Any]],
+    promise     : Promise[Any]
   )
 
   protected def addClientPollEventIfNeeded(containingDocument: XFormsContainingDocument, delayMs: Int): Unit =
@@ -98,11 +98,11 @@ trait AsynchronousSubmissionManagerTrait {
       runningCount.decrementAndGet()
       completionQueue.add(
         CompletedCompletion(
+          sequence,
           description,
-          continuation.asInstanceOf[Try[Any] => Either[Try[Any], Future[Any]]],
-          p.asInstanceOf[Promise[Any]],
           result,
-          sequence
+          continuation.asInstanceOf[Try[Any] => Either[Try[Any], Future[Any]]],
+          p.asInstanceOf[Promise[Any]]
         )
       )
 
@@ -134,7 +134,7 @@ trait AsynchronousSubmissionManagerTrait {
       var failedCount = 0
 
       Iterator.continually(completionQueue.poll()).takeWhile(_ ne null).foreach {
-        case CompletedCompletion(description, continuation, callerPromise, resultTry, sequence) =>
+        case CompletedCompletion(sequence, description, resultTry, continuation, callerPromise) =>
 
           pendingCount -= 1
           pendingList = pendingList.filterNot(_.sequence == sequence)

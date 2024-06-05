@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.properties.Property
 import org.orbeon.oxf.xforms.XFormsProperties.AssetsBaselineUpdatesProperty
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
@@ -21,113 +22,150 @@ import org.scalatest.funspec.AnyFunSpec
 
 class XFormsAssetsTest extends AnyFunSpec{
 
+  val FRPrefix    = "fr"
+  val FR          = "http://orbeon.org/oxf/xml/form-runner"
+  val FRNamespace = Namespace(FRPrefix, FR)
+
   val BaselineAssets =
     """
       {
-        "css": [
-          { "full": "/ops/yui/container/assets/skins/sam/container.css",                   "min": false },
-          { "full": "/apps/fr/style/bootstrap/css/bootstrap.css",                          "min": true  },
-          { "full": "/apps/fr/style/form-runner-bootstrap-override.css",                   "min": false },
-          { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/all.css",               "min": true  },
-          { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/v4-shims.css",          "min": true  },
-          { "full": "/config/theme/xforms.css",                                            "min": false },
-          { "full": "/config/theme/error.css",                                             "min": false },
-          { "full": "/ops/nprogress-0.2.0/nprogress.css",                                  "min": false }
-        ],
+          "css": [
+            { "full": "/ops/yui/container/assets/skins/sam/container.css",                   "min": false },
+            { "full": "/apps/fr/style/bootstrap/css/bootstrap.css",                          "min": true  },
+            { "full": "/apps/fr/style/form-runner-bootstrap-override.css",                   "min": false },
+            { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/all.css",               "min": true  },
+            { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/v4-shims.css",          "min": true  },
+            { "full": "/config/theme/xforms.css",                                            "min": false },
+            { "full": "/config/theme/error.css",                                             "min": false },
+            { "full": "/ops/nprogress-0.2.0/nprogress.css",                                  "min": false },
+            { "full": "/ops/css-loader/css-loader.css",                                      "min": false }
+          ],
 
-        "js": [
-          { "full": "/ops/jquery/jquery-3.6.1.js",                                         "min": true  },
-          { "full": "/apps/fr/style/bootstrap/js/bootstrap.js",                            "min": true  },
-          { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
-          { "full": "/ops/nprogress-0.2.0/nprogress.js",                                   "min": true  },
-          { "full": "/ops/bowser/bowser.js",                                               "min": true  },
-          { "full": "/ops/mousetrap/mousetrap.min.js",                                     "min": false },
+          "js": [
+            { "full": "/ops/jquery/jquery-3.6.1.js",                                         "min": true  },
+            { "full": "/apps/fr/style/bootstrap/js/bootstrap.js",                            "min": true  },
+            { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
+            { "full": "/ops/nprogress-0.2.0/nprogress.js",                                   "min": true  },
+            { "full": "/ops/bowser/bowser.js",                                               "min": true  },
+            { "full": "/ops/mousetrap/mousetrap.min.js",                                     "min": false },
+            { "full": "/ops/fetch/fetch.umd.js",                                             "min": false },
 
-          { "full": "/ops/yui/yahoo/yahoo.js",                                             "min": true  },
-          { "full": "/ops/yui/event/event.js",                                             "min": true  },
-          { "full": "/ops/yui/dom/dom.js",                                                 "min": true  },
-          { "full": "/ops/yui/element/element.js",                                         "min": true  },
-          { "full": "/ops/yui/animation/animation.js",                                     "min": true  },
-          { "full": "/ops/yui/dragdrop/dragdrop.js",                                       "min": true  },
-          { "full": "/ops/yui/container/container.js",                                     "min": true  },
-          { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
+            { "full": "/ops/web-streams-polyfill/ponyfill.es2018.js",                        "min": false },
 
-          { "full": "/ops/javascript/underscore/underscore.min.js",                        "min": false },
+            { "full": "/ops/yui/yahoo/yahoo.js",                                             "min": true  },
+            { "full": "/ops/yui/event/event.js",                                             "min": true  },
+            { "full": "/ops/yui/dom/dom.js",                                                 "min": true  },
+            { "full": "/ops/yui/element/element.js",                                         "min": true  },
+            { "full": "/ops/yui/animation/animation.js",                                     "min": true  },
+            { "full": "/ops/yui/dragdrop/dragdrop.js",                                       "min": true  },
+            { "full": "/ops/yui/container/container.js",                                     "min": true  },
+            { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
 
-          { "full": "/ops/javascript/xforms.js",                                           "min": true  },
-          { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
-          { "full": "/ops/javascript/orbeon/xforms/control/Placeholder.js",                "min": true  },
+            { "full": "/ops/javascript/underscore/underscore.min.js",                        "min": false },
 
-          { "full": "/ops/javascript/scalajs/orbeon-xforms.js",                            "min": false }
-        ]
-      }"""
+            { "full": "/ops/javascript/xforms.js",                                           "min": true  },
+            { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
+            { "full": "/ops/javascript/orbeon/xforms/control/Placeholder.js",                "min": true  },
+
+            { "full": "/ops/javascript/scalajs/orbeon-xforms-web.js",                        "min": false }
+          ],
+
+          "xbl": [
+            "fr:number",
+            "fr:date",
+            "fr:code-mirror",
+            "fr:section"
+          ]
+        }"""
+
+
+  val XblBaseline = Set(
+    QName("number",      FRNamespace),
+    QName("date",        FRNamespace),
+    QName("code-mirror", FRNamespace),
+    QName("section",     FRNamespace),
+  )
 
   val ExpectedAssets =
     """
       {
-        "css": [
-          { "full": "/apps/fr/style/bootstrap/css/bootstrap.css",                          "min": true  },
-          { "full": "/apps/fr/style/form-runner-bootstrap-override.css",                   "min": false },
-          { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/all.css",               "min": true  },
-          { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/v4-shims.css",          "min": true  },
-          { "full": "/config/theme/xforms.css",                                            "min": false },
-          { "full": "/config/theme/error.css",                                             "min": false },
-          { "full": "/ops/nprogress-0.2.0/nprogress.css",                                  "min": false },
-          { "full": "/apps/fr/assets/foo.css",                                             "min": false }
-        ],
+          "css": [
+            { "full": "/apps/fr/style/bootstrap/css/bootstrap.css",                          "min": true  },
+            { "full": "/apps/fr/style/form-runner-bootstrap-override.css",                   "min": false },
+            { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/all.css",               "min": true  },
+            { "full": "/apps/fr/style/fontawesome-free-6.3.0-web/css/v4-shims.css",          "min": true  },
+            { "full": "/config/theme/xforms.css",                                            "min": false },
+            { "full": "/config/theme/error.css",                                             "min": false },
+            { "full": "/ops/nprogress-0.2.0/nprogress.css",                                  "min": false },
+            { "full": "/ops/css-loader/css-loader.css",                                      "min": false },
+            { "full": "/apps/fr/assets/foo.css",                                             "min": false }
+          ],
 
-        "js": [
-          { "full": "/ops/jquery/jquery-3.6.1.js",                                         "min": true  },
-          { "full": "/apps/fr/style/bootstrap/js/bootstrap.js",                            "min": true  },
-          { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
-          { "full": "/ops/nprogress-0.2.0/nprogress.js",                                   "min": true  },
-          { "full": "/ops/bowser/bowser.js",                                               "min": true  },
-          { "full": "/ops/mousetrap/mousetrap.min.js",                                     "min": false },
+          "js": [
+            { "full": "/ops/jquery/jquery-3.6.1.js",                                         "min": true  },
+            { "full": "/apps/fr/style/bootstrap/js/bootstrap.js",                            "min": true  },
+            { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
+            { "full": "/ops/nprogress-0.2.0/nprogress.js",                                   "min": true  },
+            { "full": "/ops/bowser/bowser.js",                                               "min": true  },
+            { "full": "/ops/mousetrap/mousetrap.min.js",                                     "min": false },
+            { "full": "/ops/fetch/fetch.umd.js",                                             "min": false },
 
-          { "full": "/ops/yui/yahoo/yahoo.js",                                             "min": true  },
-          { "full": "/ops/yui/event/event.js",                                             "min": true  },
-          { "full": "/ops/yui/dom/dom.js",                                                 "min": true  },
-          { "full": "/ops/yui/element/element.js",                                         "min": true  },
-          { "full": "/ops/yui/animation/animation.js",                                     "min": true  },
-          { "full": "/ops/yui/dragdrop/dragdrop.js",                                       "min": true  },
-          { "full": "/ops/yui/container/container.js",                                     "min": true  },
-          { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
+            { "full": "/ops/web-streams-polyfill/ponyfill.es2018.js",                        "min": false },
 
-          { "full": "/ops/javascript/underscore/underscore.min.js",                        "min": false },
+            { "full": "/ops/yui/yahoo/yahoo.js",                                             "min": true  },
+            { "full": "/ops/yui/event/event.js",                                             "min": true  },
+            { "full": "/ops/yui/dom/dom.js",                                                 "min": true  },
+            { "full": "/ops/yui/element/element.js",                                         "min": true  },
+            { "full": "/ops/yui/animation/animation.js",                                     "min": true  },
+            { "full": "/ops/yui/dragdrop/dragdrop.js",                                       "min": true  },
+            { "full": "/ops/yui/container/container.js",                                     "min": true  },
+            { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
 
-          { "full": "/ops/javascript/xforms.js",                                           "min": true  },
-          { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
-          { "full": "/ops/javascript/orbeon/xforms/control/Placeholder.js",                "min": true  },
+            { "full": "/ops/javascript/underscore/underscore.min.js",                        "min": false },
 
-          { "full": "/apps/fr/resources/scalajs/orbeon-form-runner.js",                    "min": false }
-        ]
-      }"""
+            { "full": "/ops/javascript/xforms.js",                                           "min": true  },
+            { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
+            { "full": "/ops/javascript/orbeon/xforms/control/Placeholder.js",                "min": true  },
 
-  // TODO: Test updating with XBL QNames.
+            { "full": "/apps/fr/resources/scalajs/orbeon-form-runner.js",                    "min": false }
+          ],
+
+          "xbl": [
+            "fr:number",
+            "fr:date",
+            "fr:section",
+            "fr:foo"
+          ]
+        }"""
+
+  val Namespaces = Map(FRPrefix -> FR)
+
   describe(s"Updating assets") {
 
-    val assets = XFormsAssetsBuilder.fromJsonString(BaselineAssets, Map.empty).xformsAssets
+    val assets = XFormsAssetsBuilder.fromJsonString(BaselineAssets, Namespaces).xformsAssets
 
     val result =
       XFormsAssetsBuilder.updateAssets(
         globalAssetsBaseline = assets,
-        globalXblBaseline    = Set.empty,
-        localExcludesProp    = Some("/ops/javascript/scalajs/orbeon-xforms.js /ops/yui/container/assets/skins/sam/container.css"),
+        globalXblBaseline    = XblBaseline,
+        localExcludesProp    = Some("/ops/javascript/scalajs/orbeon-xforms-web.js /ops/yui/container/assets/skins/sam/container.css"),
         localUpdatesProp     = Some(
           Property(
             XS_STRING_QNAME,
             """+/apps/fr/resources/scalajs/orbeon-form-runner.js
                -/ops/yui/calendar/assets/skins/sam/calendar.css
                +/apps/fr/assets/foo.css
+               -fr:code-mirror
+               +fr:foo
             """,
-            Map.empty,
+            Namespaces,
             AssetsBaselineUpdatesProperty
           )
         )
       )
 
     it("must add and remove assets") {
-      assert(XFormsAssetsBuilder.fromJsonString(ExpectedAssets, Map.empty) == result)
+      assert(XFormsAssetsBuilder.fromJsonString(ExpectedAssets, Namespaces) == result)
     }
   }
 }

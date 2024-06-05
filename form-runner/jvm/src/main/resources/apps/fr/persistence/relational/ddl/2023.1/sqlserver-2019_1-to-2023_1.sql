@@ -30,3 +30,6 @@ ALTER COLUMN created            DATETIME2(3);
 
 ALTER TABLE  orbeon_i_current
 ALTER COLUMN last_modified_time DATETIME2(3);
+
+ALTER TABLE  orbeon_i_control_text
+ALTER COLUMN val                NVARCHAR(MAX);

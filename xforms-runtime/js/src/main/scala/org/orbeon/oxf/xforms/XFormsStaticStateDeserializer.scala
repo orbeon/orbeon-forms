@@ -1098,7 +1098,7 @@ object XFormsStaticStateImpl {
 
       def propertyMaybeAsExpression(name: String) : Either[Any, StaticXPath.CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
 
-      def baselineAssets: (List[String], List[String]) = (Nil, Nil)
+      def baselineAssets: XFormsAssets = XFormsAssets(Nil, Nil)
       def bindingAssets: XBLAssets = XBLAssets(Nil, Nil)
     }
   }

@@ -21,11 +21,11 @@ import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.processor.ScriptBuilder._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XHTMLOutput}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.xforms.xbl.{XBLAssets, XBLAssetsSupport}
+import org.orbeon.oxf.xforms.xbl.{AssetsSupport, XBLAssets}
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.{Constants, HeadElement}
+import org.orbeon.xforms.Constants
 import org.xml.sax.Attributes
 
 
@@ -81,17 +81,17 @@ class XHTMLHeadHandler(
         )
       }
 
-    val (baselineJs, baselineCss) = containingDocument.staticState.baselineAssets
-    val XBLAssets(css, js)        = containingDocument.staticState.bindingAssets
+    val XFormsAssets(baselineCss, baselineJs) = containingDocument.staticState.baselineAssets
+    val XBLAssets(css, js)                    = containingDocument.staticState.bindingAssets
 
     // Stylesheets
-    outputCssAssets(xhtmlPrefix, baselineCss, css)
+    AssetsSupport.outputCssAssets(xhtmlPrefix, baselineCss, css, isMinimal)
 
     // Scripts
     locally {
 
       // Linked JavaScript resources
-      outputJsAssets(xhtmlPrefix, baselineJs, js)
+      AssetsSupport.outputJsAssets(xhtmlPrefix, baselineJs, js, isMinimal)
 
       if (! containingDocument.isServeInlineResources) {
 
@@ -101,7 +101,7 @@ class XHTMLHeadHandler(
             localName = "script",
             prefix    = xhtmlPrefix,
             uri       = XHTML_NAMESPACE_URI,
-            atts      = ("src" -> (XFormsAssetPaths.FormStaticResourcesPath + containingDocument.staticState.digest + ".js") :: StandaloneScriptBaseAtts)
+            atts      = "src" -> (XFormsAssetPaths.FormStaticResourcesPath + containingDocument.staticState.digest + ".js") :: StandaloneScriptBaseAtts
           )
 
         // Dynamic resources
@@ -109,7 +109,7 @@ class XHTMLHeadHandler(
           localName = "script",
           prefix    = xhtmlPrefix,
           uri       = XHTML_NAMESPACE_URI,
-          atts      = ("src" -> (Constants.FormDynamicResourcesPath + containingDocument.uuid + ".js") :: StandaloneScriptBaseAtts)
+          atts      = "src" -> (Constants.FormDynamicResourcesPath + containingDocument.uuid + ".js") :: StandaloneScriptBaseAtts
         )
 
       } else {
@@ -165,89 +165,10 @@ class XHTMLHeadHandler(
 
 private object XHTMLHeadHandler {
 
-  val ScriptBaseAtts =
-    List(
-      "type"  -> "text/javascript"
-    )
-
   val StandaloneScriptBaseAtts =
     List(
       "type"  -> "text/javascript",
       "class" -> "xforms-standalone-resource",
       "defer" -> "defer"
     )
-
-  val StyleBaseAtts =
-    List(
-      "type"  -> "text/css",
-      "media" -> "all"
-    )
-
-  val LinkBaseAtts =
-    List(
-      "rel"   -> "stylesheet",
-      "type"  -> "text/css",
-      "media" -> "all"
-    )
-
-  private def valueOptToList(name: String, value: Option[String]): List[(String, String)] =
-    value.toList map (name -> _)
-
-  private def outputJsAssets(
-    xhtmlPrefix   : String,
-    baselineAssets: List[String],
-    bindingAssets : List[HeadElement],
-  )(implicit
-    receiver          : XMLReceiver
-  ): Unit = {
-
-    def outputScriptElement(resource: Option[String], cssClass: Option[String], content: Option[String]): Unit =
-      withElement(
-        localName = "script",
-        prefix    = xhtmlPrefix,
-        uri       = XHTML_NAMESPACE_URI,
-        atts      = ScriptBaseAtts ::: valueOptToList("src", resource) ::: valueOptToList("class", cssClass)
-      ) {
-        content foreach text
-      }
-
-    XBLAssetsSupport.outputAssets(
-      outputElement  = outputScriptElement,
-      baselineAssets = baselineAssets,
-      bindingAssets   = bindingAssets,
-    )
-  }
-
-  private def outputCssAssets(
-    xhtmlPrefix   : String,
-    baselineAssets: List[String],
-    bindingAssets : List[HeadElement],
-  )(implicit
-    receiver          : XMLReceiver
-  ): Unit = {
-
-    def outputLinkOrStyleElement(resource: Option[String], cssClass: Option[String], content: Option[String]): Unit = {
-
-      withElement(
-        localName = resource match {
-          case Some(_) => "link"
-          case None    => "style"
-        },
-        prefix    = xhtmlPrefix,
-        uri       = XHTML_NAMESPACE_URI,
-        atts      = (resource match {
-            case Some(resource) => ("href"  -> resource) :: LinkBaseAtts
-            case None           => StyleBaseAtts
-          }) ::: valueOptToList("class", cssClass)
-      ) {
-        content foreach text
-      }
-    }
-
-    XBLAssetsSupport.outputAssets(
-      outputElement  = outputLinkOrStyleElement,
-      bindingAssets   = bindingAssets,
-      baselineAssets = baselineAssets
-    )
-  }
 }

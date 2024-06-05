@@ -41,7 +41,7 @@ trait XFormsStaticState
   // Other configurations
   def sanitizeInput                       : String => String
 
-  def baselineAssets                      : (List[String], List[String])
+  def baselineAssets                      : XFormsAssets
   def bindingAssets                       : XBLAssets
 }
 

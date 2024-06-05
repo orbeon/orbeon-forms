@@ -125,7 +125,7 @@ class XFormsStaticStateImpl(
   lazy val sanitizeInput: String => String =
     StringReplacer(staticProperties.staticStringProperty(P.SanitizeProperty))
 
-  lazy val baselineAssets: (List[String], List[String]) = {
+  lazy val baselineAssets: XFormsAssets = {
 
     val xblBaseline = metadata.xblBaselineAssets
 
@@ -172,9 +172,9 @@ class XFormsStaticStateImpl(
         case Right(qname) => missingBindings.getOrElse(qname, throw new IllegalArgumentException(qname.qualifiedName))
       }
 
-    (
-      (updatedAssets.js  ::: resolvedXblBaselineAssetPaths.flatMap(_.js)) .map(_.assetPath(tryMin = true)),
-      (updatedAssets.css ::: resolvedXblBaselineAssetPaths.flatMap(_.css)).map(_.assetPath(tryMin = true)),
+    XFormsAssets(
+      css = updatedAssets.css ::: resolvedXblBaselineAssetPaths.flatMap(_.css),
+      js  = updatedAssets.js  ::: resolvedXblBaselineAssetPaths.flatMap(_.js)
     )
   }
 

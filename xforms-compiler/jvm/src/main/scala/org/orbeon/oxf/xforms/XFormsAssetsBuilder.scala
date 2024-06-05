@@ -35,8 +35,6 @@ object XFormsAssetsBuilder {
     localUpdatesProp    : Option[Property],
   ): XFormsAssetsWithXbl = {
 
-    println(s"xxx XFormsAssetsBuilder.updateAssets: assets = $globalAssetsBaseline, excludesProp = $localExcludesProp, updatesProp = $localUpdatesProp")
-
     def qNameFromString(s: String): QName =
       localUpdatesProp
         .map(_.namespaces.get _)

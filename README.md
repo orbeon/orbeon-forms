@@ -5,6 +5,7 @@ Web Forms for the Enterprise and the Government
 -----------------------------------------------
 
 Last updated for Orbeon Forms 2023.1.1 (March 2024)
+This project is tested with BrowserStack
 
 [![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -190,7 +191,6 @@ Please consult the `third-party-licenses` directory for more information about i
 Credits
 -------
 
-This project is tested with BrowserStack.
 We would like to thank [YourKit, LLC](https://www.yourkit.com/) for kindly supporting open source projects like Orbeon
 Forms with the full-featured [YourKit Java Profiler](https://www.yourkit.com/java/profiler/index.jsp).
 

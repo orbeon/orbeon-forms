@@ -152,6 +152,12 @@
         <xi:include href="oxf:/forms/orbeon/builder/form/toolbox.xml" xxi:omit-xml-base="true"/>
 
         <xh:div class="fb-main">
+
+            <!-- Lease message -->
+            <fr:lease fr-resources-ref="$fr-resources"/>
+
+            <!--<xh:div style="background-color: blue; height: 100%;"/>-->
+
             <xh:div class="fb-main-inner">
                 <xh:div class="navbar navbar-inverse">
                     <xh:div class="navbar-inner">
@@ -243,9 +249,6 @@
                         ) = 'fluid'"/>
 
                 <xh:div class="container{'-fluid'[$is-page-layout-fluid]}">
-
-                    <!-- Lease message -->
-                    <fr:lease fr-resources-ref="$fr-resources"/>
 
                     <xh:div class="row{'-fluid'[$is-page-layout-fluid]}">
                         <xh:div class="span12">

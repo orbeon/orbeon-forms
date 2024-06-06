@@ -73,6 +73,8 @@ body.orbeon {
 .orbeon {
 
     .fb-main {
+        display: flex;
+        flex-direction: column;
         position: absolute;
         top: 48px + @fbGutter;
         right: @fbGutter;
@@ -86,7 +88,7 @@ body.orbeon {
             box-sizing: border-box;
             margin-bottom: 0;
             min-width: 740px;                                               // To allow for fluidity but not "too small" (was 980px)
-            min-height: 100%;                                               // So the main area uses all the available space, not revealing a large portion of the background
+            flex-grow: 1;                                                   // So the main area takes all the space available (except for the lease banner)
 
             .container-fluid {
                 padding: 0 40px;                                            // Additional padding on the sides, to leave space for icons

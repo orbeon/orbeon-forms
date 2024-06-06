@@ -25,6 +25,10 @@
         element="fr|lease"
         xxbl:mode="binding">
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/lease/lease.css"/>
+        </xbl:resources>
+
         <xbl:implementation>
             <xf:model>
                 <xf:var name="fr-persistence-instance" as="element('_')" value="xxf:instance('fr-persistence-instance')"/>
@@ -153,89 +157,95 @@
                 class="alert alert-info fr-top-alert"
                 xxf:element="div">
 
-                <xh:i class="fa fa-lock" aria-hidden="true"/>
-
-                <xh:div>
-                    <!-- Banner message, incl. countdown if lease was acquired -->
-                    <xf:switch caseref="if ($fr-lease-state = ('current-user', 'other-user') or not($is-fb)) then $fr-lease-state else ''">
-                        <xf:case value="'current-user'">
-                            <xh:div>
-                                <xf:output value="$fr-resources/detail/lease/current-user-left"/>
-                                <!-- Make `fr:countdown` non-relevant if this case isn't shown, as it expects a valid `lease-end-time` -->
-                                <xf:var name="countdown-relevant" value="$fr-lease-state = 'current-user'"/>
-                                <fr:countdown
-                                    ref="$fr-persistence-instance/lease-end-time[$countdown-relevant]"
-                                    alert-threshold-ref="$fr-persistence-instance/lease-alert-threshold">
-
-                                    <xf:action event="fr-countdown-ended" if="$fr-lease-state = 'current-user'">
-                                        <xf:dispatch name="fr-relinquish-lease" targetid="fr-lease"/>
-                                    </xf:action>
-
-                                    <xf:action event="fr-countdown-alert" if="$fr-lease-state = 'current-user'">
-                                        <xf:dispatch target="fr-lease-renew-dialog" name="fr-show"/>
-                                    </xf:action>
-                                </fr:countdown>
-                                <xf:output value="$fr-resources/detail/lease/current-user-right"/>
-                            </xh:div>
-                        </xf:case>
-
-                        <xf:case value="'relinquished'">
-                            <xf:output value="$fr-resources/detail/lease/relinquished"/>
-                        </xf:case>
-
-                        <xf:case value="'other-user'">
-                            <xf:output value="
-                                xxf:format-message(
-                                    $fr-resources/detail/lease/other-user,
-                                    xxf:instance('fr-lockinfo-response')/d:owner/fr:username/string()
-                                )
-                            "/>
-                        </xf:case>
-                    </xf:switch>
-
-                    <!-- Banner buttons -->
-                    <xh:div class="fr-top-alert-buttons">
-                        <xf:switch caseref="if ($fr-lease-state = 'current-user') then 'has-lease' else 'does-not-have-lease'">
-                            <xf:case value="'has-lease'">
-                                <!-- 'Relinquish lease' button -->
-                                <xf:trigger class="xforms-trigger-appearance-modal">
-                                    <xf:label ref="$fr-resources/detail/lease/relinquish"/>
-                                    <xf:action event="DOMActivate">
-                                        <xf:dispatch name="fr-relinquish-lease" targetid="fr-lease"/>
-                                    </xf:action>
-                                </xf:trigger>
-
-                                <!-- 'Renew lease' button -->
-                                <xf:trigger class="xforms-trigger-appearance-modal">
-                                    <xf:label ref="$fr-resources/detail/lease/renew"/>
-                                    <xf:action event="DOMActivate">
-                                        <xf:dispatch name="fr-acquire-lease" targetid="fr-lease"/>
-                                    </xf:action>
-                                </xf:trigger>
-                            </xf:case>
-
-                            <xf:case value="'does-not-have-lease'">
-                                <!-- 'Try to acquire lease' button -->
-                                <xf:trigger class="xforms-trigger-appearance-modal">
-                                    <xf:label ref="$fr-resources/detail/lease/try-acquire"/>
-                                    <xf:action event="DOMActivate">
-                                        <xf:setvalue ref="$fr-persistence-instance/lease-load-document">true</xf:setvalue>
-                                        <xf:setvalue ref="$fr-persistence-instance/lease-refresh-needed" value="$is-fb"/>
-                                        <xf:dispatch name="fr-acquire-lease" targetid="fr-lease"/>
-                                    </xf:action>
-                                </xf:trigger>
-
-                                <!-- 'Show in read-only mode' button -->
-                                <xf:trigger ref="instance('i')/show-in-view-mode-trigger">
-                                    <xf:label ref="$fr-resources/detail/lease/show-in-view-mode"/>
-                                    <xf:action event="DOMActivate" type="xpath">
-                                        fr:run-process-by-name('oxf.fr.detail.process', 'lease-view')
-                                    </xf:action>
-                                </xf:trigger>
-                            </xf:case>
-                        </xf:switch>
-                    </xh:div>
+                <xh:div class="fr-lease-icon">
+                    <xh:i class="fa fa-lock" aria-hidden="true"/>
                 </xh:div>
+
+                <!-- Banner message, incl. countdown if lease was acquired -->
+                <xf:switch
+                    caseref="if ($fr-lease-state = ('current-user', 'other-user') or not($is-fb)) then $fr-lease-state else ''"
+                    xxf:element="div"
+                    class="fr-lease-text">
+
+                    <xf:case value="'current-user'">
+                        <xh:div>
+                            <xf:output value="$fr-resources/detail/lease/current-user-left"/>
+                            <!-- Make `fr:countdown` non-relevant if this case isn't shown, as it expects a valid `lease-end-time` -->
+                            <xf:var name="countdown-relevant" value="$fr-lease-state = 'current-user'"/>
+                            <fr:countdown
+                                ref="$fr-persistence-instance/lease-end-time[$countdown-relevant]"
+                                alert-threshold-ref="$fr-persistence-instance/lease-alert-threshold">
+
+                                <xf:action event="fr-countdown-ended" if="$fr-lease-state = 'current-user'">
+                                    <xf:dispatch name="fr-relinquish-lease" targetid="fr-lease"/>
+                                </xf:action>
+
+                                <xf:action event="fr-countdown-alert" if="$fr-lease-state = 'current-user'">
+                                    <xf:dispatch target="fr-lease-renew-dialog" name="fr-show"/>
+                                </xf:action>
+                            </fr:countdown>
+                            <xf:output value="$fr-resources/detail/lease/current-user-right"/>
+                        </xh:div>
+                    </xf:case>
+
+                    <xf:case value="'relinquished'">
+                        <xf:output value="$fr-resources/detail/lease/relinquished"/>
+                    </xf:case>
+
+                    <xf:case value="'other-user'">
+                        <xf:output value="
+                            xxf:format-message(
+                                $fr-resources/detail/lease/other-user,
+                                xxf:instance('fr-lockinfo-response')/d:owner/fr:username/string()
+                            )
+                        "/>
+                    </xf:case>
+                </xf:switch>
+
+                <!-- Banner buttons -->
+                <xf:switch
+                    caseref="if ($fr-lease-state = 'current-user') then 'has-lease' else 'does-not-have-lease'"
+                    xxf:element="div"
+                    class="fr-top-alert-buttons">
+
+                    <xf:case value="'has-lease'">
+                        <!-- 'Relinquish lease' button -->
+                        <xf:trigger class="xforms-trigger-appearance-modal">
+                            <xf:label ref="$fr-resources/detail/lease/relinquish"/>
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch name="fr-relinquish-lease" targetid="fr-lease"/>
+                            </xf:action>
+                        </xf:trigger>
+
+                        <!-- 'Renew lease' button -->
+                        <xf:trigger class="xforms-trigger-appearance-modal">
+                            <xf:label ref="$fr-resources/detail/lease/renew"/>
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch name="fr-acquire-lease" targetid="fr-lease"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xf:case>
+
+                    <xf:case value="'does-not-have-lease'">
+                        <!-- 'Try to acquire lease' button -->
+                        <xf:trigger class="xforms-trigger-appearance-modal">
+                            <xf:label ref="$fr-resources/detail/lease/try-acquire"/>
+                            <xf:action event="DOMActivate">
+                                <xf:setvalue ref="$fr-persistence-instance/lease-load-document">true</xf:setvalue>
+                                <xf:setvalue ref="$fr-persistence-instance/lease-refresh-needed" value="$is-fb"/>
+                                <xf:dispatch name="fr-acquire-lease" targetid="fr-lease"/>
+                            </xf:action>
+                        </xf:trigger>
+
+                        <!-- 'Show in read-only mode' button -->
+                        <xf:trigger ref="instance('i')/show-in-view-mode-trigger">
+                            <xf:label ref="$fr-resources/detail/lease/show-in-view-mode"/>
+                            <xf:action event="DOMActivate" type="xpath">
+                                fr:run-process-by-name('oxf.fr.detail.process', 'lease-view')
+                            </xf:action>
+                        </xf:trigger>
+                    </xf:case>
+                </xf:switch>
             </xf:group>
         </xbl:template>
     </xbl:binding>

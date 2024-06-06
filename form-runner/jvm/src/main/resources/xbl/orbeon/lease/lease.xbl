@@ -169,10 +169,11 @@
 
                     <xf:case value="'current-user'">
                         <xh:div>
-                            <xf:output value="$fr-resources/detail/lease/current-user-left"/>
                             <!-- Make `fr:countdown` non-relevant if this case isn't shown, as it expects a valid `lease-end-time` -->
                             <xf:var name="countdown-relevant" value="$fr-lease-state = 'current-user'"/>
-                            <fr:countdown
+
+                            <!-- Avoid newlines between xf:output and fr:countdown so that no whitespace is introduced -->
+                            <xf:output value="$fr-resources/detail/lease/current-user-left"/><fr:countdown
                                 ref="$fr-persistence-instance/lease-end-time[$countdown-relevant]"
                                 alert-threshold-ref="$fr-persistence-instance/lease-alert-threshold">
 
@@ -183,8 +184,7 @@
                                 <xf:action event="fr-countdown-alert" if="$fr-lease-state = 'current-user'">
                                     <xf:dispatch target="fr-lease-renew-dialog" name="fr-show"/>
                                 </xf:action>
-                            </fr:countdown>
-                            <xf:output value="$fr-resources/detail/lease/current-user-right"/>
+                            </fr:countdown><xf:output value="$fr-resources/detail/lease/current-user-right"/>
                         </xh:div>
                     </xf:case>
 

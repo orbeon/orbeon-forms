@@ -669,6 +669,7 @@
     </property>
 
     <!-- Temporary until we have fully switched to Bootstrap 5 -->
+    <!-- Unused as of 2024-06-06 -->
     <property as="xs:string"  name="oxf.xforms.assets.baseline.updates.detail">
         -/apps/fr/style/bootstrap/css/bootstrap.css
         -/apps/fr/style/form-runner-bootstrap-override.css

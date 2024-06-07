@@ -231,15 +231,18 @@ body.orbeon { background-color: @frBackground }
         border-radius: 5px;
         margin-top: 10px;
 
-        &:before {
-            content: "";
-            position: absolute;
-            left: 10px;
-            top: -10px;
-            border-style: solid;
-            border-width: 0 10px 10px 10px;
-            display: block;
-            width: 0;
+        // https://github.com/orbeon/orbeon-forms/issues/6349
+        @media (prefers-contrast: no-preference) or (prefers-contrast: less) {
+            &:before {
+                content: "";
+                position: absolute;
+                left: 10px;
+                top: -10px;
+                border-style: solid;
+                border-width: 0 10px 10px 10px;
+                display: block;
+                width: 0;
+            }
         }
     }
 

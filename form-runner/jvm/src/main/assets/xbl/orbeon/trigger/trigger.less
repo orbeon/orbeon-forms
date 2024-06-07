@@ -2,20 +2,17 @@
 
 .orbeon {
 
-    .fr-view {
+    // 2024-05-29: Moved spread out styles to here
 
-        // 2024-05-29: Moved spread out styles to here
+    .fr-view:not(.fr-mode-landing), .xforms-dialog {  // ideally we'd like `:not(ancestor::.fr-view.fr-mode-landing`)
+        // Make default button a little darker
+        .btn {
+            background-color: darken(@wellBackground, 5%);
+        }
 
-        &:not(.fr-mode-landing) {
-            // Make default button a little darker
-            .btn {
-                background-color: darken(@wellBackground, 5%);
-            }
-
-            .btn {
-                &.disabled, &[disabled] {
-                    background-color: darken(@wellBackground, 5%); // restore default color or buttons are too dark when disabled
-                }
+        .btn {
+            &.disabled, &[disabled] {
+                background-color: darken(@wellBackground, 5%); // restore default color or buttons are too dark when disabled
             }
         }
 

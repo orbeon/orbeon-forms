@@ -61,6 +61,7 @@ object NodeInfoCell {
   //
   // Return `array(map(xs:string, *)*)`.
   //
+  // 2024-06-10: This is called at form compilation time, wouldn't need to be under shared.
   //@XPathFunction
   def analyzeTrTdGridAndFillHoles(grid: NodeInfo, forMigration: Boolean): Item = {
 
@@ -97,6 +98,7 @@ object NodeInfoCell {
   //
   // Return `array(map(xs:string, *)*)`.
   //
+  // 2024-06-10: This is called at form compilation time, wouldn't need to be under shared.
   //@XPathFunction
   def analyze12ColumnGridAndFillHoles(grid: NodeInfo, simplify: Boolean, transpose: Boolean): Item =
     SaxonUtils.newArrayItem(

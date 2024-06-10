@@ -280,33 +280,40 @@
             <xsl:choose>
                 <xsl:when test="not($use-css-grids-output)">
 
-                    <xsl:if test="exists($cells[1])"><!-- https://github.com/orbeon/orbeon-forms/issues/5260 -->
-                        <xsl:variable name="tr" select="map:get($cells[1], 'c')/parent::xh:tr"/>
+                    <!-- https://github.com/orbeon/orbeon-forms/issues/5260 -->
+                    <!-- https://github.com/orbeon/orbeon-forms/issues/6367 -->
+                    <xsl:variable
+                        name="tr"
+                        select="
+                            if (exists($cells[1])) then
+                                map:get($cells[1], 'c')/parent::xh:tr
+                            else
+                                ()
+                        "/>
 
-                        <xsl:if test="exists($tr/@class)">
-                            <xsl:copy-of select="fr:scope-outer-avt-class($tr/@class)"/>
-                        </xsl:if>
-
-                        <xsl:element name="{$tr-elem}">
-
-                            <xsl:choose>
-                                <xsl:when test="exists($tr)">
-                                    <xsl:copy-of select="fr:th-td-tr-classes-attr('tr', exists($tr/@class), ())"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:attribute name="class">fr-grid-tr</xsl:attribute>
-                                </xsl:otherwise>
-                            </xsl:choose>
-
-                            <xsl:if test="$static-row-pos = 1">
-                                <xsl:copy-of select="$left-side-block"/>
-                            </xsl:if>
-                            <xsl:copy-of select="$cells-content"/>
-                            <xsl:if test="$static-row-pos = 1">
-                                <xsl:copy-of select="$right-side-block"/>
-                            </xsl:if>
-                        </xsl:element>
+                    <xsl:if test="exists($tr/@class)">
+                        <xsl:copy-of select="fr:scope-outer-avt-class($tr/@class)"/>
                     </xsl:if>
+
+                    <xsl:element name="{$tr-elem}">
+
+                        <xsl:choose>
+                            <xsl:when test="exists($tr)">
+                                <xsl:copy-of select="fr:th-td-tr-classes-attr('tr', exists($tr/@class), ())"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="class">fr-grid-tr</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+
+                        <xsl:if test="$static-row-pos = 1">
+                            <xsl:copy-of select="$left-side-block"/>
+                        </xsl:if>
+                        <xsl:copy-of select="$cells-content"/>
+                        <xsl:if test="$static-row-pos = 1">
+                            <xsl:copy-of select="$right-side-block"/>
+                        </xsl:if>
+                    </xsl:element>
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- CSS grids output -->

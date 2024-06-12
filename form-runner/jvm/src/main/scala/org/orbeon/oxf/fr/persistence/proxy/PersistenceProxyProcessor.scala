@@ -98,7 +98,7 @@ private[persistence] object PersistenceProxyProcessor {
 
   sealed trait VersionAction
   private object VersionAction {
-    case object Reject                                           extends VersionAction
+    case class  Reject             (reason: String)              extends VersionAction
     case class  AcceptForData      (v: Option[Version.Specific]) extends VersionAction
     case class  AcceptAndUseForForm(v: Version.Specific)         extends VersionAction
     case class  HeadData           (v: Version.ForDocument)      extends VersionAction
@@ -114,46 +114,46 @@ private[persistence] object PersistenceProxyProcessor {
           case v @ Version.ForDocument(_, _) => VersionAction.HeadData(v) // only for this case
           case     Version.Unspecified       => VersionAction.LatestForm
           case v @ Version.Specific(_)       => VersionAction.AcceptAndUseForForm(v)
-          case     Version.Next              => VersionAction.Reject
+          case     Version.Next              => VersionAction.Reject("form GET for next version")
         },
       FormOrData.Data ->
         {
-          case     Version.ForDocument(_, _) => VersionAction.Reject
+          case     Version.ForDocument(_, _) => VersionAction.Reject("data GET for document version")
           case     Version.Unspecified       => VersionAction.AcceptForData(None)
           case v @ Version.Specific(_)       => VersionAction.AcceptForData(Some(v))
-          case     Version.Next              => VersionAction.Reject
+          case     Version.Next              => VersionAction.Reject("data GET for next version")
         }
     ),
     HttpMethod.PUT -> Map(
       FormOrData.Form ->
         {
-          case     Version.ForDocument(_, _) => VersionAction.Reject
+          case     Version.ForDocument(_, _) => VersionAction.Reject("form PUT for document version")
           case     Version.Unspecified       => VersionAction.LatestForm
           case v @ Version.Specific(_)       => VersionAction.AcceptAndUseForForm(v)
           case     Version.Next              => VersionAction.NextForm // only for this case
         },
       FormOrData.Data ->
         {
-          case     Version.ForDocument(_, _) => VersionAction.Reject
+          case     Version.ForDocument(_, _) => VersionAction.Reject("data PUT for document version")
           case     Version.Unspecified       => VersionAction.AcceptForData(None)
           case v @ Version.Specific(_)       => VersionAction.AcceptForData(Some(v))
-          case     Version.Next              => VersionAction.Reject
+          case     Version.Next              => VersionAction.Reject("data PUT for next version")
         }
     ),
     HttpMethod.DELETE -> Map(
       FormOrData.Form ->
         {
-          case     Version.ForDocument(_, _) => VersionAction.Reject
+          case     Version.ForDocument(_, _) => VersionAction.Reject("form DELETE for document version")
           case     Version.Unspecified       => VersionAction.LatestForm
           case v @ Version.Specific(_)       => VersionAction.AcceptAndUseForForm(v)
-          case     Version.Next              => VersionAction.Reject
+          case     Version.Next              => VersionAction.Reject("form DELETE for next version")
         },
       FormOrData.Data ->
         {
-          case     Version.ForDocument(_, _) => VersionAction.Reject
+          case     Version.ForDocument(_, _) => VersionAction.Reject("data DELETE for document version")
           case     Version.Unspecified       => VersionAction.AcceptForData(None)
           case v @ Version.Specific(_)       => VersionAction.AcceptForData(Some(v))// could disallow (used to)
-          case     Version.Next              => VersionAction.Reject
+          case     Version.Next              => VersionAction.Reject("data DELETE for next version")
         }
     ),
     HttpMethod.LOCK -> Map(
@@ -233,7 +233,7 @@ private[persistence] object PersistenceProxyProcessor {
   ): Unit = {
 
     // Throws if there is an incompatibility
-    checkDataFormatVersionIfNeeded(request, appForm, formOrData)
+    checkDataFormatVersionIfNeeded(indentedLogger, request, appForm, formOrData)
 
     val isDataXmlRequest = formOrData == FormOrData.Data && filename.contains(DataXml)
     val isFormBuilder    = appForm == AppForm.FormBuilder
@@ -290,8 +290,14 @@ private[persistence] object PersistenceProxyProcessor {
               .flatMap(_.trimAllToOpt)
               .map(FormRunner.AccessTokenParam ->).toList
 
+          def throw400ForUnsupportedVersion(v: Int): Unit = {
+            indentedLogger.logInfo("", s"400 Bad Request: request for version $v, but versioning not supported")
+            throw HttpStatusCodeException(StatusCode.BadRequest)
+          }
+
           versionAction match {
-            case VersionAction.Reject =>
+            case VersionAction.Reject(reason) =>
+              indentedLogger.logInfo("", s"400 Bad Request: $reason")
               throw HttpStatusCodeException(StatusCode.BadRequest)
             case VersionAction.AcceptAndUseForForm(v) if crudMethod == HttpMethod.DELETE =>
 
@@ -307,19 +313,22 @@ private[persistence] object PersistenceProxyProcessor {
                   mustFilterVersioningHeaders = false
                 )
               else if (v.version != 1)
-                throw HttpStatusCodeException(StatusCode.BadRequest)
+                throw400ForUnsupportedVersion(v.version)
 
               (None, Some(v.version))
             case VersionAction.AcceptAndUseForForm(v) =>
 
               if (! isVersioningSupported && v.version != 1)
-                throw HttpStatusCodeException(StatusCode.BadRequest)
+                throw400ForUnsupportedVersion(v.version)
 
               (None, Some(v.version))
-            case VersionAction.AcceptForData(v) =>
+            case VersionAction.AcceptForData(vOpt) =>
 
-              if (! isVersioningSupported && ! v.forall(_.version == 1))
-                throw HttpStatusCodeException(StatusCode.BadRequest)
+              if (! isVersioningSupported)
+                vOpt.foreach { v =>
+                  if (v.version != 1)
+                    throw400ForUnsupportedVersion(v.version)
+                }
 
               val (cxrOpt, effectiveFormDefinitionVersion, responseHeadersOpt) =
                 connectToObtainResponseHeadersAndCheckVersion(
@@ -327,7 +336,7 @@ private[persistence] object PersistenceProxyProcessor {
                   requestMethod              = crudMethod,
                   serviceUri                 = serviceUri,
                   outgoingPersistenceHeaders = outgoingPersistenceHeaders,
-                  specificIncomingVersionOpt = v.map(_.version),
+                  specificIncomingVersionOpt = vOpt.map(_.version),
                   queryForToken              = queryForToken
                 )
 
@@ -398,6 +407,7 @@ private[persistence] object PersistenceProxyProcessor {
                 PersistenceMetadataSupport.readLatestVersion(appForm).getOrElse(1)
               (None, Some(versionFromMetadata))
             case VersionAction.NextForm if ! isVersioningSupported =>
+              indentedLogger.logInfo("", s"400 Bad Request: request for next version while versioning not supported")
               throw HttpStatusCodeException(StatusCode.BadRequest)
             case VersionAction.NextForm =>
               val versionFromMetadata =
@@ -567,13 +577,18 @@ private[persistence] object PersistenceProxyProcessor {
     }
 
   private def compareVersionAgainstIncomingIfNeeded(
+    indentedLogger                    : IndentedLogger,
     effectiveFormDefinitionVersionOpt : Option[Int],
     responseHeaders                   : ResponseHeaders
   ): Int = {
     val versionFromProvider = responseHeaders.formVersion.getOrElse(1)
     effectiveFormDefinitionVersionOpt.foreach { incomingVersion =>
-      if (incomingVersion != versionFromProvider)
+      if (incomingVersion != versionFromProvider) {
+        indentedLogger.logInfo("",
+          s"400 Bad Request: incoming version ($incomingVersion) " +
+          s"doesn't match version from provider ($versionFromProvider)")
         throw HttpStatusCodeException(StatusCode.BadRequest)
+      }
     }
     versionFromProvider
   }
@@ -631,7 +646,7 @@ private[persistence] object PersistenceProxyProcessor {
       ).get // throws `HttpStatusCodeException` if not successful, including `NotFound`
 
     val responseHeaders     = extractResponseHeaders(cxr.getFirstHeaderIgnoreCase)
-    val versionFromProvider = compareVersionAgainstIncomingIfNeeded(specificIncomingVersionOpt, responseHeaders)
+    val versionFromProvider = compareVersionAgainstIncomingIfNeeded(indentedLogger, specificIncomingVersionOpt, responseHeaders)
 
     (cxr, versionFromProvider, responseHeaders)
   }
@@ -660,7 +675,7 @@ private[persistence] object PersistenceProxyProcessor {
       ) match {
         case Success(responseHeaders) =>
           // Existing data
-          val versionFromProvider = compareVersionAgainstIncomingIfNeeded(specificIncomingVersionOpt, responseHeaders)
+          val versionFromProvider = compareVersionAgainstIncomingIfNeeded(indentedLogger, specificIncomingVersionOpt, responseHeaders)
           // NOTE: If we get here, we have already passed successful permissions checks for `GET`/`HEAD` AKA
           // `Read` and we must have the allowed operations. However here we are doing a `PUT`/`DELETE` AKA
           // `Update`/`Delete` and we need to check operations again below. But we could skip actually getting
@@ -673,7 +688,7 @@ private[persistence] object PersistenceProxyProcessor {
             case Some(version) if requestMethod == HttpMethod.PUT =>
               (version, None)
             case None if requestMethod == HttpMethod.PUT =>
-              // We can't write new data if we don't know the version
+              indentedLogger.logInfo("", s"400 Bad Request: can't write new data without knowing the version")
               throw HttpStatusCodeException(StatusCode.BadRequest)
             case _ =>
               // We wouldn't need a version to delete data *except* that we need to get form permissions!
@@ -685,16 +700,17 @@ private[persistence] object PersistenceProxyProcessor {
     }
 
   private def checkDataFormatVersionIfNeeded(
-    request   : Request,
-    appForm   : AppForm,
-    formOrData: FormOrData
+    indentedLogger : IndentedLogger,
+    request        : Request,
+    appForm        : AppForm,
+    formOrData     : FormOrData
   ): Unit =
     if (formOrData == FormOrData.Data && GetOrPutMethods(request.getMethod))
       // https://github.com/orbeon/orbeon-forms/issues/4861
       request.getFirstParamAsString(DataFormatVersionName) foreach { incomingVersion =>
 
-        val providerVersion =
-          providerDataFormatVersionOrThrow(appForm)
+        val dataFormatVersionSupportedByProvider =
+          providerDataFormatVersionOrThrow(appForm).entryName
 
         require(
           AllowedDataFormatVersionParams(incomingVersion),
@@ -703,8 +719,12 @@ private[persistence] object PersistenceProxyProcessor {
 
         // We can remove this once we are able to perform conversions here, see:
         // https://github.com/orbeon/orbeon-forms/issues/3110
-        if (! Set(RawDataFormatVersion, providerVersion.entryName)(incomingVersion))
+        if (! Set(RawDataFormatVersion, dataFormatVersionSupportedByProvider)(incomingVersion)) {
+          indentedLogger.logInfo("",
+            s"400 Bad Request: incoming data format version ($incomingVersion) is neither `raw`" +
+            s"nor the data format version supported by the provider ($dataFormatVersionSupportedByProvider)")
           throw HttpStatusCodeException(StatusCode.BadRequest)
+        }
       }
 
   private def parsePruneAndSerializeXmlData(

@@ -18,7 +18,7 @@
 @frWizardBodyWidth: @frWizardWidth - @frWizardTocWidth - 2 - 1;
 
 // Make li the same height as section title
-@wizardLineHeight: @frSectionTitleLineHeight - 2 * 3px; // 3px is the Bootstrap padding on .nav-list > li > [span >] a
+@wizardLineHeight: @frSectionTitleLineHeight - 2;
 
 .orbeon .xbl-fr-wizard {
 
@@ -77,7 +77,7 @@
                 text-decoration: none;
                 text-shadow: none;
                 border: none;
-                line-height: 24px; // to align with section title
+                line-height: @wizardLineHeight; // to align with section title
                 .text-overflow();
                 color: @linkColor;
 
@@ -130,10 +130,6 @@
             .active.visible-incomplete > span > .btn-link {
                 color: @white;
                 background-color: @error;
-            }
-
-            li {
-                line-height: @wizardLineHeight;
             }
 
             .nav-list {

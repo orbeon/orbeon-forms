@@ -302,8 +302,8 @@
                      'fb'[$is-form-builder and $is-detail],
                      (:  For now let those depend on $bs5 :)
                      'landing'[$is-landing and $bs5],
-                     'summary'[$is-summary and $bs5],
-                     'detail'[$is-detail and $bs5]
+                     'summary'[$is-summary and $bs5], (: 2024-06-13: not used yet :)
+                     'detail'[$is-detail and $bs5]    (: 2024-06-13: not used yet :)
                  )
                 return p:property(concat('oxf.xforms.assets.baseline.updates.', $update))
             return string-join($updates, ' ')

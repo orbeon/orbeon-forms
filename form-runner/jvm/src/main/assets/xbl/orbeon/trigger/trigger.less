@@ -4,100 +4,98 @@
 
     // 2024-05-29: Moved spread out styles to here
 
-    .fr-view:not(.fr-mode-landing), .xforms-dialog {  // ideally we'd like `:not(ancestor::.fr-view.fr-mode-landing`)
-        // Make default button a little darker
-        .btn {
-            background-color: darken(@wellBackground, 5%);
+    // Make default button a little darker
+    .btn {
+        background-color: darken(@wellBackground, 5%);
+    }
+
+    .btn {
+        &.disabled, &[disabled] {
+            background-color: darken(@wellBackground, 5%); // restore default color or buttons are too dark when disabled
         }
+    }
 
-        .btn {
-            &.disabled, &[disabled] {
-                background-color: darken(@wellBackground, 5%); // restore default color or buttons are too dark when disabled
-            }
+    button.btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    button.btn.dropdown-toggle {
+        display: inline-block;
+    }
+
+    button.btn kbd, a kbd {
+        background-color: transparent;
+        border: 1px solid @textColor;
+        line-height: 16px;
+
+        display: none; // hide by default, will show on hover
+        border-radius: 2px;
+        padding: 0 8px;
+        margin-left: 1em;
+        margin-right: -7px;
+
+        font-family: system-ui; // `monospace` has ugly modifiers/keyboard fonts
+        font-size: 6pt;
+
+        &:empty {
+            display: none;
         }
+    }
 
-        button.btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .buttonBackgroundOrbeon(@startColor, @endColor, @textColor: #fff) {
 
-        button.btn.dropdown-toggle {
-            display: inline-block;
-        }
+        color: @textColor;
+        background-color: @startColor;
+        background-image: none;
+        text-shadow: none;
 
-        button.btn kbd, a kbd {
-            background-color: transparent;
-            border: 1px solid @textColor;
-            line-height: 16px;
-
-            display: none; // hide by default, will show on hover
-            border-radius: 2px;
-            padding: 0 8px;
-            margin-left: 1em;
-            margin-right: -7px;
-
-            font-family: system-ui; // `monospace` has ugly modifiers/keyboard fonts
-            font-size: 6pt;
-
-            &:empty {
-                display: none;
-            }
-        }
-
-        .buttonBackgroundOrbeon(@startColor, @endColor, @textColor: #fff) {
-
+        &:hover, &:focus, &:active, &.active, &.disabled, &[disabled] {
             color: @textColor;
-            background-color: @startColor;
-            background-image: none;
-            text-shadow: none;
-
-            &:hover, &:focus, &:active, &.active, &.disabled, &[disabled] {
-                color: @textColor;
-                background-color: @endColor;
-            }
-
-            kbd {
-                border-color: @textColor;
-            }
+            background-color: @endColor;
         }
 
-        .xforms-trigger-appearance-xxforms-primary .btn, .btn-primary {
-            .buttonBackgroundOrbeon(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
+        kbd {
+            border-color: @textColor;
         }
-        .xforms-trigger-appearance-xxforms-warning .btn, .btn-warning {
-            .buttonBackgroundOrbeon(@btnWarningBackground, @btnWarningBackgroundHighlight);
-        }
-        .xforms-trigger-appearance-xxforms-danger .btn, .btn-danger {
-            .buttonBackgroundOrbeon(@btnDangerBackground, @btnDangerBackgroundHighlight);
-        }
-        .xforms-trigger-appearance-xxforms-success .btn, .btn-success {
-            .buttonBackgroundOrbeon(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
-        }
-        .xforms-trigger-appearance-xxforms-info .btn, .btn-info {
-            .buttonBackgroundOrbeon(@btnInfoBackground, @btnInfoBackgroundHighlight);
-        }
-        .xforms-trigger-appearance-xxforms-inverse .btn, .btn-inverse {
-            .buttonBackgroundOrbeon(@btnInverseBackground, @btnInverseBackgroundHighlight);
-        }
+    }
 
-        button.btn, label.btn {
-            background-image: none;
-            text-shadow: none;
-            border: none;
-        }
+    .xforms-trigger-appearance-xxforms-primary .btn, .btn-primary {
+        .buttonBackgroundOrbeon(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
+    }
+    .xforms-trigger-appearance-xxforms-warning .btn, .btn-warning {
+        .buttonBackgroundOrbeon(@btnWarningBackground, @btnWarningBackgroundHighlight);
+    }
+    .xforms-trigger-appearance-xxforms-danger .btn, .btn-danger {
+        .buttonBackgroundOrbeon(@btnDangerBackground, @btnDangerBackgroundHighlight);
+    }
+    .xforms-trigger-appearance-xxforms-success .btn, .btn-success {
+        .buttonBackgroundOrbeon(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
+    }
+    .xforms-trigger-appearance-xxforms-info .btn, .btn-info {
+        .buttonBackgroundOrbeon(@btnInfoBackground, @btnInfoBackgroundHighlight);
+    }
+    .xforms-trigger-appearance-xxforms-inverse .btn, .btn-inverse {
+        .buttonBackgroundOrbeon(@btnInverseBackground, @btnInverseBackgroundHighlight);
+    }
 
-        // Updates to Bootstrap btn-link
-        button.btn-link {
-            white-space: normal;
-            text-align: inherit;
-            text-decoration: underline;
-            font-size: inherit;
-            padding: 0 0 2px 0;
+    button.btn, label.btn {
+        background-image: none;
+        text-shadow: none;
+        border: none;
+    }
 
-            text-decoration-thickness: from-font; // this tends to make the line thinner
-            text-underline-offset: 0.2rem;        // otherwise the line touches the bottom of the characters
-            text-decoration-skip-ink: auto;       // `auto` is the default, but we want to be explicit
-        }
+    // Updates to Bootstrap btn-link
+    button.btn-link {
+        white-space: normal;
+        text-align: inherit;
+        text-decoration: underline;
+        font-size: inherit;
+        padding: 0 0 2px 0;
+
+        text-decoration-thickness: from-font; // this tends to make the line thinner
+        text-underline-offset: 0.2rem;        // otherwise the line touches the bottom of the characters
+        text-decoration-skip-ink: auto;       // `auto` is the default, but we want to be explicit
     }
 }

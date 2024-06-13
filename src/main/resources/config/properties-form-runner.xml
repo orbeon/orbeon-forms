@@ -656,6 +656,7 @@
         +/apps/fr/style/form-runner-bootstrap5-override.css
         -/apps/fr/style/bootstrap/js/bootstrap.js
         +/apps/fr/style/bootstrap-5.1.3-dist/js/bootstrap.js
+        -fr:trigger <!-- to avoid contaminating BS5 styles -->
     </property>
 
     <!-- Temporary until we have fully switched to Bootstrap 5 -->

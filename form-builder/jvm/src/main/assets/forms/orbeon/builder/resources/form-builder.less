@@ -1674,7 +1674,16 @@ body.orbeon {
         text-align: right;                                                  // Message and buttons to show on the right
         padding: 0 @fbGutter;
 
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        column-gap: .5em;
+
         .fr-status-icons { display: none }                                  // Don't show valid/invalid icon, as we show XPath errors in .fb-xpath-errors
+
+        .fr-messages {
+            white-space: nowrap;
+        }
 
         // Override Form Runner defaults
         .fr-buttons {
@@ -1682,9 +1691,10 @@ body.orbeon {
             position: static;
             width: auto;
             margin: 0;
-            padding: 0 10px;
+            padding: 0;
             vertical-align: top;
             background-color: @fbButtonsBackground;
+            white-space: nowrap;
         }
     }
 

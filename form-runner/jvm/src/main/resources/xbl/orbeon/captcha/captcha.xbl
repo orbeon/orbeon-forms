@@ -34,6 +34,7 @@
             <xbl:handler event="fr-reload" phase="target">
                 <xf:dispatch name="fr-reload" targetid="captcha"/>
                 <xf:setvalue ref="xxf:instance('fr-persistence-instance')/captcha">false</xf:setvalue>
+                <xf:setvalue ref="xxf:instance('fr-persistence-instance')/captcha-suspend">false</xf:setvalue>
             </xbl:handler>
         </xbl:handlers>
 

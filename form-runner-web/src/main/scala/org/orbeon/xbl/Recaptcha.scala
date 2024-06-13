@@ -1,5 +1,6 @@
 package org.orbeon.xbl
 
+import org.orbeon.oxf.util.PathUtils
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{DocumentAPI, Page}
 import org.scalajs.dom
@@ -21,7 +22,10 @@ object Recaptcha {
     var rendered: Boolean = false
 
     //@JSExport
-    def render(publicKey: String, theme: String): Unit = {
+    def render(publicKeyV2: String, publicKeyV3: String, theme: String): Unit = {
+
+      val publicKeyV2Opt = Option(publicKeyV2).filter(_.nonEmpty)
+      val publicKeyV3Opt = Option(publicKeyV3).filter(_.nonEmpty)
 
       // Find if the reCAPTCHA has been loaded already
       val alreadyLoaded = {
@@ -32,35 +36,39 @@ object Recaptcha {
 
       // Load reCAPTCHA script with appropriate language
       if (! alreadyLoaded) {
-        val htmlLangOpt     = Option(dom.document.querySelector("html").getAttribute("lang"))
-        val langParameter   = htmlLangOpt.map(lang => s"?hl=$lang").getOrElse("")
-        val reCaptchaScript = dom.document.createElement("script").asInstanceOf[HTMLScriptElement]
-        reCaptchaScript.src = ReCaptchaScript + langParameter
+        val htmlLangOpt      = Option(dom.document.querySelector("html").getAttribute("lang"))
+        val langParameterSeq = htmlLangOpt   .map(("hl"    , _)).toSeq
+        val v3SiteKeySeq     = publicKeyV3Opt.map(("render", _)).toSeq
+        val reCaptchaScript  = dom.document.createElement("script").asInstanceOf[HTMLScriptElement]
+        reCaptchaScript.src  = PathUtils.recombineQuery(ReCaptchaScript, langParameterSeq ++ v3SiteKeySeq)
+
         containerElem.appendChild(reCaptchaScript)
       }
 
       if (! rendered) {
-          rendered = true
-          renderRecaptcha(publicKey, theme)
+        rendered = true
+        publicKeyV2Opt.foreach(renderRecaptcha(_, theme) )
       }
+    }
+
+    private def grecaptcha() = window.asInstanceOf[js.Dynamic].grecaptcha
+
+    private val successfulResponse: js.Function1[String, Unit] = (response: String) => {
+      val responseId = containerElem.querySelector(".xbl-fr-recaptcha-response").id;
+      DocumentAPI.setValue(responseId, response)
     }
 
     private def renderRecaptcha(publicKey: String, theme: String): Unit = {
 
-      val grecaptcha = window.asInstanceOf[js.Dynamic].grecaptcha
       val reCaptchaNotFullyLoaded =
-        js.isUndefined(grecaptcha)        ||
-        js.isUndefined(grecaptcha.render)
+        js.isUndefined(grecaptcha())        ||
+        js.isUndefined(grecaptcha().render)
 
       if (reCaptchaNotFullyLoaded) {
         val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
         js.timers.setTimeout(shortDelay)(renderRecaptcha(publicKey, theme))
       } else {
-        val successfulResponse: js.Function1[String, Unit] = (response: String) => {
-          val responseId = containerElem.querySelector(".xbl-fr-recaptcha-response").id;
-          DocumentAPI.setValue(responseId, response)
-        }
-        grecaptcha.render(
+        grecaptcha().render(
           containerElem.querySelector(".xbl-fr-recaptcha-div"),
           js.Dictionary(
             "sitekey"  -> publicKey,
@@ -71,9 +79,11 @@ object Recaptcha {
       }
     }
 
-    def reset(): Unit = {
-      val grecaptcha = window.asInstanceOf[js.Dynamic].grecaptcha
-      grecaptcha.reset()
-    }
+    //@JSExport
+    def execute(publicKeyV3: String): Unit =
+      grecaptcha().execute(publicKeyV3, js.Dictionary("action"  -> "submit")).`then`(successfulResponse)
+
+    def reset(): Unit =
+      grecaptcha().reset()
   }
 }

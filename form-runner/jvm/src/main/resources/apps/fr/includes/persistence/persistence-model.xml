@@ -960,6 +960,7 @@
             <data-safe/>
             <!-- Is the captcha valid: start with false, will set it to true when valid -->
             <captcha>false</captcha>
+            <captcha-suspend>false</captcha-suspend>
             <lease-enabled/>
             <!-- When lease-enabled = 'true': other-user | current-user | relinquished -->
             <lease-state/>

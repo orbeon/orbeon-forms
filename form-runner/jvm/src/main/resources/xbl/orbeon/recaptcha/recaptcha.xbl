@@ -32,10 +32,13 @@
             </xbl:handler>
             <xbl:handler event="fr-reload" phase="target">
                 <xf:setvalue ref="response"/>
-                <xf:action type="javascript" >
+                <xf:action if="$version = '2'" type="javascript" >
                     var i = ORBEON.xforms.XBL.instanceForControl(this);
                     if (i) i.reset();
                 </xf:action>
+            </xbl:handler>
+            <xbl:handler event="fr-check-response" phase="target">
+                <xf:dispatch name="fr-check-response" targetid="component-inner-group"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -48,6 +51,23 @@
                     </_>
                 </xf:instance>
                 <xf:instance id="verify-response"><_/></xf:instance>
+                <xf:instance id="conf">
+                    <_>
+                        <v2>
+                            <public-key/>
+                            <private-key/>
+                        </v2>
+                        <v3>
+                            <public-key/>
+                            <private-key/>
+                            <score-threshold>0.5</score-threshold>
+                        </v3>
+                    </_>
+                </xf:instance>
+                <xf:bind ref="v3/score-threshold" type="xs:decimal"/>
+                <xf:var name="conf" value="instance('conf')"/>
+                <xf:instance id="version"><_>3</_></xf:instance>
+                <xf:var name="version" value="instance('version')"/>
                 <xf:submission
                     id="verify-submission"
                     resource="https://www.google.com/recaptcha/api/siteverify"
@@ -66,58 +86,131 @@
 
                         <!-- Init event -->
                         <xf:action id="xf-en" ev:event="xforms-enabled">
-                            <xf:action type="javascript">
-                                <xf:param name="publicKey" value="fr:component-param-value('public-key')"/>
-                                <xf:param name="theme"     value="fr:component-param-value('theme')"/>
-                                <xf:body>ORBEON.xforms.XBL.instanceForControl(this).render(publicKey, theme);</xf:body>
-                            </xf:action>
-                            <!-- Copy value of private key to local model -->
-                            <xf:var name="private-key">
+                            <!-- Copy public keys to local model -->
+                            <xf:setvalue
+                                ref="$conf/v2/public-key"
+                                value="
+                                    let $publicKeyV2NoPrefix := fr:component-param-value('public-key'),
+                                        $publicKeyV2Prefix   := fr:component-param-value('v2.public-key')
+                                    return if (empty($publicKeyV2Prefix)) then $publicKeyV2NoPrefix else $publicKeyV2Prefix
+                                "/>
+                            <xf:setvalue ref="$conf/v3/public-key" value="fr:component-param-value('v3.public-key')"/>
+
+                            <!-- Copy private keys to local model -->
+                            <xf:setvalue ref="$conf/v2/private-key">
                                 <xsl:choose>
                                     <xsl:when test="exists(fr:private-key/@ref)">
                                         <xxf:value value="fr:private-key/@ref" xxbl:scope="outer"/>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:attribute name="value">fr:component-param-value('private-key')</xsl:attribute>
+                                        <xsl:attribute name="value">
+                                            let $privateKeyV2NoPrefix := fr:component-param-value('private-key'),
+                                                $privateKeyV2Prefix   := fr:component-param-value('v2.private-key')
+                                            return if (empty($privateKeyV2Prefix)) then $privateKeyV2NoPrefix else $privateKeyV2Prefix
+                                        </xsl:attribute>
                                     </xsl:otherwise>
                                 </xsl:choose>
-                            </xf:var>
-                            <xf:setvalue ref="secret" value="$private-key"/>
+                            </xf:setvalue>
+                            <xf:setvalue ref="$conf/v3/private-key" value="fr:component-param-value('v3.private-key')"/>
+
+                            <!-- v3 score threshold (i.e. below that score, we invoke v2) -->
+                            <xf:setvalue
+                                ref="$conf/v3/score-threshold"
+                                value="
+                                    let $scoreThreshold := fr:component-param-value('v3.score-threshold')
+                                    return if (empty($scoreThreshold)) then 0.5 else xs:decimal($scoreThreshold)
+                                "/>
+
+                            <!-- Version selection -->
+                            <xf:setvalue ref="$version" value="if ($conf/v3/public-key = '') then '2' else '3'"/>
+
+                            <!-- Script loading and initialization -->
+                            <xf:action type="javascript">
+                                <xf:param name="publicKeyV2" value="$conf/v2/public-key"/>
+                                <xf:param name="publicKeyV3" value="$conf/v3/public-key"/>
+                                <xf:param name="theme"       value="fr:component-param-value('theme')"/>
+                                <xf:body>
+                                    ORBEON.xforms.XBL.instanceForControl(this).render(publicKeyV2, publicKeyV3, theme);
+                                </xf:body>
+                            </xf:action>
                         </xf:action>
 
                         <xf:action ev:event="fr-verify">
+                            <!-- In v2, directly check if the response (if any) is valid -->
+                            <xf:dispatch if="$version = '2'" targetid="fr-recaptcha" name="fr-check-response"/>
+
+                            <!-- In v3, we need to "programmatically invoke the challenge" as the user doesn't interact with the UI -->
+                            <xf:action if="$version = '3'">
+                                <xf:action type="javascript">
+                                    <xf:param name="publicKeyV3" value="$conf/v3/public-key"/>
+                                    <xf:body>
+                                        ORBEON.xforms.XBL.instanceForControl(this).execute(publicKeyV3);
+                                    </xf:body>
+                                </xf:action>
+                                <xf:setvalue ref="xxf:instance('fr-persistence-instance')/captcha-suspend">true</xf:setvalue>
+                            </xf:action>
+                        </xf:action>
+
+                        <xf:action ev:event="fr-check-response">
                             <xf:var name="did-enter-value" value="response != ''"/>
+
                             <!-- No user value entered by the user: just dispatch an error -->
                             <xf:action if="not($did-enter-value)">
                                 <xf:dispatch targetid="fr-recaptcha" name="fr-verify-error">
                                     <xf:property name="fr-error-code" value="'empty'"/>
                                 </xf:dispatch>
                             </xf:action>
+
                             <!-- User value entered by the user: do verification -->
                             <xf:action if="$did-enter-value">
+                                <!-- Secret key -->
+                                <xf:setvalue ref="secret" value="if ($version = '2') then $conf/v2/private-key else $conf/v3/private-key"/>
                                 <!-- Call API doing the verification -->
                                 <xf:send submission="verify-submission"/>
                                 <!-- Reset response, so the next time they are changed we only run the verification when both new values are updated -->
                                 <xf:setvalue ref="response"/>
+                                <!-- For testing: force failure -->
+                                <!--<xf:action if="$version = '3'"><xf:setvalue ref="instance('verify-response')/score" value="'0.1'"/></xf:action>-->
                                 <!-- Parse the response -->
-                                <xf:var name="is-success" value="instance('verify-response')/success = 'true'"/>
+                                <xf:var
+                                    name="is-success"
+                                    value="
+                                        instance('verify-response')/success = 'true' and
+                                        ($version != '3' or xs:decimal(instance('verify-response')/score) > $conf/v3/score-threshold)
+                                    "/>
                                 <!-- Dispatch failure event -->
-                                <xf:dispatch if="not($is-success)" targetid="fr-recaptcha" name="fr-verify-error"/>
+                                <xf:dispatch if="not($is-success) and $version = '2'" targetid="fr-recaptcha" name="fr-verify-error"/>
                                 <!-- Dispatch success event -->
                                 <!-- NOTE: With Form Runner this hides the component, so make sure this is done last.
                                      Ideally, we would manage to dispatch the event as the last operation of the whole
                                      action. There doesn't seem to be an elegant way to do this with XForms actions.
                                      See https://github.com/orbeon/orbeon-forms/issues/1627 -->
                                 <xf:dispatch if="$is-success" targetid="fr-recaptcha" name="fr-verify-done"/>
+                                <!-- If v3 failed, try v2 -->
+                                <xf:action if="not($is-success) and $version = '3'">
+                                    <xf:setvalue ref="$version" value="'2'"/>
+                                </xf:action>
+                                <!-- Resume the process if needed -->
+                                <xf:action if="xxf:instance('fr-persistence-instance')/captcha-suspend = 'true'">
+                                    <!-- If validating again later, prevent the process from being suspended if the captcha is not invoked  -->
+                                    <xf:setvalue ref="xxf:instance('fr-persistence-instance')/captcha-suspend"/>
+                                    <!-- Resume the process (i.e. data validation/submission) -->
+                                    <xf:action type="xpath">fr:run-process('oxf.fr.detail.process', 'resume')</xf:action>
+                                </xf:action>
                             </xf:action>
                         </xf:action>
 
                         <!-- Provides access the reCAPTCHA response exposed by the JavaScript API
                              http://code.google.com/apis/recaptcha/docs/display.html#recaptcha_methods -->
-                        <xf:input ref="response"  class="xbl-fr-recaptcha-response xforms-hidden"/>
+                        <xf:input ref="response" class="xbl-fr-recaptcha-response xforms-hidden">
+                            <!-- In v3, it's the response being received that will trigger the response verification -->
+                            <xf:action ev:event="xforms-value-changed" if=". != '' and $version = '3'">
+                                <xf:dispatch targetid="fr-recaptcha" name="fr-check-response"/>
+                            </xf:action>
+                        </xf:input>
 
-                        <!-- Div in which the reCAPTCHA is rendered-->
-                        <xh:div id="recaptcha-div" class="xbl-fr-recaptcha-div"/>
+                        <!-- Div in which the reCAPTCHA v2 is rendered -->
+                        <xh:div id="recaptcha-div" class="{{'xbl-fr-recaptcha-div', 'xforms-disabled'[$version != '2']}}"/>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

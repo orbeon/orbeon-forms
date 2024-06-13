@@ -2,7 +2,30 @@
 
 .orbeon {
 
+    .fr-buttons {
+        font-size: 0; // Removes space between buttons, see http://stackoverflow.com/a/19038859/5295
+
+        // Make buttons stick to the viewport
+        // https://github.com/orbeon/orbeon-forms/issues/4809
+        position: sticky;
+        bottom: 0;
+
+        padding: 10px;
+        background-color: white;
+        border-radius: @baseBorderRadius;
+        text-align: center;
+        z-index: 4; // To show above the date `.add-on`, which has a `z-index: 3`
+
+        .fr-buttons-message div {
+            display: inline;
+        }
+    }
+
     .fr-buttons, .fr-dialog-buttons {
+
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
 
         kbd {
             display: none;
@@ -14,26 +37,6 @@
 
         &:hover kbd:has(.xforms-output-output:empty) {
             display: none;
-        }
-
-        display: block;
-        font-size: 0; // Removes space between buttons, see http://stackoverflow.com/a/19038859/5295
-
-        // Make buttons stick to the viewport
-        // https://github.com/orbeon/orbeon-forms/issues/4809
-        position: sticky;
-        bottom: 0;
-        width: 100%;
-        box-sizing: border-box;
-
-        padding: 10px;
-        background-color: white;
-        border-radius: @baseBorderRadius;
-        text-align: center;
-        z-index: 4; // To show above the date `.add-on`, which has a `z-index: 3`
-
-        .fr-buttons-message div {
-            display: inline;
         }
 
         // Space between the image and the text in a button, only for the buttons bar

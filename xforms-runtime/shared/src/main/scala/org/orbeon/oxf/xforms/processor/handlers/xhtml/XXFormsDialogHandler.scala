@@ -9,6 +9,7 @@ import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
+import org.xml.sax.helpers.AttributesImpl
 
 
 /**
@@ -46,7 +47,6 @@ class XXFormsDialogHandler(
 
     // TODO: Pass `dialogXFormsControl` instead of `null`?
     val classes = getInitialClasses(uri, localname, attributes, elementAnalysis, null, incrementalDefault = false, staticLabel = None)
-    classes.append(" xforms-initially-hidden")
     classes.append(" xforms-dialog-")
 
     val explicitLevel = attributes.getValue("level")
@@ -63,23 +63,20 @@ class XXFormsDialogHandler(
     classes.append(level)
     classes.append(" xforms-dialog-close-")
     classes.append(!("false" == attributes.getValue("close")))
-    // 2022-12-11: For now disable drag and drop of dialog
-    // https://github.com/orbeon/orbeon-forms/issues/5283
-//    classes.append(" xforms-dialog-draggable-")
-//    classes.append(!("false" == attributes.getValue("draggable")))
     classes.append(" xforms-dialog-draggable-false")
     classes.append(" xforms-dialog-visible-")
     classes.append(dialogXFormsControl.isDialogVisible)
 
-    // Start main `xh:div`
+    // Start main `xh:dialog`
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
+    val dialogQName = XMLUtils.buildQName(xhtmlPrefix, "dialog")
     val divQName = XMLUtils.buildQName(xhtmlPrefix, "div")
     val contentHandler = handlerContext.controller.output
 
-    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, attributes, classes.toString, effectiveDialogId.some))
+    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "dialog", dialogQName, XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, attributes, classes.toString, effectiveDialogId.some))
 
     // Child `xh:div` for label
-    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes(XFormsNames.CLASS_QNAME, "hd xxforms-dialog-head"))
+    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes(XFormsNames.CLASS_QNAME, "xxforms-dialog-head"))
     val labelValue =
       if (dialogXFormsControl != null)
         dialogXFormsControl.getLabel(handlerContext.collector)
@@ -91,15 +88,16 @@ class XXFormsDialogHandler(
     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName)
 
     // Child `xh:div` for body
-    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes(XFormsNames.CLASS_QNAME, "bd xxforms-dialog-body"))
+    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes(XFormsNames.CLASS_QNAME, "xxforms-dialog-body"))
   }
 
-  override def `end`(): Unit = {
+  override def end(): Unit = {
     // Close `xh:div`'s
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
+    val dialogQName = XMLUtils.buildQName(xhtmlPrefix, "dialog")
     val divQName = XMLUtils.buildQName(xhtmlPrefix, "div")
     val contentHandler = handlerContext.controller.output
     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName)
-    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName)
+    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "dialog", dialogQName)
   }
 }

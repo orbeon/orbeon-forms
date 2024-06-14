@@ -2297,67 +2297,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
          * Initialize dialogs
          */
         _dialog: function (dialog) {
-
-            var isModal     = $(dialog).is('.xforms-dialog-modal');
-            var hasClose    = $(dialog).is('.xforms-dialog-close-true');
-            var isDraggable = $(dialog).is('.xforms-dialog-draggable-true');
-            var isMinimal   = $(dialog).is('.xforms-dialog-appearance-minimal');
-
-            // If we already have a dialog for the same id, first destroy it, as this is an object left behind
-            // by a deleted repeat iteration
-            if (ORBEON.xforms.Globals.dialogs[dialog.id])
-                ORBEON.xforms.Globals.dialogs[dialog.id].destroy();
-
-            // Create dialog object
-            var yuiDialog =
-                new YAHOO.widget.Dialog(dialog.id, {
-                    modal              : isModal,
-                    close              : hasClose,
-                    visible            : false,
-                    draggable          : ! isMinimal && isDraggable,
-                    fixedcenter        : false,
-                    constraintoviewport: true,
-                    underlay           : "none",
-                    usearia            : ORBEON.xforms.Page.getXFormsFormFromHtmlElemOrThrow(dialog).useARIA(),
-                    role               : "" // See bug 315634 http://goo.gl/54vzd
-                });
-            if (isMinimal) {
-                // Close the dialog when users click on document
-                YAHOO.util.Event.addListener(document.body, "click", ORBEON.xforms.Events.dialogMinimalBodyClick, yuiDialog);
-            }
-            // Register listener for when the dialog is closed by a click on the "x"
-            yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
-
-            // This is for JAWS to read the content of the dialog (otherwise it just reads the button)
-            var dialogDiv = YAHOO.util.Dom.getElementsByClassName("xforms-dialog", "div", yuiDialog.element)[0];
-            dialogDiv.setAttribute("aria-live",  "polite");
-            dialogDiv.setAttribute("aria-modal", "true");
-            dialogDiv.setAttribute("role",       "dialog");
-            var dialogHeadDiv = dialogDiv.querySelector(".xxforms-dialog-head");
-            if (dialogHeadDiv != null)
-                dialogDiv.setAttribute("aria-labelledby", dialogDiv.id + "_h");
-
-            // If the dialog has a close "x" in the dialog toolbar, register a listener on the escape key that does the same as clicking on the "x"
-            if (hasClose) {
-                var escapeListener = new YAHOO.util.KeyListener(document, {keys: 27}, {
-                    fn: yuiDialog.hide,
-                    scope: yuiDialog,
-                    correctScope: true
-                });
-                yuiDialog.cfg.queueProperty("keylisteners", escapeListener);
-            }
-
-            // Move the dialog under the form element, as if the dialog is inside another absolute block it can be cropped
-            // (can't escape that block), and in some cases the mask can show on top of the dialog (even if the z-index
-            // for the dialog is higher than the z-index for the mask). See:
-            // http://forge.ow2.org/tracker/index.php?func=detail&aid=314943&group_id=168&atid=350207
-            var form = ORBEON.xforms.Page.getAncestorOrSelfHtmlFormFromHtmlElemOrThrow(yuiDialog.element);
-            if (yuiDialog.element.parentNode != form)
-                form.appendChild(yuiDialog.element);
-
-            ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
-
-            return yuiDialog;
+            // TODO: see how `ORBEON.xforms.Globals.dialogs[dialog.id]` is used, and if we can remove this code
         }
     };
 

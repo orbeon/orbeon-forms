@@ -294,8 +294,6 @@
     .xforms-select-appearance-full label { vertical-align: middle; margin-right: .5em  }
     fieldset.xforms-select-appearance-full { margin: 0; border: none } // when fieldset is used for full selection controls
 
-    .xforms-dialog .bd { overflow: auto }
-
     .xforms-group-appearance-xxforms-fieldset {
         padding-left: 1em;
         padding-right: 1em;
@@ -431,14 +429,14 @@
 
     // ***** Indicators and messages ***********************************************************************************
 
-    .xforms-error-panel .bd {
+    .xforms-error-panel .xxforms-dialog-body {
         padding: 10px 20px 10px 20px !important; // Override padding defined by YUI
         overflow: auto; background-color: white;
     }
     .xforms-error-panel {
         width: 500px;
 
-        .hd { background-color: #FF6600; }
+        .xxforms-dialog-head { background-color: #FF6600; }
 
         .xforms-error-panel-details-hidden,
         .xforms-error-panel-details-shown {

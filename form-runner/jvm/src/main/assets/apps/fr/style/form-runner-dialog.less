@@ -14,16 +14,19 @@
 
     .xforms-dialog, .xforms-message-dialog {
 
-        // Keep the dialog fairly narrow to increase legibility, but allow it to be narrower on phones
-        max-width: 500px;
-        border: none;
+        &::backdrop {
+            background-color: rgba(0, 0, 0, 0.25);
+        }
 
-        // Try automatic centering of the dialog, but this disables the ability to move the dialog by dragging it.
-        //&.xxforms-dialog-auto {
-            margin-left: auto;
-            margin-right: auto;
-            margin-top: 4rem;
-        //}
+        max-width: 500px;  // Keep the dialog fairly narrow to increase legibility, but allow it to be narrower on phones
+        background-color: rgba(0, 0, 0, 0); // For the rounded to show
+        border: none;
+        padding: 0;
+
+        // Automatic centering of the dialog, but this disables the ability to move the dialog by dragging it.
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 4rem;
 
         .xxforms-dialog-body p {
             margin: .5em 0 .5em 0
@@ -54,7 +57,6 @@
             background-color: @dialogTitleBackgroundColor;
             border-top-left-radius: @dialogBorderRadius;
             border-top-right-radius: @dialogBorderRadius;
-            margin: 0 -1px;
             border: none;
             font-size: .9rem; // 2022-12-11: larger font size for dialog title looks better
             line-height: 2rem;
@@ -67,8 +69,9 @@
             background-color: @dialogBackgroundColor;
             border-bottom-left-radius: @dialogBorderRadius;
             border-bottom-right-radius: @dialogBorderRadius;
-            margin: 0 -1px;
             border: none;
+            padding: 10px;
+            overflow: auto;
         }
 
         .xxforms-dialog-head:empty + .xxforms-dialog-body {
@@ -90,13 +93,11 @@
         // Dialogs for which we want the main area to take remaining height
         &.xxforms-set-height {
 
-            &.xforms-dialog-visible-true {
-                display: flex;
-            }
+            &[open] { display: flex }     // Don't override the user agent `display: none` closed
             flex-direction: column;
             align-items: normal;
-            min-height: 0; // so that `height` below wins
-            height: ~"calc(100% - 6rem)"; // don't let less calculate this
+            min-height: 0;                // So that `height` below wins
+            height: ~"calc(100% - 8rem)"; // Don't let less calculate this
 
             .xxforms-dialog-body {
                 padding: 0;

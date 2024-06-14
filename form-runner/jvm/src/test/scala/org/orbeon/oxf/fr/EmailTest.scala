@@ -25,7 +25,7 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.net.URI
-import javax.mail.internet.InternetAddress
+import jakarta.mail.internet.InternetAddress
 
 class EmailTest
   extends DocumentTestBase

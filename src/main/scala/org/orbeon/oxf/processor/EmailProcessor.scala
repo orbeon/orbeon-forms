@@ -30,10 +30,10 @@ import org.orbeon.oxf.xml.dom.LocationSAXWriter
 
 import java.io._
 import java.util.{Properties => JProperties}
-import javax.activation.{DataHandler, DataSource}
-import javax.mail.Message.RecipientType
-import javax.mail._
-import javax.mail.internet._
+import jakarta.activation.{DataHandler, DataSource}
+import jakarta.mail.Message.RecipientType
+import jakarta.mail._
+import jakarta.mail.internet._
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
 

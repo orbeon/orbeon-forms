@@ -42,7 +42,7 @@ trait FormRunnerEmailBackend {
     } yield {
       // This appears necessary for non-ASCII characters to make it through.
       // Verified that this works with GMail.
-      javax.mail.internet.MimeUtility.encodeText(name, CharsetNames.Utf8, null)
+      jakarta.mail.internet.MimeUtility.encodeText(name, CharsetNames.Utf8, null)
     }
   }
 

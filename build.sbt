@@ -99,9 +99,9 @@ val CoreLibraryDependencies = Seq(
   "javax.cache"                 % "cache-api"                       % "1.1.1",
   "net.sf.ehcache"              % "ehcache"                         % "2.10.9.2",
   "org.ehcache"                 % "ehcache"                         % "3.10.8",
-  "javax.xml.bind"              % "jaxb-api"                        % "2.3.1",   // for Ehcache 3
-  "com.sun.xml.bind"            % "jaxb-core"                       % "2.3.0.1", // for Ehcache 3
-  "com.sun.xml.bind"            % "jaxb-impl"                       % "2.3.1",   // for Ehcache 3
+  "jakarta.xml.bind"            % "jakarta.xml.bind-api"            % "4.0.2",   // for Ehcache 3
+  "com.sun.xml.bind"            % "jaxb-core"                       % "4.0.5",   // for Ehcache 3
+  "com.sun.xml.bind"            % "jaxb-impl"                       % "4.0.5",   // for Ehcache 3
   "commons-codec"               % "commons-codec"                   % "1.15",
   "org.apache.commons"          % "commons-collections4"            % "4.4",
   "commons-fileupload"          % "commons-fileupload"              % "1.5",

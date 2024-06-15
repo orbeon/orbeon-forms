@@ -49,6 +49,11 @@
 }
 
 body {
+    .xforms-dialog .tox-tinymce--toolbar-sticky-off {
+        // For the `top` and `left` to be relative to the viewport, not the dialog,
+        // as TinyMCE sets those assuming the toolbar is in the document body.
+        position: fixed !important;
+    }
     .tox.tox-tinymce-inline {
         .tox-editor-header {
             z-index: 1500; // so it shows in front of modals

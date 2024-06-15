@@ -18,7 +18,8 @@ import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, DocumentAPI, Page}
 import org.scalajs.dom
-import org.scalajs.dom.{document, html}
+import org.scalajs.dom.{Element, MutationObserver, MutationObserverInit, MutationRecord, document, html}
+import org.scalajs.dom.ext._
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import org.orbeon.polyfills.HTMLPolyfills._
@@ -30,6 +31,30 @@ import scala.scalajs.js.{UndefOr, |}
 
 
 object TinyMCE {
+
+  // If the TinyMCE adds a toolbar directly under the body, and we have a dialog open, move the toolbox inside the
+  // dialog. We need this for the toolbar not to show under the dialog.
+  document.addEventListener("DOMContentLoaded", { (_: dom.Event) =>
+    val observer = new MutationObserver({ (mutations, _) =>
+      mutations.foreach { mutation =>
+          mutation.addedNodes.foreach {
+            case element: Element =>
+              if (element.classList.contains("tox-tinymce-inline")) {
+                val openDialog = document.querySelector("dialog[open]")
+                if (openDialog != null) {
+                  openDialog.appendChild(element)
+                }
+              }
+            case _ =>
+          }
+      }
+    })
+
+    observer.observe(
+      target  = document.body,
+      options = MutationObserverInit(childList = true, subtree = false)
+    )
+  })
 
   var baseUrlInitialized = false
 

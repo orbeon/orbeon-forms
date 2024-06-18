@@ -16,7 +16,6 @@ package org.orbeon.builder
 import autowire._
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum.{Enum, EnumEntry}
-import io.circe.generic.auto._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{AboveBelow, Orientation}
 import org.orbeon.jquery.Offset
@@ -26,16 +25,17 @@ import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.document
 import org.scalajs.jquery.JQuery
 
+import scala.collection.immutable
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 
 object RowEditor {
 
-  var currentGridBodyOpt : Option[Block] = None
-  var currentRowPosOpt   : Option[Int]   = None
-  lazy val rowEditorContainer            = $(".fb-row-editor")
+  private var      currentGridBodyOpt  : Option[Block] = None
+  private var      currentRowPosOpt    : Option[Int]   = None
+  private lazy val rowEditorContainer  : JQuery        = $(".fb-row-editor")
 
-  def withCurrentGridBody[T](f: Block => T): Option[T] =
+  private def withCurrentGridBody[T](f: Block => T): Option[T] =
     currentGridBodyOpt flatMap { currentGridBody =>
       // Check the current grid is still in the document, as we might have an outdated reference in case we read it in
       // `onUnderPointerChange`, since the current grid is also updated in another listener to `onUnderPointerChange`
@@ -48,7 +48,7 @@ object RowEditor {
     def className = s".fb-row-$entryName"
   }
   object RowEditor extends Enum[RowEditor] {
-    val values = findValues
+    val values: immutable.IndexedSeq[RowEditor] = findValues
     case object InsertAbove extends RowEditor
     case object Delete      extends RowEditor
     case object InsertBelow extends RowEditor

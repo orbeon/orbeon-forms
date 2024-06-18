@@ -105,7 +105,7 @@ object RowEditor {
           el     = rowEditorContainer,
           offset = Offset(
             left = containerLeft,
-            top  = rowTop
+            top  = rowTop - Position.scrollTop()
           )
         )
 

@@ -24,6 +24,10 @@ object Recaptcha {
     //@JSExport
     def render(publicKeyV2: String, publicKeyV3: String, theme: String): Unit = {
 
+      // Some people seem to have problems using both reCAPTCHA v2 and v3 on the same page. As of 2024-06-19, no problem
+      // has been observed with out current implementation. For reference, here is some code that could help in case of
+      // issues: https://stackoverflow.com/questions/53184795/both-recaptcha-v2-and-v3-on-same-page/78479621#78479621
+
       val publicKeyV2Opt = Option(publicKeyV2).filter(_.nonEmpty)
       val publicKeyV3Opt = Option(publicKeyV3).filter(_.nonEmpty)
 

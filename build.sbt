@@ -148,7 +148,7 @@ val CoreLibraryDependencies = Seq(
   "com.drewnoakes"              % "metadata-extractor"              % "2.18.0",
   "net.coobird"                 % "thumbnailator"                   % ThumbnailatorVersion,
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
-  "com.github.penggle"          % "kaptcha"                         % "2.3.2",
+  "org.orbeon"                  % "kaptcha"                         % "2.3.3-SNAPSHOT",
 
   "javax.servlet"               % "javax.servlet-api"               % JavaxServletApiVersion   % Provided,
   "jakarta.servlet"             % "jakarta.servlet-api"             % JakartaServletApiVersion % Provided,

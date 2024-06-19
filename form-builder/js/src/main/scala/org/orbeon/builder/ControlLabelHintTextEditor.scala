@@ -124,31 +124,31 @@ object ControlLabelHintTextEditor {
     }
 
     // Show editor on click on label
-    def resourceEditorStartEdit(currentLabelHint: JQuery): Unit = {
-
-      // Remove `for` so browser doesn't set the focus to the control on click
-      currentLabelHint.removeAttr("for")
-      // Show, position, and populate editor
-      // Get position before showing editor, so showing doesn't move things in the page
-      Private.containerDiv.width(currentLabelHint.outerWidth())
-      // Cannot just use `show()` because we have `display: none` originally, which would default to `display: block`.
-      // This is because we can't use an inline `style` attribute anymore, see https://github.com/orbeon/orbeon-forms/issues/3565
-      Private.containerDiv.css("display", "flex")
-      Private.startEdit()
-      Private.containerDiv.offset(currentLabelHint.offset())
-      Private.setValue(Private.labelHintValue(currentLabelHint))
-      Private.checkboxInput.prop("checked", Private.isLabelHintHtml)
-      // Set tooltip for checkbox and HTML5 placeholders (don't do this once for all, as the language can change)
-      Private.checkboxInput.tooltip(new JQueryTooltipConfig {
-        val title = $(".fb-message-lhha-checkbox").text()
-      })
-      val labelTextOrHint = Private.getEditorType.entryName // TODO: pass `resourceEditorCurrentLabelHint`
-      Private.textInput.attr("placeholder", $(s".fb-message-type-$labelTextOrHint").text())
-      // Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
-      currentLabelHint.css("visibility", "hidden")
-      // Add class telling if this is a label or hint editor
-      Private.annotateWithLhhaClass(true)
-    }
+    def resourceEditorStartEdit(currentLabelHint: JQuery): Unit =
+      AjaxClient.allEventsProcessedF("resourceEditorStartEdit") foreach { _ =>
+        // Remove `for` so browser doesn't set the focus to the control on click
+        currentLabelHint.removeAttr("for")
+        // Show, position, and populate editor
+        // Get position before showing editor, so showing doesn't move things in the page
+        Private.containerDiv.width(currentLabelHint.outerWidth())
+        // Cannot just use `show()` because we have `display: none` originally, which would default to `display: block`.
+        // This is because we can't use an inline `style` attribute anymore, see https://github.com/orbeon/orbeon-forms/issues/3565
+        Private.containerDiv.css("display", "flex")
+        Private.startEdit()
+        Private.containerDiv.offset(currentLabelHint.offset())
+        Private.setValue(Private.labelHintValue(currentLabelHint))
+        Private.checkboxInput.prop("checked", Private.isLabelHintHtml)
+        // Set tooltip for checkbox and HTML5 placeholders (don't do this once for all, as the language can change)
+        Private.checkboxInput.tooltip(new JQueryTooltipConfig {
+          val title = $(".fb-message-lhha-checkbox").text()
+        })
+        val labelTextOrHint = Private.getEditorType.entryName // TODO: pass `resourceEditorCurrentLabelHint`
+        Private.textInput.attr("placeholder", $(s".fb-message-type-$labelTextOrHint").text())
+        // Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
+        currentLabelHint.css("visibility", "hidden")
+        // Add class telling if this is a label or hint editor
+        Private.annotateWithLhhaClass(true)
+      }
 
     // Called when users press enter or tab out
     def resourceEditorEndEdit(): Unit = {

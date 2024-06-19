@@ -104,11 +104,7 @@ object Position {
     onUnderPointerChange {
       val top  = pointerPos.top  + Position.scrollTop()
       val left = pointerPos.left + Position.scrollLeft()
-      val dialogVisible =
-        Globals.dialogs.exists {
-          case (_: String, yuiDialog: js.Dynamic) =>
-            yuiDialog.cfg.config.visible.value.asInstanceOf[Boolean]
-        }
+      val dialogVisible = document.querySelectorAll("dialog[open]").length > 0
       val newContainer =
         if (dialogVisible)
           // Ignore container under the pointer if a dialog is visible

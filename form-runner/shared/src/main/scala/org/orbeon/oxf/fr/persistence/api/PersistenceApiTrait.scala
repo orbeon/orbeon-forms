@@ -226,10 +226,10 @@ trait PersistenceApiTrait {
           }
         }</distinct-values>
 
-    val result = documentsXmlTry(servicePath, queryXml.toString.getBytes(CharsetNames.Utf8), Right(searchVersion)).get
+      val result = documentsXmlTry(servicePath, queryXml.toString.getBytes(CharsetNames.Utf8), Right(searchVersion)).get
 
       val controls = for {
-        query <- result / "query"
+        query <- result / * / "query"
         path  <- query.attValueOpt("path")
       } yield Control(
         path           = path,
@@ -237,7 +237,7 @@ trait PersistenceApiTrait {
       )
 
       val metadata = (for {
-        query    <- result / "query"
+        query    <- result / * / "query"
         metadata <- query.attValueOpt("metadata")
         if metadataValues.contains(metadata)
       } yield metadata -> (query / "value").map(_.getStringValue)).toMap

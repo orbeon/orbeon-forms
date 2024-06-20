@@ -118,7 +118,7 @@
                                 ref="$conf/v3/score-threshold"
                                 value="
                                     let $scoreThreshold := fr:component-param-value('v3.score-threshold')
-                                    return if (empty($scoreThreshold)) then 0.5 else xs:decimal($scoreThreshold)
+                                    return if (empty($scoreThreshold)) then 0.5 else $scoreThreshold
                                 "/>
 
                             <!-- Version selection -->

@@ -123,6 +123,7 @@ object PropertySet {
         XS_STRING_QNAME             -> convertString,
         XS_INTEGER_QNAME            -> convertInteger,
         XS_BOOLEAN_QNAME            -> convertBoolean,
+        XS_DECIMAL_QNAME            -> convertDecimal,
 //        XS_DATE_QNAME               -> convertDate,
 //        XS_DATETIME_QNAME           -> convertDate,
         XS_QNAME_QNAME              -> convertQName,
@@ -139,6 +140,7 @@ object PropertySet {
     def convertString (value: String, namespaces: Map[String, String]) = value
     def convertInteger(value: String, namespaces: Map[String, String]) = jl.Integer.valueOf(value)
     def convertBoolean(value: String, namespaces: Map[String, String]) = jl.Boolean.valueOf(value)
+    def convertDecimal(value: String, namespaces: Map[String, String]) = jl.Double.valueOf(value)
 //    def convertDate   (value: String, namespaces: Map[String, String]) = new ju.Date(DateUtilsUsingSaxon.parseISODateOrDateTime(value))
 
     def convertQName(value: String, namespaces: Map[String, String]): QName =

@@ -1338,9 +1338,6 @@ root / Compile / resourceGenerators += Def.taskDyn {
     files.filter(_.isFile) ++ files.filter(_.isDirectory).flatMap(allFilesIn)
   }
 
-  // Consider all .xml/.xhtml/.bin files in data/orbeon/fr as input files (do not ignore .DS_Store, etc. for now)
-  val inputFiles = allFilesIn(inputFilesDirectory)
-
   Def.task {
     def generateDemoSqliteDatabase(in: Set[File]): Set[File] = {
       // Running DemoSqliteDatabase here using (demoSqliteDatabase / Compile / runMain).toTask(...).value doesn't work
@@ -1359,9 +1356,19 @@ root / Compile / resourceGenerators += Def.taskDyn {
       Set(generatedFile)
     }
 
-    // Generate the file only if it doesn't exist or if any of the input files has changed
-    val cachedFunction = FileFunction.cached(streams.value.cacheDirectory / "sqlite-cache")(generateDemoSqliteDatabase)
-    cachedFunction(inputFiles.toSet).toSeq
+    val cacheDirectory = streams.value.cacheDirectory
+
+    // Only generate demo SQLite database when packaging (there must be a cleaner, more idiomatic way to do this)
+    if (state.value.currentCommand.exists(_.commandLine.startsWith("package"))) {
+      // Consider all .xml/.xhtml/.bin files in data/orbeon/fr as input files (do not ignore .DS_Store, etc. for now)
+      val inputFiles = allFilesIn(inputFilesDirectory)
+
+      // Generate the file only if it doesn't exist or if any of the input files has changed
+      val cachedFunction = FileFunction.cached(cacheDirectory / "sqlite-cache")(generateDemoSqliteDatabase)
+      cachedFunction(inputFiles.toSet).toSeq
+    } else {
+      Seq.empty[File]
+    }
   }
 }.taskValue
 

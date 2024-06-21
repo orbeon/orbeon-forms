@@ -18,6 +18,7 @@ import org.orbeon.facades.Select2.{Success, toJQuerySelect2}
 import org.orbeon.web.DomSupport
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
+import org.orbeon.polyfills.HTMLPolyfills._
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.raw.{Element, Node}
@@ -76,7 +77,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           def options(open: Boolean): Select2.Options =
             new Select2.Options {
               val allowClear         = placeholderOpt.isDefined // allowClear can be enabled only if a placeholder is defined
-              val dropdownParent     = js.undefined
+              val dropdownParent     = containerElem.closest("dialog").map($(_)).orUndefined // For dropdown not to show under dialog
               val ajax               = if (isDatabound) Select2Ajax else null
               val width              = "100%" // For Select2 width to update as the viewport width changes
               val tags               = open

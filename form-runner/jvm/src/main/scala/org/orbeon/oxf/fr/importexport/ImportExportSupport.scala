@@ -40,7 +40,7 @@ object ImportExportSupport {
   val DefaultExcelNameManglingConfig =
     ExcelNameManglingConfig(
       prefix = "_",
-      re     = """([A-Z|a-z]+\d+|[CcRr]\d+.+)""".r
+      re     = """([A-Z|a-z]+\d+|[CcRrSs]\d+.+)""".r
     )
 
   case class ExcelNameManglingConfig(prefix: String, re: Regex)

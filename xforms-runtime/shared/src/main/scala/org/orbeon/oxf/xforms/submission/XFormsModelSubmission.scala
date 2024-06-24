@@ -645,14 +645,30 @@ class XFormsModelSubmission(
 
       try {
         withDebug("handling result") {
-          connectResult.result match {
-            case Success((replacer, cxr)) => (replacer.replace(thisSubmission, cxr, submissionParameters, replacer.deserialize(thisSubmission, cxr, submissionParameters)), cxr.some)
-            case Failure(throwable)       => (ReplaceResult.SendError(throwable, Left(None), submissionParameters.tunnelProperties), None)
+          connectResult match {
+            case ConnectResultT.Success(_, replacer, cxr) =>
+              (
+                replacer.replace(
+                  thisSubmission,
+                  cxr,
+                  submissionParameters,
+                  replacer.deserialize(thisSubmission, cxr, submissionParameters)
+                ),
+                cxr.some
+              )
+            case ConnectResultT.Failure(_, throwable, _) =>
+              (
+                ReplaceResult.SendError(throwable, Left(None), submissionParameters.tunnelProperties),
+                None
+              )
           }
         }
       } catch {
         case NonFatal(throwable) =>
-          val cxrOpt = connectResult.result.toOption.map(_._2)
+          val cxrOpt = connectResult match {
+            case ConnectResultT.Success(_, _, cxr) => cxr.some
+            case ConnectResultT.Failure(_, _, cxrOpt) => cxrOpt
+          }
           (ReplaceResult.SendError(throwable, Left(cxrOpt), submissionParameters.tunnelProperties), cxrOpt)
       }
     }

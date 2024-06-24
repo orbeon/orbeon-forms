@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 import cats.effect.IO
 import org.orbeon.connection.ConnectionSupport.fs2StreamToInputStreamInMemory
-import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
+import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent, StreamedContentT}
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -41,23 +41,29 @@ import org.orbeon.oxf.util.Logging._
 
 object SubmissionUtils {
 
-  def convertConnectResult(fs2Cr: AsyncConnectResult): IO[ConnectResult] =
-    fs2Cr match {
-      case ConnectResultT(_, Success(t @ (_, fs2Cxr @ ConnectionResultT(_, _, _, fs2Content, _, _)))) =>
-        for(is <- fs2StreamToInputStreamInMemory(fs2Content.stream))
+  def convertConnectResult(fs2Cr: AsyncConnectResult): IO[ConnectResult] = {
+
+    def withInputStreamInMemory(
+      fs2Cxr     : ConnectionResultT[fs2.Stream[IO, Byte]]
+    ): IO[ConnectionResultT[InputStream]] =
+      for (is <- fs2StreamToInputStreamInMemory(fs2Cxr.content.stream))
         yield
-          fs2Cr.copy(
-            result = Success(
-              t.copy(
-                _2 = fs2Cxr.copy(
-                  content = fs2Content.copy(stream = is)
-                )
-              )
-            )
+          fs2Cxr.copy(
+            content = fs2Cxr.content.copy(stream = is)
           )
-      case ConnectResultT(submissionEffectiveId, Failure(t)) =>
-        IO.pure(ConnectResultT(submissionEffectiveId, Failure(t)))
+
+    fs2Cr match {
+      case c @ ConnectResultT.Success(_, _, fs2Cxr) =>
+        withInputStreamInMemory(fs2Cxr)
+          .map(s => c.copy(stream = s))
+      case c @ ConnectResultT.Failure(_, _, Some(fs2Cxr)) =>
+        withInputStreamInMemory(fs2Cxr)
+          .map(s => c.copy(streamOpt = Some(s)))
+      case c @ ConnectResultT.Failure(_, _, None) =>
+        // Not sure why I can't just write `IO.pure(c)`
+        IO.pure(ConnectResultT.Failure(c.submissionEffectiveId, c.throwable, None))
     }
+  }
 
   def logRequestBody(mediatype: String, messageBody: Array[Byte])(implicit logger: IndentedLogger): Unit =
     if (ContentTypes.isXMLMediatype(mediatype) ||

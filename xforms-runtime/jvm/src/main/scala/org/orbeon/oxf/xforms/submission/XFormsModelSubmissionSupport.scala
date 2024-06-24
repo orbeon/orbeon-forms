@@ -27,8 +27,15 @@ object XFormsModelSubmissionSupport extends XFormsModelSubmissionSupportTrait {
       }
 
     computation
-      .flatMap(fs2Cr => IO.fromTry(fs2Cr.result))
+      .flatMap {
+          case ConnectResultT.Success(_, result, stream)       =>
+            IO.pure((result, stream))
+          case ConnectResultT.Failure(_, throwable, streamOpt) =>
+            IO(streamOpt.foreach(_.close())) *>
+            IO.raiseError(throwable)
+      }
       .bracket(replace)(t => IO(t._2.close()))
       .unsafeRunSync()
+
   }
 }

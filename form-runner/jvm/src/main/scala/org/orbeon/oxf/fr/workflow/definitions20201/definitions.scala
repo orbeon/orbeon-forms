@@ -7,7 +7,7 @@ package org.orbeon.oxf.fr.workflow.definitions20201
 // https://github.com/benhutchison/prickle#support-for-shared-objects
 
 // NOTE: You can't use for example a `case class Lang(name: String)` type for the `Map` key without a
-// custom encoder/decoder. So We use `String for now.
+// custom encoder/decoder. So we use `String for now.
 case class LocalizedString(values: Map[String, String])
 
 case class Stage(

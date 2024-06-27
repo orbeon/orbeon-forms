@@ -56,6 +56,7 @@ class Form(
     xblInstances.foreach(_.destroy())
     xblInstances.clear()
     InitSupport.removeNamespacePromise(ns)
+    errorPanel.asInstanceOf[js.Dynamic].hide()
   }
 
   def addCallback(name: String, fn: js.Function): Unit =

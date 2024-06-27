@@ -56,6 +56,15 @@ class Form(
     xblInstances.foreach(_.destroy())
     xblInstances.clear()
     InitSupport.removeNamespacePromise(ns)
+
+    // Hide dialogs in this form
+    Globals.dialogs.foreach { case (_, yuiDialog) =>
+      val dialogElement = yuiDialog.element.asInstanceOf[html.Element]
+      if (elem.contains(dialogElement))
+        yuiDialog.hide()
+    }
+
+    // Hide error panel, which isn't in `Globals.dialogs`
     errorPanel.asInstanceOf[js.Dynamic].hide()
   }
 

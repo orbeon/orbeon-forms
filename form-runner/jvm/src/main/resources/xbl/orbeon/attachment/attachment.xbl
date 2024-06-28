@@ -235,11 +235,11 @@
                             <remove>Quitar archivo adjunto</remove>
                         </resource>
                         <resource xml:lang="fi">
-                            <drag-single todo="true">[Drag file here or {0}select file{1}.]</drag-single>
-                            <drag-multiple todo="true">[Drag files here or {0}select files{1}.]</drag-multiple>
+                            <drag-single>Raahaa tiedosto tähän tai {0}valitse tiedosto{1}.</drag-single>
+                            <drag-multiple>Raahaa tiedostot tähän tai {0}valitse tiedostot{1}.</drag-multiple>
                             <download>Lataa</download>
-                            <empty todo="true">[No attachment.]</empty>
-                            <remove todo="true">[Remove Attachment]</remove>
+                            <empty>Ei liitettä</empty>
+                            <remove>Poista liite</remove>
                         </resource>
                         <resource xml:lang="fr">
                             <drag-single>Déposer le fichier ici ou {0}sélectionner le fichier{1}.</drag-single>

@@ -44,10 +44,21 @@ case class RefContext(
   xpathContext                 : XPathContext
 )
 
-case class ConnectResultT[S](
-  submissionEffectiveId : String,
-  result                : Try[(Replacer, ConnectionResultT[S])]
-)
+sealed trait ConnectResultT[S] { def submissionEffectiveId : String }
+object ConnectResultT {
+
+  case class Success[S](
+    submissionEffectiveId : String,
+    result                : Replacer,
+    stream                : ConnectionResultT[S]
+  ) extends ConnectResultT[S]
+
+  case class Failure[S](
+    submissionEffectiveId : String,
+    throwable             : Throwable,
+    streamOpt             : Option[ConnectionResultT[S]]
+  ) extends ConnectResultT[S]
+}
 
 sealed trait ReplaceResult
 object ReplaceResult {

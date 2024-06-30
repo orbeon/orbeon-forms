@@ -43,7 +43,7 @@
             fr|databound-select1[appearance ~= search]"
         xxf:external-events="fr-search fr-change"
         xxbl:container="span"
-        xxbl:mode="lhha binding value focus selection javascript-lifecycle">
+        xxbl:mode="lhha binding value focus selection javascript-lifecycle allow-minimal-label-hint">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">With Search</display-name>
@@ -509,7 +509,12 @@
                             ref="if (not($view)) then . else ()"
                             xxf:element="span"
                             class="{{'fr-service-error'[instance('local')/submission-status = 'failure']}}"
-                            data-placeholder="{{xxf:r('select')}}"
+                            data-placeholder="{{
+                                if (xxf:label-appearance('fr-databound-select1-search') = 'minimal') then
+                                    xxf:label('fr-databound-select1-search')
+                                else
+                                    xxf:r('select')
+                            }}"
                             data-service-performs-search="{$service-performs-search}"
                             data-min-input-length="{{$min-input-length}}"
                             data-value="{{$binding}}"

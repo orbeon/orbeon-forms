@@ -76,7 +76,6 @@
 
     <xsl:template match="xh:html/xh:head">
         <head>
-            <xsl:apply-templates select="@* | node()"/>
             <!-- https://github.com/orbeon/orbeon-forms/issues/4206 -->
             <style type="text/css">
                 @page {
@@ -192,6 +191,8 @@
             <bookmarks>
                 <xsl:apply-templates select="$processed-body-content" mode="bookmarks"/>
             </bookmarks>
+
+            <xsl:apply-templates select="@* | node()"/>
         </head>
     </xsl:template>
 

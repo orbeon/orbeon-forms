@@ -96,15 +96,18 @@ class RegularSubmission(submission: XFormsModelSubmission)
     def createConnectResult[S](cxr: ConnectionResultT[S])(implicit logger: IndentedLogger): ConnectResultT[S] =
       withDebug("creating connect result") {
         try {
-          ConnectResultT(
+          ConnectResultT.Success(
             submissionEffectiveId,
-            Success(submission.getReplacer(cxr, submissionParameters)(submission.getIndentedLogger), cxr)
+            submission.getReplacer(cxr, submissionParameters)(submission.getIndentedLogger),
+            cxr
           )
         } catch {
           case NonFatal(throwable) =>
-            // xxx need to close cxr in case of error also later after running deserialize()
-            IOUtils.runQuietly(cxr.close()) // close here as it's not passed through `ConnectResult`
-            ConnectResultT(submissionEffectiveId, Failure(throwable))
+            ConnectResultT.Failure(
+              submissionEffectiveId,
+              throwable,
+              Some(cxr)
+          )
         } finally {
           if (submissionParameters.isAsynchronous)
             debugResults(

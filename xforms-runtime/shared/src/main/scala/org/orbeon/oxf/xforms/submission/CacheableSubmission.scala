@@ -82,9 +82,10 @@ class CacheableSubmission(submission: XFormsModelSubmission)
           dontHandleResponse = false
         )
 
-      ConnectResultT(
+      ConnectResultT.Success(
         submissionEffectiveId,
-        Success((new DirectInstanceReplacer((document, instanceCaching)), connectionResult))
+        new DirectInstanceReplacer((document, instanceCaching)),
+        connectionResult
       )
     }
 
@@ -101,9 +102,10 @@ class CacheableSubmission(submission: XFormsModelSubmission)
           dontHandleResponse = false
         )
 
-      ConnectResultT(
+      ConnectResultT.Success(
         submissionEffectiveId,
-        Success((new DirectInstanceReplacer((document, instanceCaching)), connectionResult))
+        new DirectInstanceReplacer((document, instanceCaching)),
+        connectionResult
       )
     }
 
@@ -157,10 +159,17 @@ class CacheableSubmission(submission: XFormsModelSubmission)
           } catch {
             case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
               // The ThrowableWrapper was thrown within the inner load() method above
-              Some(Left(ConnectResultT.apply(submissionEffectiveId, Failure(throwableWrapper.throwable))))
+              Some(Left(ConnectResultT.Failure(
+                submissionEffectiveId,
+                throwableWrapper.throwable,
+                None
+              )))
             case NonFatal(throwable) =>
               // Any other throwable
-              Some(Left(ConnectResultT(submissionEffectiveId, Failure(throwable))))
+              Some(Left(ConnectResultT.Failure(
+                submissionEffectiveId,
+                throwable, None
+              )))
           }
         }
     } // match
@@ -244,8 +253,8 @@ class CacheableSubmission(submission: XFormsModelSubmission)
           case _                         => throw new IllegalStateException
         }
 
-      submissionResult.result match {
-        case Success((replacer @ InstanceReplacer, cxr)) =>
+      submissionResult match {
+        case ConnectResultT.Success(_, replacer @ InstanceReplacer, cxr) =>
           // `load()` requires an immutable `TinyTree`
           // Since we forced `isReadonly` above, the result must also be a readonly instance
           replacer.deserialize(submission, cxr, updatedSubmissionParameters) match {
@@ -254,7 +263,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
             case Left(Left(_))                  => throw new IllegalStateException
             case Left(Right(documentInfo))      => documentInfo
           }
-        case Failure(throwable) =>
+        case ConnectResultT.Failure(_, throwable, _) =>
           throw new CacheableSubmission.ThrowableWrapper(throwable)
         case _ =>
           // Must not happen

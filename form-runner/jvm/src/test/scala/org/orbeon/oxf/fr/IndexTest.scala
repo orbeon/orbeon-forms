@@ -14,7 +14,7 @@ class IndexTest
      with ResourceManagerSupport
      with AnyFunSpecLike {
 
-  describe("The `findIndexedControls` function") {
+  describe("The `searchableValues` function") {
 
     implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
 
@@ -372,7 +372,7 @@ class IndexTest
           expected == Index.searchableValues(
             formDoc                   = elemToDocumentInfo(elem),
             appForm                   = appForm,
-            searchVersionOpt                = None,
+            searchVersionOpt          = None,
             databaseDataFormatVersion = dstVersion
           ).controls
         )
@@ -557,7 +557,7 @@ class IndexTest
         expectedIndexedControls == Index.searchableValues(
           formDoc                   = elemToDocumentInfo(formWithSummarySettings),
           appForm                   = appForm,
-          searchVersionOpt                = None,
+          searchVersionOpt          = None,
           databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
         ).controls
       )

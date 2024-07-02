@@ -113,7 +113,10 @@ class JavaxHttpServletRequest(httpServletRequest: javax.servlet.http.HttpServlet
 
   override def getAuthType: String = httpServletRequest.getAuthType
   override def getContextPath: String = httpServletRequest.getContextPath
-  override def getCookies: Array[Cookie] = if (httpServletRequest.getCookies eq null) null else httpServletRequest.getCookies.map(Cookie(_))
+  override def getCookies: Array[Cookie] =
+    Option(httpServletRequest.getCookies)
+      .map(_.map(c => Cookie(c): Cookie))
+      .getOrElse(Array.empty[Cookie])
   override def getDateHeader(name: String): Long = httpServletRequest.getDateHeader(name)
   override def getHeader(name: String): String = httpServletRequest.getHeader(name)
   override def getHeaderNames: ju.Enumeration[String] = httpServletRequest.getHeaderNames
@@ -152,7 +155,10 @@ class JavaxHttpServletRequest(httpServletRequest: javax.servlet.http.HttpServlet
       override def getContentLength: Int = wrapper.getContentLength
       override def getContentType: String = wrapper.getContentType
       override def getContextPath: String = wrapper.getContextPath
-      override def getCookies: Array[javax.servlet.http.Cookie] = wrapper.getCookies.map(_.getNativeCookie.asInstanceOf[javax.servlet.http.Cookie])
+      override def getCookies: Array[javax.servlet.http.Cookie] =
+        Option(wrapper.getCookies)
+          .map(_.map(c => c.getNativeCookie.asInstanceOf[javax.servlet.http.Cookie]))
+          .getOrElse(Array.empty[javax.servlet.http.Cookie])
       override def getDateHeader(name: String): Long = wrapper.getDateHeader(name)
       override def getHeader(name: String): String = wrapper.getHeader(name)
       override def getHeaderNames: ju.Enumeration[String] = wrapper.getHeaderNames
@@ -199,7 +205,10 @@ class JakartaHttpServletRequest(httpServletRequest: jakarta.servlet.http.HttpSer
 
   override def getAuthType: String = httpServletRequest.getAuthType
   override def getContextPath: String = httpServletRequest.getContextPath
-  override def getCookies: Array[Cookie] = if (httpServletRequest.getCookies eq null) null else httpServletRequest.getCookies.map(Cookie(_))
+  override def getCookies: Array[Cookie] =
+    Option(httpServletRequest.getCookies)
+      .map(_.map(c => Cookie(c): Cookie))
+      .getOrElse(Array.empty[Cookie])
   override def getDateHeader(name: String): Long = httpServletRequest.getDateHeader(name)
   override def getHeader(name: String): String = httpServletRequest.getHeader(name)
   override def getHeaderNames: ju.Enumeration[String] = httpServletRequest.getHeaderNames
@@ -238,7 +247,10 @@ class JakartaHttpServletRequest(httpServletRequest: jakarta.servlet.http.HttpSer
       override def getContentLength: Int = wrapper.getContentLength
       override def getContentType: String = wrapper.getContentType
       override def getContextPath: String = wrapper.getContextPath
-      override def getCookies: Array[jakarta.servlet.http.Cookie] = wrapper.getCookies.map(_.getNativeCookie.asInstanceOf[jakarta.servlet.http.Cookie])
+      override def getCookies: Array[jakarta.servlet.http.Cookie] =
+        Option(wrapper.getCookies)
+          .map(_.map(_.getNativeCookie.asInstanceOf[jakarta.servlet.http.Cookie]))
+          .getOrElse(Array.empty[jakarta.servlet.http.Cookie])
       override def getDateHeader(name: String): Long = wrapper.getDateHeader(name)
       override def getHeader(name: String): String = wrapper.getHeader(name)
       override def getHeaderNames: ju.Enumeration[String] = wrapper.getHeaderNames

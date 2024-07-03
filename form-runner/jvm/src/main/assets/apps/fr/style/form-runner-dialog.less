@@ -18,6 +18,8 @@
             background-color: rgba(0, 0, 0, 0.25);
         }
 
+        &[open] { display: flex }     // Don't override the user agent `display: none` closed
+        flex-direction: column;
         max-width: 500px;  // Keep the dialog fairly narrow to increase legibility, but allow it to be narrower on phones
         background-color: rgba(0, 0, 0, 0); // For the rounded to show
         border: none;
@@ -27,6 +29,7 @@
         margin-left: auto;
         margin-right: auto;
         margin-top: 4rem;
+        overflow: visible;
 
         .xxforms-dialog-body p {
             margin: .5em 0 .5em 0
@@ -42,14 +45,6 @@
             &::before {
                 font-size: 50px;
             }
-        }
-
-        .fr-dialog-buttons {
-            text-align: right;
-            padding: 10px 5px 0 5px; // dialog bd already has padding so no padding-bottom
-            margin-top: 5px; // so that content above doesn't touch us
-            border-top: 2px solid @frBorderColor;
-            clear: both
         }
 
         .xxforms-dialog-head {
@@ -71,7 +66,15 @@
             border-bottom-right-radius: @dialogBorderRadius;
             border: none;
             padding: 10px;
-            overflow: auto;
+            height: 100%;
+
+            .fr-dialog-buttons {
+                text-align: right;
+                padding: 10px 5px 0 5px; // Dialog bd already has padding so no padding-bottom
+                margin-top: 5px;         // So that content above doesn't touch us
+                border-top: 2px solid @frBorderColor;
+                clear: both
+            }
         }
 
         .xxforms-dialog-head:empty + .xxforms-dialog-body {

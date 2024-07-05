@@ -4,6 +4,7 @@
     .xbl-fr-dropdown-select1 {
         select:has(option[value = "0"]:checked) {
             color: @controlPlaceholderColor;
+            option { color: initial; } // Items in the dropdown no to have the placeholder color on Windows
         }
     }
 }

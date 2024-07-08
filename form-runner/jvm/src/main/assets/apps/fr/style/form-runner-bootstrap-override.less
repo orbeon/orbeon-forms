@@ -18,6 +18,12 @@ body.orbeon {
 }
 
 .orbeon {
+
+    --fr-min-gray-on-white: #ccc;
+    @media (prefers-contrast: more) {
+        --fr-min-gray-on-white: #949494;
+    }
+
     font-family: @frBaseFontFamily;
     font-size: @frFontSize;         // Use our own preferred font size
     line-height: @baseLineHeight;

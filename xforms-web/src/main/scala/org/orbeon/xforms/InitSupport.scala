@@ -293,9 +293,7 @@ object InitSupport {
         }
 
         // Run other code sent by server
-        if (initializations.messagesToRun.nonEmpty)
-          MessageDialog.showMessages(initializations.messagesToRun.toJSArray)
-
+        initializations.messagesToRun.foreach(dom.window.alert)
         initializations.dialogsToShow foreach { case rpc.Dialog(id, neighborId) =>
           XFormsUI.showDialogForInit(id, neighborId)
         }

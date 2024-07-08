@@ -327,7 +327,7 @@
 
                                 // Display modal message
                                 case "message": {
-                                    ORBEON.xforms.Message.execute(childNode);
+                                    alert(childNode.textContent);
                                     break;
                                 }
 

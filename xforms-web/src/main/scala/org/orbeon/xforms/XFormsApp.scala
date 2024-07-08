@@ -46,7 +46,6 @@ object XFormsApp extends App {
     // We know that `window.ORBEON.xforms` already exists
     val xformsDyn = orbeonDyn.xforms
 
-    xformsDyn.Message                = js.Dynamic.global.OrbeonMessage
     xformsDyn.Page                   = js.Dynamic.global.OrbeonPage
     xformsDyn.ServerValueStore       = js.Dynamic.global.OrbeonServerValueStore
     xformsDyn.AjaxEvent              = js.Dynamic.global.OrbeonAjaxEvent

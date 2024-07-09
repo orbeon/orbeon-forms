@@ -357,7 +357,21 @@
                                 <xbl:content includes=":root > fr|header > *"/>
 
                                 <!-- Body of the error summary -->
-                                <xf:group class="fr-error-summary-body {{for $d in distinct-values(error/@level[. = ('error', 'warning', 'info')]/string()) return concat('fr-level-', $d)}}" id="body">
+                                <xf:group
+                                    id="body"
+                                    class="fr-error-summary-body {{
+                                        let $levels :=
+                                            distinct-values(
+                                                $visible-errors-for-section/
+                                                @level[. = ('error', 'warning', 'info')]/
+                                                string()
+                                            )
+                                        return
+                                                 if ($levels = 'error'  ) then 'fr-level-error'
+                                            else if ($levels = 'warning') then 'fr-level-warning'
+                                            else if ($levels = 'info'   ) then 'fr-level-info'
+                                            else ''
+                                    }}">
                                     <!-- Include optional fr:label into xf:label -->
                                     <xsl:for-each select="/*/fr:label[1]">
                                         <xf:label xxbl:scope="outer" class="fr-error-title">

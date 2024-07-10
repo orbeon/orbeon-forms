@@ -15,13 +15,14 @@ package org.orbeon.xbl
 
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum._
-import org.orbeon.jquery.Offset
+import org.orbeon.polyfills.HTMLPolyfills._
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms.facade.Utils
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom.raw.KeyboardEvent
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
+import org.scalajs.dom.ext._
 
 import scala.scalajs.js
 
@@ -101,22 +102,22 @@ trait GridSectionMenus {
   // Both callers are in response to  events flowing through `.fr-$componentName-dropdown-button`.
   def moveMenu(e: JQueryEventObject): Unit = {
 
-    val jTarget        = $(e.target)
-    val jButton        = jTarget.closest(s".fr-$componentName-dropdown-button")
-    val button         = jButton(0)
-    val jDropdown      = jTarget.closest(".dropdown")
-    val dropdown       = jDropdown.get(0)
+    val target    = e.target.asInstanceOf[html.Element]
+    val button    = target.closest(s".fr-$componentName-dropdown-button").get
+    val dropdown  = target.closest(".dropdown").get
 
-    // Move globalMenuElem in the DOM just below the button
+    // Move globalMenuElem in the DOM just below the button (for positioning, dialog)
     dropdown.parentNode.insertBefore(globalMenuElem.get, dropdown.nextSibling)
 
-    $(globalMenuElem).css("position", "absolute")
+    globalMenuElem.get.style.position = "absolute"
 
     Operation.values foreach { op =>
-      $(globalMenuElem).find(".dropdown-menu").children(s".fr-${op.entryName}").toggleClass(
-        "disabled",
-        ! $(iteration(e)).is(s".can-${op.entryName}")
-      )
+      val menuItems = globalMenuElem.get.querySelectorAll(s".dropdown-menu .fr-${op.entryName}").toList.asInstanceOf[List[html.Element]]
+      menuItems.foreach { item =>
+        val canDo       = iteration(e).classList.contains(s"can-${op.entryName}")
+        val toggleClass = if (canDo) item.classList.remove _ else item.classList.add _
+        toggleClass("disabled")
+      }
     }
 
     componentId(e).zip(findIterationForElemWithId(button)) foreach {
@@ -172,7 +173,7 @@ trait GridSectionMenus {
 
   private object Util {
 
-    def iteration(e: JQueryEventObject): js.UndefOr[html.Element] =
+    def iteration(e: JQueryEventObject): html.Element =
       $(e.target).closest(s".fr-$componentName-repeat-iteration")(0)
 
     def findIterationForElemWithId(elemWithId: html.Element): Option[Int] =

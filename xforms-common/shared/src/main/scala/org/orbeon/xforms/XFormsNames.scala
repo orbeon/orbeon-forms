@@ -68,6 +68,7 @@ object XFormsNames {
   val ROLE_QNAME       = QName("role")
   val TABINDEX_QNAME   = QName("tabindex")
   val ACCESSKEY_QNAME  = QName("accesskey")
+  val AUTOFOCUS_QNAME  = QName("autofocus")
 
   val APPEARANCE_QNAME = QName("appearance")
   val MEDIATYPE_QNAME  = QName("mediatype")

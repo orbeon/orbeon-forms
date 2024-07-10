@@ -83,6 +83,13 @@ object XFormsBaseHandler {
         destAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, value)
     }
 
+    // Handle "autofocus"
+    locally {
+      val value = srcAttributes.getValue(XFormsNames.AUTOFOCUS_QNAME.localName)
+      if (value == "true")
+        destAttributes.addOrReplace(XFormsNames.AUTOFOCUS_QNAME, XFormsNames.AUTOFOCUS_QNAME.localName)
+    }
+
     // Handle "accesskey"
     locally {
       val value = srcAttributes.getValue(XFormsNames.ACCESSKEY_QNAME.localName)

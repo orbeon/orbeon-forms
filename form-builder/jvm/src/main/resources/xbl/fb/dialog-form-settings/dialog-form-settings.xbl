@@ -631,7 +631,7 @@
                                     <fr:c x="1" y="1" w="6" h="1">
                                         <!-- Application name -->
                                         <!-- Use an input if app name is a wildcard -->
-                                        <xf:input ref="app[$app-chooser = 'input']" id="fb-app-name-input" xxf:autocomplete="off">
+                                        <xf:input ref="app[$app-chooser = 'input']" id="fb-app-name-input" xxf:autocomplete="off" autofocus="true">
                                             <xf:label ref="$resources/application-name/label"/>
                                             <xf:hint ref="$resources/application-name/hint"/>
                                             <xf:help ref="$resources/application-name/help" mediatype="text/html"/>

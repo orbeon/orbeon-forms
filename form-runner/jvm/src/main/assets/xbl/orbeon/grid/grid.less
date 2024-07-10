@@ -554,7 +554,8 @@
             .can-remove, .can-move-up, .can-move-down, .can-insert-above, .can-insert-below {
                 .dropdown {
                     display: block;
-                    margin: @frGridCellPadding;
+                    // Margin around button, but not menu itself, which also has the `dropdown` class
+                    &:not(.open) { margin: @frGridCellPadding }
                 }
             }
 

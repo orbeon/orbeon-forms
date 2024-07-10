@@ -106,16 +106,11 @@ trait GridSectionMenus {
     val button         = jButton(0)
     val jDropdown      = jTarget.closest(".dropdown")
     val dropdown       = jDropdown.get(0)
-    val dropdownOffset = Offset(jDropdown)
 
     // Move globalMenuElem in the DOM just below the button
     dropdown.parentNode.insertBefore(globalMenuElem.get, dropdown.nextSibling)
 
-    // Move globalMenuElem in the DOM just below jDropdown
-    jDropdown.after($(globalMenuElem))
-
     $(globalMenuElem).css("position", "absolute")
-    Offset.offset($(globalMenuElem), Offset(dropdownOffset.left, dropdownOffset.top + jButton.outerHeight()))
 
     Operation.values foreach { op =>
       $(globalMenuElem).find(".dropdown-menu").children(s".fr-${op.entryName}").toggleClass(

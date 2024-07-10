@@ -101,13 +101,18 @@ trait GridSectionMenus {
   // Both callers are in response to  events flowing through `.fr-$componentName-dropdown-button`.
   def moveMenu(e: JQueryEventObject): Unit = {
 
-    val jTarget = $(e.target)
-
-    val jButton   = jTarget.closest(s".fr-$componentName-dropdown-button")
-    val button    = jButton(0)
-    val jDropdown = jTarget.closest(".dropdown")
-
+    val jTarget        = $(e.target)
+    val jButton        = jTarget.closest(s".fr-$componentName-dropdown-button")
+    val button         = jButton(0)
+    val jDropdown      = jTarget.closest(".dropdown")
+    val dropdown       = jDropdown.get(0)
     val dropdownOffset = Offset(jDropdown)
+
+    // Move globalMenuElem in the DOM just below the button
+    dropdown.parentNode.insertBefore(globalMenuElem.get, dropdown.nextSibling)
+
+    // Move globalMenuElem in the DOM just below jDropdown
+    jDropdown.after($(globalMenuElem))
 
     $(globalMenuElem).css("position", "absolute")
     Offset.offset($(globalMenuElem), Offset(dropdownOffset.left, dropdownOffset.top + jButton.outerHeight()))

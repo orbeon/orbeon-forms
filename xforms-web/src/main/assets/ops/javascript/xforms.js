@@ -1726,11 +1726,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 return;
             }
 
-            // Prevent default behavior when the esc key is pressed, which would otherwise reset all the form fields on IE,
-            // up to IE11 included. See https://github.com/orbeon/orbeon-forms/issues/131
-            if (event.keyCode == 27)
-                event.preventDefault();
-
             var target = YAHOO.util.Event.getTarget(event);
             var control = ORBEON.xforms.Events._findParentXFormsControl(target);
             if (control != null) {
@@ -2022,19 +2017,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 if (foundRepeatBegin) break;
                 // Explore parent
                 node = node.parentNode;
-            }
-        },
-
-        /**
-         * Event listener on dialogs called by YUI when the dialog is closed. If the dialog was closed by the user (not
-         * because the server told use to close the dialog), then we want to notify the server that this happened.
-         */
-        dialogClose: function (type, args, me) {
-            if (! ORBEON.xforms.Globals.maskDialogCloseEvents) {
-                var dialogId = me;
-                var dialog = document.getElementById(dialogId);
-                var event = new ORBEON.xforms.AjaxEvent(null, dialog.id, null, "xxforms-dialog-close");
-                ORBEON.xforms.AjaxClient.fireEvent(event);
             }
         },
 

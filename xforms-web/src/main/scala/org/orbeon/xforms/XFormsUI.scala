@@ -22,8 +22,9 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomSupport
+import org.orbeon.xforms.AjaxClient.fireEvent
 import org.orbeon.xforms.Constants.LhhacSeparator
-import org.orbeon.xforms.facade.{Controls, Init, Utils, XBL}
+import org.orbeon.xforms.facade.{Controls, Events, Init, Utils, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.URL
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
@@ -1494,14 +1495,33 @@ object XFormsUI {
         focusControlIdOpt foreach Controls.setFocus
       }
 
+    // Server telling us to show the dialog
     def showDialog(controlId: String, neighborIdOpt: Option[String], reason: String): Unit = {
       val dialogElem = dom.document.getElementById(controlId).asInstanceOf[HTMLDialogElement]
       dialogElem.showModal()
+      dialogElem.addEventListener("cancel", dialogCancelListenerFn)
     }
 
+    // Server telling us to hide the dialog
     def hideDialog(id: String, formID: String): Unit = {
       val dialogElem = dom.document.getElementById(id).asInstanceOf[HTMLDialogElement]
+      dialogElem.removeEventListener("cancel", dialogCancelListenerFn)
       dialogElem.close()
+    }
+
+    // When users close the dialog (Esc), inform the server
+    private val dialogCancelListenerFn: js.Function1[dom.Event, Unit] = dialogCancelListener _
+    private def dialogCancelListener(event: dom.Event) : Unit = {
+      val dialogElem = event.target.asInstanceOf[html.Element]
+      dialogElem.removeEventListener("cancel", dialogCancelListenerFn)
+      AjaxClient.fireEvent(
+        new AjaxEvent(
+          js.Dictionary[js.Any](
+            "eventName" -> "xxforms-dialog-close",
+            "targetId"  -> dialogElem.id
+          )
+        )
+      )
     }
   }
 }

@@ -17,6 +17,7 @@ import org.log4s.Logger
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.facades.HTMLDialogElement
+import org.orbeon.polyfills.HTMLPolyfills._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils._
@@ -1499,21 +1500,22 @@ object XFormsUI {
     def showDialog(controlId: String, neighborIdOpt: Option[String], reason: String): Unit = {
       val dialogElem = dom.document.getElementById(controlId).asInstanceOf[HTMLDialogElement]
       dialogElem.showModal()
-      dialogElem.addEventListener("cancel", dialogCancelListenerFn)
+      dialogElem.addEventListener("cancel" , dialogCancelListener )
+      dialogElem.addEventListener("keydown", dialogKeydownListener)
     }
 
     // Server telling us to hide the dialog
     def hideDialog(id: String, formID: String): Unit = {
       val dialogElem = dom.document.getElementById(id).asInstanceOf[HTMLDialogElement]
-      dialogElem.removeEventListener("cancel", dialogCancelListenerFn)
+      dialogElem.removeEventListener("cancel" , dialogCancelListener )
+      dialogElem.removeEventListener("keydown", dialogKeydownListener)
       dialogElem.close()
     }
 
-    // When users close the dialog (Esc), inform the server
-    private val dialogCancelListenerFn: js.Function1[dom.Event, Unit] = dialogCancelListener _
-    private def dialogCancelListener(event: dom.Event) : Unit = {
-      val dialogElem = event.target.asInstanceOf[html.Element]
-      dialogElem.removeEventListener("cancel", dialogCancelListenerFn)
+    // Users closed the dialog (Esc): the browser dispatches the `cancel` event, we inform the server
+    // Declared as `val` to ensure function identity, for the `removeEventListener` to work
+    private val dialogCancelListener: js.Function1[dom.Event, Unit] = (event: dom.Event) => {
+      val dialogElem    = event.target.asInstanceOf[html.Element]
       AjaxClient.fireEvent(
         new AjaxEvent(
           js.Dictionary[js.Any](
@@ -1522,6 +1524,17 @@ object XFormsUI {
           )
         )
       )
+    }
+
+    // Prevent Esc from closing the dialog if the `xxf:dialog` has `close="false"`
+    private val dialogKeydownListener: js.Function1[dom.KeyboardEvent, Unit] = (event: dom.KeyboardEvent) => {
+      val targetElem    = event.target.asInstanceOf[html.Element]
+      val dialogElem    = targetElem.closest("dialog").get
+      val supportsClose = dialogElem.classList.contains("xforms-dialog-close-true")
+      if (event.key == "Escape" && ! supportsClose) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
     }
   }
 }

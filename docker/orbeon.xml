@@ -1,0 +1,22 @@
+<Context path="/orbeon">
+	<Resource
+	    name="jdbc/postgresql"
+	    driverClassName="org.postgresql.Driver"
+
+	    auth="Container"
+	    type="javax.sql.DataSource"
+
+	    initialSize="3"
+	    maxActive="10"
+	    maxIdle="10"
+	    maxWait="30000"
+
+	    poolPreparedStatements="true"
+
+	    testOnBorrow="true"
+	    validationQuery="select 1"
+
+	    username="orbeon"
+	    password="orbeon"
+	    url="jdbc:postgresql://postgres:5432/orbeon?useUnicode=true&amp;characterEncoding=UTF8&amp;socketTimeout=30&amp;tcpKeepAlive=true"/>
+</Context>

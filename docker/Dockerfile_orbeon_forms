@@ -1,0 +1,31 @@
+FROM tomcat:9.0
+
+ARG tag
+ARG file
+
+RUN mkdir -p /tmp/orbeon
+WORKDIR /tmp/orbeon
+
+RUN apt-get update -y && apt-get install -y unzip
+
+# Download Orbeon Forms and extract WAR file
+RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file
+RUN unzip $file
+RUN basename=${file%.zip} && mv $basename/orbeon.war .
+RUN unzip orbeon.war
+RUN rm -rf /usr/local/tomcat/webapps/*
+RUN mkdir -p /usr/local/tomcat/webapps/orbeon
+RUN mv WEB-INF /usr/local/tomcat/webapps/orbeon/
+
+# Download and copy JDBC driver for PostgreSQL
+RUN mkdir -p /usr/local/tomcat/conf/Catalina/localhost
+RUN wget https://jdbc.postgresql.org/download/postgresql-42.7.3.jar
+RUN mv postgresql-42.7.3.jar /usr/local/tomcat/lib/
+
+RUN rm -rf /tmp/orbeon
+
+# Default configuration
+COPY orbeon.xml /usr/local/tomcat/conf/Catalina/localhost/
+COPY properties-local.xml /usr/local/tomcat/webapps/orbeon/WEB-INF/resources/config/
+
+EXPOSE 8080

@@ -3,4 +3,4 @@ FROM postgres:latest
 ARG sql_file
 
 # SQL script to create Orbeon Forms tables and indexes
-COPY ../form-runner/jvm/src/main/resources/apps/fr/persistence/relational/ddl/$sql_file /docker-entrypoint-initdb.d/
+COPY $sql_file /docker-entrypoint-initdb.d/

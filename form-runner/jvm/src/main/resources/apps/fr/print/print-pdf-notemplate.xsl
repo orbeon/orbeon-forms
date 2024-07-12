@@ -400,7 +400,7 @@
                 p:has-class('xforms-case-deselected')            or
                 p:has-class('xforms-case-begin-end')             or
                 p:has-class('xforms-hidden')                     or
-                p:has-class('fr-dialog')                         or
+                p:has-class('xforms-dialog')                     or
                 p:has-class('xforms-error-dialogs')              or
                 p:has-class('xforms-help-panel')                 or
                 p:has-class('xforms-template')]"

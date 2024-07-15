@@ -13,6 +13,8 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file
 RUN unzip $file
 RUN basename=${file%.zip} && mv $basename/orbeon.war .
 RUN unzip orbeon.war
+RUN rm WEB-INF/orbeon-demo.sqlite
+RUN rm WEB-INF/lib/sqlite-jdbc-*
 RUN rm -rf /usr/local/tomcat/webapps/*
 RUN mkdir -p /usr/local/tomcat/webapps/orbeon
 RUN mv WEB-INF /usr/local/tomcat/webapps/orbeon/

@@ -1,31 +1,17 @@
-<!--
-    This file is an empty template for your own `properties-local.xml` file.
-    Please follow the instructions linked below:
-
-    https://doc.orbeon.com/configuration/properties
--->
 <properties
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
 >
-    <!-- Always set a strong password here, see:
-         https://doc.orbeon.com/configuration/properties/general#oxf.crypto.password -->
     <property
         as="xs:string"
         name="oxf.crypto.password"
         value=""/>
-
-    <!-- Set a strong password here if you plan to use the "Field-level encryption" feature, see:
-         https://doc.orbeon.com/form-builder/advanced/field-level-encryption -->
     <property
         as="xs:string"
         name="oxf.fr.field-encryption.password"
         value=""/>
-
-    <!-- Set a strong password here if you plan to use the "Token-based permissions" feature, see:
-         https://doc.orbeon.com/form-runner/access-control/tokens -->
     <property
         as="xs:string"
         name="oxf.fr.access-token.password"
@@ -39,4 +25,10 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.w9.form"        value="postgresql"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"    value="postgresql"/>
     <property as="xs:boolean" name="oxf.fr.persistence.sqlite.active"                  value="false"/>
+
+    <property
+        as="xs:string"
+        processor-name="oxf:page-flow"
+        name="service-public-methods"
+        value="GET HEAD POST PUT DELETE"/>
 </properties>

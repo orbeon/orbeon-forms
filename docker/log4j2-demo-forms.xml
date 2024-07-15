@@ -1,0 +1,60 @@
+<Configuration status="error" dest="err" name="OrbeonWebAppConfig">
+
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="%date{ISO8601} %-5level %logger{1} - %message%n"/>
+        </Console>
+
+        <File
+            name="SingleFileAppender"
+            fileName="/logs/orbeon.log"
+            append="true">
+            <PatternLayout pattern="%date{ISO8601} %-5level %logger{1} - %message%n"/>
+        </File>
+
+        <RollingFile
+            name="RollingFileAppender"
+            fileName="/logs/orbeon-rolling.log"
+            filePattern="/logs/orbeon-rolling-%date{yyyy-dd-MM}.log.gz"
+            ignoreExceptions="false">
+            <PatternLayout pattern="%date{ISO8601} %-5level %logger{1} - %message%n"/>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- XForms engine activity, see https://doc.orbeon.com/configuration/advanced/xforms-logging.html -->
+        <!--
+        <Logger name="org.orbeon.oxf.xforms.processor.XFormsServer"          level="debug"/>
+        -->
+
+        <!-- To enable logging for any of the sub-systems below, copy that section outside of the comment block -->
+        <!--
+        <Logger name="org.orbeon.lifecycle"                                  level="debug"/>
+        <Logger name="org.orbeon.auth"                                       level="debug"/>
+        <Logger name="org.orbeon.filter.limiter"                             level="debug"/>
+        <Logger name="org.orbeon.properties"                                 level="debug"/>
+        <Logger name="org.orbeon.oxf.controller.PageFlowControllerProcessor" level="debug"/>
+        <Logger name="org.orbeon.oxf.webapp.OrbeonSessionListener"           level="info"/>
+        <Logger name="org.orbeon.oxf.webapp.OrbeonServletContextListener"    level="info"/>
+        <Logger name="org.orbeon.fr.data-migration"                          level="debug"/>
+        <Logger name="org.orbeon.xforms.analysis.calculate"                  level="debug"/>
+        <Logger name="org.orbeon.xbl"                                        level="debug"/>
+        <Logger name="net.sf.ehcache.distribution"                           level="debug"/>
+        -->
+
+        <!-- Prevent extra display of eXist paging activity -->
+        <Logger name="org.exist.storage.btree.Paged" level="warn"/>
+        <Logger name="org.exist.storage.DBBroker"    level="warn"/>
+        <Logger name="org.exist.storage.BrokerPool"  level="warn"/>
+
+        <Root level="info">
+            <AppenderRef ref="SingleFileAppender"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

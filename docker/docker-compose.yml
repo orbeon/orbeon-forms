@@ -11,6 +11,8 @@ services:
         target: /usr/local/tomcat/webapps/orbeon/WEB-INF/resources/config/license.xml
     depends_on:
       - postgres
+    networks:
+      - orbeon-forms-and-postgres
   postgres:
     image: orbeon/postgres:2023.1.3-pe
     restart: always
@@ -25,6 +27,11 @@ services:
 #      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
 #    secrets:
 #      - postgres_password
+    networks:
+      - orbeon-forms-and-postgres
+networks:
+  orbeon-forms-and-postgres:
+    driver: bridge
 volumes:
   pgdata:
     name: ${POSTGRES_VOLUME:-orbeon_pgdata}

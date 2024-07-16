@@ -20,6 +20,7 @@ import enumeratum.{Enum, EnumEntry}
 import enumeratum.values.{IntEnum, IntEnumEntry}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.http.{Headers, HttpMethod, PathType}
+import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.jdk.CollectionConverters._
@@ -254,8 +255,16 @@ trait ExternalContext {
   def getRequest: Request
   def getResponse: Response
 
-  def getStartLoggerString: String
-  def getEndLoggerString: String
+  def getStartLoggerString: String = {
+
+    val pathQuery =
+      PathUtils.appendQueryString(
+        getRequest.getRequestURI,
+        PathUtils.encodeQueryString(getRequest.parameters)
+      )
+
+    s"Received request: ${getRequest.getMethod} $pathQuery"
+  }
 }
 
 // Abstraction for ServletContext and PortletContext

@@ -299,7 +299,4 @@ class Portlet2ExternalContext(
       } else
         null
     }
-
-  def getStartLoggerString: String = getRequest.getRequestPath + " - Received request"
-  def getEndLoggerString  : String = getRequest.getRequestPath
 }

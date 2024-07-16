@@ -15,6 +15,7 @@ package org.orbeon.oxf.externalcontext
 
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 
+
 // This context uses the original `WebAppContext` and session
 class LocalExternalContext(val webAppContext: WebAppContext, request: Request, response: Response) extends ExternalContext {
 
@@ -23,7 +24,4 @@ class LocalExternalContext(val webAppContext: WebAppContext, request: Request, r
 
   val getRequest  = request
   val getResponse = response
-
-  def getStartLoggerString = getRequest.getRequestPath + " - Received request"
-  def getEndLoggerString   = getRequest.getRequestPath
 }

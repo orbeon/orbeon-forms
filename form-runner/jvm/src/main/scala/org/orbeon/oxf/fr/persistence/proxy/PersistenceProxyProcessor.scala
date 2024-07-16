@@ -28,6 +28,7 @@ import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyPermissions.{ResponseHeaders, extractResponseHeaders}
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.HttpMethod.CrudMethod
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
@@ -44,6 +45,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.RelevanceHandling._
+import shapeless.syntax.typeable._
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
 import java.net.URI
@@ -84,13 +86,16 @@ private[persistence] object PersistenceProxyProcessor {
   val Logger: log4s.Logger = LoggerFactory.createLogger(PersistenceProxyProcessor.getClass)
 
   case class OutgoingRequest(
-    method : HttpMethod,
+    method : CrudMethod,
     headers: Map[String, List[String]]
   )
 
   private object OutgoingRequest {
     def apply(request: Request): OutgoingRequest =
-      OutgoingRequest(request.getMethod, headersFromRequest(request))
+      OutgoingRequest(
+        request.getMethod.narrowTo[CrudMethod].getOrElse(throw new IllegalStateException(request.getMethod.entryName)),
+        headersFromRequest(request)
+      )
 
     def headersFromRequest(request: Request): Map[String, List[String]] =
       request.getHeaderValuesMap.asScala.mapValues(_.toList).toMap
@@ -305,7 +310,6 @@ private[persistence] object PersistenceProxyProcessor {
                 // Call just to check the version
                 connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
                   request                     = OutgoingRequest(request),
-                  requestMethod               = crudMethod,
                   serviceUri                  = serviceUri,
                   outgoingPersistenceHeaders  = outgoingPersistenceHeaders,
                   specificIncomingVersionOpt  = Some(v.version),
@@ -333,7 +337,6 @@ private[persistence] object PersistenceProxyProcessor {
               val (cxrOpt, effectiveFormDefinitionVersion, responseHeadersOpt) =
                 connectToObtainResponseHeadersAndCheckVersion(
                   request                    = OutgoingRequest(request),
-                  requestMethod              = crudMethod,
                   serviceUri                 = serviceUri,
                   outgoingPersistenceHeaders = outgoingPersistenceHeaders,
                   specificIncomingVersionOpt = vOpt.map(_.version),
@@ -595,7 +598,6 @@ private[persistence] object PersistenceProxyProcessor {
 
   private def connectToObtainResponseHeadersAndCheckVersion(
     request                    : OutgoingRequest,
-    requestMethod              : HttpMethod.CrudMethod,
     serviceUri                 : String,
     outgoingPersistenceHeaders : Map[String, String],
     specificIncomingVersionOpt : Option[Int],
@@ -603,7 +605,7 @@ private[persistence] object PersistenceProxyProcessor {
   )(implicit
     indentedLogger             : IndentedLogger
   ): (Option[ConnectionResult], Int, Option[ResponseHeaders]) =
-    requestMethod match {
+    request.method match {
       case HttpMethod.GET | HttpMethod.HEAD =>
 
         val (cxr, versionFromProvider, responseHeaders) =
@@ -620,7 +622,6 @@ private[persistence] object PersistenceProxyProcessor {
         val (versionForPutOrDelete, responseHeadersOpt) =
           connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
             request                     = request,
-            requestMethod               = requestMethod,
             serviceUri                  = serviceUri,
             outgoingPersistenceHeaders  = outgoingPersistenceHeaders,
             specificIncomingVersionOpt  = specificIncomingVersionOpt,
@@ -653,7 +654,6 @@ private[persistence] object PersistenceProxyProcessor {
 
   private def connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
     request                    : OutgoingRequest,
-    requestMethod              : HttpMethod.CrudMethod,
     serviceUri                 : String,
     outgoingPersistenceHeaders : Map[String, String],
     specificIncomingVersionOpt : Option[Int],
@@ -685,9 +685,9 @@ private[persistence] object PersistenceProxyProcessor {
         case Failure(HttpStatusCodeException(statusCode @ (StatusCode.NotFound | StatusCode.Gone), _, _)) =>
           // Non-existing data
           specificIncomingVersionOpt match {
-            case Some(version) if requestMethod == HttpMethod.PUT =>
+            case Some(version) if request.method == HttpMethod.PUT =>
               (version, None)
-            case None if requestMethod == HttpMethod.PUT =>
+            case None if request.method == HttpMethod.PUT =>
               indentedLogger.logInfo("", s"400 Bad Request: can't write new data without knowing the version")
               throw HttpStatusCodeException(StatusCode.BadRequest)
             case _ =>

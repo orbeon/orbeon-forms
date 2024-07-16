@@ -23,7 +23,7 @@ object UI {
   //@XPathFunction
   def status : String = {
     RelationalUtils.Logger.debug(s"Reindex status read from UI: ${StatusStore.getStatus.name}")
-    val lastModified = DateUtils.formatIsoDateTimeUtc(StatusStore.getLastModified.getTime)
+    val lastModified = DateUtils.formatIsoDateTimeUtc(StatusStore.getLastModified.toInstant)
     val statusName   = StatusStore.getStatus.name
     s"$lastModified $statusName"
   }

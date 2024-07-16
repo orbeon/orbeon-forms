@@ -246,7 +246,7 @@ trait CreateUpdateDelete {
     existingRowOpt: Option[Row],
     delete        : Boolean,
     versionToSet  : Int
-  ):Option[Timestamp] = {
+  ):Option[Instant] = {
 
     val table = SqlSupport.tableName(req)
 
@@ -408,7 +408,7 @@ trait CreateUpdateDelete {
         ps.executeUpdate()
       }
 
-      currentTimestamp
+      currentTimestamp.toInstant
     }
 
     lastModifiedOpt
@@ -515,8 +515,8 @@ trait CreateUpdateDelete {
       // This is currently `None` for a force `DELETE`, but we could also try to return the information in that case
       // although we don't have a use for it at the moment.
       lastModifiedOpt.foreach { lastModified =>
-        httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(lastModified.toInstant))
-        httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(lastModified.getTime))
+        httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(lastModified))
+        httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(lastModified))
       }
 
       // "If the target resource does not have a current representation and the PUT successfully creates one, then the

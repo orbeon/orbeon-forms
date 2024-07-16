@@ -18,14 +18,13 @@ import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder, ResolverSt
 import java.time.temporal.ChronoField
 import java.time.{Instant, OffsetDateTime, ZoneOffset}
 import java.util.Locale
-
 import scala.util.Try
 
 
 object DateUtils {
 
-  def formatIsoDateTimeUtc(instant: Long): String =
-    DateTime.format(Instant.ofEpochMilli(instant))
+  def formatIsoDateTimeUtc(instant: Instant): String =
+    DateTime.format(instant)
 
   def formatRfc1123DateTimeGmt(instant: Long): String =
     formatRfc1123DateTimeGmt(Instant.ofEpochMilli(instant))

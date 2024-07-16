@@ -27,6 +27,7 @@ import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger, NetUtils}
 
 import java.io.{ByteArrayInputStream, StringReader}
 import java.sql.Timestamp
+import java.time.Instant
 import scala.annotation.tailrec
 
 
@@ -134,11 +135,11 @@ trait Read {
         httpResponse.setHeader(Headers.OrbeonLastModifiedByUsername, lastModifiedBy.username)
       }
       fromDatabase.stageOpt.foreach(httpResponse.setHeader(StageHeader.HeaderName, _))
-      httpResponse.setHeader(Headers.Created,            DateUtils.formatRfc1123DateTimeGmt(fromDatabase.createdDateTime.toInstant))
-      httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(fromDatabase.lastModifiedDateTime.toInstant))
+      httpResponse.setHeader(Headers.Created,            DateUtils.formatRfc1123DateTimeGmt(fromDatabase.createdDateTime))
+      httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(fromDatabase.lastModifiedDateTime))
       // Also provide this with in ISO format with millisecond precision for compatibility with Search and History APIs
-      httpResponse.setHeader(Headers.OrbeonCreated,      DateUtils.formatIsoDateTimeUtc(fromDatabase.createdDateTime.getTime))
-      httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(fromDatabase.lastModifiedDateTime.getTime))
+      httpResponse.setHeader(Headers.OrbeonCreated,      DateUtils.formatIsoDateTimeUtc(fromDatabase.createdDateTime))
+      httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(fromDatabase.lastModifiedDateTime))
       if (!req.forAttachment)
         httpResponse.setHeader(Headers.ContentType,      ContentTypes.XmlContentType)
 
@@ -179,8 +180,8 @@ trait Read {
    lastModifiedByOpt   : Option[UserAndGroup],
    formVersion         : Int,
    stageOpt            : Option[String],
-   createdDateTime     : Timestamp,
-   lastModifiedDateTime: Timestamp,
+   createdDateTime     : Instant,
+   lastModifiedDateTime: Instant,
    bodyOpt             : Option[Array[Byte]],
    totalAttachmentSize : Option[Int]
  )
@@ -339,8 +340,8 @@ trait Read {
             lastModifiedByOpt    = lastModifiedByOpt,
             formVersion          = dbFormVersion,
             stageOpt             = if (hasStage) Option(resultSet.getString("stage")) else None,
-            createdDateTime      = resultSet.getTimestamp("created"),
-            lastModifiedDateTime = resultSet.getTimestamp("last_modified_time"),
+            createdDateTime      = resultSet.getTimestamp("created").toInstant,
+            lastModifiedDateTime = resultSet.getTimestamp("last_modified_time").toInstant,
             bodyOpt              = bodyOpt,
             totalAttachmentSize  = readTotalAttachmentSize.option(resultSet.getInt("total_file_content_size"))
           )

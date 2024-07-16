@@ -12,6 +12,7 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.debug
 import shapeless.syntax.typeable.typeableOps
 
+import java.time.Instant
 import scala.util.Try
 
 
@@ -19,6 +20,7 @@ object PersistenceProxyPermissions {
 
   case class ResponseHeaders(
     createdBy    : Option[UserAndGroup],
+    createdTime  : Option[Instant],
     organization : Option[(Int, Organization)],
     formVersion  : Option[Int],
     stage        : Option[String]
@@ -140,6 +142,7 @@ object PersistenceProxyPermissions {
 
     ResponseHeaders(
       createdBy    = ownerUserAndGroupFromHeadersOpt,
+      createdTime  = getHeaderIgnoreCase(Headers.OrbeonCreated).map(Instant.parse),
       organization = None, // TODO
       formVersion  = getHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt),
       stage        = getHeaderIgnoreCase(StageHeader.HeaderName)

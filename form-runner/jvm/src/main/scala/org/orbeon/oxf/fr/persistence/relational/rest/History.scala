@@ -173,8 +173,8 @@ private object History {
 
           (
             rs.getInt("total"),
-            Option(rs.getTimestamp("min_last_modified_time")).map(_.getTime),
-            Option(rs.getTimestamp("max_last_modified_time")).map(_.getTime)
+            Option(rs.getTimestamp("min_last_modified_time")).map(_.toInstant),
+            Option(rs.getTimestamp("max_last_modified_time")).map(_.toInstant)
           )
         }
       }
@@ -229,7 +229,7 @@ private object History {
 
               if (position == 0) {
                 receiver.addAttribute("", "form-version", "form-version", rs.getString("form_version"))
-                receiver.addAttribute("", "created-time", "created-time", DateUtils.formatIsoDateTimeUtc(rs.getTimestamp("created").getTime))
+                receiver.addAttribute("", "created-time", "created-time", DateUtils.formatIsoDateTimeUtc(rs.getTimestamp("created").toInstant))
                 receiver.addAttribute("", "created-username", "created-username", "TODO") // xxx
               }
 
@@ -241,7 +241,7 @@ private object History {
                 atts =
                   (hasStage list ("stage" -> rs.getString("stage").trimAllToEmpty)) :::
                   List(
-                    "modified-time"     -> DateUtils.formatIsoDateTimeUtc(rs.getTimestamp("last_modified_time").getTime),
+                    "modified-time"     -> DateUtils.formatIsoDateTimeUtc(rs.getTimestamp("last_modified_time").toInstant),
                     "modified-username" -> rs.getString("last_modified_by").trimAllToEmpty,
                     "owner-username"    -> userAndGroup.map(_.username).getOrElse(""),
                     "owner-group"       -> userAndGroup.flatMap(_.groupname).getOrElse(""),

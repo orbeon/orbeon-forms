@@ -36,8 +36,8 @@ trait SearchResult {
       <documents search-total={count.toString}>{
         documents.map(doc =>
           <document
-            created             ={DateUtils.formatIsoDateTimeUtc(doc.metadata.createdTime.getTime)}
-            last-modified       ={DateUtils.formatIsoDateTimeUtc(doc.metadata.lastModifiedTime.getTime)}
+            created             ={DateUtils.formatIsoDateTimeUtc(doc.metadata.createdTime.toInstant)}
+            last-modified       ={DateUtils.formatIsoDateTimeUtc(doc.metadata.lastModifiedTime.toInstant)}
             created-by          ={doc.metadata.createdBy.map(_.username).map(xml.Text(_))}
             created-by-groupname={doc.metadata.createdBy.flatMap(_.groupname).map(xml.Text(_))}
             last-modified-by    ={doc.metadata.lastModifiedBy.map(_.username).map(xml.Text(_))}

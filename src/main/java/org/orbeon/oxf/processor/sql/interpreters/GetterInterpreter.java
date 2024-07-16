@@ -464,7 +464,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
         } else if (columnType == Types.TIMESTAMP) {
             final Timestamp value = resultSet.getTimestamp(columnIndex);
             if (value != null)
-                stringValue = DateUtils.formatIsoDateTimeUtc(value.getTime());
+                stringValue = DateUtils.formatIsoDateTimeUtc(value.toInstant());
         } else if (columnType == Types.DECIMAL
                 || columnType == Types.NUMERIC) {
             final BigDecimal value = resultSet.getBigDecimal(columnIndex);

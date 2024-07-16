@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URLConnection;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -215,7 +216,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                             String filePath = path + name;
                             File file = new File(config.getBaseDirectory(), filePath);
                             long lastModified = file.lastModified();
-                            String lastModifiedDate = DateUtils.formatIsoDateTimeUtc(lastModified);
+                            String lastModifiedDate = DateUtils.formatIsoDateTimeUtc(Instant.ofEpochMilli(lastModified));
                             long fileSize = file.length();
 
                             helper.startElement(FILE_ELEMENT, new String[]{"last-modified-ms", Long.toString(lastModified),

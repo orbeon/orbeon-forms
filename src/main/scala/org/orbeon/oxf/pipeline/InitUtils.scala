@@ -58,7 +58,8 @@ object InitUtils {
   def runProcessor(
     processor       : Processor,
     externalContext : ExternalContext,
-    pipelineContext : PipelineContext)(implicit
+    pipelineContext : PipelineContext
+  )(implicit
     logger          : log4s.Logger
   ): Unit = {
 

@@ -114,7 +114,7 @@ object PersistenceMetadataSupport {
     ) |!>
       (formPermissions => debug("CRUD: form permissions", List("permissions" -> formPermissions.toString)))
 
-  def readFormPermissions(appForm: AppForm, version: FormDefinitionVersion)(implicit indentedLogger: IndentedLogger): Option[NodeInfo] = {
+  private def readFormPermissions(appForm: AppForm, version: FormDefinitionVersion)(implicit indentedLogger: IndentedLogger): Option[NodeInfo] = {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
     PersistenceApi.readFormMetadataOpt(appForm, version)
       .flatMap(_.firstChildOpt(Names.Permissions))

@@ -112,7 +112,7 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
       try {
         response.getWriter
       } catch {
-        case e: IllegalStateException =>
+        case _: IllegalStateException =>
           new PrintWriter(
             new BufferedWriter(
               new OutputStreamWriter(

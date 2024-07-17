@@ -14,10 +14,10 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.oxf.controller.Authorizer
-import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.{AppForm, Version}
+import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
+import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
@@ -106,6 +106,25 @@ private object CRUD {
       case Failure(t)      => throw HttpStatusCodeException(StatusCode.BadRequest, throwable = Some(t))
     }
 
+    val existingRow = {
+
+      def headerValueIgnoreCaseExisting(name: String): Option[String] = headerValueIgnoreCase(s"$name-Existing")
+
+      headerValueIgnoreCaseExisting(Headers.OrbeonCreated).map(Instant.parse).map {
+        createdTime =>
+          ExistingRow(
+            createdTime  = createdTime,
+            createdBy    = headerValueIgnoreCaseExisting(Headers.OrbeonUsername).map { username =>
+              UserAndGroup(
+                username  = username,
+                groupname = headerValueIgnoreCaseExisting(Headers.OrbeonGroup)
+              )
+            },
+            organization = None, // Some(Headers.allItemsIgnoreCase(headers, Headers.OrbeonOrganization).toList).filter(_.nonEmpty)
+          )
+      }
+    }
+
     requestPath match {
       case CrudFormPath(provider, app, form, filename) =>
         val filenameOpt = if (filename == FormXhtml) None else Some(filename)
@@ -121,7 +140,8 @@ private object CRUD {
           requestFlatView,
           httpRequest.credentials,
           requestWorkflowStage,
-          ranges
+          ranges,
+          existingRow
         )
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
 
@@ -153,7 +173,8 @@ private object CRUD {
           requestFlatView,
           httpRequest.credentials,
           requestWorkflowStage,
-          ranges
+          ranges,
+          existingRow
         )
       case _ =>
         throw HttpStatusCodeException(StatusCode.BadRequest)

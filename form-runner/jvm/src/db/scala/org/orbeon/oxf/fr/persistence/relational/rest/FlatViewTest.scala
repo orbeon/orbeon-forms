@@ -73,7 +73,8 @@ class FlatViewTest
       flatView        = true,
       credentials     = None,
       workflowStage   = None,
-      ranges          = HttpRanges()
+      ranges          = HttpRanges(),
+      existingRow     = None
     )
 
     case class Form(

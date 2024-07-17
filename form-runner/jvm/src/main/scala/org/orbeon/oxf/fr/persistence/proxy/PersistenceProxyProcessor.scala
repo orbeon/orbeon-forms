@@ -25,10 +25,9 @@ import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.findCurrentCredentialsFromSession
 import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyPermissions.{ResponseHeaders, extractResponseHeaders}
+import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyPermissions.ResponseHeaders
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.HttpMethod.CrudMethod
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
@@ -45,7 +44,6 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.RelevanceHandling._
-import shapeless.syntax.typeable._
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
 import java.net.URI
@@ -86,14 +84,14 @@ private[persistence] object PersistenceProxyProcessor {
   val Logger: log4s.Logger = LoggerFactory.createLogger(PersistenceProxyProcessor.getClass)
 
   case class OutgoingRequest(
-    method : CrudMethod,
+    method : HttpMethod,
     headers: Map[String, List[String]]
   )
 
   private object OutgoingRequest {
     def apply(request: Request): OutgoingRequest =
       OutgoingRequest(
-        request.getMethod.narrowTo[CrudMethod].getOrElse(throw new IllegalStateException(request.getMethod.entryName)),
+        request.getMethod,
         headersFromRequest(request)
       )
 
@@ -263,7 +261,7 @@ private[persistence] object PersistenceProxyProcessor {
     )
 
     // TODO: what about permissions for the attachments? is that a thing?
-    val (cxrOpt, effectiveFormDefinitionVersionOpt) =
+    val (cxrOpt, effectiveFormDefinitionVersionOpt, responseHeadersOpt) =
       request.getMethod match {
         case crudMethod: HttpMethod.CrudMethod
           if formOrData == FormOrData.Form && filename.isEmpty || formOrData == FormOrData.Data && filename.isDefined =>
@@ -295,7 +293,7 @@ private[persistence] object PersistenceProxyProcessor {
               .flatMap(_.trimAllToOpt)
               .map(FormRunner.AccessTokenParam ->).toList
 
-          def throw400ForUnsupportedVersion(v: Int): Unit = {
+          def throw400ForUnsupportedVersion(v: Int): Nothing = {
             indentedLogger.logInfo("", s"400 Bad Request: request for version $v, but versioning not supported")
             throw HttpStatusCodeException(StatusCode.BadRequest)
           }
@@ -306,8 +304,10 @@ private[persistence] object PersistenceProxyProcessor {
               throw HttpStatusCodeException(StatusCode.BadRequest)
             case VersionAction.AcceptAndUseForForm(v) if crudMethod == HttpMethod.DELETE =>
 
-              if (isVersioningSupported)
-                // Call just to check the version
+              if (! isVersioningSupported && v.version != 1)
+                throw400ForUnsupportedVersion(v.version)
+
+              val responseHeadersOpt =
                 connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
                   request                     = OutgoingRequest(request),
                   serviceUri                  = serviceUri,
@@ -315,17 +315,15 @@ private[persistence] object PersistenceProxyProcessor {
                   specificIncomingVersionOpt  = Some(v.version),
                   queryForToken               = queryForToken,
                   mustFilterVersioningHeaders = false
-                )
-              else if (v.version != 1)
-                throw400ForUnsupportedVersion(v.version)
+                )._2
 
-              (None, Some(v.version))
+              (None, Some(v.version), responseHeadersOpt)
             case VersionAction.AcceptAndUseForForm(v) =>
 
               if (! isVersioningSupported && v.version != 1)
                 throw400ForUnsupportedVersion(v.version)
 
-              (None, Some(v.version))
+              (None, Some(v.version), None)
             case VersionAction.AcceptForData(vOpt) =>
 
               if (! isVersioningSupported)
@@ -373,7 +371,7 @@ private[persistence] object PersistenceProxyProcessor {
                 Operations.serialize(operations, normalized = true).mkString(" ")
               )
 
-              (cxrOpt, Some(effectiveFormDefinitionVersion))
+              (cxrOpt, Some(effectiveFormDefinitionVersion), responseHeadersOpt)
 
             case VersionAction.HeadData(v) =>
 
@@ -392,7 +390,7 @@ private[persistence] object PersistenceProxyProcessor {
 
               // This can throw if the connection fails (it is usually internal but can be external)
               // This can throw an `HttpStatusCodeException`, including for a 404
-              val (cxr, effectiveFormDefinitionVersion, _) =
+              val (cxr, effectiveFormDefinitionVersion, responseHeaders) =
                 connectToObtainResponseHeadersAndCheckVersionGetOrHead(
                   request                    = OutgoingRequest(HttpMethod.HEAD, filterVersioningHeaders(OutgoingRequest.headersFromRequest(request))),
                   serviceUri                 = dataServiceUri,
@@ -402,25 +400,23 @@ private[persistence] object PersistenceProxyProcessor {
 
               IOUtils.useAndClose(cxr)(identity)
 
-              (None, Some(effectiveFormDefinitionVersion))
+              (None, Some(effectiveFormDefinitionVersion), Some(responseHeaders))
             case VersionAction.LatestForm if ! isVersioningSupported =>
-              (None, Some(1))
+              (None, Some(1), None)
             case VersionAction.LatestForm =>
-              val versionFromMetadata =
-                PersistenceMetadataSupport.readLatestVersion(appForm).getOrElse(1)
-              (None, Some(versionFromMetadata))
+              val (headers, versionFromMetadataOpt) = PersistenceMetadataSupport.readLatestVersion(appForm)
+              (None, Some(versionFromMetadataOpt.getOrElse(1)), Some(ResponseHeaders.fromHeaders(Headers.firstItemIgnoreCase(headers, _))))
             case VersionAction.NextForm if ! isVersioningSupported =>
               indentedLogger.logInfo("", s"400 Bad Request: request for next version while versioning not supported")
               throw HttpStatusCodeException(StatusCode.BadRequest)
             case VersionAction.NextForm =>
-              val versionFromMetadata =
-                PersistenceMetadataSupport.readLatestVersion(appForm).map(_ + 1).getOrElse(1)
-              (None, Some(versionFromMetadata))
+              val (headers, versionFromMetadataOpt) = PersistenceMetadataSupport.readLatestVersion(appForm)
+              (None, Some(versionFromMetadataOpt.map(_ + 1).getOrElse(1)), Some(ResponseHeaders.fromHeaders(Headers.firstItemIgnoreCase(headers, _))))
             case VersionAction.Ignore =>
-              (None, None)
+              (None, None, None)
           }
         case _ =>
-          (None, None)
+          (None, None, None)
       }
 
     def maybeMigrateFormDefinition: Option[(InputStream, OutputStream) => Unit] =
@@ -471,6 +467,10 @@ private[persistence] object PersistenceProxyProcessor {
     val outgoingVersionHeaderOpt =
       effectiveFormDefinitionVersionOpt.map(v => Version.OrbeonFormDefinitionVersion -> v.toString)
 
+    // https://github.com/orbeon/orbeon-forms/issues/5741
+    val existingFormOrDataHeaders =
+      responseHeadersOpt.map(ResponseHeaders.toHeaders).getOrElse(Nil)
+
     val bodyContentOpt = bodyContent(
       request,
       isDataXmlRequest,
@@ -502,7 +502,7 @@ private[persistence] object PersistenceProxyProcessor {
         OutgoingRequest(request),
         outgoingRequestContent,
         serviceUri,
-        outgoingPersistenceHeaders ++ outgoingVersionHeaderOpt
+        outgoingPersistenceHeaders ++ outgoingVersionHeaderOpt ++ existingFormOrDataHeaders
       )
     }
 
@@ -630,6 +630,8 @@ private[persistence] object PersistenceProxyProcessor {
           )
 
         (None, versionForPutOrDelete, responseHeadersOpt)
+      case other =>
+        throw new IllegalStateException(other.entryName)
     }
 
   private def connectToObtainResponseHeadersAndCheckVersionGetOrHead(
@@ -646,7 +648,7 @@ private[persistence] object PersistenceProxyProcessor {
         proxyEstablishConnection(request, None, serviceUri, outgoingPersistenceHeaders)
       ).get // throws `HttpStatusCodeException` if not successful, including `NotFound`
 
-    val responseHeaders     = extractResponseHeaders(cxr.getFirstHeaderIgnoreCase)
+    val responseHeaders     = ResponseHeaders.fromHeaders(cxr.getFirstHeaderIgnoreCase)
     val versionFromProvider = compareVersionAgainstIncomingIfNeeded(indentedLogger, specificIncomingVersionOpt, responseHeaders)
 
     (cxr, versionFromProvider, responseHeaders)
@@ -1038,7 +1040,7 @@ private[persistence] object PersistenceProxyProcessor {
 
     getHeaderIgnoreCaseFromHeadResponseTry match {
       case Success(getHeaderIgnoreCaseFromHeadResponse) =>
-        Success(extractResponseHeaders(getHeaderIgnoreCaseFromHeadResponse))
+        Success(ResponseHeaders.fromHeaders(getHeaderIgnoreCaseFromHeadResponse))
       case Failure(t @ HttpStatusCodeException(StatusCode.NotFound | StatusCode.Gone, _, _)) =>
         Failure(t)
       case Failure(t) =>

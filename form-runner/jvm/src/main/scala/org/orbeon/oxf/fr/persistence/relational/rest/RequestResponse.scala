@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import org.orbeon.oxf.externalcontext.Credentials
+import org.orbeon.oxf.externalcontext.{Credentials, UserAndGroup}
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.http.HttpRanges
@@ -26,6 +26,12 @@ case class DataPart(
   documentId : String,
   stage      : Option[String],
   forceDelete: Boolean
+)
+
+case class ExistingRow(
+  createdTime  : Instant,
+  createdBy    : Option[UserAndGroup],
+  organization : Option[Int]
 )
 
 case class LockUnlockRequest(
@@ -45,7 +51,8 @@ case class CrudRequest(
   flatView       : Boolean,
   credentials    : Option[Credentials],
   workflowStage  : Option[String],
-  ranges         : HttpRanges
+  ranges         : HttpRanges,
+  existingRow    : Option[ExistingRow]
 ) {
   def forForm       : Boolean = dataPart.isEmpty
   def forData       : Boolean = dataPart.isDefined

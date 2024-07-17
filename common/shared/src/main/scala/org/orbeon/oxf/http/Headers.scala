@@ -59,7 +59,6 @@ object Headers {
   val OrbeonTokenLower             = OrbeonToken.toLowerCase
   val OrbeonUsernameLower          = OrbeonUsername.toLowerCase
   val OrbeonGroupLower             = OrbeonGroup.toLowerCase
-  val OrbeonOrganizationLower      = OrbeonOrganization.toLowerCase
   val OrbeonRolesLower             = OrbeonRoles.toLowerCase
   val OrbeonCredentialsLower       = OrbeonCredentials.toLowerCase
 

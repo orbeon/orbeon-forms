@@ -1,14 +1,14 @@
 package org.orbeon.oxf.fr.persistence.proxy
 
 import org.orbeon.oxf.externalcontext.{Credentials, Organization, UserAndGroup}
-import org.orbeon.oxf.fr.{FormRunnerAccessToken, Version}
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization._
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.StageHeader
+import org.orbeon.oxf.fr.{FormRunnerAccessToken, Version}
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.{DateUtils, IndentedLogger}
 import org.orbeon.oxf.util.Logging.debug
 import shapeless.syntax.typeable.typeableOps
 
@@ -25,6 +25,36 @@ object PersistenceProxyPermissions {
     formVersion  : Option[Int],
     stage        : Option[String]
   )
+
+  object ResponseHeaders {
+
+    def fromHeaders(getHeaderIgnoreCase: String => Option[String]): ResponseHeaders = {
+
+      def ownerUserAndGroupFromHeadersOpt: Option[UserAndGroup] =
+        getHeaderIgnoreCase(Headers.OrbeonUsername).map { username =>
+          UserAndGroup(username, getHeaderIgnoreCase(Headers.OrbeonGroup))
+        }
+
+      ResponseHeaders(
+        createdBy    = ownerUserAndGroupFromHeadersOpt,
+        createdTime  = getHeaderIgnoreCase(Headers.OrbeonCreated).map(Instant.parse),
+        organization = None, // TODO
+        formVersion  = getHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt),
+        stage        = getHeaderIgnoreCase(StageHeader.HeaderName)
+      )
+    }
+
+    def toHeaders(responseHeaders: ResponseHeaders): List[(String, String)] = {
+
+      def headerValueIgnoreCaseExisting(name: String, value: String): (String, String) =
+        s"$name-Existing" -> value
+
+      responseHeaders.createdBy.map(v => headerValueIgnoreCaseExisting(Headers.OrbeonUsername, v.username)).toList            ++
+        responseHeaders.createdBy.flatMap(_.groupname).map(v => headerValueIgnoreCaseExisting(Headers.OrbeonGroup, v)).toList ++
+        responseHeaders.createdTime.map(v => headerValueIgnoreCaseExisting(Headers.OrbeonCreated, DateUtils.formatIsoDateTimeUtc(v))).toList
+        //responseHeaders.organization.map(v => headerValueIgnoreCaseExisting(Headers.OrbeonOrganization, v._1.toString)).toList // TODO
+    }
+  }
 
   def findAuthorizedOperationsOrThrow(
     formPermissions   : Permissions,
@@ -132,20 +162,4 @@ object PersistenceProxyPermissions {
         }
       )
     }
-
-  def extractResponseHeaders(getHeaderIgnoreCase: String => Option[String]): ResponseHeaders = {
-
-    def ownerUserAndGroupFromHeadersOpt: Option[UserAndGroup] =
-      getHeaderIgnoreCase(Headers.OrbeonUsername).map { username =>
-        UserAndGroup(username, getHeaderIgnoreCase(Headers.OrbeonGroup))
-      }
-
-    ResponseHeaders(
-      createdBy    = ownerUserAndGroupFromHeadersOpt,
-      createdTime  = getHeaderIgnoreCase(Headers.OrbeonCreated).map(Instant.parse),
-      organization = None, // TODO
-      formVersion  = getHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt),
-      stage        = getHeaderIgnoreCase(StageHeader.HeaderName)
-    )
-  }
 }

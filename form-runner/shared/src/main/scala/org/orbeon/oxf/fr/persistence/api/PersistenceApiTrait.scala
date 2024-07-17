@@ -396,19 +396,20 @@ trait PersistenceApiTrait {
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
-  ): Option[om.NodeInfo] = {
+  ): (Map[String, List[String]], Option[om.NodeInfo]) = {
 
-    val formsDocTry = readHeadersAndDocument(
-      FormRunner.createFormMetadataPathAndQuery(
-        app         = appForm.app,
-        form        = appForm.form,
-        allVersions = version != FormDefinitionVersion.Latest,
-        allForms    = true
-      ),
-      None
-    ).map(_._2)
+    val formsDocTry =
+      readHeadersAndDocument(
+        FormRunner.createFormMetadataPathAndQuery(
+          app         = appForm.app,
+          form        = appForm.form,
+          allVersions = version != FormDefinitionVersion.Latest,
+          allForms    = true
+        ),
+        None
+      )
 
-    formsDocTry map { formsDoc =>
+    formsDocTry map { case (headers, formsDoc) =>
       val formElements = formsDoc / "forms" / "form"
       val formByVersion = version match {
         case FormDefinitionVersion.Specific(v) =>
@@ -417,7 +418,7 @@ trait PersistenceApiTrait {
           None
       }
 
-      formByVersion.orElse(formElements.headOption)
+      headers -> formByVersion.orElse(formElements.headOption)
     }
   } .get
 

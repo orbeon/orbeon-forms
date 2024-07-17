@@ -15,10 +15,10 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.io.IOUtils._
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
-import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
+import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr.Version._
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.Version._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}
@@ -177,62 +177,6 @@ object RequestReader {
 
 trait CreateUpdateDelete {
 
-  private def findExistingRow(connection: Connection, req: CrudRequest, versionToSet: Int): Option[Row] = {
-
-    val idCols = SqlSupport.idColumns(req).filter(_ != "file_name")
-    val table  = SqlSupport.tableName(req, master = true)
-    val sql =
-      s"""|SELECT created
-          |       ${if (req.forData) ", username , groupname, organization_id, form_version" else ""}
-          |FROM   $table t,
-          |       (
-          |           SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
-          |           FROM     $table
-          |           WHERE    app  = ?
-          |                    and form = ?
-          |                    ${if (req.forForm) "and form_version = ?" else ""}
-          |                    ${if (req.forData) "and document_id  = ?" else ""}
-          |                    ${if (req.forData) "and draft        = ?" else ""}
-          |           GROUP BY ${idCols.mkString(", ")}
-          |       ) m
-          |WHERE  ${SqlSupport.joinColumns("last_modified_time" +: idCols, "t", "m")}
-          |       AND deleted = 'N'
-          |""".stripMargin
-
-    useAndClose(connection.prepareStatement(sql)) { ps =>
-
-      val position = Iterator.from(1)
-      ps.setString(position.next(), req.appForm.app)
-      ps.setString(position.next(), req.appForm.form)
-      if (req.forForm)
-        ps.setInt(position.next(), versionToSet)
-
-      req.dataPart foreach { dataPart =>
-        ps.setString(position.next(), dataPart.documentId)
-        ps.setString(position.next(), if (dataPart.isDraft) "Y" else "N")
-      }
-
-      useAndClose(ps.executeQuery()) { resultSet =>
-
-        // Create Row object with first row of result
-        if (resultSet.next()) {
-          // The query could return multiple rows if we have both a draft and non-draft, but the `created`,
-          // `username`, `groupname`, and `form_version` must be the same on all rows, so it doesn't matter from
-          // which row we read this from.
-          Some(Row(
-            createdTime  = resultSet.getTimestamp("created"),
-            createdBy    = if (req.forData) UserAndGroup.fromStrings(resultSet.getString("username"), resultSet.getString("groupname")) else None,
-            organization = if (req.forData) OrganizationSupport.readFromResultSet(connection, resultSet)                                else None,
-            formVersion  = if (req.forData) Option(resultSet.getInt("form_version"))                                                    else None,
-            stage        = None // We don't need to know about the stage of a possible existing row
-          ))
-        } else {
-          None
-        }
-      }
-    }
-  }
-
   // NOTE: Gets the first organization if there are multiple organization roots
   private def currentUserOrganization(connection: Connection, req: CrudRequest): Option[OrganizationId] =
     req.credentials
@@ -243,7 +187,6 @@ trait CreateUpdateDelete {
   private def store(
     connection    : Connection,
     req           : CrudRequest,
-    existingRowOpt: Option[Row],
     delete        : Boolean,
     versionToSet  : Int
   ):Option[Instant] = {
@@ -382,7 +325,7 @@ trait CreateUpdateDelete {
 
       val currentTimestamp = new Timestamp(System.currentTimeMillis())
 
-      val includedCols = insertCols(req, existingRowOpt, delete, versionToSet, currentTimestamp, currentUserOrganization(connection, req))
+      val includedCols = insertCols(req, delete, versionToSet, currentTimestamp, currentUserOrganization(connection, req))
       val colNames     = includedCols.map(_.name).mkString(", ")
       val colValues    =
         includedCols
@@ -427,29 +370,13 @@ trait CreateUpdateDelete {
     val versionToSet =
       req.version.getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest))
 
-    // TODO: Since the persistence proxy does a HEAD already, we must not repeat it here. Instead, the  persistence
-    //  proxy must pass the information needed: existing or not, `formVersion`, `organization._1`, `createdTime`,
-    //  `createdBy.username`
-    val existingRowOpt =
-      RelationalUtils.withConnection { connection =>
-        findExistingRow(connection, req, versionToSet)
-      }
-
-    debug("CRUD: retrieved existing row", List("existing" -> existingRowOpt.isDefined.toString))
-
-    // Just a consistency test
-    existingRowOpt.flatMap(_.formVersion).foreach { versionFromExisting =>
-      if (versionToSet != versionFromExisting)
-        throw HttpStatusCodeException(StatusCode.Conflict) // or 400?
-    }
-
     if (req.forForm)
       PersistenceMetadataSupport.maybeInvalidateCachesFor(req.appForm, versionToSet)
 
     RelationalUtils.withConnection { connection =>
 
       // Update database
-      val lastModifiedOpt = store(connection, req, existingRowOpt, delete, versionToSet)
+      val lastModifiedOpt = store(connection, req, delete, versionToSet)
 
       debug("CRUD: database updated, before commit", List("version" -> versionToSet.toString))
 
@@ -527,7 +454,7 @@ trait CreateUpdateDelete {
       httpResponse.setStatus(
         if (delete)
           StatusCode.NoContent
-        else if (existingRowOpt.isDefined)
+        else if (req.existingRow.isDefined)
           StatusCode.NoContent
         else
           StatusCode.Created

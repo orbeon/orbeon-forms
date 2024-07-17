@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import org.orbeon.oxf.externalcontext.{Organization, UserAndGroup}
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.util.CoreUtils._
 
@@ -50,14 +49,6 @@ object SqlSupport {
     (ps: PreparedStatement, i: Int) => setter(ps)(i, value)
   }
 
-  case class Row(
-    createdTime  : Timestamp,
-    createdBy    : Option[UserAndGroup],
-    organization : Option[(Int, Organization)],
-    formVersion  : Option[Int],
-    stage        : Option[String]
-  )
-
   sealed abstract class ColValue
 
   case class StaticColValue (
@@ -76,7 +67,6 @@ object SqlSupport {
 
   def insertCols(
     req                    : CrudRequest,
-    existingRowOpt         : Option[Row], // used to copy username, groupname, organization, created
     delete                 : Boolean,
     versionToSet           : Int,
     currentTimestamp       : Timestamp,
@@ -88,8 +78,8 @@ object SqlSupport {
     val isFormDefinition = req.forForm && ! req.forAttachment
     val organizationToSet = req.forData match {
       case false => None
-      case true  => existingRowOpt match {
-        case Some(row) => row.organization.map(_._1)
+      case true  => req.existingRow match {
+        case Some(row) => row.organization
         case None      => currentUserOrganization.map(_.underlying)
       }
     }
@@ -117,7 +107,7 @@ object SqlSupport {
         name          = "created",
         value         = DynamicColValue(
           placeholder = "?",
-          paramSetter = param(_.setTimestamp, existingRowOpt.map(_.createdTime).getOrElse(currentTimestamp))
+          paramSetter = param(_.setTimestamp, req.existingRow.map(_.createdTime).map(Timestamp.from).getOrElse(currentTimestamp))
         )
       ),
       Col(
@@ -223,7 +213,7 @@ object SqlSupport {
           name          = "username",
           value         = DynamicColValue(
             placeholder = "?" ,
-            paramSetter = param(_.setString, existingRowOpt.flatMap(_.createdBy).map(_.username).getOrElse(req.username.orNull))
+            paramSetter = param(_.setString, req.existingRow.flatMap(_.createdBy).map(_.username).getOrElse(req.username.orNull))
           )
         )
     ) ::: (
@@ -232,7 +222,7 @@ object SqlSupport {
           name          = "groupname",
           value         = DynamicColValue(
             placeholder = "?",
-            paramSetter = param(_.setString, existingRowOpt.flatMap(_.createdBy).flatMap(_.groupname).getOrElse(req.groupname.orNull))
+            paramSetter = param(_.setString, req.existingRow.flatMap(_.createdBy).flatMap(_.groupname).getOrElse(req.groupname.orNull))
           )
         )
     ) ::: (

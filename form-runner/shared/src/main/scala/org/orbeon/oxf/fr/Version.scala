@@ -14,8 +14,6 @@ object Version {
   val OrbeonForDocumentIsDraft         : String = "Orbeon-For-Document-IsDraft"
   val OrbeonFormDefinitionVersion      : String = "Orbeon-Form-Definition-Version"
 
-  val OrbeonFormDefinitionVersionLower : String = OrbeonFormDefinitionVersion.toLowerCase // only used by tests
-
   val AllVersionHeadersLower: Set[String] =
     Set(OrbeonForDocumentId, OrbeonForDocumentIsDraft, OrbeonFormDefinitionVersion).map(_.toLowerCase())
 

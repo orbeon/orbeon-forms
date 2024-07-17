@@ -20,12 +20,12 @@ import org.orbeon.dom.io.XMLWriter
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
-import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.fr.Version.{Specific, Unspecified}
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
+import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.test.TestHttpClient
@@ -140,7 +140,7 @@ private[persistence] object HttpCall {
       val response = Response(
         code        = actualResponse.statusCode,
         operations  = Operations.parseFromHeaders(actualHeaders).getOrElse(Operations.None),
-        formVersion = actualHeaders.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt),
+        formVersion = Headers.firstItemIgnoreCase(actualHeaders, Version.OrbeonFormDefinitionVersion).map(_.toInt),
         body        = {
           val outputStream = new ByteArrayOutputStream
           IOUtils.copyStreamAndClose(actualResponse.content.stream, outputStream)

@@ -16,8 +16,8 @@ package org.orbeon.oxf.fr.persistence.http
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
 import org.orbeon.oxf.fr.Version
 import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
-import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.StageHeader
+import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.http.{Headers, HttpRange, StatusCode}
 import org.orbeon.oxf.test.XMLSupport
@@ -82,7 +82,7 @@ private[persistence] object HttpAssert extends XMLSupport {
         // Check operations
         assert(Operations.parseFromHeaders(headers).getOrElse(Operations.None) == expectedOperations)
         // Check form version
-        val resultFormVersion = headers.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)
+        val resultFormVersion = Headers.firstItemIgnoreCase(headers, Version.OrbeonFormDefinitionVersion).map(_.toInt)
         assert(expectedFormVersion == resultFormVersion)
         // Check stage
         val resultStage = headers.get(StageHeader.HeaderNameLower).map(_.head).map(Stage.apply(_, ""))

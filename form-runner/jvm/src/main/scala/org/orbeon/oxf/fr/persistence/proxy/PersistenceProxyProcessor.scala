@@ -171,7 +171,7 @@ private[persistence] object PersistenceProxyProcessor {
 
   // TODO: Could just pass `ec` and no separate `request`/`response`
   // Proxy the request to the appropriate persistence implementation
-  def proxyRequest(
+  private def proxyRequest(
     request        : Request,
     response       : Response
   )(implicit
@@ -660,7 +660,7 @@ private[persistence] object PersistenceProxyProcessor {
     outgoingPersistenceHeaders : Map[String, String],
     specificIncomingVersionOpt : Option[Int],
     queryForToken              : List[(String, String)],
-    mustFilterVersioningHeaders: Boolean
+    mustFilterVersioningHeaders: Boolean // will be `true` for data, `false` for form
   )(implicit
     indentedLogger             : IndentedLogger
   ): (Int, Option[ResponseHeaders]) = { // `ResponseHeaders` are `None` in case of non-existing data
@@ -834,8 +834,8 @@ private[persistence] object PersistenceProxyProcessor {
     indentedLogger : IndentedLogger
   ): ConnectionResult = {
 
-    implicit val externalContext          = NetUtils.getExternalContext
-    implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+    implicit val externalContext         : ExternalContext               = NetUtils.getExternalContext
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
     val outgoingURL =
       URI.create(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, uri, UrlRewriteMode.Absolute))
@@ -1017,7 +1017,7 @@ private[persistence] object PersistenceProxyProcessor {
     requestHeaders             : Map[String, List[String]],
     serviceURI                 : String,
     outgoingPersistenceHeaders : Map[String, String],
-    mustFilterVersioningHeaders: Boolean
+    mustFilterVersioningHeaders: Boolean // will be `true` for data, `false` for form
   )(implicit
     indentedLogger             : IndentedLogger
   ): Try[ResponseHeaders] = {
@@ -1025,9 +1025,9 @@ private[persistence] object PersistenceProxyProcessor {
     val headRequest =
       OutgoingRequest(
         method  = HttpMethod.HEAD,
-        headers = // We filter out incoming versioning headers as we want to hit the `Version.Unspecified` case
+        headers =
           if (mustFilterVersioningHeaders)
-            filterVersioningHeaders(requestHeaders)
+            filterVersioningHeaders(requestHeaders) // case of data: filter out incoming versioning headers as we want to hit the `Version.Unspecified` case
           else
             requestHeaders
       )

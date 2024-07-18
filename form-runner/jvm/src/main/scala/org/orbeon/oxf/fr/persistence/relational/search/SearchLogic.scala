@@ -14,17 +14,17 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.externalcontext.{ExternalContext, Organization, UserAndGroup}
-import org.orbeon.oxf.fr.{FormDefinitionVersion, SearchVersion}
+import org.orbeon.oxf.fr.SearchVersion
+import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationId, OrganizationSupport}
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata.LastModified
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.fr.persistence.relational.search.part._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
-import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
@@ -50,8 +50,7 @@ object SearchLogic {
     rootElement.child("operations").headOption.map(_.attValue("any-of").splitTo[Set]().map(Operation.withName))
 
   private def computePermissions(
-    request       : SearchRequestCommon,
-    version       : FormDefinitionVersion
+    request       : SearchRequestCommon
   )(implicit
     indentedLogger: IndentedLogger
   ): SearchPermissions = {
@@ -62,7 +61,7 @@ object SearchLogic {
       PersistenceMetadataSupport.readFormPermissionsMaybeWithAdminSupport(
         request.isInternalAdminUser,
         request.appForm,
-        version
+        request.version
       )
 
     SearchPermissions(
@@ -87,8 +86,7 @@ object SearchLogic {
     indentedLogger    : IndentedLogger
   ): T = {
 
-    val version          = PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(request.appForm, request.version)
-    val permissions      = computePermissions(request, version)
+    val permissions      = computePermissions(request)
     val hasNoPermissions =
       ! permissions.authorizedBasedOnRoleOptimistic     &&
       permissions.authorizedIfUsername         .isEmpty &&
@@ -102,7 +100,7 @@ object SearchLogic {
       RelationalUtils.withConnection { connection =>
 
         val commonAndPermissionsParts = List(
-          commonPart     (request.appForm, version, queries, freeTextSearch),
+          commonPart     (request.appForm, request.version, queries, freeTextSearch),
           permissionsPart(permissions)
         )
 

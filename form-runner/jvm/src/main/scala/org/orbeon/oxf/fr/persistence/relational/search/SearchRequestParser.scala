@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.externalcontext.Credentials
-import org.orbeon.oxf.fr.{AppForm, SearchVersion}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.parsePositiveIntParamOrThrow
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider, RelationalUtils}
-import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
@@ -38,18 +38,16 @@ object SearchRequestParser {
 
   def parseRequest(
     provider           : Provider,
-    app                : String,
-    form               : String,
+    appForm            : AppForm,
     isInternalAdminUser: Boolean,
     searchDocument     : DocumentInfo,
-    version            : SearchVersion
+    version            : FormDefinitionVersion
   )(implicit
     indentedLogger: IndentedLogger
   ): SearchRequest = {
 
     debug(s"search request: ${TransformerUtils.tinyTreeToString(searchDocument)}")
 
-    val appForm          = AppForm(app, form)
     val searchElement    = searchDocument.rootElement
     val queryEls         = searchElement.child("query").toList
     val freeTextElOpt    = queryEls.find(nodeInfo => ! nodeInfo.hasAtt("path") && ! nodeInfo.hasAtt("metadata"))
@@ -104,7 +102,7 @@ object SearchRequestParser {
 
   private def controlQueries(
     appForm        : AppForm,
-    version        : SearchVersion,
+    version        : FormDefinitionVersion,
     controlQueryEls: List[NodeInfo],
     allControls    : Boolean
   )(implicit
@@ -148,7 +146,7 @@ object SearchRequestParser {
       val specificControlsByPath =
         specificControls.map(c => c.path -> c).toMap
 
-      PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(appForm, version)) match {
+      PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, version) match {
         case Success(EncryptionAndIndexDetails(_, indexedControlsXPaths)) =>
           indexedControlsXPaths.value map { indexedControlXPath =>
             ControlQuery(

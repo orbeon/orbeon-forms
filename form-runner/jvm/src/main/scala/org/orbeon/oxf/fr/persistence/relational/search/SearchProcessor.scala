@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
@@ -54,14 +55,18 @@ class SearchProcessor
 
             val SearchProcessor.SearchPath(provider, app, form) = httpRequest.getRequestPath
 
+            val appForm = AppForm(app, form)
+
+            val formDefinitionVersion =
+              PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(appForm, SearchLogic.searchVersion(httpRequest))
+
             val request =
               SearchRequestParser.parseRequest(
                 Provider.withName(provider),
-                app,
-                form,
+                appForm,
                 PersistenceMetadataSupport.isInternalAdminUser(httpRequest.getFirstParamAsString),
                 searchDocument,
-                SearchLogic.searchVersion(httpRequest)
+                formDefinitionVersion
               )
 
             val (result, count) = doSearch(request)

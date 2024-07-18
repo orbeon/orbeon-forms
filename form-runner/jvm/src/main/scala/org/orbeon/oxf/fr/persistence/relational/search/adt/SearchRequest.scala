@@ -14,10 +14,10 @@
 package org.orbeon.oxf.fr.persistence.relational.search.adt
 
 import org.orbeon.oxf.externalcontext.Credentials
-import org.orbeon.oxf.fr.{AppForm, SearchVersion}
 import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata.LastModified
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, SearchVersion}
 
 import java.time.Instant
 
@@ -25,7 +25,7 @@ import java.time.Instant
 trait SearchRequestCommon {
   def provider           : Provider
   def appForm            : AppForm
-  def version            : SearchVersion
+  def version            : FormDefinitionVersion
   def credentials        : Option[Credentials]
   def anyOfOperations    : Option[Set[Operation]]
   def isInternalAdminUser: Boolean
@@ -124,7 +124,7 @@ case class MetadataQuery(
 case class SearchRequest(
   provider           : Provider,
   appForm            : AppForm,
-  version            : SearchVersion,
+  version            : FormDefinitionVersion,
   credentials        : Option[Credentials],
   isInternalAdminUser: Boolean,
   pageSize           : Int,

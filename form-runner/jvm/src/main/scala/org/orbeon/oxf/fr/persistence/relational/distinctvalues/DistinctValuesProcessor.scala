@@ -14,8 +14,10 @@
 package org.orbeon.oxf.fr.persistence.relational.distinctvalues
 
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
+import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
+import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
@@ -51,7 +53,14 @@ class DistinctValuesProcessor
             XPath.GlobalConfiguration
           )
 
-          val request        = parseRequest(document, SearchLogic.searchVersion(httpRequest))
+          val DistinctValuesPath(provider, app, form) = httpRequest.getRequestPath
+
+          val appForm = AppForm(app, form)
+
+          val formDefinitionVersion =
+            PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(appForm, SearchLogic.searchVersion(httpRequest))
+
+          val request        = parseRequest(Provider.withName(provider), appForm, document, formDefinitionVersion)
           val distinctValues = queryDistinctValues(request)
 
           outputResult(distinctValues, xmlReceiver)

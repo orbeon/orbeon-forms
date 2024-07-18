@@ -14,16 +14,16 @@
 package org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt
 
 import org.orbeon.oxf.externalcontext.Credentials
-import org.orbeon.oxf.fr.{AppForm, SearchVersion}
 import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchRequestCommon
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 
 
 case class DistinctValuesRequest(
   provider           : Provider,
   appForm            : AppForm,
-  version            : SearchVersion,
+  version            : FormDefinitionVersion,
   credentials        : Option[Credentials],
   anyOfOperations    : Option[Set[Operation]],
   isInternalAdminUser: Boolean,

@@ -57,6 +57,8 @@ object SearchLogic {
 
     val searchOperations = request.anyOfOperations.getOrElse(SearchOps.SearchOperations)
 
+    // The persistence proxy should pre-process and post-process the information, see:
+    // https://github.com/orbeon/orbeon-forms/issues/5741
     val formPermissions =
       PersistenceMetadataSupport.readFormPermissionsMaybeWithAdminSupport(
         request.isInternalAdminUser,

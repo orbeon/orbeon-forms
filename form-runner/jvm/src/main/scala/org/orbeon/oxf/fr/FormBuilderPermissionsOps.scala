@@ -160,6 +160,11 @@ trait FormBuilderPermissionsOps {
           formEl.elemValue("available") == "false" // filter forms marked as not available
         )
 
+      // 2024-07-18: It might not be necessary to include in the response the `<permissions>` element. That element is
+      // used above, as returned by the provider, to compute required operations. But it should not be necessary for
+      // the Form Metadata API to return it to the end caller.
+      // https://doc.orbeon.com/form-runner/api/persistence/custom-persistence-providers#form-metadata-api
+
       // If kept, rewrite <form> to add operations="…" attribute
       keepForm list {
         val newFormEl      = wrapper.wrap(dom.Element("form"))

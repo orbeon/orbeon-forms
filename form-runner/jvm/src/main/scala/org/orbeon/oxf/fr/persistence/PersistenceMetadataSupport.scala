@@ -125,7 +125,9 @@ object PersistenceMetadataSupport {
       .flatMap(_.firstChildOpt(Names.Permissions))
   }
 
-  // Used by search only
+  // The persistence proxy should pre-process and post-process the information, see:
+  // https://github.com/orbeon/orbeon-forms/issues/5741
+  // Used by search/distinct values only
   def getEffectiveFormVersionForSearchMaybeCallApi(
     appForm        : AppForm,
     incomingVersion: SearchVersion

@@ -171,7 +171,7 @@ object FormRunnerPersistence {
   val NewFromServiceUriProperty           = NewFromServiceUriPropertyPrefix + ".uri"
   val NewFromServiceParamsProperty        = NewFromServiceUriPropertyPrefix + ".passing-request-parameters"
 
-  val StandardProviderProperties          = Set("uri", "autosave", "active", "permissions")
+  val StandardProviderProperties          = Set("uri", "autosave", "active", "permissions", "flat-view")
   val AttachmentAttributeNames            = List("filename", "mediatype", "size")
 
   def findProvider(appForm: AppForm, formOrData: FormOrData, properties: PropertySet = CoreCrossPlatformSupport.properties): Option[String] =

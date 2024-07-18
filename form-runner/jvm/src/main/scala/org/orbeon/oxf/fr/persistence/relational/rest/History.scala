@@ -83,7 +83,7 @@ private object History {
     form               : String,
     documentId         : String,
     filenameOpt        : Option[String],
-    isInternalAdminUser: Boolean, // xxx unused for now, we don't check permissions!
+    isInternalAdminUser: Boolean, // 2024-07-18: Unused, see https://github.com/orbeon/orbeon-forms/issues/6416
     outputStream       : OutputStream
   )(implicit
     externalContext    : ExternalContext,

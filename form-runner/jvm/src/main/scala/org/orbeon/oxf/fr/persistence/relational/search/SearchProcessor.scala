@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.fr.persistence.relational.search
 
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
@@ -39,7 +40,8 @@ class SearchProcessor
       name, new CacheableTransformerOutputImpl(self, name) {
         def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
-          implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
+          implicit val externalContext: ExternalContext = NetUtils.getExternalContext
+          implicit val indentedLogger : IndentedLogger  = RelationalUtils.newIndentedLogger
 
           try {
             val searchDocument = readInputAsTinyTree(

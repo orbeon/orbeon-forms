@@ -1,6 +1,6 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import org.orbeon.oxf.externalcontext.UserAndGroup
+import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
@@ -24,8 +24,10 @@ class History extends ProcessorImpl {
 
   override def start(pipelineContext: PipelineContext): Unit = {
 
-    val httpRequest  = NetUtils.getExternalContext.getRequest
-    val httpResponse = NetUtils.getExternalContext.getResponse
+    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
+
+    val httpRequest  = externalContext.getRequest
+    val httpResponse = externalContext.getResponse
 
     implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
 
@@ -84,6 +86,7 @@ private object History {
     isInternalAdminUser: Boolean, // xxx unused for now, we don't check permissions!
     outputStream       : OutputStream
   )(implicit
+    externalContext    : ExternalContext,
     indentedLogger     : IndentedLogger
   ): Unit = {
     RelationalUtils.withConnection { connection =>

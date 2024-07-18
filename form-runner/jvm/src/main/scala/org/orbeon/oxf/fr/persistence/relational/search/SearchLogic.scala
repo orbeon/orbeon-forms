@@ -83,7 +83,8 @@ object SearchLogic {
   )(
     body              : (Connection, List[StatementPart], SearchPermissions) => T
   )(implicit
-    indentedLogger: IndentedLogger
+    externalContext   : ExternalContext,
+    indentedLogger    : IndentedLogger
   ): T = {
 
     val version          = PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(request.appForm, request.version)
@@ -112,7 +113,12 @@ object SearchLogic {
 
 trait SearchLogic {
 
-  def doSearch(request: SearchRequest)(implicit indentedLogger: IndentedLogger): (List[Document], Int) =
+  def doSearch(
+    request        : SearchRequest
+  )(implicit
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
+  ): (List[Document], Int) =
     SearchLogic.doSearch(
       request           = request,
       queries           = request.queries,

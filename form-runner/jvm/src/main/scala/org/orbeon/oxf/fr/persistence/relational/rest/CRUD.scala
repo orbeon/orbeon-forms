@@ -41,9 +41,11 @@ class CRUD
 
   override def start(pipelineContext: PipelineContext): Unit = {
 
-    implicit val httpRequest   : ExternalContext.Request  = NetUtils.getExternalContext.getRequest
-    implicit val httpResponse  : ExternalContext.Response = NetUtils.getExternalContext.getResponse
-    implicit val indentedLogger: IndentedLogger           = new IndentedLogger(logger)
+    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
+    implicit val indentedLogger : IndentedLogger  = new IndentedLogger(logger)
+
+    implicit val httpRequest: ExternalContext.Request  = externalContext.getRequest
+    val httpResponse  : ExternalContext.Response = externalContext.getResponse
 
     try {
 

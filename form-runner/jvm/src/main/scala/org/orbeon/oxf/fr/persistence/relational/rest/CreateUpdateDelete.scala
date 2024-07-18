@@ -358,11 +358,11 @@ trait CreateUpdateDelete {
   }
 
   def change(
-    req           : CrudRequest,
-    delete        : Boolean
+    req            : CrudRequest,
+    delete         : Boolean
   )(implicit
-    httpResponse  : ExternalContext.Response,
-    indentedLogger: IndentedLogger
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
   ): Unit = {
 
     debug("CRUD: handling change request", List("delete" -> delete.toString, "request" -> req.toString))
@@ -428,6 +428,8 @@ trait CreateUpdateDelete {
           FlatView.createFlatViews(req, versionToSet, connection, fullyQualifiedNames, maxIdentifierLength)
         }
       }
+
+      val httpResponse = externalContext.getResponse
 
       // Inform caller of the form definition version used
       httpResponse.setHeader(OrbeonFormDefinitionVersion, versionToSet.toString)

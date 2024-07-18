@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.distinctvalues
 
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt._
@@ -33,7 +34,12 @@ trait DistinctValuesLogic {
     innerSQL   : String
   )
 
-  def queryDistinctValues(request: DistinctValuesRequest)(implicit indentedLogger: IndentedLogger): DistinctValues = {
+  def queryDistinctValues(
+    request        : DistinctValuesRequest
+  )(implicit
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
+  ): DistinctValues = {
     // Re-use part of the search API logic (permissions, SQL generation)
     SearchLogic.doSearch(
       request           = request,

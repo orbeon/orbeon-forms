@@ -17,9 +17,9 @@ import org.apache.commons.io.input.ReaderInputStream
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
+import org.orbeon.oxf.fr.Version._
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.persistence.relational.Provider.{PostgreSQL, SQLite, binarySize, partialBinary}
-import org.orbeon.oxf.fr.Version._
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
@@ -37,8 +37,8 @@ trait Read {
     req           : CrudRequest,
     method        : HttpMethod
   )(implicit
-    httpResponse  : ExternalContext.Response,
-    indentedLogger: IndentedLogger
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
   ): Unit = {
 
     val hasStage = req.forData && ! req.forAttachment
@@ -73,7 +73,6 @@ trait Read {
 
     getOrHeadOnceOrRepeatedly(
       req            = req,
-      httpResponse   = httpResponse,
       headersSet     = false,
       hasStage       = hasStage,
       bodyContentOpt = bodyContentOpt
@@ -82,13 +81,13 @@ trait Read {
 
   @tailrec
   private def getOrHeadOnceOrRepeatedly(
-    req           : CrudRequest,
-    httpResponse  : ExternalContext.Response,
-    headersSet    : Boolean,
-    hasStage      : Boolean,
-    bodyContentOpt: Option[BodyContent]
+    req            : CrudRequest,
+    headersSet     : Boolean,
+    hasStage       : Boolean,
+    bodyContentOpt : Option[BodyContent]
   )(implicit
-    indentedLogger: IndentedLogger
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
   ): Unit = {
     val partialBinaryMaxLength = Provider.partialBinaryMaxLength(req.provider)
 
@@ -115,6 +114,8 @@ trait Read {
       },
       bodyContentOpt          = actualBodyContentOpt
     )
+
+    val httpResponse = externalContext.getResponse
 
     if (! headersSet) {
       // Send headers
@@ -165,7 +166,6 @@ trait Read {
       case Some(nextBodyContent) =>
         getOrHeadOnceOrRepeatedly(
           req            = req,
-          httpResponse   = httpResponse,
           hasStage       = hasStage,
           // Only set headers once
           headersSet     = true,
@@ -197,6 +197,7 @@ trait Read {
     readTotalAttachmentSize: Boolean,
     bodyContentOpt         : Option[BodyContent]
   )(implicit
+    externalContext        : ExternalContext,
     indentedLogger         : IndentedLogger
   ): FromDatabase = RelationalUtils.withConnection { connection =>
     val sql = {

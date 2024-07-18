@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index
 
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
@@ -30,7 +31,10 @@ class ReindexProcessor extends ProcessorImpl {
   private val ReindexPathRegex    = """/fr/service/([^/]+)/reindex""".r
 
   override def start(pipelineContext: PipelineContext): Unit = {
-    implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
+
+    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
+    implicit val indentedLogger : IndentedLogger  = RelationalUtils.newIndentedLogger
+
     val ReindexPathRegex(providerToken) = NetUtils.getExternalContext.getRequest.getRequestPath
     RelationalUtils.withConnection(Index.reindex(Provider.withName(providerToken), _, WhatToReindex.AllData))
   }

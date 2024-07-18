@@ -17,13 +17,14 @@ import org.log4s
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunnerPersistence.{getProvidersWithProperties, isInternalProvider, providerPropertyName, providerPropertyOpt}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.processor.DatabaseContext
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtilsUsingSaxon, IndentedLogger, LoggerFactory, Logging, NetUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtilsUsingSaxon, IndentedLogger, LoggerFactory, Logging}
 
 import java.sql.{Connection, ResultSet}
 import java.time.Instant
@@ -83,7 +84,12 @@ object RelationalUtils extends Logging {
     problematicDataSources.isEmpty
   }
 
-  def withConnection[T](thunk: Connection => T)(implicit indentedLogger: IndentedLogger): T =
+  def withConnection[T](
+    thunk          : Connection => T
+  )(implicit
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
+  ): T =
     withConnection(getDataSourceNameFromHeaders)(thunk)
 
   def withConnection[T](datasourceName: String)(thunk: Connection => T)(implicit indentedLogger: IndentedLogger): T =
@@ -119,8 +125,8 @@ object RelationalUtils extends Logging {
     valid.option(readInt)
   }
 
-  private def getDataSourceNameFromHeaders =
-    NetUtils.getExternalContext.getRequest.getFirstHeaderIgnoreCase("orbeon-datasource") getOrElse
+  private def getDataSourceNameFromHeaders(implicit ec: ExternalContext): String =
+    ec.getRequest.getFirstHeaderIgnoreCase("orbeon-datasource") getOrElse
       (throw new OXFException("Missing `orbeon-datasource` header"))
 
   private def getDataSourceNoFallback(name: String): Option[DataSource] = {

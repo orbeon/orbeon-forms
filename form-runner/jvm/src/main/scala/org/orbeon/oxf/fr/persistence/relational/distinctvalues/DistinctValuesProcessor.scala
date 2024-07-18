@@ -42,7 +42,8 @@ class DistinctValuesProcessor
       name, new CacheableTransformerOutputImpl(self, name) {
         def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
-          implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
+          implicit val externalContext: ExternalContext = NetUtils.getExternalContext
+          implicit val indentedLogger : IndentedLogger  = RelationalUtils.newIndentedLogger
 
           val document = readInputAsTinyTree(
             pipelineContext,

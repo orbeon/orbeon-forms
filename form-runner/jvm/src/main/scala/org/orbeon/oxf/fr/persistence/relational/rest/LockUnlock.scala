@@ -32,10 +32,11 @@ trait LockUnlock {
   import Private._
 
   def lock(
-    req           : LockUnlockRequest
+    req            : LockUnlockRequest
   )(implicit
-    httpResponse  : ExternalContext.Response,
-    indentedLogger: IndentedLogger): Unit = {
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
+  ): Unit = {
     import LeaseStatus._
     val timeout = readTimeoutFromHeader
     readLeaseStatus(req) { (connection, leaseStatus, dataPart, reqLockInfo) =>
@@ -51,10 +52,11 @@ trait LockUnlock {
   }
 
   def unlock(
-    req           : LockUnlockRequest
+    req            : LockUnlockRequest
   )(implicit
-    httpResponse  : ExternalContext.Response,
-    indentedLogger: IndentedLogger): Unit = {
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
+  ): Unit = {
     import LeaseStatus._
     readLeaseStatus(req) { (connection, leaseStatus, dataPart, _) =>
       leaseStatus match {
@@ -78,7 +80,8 @@ trait LockUnlock {
       case object DoesNotExist                                  extends LeaseStatus
     }
 
-    def issueLockedResponse(existingLease: LockSql.Lease)(implicit httpResponse: ExternalContext.Response): Unit = {
+    def issueLockedResponse(existingLease: LockSql.Lease)(implicit externalContext: ExternalContext): Unit = {
+      val httpResponse = externalContext.getResponse
       httpResponse.setStatus(StatusCode.Locked)
       httpResponse.setHeader(Headers.ContentType, ContentTypes.XmlContentType)
       httpResponse.getOutputStream.pipe(useAndClose(_)(os =>
@@ -97,10 +100,11 @@ trait LockUnlock {
     }
 
     def readLeaseStatus(
-      req           : LockUnlockRequest)(
-      thunk         : (Connection, LeaseStatus, DataPart, LockInfo) => Unit
+      req            : LockUnlockRequest)(
+      thunk          : (Connection, LeaseStatus, DataPart, LockInfo) => Unit
     )(implicit
-      indentedLogger: IndentedLogger
+      externalContext: ExternalContext,
+      indentedLogger : IndentedLogger
     ): Unit = {
 
       import LeaseStatus._

@@ -182,10 +182,10 @@ private[persistence] object PersistenceProxyProcessor {
       case (_,               FormPath(path, app, form, _))                       => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, None            , path)
       case (_,               DataPath(path, app, form, _, documentId, filename)) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Some(filename)  , path, Some(documentId))
       case (_,               DataCollectionPath(path, app, form))                => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
-      case (HttpMethod.POST, SearchPath(path, app, form))                        => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
+      case (HttpMethod.POST, SearchPath(path, app, form))                        => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
       case (HttpMethod.POST, ReEncryptAppFormPath(path, app, form))              => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
       case (HttpMethod.GET,  HistoryPath(path, app, form, _, _))                 => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
-      case (HttpMethod.POST, DistinctValuesPath(path, app, form))                => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None            , path)
+      case (HttpMethod.POST, DistinctValuesPath(path, app, form))                => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
       case (HttpMethod.GET,  PublishedFormsMetadataPath(_, app, form))           => proxyPublishedFormsMetadata(request, response, Option(app), Option(form))
       case (HttpMethod.GET,  ReindexPath)                                        => proxyReindex               (request, response) // TODO: should be `POST`
       case (HttpMethod.GET,  ReEncryptStatusPath)                                => proxyReEncryptStatus       (request, response)
@@ -197,7 +197,7 @@ private[persistence] object PersistenceProxyProcessor {
     request       : Request,
     response      : Response,
     appForm       : AppForm,
-    formOrData    : FormOrData,
+    formOrData    : FormOrData, // for finding the provider
     path          : String
   )(implicit
     indentedLogger: IndentedLogger
@@ -211,9 +211,30 @@ private[persistence] object PersistenceProxyProcessor {
       PathUtils.encodeQueryString(request.parameters)
     )
 
-    // NOTE: No form definition version handled!
+    // Proxy the request body
+    val bodyContentOpt =
+      bodyContent(
+        request          = request,
+        isDataXmlRequest = false,
+        isFormBuilder    = false,
+        appForm          = appForm,
+        encrypt          = false
+      )
+
+    // Proxy the version header
+    val incomingVersionHeaderOpt =
+      request.getFirstHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion)
+
+    val outgoingVersionHeaderOpt =
+      incomingVersionHeaderOpt.map(v => Version.OrbeonFormDefinitionVersion -> v)
+
     proxyRequestImpl(
-      proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, outgoingPersistenceHeaders),
+      proxyEstablishConnection(
+        OutgoingRequest(request),
+        bodyContentOpt,
+        serviceURI,
+        outgoingPersistenceHeaders ++ outgoingVersionHeaderOpt
+      ),
       request,
       response,
       Nil,
@@ -471,13 +492,18 @@ private[persistence] object PersistenceProxyProcessor {
     val existingFormOrDataHeaders =
       responseHeadersOpt.map(ResponseHeaders.toHeaders).getOrElse(Nil)
 
-    val bodyContentOpt = bodyContent(
-      request,
-      isDataXmlRequest,
-      isFormBuilder,
-      appForm,
-      formOrData
-    )
+    val bodyContentOpt =
+      bodyContent(
+        request          = request,
+        isDataXmlRequest = isDataXmlRequest,
+        isFormBuilder    = isFormBuilder,
+        appForm          = appForm,
+        encrypt          = formOrData match {
+          case FormOrData.Form                  => false // don't encrypt form definitions
+          case FormOrData.Data if isFormBuilder => false // don't encrypt Form Builder form data
+          case FormOrData.Data                  => true
+        }
+      )
 
     val attachmentsProviderCxrOpt = attachmentsProviderCxr(
       isAttachment,
@@ -521,8 +547,8 @@ private[persistence] object PersistenceProxyProcessor {
     isDataXmlRequest: Boolean,
     isFormBuilder   : Boolean,
     appForm         : AppForm,
-    formOrData      : FormOrData
-    )(implicit
+    encrypt         : Boolean
+  )(implicit
     indentedLogger: IndentedLogger
   ): Option[StreamedContent] =
     HttpMethod.HttpMethodsWithRequestBody(request.getMethod).option {
@@ -532,22 +558,18 @@ private[persistence] object PersistenceProxyProcessor {
         case None          => request.getInputStream
       }
 
-      val inputData = requestInputStream -> request.contentLengthOpt
-      val (bodyInputStream, bodyContentLength) = formOrData match {
-        case FormOrData.Form =>
-          // Don't encrypt form definitions
-          inputData
-        case FormOrData.Data if isFormBuilder =>
-          // Don't encrypt Form Builder form data either
-          inputData
-        case FormOrData.Data =>
+      val withEncryptionOpt =
+        encrypt.flatOption {
           FieldEncryption.encryptDataIfNecessary(
             request,
             requestInputStream,
             appForm,
             isDataXmlRequest
-          ).getOrElse(inputData)
-      }
+          )
+        }
+
+      val (bodyInputStream, bodyContentLength) =
+        withEncryptionOpt.getOrElse(requestInputStream -> request.contentLengthOpt)
 
       StreamedContent(
         bodyInputStream,

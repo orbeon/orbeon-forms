@@ -323,7 +323,7 @@ private[persistence] object PersistenceProxyProcessor {
             case VersionAction.Reject(reason) =>
               indentedLogger.logInfo("", s"400 Bad Request: $reason")
               throw HttpStatusCodeException(StatusCode.BadRequest)
-            case VersionAction.AcceptAndUseForForm(v) if crudMethod == HttpMethod.DELETE =>
+            case VersionAction.AcceptAndUseForForm(v) =>
 
               if (! isVersioningSupported && v.version != 1)
                 throw400ForUnsupportedVersion(v.version)
@@ -339,12 +339,7 @@ private[persistence] object PersistenceProxyProcessor {
                 )._2
 
               (None, Some(v.version), responseHeadersOpt)
-            case VersionAction.AcceptAndUseForForm(v) =>
 
-              if (! isVersioningSupported && v.version != 1)
-                throw400ForUnsupportedVersion(v.version)
-
-              (None, Some(v.version), None)
             case VersionAction.AcceptForData(vOpt) =>
 
               if (! isVersioningSupported)
@@ -632,8 +627,8 @@ private[persistence] object PersistenceProxyProcessor {
 
         val (cxr, versionFromProvider, responseHeaders) =
           connectToObtainResponseHeadersAndCheckVersionGetOrHead(
-            request                   = request,
-            serviceUri                = serviceUri,
+            request                    = request,
+            serviceUri                 = serviceUri,
             outgoingPersistenceHeaders = outgoingPersistenceHeaders,
             specificIncomingVersionOpt = specificIncomingVersionOpt
           )

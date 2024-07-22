@@ -4,19 +4,7 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
 >
-    <property
-        as="xs:string"
-        name="oxf.crypto.password"
-        value=""/>
-    <property
-        as="xs:string"
-        name="oxf.fr.field-encryption.password"
-        value=""/>
-    <property
-        as="xs:string"
-        name="oxf.fr.access-token.password"
-        value=""/>
-
+    <property as="xs:string"  name="oxf.crypto.password"                               value=""/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                 value="postgresql"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form" value="postgresql"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"   value="postgresql"/>

@@ -24,6 +24,7 @@ SQL_DATA_FILE='02-orbeon-postgresql-data.sql'
 
 # Image names
 POSTGRES_IMAGE="orbeon/postgres:$VERSION"
+ORBEON_FORMS_BASE_IMAGE="orbeon/orbeon-forms-base:$VERSION"
 ORBEON_FORMS_IMAGE="orbeon/orbeon-forms:$VERSION"
 
 # Image/container names for demo forms import/export
@@ -42,14 +43,18 @@ main() {
     docker login -u orbeon
   fi
 
-  # Build Orbeon Forms image
-  docker build -f Dockerfile_orbeon_forms --build-arg tag="$TAG" --build-arg file="$FILE" -t "$ORBEON_FORMS_IMAGE" .
+  # Build Orbeon Forms image (base image)
+  docker build -f Dockerfile.orbeon_forms --build-arg tag="$TAG" --build-arg file="$FILE" -t "$ORBEON_FORMS_BASE_IMAGE" .
 
-  # Import demo forms into PostgreSQL database and export them to SQL script
-  create_demo_forms_sql_script
+  # Build Orbeon Forms image (including PostgreSQL JDBC driver)
+  docker build -f Dockerfile.orbeon_forms.postgres --build-arg base_image="$ORBEON_FORMS_BASE_IMAGE" -t "$ORBEON_FORMS_IMAGE" .
+
+  # Do not import demo forms into PostgreSQL, just use SQLite
+  ## Import demo forms into PostgreSQL database and export them to SQL script
+  #create_demo_forms_sql_script
 
   # Build PostgreSQL image with demo forms data (as local SQL file)
-  docker build -f Dockerfile_postgres -t "$POSTGRES_IMAGE" .
+  docker build -f Dockerfile.postgres -t "$POSTGRES_IMAGE" .
 
   if $publish; then
     docker push "$ORBEON_FORMS_IMAGE"
@@ -67,7 +72,7 @@ is_orbeon_forms_ready() {
 
 create_demo_forms_sql_script() {
   # Build and run PostgreSQL container and wait until it's ready
-  docker build -f Dockerfile_postgres -t "$DEMO_FORMS_POSTGRES_IMAGE" .
+  docker build -f Dockerfile.postgres -t "$DEMO_FORMS_POSTGRES_IMAGE" .
   docker network create "$DEMO_FORMS_POSTGRES_NETWORK"
   docker run --name "$DEMO_FORMS_POSTGRES_CONTAINER" \
              --network="$DEMO_FORMS_POSTGRES_NETWORK" \
@@ -128,7 +133,7 @@ cleanup() {
     fi
   done
 
-  images=("$POSTGRES_IMAGE" "$ORBEON_FORMS_IMAGE" "$DEMO_FORMS_POSTGRES_IMAGE" )
+  images=("$POSTGRES_IMAGE" "$ORBEON_FORMS_BASE_IMAGE" "$ORBEON_FORMS_IMAGE" "$DEMO_FORMS_POSTGRES_IMAGE" )
   for image in "${images[@]}"; do
     if [ "$(docker images -q "$image")" ]; then
       docker rmi "$image"

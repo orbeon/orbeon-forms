@@ -175,15 +175,15 @@ object FormRunnerRenderedFormat {
     val hasTemplates =
       frFormAttachmentsRootElemOpt exists (extractPdfTemplates(_).nonEmpty)
 
-    val usePdfTemplate              = hasTemplates && booleanParamByName(params, UsePdfTemplateParam, default = true)
-    val requestedPdfTemplateNameOpt = paramByName(params, PdfTemplateNameParam)
+    val usePdfTemplate              = hasTemplates && booleanParamByNameUseAvt(params, UsePdfTemplateParam, default = true)
+    val requestedPdfTemplateNameOpt = paramByNameUseAvt(params, PdfTemplateNameParam)
 
     usePdfTemplate option {
       frFormAttachmentsRootElemOpt flatMap { rootElem =>
         selectPdfTemplate(
           attachmentsRootElem = rootElem,
           pdfTemplateNameOpt  = requestedPdfTemplateNameOpt,
-          requestedLangOpt    = paramByName(params, PdfTemplateLangParam) flatMap trimAllToOpt,
+          requestedLangOpt    = paramByNameUseAvt(params, PdfTemplateLangParam),
           defaultLang         = defaultLang
         )
       } getOrElse {
@@ -215,7 +215,7 @@ object FormRunnerRenderedFormat {
         }
 
       def langParamForPdfAutomatic = {
-        val lang = paramByName(params, "lang") flatMap trimAllToOpt getOrElse defaultLang
+        val lang = paramByNameUseAvt(params, "lang") getOrElse defaultLang
         List("fr-remember-language" -> false.toString, LanguageParam -> lang)
       }
 
@@ -226,7 +226,7 @@ object FormRunnerRenderedFormat {
     }
 
     def paramIfBoolean(paramName: String) =
-      paramByName(params, paramName).filter(FalseAndTrue)
+      paramByNameUseAvt(params, paramName).filter(FalseAndTrue)
 
     def hintsAlertsParamForPdfAutomatic(token: String) = {
       val valueOpt = paramIfBoolean(s"show-$token").map(s"fr-pdf-show-$token" -> _)

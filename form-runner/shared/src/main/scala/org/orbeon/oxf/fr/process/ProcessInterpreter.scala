@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.process
 
 import cats.effect.IO
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.fr.FormRunnerCommon.spc
 import org.orbeon.oxf.fr.XMLNames
 import org.orbeon.oxf.fr.process.ProcessParser._
 import org.orbeon.oxf.util.CoreUtils._
@@ -448,6 +449,12 @@ object ProcessInterpreter {
 
   def requiredParamByName(params: ActionParams, action: String, name: String): String =
     params.getOrElse(Some(name), missingArgument(action, name))
+
+  def paramByNameUseAvt(params: ActionParams, name: String): Option[String] =
+    params.get(Some(name)).map(spc.evaluateValueTemplate).flatMap(_.trimAllToOpt)
+
+  def booleanParamByNameUseAvt(params: ActionParams, name: String, default: Boolean): Boolean =
+    params.get(Some(name)).map(spc.evaluateValueTemplate).flatMap(_.trimAllToOpt).map(_ == "true").getOrElse(default)
 
   // TODO: Obtain action name automatically.
   private def missingArgument(action: String, name: String) =

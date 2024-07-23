@@ -148,7 +148,9 @@
             // in the column header). But only do this for the top-level control within a cell. Also, we now only do
             // this in wide layout, as in narrow layout we need to show again the LHH on each individual control.
             // https://github.com/orbeon/orbeon-forms/issues/4491
-            @media not (max-width: 640px) {
+
+            // Use a mixin because Less CSS doesn't parse `@media` correctly
+            .hide-lhh() {
                 &.fr-repeat-single-row {
                     .fr-grid-body .fr-grid-td {
                         &> .xforms-control, &> .xbl-component, &> .xforms-group {
@@ -161,6 +163,13 @@
                     }
                 }
             }
+            @media not (max-width: 640px) {
+                .hide-lhh();
+            }
+            // For the PDF renderer which doesn't support `@media` queries properly
+            @media print {
+                .hide-lhh();
+            }
         }
 
         // =============================================================================================================
@@ -170,7 +179,7 @@
         // =============================================================================================================
         .fr-grid.fr-repeat {
 
-            &.fr-repeat-multiple-rows:not(.fr-grid-css) {
+            &.fr-repeat-multiple-rows.fr-grid-table { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
                 & > .fr-grid-head {
                     display: none;
                 }
@@ -184,7 +193,7 @@
             // We never have a header row in narrow layout
             @media (max-width: 640px) {
                 &.fr-repeat-single-row, &.fr-repeat-multiple-rows { // to make rule stronger
-                    &:not(.fr-grid-css) > .fr-grid-head {
+                    &.fr-grid-table > .fr-grid-head { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
                         display: none;
                     }
                     &.fr-grid-css > .fr-grid-repeat-top-row {
@@ -231,13 +240,21 @@
                         padding-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
                     }
                 }
-                &:not(.fr-grid-css) {
+                &.fr-grid-table { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
                     // Apparently the PDF renderer doesn't support `:first-of-type` :(
                     .fr-grid-tr:first-child > {
                         .fr-grid-td, .fr-repeat-column-number, .fr-repeat-column-right {
-                            @media not (max-width: 640px) {
+                            // Use a mixin because Less CSS doesn't parse `@media` correctly
+                            .top-border() {
                                 border-top: 2px solid #ddd;
                                 padding-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
+                            }
+                            @media not (max-width: 640px) {
+                                .top-border();
+                            }
+                            // The PDF renderer doesn't support `@media` queries properly
+                            @media print {
+                                .top-border();
                             }
                         }
                     }
@@ -247,7 +264,7 @@
 
         // The `full` appearance uses more borders, but as of 2024-07-30 we decided to remove the cell borders
         // around form controls to make the look lighter.
-        &:not(.xforms-grid-appearance-minimal) {
+        &.xforms-grid-appearance-full {
             .fr-grid.fr-repeat {
 
                 border: 1px solid #ddd;
@@ -314,19 +331,17 @@
                 }
 
                 // Case of legacy table layout (also used for PDF)
-                &:not(.fr-grid-css) {
+                &.fr-grid-table { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
 
                     border-collapse: separate; // otherwise we cannot have rounded corners
 
-                    // Wide layout
-                    @media not (max-width: 640px) {
-
+                    // Use a mixin because Less CSS doesn't parse `@media` correctly
+                    .table-border-top() {
                         & > .xforms-repeat-delimiter + .fr-grid-repeat-iteration {
-                            > tr:first-of-type > td {
+                            > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
                                 border-top: 1px solid #ddd;
                             }
                         }
-
                         // In wide layout, we must not show the top border on the first `.fr-grid-repeat-iteration` in
                         // the "multiple" case.
                         &.fr-repeat-multiple-rows {                                                  // multiple only
@@ -334,13 +349,21 @@
                             & > .xforms-repeat-begin-end:first-child {                               // OR if there is no top row (readonly AND multiple)
                                 & + .xforms-repeat-delimiter {
                                     & + .fr-grid-repeat-iteration {
-                                        > tr:first-of-type > td {
+                                        > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
                                             border-top: none;
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+                    // Wide layout
+                    @media not (max-width: 640px) {
+                        .table-border-top();
+                    }
+                    // The PDF renderer doesn't support `@media` queries properly
+                    @media print {
+                        .table-border-top();
                     }
 
                     // Narrow layout
@@ -351,7 +374,7 @@
                         margin-right: 4px;
 
                         & > .xforms-repeat-delimiter + .fr-grid-repeat-iteration {
-                            > tr:first-of-type > td {
+                            > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
                                 &.fr-repeat-column-number, &.fr-repeat-column-left, &.fr-repeat-column-right, &.fr-grid-td {
                                     border-top: 1px solid #ddd;
                                 }
@@ -366,7 +389,7 @@
                         & > .xforms-repeat-begin-end:first-child {                               // OR if there is no top row (readonly AND multiple)
                             & + .xforms-repeat-delimiter {
                                 & + .fr-grid-repeat-iteration {
-                                    > tr:first-of-type > td {
+                                    > tr:first-child > td { // the PDF renderer doesn't support `:first-of-type`
                                         border-top: none;
                                     }
                                 }
@@ -751,12 +774,30 @@
                     margin: @frGridCellPadding + 2 @frGridCellPadding;
                     font-size: smaller;
                 }
+                @media print {
+                    .badge {
+                        color: @textColor;
+                        background-color: transparent;
+                    }
+                }
+            }
+
+            .fr-grid-head {
+                .xforms-label {
+                    margin: 0 @frGridCellPadding;
+                }
+
+                .xforms-hint {
+                    margin-left: @frGridCellPadding;
+                }
             }
 
             // Highlight the current grid row
             .xforms-repeat-selected-item-1 {
                 .fr-repeat-column-left, .fr-repeat-column-number {
-                    background-color: @grayLighter;
+                    @media not print {
+                        background-color: @grayLighter;
+                    }
                 }
             }
 

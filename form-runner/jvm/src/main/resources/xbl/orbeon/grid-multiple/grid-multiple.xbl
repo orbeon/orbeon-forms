@@ -225,6 +225,7 @@
                                     'fr-grid',
                                     concat('fr-grid-', $static-col-count),
                                     'fr-grid-css'[$use-css-grids-output],
+                                    'fr-grid-table'[not($use-css-grids-output)],
                                     (: Control name might not be available (unclear why normalize-space() is needed) :)
                                     for $name in frf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
                                     'fr-grid-readonly'[$readonly],

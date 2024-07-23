@@ -128,7 +128,7 @@ object Authorizer extends Logging {
         // point, we just follow the header proxying method we use in other places and remove Cookie/Set-Cookie.
 
         val method  = request.getMethod
-        val newURL  = appendToURI(baseDelegateURI, request.getRequestPath, Option(request.getQueryString))
+        val newURL  = appendToURI(baseDelegateURI, request.getRequestPath, request.queryStringOpt)
 
         // Add remote address to help authorizer filter
         val allHeaders = {

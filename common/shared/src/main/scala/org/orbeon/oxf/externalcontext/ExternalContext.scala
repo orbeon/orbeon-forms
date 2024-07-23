@@ -149,6 +149,7 @@ object ExternalContext {
 
     def getNativeRequest: Any
 
+    def queryStringOpt: Option[String]                         = Option(getQueryString)
     // TODO: return immutable.Map[String, List[AnyRef]] -> what about AnyRef?
     def parameters: collection.Map[String, Array[AnyRef]]      = getParameterMap.asScala
     def getFirstParamAsString(name: String): Option[String]    = parameters.get(name) flatMap (_ collectFirst { case s: String => s })
@@ -260,7 +261,7 @@ trait ExternalContext {
     val pathQuery =
       PathUtils.appendQueryString(
         getRequest.getRequestURI,
-        PathUtils.encodeQueryString(getRequest.parameters)
+        getRequest.queryStringOpt.getOrElse("")
       )
 
     s"Received request: ${getRequest.getMethod} $pathQuery"

@@ -233,9 +233,9 @@ trait CreateUpdateDelete {
           Nil
         else
           req.provider match {
-          case Provider.MySQL => List("ORDER BY last_modified_time")
-          case _              => Nil
-        }
+            case Provider.MySQL => List("ORDER BY last_modified_time")
+            case _              => Nil
+          }
 
       val selectParts = List("SELECT count(*) count", fromPart, wherePart, lastModifiedPart, filenamePart)
       val deleteParts = List("DELETE",                fromPart, wherePart, lastModifiedPart, filenamePart) ::: orderByPart
@@ -298,6 +298,8 @@ trait CreateUpdateDelete {
 
     req.dataPart match {
       case Some(dataPart) if dataPart.forceDelete =>
+
+        assert(delete)
 
         // Force delete, AKA purge, historical data and/or attachments
 

@@ -167,7 +167,8 @@
             <xf:var name="resource" value="fr:component-param-value('resource')">
                 <xf:action event="xforms-enabled xforms-value-changed">
                     <!-- Update itemset based on resource if not blank (can be blank e.g. in builder) -->
-                    <xf:send if="xxf:non-blank($resource)" submission="get-itemset">
+                    <!-- See also https://github.com/orbeon/orbeon-forms/issues/6422 -->
+                    <xf:send if="not(fr:is-design-time()) and xxf:non-blank($resource)" submission="get-itemset">
                         <xf:property name="resource" value="$resource"/>
                     </xf:send>
                 </xf:action>

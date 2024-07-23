@@ -258,7 +258,7 @@
         <xbl:handlers>
 
             <!-- Scala.js asks us to call the service to get a list of suggestions -->
-            <xbl:handler event="fr-search">
+            <xbl:handler event="fr-search" if="not(fr:is-design-time())">
 
                 <!-- Evaluate resource URL, done in the view to have access to the outer scope -->
                 <xf:dispatch name="fr-update-resource" targetid="view">
@@ -473,7 +473,7 @@
                                             <xf:setvalue
                                                 if="xxf:is-blank($binding)"
                                                 ref="instance('local')/label"/>
-                                            <xf:action if="xxf:non-blank($binding) or $auto-select-unique-choice">
+                                            <xf:action if="not(fr:is-design-time()) and (xxf:non-blank($binding) or $auto-select-unique-choice)">
                                                 <xf:var name="resource"><xxf:value xxbl:scope="outer" value="$resource"/></xf:var>
                                                 <xf:send submission="get-result">
                                                     <xf:property name="fr-resource" value="$resource"/>

@@ -357,6 +357,11 @@ private[persistence] object PersistenceProxyProcessor {
                   queryForToken              = queryForToken
                 )
 
+              // 2024-07-23: Here, we read the form permissions by calling `/fr/service/persistence/form`, then we
+              // extract the `<permissions>` element if any, and obtain a `Permissions` object. I wondered why we
+              // couldn't just use the `operations` attribute from the form metadata, and the answer is that we have
+              // two ways of obtaining operations: one "without data" (see `authorizedOperationsForNoData()`), and one
+              // with data. The latter is used here, and it requires the availability of the `<permissions>` element.
               val operations =
                 try {
                   val formPermissions =

@@ -114,10 +114,9 @@
     // We *should* have `.orbeon.xforms-ios` on the same element, but when embedding,
     // it's not yet (2020-05-26) the case and we have `.xforms-ios .orbeon`.
     &.xforms-ios, .xforms-ios & {
-        // As of 2020-05-29, drag and drop does not work on iOS, even on an iPad with multitasking.
-        // So we hide the drop area.
         .fr-attachment-drop {
-            display: none;
+            // https://github.com/orbeon/orbeon-forms/issues/3079
+            // https://github.com/orbeon/orbeon-forms/issues/6420
         }
     }
 

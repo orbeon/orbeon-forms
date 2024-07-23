@@ -73,8 +73,8 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       val currentFormLang = FormRunner.currentLang
 
-      val templateParams      = paramByName(params, "template").map(spc.evaluateValueTemplate).map("fr-template" -> _).toList
-      val templateMatchParam  = paramByName(params, "match").map(spc.evaluateValueTemplate).getOrElse("first")
+      val templateParams      = paramByNameUseAvt(params, "template").map("fr-template" -> _).toList
+      val templateMatchParam  = paramByNameUseAvt(params, "match").getOrElse("first")
       val templateMatchParams = Seq("fr-match" -> templateMatchParam).toList
       val pdfTiffParams =
         for {
@@ -90,7 +90,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       // https://github.com/orbeon/orbeon-forms/issues/5911
       val emailDataFormatVersion =
-        paramByName(params, DataFormatVersionName).map(DataFormatVersion.withName).getOrElse(DataFormatVersion.V400)
+        paramByNameUseAvt(params, DataFormatVersionName).map(DataFormatVersion.withName).getOrElse(DataFormatVersion.V400)
 
       val emailParam =
         (s"email-$DataFormatVersionName" -> emailDataFormatVersion.entryName)
@@ -120,11 +120,11 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       implicit val xfcd: XFormsContainingDocument = inScopeContainingDocument
 
-      val propertyPrefixOpt = paramByNameOrDefault(params, "property")
+      val propertyPrefixOpt = paramByNameOrDefaultUseAvt(params, "property")
 
       def findParamValue(name: String): Option[String] = {
 
-        def fromParam    = paramByName(params, name)
+        def fromParam    = paramByNameUseAvt(params, name)
         def fromProperty = propertyPrefixOpt flatMap (prefix => formRunnerProperty(prefix + "." + name))
         def fromDefault  = DefaultSendParameters.get(name)
 
@@ -349,7 +349,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       ensureDataCalculationsAreUpToDate()
 
       val renderedFormat = (
-        paramByName(params, "format")
+        paramByNameUseAvt(params, "format")
         flatMap   trimAllToOpt
         flatMap   RenderedFormat.withNameOption
         getOrElse RenderedFormat.Pdf
@@ -454,7 +454,8 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     params         : ActionParams,
     renderedFormat : RenderedFormat,
     fullFilename   : Option[String],
-    currentFormLang: String)(implicit
+    currentFormLang: String
+  )(implicit
     frParams       : FormRunnerParams
   ): String = {
 
@@ -484,7 +485,8 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
   // Create if needed and return the element key name
   private def tryCreateRenderedFormatIfNeeded(
     params        : ActionParams,
-    renderedFormat: RenderedFormat)(implicit
+    renderedFormat: RenderedFormat
+  )(implicit
     frParams      : FormRunnerParams
   ): Try[(URI, String)] =
     Try {

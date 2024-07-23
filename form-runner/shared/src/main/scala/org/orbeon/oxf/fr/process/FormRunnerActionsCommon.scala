@@ -91,8 +91,8 @@ trait FormRunnerActionsCommon {
 
       ensureDataCalculationsAreUpToDate()
 
-      val level     = paramByNameOrDefault(params, "level")   map LevelByName getOrElse ErrorLevel
-      val controlId = paramByName(params, "control") getOrElse Names.ViewComponent
+      val level     = paramByNameOrDefaultUseAvt(params, "level") map LevelByName getOrElse ErrorLevel
+      val controlId = paramByNameUseAvt(params, "control")  getOrElse Names.ViewComponent
 
       // In case of explicit validation mode
       if (frc.formRunnerProperty("oxf.fr.detail.validation-mode")(FormRunnerParams()) contains "explicit") {
@@ -149,10 +149,9 @@ trait FormRunnerActionsCommon {
       ensureDataCalculationsAreUpToDate()
 
       val appForm       = AppForm(app, form)
-      val isDraft       = booleanParamByName(params, "draft", default = false)
-      val pruneMetadata = booleanParamByName(params, "prune-metadata", default = false)
-      val queryXVT      = paramByName(params, "query")
-      val querySuffix   = queryXVT.map(spc.evaluateValueTemplate).map('&' + _).getOrElse("")
+      val isDraft       = booleanParamByNameUseAvt(params, "draft", default = false)
+      val pruneMetadata = booleanParamByNameUseAvt(params, "prune-metadata", default = false)
+      val querySuffix   = paramByNameUseAvt(params, "query").map('&' + _).getOrElse("")
 
       // Notify that the data is about to be saved
       dispatch(name = "fr-data-save-prepare", targetId = FormModel)
@@ -262,8 +261,8 @@ trait FormRunnerActionsCommon {
 
   def trySetDataStatus(params: ActionParams): ActionResult = ActionResult.trySync {
 
-    val isSafe  = paramByName(params, "status") map (_ == "safe") getOrElse true
-    val isDraft = booleanParamByName(params, "draft", default = false)
+    val isSafe  = paramByNameUseAvt(params, "status").forall(_ == "safe")
+    val isDraft = booleanParamByNameUseAvt(params, "draft", default = false)
 
     val saveStatus     = if (isDraft) Seq.empty else frc.persistenceInstance.rootElement / "data-status"
     val autoSaveStatus = frc.persistenceInstance.rootElement / "autosave" / "status"
@@ -273,7 +272,7 @@ trait FormRunnerActionsCommon {
   }
 
   def trySetWorkflowStage(params: ActionParams): ActionResult = ActionResult.trySync {
-    val name = paramByNameOrDefault(params, "name").map(spc.evaluateValueTemplate)
+    val name = paramByNameOrDefaultUseAvt(params, "name")
     frc.documentWorkflowStage = name
     // Manual dependency HACK: RR fr-form-model, as it might use the stage that we just set
     recalculate(FormModel)
@@ -286,15 +285,15 @@ trait FormRunnerActionsCommon {
   private def messageFromResourceOrParam(params: ActionParams): Option[TextOrHtml] = {
     def fromResource =
       for {
-        messageName <- paramByNameOrDefault(params, "resource")
+        messageName <- paramByNameOrDefaultUseAvt(params, "resource")
         messageNode <- (frc.currentFRResources / "detail" / "messages" / messageName).headOption
         isHtml       = FormRunnerActionsCommon.isMessageInHtml(messageNode)
       } yield TextOrHtml(spc.evaluateValueTemplate(messageNode.getStringValue), isHtml)
 
     def fromParam =
       for {
-        message <- paramByName(params, "message")
-        isHtml   = booleanParamByName(params, "html", default = false)
+        message <- paramByNameUseAvt(params, "message")
+        isHtml   = booleanParamByNameUseAvt(params, "html", default = false)
       } yield TextOrHtml(spc.evaluateValueTemplate(message), isHtml)
 
     fromResource orElse fromParam
@@ -309,7 +308,7 @@ trait FormRunnerActionsCommon {
   def tryErrorMessage(params: ActionParams): ActionResult =
     ActionResult.trySync {
       val htmlMessage = messageFromResourceOrParam(params).get.asHtml
-      val appearance  = paramByName(params, "appearance").map(FormRunnerBaseOps.MessageAppearance.withName).getOrElse(FormRunnerBaseOps.MessageAppearance.Dialog)
+      val appearance  = paramByNameUseAvt(params, "appearance").map(FormRunnerBaseOps.MessageAppearance.withName).getOrElse(FormRunnerBaseOps.MessageAppearance.Dialog)
 
       frc.errorMessage(htmlMessage, appearance)
     }
@@ -389,12 +388,7 @@ trait FormRunnerActionsCommon {
 
       val location     = fromParams orElse fromProperties map spc.evaluateValueTemplate flatMap trimAllToOpt get
       val targetOpt    = params.get(Some("target")) flatMap trimAllToOpt
-      val showProgress = {
-        val paramStringOpt    = paramByName(params, ShowProgressName)
-        val paramEvaluatedOpt = paramStringOpt.map(spc.evaluateValueTemplate)
-        val paramBooleanOpt   = paramEvaluatedOpt.map(_ == "true")
-        paramBooleanOpt.getOrElse(false)
-      }
+      val showProgress = booleanParamByNameUseAvt(params, ShowProgressName, default = false)
 
       load(prependCommonFormRunnerParameters(location, forNavigate = true), targetOpt, showProgress = showProgress)
     }

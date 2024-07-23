@@ -298,15 +298,15 @@ trait ProcessInterpreter extends Logging {
 
   // Interrupt the process and complete with a success
   private def trySuccess(params: ActionParams): ActionResult =
-    ActionResult.Interrupt(paramByName(params, "message"), Left(Success(())))
+    ActionResult.Interrupt(paramByNameUseAvt(params, "message"), Left(Success(())))
 
   // Interrupt the process and complete with a failure
   private def tryFailure(params: ActionParams): ActionResult =
-    ActionResult.Interrupt(paramByName(params, "message"), Left(Failure(ProcessFailure())))
+    ActionResult.Interrupt(paramByNameUseAvt(params, "message"), Left(Failure(ProcessFailure())))
 
   // Run a sub-process
   private def tryProcess(params: ActionParams): ActionResult =
-    Try(paramByNameOrDefault(params, "name").get)
+    Try(paramByNameOrDefaultUseAvt(params, "name").get)
       .map(rawProcessByName(processStackDyn.value.get.scope, _)) match {
       case Success(process) =>
         runSubProcess(process, Success(()))
@@ -344,7 +344,7 @@ trait ProcessInterpreter extends Logging {
   // Rollback the current transaction
   private def tryRollback(params: ActionParams): ActionResult =
     ActionResult.trySync {
-      val tokens = paramByNameOrDefault(params, "changes") map (_.tokenizeToSet) getOrElse Set.empty
+      val tokens = paramByNameOrDefaultUseAvt(params, "changes") map (_.tokenizeToSet) getOrElse Set.empty
 
       if (tokens != Set("in-memory-form-data"))
         throw new IllegalArgumentException(s"""`rollback` action must have a `changes = "in-memory-form-data"` parameter""")
@@ -456,7 +456,10 @@ object ProcessInterpreter {
   def booleanParamByNameUseAvt(params: ActionParams, name: String, default: Boolean): Boolean =
     params.get(Some(name)).map(spc.evaluateValueTemplate).flatMap(_.trimAllToOpt).map(_ == "true").getOrElse(default)
 
+  def paramByNameOrDefaultUseAvt(params: ActionParams, name: String): Option[String] =
+    params.get(Some(name)).map(spc.evaluateValueTemplate).flatMap(_.trimAllToOpt).orElse(params.get(None))
+
   // TODO: Obtain action name automatically.
-  private def missingArgument(action: String, name: String) =
+  private def missingArgument(action: String, name: String): Nothing =
     throw new IllegalArgumentException(s"$action: `$name` parameter is required")
 }

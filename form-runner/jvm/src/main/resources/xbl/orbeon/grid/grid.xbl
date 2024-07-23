@@ -279,12 +279,6 @@
                                     'fr-grid-css'[$use-css-grids-output],
                                     (: Control name might not be available (unclear why normalize-space() is needed) :)
                                     for $name in frf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
-                                    if ($is-repeat and not($use-css-grids-output)) then (
-                                        'table',
-                                        'table-bordered'[$appearance = 'full'],
-                                        'table-condensed'
-                                    ) else
-                                        (),
                                     'fr-grid-readonly'[$readonly],
                                     if ($is-repeat) then (
                                         'fr-repeat',
@@ -314,25 +308,6 @@
 
                             <!-- If repeat, add header row with buttons and optional headers with control labels -->
                             <xsl:if test="$is-repeat">
-                                <xsl:if test="$is-table">
-                                    <!-- Add `colgroup` to make column sizing with CSS easier -->
-                                    <xh:colgroup>
-                                        <xsl:if test="$left-column">
-                                            <xh:col class="fr-repeat-column-left" xxf:control="true" ref=".[not($view-mode)]"/>
-                                        </xsl:if>
-                                        <!-- TODO: What to do if `not($lhh-in-header)`? -->
-                                        <!-- Q: No need to handle `colspan` here, right? -->
-                                        <xsl:if test="$lhh-in-header">
-                                            <xsl:for-each select="array:get($rows-array, 1)">
-                                                <xh:col class="fr-grid-col-{position()}"/>
-                                            </xsl:for-each>
-                                        </xsl:if>
-                                        <xsl:if test="right-column">
-                                            <xh:col class="fr-repeat-column-right" xxf:control="true" ref=".[not($view-mode)]"/>
-                                        </xsl:if>
-                                    </xh:colgroup>
-                                </xsl:if>
-
                                 <xsl:variable name="header-side-block" as="element(*)?">
                                     <xsl:if test="$left-column or $right-column">
                                         <xsl:element name="{$th-elem}">

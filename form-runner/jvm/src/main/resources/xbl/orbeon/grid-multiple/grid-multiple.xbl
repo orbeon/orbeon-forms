@@ -227,12 +227,6 @@
                                     'fr-grid-css'[$use-css-grids-output],
                                     (: Control name might not be available (unclear why normalize-space() is needed) :)
                                     for $name in frf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
-                                    if (not($use-css-grids-output)) then (
-                                        'table',
-                                        'table-bordered'[$appearance = 'full'],
-                                        'table-condensed'
-                                    ) else
-                                        (),
                                     'fr-grid-readonly'[$readonly],
                                     'fr-repeat',
                                     'fr-grid-number-rows'[$number-rows],

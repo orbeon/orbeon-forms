@@ -256,20 +256,7 @@
                                             concat('fr-grid-', $y, '-', $x),
                                             if ($is-editable) then fr:fb-control-classes(., true()) else ()
                                     "/>
-                                    <xsl:copy-of
-                                        select="
-                                            (
-                                                @* except @class
-                                            )
-                                            |
-                                            (
-                                                node() except (
-                                                    if ($lhh-in-header and exists(@id) and empty(self::xf:trigger)) then
-                                                        (xf:label, xf:hint, xf:help)
-                                                    else
-                                                        ()
-                                                )
-                                            )"/>
+                                    <xsl:copy-of select="(@* except @class) | node()"/>
                                 </xsl:copy>
                             </xsl:for-each>
                         </xf:group>

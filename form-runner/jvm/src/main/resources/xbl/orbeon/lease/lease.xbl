@@ -31,7 +31,7 @@
 
         <xbl:implementation>
             <xf:model>
-                <xf:var name="fr-persistence-instance" as="element('_')" value="xxf:instance('fr-persistence-instance')"/>
+                <xf:var name="fr-persistence-instance" as="element(_)"   value="xxf:instance('fr-persistence-instance')"/>
                 <xf:var name="fr-lease-enabled"        as="xs:boolean"   value="$fr-persistence-instance/lease-enabled = 'true'"/>
                 <xf:var name="fr-lease-state"          as="xs:string"    value="$fr-persistence-instance/lease-state/string()"/>
 

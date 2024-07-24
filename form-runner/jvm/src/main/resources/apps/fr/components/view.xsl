@@ -251,11 +251,11 @@
 
     <xsl:template name="fr-detail-page-global-variables">
 
-        <xf:var name="_fr-persistence-instance"                 as="element('_')"               value="xxf:instance('fr-persistence-instance')"/>
+        <xf:var name="_fr-persistence-instance"                 as="element(_)"                 value="xxf:instance('fr-persistence-instance')"/>
         <xf:var name="_fr-lease-enabled"                        as="xs:boolean"                 value="$_fr-persistence-instance/lease-enabled = 'true'"/>
         <xf:var name="_fr-lease-state"                          as="xs:string"                  value="$_fr-persistence-instance/lease-state/string()"/>
-        <xf:var name="_fr-document-available-from-elem-opt"     as="element('available-from')?" value="xxf:instance('fr-form-metadata')/available-from"/>
-        <xf:var name="_fr-document-available-to-elem-opt"       as="element('available-to')?"   value="xxf:instance('fr-form-metadata')/available-to"/>
+        <xf:var name="_fr-document-available-from-elem-opt"     as="element(available-from)?"   value="xxf:instance('fr-form-metadata')/available-from"/>
+        <xf:var name="_fr-document-available-to-elem-opt"       as="element(available-to)?"     value="xxf:instance('fr-form-metadata')/available-to"/>
         <xf:var name="_fr-document-available-from-dateTime-opt" as="xs:string?"                 value="if (exists($_fr-document-available-from-elem-opt))
                                                                                                        then $_fr-document-available-from-elem-opt/@dateTime/string()
                                                                                                        else xxf:property(string-join(('oxf.fr.detail.available-from.dateTime', fr:app-name(), fr:form-name()), '.'))"/>

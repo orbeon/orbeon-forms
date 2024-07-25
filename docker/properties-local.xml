@@ -1,10 +1,6 @@
-<properties
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
->
-    <property as="xs:string"  name="oxf.crypto.password"               value=""/>
+<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:oxf="http://www.orbeon.com/oxf/processors">
+    <property as="xs:string"  name="oxf.crypto.password"               value="CHANGE THIS PASSWORD"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*" value="postgresql"/>
     <property as="xs:boolean" name="oxf.fr.persistence.sqlite.active"  value="false"/>
 </properties>

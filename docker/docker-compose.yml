@@ -6,6 +6,8 @@ services:
       - ${ORBEON_TOMCAT_PORT:-8080}:8080
     volumes:
       - ${ORBEON_PROPERTIES_FILE:-./properties-local.xml}:/usr/local/tomcat/webapps/orbeon/WEB-INF/resources/config/properties-local.xml
+      - ${ORBEON_TOMCAT_CONTEXT_FILE:-./orbeon.xml}:/usr/local/tomcat/conf/Catalina/localhost/orbeon.xml
+#      - ${ORBEON_LOG4J2_FILE:-./log4j2.xml}:/usr/local/tomcat/webapps/orbeon/WEB-INF/resources/config/log4j2.xml
     secrets:
       - source: license
         target: /usr/local/tomcat/webapps/orbeon/WEB-INF/resources/config/license.xml
@@ -34,7 +36,7 @@ networks:
     driver: bridge
 volumes:
   pgdata:
-    name: ${POSTGRES_VOLUME:-orbeon_pgdata}
+    name: ${ORBEON_POSTGRES_VOLUME:-orbeon_pgdata}
 secrets:
   license:
     file: ${ORBEON_LICENSE_FILE:-./license.xml}

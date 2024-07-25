@@ -27,18 +27,4 @@ RUN rm -rf /tmp/orbeon \
     && apt-get autoremove -y \
     && apt-get clean
 
-## JDBC driver for MySQL
-#RUN wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-9.0.0.tar.gz
-#RUN tar xvfz mysql-connector-j-9.0.0.tar.gz
-#RUN mv mysql-connector-j-9.0.0/mysql-connector-j-9.0.0.jar /usr/local/tomcat/lib/
-
-## JDBC driver for Oracle
-#RUN wget https://download.oracle.com/otn-pub/otn_software/jdbc/234/ojdbc11.jar
-#RUN mv ojdbc11.jar /usr/local/tomcat/lib/
-
-## JDBC driver for SQL Server
-#RUN wget --trust-server-names https://go.microsoft.com/fwlink/?linkid=2276509
-#RUN tar xvfz sqljdbc_12.6.3.0_enu.tar.gz
-#RUN mv sqljdbc_12.6/enu/jars/mssql-jdbc-12.6.3.jre11.jar /usr/local/tomcat/lib/
-
 EXPOSE 8080

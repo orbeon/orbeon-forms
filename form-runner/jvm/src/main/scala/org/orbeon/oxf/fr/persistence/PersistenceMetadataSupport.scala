@@ -80,15 +80,12 @@ object PersistenceMetadataSupport {
       }
     }
 
-  def readLatestVersion(appForm: AppForm)(implicit indentedLogger: IndentedLogger): (Map[String, List[String]], Option[Int]) = {
+  def readLatestVersion(appForm: AppForm)(implicit indentedLogger: IndentedLogger): Option[Int] = {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
-    val (headers, versionOpt) = PersistenceApi.readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)
-
-    headers ->
-      versionOpt
-        .flatMap(_.firstChildOpt(Names.FormVersion))
-        .map(_.getStringValue.toInt)
+    PersistenceApi.readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)._2
+      .flatMap(_.firstChildOpt(Names.FormVersion))
+      .map(_.getStringValue.toInt)
   }
 
   def isInternalAdminUser(requestParam: String => Option[String]): Boolean =
@@ -135,7 +132,7 @@ object PersistenceMetadataSupport {
     indentedLogger : IndentedLogger
   ): FormDefinitionVersion =
     incomingVersion match {
-      case SearchVersion.Unspecified  => PersistenceMetadataSupport.readLatestVersion(appForm)._2.map(FormDefinitionVersion.Specific).getOrElse(FormDefinitionVersion.Latest)
+      case SearchVersion.Unspecified  => PersistenceMetadataSupport.readLatestVersion(appForm).map(FormDefinitionVersion.Specific).getOrElse(FormDefinitionVersion.Latest)
       case SearchVersion.All          => FormDefinitionVersion.Latest
       case SearchVersion.Specific(v)  => FormDefinitionVersion.Specific(v)
     }

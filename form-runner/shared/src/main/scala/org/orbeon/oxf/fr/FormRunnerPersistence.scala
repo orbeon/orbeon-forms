@@ -409,10 +409,12 @@ trait FormRunnerPersistence {
     documentIdOpt.toList                                  :::
     Nil mkString "/"
 
+  // Create a path starting and ending with `/`
   //@XPathFunction
   def createFormDefinitionBasePath(app: String, form: String): String =
     CRUDBasePath :: createFormDefinitionBasePathNoPrefix(AppForm(app, form), None) :: "" :: Nil mkString "/"
 
+  // Path neither starts nor ends with with `/`
   def createFormDefinitionBasePathNoPrefix(appForm: AppForm, version: Option[Int]): String =
     appForm.app :: appForm.form :: version.map(_.toString).toList ::: FormOrData.Form.entryName :: Nil mkString "/"
 

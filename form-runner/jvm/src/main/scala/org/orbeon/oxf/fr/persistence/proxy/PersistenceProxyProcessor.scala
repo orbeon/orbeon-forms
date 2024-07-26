@@ -101,20 +101,20 @@ private[persistence] object PersistenceProxyProcessor {
 
   sealed trait VersionAction
   private object VersionAction {
-    case class  Reject             (reason: String)              extends VersionAction
-    case class  AcceptForData      (v: Option[Version.Specific]) extends VersionAction
-    case class  AcceptAndUseForForm(v: Version.Specific)         extends VersionAction
-    case class  HeadData           (v: Version.ForDocument)      extends VersionAction
-    case object LatestForm                                       extends VersionAction
-    case object NextForm                                         extends VersionAction
-    case object Ignore                                           extends VersionAction
+    case class  Reject                (reason: String)              extends VersionAction
+    case class  AcceptForData         (v: Option[Version.Specific]) extends VersionAction
+    case class  AcceptAndUseForForm   (v: Version.Specific)         extends VersionAction
+    case class  HeadDataForFormGetOnly(v: Version.ForDocument)      extends VersionAction
+    case object LatestForm                                          extends VersionAction
+    case object NextForFormPutOnly                                  extends VersionAction
+    case object Ignore                                              extends VersionAction
   }
 
   private val VersionActionMap: Map[HttpMethod, Map[FormOrData, Version => VersionAction]] = Map(
     HttpMethod.GET -> Map(
       FormOrData.Form ->
         {
-          case v @ Version.ForDocument(_, _) => VersionAction.HeadData(v) // only for this case
+          case v @ Version.ForDocument(_, _) => VersionAction.HeadDataForFormGetOnly(v) // only for this case
           case     Version.Unspecified       => VersionAction.LatestForm
           case v @ Version.Specific(_)       => VersionAction.AcceptAndUseForForm(v)
           case     Version.Next              => VersionAction.Reject("form GET for next version")
@@ -133,7 +133,7 @@ private[persistence] object PersistenceProxyProcessor {
           case     Version.ForDocument(_, _) => VersionAction.Reject("form PUT for document version")
           case     Version.Unspecified       => VersionAction.LatestForm
           case v @ Version.Specific(_)       => VersionAction.AcceptAndUseForForm(v)
-          case     Version.Next              => VersionAction.NextForm // only for this case
+          case     Version.Next              => VersionAction.NextForFormPutOnly // only for this case
         },
       FormOrData.Data ->
         {
@@ -394,14 +394,14 @@ private[persistence] object PersistenceProxyProcessor {
 
               (cxrOpt, Some(effectiveFormDefinitionVersion), responseHeadersOpt)
 
-            case VersionAction.HeadData(v) =>
+            case VersionAction.HeadDataForFormGetOnly(v) =>
 
               // Create path directly to the correct provider so we avoid a callback to the proxy through the PFC
-              val (dataPersistenceBaseUrl, dataOutgoingPersistenceHeaders) = getPersistenceURLHeaders(appForm, FormOrData.Data)
+              val (persistenceBaseUrl, dataOutgoingPersistenceHeaders) = getPersistenceURLHeaders(appForm, FormOrData.Data)
 
               val dataServiceUri =
                 PathUtils.recombineQuery(
-                  dataPersistenceBaseUrl.dropTrailingSlash                                                  ::
+                  persistenceBaseUrl.dropTrailingSlash                                                      ::
                     "crud"                                                                                  ::
                     FormRunner.createFormDataBasePathNoPrefix(appForm, None, v.isDraft, Some(v.documentId)) ::
                     DataXml                                                                                 ::
@@ -424,15 +424,62 @@ private[persistence] object PersistenceProxyProcessor {
               (None, Some(effectiveFormDefinitionVersion), Some(responseHeaders))
             case VersionAction.LatestForm if ! isVersioningSupported =>
               (None, Some(1), None)
-            case VersionAction.LatestForm =>
-              val (headers, versionFromMetadataOpt) = PersistenceMetadataSupport.readLatestVersion(appForm)
-              (None, Some(versionFromMetadataOpt.getOrElse(1)), Some(ResponseHeaders.fromHeaders(Headers.firstItemIgnoreCase(headers, _))))
-            case VersionAction.NextForm if ! isVersioningSupported =>
-              indentedLogger.logInfo("", s"400 Bad Request: request for next version while versioning not supported")
+            case VersionAction.NextForFormPutOnly if ! isVersioningSupported =>
+              indentedLogger.logInfo("", s"400 Bad Request: request for next version and versioning not supported")
               throw HttpStatusCodeException(StatusCode.BadRequest)
-            case VersionAction.NextForm =>
-              val (headers, versionFromMetadataOpt) = PersistenceMetadataSupport.readLatestVersion(appForm)
-              (None, Some(versionFromMetadataOpt.map(_ + 1).getOrElse(1)), Some(ResponseHeaders.fromHeaders(Headers.firstItemIgnoreCase(headers, _))))
+            case VersionAction.NextForFormPutOnly =>
+              PersistenceMetadataSupport.readLatestVersion(appForm) match {
+                case Some(versionFromMetadata) =>
+                  // There is at least one published form, and we will create the next version. We don't need to do a
+                  // `HEAD` on this form, since it doesn't exist: either it was never created in the database, or it
+                  // was but was deleted, in which case it is ok to start over with a new creator, etc. This behavior
+                  // might be different from when we were reading the `existingRow` in the provider upon `PUT`.
+                  (None, Some(versionFromMetadata + 1), None)
+                case None =>
+                  // No form published, start with 1
+                  (None, Some(1), None)
+              }
+            case VersionAction.LatestForm =>
+              PersistenceMetadataSupport.readLatestVersion(appForm) match {
+                case Some(versionFromMetadata) if crudMethod == HttpMethod.GET || crudMethod == HttpMethod.HEAD =>
+                  // There is at least one published form
+                  // We now know the version and return it, but we let the rest of the proxying happen further below
+                  (None, Some(versionFromMetadata), None)
+                case Some(versionFromMetadata) =>
+                  // There is at least one published form
+                  // We need to obtain the response headers which tell us the existing metadata, so that we can pass
+                  // it down to the provider, so that the `PUT`/`DELETE` can propagate the metadata.
+
+                  val (persistenceBaseUrl, dataOutgoingPersistenceHeaders) = getPersistenceURLHeaders(appForm, FormOrData.Form)
+
+                  val serviceUri =
+                    PathUtils.recombineQuery(
+                      persistenceBaseUrl.dropTrailingSlash                             ::
+                        "crud"                                                         ::
+                        FormRunner.createFormDefinitionBasePathNoPrefix(appForm, None) ::
+                        FormXhtml                                                      ::
+                        Nil mkString "/",
+                      queryForToken
+                    )
+
+                  val outgoingVersionHeader =
+                    Version.OrbeonFormDefinitionVersion -> versionFromMetadata.toString
+
+                  val (cxr, _, responseHeaders) =
+                    connectToObtainResponseHeadersAndCheckVersionGetOrHead(
+                      request                    = OutgoingRequest(HttpMethod.HEAD, filterVersioningHeaders(OutgoingRequest.headersFromRequest(request))),
+                      serviceUri                 = serviceUri,
+                      outgoingPersistenceHeaders = dataOutgoingPersistenceHeaders + outgoingVersionHeader,
+                      specificIncomingVersionOpt = Some(versionFromMetadata)
+                    )
+
+                  IOUtils.useAndClose(cxr)(identity)
+
+                  (None, Some(versionFromMetadata), Some(responseHeaders))
+                case None =>
+                  // No form published, start with 1
+                  (None, Some(1), None)
+              }
             case VersionAction.Ignore =>
               (None, None, None)
           }

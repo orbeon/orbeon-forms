@@ -130,7 +130,7 @@
 
         <!-- Found document messages -->
         <xf:group
-            ref="if ($_fr-persistence-instance/found-document-message-to-show != '') then . else ()"
+            ref="if (xxf:non-blank($_fr-persistence-instance/found-document-message-to-show)) then . else ()"
             class="alert alert-info fr-top-alert"
             xxf:element="div"
         >
@@ -272,7 +272,7 @@
                 as="xs:boolean"
                 value="
                     (: No draft message is showing :)
-                    $_fr-persistence-instance/found-document-message-to-show = '' and
+                    xxf:is-blank($_fr-persistence-instance/found-document-message-to-show) and
                     (: Either we don't need a lease or we have the lease :)
                     (not($_fr-lease-enabled) or $_fr-lease-state = 'current-user') and
                     (: Either the form is not available yet or not available anymore :)
@@ -743,7 +743,13 @@
                             xxf:instance('fr-form-metadata')/description
                         )[1]"/>
 
-                <xf:group xxf:element="div" ref=".[xxf:non-blank($description)]" class="alert fr-form-description">
+                <xf:group
+                    xxf:element="div"
+                    ref=".[
+                        xxf:non-blank($description) and
+                        xxf:is-blank($_fr-persistence-instance/found-document-message-to-show)
+                    ]"
+                    class="alert fr-form-description">
                     <!-- Don't allow closing as that removes the markup and the XForms engine might attempt to update the nested
                          xf:output, which will cause an error. -->
                     <xf:var name="is-html" value="$description/@mediatype = 'text/html'"/>
@@ -1361,7 +1367,7 @@
             <xsl:when test="not($hide-buttons-bar)">
                 <xf:var
                     name="hide-buttons-bar"
-                    value="$_fr-persistence-instance/found-document-message-to-show != '' or
+                    value="xxf:non-blank($_fr-persistence-instance/found-document-message-to-show) or
                            $_fr-document-available-too-early-or-late"/>
                 <xf:group
                     model="fr-form-model"

@@ -711,15 +711,20 @@
 
             // But if there is a nested table, show those in the label in the column header of that table
             .fr-grid-head .fr-grid-th {
-                .xforms-label {
-                    display: block; // label in repeat table header is block so yellow background in FB takes the whole width
-                }
-                .xforms-help {
-                    margin-top: 3px;
-                }
                 overflow-wrap: break-word;
                 // https://github.com/orbeon/orbeon-forms/issues/5716
                 word-wrap: break-word; // keep also `word-wrap`, even if it's deprecated in favor of `overflow-wrap`, for the PDF renderer
+                .xforms-label {
+                    display: block; // label in repeat table header is block so yellow background in FB takes the whole width
+                    margin: @frGridCellPadding @frGridCellPadding;
+                }
+                .xforms-help {
+                    margin-top: @frGridCellPadding + 2;
+                    margin-left: @frGridCellPadding;
+                }
+                .xforms-hint {
+                    margin-left: @frGridCellPadding;
+                }
             }
 
             .fr-repeat-column-left, .fr-repeat-column-right, .fr-repeat-column-number {
@@ -745,16 +750,6 @@
                 .badge {
                     margin: @frGridCellPadding + 2 @frGridCellPadding;
                     font-size: smaller;
-                }
-            }
-
-            .fr-grid-head {
-                .xforms-label {
-                    margin: 0 @frGridCellPadding;
-                }
-
-                .xforms-hint {
-                    margin-left: @frGridCellPadding;
                 }
             }
 

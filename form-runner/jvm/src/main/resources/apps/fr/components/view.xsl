@@ -143,7 +143,7 @@
                 <xf:case value="'found-draft-for-document'">
                     <xf:output value="$fr-resources/detail/draft-singleton/found-draft-for-document"/>
                     <xh:div class="fr-top-alert-buttons">
-                        <xf:group>
+                        <xf:group appearance="xxf:internal">
                             <xf:action event="DOMActivate">
                                 <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
                                 <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
@@ -168,7 +168,7 @@
                 <xf:case value="'found-draft-for-never-saved'">
                     <xf:output value="$fr-resources/detail/draft-singleton/found-draft-for-never-saved"/>
                     <xh:div class="fr-top-alert-buttons">
-                        <xf:group>
+                        <xf:group appearance="xxf:internal">
                             <xf:action event="DOMActivate">
                                 <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
                                 <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
@@ -206,7 +206,7 @@
                 <xf:case value="'found-drafts-for-never-saved'">
                     <xf:output value="$fr-resources/detail/draft-singleton/found-drafts-for-never-saved"/>
                     <xh:div class="fr-top-alert-buttons">
-                        <xf:group>
+                        <xf:group appearance="xxf:internal">
                             <xf:trigger>
                                 <xf:label value="$fr-resources/detail/draft-singleton/start-new"/>
                                 <xf:action event="DOMActivate">
@@ -231,7 +231,7 @@
                 <xf:case value="'found-multiple-docs-for-singleton'">
                     <xf:output value="$fr-resources/detail/draft-singleton/multiple-docs-explanation"/>
                     <xh:div class="fr-top-alert-buttons">
-                        <xf:group>
+                        <xf:group appearance="xxf:internal">
                             <xf:trigger xxf:modal="true">
                                 <xf:label value="$fr-resources/detail/draft-singleton/multiple-docs-view-data"/>
                                 <xf:load

@@ -191,19 +191,39 @@ body.orbeon { background-color: @frBackground }
 
     .fr-top-alert {
         display: flex;
-        .fa {
-            font-size: 3em;
-            float: left;
-            padding-right: 20px;
-            padding-left: 10px;
-            padding-bottom: 10px;
-            // For alignment when both lease and document messages show
-            min-width: 30px;
+        column-gap: 1em;
+        width: 100%;
+        box-sizing: border-box;
+        & > .fa {
+            margin-top: 4px;    // align with text
+            flex-grow: 0;
+            &::before {
+                font-size: 3em; // larger icon
+            }
+        }
+        & > .xforms-switch {
+            flex-grow: 1;
         }
         .fr-top-alert-buttons {
             padding-top: 10px;
-            .xforms-trigger {
-                padding-right: 10px;
+            display: flex;
+            column-gap: 1em;
+            row-gap: 1em;
+            width: auto;
+            text-align: center;
+            align-items: center;
+            & > * {
+                flex-basis: 0;
+                flex-grow: 1;
+                min-width: 0;
+                width: 100%;
+                button {
+                    text-wrap: pretty;
+                    width: 100%;
+                }
+            }
+            @media (max-width: 640px) {
+                flex-direction: column; // stack buttons
             }
         }
     }

@@ -358,7 +358,13 @@
     <!-- Start grid content -->
     <xsl:template match="*:div[p:has-class('xbl-fr-grid')]">
         <xsl:element name="{local-name()}">
-            <xsl:apply-templates select="@* | node()"/>
+            <xsl:apply-templates select="@*"/>
+            <xsl:if test="not(p:has-class('xforms-grid-appearance-minimal'))">
+                <!-- This is so that the PDF renderer can match on this class, as `:not()` is not supported. This
+                     class is not placed unless the `full` appearance is explicit. -->
+                <xsl:attribute name="class" select="concat(@class, ' xforms-grid-appearance-full')"/>
+            </xsl:if>
+            <xsl:apply-templates select="node()"/>
         </xsl:element>
     </xsl:template>
 

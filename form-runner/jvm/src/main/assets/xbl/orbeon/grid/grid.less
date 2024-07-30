@@ -117,22 +117,24 @@
         // =============================================================================================================
         @media (max-width: 640px) {
             .fr-grid {
-                // https://github.com/orbeon/orbeon-forms/issues/4805
-                &:not(.fr-grid-css) {
-                    &> .fr-grid-body .fr-grid-tr .fr-grid-td {
-                        display: block;
-                    }
-                    &.fr-repeat-multiple-rows {
-                        // Only keep 2 table headers: one for the column with the dropdown button, and one for fields
-                        .fr-grid-th:nth-child(n+3) {
-                            display: none
+                &.fr-norepeat, &.fr-repeat-single-row, &.fr-repeat-multiple-rows { // to make rule stronger
+                    // https://github.com/orbeon/orbeon-forms/issues/4805
+                    &:not(.fr-grid-css) {
+                        &> .fr-grid-body .fr-grid-tr .fr-grid-td {
+                            display: block;
+                        }
+                        &.fr-repeat-multiple-rows {
+                            // Only keep 2 table headers: one for the column with the dropdown button, and one for fields
+                            .fr-grid-th:nth-child(n+3) {
+                                display: none
+                            }
                         }
                     }
-                }
 
-                &.fr-grid-css {
-                    &> .fr-grid-body, &> .fr-grid-repeat-iteration > .fr-grid-body {
-                        display: block;
+                    &.fr-grid-css {
+                        & > .fr-grid-body, & > .fr-grid-repeat-iteration > .fr-grid-body {
+                            display: block;
+                        }
                     }
                 }
             }
@@ -263,7 +265,7 @@
 
         // The `full` appearance uses more borders, but as of 2024-07-30 we decided to remove the cell borders
         // around form controls to make the look lighter.
-        &.xforms-grid-appearance-full {
+        .full-appearance-borders() {
             .fr-grid.fr-repeat {
 
                 border: 1px solid #ddd;
@@ -397,6 +399,15 @@
                     }
                 }
             }
+        }
+
+        // For PDF renderer (which doesn't support `:not()`), class added in `print-pdf-notemplate.xsl`
+        &.xforms-grid-appearance-full {
+            .full-appearance-borders();
+        }
+        // For browser
+        &:not(.xforms-grid-appearance-minimal) {
+            .full-appearance-borders();
         }
 
         // =============================================================================================================

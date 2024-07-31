@@ -7,6 +7,7 @@
 
         // Make buttons stick to the viewport
         // https://github.com/orbeon/orbeon-forms/issues/4809
+        // https://github.com/orbeon/orbeon-forms/issues/6417
         position: sticky;
         bottom: 0;
 
@@ -71,10 +72,11 @@
     @media (max-width: 640px) {
         .fr-buttons {
 
-            position: fixed;
+            position: sticky;
             bottom: 0;
             left: 0;
             right: 0;
+            padding: 0;
 
             .xforms-trigger button {
                 // Each button is on its own line and takes the whole line

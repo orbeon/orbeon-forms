@@ -37,7 +37,16 @@
                     </section>
                     <control-section>
                         <control-grid>
+                            <table-or-css>table css</table-or-css>
+                            <appearance>full minimal</appearance>
+                            <number>yes no</number>
+                            <readonly-static>yes no</readonly-static>
                             <readonly>false</readonly>
+
+
+
+
+
                         </control-grid>
                     </control-section>
                     <repeated-full-number-readwrite-table-section>
@@ -288,7 +297,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-full-number-readwrite-table-section-bind"
                          ref="repeated-full-number-readwrite-table-section"
-                         name="repeated-full-number-readwrite-table-section">
+                         name="repeated-full-number-readwrite-table-section"
+                         relevant="xxf:split($table-or-css) = 'table' and xxf:split($appearance) = 'full' and xxf:split($number) = 'yes' and xxf:split($readonly-static) = 'no'">
                     <xf:bind id="repeated-full-number-readwrite-table-single-grid-bind"
                              ref="repeated-full-number-readwrite-table-single-grid"
                              name="repeated-full-number-readwrite-table-single-grid"
@@ -324,11 +334,11 @@
                 </xf:bind>
                 <xf:bind id="repeated-minimal-number-readwrite-table-section-bind"
                          ref="repeated-minimal-number-readwrite-table-section"
-                         name="repeated-minimal-number-readwrite-table-section">
+                         name="repeated-minimal-number-readwrite-table-section"
+                         relevant="xxf:split($table-or-css) = 'table' and xxf:split($appearance) = 'minimal' and xxf:split($number) = 'yes' and xxf:split($readonly-static) = 'no'">
                     <xf:bind id="repeated-minimal-number-readwrite-table-single-grid-bind"
                              ref="repeated-minimal-number-readwrite-table-single-grid"
-                             name="repeated-minimal-number-readwrite-table-single-grid"
-                             readonly="$readonly = true()">
+                             name="repeated-minimal-number-readwrite-table-single-grid">
                         <xf:bind id="repeated-minimal-number-readwrite-table-single-grid-iteration-bind"
                                  ref="repeated-minimal-number-readwrite-table-single-grid-iteration"
                                  name="repeated-minimal-number-readwrite-table-single-grid-iteration">
@@ -360,11 +370,11 @@
                 </xf:bind>
                 <xf:bind id="repeated-full-nonumber-readwrite-table-section-bind"
                          ref="repeated-full-nonumber-readwrite-table-section"
-                         name="repeated-full-nonumber-readwrite-table-section">
+                         name="repeated-full-nonumber-readwrite-table-section"
+                         relevant="xxf:split($table-or-css) = 'table' and xxf:split($appearance) = 'full' and xxf:split($number) = 'no' and xxf:split($readonly-static) = 'no'">
                     <xf:bind id="repeated-full-nonumber-readwrite-table-single-grid-bind"
                              ref="repeated-full-nonumber-readwrite-table-single-grid"
-                             name="repeated-full-nonumber-readwrite-table-single-grid"
-                             readonly="$readonly = true()">
+                             name="repeated-full-nonumber-readwrite-table-single-grid">
                         <xf:bind id="repeated-full-nonumber-readwrite-table-single-grid-iteration-bind"
                                  ref="repeated-full-nonumber-readwrite-table-single-grid-iteration"
                                  name="repeated-full-nonumber-readwrite-table-single-grid-iteration">
@@ -396,7 +406,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-minimal-nonumber-readwrite-table-section-bind"
                          ref="repeated-minimal-nonumber-readwrite-table-section"
-                         name="repeated-minimal-nonumber-readwrite-table-section">
+                         name="repeated-minimal-nonumber-readwrite-table-section"
+                         relevant="xxf:split($table-or-css) = 'table' and xxf:split($appearance) = 'minimal' and xxf:split($number) = 'no' and xxf:split($readonly-static) = 'no'">
                     <xf:bind id="repeated-minimal-nonumber-readwrite-table-single-grid-bind"
                              ref="repeated-minimal-nonumber-readwrite-table-single-grid"
                              name="repeated-minimal-nonumber-readwrite-table-single-grid"
@@ -432,7 +443,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-full-number-readonly-table-section-bind"
                          ref="repeated-full-number-readonly-table-section"
-                         name="repeated-full-number-readonly-table-section">
+                         name="repeated-full-number-readonly-table-section"
+                         relevant="xxf:split($table-or-css) = 'table' and xxf:split($appearance) = 'full' and xxf:split($number) = 'yes' and xxf:split($readonly-static) = 'yes'">
                     <xf:bind id="repeated-full-number-readonly-table-single-grid-bind"
                              ref="repeated-full-number-readonly-table-single-grid"
                              name="repeated-full-number-readonly-table-single-grid"
@@ -468,7 +480,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-minimal-number-readonly-table-section-bind"
                          ref="repeated-minimal-number-readonly-table-section"
-                         name="repeated-minimal-number-readonly-table-section">
+                         name="repeated-minimal-number-readonly-table-section"
+                         relevant="xxf:split($table-or-css) = 'table' and xxf:split($appearance) = 'minimal' and xxf:split($number) = 'yes' and xxf:split($readonly-static) = 'yes'">
                     <xf:bind id="repeated-minimal-number-readonly-table-single-grid-bind"
                              ref="repeated-minimal-number-readonly-table-single-grid"
                              name="repeated-minimal-number-readonly-table-single-grid"
@@ -504,7 +517,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-full-nonumber-readonly-table-section-bind"
                          ref="repeated-full-nonumber-readonly-table-section"
-                         name="repeated-full-nonumber-readonly-table-section">
+                         name="repeated-full-nonumber-readonly-table-section"
+                         relevant="xxf:split($table-or-css) = 'table' and xxf:split($appearance) = 'full' and xxf:split($number) = 'no' and xxf:split($readonly-static) = 'yes'">
                     <xf:bind id="repeated-full-nonumber-readonly-table-single-grid-bind"
                              ref="repeated-full-nonumber-readonly-table-single-grid"
                              name="repeated-full-nonumber-readonly-table-single-grid"
@@ -540,7 +554,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-minimal-nonumber-readonly-table-section-bind"
                          ref="repeated-minimal-nonumber-readonly-table-section"
-                         name="repeated-minimal-nonumber-readonly-table-section">
+                         name="repeated-minimal-nonumber-readonly-table-section"
+                         relevant="xxf:split($table-or-css) = 'table' and xxf:split($appearance) = 'minimal' and xxf:split($number) = 'no' and xxf:split($readonly-static) = 'yes'">
                     <xf:bind id="repeated-minimal-nonumber-readonly-table-single-grid-bind"
                              ref="repeated-minimal-nonumber-readonly-table-single-grid"
                              name="repeated-minimal-nonumber-readonly-table-single-grid"
@@ -576,7 +591,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-full-number-readwrite-css-section-bind"
                          ref="repeated-full-number-readwrite-css-section"
-                         name="repeated-full-number-readwrite-css-section">
+                         name="repeated-full-number-readwrite-css-section"
+                         relevant="xxf:split($table-or-css) = 'css' and xxf:split($appearance) = 'full' and xxf:split($number) = 'yes' and xxf:split($readonly-static) = 'no'">
                     <xf:bind id="repeated-full-number-readwrite-css-single-grid-bind"
                              ref="repeated-full-number-readwrite-css-single-grid"
                              name="repeated-full-number-readwrite-css-single-grid"
@@ -612,7 +628,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-minimal-number-readwrite-css-section-bind"
                          ref="repeated-minimal-number-readwrite-css-section"
-                         name="repeated-minimal-number-readwrite-css-section">
+                         name="repeated-minimal-number-readwrite-css-section"
+                         relevant="xxf:split($table-or-css) = 'css' and xxf:split($appearance) = 'minimal' and xxf:split($number) = 'yes' and xxf:split($readonly-static) = 'no'">
                     <xf:bind id="repeated-minimal-number-readwrite-css-single-grid-bind"
                              ref="repeated-minimal-number-readwrite-css-single-grid"
                              name="repeated-minimal-number-readwrite-css-single-grid"
@@ -648,7 +665,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-full-nonumber-readwrite-css-section-bind"
                          ref="repeated-full-nonumber-readwrite-css-section"
-                         name="repeated-full-nonumber-readwrite-css-section">
+                         name="repeated-full-nonumber-readwrite-css-section"
+                         relevant="xxf:split($table-or-css) = 'css' and xxf:split($appearance) = 'full' and xxf:split($number) = 'no' and xxf:split($readonly-static) = 'no'">
                     <xf:bind id="repeated-full-nonumber-readwrite-css-single-grid-bind"
                              ref="repeated-full-nonumber-readwrite-css-single-grid"
                              name="repeated-full-nonumber-readwrite-css-single-grid"
@@ -684,7 +702,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-minimal-nonumber-readwrite-css-section-bind"
                          ref="repeated-minimal-nonumber-readwrite-css-section"
-                         name="repeated-minimal-nonumber-readwrite-css-section">
+                         name="repeated-minimal-nonumber-readwrite-css-section"
+                         relevant="xxf:split($table-or-css) = 'css' and xxf:split($appearance) = 'minimal' and xxf:split($number) = 'no' and xxf:split($readonly-static) = 'no'">
                     <xf:bind id="repeated-minimal-nonumber-readwrite-css-single-grid-bind"
                              ref="repeated-minimal-nonumber-readwrite-css-single-grid"
                              name="repeated-minimal-nonumber-readwrite-css-single-grid"
@@ -720,7 +739,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-full-number-readonly-css-section-bind"
                          ref="repeated-full-number-readonly-css-section"
-                         name="repeated-full-number-readonly-css-section">
+                         name="repeated-full-number-readonly-css-section"
+                         relevant="xxf:split($table-or-css) = 'css' and xxf:split($appearance) = 'full' and xxf:split($number) = 'yes' and xxf:split($readonly-static) = 'yes'">
                     <xf:bind id="repeated-full-number-readonly-css-single-grid-bind"
                              ref="repeated-full-number-readonly-css-single-grid"
                              name="repeated-full-number-readonly-css-single-grid"
@@ -756,7 +776,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-minimal-number-readonly-css-section-bind"
                          ref="repeated-minimal-number-readonly-css-section"
-                         name="repeated-minimal-number-readonly-css-section">
+                         name="repeated-minimal-number-readonly-css-section"
+                         relevant="xxf:split($table-or-css) = 'css' and xxf:split($appearance) = 'minimal' and xxf:split($number) = 'yes' and xxf:split($readonly-static) = 'yes'">
                     <xf:bind id="repeated-minimal-number-readonly-css-single-grid-bind"
                              ref="repeated-minimal-number-readonly-css-single-grid"
                              name="repeated-minimal-number-readonly-css-single-grid"
@@ -792,7 +813,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-full-nonumber-readonly-css-section-bind"
                          ref="repeated-full-nonumber-readonly-css-section"
-                         name="repeated-full-nonumber-readonly-css-section">
+                         name="repeated-full-nonumber-readonly-css-section"
+                         relevant="xxf:split($table-or-css) = 'css' and xxf:split($appearance) = 'full' and xxf:split($number) = 'no' and xxf:split($readonly-static) = 'yes'">
                     <xf:bind id="repeated-full-nonumber-readonly-css-single-grid-bind"
                              ref="repeated-full-nonumber-readonly-css-single-grid"
                              name="repeated-full-nonumber-readonly-css-single-grid"
@@ -828,7 +850,8 @@
                 </xf:bind>
                 <xf:bind id="repeated-minimal-nonumber-readonly-css-section-bind"
                          ref="repeated-minimal-nonumber-readonly-css-section"
-                         name="repeated-minimal-nonumber-readonly-css-section">
+                         name="repeated-minimal-nonumber-readonly-css-section"
+                         relevant="xxf:split($table-or-css) = 'css' and xxf:split($appearance) = 'minimal' and xxf:split($number) = 'no' and xxf:split($readonly-static) = 'yes'">
                     <xf:bind id="repeated-minimal-nonumber-readonly-css-single-grid-bind"
                              ref="repeated-minimal-nonumber-readonly-css-single-grid"
                              name="repeated-minimal-nonumber-readonly-css-single-grid"
@@ -864,6 +887,14 @@
                 </xf:bind>
                 <xf:bind id="control-section-bind" ref="control-section" name="control-section">
                     <xf:bind id="control-grid-bind" ref="control-grid" name="control-grid">
+
+
+
+
+                        <xf:bind id="table-or-css-bind" ref="table-or-css" name="table-or-css"/>
+                        <xf:bind id="appearance-bind" ref="appearance" name="appearance"/>
+                        <xf:bind id="number-bind" ref="number" name="number"/>
+                        <xf:bind id="readonly-static-bind" ref="readonly-static" name="readonly-static"/>
                         <xf:bind id="readonly-bind" ref="readonly" name="readonly" type="xf:boolean"/>
                     </xf:bind>
                 </xf:bind>
@@ -878,10 +909,23 @@
                     <description xml:lang="en" mediatype="text/html">&lt;div&gt;This form illustrates the different appearances of repeated grids depending on the following parameters:&lt;/div&gt;&lt;div&gt;&amp;nbsp;&lt;/div&gt;&lt;ol&gt;&lt;li&gt;Repetition over one vs. more rows&lt;/li&gt;&lt;li&gt;Full appearance vs. minimal appearance&lt;/li&gt;&lt;li&gt;Whether to show the repetition number or not&lt;/li&gt;&lt;li&gt;Modifiable vs. readonly grid&lt;/li&gt;&lt;li&gt;Use of HTML tables vs. CSS grids for rendering&lt;/li&gt;&lt;/ol&gt;&lt;div&gt;With Form Builder, you can control the appearance, numbering, and readonly parameters in the Container Settings dialog. With Orbeon Forms 2022.1, Orbeon Forms uses CSS grids by default. This default can be changed using configuration properties.&lt;/div&gt;</description>
                     <created-with-version>2022.1-SNAPSHOT PE</created-with-version>
                     <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
                     <library-versions>
                         <orbeon>1</orbeon>
                     </library-versions>
                     <grid-markup>html-table</grid-markup>
+
+
+
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
                 </metadata>
             </xf:instance>
 
@@ -894,10 +938,79 @@
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
+                        <table-or-css>
+                            <label>Table or CSS</label>
+                            <hint/>
+                            <item>
+                                <label>Table</label>
+                                <hint/>
+                                <value>table</value>
+                            </item>
+                            <item>
+                                <label>CSS</label>
+                                <hint/>
+                                <value>css</value>
+                            </item>
+                        </table-or-css>
+                        <appearance>
+                            <label>Appearance</label>
+                            <hint/>
+                            <item>
+                                <label>Full</label>
+                                <hint/>
+                                <value>full</value>
+                            </item>
+                            <item>
+                                <label>Minimal</label>
+                                <hint/>
+                                <value>minimal</value>
+                            </item>
+                        </appearance>
+                        <number>
+                            <label>Number</label>
+                            <hint/>
+
+                            <item>
+                                <label>Yes</label>
+                                <hint/>
+                                <value>yes</value>
+                            </item>
+                            <item>
+                                <label>No</label>
+                                <hint/>
+                                <value>no</value>
+                            </item>
+
+
+                        </number>
+                        <readonly-static>
+                            <label>Readonly (static)</label>
+                            <hint/>
+
+
+
+                            <item>
+                                <label>Yes</label>
+                                <hint/>
+                                <value>yes</value>
+                            </item>
+                            <item>
+                                <label>No</label>
+                                <hint/>
+                                <value>no</value>
+                            </item>
+
+
+                        </readonly-static>
                         <readonly>
-                            <label>Readonly</label>
+                            <label>Readonly (dynamic)</label>
                             <hint/>
                         </readonly>
+
+
+
+
+
                         <section>
                             <label>Template</label>
                         </section>
@@ -1484,6 +1597,21 @@
                                 <hint/>
                             </item>
                         </f4>
+                        <repeated-minimal-number-readwrite-table-single-grid/>
+                        <repeated-full-nonumber-readwrite-table-single-grid/>
+                        <repeated-minimal-nonumber-readwrite-table-single-grid/>
+                        <repeated-full-number-readonly-table-single-grid/>
+                        <repeated-minimal-number-readonly-table-single-grid/>
+                        <repeated-full-nonumber-readonly-table-single-grid/>
+                        <repeated-minimal-nonumber-readonly-table-single-grid/>
+                        <repeated-full-number-readwrite-css-single-grid/>
+                        <repeated-minimal-number-readwrite-css-single-grid/>
+                        <repeated-full-nonumber-readwrite-css-single-grid/>
+                        <repeated-minimal-nonumber-readwrite-css-single-grid/>
+                        <repeated-full-number-readonly-css-single-grid/>
+                        <repeated-minimal-number-readonly-css-single-grid/>
+                        <repeated-full-nonumber-readonly-css-single-grid/>
+                        <repeated-minimal-nonumber-readonly-css-single-grid/>
 
                     </resource>
                 </resources>
@@ -1733,7 +1861,7 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl"
                      xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="section-section" bind="section-bind">
                     <xf:label ref="$form-resources/section/label"/>
@@ -1801,7 +1929,70 @@
                 <fr:section id="control-section-section" bind="control-section-bind">
                     <xf:label ref="$form-resources/control-section/label"/>
                     <fr:grid id="control-grid-grid" bind="control-grid-bind">
-                        <fr:c x="1" y="1" w="6">
+                        <fr:c x="1" y="1" w="2">
+                            <xf:select id="table-or-css-control" appearance="full" bind="table-or-css-bind">
+                                <xf:label ref="$form-resources/table-or-css/label"/>
+                                <xf:hint ref="$form-resources/table-or-css/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/table-or-css/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select>
+
+                        </fr:c>
+                        <fr:c x="3" y="1" w="2" h="1">
+                            <xf:select id="appearance-control" appearance="full" bind="appearance-bind">
+                                <xf:label ref="$form-resources/appearance/label"/>
+                                <xf:hint ref="$form-resources/appearance/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/appearance/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select>
+
+                        </fr:c>
+                        <fr:c x="5" y="1" w="2">
+                            <xf:select id="number-control" appearance="full" bind="number-bind">
+                                <xf:label ref="$form-resources/number/label"/>
+                                <xf:hint ref="$form-resources/number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                                <xf:itemset ref="$form-resources/number/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select>
+
+                        </fr:c>
+                        <fr:c x="7" y="1" w="2" h="1">
+                            <xf:select id="readonly-static-control" appearance="full" bind="readonly-static-bind">
+                                <xf:label ref="$form-resources/readonly-static/label"/>
+                                <xf:hint ref="$form-resources/readonly-static/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+
+                                <xf:itemset ref="$form-resources/readonly-static/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select>
+
+                        </fr:c>
+                        <fr:c x="9" y="1" w="2" h="1">
                             <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder"
                                             xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                             id="readonly-control"
@@ -1812,13 +2003,15 @@
 
 
                             </fr:yesno-input>
+
                         </fr:c>
-                        <fr:c x="7" y="1" w="6"/>
+                        <fr:c x="11" y="1" w="2" h="1"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="repeated-full-number-readwrite-table-section-section"
                             bind="repeated-full-number-readwrite-table-section-bind">
                     <xf:label ref="$form-resources/repeated-full-number-readwrite-table-section/label"/>
+
                     <fr:grid id="repeated-full-number-readwrite-table-single-grid-grid"
                              bind="repeated-full-number-readwrite-table-single-grid-bind"
                              repeat="content"
@@ -1892,6 +2085,7 @@
                 <fr:section id="repeated-minimal-number-readwrite-table-section-section"
                             bind="repeated-minimal-number-readwrite-table-section-bind">
                     <xf:label ref="$form-resources/repeated-minimal-number-readwrite-table-section/label"/>
+
                     <fr:grid id="repeated-minimal-number-readwrite-table-single-grid-grid"
                              bind="repeated-minimal-number-readwrite-table-single-grid-bind"
                              repeat="content"
@@ -1965,6 +2159,7 @@
                 <fr:section id="repeated-full-nonumber-readwrite-table-section-section"
                             bind="repeated-full-nonumber-readwrite-table-section-bind">
                     <xf:label ref="$form-resources/repeated-full-nonumber-readwrite-table-section/label"/>
+
                     <fr:grid id="repeated-full-nonumber-readwrite-table-single-grid-grid"
                              bind="repeated-full-nonumber-readwrite-table-single-grid-bind"
                              repeat="content"
@@ -2036,6 +2231,7 @@
                 <fr:section id="repeated-minimal-nonumber-readwrite-table-section-section"
                             bind="repeated-minimal-nonumber-readwrite-table-section-bind">
                     <xf:label ref="$form-resources/repeated-minimal-nonumber-readwrite-table-section/label"/>
+
                     <fr:grid id="repeated-minimal-nonumber-readwrite-table-single-grid-grid"
                              bind="repeated-minimal-nonumber-readwrite-table-single-grid-bind"
                              repeat="content"
@@ -2107,6 +2303,7 @@
                 <fr:section id="repeated-full-number-readonly-table-section-section"
                             bind="repeated-full-number-readonly-table-section-bind">
                     <xf:label ref="$form-resources/repeated-full-number-readonly-table-section/label"/>
+
                     <fr:grid readonly="true" id="repeated-full-number-readonly-table-single-grid-grid"
                              bind="repeated-full-number-readonly-table-single-grid-bind"
                              repeat="content"
@@ -2180,6 +2377,7 @@
                 <fr:section id="repeated-minimal-number-readonly-table-section-section"
                             bind="repeated-minimal-number-readonly-table-section-bind">
                     <xf:label ref="$form-resources/repeated-minimal-number-readonly-table-section/label"/>
+
                     <fr:grid readonly="true" id="repeated-minimal-number-readonly-table-single-grid-grid"
                              bind="repeated-minimal-number-readonly-table-single-grid-bind"
                              repeat="content"
@@ -2253,6 +2451,7 @@
                 <fr:section id="repeated-full-nonumber-readonly-table-section-section"
                             bind="repeated-full-nonumber-readonly-table-section-bind">
                     <xf:label ref="$form-resources/repeated-full-nonumber-readonly-table-section/label"/>
+
                     <fr:grid readonly="true" id="repeated-full-nonumber-readonly-table-single-grid-grid"
                              bind="repeated-full-nonumber-readonly-table-single-grid-bind"
                              repeat="content"
@@ -2324,6 +2523,7 @@
                 <fr:section id="repeated-minimal-nonumber-readonly-table-section-section"
                             bind="repeated-minimal-nonumber-readonly-table-section-bind">
                     <xf:label ref="$form-resources/repeated-minimal-nonumber-readonly-table-section/label"/>
+
                     <fr:grid readonly="true" id="repeated-minimal-nonumber-readonly-table-single-grid-grid"
                              bind="repeated-minimal-nonumber-readonly-table-single-grid-bind"
                              repeat="content"
@@ -2396,6 +2596,7 @@
                 <fr:section id="repeated-full-number-readwrite-css-section-section"
                             bind="repeated-full-number-readwrite-css-section-bind">
                     <xf:label ref="$form-resources/repeated-full-number-readwrite-css-section/label"/>
+
                     <fr:grid id="repeated-full-number-readwrite-css-single-grid-grid"
                              bind="repeated-full-number-readwrite-css-single-grid-bind"
                              repeat="content"
@@ -2471,6 +2672,7 @@
                 <fr:section id="repeated-minimal-number-readwrite-css-section-section"
                             bind="repeated-minimal-number-readwrite-css-section-bind">
                     <xf:label ref="$form-resources/repeated-minimal-number-readwrite-css-section/label"/>
+
                     <fr:grid id="repeated-minimal-number-readwrite-css-single-grid-grid"
                              bind="repeated-minimal-number-readwrite-css-single-grid-bind"
                              repeat="content"
@@ -2546,6 +2748,7 @@
                 <fr:section id="repeated-full-nonumber-readwrite-css-section-section"
                             bind="repeated-full-nonumber-readwrite-css-section-bind">
                     <xf:label ref="$form-resources/repeated-full-nonumber-readwrite-css-section/label"/>
+
                     <fr:grid id="repeated-full-nonumber-readwrite-css-single-grid-grid"
                              bind="repeated-full-nonumber-readwrite-css-single-grid-bind"
                              repeat="content"
@@ -2619,6 +2822,7 @@
                 <fr:section id="repeated-minimal-nonumber-readwrite-css-section-section"
                             bind="repeated-minimal-nonumber-readwrite-css-section-bind">
                     <xf:label ref="$form-resources/repeated-minimal-nonumber-readwrite-css-section/label"/>
+
                     <fr:grid id="repeated-minimal-nonumber-readwrite-css-single-grid-grid"
                              bind="repeated-minimal-nonumber-readwrite-css-single-grid-bind"
                              repeat="content"
@@ -2692,6 +2896,7 @@
                 <fr:section id="repeated-full-number-readonly-css-section-section"
                             bind="repeated-full-number-readonly-css-section-bind">
                     <xf:label ref="$form-resources/repeated-full-number-readonly-css-section/label"/>
+
                     <fr:grid readonly="true" id="repeated-full-number-readonly-css-single-grid-grid"
                              bind="repeated-full-number-readonly-css-single-grid-bind"
                              repeat="content"
@@ -2767,6 +2972,7 @@
                 <fr:section id="repeated-minimal-number-readonly-css-section-section"
                             bind="repeated-minimal-number-readonly-css-section-bind">
                     <xf:label ref="$form-resources/repeated-minimal-number-readonly-css-section/label"/>
+
                     <fr:grid readonly="true" id="repeated-minimal-number-readonly-css-single-grid-grid"
                              bind="repeated-minimal-number-readonly-css-single-grid-bind"
                              repeat="content"
@@ -2842,6 +3048,7 @@
                 <fr:section id="repeated-full-nonumber-readonly-css-section-section"
                             bind="repeated-full-nonumber-readonly-css-section-bind">
                     <xf:label ref="$form-resources/repeated-full-nonumber-readonly-css-section/label"/>
+
                     <fr:grid readonly="true" id="repeated-full-nonumber-readonly-css-single-grid-grid"
                              bind="repeated-full-nonumber-readonly-css-single-grid-bind"
                              repeat="content"
@@ -2915,6 +3122,7 @@
                 <fr:section id="repeated-minimal-nonumber-readonly-css-section-section"
                             bind="repeated-minimal-nonumber-readonly-css-section-bind">
                     <xf:label ref="$form-resources/repeated-minimal-nonumber-readonly-css-section/label"/>
+
                     <fr:grid readonly="true" id="repeated-minimal-nonumber-readonly-css-single-grid-grid"
                              bind="repeated-minimal-nonumber-readonly-css-single-grid-bind"
                              repeat="content"

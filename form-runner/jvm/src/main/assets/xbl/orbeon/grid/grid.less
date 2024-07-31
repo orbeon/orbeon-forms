@@ -246,17 +246,8 @@
                     .fr-grid-tr:first-child > {
                         .fr-grid-td, .fr-repeat-column-number, .fr-repeat-column-right {
                             // Use a mixin because Less CSS doesn't parse `@media` correctly
-                            .top-border() {
-                                border-top: 2px solid #ddd;
-                                padding-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
-                            }
-                            @media not (max-width: 640px) {
-                                .top-border();
-                            }
-                            // The PDF renderer doesn't support `@media` queries properly
-                            @media print {
-                                .top-border();
-                            }
+                            border-top: 2px solid #ddd;
+                            padding-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
                         }
                     }
                 }

@@ -75,6 +75,7 @@ trait FormRunnerActionsCommon {
     "wizard-prev"            -> tryWizardPrev,
     "wizard-next"            -> tryWizardNext,
     "new-to-edit"            -> tryNewToEdit,
+    "edit-to-new"            -> tryEditToNew,
     "callback"               -> tryCallback,
   )
 
@@ -248,14 +249,19 @@ trait FormRunnerActionsCommon {
   }
 
   def tryNewToEdit(params: ActionParams): ActionResult = ActionResult.trySync {
-
-    val modeElement = frc.parametersInstance.get.rootElement / "mode"
-    val isNew       = modeElement.stringValue == "new"
-
-    if (isNew && frc.canUpdate) {
-      setvalue(modeElement, "edit")
-      // Manual dependency HACK: RR fr-form-model as we have changed mode
+    if (frc.getMode == "new" && frc.canUpdate) {
+      frc.updateMode("edit")
+      // Manual dependency HACK: RR `fr-form-model` as we have changed mode
       recalculate(FormModel)
+    }
+  }
+
+  def tryEditToNew(params: ActionParams): ActionResult = ActionResult.trySync {
+    if (frc.getMode == "edit" && frc.canCreate) {
+      frc.updateMode("new")
+      // Manual dependency HACK: RR `fr-form-model` as we have changed mode
+      recalculate(FormModel)
+      XFormsAPI.dispatch(name = "fr-new-document", targetId = "fr-persistence-model")
     }
   }
 

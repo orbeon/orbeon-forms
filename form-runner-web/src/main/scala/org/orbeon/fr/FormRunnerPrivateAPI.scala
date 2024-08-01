@@ -35,7 +35,7 @@ object FormRunnerPrivateAPI extends js.Object {
   // 2018-05-07: Some browsers, including Firefox and Chrome, no longer use the message provided here.
   private val Message = "You may lose some unsaved changes."
 
-  private val NewPathSuffix = "/new"
+  private val NewEditViewPathRe = """(.*/fr/)([^/]+)/([^/]+)/(new|edit|view)(?:/([^/]+))?$""".r
 
   def setDataStatus(uuid: String, safe: Boolean): Unit = {
 
@@ -76,7 +76,9 @@ object FormRunnerPrivateAPI extends js.Object {
 
     val location = dom.window.location
 
-    if (location.pathname.endsWith(NewPathSuffix)) {
+    val NewEditViewPathRe(_, _, _, mode, _)  = location.pathname
+
+    if (mode == "new") {
 
       val newSearch = {
         val supportsURLSearchParams = global.URLSearchParams.asInstanceOf[UndefOr[URLSearchParams]].isDefined
@@ -94,12 +96,39 @@ object FormRunnerPrivateAPI extends js.Object {
         }
       }
 
-      // `search`: for example `?form-version=42`
+      // `newSearch`: for example `?form-version=42`
       // `hash`: for now not used by Form Runner, but it is safer to keep it
       dom.window.history.replaceState(
         statedata = dom.window.history.state,
         title     = "",
         url       = s"edit/$documentId$newSearch${location.hash}"
+      )
+    }
+  }
+
+  def editToNew(): Unit = {
+
+    val location = dom.window.location
+
+    val NewEditViewPathRe(context, app, form, mode, _)  = location.pathname
+
+    if (mode == "edit") {
+
+      val newSearch = {
+        val urlSearchParams = new URLSearchParams(location.search)
+        urlSearchParams.delete("draft")
+        urlSearchParams.toString match {
+          case ""                 => ""
+          case stringSearchParams => s"?$stringSearchParams"
+        }
+      }
+
+      // `newSearch`: for example `?form-version=42`
+      // `hash`: for now not used by Form Runner, but it is safer to keep it
+      dom.window.history.replaceState(
+        statedata = dom.window.history.state,
+        title     = "",
+        url       = s"$context$app/$form/new$newSearch${location.hash}"
       )
     }
   }

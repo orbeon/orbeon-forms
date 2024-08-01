@@ -370,6 +370,14 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def errorSummaryInstance        : XFormsInstance         = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
   def persistenceInstance         : XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
 
+  def getMode: String =
+    (parametersInstance.get.rootElement / "mode").stringValue
+
+  def updateMode(newMode: String): Unit = {
+    val modeElement = parametersInstance.get.rootElement / "mode"
+    setvalue(modeElement, newMode)
+  }
+
   private def authorizedOperationsInstance: XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-authorized-operations")  get
   private def documentMetadataInstance    : XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-document-metadata")      get
 

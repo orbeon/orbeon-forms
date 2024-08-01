@@ -657,6 +657,12 @@
                     <xf:param name="isDraft"    value="fr:is-draft()"/>
                     <xf:body>ORBEON.fr.private.API.newToEdit(documentId, isDraft)</xf:body>
                 </xf:action>
+                <xf:action
+                    type="javascript"
+                    event="xforms-value-changed"
+                    if="$mode-for-save = 'new'">
+                    <xf:body>ORBEON.fr.private.API.editToNew()</xf:body>
+                </xf:action>
             </xf:var>
 
             <!-- This is a HACK for Form Builder only: place non-relevant instances of all toolbox controls so that

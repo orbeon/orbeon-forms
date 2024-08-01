@@ -120,7 +120,7 @@ trait FormRunnerActionsCommon {
       val isPrevAllowed = Wizard.isPrevAllowed
       dispatch(name = "fr-prev", targetId = Names.ViewComponent)
       if (! isPrevAllowed)
-        throw new UnsupportedOperationException()
+        throw new UnsupportedOperationException
     }
 
   def tryWizardNext(params: ActionParams): ActionResult =
@@ -129,7 +129,7 @@ trait FormRunnerActionsCommon {
       val isNextAllowed = Wizard.isNextAllowed
       dispatch(name = "fr-next", targetId = Names.ViewComponent)
       if (! isNextAllowed)
-        throw new UnsupportedOperationException()
+        throw new UnsupportedOperationException
     }
 
   // It makes sense to update all calculations as needed before saving data

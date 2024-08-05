@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.helpers.AttributesImpl
@@ -69,7 +70,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     if (relevant) {
       // Control is relevant
       // NOTE: Ugly test on staticControl is to handle the case of `xf:output` within LHHA
-      if ((_value eq null) || (staticControl eq null) || containingDocument.xpathDependencies.requireValueUpdate(staticControl, effectiveId)) {
+      if ((_value eq null) || (staticControl eq null) || containingDocument.xpathDependencies.requireValueUpdate(staticControl, XFormsId.getEffectiveIdSuffixParts(effectiveId))) {
         _value = null
         markExternalValueDirty()
       }

@@ -205,12 +205,11 @@ class PathMapXPathDependencies(
       first exists (second contains)
 
     private def searchMatchesForInstances(
-      controlEffectiveId     : String,
+      controlIndexes         : Array[Int],
       firstWithPrefixedIds   : MapSet[String, String],
       secondWithInstanceKeys : MapSet[ModelOrInstanceKey, String]
-    ) = {
+    ): Boolean = {
 
-      val controlIndexes        = XFormsId.getEffectiveIdSuffixParts(controlEffectiveId)
       val controlIsWithinRepeat = controlIndexes.nonEmpty
 
       compareWithPredicate(
@@ -231,9 +230,8 @@ class PathMapXPathDependencies(
       )
     }
 
-    def intersectsStructuralChangeModel(controlEffectiveId: String, analysis: XPathAnalysis): Boolean = {
+    def intersectsStructuralChangeModel(controlIndexes: Array[Int], analysis: XPathAnalysis): Boolean = {
 
-      val controlIndexes        = XFormsId.getEffectiveIdSuffixParts(controlEffectiveId)
       val controlIsWithinRepeat = controlIndexes.nonEmpty
 
       val touchedModelsEffectiveIds = structuralChangeModelKeys
@@ -254,24 +252,24 @@ class PathMapXPathDependencies(
     }
 
     def intersectsBinding(
-      controlEffectiveId : String,
-      bindingAnalysis    : XPathAnalysis,
-      changes            : MapSet[ModelOrInstanceKey, String]
+      controlIndexes  : Array[Int],
+      bindingAnalysis : XPathAnalysis,
+      changes         : MapSet[ModelOrInstanceKey, String]
     ): Boolean =
       searchMatchesForInstances(
-        controlEffectiveId,
+        controlIndexes,
         bindingAnalysis.valueDependentPaths,
         changes
       )
 
     def intersectsValue(
-      controlEffectiveId : String,
-      bindingAnalysis    : XPathAnalysis,
-      changes            : MapSet[ModelOrInstanceKey, String]
+      controlIndexes  : Array[Int],
+      bindingAnalysis : XPathAnalysis,
+      changes         : MapSet[ModelOrInstanceKey, String]
     ): Boolean =
-      intersectsBinding(controlEffectiveId, bindingAnalysis, refreshChangeset) ||
+      intersectsBinding(controlIndexes, bindingAnalysis, refreshChangeset) ||
         searchMatchesForInstances(
-          controlEffectiveId,
+          controlIndexes,
           bindingAnalysis.returnablePaths,
           changes
         )
@@ -432,9 +430,9 @@ class PathMapXPathDependencies(
   private val MustNotUpdateResultZero = UpdateResult(requireUpdate = false, savedEvaluations = 0)
 
   private def buildRepeatResultCacheKey(
-    control            : ElementAnalysis,
-    analyses           : List[XPathAnalysis],
-    controlEffectiveId : String
+    control        : ElementAnalysis,
+    analyses       : List[XPathAnalysis],
+    controlIndexes : Array[Int]
   ): Option[RepeatCacheKey] = {
     if (control.isWithinRepeat) {
       analyses match {
@@ -454,7 +452,7 @@ class PathMapXPathDependencies(
           Some(
             RepeatCacheKey(
               control.prefixedId,
-              XFormsId.getEffectiveIdSuffixParts(controlEffectiveId) take maxDependentModelDepth toList
+              controlIndexes take maxDependentModelDepth toList
             )
           )
         case _ =>
@@ -464,11 +462,11 @@ class PathMapXPathDependencies(
       None
   }
 
-  def requireBindingUpdate(control: ElementAnalysis, controlEffectiveId: String): Boolean = {
+  def requireBindingUpdate(control: ElementAnalysis, controlIndexes: Array[Int]): Boolean = {
 
     assert(inRefresh || inBindingUpdate)
 
-    val resultCacheKey = buildRepeatResultCacheKey(control, control.bindingAnalysis.toList, controlEffectiveId: String)
+    val resultCacheKey = buildRepeatResultCacheKey(control, control.bindingAnalysis.toList, controlIndexes)
 
     val cached = resultCacheKey flatMap modifiedBindingCacheForRepeats.get
     val updateResult: UpdateResult =
@@ -489,8 +487,8 @@ class PathMapXPathDependencies(
             case Some(analysis) =>
               // Binding dependencies are known
               UpdateResult(
-                intersectsStructuralChangeModel(controlEffectiveId, analysis) ||
-                  intersectsBinding(controlEffectiveId, analysis, refreshChangeset),
+                intersectsStructuralChangeModel(controlIndexes, analysis) ||
+                  intersectsBinding(controlIndexes, analysis, refreshChangeset),
                 control.bindingXPathEvaluations
               )
           }
@@ -499,7 +497,7 @@ class PathMapXPathDependencies(
             debug(
               "binding requires update",
               List(
-                "effective id" -> controlEffectiveId,
+                "effective id" -> controlIndexes.mkString("Array(", ", ", ")"),
                 "XPath"        -> control.bindingAnalysis.map(_.xpathString).orNull // XPath can be missing in offline
               )
             )
@@ -519,11 +517,11 @@ class PathMapXPathDependencies(
     updateResult.requireUpdate
   }
 
-  def requireValueUpdate(control: ElementAnalysis, controlEffectiveId: String): Boolean = {
+  def requireValueUpdate(control: ElementAnalysis, controlIndexes: Array[Int]): Boolean = {
 
     assert(inRefresh || inBindingUpdate)
 
-    val resultCacheKey = buildRepeatResultCacheKey(control, control.valueAnalysis.toList, controlEffectiveId)
+    val resultCacheKey = buildRepeatResultCacheKey(control, control.valueAnalysis.toList, controlIndexes)
 
     val cached = resultCacheKey flatMap modifiedValueCacheForRepeats.get
     val (updateResult, valueAnalysis) =
@@ -548,15 +546,15 @@ class PathMapXPathDependencies(
             case Some(analysis) =>
               // Value dependencies are known
               UpdateResult(
-                intersectsStructuralChangeModel(controlEffectiveId, analysis) ||
-                  intersectsValue(controlEffectiveId, analysis, refreshChangeset),
+                intersectsStructuralChangeModel(controlIndexes, analysis) ||
+                  intersectsValue(controlIndexes, analysis, refreshChangeset),
                 if (control.value.isDefined) 1 else 0)
           }
           if (tempUpdateResult.requireUpdate && tempValueAnalysis.isDefined)
             debug(
               "value requires update",
               List(
-                "effective id" -> controlEffectiveId,
+                "effective id" -> controlIndexes.mkString("Array(", ", ", ")"),
                 "XPath"        -> tempValueAnalysis.map(_.xpathString).orNull // XPath can be missing in offline
               )
             )
@@ -578,7 +576,7 @@ class PathMapXPathDependencies(
     updateResult.requireUpdate
   }
 
-  def requireLHHAUpdate(control: ElementAnalysis, lhha: LHHA, controlEffectiveId: String): Boolean = {
+  def requireLHHAUpdate(control: ElementAnalysis, lhha: LHHA, controlIndexes: Array[Int]): Boolean = {
 
     // LHHA is evaluated lazily typically outside of refresh, but LHHA invalidation takes place during refresh
     assert(inRefresh || inBindingUpdate)
@@ -587,7 +585,7 @@ class PathMapXPathDependencies(
 
       val lhhaControl = {
         collectByErasedType[StaticLHHASupport](control) getOrElse
-        (throw new OXFException(s"Control $controlEffectiveId not found or doesn't support LHHA"))
+        (throw new OXFException(s"Control ${controlIndexes.mkString("Array(", ", ", ")")} not found or doesn't support LHHA"))
       }
 
       lhhaControl.lhhaValueAnalyses(lhha)
@@ -603,8 +601,8 @@ class PathMapXPathDependencies(
             true
           case analysis => // dependencies are known
             val result =
-              intersectsStructuralChangeModel(controlEffectiveId, analysis) ||
-                intersectsValue(controlEffectiveId, analysis, refreshChangeset)
+              intersectsStructuralChangeModel(controlIndexes, analysis) ||
+                intersectsValue(controlIndexes, analysis, refreshChangeset)
             if (result) lhhaHitCount += 1 else lhhaMissCount += 1
             result
         }
@@ -619,13 +617,13 @@ class PathMapXPathDependencies(
       }
     }
 
-    buildRepeatResultCacheKey(control, analysesOrEmpty, controlEffectiveId) match {
+    buildRepeatResultCacheKey(control, analysesOrEmpty, controlIndexes) match {
       case Some(key) => modifiedLHHACacheForRepeats.getOrElseUpdate(key, requireUpdate)
       case None      => requireUpdate
     }
   }
 
-  def requireItemsetUpdate(control: SelectionControlTrait, controlEffectiveId: String): Boolean = {
+  def requireItemsetUpdate(control: SelectionControlTrait, controlIndexes: Array[Int]): Boolean = {
 
     assert(inRefresh || inBindingUpdate)
 
@@ -639,13 +637,13 @@ class PathMapXPathDependencies(
           true
         case Some(analysis) => // dependencies are known
           val result =
-            intersectsStructuralChangeModel(controlEffectiveId, analysis) ||
-              intersectsValue(controlEffectiveId, analysis, refreshChangeset)
+            intersectsStructuralChangeModel(controlIndexes, analysis) ||
+              intersectsValue(controlIndexes, analysis, refreshChangeset)
           if (result) itemsetHitCount += 1 else itemsetMissCount += 1
           result
       }
 
-    buildRepeatResultCacheKey(control, control.itemsetAnalysis.toList, controlEffectiveId: String) match {
+    buildRepeatResultCacheKey(control, control.itemsetAnalysis.toList, controlIndexes) match {
       case Some(key) => modifiedItemsetCacheForRepeats.getOrElseUpdate(key, requireUpdate)
       case None      => requireUpdate
     }
@@ -702,7 +700,7 @@ class PathMapXPathDependencies(
             // Value dependencies are known
             UpdateResult(
               intersectsValue(
-                model.effectiveId,
+                XFormsId.getEffectiveIdSuffixParts(model.effectiveId),
                 analysis,
                 if (mip.isValidateMIP) modelState.revalidateChangeset else modelState.recalculateChangeset
               ),

@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsContextStackSupport}
+import org.orbeon.xforms.XFormsId
 
 
 class MutableLHHProperty(control: XFormsControl, lhhaType: LHHA, supportsHTML: Boolean)
@@ -103,7 +104,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
   }
 
   protected def requireUpdate: Boolean =
-    control.containingDocument.xpathDependencies.requireLHHAUpdate(control.staticControl, lhhaType, control.effectiveId)
+    control.containingDocument.xpathDependencies.requireLHHAUpdate(control.staticControl, lhhaType, XFormsId.getEffectiveIdSuffixParts(control.effectiveId))
 
   protected def notifyCompute(): Unit =
     control.containingDocument.xpathDependencies.notifyComputeLHHA()

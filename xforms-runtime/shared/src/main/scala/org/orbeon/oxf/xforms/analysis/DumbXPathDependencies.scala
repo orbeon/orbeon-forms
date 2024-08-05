@@ -40,10 +40,10 @@ class DumbXPathDependencies extends XPathDependencies {
   def notifyOptimizeLHHA   (): Unit = ()
   def notifyComputeItemset (): Unit = ()
   def notifyOptimizeItemset(): Unit = ()
-  def requireBindingUpdate (control: ElementAnalysis, controlEffectiveId: String) = true
-  def requireValueUpdate   (control: ElementAnalysis, controlEffectiveId: String) = true
-  def requireLHHAUpdate    (control: ElementAnalysis, lhha: LHHA, controlEffectiveId: String) = true
-  def requireItemsetUpdate (control: SelectionControlTrait, controlPrefixedId: String) = true
+  def requireBindingUpdate (control: ElementAnalysis, controlIndexes: Array[Int]) = true
+  def requireValueUpdate   (control: ElementAnalysis, controlIndexes: Array[Int]) = true
+  def requireLHHAUpdate    (control: ElementAnalysis, lhha: LHHA, controlIndexes: Array[Int]) = true
+  def requireItemsetUpdate (control: SelectionControlTrait, controlIndexes: Array[Int]) = true
   def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MIP, level: ValidationLevel) = true
   def hasAnyCalculationBind(model: Model, instancePrefixedId: String) = true
   def hasAnyValidationBind (model: Model, instancePrefixedId: String) = true

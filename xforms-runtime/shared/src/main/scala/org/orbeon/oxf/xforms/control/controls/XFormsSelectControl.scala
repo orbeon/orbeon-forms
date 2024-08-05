@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.compat._
 import scala.collection.{mutable, Set => CSet}
@@ -98,7 +99,7 @@ class XFormsSelectControl(
 
   override def markDirtyImpl(): Unit = {
     super.markDirtyImpl()
-    if (! isExternalValueDirty && containingDocument.xpathDependencies.requireItemsetUpdate(staticControl, effectiveId)) {
+    if (! isExternalValueDirty && containingDocument.xpathDependencies.requireItemsetUpdate(staticControl, XFormsId.getEffectiveIdSuffixParts(effectiveId))) {
       // If the itemset has changed but the value has not changed, the external value might still need to be
       // re-evaluated.
       markExternalValueDirty()

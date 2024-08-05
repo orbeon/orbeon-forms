@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, Variable}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.value.EmptySequence
+import org.orbeon.xforms.XFormsId
 
 /**
  * Representation of a variable in a tree of controls.
@@ -81,7 +82,7 @@ class XFormsVariableControl(
 
     if (relevant) {
       // Evaluate variable value if needed if relevant
-      if ((_value eq null) || containingDocument.xpathDependencies.requireValueUpdate(staticControl, effectiveId)) {
+      if ((_value eq null) || containingDocument.xpathDependencies.requireValueUpdate(staticControl, XFormsId.getEffectiveIdSuffixParts(effectiveId))) {
         variable.markDirty()
         val contextStack = getContextStack
         contextStack.setBinding(bindingContext)

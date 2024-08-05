@@ -47,10 +47,10 @@ trait XPathDependencies {
   def notifyComputeItemset ()                  : Unit
   def notifyOptimizeItemset()                  : Unit
 
-  def requireBindingUpdate (control: ElementAnalysis,                   controlEffectiveId: String): Boolean
-  def requireValueUpdate   (control: ElementAnalysis,                   controlEffectiveId: String): Boolean
-  def requireLHHAUpdate    (control: ElementAnalysis,       lhha: LHHA, controlEffectiveId: String): Boolean
-  def requireItemsetUpdate (control: SelectionControlTrait,             controlEffectiveId: String): Boolean
+  def requireBindingUpdate (control: ElementAnalysis,                   controlIndexes: Array[Int]): Boolean
+  def requireValueUpdate   (control: ElementAnalysis,                   controlIndexes: Array[Int]): Boolean
+  def requireLHHAUpdate    (control: ElementAnalysis,       lhha: LHHA, controlIndexes: Array[Int]): Boolean
+  def requireItemsetUpdate (control: SelectionControlTrait,             controlIndexes: Array[Int]): Boolean
 
   def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MIP, level: ValidationLevel): Boolean
 

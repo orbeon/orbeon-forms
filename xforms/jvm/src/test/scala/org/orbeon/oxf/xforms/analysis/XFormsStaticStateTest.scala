@@ -132,11 +132,11 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
     mockInstance
   }
 
-  private def requireBindingUpdate(effectiveId: String)(implicit dependencies: XPathDependencies, partAnalysis: PartAnalysis) =
-    dependencies.requireBindingUpdate(partAnalysis.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)), effectiveId)
+  private def requireBindingUpdate(effectiveId: String)(implicit dependencies: XPathDependencies, partAnalysis: PartAnalysis): Boolean =
+    dependencies.requireBindingUpdate(partAnalysis.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)), XFormsId.getEffectiveIdSuffixParts(effectiveId))
 
-  private def requireValueUpdate(effectiveId: String)(implicit dependencies: XPathDependencies, partAnalysis: PartAnalysis) =
-    dependencies.requireValueUpdate(partAnalysis.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)), effectiveId)
+  private def requireValueUpdate(effectiveId: String)(implicit dependencies: XPathDependencies, partAnalysis: PartAnalysis): Boolean =
+    dependencies.requireValueUpdate(partAnalysis.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)), XFormsId.getEffectiveIdSuffixParts(effectiveId))
 
   @Test def xpathAnalysis(): Unit = {
     Assume.assumeTrue(Version.isPE)

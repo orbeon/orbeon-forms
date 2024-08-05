@@ -116,8 +116,8 @@ object XPathAnalysis {
    */
   def getDisplayPath(path: String): String = {
 
-    // Special case of empty path
-    if (path.isEmpty) return path
+    if (path.isEmpty)
+      return path
 
     val pool = StaticXPath.GlobalConfiguration.getNamePool
 
@@ -131,11 +131,10 @@ object XPathAnalysis {
 
           optionalAt + {
             try {
-              // Obtain QName
               pool.getDisplayName(number.toInt)
             } catch {
               // Shouldn't happen, right? But since this is for debugging we output the token.
-              case e: NumberFormatException => token
+              case _: NumberFormatException => token
             }
           }
         }

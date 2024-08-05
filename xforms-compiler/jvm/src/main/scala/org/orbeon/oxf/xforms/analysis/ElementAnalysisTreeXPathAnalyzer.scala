@@ -315,8 +315,15 @@ object ElementAnalysisTreeXPathAnalyzer {
         }
 
       if (missingReferences.isEmpty)
-        analyzeXPathWithCompiledExpression(partAnalysisCtx, bind, getChildrenContext(partAnalysisCtx, bind), allBindVariablesInScope, mip.compiledExpression) match {
-          case valueAnalysis if valueAnalysis.figuredOutDependencies => mip.analysis = valueAnalysis
+        analyzeXPathWithCompiledExpression(
+          partAnalysisCtx      = partAnalysisCtx,
+          e                    = bind,
+          contextAnalysis      = getChildrenContext(partAnalysisCtx, bind),
+          inScopeVariables     = allBindVariablesInScope,
+          expression           = mip.compiledExpression
+        ) match {
+          case valueAnalysis if valueAnalysis.figuredOutDependencies =>
+            mip.analysis = valueAnalysis
           case _ => // NOP
         }
       else if (partAnalysisCtx.isTopLevelPart && ! partAnalysisCtx.staticProperties.allowErrorRecoveryOnInit)
@@ -533,6 +540,7 @@ object ElementAnalysisTreeXPathAnalyzer {
       combinedAnalysis.some
     }
 
+    // 2024-08-05: 8 callers.
     def analyzeXPathWithStringExpression(
       partAnalysisCtx  : PartAnalysisContextAfterTree,
       e                : ElementAnalysis,
@@ -556,14 +564,14 @@ object ElementAnalysisTreeXPathAnalyzer {
         avt                       = avt
       )
 
+    // 2024-08-05: Only 1 caller.
     def analyzeXPathWithCompiledExpression(
-      partAnalysisCtx  : PartAnalysisContextAfterTree,
-      e                : ElementAnalysis,
-      contextAnalysis  : Option[XPathAnalysis],
-      inScopeVariables : Map[String, VariableTrait],
-      expression       : CompiledExpression
-    ): XPathAnalysis = {
-      val defaultInstancePrefixedId = e.model flatMap (_.defaultInstancePrefixedId)
+      partAnalysisCtx     : PartAnalysisContextAfterTree,
+      e                   : ElementAnalysis,
+      contextAnalysis     : Option[XPathAnalysis],
+      inScopeVariables    : Map[String, VariableTrait],
+      expression          : CompiledExpression
+    ): XPathAnalysis =
       PathMapXPathAnalysisBuilder(
         partAnalysisCtx           = partAnalysisCtx,
         compiledExpression        = expression,
@@ -571,10 +579,9 @@ object ElementAnalysisTreeXPathAnalyzer {
         inScopeVariables          = inScopeVariables,
         pathMapContext            = new SimplePathMapContext(e),
         scope                     = e.scope,
-        defaultInstancePrefixedId = defaultInstancePrefixedId,
-        element                   = e.element
+        element                   = e.element,
+        defaultInstancePrefixedId = e.model flatMap (_.defaultInstancePrefixedId)
       )
-    }
 
     def combineXPathAnalysis(xpa1: XPathAnalysis, xpa2: XPathAnalysis): XPathAnalysis =
       xpa1 match {

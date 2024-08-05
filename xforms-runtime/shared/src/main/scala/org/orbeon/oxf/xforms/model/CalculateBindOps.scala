@@ -115,7 +115,7 @@ trait CalculateBindOps {
     // Whether this is the first recalculate for the associated XForms model
     var isFirstCalculate = model.containingDocument.initializing
 
-    def evaluateAndSetCustomMIPs(
+    private def evaluateAndSetCustomMIPs(
       bindNode  : BindNode,
       collector : ErrorEventCollector
     ): Unit =
@@ -137,7 +137,7 @@ trait CalculateBindOps {
       )
     }
 
-    def handleComputedExpressionBind(
+    private def handleComputedExpressionBind(
       bindNode  : BindNode,
       collector : ErrorEventCollector
     ): Unit = {
@@ -184,7 +184,7 @@ trait CalculateBindOps {
     }
 
     // Q: Can bindNode.node ever be null here?
-    def mustEvaluateNode(node: om.NodeInfo, defaultsStrategy: SomeDefaultsStrategy): Boolean =
+    private def mustEvaluateNode(node: om.NodeInfo, defaultsStrategy: SomeDefaultsStrategy): Boolean =
       defaultsStrategy == AllDefaultsStrategy || (node ne null) && InstanceData.getRequireDefaultValue(node)
 
     def applyCalculatedBindsUseOrderIfNeeded(
@@ -199,7 +199,7 @@ trait CalculateBindOps {
         case None =>
           iterateBinds(topLevelBinds, bindNode =>
             if (
-              bindNode.staticBind.hasXPathMIP(mip)                                            &&
+              bindNode.staticBind.hasXPathMIP(mip)                                      &&
               dependencies.requireModelMIPUpdate(model, bindNode.staticBind, mip, null) &&
               mustEvaluateNode(bindNode.node, defaultsStrategy)
             ) {
@@ -209,14 +209,15 @@ trait CalculateBindOps {
       }
     }
 
-    def applyCalculatedBindsFollowDependencies(
+    private def applyCalculatedBindsFollowDependencies(
       order            : List[StaticBind],
       mip              : StringMIP,
       defaultsStrategy : SomeDefaultsStrategy,
       collector        : ErrorEventCollector
-    ): Unit = {
-      order foreach { staticBind =>
-        val logger = DependencyAnalyzer.Logger
+    ): Unit =
+      order.foreach { staticBind =>
+
+        val logger  = DependencyAnalyzer.Logger
         val isDebug = logger.isDebugEnabled
         if (dependencies.requireModelMIPUpdate(model, staticBind, mip, null)) {
           var evaluationCount = 0
@@ -235,14 +236,13 @@ trait CalculateBindOps {
           if (isDebug) logger.debug(s"skip ${mip.name} for ${staticBind.staticId}")
         }
       }
-    }
 
-    def evaluateAndSetCalculatedBind(
+    private def evaluateAndSetCalculatedBind(
       bindNode  : BindNode,
       mip       : StringMIP,
       collector : ErrorEventCollector
     ): Unit =
-      evaluateCalculatedBind(bindNode, mip, collector) foreach { stringResult =>
+      evaluateCalculatedBind(bindNode, mip, collector).foreach { stringResult =>
 
         val valueToSet =
           bindNode.staticBind.nonPreserveWhitespaceMIPOpt match {

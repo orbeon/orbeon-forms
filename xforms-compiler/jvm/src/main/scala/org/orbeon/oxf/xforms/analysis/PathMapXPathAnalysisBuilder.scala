@@ -52,11 +52,12 @@ object PathMapXPathAnalysisBuilder {
     defaultInstancePrefixedId : Option[String],
     locationData              : LocationData,
     element                   : Element,
-    avt                       : Boolean)(implicit
+    avt                       : Boolean
+  )(implicit
     logger                    : IndentedLogger
   ): XPathAnalysis = {
 
-    def compileExpression =
+    def compileExpression: CompiledExpression =
       XPath.compileExpression(
         xpathString      = xpathString,
         namespaceMapping = namespaceMapping,
@@ -65,7 +66,7 @@ object PathMapXPathAnalysisBuilder {
         avt              = avt
       )
 
-    def applyCompiledExpression(compiledExpression: CompiledExpression) =
+    def applyCompiledExpression(compiledExpression: CompiledExpression): XPathAnalysis =
       apply(
         partAnalysisCtx,
         compiledExpression,
@@ -259,13 +260,14 @@ object PathMapXPathAnalysisBuilder {
           if (processPaths())
             // Success
             PathMapXPathAnalysis(
-              xpathString,
-              true,
-              valueDependentPaths,
-              returnablePaths,
-              dependentModels,
-              dependentInstances)(
-              Some(pathmap),
+              xpathString            = xpathString,
+              figuredOutDependencies = true,
+              valueDependentPaths    = valueDependentPaths,
+              returnablePaths        = returnablePaths,
+              dependentModels        = dependentModels,
+              dependentInstances     = dependentInstances
+            )(
+              pathmap                = Some(pathmap),
             )
           else
             // Failure

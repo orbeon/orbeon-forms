@@ -418,9 +418,8 @@ class PathMapXPathDependencies(
   }
 
   // For unit tests only
-  def markStructuralChangeTest(model: XFormsModel): Unit = {
+  def markStructuralChangeTest(model: XFormsModel): Unit =
     getOrCreateModelState(model).markStructuralChange()
-  }
 
   // For unit tests only
   def markValueChangedTest(instance: XFormsInstance, namespaces: Map[String, String], path: String): Unit =

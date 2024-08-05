@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import cats.syntax.option._
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis.buildInstanceString
@@ -38,7 +39,8 @@ object ElementAnalysisTreeXPathAnalyzer {
 
   def analyzeXPath(
     partAnalysisCtx : PartAnalysisContextAfterTree,
-    e               : ElementAnalysis)(implicit
+    e               : ElementAnalysis
+  )(implicit
     logger          : IndentedLogger
   ): Unit = {
 
@@ -179,7 +181,8 @@ object ElementAnalysisTreeXPathAnalyzer {
 
     def computeValueAnalysis(
       partAnalysisCtx : PartAnalysisContextAfterTree,
-      e               : ElementAnalysis)(implicit
+      e               : ElementAnalysis
+    )(implicit
       logger          : IndentedLogger
     ): Option[XPathAnalysis] =
       e match {
@@ -211,11 +214,22 @@ object ElementAnalysisTreeXPathAnalyzer {
 
         case e: StaticBind =>
           // Compute value analysis if we have a `type` or `xxf:whitespace`, otherwise don't bother
-          e.typeMIPOpt orElse e.nonPreserveWhitespaceMIPOpt match {
-            case Some(_) if e.hasBinding => analyzeXPathWithStringExpression(partAnalysisCtx, e, getChildrenContext(partAnalysisCtx, e), e.inScopeVariables, StaticXPath.makeStringExpression(".")).some
-            case _                       => None
-          }
-
+          // 2024-08-05: Also add `calculate` and `xxf:default` so that we can determine whether there is a dependency
+          // on the current value, see: https://github.com/orbeon/orbeon-forms/issues/6370
+          (e.hasBinding && (
+            e.typeMIPOpt.nonEmpty                                     ||
+            e.nonPreserveWhitespaceMIPOpt.nonEmpty                    ||
+            e.allMIPNameToXPathMIP.contains(ModelDefs.Calculate.name) ||
+            e.allMIPNameToXPathMIP.contains(ModelDefs.Default.name)
+          )).option(
+            analyzeXPathWithStringExpression(
+              partAnalysisCtx,
+              e,
+              getChildrenContext(partAnalysisCtx, e),
+              e.inScopeVariables,
+              StaticXPath.makeStringExpression(".")
+            )
+          )
         case _: Model                                    => None
         case e: OutputControl if e.staticValue.isDefined => None
         case e: AttributeControl                         => analyzeXPathWithStringExpression(partAnalysisCtx, e, getChildrenContext(partAnalysisCtx, e), e.inScopeVariables, e.attributeValue, avt = true).some

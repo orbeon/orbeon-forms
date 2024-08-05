@@ -189,6 +189,19 @@
                                     </returnable-instances>
                                 </analysis>
                             </binding>
+                            <value>
+                                <analysis expression="string((.)[1])" analyzed="true">
+                                    <value-dependent>
+                                        <path>instance('i5')</path>
+                                    </value-dependent>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i5</instance>
+                                    </dependent-instances>
+                                </analysis>
+                            </value>
                             <mip name="calculate" expression="string((42)[1])">
                                 <analysis expression="string((42)[1])" analyzed="true"/>
                             </mip>
@@ -231,6 +244,19 @@
                                     </returnable-instances>
                                 </analysis>
                             </binding>
+                            <value>
+                                <analysis expression="string((.)[1])" analyzed="true">
+                                    <value-dependent>
+                                        <path>instance('i7')</path>
+                                    </value-dependent>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i7</instance>
+                                    </dependent-instances>
+                                </analysis>
+                            </value>
                             <mip name="default" expression="string((42)[1])">
                                 <analysis expression="string((42)[1])" analyzed="true"/>
                             </mip>
@@ -447,6 +473,19 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
+                                <value>
+                                    <analysis expression="string((.)[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('i2')/a</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>i2</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </value>
                                 <mip name="calculate" expression="string((concat(../b, ../c))[1])">
                                     <analysis expression="string((concat(../b, ../c))[1])" analyzed="true">
                                         <value-dependent>
@@ -479,6 +518,19 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
+                                <value>
+                                    <analysis expression="string((.)[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('i2')/b</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>i2</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </value>
                                 <mip name="default" expression="string((concat(../a, ../c))[1])">
                                     <analysis expression="string((concat(../a, ../c))[1])" analyzed="true">
                                         <value-dependent>
@@ -6054,6 +6106,19 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
+                                <value>
+                                    <analysis expression="string((.)[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('instance')/@destination</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>instance</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </value>
                                 <mip name="calculate" expression="string(($source)[1])">
                                     <analysis expression="string(($source)[1])" analyzed="true">
                                         <value-dependent>

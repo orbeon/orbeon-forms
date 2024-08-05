@@ -170,5 +170,61 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
     }
   }
 
+  // https://github.com/orbeon/orbeon-forms/issues/6370
+  @Test def calculateUponDestinationNodeChange(): Unit = {
+    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+
+    this setupDocument
+      <xh:html
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        <xh:head>
+            <xf:model id="my-model" xxf:expose-xpath-types="true" xxf:xpath-analysis="true">
+                <xf:instance id="my-instance">
+                  <_ xmlns="">
+                        <show>false</show>
+                        <value/>
+                        <other>42</other>
+                        <dummy>abc</dummy>
+                    </_>
+                </xf:instance>
+                <xf:bind id="show-bind"  ref="show" type="xs:boolean"/>
+                <xf:bind id="value-bind" ref="value" calculate="../other" relevant="../show = true()"/>
+                <xf:setvalue event="xforms-disabled" observer="value-input" ref="event('xxf:binding')"/>
+            </xf:model>
+        </xh:head>
+        <xh:body>
+            <xf:input id="toggle-checkbox" ref="show">
+                <xf:label>Toggle visibility</xf:label>
+            </xf:input>
+            <xf:input id="value-input" ref="value">
+                <xf:label>Value</xf:label>
+            </xf:input>
+            <xf:input id="other-input" ref="other">
+                <xf:label>Other</xf:label>
+            </xf:input>
+            <xf:input id="dummy-input" ref="dummy">
+                <xf:label>Dummy</xf:label>
+            </xf:input>
+        </xh:body>
+      </xh:html>.toDocument
+
+    setControlValueWithEventSearchNested("toggle-checkbox", "true")
+    setControlValueWithEventSearchNested("toggle-checkbox", "false")
+    setControlValueWithEventSearchNested("toggle-checkbox", "true")
+
+    assert("42" == getControlValue("value-input"))
+
+    setControlValueWithEventSearchNested("other-input", "43")
+    assert("43" == getControlValue("value-input"))
+
+    setControlValueWithEventSearchNested("toggle-checkbox", "false")
+    setControlValueWithEventSearchNested("toggle-checkbox", "true")
+
+    assert("43" == getControlValue("value-input"))
+  }
+
   // TODO: more tests
 }

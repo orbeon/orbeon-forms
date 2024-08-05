@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
@@ -664,39 +665,54 @@ class PathMapXPathDependencies(
       case ModelDefs.Constraint => bind.constraintsByLevel.getOrElse(level, Nil)
       case ModelDefs.Type       => bind.typeMIPOpt.toList
       case ModelDefs.Whitespace => bind.nonPreserveWhitespaceMIPOpt.toList
-      case _                => bind.getXPathMIPs(mip.name)
+      case _                    => bind.getXPathMIPs(mip.name)
     }
 
     val modelState = getOrCreateModelState(model)
 
-    def resultForMIP(mip: StaticBind.MIP): UpdateResult =
+    def resultForMIP(mip: StaticBind.MIP): Iterator[UpdateResult] =
       if (modelState.isMIPInitiallyDirty(mip)) {
         // We absolutely must evaluate the MIP
-        MustUpdateResultOne
+        Iterator.single(MustUpdateResultOne)
       } else  {
         // Check MIP dependencies for XPath and type MIPs
 
         // Special case for type which is not an XPath expression
         // We don't check whether we need to update the type MIP, since it is constant, but we check whether
         // the value to type check has changed.
-        val valueAnalysis = mip match {
-          case xpathMIP: StaticBind.XPathMIP => Some(xpathMIP.analysis)
-          case _: StaticBind.TypeMIP         => bind.valueAnalysis
-          case _: StaticBind.WhitespaceMIP   => bind.valueAnalysis
+        val valueAnalysisIt = mip match {
+          case xpathMIP: StaticBind.XPathMIP
+            if xpathMIP.name == ModelDefs.Calculate.name || xpathMIP.name == ModelDefs.Default.name =>
+            Iterator(Some(xpathMIP.analysis), bind.valueAnalysis)
+          case xpathMIP: StaticBind.XPathMIP => Iterator.single(Some(xpathMIP.analysis))
+          case _: StaticBind.TypeMIP         => Iterator.single(bind.valueAnalysis)
+          case _: StaticBind.WhitespaceMIP   => Iterator.single(bind.valueAnalysis)
           case _                             => throw new IllegalStateException(s"unexpected MIP `${mip.name}`")
         }
 
         def dependsOnOtherModel(analysis: XPathAnalysis) =
           analysis.dependentModels exists (_ != model.getPrefixedId)
 
-        val updateResult = valueAnalysis match {
-          case Some(analysis) if ! analysis.figuredOutDependencies || dependsOnOtherModel(analysis) =>
+        def logDebug(valueAnalysis: Option[XPathAnalysis], updateResult: UpdateResult): Unit = {
+          if (updateResult.requireUpdate)
+            debug(
+              "MIP requires update",
+              List(
+                "prefixed id" -> bind.prefixedId,
+                "MIP name"    -> mip.name,
+                "XPath"       -> valueAnalysis.map(_.xpathString).orNull // XPath can be missing in offline
+              )
+            )
+        }
+
+        val updateResult = valueAnalysisIt.map {
+          case someAnalysis @ Some(analysis) if ! analysis.figuredOutDependencies || dependsOnOtherModel(analysis) =>
             // Value dependencies are unknown OR we depend on another model
             // A this time, if we depend on another model, we have to update because we don't have
             // the other model's dependencies reliably available, e.g. if the other model has
             // already done a recalculate, its dependencies are cleared.
-            MustUpdateResultOne
-          case Some(analysis) =>
+            MustUpdateResultOne |!> (logDebug(someAnalysis, _))
+          case someAnalysis @ Some(analysis) =>
             // Value dependencies are known
             UpdateResult(
               intersectsValue(
@@ -705,28 +721,18 @@ class PathMapXPathDependencies(
                 if (mip.isValidateMIP) modelState.revalidateChangeset else modelState.recalculateChangeset
               ),
               1
-            )
-          case None =>
-            MustUpdateResultOne
+            ) |!> (logDebug(someAnalysis, _))
+          case someAnalysis @ None =>
+            MustUpdateResultOne |!> (logDebug(someAnalysis, _))
         }
-
-        if (updateResult.requireUpdate)
-          debug(
-            "MIP requires update",
-            List(
-              "prefixed id" -> bind.prefixedId,
-              "MIP name"    -> mip.name,
-              "XPath"       -> valueAnalysis.map(_.xpathString).orNull // XPath can be missing in offline
-            )
-          )
 
         updateResult
       }
 
     // Stats and return value
     // Require an update of all MIPs of the given name/level if at least one dependency fails
-    mips.iterator map resultForMIP find (_.requireUpdate) match {
-      case Some(firstUpdateResult) =>
+    mips.iterator.flatMap(resultForMIP).find(_.requireUpdate) match {
+      case Some(_) =>
         mipUpdateCount += mips.size
         true
       case None =>

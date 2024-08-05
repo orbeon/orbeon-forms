@@ -108,6 +108,19 @@
                                     </returnable-instances>
                                 </analysis>
                             </binding>
+                            <value>
+                                <analysis expression="string((.)[1])" analyzed="true">
+                                    <value-dependent>
+                                        <path>instance('main')/value2</path>
+                                    </value-dependent>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>main</instance>
+                                    </dependent-instances>
+                                </analysis>
+                            </value>
                             <mip name="calculate" expression="string((instance('fr-dataset-dataset-1')/bar)[1])">
                                 <analysis expression="string((instance('fr-dataset-dataset-1')/bar)[1])" analyzed="true">
                                     <value-dependent>

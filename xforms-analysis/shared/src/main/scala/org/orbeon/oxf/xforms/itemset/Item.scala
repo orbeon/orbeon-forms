@@ -111,7 +111,7 @@ sealed trait ChoiceLeafImpl {
   self: Item.ChoiceNode =>
 
   def iterateLHHA: Iterator[(String, LHHAValue)] =
-    Iterator("label" -> label)
+    Iterator.single("label" -> label)
 
   override def equals(other: Any): Boolean = other match {
     case other: Item.ChoiceNode =>

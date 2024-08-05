@@ -143,7 +143,7 @@ object Extensions {
         e.content.iterator collect { case e: Element => e } flatMap (_.descendantElementIterator(includeSelf = true))
 
       if (includeSelf)
-        Iterator(e) ++ childrenAndDescendants
+        Iterator.single(e) ++ childrenAndDescendants
       else
         childrenAndDescendants
     }
@@ -168,7 +168,7 @@ object Extensions {
           (_.attributeValueOpt(XMLConstants.XML_BASE_QNAME))
 
       val urisRootToLeaf =
-        baseURI.iterator ++ xmlBaseValuesLeafToRootIt.toArray.reverseIterator ++ Iterator(uri)
+        baseURI.iterator ++ xmlBaseValuesLeafToRootIt.toArray.reverseIterator ++ Iterator.single(uri)
 
       urisRootToLeaf.foldLeft(null: URI) {
         case (r, s) =>

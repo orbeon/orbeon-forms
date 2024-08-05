@@ -76,8 +76,8 @@ object ItemsetSupport {
         allDataItems collect { case oneDataXPathItem if
           SaxonUtils.deepCompare(
             config                     = XPath.GlobalConfiguration,
-            it1                        = Iterator(oneDataXPathItem),
-            it2                        = Iterator(firstItemXPathItem),
+            it1                        = Iterator.single(oneDataXPathItem),
+            it2                        = Iterator.single(firstItemXPathItem),
             excludeWhitespaceTextNodes = false
           ) => oneDataXPathItem
         }

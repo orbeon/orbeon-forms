@@ -31,7 +31,7 @@ trait MaybeFocusableTrait {
   def followDescendantsForFocus: Iterator[XFormsControl] = Iterator.empty
 
   private def recurseFocusableControls(t: XFormsControl): Iterator[XFormsControl] =
-    Iterator(t) ++ (t.followDescendantsForFocus flatMap recurseFocusableControls)
+    Iterator.single(t) ++ (t.followDescendantsForFocus flatMap recurseFocusableControls)
 }
 
 trait SingleNodeFocusableTrait extends VisitableTrait with MaybeFocusableTrait {

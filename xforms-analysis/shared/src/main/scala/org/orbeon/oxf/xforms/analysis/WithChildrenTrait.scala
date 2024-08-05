@@ -34,7 +34,7 @@ trait WithChildrenTrait extends ElementAnalysis {
     _children = _children filterNot (_ eq child)
 
   final def descendantsOrSelf: Iterator[ElementAnalysis] =
-    Iterator(this) ++ descendants
+    Iterator.single(this) ++ descendants
 
   // All this element's descendants (valid after build() has been called)
   final def descendants: Iterator[ElementAnalysis] = {

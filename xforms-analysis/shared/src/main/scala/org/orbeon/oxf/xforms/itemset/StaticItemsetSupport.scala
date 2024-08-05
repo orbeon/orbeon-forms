@@ -103,8 +103,8 @@ object StaticItemsetSupport {
         allDataItems exists { oneDataXPathItem =>
           SaxonUtils.deepCompare(
             config                     = StaticXPath.GlobalConfiguration,
-            it1                        = Iterator(oneDataXPathItem),
-            it2                        = Iterator(firstItemXPathItem),
+            it1                        = Iterator.single(oneDataXPathItem),
+            it2                        = Iterator.single(firstItemXPathItem),
             excludeWhitespaceTextNodes = false
           )
         }

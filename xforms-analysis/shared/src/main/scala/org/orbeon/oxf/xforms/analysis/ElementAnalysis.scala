@@ -330,9 +330,9 @@ object ElementAnalysis {
   def ancestorsAcrossPartsIterator(start: ElementAnalysis, includeSelf: Boolean): Iterator[ElementAnalysis] =
     new IteratorBase(if (includeSelf) start.some else start.parent, _.parent) flatMap {
       case r: RootControl =>
-        Iterator(r) ++ (r.elementInParent.iterator flatMap (ancestorsAcrossPartsIterator(_, includeSelf = true)))
+        Iterator.single(r) ++ (r.elementInParent.iterator flatMap (ancestorsAcrossPartsIterator(_, includeSelf = true)))
       case e =>
-        Iterator(e)
+        Iterator.single(e)
     }
 
   /**

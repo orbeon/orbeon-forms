@@ -69,7 +69,7 @@ object SaxonUtils {
     ExpressionTool.effectiveBooleanValue(iterator)
 
   def iterateExpressionTree(e: Expression): Iterator[Expression] =
-    Iterator(e) ++
+    Iterator.single(e) ++
       (e.operands.iterator.asScala flatMap (o => iterateExpressionTree(o.getChildExpression)))
 
   def iterateExternalVariableReferences(expr: Expression): Iterator[String] = {

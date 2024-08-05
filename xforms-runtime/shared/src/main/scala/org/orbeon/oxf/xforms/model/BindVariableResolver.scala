@@ -144,7 +144,7 @@ object BindVariableResolver {
       singleNodeTarget <- modelBinds.singleNodeContextBinds.get(targetBindId)
       if isValidTarget(singleNodeTarget)
     } yield
-      Iterator(singleNodeTarget)
+      Iterator.single(singleNodeTarget)
   }
 
   def searchDescendantRuntimeBinds(targetAncestorOrSelf: List[StaticBind], rootBinds: Seq[RuntimeBind], rootId: String): Iterator[RuntimeBind] = {
@@ -161,7 +161,7 @@ object BindVariableResolver {
       path.tail match {
         case Nil =>
           // We are at a target: return all items
-          Iterator(nextBind)//.items.asScala.iterator
+          Iterator.single(nextBind)//.items.asScala.iterator
         case pathTail =>
           // We need to dig deeper to reach the target
           for {

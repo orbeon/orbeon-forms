@@ -528,7 +528,7 @@ class XFormsRepeatControl(
   // repeat object associated with the repeat index"
   override def followDescendantsForFocus: Iterator[XFormsControl] =
     if (getIndex > 0)
-      Iterator(children(getIndex - 1))
+      Iterator.single(children(getIndex - 1))
     else
       Iterator.empty
 
@@ -630,7 +630,7 @@ object XFormsRepeatControl {
     def search(ancestorRepeats: List[RepeatControl], suffix: String): Iterator[String] =
       ancestorRepeats match {
         case Nil          =>
-          Iterator(addSuffix(controlPrefixedId, suffix))
+          Iterator.single(addSuffix(controlPrefixedId, suffix))
         case head :: tail =>
 
           val repeatEffectiveId = addSuffix(head.prefixedId, suffix)

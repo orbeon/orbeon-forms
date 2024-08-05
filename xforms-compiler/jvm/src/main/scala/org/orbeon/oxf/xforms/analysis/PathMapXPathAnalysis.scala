@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms._
 import org.orbeon.saxon.expr._
-import org.orbeon.xforms.XFormsId
 
 
 case class PathMapXPathAnalysis(
@@ -24,9 +23,32 @@ case class PathMapXPathAnalysis(
   valueDependentPaths    : MapSet[String, String],
   returnablePaths        : MapSet[String, String],
   dependentModels        : collection.Set[String],
-  dependentInstances     : collection.Set[String])(
-  var pathmap            : Option[PathMap], // this is used when used as variables and context and can be freed afterwards
+  dependentInstances     : collection.Set[String]
+)(
+  var pathmap            : Option[PathMap], // use `Option` as transient state can be freed
 ) extends XPathAnalysis {
-
+  def pathMapOrThrow: PathMap = pathmap.getOrElse(throw new IllegalStateException("transient state already freed"))
   override def freeTransientState(): Unit = pathmap = None
+}
+
+object PathMapXPathAnalysis {
+
+  def apply(
+    xpathString           : String,
+    figuredOutDependencies: Boolean,
+    valueDependentPaths   : MapSet[String, String],
+    returnablePaths       : MapSet[String, String],
+    dependentModels       : collection.Set[String],
+    dependentInstances    : collection.Set[String],
+    pathmap               : PathMap
+  ): PathMapXPathAnalysis =
+    PathMapXPathAnalysis(
+      xpathString,
+      figuredOutDependencies,
+      valueDependentPaths,
+      returnablePaths,
+      dependentModels,
+      dependentInstances)(
+      Some(pathmap)
+    )
 }

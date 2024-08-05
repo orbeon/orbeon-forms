@@ -50,7 +50,7 @@ class XXFormsBinding extends XFormsFunction {
             boundElemOpt.flatMap(_.bindingAnalysis) match {
               case Some(analysis: PathMapXPathAnalysis) =>
                 // TODO: review this!
-                val clonedVariablePathMap = analysis.pathmap.get.clone
+                val clonedVariablePathMap = analysis.pathMapOrThrow.clone
                 pathMap.addRoots(clonedVariablePathMap.getPathMapRoots)
                 clonedVariablePathMap.findFinalNodes
               case _ =>

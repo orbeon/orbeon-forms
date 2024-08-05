@@ -606,12 +606,12 @@ object ElementAnalysisTreeXPathAnalyzer {
                   pmxpa.valueDependentPaths combine other.valueDependentPaths,
                   pmxpa.returnablePaths combine other.returnablePaths,
                   pmxpa.dependentModels ++ other.dependentModels,
-                  pmxpa.dependentInstances ++ other.dependentInstances)(
+                  pmxpa.dependentInstances ++ other.dependentInstances,
                   {
-                    val newPathmap = pmxpa.pathmap.get.clone
-                    newPathmap.addRoots(other.pathmap.get.clone.getPathMapRoots)
-                    Some(newPathmap)
-                  },
+                    val newPathmap = pmxpa.pathMapOrThrow.clone
+                    newPathmap.addRoots(other.pathMapOrThrow.clone.getPathMapRoots)
+                    newPathmap
+                  }
                 )
               case _ =>
                 throw new IllegalStateException // should not happen
@@ -629,8 +629,8 @@ object ElementAnalysisTreeXPathAnalyzer {
             valueDependentPaths    = pmxpa.valueDependentPaths combine pmxpa.returnablePaths,
             returnablePaths        = MapSet.empty[String, String],
             dependentModels        = pmxpa.dependentModels,
-            dependentInstances     = pmxpa.dependentInstances)(
-            pathmap                = Some(pmxpa.pathmap.get.clone),
+            dependentInstances     = pmxpa.dependentInstances,
+            pathmap                = pmxpa.pathMapOrThrow.clone
           )
       }
 

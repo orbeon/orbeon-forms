@@ -65,7 +65,7 @@ object XXFormsLang {
     avtLangAnalysisOpt foreach {
       case analysis: PathMapXPathAnalysis =>
         // There is a pathmap for the `xml:lang` AVT, so add the new roots
-        pathMap.addRoots(analysis.pathmap.get.clone.getPathMapRoots)
+        pathMap.addRoots(analysis.pathMapOrThrow.clone.getPathMapRoots)
         //pathMap.findFinalNodes // FIXME: needed?
         //pathMap.updateFinalNodes(finalNodes)
       case analysis if ! analysis.figuredOutDependencies =>

@@ -125,7 +125,7 @@ object PathMapXPathAnalysisBuilder {
               name,
               valueAnalysis match {
                 // Valid PathMap
-                case Some(analysis: PathMapXPathAnalysis) => analysis.pathmap.get
+                case Some(analysis: PathMapXPathAnalysis) => analysis.pathMapOrThrow
                 // Constant string
                 case _ => stringPathmap
               }
@@ -142,7 +142,7 @@ object PathMapXPathAnalysisBuilder {
             // Expression depends on the context and has a context which has a pathmap
 
             // We clone the base analysis and add to an existing PathMap
-            val clonedPathmap = baseAnalysis.pathmap.get.clone
+            val clonedPathmap = baseAnalysis.pathMapOrThrow.clone
             clonedPathmap.setInScopeVariables(variablePathMaps)
             clonedPathmap.setPathMapContext(pathMapContext)
 
@@ -265,9 +265,8 @@ object PathMapXPathAnalysisBuilder {
               valueDependentPaths    = valueDependentPaths,
               returnablePaths        = returnablePaths,
               dependentModels        = dependentModels,
-              dependentInstances     = dependentInstances
-            )(
-              pathmap                = Some(pathmap),
+              dependentInstances     = dependentInstances,
+              pathmap                = pathmap
             )
           else
             // Failure

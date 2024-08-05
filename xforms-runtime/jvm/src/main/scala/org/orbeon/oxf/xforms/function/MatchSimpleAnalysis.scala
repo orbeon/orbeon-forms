@@ -25,7 +25,7 @@ trait MatchSimpleAnalysis {
       // Clone the PathMap first because the nodes returned must belong to this PathMap
       element.bindingAnalysis.get match {
         case bindingAnalysis: PathMapXPathAnalysis =>
-          val clonedContextPathMap = bindingAnalysis.pathmap.get.clone
+          val clonedContextPathMap = bindingAnalysis.pathMapOrThrow.clone
           pathMap.addRoots(clonedContextPathMap.getPathMapRoots)
           clonedContextPathMap.findFinalNodes
         case bindingAnalysis: ConstantXPathAnalysis if bindingAnalysis.figuredOutDependencies =>

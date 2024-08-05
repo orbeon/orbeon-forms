@@ -18,7 +18,7 @@ import net.sf.ehcache
 import net.sf.ehcache.CacheManager
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.CoreUtils._
 
 import java.io
 import scala.util.control.NonFatal

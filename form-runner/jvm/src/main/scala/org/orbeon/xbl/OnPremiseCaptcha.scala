@@ -6,7 +6,7 @@ import javax.imageio.ImageIO
 import com.google.code.kaptcha.impl.DefaultKaptcha
 import com.google.code.kaptcha.util.Config
 import org.orbeon.oxf.util.Base64
-import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.CoreUtils._
 
 import java.util.Properties
 

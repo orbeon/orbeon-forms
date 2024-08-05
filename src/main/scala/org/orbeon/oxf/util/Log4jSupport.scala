@@ -10,7 +10,7 @@ import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.resources.handler.OXFHandler
-import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory.logger
 import org.orbeon.oxf.xml.{ParserConfiguration, XMLParsing}
 

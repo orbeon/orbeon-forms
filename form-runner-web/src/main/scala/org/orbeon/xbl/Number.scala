@@ -14,7 +14,7 @@
 package org.orbeon.xbl
 
 import org.log4s.Logger
-import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.XBL

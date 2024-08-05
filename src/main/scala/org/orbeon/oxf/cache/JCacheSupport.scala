@@ -4,7 +4,7 @@ import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.CoreUtils._
 
 import java.io
 import java.net.URI

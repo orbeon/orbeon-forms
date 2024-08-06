@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.xforms.XFormsNames.FOR_QNAME
 import org.orbeon.xforms.xbl.Scope

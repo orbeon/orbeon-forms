@@ -15,7 +15,7 @@ package org.orbeon.oxf.xml
 
 import org.orbeon.dom.Document
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{Compressor, SecureUtils}
 
 

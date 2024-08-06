@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.{SingleNodeFocusableTrait, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
+
 /**
  * Represents an xf:trigger control.
  *

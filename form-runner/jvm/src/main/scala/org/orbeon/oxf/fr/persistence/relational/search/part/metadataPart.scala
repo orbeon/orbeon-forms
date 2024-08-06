@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.search.part
 import org.orbeon.oxf.fr.persistence.relational.Statement.{Setter, StatementPart}
 import org.orbeon.oxf.fr.persistence.relational.search.adt.MetadataFilterType.{InstantFilterType, StringFilterType}
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{MetadataQuery, SearchRequest}
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.CoreUtils._
 
 import java.sql.Timestamp
 import java.time.Instant

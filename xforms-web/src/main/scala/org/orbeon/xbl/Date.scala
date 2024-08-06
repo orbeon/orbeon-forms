@@ -17,7 +17,7 @@ import cats.syntax.option._
 import org.log4s.Logger
 import org.orbeon.date.JSDateUtils
 import org.orbeon.facades.DatePicker._
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames

@@ -2,13 +2,13 @@ package org.orbeon.oxf.fr
 
 import org.log4s
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, SecureUtils}
 
 
 trait FormRunnerPlatformJVM extends FormRunnerPlatform {
   def configCheck(): Set[(String, log4s.LogLevel)] = {
-    
+
     implicit val logger: IndentedLogger = RelationalUtils.newIndentedLogger
 
     val passwordGeneral         = (! SecureUtils.checkPasswordForKeyUsage(SecureUtils.KeyUsage.General)        )       .set("password.general",          log4s.Error)

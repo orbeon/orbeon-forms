@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms.library
 
 import org.orbeon.macros.XPathFunction
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}

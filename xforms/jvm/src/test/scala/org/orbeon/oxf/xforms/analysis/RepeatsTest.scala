@@ -13,16 +13,19 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.junit.Test
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xml.dom.Converter._
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatest.funspec.AnyFunSpecLike
 
-class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
 
-  @Test def repeatAncestors(): Unit = {
+class RepeatsTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with AnyFunSpecLike {
 
-    this setupDocument
+  describe("repeat ancestors") {
+
+    val TestDoc =
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
            xmlns:xf="http://www.w3.org/2002/xforms"
            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
@@ -75,37 +78,43 @@ class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
         </body>
       </xh:html>.toDocument
 
-    // Test hierarchy string
-    assert(document.staticOps.getRepeatHierarchyString("") === "repeat-department,repeat-employee repeat-department,repeat-office repeat-department,repeat-building")
+    it("must pass all checks") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(TestDoc)) {
+          // Test hierarchy string
+          assert(document.staticOps.getRepeatHierarchyString("") == "repeat-department,repeat-employee repeat-department,repeat-office repeat-department,repeat-building")
 
-    val repeatAncestors = Map(
-      "department" -> Seq(),
-      "employee"   -> Seq("repeat-department"),
-      "office"     -> Seq("repeat-department"),
-      "building"   -> Seq()
-    )
+          val repeatAncestors = Map(
+            "department" -> Seq(),
+            "employee"   -> Seq("repeat-department"),
+            "office"     -> Seq("repeat-department"),
+            "building"   -> Seq()
+          )
 
-    // Test ancestors of repeat controls
-    for {
-      (name, ancestors) <- repeatAncestors
-      id = "repeat-" + name
-    } yield
-      assert(document.staticOps.getAncestorRepeatIds(id) === ancestors)
+          // Test ancestors of repeat controls
+          for {
+            (name, ancestors) <- repeatAncestors
+            id = "repeat-" + name
+          } yield
+            assert(document.staticOps.getAncestorRepeatIds(id) == ancestors)
 
-    // Test ancestors of other controls and actions
-    for {
-      id <- Seq("my-output", "action1", "action2")
-    } yield
-      assert(document.staticOps.getAncestorRepeatIds(id) === Seq("repeat-employee", "repeat-department"))
+          // Test ancestors of other controls and actions
+          for {
+            id <- Seq("my-output", "action1", "action2")
+          } yield
+            assert(document.staticOps.getAncestorRepeatIds(id) == Seq("repeat-employee", "repeat-department"))
 
-    // Test closest common ancestor
-    assert(document.staticOps.findClosestCommonAncestorRepeat("repeat-employee", "repeat-office") === Some("repeat-department"))
+          // Test closest common ancestor
+          assert(document.staticOps.findClosestCommonAncestorRepeat("repeat-employee", "repeat-office").contains("repeat-department"))
 
-    // TODO: test combination of ancestors for all controls
-    // TODO: test with ancestor parts
+          // TODO: test combination of ancestors for all controls
+          // TODO: test with ancestor parts
 
-    // TODO: actions directly nested within repeat do not report the correct ancestors
-//        assert(getDocument.getStaticOps.getAncestorRepeats("action1", null).asScala === Seq("repeat-employee", "repeat-department"))
-//        assert(getDocument.getStaticOps.getAncestorRepeats("action2", null).asScala === Seq("repeat-employee", "repeat-department"))
+          // TODO: actions directly nested within repeat do not report the correct ancestors
+      //        assert(getDocument.getStaticOps.getAncestorRepeats("action1", null).asScala == Seq("repeat-employee", "repeat-department"))
+      //        assert(getDocument.getStaticOps.getAncestorRepeats("action2", null).asScala == Seq("repeat-employee", "repeat-department"))
+        }
+      }
+    }
   }
 }

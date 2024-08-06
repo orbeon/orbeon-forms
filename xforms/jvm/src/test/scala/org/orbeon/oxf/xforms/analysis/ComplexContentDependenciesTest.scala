@@ -13,20 +13,23 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.junit._
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xml.dom.Converter._
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatest.funspec.AnyFunSpecLike
 
-class ComplexContentDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
+
+class ComplexContentDependenciesTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with AnyFunSpecLike {
 
   // See: [ #315535 ] XPath analysis: xxf:serialize() support: detect changes to nested elements
   //      http://forge.ow2.org/tracker/index.php?func=detail&aid=315535&group_id=168&atid=350207
-  @Test def serializeFunction(): Unit = {
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+  describe("`serialize()` functions") {
+    assume(Version.isPE)
 
-    this setupDocument
+    val TestDoc =
       <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
            xmlns:xh="http://www.w3.org/1999/xhtml"
            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
@@ -50,23 +53,29 @@ class ComplexContentDependenciesTest extends DocumentTestBase with AssertionsFor
         </xh:body>
       </xh:html>.toDocument
 
-    assert(getControlValue("input") === "complex")
-    assert(getControlValue("output1") === "<div><p>This is <b>complex</b> content.</p></div>")
-    assert(getControlValue("output2") === "<div><p>This is <b>complex</b> content.</p></div>")
+    it("must pass all checks") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(TestDoc)) {
+          assert(getControlValue("input") == "complex")
+          assert(getControlValue("output1") == "<div><p>This is <b>complex</b> content.</p></div>")
+          assert(getControlValue("output2") == "<div><p>This is <b>complex</b> content.</p></div>")
 
-    setControlValue("input", "bold")
+          setControlValue("input", "bold")
 
-    assert(getControlValue("input") === "bold")
-    assert(getControlValue("output1") === "<div><p>This is <b>bold</b> content.</p></div>")
-    assert(getControlValue("output2") === "<div><p>This is <b>bold</b> content.</p></div>")
+          assert(getControlValue("input") == "bold")
+          assert(getControlValue("output1") == "<div><p>This is <b>bold</b> content.</p></div>")
+          assert(getControlValue("output2") == "<div><p>This is <b>bold</b> content.</p></div>")
+        }
+      }
+    }
   }
 
   // See: [ #315525 ] XPath analysis: bug with xf:output pointing to complex content
   //      http://forge.ow2.org/tracker/index.php?func=detail&aid=315525&group_id=168&atid=350207
-  @Test def outputComplexContent(): Unit = {
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+  describe("output complex content") {
+    assume(Version.isPE)
 
-    this setupDocument
+    val TestDoc =
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
            xmlns:xf="http://www.w3.org/2002/xforms"
            xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -83,12 +92,18 @@ class ComplexContentDependenciesTest extends DocumentTestBase with AssertionsFor
         </xh:body>
       </xh:html>.toDocument
 
-    assert(getControlValue("input") === "Teddy")
-    assert(getControlValue("output") === "TeddyBear")
+    it("must pass all checks") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(TestDoc)) {
+          assert(getControlValue("input") === "Teddy")
+          assert(getControlValue("output") === "TeddyBear")
 
-    setControlValue("input", "Theodore")
+          setControlValue("input", "Theodore")
 
-    assert(getControlValue("input") === "Theodore")
-    assert(getControlValue("output") === "TheodoreBear")
+          assert(getControlValue("input") === "Theodore")
+          assert(getControlValue("output") === "TheodoreBear")
+        }
+      }
+    }
   }
 }

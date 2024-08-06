@@ -13,79 +13,89 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.junit.Test
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatest.funspec.AnyFunSpecLike
 
-class WhitespaceTest extends DocumentTestBase with AssertionsForJUnit {
 
-  val controlIds = List(
-    "with-trimming-control",
-    "without-trimming-control",
-    "calculated-value-with-trimming-control",
-    "calculated-value-without-trimming-control"
-  )
+class WhitespaceTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with AnyFunSpecLike {
 
-  def assertValues(expectedValues: List[String]) =
-    for ((expectedValue, controlId) <- expectedValues.zip(controlIds))
-      assert(expectedValue === getControlValue(controlId))
+  describe("The `xxf:whitespace` MIP") {
 
-  def assertInitialState() =
-    assertValues(
-        List(
-          "",
-          " " * 4,
-          "",
-          " " * 12
-        )
-      )
+    val ControlIds = List(
+      "with-trimming-control",
+      "without-trimming-control",
+      "calculated-value-with-trimming-control",
+      "calculated-value-without-trimming-control"
+    )
 
-  @Test def testInitialAndValueChanges(): Unit =
-    withActionAndDoc("oxf:/org/orbeon/oxf/xforms/analysis/whitespace.xhtml") {
+    def assertValues(expectedValues: List[String]): Unit =
+      for ((expectedValue, controlId) <- expectedValues.zip(ControlIds))
+        assert(expectedValue == getControlValue(controlId))
 
-      assertInitialState()
-
-      // After value change to trimmed value
-      setControlValue("with-trimming-control", "  Laniakea  ")
-
+    def assertInitialState(): Unit =
       assertValues(
-        List(
-          "Laniakea",
-          " " * 4,
-          "Laniakea",
-          " " * 12
+          List(
+            "",
+            " " * 4,
+            "",
+            " " * 12
+          )
         )
-      )
 
-      // After value change to non-trimmed value
-      setControlValue("without-trimming-control", "  Andromeda  ")
+    it("must pass initial and value changes") {
+      withTestExternalContext { _ =>
+        withActionAndDoc("oxf:/org/orbeon/oxf/xforms/analysis/whitespace.xhtml") {
+          assertInitialState()
 
-      assertValues(
-        List(
-          "Laniakea",
-          "  Andromeda  ",
-          "Laniakea",
-          "      Andromeda      "
-        )
-      )
+          // After value change to trimmed value
+          setControlValue("with-trimming-control", "  Laniakea  ")
+
+          assertValues(
+            List(
+              "Laniakea",
+              " " * 4,
+              "Laniakea",
+              " " * 12
+            )
+          )
+
+          // After value change to non-trimmed value
+          setControlValue("without-trimming-control", "  Andromeda  ")
+
+          assertValues(
+            List(
+              "Laniakea",
+              "  Andromeda  ",
+              "Laniakea",
+              "      Andromeda      "
+            )
+          )
+        }
+      }
     }
 
-  @Test def testInstanceReplacement(): Unit =
-    withActionAndDoc("oxf:/org/orbeon/oxf/xforms/analysis/whitespace.xhtml") {
+    it("must pass instance replacement") {
+      withTestExternalContext { _ =>
+        withActionAndDoc("oxf:/org/orbeon/oxf/xforms/analysis/whitespace.xhtml") {
+          assertInitialState()
 
-      assertInitialState()
+          XFormsAPI.sendThrowOnError("replace-submission")
+          XFormsAPI.refresh("model")
 
-      XFormsAPI.sendThrowOnError("replace-submission")
-      XFormsAPI.refresh("model")
-
-      assertValues(
-        List(
-          "Mercury",
-          "  Venus  ",
-          "Mercury",
-          "      Venus      "
-        )
-      )
+          assertValues(
+            List(
+              "Mercury",
+              "  Venus  ",
+              "Mercury",
+              "      Venus      "
+            )
+          )
+        }
+      }
     }
+  }
 }

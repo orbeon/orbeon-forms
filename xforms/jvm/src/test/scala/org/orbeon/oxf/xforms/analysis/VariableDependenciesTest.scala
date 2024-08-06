@@ -13,19 +13,22 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.junit._
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xml.dom.Converter._
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatest.funspec.AnyFunSpecLike
 
-class VariableDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
-  @Test def variableWithIntermediateControl(): Unit = {
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+class VariableDependenciesTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with AnyFunSpecLike {
 
-    this setupDocument
+  describe("variable with intermediate control") {
+    assume(Version.isPE)
+
+    val TestDoc =
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
            xmlns:xf="http://www.w3.org/2002/xforms"
            xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -53,10 +56,17 @@ class VariableDependenciesTest extends DocumentTestBase with AssertionsForJUnit 
         </xh:body>
       </xh:html>.toDocument
 
-    assert(getControl("my-output").getLabel(EventCollector.Throw) === "Name")
+    it("must pass all checks") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(TestDoc)) {
 
-    setControlValue("my-input", "fr")
+          assert(getControl("my-output").getLabel(EventCollector.Throw) === "Name")
 
-    assert(getControl("my-output").getLabel(EventCollector.Throw) === "Nom")
+          setControlValue("my-input", "fr")
+
+          assert(getControl("my-output").getLabel(EventCollector.Throw) === "Nom")
+        }
+      }
+    }
   }
 }

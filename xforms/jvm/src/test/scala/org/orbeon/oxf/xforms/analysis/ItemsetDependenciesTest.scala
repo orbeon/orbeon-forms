@@ -14,20 +14,23 @@
 
 package org.orbeon.oxf.xforms.analysis
 
-import org.junit.{Assume, Test}
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xml.dom.Converter._
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatest.funspec.AnyFunSpecLike
 
-class ItemsetDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
+
+class ItemsetDependenciesTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with AnyFunSpecLike {
 
   // See: [ #315557 ] XPath analysis: Checkbox with both itemset and value changing ends up in incorrect state
   //      http://forge.ow2.org/tracker/?func=detail&atid=350207&aid=315557&group_id=168
-  @Test def selectValueDependingOnItemset(): Unit = {
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+  describe("select value depending on itemset") {
+    assume(Version.isPE)
 
-    this setupDocument
+    val TestDoc =
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
            xmlns:xf="http://www.w3.org/2002/xforms"
            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
@@ -66,13 +69,20 @@ class ItemsetDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
         </xh:body>
       </xh:html>.toDocument
 
-    assert(getControlExternalValue("checkbox") === "1")
-    assert(getControlExternalValue("value-selection") === "1")
-    assert(getItemset("checkbox") === """[{"label":"","value":"1"}]""")
+    it("must pass all checks") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(TestDoc)) {
 
-    setControlValue("value-selection", "2")
+          assert(getControlExternalValue("checkbox") == "1")
+          assert(getControlExternalValue("value-selection") == "1")
+          assert(getItemset("checkbox") == """[{"label":"","value":"1"}]""")
 
-    assert(getControlExternalValue("checkbox") === "2")
-    assert(getItemset("checkbox") === """[{"label":"","value":"2"}]""")
+          setControlValue("value-selection", "2")
+
+          assert(getControlExternalValue("checkbox") == "2")
+          assert(getItemset("checkbox") == """[{"label":"","value":"2"}]""")
+        }
+      }
+    }
   }
 }

@@ -13,131 +13,162 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.junit._
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xml.dom.Converter._
-import org.scalatestplus.junit._
+import org.scalatest.funspec.AnyFunSpecLike
 
-class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
-  @Before def setupDocument(): Unit = setupDocument("oxf:/org/orbeon/oxf/xforms/analysis/mips.xhtml")
+class MIPDependenciesTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with AnyFunSpecLike {
 
-  @Test def typeInvalid(): Unit = {
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+ val AnalysisMipsFormUrl = "oxf:/org/orbeon/oxf/xforms/analysis/mips.xhtml"
 
-    // Initial state
-    assert("150" === getControlValue("line-total⊙1"))
-    assert("2150" === getControlValue("subtotal"))
+  describe("validity based on `type` MIP") {
+    assume(Version.isPE)
+    it("must pass all checks") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(AnalysisMipsFormUrl)) {
 
-    // Change first item price to foo
-    setControlValue("price⊙1", "foo")
+          // Initial state
+          assert("150" == getControlValue("line-total⊙1"))
+          assert("2150" == getControlValue("subtotal"))
 
-    assert(! isValid("price⊙1"))
-    assert(! isValid("line-total⊙1"))
-    assert("-" === getControlValue("line-total⊙1"))
-    assert("2000" === getControlValue("subtotal"))
+          // Change first item price to foo
+          setControlValue("price⊙1", "foo")
 
-    // Change first item price to 100
-    setControlValue("price⊙1", "100")
+          assert(! isValid("price⊙1"))
+          assert(! isValid("line-total⊙1"))
+          assert("-" == getControlValue("line-total⊙1"))
+          assert("2000" == getControlValue("subtotal"))
 
-    assert(isValid("price⊙1"))
-    assert(isValid("line-total⊙1"))
-    assert("300" === getControlValue("line-total⊙1"))
-    assert("2300" === getControlValue("subtotal"))
+          // Change first item price to 100
+          setControlValue("price⊙1", "100")
+
+          assert(isValid("price⊙1"))
+          assert(isValid("line-total⊙1"))
+          assert("300" == getControlValue("line-total⊙1"))
+          assert("2300" == getControlValue("subtotal"))
+        }
+      }
+    }
   }
 
-  @Test def relevance(): Unit = {
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+  describe("`relevant` MIP") {
+    assume(Version.isPE)
+    it("must pass all checks") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(AnalysisMipsFormUrl)) {
+          val units = getControlValue("units⊙1")
 
-    val units = getControlValue("units⊙1")
+          // Change first item units to foo
+          setControlValue("units⊙1", "foo")
 
-    // Change first item units to foo
-    setControlValue("units⊙1", "foo")
+          assert(! isValid("units⊙1"))
+          assert(!isRelevant("line-total⊙1"))
+          assert("2000" == getControlValue("subtotal"))
 
-    assert(! isValid("units⊙1"))
-    assert(!isRelevant("line-total⊙1"))
-    assert("2000" === getControlValue("subtotal"))
+          // Change back item  units
+          setControlValue("units⊙1", units)
 
-    // Change back item  units
-    setControlValue("units⊙1", units)
-
-    assert(isValid("units⊙1"))
-    assert(isRelevant("line-total⊙1"))
-    assert(isValid("line-total⊙1"))
-    assert("150" === getControlValue("line-total⊙1"))
-    assert("2150" === getControlValue("subtotal"))
+          assert(isValid("units⊙1"))
+          assert(isRelevant("line-total⊙1"))
+          assert(isValid("line-total⊙1"))
+          assert("150" == getControlValue("line-total⊙1"))
+          assert("2150" == getControlValue("subtotal"))
+        }
+      }
+    }
   }
 
-  @Test def typeConstraintInvalid(): Unit = {
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+  describe("validity based on `constraint` MIP") {
+    assume(Version.isPE)
+    it("must pass all checks") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(AnalysisMipsFormUrl)) {
 
-    val units = getControlValue("units⊙1")
+          val units = getControlValue("units⊙1")
 
-    // Change first item units to a constraint-invalid value
-    setControlValue("units⊙1", "0")
+          // Change first item units to a constraint-invalid value
+          setControlValue("units⊙1", "0")
 
-    assert(! isValid("units⊙1"))
-    assert(!isRelevant("line-total⊙1"))
-    assert("2000" === getControlValue("subtotal"))
+          assert(! isValid("units⊙1"))
+          assert(!isRelevant("line-total⊙1"))
+          assert("2000" == getControlValue("subtotal"))
 
-    // Then change to type-invalid too
-    setControlValue("units⊙1", "foo")
+          // Then change to type-invalid too
+          setControlValue("units⊙1", "foo")
 
-    assert(! isValid("units⊙1"))
-    assert(!isRelevant("line-total⊙1"))
-    assert("2000" === getControlValue("subtotal"))
+          assert(! isValid("units⊙1"))
+          assert(!isRelevant("line-total⊙1"))
+          assert("2000" == getControlValue("subtotal"))
 
-    // Change back item  units
-    setControlValue("units⊙1", units)
+          // Change back item  units
+          setControlValue("units⊙1", units)
 
-    assert(isValid("units⊙1"))
-    assert(isRelevant("line-total⊙1"))
-    assert(isValid("line-total⊙1"))
-    assert("150" === getControlValue("line-total⊙1"))
-    assert("2150" === getControlValue("subtotal"))
+          assert(isValid("units⊙1"))
+          assert(isRelevant("line-total⊙1"))
+          assert(isValid("line-total⊙1"))
+          assert("150" == getControlValue("line-total⊙1"))
+          assert("2150" == getControlValue("subtotal"))
+        }
+      }
+    }
   }
 
-  @Test def simpleRequired(): Unit = {
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+  describe("`required` MIP") {
+    assume(Version.isPE)
+    it("must pass all checks") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(AnalysisMipsFormUrl)) {
 
-    // NOTE: The value of @required has no dependencies in this sample, so this is a weak test
+          // NOTE: The value of @required has no dependencies in this sample, so this is a weak test
 
-    assert(isRequired("name⊙1"))
-    assert(isValid("name⊙1"))
+          assert(isRequired("name⊙1"))
+          assert(isValid("name⊙1"))
 
-    setControlValue("name⊙1", "")
-    assert(isRequired("name⊙1"))
-    assert(! isValid("name⊙1"))
+          setControlValue("name⊙1", "")
+          assert(isRequired("name⊙1"))
+          assert(! isValid("name⊙1"))
 
-    setControlValue("name⊙1", "100")
-    assert(isRequired("name⊙1"))
-    assert(isValid("name⊙1"))
+          setControlValue("name⊙1", "100")
+          assert(isRequired("name⊙1"))
+          assert(isValid("name⊙1"))
+        }
+      }
+    }
   }
 
-  @Test def testNormalizeSpaceContextConstraint(): Unit = {
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+  describe("`normalize-space()` constraint") {
+    assume(Version.isPE)
+    it("must pass all checks") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(AnalysisMipsFormUrl)) {
 
-    // NOTE: The value of @required has no dependencies in this sample, so this is a weak test
+          assert(isValid("name⊙1"))
 
-    assert(isValid("name⊙1"))
+          setControlValue("name⊙1", "    ") // series of spaces
+          assert(! isValid("name⊙1"))
 
-    setControlValue("name⊙1", "    ") // series of spaces
-    assert(! isValid("name⊙1"))
-
-    setControlValue("name⊙1", "100")
-    assert(isValid("name⊙1"))
+          setControlValue("name⊙1", "100")
+          assert(isValid("name⊙1"))
+        }
+      }
+    }
   }
 
   // See: [ #315733 ] Incorrect MIPs when more than two binds point to the same node
   //      http://forge.ow2.org/tracker/index.php?func=detail&aid=315733&group_id=168&atid=350207
-  @Test def multipleBindsOnSameNode(): Unit = {
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+  describe("multiple `xf:bind`s on same node") {
+    assume(Version.isPE)
 
-    this setupDocument
-      <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-           xmlns:xh="http://www.w3.org/1999/xhtml"
-           xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+    val MultipleBindsDoc =
+      <xh:html
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
         <xh:head>
           <xf:model xxf:xpath-analysis="true">
             <xf:instance id="instance">
@@ -153,28 +184,35 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
         </xh:body>
       </xh:html>.toDocument
 
-    // Test all combinations of MIPs
-    for {
-      required <- Seq(false, true)
-      valid    <- Seq(false, true)
-      readonly <- Seq(false, true)
-      value    = Seq(required, valid, readonly) map (if (_) "1" else "0") mkString
-    } yield {
-      // Value looks like "000" to "111"
-      setControlValue("input", value)
+    it("must pass all checks") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(MultipleBindsDoc)) {
 
-      // Check all MIPs
-      assert(isReadonly("input") === readonly)
-      assert(isValid("input") === valid)
-      assert(isRequired("input") === required)
+          // Test all combinations of MIPs
+          for {
+            required <- Seq(false, true)
+            valid    <- Seq(false, true)
+            readonly <- Seq(false, true)
+            value    = Seq(required, valid, readonly) map (if (_) "1" else "0") mkString
+          } yield {
+            // Value looks like "000" to "111"
+            setControlValue("input", value)
+
+            // Check all MIPs
+            assert(isReadonly("input") == readonly)
+            assert(isValid("input") == valid)
+            assert(isRequired("input") == required)
+          }
+        }
+      }
     }
   }
 
   // https://github.com/orbeon/orbeon-forms/issues/6370
-  @Test def calculateUponDestinationNodeChange(): Unit = {
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+  describe("`calculate` MIP recalculates upon destination node change") {
+    assume(Version.isPE)
 
-    this setupDocument
+    val Issue6370TestDoc =
       <xh:html
         xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:xf="http://www.w3.org/2002/xforms"
@@ -211,19 +249,26 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
         </xh:body>
       </xh:html>.toDocument
 
-    setControlValueWithEventSearchNested("toggle-checkbox", "true")
-    setControlValueWithEventSearchNested("toggle-checkbox", "false")
-    setControlValueWithEventSearchNested("toggle-checkbox", "true")
+    it("must pass all checks") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(Issue6370TestDoc)) {
 
-    assert("42" == getControlValue("value-input"))
+          setControlValueWithEventSearchNested("toggle-checkbox", "true")
+          setControlValueWithEventSearchNested("toggle-checkbox", "false")
+          setControlValueWithEventSearchNested("toggle-checkbox", "true")
 
-    setControlValueWithEventSearchNested("other-input", "43")
-    assert("43" == getControlValue("value-input"))
+          assert("42" == getControlValue("value-input"))
 
-    setControlValueWithEventSearchNested("toggle-checkbox", "false")
-    setControlValueWithEventSearchNested("toggle-checkbox", "true")
+          setControlValueWithEventSearchNested("other-input", "43")
+          assert("43" == getControlValue("value-input"))
 
-    assert("43" == getControlValue("value-input"))
+          setControlValueWithEventSearchNested("toggle-checkbox", "false")
+          setControlValueWithEventSearchNested("toggle-checkbox", "true")
+
+          assert("43" == getControlValue("value-input"))
+        }
+      }
+    }
   }
 
   // TODO: more tests

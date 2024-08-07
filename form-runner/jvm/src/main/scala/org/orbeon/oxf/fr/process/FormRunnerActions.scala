@@ -35,7 +35,7 @@ import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.RelevanceHandling
+import org.orbeon.xforms.{RelevanceHandling, XFormsNames}
 import org.orbeon.xforms.XFormsNames._
 
 import java.net.URI
@@ -299,10 +299,20 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       debug(s"`send` action sending submission", evaluatedSendPropertiesWithUpdates.iterator collect { case (k, Some(v)) => k -> v } toList)
 
-      sendThrowOnError(
-        s"fr-send-submission",
-        evaluatedSendPropertiesWithUpdates.map{ case (k, v) => PropertyValue(k, v) }.toList
-      )
+      val result =
+        sendThrowOnError(
+          s"fr-send-submission",
+          evaluatedSendPropertiesWithUpdates.map{ case (k, v) => PropertyValue(k, v) }.toList
+        )
+
+      // It is unclear why not doing this at the end of a `replace="instance"` followed by a `save()` messes things up,
+      // but it does. So we make sure that, after a `send()` and before any other action, everything is up-to-date in
+      // the data model.
+      // https://github.com/orbeon/orbeon-forms/issues/6436
+      if (evaluatedSendPropertiesWithUpdates.get("replace").flatten.contains(XFormsNames.XFORMS_SUBMIT_REPLACE_INSTANCE))
+        inScopeContainingDocument.rebuildRecalculateRevalidateIfNeeded()
+
+      result
     }
 
   private def tryChangeMode(
@@ -382,7 +392,6 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         formTargetOpt      = formTargetOpt,
         responseIsResource = true
       )
-
     }
 
   def clearRenderedFormatsResources(): Try[Any] =

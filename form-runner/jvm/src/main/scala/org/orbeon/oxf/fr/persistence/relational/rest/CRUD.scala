@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import org.orbeon.oxf.controller.Authorizer
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
+import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.http._
@@ -101,7 +102,7 @@ private object CRUD {
     val incomingVersion = headerValueIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt)
     val requestUsername = headerValueIgnoreCase(Headers.OrbeonUsername)
     val requestGroup    = headerValueIgnoreCase(Headers.OrbeonGroup)
-    val requestFlatView = headerValueIgnoreCase("orbeon-create-flat-view").contains("true")
+    val requestFlatView = headerValueIgnoreCase(Headers.OrbeonCreateFlatView).contains("true")
 
     val ranges = HttpRanges(httpRequest) match {
       case Success(ranges) => ranges
@@ -148,14 +149,14 @@ private object CRUD {
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
 
         val filenameOpt     = if (filename == DataXml) None else Some(filename)
-        val lastModifiedOpt = httpRequest.getFirstParamAsString("last-modified-time").flatMap(_.trimAllToOpt).map(Instant.parse) // xxx TODO constant
+        val lastModifiedOpt = httpRequest.getFirstParamAsString(PersistenceApi.LastModifiedTimeParam).flatMap(_.trimAllToOpt).map(Instant.parse)
 
         val forceDelete =
           (httpRequest.getMethod == HttpMethod.DELETE || httpRequest.getMethod == HttpMethod.HEAD) &&
-            httpRequest.getFirstParamAsString("force-delete").flatMap(_.trimAllToOpt).contains(true.toString)
+            httpRequest.getFirstParamAsString(PersistenceApi.ForceDeleteParam).flatMap(_.trimAllToOpt).contains(true.toString)
 
         if (forceDelete && (
-          ! Authorizer.authorizedWithToken(NetUtils.getExternalContext) || // force `DELETE` from internal callers only
+          ! Authorizer.authorizedWithToken(NetUtils.getExternalContext) || // force `DELETE` from internal callers only (for now, as a safeguard)
           filenameOpt.isEmpty && lastModifiedOpt.isEmpty                || // and only for historical data
           filenameOpt.isDefined && lastModifiedOpt.isDefined               // or for attachments
           )

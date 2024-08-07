@@ -8,8 +8,8 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, RequestAdapter, UrlRewri
 import org.orbeon.oxf.fr.FormRunner.{createFormDataBasePath, providerPropertyAsBoolean}
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml, findProvider}
+import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr._
-import Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
@@ -30,10 +30,15 @@ import scala.util.Try
 
 // Provide a simple API to access the persistence layer from Scala
 //
-// This uses `Connection.connectNow()`, through `connectPersistence()`. which create an internal `Connection`. This
+// This uses `Connection.connectNow()`, through `connectPersistence()`, which creates an internal `Connection`. This
 // results eventually in calling a page flow and then `PersistenceProxyProcessor`. So there is overhead. Possibly
 // `connectPersistence()` could call directly `PersistenceProxyProcessor` instead.
 trait PersistenceApiTrait {
+
+  val LastModifiedTimeParam = "last-modified-time"
+  val ForceDeleteParam      = "force-delete"
+  val PageSizeParam         = "page-size"
+  val PageNumberParam       = "page-number"
 
   private val SearchPageSize = 100
 
@@ -280,7 +285,13 @@ trait PersistenceApiTrait {
       debug(s"reading data history page `$pageNumber`")
 
       val servicePathParams =
-        PathUtils.recombineQuery(servicePathQuery, List("page-size" -> SearchPageSize.toString, "page-number" -> pageNumber.toString))
+        PathUtils.recombineQuery(
+          servicePathQuery,
+          List(
+            PersistenceApi.PageSizeParam   -> SearchPageSize.toString,
+            PersistenceApi.PageNumberParam -> pageNumber.toString
+          )
+        )
 
       val documentsXmlTry =
         ConnectionResult.tryWithSuccessConnection(
@@ -349,7 +360,7 @@ trait PersistenceApiTrait {
 
     val path = PathUtils.recombineQuery(
       FormRunner.createFormDataBasePath(appFormVersion._1.app, appFormVersion._1.form, isDraft = false, documentId) + DataXml,
-      lastModifiedTime.toList.map("last-modified-time" -> _.toString) :::
+      lastModifiedTime.toList.map(PersistenceApi.LastModifiedTimeParam -> _.toString) :::
       createInternalAdminUserTokenParam(isInternalAdminUser).toList,
       overwrite = true
     )
@@ -388,6 +399,7 @@ trait PersistenceApiTrait {
     readHeadersAndDocument(path, Some(Left(version))).map(_ -> path)
   }
 
+  // xxx see todo below
   // TODO: This should return a `Try`. Right now it throws if the document cannot be read.
   // Retrieves from the persistence layer the metadata for a form, return an `Option[<form>]`
   def readFormMetadataOpt(
@@ -437,9 +449,9 @@ trait PersistenceApiTrait {
     val pathWithParams =
       PathUtils.recombineQuery(
         path,
-        (forceDelete list ("force-delete" -> true.toString)) :::
-        createInternalAdminUserTokenParam(isInternalAdminUser).toList :::
-        modifiedTimeOpt.toList.map(modifiedTime => "last-modified-time" -> modifiedTime.toString),
+        (forceDelete list (PersistenceApi.ForceDeleteParam -> true.toString)) :::
+        createInternalAdminUserTokenParam(isInternalAdminUser).toList         :::
+        modifiedTimeOpt.toList.map(modifiedTime => PersistenceApi.LastModifiedTimeParam -> modifiedTime.toString),
         // Overwrite last-modified-time parameter (might already exist if we got the URL from the history API)
         overwrite = true
       )

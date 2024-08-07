@@ -2,6 +2,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
+import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
@@ -69,8 +70,8 @@ private object History {
   case object Request {
     def apply(getParam: String => Option[String], providerString: String): Request =
       Request(
-        pageSize   = RelationalUtils.parsePositiveIntParamOrThrow(getParam("page-size"),  10),
-        pageNumber = RelationalUtils.parsePositiveIntParamOrThrow(getParam("page-number"), 1),
+        pageSize   = RelationalUtils.parsePositiveIntParamOrThrow(getParam(PersistenceApi.PageSizeParam),  10),
+        pageNumber = RelationalUtils.parsePositiveIntParamOrThrow(getParam(PersistenceApi.PageNumberParam), 1),
         provider   = Provider.withName(providerString)
       )
   }

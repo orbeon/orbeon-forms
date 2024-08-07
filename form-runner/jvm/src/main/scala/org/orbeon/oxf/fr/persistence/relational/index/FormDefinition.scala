@@ -16,11 +16,11 @@ package org.orbeon.oxf.fr.persistence.relational.index
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
-import org.orbeon.oxf.fr.persistence.api.PersistenceApiTrait
+import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SearchableValues, SummarySettings}
-import org.orbeon.oxf.fr._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
@@ -92,8 +92,6 @@ trait FormDefinition {
       FormRunner.searchControlsInFormByClass     (classes     = ClassesPredicate, databaseDataFormatVersion)
 
     def pathString(path: List[PathElem]) = path.map(_.value).mkString("/")
-
-    object PersistenceApi extends PersistenceApiTrait
 
     val distinctValuesOpt = searchVersionOpt.toSeq.map { searchVersion =>
       val dynamicControlPaths = indexedControlBindPathHolders.filter { controlInfo =>

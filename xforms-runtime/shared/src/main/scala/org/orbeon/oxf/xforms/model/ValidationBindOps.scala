@@ -37,8 +37,7 @@ trait ValidationBindOps extends Logging {
 
   self: XFormsModelBinds =>
 
-  // TEMP: Picked a different name or `fullOptJS` fails!
-  import Private2._
+  import Private._
 
   def applyValidationBinds(invalidInstances: m.Set[String], collector: ErrorEventCollector): Unit = {
     if (! staticModel.mustRevalidate) {
@@ -76,7 +75,7 @@ trait ValidationBindOps extends Logging {
     } yield
       mip
 
-  private object Private2 {
+  private object Private {
 
     lazy val xformsValidator = {
       val validator = new XFormsModelSchemaValidator("oxf:/org/orbeon/oxf/xforms/xforms-types.xsd")

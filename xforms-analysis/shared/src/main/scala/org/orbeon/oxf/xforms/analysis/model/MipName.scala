@@ -45,32 +45,38 @@ object MipName {
   case object Whitespace   extends { val name = "whitespace" } with Ext with Computed
 
   case class Custom(qName: QName) extends StringXPath { // with `ComputedMIP`?
-    def name = qName.qualifiedName
+    def name = buildInternalCustomMIPName(qName)
     val aName: QName = qName
     val eName: QName = qName
   }
 
-  def fromQName(mipQName: QName): MipName =
-    AllMipsByQName.getOrElse(mipQName, Custom(mipQName))
+  val AllMipNames            : Set[MipName]          = Set(Relevant, Readonly, Required, Constraint, Calculate, Default, Type, Whitespace)
+  val AllMipNamesInOrder     : List[String]          = AllMipNames.toList.sortBy(_.name).map(_.name)
 
-  val AllMipNames            : Set[MipName]                    = Set(Relevant, Readonly, Required, Constraint, Calculate, Default, Type, Whitespace)
-  val AllMipNamesInOrder     : List[String]                    = AllMipNames.toList.sortBy(_.name).map(_.name)
-  val AllMipsByQName         : Map[QName, MipName]             = AllMipNames.map(mipName => mipName.aName -> mipName).toMap
+  val AllComputedMipsByName  : Map[String, Computed] = AllMipNames.collect { case m: Computed => m.name -> m } .toMap
+  val AllXPathMipsByName     : Map[String, XPath]    = AllMipNames.collect { case m: XPath    => m.name -> m } .toMap
 
-  val AllComputedMipsByName  : Map[String, Computed]           = AllMipNames collect { case m: Computed => m.name -> m } toMap
-  val AllXPathMipsByName     : Map[String, XPath]              = AllMipNames collect { case m: XPath    => m.name -> m } toMap
+  // Should be all except `Type` and `Whitespace` (and of course `Custom(_)`)
+  val QNameToXPathMIP        : Map[QName, XPath]     =
+    AllMipNames
+      .collect {
+        case m: XPath with Computed => m.aName -> m
+        case m: XPath with Validate => m.aName -> m
+      }
+      .toMap
 
-  val QNameToXPathComputedMip: Map[QName, XPath with Computed] = AllMipNames collect { case m: XPath with Computed => m.aName -> m } toMap
-  val QNameToXPathValidateMip: Map[QName, XPath with Validate] = AllMipNames collect { case m: XPath with Validate => m.aName -> m } toMap
-  val QNameToXPathMIP        : Map[QName, XPath]               = QNameToXPathComputedMip ++ QNameToXPathValidateMip
+  val CalculateMipNames      : Set[MipName]          = AllMipNames.collect { case m: Computed => m }
+  val ValidateMipNames       : Set[MipName]          = AllMipNames.collect { case m: Validate => m }
+  val BooleanXPathMipNames   : Set[MipName]          = AllMipNames.collect { case m: XPath with BooleanXPath => m }
 
-  val CalculateMipNames      : Set[MipName]                    = AllMipNames collect { case m: Computed => m }
-  val ValidateMipNames       : Set[MipName]                    = AllMipNames collect { case m: Validate => m }
-  val BooleanXPathMipNames   : Set[MipName]                    = AllMipNames collect { case m: XPath with BooleanXPath => m }
-
-  val StandardCustomMipQNames: Set[QName]                      = Set(XXFORMS_EVENT_MODE_QNAME)
-  val NeverCustomMipUris     : Set[String]                     = Set(XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)
+  val StandardCustomMipQNames: Set[QName]            = Set(XXFORMS_EVENT_MODE_QNAME)
+  val NeverCustomMipUris     : Set[String]           = Set(XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)
 
   def buildInternalCustomMIPName(qName: QName): String = qName.qualifiedName
   def buildExternalCustomMIPName(name: String): String = name.replace(':', '-')
+
+  private val AllMipsByQName = AllMipNames.map(mipName => mipName.aName -> mipName).toMap
+
+  def fromQName(mipQName: QName): MipName =
+    AllMipsByQName.getOrElse(mipQName, Custom(mipQName))
 }

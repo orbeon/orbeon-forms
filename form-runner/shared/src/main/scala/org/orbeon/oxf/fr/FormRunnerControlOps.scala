@@ -27,7 +27,7 @@ import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.NodeInfoFactory.namespaceInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI.insert
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.model.MipName
+import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{Item, NodeInfo}
@@ -501,7 +501,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     ctx      : FormRunnerDocContext
   ): Boolean =
     valueNamespaceMappingScopeIfNeeded(bindElem, value).isDefined &&
-      MipName.StringQNames(bindElem.resolveQName(value))
+      Types.StringQNames(bindElem.resolveQName(value))
 
   private object Private {
 

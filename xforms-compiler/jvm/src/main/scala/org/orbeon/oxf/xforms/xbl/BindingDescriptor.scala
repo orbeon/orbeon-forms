@@ -19,7 +19,7 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CollectionUtils.ListOps
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.analysis.model.MipName
+import org.orbeon.oxf.xforms.analysis.model.Types
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.saxon.om.NodeInfo
@@ -28,6 +28,7 @@ import org.orbeon.xforms.XFormsNames.{APPEARANCE_QNAME, XFORMS_STRING_QNAME}
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.compat._
+
 
 // CSS selectors can be very complex but we only support a small subset of them for the purpose of binding controls to
 // elements. Namely, we can bind:
@@ -131,7 +132,7 @@ object BindingDescriptor {
   ): Iterable[(Option[String], Option[NodeInfo], Boolean)] = {
 
     val Datatype1 = datatype
-    val Datatype2 = MipName.getVariationTypeOrKeep(datatype)
+    val Datatype2 = Types.getVariationTypeOrKeep(datatype)
 
     val appearancesToBindingMaybeMultiple =
       descriptors collect {
@@ -391,7 +392,7 @@ object BindingDescriptor {
     ): Option[BindingDescriptor] = {
 
       val Datatype1 = searchDatatype
-      val Datatype2 = MipName.getVariationTypeOrKeep(searchDatatype)
+      val Datatype2 = Types.getVariationTypeOrKeep(searchDatatype)
 
       def findWithDatatypeAndAppearance =
         descriptors collectFirst {
@@ -425,7 +426,7 @@ object BindingDescriptor {
     ): Option[BindingDescriptor] = {
 
       val Datatype1 = searchDatatype
-      val Datatype2 = MipName.getVariationTypeOrKeep(searchDatatype)
+      val Datatype2 = Types.getVariationTypeOrKeep(searchDatatype)
 
       def findWithNameDatatypeAndAppearance =
         relatedDescriptors collectFirst {

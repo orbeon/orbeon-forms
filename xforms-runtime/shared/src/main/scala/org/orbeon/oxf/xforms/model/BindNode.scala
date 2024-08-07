@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.model
 
 import org.orbeon.dom.Node
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.model.{MipName, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{MipName, StaticBind, Types}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
@@ -47,9 +47,9 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: om.Item
     }
 
   // Current MIP state
-  private var _relevant = MipName.DEFAULT_RELEVANT // move to public var once all callers are Scala
-  private var _readonly = MipName.DEFAULT_READONLY // move to public var once all callers are Scala
-  private var _required = MipName.DEFAULT_REQUIRED // move to public var once all callers are Scala
+  private var _relevant = Types.DEFAULT_RELEVANT // move to public var once all callers are Scala
+  private var _readonly = Types.DEFAULT_READONLY // move to public var once all callers are Scala
+  private var _required = Types.DEFAULT_REQUIRED // move to public var once all callers are Scala
 
   private var _invalidTypeValidation: StaticBind.MIP = null
   private var _requiredValidation: StaticBind.MIP    = null

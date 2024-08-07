@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
-import org.orbeon.oxf.xforms.analysis.model.MipName
+import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.saxon.om.NodeInfo
@@ -54,7 +54,7 @@ trait BindingOps {
             searchAppearances = controlElem attTokens APPEARANCE_QNAME,
             descriptors       = descriptors
           )
-        newDatatype                  = MipName.qNameForBuiltinTypeName(builtinDatatype, required = false)
+        newDatatype                  = Types.qNameForBuiltinTypeName(builtinDatatype, required = false)
       } yield
         (virtualName, appearanceOpt, newDatatype)
 

@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{Logging, XPath}
-import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
+import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -185,7 +185,7 @@ trait ValidationBindOps extends Logging {
       } else if (isBuiltInXFormsType && (typeLocalname == "HTMLFragment")) {
         // Just a marker type
         true
-      } else if (isBuiltInXFormsType && MipName.XFormsSchemaTypeNames(typeLocalname)) {
+      } else if (isBuiltInXFormsType && Types.XFormsSchemaTypeNames(typeLocalname)) {
         // `xf:dayTimeDuration`, `xf:yearMonthDuration`, `xf:card-number`
         val validationError = xformsValidator.validateDatatype(
           nodeValue,
@@ -332,7 +332,7 @@ trait ValidationBindOps extends Logging {
       } catch {
         case NonFatal(t) =>
           handleMIPXPathException(t, bindNode, xpathMIP, MipName.Constraint, collector)
-          ! MipName.DEFAULT_VALID
+          ! Types.DEFAULT_VALID
       }
   }
 }

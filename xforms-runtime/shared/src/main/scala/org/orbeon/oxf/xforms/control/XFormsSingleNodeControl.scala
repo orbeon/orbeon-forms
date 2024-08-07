@@ -17,7 +17,7 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
-import org.orbeon.oxf.xforms.analysis.model.{MipName, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{MipName, StaticBind, Types}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_ITERATION_MOVED
@@ -58,17 +58,17 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
       Nil
 
   // Standard MIPs
-  private var _readonly = MipName.DEFAULT_READONLY
+  private var _readonly = Types.DEFAULT_READONLY
   final def isReadonly: Boolean = _readonly
 
-  private var _required = MipName.DEFAULT_REQUIRED
+  private var _required = Types.DEFAULT_REQUIRED
   final def isRequired: Boolean = _required
 
   // TODO: maybe represent as case class
   //case class ValidationStatus(valid: Boolean, alertLevel: Option[ValidationLevel], failedValidations: List[StaticBind.MIP])
   //private var _validationStatus: Option[ValidationStatus] = None
 
-  private var _valid = MipName.DEFAULT_VALID
+  private var _valid = Types.DEFAULT_VALID
   def isValid: Boolean = _valid
 
   // NOTE: At this time, the control only stores the constraints for a single level (the "highest" level). There is no
@@ -199,11 +199,11 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   }
 
   private def setDefaultMIPs(): Unit = {
-    this._readonly          = MipName.DEFAULT_READONLY
-    this._required          = MipName.DEFAULT_REQUIRED
-    this._valid             = MipName.DEFAULT_VALID
+    this._readonly          = Types.DEFAULT_READONLY
+    this._required          = Types.DEFAULT_REQUIRED
+    this._valid             = Types.DEFAULT_VALID
     this._valueType         = null
-    this._customMIPs        = Map.empty[String, String]
+    this._customMIPs        = Map.empty
 
     this._alertLevel        = None
     this._failedValidations = Nil

@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.MipName._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
-import org.orbeon.oxf.xforms.analysis.model.{MipName, Model}
+import org.orbeon.oxf.xforms.analysis.model.{MipName, Model, Types}
 import org.orbeon.oxf.xforms.analysis.{XPathDependencies, XPathErrorDetails}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -72,14 +72,14 @@ class XFormsModelBinds(protected val model: XFormsModel)
         }
 
       MipName.fromQName(mipQName) match {
-        case MipName.Type       => bind.staticBind.dataType                                                    map makeQNameValue
-        case MipName.Relevant   => evaluateBooleanMIP(bindNode, MipName.Relevant, DEFAULT_RELEVANT, collector) map booleanToBooleanValue
-        case MipName.Readonly   => evaluateBooleanMIP(bindNode, MipName.Readonly, DEFAULT_READONLY, collector) map booleanToBooleanValue
-        case MipName.Required   => evaluateBooleanMIP(bindNode, MipName.Required, DEFAULT_REQUIRED, collector) map booleanToBooleanValue
-        case MipName.Constraint => hasSuccessfulErrorConstraints                                               map booleanToBooleanValue
-        case MipName.Calculate  => evaluateCalculatedBind(bindNode, MipName.Calculate, collector)              map stringToStringValue
-        case MipName.Default    => evaluateCalculatedBind(bindNode, MipName.Default, collector)                map stringToStringValue
-        case MipName.Whitespace => bind.staticBind.nonPreserveWhitespaceMIPOpt.map(_.policy.entryName)         map stringToStringValue
+        case MipName.Type       => bind.staticBind.dataType                                                          map makeQNameValue
+        case MipName.Relevant   => evaluateBooleanMIP(bindNode, MipName.Relevant, Types.DEFAULT_RELEVANT, collector) map booleanToBooleanValue
+        case MipName.Readonly   => evaluateBooleanMIP(bindNode, MipName.Readonly, Types.DEFAULT_READONLY, collector) map booleanToBooleanValue
+        case MipName.Required   => evaluateBooleanMIP(bindNode, MipName.Required, Types.DEFAULT_REQUIRED, collector) map booleanToBooleanValue
+        case MipName.Constraint => hasSuccessfulErrorConstraints                                                     map booleanToBooleanValue
+        case MipName.Calculate  => evaluateCalculatedBind(bindNode, MipName.Calculate, collector)                    map stringToStringValue
+        case MipName.Default    => evaluateCalculatedBind(bindNode, MipName.Default, collector)                      map stringToStringValue
+        case MipName.Whitespace => bind.staticBind.nonPreserveWhitespaceMIPOpt.map(_.policy.entryName)               map stringToStringValue
         case custom @ MipName.Custom(_) =>
           // 2024-08-06: This also catches `MipName.Whitespace`.
           // NOTE: This only evaluates the first custom MIP of the given name associated with the bind. We do store multiple

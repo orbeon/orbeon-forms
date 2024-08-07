@@ -16,7 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.xforms.analysis.model.MipName
+import org.orbeon.oxf.xforms.analysis.model.Types
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.saxon.om.NodeInfo
@@ -126,8 +126,8 @@ class BindingDescriptorTest
     ): Unit =
       it(s"must pass with $oldControlName/$oldDatatype/$oldAppearance/$newDatatype/$newAppearance") {
         for {
-          oldT <- List(oldDatatype, MipName.getVariationTypeOrKeep(oldDatatype))
-          newT <- List(newDatatype, MipName.getVariationTypeOrKeep(newDatatype))
+          oldT <- List(oldDatatype, Types.getVariationTypeOrKeep(oldDatatype))
+          newT <- List(newDatatype, Types.getVariationTypeOrKeep(newDatatype))
         } locally {
           assert(expected === newElementName(oldControlName, oldT, oldAppearance.to(Set), newT, newAppearance, Bindings))
         }
@@ -167,7 +167,7 @@ class BindingDescriptorTest
     ): Unit =
       it(s"must pass with $elemName/$dataType") {
         for {
-          newT <- List(dataType, MipName.getVariationTypeOrKeep(dataType))
+          newT <- List(dataType, Types.getVariationTypeOrKeep(dataType))
         } locally {
           assert(expected === (possibleAppearancesWithLabel(elemName, newT, "en", getAllRelevantDescriptors(Bindings)) map (t => t._1 -> t._3)))
         }

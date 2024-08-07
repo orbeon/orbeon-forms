@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
-import org.orbeon.oxf.xforms.analysis.model.MipName
+import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xforms.function.xxforms.{ExcludedDatesValidation, ValidationFunctionNames}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
@@ -182,7 +182,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           }
 
         delete(existingAttributeValidations ++ existingElementValidations)
-        insertElementsImposeOrder(into = bindElem, origin = nestedValidations, MipName.AllMIPNamesInOrder)
+        insertElementsImposeOrder(into = bindElem, origin = nestedValidations, MipName.AllMipNamesInOrder)
     }
   }
 
@@ -451,7 +451,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           val builtinTypeString = builtinTypeStringOpt.get
 
           // If a builtin type, we just have a local name
-          val nsURI = MipName.uriForBuiltinTypeName(builtinTypeString, builtinTypeRequired)
+          val nsURI = Types.uriForBuiltinTypeName(builtinTypeString, builtinTypeRequired)
 
           // Namespace mapping must be in scope
           val prefix = bind.nonEmptyPrefixesForURI(nsURI).min

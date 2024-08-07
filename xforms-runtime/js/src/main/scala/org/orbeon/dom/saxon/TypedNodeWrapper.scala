@@ -15,7 +15,7 @@ package org.orbeon.dom.saxon
 
 import org.orbeon.dom
 import org.orbeon.dom.Node
-import org.orbeon.oxf.xforms.analysis.model.MipName
+import org.orbeon.oxf.xforms.analysis.model.Types
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.model.{BuiltInAtomicType, SchemaType, Type, Untyped}
@@ -60,7 +60,7 @@ class TypedNodeWrapper private (node: dom.Node, docWrapper: DocumentWrapper, par
 
       // For type annotation purposes, `xf:integer` is translated into `xs:integer`. This is because XPath has no
       // knowledge of the XForms union types.
-      if (uri == XFormsNames.XFORMS_NAMESPACE_URI && MipName.XFormsVariationTypeNames(localname))
+      if (uri == XFormsNames.XFORMS_NAMESPACE_URI && Types.XFormsVariationTypeNames(localname))
         uri = XMLConstants.XSD_URI
 
       val schemaType = getConfiguration.getSchemaType(new StructuredQName(nodeType.namespace.prefix, uri, localname))

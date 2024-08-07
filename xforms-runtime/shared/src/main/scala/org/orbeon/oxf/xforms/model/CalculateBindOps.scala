@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.model
 import org.orbeon.oxf.util.Whitespace.applyPolicy
 import org.orbeon.oxf.xforms.analysis.model.MipName._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
-import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, MipName, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, MipName, StaticBind, Types}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
 import org.orbeon.saxon.om
@@ -146,11 +146,11 @@ trait CalculateBindOps {
       val staticBind = bindNode.staticBind
 
       if (staticBind.hasXPathMIP(MipName.Relevant) && dependencies.requireModelMIPUpdate(model, staticBind, MipName.Relevant, null))
-        evaluateBooleanMIP(bindNode, MipName.Relevant, DEFAULT_RELEVANT, collector) foreach bindNode.setRelevant
+        evaluateBooleanMIP(bindNode, MipName.Relevant, Types.DEFAULT_RELEVANT, collector) foreach bindNode.setRelevant
 
       if (staticBind.hasXPathMIP(MipName.Readonly) && dependencies.requireModelMIPUpdate(model, staticBind, MipName.Readonly, null) ||
           staticBind.hasXPathMIP(MipName.Calculate))
-        evaluateBooleanMIP(bindNode, MipName.Readonly, DEFAULT_READONLY, collector) match {
+        evaluateBooleanMIP(bindNode, MipName.Readonly, Types.DEFAULT_READONLY, collector) match {
           case Some(value) =>
             bindNode.setReadonly(value)
           case None if bindNode.staticBind.hasXPathMIP(MipName.Calculate) =>
@@ -160,7 +160,7 @@ trait CalculateBindOps {
         }
 
       if (staticBind.hasXPathMIP(MipName.Required) && dependencies.requireModelMIPUpdate(model, staticBind, MipName.Required, null))
-        evaluateBooleanMIP(bindNode, MipName.Required, DEFAULT_REQUIRED, collector) foreach bindNode.setRequired
+        evaluateBooleanMIP(bindNode, MipName.Required, Types.DEFAULT_REQUIRED, collector) foreach bindNode.setRequired
 
       evaluateAndSetCustomMIPs(bindNode, collector)
     }

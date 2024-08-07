@@ -4,7 +4,7 @@ import cats.syntax.option._
 import io.circe.generic.auto._
 import io.circe.generic.semiauto._
 import io.circe.syntax._
-import io.circe.{Encoder, Json}
+import io.circe.{Encoder, Json, KeyEncoder}
 import org.orbeon.dom
 import org.orbeon.dom.QName
 import org.orbeon.oxf.http.BasicCredentials
@@ -13,7 +13,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory, StaticXPath}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, MipName, Model, StaticBind}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
@@ -256,7 +256,7 @@ object XFormsStaticStateSerializer {
           }
         case e: StaticBind =>
           updateDistinctCommon(e)
-          e.allMIPNameToXPathMIP.valuesIterator.flatten foreach { xpathMip =>
+          e.allMipNamesToXPathMIP.valuesIterator.flatten foreach { xpathMip =>
             collectForXPathAnalysis(xpathMip.analysis)
           }
         case e =>
@@ -509,12 +509,17 @@ object XFormsStaticStateSerializer {
             "policy"     -> a.policy.asJson
           )
 
+          implicit val encodeXPathMipName: Encoder[MipName.XPath] = (a: MipName.XPath) => a.aName.asJson
+
+          // This will lose the prefix, is that ok?
+          implicit val encodeCustomMipNameKey: KeyEncoder[MipName.Custom] = (a: MipName.Custom) => a.aName.clarkName
+
           implicit val encodeXPathMIP: Encoder[StaticBind.XPathMIP] = (a: StaticBind.XPathMIP) => {
 
             val b = ListBuffer[(String, Json)]()
 
             b += "id"         -> Json.fromString(a.id)
-            b += "name"       -> Json.fromString(a.name)
+            b += "name"       -> a.name.asJson
             if (a.level != ValidationLevel.ErrorLevel)
               b += "level"      -> a.level.asJson
             b += "expression" -> Json.fromString(a.expression)
@@ -530,10 +535,12 @@ object XFormsStaticStateSerializer {
             b += "typeMIPOpt"                  -> c.typeMIPOpt.asJson
   //            "dataType"                    -> c.dataType.asJson,
   //            "nonPreserveWhitespaceMIPOpt" -> c.nonPreserveWhitespaceMIPOpt.asJson,
+          if (c.nonPreserveWhitespaceMIPOpt.isDefined)
+            b += "whitespaceMipOpt"            -> c.nonPreserveWhitespaceMIPOpt.asJson
           if (c.mipNameToXPathMIP.nonEmpty)
             b += "mipNameToXPathMIP"           -> c.mipNameToXPathMIP.asJson
-          if (c.customMIPNameToXPathMIP.nonEmpty)
-            b += "customMIPNameToXPathMIP"     -> c.customMIPNameToXPathMIP.asJson
+          if (c.customMipNameToXPathMIP.nonEmpty)
+            b += "customMIPNameToXPathMIP"     -> c.customMipNameToXPathMIP.asJson
   //            //allMIPNameToXPathMIP combines both above
   //            constraintsByLevel // ValidationLevel // depends on `allMIPNameToXPathMIP`
         case c: OutputControl =>

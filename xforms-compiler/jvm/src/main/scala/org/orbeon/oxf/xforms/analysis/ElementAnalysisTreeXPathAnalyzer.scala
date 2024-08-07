@@ -217,10 +217,10 @@ object ElementAnalysisTreeXPathAnalyzer {
           // 2024-08-05: Also add `calculate` and `xxf:default` so that we can determine whether there is a dependency
           // on the current value, see: https://github.com/orbeon/orbeon-forms/issues/6370
           (e.hasBinding && (
-            e.typeMIPOpt.nonEmpty                                     ||
-            e.nonPreserveWhitespaceMIPOpt.nonEmpty                    ||
-            e.allMIPNameToXPathMIP.contains(ModelDefs.Calculate.name) ||
-            e.allMIPNameToXPathMIP.contains(ModelDefs.Default.name)
+            e.typeMIPOpt.nonEmpty                                ||
+            e.nonPreserveWhitespaceMIPOpt.nonEmpty               ||
+            e.allMipNamesToXPathMIP.contains(MipName.Calculate) ||
+            e.allMipNamesToXPathMIP.contains(MipName.Default)
           )).option(
             analyzeXPathWithStringExpression(
               partAnalysisCtx,
@@ -289,8 +289,8 @@ object ElementAnalysisTreeXPathAnalyzer {
       }
 
       if (partAnalysisCtx.staticProperties.isCalculateDependencies) {
-        model.recalculateOrder  = Some(DependencyAnalyzer.determineEvaluationOrder(model, ModelDefs.Calculate)._1)
-        model.defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(model, ModelDefs.Default)._1)
+        model.recalculateOrder  = Some(DependencyAnalyzer.determineEvaluationOrder(model, MipName.Calculate)._1)
+        model.defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(model, MipName.Default)._1)
       }
     }
 
@@ -298,7 +298,7 @@ object ElementAnalysisTreeXPathAnalyzer {
       // Analyze local MIPs if there is a @ref
       bind.ref match {
         case Some(_) =>
-          for (mips <- bind.allMIPNameToXPathMIP.values; mip <- mips)
+          for (mips <- bind.allMipNamesToXPathMIP.values; mip <- mips)
             analyzeMip(partAnalysisCtx, bindTree, bind, mip)
         case None =>
       }

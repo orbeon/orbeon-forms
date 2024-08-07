@@ -133,10 +133,10 @@ object PartAnalysisDebugSupport {
 
       // MIP analysis
       for {
-        (_, mips) <- a.allMIPNameToXPathMIP.toList.sortBy(_._1)
+        (_, mips) <- a.allMipNamesToXPathMIP.toList.sortBy(_._1.aName) // or could sort by qualified name `_1.name`
         mip <- mips
       } locally {
-        withElement("mip", atts = List("name" -> mip.name, "expression" -> mip.compiledExpression.string)) {
+        withElement("mip", atts = List("name" -> mip.name.name, "expression" -> mip.compiledExpression.string)) {
           writeXPathAnalysis(mip.analysis)
         }
       }

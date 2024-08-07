@@ -22,9 +22,10 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.model.MipName._
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
+import org.orbeon.oxf.xforms.analysis.model.{MipName, Model}
 import org.orbeon.oxf.xforms.analysis.{XPathDependencies, XPathErrorDetails}
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
@@ -32,7 +33,6 @@ import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 
 import scala.collection.compat._
@@ -52,8 +52,9 @@ class XFormsModelBinds(protected val model: XFormsModel)
   protected val dependencies               : XPathDependencies        = containingDocument.xpathDependencies
   protected val staticModel                : Model                    = model.staticModel
 
+  // 2024-08-06: 1 caller.
   // Support for `xxf:evaluate-bind-property` function
-  def evaluateBindByType(bind: RuntimeBind, position: Int, mipType: QName): Option[AtomicValue] =
+  def evaluateBindByType(bind: RuntimeBind, position: Int, mipQName: QName): Option[AtomicValue] =
     // We don't want to dispatch events while we are performing the actual recalculate/revalidate operation,
     // so we collect them here and dispatch them altogether once everything is done.
     EventCollector.withBufferCollector { collector =>
@@ -63,40 +64,36 @@ class XFormsModelBinds(protected val model: XFormsModel)
       def makeQNameValue(qName: QName) =
         new QNameValue(qName.namespace.prefix, qName.namespace.uri, qName.localName)
 
-      def hasSuccessfulErrorConstraints =
+      def hasSuccessfulErrorConstraints: Option[Boolean] =
         bind.staticBind.constraintsByLevel.nonEmpty option {
           bindNode.staticBind.constraintsByLevel.get(ErrorLevel).to(List) flatMap { mips =>
             failedConstraintMIPs(mips, bindNode, collector)
           } isEmpty
         }
 
-      // NOTE: This only evaluates the first custom MIP of the given name associated with the bind. We do store multiple
-      // ones statically, but don't have yet a solution to combine them. Should we string-join them?
-      def evaluateCustomMIPByName(mipType: QName) =
-        evaluateCustomMIP(
-          bindNode,
-          bindNode.staticBind.customMIPNameToXPathMIP(buildInternalCustomMIPName(mipType)).head,
-          collector
-        )
-
-      mipType match {
-        case TYPE_QNAME            => bind.staticBind.dataType                                            map makeQNameValue
-        case RELEVANT_QNAME        => evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT, collector) map booleanToBooleanValue
-        case READONLY_QNAME        => evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY, collector) map booleanToBooleanValue
-        case REQUIRED_QNAME        => evaluateBooleanMIP(bindNode, Required, DEFAULT_REQUIRED, collector) map booleanToBooleanValue
-        case CONSTRAINT_QNAME      => hasSuccessfulErrorConstraints                                       map booleanToBooleanValue
-        case CALCULATE_QNAME       => evaluateCalculatedBind(bindNode, Calculate, collector)              map stringToStringValue
-        case XXFORMS_DEFAULT_QNAME => evaluateCalculatedBind(bindNode, Default, collector)                map stringToStringValue
-        case mipType               => evaluateCustomMIPByName(mipType)                                    map stringToStringValue
+      MipName.fromQName(mipQName) match {
+        case MipName.Type       => bind.staticBind.dataType                                                    map makeQNameValue
+        case MipName.Relevant   => evaluateBooleanMIP(bindNode, MipName.Relevant, DEFAULT_RELEVANT, collector) map booleanToBooleanValue
+        case MipName.Readonly   => evaluateBooleanMIP(bindNode, MipName.Readonly, DEFAULT_READONLY, collector) map booleanToBooleanValue
+        case MipName.Required   => evaluateBooleanMIP(bindNode, MipName.Required, DEFAULT_REQUIRED, collector) map booleanToBooleanValue
+        case MipName.Constraint => hasSuccessfulErrorConstraints                                               map booleanToBooleanValue
+        case MipName.Calculate  => evaluateCalculatedBind(bindNode, MipName.Calculate, collector)              map stringToStringValue
+        case MipName.Default    => evaluateCalculatedBind(bindNode, MipName.Default, collector)                map stringToStringValue
+        case MipName.Whitespace => bind.staticBind.nonPreserveWhitespaceMIPOpt.map(_.policy.entryName)         map stringToStringValue
+        case custom @ MipName.Custom(_) =>
+          // 2024-08-06: This also catches `MipName.Whitespace`.
+          // NOTE: This only evaluates the first custom MIP of the given name associated with the bind. We do store multiple
+          // ones statically, but don't have yet a solution to combine them. Should we string-join them?
+          evaluateCustomMIP(
+            bindNode,
+            bindNode.staticBind.customMipNameToXPathMIP(custom).head,
+            collector
+          ) map stringToStringValue
       }
     }
 }
 
 object XFormsModelBinds {
-
-  type StaticMIP      = StaticBind.MIP
-  type StaticXPathMIP = StaticBind.XPathMIP
-  type StaticTypeMIP  = StaticBind.TypeMIP
 
   // Create an instance of XFormsModelBinds if the given model has xf:bind elements.
   def apply(model: XFormsModel): Option[XFormsModelBinds] =
@@ -139,7 +136,8 @@ object XFormsModelBinds {
   def evaluateBooleanExpression(
     model    : XFormsModel,
     bindNode : BindNode,
-    xpathMIP : StaticXPathMIP)(implicit
+    xpathMIP : XPathMIP
+  )(implicit
     reporter : Reporter
   ): Boolean =
     XPath.evaluateSingle(
@@ -153,7 +151,8 @@ object XFormsModelBinds {
   def evaluateStringExpression(
     model    : XFormsModel,
     bindNode : BindNode,
-    xpathMIP : StaticXPathMIP)(implicit
+    xpathMIP : XPathMIP
+  )(implicit
     reporter : Reporter
   ): String =
     XPath.evaluateAsString(
@@ -165,12 +164,13 @@ object XFormsModelBinds {
     )
 
   def handleMIPXPathException(
-    throwable     : Throwable,
-    bindNode      : BindNode,
-    xpathMIP      : StaticXPathMIP,
-    contextMessage: String,
-    collector     : ErrorEventCollector)(implicit
-    logger    : IndentedLogger
+    throwable: Throwable,
+    bindNode : BindNode,
+    xpathMIP : XPathMIP,
+    mipName  : MipName,
+    collector: ErrorEventCollector
+  )(implicit
+    logger   : IndentedLogger
   ): Unit = {
     XFormsCrossPlatformSupport.getRootThrowable(throwable) match {
       case e: TypedNodeWrapper.TypedValueException =>
@@ -189,7 +189,7 @@ object XFormsModelBinds {
         val ve = OrbeonLocationException.wrapException(t,
           XmlExtendedLocationData(
             locationData = bindNode.locationData,
-            description  = Option(contextMessage),
+            description  = Some(mipName.name),
             params       = List("expression" -> xpathMIP.compiledExpression.string),
             element      = Some(bindNode.staticBind.element)
           )

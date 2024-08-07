@@ -21,8 +21,7 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs.MIP
-import org.orbeon.oxf.xforms.analysis.model.{Model, ModelDefs, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{MipName, Model, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om
@@ -111,6 +110,7 @@ class PathMapXPathDependencies(
     }
 
     def rebuildDone(): Unit = {
+
       hasStructuralChanges = false
 
       markBindsDirty()
@@ -193,8 +193,8 @@ class PathMapXPathDependencies(
       secondWithInstanceKeys : collection.Iterable[ModelOrInstanceKey],
       predicate              : ModelOrInstanceKey => Boolean
     ): Boolean =
-      firstWithPrefixedIds exists { firstPrefixedId =>
-        secondWithInstanceKeys exists { secondInstanceKey =>
+      firstWithPrefixedIds.exists { firstPrefixedId =>
+        secondWithInstanceKeys.exists { secondInstanceKey =>
           secondInstanceKey.prefixedId == firstPrefixedId && predicate(secondInstanceKey)
         }
       }
@@ -202,24 +202,21 @@ class PathMapXPathDependencies(
     private def setsHaveIntersection(
       first  : collection.Set[String],
       second : collection.Set[String]
-    ) =
-      first exists (second contains)
+    ): Boolean =
+      first.exists(second.contains)
 
     private def searchMatchesForInstances(
       controlIndexes         : Array[Int],
       firstWithPrefixedIds   : MapSet[String, String],
       secondWithInstanceKeys : MapSet[ModelOrInstanceKey, String]
-    ): Boolean = {
-
-      val controlIsWithinRepeat = controlIndexes.nonEmpty
-
+    ): Boolean =
       compareWithPredicate(
         firstWithPrefixedIds.map.keys,
         secondWithInstanceKeys.map.keys,
         instanceKey => {
 
           val matchesRepeatIterations =
-            ! controlIsWithinRepeat ||
+            controlIndexes.isEmpty ||
             controlIndexes.startsWith(XFormsId.getEffectiveIdSuffixParts(instancesByKey(instanceKey).effectiveId))
 
           matchesRepeatIterations &&
@@ -229,7 +226,6 @@ class PathMapXPathDependencies(
             )
         }
       )
-    }
 
     def intersectsStructuralChangeModel(controlIndexes: Array[Int], analysis: XPathAnalysis): Boolean = {
 
@@ -656,16 +652,16 @@ class PathMapXPathDependencies(
   def hasAnyValidationBind(model: Model, instancePrefixedId: String): Boolean =
     ! model.figuredAllBindRefAnalysis || model.validationBindInstances.contains(instancePrefixedId)
 
-  def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MIP, level: ValidationLevel): Boolean = {
+  def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MipName, level: ValidationLevel): Boolean = {
 
     // TODO: cache must store by MIP to optimize xf:bind/@ref over multiple nodes
 
     // Get constraints by the level specified
     val mips = mip match {
-      case ModelDefs.Constraint => bind.constraintsByLevel.getOrElse(level, Nil)
-      case ModelDefs.Type       => bind.typeMIPOpt.toList
-      case ModelDefs.Whitespace => bind.nonPreserveWhitespaceMIPOpt.toList
-      case _                    => bind.getXPathMIPs(mip.name)
+      case MipName.Constraint      => bind.constraintsByLevel.getOrElse(level, Nil)
+      case MipName.Type            => bind.typeMIPOpt.toList
+      case MipName.Whitespace      => bind.nonPreserveWhitespaceMIPOpt.toList
+      case xpathMip: MipName.XPath => bind.getXPathMIPs(xpathMip)
     }
 
     val modelState = getOrCreateModelState(model)
@@ -682,7 +678,7 @@ class PathMapXPathDependencies(
         // the value to type check has changed.
         val valueAnalysisIt = mip match {
           case xpathMIP: StaticBind.XPathMIP
-            if xpathMIP.name == ModelDefs.Calculate.name || xpathMIP.name == ModelDefs.Default.name =>
+            if xpathMIP.name == MipName.Calculate || xpathMIP.name == MipName.Default =>
             Iterator(Some(xpathMIP.analysis), bind.valueAnalysis)
           case xpathMIP: StaticBind.XPathMIP => Iterator.single(Some(xpathMIP.analysis))
           case _: StaticBind.TypeMIP         => Iterator.single(bind.valueAnalysis)
@@ -699,7 +695,7 @@ class PathMapXPathDependencies(
               "MIP requires update",
               List(
                 "prefixed id" -> bind.prefixedId,
-                "MIP name"    -> mip.name,
+                "MIP name"    -> mip.name.aName.qualifiedName,
                 "XPath"       -> valueAnalysis.map(_.xpathString).orNull // XPath can be missing in offline
               )
             )

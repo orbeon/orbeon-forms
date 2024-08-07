@@ -14,11 +14,10 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectionControlTrait}
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs.MIP
-import org.orbeon.xforms.analysis.model.ValidationLevel
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{MipName, Model, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.saxon.om
+import org.orbeon.xforms.analysis.model.ValidationLevel
 
 
 trait XPathDependencies {
@@ -52,7 +51,7 @@ trait XPathDependencies {
   def requireLHHAUpdate    (control: ElementAnalysis,       lhha: LHHA, controlIndexes: Array[Int]): Boolean
   def requireItemsetUpdate (control: SelectionControlTrait,             controlIndexes: Array[Int]): Boolean
 
-  def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MIP, level: ValidationLevel): Boolean
+  def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MipName, level: ValidationLevel): Boolean
 
   def hasAnyCalculationBind(model: Model, instancePrefixedId: String): Boolean
   def hasAnyValidationBind (model: Model, instancePrefixedId: String): Boolean

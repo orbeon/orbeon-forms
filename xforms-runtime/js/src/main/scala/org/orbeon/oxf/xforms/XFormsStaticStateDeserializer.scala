@@ -4,16 +4,15 @@ import cats.syntax.option._
 import io.circe.generic.auto._
 import io.circe.generic.semiauto._
 import io.circe.parser.decode
-import io.circe.{Decoder, DecodingFailure, HCursor}
+import io.circe.{Decoder, DecodingFailure, HCursor, KeyDecoder}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom
-import org.orbeon.dom.QName
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Modifier, StaticXPath, XPath}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Modifier, StaticXPath, Whitespace, XPath}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
@@ -28,7 +27,7 @@ import org.orbeon.saxon.om
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{HeadElement, XFormsCrossPlatformSupport, XFormsId}
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable.typeableOps
 
@@ -59,7 +58,7 @@ object XFormsStaticStateDeserializer {
 
     var collectedStrings        = IndexedSeq[String]()
     var collectedNamespaces     = IndexedSeq[Map[String, String]]()
-    var collectedQNames         = IndexedSeq[QName]()
+    var collectedQNames         = IndexedSeq[dom.QName]()
     var collectedCommonBindings = IndexedSeq[CommonBinding]()
     var collectedScopes         = IndexedSeq[Scope]()
     var collectedModelRefs      = Map[String, List[ElementAnalysis]]()
@@ -223,7 +222,7 @@ object XFormsStaticStateDeserializer {
         deserializeExternalValueOpt <- c.getOrElse[Option[String]]("deserializeExternalValueOpt")(None)
         cssClasses                  <- c.get[String]("cssClasses")
         allowedExternalEvents       <- c.getOrElse[Set[String]]("allowedExternalEvents")(Set.empty)
-        constantInstances           <- c.getOrElse[Iterable[((Int, Int), StaticXPath.DocumentNodeInfoType)]]("constantInstances")(Map.empty)
+        constantInstances           <- c.getOrElse[Iterable[((Int, Int), StaticXPath.DocumentNodeInfoType)]]("constantInstances")(Nil)
       } yield
         CommonBinding(
           bindingElemId,
@@ -331,7 +330,7 @@ object XFormsStaticStateDeserializer {
     implicit val decodeValueNode: Decoder[Item.ValueNode] = (c: HCursor) =>
       for {
         label      <- c.get[LHHAValue]("label")
-        attributes <- c.get[List[(QName, String)]]("attributes") // TODO: QName
+        attributes <- c.get[List[(dom.QName, String)]]("attributes") // TODO: QName
         position   <- c.get[Int]("position")
         help       <- c.get[Option[LHHAValue]]("help")
         hint       <- c.get[Option[LHHAValue]]("hint")
@@ -611,10 +610,20 @@ object XFormsStaticStateDeserializer {
                 } yield
                   new StaticBind.TypeMIP(id, datatype)
 
+              implicit val decodeWhitespaceMIP: Decoder[StaticBind.WhitespaceMIP] = (c: HCursor) =>
+                for {
+                  id         <- c.get[String]("id")
+                  policy     <- c.get[Whitespace.Policy]("policy")
+                } yield
+                  new StaticBind.WhitespaceMIP(id, policy)
+
+              implicit val decodeXPathMipName: Decoder[MipName.XPath] = (c: HCursor) =>
+                implicitly[Decoder[dom.QName]].apply(c).map(s => MipName.fromQName(s).asInstanceOf[MipName.XPath])
+
               implicit val decodeXPathMIP: Decoder[StaticBind.XPathMIP] = (c: HCursor) =>
                 for {
                   id         <- c.get[String]("id")
-                  name       <- c.get[String]("name")
+                  name       <- c.get[MipName.XPath]("name")
                   level      <- c.getOrElse[ValidationLevel]("level")(ValidationLevel.ErrorLevel)
                   expression <- c.get[String]("expression")
                   analysis   <- c.getOrElse[Option[XPathAnalysis]]("analysis")(None)
@@ -622,12 +631,17 @@ object XFormsStaticStateDeserializer {
                   new StaticBind.XPathMIP(id, name, level, expression, namespaceMapping, xpathMipLocationData, functionLibrary) |!>
                     (_.analysis = analysis.getOrElse(new NegativeAnalysis(expression)))
 
+              // This will lose the prefix, is that ok?
+              implicit val decodeCustomMipNameKey: KeyDecoder[MipName.Custom] =
+                (a: String) => dom.QName.fromClarkName(a).map(qName => MipName.Custom(qName))
+
               val staticBind =
                 for {
                   nameOpt                     <- c.getOrElse[Option[String]]("nameOpt")(None)
                   typeMIPOpt                  <- c.getOrElse[Option[StaticBind.TypeMIP]]("typeMIPOpt")(None)
-                  mipNameToXPathMIP           <- c.getOrElse[Iterable[(String, List[StaticBind.XPathMIP])]]("mipNameToXPathMIP")(Nil)
-                  customMIPNameToXPathMIP     <- c.getOrElse[Map[String, List[StaticBind.XPathMIP]]]("customMIPNameToXPathMIP")(Map.empty)
+                  whitespaceMipOpt            <- c.getOrElse[Option[StaticBind.WhitespaceMIP]]("whitespaceMipOpt")(None)
+                  customMIPNameToXPathMIP     <- c.getOrElse[Map[MipName.Custom, List[StaticBind.XPathMIP]]]("customMIPNameToXPathMIP")(Map.empty)
+                  mipNameToXPathMIP           <- c.getOrElse[Iterable[(MipName.XPath, List[StaticBind.XPathMIP])]]("mipNameToXPathMIP")(Nil)
                 } yield
                   new StaticBind(
                     index,
@@ -642,13 +656,14 @@ object XFormsStaticStateDeserializer {
                   )(
                     nameOpt,
                     typeMIPOpt,
+                    whitespaceMipOpt,
                     mipNameToXPathMIP,
                     customMIPNameToXPathMIP,
                     StaticBind.getBindTree(controlStack.headOption)
                   )
 
             //              var figuredAllBindRefAnalysis: Boolean = false
-
+            
               staticBind.getOrElse(throw new NoSuchElementException) // XXX TODO
 
             case XFORMS_OUTPUT_QNAME | XXFORMS_TEXT_QNAME =>
@@ -728,7 +743,7 @@ object XFormsStaticStateDeserializer {
 
               lhha.getOrElse(throw new NoSuchElementException) // XXX TODO
 
-            case qName: QName if EventHandler.isAction(qName) =>
+            case qName: dom.QName if EventHandler.isAction(qName) =>
 
               if (EventHandler.isEventHandler(element)) {
 
@@ -980,7 +995,7 @@ object XFormsStaticStateDeserializer {
         _ = {
           collectedNamespaces = namespaces
         }
-        qNames               <- c.get[IndexedSeq[QName]]("qnames")
+        qNames               <- c.get[IndexedSeq[dom.QName]]("qnames")
         _ = {
           collectedQNames = qNames
         }
@@ -1183,7 +1198,7 @@ object TopLevelPartAnalysisImpl {
 
         def iterateGlobals: Iterator[Global] = _globals.map(Global(_, null)).iterator
 
-        def allXblAssetsMaybeDuplicates: Iterable[(QName, XBLAssets)] = Nil
+        def allXblAssetsMaybeDuplicates: Iterable[(dom.QName, XBLAssets)] = Nil
 
         def containingScope(prefixedId: String): Scope = throw new NotImplementedError("containingScope")
 

@@ -14,8 +14,9 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.util.Whitespace.applyPolicy
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
-import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, ModelDefs, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.MipName._
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
+import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, MipName, StaticBind}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
 import org.orbeon.saxon.om
@@ -42,7 +43,7 @@ trait CalculateBindOps {
           (if (isFirstCalculate) AllDefaultsStrategy else defaultsStrategy) match {
             case strategy: SomeDefaultsStrategy =>
               applyCalculatedBindsUseOrderIfNeeded(
-                ModelDefs.Default,
+                MipName.Default,
                 staticModel.defaultValueOrder,
                 strategy,
                 collector
@@ -52,7 +53,7 @@ trait CalculateBindOps {
 
         if (staticModel.hasCalculateBind)
           applyCalculatedBindsUseOrderIfNeeded(
-            ModelDefs.Calculate,
+            MipName.Calculate,
             staticModel.recalculateOrder,
             AllDefaultsStrategy,
             collector
@@ -66,42 +67,43 @@ trait CalculateBindOps {
 
   protected def evaluateCustomMIP(
     bindNode  : BindNode,
-    mip       : StaticXPathMIP,
+    mip       : XPathMIP,
     collector : ErrorEventCollector
   ): Option[String] = {
     try {
       Option(evaluateStringExpression(model, bindNode, mip))
     } catch {
       case NonFatal(t) =>
-        handleMIPXPathException(t, bindNode, mip, "custom-mip", collector)
+        handleMIPXPathException(t, bindNode, mip, mip.name, collector)
         None
     }
   }
 
   protected def evaluateBooleanMIP(
-    bindNode      : BindNode,
-    mipType       : BooleanMIP,
-    defaultForMIP : Boolean,
-    collector     : ErrorEventCollector
+    bindNode     : BindNode,
+    mipName      : MipName.BooleanXPath,
+    defaultForMIP: Boolean,
+    collector    : ErrorEventCollector
   ): Option[Boolean] = {
-    bindNode.staticBind.firstXPathMIP(mipType) map { mip =>
-      try {
+    bindNode.staticBind.firstXPathMipByName(mipName) map { mip =>
+      try
         evaluateBooleanExpression(model, bindNode, mip)
-      } catch {
+      catch {
         case NonFatal(t) =>
-          handleMIPXPathException(t, bindNode, mip, mipType.name, collector)
+          handleMIPXPathException(t, bindNode, mip, mipName, collector)
           ! defaultForMIP // https://github.com/orbeon/orbeon-forms/issues/835
       }
     }
   }
 
   protected def evaluateCalculatedBind(
-    bindNode  : BindNode,
-    mip       : StringMIP,
-    collector : ErrorEventCollector
+    bindNode : BindNode,
+    mipName  : MipName.StringXPath,
+    collector: ErrorEventCollector
   ): Option[String] =
-    bindNode.staticBind.firstXPathMIP(mip) flatMap { xpathMIP =>
-      try Option(evaluateStringExpression(model, bindNode, xpathMIP))
+    bindNode.staticBind.firstXPathMipByName(mipName) flatMap { xpathMIP =>
+      try
+        Option(evaluateStringExpression(model, bindNode, xpathMIP))
       catch {
         case NonFatal(t) =>
           handleMIPXPathException(t, bindNode, xpathMIP, xpathMIP.name, collector)
@@ -119,13 +121,13 @@ trait CalculateBindOps {
       bindNode  : BindNode,
       collector : ErrorEventCollector
     ): Unit =
-      if (bindNode.staticBind.customMIPNameToXPathMIP.nonEmpty) // in most cases there are no custom MIPs
+      if (bindNode.staticBind.customMipNameToXPathMIP.nonEmpty) // in most cases there are no custom MIPs
         for {
-          (name, mips) <- bindNode.staticBind.customMIPNameToXPathMIP
+          (name, mips) <- bindNode.staticBind.customMipNameToXPathMIP
           mip          <- mips.headOption
           result       <- evaluateCustomMIP(bindNode, mip, collector)
         } locally {
-          bindNode.setCustom(name, result)
+          bindNode.setCustom(name.name, result)
         }
 
     def applyComputedExpressionBinds(collector: ErrorEventCollector): Unit = {
@@ -143,22 +145,22 @@ trait CalculateBindOps {
     ): Unit = {
       val staticBind = bindNode.staticBind
 
-      if (staticBind.hasXPathMIP(Relevant) && dependencies.requireModelMIPUpdate(model, staticBind, Relevant, null))
-        evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT, collector) foreach bindNode.setRelevant
+      if (staticBind.hasXPathMIP(MipName.Relevant) && dependencies.requireModelMIPUpdate(model, staticBind, MipName.Relevant, null))
+        evaluateBooleanMIP(bindNode, MipName.Relevant, DEFAULT_RELEVANT, collector) foreach bindNode.setRelevant
 
-      if (staticBind.hasXPathMIP(Readonly) && dependencies.requireModelMIPUpdate(model, staticBind, Readonly, null) ||
-          staticBind.hasXPathMIP(Calculate))
-        evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY, collector) match {
+      if (staticBind.hasXPathMIP(MipName.Readonly) && dependencies.requireModelMIPUpdate(model, staticBind, MipName.Readonly, null) ||
+          staticBind.hasXPathMIP(MipName.Calculate))
+        evaluateBooleanMIP(bindNode, MipName.Readonly, DEFAULT_READONLY, collector) match {
           case Some(value) =>
             bindNode.setReadonly(value)
-          case None if bindNode.staticBind.hasXPathMIP(Calculate) =>
+          case None if bindNode.staticBind.hasXPathMIP(MipName.Calculate) =>
             // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
             bindNode.setReadonly(true)
           case None =>
         }
 
-      if (staticBind.hasXPathMIP(Required) && dependencies.requireModelMIPUpdate(model, staticBind, Required, null))
-        evaluateBooleanMIP(bindNode, Required, DEFAULT_REQUIRED, collector) foreach bindNode.setRequired
+      if (staticBind.hasXPathMIP(MipName.Required) && dependencies.requireModelMIPUpdate(model, staticBind, MipName.Required, null))
+        evaluateBooleanMIP(bindNode, MipName.Required, DEFAULT_REQUIRED, collector) foreach bindNode.setRequired
 
       evaluateAndSetCustomMIPs(bindNode, collector)
     }
@@ -167,7 +169,7 @@ trait CalculateBindOps {
       iterateBinds(topLevelBinds, bindNode =>
         if (! bindNode.hasChildrenElements) { // quick test to rule out containing elements
           bindNode.staticBind.nonPreserveWhitespaceMIPOpt foreach { mip =>
-            if (dependencies.requireModelMIPUpdate(model, bindNode.staticBind, ModelDefs.Whitespace, null)) {
+            if (dependencies.requireModelMIPUpdate(model, bindNode.staticBind, MipName.Whitespace, null)) {
               DataModel.setValueIfChangedHandleErrors(
                 eventTarget  = model,
                 locationData = bindNode.locationData,
@@ -188,7 +190,7 @@ trait CalculateBindOps {
       defaultsStrategy == AllDefaultsStrategy || (node ne null) && InstanceData.getRequireDefaultValue(node)
 
     def applyCalculatedBindsUseOrderIfNeeded(
-      mip              : StringMIP,
+      mip              : StringXPath,
       orderOpt         : Option[List[StaticBind]],
       defaultsStrategy : SomeDefaultsStrategy,
       collector        : ErrorEventCollector
@@ -197,13 +199,17 @@ trait CalculateBindOps {
         case Some(order) =>
           applyCalculatedBindsFollowDependencies(order, mip, defaultsStrategy, collector)
         case None =>
-          iterateBinds(topLevelBinds, bindNode =>
-            if (
-              bindNode.staticBind.hasXPathMIP(mip)                                      &&
-              dependencies.requireModelMIPUpdate(model, bindNode.staticBind, mip, null) &&
-              mustEvaluateNode(bindNode.node, defaultsStrategy)
-            ) {
-              evaluateAndSetCalculatedBind(bindNode, mip, collector)
+          iterateBinds(
+            topLevelBinds,
+            bindNode => {
+              val staticBind = bindNode.staticBind
+              if (
+                staticBind.hasXPathMIP(mip)                                      &&
+                dependencies.requireModelMIPUpdate(model, staticBind, mip, null) &&
+                mustEvaluateNode(bindNode.node, defaultsStrategy)
+              ) {
+                evaluateAndSetCalculatedBind(bindNode, mip, collector)
+              }
             }
           )
       }
@@ -211,7 +217,7 @@ trait CalculateBindOps {
 
     private def applyCalculatedBindsFollowDependencies(
       order            : List[StaticBind],
-      mip              : StringMIP,
+      mip              : StringXPath,
       defaultsStrategy : SomeDefaultsStrategy,
       collector        : ErrorEventCollector
     ): Unit =
@@ -219,6 +225,7 @@ trait CalculateBindOps {
 
         val logger  = DependencyAnalyzer.Logger
         val isDebug = logger.isDebugEnabled
+
         if (dependencies.requireModelMIPUpdate(model, staticBind, mip, null)) {
           var evaluationCount = 0
           BindVariableResolver.resolveNotAncestorOrSelf(self, None, staticBind) foreach { runtimeBindIt =>
@@ -239,7 +246,7 @@ trait CalculateBindOps {
 
     private def evaluateAndSetCalculatedBind(
       bindNode  : BindNode,
-      mip       : StringMIP,
+      mip       : StringXPath,
       collector : ErrorEventCollector
     ): Unit =
       evaluateCalculatedBind(bindNode, mip, collector).foreach { stringResult =>

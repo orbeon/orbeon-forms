@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs
+import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.saxon.om.NodeInfo
@@ -54,7 +54,7 @@ trait BindingOps {
             searchAppearances = controlElem attTokens APPEARANCE_QNAME,
             descriptors       = descriptors
           )
-        newDatatype                  = ModelDefs.qNameForBuiltinTypeName(builtinDatatype, required = false)
+        newDatatype                  = MipName.qNameForBuiltinTypeName(builtinDatatype, required = false)
       } yield
         (virtualName, appearanceOpt, newDatatype)
 
@@ -220,7 +220,7 @@ trait BindingOps {
   // In other words we leave Type and Required and custom MIPs as they are
   // This must match what is done in annotate.xpl
   private val BindTemplateAttributesToNamespace =
-    Set(ModelDefs.Relevant, ModelDefs.Readonly, ModelDefs.Constraint, ModelDefs.Calculate, ModelDefs.Default) map (_.aName)
+    Set(MipName.Relevant, MipName.Readonly, MipName.Constraint, MipName.Calculate, MipName.Default).map(_.aName)
 
   // From an `<xbl:binding>`, return all bind attributes
   // They are obtained from the legacy `datatype` element or from `templates/bind`.

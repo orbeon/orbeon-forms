@@ -9,15 +9,16 @@ import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.Whitespace.Policy
 import org.orbeon.oxf.util.{Modifier, StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsProperties.ExposeXpathTypesProperty
 import org.orbeon.oxf.xforms.XFormsStaticElementValue
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.EventHandler._
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{Constraint, QNameToXPathMIP, buildInternalCustomMIPName}
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.{TypeMIP, XPathMIP}
-import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, ModelVariable, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.MipName
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.{TypeMIP, WhitespaceMIP, XPathMIP}
+import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.xbl.CommonBinding
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
@@ -626,7 +627,7 @@ object StaticBindBuilder {
     // 2. When using `Try`, we should capture errors so that `xxf:dynamic` can report them.
     def createOrNone(
       id        : String,
-      mipName   : String,
+      mipName   : MipName.XPath,
       level     : ValidationLevel,
       expression: String
     ): Option[XPathMIP] =
@@ -666,8 +667,15 @@ object StaticBindBuilder {
       fromAttribute orElse fromNestedElement.headOption orElse fromNestedElementsLegacy.headOption
     }
 
+    val whitespaceMipOpt: Option[WhitespaceMIP] = {
+      Option(element.attributeValue(MipName.Whitespace.aName)) map
+      (Policy.withNameOption(_) getOrElse Policy.Preserve)     filterNot
+      (_ == Policy.Preserve)                                   map
+      (new WhitespaceMIP(element.idOrNull, _))
+    }
+
     // Built-in XPath MIPs
-    val mipNameToXPathMIP: Iterable[(String, List[XPathMIP])] = {
+    val mipNameToXPathMIP: Iterable[(MipName.XPath, List[XPathMIP])] = {
 
       def fromAttribute(name: QName) =
         for (value <- Option(element.attributeValue(name)).toList)
@@ -689,27 +697,27 @@ object StaticBindBuilder {
           (e.idOrNull, value, e.attributeValueOpt(LEVEL_QNAME) map ValidationLevel.LevelByName getOrElse ValidationLevel.ErrorLevel)
 
       for {
-        mip              <- QNameToXPathMIP.values
+        mip              <- MipName.QNameToXPathMIP.values
         idValuesAndLevel = fromNestedElement(mip.eName) ::: fromNestedElementLegacy(mip.aName) ::: fromAttribute(mip.aName)
         if idValuesAndLevel.nonEmpty
         mips             = idValuesAndLevel flatMap {
           case (id, value, level) =>
             // Ignore level for non-constraint MIPs as it's not supported yet
-            val overriddenLevel = if (mip.name == Constraint.name) level else ValidationLevel.ErrorLevel
-            createOrNone(id, mip.name, overriddenLevel, value)
+            val overriddenLevel = if (mip == MipName.Constraint) level else ValidationLevel.ErrorLevel
+            createOrNone(id, mip, overriddenLevel, value)
         }
       } yield
-        mip.name -> mips
+        mip -> mips
     }
 
-    val customMIPNameToXPathMIP: Map[String, List[XPathMIP]] = { // Q: Why String -> List[XPathMIP] and not String -> XPathMIP?
+    val customMipNameToXPathMIP: Iterable[(MipName.Custom, List[XPathMIP])] = {
 
       def attributeCustomMIP =
         for {
           att <- element.attributes.iterator
           if bindTree.isCustomMIP(att.getQName)
           value = att.getValue
-          customMIPName = buildInternalCustomMIPName(att.getQName)
+          customMIPName = att.getQName
         } yield
           (staticId, customMIPName, value)
 
@@ -725,13 +733,11 @@ object StaticBindBuilder {
       //         (getElementId(elem), customMIPName, value)
 
       for {
-        (name, idNameValue) <- attributeCustomMIP.toList groupBy (_._2)
-        mips = idNameValue flatMap {
-          case (id, _, value) =>
-            createOrNone(id, name, ValidationLevel.ErrorLevel, value)
-        }
+        (qName, idNameValue) <- attributeCustomMIP.toList.groupBy(_._2)
+        customMip = MipName.Custom(qName)
+        mips      = idNameValue.flatMap { case (id, _, value) => createOrNone(id, customMip, ValidationLevel.ErrorLevel, value)}
       } yield
-        name -> mips
+        customMip -> mips
     }
 
     new StaticBind(
@@ -747,8 +753,9 @@ object StaticBindBuilder {
     )(
       bindNameOpt,
       typeMIPOpt,
+      whitespaceMipOpt,
       mipNameToXPathMIP,
-      customMIPNameToXPathMIP,
+      customMipNameToXPathMIP.toMap,
       bindTree
     )
   }

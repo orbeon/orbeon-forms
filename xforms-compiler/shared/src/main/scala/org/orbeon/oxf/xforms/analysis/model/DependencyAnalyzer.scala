@@ -75,7 +75,7 @@ object DependencyAnalyzer {
   //
   def determineEvaluationOrder(
     model   : Model,
-    mip     : ModelDefs.XPathMIP // `Model.Calculate` or `Model.Default`.
+    mip     : MipName.XPath // `Model.Calculate` or `Model.Default`.
   ): (List[StaticBind], () => List[Vertex]) = {
 
     if (Logger.isDebugEnabled)
@@ -88,7 +88,7 @@ object DependencyAnalyzer {
       val validBindNames = allBindsByName.keySet
 
       val allBindsIt = model.iterateAllBinds
-      val detailsIt  = allBindsIt flatMap (b => BindDetails.fromStaticBindMIP(validBindNames, b, b.firstXPathMIP(mip)))
+      val detailsIt  = allBindsIt flatMap (b => BindDetails.fromStaticBindMIP(validBindNames, b, b.firstXPathMipByName(mip)))
 
       detailsIt.toList
     }
@@ -165,7 +165,7 @@ object DependencyAnalyzer {
               d.name.get,
               Set.empty,
               None,
-              d.staticBind.firstXPathMIP(mip) collect {
+              d.staticBind.firstXPathMipByName(mip) collect {
                 case m if m.analysis.figuredOutDependencies => m.analysis
               }
             )
@@ -179,8 +179,8 @@ object DependencyAnalyzer {
         val vertex = Vertex(
           staticId,
           refs map allBindsByName map (b => verticesByIds(b.staticId)),
-          staticBind.firstXPathMIP(mip).map(_.expression),
-          staticBind.firstXPathMIP(mip).map(_.analysis)
+          staticBind.firstXPathMipByName(mip).map(_.expression),
+          staticBind.firstXPathMipByName(mip).map(_.analysis)
         )
         verticesByIds += staticId -> vertex
         vertex

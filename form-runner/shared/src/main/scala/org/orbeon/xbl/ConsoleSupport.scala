@@ -70,8 +70,8 @@ object ConsoleSupport {
 
     val contextName =
       details match {
-        case XPathErrorDetails.ForBindMip(_, mipName)              => mipName
-        case XPathErrorDetails.ForBindMipReferences(_, mipName, _) => mipName
+        case XPathErrorDetails.ForBindMip(_, mipName)              => mipName.name
+        case XPathErrorDetails.ForBindMipReferences(_, mipName, _) => mipName.name
         case XPathErrorDetails.ForAnalysis()                       => "analysis"
         case XPathErrorDetails.ForAttribute(_)                     => "attribute"
         case XPathErrorDetails.ForVariable(_)                      => "variable"

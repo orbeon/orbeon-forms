@@ -38,7 +38,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsInvalidateInstanceAction
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs
+import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
@@ -200,7 +200,7 @@ object FormBuilderXPathApi {
 
     val resultOpt =
       for {
-        mip             <- ModelDefs.AllComputedMipsByName.get(mipName)
+        mip             <- MipName.AllComputedMipsByName.get(mipName)
         controlBindElem <-
           if (controlName ne null)
             FormRunner.findBindByName(controlName)
@@ -232,7 +232,7 @@ object FormBuilderXPathApi {
 
     val resultOpt =
       for {
-        mip <- ModelDefs.AllComputedMipsByName.get(mipName)
+        mip <- MipName.AllComputedMipsByName.get(mipName)
       } yield
         FormBuilder.writeAndNormalizeMip(Option(controlName), mip, mipValue, iteration = iteration)
 

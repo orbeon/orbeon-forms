@@ -19,7 +19,7 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CollectionUtils.ListOps
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs
+import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.saxon.om.NodeInfo
@@ -131,7 +131,7 @@ object BindingDescriptor {
   ): Iterable[(Option[String], Option[NodeInfo], Boolean)] = {
 
     val Datatype1 = datatype
-    val Datatype2 = ModelDefs.getVariationTypeOrKeep(datatype)
+    val Datatype2 = MipName.getVariationTypeOrKeep(datatype)
 
     val appearancesToBindingMaybeMultiple =
       descriptors collect {
@@ -391,7 +391,7 @@ object BindingDescriptor {
     ): Option[BindingDescriptor] = {
 
       val Datatype1 = searchDatatype
-      val Datatype2 = ModelDefs.getVariationTypeOrKeep(searchDatatype)
+      val Datatype2 = MipName.getVariationTypeOrKeep(searchDatatype)
 
       def findWithDatatypeAndAppearance =
         descriptors collectFirst {
@@ -425,7 +425,7 @@ object BindingDescriptor {
     ): Option[BindingDescriptor] = {
 
       val Datatype1 = searchDatatype
-      val Datatype2 = ModelDefs.getVariationTypeOrKeep(searchDatatype)
+      val Datatype2 = MipName.getVariationTypeOrKeep(searchDatatype)
 
       def findWithNameDatatypeAndAppearance =
         relatedDescriptors collectFirst {

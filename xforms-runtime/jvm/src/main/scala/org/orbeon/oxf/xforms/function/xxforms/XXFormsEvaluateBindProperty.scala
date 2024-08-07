@@ -30,7 +30,7 @@ class XXFormsEvaluateBindProperty extends XFormsFunction {
     XFormsFunction.context.container.resolveObjectByIdInScope(XFormsFunction.getSourceEffectiveId, bindId, bindingContext.singleItemOpt) collect {
       case bind: RuntimeBind => bind
     } flatMap { bind =>
-      bind.model.modelBindsOpt.flatMap(_.evaluateBindByType(bind, position = 1, mipType = mipQName))
+      bind.model.modelBindsOpt.flatMap(_.evaluateBindByType(bind, position = 1, mipQName = mipQName))
     } orNull
   }
 }

@@ -2,7 +2,7 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{NeverCustomMIPsURIs, StandardCustomMIPsQNames}
+import org.orbeon.oxf.xforms.analysis.model.MipName.{NeverCustomMipUris, StandardCustomMipQNames}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, WithChildrenTrait}
 import org.orbeon.xforms.XFormsNames.XXFORMS_CUSTOM_MIPS_QNAME
 import org.orbeon.xforms.xbl.Scope
@@ -115,12 +115,12 @@ trait ModelBinds extends BindTree {
     def canBeCustomMIP(qName: QName) =
       qName.namespace.prefix.nonEmpty              &&
       (! qName.namespace.prefix.startsWith("xml")) &&
-      (StandardCustomMIPsQNames(qName) || ! NeverCustomMIPsURIs(qName.namespace.uri))
+      (StandardCustomMipQNames(qName) || ! NeverCustomMipUris(qName.namespace.uri))
 
     selfModel.element.attributeOpt(XXFORMS_CUSTOM_MIPS_QNAME) match {
       case Some(_) =>
         // If the attribute is present, allow all specified QNames if valid, plus standard MIP QNames
-        attQNameSet(selfModel.element, XXFORMS_CUSTOM_MIPS_QNAME, namespaceMapping) ++ StandardCustomMIPsQNames filter canBeCustomMIP
+        attQNameSet(selfModel.element, XXFORMS_CUSTOM_MIPS_QNAME, namespaceMapping) ++ StandardCustomMipQNames filter canBeCustomMIP
       case None    =>
         // Attribute not present: backward-compatible behavior
         canBeCustomMIP

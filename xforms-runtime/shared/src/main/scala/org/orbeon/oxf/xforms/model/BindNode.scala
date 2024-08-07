@@ -15,8 +15,7 @@ package org.orbeon.oxf.xforms.model
 
 import org.orbeon.dom.Node
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{Required, Type}
-import org.orbeon.oxf.xforms.analysis.model.{ModelDefs, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{MipName, StaticBind}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
@@ -48,9 +47,9 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: om.Item
     }
 
   // Current MIP state
-  private var _relevant = ModelDefs.DEFAULT_RELEVANT // move to public var once all callers are Scala
-  private var _readonly = ModelDefs.DEFAULT_READONLY // move to public var once all callers are Scala
-  private var _required = ModelDefs.DEFAULT_REQUIRED // move to public var once all callers are Scala
+  private var _relevant = MipName.DEFAULT_RELEVANT // move to public var once all callers are Scala
+  private var _readonly = MipName.DEFAULT_READONLY // move to public var once all callers are Scala
+  private var _required = MipName.DEFAULT_REQUIRED // move to public var once all callers are Scala
 
   private var _invalidTypeValidation: StaticBind.MIP = null
   private var _requiredValidation: StaticBind.MIP    = null
@@ -152,10 +151,10 @@ object BindNode {
   // - also prioritize failed datatype validation, as part of https://github.com/orbeon/orbeon-forms/issues/2242
   private def prioritizeValidations(mipsForLevel: (ValidationLevel, List[StaticBind.MIP])): (ValidationLevel, List[StaticBind.MIP]) =
     mipsForLevel match {
-      case (ValidationLevel.ErrorLevel, mips) if mips exists (_.name == Required.name) =>
-        ValidationLevel.ErrorLevel -> (mips filter (_.name == Required.name))
-      case (ValidationLevel.ErrorLevel, mips) if mips exists (_.name == Type.name) =>
-        ValidationLevel.ErrorLevel -> (mips filter (_.name == Type.name))
+      case (ValidationLevel.ErrorLevel, mips) if mips exists (_.name == MipName.Required) =>
+        ValidationLevel.ErrorLevel -> (mips filter (_.name == MipName.Required))
+      case (ValidationLevel.ErrorLevel, mips) if mips exists (_.name == MipName.Type) =>
+        ValidationLevel.ErrorLevel -> (mips filter (_.name == MipName.Type))
       case validations =>
         validations
     }

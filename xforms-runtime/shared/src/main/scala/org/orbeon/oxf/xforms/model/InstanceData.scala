@@ -19,7 +19,7 @@ import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs
+import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
@@ -56,8 +56,8 @@ object InstanceData {
   }
 
   private val ReadonlyLocalInstanceData: InstanceData = new InstanceData {
-    override def getRequired: Boolean = ModelDefs.DEFAULT_REQUIRED
-    override def getValid: Boolean = ModelDefs.DEFAULT_VALID
+    override def getRequired: Boolean = MipName.DEFAULT_REQUIRED
+    override def getValid: Boolean = MipName.DEFAULT_VALID
     override def getSchemaOrBindType: QName = null
     override def getInvalidBindIds: List[String] = Nil
     override def getLocationData: LocationData = null
@@ -83,7 +83,7 @@ object InstanceData {
 
   def findCustomMip(binding: om.Item, qName: QName): Option[String] =
     binding match {
-      case nodeInfo: om.NodeInfo => InstanceData.findCustomMip(nodeInfo, ModelDefs.buildInternalCustomMIPName(qName))
+      case nodeInfo: om.NodeInfo => InstanceData.findCustomMip(nodeInfo, MipName.buildInternalCustomMIPName(qName))
       case _                     => None
     }
 
@@ -91,7 +91,7 @@ object InstanceData {
     if (nodeInfo.isInstanceOf[VirtualNodeType])
       getInheritedRelevant(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else if (nodeInfo ne null)
-      ModelDefs.DEFAULT_RELEVANT
+      MipName.DEFAULT_RELEVANT
     else
       throw new OXFException("Cannot get relevant Model Item Property on null object.")
 
@@ -101,7 +101,7 @@ object InstanceData {
       val currentInstanceData = getLocalInstanceData(currentNode)
       val currentRelevant =
         if (currentInstanceData eq null)
-          ModelDefs.DEFAULT_RELEVANT
+          MipName.DEFAULT_RELEVANT
         else
           currentInstanceData.getLocalRelevant
       if (! currentRelevant)
@@ -114,7 +114,7 @@ object InstanceData {
   def getLocalRelevant(node: Node): Boolean = {
     val currentInstanceData = getLocalInstanceData(node)
     if (currentInstanceData eq null)
-      ModelDefs.DEFAULT_RELEVANT
+      MipName.DEFAULT_RELEVANT
     else
       currentInstanceData.getLocalRelevant
   }
@@ -122,7 +122,7 @@ object InstanceData {
   def getRequired(nodeInfo: om.NodeInfo): Boolean = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
     if (existingInstanceData eq null)
-      ModelDefs.DEFAULT_REQUIRED
+      MipName.DEFAULT_REQUIRED
     else
       existingInstanceData.getRequired
   }
@@ -130,7 +130,7 @@ object InstanceData {
   def getRequired(node: Node): Boolean = {
     val existingInstanceData = getLocalInstanceData(node)
     if (existingInstanceData eq null)
-      ModelDefs.DEFAULT_REQUIRED
+      MipName.DEFAULT_REQUIRED
     else
       existingInstanceData.getRequired
   }
@@ -149,7 +149,7 @@ object InstanceData {
       val currentInstanceData = getLocalInstanceData(currentNode)
       val currentReadonly =
         if (currentInstanceData eq null)
-          ModelDefs.DEFAULT_READONLY
+          MipName.DEFAULT_READONLY
         else
           currentInstanceData.getLocalReadonly
       if (currentReadonly)
@@ -162,7 +162,7 @@ object InstanceData {
   def getValid(nodeInfo: om.NodeInfo): Boolean = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
     if (existingInstanceData eq null)
-      ModelDefs.DEFAULT_VALID
+      MipName.DEFAULT_VALID
     else
       existingInstanceData.getValid
   }
@@ -170,7 +170,7 @@ object InstanceData {
   def getValid(node: Node): Boolean = {
     val existingInstanceData = getLocalInstanceData(node)
     if (existingInstanceData eq null)
-      ModelDefs.DEFAULT_VALID
+      MipName.DEFAULT_VALID
     else
       existingInstanceData.getValid
   }
@@ -383,16 +383,16 @@ class InstanceData private {
       default
 
   private def getLocalRelevant: Boolean =
-    testMipForNonDefault(_.relevant, ModelDefs.DEFAULT_RELEVANT)
+    testMipForNonDefault(_.relevant, MipName.DEFAULT_RELEVANT)
 
   private def getLocalReadonly: Boolean =
-    testMipForNonDefault(_.readonly, ModelDefs.DEFAULT_READONLY)
+    testMipForNonDefault(_.readonly, MipName.DEFAULT_READONLY)
 
   def getRequired: Boolean =
-    testMipForNonDefault(_.required, ModelDefs.DEFAULT_REQUIRED)
+    testMipForNonDefault(_.required, MipName.DEFAULT_REQUIRED)
 
   def getValid: Boolean =
-    ! schemaInvalid && testMipForNonDefault(_.valid, ModelDefs.DEFAULT_VALID)
+    ! schemaInvalid && testMipForNonDefault(_.valid, MipName.DEFAULT_VALID)
 
   private def collectAllClientCustomMIPs: Map[String, String] =
     BindNode.collectAllClientCustomMIPs(bindNodes)
@@ -412,7 +412,7 @@ class InstanceData private {
       val it = bindNodes.iterator
       while (it.hasNext) {
         val bindNode = it.next()
-        if (bindNode.valid != ModelDefs.DEFAULT_VALID) {
+        if (bindNode.valid != MipName.DEFAULT_VALID) {
           if (sb eq null)
             sb = new mutable.ListBuffer
           sb += bindNode.parentBind.staticId

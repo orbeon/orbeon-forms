@@ -28,8 +28,7 @@ import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs.MIP
+import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.NodeInfo
@@ -37,8 +36,8 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.Constants.ComponentSeparator
-import org.orbeon.xforms.{Namespaces, XFormsId}
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.{Namespaces, XFormsId}
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
@@ -55,7 +54,7 @@ trait ControlOps extends ResourcesOps {
   self: GridOps => // funky dependency, to resolve at some point
 
   private val MIPsToRewrite =
-    ModelDefs.AllMIPs - ModelDefs.Type - ModelDefs.Required - ModelDefs.Whitespace
+    MipName.AllMipNames - MipName.Type - MipName.Required - MipName.Whitespace
 
   private val RewrittenMIPs =
     MIPsToRewrite
@@ -427,7 +426,7 @@ trait ControlOps extends ResourcesOps {
   // The bind is created if needed
   def writeAndNormalizeMip(
     controlNameOpt : Option[String],
-    mip            : MIP, // `CalculateMIP | ValidateMIP` depending on caller
+    mip            : MipName, // `CalculateMIP | ValidateMIP` depending on caller
     mipValue       : String,
     iteration      : Boolean)(implicit
     ctx            : FormBuilderDocContext
@@ -459,7 +458,7 @@ trait ControlOps extends ResourcesOps {
   }
 
   // Return `(attQName, elemQName)`
-  def mipToFBMIPQNames(mip: ModelDefs.MIP): (QName, QName) =
+  def mipToFBMIPQNames(mip: MipName): (QName, QName) =
     RewrittenMIPs.get(mip) match {
       case Some(qn) => qn        -> qn
       case None     => mip.aName -> mip.eName

@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs
+import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import org.orbeon.saxon.om
@@ -291,10 +291,10 @@ object ImportExportSupport {
     }
 
   def isBindReadonly(bind: om.NodeInfo)(implicit ctx: FormRunnerDocContext): Boolean =
-    FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, ModelDefs.Readonly).contains(FormRunner.TrueExpr)
+    FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, MipName.Readonly).contains(FormRunner.TrueExpr)
 
   def isBindRequired(bind: om.NodeInfo)(implicit ctx: FormRunnerDocContext): Boolean =
-    FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, ModelDefs.Required).contains(FormRunner.TrueExpr)
+    FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, MipName.Required).contains(FormRunner.TrueExpr)
 
   def iterateAncestorOrSelfBinds(b: om.NodeInfo): Iterator[om.NodeInfo] =
     iterateFrom[om.NodeInfo](b, _ parent XMLNames.XFBindTest headOption)
@@ -312,7 +312,7 @@ object ImportExportSupport {
           ! (control.namespaceURI == XMLNames.FR && control.localname == "hidden")  && // `fr:hidden`
           ! (control.namespaceURI == XMLNames.XF && control.localname == "trigger") && // `xf:trigger`
           ! controlIsHiddenWithCss(control)                                         &&
-          ! FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, ModelDefs.Relevant).contains(FormRunner.FalseExpr)
+          ! FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, MipName.Relevant).contains(FormRunner.FalseExpr)
         }
 
         (cbphr, visible)
@@ -322,7 +322,7 @@ object ImportExportSupport {
     controlIsHiddenWithCss(control) || {
       FormRunner.searchControlBindPathHoldersInDoc(List(control), ctx.dataRootElem.some, _ => true).headOption exists {
         case ControlBindPathHoldersResources(_, bind, _, _, _) =>
-          FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, ModelDefs.Relevant).contains(FormRunner.FalseExpr)
+          FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, MipName.Relevant).contains(FormRunner.FalseExpr)
       }
     }
 

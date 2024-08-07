@@ -26,7 +26,7 @@ import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, StaticXPath, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs.Relevant
+import org.orbeon.oxf.xforms.analysis.model.MipName.Relevant
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}

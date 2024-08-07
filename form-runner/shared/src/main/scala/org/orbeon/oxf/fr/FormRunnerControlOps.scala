@@ -27,7 +27,7 @@ import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.NodeInfoFactory.namespaceInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI.insert
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs
+import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{Item, NodeInfo}
@@ -421,7 +421,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   // NOTE: Don't call this for `Required` as this doesn't look at nested elements.
   def readDenormalizedCalculatedMip(
     bindElem    : NodeInfo,
-    mip         : ModelDefs.ComputedMIP,
+    mip         : MipName.Computed,
     mipAttQName : QName)(implicit // pass `mipAttQName` separately for Form Builder
     ctx         : FormRunnerDocContext
   ): String =
@@ -435,11 +435,11 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   // NOTE: There is something similar in `AlertsAndConstraintsOps` but for Form Builder use.
   def readDenormalizedCalculatedMipHandleChildElement(
     bindElem : NodeInfo,
-    mip      : ModelDefs.ComputedMIP
+    mip      : MipName.Computed
   ): List[String] = {
 
-    def mipAtts (bind: NodeInfo, mip: ModelDefs.MIP) = bind /@ mip.aName
-    def mipElems(bind: NodeInfo, mip: ModelDefs.MIP) = bind / mip.eName
+    def mipAtts (bind: NodeInfo, mip: MipName) = bind /@ mip.aName
+    def mipElems(bind: NodeInfo, mip: MipName) = bind / mip.eName
 
     def fromAttribute(a: NodeInfo) = a.stringValue
     def fromElement(e: NodeInfo)   = e.attValue(XFormsNames.VALUE_QNAME)
@@ -463,7 +463,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   // This depends on context, as the default for `readonly` depends on whether there is a `calculate`.
   //
   def normalizeMipValue(
-    mip          : ModelDefs.MIP,
+    mip          : MipName,
     mipValue     : String,
     hasCalculate : => Boolean,
     isTypeString : String => Boolean
@@ -474,14 +474,15 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
       val isDefault =
         mip match {
-          case ModelDefs.Relevant   => trimmed == TrueExpr
-          case ModelDefs.Readonly   => trimmed == TrueExpr && hasCalculate || trimmed == FalseExpr && ! hasCalculate
-          case ModelDefs.Required   => trimmed == FalseExpr
-          case ModelDefs.Constraint => trimmed.isEmpty
-          case ModelDefs.Calculate  => trimmed.isEmpty
-          case ModelDefs.Default    => trimmed.isEmpty
-          case ModelDefs.Type       => isTypeString(trimmed)
-          case ModelDefs.Whitespace => trimmed == Whitespace.Policy.Preserve.entryName
+          case MipName.Relevant   => trimmed == TrueExpr
+          case MipName.Readonly   => trimmed == TrueExpr && hasCalculate || trimmed == FalseExpr && ! hasCalculate
+          case MipName.Required   => trimmed == FalseExpr
+          case MipName.Constraint => trimmed.isEmpty
+          case MipName.Calculate  => trimmed.isEmpty
+          case MipName.Default    => trimmed.isEmpty
+          case MipName.Type       => isTypeString(trimmed)
+          case MipName.Whitespace => trimmed == Whitespace.Policy.Preserve.entryName
+          case MipName.Custom(v)  => throw new UnsupportedOperationException(v.qualifiedName)
         }
 
       ! isDefault option trimmed
@@ -490,7 +491,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   // 2024-04-04: This only checks the attribute, but it is ok as only `constraint`, `required`, and `type` support
   // nested elements.
   def hasCalculate(bindElem: NodeInfo): Boolean =
-    bindElem.attValueOpt(ModelDefs.Calculate.name).isDefined
+    bindElem.attValueOpt(MipName.Calculate.name).isDefined
 
   // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
   // expressions and types could use it. So for now the mapping is never garbage collected.
@@ -500,7 +501,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     ctx      : FormRunnerDocContext
   ): Boolean =
     valueNamespaceMappingScopeIfNeeded(bindElem, value).isDefined &&
-      ModelDefs.StringQNames(bindElem.resolveQName(value))
+      MipName.StringQNames(bindElem.resolveQName(value))
 
   private object Private {
 
@@ -536,7 +537,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   // When *reading* a value from the form definition, return the denormalized or explicit value since the
   // user interface is not and should not be aware of defaults.
   def denormalizeMipValue(
-    mip          : ModelDefs.ComputedMIP,
+    mip          : MipName.Computed,
     mipValue     : Option[String],
     hasCalculate : => Boolean,
     isTypeString : String => Boolean // shouldn't be needed as `Type` is not a `ComputedMIP`!
@@ -558,12 +559,12 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
           value
         case None =>
           mip match {
-            case ModelDefs.Relevant   => TrueExpr
-            case ModelDefs.Readonly   => if (hasCalculate) TrueExpr else FalseExpr
-            case ModelDefs.Required   => FalseExpr
-            case ModelDefs.Calculate  => ""
-            case ModelDefs.Default    => ""
-            case ModelDefs.Whitespace => Whitespace.Policy.Preserve.entryName
+            case MipName.Relevant   => TrueExpr
+            case MipName.Readonly   => if (hasCalculate) TrueExpr else FalseExpr
+            case MipName.Required   => FalseExpr
+            case MipName.Calculate  => ""
+            case MipName.Default    => ""
+            case MipName.Whitespace => Whitespace.Policy.Preserve.entryName
           }
       }
     }

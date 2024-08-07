@@ -17,7 +17,7 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
-import org.orbeon.oxf.xforms.analysis.model.{ModelDefs, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{MipName, StaticBind}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_ITERATION_MOVED
@@ -58,17 +58,17 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
       Nil
 
   // Standard MIPs
-  private var _readonly = ModelDefs.DEFAULT_READONLY
+  private var _readonly = MipName.DEFAULT_READONLY
   final def isReadonly: Boolean = _readonly
 
-  private var _required = ModelDefs.DEFAULT_REQUIRED
+  private var _required = MipName.DEFAULT_REQUIRED
   final def isRequired: Boolean = _required
 
   // TODO: maybe represent as case class
   //case class ValidationStatus(valid: Boolean, alertLevel: Option[ValidationLevel], failedValidations: List[StaticBind.MIP])
   //private var _validationStatus: Option[ValidationStatus] = None
 
-  private var _valid = ModelDefs.DEFAULT_VALID
+  private var _valid = MipName.DEFAULT_VALID
   def isValid: Boolean = _valid
 
   // NOTE: At this time, the control only stores the constraints for a single level (the "highest" level). There is no
@@ -94,7 +94,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   // Custom MIPs
   private var _customMIPs = Map.empty[String, String]
   def customMIPs: Map[String, String] = _customMIPs
-  def customMIPsClasses: i.Iterable[String] = customMIPs map { case (k, v) => ModelDefs.buildExternalCustomMIPName(k) + '-' + v }
+  def customMIPsClasses: i.Iterable[String] = customMIPs map { case (k, v) => MipName.buildExternalCustomMIPName(k) + '-' + v }
 
   override def onDestroy(update: Boolean): Unit = {
     super.onDestroy(update)
@@ -199,9 +199,9 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   }
 
   private def setDefaultMIPs(): Unit = {
-    this._readonly          = ModelDefs.DEFAULT_READONLY
-    this._required          = ModelDefs.DEFAULT_REQUIRED
-    this._valid             = ModelDefs.DEFAULT_VALID
+    this._readonly          = MipName.DEFAULT_READONLY
+    this._required          = MipName.DEFAULT_REQUIRED
+    this._valid             = MipName.DEFAULT_VALID
     this._valueType         = null
     this._customMIPs        = Map.empty[String, String]
 
@@ -499,7 +499,7 @@ object XFormsSingleNodeControl {
             value2         = mips2.get(name)
             if Option(value1) != value2
           } yield
-            plusOrMinusPrefix + ModelDefs.buildExternalCustomMIPName(name) + '-' + value1 // TODO: encode so that there are no spaces
+            plusOrMinusPrefix + MipName.buildExternalCustomMIPName(name) + '-' + value1 // TODO: encode so that there are no spaces
 
         val classesToRemove = diff(customMIPs1, customMIPs2, '-')
         val classesToAdd    = diff(customMIPs2, customMIPs1, '+')

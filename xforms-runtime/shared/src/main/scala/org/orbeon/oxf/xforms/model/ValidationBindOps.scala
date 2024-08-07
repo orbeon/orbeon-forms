@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{Logging, XPath}
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{Constraint, Required, Type}
+import org.orbeon.oxf.xforms.analysis.model.MipName
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -51,7 +51,7 @@ trait ValidationBindOps extends Logging {
       // 1. Validate based on type and requiredness
       if (staticModel.hasTypeBind || staticModel.hasRequiredBind)
         iterateBinds(topLevelBinds, bindNode =>
-          if (bindNode.staticBind.dataType.isDefined || bindNode.staticBind.hasXPathMIP(Required))
+          if (bindNode.staticBind.dataType.isDefined || bindNode.staticBind.hasXPathMIP(MipName.Required))
             validateTypeAndRequired(bindNode, invalidInstances)
         )
 
@@ -65,10 +65,10 @@ trait ValidationBindOps extends Logging {
   }
 
   protected def failedConstraintMIPs(
-    mips      : List[StaticXPathMIP],
+    mips      : List[XPathMIP],
     bindNode  : BindNode,
     collector : ErrorEventCollector
-  ): List[StaticXPathMIP] =
+  ): List[XPathMIP] =
     for {
       mip       <- mips
       succeeded = evaluateBooleanExpressionStoreProperties(bindNode, mip, collector)
@@ -88,7 +88,7 @@ trait ValidationBindOps extends Logging {
 
       val staticBind = bindNode.staticBind
 
-      assert(staticBind.typeMIPOpt.isDefined || staticBind.hasXPathMIP(Required))
+      assert(staticBind.typeMIPOpt.isDefined || staticBind.hasXPathMIP(MipName.Required))
 
       // Don't try to apply validity to a node if it has children nodes or if it's not a node
       // "The type model item property is not applied to instance nodes that contain child elements"
@@ -102,7 +102,7 @@ trait ValidationBindOps extends Logging {
       // Current required value (computed during previous recalculate)
       val isRequired = InstanceData.getRequired(currentNodeInfo)
 
-      val requiredMIPOpt = staticBind.firstXPathMIP(Required)
+      val requiredMIPOpt = staticBind.firstXPathMipByName(MipName.Required)
 
       // 1. Check type validity
 
@@ -122,8 +122,8 @@ trait ValidationBindOps extends Logging {
       val typeValidity =
         staticBind.dataType match {
           case Some(_) =>
-            if (dependencies.requireModelMIPUpdate(model, staticBind, Type, null) ||
-              requiredMIPOpt.isDefined && dependencies.requireModelMIPUpdate(model, staticBind, Required, null)) {
+            if (dependencies.requireModelMIPUpdate(model, staticBind, MipName.Type, null) ||
+              requiredMIPOpt.isDefined && dependencies.requireModelMIPUpdate(model, staticBind, MipName.Required, null)) {
               // Compute new type validity if the value of the node might have changed OR the value of requiredness
               // might have changed
               val typeValidity = validateType(bindNode.parentBind, currentNodeInfo, isRequired)
@@ -185,7 +185,7 @@ trait ValidationBindOps extends Logging {
       } else if (isBuiltInXFormsType && (typeLocalname == "HTMLFragment")) {
         // Just a marker type
         true
-      } else if (isBuiltInXFormsType && ModelDefs.XFormsSchemaTypeNames(typeLocalname)) {
+      } else if (isBuiltInXFormsType && MipName.XFormsSchemaTypeNames(typeLocalname)) {
         // `xf:dayTimeDuration`, `xf:yearMonthDuration`, `xf:card-number`
         val validationError = xformsValidator.validateDatatype(
           nodeValue,
@@ -283,7 +283,7 @@ trait ValidationBindOps extends Logging {
       for {
         (level, mips) <- bindNode.staticBind.constraintsByLevel
       } locally {
-        if (dependencies.requireModelMIPUpdate(model, bindNode.staticBind, Constraint, level)) {
+        if (dependencies.requireModelMIPUpdate(model, bindNode.staticBind, MipName.Constraint, level)) {
           // Re-evaluate and set
           val failedConstraints = failedConstraintMIPs(mips, bindNode, collector)
           if (failedConstraints.nonEmpty)
@@ -304,7 +304,7 @@ trait ValidationBindOps extends Logging {
 
     def evaluateBooleanExpressionStoreProperties(
       bindNode  : BindNode,
-      xpathMIP  : StaticXPathMIP,
+      xpathMIP  : XPathMIP,
       collector : ErrorEventCollector
     ): Boolean =
       try {
@@ -331,8 +331,8 @@ trait ValidationBindOps extends Logging {
         result
       } catch {
         case NonFatal(t) =>
-          handleMIPXPathException(t, bindNode, xpathMIP, Constraint.name, collector)
-          ! ModelDefs.DEFAULT_VALID
+          handleMIPXPathException(t, bindNode, xpathMIP, MipName.Constraint, collector)
+          ! MipName.DEFAULT_VALID
       }
   }
 }

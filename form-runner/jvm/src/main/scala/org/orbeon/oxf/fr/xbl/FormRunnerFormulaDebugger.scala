@@ -6,7 +6,7 @@ import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis
 import org.orbeon.oxf.xforms.analysis.model.DependencyAnalyzer.Vertex
-import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, ModelDefs}
+import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, MipName}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
@@ -28,7 +28,7 @@ object FormRunnerFormulaDebugger {
   def explainModel(mipName: String): Item = {
 
     val mip =
-      ModelDefs.AllXPathMipsByName(mipName)
+      MipName.AllXPathMipsByName(mipName)
 
     val model =
       XFormsAPI.topLevelModel(FormModel).map(_.staticModel).getOrElse(throw new IllegalArgumentException("model not found"))

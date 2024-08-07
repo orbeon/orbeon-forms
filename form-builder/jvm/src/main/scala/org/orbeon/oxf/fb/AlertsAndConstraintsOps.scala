@@ -24,8 +24,7 @@ import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
+import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.function.xxforms.{ExcludedDatesValidation, ValidationFunctionNames}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
@@ -75,9 +74,9 @@ trait AlertsAndConstraintsOps extends ControlOps {
     val allValidations = {
       val idsIterator = nextTmpIds(token = Names.Validation, count = validationElemsSeq.size).iterator
       validationElemsSeq map (v => v -> (v attValue "type")) flatMap {
-        case (e, Required.name) => Some(RequiredValidation.fromXml(e, idsIterator))
-        case (e, "datatype")    => Some(DatatypeValidation.fromXml(e, idsIterator, controlName))
-        case (e, _)             => ConstraintValidation.fromXmlOpt(e, idsIterator)
+        case (e, MipName.Required.name) => Some(RequiredValidation.fromXml(e, idsIterator))
+        case (e, "datatype")            => Some(DatatypeValidation.fromXml(e, idsIterator, controlName))
+        case (e, _)                     => ConstraintValidation.fromXmlOpt(e, idsIterator)
       }
     }
 
@@ -89,7 +88,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     } foreach { v =>
       writeValidations(
         controlName,
-        Required,
+        MipName.Required,
         List(v)
       )
     }
@@ -103,7 +102,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
       writeValidations(
         controlName,
-        Type,
+        MipName.Type,
         List(v)
       )
     }
@@ -111,7 +110,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     // Several "constraint" validations are supported
     writeValidations(
       controlName,
-      Constraint,
+      MipName.Constraint,
       allValidations collect { case v: ConstraintValidation => v }
     )
 
@@ -124,7 +123,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
   private def writeValidations(
     controlName : String,
-    mip         : ValidateMIP,
+    mip         : MipName.Validate,
     validations : List[Validation])(implicit
     ctx         : FormBuilderDocContext
   ): Unit = {
@@ -162,12 +161,12 @@ trait AlertsAndConstraintsOps extends ControlOps {
                   <xf:dummy
                     id={idOpt.orNull}
                     level={if (level != ValidationLevel.ErrorLevel) level.entryName else null}
-                    value={if (mip != Type) nonEmptyValue else null}
+                    value={if (mip != MipName.Type) nonEmptyValue else null}
                     xmlns:xf={XF}
                     xmlns:fb={XMLNames.FB}>{
-                    if (mip == Type) // https://github.com/orbeon/orbeon-forms/issues/6252
+                    if (mip == MipName.Type) // https://github.com/orbeon/orbeon-forms/issues/6252
                       normalizeMipValue(
-                        mip          = Type,
+                        mip          = MipName.Type,
                         mipValue     = nonEmptyValue,
                         hasCalculate = throw new IllegalArgumentException, // unused here as we pass `mip == Type`
                         isTypeString = isTypeStringUpdateNsIfNeeded(bindElem, _)
@@ -183,7 +182,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           }
 
         delete(existingAttributeValidations ++ existingElementValidations)
-        insertElementsImposeOrder(into = bindElem, origin = nestedValidations, AllMIPNamesInOrder)
+        insertElementsImposeOrder(into = bindElem, origin = nestedValidations, MipName.AllMIPNamesInOrder)
     }
   }
 
@@ -286,7 +285,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def stringValue: String          = eitherToXPath(required)
 
     def toXML(implicit ctx: FormBuilderDocContext): sx.Elem =
-      <validation type={Required.name} level={level.entryName} default-alert={alert.isEmpty.toString}>
+      <validation type={MipName.Required.name} level={level.entryName} default-alert={alert.isEmpty.toString}>
         <required>{eitherToXPath(required)}</required>
         {alertOrPlaceholder(alert)}
       </validation>
@@ -297,17 +296,17 @@ trait AlertsAndConstraintsOps extends ControlOps {
     private val DefaultRequireValidation = RequiredValidation(None, Left(false), None)
 
     def fromForm(controlName: String)(implicit ctx: FormBuilderDocContext): RequiredValidation =
-      findMIPs(controlName, Required).headOption map {
+      findMIPs(controlName, MipName.Required).headOption map {
         case (idOpt, _, value, alertOpt) =>
           RequiredValidation(idOpt, xpathOptToEither(Some(value)), alertOpt)
       } getOrElse
         DefaultRequireValidation
 
     def fromXml(validationElem: NodeInfo, newIds: Iterator[String])(implicit ctx: FormBuilderDocContext): RequiredValidation = {
-      require(validationElem /@ "type" === Required.name)
+      require(validationElem /@ "type" === MipName.Required.name)
 
       val validationIdOpt = validationElem.id.trimAllToOpt orElse Some(newIds.next())
-      val required        = validationElem / Required.name stringValue
+      val required        = validationElem / MipName.Required.name stringValue
 
       RequiredValidation(
         validationIdOpt,
@@ -416,7 +415,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           Right(qName)
       }
 
-      findMIPs(controlName, Type).headOption map {
+      findMIPs(controlName, MipName.Type).headOption map {
         case (idOpt, _, value, alertOpt) =>
           // If the value is blank, use `xs:string` as the default
           // https://github.com/orbeon/orbeon-forms/issues/6252
@@ -452,7 +451,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           val builtinTypeString = builtinTypeStringOpt.get
 
           // If a builtin type, we just have a local name
-          val nsURI = ModelDefs.uriForBuiltinTypeName(builtinTypeString, builtinTypeRequired)
+          val nsURI = MipName.uriForBuiltinTypeName(builtinTypeString, builtinTypeRequired)
 
           // Namespace mapping must be in scope
           val prefix = bind.nonEmptyPrefixesForURI(nsURI).min
@@ -520,7 +519,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
   object ConstraintValidation {
 
     def fromForm(controlName: String)(implicit ctx: FormBuilderDocContext): List[ConstraintValidation] =
-      findMIPs(controlName, Constraint) map {
+      findMIPs(controlName, MipName.Constraint) map {
         case (idOpt, level, value, alertOpt) =>
           ConstraintValidation(idOpt, level, value, alertOpt)
       }
@@ -528,7 +527,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def fromXmlOpt(validationElem: NodeInfo, newIds: Iterator[String])(implicit ctx: FormBuilderDocContext): Option[ConstraintValidation] = {
 
       def normalizedAttOpt(attName: String) =
-        (validationElem child Constraint.name attValue attName headOption) flatMap trimAllToOpt
+        (validationElem child MipName.Constraint.name attValue attName headOption) flatMap trimAllToOpt
 
       val constraintExpressionOpt = validationElem attValue "type" match {
         case "formula"                                     => normalizedAttOpt("expression")
@@ -664,7 +663,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     }
   }
 
-  private def findMIPs(controlName: String, mip: MIP)(implicit ctx: FormBuilderDocContext): List[(Option[String], ValidationLevel, String, Option[AlertDetails])] = {
+  private def findMIPs(controlName: String, mip: MipName)(implicit ctx: FormBuilderDocContext): List[(Option[String], ValidationLevel, String, Option[AlertDetails])] = {
 
     val bind            = findBindByName(controlName).get // require the bind
     val supportedAlerts = AlertDetails.fromForm(controlName)
@@ -687,7 +686,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       (
         id.trimAllToOpt,
         (e attValue LEVEL_QNAME).trimAllToOpt map ValidationLevel.LevelByName getOrElse ValidationLevel.ErrorLevel,
-        if (mip == Type) e.stringValue else e attValue VALUE_QNAME,
+        if (mip == MipName.Type) e.stringValue else e attValue VALUE_QNAME,
         findAlertForId(id)
       )
     }
@@ -699,8 +698,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
     attributeValidations ++ elementValidations toList
   }
 
-  private def mipAtts (bind: NodeInfo, mip: MIP) = bind /@ mipToFBMIPQNames(mip)._1
-  private def mipElems(bind: NodeInfo, mip: MIP) = bind /  mipToFBMIPQNames(mip)._2
+  private def mipAtts (bind: NodeInfo, mip: MipName) = bind /@ mipToFBMIPQNames(mip)._1
+  private def mipElems(bind: NodeInfo, mip: MipName) = bind /  mipToFBMIPQNames(mip)._2
 
   private def alertOrPlaceholder(alert: Option[AlertDetails])(implicit ctx: FormBuilderDocContext) =
     alert orElse Some(AlertDetails(None, Nil, global = false)) map (_.toXML) get

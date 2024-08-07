@@ -478,9 +478,11 @@ trait FormRunnerPersistence {
   def isAutosaveSupported(app: String, form: String): Boolean =
     findProvider(AppForm(app, form), FormOrData.Data) exists (providerPropertyAsBoolean(_, "autosave", default = false))
 
+  // 2024-08-07: This is currently unused. Conceivably, Form Runner could have different behavior if the persistence
+  // provider does not support permissions. But this would be significant work to do properly.
   //@XPathFunction
-  def isOwnerGroupPermissionsSupported(app: String, form: String): Boolean =
-    providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Data).get, "permissions", default = false)
+//  def isOwnerGroupPermissionsSupported(app: String, form: String): Boolean =
+//    providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Data).get, "permissions", default = false)
 
   //@XPathFunction
   def isFormDefinitionVersioningSupported(app: String, form: String): Boolean =

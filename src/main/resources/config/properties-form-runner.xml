@@ -60,6 +60,7 @@
     <property as="xs:boolean" name="oxf.fr.persistence.sqlite.autosave"                            value="true"/>
 
     <!-- Whether providers support permissions -->
+    <!-- 2024-08-07: This set of properties is currently unused. -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.permissions"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.permissions"                          value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.postgresql.permissions"                     value="true"/>

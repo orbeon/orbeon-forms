@@ -166,7 +166,8 @@ trait FormRunnerActionsCommon {
           data                       = originalData,
           metadataOpt                = frc.metadataInstance.map(_.root),
           dstDataFormatVersionString = databaseDataFormatVersion.entryName,
-          pruneMetadata              = pruneMetadata
+          pruneMetadata              = pruneMetadata,
+          pruneTmpAttMetadata        = true
         )
 
       // Forward the token if present so the persistence proxy can use it
@@ -204,10 +205,10 @@ trait FormRunnerActionsCommon {
       def continuation(value: Try[(List[AttachmentWithEncryptedAtRest], Option[Int], Option[String])]): Try[Unit] =
         Try {
           value match {
-            case Success((attachmentWithEncryptedAtRest, _, stringOpt)) =>
+            case Success((savedAttachments, _, stringOpt)) =>
 
               // Update, in this thread, the attachment paths
-              updateAttachments(frc.formInstance.root, attachmentWithEncryptedAtRest)
+              updateAttachments(frc.formInstance.root, savedAttachments, setTmpFileAtt = true)
 
               // Update the response instance, optionally used by the result dialog
               setCreateUpdateResponse(stringOpt.getOrElse(""))
@@ -223,8 +224,8 @@ trait FormRunnerActionsCommon {
               // Notify that the data is saved (2014-07-07: used by FB only)
               // We pass the URLs to the event so that Form Builder can update `fb-form-instance`
               dispatch(name = "fr-data-save-done", targetId = FormModel, properties = Map(
-                "before-urls" -> Some(attachmentWithEncryptedAtRest.map(_.fromPath)),
-                "after-urls"  -> Some(attachmentWithEncryptedAtRest.map(_.toPath))
+                "before-urls" -> Some(savedAttachments.map(_.fromPath)),
+                "after-urls"  -> Some(savedAttachments.map(_.toPath))
               ))
 
               Success(())

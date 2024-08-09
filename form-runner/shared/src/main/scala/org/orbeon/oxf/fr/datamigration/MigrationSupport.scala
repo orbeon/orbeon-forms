@@ -222,12 +222,13 @@ object MigrationSupport {
     }
 
   def migrateDataWithFormMetadataMigrations(
-    appForm             : AppForm,
-    data                : DocumentNodeInfoType,
-    metadataRootElemOpt : Option[NodeInfo],
-    srcVersion          : DataFormatVersion,
-    dstVersion          : DataFormatVersion,
-    pruneMetadata       : Boolean
+    appForm            : AppForm,
+    data               : DocumentNodeInfoType,
+    metadataRootElemOpt: Option[NodeInfo],
+    srcVersion         : DataFormatVersion,
+    dstVersion         : DataFormatVersion,
+    pruneMetadata      : Boolean,
+    pruneTmpAttMetadata: Boolean
   ): Option[DocumentWrapper] =
     appForm match {
       case AppForm.FormBuilder => None
@@ -242,12 +243,15 @@ object MigrationSupport {
             findMigrationSet = new MigrationsFromMetadata(metadataRootElemOpt)
           )
 
-        if (pruneMetadata)
-          pruneFormRunnerMetadataFromMutableData(mutableData)
+        val pruned =
+          (pruneMetadata || pruneTmpAttMetadata) &&
+            pruneFormRunnerMetadataFromMutableData(mutableData, pruneMetadata, pruneTmpAttMetadata).isDefined
 
-        result == MigrationResult.Some || pruneMetadata option mutableData
+        result == MigrationResult.Some || pruned option mutableData
     }
 
+  // 2024-08-08: Can't find a trace of this being used internally or externally except by single caller that exposes the
+  // XPath function. But it seems that at some point we might have exposed it?
   def migrateDataWithFormDefinition(
     data          : DocumentNodeInfoType,
     form          : DocumentNodeInfoType,
@@ -265,13 +269,15 @@ object MigrationSupport {
           findMigrationSet = new MigrationsFromForm(form, instanceRoot("fb-components-instance") map (_.root), legacyGridsOnly = false)
         )
 
-      if (pruneMetadata)
-        pruneFormRunnerMetadataFromMutableData(mutableData)
+      val pruned =
+        pruneMetadata &&
+          pruneFormRunnerMetadataFromMutableData(mutableData, pruneRegular = true, pruneTmpAttMetadata = true).isDefined
 
-      result == MigrationResult.Some || pruneMetadata option mutableData
+      result == MigrationResult.Some || pruned option mutableData
     }
 
   // TODO: This is not strictly related to migration, maybe move somewhere else.
+  //  This bridges uses `NodeInfo` but also `orbeon.dom`.
   def copyDocumentKeepInstanceData(data: DocumentNodeInfoType): DocumentWrapper =
     new DocumentWrapper(
       data match {
@@ -287,31 +293,64 @@ object MigrationSupport {
       XPath.GlobalConfiguration
     )
 
+  // Prune except `fr:relevant` attributes, as we need them to handle extra relevance information. Those will
+  // be kept/removed later as needed by the submission code.
+  // https://github.com/orbeon/orbeon-forms/issues/3568
+  private val matchFrExceptRelevant =
+    (a: NodeInfo) => a.namespaceURI == XMLNames.FR && a.localname != "relevant"
+
+  // Also don't prune `fr:tmp-*` attributes if requested:
+  // https://github.com/orbeon/orbeon-forms/issues/5768
+  private val matchFrExceptRelevantAndTmp =
+    (a: NodeInfo) => matchFrExceptRelevant(a) && ! a.localname.startsWith("tmp-")
+
+  // Prune all `fr:tmp-*` only
+  private val matchFrTmp =
+    (a: NodeInfo) => a.namespaceURI == XMLNames.FR && a.localname.startsWith("tmp-")
+
   // Remove all `fr:*` elements and attributes
-  def pruneFormRunnerMetadataFromMutableData(mutableData: DocumentWrapper): DocumentWrapper = {
+  def pruneFormRunnerMetadataFromMutableData(
+    mutableData        : DocumentWrapper,
+    pruneRegular       : Boolean,
+    pruneTmpAttMetadata: Boolean
+  ): Option[DocumentWrapper] = {
 
-    // Delete elements from concrete `List` to avoid possible laziness
-    val frElements = mutableData descendant * filter (_.namespaceURI == XMLNames.FR) toList
-
-    frElements.foreach (delete(_, doDispatch = false))
+    val deletedFrElemCount =
+      if (pruneRegular) {
+        // Delete elements from concrete `List` to avoid possible laziness
+        val matchedFrElems = (mutableData descendant *).filter(_.namespaceURI == XMLNames.FR).toList
+        matchedFrElems.map(delete(_, doDispatch = false).size).sum
+      } else
+        0
 
     // Attributes: see https://github.com/orbeon/orbeon-forms/issues/3568
-    val allElements = mutableData descendant *
+    val allNewElems = mutableData descendant *
 
-    // Prune except `fr:relevant` attributes, as we need them to handle extra relevance information. Those will
-    // be kept/removed later as needed by the submission code.
-    // https://github.com/orbeon/orbeon-forms/issues/3568
-    val frAttributes = allElements /@ @* filter (a => a.namespaceURI == XMLNames.FR && a.localname != "relevant") toList
+    val deletedAttCount =
+      if (pruneRegular || pruneTmpAttMetadata) {
+        val attCondition =
+          if (pruneRegular && pruneTmpAttMetadata)
+            matchFrExceptRelevant
+          else if (pruneRegular)
+            matchFrExceptRelevantAndTmp
+          else
+            matchFrTmp
 
-    frAttributes.foreach (delete(_, doDispatch = false))
+        val matchedFrAtts = (allNewElems /@ @*).filter(attCondition).toList
+        matchedFrAtts.map(delete(_, doDispatch = false).size).sum
+      } else
+         0
 
-    // Also remove all `fr:*` namespaces
-    // TODO: This doesn't work: we find the nodes but the delete action doesn't manage to delete the node.
-    val frlNamespaces = allElements.namespaceNodes filter (_.stringValue == XMLNames.FR)
+    val deletedNsCount =
+      if (pruneRegular) {
+        // Also remove all `fr:*` namespaces
+        // TODO: This doesn't work: we find the nodes but the delete action doesn't manage to delete the node.
+        val matchedFrNs = allNewElems.namespaceNodes.filter(_.stringValue == XMLNames.FR).toList
+        matchedFrNs.map(delete(_, doDispatch = false).size).sum
+      } else
+        0
 
-    frlNamespaces.foreach (delete(_, doDispatch = false))
-
-    mutableData
+    (deletedFrElemCount + deletedAttCount + deletedNsCount > 0) option mutableData
   }
 
   def applyPath(mutableData: NodeInfo, path: i.Seq[PathElem]): Seq[NodeInfo] =

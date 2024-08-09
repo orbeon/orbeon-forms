@@ -126,7 +126,8 @@
                                     xxf:instance('fr-form-instance')/root(),
                                     xxf:instance('fr-form-metadata')/root(),
                                     '4.0.0',
-                                    false()
+                                    false(),
+                                    true()
                                 )"
                             replace="instance"
                             instance="fr-test-submission-response"/>

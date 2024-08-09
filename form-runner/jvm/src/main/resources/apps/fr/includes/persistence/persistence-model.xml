@@ -578,7 +578,8 @@
                                    xxf:instance('fr-form-instance')/root(),
                                    xxf:instance('fr-form-metadata')/root(),
                                    $data-format-version,
-                                   $prune-metadata
+                                   $prune-metadata,
+                                   true()
                                )
                             )
                     "

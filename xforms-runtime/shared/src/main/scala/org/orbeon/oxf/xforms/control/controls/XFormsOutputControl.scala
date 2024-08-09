@@ -27,6 +27,8 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.saxon.om
+import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.XFormsNames._
@@ -91,6 +93,16 @@ class XFormsOutputControl(
       result
     }
 
+  // Form Runner places `fr:tmp-file`, but we don't want to depend on the `fr` prefix here, so we consider that the
+  // attribute can be in any namespace.
+  private def findTmpFileAtt: Option[om.NodeInfo] =
+    boundItemOpt
+      .collect { case elem: om.NodeInfo if elem.isElement => elem.attOpt("tmp-file") }
+      .flatten
+
+  private def findTmpFile: Option[String] =
+    findTmpFileAtt.flatMap(_.stringValue.trimAllToOpt)
+
   override def evaluateExternalValue(collector: ErrorEventCollector): Unit = {
     assert(isRelevant)
 
@@ -99,10 +111,11 @@ class XFormsOutputControl(
 
     val updatedValue =
       if (staticControlOpt exists (c => c.isDownloadAppearance || c.isVideoMediatype)) {
-        proxyValueIfNeeded(internalValue, "", filename(collector), fileMediatype(collector) orElse mediatype, collector)
+        proxyValueIfNeeded(findTmpFile.getOrElse(internalValue), "", filename(collector), fileMediatype(collector) orElse mediatype, collector)
       } else if (staticControlOpt exists (_.isImageMediatype)) {
         // Use dummy image as default value so that client always has something to load
-        proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, filename(collector), fileMediatype(collector) orElse mediatype, collector)
+        // Use `*:tmp-file` if present
+        proxyValueIfNeeded(findTmpFile.getOrElse(internalValue), DUMMY_IMAGE_URI, filename(collector), fileMediatype(collector) orElse mediatype, collector)
       } else if (staticControlOpt exists (_.isHtmlMediatype)) {
         internalValue
       } else {

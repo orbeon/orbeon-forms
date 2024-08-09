@@ -238,12 +238,13 @@ object ImportExportSupport {
           // TODO: Move this to function and reuse from `persistence-model.xml`
           val dataMaybeGridMigrated =
             MigrationSupport.migrateDataWithFormMetadataMigrations(
-              appForm             = appForm,
-              data                = formData,
-              metadataRootElemOpt = metadataRootElem.some,
-              srcVersion          = inputDataFormat,
-              dstVersion          = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataRootElem.some),
-              pruneMetadata       = false
+              appForm              = appForm,
+              data                 = formData,
+              metadataRootElemOpt  = metadataRootElem.some,
+              srcVersion           = inputDataFormat,
+              dstVersion           = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataRootElem.some),
+              pruneMetadata        = false,
+              pruneTmpAttMetadata  = true
             )
 
           val dataMaybeGridMigratedOrOriginalRootElem =

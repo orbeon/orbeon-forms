@@ -157,9 +157,17 @@
                     <xxf:size ref="@size"/>
 
                     <!-- Clear annotation when the image is cleared -->
-                    <xf:setvalue event="xforms-value-changed"
-                                 if=". = ''"
-                                 ref="../annotation"/>
+                    <xf:action event="xforms-value-changed" if="xxf:is-blank(.)">
+                        <xf:setvalue ref="../annotation"/>
+                        <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
+                        <xf:delete
+                            ref="@fr:tmp-file"/>
+                    </xf:action>
+                    <xf:action event="xforms-upload-done">
+                        <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
+                        <xf:delete
+                            ref="@fr:tmp-file"/>
+                    </xf:action>
                 </xf:upload>
 
             </xf:group>

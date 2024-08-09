@@ -385,16 +385,17 @@
                         <xsl:for-each
                             select="
                                 $attachment-holders/(
-                                    self::*[@filename and normalize-space() != ''], (: single attachment    :)
-                                    _[@filename and normalize-space() != '']        (: multiple attachments :)
+                                    self::*[@filename and (p:non-blank(.) or p:non-blank(@fr:tmp-file))], (: single attachment    :)
+                                    _[@filename and (p:non-blank(.) or p:non-blank(@fr:tmp-file))]        (: multiple attachments :)
                                 )">
                             <!-- URL may be absolute or already point to persistence layer -->
+                            <!-- Use `@fr:tmp-file` first if present, see https://github.com/orbeon/orbeon-forms/issues/5768 -->
                             <part
                                 name="attachment-{position()}"
                                 content-type="{@mediatype}"
                                 content-disposition="attachment; filename=&quot;{@filename}&quot;"
                                 src="input:attachment-{position()}"
-                                fr:uri="{p:rewrite-service-uri(normalize-space(), true())}"/>
+                                fr:uri="{p:rewrite-service-uri(p:trim((@fr:tmp-file, .)[p:non-blank(.)]), true())}"/>
                         </xsl:for-each>
 
                     </body>

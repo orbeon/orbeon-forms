@@ -166,9 +166,19 @@ object SimplePath {
     def attTokens(attName: QName)  = attValue(attName).tokenizeToSet
     def attClasses = attTokens("class")
     def id = attValue("id")
-    def hasId = att("id").nonEmpty && attValue("id").trimAllToEmpty != ""
+    def hasId = att("id").nonEmpty && attValue("id").nonAllBlank
     def hasAtt(attName: String) = att(attName).nonEmpty
     def hasAtt(attName: QName) = att(attName).nonEmpty
+
+    def attOpt(attName: String): Option[NodeInfo] = /@(attName) match {
+      case Seq() => None
+      case s     => s.headOption
+    }
+
+    def attOpt(attName: QName): Option[NodeInfo] = /@(attName) match {
+      case Seq() => None
+      case s     => s.headOption
+    }
 
     def attValueOpt(attName: String) = /@(attName) match {
       case Seq() => None

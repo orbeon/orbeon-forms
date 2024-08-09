@@ -695,16 +695,21 @@
                                         </xsl:for-each>
 
                                         <!-- Set values (we choose to set all targets returned) -->
-                                        <xf:setvalue
+                                        <xf:action
                                             iterate="
                                                 frf:resolveTargetRelativeToActionSource(
                                                     xxf:get-request-attribute('fr-action-source'),
                                                     $control-name,
                                                     true(),
                                                     ()
-                                                )"
-                                            ref="."
-                                            value="$control-value"/>
+                                                )">
+                                            <xf:setvalue
+                                                ref="."
+                                                value="$control-value"/>
+                                            <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
+                                            <xf:delete
+                                                ref=".//@fr:tmp-file"/>
+                                        </xf:action>
                                     </xsl:when>
                                     <xsl:when test="p:has-class('fr-itemset-action')">
                                         <!-- Keep parameters but override implementation -->

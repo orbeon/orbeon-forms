@@ -787,6 +787,9 @@
                 <xf:setvalue
                     ref="."
                     value="$value"/>
+                <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
+                <xf:delete
+                    ref="@fr:tmp-file"/>
             </xf:action>
         </xf:action>
 
@@ -823,7 +826,9 @@
                 <xf:setvalue
                     iterate="(. | image)/(.[empty(*)] | @filename | @mediatype | @size | @label)"
                     ref="."/>
-
+                <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
+                <xf:delete
+                    ref=".//@fr:tmp-file"/>
             </xf:action>
         </xf:action>
 

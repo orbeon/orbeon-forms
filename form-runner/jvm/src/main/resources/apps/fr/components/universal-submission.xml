@@ -47,7 +47,8 @@
                        xxf:instance('fr-form-instance')/root(),
                        xxf:instance('fr-form-metadata')/root(),
                        event('data-format-version'),
-                       event('prune-metadata') = 'true'
+                       event('prune-metadata') = 'true',
+                       event('prune-tmp-att-metadata') = 'true'
                    )"
         replace="{event('replace')}"
         instance="fr-send-submission-response"

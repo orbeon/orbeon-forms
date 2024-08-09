@@ -170,7 +170,8 @@
                                $data/root(),
                                p:mutable-document($metadata-elem),
                                ($data-format-version-opt, '4.0.0')[1],
-                               ($prune-metadata-opt,      false())[1]
+                               ($prune-metadata-opt,      false())[1],
+                               true()
                            )"/>
                 </xsl:template>
             </xsl:stylesheet>

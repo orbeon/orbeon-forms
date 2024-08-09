@@ -43,7 +43,8 @@ object GridDataMigration {
         metadataRootElemOpt = metadataOpt.map(_.rootElement),
         srcVersion          = FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
         dstVersion          = dstDataFormatVersion,
-        pruneMetadata       = false
+        pruneMetadata       = false,
+        pruneTmpAttMetadata = true // no need to keep this when reading form the persistence
       ) getOrElse
         MigrationSupport.copyDocumentKeepInstanceData(data) // copy so we can handle `fr:data-format-version` below
 
@@ -52,7 +53,8 @@ object GridDataMigration {
     migratedOrDuplicatedData
   }
 
-  // NOTE: Exposed to some external users.
+  // 2024-08-08: Not used internally. However, this has been exposed to some external users as an XPath function for the
+  // `before-publish` process.
   //@XPathFunction
   def dataMaybeMigratedToDatabaseFormat(
     app         : String,
@@ -61,16 +63,18 @@ object GridDataMigration {
     metadataOpt : Option[DocumentNodeInfoType]
   ): DocumentNodeInfoType =
     MigrationSupport.migrateDataWithFormMetadataMigrations(
-      appForm             = AppForm(app, form),
-      data                = data,
-      metadataRootElemOpt = metadataOpt.map(_.rootElement),
-      srcVersion          = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataOpt.map(_.rootElement)),
-      dstVersion          = FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form)),
-      pruneMetadata       = false
+      appForm              = AppForm(app, form),
+      data                 = data,
+      metadataRootElemOpt  = metadataOpt.map(_.rootElement),
+      srcVersion           = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataOpt.map(_.rootElement)),
+      dstVersion           = FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form)),
+      pruneMetadata        = false,
+      pruneTmpAttMetadata  = true
     ) getOrElse
       data
 
-  // NOTE: Exposed to some external users.
+  // 2024-08-08: Can't find a trace of this being used internally or externally. But it seems that at some point we
+  // might have exposed it?
   //@XPathFunction
   def dataMaybeMigratedFromFormDefinition(
     data     : DocumentNodeInfoType,
@@ -95,7 +99,8 @@ object GridDataMigration {
     data                      : DocumentNodeInfoType,
     metadataOpt               : Option[DocumentNodeInfoType],
     dstDataFormatVersionString: String,
-    pruneMetadata             : Boolean
+    pruneMetadata             : Boolean,
+    pruneTmpAttMetadata       : Boolean
   ): DocumentNodeInfoType = {
 
     val appForm              = AppForm(app, form)
@@ -103,12 +108,13 @@ object GridDataMigration {
 
     val migratedOrDuplicatedData =
       MigrationSupport.migrateDataWithFormMetadataMigrations(
-        appForm             = appForm,
-        data                = data,
-        metadataRootElemOpt = metadataOpt.map(_.rootElement),
-        srcVersion          = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataOpt.map(_.rootElement)),
-        dstVersion          = dstDataFormatVersion,
-        pruneMetadata       = pruneMetadata
+        appForm              = appForm,
+        data                 = data,
+        metadataRootElemOpt  = metadataOpt.map(_.rootElement),
+        srcVersion           = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataOpt.map(_.rootElement)),
+        dstVersion           = dstDataFormatVersion,
+        pruneMetadata        = pruneMetadata,
+        pruneTmpAttMetadata  = pruneTmpAttMetadata
       ) getOrElse
         MigrationSupport.copyDocumentKeepInstanceData(data) // copy so we can handle `fr:data-format-version` below
 
@@ -132,14 +138,15 @@ object GridDataMigration {
 
     val migratedOrDuplicatedData =
       MigrationSupport.migrateDataWithFormMetadataMigrations(
-        appForm             = appForm,
-        data                = data,
-        metadataRootElemOpt = metadataOpt.map(_.rootElement),
-        srcVersion          = srcDataFormatVersionString.trimAllToOpt map
-                                DataFormatVersion.withNameIncludeEdge getOrElse
-                                DataFormatVersion.V400,
-        dstVersion          = dstDataFormatVersion,
-        pruneMetadata       = false
+        appForm              = appForm,
+        data                 = data,
+        metadataRootElemOpt  = metadataOpt.map(_.rootElement),
+        srcVersion           = srcDataFormatVersionString.trimAllToOpt map
+                                 DataFormatVersion.withNameIncludeEdge getOrElse
+                                 DataFormatVersion.V400,
+        dstVersion           = dstDataFormatVersion,
+        pruneMetadata        = false,
+        pruneTmpAttMetadata  = false //TODO: We need this for mode changes. It would be good to know if we are in a mode change and if not set this to `true`.
       ) getOrElse
         MigrationSupport.copyDocumentKeepInstanceData(data) // copy so we can handle `fr:data-format-version` below
 

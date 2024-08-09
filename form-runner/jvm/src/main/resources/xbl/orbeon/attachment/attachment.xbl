@@ -415,10 +415,14 @@
                                 <xf:delete
                                     if="$multiple"
                                     ref="."/>
-                                <xf:setvalue
-                                    if="not($multiple)"
-                                    iterate="., @filename, @mediatype, @size"
-                                    ref="."/>
+                                <xf:action if="not($multiple)">
+                                    <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
+                                    <xf:delete
+                                        ref="$binding/@fr:tmp-file"/>
+                                    <xf:setvalue
+                                        iterate="., @filename, @mediatype, @size"
+                                        ref="."/>
+                                </xf:action>
                             </xf:action>
                         </xf:trigger>
 
@@ -484,6 +488,9 @@
                                 <xf:setvalue
                                     ref="$binding"
                                     value="instance()"/>
+                                <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
+                                <xf:delete
+                                    ref="$binding/@fr:tmp-file"/>
                                 <xf:insert
                                     context="$binding"
                                     origin="instance()/@*"/>

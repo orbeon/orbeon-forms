@@ -109,9 +109,9 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     }
 
   def trySend(params: ActionParams): ActionResult =
-    ActionResult.trySync(trySendImpl(params))
+    ActionResult.trySync(trySendImpl(params, pruneTmpAttMetadata = true))
 
-  def trySendImpl(params: ActionParams): Option[XFormsSubmitDoneEvent] = {
+  def trySendImpl(params: ActionParams, pruneTmpAttMetadata: Boolean): Option[XFormsSubmitDoneEvent] = {
 
       ensureDataCalculationsAreUpToDate()
 
@@ -248,6 +248,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
                 metadataOpt                = frc.metadataInstance.map(_.root),
                 dstDataFormatVersionString = FormRunnerPersistence.providerDataFormatVersionOrThrow(formRunnerParams.appForm).entryName,
                 pruneMetadata              = evaluatedSendProperties.get(PruneMetadataName).flatten.contains(true.toString),
+                pruneTmpAttMetadata        = true
               )
 
             val basePath =
@@ -294,8 +295,11 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         multipartTmpFileUriOpt map { case (_, boundary) =>
           "mediatype" -> evaluatedSendProperties.get("mediatype").flatten.map(ct => s"$ct; boundary=$boundary")}
 
+      val keepTmpAttMetadataProperty =
+        "prune-tmp-att-metadata" -> Some(pruneTmpAttMetadata.toString)
+
       val evaluatedSendPropertiesWithUpdates =
-        evaluatedSendProperties + binaryContentUrlProperty ++ multipartContentTypePropertyOpt
+        evaluatedSendProperties + binaryContentUrlProperty ++ multipartContentTypePropertyOpt + keepTmpAttMetadataProperty
 
       debug(s"`send` action sending submission", evaluatedSendPropertiesWithUpdates.iterator collect { case (k, Some(v)) => k -> v } toList)
 
@@ -335,9 +339,10 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         Some(             Some(PruneMetadataName)      -> false.toString),
         Some(             Some("parameters")           -> s"$FormVersionParam $DataFormatVersionName"),
         formTargetOpt.map(Some(FormTargetName)         -> _),
-        Some(             Some("response-is-resource") -> responseIsResource.toString)
+        Some(             Some("response-is-resource") -> responseIsResource.toString),
+        Some(             Some("xxx is mode change") -> true.toString),
       )
-    trySendImpl(params.flatten.toMap)
+    trySendImpl(params.flatten.toMap, pruneTmpAttMetadata = false)
   }
 
   def tryNavigateToReview(params: ActionParams): ActionResult =

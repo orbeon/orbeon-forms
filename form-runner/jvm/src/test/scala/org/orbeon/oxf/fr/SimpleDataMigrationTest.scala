@@ -16,8 +16,8 @@ package org.orbeon.oxf.fr
 import cats.syntax.option._
 import org.orbeon.connection.StreamedContent
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
-import org.orbeon.oxf.fr.SimpleDataMigration.FormDiff
+import org.orbeon.oxf.fr.SimpleDataMigration.{DataMigrationBehavior, FormDiff}
+import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.importexport.FormDefinitionOps
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
 import org.orbeon.oxf.util.ContentTypes
@@ -699,5 +699,113 @@ class SimpleDataMigrationTest
 
       assert(Expected == diffs)
     }
+  }
+
+  describe("Pruning `fr:*` and `fr:tmp-file` metadata") {
+
+    val DataWithItemsetMetadata: NodeInfo =
+      <form>
+          <section-1>
+              <dropdown xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        fr:itemsetid="fr5e11ecff7012c5372e4f0ee5c89166a9b14d208b"/>
+              <attachment
+                    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                    filename="IMG_2686.jpg"
+                    mediatype="image/jpeg"
+                    size="364800"
+                    fr:tmp-file="file:/temp/xforms_upload_16369506248677280667.tmp?filename=IMG_2686.jpg&amp;mediatype=image%2Fjpeg&amp;size=364800&amp;mac=40d381a4b94af7be223a267dcf87213c8557869d6aa7e88598cafccdc9a68726"
+                >/fr/service/persistence/crud/issue/5768/data/d195439f3531e370d286d3de93335235c1c9952a/b5a8a249f0909b177d4170bd3afeaadd83e042f8.bin</attachment>
+          </section-1>
+          <fr:metadata xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+              <itemset id="fr5e11ecff7012c5372e4f0ee5c89166a9b14d208b">
+                  <choices>
+                      <item>
+                          <label>Chemistry</label>
+                          <value>for the discovery and synthesis of quantum dots</value>
+                      </item>
+                  </choices>
+              </itemset>
+          </fr:metadata>
+      </form>
+
+    val DataWithItemsetMetadataPruned: NodeInfo =
+      <form>
+          <section-1>
+              <dropdown/>
+              <attachment
+                    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                    filename="IMG_2686.jpg"
+                    mediatype="image/jpeg"
+                    size="364800"
+                    fr:tmp-file="file:/temp/xforms_upload_16369506248677280667.tmp?filename=IMG_2686.jpg&amp;mediatype=image%2Fjpeg&amp;size=364800&amp;mac=40d381a4b94af7be223a267dcf87213c8557869d6aa7e88598cafccdc9a68726"
+                >/fr/service/persistence/crud/issue/5768/data/d195439f3531e370d286d3de93335235c1c9952a/b5a8a249f0909b177d4170bd3afeaadd83e042f8.bin</attachment>
+          </section-1>
+      </form>
+
+    val DataWithTmpAttPruned: NodeInfo =
+      <form>
+          <section-1>
+              <dropdown xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        fr:itemsetid="fr5e11ecff7012c5372e4f0ee5c89166a9b14d208b"/>
+              <attachment
+                    filename="IMG_2686.jpg"
+                    mediatype="image/jpeg"
+                    size="364800"
+                >/fr/service/persistence/crud/issue/5768/data/d195439f3531e370d286d3de93335235c1c9952a/b5a8a249f0909b177d4170bd3afeaadd83e042f8.bin</attachment>
+          </section-1>
+          <fr:metadata xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+              <itemset id="fr5e11ecff7012c5372e4f0ee5c89166a9b14d208b">
+                  <choices>
+                      <item>
+                          <label>Chemistry</label>
+                          <value>for the discovery and synthesis of quantum dots</value>
+                      </item>
+                  </choices>
+              </itemset>
+          </fr:metadata>
+      </form>
+
+    val DataWithAllPruned: NodeInfo =
+      <form>
+          <section-1>
+              <dropdown/>
+              <attachment
+                    filename="IMG_2686.jpg"
+                    mediatype="image/jpeg"
+                    size="364800"
+                >/fr/service/persistence/crud/issue/5768/data/d195439f3531e370d286d3de93335235c1c9952a/b5a8a249f0909b177d4170bd3afeaadd83e042f8.bin</attachment>
+          </section-1>
+      </form>
+
+    val Expected = List(
+      (DataWithItemsetMetadata, None,                                false, false),
+      (DataWithItemsetMetadata, Some(DataWithTmpAttPruned),          false, true),
+      (DataWithItemsetMetadata, Some(DataWithItemsetMetadataPruned), true,  false),
+      (DataWithItemsetMetadata, Some(DataWithAllPruned),             true,  true),
+    )
+
+    for ((data, prunedDataOpt, pruneMetadata, pruneTmpAttMetadata) <- Expected)
+      it(s"must ${if (pruneMetadata) "prune" else "keep"} `fr:*` and ${if (pruneTmpAttMetadata) "prune" else "keep"} `fr:tmp-file`") {
+
+        val resultOpt =
+          MigrationSupport.migrateDataWithFormMetadataMigrations(
+            appForm             = AppForm("acme", "sales"),
+            data                = data.root,
+            metadataRootElemOpt = None,
+            srcVersion          = DataFormatVersion.V400,
+            dstVersion          = DataFormatVersion.V400,
+            pruneMetadata       = pruneMetadata,
+            pruneTmpAttMetadata = pruneTmpAttMetadata
+          )
+
+        assert(resultOpt.isDefined == prunedDataOpt.isDefined)
+
+        resultOpt.zip(prunedDataOpt).foreach { case (result, prunedData) =>
+          assertXMLDocumentsIgnoreNamespacesInScope(
+            left  = prunedData.root,
+            right = result
+          )
+        }
+      }
   }
 }

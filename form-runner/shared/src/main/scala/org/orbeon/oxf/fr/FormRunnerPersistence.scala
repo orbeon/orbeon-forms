@@ -156,6 +156,7 @@ object FormRunnerPersistence {
   val OrbeonDecryptHeader                 = "Orbeon-Decrypt"
   val OrbeonDecryptHeaderLower            = OrbeonDecryptHeader.toLowerCase
   val AttachmentEncryptedAttributeName    = QName("attachment-encrypted", XMLNames.FRNamespace)
+  val TmpFileAttributeName                = QName("tmp-file", XMLNames.FRNamespace)
   val ValueEncryptedAttributeName         = QName("value-encrypted"     , XMLNames.FRNamespace)
   val LagacyValueEncryptedAttributeName   = QName("encrypted")
   val AttachmentEncryptedAttribute        = NodeInfoFactory.attributeInfo(AttachmentEncryptedAttributeName, true.toString)
@@ -604,12 +605,13 @@ trait FormRunnerPersistence {
   //   - Q: What to do whe reading the attachment? Do we know for sure we need to decrypt it?
   //
   def updateAttachments(
-    data                          : DocumentNodeInfoType,
-    attachmentsWithEncryptedAtRest: List[AttachmentWithEncryptedAtRest],
+    data            : DocumentNodeInfoType,
+    savedAttachments: List[AttachmentWithEncryptedAtRest],
+    setTmpFileAtt   : Boolean
   ): Unit = {
 
     val urlsToAttachments =
-      attachmentsWithEncryptedAtRest.groupBy(_.fromPath)
+      savedAttachments.groupBy(_.fromPath)
 
     for {
       holder          <- data.descendantOrSelf(*).iterator // TODO: not efficient because we build a `Stream`/`LazyList` in the background!
@@ -618,7 +620,7 @@ trait FormRunnerPersistence {
       attachment :: _ <- urlsToAttachments.get(beforeURL) // ignore rest, see comment about duplicate `fromPath` above
     } locally {
       XFormsCrossPlatformSupport.mapSavedUri(attachment.fromPath, attachment.toPath)
-      updateHolder(holder, attachment)
+      updateHolder(holder, attachment, setTmpFileAtt)
     }
   }
 
@@ -911,7 +913,7 @@ trait FormRunnerPersistence {
 
     for {
       savedAttachments <- saveAllAttachmentsStream.compile.toList
-      _                = updateAttachments(preparedDataDocumentInfo, savedAttachments)
+      _                = updateAttachments(preparedDataDocumentInfo, savedAttachments, setTmpFileAtt = false) // works on a copy of the data
       cr               <- saveXmlDataIo(preparedData, putUrl, formVersion, credentials, workflowStage)
       cxr              <- IO.fromTry(ConnectionResult.trySuccessConnection(cr))
       versionOpt       = Headers.firstItemIgnoreCase(cxr.headers, OrbeonFormDefinitionVersion).map(_.toInt) // will throw if the version is not an integer
@@ -936,7 +938,7 @@ trait FormRunnerPersistence {
     // - https://github.com/orbeon/orbeon-forms/issues/3301
   }
 
-  private def updateHolder(holder: NodeInfo, attachment: AttachmentWithEncryptedAtRest): Unit = {
+  private def updateHolder(holder: NodeInfo, attachment: AttachmentWithEncryptedAtRest, setTmpFileAtt: Boolean): Unit = {
     setvalue(holder, attachment.toPath)
     XFormsAPI.delete(holder /@ AttachmentEncryptedAttributeName)
     if (attachment.isEncryptedAtRest)
@@ -944,6 +946,12 @@ trait FormRunnerPersistence {
         into   = holder,
         origin = AttachmentEncryptedAttribute
       )
+    if (setTmpFileAtt) {
+      XFormsAPI.insert(
+        into   = holder,
+        origin = NodeInfoFactory.attributeInfo(TmpFileAttributeName, attachment.fromPath)
+      )
+    }
   }
 
   def userOwnsLeaseOrNoneRequired: Boolean =

@@ -86,7 +86,7 @@ trait FormRunnerPublish {
     implicit val xfcd                    : XFormsContainingDocument                           = inScopeContainingDocument
     implicit val indentedLogger          : IndentedLogger                                     = xfcd.getIndentedLogger("form-builder")
 
-    val (attachmentWithEncryptedAtRest, publishedVersion, stringOpt) = {
+    val (savedAttachments, publishedVersion, stringOpt) = {
       Await.result(
         putWithAttachments(
           liveData          = xhtml.root,
@@ -107,14 +107,14 @@ trait FormRunnerPublish {
     }
 
     // Update, in this thread, the attachment paths
-    updateAttachments(xhtml.root, attachmentWithEncryptedAtRest)
+    updateAttachments(xhtml.root, savedAttachments, setTmpFileAtt = false)
 
     // Update the response instance, optionally used by the publish dialog
     setCreateUpdateResponse(stringOpt.getOrElse(""))
 
     MapFunctions.createValue(
       Map[AtomicValue, ValueRepresentation](
-        (SaxonUtils.fixStringValue("published-attachments"), attachmentWithEncryptedAtRest.size),
+        (SaxonUtils.fixStringValue("published-attachments"), savedAttachments.size),
         (SaxonUtils.fixStringValue("published-version"),     publishedVersion.getOrElse(1): Int)
       )
     )

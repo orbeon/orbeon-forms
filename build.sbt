@@ -73,7 +73,7 @@ val TinkVersion                   = "1.6.1"
 val GsonVersionForTink            = "2.9.0"
 val ProtobufJavaVersionForTink    = "3.19.6"
 val JavaMailApiVersion            = "2.1.3"
-val JavaMailVersion               = "2.0.1"
+val AngusMailVersion              = "2.0.3"
 val JavaActivationVersion         = "2.0.1"
 val AntVersion                    = "1.10.11"
 val ThumbnailatorVersion          = "0.4.16"
@@ -110,7 +110,7 @@ val CoreLibraryDependencies = Seq(
   "commons-pool"                % "commons-pool"                    % "1.6",
   "org.apache.ant"              % "ant"                             % AntVersion,
   "jakarta.mail"                % "jakarta.mail-api"                % JavaMailApiVersion,
-  "com.sun.mail"                % "jakarta.mail"                    % JavaMailVersion exclude("javax.activation", "activation"), // check
+  "org.eclipse.angus"           % "angus-mail"                      % AngusMailVersion,
   "com.sun.activation"          % "jakarta.activation"              % JavaActivationVersion,
   "org.apache.httpcomponents"   % "httpclient"                      % HttpComponentsVersion,
   "javax.enterprise.concurrent" % "javax.enterprise.concurrent-api" % "1.1",

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.io.FileUtils
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
@@ -34,7 +35,9 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.helpers.AttributesImpl
 
+import java.net.URI
 import scala.jdk.CollectionConverters._
+import scala.util.Try
 import scala.util.control.NonFatal
 
 
@@ -100,8 +103,10 @@ class XFormsOutputControl(
       .collect { case elem: om.NodeInfo if elem.isElement => elem.attOpt("tmp-file") }
       .flatten
 
-  private def findTmpFile: Option[String] =
-    findTmpFileAtt.flatMap(_.stringValue.trimAllToOpt)
+  private def findTmpFileValue: Option[String] =
+    findTmpFileAtt
+      .flatMap(_.stringValue.trimAllToOpt)
+      .filter(XFormsOutputControl.isTemporaryFileUri)
 
   override def evaluateExternalValue(collector: ErrorEventCollector): Unit = {
     assert(isRelevant)
@@ -109,13 +114,18 @@ class XFormsOutputControl(
     val internalValue = getValue(collector)
     assert(internalValue ne null)
 
+    def internalValueMaybeFromTmpFile: String =
+      if (internalValue.isAllBlank) // don't try to use `@*:tmp-file` if main value is blank (just a sanity check)
+        internalValue
+      else
+        findTmpFileValue.getOrElse(internalValue) // use `@*:tmp-file` if present and points to a temporary file
+
     val updatedValue =
       if (staticControlOpt exists (c => c.isDownloadAppearance || c.isVideoMediatype)) {
-        proxyValueIfNeeded(findTmpFile.getOrElse(internalValue), "", filename(collector), fileMediatype(collector) orElse mediatype, collector)
+        proxyValueIfNeeded(internalValueMaybeFromTmpFile, "", filename(collector), fileMediatype(collector) orElse mediatype, collector)
       } else if (staticControlOpt exists (_.isImageMediatype)) {
         // Use dummy image as default value so that client always has something to load
-        // Use `*:tmp-file` if present
-        proxyValueIfNeeded(findTmpFile.getOrElse(internalValue), DUMMY_IMAGE_URI, filename(collector), fileMediatype(collector) orElse mediatype, collector)
+        proxyValueIfNeeded(internalValueMaybeFromTmpFile, DUMMY_IMAGE_URI, filename(collector), fileMediatype(collector) orElse mediatype, collector)
       } else if (staticControlOpt exists (_.isHtmlMediatype)) {
         internalValue
       } else {
@@ -324,6 +334,9 @@ class XFormsOutputControl(
 }
 
 object XFormsOutputControl {
+
+  def isTemporaryFileUri(uri: String): Boolean =
+    Try(URI.create(uri)).toOption.exists(FileUtils.isTemporaryFileUri)
 
   def getExternalValueOrDefault(
     control       : XFormsOutputControl,

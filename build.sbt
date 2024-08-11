@@ -63,7 +63,7 @@ val PPrintVersion                 = "0.9.0"
 // Java libraries
 val SaxonJvmVersion               = "9.1.0.8.3"
 val JUnitInterfaceVersion         = "0.13.3"
-val Slf4jVersion                  = "2.0.13"
+val Slf4jVersion                  = "2.0.16"
 val HttpComponentsVersion         = "4.5.14"
 val Log4j2Version                 = "2.23.1"
 val CommonsIoVersion              = "2.15.1"

@@ -6,17 +6,20 @@ VERSION=${1:-'2023.1.3-pe'}
 TAG=${2:-'tag-release-2023.1.3-pe-pseudo'}
 FILE=${3:-'orbeon-2023.1.3.202406131619-PE.zip'}
 SQL_FILE=${4:-'2023.1/postgresql-2023_1.sql'}
-DEMO_FORMS_LICENSE_FILE=${5:-"$HOME/.orbeon/license.xml"}
-DEMO_FORMS_POSTGRES_NETWORK=${6:-'demo_forms_network'}
-DEMO_FORMS_ORBEON_FORMS_PORT=${7:-'18080'}
+PLATFORMS=${5:-'linux/amd64,linux/arm64'}
+DEMO_FORMS_LICENSE_FILE=${6:-"$HOME/.orbeon/license.xml"}
+DEMO_FORMS_POSTGRES_NETWORK=${7:-'demo_forms_network'}
+DEMO_FORMS_ORBEON_FORMS_PORT=${8:-'18080'}
 
 echo "Version: $VERSION"
 echo "Tag: $TAG"
 echo "File: $FILE"
 echo "SQL file: $SQL_FILE"
+echo "Platforms: $PLATFORMS"
 echo "Demo forms license file: $DEMO_FORMS_LICENSE_FILE"
 echo "Demo forms PostgreSQL network: $DEMO_FORMS_POSTGRES_NETWORK"
 echo "Demo forms Orbeon Forms port: $DEMO_FORMS_ORBEON_FORMS_PORT"
+echo
 
 # SQL script import order is defined by lexicographical order (hence 01-, 02-, etc.)
 SQL_SCHEMA_FILE='01-orbeon-postgresql-schema.sql'
@@ -35,6 +38,12 @@ DEMO_FORMS_ORBEON_FORMS_CONTAINER='orbeon-orbeon-forms-demo-forms'
 main() {
   trap cleanup EXIT
 
+  # This script needs the 'Use containerd for pulling and storing images' option enabled in Docker Desktop
+  if ! docker info 2>/dev/null | grep -q "driver-type: io.containerd"; then
+      echo "This script needs the 'Use containerd for pulling and storing images' option enabled in Docker Desktop"
+      exit 1
+  fi
+
   # Copy the SQL file in the current directory, as COPY in Dockerfile doesn't support accessing files outside the build
   # context (i.e. the ".." below is problematic)
   cp "../form-runner/jvm/src/main/resources/apps/fr/persistence/relational/ddl/$SQL_FILE" "$SQL_SCHEMA_FILE"
@@ -44,17 +53,17 @@ main() {
   fi
 
   # Build Orbeon Forms image (base image)
-  docker build -f Dockerfile.orbeon_forms --build-arg tag="$TAG" --build-arg file="$FILE" -t "$ORBEON_FORMS_BASE_IMAGE" .
+  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms --build-arg tag="$TAG" --build-arg file="$FILE" -t "$ORBEON_FORMS_BASE_IMAGE" .
 
   # Build Orbeon Forms image (including PostgreSQL JDBC driver)
-  docker build -f Dockerfile.orbeon_forms.postgres --build-arg base_image="$ORBEON_FORMS_BASE_IMAGE" -t "$ORBEON_FORMS_IMAGE" .
+  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.postgres --build-arg base_image="$ORBEON_FORMS_BASE_IMAGE" -t "$ORBEON_FORMS_IMAGE" .
 
   # Do not import demo forms into PostgreSQL, just use SQLite
   ## Import demo forms into PostgreSQL database and export them to SQL script
   #create_demo_forms_sql_script
 
   # Build PostgreSQL image with demo forms data (as local SQL file)
-  docker build -f Dockerfile.postgres -t "$POSTGRES_IMAGE" .
+  docker build --platform="$PLATFORMS" -f Dockerfile.postgres -t "$POSTGRES_IMAGE" .
 
   if $publish; then
     docker push "$ORBEON_FORMS_IMAGE"

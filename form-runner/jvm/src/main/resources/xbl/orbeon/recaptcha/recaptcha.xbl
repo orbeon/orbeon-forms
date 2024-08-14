@@ -11,19 +11,16 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
-         xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <xbl:binding id="fr-recaptcha" element="fr|recaptcha" xxbl:mode="binding lhha">
         <xbl:handlers>
@@ -84,8 +81,7 @@
                 <xsl:template match="/*">
                     <xf:group id="component-inner-group">
 
-                        <!-- Init event -->
-                        <xf:action id="xf-en" ev:event="xforms-enabled">
+                        <xf:action event="xxforms-visible" phase="target">
                             <!-- Copy public keys to local model -->
                             <xf:setvalue
                                 ref="$conf/v2/public-key"
@@ -106,7 +102,11 @@
                                         <xsl:attribute name="value">
                                             let $privateKeyV2NoPrefix := fr:component-param-value('private-key'),
                                                 $privateKeyV2Prefix   := fr:component-param-value('v2.private-key')
-                                            return if (empty($privateKeyV2Prefix)) then $privateKeyV2NoPrefix else $privateKeyV2Prefix
+                                            return
+                                                if (empty($privateKeyV2Prefix)) then
+                                                    $privateKeyV2NoPrefix
+                                                else
+                                                    $privateKeyV2Prefix
                                         </xsl:attribute>
                                     </xsl:otherwise>
                                 </xsl:choose>
@@ -122,7 +122,7 @@
                                 "/>
 
                             <!-- Version selection -->
-                            <xf:setvalue ref="$version" value="if ($conf/v3/public-key = '') then '2' else '3'"/>
+                            <xf:setvalue ref="$version" value="if (xxf:non-blank($conf/v3/public-key)) then '2' else '3'"/>
 
                             <!-- Script loading and initialization -->
                             <xf:action type="javascript">
@@ -135,7 +135,7 @@
                             </xf:action>
                         </xf:action>
 
-                        <xf:action ev:event="fr-verify">
+                        <xf:action event="fr-verify" phase="target">
                             <!-- In v2, directly check if the response (if any) is valid -->
                             <xf:dispatch if="$version = '2'" targetid="fr-recaptcha" name="fr-check-response"/>
 
@@ -151,8 +151,8 @@
                             </xf:action>
                         </xf:action>
 
-                        <xf:action ev:event="fr-check-response">
-                            <xf:var name="did-enter-value" value="response != ''"/>
+                        <xf:action event="fr-check-response" phase="target">
+                            <xf:var name="did-enter-value" value="xxf:non-blank(response)"/>
 
                             <!-- No user value entered by the user: just dispatch an error -->
                             <xf:action if="not($did-enter-value)">
@@ -200,21 +200,20 @@
                             </xf:action>
                         </xf:action>
 
-                        <!-- Provides access the reCAPTCHA response exposed by the JavaScript API
+                        <!-- Provides access to the reCAPTCHA response exposed by the JavaScript API
                              http://code.google.com/apis/recaptcha/docs/display.html#recaptcha_methods -->
                         <xf:input ref="response" class="xbl-fr-recaptcha-response xforms-hidden">
                             <!-- In v3, it's the response being received that will trigger the response verification -->
-                            <xf:action ev:event="xforms-value-changed" if=". != '' and $version = '3'">
+                            <xf:action event="xforms-value-changed" if="xxf:non-blank(.) and $version = '3'">
                                 <xf:dispatch targetid="fr-recaptcha" name="fr-check-response"/>
                             </xf:action>
                         </xf:input>
 
                         <!-- Div in which the reCAPTCHA v2 is rendered -->
-                        <xh:div id="recaptcha-div" class="{{'xbl-fr-recaptcha-div', 'xforms-disabled'[$version != '2']}}"/>
+                        <xh:div id="recaptcha-div" class="xbl-fr-recaptcha-div{{' xforms-disabled'[$version != '2']}}"/>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>
         </xbl:template>
     </xbl:binding>
-
 </xbl:xbl>

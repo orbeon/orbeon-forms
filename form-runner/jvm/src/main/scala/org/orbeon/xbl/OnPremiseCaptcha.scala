@@ -17,9 +17,11 @@ object OnPremiseCaptcha {
     new DefaultKaptcha().kestrel(_.setConfig(new Config(props)))
   }
 
+  //@XPathFunction
   def answer(): String =
     kaptcha.createText()
 
+  //@XPathFunction
   def image(text: String): String = {
     val image: BufferedImage = kaptcha.createImage(text)
     val os = new ByteArrayOutputStream

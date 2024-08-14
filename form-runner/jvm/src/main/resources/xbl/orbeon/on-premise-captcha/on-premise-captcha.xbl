@@ -11,15 +11,15 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:OnPremiseCaptcha="java:org.orbeon.xbl.OnPremiseCaptcha">
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:OnPremiseCaptcha="java:org.orbeon.xbl.OnPremiseCaptcha">
 
     <xbl:binding id="fr-on-premise-captcha" element="fr|on-premise-captcha" xxbl:mode="binding lhha">
         <xbl:resources>
@@ -59,11 +59,11 @@
         </xbl:implementation>
         <xbl:template>
             <xf:group id="component-inner-group" appearance="xxf:internal">
-                <xf:action ev:event="xforms-enabled">
+                <xf:action event="xxforms-visible" phase="target">
                     <xf:setvalue ref="instance()/expected-answer" value="OnPremiseCaptcha:answer()"/>
                     <xf:setvalue ref="instance()/image"           value="OnPremiseCaptcha:image(instance()/expected-answer)"/>
                 </xf:action>
-                <xf:action ev:event="fr-verify xforms-value-changed">
+                <xf:action event="fr-verify xforms-value-changed">
                     <xf:var      name="correct"     value="instance()/user-answer = instance()/expected-answer"/>
                     <xf:dispatch if="not($correct)" name="fr-verify-error" targetid="fr-on-premise-captcha"/>
                     <xf:dispatch if="$correct"      name="fr-verify-done"  targetid="fr-on-premise-captcha"/>

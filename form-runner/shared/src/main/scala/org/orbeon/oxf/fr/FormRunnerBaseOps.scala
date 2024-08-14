@@ -457,7 +457,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
           case ""                                   => Array.empty
           case "reCAPTCHA"                          => Array(XMLNames.FR, "fr:recaptcha")
           case "SimpleCaptcha" | "OnPremiseCaptcha" => Array(XMLNames.FR, "fr:on-premise-captcha")
-          case captchaName        =>
+          case captchaName  =>
             captchaName.splitTo[List](":") match {
               case List(prefix, _) =>
                 captchaProperty.namespaces.get(prefix) match {

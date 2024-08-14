@@ -435,8 +435,11 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
       (_.stringValue)
 
   // Captcha support
+  // 2024-08-14: I don't see any XPath uses.
   //@XPathFunction
   def captchaPassed: Boolean = persistenceInstance.rootElement / "captcha" === "true"
+
+  // 2024-08-14: I don't see any XPath uses.
   //@XPathFunction
   def showCaptcha: Boolean = isNewOrEditMode(FormRunnerParams().mode) && ! captchaPassed
 

@@ -69,6 +69,7 @@ trait FormRunnerActionsCommon {
     "collapse-all"           -> tryCollapseSections,
     "result-dialog"          -> tryShowResultDialog,
     "captcha"                -> tryCaptcha,
+    "captcha-reset"          -> tryCaptchaReset,
     "set-data-status"        -> trySetDataStatus,
     "set-workflow-stage"     -> trySetWorkflowStage,
     "wizard-update-validity" -> tryUpdateCurrentWizardPageValidity,
@@ -341,6 +342,12 @@ trait FormRunnerActionsCommon {
         dispatch(name = "fr-verify", targetId = "fr-captcha")
         dispatch(name = "fr-verify", targetId = "fr-view-component")
       }
+    }
+
+  def tryCaptchaReset(params: ActionParams): ActionResult =
+    ActionResult.trySync {
+      dispatch(name = "fr-reload", targetId = "fr-captcha")
+      dispatch(name = "fr-reload", targetId = "fr-view-component")
     }
 
   private val StateParams = List[(String, (() => String, String => Boolean))](

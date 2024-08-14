@@ -50,41 +50,40 @@ object Recaptcha {
       }
     }
 
+    // 2024-08-14: I don't see any uses.
     //@JSExport
     def execute(publicKeyV3: String): Unit =
-      grecaptcha.execute(publicKeyV3, js.Dictionary("action"  -> "submit")).`then`(successfulResponse)
+      findGrecaptcha.foreach(_.execute(publicKeyV3, js.Dictionary("action"  -> "submit")).`then`(successfulResponse))
 
     //@JSExport
     def reset(): Unit =
-      grecaptcha.reset()
+      findGrecaptcha.foreach(_.reset())
 
-    private def grecaptcha: js.Dynamic = window.asInstanceOf[js.Dynamic].grecaptcha
+    private def findGrecaptcha: Option[js.Dynamic] = {
+      val grecaptcha = window.asInstanceOf[js.Dynamic].grecaptcha
+      ! js.isUndefined(grecaptcha) && ! js.isUndefined(grecaptcha.render) option grecaptcha
+    }
 
     private val successfulResponse: js.Function1[String, Unit] = (response: String) => {
       val responseControlEffectiveId = containerElem.querySelector(".xbl-fr-recaptcha-response").id
       DocumentAPI.setValue(responseControlEffectiveId, response)
     }
 
-    private def renderRecaptcha(publicKey: String, theme: String): Unit = {
-
-      val reCaptchaNotFullyLoaded =
-        js.isUndefined(grecaptcha)        ||
-        js.isUndefined(grecaptcha.render)
-
-      if (reCaptchaNotFullyLoaded) {
-        val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
-        js.timers.setTimeout(shortDelay)(renderRecaptcha(publicKey, theme))
-      } else {
-        grecaptcha.render(
-          containerElem.querySelector(".xbl-fr-recaptcha-div"),
-          // TODO: facade
-          js.Dictionary(
-            "sitekey"  -> publicKey,
-            "theme"    -> theme,
-            "callback" -> successfulResponse
+    private def renderRecaptcha(publicKey: String, theme: String): Unit =
+      findGrecaptcha match {
+        case None =>
+          val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
+          js.timers.setTimeout(shortDelay)(renderRecaptcha(publicKey, theme))
+        case Some(grecaptcha) =>
+          grecaptcha.render(
+            containerElem.querySelector(".xbl-fr-recaptcha-div"),
+            // TODO: facade
+            js.Dictionary(
+              "sitekey"  -> publicKey,
+              "theme"    -> theme,
+              "callback" -> successfulResponse
+            )
           )
-        )
       }
-    }
   }
 }

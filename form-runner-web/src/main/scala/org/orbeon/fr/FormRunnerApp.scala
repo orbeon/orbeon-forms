@@ -73,6 +73,7 @@ object FormRunnerApp extends App {
     xbl.TinyMCE
     xbl.AttachmentMultiple
     xbl.Recaptcha
+    xbl.FriendlyCaptcha
     xbl.ClipboardCopy
     xbl.Trigger
 

@@ -228,7 +228,8 @@
         fr:owns-lease-or-none-required() and fr:is-wizard-separate-toc() and fr:is-wizard-body-shown()
     </property>
 
-    <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->
+    <!-- Empty (no captcha), 'reCAPTCHA' | 'SimpleCaptcha' | `fr:friendly-captcha` | QName -->
+    <property as="xs:string"  name="oxf.fr.detail.captcha.component.*.*"                           value=""/>
     <property as="xs:string"  name="oxf.fr.detail.captcha.visible.*.*"                             value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.captcha.location.*.*"                            value="form-bottom"/>
 

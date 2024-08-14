@@ -199,6 +199,11 @@
         year-from-date(current-date())
     </property>
 
+    <property
+        as="xs:string"
+        name="oxf.xforms.xbl.fr.friendly-captcha.script-url"
+        value="https://cdn.jsdelivr.net/npm/friendly-challenge@0.9.16/widget.min.js"/>
+
     <property as="xs:string"  name="oxf.xforms.xbl.library">
         fr:grid-single
         fr:grid-multiple

@@ -1,0 +1,164 @@
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-friendly-captcha"
+        element="fr|friendly-captcha"
+        xxbl:mode="binding lhha">
+
+        <xbl:handlers>
+            <xbl:handler event="fr-verify" phase="target">
+                <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
+            </xbl:handler>
+            <xbl:handler event="fr-reload" phase="target">
+                <xf:setvalue ref="solution"/>
+                <xf:action type="javascript" >
+                    var i = ORBEON.xforms.XBL.instanceForControl(this);
+                    if (i) i.reset();
+                </xf:action>
+            </xbl:handler>
+            <xbl:handler event="fr-check-response" phase="target">
+                <xf:dispatch name="fr-check-response" targetid="component-inner-group"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model id="friendly-captcha-model">
+                <xf:instance id="verify-request">
+                    <_>
+                        <solution/>
+                        <secret/>
+                        <sitekey/> <!-- optional: "sitekey that you want to make sure the puzzle was generated from" -->
+                    </_>
+                </xf:instance>
+                <xf:instance id="verify-response">
+                    <_/>
+                    <!-- Example response:
+                    <json type="object">
+                        <success/>
+                        <errors>
+                            <_>secret_missing</_>
+                        </errors>
+                    </json>
+                  -->
+                </xf:instance>
+                <xf:instance id="conf">
+                    <_>
+                        <public-key/>
+                        <private-key/>
+                    </_>
+                </xf:instance>
+                <xf:var name="conf" value="instance('conf')"/>
+                <xf:submission
+                    id="verify-submission"
+                    resource="https://api.friendlycaptcha.com/api/v1/siteverify"
+                    ref="instance('verify-request')"
+                    method="post"
+                    serialization="application/x-www-form-urlencoded"
+                    replace="instance"
+                    targetref="instance('verify-response')"/>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:group id="component-inner-group">
+
+                <xf:action event="xxforms-visible" phase="target">
+
+                    <!-- Copy public key to local model -->
+                    <xf:setvalue
+                        ref="$conf/public-key"
+                        value="fr:component-param-value('public-key')"/>
+
+                    <!-- Copy private key to local model -->
+                    <xf:setvalue
+                        ref="$conf/private-key"
+                        value="fr:component-param-value('private-key')"/>
+
+                    <!-- Script loading and initialization -->
+                    <xf:action type="javascript">
+                        <xf:param name="publicKey" value="$conf/public-key"/>
+                        <xf:param name="scriptUrl" value="fr:component-param-value('script-url')"/>
+                        <xf:body>
+                            ORBEON.xforms.XBL.instanceForControl(this).render(publicKey, scriptUrl);
+                        </xf:body>
+                    </xf:action>
+                </xf:action>
+
+                <xf:action event="xxforms-hidden" phase="target">
+                    <xf:action type="javascript">
+                        <xf:body>
+                            var i = ORBEON.xforms.XBL.instanceForControl(this);
+                            if (i) i.destroy();
+                        </xf:body>
+                    </xf:action>
+                </xf:action>
+
+                <xf:action event="fr-verify" phase="target">
+                    <xf:dispatch
+                        targetid="fr-friendly-captcha"
+                        name="fr-check-response"/>
+                </xf:action>
+
+                <xf:action event="fr-check-response" phase="target">
+                    <xf:var name="did-enter-value" value="xxf:non-blank(solution)"/>
+
+                    <!-- No user value entered by the user: just dispatch an error -->
+                    <xf:action if="not($did-enter-value)">
+                        <xf:dispatch targetid="fr-friendly-captcha" name="fr-verify-error">
+                            <xf:property name="fr-error-code" value="'empty'"/>
+                        </xf:dispatch>
+                    </xf:action>
+
+                    <!-- User value entered by the user: do verification -->
+                    <xf:action if="$did-enter-value">
+                        <xf:setvalue ref="instance('verify-request')/secret" value="$conf/private-key"/>
+                        <!-- Call API doing the verification -->
+                        <xf:send submission="verify-submission"/>
+                        <!-- Reset response, so the next time they are changed we only run the verification when both new values are updated -->
+                        <xf:setvalue ref="solution"/>
+                        <!-- Parse the response -->
+                        <xf:var
+                            name="is-success"
+                            value="instance('verify-response')/success = 'true'"/>
+                        <!-- Dispatch failure event -->
+                        <xf:dispatch if="not($is-success)" targetid="fr-friendly-captcha" name="fr-verify-error"/>
+                        <!-- Dispatch success event -->
+                        <!-- NOTE: With Form Runner this hides the component, so make sure this is done last.
+                             Ideally, we would manage to dispatch the event as the last operation of the whole
+                             action. There doesn't seem to be an elegant way to do this with XForms actions.
+                             See https://github.com/orbeon/orbeon-forms/issues/1627 -->
+                        <xf:dispatch if="$is-success" targetid="fr-friendly-captcha" name="fr-verify-done"/>
+
+                        <!-- Resume the process if needed -->
+                        <xf:action if="xxf:instance('fr-persistence-instance')/captcha-suspend = 'true'">
+                            <!-- If validating again later, prevent the process from being suspended if the captcha is not invoked  -->
+                            <xf:setvalue ref="xxf:instance('fr-persistence-instance')/captcha-suspend"/>
+                            <!-- Resume the process (i.e. data validation/submission) -->
+                            <xf:action type="xpath">fr:run-process('oxf.fr.detail.process', 'resume')</xf:action>
+                        </xf:action>
+                    </xf:action>
+                </xf:action>
+
+                <!-- Provides access the friendly-captcha response exposed by the JavaScript API -->
+                <xf:input ref="solution" class="xbl-fr-friendly-captcha-response xforms-hidden">
+                    <xf:action event="xforms-value-changed" if="xxf:non-blank(.)">
+                        <xf:dispatch targetid="fr-friendly-captcha" name="fr-check-response"/>
+                    </xf:action>
+                </xf:input>
+
+                <!-- Div in which the friendly-captcha is rendered -->
+                <!-- Add `data-sitekey` even though we pass it through the API, as I have noticed if you tab
+                     through the component occasionally you can get the error "FriendlyCaptcha: sitekey not set
+                     on frc-captcha element" -->
+                <xh:div class="xbl-fr-friendly-captcha-div frc-captcha" data-sitekey="{$conf/public-key}"/>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

@@ -22,10 +22,13 @@ object PersistenceApi extends PersistenceApiTrait {
 
   // Unlike other functions in `PersistenceApiTrait`, this calls `PersistenceProxyProcessor` directly.
   def getFormMetadata(
-    app            : Option[String],
-    form           : Option[String],
-    incomingHeaders: ju.Map[String, Array[String]],
-    allVersions    : Boolean)(implicit
+    app                   : Option[String],
+    form                  : Option[String],
+    incomingHeaders       : ju.Map[String, Array[String]],
+    allVersions           : Boolean,
+    allForms              : Boolean,
+    ignoreAdminPermissions: Boolean
+  )(implicit
     logger         : IndentedLogger
   ): Iterator[MetadataDetails] = {
 
@@ -34,8 +37,9 @@ object PersistenceApi extends PersistenceApiTrait {
     val formMetadataDocElem =
       PersistenceProxyProcessor.callPublishedFormsMetadata(
         makeOutgoingRequest(HttpMethod.GET, incomingHeaders, List(
-          "all-forms"    -> "false",
-          "all-versions" -> allVersions.toString,
+          "all-forms"                -> allForms.toString,
+          "all-versions"             -> allVersions.toString,
+          "ignore-admin-permissions" -> ignoreAdminPermissions.toString,
         )),
         app        = app,
         form       = form

@@ -56,7 +56,7 @@
                     value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
 
                 <xf:action if="$is-admin and not($has-any-matching-roles)" type="xpath">
-                    frf:sendError(503)
+                    frf:sendError(403)
                 </xf:action>
 
                 <xf:var

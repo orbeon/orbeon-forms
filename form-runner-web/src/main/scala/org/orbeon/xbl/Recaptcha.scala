@@ -50,7 +50,6 @@ object Recaptcha {
       }
     }
 
-    // 2024-08-14: I don't see any uses.
     //@JSExport
     def execute(publicKeyV3: String): Unit =
       findGrecaptcha.foreach(_.execute(publicKeyV3, js.Dictionary("action"  -> "submit")).`then`(successfulResponse))

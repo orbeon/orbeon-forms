@@ -45,7 +45,6 @@ class DeferredActionContext(container: XBLContainer) {
   private var _flaggedInstances = Set.empty[String]
   def flaggedInstances: Set[String] = _flaggedInstances
 
-  def markRebuild(): Unit = _rebuild = true
   def resetRebuild(): Unit = _rebuild = false
 
   def markRecalculateRevalidate(defaultsStrategy: DefaultsStrategy, instanceIdOpt: Option[String]): Unit = {
@@ -63,10 +62,8 @@ class DeferredActionContext(container: XBLContainer) {
   }
 
   def markStructuralChange(defaultsStrategy: DefaultsStrategy, instanceIdOpt: Option[String]): Unit = {
-    // "XForms Actions that change the tree structure of instance data result in setting all four deferred update
-    // flags to true for the model over which they operate"
 
-    markRebuild()
+    _rebuild = true
     markRecalculateRevalidate(defaultsStrategy, instanceIdOpt)
 
     container.requireRefresh()

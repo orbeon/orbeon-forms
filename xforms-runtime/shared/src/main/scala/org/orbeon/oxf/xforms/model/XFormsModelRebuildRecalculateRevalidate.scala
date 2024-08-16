@@ -67,15 +67,22 @@ trait XFormsModelRebuildRecalculateRevalidate {
         }
         bindsIfInstance match {
           case Some(binds) =>
-            // NOTE: `contextStack.resetBindingContext(this)` called in `evaluateVariables()`
-            binds.rebuild()
-            // Controls may have @bind or bind() references, so we need to mark them as dirty. Will need dependencies for
-            // controls to fix this.
-            // TODO: Handle XPathDependencies
-            container.requireRefresh()
+            try {
+              // NOTE: `contextStack.resetBindingContext(this)` called in `evaluateVariables()`
+              binds.rebuild()
+              // Controls may have @bind or bind() references, so we need to mark them as dirty. Will need dependencies for
+              // controls to fix this.
+              // TODO: Handle XPathDependencies
+            } finally {
+              // In case of fatal error above, we still set the appropriate flags to avoid serious state inconsistencies
+              // https://github.com/orbeon/orbeon-forms/issues/6442
+              deferredActionContext.markRecalculateRevalidate(deferredActionContext.defaultsStrategy, None)
+              container.requireRefresh()
+            }
           case None =>
         }
       } finally {
+        // In case of fatal error above, we still set the appropriate flags to avoid serious state inconsistencies
         deferredActionContext.resetRebuild()
       }
       containingDocument.xpathDependencies.rebuildDone(selfModel)

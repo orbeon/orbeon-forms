@@ -29,7 +29,7 @@ trait RRRFunctions {
 }
 
 trait XFormsRebuildFunctions extends RRRFunctions {
-  def setFlag(model: XFormsModel, applyDefaults: Boolean): Unit = model.deferredActionContext.markRebuild()
+  def setFlag(model: XFormsModel, applyDefaults: Boolean): Unit = model.deferredActionContext.markStructuralChange(NoDefaultsStrategy, None)
   def createEvent(model: XFormsModel) = new XFormsRebuildEvent(model)
 }
 

@@ -64,8 +64,8 @@ class DefaultsTest
 
           def assertStringValues(i: Int) = {
             val values = stringValues
-            assert(i === values.size)
-            assert((expected take i) === values)
+            assert(i == values.size)
+            assert((expected take i) == values)
           }
 
           def insertOne(requireDefaultValues: Boolean) =
@@ -120,7 +120,7 @@ class DefaultsTest
             recalculate(instance.model.getId, applyDefaults = true)
           }
 
-          assert(List.fill(6)("7") === stringValues)
+          assert(List.fill(6)("7") == stringValues)
         }
       }
     }
@@ -177,8 +177,8 @@ class DefaultsTest
 
           val instance = doc.getDefaultModel.defaultInstanceOpt.get
 
-          assert("2" === (instance.rootElement / "oldvalue" stringValue))
-          assert(""  === (instance.rootElement / "newvalue" stringValue))
+          assert("2" == (instance.rootElement / "oldvalue" stringValue))
+          assert(""  == (instance.rootElement / "newvalue" stringValue))
 
           // Replace `oldvalue` with `newvalue` but do not recompute defaults
           withAction {
@@ -187,30 +187,30 @@ class DefaultsTest
 
           assert(instance.rootElement / "oldvalue" isEmpty)
           assert(instance.rootElement / "newvalue" nonEmpty)
-          assert("" === (instance.rootElement / "newvalue" stringValue))
+          assert("" == (instance.rootElement / "newvalue" stringValue))
 
           // Replace `oldvalue` with `newvalue` and recompute defaults
           withAction {
             sendThrowOnError("replace-element-submission", List(PropertyValue("defaults", Some("true"))))
           }
 
-          assert("2" === (instance.rootElement / "newvalue" stringValue))
+          assert("2" == (instance.rootElement / "newvalue" stringValue))
 
           // Replace entire instance and do not recompute defaults
           withAction {
             sendThrowOnError("replace-entire-instance-submission", List(PropertyValue("defaults", Some("false"))))
           }
 
-          assert("" === (instance.rootElement / "some" stringValue))
-          assert("" === (instance.rootElement / "value" stringValue))
+          assert("" == (instance.rootElement / "some" stringValue))
+          assert("" == (instance.rootElement / "value" stringValue))
 
           // Replace entire instance and recompute defaults
           withAction {
             sendThrowOnError("replace-entire-instance-submission", List(PropertyValue("defaults", Some("true"))))
           }
 
-          assert("2" === (instance.rootElement / "some" stringValue))
-          assert("3" === (instance.rootElement / "value" stringValue))
+          assert("2" == (instance.rootElement / "some" stringValue))
+          assert("3" == (instance.rootElement / "value" stringValue))
         }
       }
     }

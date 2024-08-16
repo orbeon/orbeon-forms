@@ -147,11 +147,7 @@
                 </xf:action>
 
                 <!-- Provides access the friendly-captcha response exposed by the JavaScript API -->
-                <xf:input ref="solution" class="xbl-fr-friendly-captcha-response xforms-hidden">
-                    <xf:action event="xforms-value-changed" if="xxf:non-blank(.)">
-                        <xf:dispatch targetid="fr-friendly-captcha" name="fr-check-response"/>
-                    </xf:action>
-                </xf:input>
+                <xf:input ref="solution" class="xbl-fr-friendly-captcha-response xforms-hidden"/>
 
                 <!-- Div in which the friendly-captcha is rendered -->
                 <!-- Add `data-sitekey` even though we pass it through the API, as I have noticed if you tab

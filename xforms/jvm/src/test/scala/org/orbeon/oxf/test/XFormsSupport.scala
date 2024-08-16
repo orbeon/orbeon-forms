@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyGetter
 import org.orbeon.oxf.xforms.event._
-import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
+import org.orbeon.oxf.xforms.event.events.{DOMActivateEvent, XXFormsValueEvent}
 import org.orbeon.oxf.xforms.itemset.{Itemset, ItemsetSupport}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.state.XFormsStateManager
@@ -120,10 +120,21 @@ trait XFormsSupport extends MockitoSugar {
             vc
         } foreach { target =>
           ClientEvents.processEvent(document, new XXFormsValueEvent(target, value))
-            document.afterExternalEvents(None)
-            document.afterUpdateResponse()
-            document.beforeExternalEvents(null, submissionIdOpt = None)
+          document.afterExternalEvents(None)
+          document.afterUpdateResponse()
+          document.beforeExternalEvents(null, submissionIdOpt = None)
         }
+      case _ =>
+    }
+
+  // TODO: Move to XFormsSupport2?
+  def activateControlWithEvent(controlEffectiveId: String)(implicit ec: ExternalContext): Unit =
+    getObject(controlEffectiveId) match {
+      case target: XFormsControl =>
+        document.withExternalEvents(ec.getResponse, None) {
+          ClientEvents.processEvent(document, new DOMActivateEvent(target))
+        }
+        document.afterUpdateResponse()
       case _ =>
     }
 

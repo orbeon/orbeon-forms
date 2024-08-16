@@ -32,7 +32,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
   def setupDocument(documentURL: String): XFormsContainingDocument =
     setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
 
-  def setupDocument(xhtml: dom.Document): XFormsContainingDocument = {
+  def setupDocument(xhtml: dom.Document, setupBeforeExternalEvents: Boolean = true): XFormsContainingDocument = {
 
     // Initialize once
     ResourceManagerSupportInitializer
@@ -43,7 +43,8 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
     val doc = XFormsContainingDocumentBuilder(staticState, None, None, mustInitialize = true)
 
     doc.afterInitialResponse()
-    doc.beforeExternalEvents(null, submissionIdOpt = None)
+    if (setupBeforeExternalEvents)
+      doc.beforeExternalEvents(null, submissionIdOpt = None)
 
     _document = doc
 

@@ -1308,7 +1308,6 @@
                             <xf:action ev:event="xforms-submit">
                                 <!-- Restore state -->
                                 <xf:insert ref="instance()" origin="instance('template')"/>
-                                <xf:rebuild/>
                                 <xf:recalculate/>
                                 <!-- setvalue: expecting just recalculate -->
                                 <xf:setvalue ref="instance()/source">888</xf:setvalue>
@@ -1337,7 +1336,6 @@
                             <xf:action ev:event="xforms-submit">
                                 <!-- Restore state -->
                                 <xf:insert ref="instance()" origin="instance('template')"/>
-                                <xf:rebuild/>
                                 <xf:recalculate/>
                                 <!-- NOT expecting rebuild or recalculate, binds point to new instance -->
                                 <xf:setvalue ref="instance()/source">888</xf:setvalue>
@@ -1482,7 +1480,6 @@
                             <xf:action ev:event="xforms-submit">
                                 <!-- Restore state -->
                                 <xf:insert ref="instance()" origin="instance('template')"/>
-                                <xf:rebuild/>
                                 <xf:recalculate/>
                                 <!-- setvalue: expecting just revalidate; integer type points to value[1] -->
                                 <xf:setvalue ref="instance()/position">2</xf:setvalue>
@@ -1515,7 +1512,6 @@
                             <xf:action ev:event="xforms-submit">
                                 <!-- Restore state -->
                                 <xf:insert ref="instance()" origin="instance('template')"/>
-                                <xf:rebuild/>
                                 <xf:recalculate/>
                                 <!-- NOT expecting rebuild or revalidate, binds point to new instance -->
                                 <xf:setvalue ref="instance()/position">2</xf:setvalue>

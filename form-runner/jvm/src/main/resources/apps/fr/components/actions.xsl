@@ -670,8 +670,10 @@
                     <!-- Rebuild, for the `frf:resolveTargetRelativeToActionSource()` to return nodes in the current
                          `fr-form-instance`, if that instance was just replaced by a submission loading the
                          auto-saved or manually-saved document. -->
-                    <xf:rebuild/>
                     <!-- https://github.com/orbeon/orbeon-forms/issues/4178 -->
+                    
+                    <!-- 2024-08-15: Force-`<xf:rebuild>` unneeded if there was an instance replacement (structural change).
+                         https://github.com/orbeon/orbeon-forms/issues/1660 -->
                     <xf:recalculate model="{$model-id}" xxf:deferred="true"/>
 
                     <xsl:if test="exists($response-actions)">

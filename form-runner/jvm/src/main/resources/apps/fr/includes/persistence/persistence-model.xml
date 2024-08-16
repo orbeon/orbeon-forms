@@ -301,6 +301,7 @@
                      2020-05-19: Confirming that upon XML POST, we want initial values to be evaluated.
                      Use case: POSTing current form data to `/new` and clearing some fields only. -->
                 <xf:message level="xxf:log-debug">Updating initial values for externally-loaded new document</xf:message>
+                <!-- `<xf:rebuild>` probably unneeded since flag set by structural changes above and `<xf:recalculate>` now rebuilds if needed -->
                 <xf:rebuild model="fr-form-model"/>
                 <xf:recalculate xxf:defaults="true" model="fr-form-model"/>
             </xf:action>
@@ -609,6 +610,7 @@
 
     <xf:action event="xforms-ready">
         <!-- Force all this so we can safely set the data status -->
+        <!-- Q: Is the force-`<xf:rebuild>` needed? -->
         <xf:rebuild/>
         <xf:recalculate/>
         <xf:refresh/>
@@ -862,7 +864,7 @@
                 "/>
 
         <xf:message level="xxf:log-debug">Rebuild/recalculate after loading doc</xf:message>
-        <xf:rebuild     model="fr-form-model"/>
+        <!-- Force-`<xf:rebuild>` unneeded: structural changes above and `<xf:recalculate>` rebuilds if needed. -->
         <xf:recalculate model="fr-form-model"/>
 
         <!-- In some cases (Form Builder, lease not acquired when page loaded), we need to refresh the model as well -->

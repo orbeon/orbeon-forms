@@ -86,6 +86,7 @@
                     xxf:defaults="{$apply-defaults}"/>
 
                 <xf:action if="$diff != 0">
+                    <!-- `<xf:rebuild>` probably unneeded since flag set by structural changes above and `<xf:recalculate>` now rebuilds if needed -->
                     <xf:rebuild/>
                     <xf:recalculate/>
                 </xf:action>
@@ -197,6 +198,7 @@
             <xsl:if test="exists(fr:map)">
                 <xf:action if="event('xxf:type') = 'fr-iteration-added'">
 
+                    <!-- Q: Is the force-`<xf:rebuild>` needed? -->
                     <xf:rebuild/>
                     <xf:recalculate/>
 

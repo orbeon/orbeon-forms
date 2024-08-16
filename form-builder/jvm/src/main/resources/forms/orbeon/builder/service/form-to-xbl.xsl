@@ -585,7 +585,7 @@
                                 context="instance()"
                                 origin="instance('fr-form-template')/*"/>
                             <!-- RRR with defaults -->
-                            <xf:rebuild/>
+                            <!-- Force-`<xf:rebuild>` unneeded: structural changes above and `<xf:recalculate>` rebuilds if needed. -->
                             <xf:recalculate xxf:defaults="true"/>
                         </xf:action>
                         <!-- If not empty, update with instance where holes have been filled if necessary -->
@@ -606,7 +606,7 @@
                                     context="instance()"
                                     origin="$simply-migrated/*"/>
                                 <!-- RRR with defaults -->
-                                <xf:rebuild/>
+                                <!-- Force-`<xf:rebuild>` unneeded: structural changes above and `<xf:recalculate>` rebuilds if needed. -->
                                 <xf:recalculate xxf:defaults="true"/>
                             </xf:action>
                         </xf:action>

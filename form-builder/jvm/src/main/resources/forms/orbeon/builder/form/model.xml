@@ -134,8 +134,8 @@
 
         <xf:insert ref="instance('fb-form-instance')" origin="$temp"/>
 
-        <!-- RRR so that all binds are up to date for the rest of the initialization -->
-        <xf:rebuild/>
+        <!-- RRR so that all binds are up-to-date for the rest of the initialization -->
+        <!-- Force-`<xf:rebuild>` unneeded: structural changes above and `<xf:recalculate>` rebuilds if needed. -->
         <xf:recalculate/>
 
     </xf:action>
@@ -170,7 +170,8 @@
             <xf:property name="deannotate" value="false()"/>
         </xf:dispatch>
 
-        <!-- RRR so that all binds are up to date for the rest of the initialization -->
+        <!-- RRR so that all binds are up-to-date for the rest of the initialization -->
+        <!-- Q: Is the force-`<xf:rebuild>` needed? -->
         <xf:rebuild/>
         <xf:recalculate/>
 
@@ -291,6 +292,7 @@
             </xf:action>
         </xf:action>
 
+        <!-- Q: Is the force-`<xf:rebuild>` needed? -->
         <xf:rebuild/>
         <xf:recalculate/>
 

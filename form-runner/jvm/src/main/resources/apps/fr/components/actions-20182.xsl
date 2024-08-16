@@ -779,7 +779,6 @@
         <xf:action class="fr-action-impl">
             <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name, ())}"/>
 
-            <xf:rebuild/>
             <xf:recalculate/>
 
             <xf:action>
@@ -814,7 +813,6 @@
 
         <xf:action class="fr-action-impl">
 
-            <xf:rebuild/>
             <xf:recalculate/>
 
             <xf:action>
@@ -907,7 +905,6 @@
 
         <xf:action class="fr-action-impl">
 
-            <xf:rebuild/>
             <xf:recalculate/>
 
             <xf:var
@@ -1114,7 +1111,6 @@
             <xf:var name="mediatype" value="uri-param-values($value, 'mediatype')[1]"/>
             <xf:var name="size"      value="uri-param-values($value, 'size')[1]"/>
 
-            <xf:rebuild/>
             <xf:recalculate/>
 
             <xf:action>
@@ -1160,7 +1156,6 @@
         <xf:action class="fr-action-impl">
             <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name, ())}"/>
 
-            <xf:rebuild/>
             <xf:recalculate/>
 
             <xf:action>
@@ -1425,7 +1420,6 @@
                             xxf:defaults="{$apply-defaults}"/>
 
                         <xf:action if="$diff != 0">
-                            <xf:rebuild/>
                             <xf:recalculate/>
                         </xf:action>
 
@@ -1458,7 +1452,6 @@
                                 )"/>
 
                         <!-- Q: Is this needed? -->
-                        <!--<xf:rebuild/>-->
                         <!--<xf:recalculate/>-->
 
                         <xf:action>

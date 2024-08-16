@@ -157,8 +157,7 @@
                              readonly="$fr-mode = ('view', 'pdf', 'email')                                or instance('readonly') = 'true'                                or ($fr-params/app = 'orbeon' and $fr-params/form = 'builder')"/>
                     <xf:action ev:event="xforms-model-construct-done">
                         <xf:action if="empty(instance()/*)"><xf:insert context="instance()"
-                                                                       origin="instance('fr-form-template')/*"/>&gt;
-                            <xf:rebuild/>
+                                                                       origin="instance('fr-form-template')/*"/>
                             <xf:recalculate xxf:defaults="true"/>
                         </xf:action>
                     </xf:action>
@@ -326,8 +325,7 @@
                              readonly="$fr-mode = ('view', 'pdf', 'email')                                or instance('readonly') = 'true'                                or ($fr-params/app = 'orbeon' and $fr-params/form = 'builder')"/>
                     <xf:action ev:event="xforms-model-construct-done">
                         <xf:action if="empty(instance()/*)"><xf:insert context="instance()"
-                                                                       origin="instance('fr-form-template')/*"/>&gt;
-                            <xf:rebuild/>
+                                                                       origin="instance('fr-form-template')/*"/>
                             <xf:recalculate xxf:defaults="true"/>
                         </xf:action>
                     </xf:action>
@@ -488,8 +486,7 @@
                              readonly="$fr-mode = ('view', 'pdf', 'email')                                or instance('readonly') = 'true'                                or ($fr-params/app = 'orbeon' and $fr-params/form = 'builder')"/>
                     <xf:action ev:event="xforms-model-construct-done">
                         <xf:action if="empty(instance()/*)"><xf:insert context="instance()"
-                                                                       origin="instance('fr-form-template')/*"/>&gt;
-                            <xf:rebuild/>
+                                                                       origin="instance('fr-form-template')/*"/>
                             <xf:recalculate xxf:defaults="true"/>
                         </xf:action>
                     </xf:action>

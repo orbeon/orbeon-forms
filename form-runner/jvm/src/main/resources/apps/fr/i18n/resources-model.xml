@@ -102,12 +102,14 @@
         </xf:action>
 
         <!-- So that model variables are updated in case another model uses them -->
+        <!-- Q: Is the force-`<xf:rebuild>` needed? -->
         <xf:rebuild/>
         <xf:recalculate/>
 
         <!-- So the error summary, which gets the alert right away, obtains the
              resource in the new language, see:
              https://github.com/orbeon/orbeon-forms/issues/2505 -->
+        <!-- Q: Is the force-`<xf:rebuild>` needed? -->
         <xf:rebuild     model="fr-form-model"/>
         <!-- So binds which depend on language are updated at a later time, see:
              https://github.com/orbeon/orbeon-forms/issues/1500 -->

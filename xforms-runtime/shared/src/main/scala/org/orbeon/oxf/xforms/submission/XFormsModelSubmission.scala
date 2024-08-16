@@ -330,7 +330,7 @@ class XFormsModelSubmission(
             val modelForInstance = refInstance.model
             // NOTE: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
             // Here, we rebuild/recalculate instead the model containing the submission's single-node binding.
-            // This can be different than the model containing the submission if using e.g. xxf:instance().
+            // This can be different than the model containing the submission if using e.g. `xxf:instance()`.
             // NOTE: XForms 1.1 seems to say this should happen regardless of whether we serialize or not. If
             // the instance is not serialized and if no instance data is otherwise used for the submission,
             // this seems however unneeded so we optimize out.
@@ -586,13 +586,13 @@ class XFormsModelSubmission(
     ): Document = {
 
       // Revalidate instance
-      // NOTE: We need to do this before pruning so that bind/@type works correctly. XForms 1.1 seems to say that this
+      // NOTE: We need to do this before pruning so that `bind/@type` works correctly. XForms 1.1 seems to say that this
       // must be done after pruning, but then it is not clear how XML Schema validation would work then.
-      // Also, if validate="false" or if serialization="none", then we do not revalidate. Now whether this optimization
-      // is acceptable depends on whether validate="false" only means "don't check the instance's validity" or also
-      // don't even recalculate. If the latter, then this also means that type annotations won't be updated, which
-      // can impact serializations that use type information, for example multipart. But in that case, here we decide
-      // the optimization is worth it anyway.
+      // Also, if `validate="false"` or if `serialization="none"`, then we do not revalidate. Now whether this
+      // optimization is acceptable depends on whether `validate="false"` only means "don't check the instance's
+      // validity" or also don't even recalculate. If the latter, then this also means that type annotations won't be
+      // updated, which can impact serializations that use type information, for example multipart. But in that case,
+      // here we decide the optimization is worth it anyway.
       if (validate)
         currentInstance foreach (_.model.doRecalculateRevalidateIfNeeded())
 

@@ -38,7 +38,7 @@ trait VisitableTrait extends XFormsControl {
       // copy of control properties upon mutation, rather than the current XFormsControlLocal/full clone alternative.
       containingDocument.controls.cloneInitialStateIfNeeded(EventCollector.ToReview)
 
-      // There is no dependency handling with the xxf:visited() function. So instead of requiring callers to do this,
+      // There is no dependency handling with the `xxf:visited()` function. So instead of requiring callers to do this,
       // as was the case at some point, we require an RR.
       bindingContext.modelOpt foreach
         (_.deferredActionContext.markRecalculateRevalidate(NoDefaultsStrategy, None))

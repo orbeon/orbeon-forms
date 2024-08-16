@@ -38,7 +38,7 @@ trait RebuildBindOps {
 
       // NOTE: Assume that model.getContextStack().resetBindingContext(model) was called
 
-      // Clear all instances that might have InstanceData
+      // Clear all instances that might have `InstanceData`
       // Only need to do this after the first rebuild
       if (! _isFirstRebuildForModel)
         for (instance <- model.instancesIterator) {

@@ -221,7 +221,7 @@ object XBLTransformer {
             // If author specified scope attribute, use it
             setAttribute(resultingNodes, XXBL_SCOPE_QNAME, scopeAttribute, None)
           } else {
-            // By default, set xxbl:scope="outer" on resulting elements
+            // By default, set `xxbl:scope="outer"` on resulting elements
             setAttribute(resultingNodes, XXBL_SCOPE_QNAME, "outer", None)
           }
           true

@@ -287,7 +287,7 @@ trait RefreshSupport {
   // ConcurrentModificationException. This should no longer happen as once we obtain a reference to
   // childrenXBLContainers, that collection doesn't change.
   def rebuildRecalculateRevalidateIfNeeded(): Unit =
-    allModels.foreach(_.rebuildRecalculateRevalidateIfNeeded())
+    allModels.foreach(_.doRebuildRecalculateRevalidateIfNeeded())
 
   def requireRefresh(): Unit = {
     // Note that we don't recurse into children container as for now refresh is global

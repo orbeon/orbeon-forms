@@ -181,7 +181,7 @@ class XFormsValueComponentControl(
       concreteRcEffectiveId = XFormsId.buildEffectiveId(staticRc.prefixedId, XFormsId.getEffectiveIdSuffixParts(this.effectiveId))
       concreteRc            <- containingDocument.findControlByEffectiveId(concreteRcEffectiveId)
     } locally {
-      
+
       implicit val receiver: XMLReceiver = ch.getXmlReceiver
 
       outputAriaDiff(previousControl, this, concreteRc.effectiveId)
@@ -396,10 +396,8 @@ class XFormsComponentControl(
       initializeMirrorListenerIfNeeded(dispatch = false)
 
       // Do RRR as xforms-model-construct didn't do it
-      for (model <- nestedContainer.models) {
-        model.doRebuildIfNeeded()
-        model.doRecalculateRevalidateIfNeeded()
-      }
+      for (model <- nestedContainer.models)
+        model.doRebuildRecalculateRevalidateIfNeeded()
 
       // `xforms-model-construct-done`
       for (model <- nestedContainer.models)
@@ -412,8 +410,7 @@ class XFormsComponentControl(
       initializeMirrorListenerIfNeeded(dispatch = false)
       // Do RRR as isRestoringDynamicState() didn't do it
       for (model <- nestedContainer.models) {
-        model.doRebuildIfNeeded()
-        model.doRecalculateRevalidateIfNeeded()
+        model.doRebuildRecalculateRevalidateIfNeeded()
       }
     }
 
@@ -505,8 +502,7 @@ class XFormsComponentControl(
       destroyMirrorListenerIfNeeded()
       initializeMirrorListenerIfNeeded(dispatch = true) foreach { mirrorInstance =>
         // If the instance was updated, it is due for an RRR, but nobody will check that before the refresh is done, so do it here.
-        mirrorInstance.model.doRebuildIfNeeded()
-        mirrorInstance.model.doRecalculateRevalidateIfNeeded()
+        mirrorInstance.model.doRebuildRecalculateRevalidateIfNeeded()
       }
     }
   }

@@ -131,10 +131,8 @@ class XFormsModel(
     // TODO: We used to not redo recalculations upon state restore. Does this cause a problem? Shouldn't
     // recalculations not depend on the number of times they run anyway?
     deferredActionContext.markStructuralChange(NoDefaultsStrategy, None)
-    if (! deferRRR) {
-      doRebuildIfNeeded()
-      doRecalculateRevalidateIfNeeded()
-    }
+    if (! deferRRR)
+      doRebuildRecalculateRevalidateIfNeeded()
   }
 
   def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit =
@@ -160,7 +158,7 @@ class XFormsModel(
         // 4.3.6 The xforms-recalculate Event
         // Recalculate and revalidate are unified
         // See https://github.com/orbeon/orbeon-forms/issues/1650
-        doRecalculateRevalidateIfNeeded()
+        doRebuildRecalculateRevalidateIfNeeded()
       case _: XFormsRefreshEvent =>
         // 4.3.4 The xforms-refresh Event
         doRefresh()
@@ -224,10 +222,8 @@ class XFormsModel(
     Dispatch.dispatchEvent(new XXFormsInstancesReadyEvent(selfModel), EventCollector.ToReview)
 
     // 3. A rebuild, recalculate, and revalidate are then performed in sequence for this mode
-    if (rrr) {
-      doRebuildIfNeeded()
-      doRecalculateRevalidateIfNeeded()
-    }
+    if (rrr)
+      doRebuildRecalculateRevalidateIfNeeded()
   }
 }
 

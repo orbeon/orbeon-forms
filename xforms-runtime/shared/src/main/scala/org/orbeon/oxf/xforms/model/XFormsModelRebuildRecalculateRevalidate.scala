@@ -50,12 +50,6 @@ trait XFormsModelRebuildRecalculateRevalidate {
       containingDocument.xpathDependencies.markValueChanged(selfModel, nodeInfo)
   }
 
-  // Only called by `XBLContainer.rebuildRecalculateRevalidateIfNeeded()`
-  def rebuildRecalculateRevalidateIfNeeded(): Unit = {
-    doRebuildIfNeeded()
-    doRecalculateRevalidateIfNeeded()
-  }
-
   def doRebuildIfNeeded(): Unit =
     if (deferredActionContext.rebuild) {
       try {
@@ -90,7 +84,15 @@ trait XFormsModelRebuildRecalculateRevalidate {
 
   // Recalculate and revalidate are a combined operation
   // See https://github.com/orbeon/orbeon-forms/issues/1650
-  def doRecalculateRevalidateIfNeeded(): Unit =
+  def doRebuildRecalculateRevalidateIfNeeded(): Unit = {
+    // https://github.com/orbeon/orbeon-forms/issues/1660
+    doRebuildIfNeeded()
+    doOnlyRecalculateRevalidateIfNeeded()
+  }
+
+  // Recalculate and revalidate are a combined operation
+  // See https://github.com/orbeon/orbeon-forms/issues/1650
+  private def doOnlyRecalculateRevalidateIfNeeded(): Unit =
     if (deferredActionContext.recalculateRevalidate) {
 
       def performRecalculateRevalidate(): m.Set[String] =

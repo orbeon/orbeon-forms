@@ -856,7 +856,7 @@ trait FormRunnerPersistence {
     // Prepare data for submission
     val formModel = XFormsAPI.topLevelModel(FormModel).getOrElse(throw new IllegalStateException)
 
-    formModel.doRecalculateRevalidateIfNeeded()
+    formModel.doRebuildRecalculateRevalidateIfNeeded()
 
     // This will be a copy of the data
     val preparedData =

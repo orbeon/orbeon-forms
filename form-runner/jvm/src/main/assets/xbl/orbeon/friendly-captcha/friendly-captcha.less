@@ -1,0 +1,35 @@
+// MIT license
+// https://github.com/FriendlyCaptcha/friendly-challenge/blob/master/LICENSE.md
+
+// Put this at top-level so that rest of CSS rules provided by Friendly Captcha apply. This is so we can just override
+// a few of these rules. The reason we override them is because if we use Friendly Captcha's `.frc-captcha` class, it
+// has the side effect of causing the captcha to reload automatically, which we don't want. This might be a bug in
+// Friendly Captcha.
+.xbl-fr-friendly-captcha-div {
+    * {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        text-align: initial;
+        border-radius: 0;
+        filter: none !important;
+        transition: none !important;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 1.2;
+        text-decoration: none;
+        background-color: initial;
+        color: #222
+    }
+
+    position: relative;
+    min-width: 250px;
+    max-width: 312px;
+    border: 1px solid #f4f4f4;
+    padding-bottom: 12px;
+    background-color: #fff;
+
+    b {
+        font-weight: 700
+    }
+}

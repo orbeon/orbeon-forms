@@ -12,6 +12,10 @@
         element="fr|friendly-captcha"
         xxbl:mode="binding lhha">
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/friendly-captcha/friendly-captcha.css"/>
+        </xbl:resources>
+
         <xbl:handlers>
             <xbl:handler event="fr-verify" phase="target">
                 <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
@@ -85,8 +89,9 @@
                     <xf:action type="javascript">
                         <xf:param name="publicKey" value="$conf/public-key"/>
                         <xf:param name="scriptUrl" value="fr:component-param-value('script-url')"/>
+                        <xf:param name="startMode" value="fr:component-param-value('start-mode')"/>
                         <xf:body>
-                            ORBEON.xforms.XBL.instanceForControl(this).render(publicKey, scriptUrl);
+                            ORBEON.xforms.XBL.instanceForControl(this).render(publicKey, scriptUrl, startMode);
                         </xf:body>
                     </xf:action>
                 </xf:action>
@@ -150,10 +155,10 @@
                 <xf:input ref="solution" class="xbl-fr-friendly-captcha-response xforms-hidden"/>
 
                 <!-- Div in which the friendly-captcha is rendered -->
-                <!-- Add `data-sitekey` even though we pass it through the API, as I have noticed if you tab
-                     through the component occasionally you can get the error "FriendlyCaptcha: sitekey not set
-                     on frc-captcha element" -->
-                <xh:div class="xbl-fr-friendly-captcha-div frc-captcha" data-sitekey="{$conf/public-key}"/>
+                <!-- We don't use the `frc-captcha` CSS class because this has the side effect of causing the captcha to
+                     reload automatically, which we don't want. This might be a bug in Friendly Captcha. This also
+                     means that we have to reapply some CSS styles, see `friendly-captcha.less`. -->
+                <xh:div class="xbl-fr-friendly-captcha-div"/>
             </xf:group>
         </xbl:template>
     </xbl:binding>

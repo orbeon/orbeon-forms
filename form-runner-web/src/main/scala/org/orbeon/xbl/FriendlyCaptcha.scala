@@ -1,5 +1,7 @@
 package org.orbeon.xbl
 
+import enumeratum.EnumEntry.Lowercase
+import enumeratum._
 import org.log4s.Logger
 import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.util.LoggerFactory
@@ -21,11 +23,13 @@ object FriendlyCaptcha {
 
   private class FriendlyCaptchaCompanion(containerElem: html.Element) extends XBLCompanion {
 
+    import FriendlyCaptchaConfig.StartMode
+
     private var renderingStarted: Boolean = false
-    private var widget: Option[WidgetInstance] = None
+    private var widget: Option[FriendlyCaptchaWidget] = None
 
     //@JSExport
-    def render(publicKey: String, scriptUrl: String): Unit = {
+    def render(publicKey: String, scriptUrl: String, startMode: String): Unit = {
 
       logger.debug("render")
 
@@ -38,7 +42,7 @@ object FriendlyCaptcha {
 
       if (! renderingStarted) {
         renderingStarted = true
-        renderFriendlyCaptcha(publicKey)
+        renderFriendlyCaptcha(publicKey, StartMode.withNameInsensitiveOption(startMode).getOrElse(StartMode.Auto))
       }
     }
 
@@ -62,7 +66,7 @@ object FriendlyCaptcha {
       DocumentAPI.setValue(responseControlEffectiveId, response)
     }
 
-    private def renderFriendlyCaptcha(publicKey: String): Unit = {
+    private def renderFriendlyCaptcha(publicKey: String, mode: StartMode): Unit = {
 
       val reCaptchaNotFullyLoaded = {
         val topLevelObject = window.asInstanceOf[js.Dynamic].friendlyChallenge
@@ -73,13 +77,13 @@ object FriendlyCaptcha {
       if (reCaptchaNotFullyLoaded) {
         logger.debug("FriendlyCaptcha not fully loaded, trying again in a moment")
         val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
-        js.timers.setTimeout(shortDelay)(renderFriendlyCaptcha(publicKey))
+        js.timers.setTimeout(shortDelay)(renderFriendlyCaptcha(publicKey, mode))
       } else {
-
-        val myWidget =
-          new WidgetInstance(
+        widget = Some(
+          new FriendlyCaptchaWidget(
             containerElem.querySelector(".xbl-fr-friendly-captcha-div"),
             new FriendlyCaptchaConfig {
+              startMode         = mode.entryName
               sitekey           = publicKey
               language          = WebSupport.findHtmlLang.getOrElse("en"): String
               solutionFieldName = "-"
@@ -89,10 +93,7 @@ object FriendlyCaptcha {
               errorCallback     = (e => logger.error(s"error callback: `$e`")): js.Function1[String, Unit]
             }
           )
-
-        widget = Some(myWidget)
-        logger.debug("about to start FriendlyCaptcha")
-        myWidget.start()
+        )
       }
     }
   }
@@ -100,10 +101,20 @@ object FriendlyCaptcha {
 
 @js.native
 @JSGlobal("friendlyChallenge.WidgetInstance")
-class WidgetInstance(elem: dom.Element, config: FriendlyCaptchaConfig) extends js.Object {
+class FriendlyCaptchaWidget(elem: dom.Element, config: FriendlyCaptchaConfig) extends js.Object {
   def start()  : Unit = js.native
   def reset()  : Unit = js.native
   def destroy(): Unit = js.native
+}
+
+object FriendlyCaptchaConfig {
+  sealed trait StartMode extends EnumEntry with Lowercase
+  object StartMode extends Enum[StartMode] {
+    def values = findValues
+    case object Auto  extends StartMode
+    case object Focus extends StartMode
+    case object None  extends StartMode
+  }
 }
 
 trait FriendlyCaptchaConfig extends js.Object {

@@ -19,13 +19,13 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
+import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.*
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}
 import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, HttpStatusCodeException, StatusCode}
-import org.orbeon.oxf.pipeline.api.{PipelineContext, TransformerXMLReceiver}
-import org.orbeon.oxf.processor.generator.RequestGenerator
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{DateUtils, IndentedLogger, NetUtils, Whitespace, XPath}
@@ -73,16 +73,7 @@ object RequestReader {
     }
 
   def requestInputStream(): Option[InputStream] =
-    RequestGenerator.getRequestBody(PipelineContext.get) match {
-      case Some(bodyURL) =>
-        Some(NetUtils.uriToInputStream(bodyURL))
-
-      case None =>
-        // TODO: should getInputStream return an Option instead or does it impact too much code elsewhere?
-        val inputStream = NetUtils.getExternalContext.getRequest.getInputStream
-        val nonEmptyInputStream = inputStream != EmptyInputStream
-        nonEmptyInputStream option inputStream
-    }
+    Option(PersistenceProxyProcessor.requestInputStream(NetUtils.getExternalContext.getRequest)).filter(_ != EmptyInputStream)
 
   def bytes(): Option[Array[Byte]] =
     requestInputStream().map { is =>

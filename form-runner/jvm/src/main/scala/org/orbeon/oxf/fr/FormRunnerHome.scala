@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.implicits.catsSyntaxOptionId
 import io.circe.{Json, parser}
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerPersistence.findProvider
@@ -21,8 +22,7 @@ import org.orbeon.oxf.util.DateUtilsUsingSaxon
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringReplacer.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
-import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
+import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
@@ -35,6 +35,7 @@ trait FormRunnerHome {
 
   private case class AvailableAndTime(available: Boolean, time: Long)
 
+  // This is a subset of org.orbeon.oxf.fr.persistence.relational.form.adt.Form
   private case class Form(
     appForm : AppForm,
     version : String,
@@ -43,7 +44,7 @@ trait FormRunnerHome {
     ops     : Set[String]
   ) {
 
-    import Form._
+    import org.orbeon.oxf.fr.persistence.relational.form.adt.Form._
 
     def isLocalAvailable    = local  exists (_.available)
     def isRemoteAvailable   = remote exists (_.available)
@@ -63,14 +64,16 @@ trait FormRunnerHome {
 
   private object Form {
 
-    private val SummaryOps = Set("*", "update", "read", "delete")
-    private val NewOps     = Set("*", "create")
-    private val AdminOp    = "admin"
-
     def apply(form: NodeInfo): Form = {
 
-      val localTime  = form elemValueOpt "last-modified-time"
-      val remoteTime = form elemValueOpt "remote-last-modified-time"
+      def availableAndTime(nodeInfo: NodeInfo): AvailableAndTime =
+        AvailableAndTime(
+          (nodeInfo elemValue "available") != "false",
+          DateUtilsUsingSaxon.parseISODateOrDateTime(nodeInfo elemValue "last-modified-time")
+        )
+
+      val localOpt  = form.some.filter(_.elemValueOpt("last-modified-time").isDefined)
+      val remoteOpt = (form / "remote-server").headOption
 
       Form(
         AppForm(
@@ -78,8 +81,8 @@ trait FormRunnerHome {
           form elemValue Names.FormName
         ),
         form elemValue Names.FormVersion,
-        localTime  map (v => AvailableAndTime((form elemValue "available")        != "false", DateUtilsUsingSaxon.parseISODateOrDateTime(v))),
-        remoteTime map (v => AvailableAndTime((form elemValue "remote-available") != "false", DateUtilsUsingSaxon.parseISODateOrDateTime(v))),
+        localOpt  map availableAndTime,
+        remoteOpt map availableAndTime,
         form attTokens "operations"
       )
     }
@@ -192,103 +195,43 @@ trait FormRunnerHome {
       providerPropertyAsBoolean(provider, property = "reencrypt", default = false)
     }
 
-  // NOTE: It would be great if we could work on typed data, whether created from XML, JSON or an object
-  // serialization. Here we juggle between XML and typed data.
-  //@XPathFunction
-  def joinLocalAndRemoteMetadata(
-    local              : SequenceIterator,
-    remote             : SequenceIterator,
-    permissionInstance : NodeInfo
-  ): SequenceIterator = {
-
-    val combinedIndexIterator = {
-
-      def makeKey(node: NodeInfo) =
-        (node elemValue Names.AppName, node elemValue Names.FormName, node elemValue Names.FormVersion)
-
-      def createIndex(it: SequenceIterator) = asScalaIterator(it) collect {
-        case node: NodeInfo => makeKey(node) -> node
-      } toMap
-
-      val localIndex  = createIndex(local)
-      val remoteIndex = createIndex(remote)
-
-      (localIndex.keySet ++ remoteIndex.keySet).iterator map { key =>
-        (localIndex.get(key), remoteIndex.get(key))
-      }
-    }
-
-    def createNode(localAndOrRemote: (Option[NodeInfo], Option[NodeInfo])): NodeInfo = {
-
-      def remoteElements(remoteNode: NodeInfo) = {
-
-        def remoteElement(name: String) =
-          elementInfo("remote-" + name, List(stringToStringValue(remoteNode elemValue name)))
-
-        List(
-          remoteElement("title"),
-          remoteElement("available"),
-          remoteElement("last-modified-time")
-        )
-      }
-
-      localAndOrRemote match {
-        case (Some(localNode), None) =>
-          localNode
-        case (None, Some(remoteNode)) =>
-          // Don't just use remoteNode, because we need `remote-` prefixes for remote data
-          elementInfo(
-            "form",
-            (remoteNode /@ "operations")     ++:
-            (remoteNode / Names.FormVersion) ++:
-            (remoteNode / Names.AppName)     ++:
-            (remoteNode / Names.FormName)    ++:
-            remoteElements(remoteNode)
-          )
-        case (Some(localNode), Some(remoteNode)) =>
-          insert(origin = remoteElements(remoteNode), into = localNode, after = localNode / *, doDispatch = false)
-          localNode
-        case (None, None) =>
-          throw new IllegalStateException
-      }
-    }
-
-    (combinedIndexIterator map createNode).toList // https://github.com/orbeon/orbeon-forms/issues/6016
-  }
-
   // Return remote servers information:
   //
   // 1. If the backward compatibility property (oxf.fr.production-server-uri) is present and not empty, try to use it
   //    and return a sequence of one string containing the server URL configured.
   // 2. Else try the JSON property (oxf.fr.home.remote-servers). If the property exists and is well-formed, return
   //    a flattened sequence of label/url pairs.
-  // 3. Otherwise the empty sequence is returned.
+  // 3. Otherwise, the empty sequence is returned.
   //@XPathFunction
-  def remoteServersXPath: SequenceIterator = {
-
-    import FormRunnerHome._
-
-    def fromCompatibility =
-      remoteServerFromCompatibilityProperty map (List(_))
-
-    def fromJSON =
-      remoteServersFromJSONProperty map { values =>
-        values flatMap { case (label, uri) => label :: uri :: Nil }
-      }
-
-    def fromEither =
-      fromCompatibility orElse fromJSON getOrElse List.empty[String]
-
-    fromEither
-  }
+  def remoteServersXPath: SequenceIterator =
+    FormRunnerHome.remoteServers.flatMap { remoteServer =>
+      remoteServer.label.toSeq ++ Seq(remoteServer.url)
+    }
 }
 
 object FormRunnerHome {
 
-  def tryRemoteServersFromString(json: String): Try[Vector[(String, String)]] =
+  case class RemoteServer(label: Option[String], url: String)
+
+  def remoteServers: Seq[RemoteServer] = {
+
+    def fromCompatibility =
+      remoteServerFromCompatibilityProperty map (Seq(_))
+
+    def fromJSON =
+      remoteServersFromJSONProperty
+
+    def fromEither =
+      fromCompatibility orElse fromJSON getOrElse Seq.empty[RemoteServer]
+
+    fromEither
+  }
+
+  // Used for tests
+  def tryRemoteServersFromString(json: String): Try[Vector[RemoteServer]] =
     parser.parse(json).toTry flatMap tryRemoteServersFromJSON
 
-  def tryRemoteServersFromJSON(json: Json): Try[Vector[(String, String)]] = Try {
+  private def tryRemoteServersFromJSON(json: Json): Try[Vector[RemoteServer]] = Try {
     json.asArray match {
       case Some(elements) =>
         elements flatMap (_.asObject) collect {
@@ -297,14 +240,14 @@ object FormRunnerHome {
             def getFieldOrThrow(key: String) =
               fields(key) flatMap (_.asString) flatMap trimAllToOpt getOrElse (throw new IllegalArgumentException)
 
-            getFieldOrThrow("label") -> getFieldOrThrow("url").dropTrailingSlash
+            RemoteServer(label = getFieldOrThrow("label").some, url = getFieldOrThrow("url").dropTrailingSlash)
         }
       case _ =>
         throw new IllegalArgumentException
     }
   }
 
-  private def remoteServersFromJSONProperty: Option[i.Seq[(String, String)]] =
+  private def remoteServersFromJSONProperty: Option[i.Seq[RemoteServer]] =
     properties.getPropertyOpt("oxf.fr.home.remote-servers") map { property =>
       Try(
         property.associatedValue(p =>
@@ -320,9 +263,9 @@ object FormRunnerHome {
       }
     }
 
-  private def remoteServerFromCompatibilityProperty: Option[String] = (
+  private def remoteServerFromCompatibilityProperty: Option[RemoteServer] = (
     properties.getStringOrURIAsStringOpt("oxf.fr.production-server-uri")
     flatMap trimAllToOpt
-    map     (_.dropTrailingSlash)
+    map     (url => RemoteServer(label = None, url = url.dropTrailingSlash))
   )
 }

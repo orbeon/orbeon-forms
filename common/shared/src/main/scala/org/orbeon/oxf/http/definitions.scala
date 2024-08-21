@@ -176,6 +176,7 @@ object StatusCode {
   val Locked                       = 423
   val LoginTimeOut                 = 440 // not standard
   val InternalServerError          = 500
+  val BadGateway                   = 502
   val ServiceUnavailable           = 503
 
   def isSuccessCode(code: Int): Boolean =

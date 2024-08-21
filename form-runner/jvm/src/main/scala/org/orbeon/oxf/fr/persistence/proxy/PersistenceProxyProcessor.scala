@@ -26,6 +26,7 @@ import org.orbeon.oxf.fr.permission.PermissionsAuthorization.findCurrentCredenti
 import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyPermissions.ResponseHeaders
+import org.orbeon.oxf.fr.persistence.relational.form.FormProxyLogic
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.*
@@ -73,7 +74,7 @@ class PersistenceProxyProcessor extends ProcessorImpl {
   }
 }
 
-private[persistence] object PersistenceProxyProcessor {
+private[persistence] object PersistenceProxyProcessor extends FormProxyLogic {
 
   val RawDataFormatVersion           = "raw"
   val AllowedDataFormatVersionParams = Set() ++ (DataFormatVersion.values map (_.entryName)) + RawDataFormatVersion
@@ -88,7 +89,7 @@ private[persistence] object PersistenceProxyProcessor {
     headers: Map[String, List[String]]
   )
 
-  private object OutgoingRequest {
+  private[persistence] object OutgoingRequest {
     def apply(request: Request): OutgoingRequest =
       OutgoingRequest(
         request.getMethod,
@@ -186,7 +187,7 @@ private[persistence] object PersistenceProxyProcessor {
       case (HttpMethod.POST, ReEncryptAppFormPath(path, app, form))              => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
       case (HttpMethod.GET,  HistoryPath(path, app, form, _, _))                 => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
       case (HttpMethod.POST, DistinctValuesPath(path, app, form))                => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
-      case (HttpMethod.GET,  PublishedFormsMetadataPath(_, app, form))           => proxyPublishedFormsMetadata(request, response, Option(app), Option(form))
+      case (_,               PublishedFormsMetadataPath(_, app, form))           => proxyPublishedFormsMetadata(request, response, AppFormOpt(Option(app), Option(form)))
       case (HttpMethod.GET,  ReindexPath)                                        => proxyReindex               (request, response) // TODO: should be `POST`
       case (HttpMethod.GET,  ReEncryptStatusPath)                                => proxyReEncryptStatus       (request, response)
       case (_, incomingPath)                                                     => throw new OXFException(s"Unsupported path: $incomingPath") // TODO: bad request?
@@ -600,10 +601,7 @@ private[persistence] object PersistenceProxyProcessor {
   ): Option[StreamedContent] =
     HttpMethod.HttpMethodsWithRequestBody(request.getMethod).option {
 
-      val requestInputStream = RequestGenerator.getRequestBody(PipelineContext.get) match {
-        case Some(bodyURL) => NetUtils.uriToInputStream(bodyURL)
-        case None          => request.getInputStream
-      }
+      val requestInputStream = PersistenceProxyProcessor.requestInputStream(request)
 
       val withEncryptionOpt =
         encrypt.flatOption {
@@ -897,11 +895,12 @@ private[persistence] object PersistenceProxyProcessor {
   // Unneeded for JVM platform
   private implicit val resourceResolver: Option[ResourceResolver] = None
 
-  private def proxyEstablishConnection(
+  protected def proxyEstablishConnection(
     request        : OutgoingRequest,
     requestContent : Option[StreamedContent],
     uri            : String,
-    headers        : Map[String, String]
+    headers        : Map[String, String],
+    credentials    : Option[BasicCredentials] = None
   )(implicit
     indentedLogger : IndentedLogger
   ): ConnectionResult = {
@@ -936,7 +935,7 @@ private[persistence] object PersistenceProxyProcessor {
     Connection.connectNow(
       method      = request.method,
       url         = outgoingURL,
-      credentials = None,
+      credentials = credentials,
       content     = requestContent,
       headers     = allHeaders,
       loadState   = true,
@@ -950,62 +949,25 @@ private[persistence] object PersistenceProxyProcessor {
    * results. So the response is not simply proxied, unlike for other persistence layer calls.
    */
   private def proxyPublishedFormsMetadata(
-    request       : Request, // for params, headers, and method
-    response      : Response,
-    app           : Option[String],
-    form          : Option[String]
+    request          : Request, // for params, headers, and method
+    response         : Response,
+    appFormFromUrlOpt: Option[AppFormOpt]
   )(implicit
-    indentedLogger: IndentedLogger
+    indentedLogger   : IndentedLogger
   ): Unit =
-    streamDocument(
-      callPublishedFormsMetadata(
-        request = request,
-        app     = app,
-        form    = form
-      ),
-      response
-    )
+    if (request.getMethod == HttpMethod.GET || request.getMethod == HttpMethod.POST) {
+      Try(localAndRemoteFormsMetadata(request, appFormFromUrlOpt)) match {
+        case Success(nodeInfo) =>
+          streamDocument(nodeInfo, response)
 
-  def callPublishedFormsMetadata(
-    request       : Request, // for params, headers, and method
-    app           : Option[String],
-    form          : Option[String] // TODO: should not be allowed if app is not provided
-  )(implicit
-    indentedLogger: IndentedLogger
-  ): NodeInfo = {
-
-    val formProviders = getProviders(app, form, FormOrData.Form)
-
-    val parameters = PathUtils.encodeQueryString(request.parameters)
-
-    val allFormElements =
-      for {
-        provider           <- formProviders
-        (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
-      } yield {
-        // Read all the forms for the current service
-        //val serviceURI = PathUtils.appendQueryString(baseURI + "/form" + Option(path).getOrElse(""), parameters)
-        val servicePath = baseURI :: "form" :: app.toList ::: form.toList ::: Nil mkString "/"
-        val serviceURI  = PathUtils.appendQueryString(servicePath, parameters)
-        val cxr         = proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, headers)
-
-        ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
-          val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
-          forms descendant "forms" descendant "form"
-        }
+        case Failure(t) =>
+          // TODO: the API should return detailed error messages in the body itself
+          indentedLogger.logError("", s"Form Metadata API error: ${t.getMessage}")
+          throw t
       }
-
-    aggregateDocument(
-      root    = "forms",
-      content =
-        FormRunner.filterFormsAndAnnotateWithOperations(
-          formsEls               = allFormElements.flatten,
-          allForms               = request.getFirstParamAsString("all-forms")                contains "true",
-          ignoreAdminPermissions = request.getFirstParamAsString("ignore-admin-permissions") contains "true",
-          credentialsOpt         = PermissionsAuthorization.findCurrentCredentialsFromSession
-        )
-    )
-  }
+    } else {
+      throw HttpStatusCodeException(StatusCode.MethodNotAllowed)
+    }
 
   private def proxyReindex(
     request       : Request,
@@ -1122,4 +1084,10 @@ private[persistence] object PersistenceProxyProcessor {
 
   private def filterVersioningHeaders(headers: Map[String, List[String]]): Map[String, List[String]] =
     headers.view.filterKeys(k => ! Version.AllVersionHeadersLower(k.toLowerCase)).to(Map)
+
+  private[persistence] def requestInputStream(request: => Request): InputStream =
+    RequestGenerator.getRequestBody(PipelineContext.get) match {
+      case Some(bodyURL) => NetUtils.uriToInputStream(bodyURL)
+      case None          => request.getInputStream
+    }
 }

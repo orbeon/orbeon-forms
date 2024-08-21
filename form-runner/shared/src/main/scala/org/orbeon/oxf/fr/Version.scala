@@ -33,7 +33,7 @@ object Version {
 sealed trait                                  FormDefinitionVersion
 
 object                                        FormDefinitionVersion {
-  case object Latest                  extends FormDefinitionVersion
+  case object Latest                  extends FormDefinitionVersion { val string = "latest" }
   case class  Specific (version: Int) extends FormDefinitionVersion
 }
 

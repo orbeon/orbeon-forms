@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.fr.FormRunnerHome.*
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -30,9 +31,9 @@ class RemoteServerTest extends AnyFunSpecLike {
       assert(
         Success(
           List(
-            "Prod 1" -> "http://prod1.acme.org/orbeon",
-            "Prod 2" -> "http://prod2.acme.org/orbeon",
-            "Prod 3" -> "http://prod2.acme.org/orbeon"
+            RemoteServer("Prod 1".some, "http://prod1.acme.org/orbeon"),
+            RemoteServer("Prod 2".some, "http://prod2.acme.org/orbeon"),
+            RemoteServer("Prod 3".some, "http://prod2.acme.org/orbeon")
           )
         ) === tryRemoteServersFromString(
           """

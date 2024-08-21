@@ -119,6 +119,16 @@ object AppForm {
     isSpecificPart(app) && isSpecificPart(form)
 }
 
+case class AppFormOpt(app: String, formOpt: Option[String])
+
+object AppFormOpt {
+  def apply(appOpt: Option[String], formOpt: Option[String]): Option[AppFormOpt] =
+    (appOpt, formOpt) match {
+      case (None, Some(_)) => throw new IllegalArgumentException("Application should be defined if form is defined")
+      case _               => appOpt.map(AppFormOpt(_, formOpt))
+    }
+}
+
 trait FormRunnerBaseOps extends FormRunnerPlatform {
 
   import FormRunnerBaseOps._

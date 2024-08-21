@@ -456,27 +456,20 @@
     </property>
 
     <!-- Home page internal processes -->
-    <property as="xs:string"  name="oxf.fr.home.process.load-local">
-        xf:send("read-local-metadata")
+    <property as="xs:string"  name="oxf.fr.home.process.load-metadata">
+        xf:send("read-metadata")
         then xf:dispatch("process-results")
     </property>
-    <property as="xs:string"  name="oxf.fr.home.process.load-remote">
-        xf:send("read-remote-metadata")
-        then xf:dispatch("store-credentials")
-        recover ask-credentials
+    <property as="xs:string"  name="oxf.fr.home.process.load-metadata-recover-with-credentials">
+        load-metadata
+        recover load-metadata-with-credentials
     </property>
-    <property as="xs:string"  name="oxf.fr.home.process.ask-credentials">
+    <property as="xs:string"  name="oxf.fr.home.process.load-metadata-with-credentials">
         xf:show("fr-credentials-dialog")
         then suspend
-        then load-remote
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.load-start-with-remote">
-        load-remote
-        then load-local
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.load-start-with-credentials">
-        ask-credentials
-        then load-local
+        then load-metadata
+        then xf:dispatch("store-credentials")
+        recover load-metadata-with-credentials
     </property>
 
     <property as="xs:string"  name="oxf.fr.home.process.credentials-ok">

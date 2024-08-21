@@ -38,6 +38,9 @@ object RelationalUtils extends Logging {
 
   val Logger: log4s.Logger = LoggerFactory.createLogger("org.orbeon.relational")
 
+  val PersistenceBase  = "/fr/service/persistence/"
+  val ResourceProvider = "resource"
+
   def newIndentedLogger: IndentedLogger =
     new IndentedLogger(Logger)
 
@@ -55,8 +58,7 @@ object RelationalUtils extends Logging {
         None,
         properties
       )
-      .filter { case (provider, _) => provider != "resource" && isInternalProvider(provider, properties) }
-      .view
+      .filter { case (provider, _) => provider != ResourceProvider && isInternalProvider(provider, properties) }
       .mapValues(_.sortBy(_.name))
 
     val problematicDataSources = propertiesByProvider.filter { case (provider, propertiesWithProvider) =>

@@ -13,19 +13,12 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.FormRunner.orbeonRolesFromCurrentRequest
-import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.{IndentedLogger, XPath}
-import org.orbeon.oxf.xforms.NodeInfoFactory
-import org.orbeon.oxf.xforms.action.XFormsAPI.insert
+import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.NodeConversions.*
-import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 
 
@@ -92,90 +85,6 @@ trait FormBuilderPermissionsOps {
             app -> forms) toMap
         }
     }
-
-  /** Given a list of forms metadata:
-   *  - determines the operations the current user can perform,
-   *  - annotates the `<form>` with an `operations="…"` attribute,
-   *  - filters out forms the current user can perform no operation on.
-   */
-  def filterFormsAndAnnotateWithOperations(
-    formsEls              : List[NodeInfo],
-    allForms              : Boolean,
-    ignoreAdminPermissions: Boolean,
-    credentialsOpt        : Option[Credentials]
-  )(implicit
-    indentedLogger        : IndentedLogger
-  ): List[NodeInfo] = {
-
-    var wrapperOpt: Option[DocumentWrapper] = None
-
-    val fbPermissions =
-      formBuilderPermissions(
-        FormRunner.formBuilderPermissionsConfiguration,
-        orbeonRolesFromCurrentRequest
-      )
-
-    formsEls.flatMap { formEl =>
-
-      val wrapper = wrapperOpt.getOrElse(
-        // Create wrapper if we don't have one already
-        new DocumentWrapper(dom.Document(), null, formEl.getConfiguration)
-          |!> (w => wrapperOpt = Some(w)) // save wrapper for following iterations
-      )
-
-      val appName  = formEl.elemValue(Names.AppName)
-      val formName = formEl.elemValue(Names.FormName)
-      val hasAdminPermissionForAppForm  = {
-        def canAccessEverything = fbPermissions.contains("*")
-        def canAccessAppForm = {
-          val formsUserCanAccess = fbPermissions.getOrElse(appName, Set.empty)
-          formsUserCanAccess.contains("*") || formsUserCanAccess.contains(formName)
-        }
-        canAccessEverything || canAccessAppForm
-      }
-
-      // For each form, compute the operations the user can potentially perform
-      val operations = {
-        val adminOperation = hasAdminPermissionForAppForm.list("admin")
-        val permissionsElement = formEl.child(Names.Permissions).headOption
-        val otherOperations =
-          Operations.serialize(
-            PermissionsAuthorization.authorizedOperationsForNoData(
-              permissions    = FormRunner.permissionsFromElemOrProperties(permissionsElement, AppForm(appName, formName)),
-              credentialsOpt = credentialsOpt
-            ),
-            normalized = true
-          )
-
-        adminOperation ++ otherOperations
-      }
-
-      // Is this form metadata returned by the API?
-      val keepForm =
-        allForms                                                   ||     // all forms are explicitly requested
-        (hasAdminPermissionForAppForm && ! ignoreAdminPermissions) || ! ( // admins can see everything
-          formName == Names.LibraryFormName ||     // filter libraries
-          operations.isEmpty                ||     // filter forms on which user can't possibly do anything
-          formEl.elemValue("available") == "false" // filter forms marked as not available
-        )
-
-      // If kept, rewrite <form> to add operations="…" attribute
-      keepForm list {
-        val newFormEl      = wrapper.wrap(dom.Element("form"))
-        val operationsAttr = NodeInfoFactory.attributeInfo("operations", operations mkString " ")
-        val newFormContent = operationsAttr +: formEl.child(*)
-
-        // 2024-07-23: I thought that it might not be necessary to include in the response the `<permissions>` element,
-        // since we compute here the required `operations` attribute. However the Search API, as well as the persistence
-        // proxy, require that the `<permissions>` element be returned.
-        // https://doc.orbeon.com/form-runner/api/persistence/custom-persistence-providers#form-metadata-api
-
-        insert(into = List(newFormEl), origin = newFormContent)
-
-        newFormEl
-      }
-    }
-  }
 
   private def findConfiguredRoles(configurationOpt: Option[NodeInfo]) = configurationOpt match {
     case Some(configuration) => configuration.root / * / "role" toList

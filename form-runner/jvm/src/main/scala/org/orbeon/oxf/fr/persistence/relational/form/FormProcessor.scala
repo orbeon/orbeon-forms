@@ -1,5 +1,5 @@
 /**
-  * Copyright (C) 2016 Orbeon, Inc.
+  * Copyright (C) 2024 Orbeon, Inc.
   *
   * This program is free software; you can redistribute it and/or modify it under the terms of the
   * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,11 +11,11 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.fr.persistence.relational.search
+package org.orbeon.oxf.fr.persistence.relational.form
 
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.AppForm
-import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
+import org.orbeon.oxf.fr.AppFormOpt
+import org.orbeon.oxf.fr.persistence.relational.form.adt.{FormRequest, FormResponse}
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -24,12 +24,13 @@ import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorOutput}
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils, XPath}
 import org.orbeon.oxf.xml.XMLReceiver
+import org.orbeon.scaxon.NodeConversions
+import org.orbeon.scaxon.NodeConversions.nodeInfoToElem
+
+import scala.util.matching.Regex
 
 
-class SearchProcessor
-  extends ProcessorImpl
-    with SearchLogic
-    with SearchResult {
+class FormProcessor extends ProcessorImpl {
 
   self =>
 
@@ -45,33 +46,32 @@ class SearchProcessor
           implicit val indentedLogger : IndentedLogger  = RelationalUtils.newIndentedLogger
 
           try {
-            val searchDocument = readInputAsTinyTree(
+            val httpRequest = NetUtils.getExternalContext.getRequest
+
+            // If GET request (compatibility mode), we'll need optional app/form names
+            val (provider, appOpt, formOpt) = httpRequest.getRequestPath match {
+              case FormProcessor.Path(provider, app, form)  => (Provider.withName(provider), Option(app), Option(form))
+              case _                                        => throw new IllegalArgumentException(s"Invalid path: ${httpRequest.getRequestPath}")
+            }
+
+            // If POST request, we'll need a body
+            val bodyFromPipeline = readInputAsTinyTree(
               pipelineContext,
               getInputByName(ProcessorImpl.INPUT_DATA),
               XPath.GlobalConfiguration
             )
 
-            val httpRequest = NetUtils.getExternalContext.getRequest
-
-            val SearchProcessor.Path(provider, app, form) = httpRequest.getRequestPath
-
-            val appForm = AppForm(app, form)
-
-            val formDefinitionVersion =
-              PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(appForm, SearchLogic.searchVersion(httpRequest))
-
-            val request =
-              SearchRequestParser.parseRequest(
-                Provider.withName(provider),
-                appForm,
-                PersistenceMetadataSupport.isInternalAdminUser(httpRequest.getFirstParamAsString),
-                searchDocument,
-                formDefinitionVersion
+            val formRequest = FormRequest.parseOrThrowBadRequest {
+              FormRequest(
+                request             = httpRequest,
+                bodyFromPipelineOpt = Some(bodyFromPipeline),
+                appFormFromUrlOpt   = AppFormOpt(appOpt, formOpt)
               )
+            }
 
-            val (result, count) = doSearch(request)
+            val forms = FormLogic.forms(provider, formRequest)
 
-            outputResult(request, result, count, xmlReceiver)
+            NodeConversions.elemToSAX(nodeInfoToElem(FormResponse(forms).toXML), xmlReceiver)
           } catch {
             case e: IllegalArgumentException =>
               throw HttpStatusCodeException(StatusCode.BadRequest, throwable = Some(e))
@@ -81,6 +81,18 @@ class SearchProcessor
     )
 }
 
-private object SearchProcessor {
-  private val Path = "/fr/service/([^/]+)/search/([^/]+)/([^/]+)".r
+object FormProcessor {
+
+  private val Path: Regex = """/fr/service/([^/]+)/form(?:/([^/]+)(?:/([^/]+))?)?""".r
+
+  def pathSuffix(appFormOpt: Option[AppFormOpt]): String = {
+
+    val prefix = "/form"
+
+    appFormOpt match {
+      case None                              => prefix
+      case Some(AppFormOpt(app, None))       => s"$prefix/$app"
+      case Some(AppFormOpt(app, Some(form))) => s"$prefix/$app/$form"
+    }
+  }
 }

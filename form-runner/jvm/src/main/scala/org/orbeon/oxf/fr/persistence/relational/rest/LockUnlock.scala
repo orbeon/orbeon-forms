@@ -16,10 +16,9 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import enumeratum.*
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
-import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, NetUtils}
 
@@ -29,7 +28,7 @@ import scala.util.Try
 
 trait LockUnlock {
 
-  import Private._
+  import Private.*
 
   def lock(
     req            : LockUnlockRequest
@@ -37,7 +36,7 @@ trait LockUnlock {
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger
   ): Unit = {
-    import LeaseStatus._
+    import LeaseStatus.*
     val timeout = readTimeoutFromHeader
     readLeaseStatus(req) { (connection, leaseStatus, dataPart, reqLockInfo) =>
       leaseStatus match {
@@ -57,7 +56,7 @@ trait LockUnlock {
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger
   ): Unit = {
-    import LeaseStatus._
+    import LeaseStatus.*
     readLeaseStatus(req) { (connection, leaseStatus, dataPart, _) =>
       leaseStatus match {
         case DoesNotExist =>
@@ -107,11 +106,8 @@ trait LockUnlock {
       indentedLogger : IndentedLogger
     ): Unit = {
 
-      import LeaseStatus._
-      val bodyInputStream = RequestGenerator.getRequestBody(PipelineContext.get) match {
-        case Some(bodyURL) => NetUtils.uriToInputStream(bodyURL)
-        case None          => NetUtils.getExternalContext.getRequest.getInputStream
-      }
+      import LeaseStatus.*
+      val bodyInputStream = PersistenceProxyProcessor.requestInputStream(NetUtils.getExternalContext.getRequest)
 
       val reqLockInfo = LockInfo.parse(bodyInputStream)
       RelationalUtils.withConnection { connection =>

@@ -1,5 +1,6 @@
 package org.orbeon.oxf.fr.persistence.api
 
+import org.orbeon.oxf.fr.AppFormOpt
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.http.HttpMethod
@@ -22,8 +23,7 @@ object PersistenceApi extends PersistenceApiTrait {
 
   // Unlike other functions in `PersistenceApiTrait`, this calls `PersistenceProxyProcessor` directly.
   def getFormMetadata(
-    app                   : Option[String],
-    form                  : Option[String],
+    appFormOpt            : Option[AppFormOpt],
     incomingHeaders       : ju.Map[String, Array[String]],
     allVersions           : Boolean,
     allForms              : Boolean,
@@ -35,14 +35,13 @@ object PersistenceApi extends PersistenceApiTrait {
     debug(s"calling form metadata API")
 
     val formMetadataDocElem =
-      PersistenceProxyProcessor.callPublishedFormsMetadata(
+      PersistenceProxyProcessor.localAndRemoteFormsMetadata(
         makeOutgoingRequest(HttpMethod.GET, incomingHeaders, List(
           "all-forms"                -> allForms.toString,
           "all-versions"             -> allVersions.toString,
           "ignore-admin-permissions" -> ignoreAdminPermissions.toString,
         )),
-        app        = app,
-        form       = form
+        appFormOpt
       )
 
     (formMetadataDocElem / "form").iterator map { formElem =>

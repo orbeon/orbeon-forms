@@ -22,6 +22,7 @@ import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
 import org.orbeon.oxf.fr.Version.Unspecified
 import org.orbeon.oxf.fr.permission.Operations
+import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.PersistenceBase
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
@@ -40,8 +41,6 @@ import scala.util.Try
 
 
 private[persistence] object HttpCall {
-
-  private val PersistenceBase = "/fr/service/persistence/"
 
   sealed trait Body
   case class XML   (doc : Document   ) extends Body

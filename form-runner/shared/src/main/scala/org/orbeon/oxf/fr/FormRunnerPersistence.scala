@@ -184,6 +184,7 @@ object FormRunnerPersistence {
     properties.getNonBlankString(
       PersistenceProviderPropertyPrefix :: appForm.app :: appForm.form :: formOrData.entryName :: AttachmentsSuffix :: Nil mkString "."
     )
+
   // Get all providers that can be used either for form data or for form definitions
   // 2024-02-28: Called with `None`/`None`/`Data`, or appOpt/formOpt/`Form`
   def getProviders(

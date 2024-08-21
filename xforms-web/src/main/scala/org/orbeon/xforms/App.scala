@@ -28,7 +28,7 @@ trait App {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.App")
 
-  //  private val LogLevel = log4s.Debug // Debug|Info|Warn|Error
+//    protected val LogLevel = log4s.Debug // Trace|Debug|Info|Warn|Error
   protected val LogLevel: log4s.LogLevel = log4s.Info // Trace|Debug|Info|Warn|Error
 
   def onOrbeonApiLoaded(): Unit

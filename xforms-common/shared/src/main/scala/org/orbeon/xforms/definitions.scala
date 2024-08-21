@@ -19,6 +19,7 @@ import enumeratum._
 
 sealed trait BindingErrorReason { val message: String }
 sealed trait NodeBindingErrorReason extends BindingErrorReason
+
 object BindingErrorReason {
   case object DisallowedNode                extends NodeBindingErrorReason { val message = "Unable to set value on disallowed node" }
   case object ReadonlyNode                  extends NodeBindingErrorReason { val message = "Unable to set value on read-only node" }

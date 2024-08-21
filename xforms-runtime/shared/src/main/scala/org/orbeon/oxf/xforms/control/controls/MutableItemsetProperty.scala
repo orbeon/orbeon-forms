@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.itemset.{Itemset, ItemsetSupport}
 import org.orbeon.xforms.XFormsId
 

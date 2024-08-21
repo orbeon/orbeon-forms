@@ -91,7 +91,7 @@ object XBLTransformer {
     xblSupport            : Option[XBLSupport],
     shadowTreeDocument    : Document,
     boundElement          : Element,
-    abstractBindingOpt    : Option[AbstractBinding],
+    abstractBindingOpt    : Option[AbstractBinding], // `None` for tests only
     excludeNestedHandlers : Boolean,
     excludeNestedLHHA     : Boolean,
     supportAVTs           : Boolean

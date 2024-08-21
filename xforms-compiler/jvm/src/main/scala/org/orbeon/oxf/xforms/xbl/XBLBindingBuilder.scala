@@ -119,7 +119,7 @@ object XBLBindingBuilder {
   // Annotate a tree
   def annotateSubtree(
     partAnalysisCtx : PartAnalysisContextForTree, // for `Metadata` and `mapScopeIds`
-    boundElement    : Option[Element],      // for `xml:base` resolution
+    boundElement    : Option[Element],            // for `xml:base` resolution
     rawTree         : Document,
     innerScope      : Scope,
     outerScope      : Scope,

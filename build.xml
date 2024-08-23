@@ -261,8 +261,14 @@
     <target name="orbeon-auth-war" depends="war-common" description="Creates Orbeon Forms orbeon-auth.war">
         <mkdir dir="build/distrib"/>
         <war destfile="build/distrib/orbeon-auth.war" webxml="descriptors/orbeon-auth-war/web.xml">
+            <lib dir="orbeon-war/jvm/target/webapp/WEB-INF/lib">
+                <include name="scala-library.jar"/>
+            </lib>
             <zipfileset dir="src/target/scala-2.12/classes" prefix="WEB-INF/classes">
-                <include name="org/orbeon/oxf/controller/AuthorizerServlet*.class"/>
+                <include name="org/orbeon/oxf/controller/*AuthorizerServlet*.class"/>
+            </zipfileset>
+            <zipfileset dir="servlet-support/target/scala-2.12/classes" prefix="WEB-INF/classes">
+                <include name="org/orbeon/oxf/servlet/*"/>
             </zipfileset>
         </war>
     </target>

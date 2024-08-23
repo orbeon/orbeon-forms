@@ -174,6 +174,13 @@
                 </xf:action>
             </xf:var>
 
+            <!-- Workaround for #6443 until we have a fix for #6456 -->
+            <xf:select1 ref="xf:element('_')" appearance="xxf:internal" id="internal-select1">
+                <xf:choices context="$itemset">
+                    <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+                </xf:choices>
+            </xf:select1>
+
             <!-- The concrete select1 -->
             <xf:select1
                 ref="$binding"
@@ -183,10 +190,10 @@
                 class="{'fr-service-error'[instance('status')/@submission-status = 'failure']}">
                 <!-- Switch to the outer scope so that a nested `xf:itemset` evaluates in that scope.
                      https://github.com/orbeon/orbeon-forms/issues/4595 -->
-                <xf:choices context="$itemset" xxbl:scope="outer">
-                    <!-- Itemset unconventionally evaluates wrt inner scope -->
-                    <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
-                </xf:choices>
+                <xf:itemset ref="xxf:itemset('internal-select1', 'xml', false())//item">
+                    <xf:label ref="label"/>
+                    <xf:value ref="value"/>
+                </xf:itemset>
             </xf:select1>
 
             <!-- Runs when the itemset changes

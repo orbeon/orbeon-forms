@@ -55,7 +55,7 @@ class XXFormsItemset extends XFormsFunction {
           ItemsetSupport.asJSON(
             itemset                    = itemset,
             controlValue               = controlValueForSelection,
-            encode                     = select1Control.mustEncodeValues,
+            encode                     = select1Control.mustEncodeValues, // shouldn't this always be `false`?
             excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy,
             locationData               = control.getLocationData
           ): om.Item

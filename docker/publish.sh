@@ -2,9 +2,9 @@
 
 publish=true
 
-VERSION=${1:-'2023.1.3-pe'}
-TAG=${2:-'tag-release-2023.1.3-pe-pseudo'}
-FILE=${3:-'orbeon-2023.1.3.202406131619-PE.zip'}
+VERSION=${1:-'2023.1.4-pe'}
+TAG=${2:-'tag-release-2023.1.4-pe-pseudo'}
+FILE=${3:-'orbeon-2023.1.4.202408212351-PE.zip'}
 SQL_FILE=${4:-'2023.1/postgresql-2023_1.sql'}
 PLATFORMS=${5:-'linux/amd64,linux/arm64'}
 DEMO_FORMS_LICENSE_FILE=${6:-"$HOME/.orbeon/license.xml"}

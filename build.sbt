@@ -585,22 +585,22 @@ lazy val xformsFilterWar = (project in file("xforms-filter-war"))
   .settings(OrbeonWebappPlugin.projectSettings: _*)
   .settings(commonSettings: _*)
 
-lazy val formRunnerAuth = (project in file("form-runner-auth"))
+lazy val authorizer = (project in file("authorizer"))
   .dependsOn(
     commonJVM,
     servletSupport
   )
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-form-runner-auth"
+    name := "orbeon-authorizer"
   )
 
-lazy val formRunnerAuthWar = (project in file("form-runner-auth-war"))
+lazy val authorizerWar = (project in file("authorizer-war"))
   .settings(
-    name := "orbeon-form-runner-auth-war",
+    name := "orbeon-authorizer-war",
   )
   .dependsOn(
-    formRunnerAuth
+    authorizer
   )
   .settings(OrbeonWebappPlugin.projectSettings: _*)
   .settings(commonSettings: _*)
@@ -1465,6 +1465,7 @@ lazy val root = (project in file("."))
     embeddingWar,
     formRunnerProxyPortletWar,
     xformsFilterWar,
+    authorizerWar,
     fullPortlet,
     servletContainerInitializer,
     demoSqliteDatabase,

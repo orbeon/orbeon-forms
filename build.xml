@@ -271,7 +271,7 @@
             <!--            -whyareyoukeeping class org.orbeon.saxon.om.NodeInfo-->
             <!--            -ignorewarnings-->
 
-            -injars      form-runner-auth-war/target/webapp/WEB-INF/lib/(*.jar;)
+            -injars authorizer-war/target/webapp/WEB-INF/lib/(*.jar;)
 
             -dontwarn org.apache.http.auth.KerberosCredentials
             -dontwarn org.apache.http.impl.auth.**
@@ -315,7 +315,7 @@
                 public static *;
             }
         </proguard>
-        <jarjar jarfile="build/lib/orbeon-form-runner-auth.jar">
+        <jarjar jarfile="build/lib/orbeon-authorizer.jar">
             <zipfileset src="${temp.jar}"/>
             <rule pattern="org.orbeon.oxf.controller.AuthorizerServlet*"        result="org.orbeon.oxf.controller.AuthorizerServlet@1"/>
             <rule pattern="org.orbeon.oxf.controller.JavaxAuthorizerServlet*"   result="org.orbeon.oxf.controller.JavaxAuthorizerServlet@1"/>

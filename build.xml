@@ -259,18 +259,75 @@
     </target>
 
     <target name="orbeon-auth-war" depends="war-common" description="Creates Orbeon Forms orbeon-auth.war">
-        <mkdir dir="build/distrib"/>
-        <war destfile="build/distrib/orbeon-auth.war" webxml="descriptors/orbeon-auth-war/web.xml">
-            <lib dir="orbeon-war/jvm/target/webapp/WEB-INF/lib">
-                <include name="scala-library.jar"/>
-            </lib>
-            <zipfileset dir="src/target/scala-2.12/classes" prefix="WEB-INF/classes">
-                <include name="org/orbeon/oxf/controller/*AuthorizerServlet*.class"/>
-            </zipfileset>
-            <zipfileset dir="servlet-support/target/scala-2.12/classes" prefix="WEB-INF/classes">
-                <include name="org/orbeon/oxf/servlet/*"/>
-            </zipfileset>
-        </war>
+        <local name="temp.jar"/>
+        <tempfile property="temp.jar" prefix="proguard" suffix=".jar" destdir="build/temp" deleteonexit="true"/>
+        <proguard>
+            -verbose
+            -dontobfuscate
+            -dontnote
+            -forceprocessing
+            -optimizations !method/inlining/unique,!method/inlining/short
+
+            <!--            -whyareyoukeeping class org.orbeon.saxon.om.NodeInfo-->
+            <!--            -ignorewarnings-->
+
+            -injars      form-runner-auth-war/target/webapp/WEB-INF/lib/(*.jar;)
+
+            -dontwarn org.apache.http.auth.KerberosCredentials
+            -dontwarn org.apache.http.impl.auth.**
+
+            -dontwarn org.apache.logging.log4j.core.**
+            -dontwarn org.apache.logging.log4j.util.**
+            -dontwarn org.slf4j.ext.**
+            -dontwarn ch.qos.logback.**
+            -dontwarn org.apache.commons.logging.**
+
+            -dontwarn scala.collection.immutable.VM
+            -dontwarn scala.reflect.**
+            -dontwarn scala.tools.nsc.**
+            -dontwarn cats.effect.Signal**
+            -dontwarn fs2.io.net.unixsocket.**
+
+            -dontwarn org.osgi.annotation.**
+            -dontwarn aQute.bnd.annotation.**
+            -dontwarn edu.umd.cs.findbugs.**
+            -dontwarn com.google.errorprone.**
+
+            -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
+
+            -libraryjars xforms-filter-war/target/webapp/WEB-INF/lib/slf4j-api-2.0.16.jar
+
+            -libraryjars lib/proguard/(javax.servlet-api-*.jar;)
+            -libraryjars lib/proguard/(jakarta.servlet-api-*.jar;)
+            -libraryjars lib/proguard/(portlet-api-*.jar;)
+            -libraryjars lib/proguard/(liferay-portal-service-*.jar;)
+            -libraryjars lib/proguard/(liferay-portal-kernel-*.jar;)
+
+            -outjars     ${temp.jar}(**.class,!**)
+
+            -keep public class org.orbeon.oxf.controller.AuthorizerServlet {
+                public static *;
+            }
+            -keep public class org.orbeon.oxf.controller.JavaxAuthorizerServlet {
+                public static *;
+            }
+            -keep public class org.orbeon.oxf.controller.JakartaAuthorizerServlet {
+                public static *;
+            }
+        </proguard>
+        <jarjar jarfile="build/lib/orbeon-form-runner-auth.jar">
+            <zipfileset src="${temp.jar}"/>
+            <rule pattern="org.orbeon.oxf.controller.AuthorizerServlet*"        result="org.orbeon.oxf.controller.AuthorizerServlet@1"/>
+            <rule pattern="org.orbeon.oxf.controller.JavaxAuthorizerServlet*"   result="org.orbeon.oxf.controller.JavaxAuthorizerServlet@1"/>
+            <rule pattern="org.orbeon.oxf.controller.JakartaAuthorizerServlet*" result="org.orbeon.oxf.controller.JakartaAuthorizerServlet@1"/>
+            <rule pattern="org.orbeon.**"                                       result="org.orbeon.private.orbeon.@1"/>
+            <rule pattern="org.apache.**"                                       result="org.orbeon.private.apache.@1"/>
+            <rule pattern="com.google.**"                                       result="org.orbeon.private.google.@1"/>
+            <rule pattern="scala.**"                                            result="org.orbeon.private.scala.@1"/>
+            <rule pattern="enumeratum.**"                                       result="org.orbeon.private.enumeratum.@1"/>
+            <rule pattern="fs2.**"                                              result="org.orbeon.private.fs2.@1"/>
+        </jarjar>
+        <delete file="${temp.jar}"/>
     </target>
 
     <!-- Zip sources file -->

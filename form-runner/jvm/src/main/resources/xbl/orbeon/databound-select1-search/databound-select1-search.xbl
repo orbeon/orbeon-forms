@@ -505,6 +505,16 @@
                         <xf:var       name="view"                    value="fr:mode() = ('view', 'pdf')"/>
                         <xf:var       name="min-input-length"        value="fr:component-param-value('min-input-length')"/>
 
+                        <!-- Internal `xf:select1` so form author can access the itemset with `xxf:itemset()` -->
+                        <xf:var name="result-raw" xxbl:scope="outer">
+                            <xxf:value value="instance('result-raw')" xxbl:scope="inner"/>
+                        </xf:var>
+                        <xf:select1 ref="$binding" appearance="xxf:internal">
+                            <xf:choices context="$result-raw" xxbl:scope="outer">
+                                <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+                            </xf:choices>
+                        </xf:select1>
+
                         <xf:group
                             ref="if (not($view)) then . else ()"
                             xxf:element="span"

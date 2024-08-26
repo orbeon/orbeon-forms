@@ -592,7 +592,9 @@ lazy val authorizer = (project in file("authorizer"))
   )
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-authorizer"
+    name := "orbeon-authorizer",
+    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % JavaxServletApiVersion      % Provided,
+    libraryDependencies += "jakarta.servlet"    % "jakarta.servlet-api"       % JakartaServletApiVersion    % Provided
   )
 
 lazy val authorizerWar = (project in file("authorizer-war"))

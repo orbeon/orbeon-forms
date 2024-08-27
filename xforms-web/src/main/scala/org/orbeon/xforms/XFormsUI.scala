@@ -575,7 +575,7 @@ object XFormsUI {
     )
 
     // Notify the caller (to handle the loading indicator)
-    if (! showProgressOpt.contains(true))
+    if (! showProgressOpt.contains(false))
       notifyReplace()
 
     // Remove possibly existing hidden fields just in case. In particular, the server should no longer include `$uuid`.

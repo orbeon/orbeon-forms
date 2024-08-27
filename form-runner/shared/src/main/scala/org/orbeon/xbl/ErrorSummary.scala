@@ -135,28 +135,31 @@ object ErrorSummary {
 
     val currentErrorOpt = SaxonUtils.selectID(errorsInstanceDoc, absoluteTargetId)
 
-    def xxfProperty[T](name: String) =
-      event.property[T](xxfName(name))
+    def xxfProperty[T](allow: Boolean, name: String) =
+      if (allow) event.property[T](xxfName(name)) else None
 
-    val eventLevelOpt = event match {
-      case e: XXFormsConstraintsChangedEvent           => e.property[String]("level")  map ValidationLevel.withNameInsensitive
-      case _: XFormsEnabledEvent                       => xxfProperty[String]("level") map ValidationLevel.withNameInsensitive
-      case _: XFormsValidEvent | _: XFormsInvalidEvent => Some(ValidationLevel.ErrorLevel)
-      case _                                           => None
+    // This function is called for the following events:
+    // xforms-enabled xxforms-constraints-changed xforms-disabled xforms-invalid xforms-valid xforms-value-changed
+    val (enabled, eventLevelOpt) = event match {
+      case e: XXFormsConstraintsChangedEvent           => true  -> e.property[String]("level") .map(ValidationLevel.withNameInsensitive)
+      case _: XFormsEnabledEvent                       => true  -> xxfProperty[String](allow = true, "level").map(ValidationLevel.withNameInsensitive)
+      case _: XFormsValidEvent | _: XFormsInvalidEvent => true  -> Some(ValidationLevel.ErrorLevel)
+      case _: XFormsDisabledEvent                      => false -> None
+      case _                                           => true  -> None
     }
 
     // Ideally, we would evaluate this lazily, but we use it in the pattern match below
     val alertOpt =
-      xxfProperty[String]("alert")
+      xxfProperty[String](allow = enabled, "alert")
 
     def bindingFromEventOpt =
-      xxfProperty[Seq[Item]]("binding") flatMap (_.headOption)
+      xxfProperty[Seq[Item]](allow = enabled, "binding") flatMap (_.headOption)
 
     def labelFromEventOpt =
-      xxfProperty[String]("label")
+      xxfProperty[String](allow = enabled, "label")
 
     def controlPositionFromEvent =
-      xxfProperty[Int]("control-position") getOrElse (throw new IllegalStateException)
+      xxfProperty[Int](allow = enabled, "control-position") getOrElse (throw new IllegalStateException)
 
     def requiredEmpty =
       bindingFromEventOpt exists {

@@ -197,22 +197,23 @@ object ElementAnalysisTreeBuilder {
     //
     def componentChildren(
       partAnalysisCtx : PartAnalysisContextForTree,
-      e               : ComponentControl,
-      honorLazy       : Boolean)(implicit
+      componentControl: ComponentControl,
+      honorLazy       : Boolean
+    )(implicit
       indentedLogger  : IndentedLogger
     ): Iterable[(Element, Scope)] =
-      if (! e.hasLazyBinding || ! honorLazy) {
+      if (! componentControl.hasLazyBinding || ! honorLazy) {
 
         val abstractBinding =
-          partAnalysisCtx.metadata.findAbstractBindingByPrefixedId(e.prefixedId) getOrElse
+          partAnalysisCtx.metadata.findAbstractBindingByPrefixedId(componentControl.prefixedId) getOrElse
             (throw new IllegalStateException)
 
         XBLBindingBuilder.createConcreteBindingFromElem(
           partAnalysisCtx,
           abstractBinding,
-          e.rootElem,
-          e.prefixedId,
-          e.containerScope
+          componentControl.rootElem,
+          componentControl.prefixedId,
+          componentControl.containerScope
         ) match {
           case Some((concreteBinding, globalOpt, compactShadowTree)) =>
 
@@ -221,11 +222,11 @@ object ElementAnalysisTreeBuilder {
               partAnalysisCtx.allGlobals += global                           // TODO: indexing
             }
 
-            e.setConcreteBinding(concreteBinding)
+            componentControl.setConcreteBinding(concreteBinding)
 
             val scopesForDirectlyNestedChildren: (Scope, Scope, XXBLScope) = {
 
-              val innerScope = e.containerScope
+              val innerScope = componentControl.containerScope
 
               // Outer scope in effect for the component element itself
               val outerScope =
@@ -233,22 +234,22 @@ object ElementAnalysisTreeBuilder {
                   innerScope
                 else {
                   // Search in ancestor parts too
-                  val controlId = e.containerScope.fullPrefix.init
+                  val controlId = componentControl.containerScope.fullPrefix.init
                   val controlAnalysis =
-                    ElementAnalysis.ancestorsAcrossPartsIterator(e, includeSelf = false) find
+                    ElementAnalysis.ancestorsAcrossPartsIterator(componentControl, includeSelf = false) find
                       (_.prefixedId == controlId) getOrElse
                       (throw new IllegalStateException)
 
                   controlAnalysis.scope
                 }
 
-              (innerScope, outerScope, if (e.scope == innerScope) XXBLScope.Inner else XXBLScope.Outer)
+              (innerScope, outerScope, if (componentControl.scope == innerScope) XXBLScope.Inner else XXBLScope.Outer)
             }
 
             def annotateChild(innerScope: Scope, outerScope: Scope, containerScope: XXBLScope)(child: Element): Element =
               XBLBindingBuilder.annotateSubtreeByElement(
                 partAnalysisCtx,
-                e.element,            // bound element
+                componentControl.element,            // bound element
                 child,                // child tree to annotate
                 innerScope,
                 outerScope,
@@ -258,8 +259,8 @@ object ElementAnalysisTreeBuilder {
 
             // Directly nested handlers (if enabled)
             def directlyNestedHandlers =
-              if (e.commonBinding.modeHandlers)
-                e.element.elements            filter
+              if (componentControl.commonBinding.modeHandlers)
+                componentControl.element.elements            filter
                   EventHandler.isEventHandler map
                   (annotateChild _).tupled(scopesForDirectlyNestedChildren)
               else
@@ -267,15 +268,15 @@ object ElementAnalysisTreeBuilder {
 
             // Directly nested LHHA (if enabled)
             def directlyNestedLHHA =
-              if (e.commonBinding.modeLHHA)
-                e.element.elements                                     filter
+              if (componentControl.commonBinding.modeLHHA)
+                componentControl.element.elements                                     filter
                   (e => LHHA.isLHHA(e) && ! e.hasAttribute(FOR_QNAME)) map
                   (annotateChild _).tupled(scopesForDirectlyNestedChildren)
               else
                 Nil
 
             val scopesForImplementationChildren =
-              (concreteBinding.innerScope, partAnalysisCtx.scopeForPrefixedId(e.prefixedId), XXBLScope.Inner)
+              (concreteBinding.innerScope, partAnalysisCtx.scopeForPrefixedId(componentControl.prefixedId), XXBLScope.Inner)
 
             val annotatedHandlers = abstractBinding.handlers      map (annotateChild _).tupled(scopesForImplementationChildren)
             val annotatedModels   = abstractBinding.modelElements map (annotateChild _).tupled(scopesForImplementationChildren)

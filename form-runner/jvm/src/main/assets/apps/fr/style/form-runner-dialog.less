@@ -72,7 +72,6 @@
                 text-align: right;
                 padding: 10px 5px 0 5px; // Dialog bd already has padding so no padding-bottom
                 margin-top: 5px;         // So that content above doesn't touch us
-                border-top: 2px solid @frBorderColor;
                 clear: both
             }
         }
@@ -93,37 +92,21 @@
             top: .5rem;
         }
 
-        // Dialogs for which we want the main area to take remaining height
-        &.xxforms-set-height {
+        &[open] { display: flex; }          // Don't override the user agent `display: none` closed
+        flex-direction: column;
+        align-items: normal;                // Needed?
+        max-height: ~"calc(100% - 8rem)";   // Don't let less calculate this
 
-            &[open] { display: flex }     // Don't override the user agent `display: none` closed
+        .xxforms-dialog-body {
+            min-height: 0;
+            display: flex;
             flex-direction: column;
-            align-items: normal;
-            min-height: 0;                // So that `height` below wins
-            height: ~"calc(100% - 8rem)"; // Don't let less calculate this
 
-            .xxforms-dialog-body {
-                padding: 0;
-                height: 100%;
-
-                padding-bottom: @buttonsAreaHeight;
-
-                .fr-dialog-buttons {
-                    height: @buttonsAreaHeight; // Fixed height
-                    padding-bottom: @buttonsAreaHeight;
-                    border-bottom-left-radius: @dialogBorderRadius;
-                    border-bottom-right-radius: @dialogBorderRadius;
-                    padding-top: 0;
-                    padding-right: 20px;
-                    padding-left: 20px;
-                    position: absolute; // Absolutely positioned
-                    bottom: 0;
-                    left: 0;
-                    right: 0; // At the bottom of the dialog body
-                    line-height: @buttonsAreaHeight;
-                    box-sizing: border-box; // So top margin gets include in height
-                    background-color: @dialogBackgroundColor;
-                }
+            .fr-dialog-buttons {
+                border-bottom-left-radius: @dialogBorderRadius;
+                border-bottom-right-radius: @dialogBorderRadius;
+                box-sizing: border-box; // So top margin gets include in height
+                background-color: @dialogBackgroundColor;
             }
         }
     }

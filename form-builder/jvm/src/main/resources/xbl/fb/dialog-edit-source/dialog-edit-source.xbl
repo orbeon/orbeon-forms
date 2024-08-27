@@ -85,15 +85,13 @@
                 level="modal"
                 close="true"
                 draggable="true"
-                class="fb-edit-source-dialog xxforms-set-height">
+                class="fb-edit-source-dialog">
 
                 <xf:label ref="$resources/dialog-edit-source/label"/>
 
-                <xh:div>
-                    <fr:code-mirror ref="source" id="code-mirror">
-                        <xf:alert ref="$resources/dialog-edit-source/source/alert"/>
-                    </fr:code-mirror>
-                </xh:div>
+                <fr:code-mirror ref="source" id="code-mirror">
+                    <xf:alert ref="$resources/dialog-edit-source/source/alert"/>
+                </fr:code-mirror>
                 <xh:div class="fr-dialog-buttons">
                     <xh:span>
                         <xf:trigger appearance="xxf:primary" id="apply-trigger">

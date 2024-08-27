@@ -18,7 +18,7 @@
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
 
-      id="fb-test-dialog" level="modal" close="true" draggable="false" class="fb-test-dialog xxforms-set-height">
+      id="fb-test-dialog" level="modal" close="true" draggable="false" class="fb-test-dialog">
 
     <xf:label ref="xxf:r('dialog-test.label')"/>
 

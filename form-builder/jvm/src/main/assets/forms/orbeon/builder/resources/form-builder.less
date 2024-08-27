@@ -1262,12 +1262,18 @@ body.orbeon {
             }
         }
 
-        .xforms-label {
-            margin-top: 5px;
+        .xbl-fr-tabbable {
+            min-height: 0;
+            display: flex;
+            & > div {
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+            }
         }
 
-        .tab-pane {
-            .dialog-scrollable(90vh);
+        .xforms-label {
+            margin-top: 5px;
         }
 
         // Adjust so that images within radio/checkbox looks centered like it is in the toolbox
@@ -1432,15 +1438,25 @@ body.orbeon {
     .fb-edit-source-dialog {
         width: 900px;
         max-width: none;
+        height: calc(100% - 8rem);  // The `max-height` we have by default isn't enough
         .xxforms-dialog-body {
+            padding: 0;
             position: relative;     // So `.CodeMirror` height can be relative to the body height
+            .fr-dialog-buttons {
+                padding: 10px;
+            }
         }
-        .CodeMirror {
-            font-size: 12px;        // Pick slightly smaller font size, default being 13px
-            position: absolute;     // So height can be 100%-64px of the dialog body
-            height: auto;           // Override default `300px`
-            top: 0; bottom: 64px;   // Leave room for buttons
-            width: 100%;
+        .xbl-fr-code-mirror {
+            flex-grow: 1;
+            position: relative;
+
+            .CodeMirror {
+                font-size: 12px;        // Pick slightly smaller font size, default being 13px
+                position: absolute;     // So height can be 100%-64px of the dialog body
+                height: auto;           // Override default `300px`
+                top: 0; bottom: 0;
+                width: 100%;
+            }
         }
         .xforms-alert.xforms-active { display: block }
     }

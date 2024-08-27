@@ -258,7 +258,7 @@
         </war>
     </target>
 
-    <target name="orbeon-auth-war" depends="war-common" description="Creates Orbeon Forms orbeon-auth.war">
+    <target name="orbeon-auth-jar" depends="war-common">
         <local name="temp.jar"/>
         <tempfile property="temp.jar" prefix="proguard" suffix=".jar" destdir="build/temp" deleteonexit="true"/>
         <proguard>
@@ -315,7 +315,7 @@
                 public static *;
             }
         </proguard>
-        <jarjar jarfile="build/lib/orbeon-authorizer.jar">
+        <jarjar jarfile="build/lib/orbeon-auth.jar">
             <zipfileset src="${temp.jar}"/>
             <rule pattern="org.orbeon.oxf.controller.AuthorizerServlet*"        result="org.orbeon.oxf.controller.AuthorizerServlet@1"/>
             <rule pattern="org.orbeon.oxf.controller.JavaxAuthorizerServlet*"   result="org.orbeon.oxf.controller.JavaxAuthorizerServlet@1"/>
@@ -328,6 +328,16 @@
             <rule pattern="fs2.**"                                              result="org.orbeon.private.fs2.@1"/>
         </jarjar>
         <delete file="${temp.jar}"/>
+    </target>
+
+    <target name="orbeon-auth-war" depends="orbeon-auth-jar" description="Creates Orbeon Forms orbeon-auth.war">
+    	<mkdir dir="build/distrib"/>
+        <war destfile="build/distrib/orbeon-${release.number}-orbeon-auth.war">
+            <webinf dir="authorizer-war/src/main/webapp/WEB-INF"/>
+            <lib dir="build/lib">
+                <include name="orbeon-auth.jar"/>
+            </lib>
+        </war>
     </target>
 
     <!-- Zip sources file -->

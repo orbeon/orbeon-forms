@@ -153,10 +153,9 @@ object PartAnalysisDebugSupport {
     def writeSelectionControl(a: SelectionControlTrait)(implicit receiver: XMLReceiver): Unit = {
       writeElementAnalysis(a)
       a.itemsetAnalysis foreach { analysis =>
-        withElement("itemset") {
-          writeXPathAnalysis(analysis)
-        }
+        writeXPathAnalysis(analysis)
       }
+      a.children foreach recurse
     }
 
     // Don't output nested value if any as everything is already contained in the enclosing variable

@@ -181,7 +181,6 @@ class SendTest
             assertXMLDocumentsIgnoreNamespacesInScope((expected: NodeInfo).root, result)
           }
         }
-
       }
     }
 
@@ -237,7 +236,6 @@ class SendTest
           assertXMLDocumentsIgnoreNamespacesInScope(ExpectedMetadata.root, result)
         }
       }
-
     }
   }
 }

@@ -4,6 +4,7 @@ import cats.data.NonEmptyList
 import cats.syntax.option.*
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum.{Enum, EnumEntry}
+import org.orbeon.oxf.fr.DataFormatVersion
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.StringUtils.*
 
@@ -77,6 +78,14 @@ object ContentToken {
       case "attachments" => ContentToken.Attachments.some
       case rendered      => RenderedFormat.findRenderedFormatWithIsUrl(rendered).map((ContentToken.Rendered.apply _).tupled)
     }
+
+  def toString(contentToken: ContentToken): String = contentToken match {
+    case ContentToken.Xml         => "xml"
+    case ContentToken.Metadata    => "metadata"
+    case ContentToken.Attachments => "attachments"
+    case ContentToken.Rendered(format, urlOnly) =>
+      if (urlOnly) s"${format.entryName}-url" else format.entryName
+  }
 }
 
 sealed trait ContentToSend
@@ -98,4 +107,10 @@ object ContentToSend {
       case Some(NonEmptyList(head, Nil))                           => ContentToSend.Single(head)
       case Some(nel)                                               => ContentToSend.Multipart(nel)
     }
+
+  def toStringOpt(contentToSend: ContentToSend): Option[String] = contentToSend match {
+    case ContentToSend.NoContent          => None
+    case ContentToSend.Single(part)       => ContentToken.toString(part).some
+    case ContentToSend.Multipart(parts)   => parts.toList.map(ContentToken.toString).mkString(" ").some
+  }
 }

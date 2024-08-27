@@ -97,6 +97,12 @@ object DataFormatVersion extends Enum[DataFormatVersion] {
       Edge
     else
       withName(s)
+
+  def withNameNoneIfEdge(s: String): Option[DataFormatVersion] =
+    if (s == "edge")
+      None
+    else
+      withName(s).some
 }
 
 case class AttachmentWithHolder(

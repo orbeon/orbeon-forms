@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.{XFormsProperties => P}
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.xforms.xbl.Scope
 
+import java.net.URI
 import scala.collection.compat._
 import scala.collection.immutable.SortedMap
 import scala.collection.mutable
@@ -185,4 +186,9 @@ class XFormsStaticStateImpl(
       js  = orderedBindings.values.iterator.flatMap(_.js) .to(mutable.LinkedHashSet).toList
     )
   }
+
+  // No cache on the JVM for now
+  // https://github.com/orbeon/orbeon-forms/issues/6462
+  def fromUriCacheOrElse(uri: URI, compute: => URI): URI = compute
+  def clearUriCache(): Unit = ()
 }

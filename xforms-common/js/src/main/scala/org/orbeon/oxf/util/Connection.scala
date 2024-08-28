@@ -33,6 +33,9 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 object Connection extends ConnectionTrait {
 
+  val OrbeonConnectionResultSourceHeaderName = "Orbeon-Connection-Result-Result-Source"
+  val CompiledFormZip                        = "compiled-form-zip"
+
   var resourceResolver: String => Option[ConnectionResult] = _
 
   var submissionProvider: Option[SubmissionProvider] = None
@@ -102,28 +105,28 @@ object Connection extends ConnectionTrait {
     def value: Short = _value
   }
 
-  private def inputStreamIterable(is: InputStream): js.Iterable[Short] =
+  def inputStreamIterable(is: InputStream): js.Iterable[Short] =
     new js.Iterable[Short] {
 
       @JSName(js.Symbol.iterator)
       def jsIterator(): js.Iterator[Short] = new js.Iterator[Short] {
 
-      var current = is.read()
+        var current = is.read()
+        val entry = new IteratorEntry
 
-      val entry = new IteratorEntry
+        def next(): Iterator.Entry[Short] = {
 
-      def next(): Iterator.Entry[Short] = {
-
-        if (current == -1) {
-          entry.update(done = true, 0)
-        } else {
-          entry.update(done = false, current.toShort)
-          current = is.read()
+          if (current == -1) {
+            entry.update(done = true, 0)
+            is.close()
+          } else {
+            entry.update(done = false, current.toShort)
+            current = is.read()
+          }
+          entry
         }
-        entry
       }
     }
-  }
 
   private def fromTemporaryFile(method: HttpMethod, url: URI): Option[AsyncConnectionResult] =
     method match {

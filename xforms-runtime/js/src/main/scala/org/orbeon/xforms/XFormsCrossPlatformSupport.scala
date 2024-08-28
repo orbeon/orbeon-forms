@@ -21,7 +21,7 @@ import org.orbeon.dom
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
-import org.orbeon.oxf.http.HttpMethod.GET
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -31,15 +31,20 @@ import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
 import org.scalajs.dom.DOMParser
 import org.scalajs.dom.ext._
-import org.scalajs.dom.raw.HTMLDocument
+import org.scalajs.dom.raw.{Blob, BlobPropertyBag, HTMLDocument}
 
 import java.io._
 import java.net.URI
 import javax.xml.transform.Transformer
 import javax.xml.transform.sax.TransformerHandler
+import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.typedarray.Uint8Array
 
 
 object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
+
+  private val UseBlobUrl = true
 
   def externalContext: ExternalContext = CoreCrossPlatformSupport.externalContext
 
@@ -122,37 +127,45 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   }
 
   // In the JavaScript environment, we currently don't require a way to handle dynamic URLs, so we
-  // proxy resources as `data:` URLs.
+  // proxy resources as `data:` or `blob:` URLs.
+  // Used by `XFormsOutputControl` for download, image, video. Scenarios:
+  // - `data:` | `blob:` URLs go unchanged to the browser
+  // - `upload`: if found, we return a `blob:` URL; if not found, we return a `javascript:void(0)` URL
+  // - other URLs go through `Connection.connectNow()`
+  //     - `fromResourceResolver()`
+  //     - `fromSubmissionProviderSync()`
   def proxyURI(
-    urlString    : String,
-    filename     : Option[String],
-    contentType  : Option[String],
-    lastModified : Long,
-    customHeaders: Map[String, List[String]],
-    getHeader    : String => Option[List[String]]
+    urlString       : String,
+    filename        : Option[String],
+    contentType     : Option[String],
+    lastModified    : Long,
+    customHeaders   : Map[String, List[String]],
+    getHeader       : String => Option[List[String]],
+    fromCacheOrElse : (URI, () => URI) => URI
   )(implicit
     logger           : IndentedLogger
-  ): String = {
+  ): URI = {
 
     implicit val ec = externalContext
 
     val uri = URI.create(urlString)
 
     uri.getScheme match {
-      case "data" =>
-        urlString
+      case "data" | "blob" =>
+        uri
       case scheme =>
         JsFileSupport.findObjectUrl(uri) match {
           case Some(objectUrl) =>
             objectUrl
           case None if scheme == JsFileSupport.UploadUriScheme =>
             // Can this happen?
-            "javascript:void(0)"
+            URI.create("javascript:void(0)")
           case None            =>
 
+            // TODO: Ideally, this would use HTTP caching, so we could do a conditional `GET`, for example.
             val cxr =
               Connection.connectNow(
-                method          = GET,
+                method          = HttpMethod.GET,
                 url             = uri,
                 credentials     = None,
                 content         = None,
@@ -162,13 +175,44 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
                 logBody         = false
               )
 
-            val baos = new ByteArrayOutputStream
-            IOUtils.copyStreamAndClose(cxr.content.stream, baos)
-            "data:" + contentType.orElse(cxr.mediatype).getOrElse("") + ";base64," + Base64.encode(baos.toByteArray, useLineBreaks = false)
+            // TODO: Handle unsuccessful connection result.
+            val isSuccess =
+              cxr.isSuccessResponse
+
+            val isSourceFromZip =
+              cxr.headers.get(Connection.OrbeonConnectionResultSourceHeaderName).exists(_.contains(Connection.CompiledFormZip))
+
+            val resultingUrl =
+              if (UseBlobUrl) {
+
+                def createBlobUrl(): URI =
+                  URI.create(
+                    js.Dynamic.global.window.URL.createObjectURL(
+                      new Blob(
+                        js.Array(new Uint8Array(Connection.inputStreamIterable(cxr.content.stream)).buffer),
+                        BlobPropertyBag(`type` = cxr.mediatype.orUndefined)
+                      )
+                    ).asInstanceOf[String]
+                  )
+
+                if (isSourceFromZip)
+                  fromCacheOrElse(uri, createBlobUrl) // UriUtils.removeQueryAndFragment ? or just fragment if any?
+                else
+                  createBlobUrl()
+              } else {
+                val baos = new ByteArrayOutputStream
+                IOUtils.copyStreamAndClose(cxr.content.stream, baos)
+                URI.create(
+                  "data:" + contentType.orElse(cxr.mediatype).getOrElse("") + ";base64," + Base64.encode(baos.toByteArray, useLineBreaks = false)
+                )
+              }
+
+            resultingUrl
         }
     }
   }
 
+  // TODO: could use `blob:`?
   // In the JavaScript environment, we currently don't require a way to handle dynamic URLs, so we
   // proxy resources as `data:` URLs.
   def proxyBase64Binary(
@@ -179,8 +223,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     getHeader        : String => Option[List[String]]
   )(implicit
     logger           : IndentedLogger
-  ): String =
-    "data:" + mediatype.getOrElse("") + ";base64," + value
+  ): URI =
+    URI.create("data:" + mediatype.getOrElse("") + ";base64," + value)
 
   def mapSavedUri(
     beforeUri         : String,

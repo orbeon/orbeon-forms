@@ -376,9 +376,10 @@ object XFormsAssetServer {
     lastModified    : Long,
     customHeaders   : Map[String, List[String]],
     headersToForward: Set[String],
-    getHeader       : String => Option[List[String]])(implicit
-    logger           : IndentedLogger
-  ): String = {
+    getHeader       : String => Option[List[String]]
+  )(implicit
+    logger          : IndentedLogger
+  ): URI = {
 
     // Get session
     val externalContext = XFormsCrossPlatformSupport.externalContext
@@ -415,13 +416,13 @@ object XFormsAssetServer {
     // Store mapping into session
     session.setAttribute(DynamicResourcesSessionKey + resource.digest, resource, SessionScope.Application)
 
-    DynamicResourcesPath + resource.digest
+    URI.create(DynamicResourcesPath + resource.digest)
   }
 
   // For Java callers
   // 2015-09-21: Only used by FileSerializer.
   def jProxyURI(urlString: String, contentType: String): String =
-    proxyURI(urlString, None, Option(contentType), -1, Map(), Set(), _ => None)(null)
+    proxyURI(urlString, None, Option(contentType), -1, Map(), Set(), _ => None)(null).toString
 
   // Try to remove a dynamic resource
   //

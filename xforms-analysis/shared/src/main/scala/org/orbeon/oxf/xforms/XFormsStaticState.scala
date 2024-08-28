@@ -20,6 +20,8 @@ import org.orbeon.oxf.xforms.analysis.TopLevelPartAnalysis
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.XBLAssets
 
+import java.net.URI
+
 
 trait XFormsStaticState
   extends XFormsStaticStateStaticProperties
@@ -43,6 +45,9 @@ trait XFormsStaticState
 
   def baselineAssets                      : XFormsAssets
   def bindingAssets                       : XBLAssets
+
+  def fromUriCacheOrElse(uri: URI, compute: => URI): URI
+  def clearUriCache(): Unit
 }
 
 trait XFormsStaticStateStaticProperties {

@@ -176,7 +176,7 @@ class XFormsOutputControl(
     try {
       // If the value is a file: we make sure it is signed otherwise we return the default value
 
-      def verifiedValueOrDefault(initial: String, value: => String, default: => String) =
+      def verifiedValueOrDefault[T](initial: String, value: => T, default: => T): T =
         if (PathUtils.getProtocol(initial) == "file" && ! XFormsUploadControl.verifyMAC(initial))
           default
         else
@@ -188,13 +188,7 @@ class XFormsOutputControl(
             case null | "anyURI" =>
               val (maybeResolved, maybeProxied) =
                 if (! urlNorewrite) {
-                  // Resolve xml:base and try to obtain a path which is an absolute path without the context
-
-                  // NOTE: We also proxy data: URLs, even though we could send them to the client directly in many
-                  // cases. One drawback is that they are are limited to 32 KB with IE8 (although IE8 support will
-                  // go away soon hopefully, and IE 8 doesn't support the image annotation component which was the
-                  // driver for data: URL support here), and in general make more sense for relatively short
-                  // values. So for now we keep the proxying for data: URLs.
+                  // Resolve `xml:base` and try to obtain a path which is an absolute path without the context
 
                   val resolvedURI =
                     URLRewriterUtils.rewriteResourceURL(
@@ -207,13 +201,14 @@ class XFormsOutputControl(
                   (
                     resolvedURI,
                     XFormsCrossPlatformSupport.proxyURI(
-                      urlString        = resolvedURI,
-                      filename         = filename,
-                      contentType      = mediatype,
-                      lastModified     = XFormsCrossPlatformSupport.getLastModifiedIfFast(resolvedURI),
-                      customHeaders    = evaluatedHeaders(collector),
-                      getHeader        = containingDocument.headersGetter
-                    )
+                      urlString       = resolvedURI,
+                      filename        = filename,
+                      contentType     = mediatype,
+                      lastModified    = XFormsCrossPlatformSupport.getLastModifiedIfFast(resolvedURI),
+                      customHeaders   = evaluatedHeaders(collector),
+                      getHeader       = containingDocument.headersGetter,
+                      fromCacheOrElse = (uri: URI, compute: () => URI) => containingDocument.staticState.fromUriCacheOrElse(uri, compute())
+                    ).toString // TODO: would be nice to stay with `URI`
                   )
                 } else {
                   // Otherwise we leave the value as is
@@ -236,7 +231,7 @@ class XFormsOutputControl(
                 mediatype,
                 evaluatedHeaders(collector),
                 containingDocument.headersGetter
-              )
+              ).toString // TODO: would be nice to stay with `URI`
             case _ =>
               defaultValue
           }

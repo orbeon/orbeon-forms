@@ -164,14 +164,16 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   }
 
   def proxyURI(
-    urlString    : String,
-    filename     : Option[String],
-    contentType  : Option[String],
-    lastModified : Long,
-    customHeaders: Map[String, List[String]],
-    getHeader    : String => Option[List[String]])(implicit
+    urlString      : String,
+    filename       : Option[String],
+    contentType    : Option[String],
+    lastModified   : Long,
+    customHeaders  : Map[String, List[String]],
+    getHeader      : String => Option[List[String]],
+    fromCacheOrElse: (URI, () => URI) => URI
+  )(implicit
     logger           : IndentedLogger
-  ): String =
+  ): URI =
     XFormsAssetServer.proxyURI(
       urlString        = urlString,
       filename         = filename,
@@ -187,16 +189,18 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     filename         : Option[String],
     mediatype        : Option[String],
     evaluatedHeaders : Map[String, List[String]],
-    getHeader        : String => Option[List[String]])(implicit
+    getHeader        : String => Option[List[String]]
+  )(implicit
     logger           : IndentedLogger
-  ): String =
+  ): URI =
     proxyURI(
       urlString        = NetUtils.base64BinaryToAnyURI(value, NetUtils.SESSION_SCOPE, logger.logger.logger),
       filename         = filename,
       contentType      = mediatype,
       lastModified     = -1,
       customHeaders    = evaluatedHeaders,
-      getHeader        = getHeader
+      getHeader        = getHeader,
+      fromCacheOrElse  = (_, compute) => compute()
     )
 
   def mapSavedUri(

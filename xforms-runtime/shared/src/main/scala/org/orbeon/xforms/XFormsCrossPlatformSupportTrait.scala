@@ -135,14 +135,16 @@ trait XFormsCrossPlatformSupportTrait {
   }
 
   def proxyURI(
-    urlString        : String,
-    filename         : Option[String],
-    contentType      : Option[String],
-    lastModified     : Long,
-    customHeaders    : Map[String, List[String]],
-    getHeader        : String => Option[List[String]])(implicit
+    urlString      : String,
+    filename       : Option[String],
+    contentType    : Option[String],
+    lastModified   : Long,
+    customHeaders  : Map[String, List[String]],
+    getHeader      : String => Option[List[String]],
+    fromCacheOrElse: (URI, () => URI) => URI
+  )(implicit
     logger           : IndentedLogger
-  ): String
+  ): URI
 
   def proxyBase64Binary(
     value            : String,
@@ -151,7 +153,7 @@ trait XFormsCrossPlatformSupportTrait {
     evaluatedHeaders : Map[String, List[String]],
     getHeader        : String => Option[List[String]])(implicit
     logger           : IndentedLogger
-  ): String
+  ): URI
 
  def mapSavedUri(
    beforeUri         : String,

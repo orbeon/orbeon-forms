@@ -27,7 +27,7 @@ object JsFileSupport {
     }
 
   // This can be called by `proxyURI()` multiple times
-  def findObjectUrl(uri: URI): Option[String] =
+  def findObjectUrl(uri: URI): Option[URI] =
     getFileDetails(uri).map(_.objectUrl)
 
   def mapSavedUri(
@@ -51,15 +51,15 @@ object JsFileSupport {
 
       // The URL must be associated only once, as each call to `URL.createObjectURL()` creates a new URL.
       private var mustRevokeObjectUrl: Boolean = false
-      lazy val objectUrl: String = {
+      lazy val objectUrl: URI = {
         val result = js.Dynamic.global.window.URL.createObjectURL(file).asInstanceOf[String]
         mustRevokeObjectUrl = true
-        result
+        URI.create(result)
       }
 
       def revokeObjectUrl(): Unit =
         if (mustRevokeObjectUrl) {
-          js.Dynamic.global.window.URL.revokeObjectURL(objectUrl)
+          js.Dynamic.global.window.URL.revokeObjectURL(objectUrl.toString)
           mustRevokeObjectUrl = false
         }
     }

@@ -11,6 +11,7 @@ import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Modifier, StaticXPath, Whitespace, XPath}
 import org.orbeon.oxf.xforms.analysis._
@@ -31,9 +32,11 @@ import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable.typeableOps
 
+import java.net.URI
 import java.util.Base64
 import java.{util => ju}
 import scala.collection.mutable
+import scala.scalajs.js
 
 
 object XFormsStaticStateDeserializer {
@@ -663,7 +666,7 @@ object XFormsStaticStateDeserializer {
                   )
 
             //              var figuredAllBindRefAnalysis: Boolean = false
-            
+
               staticBind.getOrElse(throw new NoSuchElementException) // XXX TODO
 
             case XFORMS_OUTPUT_QNAME | XXFORMS_TEXT_QNAME =>
@@ -1062,7 +1065,8 @@ object XFormsStaticStateImpl {
     _nonDefaultProperties        : Map[String, (String, Boolean)],
     globalMaxSizePerFileProperty : Int,
     _topLevelPart                : TopLevelPartAnalysis,
-    _template                    : Option[AnnotatedTemplate])(implicit
+    _template                    : Option[AnnotatedTemplate]
+  )(implicit
     _logger                      : IndentedLogger
   ): XFormsStaticState = {
 
@@ -1115,6 +1119,21 @@ object XFormsStaticStateImpl {
 
       def baselineAssets: XFormsAssets = XFormsAssets(Nil, Nil)
       def bindingAssets: XBLAssets = XBLAssets(Nil, Nil)
+
+      private val uriCache = mutable.Map[URI, URI]()
+
+      def fromUriCacheOrElse(uri: URI, compute: => URI): URI =
+        uriCache.getOrElseUpdate(uri, compute)
+
+      def clearUriCache(): Unit = {
+        uriCache.values
+          .filter(_.getScheme == "blob") // should be the case for all URIs in the cache
+          .foreach(uri => {
+            debug(s"revoking blob URL: `$uri`")
+            js.Dynamic.global.window.URL.revokeObjectURL(uri.toString)
+          })
+        uriCache.clear()
+      }
     }
   }
 }

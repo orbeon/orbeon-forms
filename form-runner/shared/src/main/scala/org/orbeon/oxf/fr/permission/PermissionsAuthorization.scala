@@ -14,13 +14,10 @@
 package org.orbeon.oxf.fr.permission
 
 import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.fr.FormRunnerAccessToken
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging.debug
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
-
-import scala.util.Try
 
 
 // TODO: move to more general location
@@ -83,6 +80,8 @@ object PermissionsAuthorization {
     permissions          : Permissions,
     currentCredentialsOpt: Option[Credentials],
     check                : PermissionsCheck
+  )(implicit
+    logger               : IndentedLogger
   ): Operations =
     permissions match {
       case Permissions.Defined(permissionsList) =>
@@ -96,6 +95,8 @@ object PermissionsAuthorization {
     credentialsOpt : Option[Credentials],
     anyOfOperations: Set[Operation],
     optimistic     : Boolean
+  )(implicit
+    logger         : IndentedLogger
   ): Boolean = {
 
     val authorizedOperationsNotAssumingOwner =
@@ -147,7 +148,7 @@ object PermissionsAuthorization {
         debug(s"UNAUTHORIZED USER")
         throw HttpStatusCodeException(StatusCode.Forbidden)
       case Some(ops) =>
-        debug(s"AUTHORIZED OPERATIONS ON FORM (DETAIL MODES): ${Operations.serialize(ops, normalized = true)}")
+        debug(s"AUTHORIZED OPERATIONS ON FORM (DETAIL MODES): `${Operations.serialize(ops, normalized = true)}`")
         ops
     }
   }
@@ -176,35 +177,39 @@ object PermissionsAuthorization {
   def authorizedOperationsForNoData(
     permissions   : Permissions,
     credentialsOpt: Option[Credentials]
+  )(implicit
+    logger        : IndentedLogger
   ): Operations =
-    permissions match {
-      case Permissions.Undefined =>
-        AnyOperation
-      case defined @ Permissions.Defined(_) =>
+    debugResult(s"authorizedOperationsForNoData: permissions = `$permissions`, credentials = `$credentialsOpt`") {
+      permissions match {
+        case Permissions.Undefined =>
+          AnyOperation
+        case defined @ Permissions.Defined(_) =>
 
-        val operationsWithoutAssumingOwnership =
-          authorizedOperations(defined, credentialsOpt, CheckWithoutDataUserPessimistic)
+          val operationsWithoutAssumingOwnership =
+            authorizedOperations(defined, credentialsOpt, CheckWithoutDataUserPessimistic)
 
-        def operationsAssumingOwnership: Operations = {
+          def operationsAssumingOwnership: Operations = {
 
-          def ownerGroupOperations(condition: Option[Condition]): List[Operations] =
-            condition match {
-              case Some(condition) => defined.permissionsList.filter(_.conditions.contains(condition)).map(_.operations)
-              case None            => Nil
-            }
+            def ownerGroupOperations(condition: Option[Condition]): List[Operations] =
+              condition match {
+                case Some(condition) => defined.permissionsList.filter(_.conditions.contains(condition)).map(_.operations)
+                case None            => Nil
+              }
 
-          val ownerOperations       = ownerGroupOperations(credentialsOpt.isDefined option                                   Condition.Owner)
-          val groupMemberOperations = ownerGroupOperations(credentialsOpt.flatMap(_.userAndGroup.groupname).isDefined option Condition.Group)
+            val ownerOperations       = ownerGroupOperations(credentialsOpt.isDefined option                                   Condition.Owner)
+            val groupMemberOperations = ownerGroupOperations(credentialsOpt.flatMap(_.userAndGroup.groupname).isDefined option Condition.Group)
 
-          Operations.combine(operationsWithoutAssumingOwnership :: ownerOperations ::: groupMemberOperations)
-        }
+            Operations.combine(operationsWithoutAssumingOwnership :: ownerOperations ::: groupMemberOperations)
+          }
 
-        // If the user can't create data, don't return permissions the user might have if that user was the owner; we
-        // assume that if the user can't create data, the user can never be the owner of any data.
-        if (Operations.allows(operationsWithoutAssumingOwnership, Operation.Create))
-          operationsAssumingOwnership
-        else
-          operationsWithoutAssumingOwnership
+          // If the user can't create data, don't return permissions the user might have if that user was the owner; we
+          // assume that if the user can't create data, the user can never be the owner of any data.
+          if (Operations.allows(operationsWithoutAssumingOwnership, Operation.Create))
+            operationsAssumingOwnership
+          else
+            operationsWithoutAssumingOwnership
+      }
     }
 
   private def isUserAuthorizedBasedOnOperationsAndMode(
@@ -250,6 +255,8 @@ object PermissionsAuthorization {
   def autosaveAuthorizedForNew(
     permissions    : Permissions,
     credentialsOpt : Option[Credentials],
+  )(implicit
+    logger         : IndentedLogger
   ): Boolean =
     Operations.allows(
       authorizedOperationsForNoData(
@@ -263,7 +270,9 @@ object PermissionsAuthorization {
     permission           : Permission,
     currentCredentialsOpt: Option[Credentials],
     check                : PermissionsCheck
-  ): Operations = {
+  )(implicit
+    logger               : IndentedLogger
+  ): Operations = debugResult(s"authorizedOperationsForPermission: permission = `$permission`, credentials = `$currentCredentialsOpt`, check = `$check`") {
 
     def allConditionsPass(check: PermissionsCheck): Boolean =
       permission.conditions.forall(conditionPasses(_, currentCredentialsOpt, check))
@@ -275,17 +284,16 @@ object PermissionsAuthorization {
       organization = currentCredentialsOpt.flatMap(_.defaultOrganization)
     )
 
-    permission.operations match {
-      case SpecificOperations(operations) =>
-        SpecificOperations(operations.filter { operation =>
-          val checkBasedOnOperation = check match {
-            case CheckWithoutDataUserPessimistic
-                 if operation == Operation.Create => checkWithCurrentUser
-            case _                                => check
-          }
-          allConditionsPass(checkBasedOnOperation)
-        })
-    }
+    val SpecificOperations(operations) = permission.operations
+
+    SpecificOperations(operations.filter { operation =>
+      val checkBasedOnOperation = check match {
+        case CheckWithoutDataUserPessimistic
+             if operation == Operation.Create => checkWithCurrentUser
+        case _                                => check
+      }
+      allConditionsPass(checkBasedOnOperation)
+    })
   }
 
   private def conditionPasses(

@@ -9,7 +9,7 @@ import org.orbeon.oxf.fr.{FormRunnerAccessToken, Version}
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{DateUtils, IndentedLogger}
-import org.orbeon.oxf.util.Logging.debug
+import org.orbeon.oxf.util.Logging._
 import shapeless.syntax.typeable.typeableOps
 
 import java.time.Instant
@@ -63,9 +63,14 @@ object PersistenceProxyPermissions {
     appFormVersion    : AppFormVersion,
     documentId        : String,
     incomingTokenOpt  : Option[String],
-    responseHeadersOpt: Option[ResponseHeaders])(implicit
+    responseHeadersOpt: Option[ResponseHeaders]
+  )(implicit
     logger            : IndentedLogger
   ): Operations = {
+
+    // TODO: add some logging in this method, at least in the case where we throw an `HttpStatusCodeException`
+
+    debug(s"findAuthorizedOperationsOrThrow: `$formPermissions`, `$credentialsOpt`, `$crudMethod`, `$appFormVersion`, `$documentId`, `$incomingTokenOpt`, `$responseHeadersOpt`")
 
     val authorizedOpsOpt = {
 
@@ -84,6 +89,8 @@ object PersistenceProxyPermissions {
                 )
               )
 
+            debug(s"operations from data: `$operationsFromData`")
+
             // We might have additional operations from a token
             val operationsFromTokenOpt: Option[Operations] =
               for {
@@ -96,6 +103,8 @@ object PersistenceProxyPermissions {
                   tokenHmac          = FormRunnerAccessToken.TokenHmac(appFormVersion._1.app, appFormVersion._1.form, appFormVersion._2, Some(documentId))
                 ).getOrElse(throw HttpStatusCodeException(StatusCode.Forbidden))
 
+            debug(s"operations from token: `$operationsFromTokenOpt`")
+
             // Operations obtained without consideration for the data
             val otherOperations: Operations =
              authorizedOperations(
@@ -103,6 +112,8 @@ object PersistenceProxyPermissions {
                 credentialsOpt,
                 CheckWithoutDataUserPessimistic
               )
+
+            debug(s"other operations: `$otherOperations`")
 
             // Those are combined
             // For example: the data might grand only `Read` but the token might grant `Update` in addition

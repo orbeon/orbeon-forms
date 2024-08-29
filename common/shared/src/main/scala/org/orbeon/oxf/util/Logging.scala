@@ -67,6 +67,12 @@ trait Logging {
     }
   }
 
+  def debugResult[T](message: => String, parameters: => Seq[(String, String)] = Nil)(body: => T)(implicit logger: IndentedLogger): T = {
+    val r = body
+    debug(message, ("result" -> r.toString) +: parameters)
+    r
+  }
+
   def maybeWithDebug[T](message: => String, parameters: => Seq[(String, String)] = Nil, condition: Boolean = true)(body: => T)(implicit logger: IndentedLogger): T =
     if (condition)
       withDebug(message, parameters)(body)

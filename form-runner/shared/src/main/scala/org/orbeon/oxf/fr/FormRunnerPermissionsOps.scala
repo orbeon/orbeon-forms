@@ -62,7 +62,9 @@ trait FormRunnerPermissionsOps {
 
   // 2023-03-08: Used by Summary and legacy eXist code
   //@XPathFunction
-  def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo, app: String, form: String): List[String] =
+  def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo, app: String, form: String): List[String] = {
+    implicit val logger: IndentedLogger =
+      inScopeContainingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
     Operations.serialize(
       PermissionsAuthorization.authorizedOperations(
         permissionsFromElemOrProperties(
@@ -74,13 +76,17 @@ trait FormRunnerPermissionsOps {
       ),
       normalized = true
     )
+  }
 
   //@XPathFunction
-  def autosaveAuthorizedForNew(permissionsElOrNull: NodeInfo, app: String, form: String): Boolean =
+  def autosaveAuthorizedForNew(permissionsElOrNull: NodeInfo, app: String, form: String): Boolean = {
+    implicit val logger: IndentedLogger =
+      inScopeContainingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
     PermissionsAuthorization.autosaveAuthorizedForNew(
       permissions    = permissionsFromElemOrProperties(Option(permissionsElOrNull), AppForm(app, form)),
       credentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession
     )
+  }
 
   //@XPathFunction
   def authorizedOperationsForDetailModeOrThrow(

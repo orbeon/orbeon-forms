@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.FormRunner.orbeonRolesFromCurrentRequest
 import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI.insert
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
@@ -103,6 +103,8 @@ trait FormBuilderPermissionsOps {
     allForms              : Boolean,
     ignoreAdminPermissions: Boolean,
     credentialsOpt        : Option[Credentials]
+  )(implicit
+    indentedLogger        : IndentedLogger
   ): List[NodeInfo] = {
 
     var wrapperOpt: Option[DocumentWrapper] = None

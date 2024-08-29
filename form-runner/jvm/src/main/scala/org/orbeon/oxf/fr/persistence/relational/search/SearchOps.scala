@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.search
 import org.orbeon.oxf.externalcontext.{Credentials, ParametrizedRole}
 import org.orbeon.oxf.fr.permission.Operation.{Delete, Read, Update}
 import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.util.IndentedLogger
 
 import scala.collection.compat._
 
@@ -27,6 +28,8 @@ object SearchOps {
   def authorizedIfOrganizationMatch(
     permissions   : Permissions,
     credentialsOpt: Option[Credentials]
+  )(implicit
+    indentedLogger: IndentedLogger
   ): List[String] = {
     val check  = PermissionsAuthorization.CheckAssumingOrganizationMatch
     val userParametrizedRoles = credentialsOpt.to(List).flatMap(_.roles).collect{ case role @ ParametrizedRole(_, _) => role }

@@ -1341,8 +1341,10 @@ body.orbeon {
     .fb-test-dialog {
         width: 90vw;                                // Try to be very wide
         max-width: none;
+        height: calc(100% - 8rem);
 
         .xxforms-dialog-body {
+            padding: 0;
             display: flex;
             flex-direction: column;
 
@@ -1397,6 +1399,7 @@ body.orbeon {
 
             .fr-dialog-buttons {
                 flex-grow: 0;
+                padding: 10px;
             }
         }
     }

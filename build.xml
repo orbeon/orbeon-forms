@@ -589,7 +589,7 @@
                 <include name="orbeon-${release.number}-xforms-filter.war"/>
             </zipfileset>
             <zipfileset dir="build/distrib" fullpath="${versioned-name}/orbeon-auth.war">
-                <include name="orbeon-auth.war"/>
+                <include name="orbeon-${release.number}-auth.war"/>
             </zipfileset>
             <zipfileset file="README.md" prefix="${versioned-name}"/>
             <zipfileset file="LICENSE.txt" prefix="${versioned-name}"/>

@@ -63,4 +63,6 @@ class PortletSessionImpl(portletSession: PortletSession)
       case listeners: SessionListeners => listeners.removeListener(sessionListener)
       case _ =>
     }
+
+  def getNativeSession: AnyRef = portletSession
 }

@@ -63,4 +63,6 @@ class ServletSessionImpl(protected val httpSession: HttpSession)
       case Some(names) => names.asScala.toList
     }
   }
+
+  def getNativeSession: AnyRef = httpSession.getNativeHttpSession
 }

@@ -147,7 +147,7 @@ object ExternalContext {
     def getPortletMode: String
     def getWindowState: String
 
-    def getNativeRequest: Any
+    def getNativeRequest: AnyRef
 
     def queryStringOpt: Option[String]                         = Option(getQueryString)
     // TODO: return immutable.Map[String, List[AnyRef]] -> what about AnyRef?
@@ -239,6 +239,8 @@ object ExternalContext {
     def javaGetAttribute (name: String                                                         ): AnyRef = getAttribute(name).orNull
     def javaGetAttribute (name: String               , scope: SessionScope                     ): AnyRef = getAttribute(name, scope).orNull
     def javaSetAttribute (name: String, value: AnyRef                                          ): Unit   = setAttribute(name, value)
+
+    def getNativeSession: AnyRef
   }
 }
 

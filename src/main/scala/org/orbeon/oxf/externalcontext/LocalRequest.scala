@@ -83,7 +83,7 @@ class LocalRequest private (
 ) extends Request {
 
   def getCharacterEncoding: String = null // not used by our code
-  def getNativeRequest: Any        = null // should only be used for cookies forwarding
+  def getNativeRequest: AnyRef     = null // should only be used for cookies forwarding
 
   def getSession(create: Boolean): Session = _sessionOpt.getOrElse {
     if (create)

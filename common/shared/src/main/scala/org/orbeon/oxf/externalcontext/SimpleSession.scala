@@ -90,6 +90,8 @@ class SimpleSession(sessionId: String) extends Session {
     checkExpired()
   }
 
+  def getNativeSession: AnyRef = null
+
   private def checkExpired(): Unit =
     if (expired)
       throw new OXFException("Cannot call methods on expired session.")

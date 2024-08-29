@@ -37,6 +37,8 @@ private class MinimalSession(session: HttpSession) extends Session {
   def setAttribute(name: String, value: AnyRef, scope: SessionScope)  = throw new UnsupportedOperationException
   def removeAttribute(name: String, scope: SessionScope)              = throw new UnsupportedOperationException
   def getAttributeNames(scope: SessionScope): List[String]            = throw new UnsupportedOperationException
+
+  def getNativeSession: AnyRef = throw new UnsupportedOperationException
 }
 
 private class MinimalRequest(req: HttpServletRequest) extends RequestAdapter {

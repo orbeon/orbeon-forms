@@ -443,10 +443,6 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   //@XPathFunction
   def showCaptcha: Boolean = isNewOrEditMode(FormRunnerParams().mode) && ! captchaPassed
 
-  // The only reason I see for passing tokens such as `reCAPTCHA` and `SimpleCaptcha` instead of QNames, besides
-  // backward compatibility, is to let things work even if no `xmlns:fr="..."` namespace mapping is present. However,
-  // this is present in the default `properties-local.xml`, so it's generally not an issue.
-  // 2024-08-16: We resolve to use QNames from now on.
   //@XPathFunction
   def captchaComponent(app: String, form: String): Array[String] = {
     val logger                   = Loggers.logger // TODO: Form Runner logger?
@@ -462,8 +458,8 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
         val propertyValue = captchaProperty.value.asInstanceOf[String]
         propertyValue match {
           case ""                                   => Array.empty
-          case "reCAPTCHA"                          => Array(XMLNames.FR, "fr:recaptcha")
-          case "SimpleCaptcha" | "OnPremiseCaptcha" => Array(XMLNames.FR, "fr:on-premise-captcha")
+          case "reCAPTCHA"                          => Array(XMLNames.FR, "fr:recaptcha")          // token for backward compatibility only
+          case "SimpleCaptcha" | "OnPremiseCaptcha" => Array(XMLNames.FR, "fr:on-premise-captcha") // same as above
           case captchaName  =>
             captchaName.splitTo[List](":") match {
               case List(prefix, _) =>

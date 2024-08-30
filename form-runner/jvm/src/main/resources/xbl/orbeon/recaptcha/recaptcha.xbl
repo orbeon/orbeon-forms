@@ -122,7 +122,7 @@
                                 "/>
 
                             <!-- Version selection -->
-                            <xf:setvalue ref="$version" value="if (xxf:non-blank($conf/v3/public-key)) then '2' else '3'"/>
+                            <xf:setvalue ref="$version" value="if (xxf:non-blank($conf/v3/public-key)) then '3' else '2'"/>
 
                             <!-- Script loading and initialization -->
                             <xf:action type="javascript">

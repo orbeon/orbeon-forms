@@ -19,7 +19,6 @@ import org.orbeon.apache.xerces.xni.parser.{XMLErrorHandler, XMLInputSource, XML
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
-import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.StaticXPath._
@@ -43,8 +42,6 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 
 object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
-
-  private val UseBlobUrl = true
 
   def externalContext: ExternalContext = CoreCrossPlatformSupport.externalContext
 
@@ -182,32 +179,20 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
             val isSourceFromZip =
               cxr.headers.get(Connection.OrbeonConnectionResultSourceHeaderName).exists(_.contains(Connection.CompiledFormZip))
 
-            val resultingUrl =
-              if (UseBlobUrl) {
-
-                def createBlobUrl(): URI =
-                  URI.create(
-                    js.Dynamic.global.window.URL.createObjectURL(
-                      new Blob(
-                        js.Array(new Uint8Array(Connection.inputStreamIterable(cxr.content.stream)).buffer),
-                        BlobPropertyBag(`type` = cxr.mediatype.orUndefined)
-                      )
-                    ).asInstanceOf[String]
+            def createBlobUrl(): URI =
+              URI.create(
+                js.Dynamic.global.window.URL.createObjectURL(
+                  new Blob(
+                    js.Array(new Uint8Array(Connection.inputStreamIterable(cxr.content.stream)).buffer),
+                    BlobPropertyBag(`type` = cxr.mediatype.orUndefined)
                   )
+                ).asInstanceOf[String]
+              )
 
-                if (isSourceFromZip)
-                  fromCacheOrElse(uri, createBlobUrl) // UriUtils.removeQueryAndFragment ? or just fragment if any?
-                else
-                  createBlobUrl()
-              } else {
-                val baos = new ByteArrayOutputStream
-                IOUtils.copyStreamAndClose(cxr.content.stream, baos)
-                URI.create(
-                  "data:" + contentType.orElse(cxr.mediatype).getOrElse("") + ";base64," + Base64.encode(baos.toByteArray, useLineBreaks = false)
-                )
-              }
-
-            resultingUrl
+            if (isSourceFromZip)
+              fromCacheOrElse(uri, createBlobUrl) // UriUtils.removeQueryAndFragment ? or just fragment if any?
+            else
+              createBlobUrl()
         }
     }
   }

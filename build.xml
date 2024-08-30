@@ -332,7 +332,7 @@
 
     <target name="orbeon-auth-war" depends="orbeon-auth-jar" description="Creates Orbeon Forms orbeon-auth.war">
     	<mkdir dir="build/distrib"/>
-        <war destfile="build/distrib/orbeon-${release.number}-orbeon-auth.war">
+        <war destfile="build/distrib/orbeon-${release.number}-auth.war">
             <webinf dir="authorizer-war/src/main/webapp/WEB-INF"/>
             <lib dir="build/lib">
                 <include name="orbeon-auth.jar"/>

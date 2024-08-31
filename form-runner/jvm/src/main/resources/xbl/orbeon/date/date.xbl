@@ -45,7 +45,8 @@
         xxbl:serialize-external-value="
             DateSupport:serializeExternalValueJava(
                 xxf:binding('fr-date'),
-                property('xxf:format.input.date'),
+                (: Reminder: empty string property returns the empty sequence :)
+                (fr:component-param-value('output-format'), property('xxf:format.input.date'))[1],
                 fr:component-param-value('week-start-day')
             )"
 
@@ -178,7 +179,8 @@
                     <xf:var
                         name="placeholder"
                         value="
-                            let $format      := property('xxf:format.input.date'),
+                            (: Reminder: empty string property returns the empty sequence :)
+                            let $format      := (fr:component-param-value('output-format'), property('xxf:format.input.date'))[1],
                                 $cleaned     := translate($format, '[01]', ''),
                                 $duplicate   := replace(replace(replace($cleaned,
                                                 'M', 'MM'),

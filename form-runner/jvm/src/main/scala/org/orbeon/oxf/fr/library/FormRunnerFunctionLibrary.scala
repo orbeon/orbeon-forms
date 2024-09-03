@@ -17,9 +17,8 @@ import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.fr._
-import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
 import org.orbeon.oxf.xforms.function

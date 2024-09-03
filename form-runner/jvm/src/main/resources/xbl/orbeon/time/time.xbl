@@ -30,6 +30,7 @@
         xxbl:serialize-external-value="
             TimeSupport:serializeExternalValueJava(
                 xxf:binding('fr-time'),
+                (: Reminder: empty string property returns the empty sequence :)
                 (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1]
             )"
 
@@ -333,6 +334,7 @@
                         xh:type="text"
                         placeholder="{
                             TimeSupport:generatePlaceholder(
+                                (: Reminder: empty string property returns the empty sequence :)
                                 (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1],
                                 instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
                                 xxf:r('format')
@@ -362,6 +364,7 @@
                 xxf:format="
                     TimeSupport:formatReadonlyModeTime(
                         xxf:binding('fr-time'),
+                        (: Reminder: empty string property returns the empty sequence :)
                         (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1]
                     )"/>
 

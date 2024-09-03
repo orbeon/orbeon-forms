@@ -95,9 +95,34 @@
         if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .
     </property>
 
-    <!-- [M]/[D]/[Y]  or [D]/[M]/[Y] or [D].[M].[Y]-->
+    <!--
+        | Format            | Example    | Description                          |
+        |===================|============|======================================|
+        | `[M]/[D]/[Y]`     | 11/5/2023  | also called "North American format"  |
+        | `[D]/[M]/[Y]`     | 5/11/2023  | also called "European format"        |
+        | `[D].[M].[Y]`     | 5.11.2023  | variation with dot separator         |
+        | `[D]-[M]-[Y]`     | 5-11-2023  | variation with dash separator        |
+        | `[M01]/[D01]/[Y]` | 11/05/2023 | force two digits for months and days |
+        | `[Y]-[M01]-[D01]` | 2023-11-05 | ISO format                           |
+    -->
     <property as="xs:string"  name="oxf.xforms.format.input.date"                                value="[M]/[D]/[Y]"/>
-    <!-- [h]:[m]:[s] [P,*-2]  or  [h]:[m]:[s] [P,2-2]  or  [H]:[m]:[s] -->
+
+    <!--
+    | Format                 | Example      | Description                                  | Since    |
+    |========================|==============|==============================================|==========|
+    | `[h]:[m]:[s] [P]`      | 2:05:12 p.m. | with dots in a.m. and p.m.                   |          |
+    | `[h]:[m] [P]`          | 2:05 p.m.    | with dots in a.m. and p.m., no seconds       | 2020.1   |
+    | `[h]:[m]:[s] [P,*-2]`  | 2:05:12 pm   | without dots in am and pm                    |          |
+    | `[h]:[m] [P,*-2]`      | 2:05 pm      | without dots in am and pm, no seconds        | 2020.1   |
+    | `[h]:[m]:[s] [PN]`     | 2:05:12 P.M  | uppercase A.M. and P.M.                      | 2022.1.1 |
+    | `[h]:[m] [PN]`         | 2:05 P.M.    | uppercase A.M. and P.M.                      | 2022.1.1 |
+    | `[h]:[m]:[s] [PN,*-2]` | 2:05:12 PM   | uppercase AM and PM                          | 2022.1.1 |
+    | `[h]:[m] [PN,*-2]`     | 2:05 PM      | uppercase AM and PM                          | 2022.1.1 |
+    | `[H]:[m]:[s]`          | 14:05:12     | 24-hour time                                 |          |
+    | `[H]:[m]`              | 14:05        | 24-hour time                                 |          |
+    | `[H01]:[m]:[s]`        | 03:05:12     | 24-hour time, 2-digit hour                   | 2022.1.1 |
+    | `[H01]:[m]`            | 03:05        | 24-hour time, 2-digit hour (without seconds) | 2022.1.1 |
+    -->
     <property as="xs:string"  name="oxf.xforms.format.input.time"                                value="[h]:[m]:[s] [P,*-2]"/>
 
     <!-- Other XForms options -->

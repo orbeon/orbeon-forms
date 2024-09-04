@@ -40,18 +40,27 @@ case class TimeFormat(
   hasSeconds     : Boolean,
   amPmFormat     : AmPmFormat,
 )
+
 object IsoTime {
 
   val IsoTimeFormat = TimeFormat(is24Hour = true, isPadHourDigits = true, hasSeconds = true, AmPmFormat.None)
 
   // Supported format only:
   //
-  // - `[h]:[m]:[s] [P]`    : e.g. 2:05:12 p.m. with dots in a.m. and p.m.
-  // - `[h]:[m] [P]`        : e.g. 2:05 p.m.    [SINCE Orbeon Forms 2020.1]
-  // - `[h]:[m]:[s] [P,2-2]`: e.g. 2:05:12 pm   without dots in am and pm
-  // - `[h]:[m] [P,2-2]`    : e.g. 2:05 pm      [SINCE Orbeon Forms 2020.1]
-  // - `[H]:[m]:[s]`        : e.g. 14:05:12
-  // - `[H]:[m]`            : e.g. 14:05        (without seconds)
+  //  | Format                 | Example      | Description                                  | Since    |
+  //  |------------------------|--------------|----------------------------------------------|----------|
+  //  | `[h]:[m]:[s] [P]`      | 2:05:12 p.m. | with dots in a.m. and p.m.                   |          |
+  //  | `[h]:[m] [P]`          | 2:05 p.m.    | with dots in a.m. and p.m., no seconds       | 2020.1   |
+  //  | `[h]:[m]:[s] [P,*-2]`  | 2:05:12 pm   | without dots in am and pm                    |          |
+  //  | `[h]:[m] [P,*-2]`      | 2:05 pm      | without dots in am and pm, no seconds        | 2020.1   |
+  //  | `[h]:[m]:[s] [PN]`     | 2:05:12 P.M  | uppercase A.M. and P.M.                      | 2022.1.1 |
+  //  | `[h]:[m] [PN]`         | 2:05 P.M.    | uppercase A.M. and P.M.                      | 2022.1.1 |
+  //  | `[h]:[m]:[s] [PN,*-2]` | 2:05:12 PM   | uppercase AM and PM                          | 2022.1.1 |
+  //  | `[h]:[m] [PN,*-2]`     | 2:05 PM      | uppercase AM and PM                          | 2022.1.1 |
+  //  | `[H]:[m]:[s]`          | 14:05:12     | 24-hour time                                 |          |
+  //  | `[H]:[m]`              | 14:05        | 24-hour time                                 |          |
+  //  | `[H01]:[m]:[s]`        | 03:05:12     | 24-hour time, 2-digit hour                   | 2022.1.1 |
+  //  | `[H01]:[m]`            | 03:05        | 24-hour time, 2-digit hour (without seconds) | 2022.1.1 |
   //
   // TODO: Would be nice to:
   //

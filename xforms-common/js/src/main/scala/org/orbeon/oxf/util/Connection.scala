@@ -33,9 +33,6 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 object Connection extends ConnectionTrait {
 
-  val OrbeonConnectionResultSourceHeaderName = "Orbeon-Connection-Result-Result-Source"
-  val CompiledFormZip                        = "compiled-form-zip"
-
   var submissionProvider: Option[SubmissionProvider] = None
 
   def connectNow(

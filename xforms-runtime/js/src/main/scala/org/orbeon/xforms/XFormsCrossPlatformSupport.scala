@@ -160,8 +160,11 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
             URI.create("javascript:void(0)")
           case None            =>
 
+            def fromZip =
+              resourceResolver.flatMap(_.resolve(HttpMethod.GET, uri, None, Map.empty)).map(_ -> true)
+
             // TODO: Ideally, this would use HTTP caching, so we could do a conditional `GET`, for example.
-            val cxr =
+            def fromConnection =
               Connection.connectNow(
                 method          = HttpMethod.GET,
                 url             = uri,
@@ -171,14 +174,14 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
                 loadState       = false,
                 saveState       = false,
                 logBody         = false
-              )
+              ) -> false
+
+            val (cxr, isSourceFromZip) =
+              fromZip.getOrElse(fromConnection)
 
             // TODO: Handle unsuccessful connection result.
             val isSuccess =
               cxr.isSuccessResponse
-
-            val isSourceFromZip =
-              cxr.headers.get(Connection.OrbeonConnectionResultSourceHeaderName).exists(_.contains(Connection.CompiledFormZip))
 
             def createBlobUrl(): URI =
               URI.create(

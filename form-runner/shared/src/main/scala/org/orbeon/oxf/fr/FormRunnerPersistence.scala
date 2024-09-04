@@ -727,6 +727,9 @@ trait FormRunnerPersistence {
         standaloneOpt      = None
       )
 
+    // Unneeded for `PUT`
+    implicit val resourceResolver: Option[ResourceResolver] = None
+
     Connection.connectAsync(
       method      = HttpMethod.PUT,
       url         = resolvedPutUri,
@@ -748,6 +751,8 @@ trait FormRunnerPersistence {
     xfcd                    : XFormsContainingDocument,
     indentedLogger          : IndentedLogger
   ): IO[AsyncConnectionResult] = {
+
+    implicit val resourceResolver: Option[ResourceResolver] = xfcd.staticState.resourceResolverOpt
 
     val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl)
 
@@ -776,6 +781,8 @@ trait FormRunnerPersistence {
     indentedLogger          : IndentedLogger
   ): IO[AsyncConnectionResult] = {
 
+    implicit val resourceResolver: Option[ResourceResolver] = xfcd.staticState.resourceResolverOpt
+
     val customPutHeaders =
       (formVersion.toList map (v => OrbeonFormDefinitionVersion -> List(v))) ::: // write all using the form definition version
       (OrbeonPathToHolder -> List(pathToHolder))                             ::
@@ -802,6 +809,7 @@ trait FormRunnerPersistence {
     )
   }
 
+  // 1 use: `buildMultipartEntity()`
   def readAttachmentSync(
     fromBasePaths           : Iterable[(String, Int)],
     beforeUrl               : String
@@ -811,6 +819,8 @@ trait FormRunnerPersistence {
     xfcd                    : XFormsContainingDocument,
     indentedLogger          : IndentedLogger
   ): ConnectionResult = {
+
+    implicit val resourceResolver: Option[ResourceResolver] = xfcd.staticState.resourceResolverOpt
 
     val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl)
 

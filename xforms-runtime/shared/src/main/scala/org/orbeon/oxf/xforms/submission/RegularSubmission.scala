@@ -123,34 +123,36 @@ class RegularSubmission(submission: XFormsModelSubmission)
       if (submissionParameters.isAsynchronous || submissionParameters.isDeferredSubmission)
         Right(
           Connection.connectAsync(
-            method          = submissionParameters.httpMethod,
-            url             = absoluteResolvedURL,
-            credentials     = submissionParameters.credentialsOpt,
-            content         = messageBody.map(StreamedContent.asyncFromBytes(_, firstItemIgnoreCase(headers, ContentType))),
-            headers         = headers,
-            loadState       = true,
-            logBody         = BaseSubmission.isLogBody
+            method           = submissionParameters.httpMethod,
+            url              = absoluteResolvedURL,
+            credentials      = submissionParameters.credentialsOpt,
+            content          = messageBody.map(StreamedContent.asyncFromBytes(_, firstItemIgnoreCase(headers, ContentType))),
+            headers          = headers,
+            loadState        = true,
+            logBody          = BaseSubmission.isLogBody
           )(
-            logger          = detailsLogger,
-            externalContext = externalContext,
-            connectionCtx   = ConnectionContextSupport.getContext(Map.empty)
+            logger           = detailsLogger,
+            externalContext  = externalContext,
+            connectionCtx    = ConnectionContextSupport.getContext(Map.empty),
+            resourceResolver = submission.containingDocument.staticState.resourceResolverOpt
           ).map(createConnectResult(_))
         )
       else
         Left(
           createConnectResult(
             Connection.connectNow(
-              method          = submissionParameters.httpMethod,
-              url             = absoluteResolvedURL,
-              credentials     = submissionParameters.credentialsOpt,
-              content         = messageBody.map(StreamedContent.fromBytes(_, firstItemIgnoreCase(headers, ContentType))),
-              headers         = headers,
-              loadState       = true,
-              saveState       = true,
-              logBody         = BaseSubmission.isLogBody
+              method           = submissionParameters.httpMethod,
+              url              = absoluteResolvedURL,
+              credentials      = submissionParameters.credentialsOpt,
+              content          = messageBody.map(StreamedContent.fromBytes(_, firstItemIgnoreCase(headers, ContentType))),
+              headers          = headers,
+              loadState        = true,
+              saveState        = true,
+              logBody          = BaseSubmission.isLogBody
             )(
-              logger          = detailsLogger,
-              externalContext = externalContext
+              logger           = detailsLogger,
+              externalContext  = externalContext,
+              resourceResolver = submission.containingDocument.staticState.resourceResolverOpt
             )
           )
         )

@@ -894,6 +894,9 @@ private[persistence] object PersistenceProxyProcessor {
       }
     }
 
+  // Unneeded for JVM platform
+  private implicit val resourceResolver: Option[ResourceResolver] = None
+
   private def proxyEstablishConnection(
     request        : OutgoingRequest,
     requestContent : Option[StreamedContent],

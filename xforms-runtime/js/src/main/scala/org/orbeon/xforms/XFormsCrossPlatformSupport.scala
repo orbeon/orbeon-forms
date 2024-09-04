@@ -140,7 +140,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     getHeader       : String => Option[List[String]],
     fromCacheOrElse : (URI, () => URI) => URI
   )(implicit
-    logger           : IndentedLogger
+    logger           : IndentedLogger,
+    resourceResolver: Option[ResourceResolver]
   ): URI = {
 
     implicit val ec = externalContext
@@ -207,7 +208,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     evaluatedHeaders : Map[String, List[String]],
     getHeader        : String => Option[List[String]]
   )(implicit
-    logger           : IndentedLogger
+    logger           : IndentedLogger,
+    resourceResolver: Option[ResourceResolver]
   ): URI =
     URI.create("data:" + mediatype.getOrElse("") + ";base64," + value)
 

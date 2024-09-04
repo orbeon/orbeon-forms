@@ -27,6 +27,17 @@ import java.net.URI
 import scala.jdk.CollectionConverters._
 
 
+trait ResourceResolver {
+  def resolve(
+    method : HttpMethod,
+    url    : URI,
+    content: Option[StreamedContent],
+    headers: Map[String, List[String]]
+  )(implicit
+    logger : IndentedLogger
+  ): Option[ConnectionResult]
+}
+
 trait ConnectionTrait {
 
   def connectNow(
@@ -40,7 +51,8 @@ trait ConnectionTrait {
     logBody         : Boolean
   )(implicit
     logger          : IndentedLogger,
-    externalContext : ExternalContext
+    externalContext : ExternalContext,
+    resourceResolver: Option[ResourceResolver]
   ): ConnectionResult
 
   def connectAsync(
@@ -54,7 +66,8 @@ trait ConnectionTrait {
   )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext,
-    connectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
+    connectionCtx   : Option[ConnectionContextSupport.ConnectionContext],
+    resourceResolver: Option[ResourceResolver]
   ): IO[AsyncConnectionResult]
 
   def isInternalPath(path: String): Boolean

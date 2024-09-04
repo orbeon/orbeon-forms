@@ -34,7 +34,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.PathUtils.{recombineQuery, splitQueryDecodeParams}
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ByteEncoding, ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, Mediatypes, PathUtils, SecureUtils, StaticXPath, URLRewriterUtils}
+import org.orbeon.oxf.util.{ByteEncoding, ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, Mediatypes, PathUtils, ResourceResolver, SecureUtils, StaticXPath, URLRewriterUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.{inScopeContainingDocument, setvalue}
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
@@ -50,6 +50,9 @@ import java.util.Random
 
 
 object FormRunnerActionsSupport {
+
+  // Unneeded for JVM platform
+  private implicit val resourceResolver: Option[ResourceResolver] = None
 
   private def paramsToAppend(processParams: ProcessParams, paramNames: List[String]): List[(String, String)] =
     paramNames collect {

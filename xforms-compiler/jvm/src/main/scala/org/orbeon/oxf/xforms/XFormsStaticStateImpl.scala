@@ -191,4 +191,7 @@ class XFormsStaticStateImpl(
   // https://github.com/orbeon/orbeon-forms/issues/6462
   def fromUriCacheOrElse(uri: URI, compute: => URI): URI = compute
   def clearUriCache(): Unit = ()
+
+  // No resource resolver on the JVM for now
+  val resourceResolverOpt: Option[ResourceResolver] = None
 }

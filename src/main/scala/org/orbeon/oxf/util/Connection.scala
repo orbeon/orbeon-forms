@@ -71,7 +71,8 @@ object Connection extends ConnectionTrait {
     logBody         : Boolean
   )(implicit
     logger          : IndentedLogger,
-    externalContext : ExternalContext
+    externalContext : ExternalContext,
+    resourceResolver: Option[ResourceResolver]
   ): ConnectionResult = {
 
     implicit val connectionContext: Option[ConnectionContextSupport.ConnectionContext] = None
@@ -105,7 +106,8 @@ object Connection extends ConnectionTrait {
   )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext,
-    connectionCtx   : Option[ConnectionContextSupport.ConnectionContext]
+    connectionCtx   : Option[ConnectionContextSupport.ConnectionContext],
+    resourceResolver: Option[ResourceResolver]
   ): IO[AsyncConnectionResult] = {
 
     // Copy `IndentedLogger` as we cannot share logger state with other threads, and the caller's logger might be
@@ -181,16 +183,18 @@ object Connection extends ConnectionTrait {
       (StreamedContent.fromBytes(_, firstItemIgnoreCase(headers, ContentType)))
 
     connectNow(
-      method          = httpMethod,
-      url             = url,
-      credentials     = Option(credentialsOrNull),
-      content         = content,
-      headers         = headers,
-      loadState       = loadState,
-      saveState       = saveState,
-      logBody         = logBody)(
-      logger          = logger,
-      externalContext = externalContext
+      method           = httpMethod,
+      url              = url,
+      credentials      = Option(credentialsOrNull),
+      content          = content,
+      headers          = headers,
+      loadState        = loadState,
+      saveState        = saveState,
+      logBody          = logBody
+    )(
+      logger           = logger,
+      externalContext  = externalContext,
+      resourceResolver = None
     )
   }
 

@@ -21,7 +21,7 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, ResourceResolver, XPath}
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.xforms.XFormsCrossPlatformSupport
@@ -81,8 +81,9 @@ object SerializationParameters {
                   )
 
                 try {
-                  implicit val logger         : IndentedLogger = submission.model.indentedLogger
-                  implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
+                  implicit val logger          : IndentedLogger = submission.model.indentedLogger
+                  implicit val externalContext : ExternalContext = XFormsCrossPlatformSupport.externalContext
+                  implicit val resourceResolver: Option[ResourceResolver] = submission.containingDocument.staticState.resourceResolverOpt
 
                   SerializationParameters(
                     messageBody            = SubmissionUtils.readByteArray(submission.containingDocument.headersGetter, resolvedAbsoluteUrl).some,

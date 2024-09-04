@@ -19,7 +19,7 @@ import org.orbeon.io.FileUtils
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{PathUtils, URLRewriterUtils}
+import org.orbeon.oxf.util.{PathUtils, ResourceResolver, URLRewriterUtils}
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, OutputControl}
 import org.orbeon.oxf.xforms.control._
@@ -181,6 +181,8 @@ class XFormsOutputControl(
           default
         else
           value
+
+      implicit val resourceResolver: Option[ResourceResolver] = containingDocument.staticState.resourceResolverOpt
 
       internalValue.trimAllToOpt match {
         case Some(trimmedInternalValue) =>

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import com.openhtmltopdf.layout.SharedContext
 import com.openhtmltopdf.pdfboxout.{PdfBoxImage, PdfBoxOutputDevice, PdfBoxUserAgent}
 import com.openhtmltopdf.resource.ImageResource
 import com.openhtmltopdf.util.{LogMessageId, XRLog}
@@ -25,7 +24,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.ImageSupport.{compressJpegImage, findImageOrientation, findTransformation, transformImage}
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.TryUtils.TryOps
-import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupportTrait, IndentedLogger, URLRewriterUtils}
+import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupportTrait, IndentedLogger, ResourceResolver, URLRewriterUtils}
 
 import java.io._
 import java.net.URI
@@ -39,12 +38,17 @@ class OrbeonPdfBoxUserAgent(
   jpegCompressionLevel     : Float,
   outputDevice             : PdfBoxOutputDevice,
   pipelineContext          : PipelineContext,
-  dotsPerPixel             : Int)(implicit
+  dotsPerPixel             : Int
+)(implicit
   externalContext          : ExternalContext,
   indentedLogger           : IndentedLogger,
   coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
 ) extends PdfBoxUserAgent(outputDevice) {
+
   import Private._
+
+  // Unneeded for JVM platform
+  private implicit val resourceResolver: Option[ResourceResolver] = None
 
   override def getImageResource(uriStr: String): ImageResource = {
     @throws[IOException]
@@ -176,16 +180,14 @@ class OrbeonPdfBoxUserAgent(
 
     val cxr =
       Connection.connectNow(
-        method          = HttpMethod.GET,
-        url             = url,
-        credentials     = None,
-        content         = None,
-        headers         = headers,
-        loadState       = true,
-        saveState       = true,
-        logBody         = false)(
-        logger          = indentedLogger,
-        externalContext = externalContext
+        method           = HttpMethod.GET,
+        url              = url,
+        credentials      = None,
+        content          = None,
+        headers          = headers,
+        loadState        = true,
+        saveState        = true,
+        logBody          = false
       )
 
     ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = false)(identity) doEitherWay {

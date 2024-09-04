@@ -394,6 +394,7 @@ trait XFormsModelInstances {
   private def loadInstance(pathOrAbsoluteURI: String, handleXInclude: Boolean): DocumentNodeInfoType = {
 
     implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
+    implicit val resourceResolver: Option[ResourceResolver] = containingDocument.staticState.resourceResolverOpt
 
     SubmissionUtils.readTinyTree(
       headersGetter       = containingDocument.headersGetter,
@@ -542,6 +543,8 @@ trait XFormsModelInstances {
 
           implicit val ec                      : ExternalContext               = XFormsCrossPlatformSupport.externalContext
           implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
+          implicit val resourceResolver        : Option[ResourceResolver]      = containingDocument.staticState.resourceResolverOpt
+
 
           val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
             url              = absoluteResolvedUrl,

@@ -191,6 +191,9 @@ object ImageSupport {
     }
   }
 
+  // Unneeded for JVM platform
+  private implicit val resourceResolver: Option[ResourceResolver] = None
+
   private def connectGet(
     existingUri     : URI)(implicit
     logger          : IndentedLogger,

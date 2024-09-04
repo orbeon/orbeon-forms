@@ -12,7 +12,7 @@ import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{IndentedLogger, URLRewriterUtils, XPath}
+import org.orbeon.oxf.util.{IndentedLogger, ResourceResolver, URLRewriterUtils, XPath}
 import org.orbeon.oxf.xforms.model.BasicIdIndex
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xml.TransformerUtils
@@ -27,10 +27,14 @@ import javax.xml.transform.stream.StreamResult
 
 object Transforms {
 
+  // Unneeded for JVM platform
+  private implicit val resourceResolver: Option[ResourceResolver] = None
+
   // TODO: Move this.
   def loadComponentBindings(
     appForm         : AppForm,
-    frDocCtx        : FormRunnerDocContext)(implicit
+    frDocCtx        : FormRunnerDocContext
+  )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
   ): DocumentInfo = {

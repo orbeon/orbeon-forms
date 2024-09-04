@@ -135,9 +135,11 @@ object SubmissionUtils {
 
   def readByteArray(
     headersGetter       : String => Option[List[String]],
-    resolvedAbsoluteUrl : URI)(implicit
+    resolvedAbsoluteUrl : URI
+  )(implicit
     logger              : IndentedLogger,
-    externalContext     : ExternalContext
+    externalContext     : ExternalContext,
+    resourceResolver    : Option[ResourceResolver]
   ): Array[Byte] =
     processGETConnection(headersGetter, resolvedAbsoluteUrl) { case (is, _) =>
       inputStreamToByteArray(is)
@@ -153,9 +155,11 @@ object SubmissionUtils {
   def readTinyTree(
     headersGetter       : String => Option[List[String]],
     resolvedAbsoluteUrl : URI,
-    handleXInclude      : Boolean)(implicit
+    handleXInclude      : Boolean
+  )(implicit
     logger              : IndentedLogger,
-    externalContext     : ExternalContext
+    externalContext     : ExternalContext,
+    resourceResolver    : Option[ResourceResolver]
   ): (DocumentNodeInfoType, Map[String, List[String]]) =
     processGETConnection(headersGetter, resolvedAbsoluteUrl) { case (is, headers) =>
       XFormsCrossPlatformSupport.readTinyTree(
@@ -170,9 +174,11 @@ object SubmissionUtils {
   private def processGETConnection[T](
     headersGetter       : String => Option[List[String]],
     resolvedAbsoluteUrl : URI)(
-    body                : (InputStream, Map[String, List[String]]) => T)(implicit
+    body                : (InputStream, Map[String, List[String]]) => T
+  )(implicit
     logger              : IndentedLogger,
-    externalContext     : ExternalContext
+    externalContext     : ExternalContext,
+    resourceResolver    : Option[ResourceResolver]
   ): T = {
     val cxr = openGETConnection(headersGetter, resolvedAbsoluteUrl)
     ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true)(body(_, cxr.headers))
@@ -180,9 +186,11 @@ object SubmissionUtils {
 
   private def openGETConnection(
     headersGetter       : String => Option[List[String]],
-    resolvedAbsoluteUrl : URI)(implicit
+    resolvedAbsoluteUrl : URI
+  )(implicit
     logger              : IndentedLogger,
-    externalContext     : ExternalContext
+    externalContext     : ExternalContext,
+    resourceResolver    : Option[ResourceResolver]
   ): ConnectionResult = {
 
     implicit val _coreCrossPlatformSupport = CoreCrossPlatformSupport

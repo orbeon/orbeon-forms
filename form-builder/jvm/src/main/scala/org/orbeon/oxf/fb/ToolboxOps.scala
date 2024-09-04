@@ -35,7 +35,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.ContentTypes.HtmlContentType
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, NetUtils, PathUtils, URLRewriterUtils, XPath}
+import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, NetUtils, PathUtils, ResourceResolver, URLRewriterUtils, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -1168,6 +1168,9 @@ object ToolboxOps {
   }
 
   private object Private {
+
+    // Unneeded for reading unpublished attachments, which are temporary files
+    private implicit val resourceResolver: Option[ResourceResolver] = None
 
     // This is for `insertNewControl`
     val LHHAResourceNamesToInsert: Set[String] = (LHHA.values.toSet - LHHA.Alert) map (_.entryName)

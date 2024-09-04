@@ -333,11 +333,11 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
 
           val cxr =
             Connection.connectNow(
-              method          = GET,
-              url             = url,
-              credentials     = None,
-              content         = None,
-              headers         = Connection.buildConnectionHeadersCapitalizedIfNeeded(
+              method           = GET,
+              url              = url,
+              credentials      = None,
+              content          = None,
+              headers          = Connection.buildConnectionHeadersCapitalizedIfNeeded(
                 url                      = url,
                 hasCredentials           = false,
                 customHeaders            = URLGeneratorBase.extractHeaders(context.element),
@@ -348,11 +348,13 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
                 externalContext          = externalContext,
                 coreCrossPlatformSupport = CoreCrossPlatformSupport
               ),
-              loadState       = true,
-              saveState       = true,
-              logBody         = false)(
-              logger          = context.logger,
-              externalContext = externalContext
+              loadState        = true,
+              saveState        = true,
+              logBody          = false
+            )(
+              logger           = context.logger,
+              externalContext  = externalContext,
+              resourceResolver = None
             )
 
           ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>

@@ -172,7 +172,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     getHeader      : String => Option[List[String]],
     fromCacheOrElse: (URI, () => URI) => URI
   )(implicit
-    logger           : IndentedLogger
+    logger           : IndentedLogger,
+    resourceResolver: Option[ResourceResolver]
   ): URI =
     XFormsAssetServer.proxyURI(
       urlString        = urlString,
@@ -191,7 +192,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     evaluatedHeaders : Map[String, List[String]],
     getHeader        : String => Option[List[String]]
   )(implicit
-    logger           : IndentedLogger
+    logger           : IndentedLogger,
+    resourceResolver: Option[ResourceResolver]
   ): URI =
     proxyURI(
       urlString        = NetUtils.base64BinaryToAnyURI(value, NetUtils.SESSION_SCOPE, logger.logger.logger),

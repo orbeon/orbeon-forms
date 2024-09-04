@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.{IndentedLogger, ResourceResolver}
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.xforms.analysis.TopLevelPartAnalysis
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
@@ -48,6 +48,8 @@ trait XFormsStaticState
 
   def fromUriCacheOrElse(uri: URI, compute: => URI): URI
   def clearUriCache(): Unit
+
+  def resourceResolverOpt: Option[ResourceResolver]
 }
 
 trait XFormsStaticStateStaticProperties {

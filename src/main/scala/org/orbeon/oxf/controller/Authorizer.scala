@@ -152,16 +152,18 @@ object Authorizer extends Logging {
 
         val cxr =
           Connection.connectNow(
-            method          = method,
-            url             = newURL,
-            credentials     = None,
-            content         = content,
-            headers         = allHeaders,
-            loadState       = true,
-            saveState       = true,
-            logBody         = false)(
-            logger          = logger,
-            externalContext = ec
+            method           = method,
+            url              = newURL,
+            credentials      = None,
+            content          = content,
+            headers          = allHeaders,
+            loadState        = true,
+            saveState        = true,
+            logBody          = false
+          )(
+            logger           = logger,
+            externalContext  = ec,
+            resourceResolver = None
           )
 
         // TODO: state must be saved in session, not anywhere else; why is this configurable globally?

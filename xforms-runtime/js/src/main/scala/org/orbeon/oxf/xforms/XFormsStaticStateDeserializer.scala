@@ -13,7 +13,7 @@ import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Modifier, StaticXPath, Whitespace, XPath}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Modifier, ResourceResolver, StaticXPath, Whitespace, XPath}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
@@ -50,8 +50,10 @@ object XFormsStaticStateDeserializer {
     c.value.asNumber.map(_.toDouble.toInt).toRight(DecodingFailure("Custom Int", c.history))
 
   def deserialize(
-    jsonString      : String,
-    functionLibrary : FunctionLibrary)(implicit
+    jsonString         : String,
+    resourceResolverOpt: Option[ResourceResolver],
+    functionLibrary    : FunctionLibrary
+  )(implicit
     logger          : IndentedLogger
   ): XFormsStaticState = {
 
@@ -1046,7 +1048,8 @@ object XFormsStaticStateDeserializer {
           nonDefaultProperties,
           Int.MaxValue,
           topLevelPart,
-          AnnotatedTemplate(template).some
+          AnnotatedTemplate(template).some,
+          resourceResolverOpt
         ) // TODO: serialize `globalMaxSizeProperty` from server
       }
 
@@ -1065,7 +1068,8 @@ object XFormsStaticStateImpl {
     _nonDefaultProperties        : Map[String, (String, Boolean)],
     globalMaxSizePerFileProperty : Int,
     _topLevelPart                : TopLevelPartAnalysis,
-    _template                    : Option[AnnotatedTemplate]
+    _template                    : Option[AnnotatedTemplate],
+    _resourceResolverOpt         : Option[ResourceResolver],
   )(implicit
     _logger                      : IndentedLogger
   ): XFormsStaticState = {
@@ -1134,6 +1138,8 @@ object XFormsStaticStateImpl {
           })
         uriCache.clear()
       }
+
+      val resourceResolverOpt: Option[ResourceResolver] = _resourceResolverOpt
     }
   }
 }

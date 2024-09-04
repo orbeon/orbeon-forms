@@ -15,7 +15,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Connection, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, PathUtils, StaticXPath, URLRewriterUtils, XPath}
+import org.orbeon.oxf.util.{Connection, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, PathUtils, ResourceResolver, StaticXPath, URLRewriterUtils, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions
@@ -501,6 +501,8 @@ trait PersistenceApiTrait {
   ): ConnectionResult = {
 
     implicit val ec: ExternalContext = coreCrossPlatformSupport.externalContext
+    // Unneeded for persistence API, as this is called generally independently from a containing document
+    implicit val resourceResolver: Option[ResourceResolver] = None
 
     val resolvedUri =
       URI.create(

@@ -36,8 +36,6 @@ object Connection extends ConnectionTrait {
   val OrbeonConnectionResultSourceHeaderName = "Orbeon-Connection-Result-Result-Source"
   val CompiledFormZip                        = "compiled-form-zip"
 
-  var resourceResolver: String => Option[ConnectionResult] = _
-
   var submissionProvider: Option[SubmissionProvider] = None
 
   def connectNow(
@@ -51,13 +49,14 @@ object Connection extends ConnectionTrait {
     logBody         : Boolean
   )(implicit
     logger          : IndentedLogger,
-    externalContext : ExternalContext
+    externalContext : ExternalContext,
+    resourceResolver: Option[ResourceResolver]
   ): ConnectionResult = {
     method match {
       case HttpMethod.PUT =>
         fromSubmissionProviderSync(method, url, content, headers)
       case HttpMethod.GET =>
-        fromResourceResolver(method, url) orElse
+        resourceResolver.flatMap(_.resolve(method, url, None, Map.empty)) orElse
           fromSubmissionProviderSync(method, url, content, headers)
       case _ =>
         Some(methodNotAllowed(url))
@@ -77,13 +76,15 @@ object Connection extends ConnectionTrait {
     logger          : IndentedLogger,
     externalContext : ExternalContext,
     connectionCtx   : Option[ConnectionContextSupport.ConnectionContext],
+    resourceResolver: Option[ResourceResolver]
   ): IO[AsyncConnectionResult] = {
     method match {
       case HttpMethod.PUT =>
         fromSubmissionProviderAsync(method, url, content, headers)(logger = IndentedLogger(logger)) // logger copied
       case HttpMethod.GET =>
-        fromResourceResolver(method, url).map(cxr => IO.pure(ConnectionResult.syncToAsync(cxr))) orElse
-          fromTemporaryFile(method, url).map(IO.pure)                                            orElse
+        resourceResolver.flatMap(_.resolve(method, url, None, Map.empty))
+          .map(cxr => IO.pure(ConnectionResult.syncToAsync(cxr))) orElse
+          fromTemporaryFile(method, url).map(IO.pure)             orElse
           fromSubmissionProviderAsync(method, url, content, headers)(logger = IndentedLogger(logger)) // logger copied
       case _ =>
         Some(IO.pure(ConnectionResult.syncToAsync(methodNotAllowed(url))))
@@ -152,12 +153,6 @@ object Connection extends ConnectionTrait {
         }
       case _ =>
         None
-    }
-
-  private def fromResourceResolver(method: HttpMethod, url: URI): Option[ConnectionResult] =
-    method match {
-      case HttpMethod.GET => resourceResolver(url.toString)
-      case _              => None
     }
 
   private def fromSubmissionProviderSync(

@@ -45,6 +45,9 @@ class XFormsAssetServer extends ProcessorImpl {
 
   import org.orbeon.oxf.xforms.processor.XFormsAssetServer._
 
+  // Unneeded for JVM platform
+  private implicit val resourceResolver: Option[ResourceResolver] = None
+
   override def start(pipelineContext: PipelineContext): Unit = {
 
     implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext

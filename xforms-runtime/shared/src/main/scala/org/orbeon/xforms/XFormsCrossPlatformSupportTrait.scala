@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ByteEncoding, CoreCrossPlatformSupport, IndentedLogger, UploadProgress}
+import org.orbeon.oxf.util.{ByteEncoding, CoreCrossPlatformSupport, IndentedLogger, ResourceResolver, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, PlainHTMLOrXHTMLReceiver, SkipRootElement, XMLReceiver}
@@ -143,7 +143,8 @@ trait XFormsCrossPlatformSupportTrait {
     getHeader      : String => Option[List[String]],
     fromCacheOrElse: (URI, () => URI) => URI
   )(implicit
-    logger           : IndentedLogger
+    logger           : IndentedLogger,
+    resourceResolver: Option[ResourceResolver]
   ): URI
 
   def proxyBase64Binary(
@@ -151,8 +152,10 @@ trait XFormsCrossPlatformSupportTrait {
     filename         : Option[String],
     mediatype        : Option[String],
     evaluatedHeaders : Map[String, List[String]],
-    getHeader        : String => Option[List[String]])(implicit
-    logger           : IndentedLogger
+    getHeader        : String => Option[List[String]]
+  )(implicit
+    logger           : IndentedLogger,
+    resourceResolver: Option[ResourceResolver]
   ): URI
 
  def mapSavedUri(

@@ -1,7 +1,7 @@
 package org.orbeon.oxf.servlet
 
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{NetUtils, PathUtils}
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.io.{ByteArrayInputStream, InputStream}
@@ -37,13 +37,19 @@ class HttpLoggingFilterImpl extends Filter {
 
     val httpRequest        = servletRequest.asInstanceOf[HttpServletRequest]
     val byteArray          = NetUtils.inputStreamToByteArray(httpRequest.getInputStream)
-    val requestPath        = httpRequest.getRequestPathInfo
+
+    val pathQuery =
+      PathUtils.appendQueryString(
+        httpRequest.getRequestPathInfo,
+        httpRequest.getQueryString
+      )
+
     val requestBody        = new String(byteArray, CharsetNames.Utf8)
     val inputStream        = new ByteArrayInputStream(byteArray)
     val servletInputStream = new HttpLoggingFilter.ByteArrayServletInputStream(inputStream)
     val wrappedRequest     = new HttpLoggingFilter.LoggerRequestWrapper(httpRequest, servletInputStream)
 
-    // Log path, headers, and body
+    Logger.info(s"request path and query: `$pathQuery`")
     Logger.info(s"request headers:\n${httpRequest.headersAsString}")
     Logger.info(s"request body:\n`$requestBody`")
 

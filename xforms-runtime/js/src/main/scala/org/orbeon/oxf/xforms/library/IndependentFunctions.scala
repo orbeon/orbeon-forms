@@ -213,8 +213,10 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     stringArgumentOrContextOpt(s) map (_.escapeXmlMinimal)
 
   @XPathFunction
-  def jsonToXml(jsonString: Option[String])(implicit xpc: XPathContext): om.NodeInfo =
-    Converter.jsonStringToXmlDoc(jsonString.getOrElse(xpc.getContextItem.getStringValue))
+  def jsonToXml(s: Option[String] = null)(implicit xpc: XPathContext): Option[om.NodeInfo] =
+    stringArgumentOrContextOpt(s).map(jsonString =>
+      Converter.jsonStringToXmlDoc(jsonString)
+    )
 
   @XPathFunction
   def xmlToJson(root: Option[om.NodeInfo])(implicit xpc: XPathContext): String =

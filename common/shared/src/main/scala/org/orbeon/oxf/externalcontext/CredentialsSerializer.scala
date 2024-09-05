@@ -33,22 +33,23 @@ object CredentialsSerializer {
   }
 
   def toHeaders[T[_]](
-    credentials: Credentials)(implicit
+    credentials: Credentials
+  )(implicit
     cbf        : Factory[String, T[String]],
     ev         : T[String] => Traversable[String]
   ): List[(String, T[String])] = {
 
     import org.orbeon.oxf.util.CoreUtils._
 
-    val usernameArray    = (cbf.newBuilder += credentials.userAndGroup.username).result()
-    val credentialsArray = (cbf.newBuilder += serializeCredentials(credentials, encodeForHeader = true)).result()
-    val groupNameArray   = (cbf.newBuilder ++= credentials.userAndGroup.groupname).result()
-    val roleNamesArray   = (cbf.newBuilder ++= credentials.roles collect { case r: SimpleRole => r.roleName }).result()
+    val usernameT    = (cbf.newBuilder += credentials.userAndGroup.username).result()
+    val credentialsT = (cbf.newBuilder += serializeCredentials(credentials, encodeForHeader = true)).result()
+    val groupNameT   = (cbf.newBuilder ++= credentials.userAndGroup.groupname).result()
+    val roleNamesT   = (cbf.newBuilder ++= credentials.roles collect { case r: SimpleRole => r.roleName }).result()
 
-    (                              Headers.OrbeonUsernameLower    -> usernameArray)    ::
-    (                              Headers.OrbeonCredentialsLower -> credentialsArray) ::
-    (groupNameArray.nonEmpty list (Headers.OrbeonGroupLower       -> groupNameArray))  :::
-    (roleNamesArray.nonEmpty list (Headers.OrbeonRolesLower       -> roleNamesArray))
+    (                          Headers.OrbeonUsernameLower    -> usernameT)    ::
+    (                          Headers.OrbeonCredentialsLower -> credentialsT) ::
+    (groupNameT.nonEmpty list (Headers.OrbeonGroupLower       -> groupNameT))  :::
+    (roleNamesT.nonEmpty list (Headers.OrbeonRolesLower       -> roleNamesT))
   }
 
   def serializeCredentials(

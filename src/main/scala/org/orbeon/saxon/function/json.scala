@@ -14,15 +14,18 @@
 package org.orbeon.saxon.function
 
 import org.orbeon.oxf.json.Converter
-import org.orbeon.oxf.xml.{DependsOnContextItemIfSingleArgumentMissing, FunctionSupport}
+import org.orbeon.oxf.xml.{DefaultFunctionSupport, DependsOnContextItemIfSingleArgumentMissing, FunctionSupport}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
 
-class JsonStringToXml extends FunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
-  override def evaluateItem(xpathContext: XPathContext): DocumentInfo =
-    stringArgumentOrContextOpt(0)(xpathContext) map (Converter.jsonStringToXmlDoc(_)) orNull
+class JsonStringToXml extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
+  override def evaluateItem(xpathContext: XPathContext): DocumentInfo = {
+    val stringOpt   = stringArgumentOrContextOpt(0)(xpathContext)
+    val documentOpt = stringOpt.map(s => Converter.jsonStringToXmlDoc(s))
+    documentOpt.orNull
+  }
 }
 
 class XmlToJsonString extends FunctionSupport with DependsOnContextItemIfSingleArgumentMissing {

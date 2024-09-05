@@ -96,4 +96,30 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
       assert(ServletPortletRequest.findCredentialsInSession(new ServletSessionImpl(mockSession)).contains(testCredentials))
     }
   }
+
+  describe("#6473: `HttpServletRequest` header methods and case-insensitivity") {
+
+    // Simulate a non-compliant implementation of `HttpServletRequest` that is case-sensitive
+    def newCaseSensitiveRequest(headersMap: Map[String, List[String]]) =
+      new HttpServletRequestWrapper(mock[HttpServletRequest]) {
+        override def getHeader(name: String) = headersMap.get(name).map(_.head).orNull
+        override def getHeaders(name: String) = headersMap.get(name).map(_.iterator).getOrElse(Iterator.empty).asJavaEnumeration
+        override def getHeaderNames = headersMap.keysIterator.asJavaEnumeration
+      }
+
+    it("must return the correct header values") {
+
+      val h1 = newCaseSensitiveRequest(
+        Map(
+          "Content-Type" -> List("application/json"),
+        )
+      )
+
+      assert(h1.getHeader("Content-Type") == "application/json")
+      assert(h1.getHeader("content-type") == null)
+
+      assert(h1.getHeadersAsList("Content-Type") == List("application/json"))
+      assert(h1.getHeadersAsList("content-type") == List("application/json"))
+    }
+  }
 }

@@ -13,34 +13,47 @@
  */
 package org.orbeon.oxf.portlet
 
-import javax.portlet.filter.PortletRequestWrapper
+import cats.data.NonEmptyList
 
+import java.util
+import javax.portlet.filter.PortletRequestWrapper
 import scala.jdk.CollectionConverters._
+
 
 trait RequestPrependHeaders extends PortletRequestWrapper {
 
-  def headersToPrepend: Map[String, Array[String]]
+  def headersToPrependAsMap: Map[String, NonEmptyList[String]]
 
-  override def getPropertyNames =
-    (headersToPrepend.keysIterator ++ (super.getPropertyNames.asScala filterNot headersToPrepend.keySet))
+  override def getPropertyNames: util.Enumeration[String] =
+    (headersToPrependAsMap.keysIterator ++ (super.getPropertyNames.asScala filterNot mustPrependHeader))
       .asJavaEnumeration
 
-  override def getProperty(name: String) =
-    addedHeaderOption(name) getOrElse super.getProperty(name)
+  override def getProperty(name: String): String =
+    addedHeaderSingleOption(name) getOrElse super.getProperty(name)
 
-  override def getProperties(name: String) =
-    headersToPrepend.get(name) map (_.iterator.asJavaEnumeration) getOrElse super.getProperties(name)
+  override def getProperties(name: String): util.Enumeration[String] =
+    addedHeaderOption(name) map (_.iterator.asJavaEnumeration) getOrElse super.getProperties(name)
 
-  private def addedHeaderOption(name: String) =
-    headersToPrepend.get(name) filter (_.nonEmpty) map (_(0))
+  private def mustPrependHeader(name: String): Boolean =
+    headersToPrependAsMap.keysIterator.exists(_.equalsIgnoreCase(name))
+
+  private def addedHeaderOption(name: String): Option[NonEmptyList[String]] =
+    headersToPrependAsMap
+      .collectFirst { case (key, value) if key.equalsIgnoreCase(name) => value }
+
+  private def addedHeaderSingleOption(name: String): Option[String] =
+    addedHeaderOption(name).map(_.head)
 }
 
 trait RequestRemoveHeaders extends PortletRequestWrapper {
 
-  def headersToRemove: String => Boolean
+  // Override this if you have a `Set` of headers to remove
+  def headersToRemoveAsSet: Set[String] = Set.empty
 
-  override def getPropertyNames = (super.getPropertyNames.asScala filterNot headersToRemove).asJavaEnumeration
+  override def getPropertyNames           : util.Enumeration[String] = (super.getPropertyNames.asScala filterNot mustRemoveHeader).asJavaEnumeration
+  override def getProperty(name: String)  : String                   = if (mustRemoveHeader(name)) null else super.getProperty(name)
+  override def getProperties(name: String): util.Enumeration[String] = if (mustRemoveHeader(name)) null else super.getProperties(name)
 
-  override def getProperty(name: String)   = if (headersToRemove(name)) null else super.getProperty(name)
-  override def getProperties(name: String) = if (headersToRemove(name)) null else super.getProperties(name)
+  private def mustRemoveHeader(name: String): Boolean =
+    headersToRemoveAsSet.exists(_.equalsIgnoreCase(name))
 }

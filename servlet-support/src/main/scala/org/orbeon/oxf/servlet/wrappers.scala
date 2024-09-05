@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
+import cats.data.NonEmptyList
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.DateUtils
@@ -21,6 +22,7 @@ import org.orbeon.oxf.util.PathUtils._
 import java.io._
 import java.{util => ju}
 import scala.jdk.CollectionConverters._
+
 
 // Request wrapper for forwarding a request which simulates a server-side redirect.
 class ForwardServletRequestWrapper(
@@ -35,7 +37,7 @@ class ForwardServletRequestWrapper(
 
   // "Constructors" for traits
   def overriddenPathQuery = pathQuery
-  def headersToRemove     = HeadersToFilter
+  override def headersToRemoveAsSet: Set[String] = HeadersToFilter
 
   override def getMethod = "GET"
 }
@@ -61,38 +63,51 @@ trait RequestPathQuery extends HttpServletRequestWrapper {
 
 trait RequestPrependHeaders extends HttpServletRequestWrapper {
 
-  def headersToPrepend: Map[String, Array[String]]
+  def headersToPrependAsMap: Map[String, NonEmptyList[String]]
 
-  override def getHeaderNames =
-    (headersToPrepend.keysIterator ++ (super.getHeaderNames.asScala filterNot headersToPrepend.keySet))
+  override def getHeaderNames: ju.Enumeration[String] =
+    (headersToPrependAsMap.keysIterator ++ (super.getHeaderNames.asScala filterNot mustPrependHeader))
       .asJavaEnumeration
 
-  override def getHeader(name: String) =
-    addedHeaderOption(name) getOrElse super.getHeader(name)
+  override def getHeader(name: String): String =
+    addedHeaderSingleOption(name) getOrElse super.getHeader(name)
 
-  override def getHeaders(name: String) =
-    headersToPrepend.get(name) map (_.iterator.asJavaEnumeration) getOrElse super.getHeaders(name)
+  override def getHeaders(name: String): ju.Enumeration[String] =
+    addedHeaderOption(name) map (_.iterator.asJavaEnumeration) getOrElse super.getHeaders(name)
 
-  override def getDateHeader(name: String) =
-    addedHeaderOption(name) map DateUtils.parseRFC1123 getOrElse super.getDateHeader(name)
+  override def getDateHeader(name: String): Long =
+    addedHeaderSingleOption(name) map DateUtils.parseRFC1123 getOrElse super.getDateHeader(name)
 
-  override def getIntHeader(name: String) =
-    addedHeaderOption(name) map (_.toInt) getOrElse super.getIntHeader(name)
+  override def getIntHeader(name: String): Int =
+    addedHeaderSingleOption(name) map (_.toInt) getOrElse super.getIntHeader(name)
 
-  private def addedHeaderOption(name: String) =
-    headersToPrepend.get(name) filter (_.nonEmpty) map (_(0))
+  private def mustPrependHeader(name: String): Boolean =
+    headersToPrependAsMap.keysIterator.exists(_.equalsIgnoreCase(name))
+
+  private def addedHeaderOption(name: String): Option[NonEmptyList[String]] =
+    headersToPrependAsMap
+      .collectFirst { case (key, value) if key.equalsIgnoreCase(name) => value }
+
+  private def addedHeaderSingleOption(name: String): Option[String] =
+    addedHeaderOption(name).map(_.head)
 }
 
 trait RequestRemoveHeaders extends HttpServletRequestWrapper {
 
-  def headersToRemove: String => Boolean
+  // Override this if you have a `Set` of headers to remove
+  def headersToRemoveAsSet: Set[String] = Set.empty
 
-  override def getHeaderNames             : ju.Enumeration[String] = (super.getHeaderNames.asScala filterNot headersToRemove).asJavaEnumeration
+  // Override this for more control
+  // The default implementation uses `headersToRemoveAsSet` and does a case-insensitive comparison
+  def mustRemoveHeader(name: String): Boolean =
+    headersToRemoveAsSet.exists(_.equalsIgnoreCase(name))
 
-  override def getHeader    (name: String): String                 = if (headersToRemove(name)) null else super.getHeader(name)
-  override def getHeaders   (name: String): ju.Enumeration[String] = if (headersToRemove(name)) null else super.getHeaders(name)
-  override def getDateHeader(name: String): Long                   = if (headersToRemove(name)) -1   else super.getDateHeader(name)
-  override def getIntHeader (name: String): Int                    = if (headersToRemove(name)) -1   else super.getIntHeader(name)
+  override def getHeaderNames             : ju.Enumeration[String] = (super.getHeaderNames.asScala filterNot mustRemoveHeader).asJavaEnumeration
+
+  override def getHeader    (name: String): String                 = if (mustRemoveHeader(name)) null else super.getHeader(name)
+  override def getHeaders   (name: String): ju.Enumeration[String] = if (mustRemoveHeader(name)) null else super.getHeaders(name)
+  override def getDateHeader(name: String): Long                   = if (mustRemoveHeader(name)) -1   else super.getDateHeader(name)
+  override def getIntHeader (name: String): Int                    = if (mustRemoveHeader(name)) -1   else super.getIntHeader(name)
 }
 
 trait RequestEmptyBody extends HttpServletRequestWrapper {

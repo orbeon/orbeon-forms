@@ -211,7 +211,7 @@ private class FilterRequestWrapper(httpServletRequest: HttpServletRequest)
   }
 
   // See https://github.com/orbeon/orbeon-forms/issues/1796
-  def headersToRemove = (name: String) => name.toLowerCase.startsWith("if-")
+  override def mustRemoveHeader(name: String): Boolean = name.toLowerCase.startsWith("if-")
 }
 
 private class OptionalBodyFilterRequestWrapper(httpServletRequest: HttpServletRequest, forceEmptyBody: Boolean)

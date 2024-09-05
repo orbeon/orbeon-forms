@@ -81,11 +81,11 @@ object FormRunnerAuthFilterImpl {
     // Do not create a session for fonts, source maps, or OPTIONS requests
     val createSession  = ! (servletRequest.isFont || servletRequest.isSourceMap || servletRequest.isOptions)
     val httpSession    = new ServletSessionImpl(servletRequest.getSession(createSession))
-    val getHttpHeaders = (name: String) => servletRequest.getHeaders(name).asScala.to(List)
+    val getHttpHeaders = (name: String) => servletRequest.getHeadersAsList(name)
 
     def headersAsString(r: HttpServletRequest) = {
       r.getHeaderNames.asScala flatMap { name =>
-        r.getHeaders(name).asScala map { value =>
+        r.getHeadersAsList(name) map { value =>
           s"$name: $value"
         }
       } mkString "\n"
@@ -125,8 +125,8 @@ object FormRunnerAuthFilterImpl {
       } else {
 
         trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
-          val headersToRemove  = FormRunnerAuth.AllHeaderNamesLower
-          val headersToPrepend = FormRunnerAuth.getCredentialsAsHeadersUseSession(
+          override def headersToRemoveAsSet: Set[String] = FormRunnerAuth.AllAuthHeaderNames
+          val headersToPrependAsMap = FormRunnerAuth.getCredentialsAsHeadersUseSession(
             userRoles = servletRequest,
             session   = httpSession,
             getHeader = getHttpHeaders

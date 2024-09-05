@@ -57,6 +57,6 @@ object FormRunnerAuthFilter {
       getHeader  = req.getProperties(_).asScala.to(List)
     ).toMap
 
-    AddLiferayUserHeadersFilter.wrap(req, FormRunnerAuth.AllHeaderNamesLower, authHeaders)
+    AddLiferayUserHeadersFilter.wrap(req, FormRunnerAuth.AllAuthHeaderNames, authHeaders)
   }
 }

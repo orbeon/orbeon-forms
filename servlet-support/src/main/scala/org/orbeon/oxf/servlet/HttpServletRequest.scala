@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.PathUtils._
 import java.io.BufferedReader
 import java.net.URI
 import java.{util => ju}
+import scala.jdk.CollectionConverters._
 
 
 object HttpServletRequest {
@@ -56,6 +57,14 @@ trait HttpServletRequest extends ServletRequest {
   def getSession(create: Boolean): HttpSession
   def isRequestedSessionIdValid: Boolean
   def isUserInRole(role: String): Boolean
+
+  // `getHeaders()` is supposed to be case-insensitive, but it might not be the case in some implementations that use
+  // custom filters. Here we try to be case-insensitive by first finding the header name ignoring case, and then
+  // getting the headers for that name using the exact case of the header name found.
+  def getHeadersAsList(name: String): List[String] =
+    getHeaderNames.asScala
+      .collectFirst { case headerName if headerName.equalsIgnoreCase(name) => getHeaders(headerName).asScala.toList}
+      .getOrElse(Nil)
 
   // javax/jakarta.servlet.http.HttpServletRequestWrapper
   def wrappedWith(wrapper: HttpServletRequestWrapper): AnyRef

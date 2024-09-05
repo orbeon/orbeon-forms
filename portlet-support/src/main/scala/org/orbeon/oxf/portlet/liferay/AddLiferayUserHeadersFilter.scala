@@ -1,5 +1,6 @@
 package org.orbeon.oxf.portlet.liferay
 
+import cats.data.NonEmptyList
 import org.orbeon.oxf.portlet.{RequestPrependHeaders, RequestRemoveHeaders}
 import org.orbeon.oxf.util.CollectionUtils
 
@@ -45,17 +46,17 @@ object AddLiferayUserHeadersFilter {
   def wrapWithLiferayUserHeaders[T <: PortletRequest](req: T, user: LiferayUser): T = {
 
     val liferayUserHeaders =
-      CollectionUtils.combineValues[String, String, Array](user.userHeaders) map
-        { case (name, value) => name.toLowerCase -> value } toMap
+      CollectionUtils.combineValues[String, String, List](user.userHeaders) map
+        { case (name, values) => name.toLowerCase -> NonEmptyList.fromListUnsafe(values) } toMap // we know that there is at least one value
 
     wrap(req, LiferaySupport.AllHeaderNamesLower, liferayUserHeaders)
   }
 
-  def wrap[T <: PortletRequest](req: T, remove: Set[String], prepend: Map[String, Array[String]]): T = {
+  def wrap[T <: PortletRequest](req: T, remove: Set[String], prepend: Map[String, NonEmptyList[String]]): T = {
 
     trait CustomProperties extends RequestRemoveHeaders with RequestPrependHeaders  {
-      val headersToRemove  = remove
-      val headersToPrepend = prepend
+      override val headersToRemoveAsSet = remove
+      val headersToPrependAsMap = prepend
     }
 
     req match {

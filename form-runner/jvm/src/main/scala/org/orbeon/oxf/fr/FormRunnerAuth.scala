@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.data.NonEmptyList
 import enumeratum._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext._
@@ -30,11 +31,12 @@ import scala.util.control.NonFatal
 
 object FormRunnerAuth {
 
-  val AllHeaderNamesLower = Set(
-    Headers.OrbeonUsernameLower,
-    Headers.OrbeonGroupLower,
-    Headers.OrbeonRolesLower,
-    Headers.OrbeonCredentialsLower
+  // Only used to determine external headers to remove
+  val AllAuthHeaderNames = Set(
+    Headers.OrbeonUsername,
+    Headers.OrbeonGroup,
+    Headers.OrbeonRoles,
+    Headers.OrbeonCredentials
   )
 
   import Private._
@@ -43,12 +45,12 @@ object FormRunnerAuth {
     userRoles  : UserRolesFacade,
     session    : ExternalContext.Session,
     getHeader  : String => List[String]
-  ): List[(String, Array[String])] =
+  ): List[(String, NonEmptyList[String])] =
     getCredentialsUseSession(userRoles, session, getHeader) match {
       case Some(credentials) =>
-        val result = CredentialsSerializer.toHeaders[Array](credentials)
+        val result = CredentialsSerializer.toHeaders[List](credentials)
         Logger.debug(s"setting auth headers to: ${headersAsJSONString(result)}")
-        result
+        result.map { case (name, values) => (name, NonEmptyList.fromListUnsafe(values)) } // we "know" the `List`s returned by `toHeaders()` are not empty
       case None =>
         // Don't set any headers in case there is no username
         Logger.debug(s"not setting credentials headers because credentials are not found")
@@ -148,7 +150,7 @@ object FormRunnerAuth {
       }
     }
 
-    def headersAsJSONString(headers: List[(String, Array[String])]): String = {
+    def headersAsJSONString(headers: Iterable[(String, Iterable[String])]): String = {
 
       val headerAsJSONStrings =
         headers map {

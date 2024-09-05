@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.embedding
 
+import cats.data.NonEmptyList
 import org.apache.commons.io.IOUtils
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
@@ -33,7 +34,6 @@ import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory
 
 import java.io.Writer
-import scala.jdk.CollectionConverters._
 import scala.util.matching.Regex
 import scala.util.{Failure, Success}
 
@@ -109,7 +109,7 @@ object APISupport {
               content = contentFromRequest,
               url     = url,
               path    = sanitizedResourcePath,
-              headers = proxyCapitalizeAndCombineHeaders(requestHeaders(req).toList, request = true).toList,
+              headers = proxyCapitalizeAndCombineHeaders(req.headerNamesWithValues, request = true).toList,
               params  = Nil
             )
           )
@@ -148,7 +148,7 @@ object APISupport {
           content = Some(contentFromRequest),
           url     = settings.formRunnerURL.dropTrailingSlash + Constants.XFormsServerSubmit,
           path    = Constants.XFormsServerSubmit,
-          headers = proxyCapitalizeAndCombineHeaders(APISupport.requestHeaders(req).toList, request = true).toList,
+          headers = proxyCapitalizeAndCombineHeaders(req.headerNamesWithValues, request = true).toList,
           params  = Nil
         ))
 
@@ -191,16 +191,9 @@ object APISupport {
   def formRunnerURL(baseURL: String, path: String, embeddable: Boolean) =
     PathUtils.appendQueryString(baseURL.dropTrailingSlash + path, if (embeddable) s"${ExternalContext.EmbeddableParam}=true" else "")
 
-  def requestHeaders(req: HttpServletRequest) =
-    for {
-      name   <- req.getHeaderNames.asScala
-      values = req.getHeaders(name).asScala.toList
-    } yield
-      name -> values
-
   // Match on headers in a case-insensitive way, but the header we sent follows the capitalization of the
   // header specified in the init parameter.
-  def headersToForward(clientHeaders: List[(String, List[String])], configuredHeaders: Map[String, String]): Iterable[(String, String)] =
+  def headersToForward(clientHeaders: List[(String, NonEmptyList[String])], configuredHeaders: Map[String, String]): Iterable[(String, String)] =
     for {
       (name, value) <- proxyAndCombineRequestHeaders(clientHeaders)
       originalName  <- configuredHeaders.get(name.toLowerCase)

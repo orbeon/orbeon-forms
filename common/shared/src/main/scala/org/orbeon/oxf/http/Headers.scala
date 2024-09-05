@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.http
 
+import cats.data.NonEmptyList
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.util.NumericUtils
 
@@ -101,6 +102,8 @@ object Headers {
 
   // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
   type ConvertibleToSeq[T[_], U] = T[U] => Seq[U]
+
+  implicit def NelConvertibleToSeq[T]: ConvertibleToSeq[NonEmptyList, T] = _.toList
 
   // Filter headers that that should never be propagated in our proxies
   // Also combine headers with the same name into a single header

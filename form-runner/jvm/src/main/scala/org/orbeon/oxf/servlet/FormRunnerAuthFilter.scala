@@ -59,14 +59,12 @@ class FormRunnerAuthFilterImpl extends Filter {
 
     val addHttpHeadersToThreadContext =
       Properties.instance.getPropertySet.getBoolean("oxf.log4j.thread-context.http-headers", default = false)
-    if (addHttpHeadersToThreadContext) {
-      val httpReq = req.asInstanceOf[HttpServletRequest]
-      httpReq.getHeaderNames.asScala.foreach { name =>
-        val key   = "orbeon-incoming-http-header-" + name.toLowerCase
-        val value = httpReq.getHeader(name)
-        ThreadContext.put(key, value)
-      }
-    }
+    if (addHttpHeadersToThreadContext)
+      req.asInstanceOf[HttpServletRequest]
+        .headerNamesWithValues
+        .foreach { case (name, values) =>
+          ThreadContext.put(s"orbeon-incoming-http-header-${name.toLowerCase}", values.head)
+        }
 
     chain.doFilter(amendRequest(req.asInstanceOf[HttpServletRequest]), res)
   }
@@ -81,17 +79,9 @@ object FormRunnerAuthFilterImpl {
     // Do not create a session for fonts, source maps, or OPTIONS requests
     val createSession  = ! (servletRequest.isFont || servletRequest.isSourceMap || servletRequest.isOptions)
     val httpSession    = new ServletSessionImpl(servletRequest.getSession(createSession))
-    val getHttpHeaders = (name: String) => servletRequest.getHeadersAsList(name)
+    val getHttpHeaders = (name: String) => servletRequest.headerValuesList(name)
 
-    def headersAsString(r: HttpServletRequest) = {
-      r.getHeaderNames.asScala flatMap { name =>
-        r.getHeadersAsList(name) map { value =>
-          s"$name: $value"
-        }
-      } mkString "\n"
-    }
-
-    logger.debug(s"incoming headers:\n${headersAsString(servletRequest)}")
+    logger.debug(s"incoming headers:\n${servletRequest.headersAsString}")
 
     // The Form Runner service path is hardcoded but that's ok. When we are filtering a service, we don't retrieve the
     // credentials, which would be provided by the container or by incoming headers. Instead, credentials are provided
@@ -108,10 +98,10 @@ object FormRunnerAuthFilterImpl {
             ServletPortletRequest.storeCredentialsInSession(
               httpSession,
               FormRunnerAuth.fromHeaderValues(
-                credentialsOpt = Option(servletRequest.getHeader(Headers.OrbeonCredentialsLower)),
-                usernameOpt    = Option(servletRequest.getHeader(Headers.OrbeonUsernameLower)),
-                rolesList      = getHttpHeaders(Headers.OrbeonRolesLower),
-                groupOpt       = Option(servletRequest.getHeader(Headers.OrbeonGroupLower)),
+                credentialsOpt = servletRequest.headerFirstValueOpt(Headers.OrbeonCredentials),
+                usernameOpt    = servletRequest.headerFirstValueOpt(Headers.OrbeonUsername),
+                rolesList      = getHttpHeaders(Headers.OrbeonRoles),
+                groupOpt       = servletRequest.headerFirstValueOpt(Headers.OrbeonGroup),
               )
             )
           case Some(_) =>
@@ -136,7 +126,7 @@ object FormRunnerAuthFilterImpl {
         new HttpServletRequestWrapper(servletRequest) with CustomHeaders
       }
 
-    logger.debug(s"amended headers:\n${headersAsString(requestWithAmendedHeaders)}")
+    logger.debug(s"amended headers:\n${requestWithAmendedHeaders.headersAsString}")
 
     requestWithAmendedHeaders
   }

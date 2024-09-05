@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
+import cats.data.NonEmptyList
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.{ArgumentMatchers, Mockito}
 import org.orbeon.oxf.externalcontext.{Credentials, ServletPortletRequest, SimpleRole, UserAndGroup}
@@ -41,7 +42,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
 
     def headersFromRequest(req: HttpServletRequest): Map[String, List[String]] =
       req.getHeaderNames.asScala map
-        (n => n -> req.getHeaders(n).asScala.toList) toMap
+        (n => n -> req.headerValuesList(n)) toMap
 
     // Request with initial headers
     def newAmendedRequest(path: String, headers: Map[String, List[String]]) = {
@@ -115,11 +116,34 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
         )
       )
 
+      // Call to native method
       assert(h1.getHeader("Content-Type") == "application/json")
       assert(h1.getHeader("content-type") == null)
 
-      assert(h1.getHeadersAsList("Content-Type") == List("application/json"))
-      assert(h1.getHeadersAsList("content-type") == List("application/json"))
+      // Call using helper
+      assert(h1.headerValuesList("Content-Type") == List("application/json"))
+      assert(h1.headerValuesList("content-type") == List("application/json"))
+    }
+
+    it("must not return empty value lists") {
+
+      val h1 = newCaseSensitiveRequest(
+        Map(
+          "My-Header-With-Values"    -> List("v1", "v2"),
+          "My-Header-Without-Values" -> Nil
+        )
+      )
+
+      // Entry without values is removed
+      assert(h1.headerNamesWithValues.toMap == Map("My-Header-With-Values" -> NonEmptyList.fromListUnsafe(List("v1", "v2"))))
+
+      // Call using helpers
+      assert(h1.headerFirstValueOpt("My-Header-With-Values")   .contains("v1"))
+      assert(h1.headerFirstValueOpt("My-Header-Without-Values").isEmpty)
+      assert(h1.headerValuesList   ("My-Header-With-Values")    == List("v1", "v2"))
+      assert(h1.headerValuesList   ("My-Header-Without-Values") == Nil)
+      assert(h1.headerValuesNel    ("My-Header-With-Values")   .contains(NonEmptyList.fromListUnsafe(List("v1", "v2"))))
+      assert(h1.headerValuesNel    ("My-Header-Without-Values").isEmpty)
     }
   }
 }

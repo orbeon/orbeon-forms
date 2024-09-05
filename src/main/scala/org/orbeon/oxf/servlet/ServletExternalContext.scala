@@ -132,7 +132,7 @@ class ServletExternalContext(
     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
     protected[ServletExternalContext] lazy val headerValuesMap: Map[String, Array[String]] = (
       for (name <- nativeRequest.getHeaderNames.asScala)
-        yield name.toLowerCase -> StringConversions.stringEnumerationToArray(nativeRequest.getHeaders(name))
+        yield name.toLowerCase -> nativeRequest.headerValuesList(name).toArray
     ).toMap
 
     def getHeaderValuesMap = headerValuesMap.asJava

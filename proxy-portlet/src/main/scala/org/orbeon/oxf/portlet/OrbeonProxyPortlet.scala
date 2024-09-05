@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.portlet
 
+import cats.data.NonEmptyList
 import org.orbeon.connection.StreamedContent
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
@@ -369,16 +370,16 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       findServletRequest(request)
         .toList
         .map(org.orbeon.oxf.servlet.HttpServletRequest.apply)
-        .flatMap(APISupport.requestHeaders)
+        .flatMap(_.headerNamesWithValues)
 
     def portletRequestHeadersIt =
       for {
         name   <- request.getPropertyNames.asScala
-        values = request.getProperties(name).asScala.toList
+        values <- NonEmptyList.fromList(request.getProperties(name).asScala.toList)
       } yield
         name -> values
 
-    val portletReqHeaders = portletRequestHeadersIt.to(List)
+    val portletReqHeaders = portletRequestHeadersIt.toList
 
     // Language information
     // NOTE: Format returned is e.g. "en_US" or "fr_FR".

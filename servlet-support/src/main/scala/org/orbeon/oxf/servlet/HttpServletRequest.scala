@@ -14,6 +14,7 @@
 package org.orbeon.oxf.servlet
 
 import org.orbeon.oxf.util.PathUtils._
+import cats.data.NonEmptyList
 
 import java.io.BufferedReader
 import java.net.URI
@@ -40,11 +41,14 @@ trait HttpServletRequest extends ServletRequest {
   def getAuthType: String
   def getContextPath: String
   def getCookies: Array[Cookie]
-  def getDateHeader(name: String): Long
-  def getHeader(name: String): String
+
+  // Prefer higher-level methods further below
   def getHeaderNames: ju.Enumeration[String]
+  def getHeader(name: String): String
   def getHeaders(name: String): ju.Enumeration[String]
   def getIntHeader(name: String): Int
+  def getDateHeader(name: String): Long
+
   def getMethod: String
   def getPathInfo: String
   def getPathTranslated: String
@@ -58,13 +62,30 @@ trait HttpServletRequest extends ServletRequest {
   def isRequestedSessionIdValid: Boolean
   def isUserInRole(role: String): Boolean
 
-  // `getHeaders()` is supposed to be case-insensitive, but it might not be the case in some implementations that use
+  lazy val headerNamesWithValues: List[(String, NonEmptyList[String])] =
+    getHeaderNames.asScala
+      .map { headerName => headerName -> NonEmptyList.fromList(getHeaders(headerName).asScala.toList) }
+      .collect { case (name, Some(valueNel)) => name -> valueNel } // value list *should* be non-empty in the first place
+      .toList
+
+  def headerFirstValueOpt(name: String): Option[String] = headerValuesNel(name).map(_.head)
+  def headerValuesList(name: String): List[String] = headerValuesNel(name).map(_.toList).getOrElse(Nil)
+
+  // `getHeaders()` is supposed to be case-insensitive, but it might not be the case in some setups that use faulty
   // custom filters. Here we try to be case-insensitive by first finding the header name ignoring case, and then
   // getting the headers for that name using the exact case of the header name found.
-  def getHeadersAsList(name: String): List[String] =
+  def headerValuesNel(name: String): Option[NonEmptyList[String]] =
     getHeaderNames.asScala
-      .collectFirst { case headerName if headerName.equalsIgnoreCase(name) => getHeaders(headerName).asScala.toList}
-      .getOrElse(Nil)
+      .collectFirst { case headerName if headerName.equalsIgnoreCase(name) => NonEmptyList.fromList(getHeaders(headerName).asScala.toList) }
+      .collect { case Some(valueNel) => valueNel }
+
+  def headersAsString: String = {
+    headerNamesWithValues.flatMap { case (headerName, headerValues) =>
+      headerValues.toList.map { value =>
+        s"$headerName: $value"
+      }
+    } mkString "\n"
+  }
 
   // javax/jakarta.servlet.http.HttpServletRequestWrapper
   def wrappedWith(wrapper: HttpServletRequestWrapper): AnyRef
@@ -126,11 +147,11 @@ class JavaxHttpServletRequest(httpServletRequest: javax.servlet.http.HttpServlet
     Option(httpServletRequest.getCookies)
       .map(_.map(c => Cookie(c): Cookie))
       .getOrElse(Array.empty[Cookie])
-  override def getDateHeader(name: String): Long = httpServletRequest.getDateHeader(name)
-  override def getHeader(name: String): String = httpServletRequest.getHeader(name)
   override def getHeaderNames: ju.Enumeration[String] = httpServletRequest.getHeaderNames
+  override def getHeader(name: String): String = httpServletRequest.getHeader(name)
   override def getHeaders(name: String): ju.Enumeration[String] = httpServletRequest.getHeaders(name)
   override def getIntHeader(name: String): Int = httpServletRequest.getIntHeader(name)
+  override def getDateHeader(name: String): Long = httpServletRequest.getDateHeader(name)
   override def getMethod: String = httpServletRequest.getMethod
   override def getPathInfo: String = httpServletRequest.getPathInfo
   override def getPathTranslated: String = httpServletRequest.getPathTranslated
@@ -168,13 +189,13 @@ class JavaxHttpServletRequest(httpServletRequest: javax.servlet.http.HttpServlet
         Option(wrapper.getCookies)
           .map(_.map(c => c.getNativeCookie.asInstanceOf[javax.servlet.http.Cookie]))
           .getOrElse(Array.empty[javax.servlet.http.Cookie])
-      override def getDateHeader(name: String): Long = wrapper.getDateHeader(name)
-      override def getHeader(name: String): String = wrapper.getHeader(name)
       override def getHeaderNames: ju.Enumeration[String] = wrapper.getHeaderNames
+      override def getHeader(name: String): String = wrapper.getHeader(name)
       override def getHeaders(name: String): ju.Enumeration[String] = wrapper.getHeaders(name)
+      override def getIntHeader(name: String): Int = wrapper.getIntHeader(name)
+      override def getDateHeader(name: String): Long = wrapper.getDateHeader(name)
       // See comment in ServletRequest trait
       override def getInputStream: javax.servlet.ServletInputStream = wrapper.getInputStream.asInstanceOf[javax.servlet.ServletInputStream]
-      override def getIntHeader(name: String): Int = wrapper.getIntHeader(name)
       override def getLocalName: String = wrapper.getLocalName
       override def getLocale: ju.Locale = wrapper.getLocale
       override def getLocales: ju.Enumeration[ju.Locale] = wrapper.getLocales

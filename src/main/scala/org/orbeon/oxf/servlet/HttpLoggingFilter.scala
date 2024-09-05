@@ -5,7 +5,6 @@ import org.orbeon.oxf.util.NetUtils
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.io.{ByteArrayInputStream, InputStream}
-import scala.jdk.CollectionConverters._
 
 
 // To enable, add the following to your `web.xml`, before all the other filters.
@@ -45,12 +44,8 @@ class HttpLoggingFilterImpl extends Filter {
     val wrappedRequest     = new HttpLoggingFilter.LoggerRequestWrapper(httpRequest, servletInputStream)
 
     // Log path, headers, and body
-    Logger.info(s"request path `$requestPath`")
-    httpRequest.getHeaderNames.asScala.foreach { headerName =>
-      val headerValue = httpRequest.getHeader(headerName)
-      Logger.info(s"request header `$headerName: $headerValue`")
-    }
-    Logger.info(s"request body `$requestBody`")
+    Logger.info(s"request headers:\n${httpRequest.headersAsString}")
+    Logger.info(s"request body:\n`$requestBody`")
 
     chain.doFilter(wrappedRequest, servletResponse)
   }

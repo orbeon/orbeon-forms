@@ -28,7 +28,7 @@ class TokenSecurityFilter extends Filter {
 
     def authorized =
       Authorizer.authorizedWithToken(
-        k => Option(httpReq.getHeader(k)) map (v => Array(v)),
+        k => httpReq.headerFirstValueOpt(k) map (v => Array(v)),
         k => Option(servletContext.getAttribute(k)))
 
     if (authorized) {

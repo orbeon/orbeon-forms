@@ -1316,8 +1316,10 @@ lazy val servletSupport = (project in file("servlet-support"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-servlet-support",
-    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % JavaxServletApiVersion      % Provided,
-    libraryDependencies += "jakarta.servlet"    % "jakarta.servlet-api"       % JakartaServletApiVersion    % Provided
+    libraryDependencies += "javax.servlet"    %   "javax.servlet-api"   % JavaxServletApiVersion      % Provided,
+    libraryDependencies += "jakarta.servlet"  %   "jakarta.servlet-api" % JakartaServletApiVersion    % Provided,
+    libraryDependencies += "org.typelevel"    %%% "cats-kernel"         % CatsVersion,
+    libraryDependencies += "org.typelevel"    %%% "cats-core"           % CatsVersion,
   )
 
 // JAR file for dynamic servlet instantiation

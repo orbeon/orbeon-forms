@@ -221,8 +221,8 @@ object FormRunnerAuth {
 
           Logger.debug(s"using `$authMethod` method")
 
-          def headerList(name: String) =
-            propertySet.getNonBlankString(name).toList flatMap (p => getHeader(p.toLowerCase))
+          def headerList(propertyName: String): List[String] =
+            propertySet.getNonBlankString(propertyName).toList.flatMap(getHeader)
 
           fromHeaderValues(
             credentialsOpt = headerList(HeaderCredentialsPropertyName).headOption,

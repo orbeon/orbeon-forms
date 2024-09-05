@@ -20,10 +20,12 @@ import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
 
+import scala.util.Try
+
 class JsonStringToXml extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
   override def evaluateItem(xpathContext: XPathContext): DocumentInfo = {
     val stringOpt   = stringArgumentOrContextOpt(0)(xpathContext)
-    val documentOpt = stringOpt.map(s => Converter.jsonStringToXmlDoc(s))
+    val documentOpt = stringOpt.flatMap(s => Try(Converter.jsonStringToXmlDoc(s)).toOption)
     documentOpt.orNull
   }
 }

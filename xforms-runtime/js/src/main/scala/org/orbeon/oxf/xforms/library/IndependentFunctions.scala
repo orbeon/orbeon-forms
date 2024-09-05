@@ -15,6 +15,8 @@ import org.orbeon.saxon.om
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
 import org.orbeon.scaxon.SimplePath._
 
+import scala.util.Try
+
 
 trait IndependentFunctions extends OrbeonFunctionLibrary {
 
@@ -214,8 +216,8 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
   def jsonToXml(s: Option[String] = null)(implicit xpc: XPathContext): Option[om.NodeInfo] =
-    stringArgumentOrContextOpt(s).map(jsonString =>
-      Converter.jsonStringToXmlDoc(jsonString)
+    stringArgumentOrContextOpt(s).flatMap(jsonString =>
+      Try(Converter.jsonStringToXmlDoc(jsonString)).toOption
     )
 
   @XPathFunction

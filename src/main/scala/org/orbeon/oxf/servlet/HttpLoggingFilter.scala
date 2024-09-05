@@ -22,10 +22,10 @@ import java.io.{ByteArrayInputStream, InputStream}
 // For backward compatibility
 class HttpLoggingFilter extends JavaxHttpLoggingFilter
 
-class JavaxHttpLoggingFilter   extends JavaxFilter  (new HttpLoggingFilterImpl)
-class JakartaHttpLoggingFilter extends JakartaFilter(new HttpLoggingFilterImpl)
+class JavaxHttpLoggingFilter   extends JavaxFilter  (new HttpLoggingFilterImpl(new HttpLoggingFilter.JavaxByteArrayServletInputStream(_)))
+class JakartaHttpLoggingFilter extends JakartaFilter(new HttpLoggingFilterImpl(new HttpLoggingFilter.JakartaByteArrayServletInputStream(_)))
 
-class HttpLoggingFilterImpl extends Filter {
+class HttpLoggingFilterImpl(makeServletInputStream: ByteArrayInputStream => InputStream) extends Filter {
 
   val Logger: Logger = LoggerFactory.getLogger("org.orbeon.filter.http-logging")
 
@@ -46,7 +46,7 @@ class HttpLoggingFilterImpl extends Filter {
 
     val requestBody        = new String(byteArray, CharsetNames.Utf8)
     val inputStream        = new ByteArrayInputStream(byteArray)
-    val servletInputStream = new HttpLoggingFilter.ByteArrayServletInputStream(inputStream)
+    val servletInputStream = makeServletInputStream(inputStream)
     val wrappedRequest     = new HttpLoggingFilter.LoggerRequestWrapper(httpRequest, servletInputStream)
 
     Logger.info(s"request path and query: `$pathQuery`")
@@ -68,8 +68,31 @@ private object HttpLoggingFilter {
     override def getInputStream: InputStream = servletInputStream
   }
 
-  class ByteArrayServletInputStream(byteArrayInputStream: ByteArrayInputStream)
-      extends InputStream {
-    def read(): Int = byteArrayInputStream.read()
+  class JavaxByteArrayServletInputStream(protected val byteArrayInputStream: ByteArrayInputStream)
+      extends javax.servlet.ServletInputStream with BaseByteArrayServletInputStream {
+    def setReadListener(readListener: javax.servlet.ReadListener): Unit = ()
+  }
+
+  class JakartaByteArrayServletInputStream(protected val byteArrayInputStream: ByteArrayInputStream)
+      extends jakarta.servlet.ServletInputStream with BaseByteArrayServletInputStream {
+    def setReadListener(readListener: jakarta.servlet.ReadListener): Unit = ()
+  }
+
+  trait BaseByteArrayServletInputStream {
+
+    // Scala 3: trait parameter
+    protected def byteArrayInputStream: ByteArrayInputStream
+
+    private var _isFinished = false
+
+    def read(): Int = {
+      val b = byteArrayInputStream.read()
+      if (b == -1)
+        _isFinished = true
+      b
+    }
+
+    def isFinished: Boolean = _isFinished
+    def isReady: Boolean = true
   }
 }

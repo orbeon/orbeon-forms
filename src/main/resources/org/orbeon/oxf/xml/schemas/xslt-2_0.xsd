@@ -687,7 +687,7 @@
 
     <xs:element name="text" substitutionGroup="xsl:instruction">
         <xs:complexType>
-            <xs:complexContent>
+            <xs:complexContent mixed="true">
                 <xs:extension base="xsl:versioned-element-type">
                     <xs:attribute name="disable-output-escaping" type="xsl:yes-or-no" default="no"/>
                 </xs:extension>

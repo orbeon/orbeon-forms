@@ -1098,6 +1098,16 @@ body.orbeon {
     .fb-pdf-dialog {
         width: 700px;
         max-width: none;
+
+        .xxforms-dialog-body > div {
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .xbl-fr-grid {
+            overflow: auto;
+        }
     }
 
     .fb-search-dialog {

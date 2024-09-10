@@ -1179,6 +1179,7 @@
     </xsl:template>
 
     <xsl:template match="fr:alert" mode="within-action-2018.2">
+        <xsl:param tunnel="yes" name="library-name"          as="xs:string?"/>
         <xxf:log
             class="fr-action-impl"
             name="orbeon.action"
@@ -1188,7 +1189,7 @@
             <xf:property name="action-type"  value="'{name(.)}'"/>
         </xxf:log>
         <xf:action class="fr-action-impl">
-            <xf:var name="message"><xsl:value-of select="@message"/></xf:var>
+            <xf:var name="message"><xsl:value-of select="frf:replaceVarReferencesWithFunctionCalls(. , @message, true(), $library-name, ())"/></xf:var>
             <xf:message value="xxf:evaluate-avt($message)"/>
         </xf:action>
     </xsl:template>

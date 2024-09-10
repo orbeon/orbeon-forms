@@ -20,16 +20,13 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.Namespaces
-import org.orbeon.xml.NamespaceMapping
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.mutable
@@ -781,7 +778,7 @@ class FormBuilderFunctionsTest
         val RenamedSubmission: NodeInfo =
             <fb:submission
               xmlns:xf={Namespaces.XF}
-              xmlns:fb={XMLNames.FB}
+              xmlns:fb={FB}
               id="echo-submission"
               class="fr-service"
               resource="/fr/service/custom/orbeon/echo?ping={$read-write-control}"

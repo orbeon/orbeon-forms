@@ -2417,10 +2417,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input-1" class="+fr-gaga-foo +fr-toto-bar">
+                        <xxf:control id="my-input-1" class="+fr-toto-bar +fr-gaga-foo">
                             <xxf:value>foo</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-input-2" class="+fr-gaga-foo +fr-toto-bar">
+                        <xxf:control id="my-input-2" class="+fr-toto-bar +fr-gaga-foo">
                             <xxf:value>bar</xxf:value>
                         </xxf:control>
                         <xxf:control id="my-output-1">

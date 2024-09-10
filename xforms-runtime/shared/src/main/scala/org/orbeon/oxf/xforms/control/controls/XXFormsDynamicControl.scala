@@ -43,7 +43,6 @@ import org.orbeon.xforms.xbl.Scope
 import org.w3c.dom.Node.ELEMENT_NODE
 import shapeless.syntax.typeable._
 
-import scala.collection.generic.Growable
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
@@ -228,7 +227,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         ListenerResult.Stop
       }
 
-      def recordChanges(findChange: om.NodeInfo => Option[(String, Element)], changes: Growable[(String, Element)])(nodes: collection.Seq[om.NodeInfo]): ListenerResult = {
+      def recordChanges(findChange: om.NodeInfo => Option[(String, Element)], changes: mutable.Growable[(String, Element)])(nodes: collection.Seq[om.NodeInfo]): ListenerResult = {
         val newChanges = nodes flatMap (findChange(_))
         changes ++= newChanges
         if (newChanges.nonEmpty) ListenerResult.Stop else ListenerResult.NextListener

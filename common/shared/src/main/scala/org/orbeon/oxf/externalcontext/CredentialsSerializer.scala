@@ -36,7 +36,7 @@ object CredentialsSerializer {
     credentials: Credentials
   )(implicit
     cbf        : Factory[String, T[String]],
-    ev         : T[String] => Traversable[String]
+    ev         : T[String] => Iterable[String]
   ): List[(String, T[String])] = {
 
     import org.orbeon.oxf.util.CoreUtils._

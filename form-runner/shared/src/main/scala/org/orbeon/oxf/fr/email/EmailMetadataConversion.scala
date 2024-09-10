@@ -5,7 +5,6 @@ import org.orbeon.oxf.fr.email.EmailMetadata.{HeaderName, Template, TemplateValu
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.saxon.function.ProcessTemplateSupport
 
-import scala.collection.compat.immutable.LazyList
 
 /**
  * Converting case classes for the legacy formats into the current format

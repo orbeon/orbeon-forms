@@ -26,7 +26,6 @@ import org.orbeon.xforms.HeadElement
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.Attributes
 
-import scala.collection.compat._
 import scala.collection.mutable
 
 

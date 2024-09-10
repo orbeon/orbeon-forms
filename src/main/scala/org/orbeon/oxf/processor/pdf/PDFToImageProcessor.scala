@@ -32,7 +32,6 @@ import org.orbeon.oxf.xml.XMLReceiver
 import java.awt.image._
 import java.io.{File, OutputStream}
 import javax.imageio.{IIOImage, ImageIO, ImageTypeSpecifier, ImageWriteParam}
-import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 
 

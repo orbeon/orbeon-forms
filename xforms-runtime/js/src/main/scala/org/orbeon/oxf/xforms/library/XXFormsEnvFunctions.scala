@@ -29,7 +29,6 @@ import org.orbeon.saxon.value.{AtomicValue, QNameValue, SequenceExtent, StringVa
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
-import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 
 

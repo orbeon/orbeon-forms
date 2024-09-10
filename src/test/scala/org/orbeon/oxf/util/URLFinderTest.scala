@@ -15,7 +15,6 @@ package org.orbeon.oxf.util
 
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.collection.compat._
 
 
 class URLFinderTest extends AnyFunSpecLike {

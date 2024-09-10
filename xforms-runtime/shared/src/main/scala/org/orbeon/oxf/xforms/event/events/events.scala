@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.xforms.{BindingErrorReason, EventNames}
 import shapeless.syntax.typeable._
 
-import scala.collection.compat._
 
 class XXFormsStateRestoredEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XXFORMS_STATE_RESTORED, target, properties, bubbles = false, cancelable = false) {

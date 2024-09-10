@@ -37,7 +37,6 @@ import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import shapeless.syntax.typeable._
 
 import java.net.URI
-import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 
 

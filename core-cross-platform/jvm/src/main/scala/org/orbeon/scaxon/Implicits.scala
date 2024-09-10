@@ -18,7 +18,6 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
 import org.orbeon.scaxon.SimplePath.URIQualifiedName
 
-import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 import scala.{collection => coll}
 

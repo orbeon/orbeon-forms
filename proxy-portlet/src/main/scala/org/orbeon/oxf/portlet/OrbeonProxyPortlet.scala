@@ -28,7 +28,6 @@ import org.orbeon.xforms.Constants
 import java.net.URL
 import javax.portlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 import scala.util.matching.Regex

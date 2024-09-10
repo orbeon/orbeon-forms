@@ -28,7 +28,6 @@ import org.orbeon.xml.NamespaceMapping
 
 import java.net.URI
 import java.{lang => jl, util => ju}
-import scala.collection.compat.immutable.LazyList
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 

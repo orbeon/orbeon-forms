@@ -3,7 +3,6 @@ package org.orbeon.oxf.util
 import org.slf4j
 
 import java.util.ServiceLoader
-import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal

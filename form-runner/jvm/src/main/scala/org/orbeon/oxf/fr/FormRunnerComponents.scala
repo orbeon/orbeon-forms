@@ -11,7 +11,6 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.compat._
 
 
 trait FormRunnerComponents {

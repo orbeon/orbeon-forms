@@ -41,7 +41,6 @@ import org.xml.sax.{InputSource, XMLReader}
 import scala.util.Try
 import scala.util.control.NonFatal
 
-import scala.collection.compat._
 
 
 object XPath extends XPathTrait {

@@ -17,7 +17,7 @@ import io.circe.Json
 import org.orbeon.oxf.http.Headers
 
 import java.net.URLEncoder
-import scala.collection.compat._
+import scala.collection.Factory
 
 
 object CredentialsSerializer {

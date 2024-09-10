@@ -22,7 +22,6 @@ import org.orbeon.saxon.value.{BooleanValue, StringValue, Value}
 import org.orbeon.saxon.MapFunctions
 import org.orbeon.scaxon.Implicits._
 
-import scala.collection.compat._
 
 
 class IsBlank extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {

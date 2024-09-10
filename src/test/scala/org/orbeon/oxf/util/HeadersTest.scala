@@ -17,7 +17,6 @@ package org.orbeon.oxf.util
 import org.orbeon.oxf.http.Headers._
 import org.scalatest.funspec.AnyFunSpec
 
-import scala.collection.compat._
 
 class HeadersTest extends AnyFunSpec {
 

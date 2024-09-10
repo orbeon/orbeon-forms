@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest
 
 import scala.jdk.CollectionConverters._
 import scala.util.{Success, Try}
-import scala.collection.compat._
 
 // For https://github.com/orbeon/orbeon-forms/issues/2843
 // We must abstract over code which changed packages between Liferay 6.2 and 7.0. We achieve this using Java reflection.

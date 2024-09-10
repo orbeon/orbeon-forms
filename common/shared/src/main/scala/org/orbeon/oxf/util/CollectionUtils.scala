@@ -17,8 +17,7 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.oxf.util.CoreUtils._
 
-import scala.collection.compat._
-import scala.collection.{AbstractIterator, mutable}
+import scala.collection.{AbstractIterator, Factory, mutable}
 import scala.language.{implicitConversions, reflectiveCalls}
 import scala.reflect.ClassTag
 

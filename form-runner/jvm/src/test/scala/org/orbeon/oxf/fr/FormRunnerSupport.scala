@@ -28,7 +28,6 @@ import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache
 
-import scala.collection.compat._
 
 object FormRunnerSupport {
   private val FindUUIDInHTMLBodyRE = """<script src="\/orbeon\/xforms-server\/form\/dynamic\/([^.]+)\.js"""".r

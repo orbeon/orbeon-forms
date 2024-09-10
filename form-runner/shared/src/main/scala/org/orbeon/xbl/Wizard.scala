@@ -33,7 +33,6 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.Constants
 import shapeless.syntax.typeable._
 
-import scala.collection.compat._
 
 object Wizard {
 

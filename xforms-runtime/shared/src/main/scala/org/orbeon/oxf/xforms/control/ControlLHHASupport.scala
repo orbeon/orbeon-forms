@@ -23,7 +23,6 @@ import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import shapeless.syntax.typeable._
 
-import scala.collection.compat._
 
 trait ControlLHHASupport {
 

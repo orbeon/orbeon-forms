@@ -21,7 +21,6 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.scaxon.Implicits._
 
-import scala.collection.compat._
 
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {

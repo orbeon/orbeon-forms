@@ -21,7 +21,6 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatestplus.junit.AssertionsForJUnit
 
 import java.net.URI
-import scala.collection.compat._
 import scala.collection.mutable
 
 

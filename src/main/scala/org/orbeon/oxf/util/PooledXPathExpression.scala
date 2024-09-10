@@ -27,7 +27,6 @@ import org.orbeon.scaxon.Implicits
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 import scala.util.control.NonFatal
-import scala.collection.compat._
 
 class PooledXPathExpression(
   expression : XPathExpression,

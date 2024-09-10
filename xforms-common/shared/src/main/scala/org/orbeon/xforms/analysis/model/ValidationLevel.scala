@@ -16,7 +16,6 @@ package org.orbeon.xforms.analysis.model
 import enumeratum.{CirceEnum, Enum, EnumEntry}
 
 import scala.collection.immutable.List
-import scala.collection.compat._
 
 
 sealed abstract class ValidationLevel(override val entryName: String) extends EnumEntry

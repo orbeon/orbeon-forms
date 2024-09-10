@@ -31,7 +31,6 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xml.NamespaceMapping
 
 import scala.util.{Failure, Success, Try}
-import scala.collection.compat._
 
 
 trait ScalaToXml {

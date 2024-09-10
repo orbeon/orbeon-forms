@@ -41,7 +41,6 @@ import org.orbeon.xforms.{Namespaces, XFormsId}
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
-import scala.collection.compat._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 

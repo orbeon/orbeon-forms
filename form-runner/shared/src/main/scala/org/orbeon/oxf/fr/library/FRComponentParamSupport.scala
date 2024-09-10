@@ -19,7 +19,6 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
-import scala.collection.compat._
 
 
 object FRComponentParamSupport {

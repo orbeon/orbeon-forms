@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
 
-import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 
 

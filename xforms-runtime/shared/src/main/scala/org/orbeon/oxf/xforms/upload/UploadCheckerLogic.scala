@@ -1,10 +1,7 @@
 package org.orbeon.oxf.xforms.upload
 
 import org.orbeon.datatypes.MaximumSize
-import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
-
-import scala.collection.compat.immutable.LazyList
 
 
 // Separate checking logic for sanity and testing

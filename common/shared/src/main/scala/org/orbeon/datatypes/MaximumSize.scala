@@ -17,7 +17,6 @@ import org.orbeon.oxf.util.NumericUtils
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.annotation.tailrec
-import scala.collection.compat.immutable.LazyList
 
 
 sealed trait MaximumSize {

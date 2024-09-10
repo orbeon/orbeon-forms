@@ -16,7 +16,7 @@ package org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.annotation.tailrec
-import scala.collection.compat._
+import scala.collection.Factory
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Try
 

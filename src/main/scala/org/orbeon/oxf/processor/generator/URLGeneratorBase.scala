@@ -20,7 +20,6 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.util.{CollectionUtils, DateUtils, NetUtils}
 
 import scala.jdk.CollectionConverters._
-import scala.collection.compat._
 
 
 object URLGeneratorBase {

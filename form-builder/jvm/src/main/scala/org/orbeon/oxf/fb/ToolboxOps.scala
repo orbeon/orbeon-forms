@@ -51,7 +51,6 @@ import org.orbeon.xforms.{Namespaces, XFormsNames}
 import org.orbeon.xforms.XFormsNames.{ID_QNAME, MEDIATYPE_QNAME}
 
 import java.net.URI
-import scala.collection.compat._
 import scala.collection.mutable
 import scala.util.Try
 

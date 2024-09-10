@@ -29,7 +29,6 @@ import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.xforms.xbl.Scope
 
 import java.net.URI
-import scala.collection.compat._
 import scala.collection.immutable.SortedMap
 import scala.collection.mutable
 

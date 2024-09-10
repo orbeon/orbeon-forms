@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaControlRef, LhhaPlacementType, XPathAnalysis}
 import org.orbeon.xforms.XFormsNames
 
-import scala.collection.compat._
 
 
 // Control support for nested or external LHHA elements

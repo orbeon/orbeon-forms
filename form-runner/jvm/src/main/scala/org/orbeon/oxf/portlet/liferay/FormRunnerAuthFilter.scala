@@ -18,7 +18,6 @@ import org.orbeon.oxf.portlet.PortletSessionImpl
 
 import javax.portlet._
 import javax.portlet.filter._
-import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 
 

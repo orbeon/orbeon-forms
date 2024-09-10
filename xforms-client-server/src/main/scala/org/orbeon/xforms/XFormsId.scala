@@ -15,7 +15,6 @@ package org.orbeon.xforms
 
 import org.orbeon.oxf.util.StringUtils._
 
-import scala.collection.compat._
 
 
 // Structured representation of an id

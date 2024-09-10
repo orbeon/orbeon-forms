@@ -37,7 +37,6 @@ import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
 import scala.collection.Searching._
-import scala.collection.compat._
 import scala.collection.Searching._
 import scala.collection.mutable.IndexedSeqOps
 import scala.collection.{IterableFactoryDefaults, IterableOnce, Iterator, SeqFactory, StrictOptimizedSeqOps, mutable}

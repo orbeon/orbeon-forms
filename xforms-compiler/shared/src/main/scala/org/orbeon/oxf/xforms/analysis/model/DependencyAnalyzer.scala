@@ -21,7 +21,6 @@ import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.Expression
 
 import scala.annotation.tailrec
-import scala.collection.compat._
 
 
 // Analyze a tree of binds to determine expressions dependencies based on references to MIP variables,

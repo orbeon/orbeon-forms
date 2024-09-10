@@ -21,7 +21,6 @@ import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
 
-import scala.collection.compat._
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{newInstance, global => g}
 

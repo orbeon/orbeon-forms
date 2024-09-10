@@ -38,7 +38,6 @@ import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.{MEDIATYPE_QNAME, TYPE_QNAME, XFORMS_INPUT_QNAME}
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.compat._
 
 
 trait FormRunnerControlOps extends FormRunnerBaseOps {

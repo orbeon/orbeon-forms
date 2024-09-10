@@ -22,7 +22,6 @@ import org.orbeon.oxf.util.StringUtils._
 import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
-import scala.collection.compat._
 
 // For backward compatibility
 class FormRunnerAuthFilter extends JavaxFormRunnerAuthFilter

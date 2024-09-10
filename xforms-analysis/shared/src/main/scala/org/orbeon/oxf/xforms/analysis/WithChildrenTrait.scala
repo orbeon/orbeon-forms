@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import scala.collection.compat._
 
 trait ElemListener {
   def startElement(element: ElementAnalysis): Unit

@@ -33,7 +33,6 @@ import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 
-import scala.collection.compat._
 import scala.collection.mutable
 
 

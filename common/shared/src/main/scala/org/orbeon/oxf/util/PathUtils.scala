@@ -16,9 +16,7 @@ package org.orbeon.oxf.util
 import org.orbeon.oxf.util.CollectionUtils.combineValues
 import org.orbeon.oxf.util.StringUtils._
 
-import java.util.regex.Pattern
 import java.{util, lang => jl}
-import scala.collection.compat.IterableOnce
 
 
 object PathUtils {

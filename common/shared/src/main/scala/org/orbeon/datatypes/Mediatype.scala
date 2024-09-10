@@ -16,7 +16,6 @@ package org.orbeon.datatypes
 import org.orbeon.datatypes.Mediatype.TypeOrSubtype._
 import org.orbeon.datatypes.Mediatype._
 import org.orbeon.datatypes.MediatypeRange._
-import scala.collection.compat._
 
 
 // Concrete mediatype, as opposed to `MediatypeRange` below

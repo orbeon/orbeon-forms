@@ -28,7 +28,6 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.oxf.util.CoreUtils._
 
-import scala.collection.compat._
 
 
 trait ContainerOps extends ControlOps {

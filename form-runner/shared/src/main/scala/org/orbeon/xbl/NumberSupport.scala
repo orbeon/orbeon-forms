@@ -24,7 +24,6 @@ import org.orbeon.saxon.value.{DecimalValue, IntegerValue}
 
 import java.text.{DecimalFormat, DecimalFormatSymbols}
 import java.util.Locale
-import scala.collection.compat._
 import scala.util.{Failure, Success}
 
 

@@ -18,7 +18,6 @@ import java.{util => ju}
 import org.orbeon.oxf.common.OXFException
 
 import scala.jdk.CollectionConverters._
-import scala.collection.compat._
 
 trait ResourceManagerFactory {
   def makeInstance: ResourceManager

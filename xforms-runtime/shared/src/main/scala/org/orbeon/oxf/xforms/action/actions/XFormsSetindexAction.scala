@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
 
-import scala.collection.compat._
 
 
 /**

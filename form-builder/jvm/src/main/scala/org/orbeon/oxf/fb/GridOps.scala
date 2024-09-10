@@ -28,7 +28,6 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 
-import scala.collection.compat._
 
 /*
  * Form Builder: operations on grids.

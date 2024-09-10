@@ -23,7 +23,6 @@ import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
-import scala.collection.compat._
 
 class HasClass extends ClassSupport {
   override def evaluateItem(xpathContext: XPathContext): BooleanValue =

@@ -27,7 +27,6 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames.{APPEARANCE_QNAME, XFORMS_STRING_QNAME}
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.compat._
 
 
 // CSS selectors can be very complex but we only support a small subset of them for the purpose of binding controls to

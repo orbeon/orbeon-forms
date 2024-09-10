@@ -21,7 +21,6 @@ import org.orbeon.oxf.util.StringUtils._
 import org.scalatest.funspec.AnyFunSpec
 
 import scala.collection.mutable
-import scala.collection.compat._
 import scala.util.{Success, Try}
 
 

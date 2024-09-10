@@ -27,7 +27,6 @@ import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames._
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.collection.compat._
 
 class BindingDescriptorTest
   extends DocumentTestBase

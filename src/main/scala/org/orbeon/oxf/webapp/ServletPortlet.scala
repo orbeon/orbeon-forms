@@ -23,7 +23,6 @@ import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 
 import scala.util.control.NonFatal
 
-import scala.collection.compat._
 
 
 // Servlet/portlet helper for processor definitions and services

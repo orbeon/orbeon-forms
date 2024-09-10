@@ -14,7 +14,6 @@ import org.orbeon.saxon.value.{AtomicValue, ObjectValue, SequenceExtent}
 import org.orbeon.scaxon.Implicits
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.compat._
 import java.{util => ju}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._

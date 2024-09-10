@@ -36,7 +36,6 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
-import scala.collection.compat._
 import scala.{xml => sx}
 
 

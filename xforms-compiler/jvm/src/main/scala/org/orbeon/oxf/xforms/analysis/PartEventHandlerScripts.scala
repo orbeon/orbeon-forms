@@ -17,7 +17,6 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.xforms.XFormsNames._
 
-import scala.collection.compat._
 import scala.collection.mutable
 
 

@@ -21,7 +21,6 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import org.orbeon.scaxon.Implicits._
-import scala.collection.compat._
 
 
 class GetRequestMethod extends DefaultFunctionSupport with RuntimeDependentFunction {

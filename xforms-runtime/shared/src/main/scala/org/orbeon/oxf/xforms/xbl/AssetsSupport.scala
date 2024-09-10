@@ -6,7 +6,6 @@ import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport.{withElement, _}
 import org.orbeon.xforms.HeadElement
 
-import scala.collection.compat._
 import scala.collection.mutable
 
 

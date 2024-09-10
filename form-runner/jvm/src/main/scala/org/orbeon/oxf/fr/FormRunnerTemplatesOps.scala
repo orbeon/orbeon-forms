@@ -16,7 +16,6 @@ import org.orbeon.xforms.{Namespaces, XFormsNames}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeInfoConversions
 
-import scala.collection.compat._
 
 
 object FormRunnerTemplatesOps {

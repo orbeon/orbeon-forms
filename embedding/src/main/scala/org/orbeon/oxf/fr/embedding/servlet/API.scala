@@ -18,7 +18,6 @@ import org.orbeon.oxf.servlet.HttpServletRequest
 
 import java.io.Writer
 import java.{util => ju}
-import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 
 object API {

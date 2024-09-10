@@ -18,7 +18,6 @@ import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
 import org.scalajs.dom.ext.SessionStorage
 
-import scala.collection.compat._
 import scala.collection.immutable
 import scala.scalajs.js.annotation.JSExport
 

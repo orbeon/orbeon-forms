@@ -21,7 +21,6 @@ import org.orbeon.oxf.util.StringUtils._
 import org.scalatestplus.junit.AssertionsForJUnit
 
 import scala.util.Try
-import scala.collection.compat._
 
 trait ClientXFormsTest extends AssertionsForJUnit with FormRunnerOps {
 

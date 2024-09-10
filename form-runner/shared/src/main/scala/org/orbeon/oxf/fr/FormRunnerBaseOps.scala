@@ -38,7 +38,6 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.compat._
 import scala.collection.immutable
 
 

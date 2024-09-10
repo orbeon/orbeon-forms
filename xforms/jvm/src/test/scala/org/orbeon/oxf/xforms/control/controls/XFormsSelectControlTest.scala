@@ -19,7 +19,6 @@ import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.saxon.om
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.collection.compat._
 
 class XFormsSelectControlTest
   extends DocumentTestBase

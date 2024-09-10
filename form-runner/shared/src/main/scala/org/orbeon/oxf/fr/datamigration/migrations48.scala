@@ -30,7 +30,6 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.BasicNamespaceMapping
 import org.orbeon.xforms.XFormsNames.{XFBindQName, XFORMS_BIND_QNAME, XFORMS_SHORT_PREFIX}
 
-import scala.collection.compat._
 
 
 case class Migration48(

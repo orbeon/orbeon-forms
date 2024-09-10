@@ -4,7 +4,6 @@ import org.orbeon.datatypes.MediatypeRange
 import org.orbeon.datatypes.MediatypeRange.WildcardMediatypeRange
 import org.orbeon.oxf.util.StringUtils._
 
-import scala.collection.compat._
 
 
 sealed trait AllowedMediatypes

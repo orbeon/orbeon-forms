@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.model
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.saxon.om
 
-import scala.collection.compat._
 import scala.collection.{mutable => m}
 
 

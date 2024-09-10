@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms.control.{XFormsContainerControl, XFormsControl, XFo
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
 
-import scala.collection.compat._
 
 class XXFormsUpdateValidityAction extends XFormsAction {
 

@@ -21,7 +21,6 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.collection.compat._
 
 
 // These functions run on a simplified "Form Builder" which loads a source form and goes through annotation.

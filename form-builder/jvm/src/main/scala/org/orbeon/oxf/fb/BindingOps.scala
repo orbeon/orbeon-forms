@@ -28,7 +28,6 @@ import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
 
-import scala.collection.compat._
 
 
 trait BindingOps {

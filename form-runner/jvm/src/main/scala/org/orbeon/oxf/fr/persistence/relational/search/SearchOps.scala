@@ -18,7 +18,6 @@ import org.orbeon.oxf.fr.permission.Operation.{Delete, Read, Update}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.util.IndentedLogger
 
-import scala.collection.compat._
 
 
 object SearchOps {

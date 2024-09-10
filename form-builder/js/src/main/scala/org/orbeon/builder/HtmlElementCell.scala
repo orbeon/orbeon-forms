@@ -19,7 +19,6 @@ import org.orbeon.polyfills.HTMLPolyfills._
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
-import scala.collection.compat._
 
 // This contains grid/cell operations acting on `html.Element`, which is on the output of the form
 // as seen in the browser.

@@ -30,7 +30,6 @@ import java.sql.{Connection, ResultSet}
 import java.time.Instant
 import javax.naming.InitialContext
 import javax.sql.DataSource
-import scala.collection.compat._
 import scala.util.control.NonFatal
 import scala.util.{Success, Try}
 

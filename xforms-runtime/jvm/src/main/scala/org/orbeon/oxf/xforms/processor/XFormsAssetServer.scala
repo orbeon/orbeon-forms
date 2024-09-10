@@ -33,7 +33,6 @@ import org.orbeon.xforms.{Constants, XFormsCrossPlatformSupport}
 
 import java.io._
 import java.net.URI
-import scala.collection.compat._
 import scala.collection.immutable.ListSet
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}

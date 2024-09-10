@@ -21,7 +21,6 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.dom.Extensions
 
-import scala.collection.compat._
 
 
 object XFormsAssetsBuilder {

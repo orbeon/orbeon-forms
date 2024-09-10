@@ -35,7 +35,6 @@ import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpec
 
-import scala.collection.compat._
 import scala.util.control.NonFatal
 
 

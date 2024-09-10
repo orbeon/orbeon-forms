@@ -17,7 +17,6 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms.$
 import org.scalajs.dom
 import org.scalajs.jquery.JQuery
-import scala.collection.compat._
 
 case class Block(
   el     : JQuery,

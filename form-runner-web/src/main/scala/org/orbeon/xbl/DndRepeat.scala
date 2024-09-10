@@ -23,7 +23,6 @@ import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
-import scala.collection.compat._
 
 
 // Companion for `fr:dnd-repeat`

@@ -35,7 +35,6 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 
-import scala.collection.compat._
 import scala.language.postfixOps
 import scala.util.control.NonFatal
 

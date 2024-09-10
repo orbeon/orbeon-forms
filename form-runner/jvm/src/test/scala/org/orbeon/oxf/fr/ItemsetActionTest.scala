@@ -22,7 +22,6 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.Constants
 
-import scala.collection.compat._
 import scala.reflect.ClassTag
 
 

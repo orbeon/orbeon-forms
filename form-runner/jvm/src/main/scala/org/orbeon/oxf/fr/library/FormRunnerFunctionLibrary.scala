@@ -42,7 +42,6 @@ import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 
-import scala.collection.compat._
 
 
 object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {

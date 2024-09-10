@@ -28,7 +28,6 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
 
-import scala.collection.compat._
 import scala.util.{Failure, Success}
 
 

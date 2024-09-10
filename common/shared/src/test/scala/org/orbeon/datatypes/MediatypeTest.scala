@@ -16,7 +16,6 @@ package org.orbeon.datatypes
 import org.orbeon.datatypes.Mediatype.TypeOrSubtype.SpecificType
 import org.orbeon.datatypes.MediatypeRange.{SingletonMediatypeRange, WildcardMediatypeRange, WildcardTypeMediatypeRange}
 import org.scalatest.funspec.AnyFunSpec
-import scala.collection.compat._
 
 
 class MediatypeTest extends AnyFunSpec {

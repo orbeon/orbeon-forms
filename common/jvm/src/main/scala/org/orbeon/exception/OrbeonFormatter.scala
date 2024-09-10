@@ -19,7 +19,6 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.util.StringUtils._
 
-import scala.collection.compat._
 
 // Orbeon-specific exception formatter
 object OrbeonFormatter extends Formatter {

@@ -20,7 +20,6 @@ import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
-import scala.collection.compat._
 
 // This contains grid/cell operations acting on `NodeInfo`, which is on the source of the form definition
 // as seen in Form Builder.

@@ -1366,7 +1366,10 @@ object XFormsUI {
           }
         }
 
-        span(cls := ("xforms-deselected" :: classOpt.toList mkString " ")) {
+        val selectedClass =
+          if (checkedValues(itemElement.value)) "xforms-selected"
+          else                                  "xforms-deselected"
+        span(cls := (selectedClass :: classOpt.toList mkString " ")) {
 
           def createInput: JsDom.TypedTag[Input] =
             input(

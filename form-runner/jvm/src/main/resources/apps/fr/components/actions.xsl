@@ -432,7 +432,7 @@
                 ]">
         <xsl:variable
             name="add-request-parameters-to-resource"
-            select="@serialization = 'application/x-www-form-urlencoded'"/>
+            select="@serialization = 'application/x-www-form-urlencoded' and @method = 'get'"/>
         <xsl:variable
             name="library-name"
             select="ancestor::xbl:binding[1]/frf:findAppFromSectionTemplateUri(namespace-uri-for-prefix('component', .))"/>
@@ -671,7 +671,7 @@
                          `fr-form-instance`, if that instance was just replaced by a submission loading the
                          auto-saved or manually-saved document. -->
                     <!-- https://github.com/orbeon/orbeon-forms/issues/4178 -->
-                    
+
                     <!-- 2024-08-15: Force-`<xf:rebuild>` unneeded if there was an instance replacement (structural change).
                          https://github.com/orbeon/orbeon-forms/issues/1660 -->
                     <xf:recalculate model="{$model-id}" xxf:deferred="true"/>

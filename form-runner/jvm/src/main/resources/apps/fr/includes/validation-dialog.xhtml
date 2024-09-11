@@ -43,17 +43,19 @@
                     4
             )"/>
 
-    <xh:i class="fa fa-fw fa-exclamation-circle fr-dialog-icon"/>
-    <xh:div class="fr-dialog-message">
-        <xf:output
-            value="
-                xxf:format-message(
-                    $fr-resources/detail/messages/validation-dialog-message,
-                    (
-                        (: 0 :) $message-type,
-                        (: 1 :) xxf:instance('fr-error-summary-instance')/counts/xs:integer(@alert)
-                    )
-               )"/>
+    <xh:div>
+        <xh:i class="fa fa-fw fa-exclamation-circle fr-dialog-icon"/>
+        <xh:div class="fr-dialog-message">
+            <xf:output
+                value="
+                    xxf:format-message(
+                        $fr-resources/detail/messages/validation-dialog-message,
+                        (
+                            (: 0 :) $message-type,
+                            (: 1 :) xxf:instance('fr-error-summary-instance')/counts/xs:integer(@alert)
+                        )
+                   )"/>
+        </xh:div>
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <!-- Don't show the "Continue" button when there are errors. This could later be an option. -->

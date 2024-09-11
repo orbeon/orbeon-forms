@@ -39,8 +39,8 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
 
   type STElement = this.Element
 
-  implicit def webDriver: WebDriver = OrbeonClientBase.driver
-  implicit val patienceConfig       = PatienceConfig(timeout = scaled(OrbeonClientBase.DefaultTimeout), interval = scaled(Span(100, Millis)))
+  implicit def webDriver     : WebDriver      = OrbeonClientBase.driver
+  implicit val patienceConfig: PatienceConfig = PatienceConfig(timeout = scaled(OrbeonClientBase.DefaultTimeout), interval = scaled(Span(100, Millis)))
 
   def loadOrbeonPage(path: String) =
     webDriver.get("http://localhost:8080/orbeon/" + path.dropStartingSlash)

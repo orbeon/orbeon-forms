@@ -8,7 +8,7 @@ import scala.scalajs.js.typedarray.{DataView, Int8Array}
 
 
 trait CryptoFunctions extends OrbeonFunctionLibrary {
-  @XPathFunction
+  @XPathFunction()
   def random(isSeed: Boolean = true): Double =
     CryptoFunctions.random()
 }

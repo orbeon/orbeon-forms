@@ -45,7 +45,7 @@ trait FormDefinition {
 
   private          val logger                   = LoggerFactory.createLogger(classOf[FormDefinition])
 //  private implicit val indentedLogger           = new IndentedLogger(logger)
-  private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+  private implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
   private def withDynamicItems(
     resources     : collection.Seq[(String, NodeInfo)],

@@ -21,7 +21,7 @@ object XXFormsFunctionLibrary
 
   lazy val namespaces = List(Namespaces.XXF -> XFormsNames.XXFORMS_SHORT_PREFIX)
 
-  @XPathFunction
+  @XPathFunction()
   def property(propertyName: String)(implicit xfc: XFormsFunction.Context): Option[AtomicValue] = {
 
     def fromContainingDocumentProperties =

@@ -54,8 +54,8 @@ class RestApiTest
      with XMLSupport
      with XFormsSupport {
 
-  private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
-  private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+  private implicit val Logger                  : IndentedLogger                = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
+  private implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
   private val CanCreate           = SpecificOperations(Set(Create))
   private val CanRead             = SpecificOperations(Set(Read))

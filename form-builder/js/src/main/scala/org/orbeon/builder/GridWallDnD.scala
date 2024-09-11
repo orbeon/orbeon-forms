@@ -116,7 +116,7 @@ object GridWallDnD {
               case Orientation.Horizontal => WallHorizontalClass
             }
           val frGridBody       = currentCell.el.parents(BlockCache.GridBodySelector).first()
-          val frGrid           = frGridBody.parent
+          val frGrid           = frGridBody.parent()
           val dndContainer     = $(s"""<div class="$WallContainerClass $orientationClass" data-index="$index">""")
           val dndHandle        = $(s"""<div class="$WallHandleClass">""")
           dndContainer.append(dndHandle)

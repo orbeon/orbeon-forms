@@ -282,9 +282,9 @@ object ControlLabelHintTextEditor {
             Underscore.clone(TinyMceDefaultConfig)
         }
 
-        tinyMceConfig.plugins                  += ",autoresize"  // Auto-size MCE height based on the content
-        tinyMceConfig.autoresize_min_height    =  100.0          // Min height of 100px
-        tinyMceConfig.autoresize_bottom_margin =  16.0           // Default padding for autoresize adds too much empty space at the bottom
+        tinyMceConfig.plugins                  = tinyMceConfig.plugins.map(_ + ",autoresize") // Auto-size MCE height based on the content
+        tinyMceConfig.autoresize_min_height    =  100.0                                       // Min height of 100px
+        tinyMceConfig.autoresize_bottom_margin =  16.0                                        // Default padding for autoresize adds too much empty space at the bottom
         tinyMceConfig.suffix                   =  ".min"
 
         val tinyMceObject = new TinyMceEditor(anchorId, tinyMceConfig, GlobalTinyMce.EditorManager)

@@ -127,7 +127,7 @@ object BlockCache {
     })
 
     def collectElems(selector: String): Iterator[dom.Element] =
-      $(selector).toArray.iterator collect { case e: dom.Element => e }
+      $(selector).toArray().iterator collect { case e: dom.Element => e }
 
     def elemNotInSectionTemplateOpt(domEl: dom.Element): Option[JQuery] = {
       val el = $(domEl)

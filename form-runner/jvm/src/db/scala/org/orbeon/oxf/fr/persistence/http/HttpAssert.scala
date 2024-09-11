@@ -27,17 +27,16 @@ import org.scalactic.Equality
 
 import java.io.ByteArrayInputStream
 
+
 private[persistence] object HttpAssert extends XMLSupport {
 
-  implicit val operationsEquality = new Equality[Operations] {
-    def areEqual(left: Operations, right: Any): Boolean =
-      (left, right) match {
-        case (SpecificOperations(leftSpecific), SpecificOperations(rightSpecific)) =>
-          leftSpecific == rightSpecific
-        case _ =>
-          left == right
-      }
-  }
+  implicit val operationsEquality: Equality[Operations] =
+    (left: Operations, right: Any) => (left, right) match {
+      case (SpecificOperations(leftSpecific), SpecificOperations(rightSpecific)) =>
+        leftSpecific == rightSpecific
+      case _ =>
+        left == right
+    }
 
   sealed trait Expected
   case   class ExpectedBody(

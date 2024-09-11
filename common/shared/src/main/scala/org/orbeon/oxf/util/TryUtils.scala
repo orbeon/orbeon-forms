@@ -56,7 +56,7 @@ object TryUtils {
   // - all subsequent elements are ignored in case of failure
   def sequenceLazily[T, U](iterable: Iterable[T])(f: T => Try[U]): Try[List[U]] = {
 
-    val tryStream     = iterable.toStream.map(f)
+    val tryStream     = iterable.to(LazyList).map(f)
     val successStream = tryStream.takeWhile(_.isSuccess).map(_.get)
 
     val successSize = successStream.size

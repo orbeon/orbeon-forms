@@ -30,7 +30,7 @@ abstract class RouterBase
   extends autowire.Server[Json, Decoder, Encoder]
     with JsonSerializers {
 
-  private implicit def logger = XFormsAPI.inScopeContainingDocument.getIndentedLogger("rpc")
+  private implicit def logger: IndentedLogger = XFormsAPI.inScopeContainingDocument.getIndentedLogger("rpc")
 
   // We know that the execution of the route is synchronous so create a "run now"
   // `ExecutionContext` to do that.
@@ -59,7 +59,7 @@ abstract class RouterBase
     val splitPath = path.split("/")
     try {
       debug("RPC: Processing request", List("method" -> (splitPath mkString ".")))
-      routes.apply(Request(splitPath, read[Json](parse(argsString).right.get).asObject.get.toMap)).value.get.get.noSpaces
+      routes.apply(Request(splitPath.toSeq, read[Json](parse(argsString).toTry.get).asObject.get.toMap)).value.get.get.noSpaces
     } catch {
       case NonFatal(t) =>
         error(

@@ -72,8 +72,8 @@ case class Forms(forms: Seq[FormWithData]) {
     )
 }
 object Forms {
-  implicit val logger                   = new IndentedLogger(LoggerFactory.createLogger(classOf[FormWithData]), true)
-  implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+  implicit val logger                  : IndentedLogger                = new IndentedLogger(LoggerFactory.createLogger(classOf[FormWithData]), true)
+  implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
   def urlPersisted(
     url            : String,

@@ -29,7 +29,7 @@ import org.scalatestplus.junit.AssertionsForJUnit
  */
 class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
-  private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[DDLTest]), true)
+  private implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[DDLTest]), true)
 
   case class TableMeta(tableName: String, colsMeta: Seq[ColMeta])
   case class ColMeta(colName: String, meta: Set[ColKeyVal])

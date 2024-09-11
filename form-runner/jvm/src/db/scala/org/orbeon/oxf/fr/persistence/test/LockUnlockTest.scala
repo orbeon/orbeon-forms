@@ -25,8 +25,8 @@ import org.scalatestplus.junit.AssertionsForJUnit
 
 class LockUnlockTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport {
 
-  private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[LockUnlockTest]), true)
-  private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+  private implicit val Logger                  : IndentedLogger                = new IndentedLogger(LoggerFactory.createLogger(classOf[LockUnlockTest]), true)
+  private implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
   @Test def lockUnlockTest(): Unit = {
     Connect.withOrbeonTables("lease") { (_, provider) =>

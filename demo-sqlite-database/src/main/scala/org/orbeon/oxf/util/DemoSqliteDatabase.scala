@@ -44,7 +44,7 @@ object DemoSqliteDatabase {
     }
   }
 
-  private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(DemoSqliteDatabase.getClass), true)
+  private implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(DemoSqliteDatabase.getClass), true)
 
   def importFiles(dataFiles: Path, sqliteFile: Path): Unit = {
     // Delete any pre-existing SQLite file and make sure the target directory exists

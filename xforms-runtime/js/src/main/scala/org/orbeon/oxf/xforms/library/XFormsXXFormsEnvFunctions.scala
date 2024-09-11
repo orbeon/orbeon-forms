@@ -11,7 +11,7 @@ import org.orbeon.saxon.value.{AtomicValue, StringValue}
 
 trait XFormsXXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
-  @XPathFunction
+  @XPathFunction()
   def element(
     name    : AtomicValue,
     content : Iterable[om.Item] = Iterable.empty)(implicit
@@ -20,7 +20,7 @@ trait XFormsXXFormsEnvFunctions extends OrbeonFunctionLibrary {
   ): om.NodeInfo =
     elementInfo(XFormsFunction.getQNameFromItem(name), content.toList)
 
-  @XPathFunction
+  @XPathFunction()
   def attribute(
     name  : AtomicValue,
     value : AtomicValue = StringValue.EMPTY_STRING)(implicit

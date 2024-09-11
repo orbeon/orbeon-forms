@@ -157,7 +157,7 @@ object FormRunnerApp extends App {
 
           val timeToExpiration = approxSessionExpiredTimeMillis - System.currentTimeMillis()
           didExpireTimerOpt.foreach(timers.clearTimeout)
-          didExpireTimerOpt = Some(timers.setTimeout(timeToExpiration) {
+          didExpireTimerOpt = Some(timers.setTimeout(timeToExpiration.toDouble) {
             Session.sessionHasExpired()
             updateDialog()
           })

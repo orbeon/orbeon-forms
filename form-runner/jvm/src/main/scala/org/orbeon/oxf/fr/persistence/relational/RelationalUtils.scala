@@ -56,6 +56,7 @@ object RelationalUtils extends Logging {
         properties
       )
       .filter { case (provider, _) => provider != "resource" && isInternalProvider(provider, properties) }
+      .view
       .mapValues(_.sortBy(_.name))
 
     val problematicDataSources = propertiesByProvider.filter { case (provider, propertiesWithProvider) =>

@@ -13,7 +13,7 @@ object SaxonFunctionLibrary extends OrbeonFunctionLibrary {
 
   lazy val namespaces = List("http://saxon.sf.net/" -> "saxon")
 
-  @XPathFunction
+  @XPathFunction()
   def evaluate(expr: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] =
     XXFormsFunctionLibrary.evaluateImpl(expr)
 }

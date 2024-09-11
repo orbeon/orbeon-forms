@@ -1182,7 +1182,7 @@ object XFormsUI {
     // Find the position of the last LHHA before the control "actual content"
     // A value of -1 means that the content came before any label
     val lastLhhaPosition =
-      documentElement.children.prefixLength(e => LhhaClasses.exists(e.classList.contains)) - 1
+      documentElement.children.segmentLength(e => LhhaClasses.exists(e.classList.contains)) - 1
 
     // Remove all elements that are not labels
     documentElement.children.filter(e => ! LhhaClasses.exists(e.classList.contains))

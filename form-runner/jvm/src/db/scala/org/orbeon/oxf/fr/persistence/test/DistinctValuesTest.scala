@@ -33,8 +33,8 @@ class DistinctValuesTest
     with ResourceManagerSupport
     with AnyFunSpecLike {
 
-  private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[DistinctValuesTest]), true)
-  private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+  private implicit val Logger                  : IndentedLogger                = new IndentedLogger(LoggerFactory.createLogger(classOf[DistinctValuesTest]), true)
+  private implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
   object Metadata {
     val CreatedBy      = "created-by"

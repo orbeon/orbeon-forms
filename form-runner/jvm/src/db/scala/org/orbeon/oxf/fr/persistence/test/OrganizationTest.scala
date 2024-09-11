@@ -31,7 +31,7 @@ class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit w
   val SF = Organization(List("usa", "ca", "sf"))
   val PA = Organization(List("usa", "ca", "pa"))
 
-  private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[OrganizationTest]), true)
+  private implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[OrganizationTest]), true)
 
   def recordsCount(connection: Connection): Int = {
     val Sql = "SELECT count(*) FROM orbeon_organization"

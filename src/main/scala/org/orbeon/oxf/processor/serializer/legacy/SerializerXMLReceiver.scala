@@ -29,7 +29,7 @@ class SerializerXMLReceiver(xmlReceiver: XMLReceiver, serializeXML11: Boolean)
 
   private var writer: Option[Writer] = None
 
-  def this(xmlReceiver: XMLReceiver, writer: Writer, serializeXML11: Boolean) {
+  def this(xmlReceiver: XMLReceiver, writer: Writer, serializeXML11: Boolean) = {
     this(xmlReceiver, serializeXML11)
     this.writer = Option(writer)
   }

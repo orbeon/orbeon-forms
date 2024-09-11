@@ -193,7 +193,7 @@ object ErrorSummary {
       case (_: XFormsValueChangedEvent, currentErrorOpt, _, alertOpt) =>
 
         // Maybe update the alert
-        (currentErrorOpt, alertOpt).zipped.foreach { (currentError, alert) =>
+        currentErrorOpt.lazyZip(alertOpt).foreach { (currentError, alert) =>
           XFormsAPI.setvalue(currentError /@ AlertAttName, alert)
         }
 

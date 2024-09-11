@@ -55,7 +55,7 @@ object PathUtils {
 
   // Recombine a path/query and parameters into a resulting URL
   def recombineQuery(pathQuery: String, params: IterableOnce[(String, String)], overwrite: Boolean = false)(implicit ed: UrlEncoderDecoder): String = {
-    val paramsToAdd                         = params.toList
+    val paramsToAdd                         = params.iterator.to(List)
     val (pathWithoutParams, existingParams) = splitQueryDecodeParams(pathQuery)
 
     val allParams =

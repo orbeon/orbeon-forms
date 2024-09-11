@@ -44,8 +44,8 @@ class FlatViewTest
 
   private object Private {
 
-    implicit val Logger                   = new IndentedLogger(LoggerFactory.createLogger(classOf[FlatViewTest]), true)
-    implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+    implicit val Logger                  : IndentedLogger                = new IndentedLogger(LoggerFactory.createLogger(classOf[FlatViewTest]), true)
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
     val UrlPrefix = "oxf:/org/orbeon/oxf/fr/"
 

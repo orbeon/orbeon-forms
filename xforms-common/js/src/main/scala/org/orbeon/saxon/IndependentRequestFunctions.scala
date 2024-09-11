@@ -7,18 +7,18 @@ import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 
 trait IndependentRequestFunctions extends OrbeonFunctionLibrary {
 
-  @XPathFunction
+  @XPathFunction()
   def getRequestMethod: String =
     CoreCrossPlatformSupport.externalContext.getRequest.getMethod.entryName.toUpperCase
 
-  @XPathFunction
+  @XPathFunction()
   def getRequestPath: String =
     CoreCrossPlatformSupport.externalContext.getRequest.getRequestPath
 
-//  @XPathFunction
+//  @XPathFunction()
 //  def getRequestHeader(name: String, encoding: Option[String]): Iterable[String] = ???
 //
-//  @XPathFunction
+//  @XPathFunction()
 //  def GetRequestParameter(name: String): Iterable[String] = ???
 
 }

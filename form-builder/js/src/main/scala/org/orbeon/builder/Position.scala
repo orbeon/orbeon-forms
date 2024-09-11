@@ -55,9 +55,9 @@ object Position {
 
   // Calls listener when what is under the pointer has potentially changed
   def onUnderPointerChange(fn: => Unit): Unit = {
-    $(document).on("mousemove.orbeon.builder", fn _)
+    $(document).on("mousemove.orbeon.builder", () => fn)
     // Resizing the window might change what is under the pointer the last time we saw it in the window
-    $(window).on("resize.orbeon.builder", fn _)
+    $(window).on("resize.orbeon.builder", () => fn)
     AjaxClient.ajaxResponseProcessed.add(_ => fn)
   }
 

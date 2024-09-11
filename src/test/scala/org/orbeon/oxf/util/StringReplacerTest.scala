@@ -19,7 +19,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 class StringReplacerTest extends AnyFunSpecLike {
 
-  implicit def logger = ResourceManagerTestBase.newIndentedLogger
+  implicit def logger: IndentedLogger = ResourceManagerTestBase.newIndentedLogger
 
   describe("Simple replacements") {
 

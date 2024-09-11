@@ -216,6 +216,7 @@ object FormRunnerPersistence {
     properties.propertiesMatching(propertyName)
       .flatMap(p => p.nonBlankStringValue.map(_ -> p))
       .groupBy(_._1)
+      .view
       .mapValues(_.map(_._2))
       .filter(kv => FormRunner.isActiveProvider(kv._1, properties))
       .toMap

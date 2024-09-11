@@ -41,7 +41,7 @@ object ControlEditor {
   private lazy val controlEditorLeft         = $(".fb-control-editor-left")
   private lazy val controlEditorRight        = $(".fb-control-editor-right")
   private lazy val controlEditorTop          = $(".fb-control-editor-top")
-  private lazy val controlEditors            = controlEditorLeft.get ++ controlEditorRight.get ++ controlEditorTop.get
+  private lazy val controlEditors            = controlEditorLeft.get() ++ controlEditorRight.get() ++ controlEditorTop.get()
   private var masked: Boolean                = false
 
   // Show/hide editor
@@ -88,7 +88,7 @@ object ControlEditor {
 
     val controlElemWithNames =
       for {
-        elem <- cell.el.children().get
+        elem <- cell.el.children().get()
         if ! controlEditors.contains(elem)
         if ! elem.classList.contains("gu-transit")
         if elem.hasAttribute("id")

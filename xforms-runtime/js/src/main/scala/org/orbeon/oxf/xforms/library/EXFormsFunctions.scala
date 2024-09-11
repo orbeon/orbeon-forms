@@ -12,15 +12,15 @@ object EXFormsFunctions extends OrbeonFunctionLibrary {
 
   lazy val namespaces = List(EXFORMS_NAMESPACE_URI -> EXFORMS_PREFIX)
 
-  @XPathFunction
+  @XPathFunction()
   def relevant(items: Iterable[om.Item] = null)(implicit xpc: XPathContext): Boolean =
     XXFormsFunctionLibrary.exformsMipFunction(items, 0)
 
-  @XPathFunction
+  @XPathFunction()
   def readonly(items: Iterable[om.Item] = null)(implicit xpc: XPathContext): Boolean =
     XXFormsFunctionLibrary.exformsMipFunction(items, 1)
 
-  @XPathFunction
+  @XPathFunction()
   def required(items: Iterable[om.Item] = null)(implicit xpc: XPathContext): Boolean =
     XXFormsFunctionLibrary.exformsMipFunction(items, 2)
 

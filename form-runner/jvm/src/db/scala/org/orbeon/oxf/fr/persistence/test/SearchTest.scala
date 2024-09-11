@@ -42,8 +42,8 @@ class SearchTest
      with ResourceManagerSupport
      with AnyFunSpecLike {
 
-  private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[SearchTest]), true)
-  private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+  private implicit val Logger                  : IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[SearchTest]), true)
+  private implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
   private val controlPath = "section-1/control-1"
 

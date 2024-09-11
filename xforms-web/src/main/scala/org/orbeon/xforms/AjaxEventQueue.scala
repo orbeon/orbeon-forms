@@ -153,7 +153,7 @@ trait AjaxEventQueue[EventType] {
       def createNewSchedule: EventSchedule = {
         val p = Promise[Unit]()
         EventSchedule(
-          handle = timers.setTimeout(newScheduleTimeAtLeastCurrentTime - currentTime) { p.success(())},
+          handle = timers.setTimeout(newScheduleTimeAtLeastCurrentTime.toDouble - currentTime) { p.success(())},
           time   = newScheduleTimeAtLeastCurrentTime,
           done   = p.future
         )

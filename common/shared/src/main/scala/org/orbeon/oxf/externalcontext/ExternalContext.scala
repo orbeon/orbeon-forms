@@ -105,7 +105,7 @@ object ExternalContext {
     def getClientContextPath(urlString: String): String
 
     def getAttributesMap: ju.Map[String, AnyRef]
-    def getHeaderValuesMap: ju.Map[String, Array[String]]
+    def getHeaderValuesMap: ju.Map[String, Array[String]] // TODO: don't use `Array`
     def getParameterMap: ju.Map[String, Array[AnyRef]]
 
     def getCharacterEncoding: String

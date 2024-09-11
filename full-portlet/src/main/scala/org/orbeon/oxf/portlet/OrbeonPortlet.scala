@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.portlet
 
+import org.log4s.Logger
 import org.orbeon.connection.StreamedContentT
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.{ExternalContext, PortletWebAppContext}
@@ -50,7 +51,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet
  */
 class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPortlet {
 
-  private implicit val logger = ProcessorService.Logger
+  private implicit val logger: Logger = ProcessorService.Logger
 
   // For BufferedPortlet
   def findTitle(request: RenderRequest) = Option(getTitle(request))

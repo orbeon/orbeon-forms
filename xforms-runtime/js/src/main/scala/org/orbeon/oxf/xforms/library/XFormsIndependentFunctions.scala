@@ -12,7 +12,7 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 trait XFormsIndependentFunctions extends OrbeonFunctionLibrary {
 
-  @XPathFunction
+  @XPathFunction()
   def parse(inputString: String, format: String = "xml"): om.NodeInfo = {
 
     val formatTokens = format.splitTo[Set]()

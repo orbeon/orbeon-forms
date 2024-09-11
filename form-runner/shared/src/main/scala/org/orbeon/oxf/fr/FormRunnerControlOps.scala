@@ -182,11 +182,11 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         bind,
         path,
         contextItemOpt map { contextItem =>
-          eval(
+          evalNodes(
             item       = contextItem,
             expr       = path map (_.value) mkString "/",
             namespaces = namespaces
-          ).asInstanceOf[collection.Seq[NodeInfo]].to(List)
+          ).to(List)
         }
       )
     }

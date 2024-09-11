@@ -75,7 +75,7 @@ trait XFormsActions {
     ActionResult.trySync {
       val all      = booleanParamByName(params, "all", default = false)
       val refParam = requiredParamByName(params, "setvalue", "ref")
-      val refSeq   = if (all) evaluate(refParam) else Seq(evaluateOne(refParam))
+      val refSeq   = if (all) evaluateNodes(refParam) else Seq(evaluateOne(refParam))
       refSeq.foreach {
         case nodeInfo: om.NodeInfo =>
           val valueToSet = params.get(Some("value")) match {
@@ -97,10 +97,10 @@ trait XFormsActions {
     ActionResult.trySync {
 
       def paramAsNodes(name: String): List[om.NodeInfo] =
-        paramByName(params, name).toList flatMap (evaluate(_)) collect { case n: om.NodeInfo => n }
+        paramByName(params, name).toList flatMap (evaluateNodes(_)) collect { case n: om.NodeInfo => n }
 
       insert(
-        origin = evaluate(requiredParamByName(params, "insert", "origin")) collect { case n: om.NodeInfo => n },
+        origin = evaluateNodes(requiredParamByName(params, "insert", "origin")) collect { case n: om.NodeInfo => n },
         into   = paramAsNodes("into"),
         before = paramAsNodes("before"),
         after  = paramAsNodes("after")
@@ -110,7 +110,7 @@ trait XFormsActions {
   def tryDelete(params: ActionParams): ActionResult =
     ActionResult.trySync {
       val refParam = requiredParamByName(params, "delete", "ref")
-      delete(ref = evaluate(refParam) collect { case n: om.NodeInfo => n })
+      delete(ref = evaluateNodes(refParam) collect { case n: om.NodeInfo => n })
     }
 
   // callback(name = "foo", params = Map("bar" -> "baz"))

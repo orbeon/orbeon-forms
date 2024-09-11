@@ -25,7 +25,7 @@ import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XSD_PR
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.oxf.{util => u}
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.scaxon.XPath._
 import org.orbeon.xforms.XFormsNames._
@@ -47,7 +47,7 @@ trait ProcessInterpreter extends Logging {
   // Must be overridden by implementation
   def findProcessByName(scope: String, name: String): Option[String]
   def processError(t: Throwable): Unit
-  def xpathContext: Item
+  def xpathContext: om.Item
   implicit def xpathFunctionLibrary: FunctionLibrary
   def xpathFunctionContext: u.FunctionContext
   def clearSuspendedProcess(): Unit
@@ -356,7 +356,7 @@ trait ProcessInterpreter extends Logging {
   private def tryNop(params: ActionParams): ActionResult =
     ActionResult.Sync(Success(()))
 
-  private def evaluateBoolean(expr: String, item: Item = xpathContext): Boolean =
+  private def evaluateBoolean(expr: String, item: om.Item = xpathContext): Boolean =
     evaluateOne(
       expr = u.StaticXPath.makeBooleanExpression(expr),
       item = item
@@ -364,7 +364,7 @@ trait ProcessInterpreter extends Logging {
 
   def evaluateString(
     expr    : String,
-    item    : Item             = xpathContext,
+    item    : om.Item          = xpathContext,
     mapping : NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
   ): String =
     evaluateOne(
@@ -375,9 +375,9 @@ trait ProcessInterpreter extends Logging {
 
   def evaluateOne(
     expr    : String,
-    item    : Item             = xpathContext,
+    item    : om.Item          = xpathContext,
     mapping : NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
-  ): Item =
+  ): om.Item =
     evalOne(
       item            = item,
       expr            = expr,
@@ -385,8 +385,8 @@ trait ProcessInterpreter extends Logging {
       functionContext = xpathFunctionContext
     )
 
-  def evaluate(expr: String, item: Item = xpathContext): collection.Seq[Any] =
-    eval(
+  def evaluateNodes(expr: String, item: om.Item = xpathContext): collection.Seq[om.NodeInfo] =
+    evalNodes(
       item            = item,
       expr            = expr,
       namespaces      = ProcessInterpreter.StandardNamespaceMapping,

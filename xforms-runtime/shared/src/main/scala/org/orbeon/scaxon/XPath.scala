@@ -50,9 +50,9 @@ object XPath {
       reporter
     )
 
-  // Evaluate an XPath expression and return a Seq of native Java objects (String, Boolean, etc.), but NodeInfo
-  // wrappers are preserved.
-  def eval(
+  // Evaluate an XPath expression and return a `Seq` of native Java objects (`String`, `Boolean`, etc.), but
+  // `om.NodeInfo` wrappers are preserved.
+  private def eval(
       item            : om.Item,
       expr            : String,
       namespaces      : NamespaceMapping                                = NamespaceMapping.EmptyMapping,
@@ -71,6 +71,28 @@ object XPath {
       null,
       reporter
     ).asScala
+
+  // Evaluate an XPath expression and return a `Seq` of `om.NodeInfo`.
+    def evalNodes(
+      item            : om.Item,
+      expr            : String,
+      namespaces      : NamespaceMapping                                = NamespaceMapping.EmptyMapping,
+      variables       : collection.Map[String, ValueRepresentationType] = null,
+      reporter        : Reporter                                        = null,
+      functionContext : FunctionContext                                 = null
+    )(implicit
+      library         : FunctionLibrary                                 = null
+  ): collection.Seq[om.NodeInfo] =
+    eval(
+      item,
+      expr,
+      namespaces,
+      variables,
+      reporter,
+      functionContext
+    )
+    .collect { case node: om.NodeInfo => node }
+
 
     // Evaluate an XPath expression as a value template
   def evalValueTemplate(

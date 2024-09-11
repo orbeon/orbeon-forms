@@ -289,19 +289,15 @@ object MigrationOps48 extends MigrationOps {
           val (pathToParentNodes, pathToChildNodes) =
             (containerPath.init map (_.value) mkString "/", containerPath.last.value)
 
-          // NOTE: Use collect, but we know they are nodes if the JSON is correct and contains paths
+          // NOTE: We know the result consists of nodes only if the JSON is correct and contains paths
           val parentNodes =
-            scaxon.XPath.eval(dataRootElem, pathToParentNodes, BasicNamespaceMapping.Mapping) collect {
-            case node: NodeInfo => node
-          }
+            scaxon.XPath.evalNodes(dataRootElem, pathToParentNodes, BasicNamespaceMapping.Mapping)
 
           parentNodes map { parentNode =>
 
-            val nodes = scaxon.XPath.eval(parentNode, pathToChildNodes) collect {
-              case node: NodeInfo => node
-            }
+            val nodes = scaxon.XPath.evalNodes(parentNode, pathToChildNodes)
 
-            // NOTE: Should ideally test on uriQualifiedName instead. The data in practice has elements which
+            // NOTE: Should ideally test on `uriQualifiedName` instead. The data in practice has elements which
             // in no namespaces, and if they were in a namespace, the prefixes would likely be unique.
             (parentNode, nodes.to(List), pathToChildNodes, iterationElem)
           }

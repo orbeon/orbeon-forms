@@ -16,22 +16,27 @@ package org.orbeon.oxf.xforms.model
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 sealed trait DefaultsStrategy
-sealed trait SomeDefaultsStrategy
-object NoDefaultsStrategy      extends DefaultsStrategy
-object FlaggedDefaultsStrategy extends DefaultsStrategy with SomeDefaultsStrategy
-object AllDefaultsStrategy     extends DefaultsStrategy with SomeDefaultsStrategy
+
+object DefaultsStrategy {
+
+  sealed trait Some extends DefaultsStrategy
+
+  object None    extends DefaultsStrategy
+  object Flagged extends DefaultsStrategy with Some
+  object All     extends DefaultsStrategy with Some
+}
 
 // A single instance of this class is associated with each XFormsModel. It keeps track of rebuild and recalculate /
 // revalidate requirements at a very coarse level.
 class DeferredActionContext(container: XBLContainer) {
 
   private def winningStrategy(st1: DefaultsStrategy, st2: DefaultsStrategy) =
-    if (st1 == AllDefaultsStrategy || st2 == AllDefaultsStrategy)
-      AllDefaultsStrategy
-    else if (st1 == FlaggedDefaultsStrategy || st2 == FlaggedDefaultsStrategy)
-      FlaggedDefaultsStrategy
+    if (st1 == DefaultsStrategy.All || st2 == DefaultsStrategy.All)
+      DefaultsStrategy.All
+    else if (st1 == DefaultsStrategy.Flagged || st2 == DefaultsStrategy.Flagged)
+      DefaultsStrategy.Flagged
     else
-      NoDefaultsStrategy
+      DefaultsStrategy.None
 
   private var _rebuild = false
   def rebuild: Boolean = _rebuild
@@ -39,7 +44,7 @@ class DeferredActionContext(container: XBLContainer) {
   private var _recalculateRevalidate = false
   def recalculateRevalidate: Boolean = _recalculateRevalidate
 
-  private var _defaultsStrategy: DefaultsStrategy = NoDefaultsStrategy
+  private var _defaultsStrategy: DefaultsStrategy = DefaultsStrategy.None
   def defaultsStrategy: DefaultsStrategy = _defaultsStrategy
 
   private var _flaggedInstances = Set.empty[String]
@@ -51,13 +56,13 @@ class DeferredActionContext(container: XBLContainer) {
     _recalculateRevalidate = true
     _defaultsStrategy      = winningStrategy(_defaultsStrategy, defaultsStrategy)
 
-    if (defaultsStrategy == FlaggedDefaultsStrategy)
+    if (defaultsStrategy == DefaultsStrategy.Flagged)
       _flaggedInstances ++= instanceIdOpt
   }
 
   def resetRecalculateRevalidate(): Unit = {
     _recalculateRevalidate = false
-    _defaultsStrategy      = NoDefaultsStrategy
+    _defaultsStrategy      = DefaultsStrategy.None
     _flaggedInstances      = Set.empty
   }
 
@@ -75,7 +80,7 @@ class DeferredActionContext(container: XBLContainer) {
 
     // Only set recalculate when we are not currently performing a recalculate (avoid infinite loop)
     if (! isCalculate)
-      markRecalculateRevalidate(NoDefaultsStrategy, None)
+      markRecalculateRevalidate(DefaultsStrategy.None, None)
 
     container.requireRefresh()
   }

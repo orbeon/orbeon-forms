@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsModelConstructDoneEvent, XFormsModelConstructEvent, XFormsReadyEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent, XFormsEvents}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance, XFormsInstanceSupport}
+import org.orbeon.oxf.xforms.model.{DefaultsStrategy, XFormsInstance, XFormsInstanceSupport}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver, XMLReceiverHelper}
@@ -389,8 +389,8 @@ class XFormsComponentControl(
       for (model <- nestedContainer.models) {
         Dispatch.dispatchEvent(new XFormsModelConstructEvent(model, rrr = false), EventCollector.ToReview)
         // 2023-04-05: Not sure below comment is up to date. Can's see a call to `markStructuralChange()`,
-        // NOTE: `xforms-model-construct` already does a `markStructuralChange()` but without `AllDefaultsStrategy`
-        model.markStructuralChange(None, AllDefaultsStrategy)
+        // NOTE: `xforms-model-construct` already does a `markStructuralChange()` but without `DefaultsStrategy.All`
+        model.markStructuralChange(None, DefaultsStrategy.All)
       }
 
       initializeMirrorListenerIfNeeded(dispatch = false)

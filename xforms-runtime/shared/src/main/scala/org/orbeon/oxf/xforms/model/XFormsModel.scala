@@ -134,7 +134,7 @@ class XFormsModel(
     // Refresh binds, but do not recalculate (only evaluate "computed expression binds")
     // TODO: We used to not redo recalculations upon state restore. Does this cause a problem? Shouldn't
     // recalculations not depend on the number of times they run anyway?
-    deferredActionContext.markStructuralChange(NoDefaultsStrategy, None)
+    deferredActionContext.markStructuralChange(DefaultsStrategy.None, None)
     if (! deferRRR)
       doRebuildRecalculateRevalidateIfNeeded()
   }
@@ -220,7 +220,7 @@ class XFormsModel(
       }
     }
 
-    deferredActionContext.markStructuralChange(NoDefaultsStrategy, None)
+    deferredActionContext.markStructuralChange(DefaultsStrategy.None, None)
 
     // So that variables are up-to-date in the handler for `xxforms-instances-ready`
     // https://github.com/orbeon/orbeon-forms/issues/6544

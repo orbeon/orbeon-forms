@@ -40,8 +40,8 @@ trait CalculateBindOps {
           applyWhitespaceBinds(collector)
 
         if (staticModel.hasDefaultValueBind)
-          (if (isFirstCalculate) AllDefaultsStrategy else defaultsStrategy) match {
-            case strategy: SomeDefaultsStrategy =>
+          (if (isFirstCalculate) DefaultsStrategy.All else defaultsStrategy) match {
+            case strategy: DefaultsStrategy.Some =>
               applyCalculatedBindsUseOrderIfNeeded(
                 MipName.Default,
                 staticModel.defaultValueOrder,
@@ -55,7 +55,7 @@ trait CalculateBindOps {
           applyCalculatedBindsUseOrderIfNeeded(
             MipName.Calculate,
             staticModel.recalculateOrder,
-            AllDefaultsStrategy,
+            DefaultsStrategy.All,
             collector
           )
 
@@ -187,13 +187,13 @@ trait CalculateBindOps {
     }
 
     // Q: Can bindNode.node ever be null here?
-    private def mustEvaluateNode(node: om.NodeInfo, defaultsStrategy: SomeDefaultsStrategy): Boolean =
-      defaultsStrategy == AllDefaultsStrategy || (node ne null) && InstanceData.getRequireDefaultValue(node)
+    private def mustEvaluateNode(node: om.NodeInfo, defaultsStrategy: DefaultsStrategy.Some): Boolean =
+      defaultsStrategy == DefaultsStrategy.All || (node ne null) && InstanceData.getRequireDefaultValue(node)
 
     def applyCalculatedBindsUseOrderIfNeeded(
       mip              : StringXPath,
       orderOpt         : Option[List[StaticBind]],
-      defaultsStrategy : SomeDefaultsStrategy,
+      defaultsStrategy : DefaultsStrategy.Some,
       collector        : ErrorEventCollector
     ): Unit = {
       orderOpt match {
@@ -219,7 +219,7 @@ trait CalculateBindOps {
     private def applyCalculatedBindsFollowDependencies(
       order            : List[StaticBind],
       mip              : StringXPath,
-      defaultsStrategy : SomeDefaultsStrategy,
+      defaultsStrategy : DefaultsStrategy.Some,
       collector        : ErrorEventCollector
     ): Unit =
       order.foreach { staticBind =>

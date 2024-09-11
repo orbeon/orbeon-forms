@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent
-import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
+import org.orbeon.oxf.xforms.model.DefaultsStrategy
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions
 
@@ -203,7 +203,7 @@ object XFormsDeleteAction extends Logging {
 
         // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
         modifiedInstance.markModified()
-        modifiedInstance.model.markStructuralChange(modifiedInstance.some, NoDefaultsStrategy)
+        modifiedInstance.model.markStructuralChange(modifiedInstance.some, DefaultsStrategy.None)
 
         debugAllowNull(
           "deleted nodes for instance",

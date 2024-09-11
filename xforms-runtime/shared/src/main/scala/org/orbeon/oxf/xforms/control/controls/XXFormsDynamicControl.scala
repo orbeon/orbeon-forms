@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
-import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsInstance, XFormsModel}
+import org.orbeon.oxf.xforms.model.{DefaultsStrategy, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.*
@@ -367,7 +367,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       // rebuilt below. However, it might not be safe to RRR right here. So for now, we just set the flag.
       val concreteModel = containingDocument.getObjectByEffectiveId(modelPrefixedId).asInstanceOf[XFormsModel]
 
-      concreteModel.markStructuralChange(None, NoDefaultsStrategy)
+      concreteModel.markStructuralChange(None, DefaultsStrategy.None)
     }
 
     bindChanges.clear()

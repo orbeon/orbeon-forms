@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
-import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, NoDefaultsStrategy, XFormsModel}
+import org.orbeon.oxf.xforms.model.{DefaultsStrategy, XFormsModel}
 import org.orbeon.xforms.XFormsNames.*
 
 
@@ -29,8 +29,8 @@ trait RRRFunctions {
 }
 
 trait XFormsRebuildFunctions extends RRRFunctions {
-  def setFlag(model: XFormsModel, applyDefaults: Boolean): Unit = model.deferredActionContext.markStructuralChange(NoDefaultsStrategy, None)
-  def createEvent(model: XFormsModel): XFormsEvent = new XFormsRebuildEvent(model)
+  def setFlag(model: XFormsModel, applyDefaults: Boolean): Unit = model.deferredActionContext.markStructuralChange(DefaultsStrategy.None, None)
+  def createEvent(model: XFormsModel) = new XFormsRebuildEvent(model)
 }
 
 // Make `<xf:recalculate>` do the same thing as `<xf:revalidate>`
@@ -40,7 +40,7 @@ trait XFormsRebuildFunctions extends RRRFunctions {
 trait XFormsRecalculateRevalidateFunctions extends RRRFunctions {
   def setFlag(model: XFormsModel, applyDefaults: Boolean): Unit =
     model.deferredActionContext.markRecalculateRevalidate(
-      defaultsStrategy = if (applyDefaults) AllDefaultsStrategy else NoDefaultsStrategy,
+      defaultsStrategy = if (applyDefaults) DefaultsStrategy.All else DefaultsStrategy.None,
       instanceIdOpt    = None
     )
   def createEvent(model: XFormsModel): XFormsEvent = new XFormsRecalculateEvent(model)

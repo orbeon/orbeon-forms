@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsInsertEvent, XXFormsReplaceEvent}
-import org.orbeon.oxf.xforms.model.{DataModel, FlaggedDefaultsStrategy, InstanceDataOps, XFormsInstance}
+import org.orbeon.oxf.xforms.model.{DataModel, DefaultsStrategy, InstanceDataOps, XFormsInstance}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.NodeInfoConversions
@@ -318,7 +318,7 @@ object XFormsInsertAction {
 
             // https://github.com/orbeon/orbeon-forms/issues/4849
             if (structuralDependencies)
-              modifiedInstance.model.markStructuralChange(Option(modifiedInstance), FlaggedDefaultsStrategy)
+              modifiedInstance.model.markStructuralChange(Option(modifiedInstance), DefaultsStrategy.Flagged)
 
             // TODO: This needs work, see https://github.com/orbeon/orbeon-forms/issues/4849
 //            if (insertedNodes forall (_.isInstanceOf[Attribute])) {

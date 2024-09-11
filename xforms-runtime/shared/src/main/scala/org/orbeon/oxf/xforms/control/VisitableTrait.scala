@@ -17,8 +17,9 @@ import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
-import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
+import org.orbeon.oxf.xforms.model.DefaultsStrategy
 import org.orbeon.oxf.xforms.state.ControlState
+
 
 trait VisitableTrait extends XFormsControl {
 
@@ -41,7 +42,7 @@ trait VisitableTrait extends XFormsControl {
       // There is no dependency handling with the `xxf:visited()` function. So instead of requiring callers to do this,
       // as was the case at some point, we require an RR.
       bindingContext.modelOpt foreach
-        (_.deferredActionContext.markRecalculateRevalidate(NoDefaultsStrategy, None))
+        (_.deferredActionContext.markRecalculateRevalidate(DefaultsStrategy.None, None))
 
       containingDocument.requireRefresh()
 

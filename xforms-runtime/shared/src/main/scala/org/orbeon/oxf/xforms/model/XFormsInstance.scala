@@ -322,7 +322,7 @@ class XFormsInstance(
     )
 
     // Call this directly, since we are not using insert/delete here
-    model.markStructuralChange(Some(this), if (applyDefaults) FlaggedDefaultsStrategy else NoDefaultsStrategy)
+    model.markStructuralChange(Some(this), if (applyDefaults) DefaultsStrategy.Flagged else DefaultsStrategy.None)
 
     val currentRoot = rootElement
 

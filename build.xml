@@ -180,6 +180,8 @@
             -dontwarn aQute.bnd.annotation.**
             -dontwarn edu.umd.cs.findbugs.**
             -dontwarn com.google.errorprone.**
+            -dontwarn org.jspecify.annotations.**
+            -dontwarn scala.runtime.Statics
 
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 
@@ -292,6 +294,8 @@
             -dontwarn aQute.bnd.annotation.**
             -dontwarn edu.umd.cs.findbugs.**
             -dontwarn com.google.errorprone.**
+            -dontwarn org.jspecify.annotations.**
+            -dontwarn scala.runtime.Statics
 
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 

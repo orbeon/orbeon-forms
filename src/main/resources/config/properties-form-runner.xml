@@ -394,6 +394,13 @@
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.controls"                 value="wizard"/>
 
+    <!-- Disable autosave for forms that only support the `new` mode -->
+    <property as="xs:integer" name="oxf.fr.detail.autosave-delay.orbeon.controls"                  value="0"/>
+    <property as="xs:integer" name="oxf.fr.detail.autosave-delay.orbeon.repeated-grids"            value="0"/>
+    <property as="xs:integer" name="oxf.fr.detail.autosave-delay.orbeon.nobel-prizes"              value="0"/>
+    <property as="xs:integer" name="oxf.fr.detail.autosave-delay.orbeon.placeholders"              value="0"/>
+    <property as="xs:integer" name="oxf.fr.detail.autosave-delay.orbeon.copy-action"               value="0"/>
+
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.dmv-14">
         home summary clear save-final review
     </property>

@@ -21,7 +21,6 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms
-import org.orbeon.xforms.AjaxClient.EventQueue
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
 import org.orbeon.xforms.facade.{AjaxServer, Events}
 import org.scalajs.dom

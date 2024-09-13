@@ -42,18 +42,18 @@ class HeadersTest extends AnyFunSpec {
     val lists  = List("Foo" -> List("foo1", "foo2"),  "Bar" -> List("bar1", "bar2"))
 
     it("must handle `Array` and `List`") {
-      assert(lists === (proxyAndCapitalizeHeaders(arrays, request = true) map { case (k, v) => k -> v.to(List)}))
-      assert(lists === proxyAndCapitalizeHeaders(lists, request = true))
+      assert(lists.sameElements(proxyAndCapitalizeHeaders(arrays.view.map{ case (k, v) => k -> v.toSeq}, request = true) map { case (k, v) => k -> v.to(List)}))
+      assert(lists == proxyAndCapitalizeHeaders(lists, request = true))
     }
 
     it("must filter request headers") {
       val toFilterInRequest  = RequestHeadersToRemove  map (_ -> List("NOT!"))
-      assert(lists === proxyAndCapitalizeHeaders(lists ++ toFilterInRequest, request = true))
+      assert(lists == proxyAndCapitalizeHeaders(lists ++ toFilterInRequest, request = true))
     }
 
     it("must filter response headers") {
       val toFilterInResponse = ResponseHeadersToRemove map (_ -> List("NOT!"))
-      assert(lists === proxyAndCapitalizeHeaders(lists ++ toFilterInResponse, request = false))
+      assert(lists == proxyAndCapitalizeHeaders(lists ++ toFilterInResponse, request = false))
     }
   }
 }

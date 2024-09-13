@@ -194,6 +194,26 @@ body.orbeon { background-color: @frBackground }
         column-gap: 1em;
         width: 100%;
         box-sizing: border-box;
+
+        .fr-top-icon, .fr-top-text {
+          display: flex;
+          align-items: center;
+
+          .fa {
+            font-size: 1em;
+            padding: 0;
+          }
+        }
+
+        .fr-top-text, .fr-top-alert-buttons {
+            width: 50%;
+        }
+
+        .fr-top-alert-buttons {
+          padding-top: 0;
+          text-align: right;
+        }
+
         & > .fa {
             margin-top: 4px;    // align with text
             flex-grow: 0;
@@ -201,25 +221,19 @@ body.orbeon { background-color: @frBackground }
                 font-size: 3em; // larger icon
             }
         }
-        & > .xforms-switch {
-            flex-grow: 1;
-        }
+
         .fr-top-alert-buttons {
-            padding-top: 10px;
             display: flex;
             column-gap: 1em;
             row-gap: 1em;
-            width: auto;
             text-align: center;
-            align-items: center;
             & > * {
-                flex-basis: 0;
                 flex-grow: 1;
-                min-width: 0;
                 width: 100%;
                 button {
                     text-wrap: pretty;
                     width: 100%;
+                    height: 100%;
                 }
             }
             @media (max-width: 640px) {

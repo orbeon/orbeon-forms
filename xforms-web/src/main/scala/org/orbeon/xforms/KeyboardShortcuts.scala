@@ -14,7 +14,7 @@ object KeyboardShortcuts {
   private val KeyBoardIconCharacter = "⌨\uFE0F"
 
   private lazy val isAppleOs: Boolean =
-    Set("macOS", "iOS")(Bowser.osname)
+    Bowser.osname.exists(Set("macOS", "iOS"))
 
   private val ModifiersMap = Map(
     '⌘' -> "command", // same as 'meta'

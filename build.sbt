@@ -52,8 +52,7 @@ val EnumeratumCirceVersion        = "1.7.4"
 val ShapelessVersion              = "2.3.7"
 val ScalaXmlVersion               = "2.3.0"  // see https://github.com/orbeon/orbeon-forms/issues/4927
 val ScalaParallelCollectionsVersion = "1.0.3"
-val ScalaAsyncVersion             = "0.10.0" // "1.0.0" with `-Xasync` causes issues
-//val ScalaAsyncVersion             = "1.0.1"
+val ScalaAsyncVersion             = "1.0.1"
 val Parboiled2Version             = "2.5.1"
 val AutowireVersion               = "0.3.3"
 val ScalatagsVersion              = "0.9.4"
@@ -374,7 +373,7 @@ lazy val commonSettings = Seq(
     "-Ymacro-annotations", // for Scala 2.13
     "-Ytasty-reader",      // for Scala 2.13 reading Scala 3 modules
 //    "-Xsource:3",          // for Scala 2.13 -> Scala 3 migration
-//"-Xasync",                 // for `scala-async` 1.0.0 or greater
+    "-Xasync",             // for `scala-async` 1.0.0 or greater
     // Consider the following flags
 //    "-feature",
 //    "-unchecked",
@@ -500,7 +499,7 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
   )
   .jsSettings(commonScalaJsSettings)
   .jsSettings(
-    libraryDependencies += "org.scala-lang.modules" %%  "scala-async"           % ScalaAsyncVersion,
+    libraryDependencies += "org.scala-lang.modules" %%%  "scala-async"          % ScalaAsyncVersion,
     libraryDependencies += "io.github.cquiroz"      %%% "scala-java-time"       % ScalaJsTimeVersion % Test,
     libraryDependencies += "io.github.cquiroz"      %%% "scala-java-time-tzdb"  % ScalaJsTimeVersion % Test,
     Compile / unmanagedJars := Nil
@@ -1446,7 +1445,7 @@ lazy val orbeonWarJS = orbeonWar.js
     libraryDependencies            ++= Seq(
       "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery" % ScalaJsJQueryVersion,
-      "org.scala-lang.modules" %%  "scala-async"    % ScalaAsyncVersion,
+      "org.scala-lang.modules" %%%  "scala-async"   % ScalaAsyncVersion,
     ),
 
     Test / parallelExecution                := false,

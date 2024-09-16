@@ -59,7 +59,6 @@ val AutowireVersion               = "0.3.3"
 val ScalatagsVersion              = "0.9.4"
 val SbinaryVersion                = "0.5.1"
 val Log4sVersion                  = "1.10.0"
-val ScalaCollectionCompatVersion  = "2.12.0"
 val PPrintVersion                 = "0.9.0"
 
 // Java libraries
@@ -181,6 +180,7 @@ val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition fr
 
 lazy val scala212 = "2.12.20"
 lazy val scala213 = "2.13.14"
+lazy val scala3   = "3.5.0"
 lazy val mainScalaVersion       = scala213
 lazy val supportedScalaVersions = List(scala212, scala213)
 
@@ -372,8 +372,9 @@ lazy val commonSettings = Seq(
     "-language:existentials",
     "-deprecation",
     "-Ymacro-annotations", // for Scala 2.13
-//    "-Xsource:3", // for Scala 2.13 -> Scala 3 migration
-//    "-Xasync", // for `scala-async` 1.0.0 or greater
+    "-Ytasty-reader",      // for Scala 2.13 reading Scala 3 modules
+//    "-Xsource:3",          // for Scala 2.13 -> Scala 3 migration
+//"-Xasync",                 // for `scala-async` 1.0.0 or greater
     // Consider the following flags
 //    "-feature",
 //    "-unchecked",
@@ -390,7 +391,6 @@ lazy val commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.scalactic"           %%% "scalactic"               % ScalaTestVersion    % Test,
     "org.scalatest"           %%% "scalatest"               % ScalaTestVersion    % Test,
-    "org.scala-lang.modules"  %%% "scala-collection-compat" % ScalaCollectionCompatVersion
   ),
 
   // This is so that assets added to JAR files are made available to dependent projects.
@@ -475,8 +475,8 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-common",
-    libraryDependencies += "org.typelevel"          %%% "cats-kernel"       % CatsVersion,
-    libraryDependencies += "org.typelevel"          %%% "cats-core"         % CatsVersion,
+    libraryDependencies += ("org.typelevel"          %%% "cats-kernel"       % CatsVersion).cross(CrossVersion.for3Use2_13),
+    libraryDependencies += ("org.typelevel"          %%% "cats-core"         % CatsVersion).cross(CrossVersion.for3Use2_13),
     libraryDependencies += "co.fs2"                 %%% "fs2-core"          % CatsFs2Version,
     libraryDependencies += "co.fs2"                 %%% "fs2-io"            % CatsFs2Version,
     libraryDependencies += "com.beachape"           %%% "enumeratum"        % EnumeratumVersion,
@@ -1325,8 +1325,8 @@ lazy val servletSupport = (project in file("servlet-support"))
     name := "orbeon-servlet-support",
     libraryDependencies += "javax.servlet"    %   "javax.servlet-api"   % JavaxServletApiVersion      % Provided,
     libraryDependencies += "jakarta.servlet"  %   "jakarta.servlet-api" % JakartaServletApiVersion    % Provided,
-    libraryDependencies += "org.typelevel"    %%% "cats-kernel"         % CatsVersion,
-    libraryDependencies += "org.typelevel"    %%% "cats-core"           % CatsVersion,
+    libraryDependencies += ("org.typelevel"    %%% "cats-kernel"         % CatsVersion).cross(CrossVersion.for3Use2_13),
+    libraryDependencies += ("org.typelevel"    %%% "cats-core"           % CatsVersion).cross(CrossVersion.for3Use2_13),
   )
 
 // JAR file for dynamic servlet instantiation

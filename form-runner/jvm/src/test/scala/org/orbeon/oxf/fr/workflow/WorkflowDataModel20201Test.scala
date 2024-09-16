@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.fr.workflow
 
-import io.circe.{Decoder, Encoder}
-import org.orbeon.oxf.test.XMLSupport
+import org.orbeon.oxf.test.{ResourceManagerSupport, XMLSupport}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -23,7 +22,10 @@ import org.scalatest.funspec.AnyFunSpec
 import scala.util.{Failure, Success}
 
 
-class WorkflowDataModel20201Test extends AnyFunSpec with XMLSupport {
+class WorkflowDataModel20201Test
+  extends AnyFunSpec
+     with ResourceManagerSupport
+     with XMLSupport {
 
   import definitions20201._
 
@@ -117,13 +119,8 @@ class WorkflowDataModel20201Test extends AnyFunSpec with XMLSupport {
 
   import io.circe.generic.auto._
 
-  // The `auto` thing is often  tricky. Try to instantiate the encoders/decoders once only here.
-  implicit val decoder = implicitly[Decoder[WorkflowConfig]]
-  implicit val encoder = implicitly[Encoder[WorkflowConfig]]
-
   describe("2020.1 workflow data model") {
 
-    import io.circe.generic.auto._
     import io.circe.parser
     import io.circe.syntax._
 

@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.*
 import org.scalatestplus.junit.AssertionsForJUnit
 
+
 class XFormsUploadControlTest extends ResourceManagerTestBase with AssertionsForJUnit {
   @Test def hmac(): Unit = {
 

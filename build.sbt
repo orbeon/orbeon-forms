@@ -370,10 +370,11 @@ lazy val commonSettings = Seq(
     "-language:higherKinds",
     "-language:existentials",
     "-deprecation",
+    "-Xasync",             // for `scala-async` 1.0.0 or greater
     "-Ymacro-annotations", // for Scala 2.13
     "-Ytasty-reader",      // for Scala 2.13 reading Scala 3 modules
-//    "-Xsource:3",          // for Scala 2.13 -> Scala 3 migration
-    "-Xasync",             // for `scala-async` 1.0.0 or greater
+    "-Xsource:3",          // for Scala 2.13 -> Scala 3 migration
+    "-Wconf:cat=scala3-migration:w", // for Scala 2.13 -> Scala 3 migration
     // Consider the following flags
 //    "-feature",
 //    "-unchecked",

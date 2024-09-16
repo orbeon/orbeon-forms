@@ -184,8 +184,7 @@ class XFormsModelSubmission(
       if (submissionParameters.replaceType != ReplaceType.All)
         throw new XFormsSubmissionException(
           thisSubmission,
-          // Scala 2.13: just use `"` and `\"` (use of `"""` due to a bug in Scala 2.12!)
-          s"""xf:submission for submission id: `$getId`, redirect code received with replace="${submissionParameters.replaceType.entryName}"""",
+          s"xf:submission for submission id: `$getId`, redirect code received with replace=\"${submissionParameters.replaceType.entryName}\"",
           "processing submission response",
           null,
           new XFormsSubmitErrorEvent(

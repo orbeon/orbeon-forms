@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 
 
 // FIXME: TMP: This is temporary until we can get dependencies right.

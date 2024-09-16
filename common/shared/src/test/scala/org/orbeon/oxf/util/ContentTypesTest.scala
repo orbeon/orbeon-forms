@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.util.ContentTypes._
+import org.orbeon.oxf.util.ContentTypes.*
 import org.scalatest.funspec.AnyFunSpec
 
 class ContentTypesTest extends AnyFunSpec {

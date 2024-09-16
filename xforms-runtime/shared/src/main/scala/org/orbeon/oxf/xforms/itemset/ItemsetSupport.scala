@@ -13,17 +13,17 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
-import org.orbeon.oxf.xforms.XFormsContextStackSupport._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.XFormsContextStackSupport.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControl, SelectionControlUtil, WithExpressionOrConstantTrait}
 import org.orbeon.oxf.xforms.analysis.{ElemListener, ElementAnalysis, XPathErrorDetails}
@@ -35,14 +35,14 @@ import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsXPathErrorEvent}
 import org.orbeon.oxf.xforms.itemset.StaticItemsetSupport.isSelected
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver, XMLUtils}
 import org.orbeon.saxon.om
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{BindingErrorReason, XFormsCrossPlatformSupport, XFormsNames}
 import org.xml.sax.SAXException
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

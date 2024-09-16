@@ -19,8 +19,8 @@ package org.orbeon.oxf.fr.excel
 import java.{lang => jl, util => ju}
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
-import org.orbeon.oxf.util.CoreUtils._
+import enumeratum.*
+import org.orbeon.oxf.util.CoreUtils.*
 
 
 // ORBEON: Moved subset of original Apache POI class to Scala and made lots of changes, including:

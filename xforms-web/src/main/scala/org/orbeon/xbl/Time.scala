@@ -15,15 +15,15 @@ package org.orbeon.xbl
 
 import org.log4s.Logger
 import org.orbeon.date.IsoTime
-import org.orbeon.date.IsoTime._
+import org.orbeon.date.IsoTime.*
 import org.orbeon.date.JSDateUtils.nowAsIsoTime
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom.html
 import org.scalajs.jquery.{JQueryEventObject, JQueryPromise}
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
 import scala.scalajs.js.{Promise, UndefOr, |}

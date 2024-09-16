@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}

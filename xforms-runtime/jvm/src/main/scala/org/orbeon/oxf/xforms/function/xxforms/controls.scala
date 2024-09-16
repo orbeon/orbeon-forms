@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.BooleanValue
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 class XXFormsIsControlRelevant extends XFormsFunction {
 

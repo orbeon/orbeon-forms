@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, UploadControl}
 import org.orbeon.oxf.xforms.control.XFormsControl
@@ -21,14 +21,14 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.outputDisabledAttribute
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.SaxSupport._
-import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.SaxSupport.*
+import org.orbeon.oxf.xml.XMLConstants.*
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.Constants.ComponentSeparatorString
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{XFormsId, XFormsNames}
-import org.xml.sax._
+import org.xml.sax.*
 import org.xml.sax.helpers.AttributesImpl
 
 import java.{lang => jl}

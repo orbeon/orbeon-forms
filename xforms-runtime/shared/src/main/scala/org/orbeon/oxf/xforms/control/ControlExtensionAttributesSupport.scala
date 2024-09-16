@@ -15,9 +15,9 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.event.EventCollector
-import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.helpers.AttributesImpl
 
 trait ControlExtensionAttributesSupport {

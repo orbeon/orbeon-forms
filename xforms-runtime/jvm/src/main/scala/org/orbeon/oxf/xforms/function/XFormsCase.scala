@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 /**
  * case($switch-id as xs:string) as xs:string? function.

@@ -14,9 +14,9 @@
 package org.orbeon.builder
 
 import org.orbeon.oxf.fr.CellOps
-import org.orbeon.oxf.fr.ClientNames._
-import org.orbeon.polyfills.HTMLPolyfills._
-import org.scalajs.dom.ext._
+import org.orbeon.oxf.fr.ClientNames.*
+import org.orbeon.polyfills.HTMLPolyfills.*
+import org.scalajs.dom.ext.*
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 

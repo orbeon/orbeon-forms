@@ -13,11 +13,11 @@
  */
 package org.orbeon.xforms
 
-import org.orbeon.jquery._
+import org.orbeon.jquery.*
 import org.orbeon.xforms
 import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom
-import org.scalajs.dom.ext._
+import org.scalajs.dom.ext.*
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
 

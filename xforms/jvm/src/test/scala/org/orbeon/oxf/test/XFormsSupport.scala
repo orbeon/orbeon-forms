@@ -17,14 +17,14 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.{ArgumentMatchers, Mockito}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyGetter
-import org.orbeon.oxf.xforms.event._
+import org.orbeon.oxf.xforms.event.*
 import org.orbeon.oxf.xforms.event.events.{DOMActivateEvent, XXFormsValueEvent}
 import org.orbeon.oxf.xforms.itemset.{Itemset, ItemsetSupport}
 import org.orbeon.oxf.xforms.model.XFormsInstance

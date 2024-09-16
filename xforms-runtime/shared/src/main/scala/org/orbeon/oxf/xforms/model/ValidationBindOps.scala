@@ -18,8 +18,8 @@ import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.model.XFormsModelBinds._
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xforms.model.XFormsModelBinds.*
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants, XMLParsing}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.StringValue

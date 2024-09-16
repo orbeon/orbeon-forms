@@ -17,9 +17,9 @@ import cats.effect.IO
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.fr.FormRunnerCommon.spc
 import org.orbeon.oxf.fr.XMLNames
-import org.orbeon.oxf.fr.process.ProcessParser._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.fr.process.ProcessParser.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Logging}
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XSD_PREFIX}
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
@@ -27,8 +27,8 @@ import org.orbeon.oxf.{util => u}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.BooleanValue
-import org.orbeon.scaxon.XPath._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.scaxon.XPath.*
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec

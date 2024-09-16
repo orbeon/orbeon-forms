@@ -13,21 +13,21 @@
   */
 package org.orbeon.oxf.fr.ui
 
-import io.circe.syntax._
+import io.circe.syntax.*
 import io.circe.{Decoder, Encoder, Json, parser}
 import org.orbeon.dom
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.json.{Converter, Symbols}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xml.NamespaceMapping
 
 import scala.util.{Failure, Success, Try}

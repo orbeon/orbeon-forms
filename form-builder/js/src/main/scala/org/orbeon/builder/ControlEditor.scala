@@ -13,18 +13,18 @@
  */
 package org.orbeon.builder
 
-import autowire._
-import org.orbeon.builder.HtmlElementCell._
+import autowire.*
+import org.orbeon.builder.HtmlElementCell.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.fr.{Cell, ControlOps}
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.xforms._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQuery
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 
 object ControlEditor {

@@ -19,15 +19,15 @@ import java.lang.{Boolean => JBoolean}
 import java.net.URI
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
-import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.http.{EmptyInputStream, HttpStatusCodeException}
 import org.orbeon.oxf.properties.PropertySet
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

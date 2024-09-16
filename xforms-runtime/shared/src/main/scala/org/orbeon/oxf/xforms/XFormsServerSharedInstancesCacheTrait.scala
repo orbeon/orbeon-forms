@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms
 
 import cats.effect.IO
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.xforms.model.InstanceCaching
-import org.orbeon.oxf.xforms.model.XFormsInstance._
+import org.orbeon.oxf.xforms.model.XFormsInstance.*
 
 
 /**

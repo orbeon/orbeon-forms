@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor}
 import org.orbeon.oxf.xml.SaxSupport.AttributesImplOps
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl

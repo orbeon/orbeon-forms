@@ -15,7 +15,7 @@ package org.orbeon.oxf.client
 
 import org.junit.Test
 import org.openqa.selenium.By
-import org.scalatest.concurrent.Eventually._
+import org.scalatest.concurrent.Eventually.*
 import org.scalatestplus.junit.AssertionsForJUnit
 
 trait ClientOrbeonFormsDemoPathTest extends AssertionsForJUnit with FormRunnerOps { // with AssertionsForJUnit

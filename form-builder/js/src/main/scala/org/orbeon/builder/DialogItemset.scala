@@ -13,9 +13,9 @@
   */
 package org.orbeon.builder
 
-import org.orbeon.jquery._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms._
+import org.orbeon.jquery.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalajs.jquery.JQueryEventObject
 

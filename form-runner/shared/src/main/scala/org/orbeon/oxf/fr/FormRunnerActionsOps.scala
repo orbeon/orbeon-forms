@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.fr
 
-import cats.syntax.option._
-import org.orbeon.oxf.fr.FormRunnerCommon._
+import cats.syntax.option.*
+import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.topLevelInstance
@@ -29,9 +29,9 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeInfoConversions
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.mutable

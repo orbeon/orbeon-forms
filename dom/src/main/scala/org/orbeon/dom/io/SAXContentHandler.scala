@@ -3,9 +3,9 @@ package org.orbeon.dom.io
 import java.{lang => jl, util => ju}
 
 import org.orbeon.dom
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.orbeon.dom.tree.{ConcreteElement, NamespaceStack}
-import org.xml.sax._
+import org.xml.sax.*
 import org.xml.sax.ext.LexicalHandler
 import org.xml.sax.helpers.DefaultHandler
 

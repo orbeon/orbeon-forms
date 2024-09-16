@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 

@@ -14,22 +14,22 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.FunctionContext
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.xforms.analysis.controls.{FormatTrait, StaticLHHASupport, ValueTrait, ViewTrait}
-import org.orbeon.oxf.xforms.control.XFormsValueControl._
+import org.orbeon.oxf.xforms.control.XFormsValueControl.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModelBinds}
 import org.orbeon.oxf.xforms.state.ControlState
-import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper}
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.xforms.XFormsId
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.helpers.AttributesImpl
 

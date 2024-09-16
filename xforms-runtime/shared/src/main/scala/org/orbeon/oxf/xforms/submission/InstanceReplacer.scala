@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.data.NonEmptyList
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.dom.Node
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.CollectionUtils.InsertPosition
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}

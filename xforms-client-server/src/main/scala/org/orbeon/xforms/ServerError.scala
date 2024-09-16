@@ -1,8 +1,8 @@
 package org.orbeon.xforms
 
 import org.orbeon.datatypes.LocationData
-import org.orbeon.oxf.util.StringUtils._
-import scalatags.Text.all._
+import org.orbeon.oxf.util.StringUtils.*
+import scalatags.Text.all.*
 
 
 // Represent a non-fatal server XForms error

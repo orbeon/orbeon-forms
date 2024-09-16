@@ -21,18 +21,18 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ProcessorUtils._
+import org.orbeon.oxf.processor.ProcessorUtils.*
 import org.orbeon.oxf.processor.generator.URLGenerator
 import org.orbeon.oxf.processor.{DOMSerializer, Processor}
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.util.{PipelineUtils, XPath, XPathCache}
 import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpec
 
 import scala.util.control.NonFatal

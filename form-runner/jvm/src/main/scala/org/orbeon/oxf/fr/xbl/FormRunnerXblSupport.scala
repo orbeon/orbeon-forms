@@ -16,8 +16,8 @@ package org.orbeon.oxf.fr.xbl
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.fr.{AppForm, XMLNames}
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.analysis.PartAnalysisForXblSupport
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLSupport}
 import org.orbeon.saxon.function.Property

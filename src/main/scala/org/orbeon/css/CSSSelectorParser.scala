@@ -14,7 +14,7 @@
 package org.orbeon.css
 
 import org.parboiled.errors.{ErrorUtils, ParsingException}
-import org.parboiled.scala._
+import org.parboiled.scala.*
 
 // CSS 3 selector parser based on the grammar specified at: http://www.w3.org/TR/css3-selectors/
 //

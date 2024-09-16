@@ -22,8 +22,8 @@
  */
 package org.orbeon.oxf.json
 
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import io.circe.{Json, JsonNumber, parser}
 
 import scala.language.postfixOps

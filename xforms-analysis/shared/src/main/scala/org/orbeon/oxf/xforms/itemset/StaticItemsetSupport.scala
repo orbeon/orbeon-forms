@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.mutable.ListBuffer

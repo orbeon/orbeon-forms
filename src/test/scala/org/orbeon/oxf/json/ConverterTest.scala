@@ -24,13 +24,13 @@ package org.orbeon.oxf.json
 
 import io.circe.{Json, parser}
 import org.orbeon.oxf.test.XMLSupport
-import org.orbeon.oxf.util.NumberUtils._
-import org.orbeon.oxf.xml.TransformerUtils._
+import org.orbeon.oxf.util.NumberUtils.*
+import org.orbeon.oxf.xml.TransformerUtils.*
 import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.value.Whitespace
-import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeConversions.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.language.postfixOps

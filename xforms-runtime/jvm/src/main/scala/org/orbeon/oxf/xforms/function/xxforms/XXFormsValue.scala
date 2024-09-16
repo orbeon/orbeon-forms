@@ -18,8 +18,8 @@ import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
-import org.orbeon.scaxon.Implicits._
-import shapeless.syntax.typeable._
+import org.orbeon.scaxon.Implicits.*
+import shapeless.syntax.typeable.*
 
 class XXFormsValue extends XFormsFunction {
 

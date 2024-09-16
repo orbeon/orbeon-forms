@@ -18,7 +18,7 @@ import org.orbeon.oxf.xml.{DefaultFunctionSupport, DependsOnContextItemIfSingleA
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.saxon.value.StringValue
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 import scala.util.Try
 

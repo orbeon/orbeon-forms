@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
 

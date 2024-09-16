@@ -15,7 +15,7 @@ package org.orbeon.oxf.client.fb
 
 import org.junit.Test
 import org.orbeon.oxf.client.FormBuilderOps
-import org.scalatest.concurrent.Eventually._
+import org.scalatest.concurrent.Eventually.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.junit.AssertionsForJUnit
 

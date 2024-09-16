@@ -15,12 +15,12 @@ package org.orbeon.xforms
 
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ContentTypes
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom
-import org.scalajs.dom._
-import org.scalajs.dom.experimental._
+import org.scalajs.dom.*
+import org.scalajs.dom.experimental.*
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
 
 import scala.concurrent.{ExecutionContext, Future}

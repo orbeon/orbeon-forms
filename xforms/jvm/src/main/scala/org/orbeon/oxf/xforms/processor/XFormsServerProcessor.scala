@@ -22,18 +22,18 @@ import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorOutput}
 import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.event.events.{KeyboardEvent, XXFormsDndEvent, XXFormsLoadEvent, XXFormsUploadDoneEvent}
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsServer}
 import org.orbeon.oxf.xforms.state.RequestParameters
-import org.orbeon.oxf.xml._
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms._
+import org.orbeon.oxf.xml.*
+import org.orbeon.xforms.XFormsNames.*
+import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget, WireAjaxEventWithoutTarget}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

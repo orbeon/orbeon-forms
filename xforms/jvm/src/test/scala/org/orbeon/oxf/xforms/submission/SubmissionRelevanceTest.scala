@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.orbeon.oxf.test.XMLSupport
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.xforms.RelevanceHandling
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.scalatest.funspec.AnyFunSpec
 
 

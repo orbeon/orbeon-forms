@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEventHandler, XFormsEventTarget}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission

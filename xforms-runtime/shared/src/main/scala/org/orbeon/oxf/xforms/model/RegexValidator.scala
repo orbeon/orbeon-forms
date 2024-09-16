@@ -20,7 +20,7 @@ import java.io.Serializable
 import java.util.regex.Pattern
 import java.{lang => jl}
 
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 
 class RegexValidator(regexs: Array[String], caseSensitive: Boolean)

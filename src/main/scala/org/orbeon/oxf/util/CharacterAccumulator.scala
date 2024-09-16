@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.util.Whitespace._
+import org.orbeon.oxf.util.Whitespace.*
 import org.orbeon.saxon.value.{Whitespace => SWhitespace}
 
 class CharacterAccumulator {

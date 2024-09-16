@@ -13,14 +13,14 @@
   */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunction
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
 import org.orbeon.saxon.expr.{Expression, Literal}
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.saxon.value._
+import org.orbeon.saxon.value.*
 import org.orbeon.xml.NamespaceMapping
 
 import scala.util.Try

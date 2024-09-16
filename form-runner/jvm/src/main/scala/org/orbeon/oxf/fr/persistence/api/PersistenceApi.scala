@@ -4,8 +4,8 @@ import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.scaxon.SimplePath.*
 
 import java.time.Instant
 import java.{util => ju}

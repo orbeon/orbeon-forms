@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectionControl, SelectionControlTrait}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.outputAriaDiff
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty}
-import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
@@ -35,8 +35,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiverHelper}
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.xforms.XFormsNames.*
 
 import scala.util.control.NonFatal
 

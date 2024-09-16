@@ -16,7 +16,7 @@ package org.orbeon.oxf.util
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.ResourceManagerSupport
-import org.orbeon.oxf.util.ImageMetadata._
+import org.orbeon.oxf.util.ImageMetadata.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 class ImageMetadataTest

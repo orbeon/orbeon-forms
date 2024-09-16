@@ -15,11 +15,11 @@ package org.orbeon.oxf.controller
 
 import org.mockito.Mockito
 import org.orbeon.oxf.externalcontext.{ExternalContext, WebAppContext}
-import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.Headers.*
 import org.scalatest.funspec.AnyFunSpecLike
 import org.scalatestplus.mockito.MockitoSugar
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.collection.mutable
 
 class AuthorizerTest extends AnyFunSpecLike with MockitoSugar {

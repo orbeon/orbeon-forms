@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 class XXFormsAVTValue extends XFormsFunction {
 

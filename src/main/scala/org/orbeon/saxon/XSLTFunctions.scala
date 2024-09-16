@@ -14,8 +14,8 @@
 package org.orbeon.saxon
 
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
-import org.orbeon.saxon.`type`.BuiltInAtomicType._
-import org.orbeon.saxon.expr.StaticProperty._
+import org.orbeon.saxon.`type`.BuiltInAtomicType.*
+import org.orbeon.saxon.expr.StaticProperty.*
 import org.orbeon.saxon.function.{EnvironmentVariable, EnvironmentVariableEnabledByProperty}
 import org.orbeon.saxon.functions.{FormatDate, FormatNumber}
 import org.orbeon.saxon.om.StandardNames

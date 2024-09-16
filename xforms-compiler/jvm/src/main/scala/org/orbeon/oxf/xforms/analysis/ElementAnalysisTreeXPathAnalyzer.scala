@@ -13,21 +13,21 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis.buildInstanceString
 import org.orbeon.oxf.xforms.{MapSet, XFormsStaticElementValue}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.valueOrSelectAttribute
-import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model._
+import org.orbeon.oxf.xforms.analysis.controls.*
+import org.orbeon.oxf.xforms.analysis.model.*
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.XFormsId
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.mutable

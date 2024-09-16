@@ -16,12 +16,12 @@ package org.orbeon.oxf.xforms.action
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OrbeonLocationException
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath, XPathCache}
-import org.orbeon.oxf.xforms.XFormsContextStackSupport._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.XFormsContextStackSupport.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -35,7 +35,7 @@ import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 
 import java.{util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

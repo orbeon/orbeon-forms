@@ -15,18 +15,18 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr
-import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.fr.FormRunnerCommon.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
 import org.orbeon.xforms.XFormsId
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import java.{util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 trait FormRunnerSectionTemplateOps {

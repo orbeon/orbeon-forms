@@ -3,7 +3,7 @@ package org.orbeon.oxf.util
 import me.gosimple.nbvcxz.Nbvcxz
 import org.log4s.Logger
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 object PasswordChecker {

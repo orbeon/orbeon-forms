@@ -5,7 +5,7 @@ import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, RelationalUtils, SummarySettings}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeConversions.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 

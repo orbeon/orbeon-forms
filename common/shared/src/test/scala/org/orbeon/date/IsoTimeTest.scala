@@ -1,7 +1,7 @@
 package org.orbeon.date
 
-import cats.syntax.option._
-import org.orbeon.date.IsoTime._
+import cats.syntax.option.*
+import org.orbeon.date.IsoTime.*
 import org.scalatest.funspec.AnyFunSpec
 
 

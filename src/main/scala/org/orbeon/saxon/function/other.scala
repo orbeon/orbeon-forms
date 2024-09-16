@@ -18,13 +18,13 @@ import java.io.{ByteArrayInputStream, InputStream}
 import org.apache.commons.codec.binary.Base64
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.ImageMetadata._
+import org.orbeon.oxf.util.ImageMetadata.*
 import org.orbeon.oxf.util.PathUtils
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtilsDependsOnXPath}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 
 class ImageMetadata extends DefaultFunctionSupport {

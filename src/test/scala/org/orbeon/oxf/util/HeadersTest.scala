@@ -14,7 +14,7 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.Headers.*
 import org.scalatest.funspec.AnyFunSpec
 
 

@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, NoDefaultsStrategy, XFormsModel}
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 
 
 trait RRRFunctions {

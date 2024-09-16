@@ -16,22 +16,22 @@ package org.orbeon.oxf.fr
 import cats.data.NonEmptyList
 import enumeratum.EnumEntry.Lowercase
 import org.log4s
-import org.orbeon.oxf.fr.FormRunnerCommon._
+import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.SimpleDataMigration.FormOps
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, inScopeContainingDocument, insert}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticState}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import scala.collection.mutable.ListBuffer
 import scala.reflect.ClassTag

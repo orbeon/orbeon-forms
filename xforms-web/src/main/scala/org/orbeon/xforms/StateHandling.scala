@@ -13,7 +13,7 @@
   */
 package org.orbeon.xforms
 
-import enumeratum._
+import enumeratum.*
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
 import org.scalajs.dom.ext.SessionStorage

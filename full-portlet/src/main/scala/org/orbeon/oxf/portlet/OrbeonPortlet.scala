@@ -17,15 +17,15 @@ import org.orbeon.connection.StreamedContentT
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.{ExternalContext, PortletWebAppContext}
 import org.orbeon.oxf.fr.embedding.APISupport.{Redirect, StreamedContentOrRedirect}
-import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.http._
+import org.orbeon.oxf.fr.embedding.*
+import org.orbeon.oxf.http.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponseImpl
-import org.orbeon.oxf.webapp.ServletPortlet._
+import org.orbeon.oxf.webapp.ServletPortlet.*
 import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet}
 
-import javax.portlet._
-import scala.jdk.CollectionConverters._
+import javax.portlet.*
+import scala.jdk.CollectionConverters.*
 
 // For backward compatibility
 class OrbeonPortlet2         extends OrbeonPortlet

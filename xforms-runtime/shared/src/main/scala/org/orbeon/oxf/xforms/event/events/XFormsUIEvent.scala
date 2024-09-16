@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEvent}
 
 

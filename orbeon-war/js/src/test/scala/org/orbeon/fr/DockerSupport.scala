@@ -16,12 +16,12 @@ package org.orbeon.fr
 import org.orbeon.node
 import org.orbeon.node.OS
 import org.orbeon.oxf.util.FutureUtils.eventually
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 import scala.async.Async.{async, await}
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{ExecutionContext, Future}
-import scala.scalajs.js.JSStringOps._
+import scala.scalajs.js.JSStringOps.*
 import scala.util.Success
 
 object DockerSupport {

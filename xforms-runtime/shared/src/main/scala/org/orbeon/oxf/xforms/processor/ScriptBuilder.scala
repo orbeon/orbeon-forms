@@ -13,19 +13,19 @@
   */
 package org.orbeon.oxf.xforms.processor
 
-import io.circe.generic.auto._
-import io.circe.syntax._
+import io.circe.generic.auto.*
+import io.circe.syntax.*
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsGlobalProperties._
-import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.MarkupUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.xforms.XFormsGlobalProperties.*
+import org.orbeon.oxf.xforms.XFormsProperties.*
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEvents}
 import org.orbeon.oxf.xforms.{ShareableScript, XFormsContainingDocument}
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 
 import java.{lang => jl}
 import scala.collection.mutable

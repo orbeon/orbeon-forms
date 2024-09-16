@@ -14,10 +14,10 @@
 package org.orbeon.oxf.util
 
 import cats.effect.IO
-import org.orbeon.connection._
+import org.orbeon.connection.*
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.http._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.http.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
 import org.orbeon.{fs2dom, sjsdom}
 import org.scalajs.dom.experimental.{Headers => JSHeaders, URL => JSURL}
@@ -26,7 +26,7 @@ import java.io.InputStream
 import java.net.URI
 import scala.scalajs.js
 import scala.scalajs.js.Iterator
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.JSName
 import scala.scalajs.js.typedarray.Uint8Array
 

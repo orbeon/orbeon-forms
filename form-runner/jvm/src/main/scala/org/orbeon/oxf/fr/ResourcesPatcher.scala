@@ -20,13 +20,13 @@ import org.orbeon.oxf.fr.process.FormRunnerActionsCommon
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.SimpleProcessor
 import org.orbeon.oxf.properties.{Properties, PropertySet}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPath}
 import org.orbeon.oxf.xml.dom.Support
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 // Processor to replace or add resources based on properties and form metadata.
 //

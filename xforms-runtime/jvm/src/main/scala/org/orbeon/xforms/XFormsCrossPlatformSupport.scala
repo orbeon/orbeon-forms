@@ -13,7 +13,7 @@
  */
 package org.orbeon.xforms
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.{InputStreamBody, StringBody}
 import org.ccil.cowan.tagsoup.HTMLSchema
@@ -29,18 +29,18 @@ import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.PathUtils.splitQuery
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, SaxonConfiguration}
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.xml.sax.InputSource
 
-import java.io._
+import java.io.*
 import java.net.URI
 import java.nio.charset.Charset
 import javax.xml.transform.dom.{DOMResult, DOMSource}

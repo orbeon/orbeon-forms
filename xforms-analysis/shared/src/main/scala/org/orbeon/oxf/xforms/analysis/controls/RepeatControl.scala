@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.xforms.XFormsNames.*
+import org.orbeon.oxf.xforms.analysis.*
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 

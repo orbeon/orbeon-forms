@@ -22,17 +22,17 @@ import org.orbeon.oxf.common.OrbeonLocationException.getRootLocationData
 import org.orbeon.oxf.externalcontext.{ExternalContext, ServletWebAppContext, WebAppExternalContext}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
-import org.orbeon.oxf.processor._
+import org.orbeon.oxf.processor.*
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceNotFoundException
 import org.orbeon.oxf.servlet.{HttpServletRequest, HttpSession, ServletContext}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{AttributesToMap, PipelineUtils}
 import org.orbeon.saxon.om.NodeInfo
 
 import java.util
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

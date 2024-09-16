@@ -14,9 +14,9 @@
 package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
-import org.orbeon.oxf.fr.persistence.relational.Statement._
+import org.orbeon.oxf.fr.persistence.relational.Statement.*
 import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchPermissions
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 
 object permissionsPart {
 

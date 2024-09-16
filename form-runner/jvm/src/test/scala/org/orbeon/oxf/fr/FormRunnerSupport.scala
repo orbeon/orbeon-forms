@@ -16,15 +16,15 @@ package org.orbeon.oxf.fr
 import org.apache.commons.io.IOUtils
 import org.orbeon.connection.{BufferedContent, StreamedContent}
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.fr.FormRunnerSupport._
+import org.orbeon.oxf.fr.FormRunnerSupport.*
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.test.TestHttpClient.CacheEvent
 import org.orbeon.oxf.test.{DocumentTestBase, TestHttpClient}
 import org.orbeon.oxf.util.PathUtils
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache

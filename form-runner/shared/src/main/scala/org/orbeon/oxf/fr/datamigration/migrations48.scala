@@ -15,18 +15,18 @@ package org.orbeon.oxf.fr.datamigration
 
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
-import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.fr.datamigration.MigrationSupport._
+import org.orbeon.oxf.fr.FormRunnerCommon.*
+import org.orbeon.oxf.fr.datamigration.MigrationSupport.*
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunnerDocContext, InDocFormRunnerDocContext}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.BasicNamespaceMapping
 import org.orbeon.xforms.XFormsNames.{XFBindQName, XFORMS_BIND_QNAME, XFORMS_SHORT_PREFIX}
 

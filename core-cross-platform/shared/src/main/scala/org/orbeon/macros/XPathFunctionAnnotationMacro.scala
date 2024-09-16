@@ -1,8 +1,8 @@
 package org.orbeon.macros
 
-import cats.syntax.option._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import cats.syntax.option.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 
 import scala.annotation.{StaticAnnotation, compileTimeOnly}
 import scala.language.experimental.macros

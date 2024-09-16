@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.ValidationException
@@ -22,11 +22,11 @@ import org.orbeon.oxf.xforms.analysis.EventHandler.PropertyQNames
 import org.orbeon.oxf.xforms.analysis.controls.{SelectionControl, TriggerControl, ValueControl}
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.ValueOrSequenceQNames
-import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, Submission}
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{BasicNamespaceMapping, XFormsId, XFormsNames, XXBLScope}
 import org.orbeon.xforms.xbl.Scope
 

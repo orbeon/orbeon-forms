@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import com.lowagie.text.pdf._
+import com.lowagie.text.pdf.*
 import com.lowagie.text.{Image, Rectangle}
 import org.log4s
 import org.orbeon.connection.ConnectionResult
@@ -22,19 +22,19 @@ import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.CharsetNames
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
 import org.orbeon.oxf.processor.generator.URLGeneratorBase
-import org.orbeon.oxf.processor.pdf.PDFTemplateProcessor._
+import org.orbeon.oxf.processor.pdf.PDFTemplateProcessor.*
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
 import org.orbeon.oxf.processor.serializer.{BinaryTextXMLReceiver, HttpSerializerBase}
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.{FloatValue, Int64Value}
 import org.orbeon.xml.NamespaceMapping
@@ -43,7 +43,7 @@ import java.io.{ByteArrayOutputStream, OutputStream}
 import java.net.URI
 import java.net.URLDecoder.{decode => decodeURL}
 import java.util.{List => JList}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

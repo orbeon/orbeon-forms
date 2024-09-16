@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.MapFunctions
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.function.ProcessTemplateSupport
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 import org.orbeon.saxon.pattern.NameTest
 import org.orbeon.saxon.value.{StringValue, Value}
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 
 import scala.annotation.tailrec
 

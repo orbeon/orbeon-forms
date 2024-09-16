@@ -19,12 +19,12 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.VariableTrait
 import org.orbeon.oxf.xforms.function.{InstanceTrait, XXFormsInstanceTrait}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.PathMap.PathMapArc
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.om.Axis
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId

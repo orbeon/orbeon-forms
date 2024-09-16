@@ -17,7 +17,7 @@ import org.orbeon.oxf.servlet.ServletContext
 import org.orbeon.oxf.webapp.Orbeon
 
 import javax.portlet.PortletContext
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // Expose parameters and attributes as maps

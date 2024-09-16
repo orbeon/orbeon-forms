@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.analysis.controls.WithExpressionOrConstantTrait

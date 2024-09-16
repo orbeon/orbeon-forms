@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary}
-import org.orbeon.saxon.`type`.BuiltInAtomicType._
-import org.orbeon.saxon.expr.StaticProperty._
+import org.orbeon.saxon.`type`.BuiltInAtomicType.*
+import org.orbeon.saxon.expr.StaticProperty.*
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 object TestFooFunctionLibrary extends OrbeonFunctionLibrary {
 

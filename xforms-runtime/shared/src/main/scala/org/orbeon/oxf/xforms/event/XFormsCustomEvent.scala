@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
 
 /**
  * Custom event.

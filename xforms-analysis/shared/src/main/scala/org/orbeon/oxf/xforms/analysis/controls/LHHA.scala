@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{CirceEnum, Enum, EnumEntry}
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_SHORT
 
 

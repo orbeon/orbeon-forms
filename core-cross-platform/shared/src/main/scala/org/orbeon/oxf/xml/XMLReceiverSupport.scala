@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.xml.SaxSupport.{AttributesImplOps, EmptyAttributes}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl

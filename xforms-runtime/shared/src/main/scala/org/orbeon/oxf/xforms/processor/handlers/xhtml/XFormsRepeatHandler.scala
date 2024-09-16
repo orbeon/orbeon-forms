@@ -14,15 +14,15 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, RepeatControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.appendWithSpace
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor, XFormsBaseHandler}
-import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.xml.sax.Attributes
 

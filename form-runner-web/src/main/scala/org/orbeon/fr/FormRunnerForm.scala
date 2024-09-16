@@ -2,14 +2,14 @@ package org.orbeon.fr
 
 import org.orbeon.oxf.fr.ControlOps
 import org.orbeon.xforms
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 
 
 // Form Runner-specific facade as we don't want to expose internal `xforms.Form` members

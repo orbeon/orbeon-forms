@@ -18,16 +18,16 @@ import java.net.URI
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
-import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.xforms.XFormsProperties.*
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, AnnotatedTemplateBuilder}
-import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.XMLConstants.*
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.XmlLocationData
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{Constants, Namespaces, XXBLScope}
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}

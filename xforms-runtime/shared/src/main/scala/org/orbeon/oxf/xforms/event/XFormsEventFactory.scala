@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.event.events._
-import org.orbeon.xforms.EventNames._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
+import org.orbeon.oxf.xforms.event.events.*
+import org.orbeon.xforms.EventNames.*
 
 // Factory for XForms events
 object XFormsEventFactory {

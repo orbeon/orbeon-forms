@@ -2,8 +2,8 @@ package org.orbeon.oxf.xml.xerces
 
 import cats.Eval
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.SLF4JLogging._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.SLF4JLogging.*
 import org.orbeon.oxf.xml.ParserConfiguration
 import org.slf4j
 import org.xml.sax.SAXNotRecognizedException

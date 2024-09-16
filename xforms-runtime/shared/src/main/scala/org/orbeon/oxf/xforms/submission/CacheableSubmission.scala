@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.effect.IO
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.connection.{ConnectionResult, ConnectionResultT, StreamedContent}
 import org.orbeon.oxf.http.{Headers, StatusCode}
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
@@ -26,7 +26,7 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 
 
 private object CacheableSubmission {

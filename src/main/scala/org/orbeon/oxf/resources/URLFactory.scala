@@ -15,9 +15,9 @@ package org.orbeon.oxf.resources
 
 import org.orbeon.oxf.resources.handler.{DataHandler, HTTPHandler, OXFHandler, SystemHandler}
 import org.orbeon.oxf.util.PathUtils.{getProtocol, removeQueryString}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
-import java.net._
+import java.net.*
 
 
 /**

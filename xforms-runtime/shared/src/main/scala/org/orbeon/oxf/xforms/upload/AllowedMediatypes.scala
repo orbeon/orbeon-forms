@@ -2,7 +2,7 @@ package org.orbeon.oxf.xforms.upload
 
 import org.orbeon.datatypes.MediatypeRange
 import org.orbeon.datatypes.MediatypeRange.WildcardMediatypeRange
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 
 

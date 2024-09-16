@@ -15,22 +15,22 @@ package org.orbeon.oxf.xforms.control
 
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaPlacementType}
-import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.{PlaceHolderInfo, XFormsBaseHandlerXHTML}
-import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper}
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax.helpers.AttributesImpl
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import scala.collection.mutable
 

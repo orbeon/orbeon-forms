@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.servlet
 
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.common.Defaults
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.ContentTypes
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 
-import java.io._
-import java.util._
+import java.io.*
+import java.util.*
 
 
 private case class FilterSettings(context: ServletContext, orbeonContextPathOpt: Option[String], defaultEncoding: String) {

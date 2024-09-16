@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import cats.syntax.option._
-import org.orbeon.dom._
+import cats.syntax.option.*
+import org.orbeon.dom.*
 import org.orbeon.oxf.common.{OXFException, Version}
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{IndentedLogger, WhitespaceMatching}
 import org.orbeon.oxf.xforms.Loggers
-import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xforms.analysis.*
+import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.dom.LocationDocumentResult
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.xforms.xbl.Scope
 import org.xml.sax.Attributes

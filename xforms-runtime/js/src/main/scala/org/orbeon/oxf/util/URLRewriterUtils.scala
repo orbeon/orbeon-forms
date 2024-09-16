@@ -2,7 +2,7 @@ package org.orbeon.oxf.util
 
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
-import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.PathUtils.*
 import org.scalajs.dom
 
 import java.net.URI

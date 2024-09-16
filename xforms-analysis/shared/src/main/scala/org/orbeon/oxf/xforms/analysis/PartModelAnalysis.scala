@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
 import org.orbeon.xforms.xbl.Scope
 

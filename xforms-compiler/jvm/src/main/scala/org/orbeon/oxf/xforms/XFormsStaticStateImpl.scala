@@ -19,9 +19,9 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.properties.Property
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
+import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{BindingLoader, XBLAssets}
 import org.orbeon.oxf.xforms.{XFormsProperties => P}

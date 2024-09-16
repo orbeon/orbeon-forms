@@ -16,11 +16,11 @@ package org.orbeon.xbl
 import org.orbeon.facades.Select2
 import org.orbeon.facades.Select2.{Success, toJQuerySelect2}
 import org.orbeon.web.DomSupport
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
-import org.orbeon.polyfills.HTMLPolyfills._
+import org.orbeon.polyfills.HTMLPolyfills.*
 import org.scalajs.dom
-import org.scalajs.dom.ext._
+import org.scalajs.dom.ext.*
 import org.scalajs.dom.raw.{Element, Node}
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}

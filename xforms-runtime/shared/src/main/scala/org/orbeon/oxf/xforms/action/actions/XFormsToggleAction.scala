@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAPI, XFormsAction}
 import org.orbeon.oxf.xforms.control.Focus

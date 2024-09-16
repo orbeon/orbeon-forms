@@ -2,10 +2,10 @@ package org.orbeon.dom.io
 
 import java.{util => ju}
 
-import org.orbeon.dom._
-import org.orbeon.dom.io.SAXWriter._
+import org.orbeon.dom.*
+import org.orbeon.dom.io.SAXWriter.*
 import org.orbeon.dom.tree.NamespaceStack
-import org.xml.sax._
+import org.xml.sax.*
 import org.xml.sax.ext.LexicalHandler
 import org.xml.sax.helpers.{AttributesImpl, LocatorImpl}
 

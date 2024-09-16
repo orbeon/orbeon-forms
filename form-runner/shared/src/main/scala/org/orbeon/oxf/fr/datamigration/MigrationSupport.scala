@@ -16,18 +16,18 @@ package org.orbeon.oxf.fr.datamigration
 import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
-import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.FormRunnerCommon.*
+import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunnerDocContext, InDocFormRunnerDocContext, XMLNames}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{StaticXPath, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, instanceRoot}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 
 import scala.collection.{immutable => i}
 

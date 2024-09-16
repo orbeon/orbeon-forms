@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.io.IOUtils.*
+import org.orbeon.oxf.util.PathUtils.*
 import org.scalatest.funspec.AnyFunSpec
 
 class JVMOnlyUtilsTest extends AnyFunSpec {

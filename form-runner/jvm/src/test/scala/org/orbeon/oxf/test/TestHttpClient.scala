@@ -16,14 +16,14 @@ package org.orbeon.oxf.test
 import org.orbeon.connection.StreamedContent
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
-import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http._
-import org.orbeon.oxf.pipeline.InitUtils._
+import org.orbeon.oxf.externalcontext.*
+import org.orbeon.oxf.http.Headers.*
+import org.orbeon.oxf.http.*
+import org.orbeon.oxf.pipeline.InitUtils.*
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.processor.XPLConstants.OXF_PROCESSORS_NAMESPACE
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, SecureUtils, URLRewriterUtils}
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xforms.state.XFormsStateManager

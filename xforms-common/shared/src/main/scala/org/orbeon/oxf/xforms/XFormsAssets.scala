@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.PathUtils.*
 
 
 case class XFormsAssets(css: List[AssetPath], js: List[AssetPath])

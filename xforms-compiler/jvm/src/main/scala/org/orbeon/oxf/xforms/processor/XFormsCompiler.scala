@@ -4,10 +4,10 @@ import org.orbeon.dom
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{BinaryTextSupport, ProcessorImpl, ProcessorOutput}
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.util.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiver}
 import org.xml.sax.helpers.AttributesImpl
 

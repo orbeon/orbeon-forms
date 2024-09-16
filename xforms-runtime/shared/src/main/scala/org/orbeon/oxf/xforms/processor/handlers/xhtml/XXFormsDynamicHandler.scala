@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.*
 import org.xml.sax.Attributes
 
 

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction, XFormsActionInterpreter}
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl

@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.fr
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.FormRunnerCommon.*
+import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.{findMigrationForVersion, findMigrationOps}
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.util.ContentTypes.HtmlContentType
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.NodeInfoFactory.namespaceInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI.insert
@@ -31,9 +31,9 @@ import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{Item, NodeInfo}
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
-import org.orbeon.scaxon.XPath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.scaxon.XPath.*
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.{MEDIATYPE_QNAME, TYPE_QNAME, XFORMS_INPUT_QNAME}
 import org.orbeon.xml.NamespaceMapping

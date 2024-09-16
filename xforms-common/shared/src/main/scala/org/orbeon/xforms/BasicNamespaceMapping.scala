@@ -2,7 +2,7 @@ package org.orbeon.xforms
 
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX}
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xml.NamespaceMapping
 
 

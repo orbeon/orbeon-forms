@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.http
 
-import org.apache.http.auth._
-import org.apache.http.client.methods._
+import org.apache.http.auth.*
+import org.apache.http.client.methods.*
 import org.apache.http.client.protocol.{ClientContext, RequestAcceptEncoding, ResponseContentEncoding}
 import org.apache.http.client.{CookieStore, CredentialsProvider}
 import org.apache.http.conn.ClientConnectionManager
@@ -30,10 +30,10 @@ import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext
 import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException => _, _}
 import org.orbeon.connection.{ConnectionContextSupport, StreamedContent}
-import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.http.HttpMethod._
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.io.IOUtils.*
+import org.orbeon.oxf.http.HttpMethod.*
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.slf4j.LoggerFactory
 
 import java.net.{CookieStore => _, _}

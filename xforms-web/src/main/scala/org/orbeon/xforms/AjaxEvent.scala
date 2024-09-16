@@ -13,17 +13,17 @@
   */
 package org.orbeon.xforms
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.xforms.EventNames._
+import org.orbeon.xforms.EventNames.*
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget, WireAjaxEventWithoutTarget}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 

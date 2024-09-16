@@ -17,8 +17,8 @@ import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 
 
 // This contains grid/cell operations acting on `NodeInfo`, which is on the source of the form definition

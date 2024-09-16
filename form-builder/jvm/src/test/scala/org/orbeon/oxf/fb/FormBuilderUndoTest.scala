@@ -16,12 +16,12 @@ package org.orbeon.oxf.fb
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl.resolveId
 import org.orbeon.datatypes.Direction
-import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fb.FormBuilder.*
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.NodeInfoCell.NodeInfoCellOps
 import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams, NodeInfoCell}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 class FormBuilderUndoTest

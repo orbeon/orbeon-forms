@@ -15,15 +15,15 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl
-import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.XMLReceiverHelper._
+import org.orbeon.oxf.xml.XMLReceiverHelper.*
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.xml.sax.helpers.AttributesImpl
 

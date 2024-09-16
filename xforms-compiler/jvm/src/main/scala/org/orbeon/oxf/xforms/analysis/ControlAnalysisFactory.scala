@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.analysis.EventHandler.{isAction, isContainerAction, isEventHandler}
-import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.{Model, Submission}
-import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.xml.dom.Extensions.*
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 

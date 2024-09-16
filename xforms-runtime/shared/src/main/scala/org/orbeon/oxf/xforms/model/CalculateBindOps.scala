@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.util.Whitespace.applyPolicy
-import org.orbeon.oxf.xforms.analysis.model.MipName._
+import org.orbeon.oxf.xforms.analysis.model.MipName.*
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, MipName, StaticBind, Types}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.model.XFormsModelBinds._
+import org.orbeon.oxf.xforms.model.XFormsModelBinds.*
 import org.orbeon.saxon.om
 
 import scala.util.control.NonFatal

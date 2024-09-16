@@ -14,11 +14,11 @@
 package org.orbeon.oxf.fr.embedding
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
+import enumeratum.*
 import org.orbeon.connection.StreamedContent
 import org.orbeon.oxf.http.{Headers, HttpClient}
 import org.orbeon.oxf.util.CollectionUtils.combineValues
-import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.xforms.Constants
 
 import java.io.{OutputStream, Writer}

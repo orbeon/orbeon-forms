@@ -14,13 +14,12 @@
 package org.orbeon.oxf.fr.persistence.test
 
 import org.junit.Test
-import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.fr.persistence.db.*
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider.*
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.scalatestplus.junit.AssertionsForJUnit
 

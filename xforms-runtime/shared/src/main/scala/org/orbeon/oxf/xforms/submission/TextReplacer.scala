@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsContainingDocument

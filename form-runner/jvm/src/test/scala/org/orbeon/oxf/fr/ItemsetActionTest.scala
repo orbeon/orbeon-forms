@@ -16,9 +16,9 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.Constants
 

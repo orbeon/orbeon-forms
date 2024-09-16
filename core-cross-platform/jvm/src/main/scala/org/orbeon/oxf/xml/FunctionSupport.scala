@@ -17,8 +17,8 @@ import org.orbeon.dom.QName
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr.{ExpressionVisitor, _}
 import org.orbeon.saxon.functions.SystemFunction
-import org.orbeon.saxon.om._
-import org.orbeon.saxon.value._
+import org.orbeon.saxon.om.*
+import org.orbeon.saxon.value.*
 
 import scala.collection.immutable.ArraySeq
 

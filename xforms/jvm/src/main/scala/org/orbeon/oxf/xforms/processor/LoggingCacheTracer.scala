@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor
 
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
 
 

@@ -1,11 +1,11 @@
 package org.orbeon.fr
 
 import org.orbeon.fr.DockerSupport.removeContainerByImage
-import org.scalatest._
+import org.scalatest.*
 import org.scalatest.funspec.FixtureAsyncFunSpecLike
 
 import java.util.concurrent.atomic.AtomicInteger
-import scala.async.Async._
+import scala.async.Async.*
 import scala.scalajs.js
 
 

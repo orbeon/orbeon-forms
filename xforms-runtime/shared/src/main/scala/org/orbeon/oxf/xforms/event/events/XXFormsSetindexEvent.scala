@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
 
 class XXFormsSetindexEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XXFORMS_SETINDEX, target, properties, bubbles = true, cancelable = false) {

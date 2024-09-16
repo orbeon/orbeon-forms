@@ -15,12 +15,12 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.dom
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.{StaticXPath, Whitespace}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.Namespaces.XXF
 import org.orbeon.xforms.{Constants, XFormsNames}
 

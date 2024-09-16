@@ -14,11 +14,12 @@
 package org.orbeon.xforms.rpc
 
 import autowire.Core.Request
-import io.circe.generic.auto._
-import io.circe.parser._
+import io.circe.generic.auto.*
+import io.circe.parser.*
 import io.circe.{Decoder, Encoder, Json}
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 
 import scala.concurrent.ExecutionContextExecutor

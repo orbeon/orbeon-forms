@@ -17,26 +17,26 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.FileUtils
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{PathUtils, ResourceResolver, URLRewriterUtils}
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, OutputControl}
-import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.XFormsCrossPlatformSupport
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.helpers.AttributesImpl
 
 import java.net.URI
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.Try
 import scala.util.control.NonFatal
 

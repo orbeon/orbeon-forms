@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.datatypes.ExtendedLocationData
-import org.orbeon.exception._
+import org.orbeon.exception.*
 import org.orbeon.oxf.common.OrbeonLocationException.getRootLocationData
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget, XFormsEvents}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 

@@ -18,16 +18,16 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.http.{Headers, PathType}
-import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver._
+import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver.*
 import org.orbeon.oxf.util.ContentTypes.{getContentTypeCharset, getContentTypeMediaType, makeContentTypeCharset}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{Base64XMLReceiver, ContentTypes, DateUtils, TextXMLReceiver}
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
-import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverAdapter}
 import org.xml.sax.Attributes
 
-import java.io._
+import java.io.*
 import scala.collection.mutable
 
 

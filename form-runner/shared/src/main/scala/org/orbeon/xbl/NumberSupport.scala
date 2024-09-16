@@ -14,8 +14,8 @@
 package org.orbeon.xbl
 
 import org.orbeon.dom
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.function.xxforms.NumericValidation
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.XMLConstants

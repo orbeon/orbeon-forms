@@ -14,12 +14,12 @@
 package org.orbeon.oxf.fr.process
 
 import cats.effect.IO
-import org.orbeon.oxf.fr.process.ProcessInterpreter._
-import org.orbeon.oxf.fr.process.ProcessParser._
+import org.orbeon.oxf.fr.process.ProcessInterpreter.*
+import org.orbeon.oxf.fr.process.ProcessParser.*
 import org.orbeon.oxf.fr.process.TestProcessInterpreter.ConstantProcessId
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.{executionContext, runtime}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{FunctionContext, IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.{Item, NodeInfo}

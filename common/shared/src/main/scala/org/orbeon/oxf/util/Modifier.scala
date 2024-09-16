@@ -16,7 +16,7 @@ package org.orbeon.oxf.util
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{CirceEnum, Enum, EnumEntry}
 
-import StringUtils._
+import StringUtils.*
 
 // NOTE: We place this in a separate module also to help with Circe issues, see:
 // https://github.com/circe/circe/issues/639

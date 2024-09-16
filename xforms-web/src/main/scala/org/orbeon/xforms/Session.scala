@@ -1,8 +1,8 @@
 package org.orbeon.xforms
 
-import io.circe._
-import io.circe.generic.auto._
-import io.circe.syntax._
+import io.circe.*
+import io.circe.generic.auto.*
+import io.circe.syntax.*
 import org.orbeon.xforms.facade.{BroadcastChannel, MessageEvent}
 
 import scala.collection.mutable

@@ -13,27 +13,27 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import cats.syntax.option._
-import org.orbeon.oxf.util.CoreUtils._
+import cats.syntax.option.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, SelectAppearanceTrait, SelectionControlTrait}
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.itemset._
+import org.orbeon.oxf.xforms.itemset.*
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.forwardAutocompleteAttribute
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.*
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XHTML}
-import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.{ComponentSeparator, ComponentSeparatorString}
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 /**

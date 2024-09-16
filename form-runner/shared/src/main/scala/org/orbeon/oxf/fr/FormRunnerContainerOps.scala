@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.fr.XMLNames.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 
 

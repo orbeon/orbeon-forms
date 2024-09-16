@@ -19,7 +19,7 @@ import org.orbeon.oxf.externalcontext.ResponseAdapter
 import org.orbeon.oxf.http.{PathType, StatusCode}
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.scalatestplus.junit.AssertionsForJUnit
 
 // As of 2012-07-05, this tests a minimal subset of BinaryTextXMLReceiver only. We should test more combinations of

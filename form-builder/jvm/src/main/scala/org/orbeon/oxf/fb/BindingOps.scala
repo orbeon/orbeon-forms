@@ -14,18 +14,18 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.fb.XMLNames._
+import org.orbeon.oxf.fb.XMLNames.*
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner.findControlByName
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.NodeInfoFactory._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.xforms.NodeInfoFactory.*
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor.*
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
 
 

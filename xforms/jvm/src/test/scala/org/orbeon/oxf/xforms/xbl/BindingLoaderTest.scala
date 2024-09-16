@@ -18,7 +18,7 @@ import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.scalatest.funspec.AnyFunSpecLike
 import org.xml.sax.helpers.AttributesImpl
 

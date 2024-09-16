@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.state
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.{IndentedLogger, SecureUtils}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventTarget}

@@ -1,15 +1,15 @@
 package org.orbeon.oxf.util
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.apache.commons.fileupload.disk.{DiskFileItem, DiskFileItemFactory}
 import org.apache.commons.fileupload.{FileItem, FileItemIterator, FileItemStream}
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.ExpirationScope.entryName
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 import java.io.{File, IOException, InputStream}
 import java.net.URI

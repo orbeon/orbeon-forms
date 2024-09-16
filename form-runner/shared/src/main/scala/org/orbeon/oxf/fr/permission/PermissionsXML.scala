@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fr.permission
 
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.oxf.util.StringUtils.*
 
 import scala.xml.Elem
 

@@ -15,14 +15,14 @@ package org.orbeon.saxon.function
 
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, DependsOnContextItemIfSingleArgumentMissing}
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.BooleanValue
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 
 class HasClass extends ClassSupport {
   override def evaluateItem(xpathContext: XPathContext): BooleanValue =

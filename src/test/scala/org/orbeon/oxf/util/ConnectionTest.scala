@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.util
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.mockito.Mockito
 import org.orbeon.connection.StreamedContent
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.externalcontext.*
+import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.scalatest.funspec.AnyFunSpecLike
@@ -26,7 +26,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 import java.net.URI
 import java.{util => ju}
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 class ConnectionTest

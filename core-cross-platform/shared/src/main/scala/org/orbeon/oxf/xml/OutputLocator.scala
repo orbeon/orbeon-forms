@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import org.xml.sax._
+import org.xml.sax.*
 
 // This is the Locator object passed to the output. It supports a stack of input Locator objects in order to
 // correctly report location information of the included documents.

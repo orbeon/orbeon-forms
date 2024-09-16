@@ -1,11 +1,11 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes

@@ -14,12 +14,12 @@
 package org.orbeon.oxf.fr.persistence.relational
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
+import enumeratum.*
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.fr.AppForm
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo

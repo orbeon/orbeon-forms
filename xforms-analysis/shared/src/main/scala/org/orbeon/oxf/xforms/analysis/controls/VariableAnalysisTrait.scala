@@ -1,10 +1,10 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.isValueOrSequenceElement
 import org.orbeon.xforms.XFormsId
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 
 
 trait VariableTrait {

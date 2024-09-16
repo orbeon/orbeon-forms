@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.saxon.model.ValidationFailure
-import org.orbeon.saxon.value._
+import org.orbeon.saxon.value.*
 
 
 object NumericValidation {

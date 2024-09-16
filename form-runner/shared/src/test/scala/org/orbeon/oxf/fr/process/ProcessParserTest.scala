@@ -1,6 +1,6 @@
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.fr.process.ProcessParser._
+import org.orbeon.oxf.fr.process.ProcessParser.*
 import org.scalatest.funspec.AnyFunSpec
 
 

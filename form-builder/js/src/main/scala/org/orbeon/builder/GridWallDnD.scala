@@ -13,19 +13,19 @@
  */
 package org.orbeon.builder
 
-import autowire._
-import org.orbeon.builder.HtmlElementCell._
+import autowire.*
+import org.orbeon.builder.HtmlElementCell.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{Direction, Orientation}
 import org.orbeon.facades.{Dragula, DragulaOptions}
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.fr.{Cell, GridModel, WallPosition}
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQuery
 
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import scala.collection.mutable
 import scala.scalajs.js
 

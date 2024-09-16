@@ -16,9 +16,9 @@ package org.orbeon.oxf.util
 import org.orbeon.datatypes.Mediatype
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ParserConfiguration, XMLParsing}
 import org.xml.sax.Attributes
 

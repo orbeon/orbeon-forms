@@ -13,20 +13,20 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.oxf.rewrite.Rewrite
 import org.orbeon.oxf.util.ContentHandlerWriter
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.control.*
+import org.orbeon.oxf.xforms.control.controls.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.processor.handlers._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xforms.processor.handlers.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.Constants.RepeatSeparator
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, rpc}
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import scala.collection.{immutable => i}
 import scala.util.control.Breaks

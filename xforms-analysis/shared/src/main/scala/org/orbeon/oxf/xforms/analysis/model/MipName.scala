@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
-import org.orbeon.dom._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.dom.*
+import org.orbeon.xforms.XFormsNames.*
 
 
 sealed trait MipName { def name: String; val aName: QName; val eName: QName }

@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.action._
+import org.orbeon.oxf.xforms.*
+import org.orbeon.oxf.xforms.action.*
 import org.orbeon.oxf.xforms.analysis.WithChildrenTrait
 import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, VariableAnalysisTrait}
 import org.orbeon.oxf.xforms.control.XFormsControl

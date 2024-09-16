@@ -2,7 +2,7 @@ package org.orbeon.oxf.fr.library
 
 import org.orbeon.datatypes.Mediatype
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, ImageSupport, IndentedLogger, Mediatypes, PathUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl

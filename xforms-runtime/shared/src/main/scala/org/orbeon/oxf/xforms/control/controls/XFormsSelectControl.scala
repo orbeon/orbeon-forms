@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.itemset.{Item, ItemsetSupport, StaticItemsetSupport
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.{mutable, Set => CSet}

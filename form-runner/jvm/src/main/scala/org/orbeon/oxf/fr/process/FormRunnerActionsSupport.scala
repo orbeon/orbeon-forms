@@ -26,22 +26,22 @@ import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.Defaults
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunner.{FormVersionParam, formRunnerProperty}
-import org.orbeon.oxf.fr.FormRunnerPersistence._
-import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.FormRunnerPersistence.*
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.process.RenderedFormat.SupportedRenderFormatsMediatypes
 import org.orbeon.oxf.fr.process.SimpleProcess.{currentXFormsDocumentId, evaluateString, xpathContext}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.PathUtils.{recombineQuery, splitQueryDecodeParams}
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.{inScopeContainingDocument, setvalue}
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport}
 
 import java.io.{ByteArrayInputStream, InputStream}

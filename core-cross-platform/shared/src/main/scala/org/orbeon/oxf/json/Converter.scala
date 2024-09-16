@@ -23,9 +23,9 @@
 package org.orbeon.oxf.json
 
 import org.orbeon.oxf.util.StaticXPath
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.*
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.xml.sax.helpers.AttributesImpl
 import io.circe.{Json, parser}
 

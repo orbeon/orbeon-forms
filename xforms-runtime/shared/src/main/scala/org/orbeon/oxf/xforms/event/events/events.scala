@@ -15,14 +15,14 @@ package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.analysis.XPathErrorDetails
 import org.orbeon.oxf.xforms.control.controls.{FileMetadata, XFormsUploadControl}
-import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.xforms.{BindingErrorReason, EventNames}
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 class XXFormsStateRestoredEvent(target: XFormsEventTarget, properties: PropertyGetter)

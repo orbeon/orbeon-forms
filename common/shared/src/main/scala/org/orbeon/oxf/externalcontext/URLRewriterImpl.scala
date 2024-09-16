@@ -1,9 +1,9 @@
 package org.orbeon.oxf.externalcontext
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.PathUtils
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 import java.net.URI
 

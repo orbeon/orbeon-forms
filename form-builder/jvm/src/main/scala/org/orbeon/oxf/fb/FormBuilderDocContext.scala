@@ -14,11 +14,11 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.{FormRunnerDocContext, Names}
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 
 
 case class FormBuilderDocContext(

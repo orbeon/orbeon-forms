@@ -13,11 +13,11 @@
  */
 package org.orbeon.exception
 
-import org.orbeon.errorified._
+import org.orbeon.errorified.*
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 
 // Orbeon-specific exception formatter

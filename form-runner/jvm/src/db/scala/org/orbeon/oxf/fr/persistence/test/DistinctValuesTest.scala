@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.persistence.http.HttpCall
 import org.orbeon.oxf.fr.Version.Specific
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, XPath}
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.scalatest.concurrent.Eventually.eventually

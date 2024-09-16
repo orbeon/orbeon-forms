@@ -13,20 +13,20 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index
 
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
-import org.orbeon.oxf.fr.persistence.relational.WhatToReindex._
-import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.persistence.relational.WhatToReindex.*
+import org.orbeon.oxf.fr.persistence.relational.*
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xml.NamespaceMapping
 

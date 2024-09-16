@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xml.dom.Extensions
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.XhtmlSpanQname
 import org.orbeon.xforms.xbl.Scope

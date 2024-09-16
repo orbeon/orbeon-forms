@@ -13,21 +13,21 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{BasicCredentials, URIReferences}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.URIProcessorOutputImpl.URIReferencesState
-import org.orbeon.oxf.processor._
+import org.orbeon.oxf.processor.*
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager, XFormsStaticStateCache}
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.{lang => jl}

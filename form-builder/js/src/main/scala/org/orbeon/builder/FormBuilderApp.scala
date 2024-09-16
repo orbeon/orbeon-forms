@@ -13,8 +13,8 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.fr._
-import org.orbeon.xforms._
+import org.orbeon.fr.*
+import org.orbeon.xforms.*
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}

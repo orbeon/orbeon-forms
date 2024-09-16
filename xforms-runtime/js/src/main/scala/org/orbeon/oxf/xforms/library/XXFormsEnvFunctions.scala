@@ -1,20 +1,20 @@
 package org.orbeon.oxf.xforms.library
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{MessageFormatCache, MessageFormatter, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.function.XFormsFunction._
+import org.orbeon.oxf.xforms.function.XFormsFunction.*
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang.resolveXMLangHandleAVTs
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport.{findResourceElementForLang, pathFromTokens, splitResourceName}
-import org.orbeon.oxf.xforms.function.xxforms._
+import org.orbeon.oxf.xforms.function.xxforms.*
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.library.XFormsEnvFunctions.findIndexForRepeatId
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
@@ -27,9 +27,9 @@ import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{SequenceTool, StandardNames}
 import org.orbeon.saxon.value.{AtomicValue, QNameValue, SequenceExtent, StringValue}
 import org.orbeon.xforms.XFormsId
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {

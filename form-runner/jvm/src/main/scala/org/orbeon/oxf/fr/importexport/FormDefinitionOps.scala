@@ -3,7 +3,7 @@ package org.orbeon.oxf.fr.importexport
 import org.orbeon.oxf.fr.SimpleDataMigration.FormOps
 import org.orbeon.oxf.fr.{FormRunner, InDocFormRunnerDocContext}
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames.{XFORMS_BIND_QNAME, XFORMS_INSTANCE_QNAME}
 
 

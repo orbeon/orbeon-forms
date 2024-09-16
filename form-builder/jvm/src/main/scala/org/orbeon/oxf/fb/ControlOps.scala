@@ -15,28 +15,28 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.Coordinate1
 import org.orbeon.dom.QName
-import org.orbeon.oxf.fb.UndoAction._
-import org.orbeon.oxf.fb.XMLNames._
-import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fb.UndoAction.*
+import org.orbeon.oxf.fb.XMLNames.*
+import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.NodeInfoCell.*
+import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerRename, FormRunnerTemplatesOps, Names}
 import org.orbeon.oxf.util.ContentTypes.HtmlContentType
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.NodeInfoFactory._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.xforms.NodeInfoFactory.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.Constants.ComponentSeparator
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{Namespaces, XFormsId}
 import org.orbeon.xml.NamespaceMapping
 

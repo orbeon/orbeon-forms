@@ -17,14 +17,14 @@ import java.{util => ju}
 
 import org.apache.commons.pool.ObjectPool
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.XPath._
+import org.orbeon.oxf.util.XPath.*
 import org.orbeon.saxon.expr.{Expression, XPathContextMajor}
 import org.orbeon.saxon.om.{Item, SequenceIterator, ValueRepresentation}
 import org.orbeon.saxon.sxpath.{XPathDynamicContext, XPathExpression, XPathVariable}
 import org.orbeon.saxon.value.{AtomicValue, ObjectValue, SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.collection.mutable
 import scala.util.control.NonFatal
 

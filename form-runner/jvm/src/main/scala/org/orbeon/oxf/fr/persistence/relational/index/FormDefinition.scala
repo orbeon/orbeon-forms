@@ -14,20 +14,21 @@
 package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.FormRunnerCommon.*
+import org.orbeon.oxf.fr.XMLNames.*
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SearchableValues, SummarySettings}
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.SimplePath.*
 
 
 trait FormDefinition {

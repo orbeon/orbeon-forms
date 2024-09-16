@@ -19,37 +19,37 @@ import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
-import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.fr.FormRunnerPersistence._
-import org.orbeon.oxf.fr._
+import org.orbeon.oxf.externalcontext.*
+import org.orbeon.oxf.fr.FormRunnerPersistence.*
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.findCurrentCredentialsFromSession
-import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
+import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyPermissions.ResponseHeaders
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
-import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http._
+import org.orbeon.oxf.http.Headers.*
+import org.orbeon.oxf.http.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.{ElementFilterXMLReceiver, ParserConfiguration, TransformerUtils, XMLParsing}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.RelevanceHandling
-import org.orbeon.xforms.RelevanceHandling._
+import org.orbeon.xforms.RelevanceHandling.*
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
 import java.net.URI
 import javax.xml.transform.stream.StreamResult
 import scala.annotation.tailrec
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 

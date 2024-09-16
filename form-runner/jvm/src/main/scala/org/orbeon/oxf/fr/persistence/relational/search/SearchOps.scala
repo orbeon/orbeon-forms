@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.externalcontext.{Credentials, ParametrizedRole}
 import org.orbeon.oxf.fr.permission.Operation.{Delete, Read, Update}
-import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.util.IndentedLogger
 
 

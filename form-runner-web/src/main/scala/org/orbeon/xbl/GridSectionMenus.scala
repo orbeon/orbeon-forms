@@ -14,15 +14,15 @@
 package org.orbeon.xbl
 
 import enumeratum.EnumEntry.Hyphencase
-import enumeratum._
-import org.orbeon.polyfills.HTMLPolyfills._
+import enumeratum.*
+import org.orbeon.polyfills.HTMLPolyfills.*
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms.facade.Utils
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom.raw.KeyboardEvent
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
-import org.scalajs.dom.ext._
+import org.scalajs.dom.ext.*
 
 import scala.scalajs.js
 

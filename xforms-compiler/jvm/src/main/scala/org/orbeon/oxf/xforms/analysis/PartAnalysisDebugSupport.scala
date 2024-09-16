@@ -16,9 +16,9 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis.writeXPathAnalysis
-import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.xforms.Constants

@@ -4,7 +4,7 @@ import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, KeyboardShortcuts}
-import org.scalajs.dom.ext._
+import org.scalajs.dom.ext.*
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
 

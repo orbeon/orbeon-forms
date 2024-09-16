@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.fr
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.connection.StreamedContent
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.SimpleDataMigration.{DataMigrationBehavior, FormDiff}
@@ -24,8 +24,8 @@ import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 

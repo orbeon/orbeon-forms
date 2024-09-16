@@ -4,7 +4,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction.relevantControl
 import org.orbeon.saxon.expr.XPathContext
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 object LHHAFunctionSupport {

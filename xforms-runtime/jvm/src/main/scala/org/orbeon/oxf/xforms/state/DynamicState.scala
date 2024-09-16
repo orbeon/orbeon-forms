@@ -17,18 +17,18 @@ import org.orbeon.dom
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.{PathMatcher, SecureUtils}
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.model.XFormsInstance
-import org.orbeon.oxf.xforms.state.XFormsOperations._
-import org.orbeon.oxf.xforms.state.XFormsProtocols._
+import org.orbeon.oxf.xforms.state.XFormsOperations.*
+import org.orbeon.oxf.xforms.state.XFormsProtocols.*
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.SAXStoreBinaryFormat._
-import org.orbeon.oxf.xml.SBinaryDefaultFormats._
+import org.orbeon.oxf.xml.SAXStoreBinaryFormat.*
+import org.orbeon.oxf.xml.SBinaryDefaultFormats.*
 import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.DelayedEvent
-import sbinary.Operations._
+import sbinary.Operations.*
 
 import scala.collection.immutable
 

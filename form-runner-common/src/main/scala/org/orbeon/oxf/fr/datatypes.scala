@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import enumeratum._
+import enumeratum.*
 
 sealed abstract class DataStatus(override val entryName: String) extends EnumEntry
 

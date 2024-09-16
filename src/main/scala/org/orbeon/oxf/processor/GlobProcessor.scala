@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor
 
-import org.orbeon.oxf.processor.RegexpMatcher._
+import org.orbeon.oxf.processor.RegexpMatcher.*
 
 
 class GlobProcessor extends RegexpProcessor {

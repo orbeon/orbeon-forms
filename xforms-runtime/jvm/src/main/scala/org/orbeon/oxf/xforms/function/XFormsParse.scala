@@ -1,11 +1,11 @@
 package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.json.Converter
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 

@@ -26,7 +26,7 @@ import javax.portlet.filter.PortletRequestWrapper
 import javax.portlet.{PortletRequest, PortletSession}
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpecLike with MockitoSugar {

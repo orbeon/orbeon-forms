@@ -13,7 +13,7 @@
   */
 package org.orbeon.date
 
-import org.orbeon.date.JSDateUtils._
+import org.orbeon.date.JSDateUtils.*
 import org.scalatest.funspec.AnyFunSpec
 
 import scala.scalajs.js

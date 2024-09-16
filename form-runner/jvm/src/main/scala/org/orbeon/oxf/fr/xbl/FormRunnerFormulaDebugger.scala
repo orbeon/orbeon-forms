@@ -10,7 +10,7 @@ import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, MipName}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 
 object FormRunnerFormulaDebugger {

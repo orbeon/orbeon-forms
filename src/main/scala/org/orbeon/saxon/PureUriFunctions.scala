@@ -16,7 +16,7 @@ package org.orbeon.saxon
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.`type`.BuiltInAtomicType.{BOOLEAN, INTEGER, STRING}
 import org.orbeon.saxon.expr.StaticProperty.{ALLOWS_ZERO_OR_MORE, ALLOWS_ZERO_OR_ONE, EXACTLY_ONE}
-import org.orbeon.saxon.function._
+import org.orbeon.saxon.function.*
 
 
 trait PureUriFunctions extends OrbeonFunctionLibrary {

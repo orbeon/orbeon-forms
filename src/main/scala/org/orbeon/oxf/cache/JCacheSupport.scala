@@ -1,15 +1,15 @@
 package org.orbeon.oxf.cache
 
 import cats.data.NonEmptyList
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 
 import java.io
 import java.net.URI
 import javax.cache.Caching
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.Try
 import scala.util.control.NonFatal
 

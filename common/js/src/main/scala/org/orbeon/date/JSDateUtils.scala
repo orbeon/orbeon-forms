@@ -13,8 +13,8 @@
   */
 package org.orbeon.date
 
-import cats.syntax.option._
-import org.orbeon.oxf.util.StringUtils._
+import cats.syntax.option.*
+import org.orbeon.oxf.util.StringUtils.*
 
 import scala.scalajs.js
 import scala.util.Try

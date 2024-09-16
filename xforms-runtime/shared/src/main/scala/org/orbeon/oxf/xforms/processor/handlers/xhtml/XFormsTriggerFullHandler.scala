@@ -15,13 +15,13 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsTriggerFullHandler._
-import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.*
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsTriggerFullHandler.*
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
 import org.orbeon.xforms.XFormsNames

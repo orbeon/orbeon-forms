@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseWrapper}
 import org.orbeon.oxf.http.StatusCode

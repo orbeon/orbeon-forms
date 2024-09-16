@@ -2,10 +2,10 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.saxon.value.Int64Value
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 
 class XXFormsRepeatPositions extends XFormsFunction {

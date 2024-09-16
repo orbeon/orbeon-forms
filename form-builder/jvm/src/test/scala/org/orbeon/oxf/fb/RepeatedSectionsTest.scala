@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fb.FormBuilder._
+import org.orbeon.oxf.fb.FormBuilder.*
 import org.orbeon.oxf.fb.ToolboxOps.insertNewControl
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.NodeInfoConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.NodeInfoConversions.*
+import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 

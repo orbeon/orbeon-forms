@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis.*
 import org.orbeon.xforms.EventNames
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 
 /**
  * Handle aspects of an element that are specific to the view.

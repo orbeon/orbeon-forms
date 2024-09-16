@@ -15,8 +15,8 @@ package org.orbeon.oxf.xml.dom
 
 import java.{lang => jl, util => ju}
 
-import org.orbeon.dom._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.dom.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.saxon.value.Whitespace
 
 

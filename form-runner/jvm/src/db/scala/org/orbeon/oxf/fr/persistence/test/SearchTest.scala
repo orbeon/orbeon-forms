@@ -24,7 +24,7 @@ import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, LoggerFactory}
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.scaxon.NodeConversions
 import org.scalatest.concurrent.Eventually.eventually

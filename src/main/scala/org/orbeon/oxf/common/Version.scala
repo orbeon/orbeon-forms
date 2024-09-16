@@ -14,9 +14,9 @@
 package org.orbeon.oxf.common
 
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 import scala.util.control.NonFatal
 

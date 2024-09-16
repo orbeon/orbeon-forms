@@ -1,10 +1,10 @@
 package org.orbeon.oxf.fr.permission
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
+import enumeratum.*
 import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 import scala.collection.immutable
 

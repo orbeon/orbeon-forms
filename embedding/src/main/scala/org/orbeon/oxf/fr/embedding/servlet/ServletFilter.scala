@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.fr.embedding.servlet
 
-import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.http._
-import org.orbeon.oxf.servlet._
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.fr.embedding.*
+import org.orbeon.oxf.http.*
+import org.orbeon.oxf.servlet.*
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 

@@ -17,15 +17,15 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor._
+import org.orbeon.oxf.processor.*
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
 import org.orbeon.oxf.processor.serializer.{CachedSerializer, HttpSerializerBase}
 import org.orbeon.oxf.util.ContentHandlerWriter
 import org.orbeon.oxf.xml.XMLConstants.XSI_TYPE_QNAME
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiver}
 
-import java.io._
+import java.io.*
 
 
 /**

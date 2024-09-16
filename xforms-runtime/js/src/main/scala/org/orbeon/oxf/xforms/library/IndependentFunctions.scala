@@ -4,16 +4,16 @@ import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.ContentTypes.XmlContentType
-import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.MarkupUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, StaticXPath}
-import org.orbeon.oxf.xml.FunctionSupport._
+import org.orbeon.oxf.xml.FunctionSupport.*
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.oxf.xml.SaxonUtils.StringValueWithEquals
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 import scala.util.Try
 

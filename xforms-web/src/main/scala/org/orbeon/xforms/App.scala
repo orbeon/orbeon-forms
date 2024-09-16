@@ -19,7 +19,7 @@ import org.log4s.log4sjs.Log4sConfig.setLoggerThreshold
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomSupport
 import org.scalajs.dom
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.util.{Failure, Success}
 

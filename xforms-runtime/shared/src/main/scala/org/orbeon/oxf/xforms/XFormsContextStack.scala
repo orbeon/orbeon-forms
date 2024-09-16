@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.{StaticXPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsXPat
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{BindNode, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope

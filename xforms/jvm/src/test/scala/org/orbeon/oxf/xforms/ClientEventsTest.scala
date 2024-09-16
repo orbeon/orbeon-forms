@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xforms.event.ClientEvents
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.scalatestplus.junit.AssertionsForJUnit
 
 class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {

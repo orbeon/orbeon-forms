@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.controller
 
-import org.orbeon.oxf.servlet._
+import org.orbeon.oxf.servlet.*
 
 // For backward compatibility
 class AuthorizerServlet extends JavaxAuthorizerServlet

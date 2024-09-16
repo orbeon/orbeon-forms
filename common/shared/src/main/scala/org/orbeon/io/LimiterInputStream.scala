@@ -16,7 +16,7 @@ package org.orbeon.io
 import java.io.{FilterInputStream, InputStream}
 
 import org.orbeon.datatypes.MaximumSize
-import org.orbeon.datatypes.MaximumSize._
+import org.orbeon.datatypes.MaximumSize.*
 
 class LimiterInputStream(
   is           : InputStream,

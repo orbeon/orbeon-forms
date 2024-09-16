@@ -1,10 +1,10 @@
 package org.orbeon.oxf.xml
 
-import org.orbeon.oxf.xml.SBinaryDefaultFormats._
+import org.orbeon.oxf.xml.SBinaryDefaultFormats.*
 import sbinary.Operations.{fromByteArray, read, toByteArray, write}
-import sbinary._
+import sbinary.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // 2020-11-26: We used to use Java serialization with `Externalizable` to do the same thing, but

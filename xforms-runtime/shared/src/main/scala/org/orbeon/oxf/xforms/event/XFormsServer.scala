@@ -6,12 +6,12 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.{SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.{withLock, withUpdateResponse}
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, XFormsModelSubmissionSupport}
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.oxf.xml.{SAXStore, TeeXMLReceiver, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.xforms.XFormsNames.{XXFORMS_NAMESPACE_URI, XXFORMS_SHORT_PREFIX}

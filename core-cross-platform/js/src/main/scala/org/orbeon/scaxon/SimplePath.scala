@@ -13,17 +13,17 @@
  */
 package org.orbeon.scaxon
 
-import org.orbeon.dom._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.dom.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.parser.Token
 import org.orbeon.saxon.model.Type
-import org.orbeon.saxon.om._
-import org.orbeon.saxon.pattern._
+import org.orbeon.saxon.om.*
+import org.orbeon.saxon.pattern.*
 import org.orbeon.saxon.tree.iter.ListIterator
 
 import scala.collection.Seq
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // The idea of this is to provide simple path navigation operations on Saxon nodes, without creating

@@ -14,20 +14,20 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{CollectionUtils, IndentedLogger}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
-import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.control.*
+import org.orbeon.oxf.xforms.control.controls.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 
 import java.{util => ju}
 import scala.collection.{mutable => m}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 private class ControlIndex {

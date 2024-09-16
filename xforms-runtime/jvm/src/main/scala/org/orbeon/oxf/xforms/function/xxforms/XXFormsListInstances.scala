@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.xforms.XFormsId
 
 

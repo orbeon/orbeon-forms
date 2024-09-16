@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
-import org.orbeon.oxf.xforms.control.LHHASupport._
-import org.orbeon.oxf.xforms.control.XFormsControl._
+import org.orbeon.oxf.xforms.control.LHHASupport.*
+import org.orbeon.oxf.xforms.control.XFormsControl.*
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 trait ControlLHHASupport {

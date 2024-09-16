@@ -15,11 +15,11 @@ package org.orbeon.oxf.xforms.control
 
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.event.EventCollector
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.NodeInfoConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.NodeInfoConversions.*
+import org.orbeon.scaxon.SimplePath.*
 import org.scalatestplus.junit.AssertionsForJUnit
 
 class BindingTest extends DocumentTestBase with AssertionsForJUnit {

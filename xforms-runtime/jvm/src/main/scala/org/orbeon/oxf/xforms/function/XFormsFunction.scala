@@ -17,19 +17,19 @@ import org.orbeon.dom
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.XPath.compileExpressionWithStaticContext
 import org.orbeon.oxf.util.{PooledXPathExpression, XPathCache}
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeXPathAnalyzer}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.DefaultFunctionSupport
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 
 import java.util.{Locale, Iterator => JIterator}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 /**

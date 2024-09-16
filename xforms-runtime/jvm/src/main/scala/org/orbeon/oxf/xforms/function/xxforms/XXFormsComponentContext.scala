@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 
 class XXFormsComponentContext extends XFormsFunction {
   // Get the closest associated component control if any, then get its parent context if any, and then its nodeset

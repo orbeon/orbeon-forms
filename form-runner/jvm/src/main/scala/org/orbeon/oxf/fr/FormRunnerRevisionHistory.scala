@@ -2,14 +2,14 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.SimpleDataMigration.{FormDiff, diffSimilarXmlData}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{DateUtils, DateUtilsUsingSaxon, StringUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.{Constants, XFormsId}
 
 

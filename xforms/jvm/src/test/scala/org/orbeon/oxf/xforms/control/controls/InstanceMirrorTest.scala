@@ -15,9 +15,9 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
-import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xforms.control.controls.InstanceMirror.*
+import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl.*
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.scalatest.funspec.AnyFunSpecLike
 

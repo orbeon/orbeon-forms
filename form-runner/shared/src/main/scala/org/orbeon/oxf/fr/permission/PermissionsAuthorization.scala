@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.fr.permission
 
-import org.orbeon.oxf.externalcontext._
+import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 
 

@@ -13,17 +13,17 @@
  */
 package org.orbeon.oxf.fr
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.QName
-import org.orbeon.oxf.fr.Names._
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.fr.Names.*
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
-import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -32,11 +32,11 @@ import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.saxon.function.ProcessTemplateSupport
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import scala.xml.Elem
 

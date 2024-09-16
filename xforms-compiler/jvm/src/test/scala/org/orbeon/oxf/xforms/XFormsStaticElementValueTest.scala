@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.util.StaticXPath
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.scalatest.funspec.AnyFunSpec
 
 

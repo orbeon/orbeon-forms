@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.webapp
 
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 object RunMode {
 

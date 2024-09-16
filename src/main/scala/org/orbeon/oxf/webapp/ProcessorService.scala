@@ -24,7 +24,7 @@ import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.ContentTypes.TextHtmlContentTypeWithCharset
 import org.orbeon.oxf.util.{DynamicVariable, LoggerFactory}
-import org.orbeon.oxf.webapp.ProcessorService._
+import org.orbeon.oxf.webapp.ProcessorService.*
 
 import scala.util.control.NonFatal
 

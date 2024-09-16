@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory, XPathCache}
 import org.orbeon.saxon.function.{EnvironmentVariable, EnvironmentVariableAlwaysEnabled}
 import org.orbeon.xml.NamespaceMapping
 
-import java.io._
+import java.io.*
 import java.nio.file.{Files, Path, Paths}
 import scala.util.{Failure, Success}
 

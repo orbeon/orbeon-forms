@@ -19,10 +19,10 @@ import org.orbeon.oxf.externalcontext.WebAppContext
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.{ResourceManagerWrapper, WebAppResourceManagerImpl}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{Log4jSupport, LoggerFactory}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 // Orbeon web app initialization

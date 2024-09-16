@@ -14,26 +14,26 @@
 package org.orbeon.xforms
 
 import cats.data.NonEmptyList
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.log4s.Logger
 import org.orbeon.liferay.LiferaySupport
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
 import org.orbeon.xforms.facade.{AjaxServer, Events}
 import org.scalajs.dom
-import org.scalajs.dom.ext._
+import org.scalajs.dom.ext.*
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.collection.mutable
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers
 import scala.util.{Failure, Success}

@@ -14,7 +14,7 @@
 package org.orbeon.xml
 
 import java.{util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // Scala 3: was private constructor. Any better solution?

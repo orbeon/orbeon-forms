@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.controller
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element, QName}
-import org.orbeon.errorified.Exceptions._
+import org.orbeon.errorified.Exceptions.*
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
@@ -25,22 +25,22 @@ import org.orbeon.oxf.http.{HttpMethod, HttpRedirectException, HttpStatusCodeExc
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.processor.XPLConstants.{NULL_SERIALIZER_PROCESSOR_QNAME, OXF_PROCESSORS_NAMESPACE}
-import org.orbeon.oxf.processor._
-import org.orbeon.oxf.processor.pipeline.ast._
+import org.orbeon.oxf.processor.*
+import org.orbeon.oxf.processor.pipeline.ast.*
 import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.resources.ResourceNotFoundException
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.URLRewriterUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.URLRewriterUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.webapp.ProcessorService
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 
 import java.util.regex.Pattern
 import java.{util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

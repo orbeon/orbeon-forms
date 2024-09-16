@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.xforms.EventNames
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 
 import scala.collection.mutable
 

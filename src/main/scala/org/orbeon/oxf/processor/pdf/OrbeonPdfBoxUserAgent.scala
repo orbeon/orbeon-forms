@@ -22,11 +22,11 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.ImageSupport.{compressJpegImage, findImageOrientation, findTransformation, transformImage}
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.TryUtils.TryOps
 import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupportTrait, IndentedLogger, ResourceResolver, URLRewriterUtils}
 
-import java.io._
+import java.io.*
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.util.Locale

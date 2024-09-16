@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.processor
 
-import ProcessorImpl._
-import RegexpMatcher._
+import ProcessorImpl.*
+import RegexpMatcher.*
 import java.util.regex.Pattern
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl

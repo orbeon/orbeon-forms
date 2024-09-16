@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames

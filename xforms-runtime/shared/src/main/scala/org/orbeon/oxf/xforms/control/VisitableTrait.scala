@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
 import org.orbeon.oxf.xforms.state.ControlState

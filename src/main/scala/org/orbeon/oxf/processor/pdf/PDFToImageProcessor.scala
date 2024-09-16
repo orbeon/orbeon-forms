@@ -13,26 +13,26 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.icepdf.core.pobjects.{Page, Document => ICEDocument}
 import org.icepdf.core.util.GraphicsRenderingHints
 import org.orbeon.dom.{Element => OrbeonDomElem}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ProcessorImpl._
-import org.orbeon.oxf.processor._
+import org.orbeon.oxf.processor.ProcessorImpl.*
+import org.orbeon.oxf.processor.*
 import org.orbeon.oxf.processor.pdf.fop.JAIMonochromeBitmapConverter
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xml.XMLReceiver
 
-import java.awt.image._
+import java.awt.image.*
 import java.io.{File, OutputStream}
 import javax.imageio.{IIOImage, ImageIO, ImageTypeSpecifier, ImageWriteParam}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // This processor converts a PDF, provided as a binary document on its `data` input, into an image (possibly a

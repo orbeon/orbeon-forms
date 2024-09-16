@@ -17,7 +17,7 @@ import org.log4s.Logger
 import org.orbeon.facades.Bowser
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.html

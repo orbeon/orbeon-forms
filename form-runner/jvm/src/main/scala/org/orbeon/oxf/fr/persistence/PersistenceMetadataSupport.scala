@@ -2,19 +2,19 @@ package org.orbeon.oxf.fr.persistence
 
 import cats.Eval
 import org.orbeon.oxf.cache.{CacheApi, CacheSupport}
-import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.permission.{Operation, Permission, Permissions, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
 import org.orbeon.oxf.fr.persistence.relational.EncryptionAndIndexDetails
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.TryUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.TryUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 import scala.util.{Success, Try}
 

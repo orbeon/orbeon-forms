@@ -16,14 +16,14 @@ package org.orbeon.oxf.xforms.processor.handlers
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, LHHA}
-import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.control.*
+import org.orbeon.oxf.xforms.control.controls.*
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import java.{lang => jl}
 

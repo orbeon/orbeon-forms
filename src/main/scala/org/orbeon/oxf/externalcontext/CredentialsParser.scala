@@ -14,7 +14,7 @@
 package org.orbeon.oxf.externalcontext
 
 import io.circe.{Json, parser}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 import java.net.URLDecoder
 

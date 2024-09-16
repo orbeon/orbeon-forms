@@ -14,7 +14,7 @@
 package org.orbeon.datatypes
 
 import org.orbeon.oxf.util.NumericUtils
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 import scala.annotation.tailrec
 

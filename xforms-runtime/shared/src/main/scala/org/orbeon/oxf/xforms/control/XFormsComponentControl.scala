@@ -14,14 +14,14 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.FunctionContext
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.xforms.BindingContext
-import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, NestedPartAnalysis}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.{outputAriaDiff, outputPlaceholderDiff}
-import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
+import org.orbeon.oxf.xforms.control.controls.InstanceMirror.*
 import org.orbeon.oxf.xforms.control.controls.{InstanceMirror, XXFormsComponentRootControl, XXFormsDynamicControl}
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -38,9 +38,9 @@ import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node.ELEMENT_NODE
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // A component control with native support for a value

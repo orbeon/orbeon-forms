@@ -13,8 +13,8 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers
 
-import org.orbeon.oxf.xml.SaxSupport._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.SaxSupport.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, ContentHandler}

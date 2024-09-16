@@ -1,10 +1,10 @@
 package org.orbeon.oxf.fr.library
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.{AppForm, FormRunnerParams, Names, XMLNames}
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisForStaticMetadataAndProperties, model}
@@ -14,10 +14,10 @@ import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.xxforms.ComponentParamSupport
 import org.orbeon.saxon.om
-import org.orbeon.saxon.value._
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.saxon.value.*
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.xforms.XFormsId
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 

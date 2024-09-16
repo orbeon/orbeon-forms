@@ -16,23 +16,22 @@ package org.orbeon.oxf.fr.persistence.test
 import org.orbeon.dom
 import org.orbeon.dom.Document
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.fr.Version._
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
-import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.persistence.attachments.FilesystemCRUD
-import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.fr.persistence.db.*
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL, SQLite}
+import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.fr.{AppForm, FormOrData}
 import org.orbeon.oxf.http.{HttpRange, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatest.funspec.AnyFunSpecLike
 

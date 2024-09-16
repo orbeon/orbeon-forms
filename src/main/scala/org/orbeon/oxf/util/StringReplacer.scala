@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import io.circe.parser
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 
 // Factory for a string replacement function configured by a JSON map.

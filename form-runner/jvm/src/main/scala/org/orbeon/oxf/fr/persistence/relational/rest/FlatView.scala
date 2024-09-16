@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.fr.AppForm
-import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 import java.sql.Connection
 import scala.annotation.tailrec

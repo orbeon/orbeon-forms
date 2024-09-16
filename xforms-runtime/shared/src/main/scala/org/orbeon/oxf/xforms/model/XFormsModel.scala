@@ -13,22 +13,22 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentationType}
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.util.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.control.Controls
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.event._
-import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.event.*
+import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.state.InstancesControls
 import org.orbeon.oxf.xforms.submission.{BaseSubmission, SubmissionUtils, XFormsModelSubmission}
@@ -44,7 +44,7 @@ import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId, XFormsNames}
 
 import java.net.URI
 import java.{util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

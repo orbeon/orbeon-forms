@@ -1,7 +1,7 @@
 package org.orbeon.xbl
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
+import enumeratum.*
 import org.log4s.Logger
 import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.util.LoggerFactory

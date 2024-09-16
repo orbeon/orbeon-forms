@@ -15,14 +15,14 @@ package org.orbeon.oxf.fr
 
 import java.{util => ju}
 
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.URLFinder
 import org.orbeon.saxon.function.{PropertiesStartsWith, Property}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 trait FormRunnerPDF {
 

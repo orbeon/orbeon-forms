@@ -17,8 +17,8 @@ import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
-import shapeless.syntax.typeable._
+import org.orbeon.scaxon.SimplePath.*
+import shapeless.syntax.typeable.*
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 
 

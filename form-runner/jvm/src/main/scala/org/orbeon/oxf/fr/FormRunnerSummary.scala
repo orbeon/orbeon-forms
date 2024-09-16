@@ -15,17 +15,17 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataFormatVersionName, DataXml}
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.{properties, runtime}
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 import java.time.{LocalDateTime, ZoneId}
 import scala.concurrent.Await

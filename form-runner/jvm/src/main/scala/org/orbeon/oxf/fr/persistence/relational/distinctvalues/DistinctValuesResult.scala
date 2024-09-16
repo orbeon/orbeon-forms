@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.distinctvalues
 
 import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt.{ControlValues, DistinctValues, MetadataValues}
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.scaxon.NodeConversions
 

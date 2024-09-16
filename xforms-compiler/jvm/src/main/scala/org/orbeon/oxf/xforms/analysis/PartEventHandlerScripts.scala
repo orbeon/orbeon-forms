@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.xforms._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.xforms.*
+import org.orbeon.xforms.XFormsNames.*
 
 import scala.collection.mutable
 

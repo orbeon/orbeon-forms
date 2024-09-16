@@ -17,11 +17,11 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.scaxon.NodeInfoConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.oxf.xml.dom.Extensions.*
+import org.orbeon.scaxon.NodeInfoConversions.*
+import org.orbeon.scaxon.SimplePath.*
 
 import scala.collection.mutable
 

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.servlet
 
 import org.orbeon.oxf.logging.{LifecycleLogger, MinimalRequest}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.slf4j.LoggerFactory
 
 import java.util.concurrent.Semaphore

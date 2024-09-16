@@ -13,16 +13,16 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.oxf.xforms.analysis.controls.{ContainerControl, LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.{forwardAccessibilityAttributes, handleAriaAttributes}
-import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 // Default group handler

@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.xforms
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.Document
 import org.orbeon.io.StringBuilderWriter
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{IndentedLogger, NumberUtils, WhitespaceMatching}
 import org.orbeon.oxf.xforms.analysis.{IdGenerator, Metadata, XFormsAnnotator, XFormsExtractor}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.xforms.XXBLScope
 

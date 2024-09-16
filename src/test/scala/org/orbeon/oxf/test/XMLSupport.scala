@@ -15,7 +15,7 @@ package org.orbeon.oxf.test
 
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document => JDocument, Element => JElement}
-import org.orbeon.oxf.xml.TransformerUtils._
+import org.orbeon.oxf.xml.TransformerUtils.*
 import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.scalatestplus.junit.AssertionsForJUnit

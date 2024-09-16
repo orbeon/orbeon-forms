@@ -17,13 +17,13 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.dom.io.DocumentSource
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.xbl._
+import org.orbeon.oxf.xforms.xbl.*
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 /**

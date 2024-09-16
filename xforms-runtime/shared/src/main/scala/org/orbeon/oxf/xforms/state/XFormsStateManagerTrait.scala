@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms.state
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 import java.util.concurrent.TimeUnit

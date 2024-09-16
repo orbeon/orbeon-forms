@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.MarkupUtils.*
 
 object URLFinder {
 

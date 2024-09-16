@@ -1,6 +1,6 @@
 package org.orbeon.xforms
 
-import org.orbeon.jquery._
+import org.orbeon.jquery.*
 import org.scalajs.dom
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 

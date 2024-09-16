@@ -1,13 +1,13 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.datatypes.ExtendedLocationData
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.orbeon.oxf.util.StaticXPath
-import org.orbeon.oxf.util.Whitespace._
-import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.analysis.model.StaticBind._
+import org.orbeon.oxf.util.Whitespace.*
+import org.orbeon.oxf.xforms.analysis.*
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.*
 import org.orbeon.oxf.xml.dom.Extensions
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope

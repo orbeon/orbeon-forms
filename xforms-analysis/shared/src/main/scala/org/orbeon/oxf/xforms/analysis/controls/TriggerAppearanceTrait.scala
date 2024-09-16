@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
+import org.orbeon.xforms.XFormsNames.*
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis.*
 
 trait TriggerAppearanceTrait extends AppearanceTrait {
 

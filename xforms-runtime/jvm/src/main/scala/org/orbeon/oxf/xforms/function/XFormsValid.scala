@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsMIPFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.BooleanValue
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 /**
  * xf:valid() as xs:boolean

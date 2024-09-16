@@ -14,7 +14,7 @@
 package org.orbeon.xbl
 
 import org.log4s.Logger
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.XBL
@@ -22,9 +22,9 @@ import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.jquery.{JQueryEventObject, JQueryPromise}
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.scalajs.js
 import scala.scalajs.js.{Promise, UndefOr, timers, |}
 

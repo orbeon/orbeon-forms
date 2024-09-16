@@ -13,7 +13,7 @@
  */
 package org.orbeon.css
 
-import org.orbeon.css.CSSSelectorParser._
+import org.orbeon.css.CSSSelectorParser.*
 import org.scalatest.funspec.AnyFunSpec
 
 

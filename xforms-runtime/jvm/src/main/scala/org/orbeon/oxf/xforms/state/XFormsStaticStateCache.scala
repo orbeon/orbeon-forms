@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.state
 
-import org.orbeon.oxf.cache._
+import org.orbeon.oxf.cache.*
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.xforms.XFormsStaticState
 

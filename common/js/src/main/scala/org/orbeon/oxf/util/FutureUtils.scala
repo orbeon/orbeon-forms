@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.util
 
-import scala.async.Async._
+import scala.async.Async.*
 import scala.concurrent.duration.{FiniteDuration, _}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.scalajs.js.timers.setTimeout

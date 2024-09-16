@@ -15,7 +15,7 @@ package org.orbeon.oxf.util
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 
 import scala.collection.{AbstractIterator, Factory, mutable}
 import scala.language.{implicitConversions, reflectiveCalls}

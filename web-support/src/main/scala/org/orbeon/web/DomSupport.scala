@@ -1,7 +1,7 @@
 package org.orbeon.web
 
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.web.DomEventNames._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.web.DomEventNames.*
 import org.scalajs.dom
 import org.scalajs.dom.{document, html}
 

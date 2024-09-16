@@ -24,7 +24,7 @@ import org.orbeon.saxon.om
 import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.xml.NamespaceMapping
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 /**

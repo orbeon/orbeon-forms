@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.model.XFormsModel
-import org.orbeon.saxon.expr._
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.expr.*
+import org.orbeon.saxon.om.*
 
 /**
  * XForms instance() function.

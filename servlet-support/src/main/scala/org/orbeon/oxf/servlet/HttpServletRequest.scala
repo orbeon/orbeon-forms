@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.servlet
 
-import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.PathUtils.*
 import cats.data.NonEmptyList
 
 import java.io.BufferedReader
 import java.net.URI
 import java.{util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 object HttpServletRequest {

@@ -16,12 +16,12 @@ package org.orbeon.oxf.common
 import java.security.SignatureException
 
 import org.orbeon.dom.Document
-import org.orbeon.oxf.common.PEVersion._
+import org.orbeon.oxf.common.PEVersion.*
 import org.orbeon.oxf.processor.validation.SchemaValidationException
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.DateUtilsUsingSaxon
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.util.Try

@@ -13,7 +13,7 @@
  */
 package org.orbeon.xforms.rpc
 
-import io.circe.parser._
+import io.circe.parser.*
 import io.circe.{Decoder, Encoder, Json}
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, Constants, EventNames, Support}
 

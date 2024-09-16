@@ -13,30 +13,30 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsReplaceEvent, XXFormsValueChangedEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, ListenersTrait, XFormsEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeInfoConversions
-import org.orbeon.scaxon.SimplePath._
-import org.orbeon.scaxon.XPath._
+import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.scaxon.XPath.*
 import org.orbeon.xforms.BasicNamespaceMapping
 import org.orbeon.xml.NamespaceMapping
-import org.w3c.dom.Node._
+import org.w3c.dom.Node.*
 
 
 // Logic to mirror mutations between an outer and an inner instance

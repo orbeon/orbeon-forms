@@ -18,13 +18,13 @@ import java.{util => ju}
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.{RuntimeDependentFunction, SaxonUtils}
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.trans.XPathException
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_URI
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * XForms property() function.

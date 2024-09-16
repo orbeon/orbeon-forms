@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xml
 
 import sbinary.Operations.{read, write}
-import sbinary._
+import sbinary.*
 
 import java.io.UTFDataFormatException
 

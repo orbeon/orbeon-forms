@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
 import org.orbeon.oxf.xml.DependsOnContextItemIfSingleArgumentMissing
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om._
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.saxon.om.*
+import org.orbeon.scaxon.Implicits.*
 import shapeless.syntax.typeable.typeableOps
 
 

@@ -2,10 +2,10 @@ package org.orbeon.dom.tree
 
 import java.{lang => jl, util => ju}
 
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.xml.sax.Attributes
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 private object ConcreteElement {

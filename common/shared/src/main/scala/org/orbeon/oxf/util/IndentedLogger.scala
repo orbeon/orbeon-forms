@@ -17,7 +17,7 @@ import java.{lang => jl}
 
 import org.log4s
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.util.IndentedLogger._
+import org.orbeon.oxf.util.IndentedLogger.*
 
 import scala.annotation.varargs
 

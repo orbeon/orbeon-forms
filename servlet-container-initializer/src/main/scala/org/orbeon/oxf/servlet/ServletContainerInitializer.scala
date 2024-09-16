@@ -15,10 +15,10 @@ package org.orbeon.oxf.servlet
 
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 import java.{util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 class JavaxServletContainerInitializer extends javax.servlet.ServletContainerInitializer with CommonContainerInitializer {

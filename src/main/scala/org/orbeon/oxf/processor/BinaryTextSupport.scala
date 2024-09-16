@@ -16,11 +16,11 @@ package org.orbeon.oxf.processor
 import java.io.{BufferedInputStream, InputStream, InputStreamReader}
 import java.{lang => jl}
 
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.orbeon.oxf.common.Defaults
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.DateUtils
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.*
 import org.xml.sax.ContentHandler
 import org.xml.sax.helpers.AttributesImpl
 

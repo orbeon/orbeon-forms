@@ -19,15 +19,15 @@ import java.security.SignatureException
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.errorified.Exceptions
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl.{INPUT_DATA, OUTPUT_DATA}
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.processor.{DOMSerializer, SignatureVerifierProcessor}
 import org.orbeon.oxf.resources.{ResourceManagerWrapper, ResourceNotFoundException}
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.PipelineUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.PipelineUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{DateUtils, DateUtilsUsingSaxon}
 import org.orbeon.oxf.xml.ParserConfiguration
 import org.orbeon.oxf.xml.dom.IOSupport

@@ -14,12 +14,12 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
-import org.orbeon.oxf.fr.datamigration._
+import org.orbeon.oxf.fr.datamigration.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert}
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 
 object GridDataMigration {

@@ -13,17 +13,17 @@
   */
 package org.orbeon.oxf.servlet
 
-import org.orbeon.oxf.externalcontext._
+import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.http.{Headers, HttpMethod, StatusCode}
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 
-import java.io._
+import java.io.*
 import java.{util, util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 /*

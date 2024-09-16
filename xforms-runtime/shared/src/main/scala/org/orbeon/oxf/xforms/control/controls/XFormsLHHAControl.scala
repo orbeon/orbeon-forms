@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, ValueControl}
-import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsContextStackSupport}

@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.scaxon.SAXMachine
-import org.orbeon.scaxon.SAXEvents._
+import org.orbeon.scaxon.SAXEvents.*
 import javax.xml.namespace.QName
-import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.xforms.XFormsNames._
-import scala.jdk.CollectionConverters._
+import org.orbeon.oxf.xml.XMLConstants.*
+import org.orbeon.xforms.XFormsNames.*
+import scala.jdk.CollectionConverters.*
 import org.orbeon.oxf.xml.XMLReceiver
 
 // All the states we know

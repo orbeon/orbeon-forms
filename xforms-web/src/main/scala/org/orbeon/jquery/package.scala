@@ -18,7 +18,7 @@ import org.scalajs.jquery.{JQuery, JQueryEventObject, JQueryStatic}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 
 
 package object jquery {

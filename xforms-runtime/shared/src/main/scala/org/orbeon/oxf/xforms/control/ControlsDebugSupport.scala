@@ -17,11 +17,11 @@ import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xml.XMLReceiver
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.AtomicValue
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 object ControlsDebugSupport {

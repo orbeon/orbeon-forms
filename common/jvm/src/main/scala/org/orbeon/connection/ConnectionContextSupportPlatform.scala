@@ -5,7 +5,7 @@ import org.orbeon.oxf.util.{LoggerFactory, ServiceProviderSupport}
 import org.slf4j
 
 import java.net.URI
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 trait ConnectionContextSupportPlatform extends ConnectionContextSupportTrait {

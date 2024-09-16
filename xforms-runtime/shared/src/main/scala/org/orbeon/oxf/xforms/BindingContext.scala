@@ -17,7 +17,7 @@ import java.{util => ju}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControlFactory
@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsInstance, XFormsModel}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.saxon.om
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.language.postfixOps
 
 // Represent the XPath binding of an XForms object (control, action, etc.)

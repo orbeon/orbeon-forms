@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms._
-import org.orbeon.saxon.expr._
+import org.orbeon.oxf.xforms.*
+import org.orbeon.saxon.expr.*
 
 
 case class PathMapXPathAnalysis(

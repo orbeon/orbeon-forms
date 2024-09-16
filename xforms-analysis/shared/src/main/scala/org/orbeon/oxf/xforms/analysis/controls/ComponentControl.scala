@@ -1,8 +1,8 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.xbl.Scope

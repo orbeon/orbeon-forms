@@ -8,7 +8,7 @@ import org.orbeon.saxon.value.{AtomicValue, BooleanValue, DateTimeValue, DoubleV
 import org.orbeon.scaxon.Implicits
 
 import java.time.Instant
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 trait FunctionSupport2 extends SystemFunction {

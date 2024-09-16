@@ -20,7 +20,7 @@ import org.orbeon.oxf.xml.{DefaultFunctionSupport, FunctionSupport, RuntimeDepen
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 
 class GetRequestMethod extends DefaultFunctionSupport with RuntimeDependentFunction {

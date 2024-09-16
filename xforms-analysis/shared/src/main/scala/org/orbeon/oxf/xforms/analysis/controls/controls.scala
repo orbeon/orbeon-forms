@@ -1,12 +1,12 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SingleItemBinding, WithChildrenTrait}
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.xforms.EventNames
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 

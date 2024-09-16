@@ -13,38 +13,38 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import cats.syntax.option._
-import org.orbeon.dom._
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
+import cats.syntax.option.*
+import org.orbeon.dom.*
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysisTreeBuilder, NestedPartAnalysis, PartAnalysis, PartAnalysisBuilder}
-import org.orbeon.oxf.xforms.control.Controls._
-import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
-import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
+import org.orbeon.oxf.xforms.control.Controls.*
+import org.orbeon.oxf.xforms.control.controls.InstanceMirror.*
+import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl.*
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
 import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.NodeInfoConversions._
-import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.scaxon.NodeInfoConversions.*
+import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.xbl.Scope
 import org.w3c.dom.Node.ELEMENT_NODE
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * xxf:dynamic control

@@ -14,18 +14,18 @@
 package org.orbeon.oxf.properties
 
 import cats.Eval
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.log4s.Logger
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
 import org.orbeon.oxf.processor.{DOMSerializer, ProcessorImpl}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{LoggerFactory, PipelineUtils}
 
 import java.util.concurrent.Semaphore
 import java.{util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

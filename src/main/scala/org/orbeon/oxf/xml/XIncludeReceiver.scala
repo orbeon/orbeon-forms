@@ -13,22 +13,22 @@
  */
 package org.orbeon.oxf.xml
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.URIReferences
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
 import org.orbeon.oxf.processor.transformer.{TransformerURIResolver, XPathProcessor}
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.{LoggerFactory, XPath, XPathCache}
-import org.orbeon.oxf.xml.XIncludeReceiver._
-import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.XMLNames._
+import org.orbeon.oxf.xml.XIncludeReceiver.*
+import org.orbeon.oxf.xml.XMLConstants.*
+import org.orbeon.oxf.xml.XMLNames.*
 import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.saxon.om.ValueRepresentation
 import org.orbeon.xml.NamespaceMapping
-import org.xml.sax._
+import org.xml.sax.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 // Streaming XInclude processing

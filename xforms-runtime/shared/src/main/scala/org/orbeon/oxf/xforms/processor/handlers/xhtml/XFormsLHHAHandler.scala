@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import cats.syntax.option._
-import org.orbeon.oxf.util.CoreUtils._
+import cats.syntax.option.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaControlRef, LhhaPlacementType}
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
@@ -23,11 +23,11 @@ import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandl
 import org.orbeon.oxf.xml.SaxSupport.AttributesImplOps
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiver
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.Attributes
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 /**

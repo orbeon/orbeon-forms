@@ -20,11 +20,11 @@ import com.drew.metadata.gif.GifHeaderDirectory
 import com.drew.metadata.jpeg.JpegDirectory
 import com.drew.metadata.png.PngDirectory
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
+import enumeratum.*
 import org.orbeon.datatypes.Mediatype
 
 import java.io.InputStream
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // Functions to extract image metadata from a stream

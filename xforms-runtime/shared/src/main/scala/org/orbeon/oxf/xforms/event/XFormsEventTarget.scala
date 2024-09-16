@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.datatypes.LocationData
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.XFormsModel

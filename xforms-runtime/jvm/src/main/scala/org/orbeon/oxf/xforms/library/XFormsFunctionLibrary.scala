@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.xforms.library
 
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.oxf.xforms.function.Last
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
-import org.orbeon.saxon.`type`.BuiltInAtomicType._
+import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.expr.StaticProperty._
-import org.orbeon.saxon.functions._
+import org.orbeon.saxon.expr.StaticProperty.*
+import org.orbeon.saxon.functions.*
 import org.orbeon.saxon.om.NamespaceConstant
-import org.orbeon.saxon.value._
-import org.orbeon.saxon._
+import org.orbeon.saxon.value.*
+import org.orbeon.saxon.*
 
 /**
  * Function library for XPath expressions in XForms.

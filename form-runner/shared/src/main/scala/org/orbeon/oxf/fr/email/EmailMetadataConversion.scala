@@ -2,7 +2,7 @@ package org.orbeon.oxf.fr.email
 
 import org.orbeon.oxf.fr.email.EmailMetadata.Legacy.{FormField, FormFieldRole}
 import org.orbeon.oxf.fr.email.EmailMetadata.{HeaderName, Template, TemplateValue}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.saxon.function.ProcessTemplateSupport
 
 

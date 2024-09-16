@@ -14,44 +14,44 @@
 package org.orbeon.oxf.fr
 
 import cats.effect.IO
-import cats.syntax.option._
+import cats.syntax.option.*
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
+import enumeratum.*
 import org.orbeon.connection.{AsyncConnectionResult, ConnectionContextSupport, ConnectionResult, StreamedContent}
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.common
 import org.orbeon.oxf.common.{Defaults, OXFException}
-import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.fr.FormRunnerCommon._
+import org.orbeon.oxf.externalcontext.*
+import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.FormModel
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import Version.OrbeonFormDefinitionVersion
-import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod}
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.ContentTypes.isTextOrXMLOrJSONContentType
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.MarkupUtils.*
+import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport}
 
 import java.net.URI
 import java.{util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 sealed trait FormOrData extends EnumEntry with Lowercase

@@ -2,13 +2,13 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary
 import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{FileUtils, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xml.NamespaceMapping
 
 

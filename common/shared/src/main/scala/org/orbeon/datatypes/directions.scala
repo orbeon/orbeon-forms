@@ -14,7 +14,7 @@
 package org.orbeon.datatypes
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
+import enumeratum.*
 
 sealed trait Direction extends EnumEntry with Lowercase
 

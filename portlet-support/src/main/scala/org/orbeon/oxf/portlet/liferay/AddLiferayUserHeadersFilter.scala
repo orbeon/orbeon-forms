@@ -4,8 +4,8 @@ import cats.data.NonEmptyList
 import org.orbeon.oxf.portlet.{RequestPrependHeaders, RequestRemoveHeaders}
 import org.orbeon.oxf.util.CollectionUtils
 
-import javax.portlet.filter._
-import javax.portlet._
+import javax.portlet.filter.*
+import javax.portlet.*
 
 
 class AddLiferayUserHeadersFilter

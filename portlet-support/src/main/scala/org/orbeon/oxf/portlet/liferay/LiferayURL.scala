@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
-import javax.portlet._
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util._
+import javax.portlet.*
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.wsrp.WSRPSupport
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // Liferay-specific portlet support

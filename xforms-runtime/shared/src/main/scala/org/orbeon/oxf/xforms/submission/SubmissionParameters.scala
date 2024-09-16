@@ -4,14 +4,14 @@ import org.orbeon.dom.QName
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.http.{BasicCredentials, HttpMethod}
 import org.orbeon.oxf.util.ContentTypes
-import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.MarkupUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, TunnelProperties}
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEvent}
-import org.orbeon.oxf.xforms.submission.SubmissionUtils._
+import org.orbeon.oxf.xforms.submission.SubmissionUtils.*
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions.DomElemOps
 import org.orbeon.saxon.om

@@ -21,17 +21,17 @@ import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.{Headers, HttpRanges, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.XFormsAssetPaths._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.*
+import org.orbeon.oxf.xforms.XFormsAssetPaths.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquireLock
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.oxf.xforms.xbl.{BindingLoader, GlobalBindingIndex}
 import org.orbeon.xforms.{Constants, XFormsCrossPlatformSupport}
 
-import java.io._
+import java.io.*
 import java.net.URI
 import scala.collection.immutable.ListSet
 import scala.util.control.NonFatal

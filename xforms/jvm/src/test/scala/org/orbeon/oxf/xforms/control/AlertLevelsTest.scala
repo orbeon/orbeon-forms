@@ -17,7 +17,7 @@ import org.junit.Test
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionSupport
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.analysis.model.ValidationLevel
 

@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xml
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StaticXPath.{GlobalConfiguration, SaxonConfiguration, ValueRepresentationType}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.saxon.expr.parser.ExpressionTool
 import org.orbeon.saxon.expr.sort.{CodepointCollator, GenericAtomicComparer}
 import org.orbeon.saxon.expr.{EarlyEvaluationContext, Expression}
@@ -28,16 +28,16 @@ import org.orbeon.saxon.ma.map.HashTrieMap
 import org.orbeon.saxon.ma.parray.ImmList
 import org.orbeon.saxon.model.{AtomicType, BuiltInType, Converter, Type}
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
 import org.orbeon.saxon.tree.iter.{EmptyIterator, ListIterator, SingletonIterator}
 import org.orbeon.saxon.utils.Configuration
-import org.orbeon.saxon.value._
+import org.orbeon.saxon.value.*
 import org.orbeon.scaxon.Implicits
-import org.w3c.dom.Node._
+import org.w3c.dom.Node.*
 
 import java.net.URI
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.Try
 import scala.util.control.Breaks.{break, breakable}
 

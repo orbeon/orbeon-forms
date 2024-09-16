@@ -13,18 +13,18 @@
  */
 package org.orbeon.builder
 
-import autowire._
+import autowire.*
 import enumeratum.EnumEntry.Hyphencase
-import enumeratum._
+import enumeratum.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.jquery.JQuery
 
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 
 object SectionGridEditor {

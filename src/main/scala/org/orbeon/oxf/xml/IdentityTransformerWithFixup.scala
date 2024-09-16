@@ -2,7 +2,7 @@ package org.orbeon.oxf.xml
 
 import javax.xml.transform.{Result, Source}
 
-import org.orbeon.saxon.event._
+import org.orbeon.saxon.event.*
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.{Configuration, Controller}
 import org.xml.sax.SAXParseException

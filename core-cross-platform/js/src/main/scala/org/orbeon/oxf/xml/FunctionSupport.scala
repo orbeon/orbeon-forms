@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.om
 
 

@@ -18,11 +18,11 @@ import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.xml.JXQName._
+import org.orbeon.oxf.xml.JXQName.*
 import org.orbeon.oxf.xml.ParserConfiguration.XIncludeOnly
 import org.orbeon.oxf.xml.{JXQName, XMLParsing, XMLReceiver}
 import org.orbeon.scaxon.DocumentAndElementsCollector
-import org.orbeon.scaxon.SAXEvents._
+import org.orbeon.scaxon.SAXEvents.*
 import org.scalatestplus.junit.AssertionsForJUnit
 
 

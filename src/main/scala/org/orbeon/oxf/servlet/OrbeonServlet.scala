@@ -16,12 +16,12 @@ package org.orbeon.oxf.servlet
 import org.log4s
 import org.orbeon.oxf.externalcontext.ServletWebAppContext
 import org.orbeon.oxf.http.{PropertiesApacheHttpClient, StatusCode}
-import org.orbeon.oxf.pipeline.api._
+import org.orbeon.oxf.pipeline.api.*
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
-import org.orbeon.oxf.webapp.ServletPortlet._
+import org.orbeon.oxf.webapp.ServletPortlet.*
 import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 // For backward compatibility
 class OrbeonServletDelegate extends JavaxOrbeonServlet

@@ -15,26 +15,26 @@ package org.orbeon.oxf.xforms.submission
 
 import cats.effect.IO
 import org.orbeon.connection.ConnectionResult
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.MipName.Relevant
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
 import org.orbeon.oxf.xml.dom.Extensions
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.om
 import org.orbeon.xforms.RelevanceHandling
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
 import scala.collection.mutable

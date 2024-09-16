@@ -2,7 +2,7 @@ package org.orbeon.dom.tree
 
 import java.{lang => jl, util => ju}
 
-import org.orbeon.dom._
+import org.orbeon.dom.*
 
 abstract class AbstractBranch extends AbstractNode with Branch {
 

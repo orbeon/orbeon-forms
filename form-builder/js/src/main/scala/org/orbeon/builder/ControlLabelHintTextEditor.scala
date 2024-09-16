@@ -14,23 +14,23 @@
 
 package org.orbeon.builder
 
-import autowire._
+import autowire.*
 import cats.Eval
-import enumeratum._
+import enumeratum.*
 import enumeratum.EnumEntry.Lowercase
-import org.orbeon.builder.facade.JQueryTooltip._
-import org.orbeon.builder.facade._
+import org.orbeon.builder.facade.JQueryTooltip.*
+import org.orbeon.builder.facade.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
 import org.scalajs.dom.document
 import org.scalajs.jquery.{JQuery, JQueryCallback, JQueryEventObject}
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
 

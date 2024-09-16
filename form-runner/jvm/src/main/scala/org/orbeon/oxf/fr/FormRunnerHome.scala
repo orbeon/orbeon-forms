@@ -14,18 +14,18 @@
 package org.orbeon.oxf.fr
 
 import io.circe.{Json, parser}
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerPersistence.findProvider
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.DateUtilsUsingSaxon
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringReplacer._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringReplacer.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 
 import scala.collection.{immutable => i}
 import scala.util.Try

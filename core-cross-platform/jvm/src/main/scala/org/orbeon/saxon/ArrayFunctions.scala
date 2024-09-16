@@ -15,12 +15,12 @@ package org.orbeon.saxon
 
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, XMLConstants}
-import org.orbeon.saxon.`type`._
+import org.orbeon.saxon.`type`.*
 import org.orbeon.saxon.expr.StaticProperty.{ALLOWS_ZERO_OR_MORE, EXACTLY_ONE}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator, SingletonIterator, ValueRepresentation}
-import org.orbeon.saxon.value._
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.saxon.value.*
+import org.orbeon.scaxon.Implicits.*
 
 
 trait ArrayFunction extends FunctionSupport

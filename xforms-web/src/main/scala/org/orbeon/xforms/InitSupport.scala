@@ -13,33 +13,33 @@
   */
 package org.orbeon.xforms
 
-import io.circe.generic.auto._
+import io.circe.generic.auto.*
 import io.circe.parser.decode
 import org.log4s.Logger
 import org.orbeon.facades.{Bowser, Mousetrap}
-import org.orbeon.liferay._
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.liferay.*
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
 import org.orbeon.xforms.StateHandling.StateResult
-import org.orbeon.xforms.facade._
+import org.orbeon.xforms.facade.*
 import org.orbeon.xforms.rpc.Initializations
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import java.io.StringWriter
 import scala.collection.{mutable => m}
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 

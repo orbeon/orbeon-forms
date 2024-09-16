@@ -14,18 +14,18 @@
 package org.orbeon.xforms.rpc
 
 import cats.data.NonEmptyList
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.oxf.http.StatusCode.{LoginTimeOut, ServiceUnavailable}
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.xforms
 import org.orbeon.xforms.AjaxClient.handleFailure
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalajs.dom.FormData
 import org.scalajs.dom.experimental.AbortController
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.{timers, |}

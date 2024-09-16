@@ -1,6 +1,6 @@
 package org.orbeon.oxf.xml
 
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.saxon.expr.parser.RetainedStaticContext
 import org.orbeon.saxon.expr.{Expression, OperandUsage, StaticContext}
 import org.orbeon.saxon.functions.registry.BuiltInFunctionSet.Entry

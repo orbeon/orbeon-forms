@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.http
 
-import enumeratum._
+import enumeratum.*
 import org.orbeon.connection.{ConnectionContextSupport, StreamedContent}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 import java.io.InputStream
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 
 case class HttpClientSettings(

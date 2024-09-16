@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
-import javax.portlet._
+import javax.portlet.*
 import com.liferay.portal.kernel.language.LanguageUtil
 import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSerializer, Organization, ParametrizedRole, SimpleRole, UserAndGroup}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 trait LiferayUser {
   // Return Liferay user, group and role information as headers. There can be multiple role headers.

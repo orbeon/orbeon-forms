@@ -1,6 +1,6 @@
 package org.orbeon.oxf.util
 
-import org.parboiled2._
+import org.parboiled2.*
 
 import java.util.concurrent.ConcurrentHashMap
 import scala.util.{Failure, Success}

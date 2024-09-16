@@ -15,9 +15,9 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
-import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.control.controls.*
 import org.orbeon.oxf.xforms.event.XFormsEvents.{DOM_FOCUS_IN, DOM_FOCUS_OUT}
-import org.orbeon.oxf.xforms.event._
+import org.orbeon.oxf.xforms.event.*
 
 // Handle control focus
 object Focus {

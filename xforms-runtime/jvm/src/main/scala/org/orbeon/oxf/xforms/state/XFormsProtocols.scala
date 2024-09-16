@@ -16,14 +16,14 @@ package org.orbeon.oxf.xforms.state
 import org.orbeon.dom.{Document, Namespace, QName}
 import org.orbeon.oxf.util.PathMatcher
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
-import org.orbeon.oxf.xforms.state.XFormsCommonBinaryFormats._
-import org.orbeon.oxf.xml.SBinaryDefaultFormats._
+import org.orbeon.oxf.xforms.state.XFormsCommonBinaryFormats.*
+import org.orbeon.oxf.xml.SBinaryDefaultFormats.*
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.LocationDocumentSource
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.runtime.{DelayedEvent, SimplePropertyValue}
-import sbinary.Operations._
-import sbinary._
+import sbinary.Operations.*
+import sbinary.*
 
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult

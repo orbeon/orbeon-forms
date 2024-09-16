@@ -14,19 +14,19 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.{AboveBelow, Direction}
-import org.orbeon.oxf.fb.UndoAction._
+import org.orbeon.oxf.fb.UndoAction.*
 import org.orbeon.oxf.fr.Cell.{findOriginCell, nonOverflowingNeighbors}
-import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.NodeInfoCell._
+import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.NodeInfoCell.*
 import org.orbeon.oxf.fr.{Cell, FormRunner, FormRunnerDocContext, GridModel}
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.SimplePath.*
 
 
 /*

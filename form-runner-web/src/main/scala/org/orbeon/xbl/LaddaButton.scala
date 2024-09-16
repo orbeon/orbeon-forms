@@ -14,7 +14,7 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.Ladda
-import org.orbeon.jquery._
+import org.orbeon.jquery.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient}
 import org.scalajs.dom.html

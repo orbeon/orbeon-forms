@@ -17,7 +17,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.control.ControlLocalSupport.XFormsControlLocal
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl, XFormsNoSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer

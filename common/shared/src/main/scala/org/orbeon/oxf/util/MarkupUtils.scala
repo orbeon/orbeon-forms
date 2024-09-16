@@ -15,7 +15,7 @@ package org.orbeon.oxf.util
 
 import java.{lang => jl}
 
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 

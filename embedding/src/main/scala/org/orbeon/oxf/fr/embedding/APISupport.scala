@@ -18,17 +18,17 @@ import org.apache.commons.io.IOUtils
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.connection.{BufferedContent, Content, StreamedContent}
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
-import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
-import org.orbeon.oxf.http._
+import org.orbeon.oxf.http.*
 import org.orbeon.oxf.servlet.{HttpServletRequest, HttpServletResponse}
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.MarkupUtils.*
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory

@@ -1,6 +1,6 @@
 package org.orbeon.dom.tree
 
-import org.orbeon.dom._
+import org.orbeon.dom.*
 
 class ConcreteAttribute(qname: QName, var value: String)
   extends AbstractNode with Attribute with WithParent with WithData {

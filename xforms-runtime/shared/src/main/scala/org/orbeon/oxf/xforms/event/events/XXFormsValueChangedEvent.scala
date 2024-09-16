@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo

@@ -16,13 +16,13 @@ package org.orbeon.oxf.xml.dom
 import java.net.URI
 import java.{util => ju}
 
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper}
 import org.xml.sax.helpers.AttributesImpl
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 object Extensions {

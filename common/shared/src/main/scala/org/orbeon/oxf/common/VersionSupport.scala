@@ -1,6 +1,6 @@
 package org.orbeon.oxf.common
 
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 
 object VersionSupport {

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.sxpath.IndependentContext
 
 import java.util.Locale

@@ -13,8 +13,8 @@
   */
 package org.orbeon.xforms
 
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.Constants._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.xforms.Constants.*
 import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom
 import org.scalajs.dom.raw

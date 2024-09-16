@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.analysis.model.Types
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.model.{BuiltInAtomicType, SchemaType, Type, Untyped}
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 import org.orbeon.saxon.value.UntypedAtomicValue
 import org.orbeon.xforms.XFormsNames
 

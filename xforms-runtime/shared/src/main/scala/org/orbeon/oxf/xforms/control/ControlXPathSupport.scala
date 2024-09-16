@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.datatypes.LocationData
-import cats.syntax.option._
+import cats.syntax.option.*
 
 import java.{util => ju}
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.{FunctionContext, XPathCache}
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.XPathErrorDetails
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
@@ -31,7 +31,7 @@ import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xml.NamespaceMapping
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl.RendererBaseUriAttributeName
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
-import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.XMLConstants.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.Constants.DocumentId
 import org.orbeon.xforms.Namespaces
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.{Attributes, Locator}
 
 

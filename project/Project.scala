@@ -1,7 +1,7 @@
 package org.orbeon.sbt
 
 import sbt.FilesInfo.{exists, lastModified}
-import sbt.Keys._
+import sbt.Keys.*
 import sbt.{Def, _}
 
 object Compat {

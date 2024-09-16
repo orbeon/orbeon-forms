@@ -2,7 +2,7 @@ package org.orbeon.oxf.fr
 
 import org.log4s
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, SecureUtils}
 
 

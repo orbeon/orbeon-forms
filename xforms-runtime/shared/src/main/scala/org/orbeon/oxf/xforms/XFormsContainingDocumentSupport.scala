@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import cats.effect.IO
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.log4s
 import org.log4s.LogLevel
 import org.orbeon.datatypes.{LocationData, MaximumSize}
@@ -24,20 +24,20 @@ import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
+import org.orbeon.oxf.xforms.XFormsProperties.*
 import org.orbeon.oxf.xforms.action.actions.XFormsDispatchAction
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
-import org.orbeon.oxf.xforms.event.ClientEvents._
+import org.orbeon.oxf.xforms.event.ClientEvents.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.event._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
+import org.orbeon.oxf.xforms.event.*
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
@@ -45,11 +45,11 @@ import org.orbeon.oxf.xforms.state.{LockResponse, RequestParameters, XFormsState
 import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic, UploadSupport}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.Constants.FormId
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.orbeon.xforms.runtime.{DelayedEvent, XFormsObject}
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import java.net.URI
 import java.util.concurrent.locks.Lock

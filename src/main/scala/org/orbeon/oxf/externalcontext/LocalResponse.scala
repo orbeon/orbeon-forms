@@ -18,7 +18,7 @@ import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, StatusCode}
 
-import java.io._
+import java.io.*
 import scala.collection.mutable
 
 

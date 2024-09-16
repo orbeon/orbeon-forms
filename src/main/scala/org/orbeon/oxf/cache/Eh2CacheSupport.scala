@@ -13,12 +13,12 @@
   */
 package org.orbeon.oxf.cache
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import net.sf.ehcache
 import net.sf.ehcache.CacheManager
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 
 import java.io
 import scala.util.control.NonFatal

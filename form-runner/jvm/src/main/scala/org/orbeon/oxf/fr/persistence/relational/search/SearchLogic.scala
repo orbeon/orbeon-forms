@@ -17,19 +17,19 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, Organization, UserAndGro
 import org.orbeon.oxf.fr.SearchVersion
 import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
-import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.relational.Statement._
+import org.orbeon.oxf.fr.persistence.relational.Statement.*
 import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationId, OrganizationSupport}
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata.LastModified
-import org.orbeon.oxf.fr.persistence.relational.search.adt._
-import org.orbeon.oxf.fr.persistence.relational.search.part._
+import org.orbeon.oxf.fr.persistence.relational.search.adt.*
+import org.orbeon.oxf.fr.persistence.relational.search.part.*
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.{Document => _, _}
 

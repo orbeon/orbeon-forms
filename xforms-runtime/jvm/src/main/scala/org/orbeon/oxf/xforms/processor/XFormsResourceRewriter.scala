@@ -14,20 +14,20 @@
 
 package org.orbeon.oxf.xforms.processor
 
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.io.{CharsetNames, IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.TryUtils._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.TryUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils, URLRewriterUtils}
 import org.orbeon.oxf.xforms.AssetPath
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
-import java.io._
+import java.io.*
 import java.util.regex.Matcher
 import scala.util.Try
 import scala.util.control.NonFatal

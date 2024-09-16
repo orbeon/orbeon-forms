@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.control.Controls.{BindingUpdater, ControlsIterator}
-import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsRepeatIterationControl, XFormsSelect1Control}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsRefreshDoneEvent

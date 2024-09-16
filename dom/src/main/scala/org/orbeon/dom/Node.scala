@@ -4,7 +4,7 @@ import org.orbeon.dom.io.{OutputFormat, XMLWriter}
 import org.orbeon.dom.tree.{AbstractNode, WithParent}
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 import java.{util => ju, lang => jl}
 

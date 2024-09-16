@@ -18,7 +18,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, WithChildrenTrait}
 import org.orbeon.oxf.xml.XMLConstants
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 

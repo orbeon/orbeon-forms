@@ -20,7 +20,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.GetRequestHeaderSupport
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.StringValue
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 class GetRequestParameterTryXFormsDocument extends RequestFunction {
 

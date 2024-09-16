@@ -18,40 +18,40 @@ import io.circe.parser
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.datatypes.{AboveBelow, Direction, MediatypeRange}
-import org.orbeon.oxf.fb.FormBuilder._
+import org.orbeon.oxf.fb.FormBuilder.*
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
-import org.orbeon.oxf.fb.UndoAction._
+import org.orbeon.oxf.fb.UndoAction.*
 import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.{allLangs, findControlByName, formRunnerProperty}
 import org.orbeon.oxf.fr.Names.FormBinds
-import org.orbeon.oxf.fr.NodeInfoCell._
+import org.orbeon.oxf.fr.NodeInfoCell.*
 import org.orbeon.oxf.fr.XMLNames.{FRServiceCallTest, XFBindTest, XFSendTest}
-import org.orbeon.oxf.fr._
-import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.*
+import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.process.SimpleProcess.{currentXFormsDocumentId, evaluateString}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{ContentTypes, Mediatypes, PathUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.action.actions.XXFormsInvalidateInstanceAction
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor.*
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.QNameValue
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeConversions
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 

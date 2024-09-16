@@ -1,10 +1,10 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.model.InstanceCaching
-import org.orbeon.oxf.xforms.model.XFormsInstance._
+import org.orbeon.oxf.xforms.model.XFormsInstance.*
 
 
 // TODO: This implementation doesn't yet handle `timeToLive`.

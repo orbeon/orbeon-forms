@@ -16,9 +16,9 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.model.DataModel

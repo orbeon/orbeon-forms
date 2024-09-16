@@ -2,7 +2,7 @@ package org.orbeon.dom
 
 import java.{util => ju}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * `Branch` interface defines the common behaviour for Nodes which

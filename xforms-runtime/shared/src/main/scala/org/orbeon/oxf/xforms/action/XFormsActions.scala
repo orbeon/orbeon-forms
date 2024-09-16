@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.action
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.xforms.action.actions._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.xforms.action.actions.*
+import org.orbeon.xforms.XFormsNames.*
 
 object XFormsActions {
 

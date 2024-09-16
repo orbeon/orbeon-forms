@@ -15,11 +15,11 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.saxon.om
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 
 
 trait SelectionControlTrait

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunnerHome._
+import org.orbeon.oxf.fr.FormRunnerHome.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.util.Success

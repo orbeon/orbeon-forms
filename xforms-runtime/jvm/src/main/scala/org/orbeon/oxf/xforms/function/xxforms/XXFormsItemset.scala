@@ -20,8 +20,8 @@ import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.Implicits._
-import shapeless.syntax.typeable._
+import org.orbeon.scaxon.Implicits.*
+import shapeless.syntax.typeable.*
 
 
 class XXFormsItemset extends XFormsFunction {

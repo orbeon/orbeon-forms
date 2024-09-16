@@ -1,32 +1,32 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.datatypes.ExtendedLocationData
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.http.BasicCredentials
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.MarkupUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.Whitespace.Policy
 import org.orbeon.oxf.util.{Modifier, StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsProperties.ExposeXpathTypesProperty
 import org.orbeon.oxf.xforms.XFormsStaticElementValue
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
-import org.orbeon.oxf.xforms.analysis.EventHandler._
-import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.analysis.EventHandler.*
+import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.{TypeMIP, WhitespaceMIP, XPathMIP}
-import org.orbeon.oxf.xforms.analysis.model._
+import org.orbeon.oxf.xforms.analysis.model.*
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.xbl.CommonBinding
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.StringLiteral
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope

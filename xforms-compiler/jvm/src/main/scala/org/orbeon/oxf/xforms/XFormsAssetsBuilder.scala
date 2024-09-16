@@ -17,8 +17,8 @@ import io.circe.{Json, JsonObject, parser}
 import org.orbeon.dom.QName
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.dom.Extensions
 
 

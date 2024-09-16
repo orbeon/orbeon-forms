@@ -16,8 +16,8 @@ package org.orbeon.oxf.util
 import java.{lang => jl}
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
-import org.orbeon.oxf.util.StringUtils._
+import enumeratum.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.saxon
 
 object Whitespace  {

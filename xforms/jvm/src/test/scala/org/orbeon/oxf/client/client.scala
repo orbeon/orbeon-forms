@@ -14,24 +14,24 @@
 package org.orbeon.oxf.client
 
 import org.junit.{After, AfterClass, BeforeClass}
-import org.openqa.selenium._
+import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeDriverService
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.openqa.selenium.support.ui.Select
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.Constants.ComponentSeparatorString
-import org.scalatest.concurrent.Eventually._
+import org.scalatest.concurrent.Eventually.*
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.time._
+import org.scalatest.time.*
 import org.scalatestplus.selenium.WebBrowser
 
 import java.net.URL
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // Basic client API

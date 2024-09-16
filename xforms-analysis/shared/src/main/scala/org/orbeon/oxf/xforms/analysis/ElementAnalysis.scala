@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, RootControl, VariableAnalysisTrait, VariableTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.{Extensions, XmlExtendedLocationData}
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.analysis.Phase
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsId, XFormsNames}

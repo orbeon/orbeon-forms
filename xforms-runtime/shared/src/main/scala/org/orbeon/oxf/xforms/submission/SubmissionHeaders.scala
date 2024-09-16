@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.submission
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.XFormsContextStackSupport._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.XFormsContextStackSupport.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
 import org.orbeon.oxf.xforms.analysis.{WithChildrenTrait, XPathErrorDetails}
 import org.orbeon.oxf.xforms.analysis.controls.{HeaderControl, WithExpressionOrConstantTrait}

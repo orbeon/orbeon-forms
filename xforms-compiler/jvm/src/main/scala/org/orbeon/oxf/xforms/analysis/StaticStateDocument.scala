@@ -4,7 +4,7 @@ import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.util.NumberUtils
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.{DigestContentHandler, EncodeDecode, TransformerUtils}
 import org.orbeon.xforms.XFormsNames.{STATIC_STATE_PROPERTIES_QNAME, XBL_XBL_QNAME}
 

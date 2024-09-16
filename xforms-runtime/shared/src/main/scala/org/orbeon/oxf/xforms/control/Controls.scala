@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.DynamicVariable
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.control.controls.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.state.{ControlState, InstanceState, InstancesControls}
@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 object Controls {

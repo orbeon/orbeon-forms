@@ -1,6 +1,6 @@
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.scalatest.funspec.AnyFunSpecLike
 

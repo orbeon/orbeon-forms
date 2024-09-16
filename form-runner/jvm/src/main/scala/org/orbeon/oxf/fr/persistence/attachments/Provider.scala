@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.attachments
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
+import enumeratum.*
 
 sealed trait Provider extends EnumEntry with Lowercase with CRUDMethods
 

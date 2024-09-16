@@ -13,30 +13,30 @@
  */
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.FormRunnerCommon.{frc, spc}
-import org.orbeon.oxf.fr.FormRunnerPersistence._
-import org.orbeon.oxf.fr.Names._
+import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.FormRunnerCommon.frc
+import org.orbeon.oxf.fr.FormRunnerPersistence.*
+import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
-import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.permission.ModeType
-import org.orbeon.oxf.fr.process.ProcessInterpreter._
+import org.orbeon.oxf.fr.process.ProcessInterpreter.*
 import org.orbeon.oxf.http.{Headers, HttpMethod}
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.saxon.functions.EscapeURI
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.RelevanceHandling
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 
 import java.net.URI
 import scala.language.postfixOps

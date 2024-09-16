@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ProcessorImpl._
+import org.orbeon.oxf.processor.ProcessorImpl.*
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorOutput}
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils, XPath}

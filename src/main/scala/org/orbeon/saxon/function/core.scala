@@ -21,7 +21,7 @@ import org.orbeon.oxf.xml.{DefaultFunctionSupport, RuntimeDependentFunction, Sax
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 class Property extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): AtomicValue =

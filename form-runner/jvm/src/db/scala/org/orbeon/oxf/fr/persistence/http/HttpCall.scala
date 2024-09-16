@@ -26,13 +26,13 @@ import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, SearchVersion, Version}
-import org.orbeon.oxf.http.HttpMethod._
-import org.orbeon.oxf.http._
+import org.orbeon.oxf.http.HttpMethod.*
+import org.orbeon.oxf.http.*
 import org.orbeon.oxf.test.TestHttpClient
-import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.{Connection, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger}
 import org.orbeon.oxf.xml.dom.{Comparator, IOSupport}
-import org.scalatest.Assertions._
+import org.scalatest.Assertions.*
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.net.URI

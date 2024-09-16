@@ -5,7 +5,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 

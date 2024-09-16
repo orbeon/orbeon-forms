@@ -20,15 +20,15 @@ import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.processor.{DOMSerializer, ProcessorImpl, XPLConstants}
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PipelineUtils
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.{FunctionSupportJava, TransformerUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 import org.orbeon.saxon.trans.XPathException
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 
 /**

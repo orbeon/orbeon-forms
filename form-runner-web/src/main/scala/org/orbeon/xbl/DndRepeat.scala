@@ -14,12 +14,12 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames, Page}
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr

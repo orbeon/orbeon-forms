@@ -13,17 +13,17 @@
  */
 package org.orbeon.builder
 
-import autowire._
+import autowire.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.web.DomEventNames
-import org.orbeon.xforms.facade._
+import org.orbeon.xforms.facade.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
 

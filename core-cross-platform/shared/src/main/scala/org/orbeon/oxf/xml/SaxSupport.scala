@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 

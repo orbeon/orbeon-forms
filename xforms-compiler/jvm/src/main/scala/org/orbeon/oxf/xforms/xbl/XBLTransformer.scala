@@ -14,23 +14,23 @@
 package org.orbeon.oxf.xforms.xbl
 
 import java.{util => ju}
-import cats.syntax.option._
-import org.orbeon.dom._
+import cats.syntax.option.*
+import org.orbeon.dom.*
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.{EventHandler, PartAnalysisContextForTree, PartAnalysisForXblSupport}
 import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.StructuredQName
-import org.orbeon.scaxon.NodeInfoConversions._
+import org.orbeon.scaxon.NodeInfoConversions.*
 import org.orbeon.xforms.Namespaces
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xml.NamespaceMapping
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 object XBLTransformer {

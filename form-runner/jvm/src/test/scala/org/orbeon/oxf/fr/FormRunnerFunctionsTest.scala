@@ -13,26 +13,26 @@
  */
 package org.orbeon.oxf.fr
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom
-import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.FormRunnerPersistence._
+import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.XMLConstants.{XS_ANYURI_QNAME, XS_BOOLEAN_QNAME, XS_STRING_QNAME}
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xml.NamespaceMapping
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 class FormRunnerFunctionsTest

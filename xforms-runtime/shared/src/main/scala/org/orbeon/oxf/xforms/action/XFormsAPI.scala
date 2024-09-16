@@ -14,30 +14,30 @@
 package org.orbeon.oxf.xforms.action
 
 import cats.data.NonEmptyList
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.{DynamicVariable, IndentedLogger}
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.action.actions._
+import org.orbeon.oxf.xforms.action.actions.*
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xforms.event.XFormsEvents.{XFORMS_SUBMIT_DONE, XFORMS_SUBMIT_ERROR}
 import org.orbeon.oxf.xforms.event.events.{XFormsSubmitDoneEvent, XFormsSubmitErrorEvent, XFormsSubmitEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.{Constants, UrlType}
 import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
 import java.util.{List => JList}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.reflect.ClassTag
 import scala.util.Try
 

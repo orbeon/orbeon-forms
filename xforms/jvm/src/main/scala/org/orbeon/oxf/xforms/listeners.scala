@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.cache
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.servlet._
-import org.orbeon.oxf.util.SLF4JLogging._
+import org.orbeon.oxf.servlet.*
+import org.orbeon.oxf.util.SLF4JLogging.*
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 
 // For backward compatibility

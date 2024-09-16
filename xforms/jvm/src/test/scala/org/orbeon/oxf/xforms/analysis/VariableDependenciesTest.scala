@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.event.EventCollector
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 

@@ -13,20 +13,20 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import cats.syntax.option._
-import org.orbeon.oxf.util.CoreUtils._
+import cats.syntax.option.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.{InputControl, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
-import org.orbeon.oxf.xml.SaxSupport._
-import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.*
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.*
+import org.orbeon.oxf.xml.SaxSupport.*
+import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
 import org.orbeon.xforms.Constants.ComponentSeparatorString
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl

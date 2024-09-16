@@ -1,11 +1,11 @@
 package org.orbeon.oxf.fr
 
-import io.circe.syntax._
+import io.circe.syntax.*
 import io.circe.{Decoder, Encoder}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.fr.permission.{Operation, Operations}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{ByteEncoding, SecureUtils}
 
 import scala.util.{Failure, Success, Try}

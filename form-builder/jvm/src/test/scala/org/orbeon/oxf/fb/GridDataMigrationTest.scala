@@ -16,12 +16,12 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom.saxon.NodeWrapper
 import org.orbeon.oxf.fr.DataFormatVersion
-import org.orbeon.oxf.fr.datamigration.MigrationSupport._
-import org.orbeon.oxf.fr.datamigration._
+import org.orbeon.oxf.fr.datamigration.MigrationSupport.*
+import org.orbeon.oxf.fr.datamigration.*
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatest.funspec.AnyFunSpecLike
 

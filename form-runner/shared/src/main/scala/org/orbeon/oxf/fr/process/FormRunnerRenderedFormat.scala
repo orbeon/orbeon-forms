@@ -15,16 +15,16 @@ package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.process.ProcessInterpreter._
+import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.process.ProcessInterpreter.*
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 
 import java.net.URI
 import scala.language.postfixOps

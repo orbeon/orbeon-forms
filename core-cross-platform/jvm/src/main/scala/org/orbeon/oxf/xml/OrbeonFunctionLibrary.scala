@@ -15,7 +15,7 @@ package org.orbeon.oxf.xml
 
 import org.orbeon.saxon.`type`.ItemType
 import org.orbeon.saxon.value.{SequenceType, Value}
-import org.orbeon.saxon.functions.StandardFunction._
+import org.orbeon.saxon.functions.StandardFunction.*
 import org.orbeon.saxon.om.{StructuredQName, NamespaceConstant}
 import org.orbeon.saxon.expr.{StaticContext, Expression}
 import org.orbeon.oxf.common.OXFException

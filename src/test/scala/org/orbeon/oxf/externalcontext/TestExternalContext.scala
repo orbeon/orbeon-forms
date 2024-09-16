@@ -16,18 +16,18 @@ package org.orbeon.oxf.externalcontext
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.ExternalContext._
+import org.orbeon.oxf.externalcontext.ExternalContext.*
 import org.orbeon.oxf.http.{Headers, HttpMethod, PathType, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xml.{PartUtils, XPathUtils}
 
-import java.io._
+import java.io.*
 import java.{util => ju}
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
   * ExternalContext used by the TestScriptProcessor. It is configurable with an XML document representing

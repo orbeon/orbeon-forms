@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunnerCommon._
+import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 
 trait FormRunnerDocContext {

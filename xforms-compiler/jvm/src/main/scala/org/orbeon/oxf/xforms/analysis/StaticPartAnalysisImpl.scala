@@ -16,12 +16,12 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model._
+import org.orbeon.oxf.xforms.*
+import org.orbeon.oxf.xforms.analysis.controls.*
+import org.orbeon.oxf.xforms.analysis.model.*
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLSupport}
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope

@@ -19,7 +19,7 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.XFormsAssets
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.Attributes

@@ -3,14 +3,14 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
-import org.orbeon.oxf.fr.persistence.relational.Statement._
+import org.orbeon.oxf.fr.persistence.relational.Statement.*
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger, NetUtils, XPath}
 import org.orbeon.oxf.xml.{DeferredXMLReceiver, DeferredXMLReceiverImpl, TransformerUtils}
 

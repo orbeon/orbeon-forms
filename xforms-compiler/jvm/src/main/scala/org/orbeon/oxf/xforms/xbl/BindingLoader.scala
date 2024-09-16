@@ -16,14 +16,14 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.properties.{Property, PropertySet}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.{AssetPath, XFormsAssets, XFormsAssetsBuilder}
 import org.orbeon.oxf.xforms.xbl.XBLAssetsBuilder.HeadElementBuilder
 import org.orbeon.oxf.xml.ParserConfiguration
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.xforms.HeadElement
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.Attributes
 
 import scala.collection.mutable

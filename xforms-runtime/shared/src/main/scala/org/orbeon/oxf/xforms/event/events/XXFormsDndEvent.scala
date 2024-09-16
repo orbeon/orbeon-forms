@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.xforms.event.XFormsEvent
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 
 class XXFormsDndEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XXFORMS_DND, target, properties, bubbles = false, cancelable = false) {

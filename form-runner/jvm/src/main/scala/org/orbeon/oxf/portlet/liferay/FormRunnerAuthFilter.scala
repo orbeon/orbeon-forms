@@ -16,9 +16,9 @@ package org.orbeon.oxf.portlet.liferay
 import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.portlet.PortletSessionImpl
 
-import javax.portlet._
-import javax.portlet.filter._
-import scala.jdk.CollectionConverters._
+import javax.portlet.*
+import javax.portlet.filter.*
+import scala.jdk.CollectionConverters.*
 
 
 class AddOrbeonAuthHeadersFilter

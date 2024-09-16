@@ -15,15 +15,15 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, RepeatControl}
 import org.orbeon.oxf.xforms.analysis.{NestedPartAnalysis, PartAnalysis}
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsRepeatIterationControl}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsContainerControl, XFormsControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEventFactory, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}

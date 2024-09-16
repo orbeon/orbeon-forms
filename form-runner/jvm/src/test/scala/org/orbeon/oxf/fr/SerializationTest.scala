@@ -17,7 +17,7 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocumentBuilder
 import org.orbeon.oxf.xforms.state.{DynamicState, XFormsState, XFormsStateManager}
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 

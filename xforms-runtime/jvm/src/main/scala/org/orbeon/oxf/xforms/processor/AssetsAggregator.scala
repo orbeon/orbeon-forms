@@ -16,13 +16,13 @@ package org.orbeon.oxf.xforms.processor
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.processor.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
+import org.orbeon.oxf.xforms.*
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.{Constants, XFormsCrossPlatformSupport}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl

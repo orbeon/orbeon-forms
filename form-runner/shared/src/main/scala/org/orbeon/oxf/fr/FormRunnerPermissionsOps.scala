@@ -14,9 +14,9 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
-import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsActions

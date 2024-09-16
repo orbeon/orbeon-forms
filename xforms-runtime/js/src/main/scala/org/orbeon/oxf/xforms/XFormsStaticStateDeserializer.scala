@@ -1,8 +1,8 @@
 package org.orbeon.oxf.xforms
 
-import cats.syntax.option._
-import io.circe.generic.auto._
-import io.circe.generic.semiauto._
+import cats.syntax.option.*
+import io.circe.generic.auto.*
+import io.circe.generic.semiauto.*
 import io.circe.parser.decode
 import io.circe.{Decoder, DecodingFailure, HCursor, KeyDecoder}
 import org.orbeon.datatypes.MaximumSize
@@ -10,19 +10,19 @@ import org.orbeon.dom
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Modifier, ResourceResolver, StaticXPath, Whitespace, XPath}
-import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
-import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model._
+import org.orbeon.oxf.xforms.analysis.controls.*
+import org.orbeon.oxf.xforms.analysis.model.*
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding, XBLAssets}
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.xforms.analysis.model.ValidationLevel

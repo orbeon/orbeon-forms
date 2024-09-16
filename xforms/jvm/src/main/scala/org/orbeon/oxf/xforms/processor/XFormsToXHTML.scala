@@ -22,8 +22,8 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsServer}
 import org.orbeon.oxf.xforms.processor.handlers.{XHTMLOutput, XMLOutput}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xml._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.util.Logging.*
 
 
 /**

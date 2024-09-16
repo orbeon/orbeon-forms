@@ -28,20 +28,20 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils.OptionOps
 import org.orbeon.oxf.util.Multipart.UploadItem
-import org.orbeon.oxf.util.SLF4JLogging._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
+import org.orbeon.oxf.util.SLF4JLogging.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
+import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.*
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.upload.api.java.{FileScan2, FileScanProvider2, FileScanResult => JFileScanResult}
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
 import org.orbeon.xforms.Constants
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import java.net.URI
 import scala.collection.{mutable => m}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 

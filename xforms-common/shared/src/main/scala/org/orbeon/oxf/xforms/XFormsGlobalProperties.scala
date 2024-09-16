@@ -2,7 +2,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 object XFormsGlobalProperties {

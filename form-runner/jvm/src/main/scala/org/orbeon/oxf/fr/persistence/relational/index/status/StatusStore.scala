@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.index.status
 
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 
 import java.util.Date
 

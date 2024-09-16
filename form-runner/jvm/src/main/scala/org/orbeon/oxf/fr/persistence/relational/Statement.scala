@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational
 
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 
 import java.sql.{Connection, PreparedStatement, ResultSet}
 

@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import cats.Eval
-import org.orbeon.dom._
-import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.dom.*
+import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.analysis.controls.VariableTrait
 
 import scala.collection.mutable

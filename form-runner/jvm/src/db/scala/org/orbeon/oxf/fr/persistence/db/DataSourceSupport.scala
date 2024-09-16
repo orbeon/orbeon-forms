@@ -17,7 +17,7 @@ import java.sql.Connection
 
 import javax.naming.{Context, InitialContext, NameAlreadyBoundException}
 import org.apache.commons.dbcp2.BasicDataSource
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 
 import scala.collection.immutable
 

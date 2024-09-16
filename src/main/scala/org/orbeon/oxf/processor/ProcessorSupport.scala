@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor
 
 import org.orbeon.datatypes.{BasicLocationData, LocationData}
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.orbeon.dom.io.DocumentSource
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.properties.Properties

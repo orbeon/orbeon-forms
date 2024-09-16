@@ -13,23 +13,23 @@
  */
 package org.orbeon.xbl
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.log4s.Logger
 import org.orbeon.date.JSDateUtils
-import org.orbeon.facades.DatePicker._
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.facades.DatePicker.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.XFormsIosClass
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryPromise
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.{Promise, UndefOr, |}
 
 

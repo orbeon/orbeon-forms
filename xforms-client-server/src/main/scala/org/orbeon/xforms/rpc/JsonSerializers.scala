@@ -13,7 +13,7 @@
   */
 package org.orbeon.xforms.rpc
 
-import io.circe.syntax._
+import io.circe.syntax.*
 import io.circe.{Decoder, Encoder, Json}
 
 // As we use this on the client and the server

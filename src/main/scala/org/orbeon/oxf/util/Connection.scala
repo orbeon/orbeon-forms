@@ -14,33 +14,33 @@
 package org.orbeon.oxf.util
 
 import cats.effect.IO
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.log4s
-import org.orbeon.connection._
+import org.orbeon.connection.*
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.io.{UriScheme, UriUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
-import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.HttpMethod._
-import org.orbeon.oxf.http._
+import org.orbeon.oxf.externalcontext.*
+import org.orbeon.oxf.http.Headers.*
+import org.orbeon.oxf.http.HttpMethod.*
+import org.orbeon.oxf.http.*
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.servlet.{Cookie, HttpServletRequest}
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 
 import java.io.File
 import java.net.URI
 import java.{util => ju}
 import scala.collection.Factory
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

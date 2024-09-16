@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.Model
 
 import scala.collection.mutable

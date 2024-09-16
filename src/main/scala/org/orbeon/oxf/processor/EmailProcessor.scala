@@ -15,24 +15,24 @@ package org.orbeon.oxf.processor
 
 import jakarta.activation.{DataHandler, DataSource}
 import jakarta.mail.Message.RecipientType
-import jakarta.mail._
-import jakarta.mail.internet._
+import jakarta.mail.*
+import jakarta.mail.internet.*
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element}
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.io.{CharsetNames, StringBuilderWriter}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.EmailProcessor._
+import org.orbeon.oxf.processor.EmailProcessor.*
 import org.orbeon.oxf.properties.PropertySet
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.LocationSAXWriter
 
-import java.io._
+import java.io.*
 import java.util.{Properties => JProperties}
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult

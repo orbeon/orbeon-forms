@@ -16,16 +16,16 @@ package org.orbeon.xforms
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms
-import org.orbeon.xforms.EventNames._
-import org.orbeon.xforms.controls.Upload._
+import org.orbeon.xforms.EventNames.*
+import org.orbeon.xforms.controls.Upload.*
 import org.scalajs.dom
 import org.scalajs.dom.raw.File
 import org.scalajs.dom.{FileList, html}
 import org.scalajs.jquery.JQueryEventObject
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.Future
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.scalajs.js.annotation.JSExport
 
 

@@ -15,16 +15,16 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.{Element, Namespace, QName}
 import org.orbeon.oxf.xforms.analysis.controls.InputControl
-import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
+import org.orbeon.oxf.xforms.control.*
+import org.orbeon.oxf.xforms.control.controls.XFormsInputControl.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.xforms.Namespaces
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.helpers.AttributesImpl
 
 

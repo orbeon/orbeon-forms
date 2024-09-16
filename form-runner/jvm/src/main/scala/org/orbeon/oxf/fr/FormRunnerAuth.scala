@@ -14,14 +14,14 @@
 package org.orbeon.oxf.fr
 
 import cats.data.NonEmptyList
-import enumeratum._
+import enumeratum.*
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext._
+import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.MarkupUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.webapp.{OrbeonSessionListener, UserRolesFacade}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.slf4j.LoggerFactory

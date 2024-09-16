@@ -17,7 +17,7 @@ import cats.data.NonEmptyList
 
 import java.util
 import javax.portlet.filter.PortletRequestWrapper
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 trait RequestPrependHeaders extends PortletRequestWrapper {

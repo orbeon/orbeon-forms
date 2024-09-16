@@ -1,10 +1,10 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.VariableResolver
 import org.orbeon.saxon.expr.Expression.ITERATE_METHOD
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.expr.instruct.SlotManager
 import org.orbeon.saxon.expr.parser.RebindingMap
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
@@ -19,7 +19,7 @@ import org.orbeon.xml.NamespaceMapping
 
 import java.{util => ju}
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // Similar to Saxon JAXPXPathStaticContext. JAXPXPathStaticContext holds a reference to an XPathVariableResolver, which

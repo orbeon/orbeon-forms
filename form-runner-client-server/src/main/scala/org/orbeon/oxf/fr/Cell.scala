@@ -13,9 +13,9 @@
   */
 package org.orbeon.oxf.fr
 
-import enumeratum._
+import enumeratum.*
 import org.orbeon.datatypes.{Direction, Orientation}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 
 import scala.collection.immutable.ArraySeq
 import scala.util.Try

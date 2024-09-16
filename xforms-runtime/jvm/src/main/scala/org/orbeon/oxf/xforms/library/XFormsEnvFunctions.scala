@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.library
 
-import org.orbeon.saxon.`type`.BuiltInAtomicType._
-import org.orbeon.saxon.expr.StaticProperty._
+import org.orbeon.saxon.`type`.BuiltInAtomicType.*
+import org.orbeon.saxon.expr.StaticProperty.*
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.oxf.xforms.function._
+import org.orbeon.oxf.xforms.function.*
 
 /**
  * XForms functions that depend on the XForms environment.

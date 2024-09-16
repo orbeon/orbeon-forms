@@ -14,18 +14,18 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.datatypes.LocationData
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
 
 import java.{util => ju}
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 /**

@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, OutputControl}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaReadonly
@@ -22,13 +22,13 @@ import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.withFormattingPrefix
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPACE_URI}
-import org.orbeon.oxf.xml.XMLReceiverHelper._
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.XMLReceiverHelper.*
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl

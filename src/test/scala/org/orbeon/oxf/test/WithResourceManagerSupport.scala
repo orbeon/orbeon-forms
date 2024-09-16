@@ -21,7 +21,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.{Log4jSupport, LoggerFactory, PipelineUtils}
 import org.orbeon.oxf.xml.ParserConfiguration
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 trait WithResourceManagerSupport {

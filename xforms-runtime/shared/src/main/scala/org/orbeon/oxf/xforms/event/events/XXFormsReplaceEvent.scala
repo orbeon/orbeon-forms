@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xforms.event.XFormsEvents._
-import XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
+import XFormsEvent.*
 import org.orbeon.saxon.om
 
 class XXFormsReplaceEvent(target: XFormsEventTarget, properties: PropertyGetter)

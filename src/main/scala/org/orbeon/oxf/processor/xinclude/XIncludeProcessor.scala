@@ -15,15 +15,15 @@ package org.orbeon.oxf.processor.xinclude
 
 import org.orbeon.oxf.http.URIReferences
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ProcessorImpl._
-import org.orbeon.oxf.processor._
+import org.orbeon.oxf.processor.ProcessorImpl.*
+import org.orbeon.oxf.processor.*
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer
 import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.xml.ParserConfiguration
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * XInclude processor.

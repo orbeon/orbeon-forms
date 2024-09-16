@@ -15,14 +15,14 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAPI, XFormsAction}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xforms.event.XFormsEventFactory.createEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventTarget}
-import org.orbeon.xforms.XFormsNames._
-import shapeless.syntax.typeable._
+import org.orbeon.xforms.XFormsNames.*
+import shapeless.syntax.typeable.*
 
 import scala.util.Try
 

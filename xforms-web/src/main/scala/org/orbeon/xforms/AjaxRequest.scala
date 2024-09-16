@@ -15,10 +15,10 @@ package org.orbeon.xforms
 
 import java.{lang => jl}
 import cats.data.NonEmptyList
-import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.xforms
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget}
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 object AjaxRequest {

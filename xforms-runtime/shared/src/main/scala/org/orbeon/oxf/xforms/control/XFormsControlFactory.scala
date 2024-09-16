@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHAAnalysis, ValueTrait}
-import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.control.controls.*
 import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 
 /**
  * Factory for all existing XForms controls including built-in controls, XBL controls, and actions.

@@ -20,12 +20,12 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.SAXWriter
 import org.orbeon.io.StringBuilderWriter
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ShareableXPathStaticContext, XMLReceiver}
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, ItemType, Type}
 import org.orbeon.saxon.event.{ComplexContentOutputter, NamespaceReducer, Sender}
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.functions.{FunctionLibrary, JavaExtensionLibrary}
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}

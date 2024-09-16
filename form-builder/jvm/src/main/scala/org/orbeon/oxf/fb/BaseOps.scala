@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.xforms.Constants.ComponentSeparator
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 import scala.collection.immutable
 

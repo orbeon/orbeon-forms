@@ -3,7 +3,7 @@ package org.orbeon.xforms
 import org.orbeon.facades.{Bowser, Mousetrap}
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.scalajs.dom
-import org.scalajs.dom.ext._
+import org.scalajs.dom.ext.*
 import org.scalajs.dom.html
 
 import scala.scalajs.js

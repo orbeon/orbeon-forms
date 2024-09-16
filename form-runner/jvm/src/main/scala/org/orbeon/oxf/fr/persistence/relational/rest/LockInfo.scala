@@ -20,7 +20,7 @@ import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.UserAndGroup
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.NodeConversions
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 import scala.xml.Elem
 

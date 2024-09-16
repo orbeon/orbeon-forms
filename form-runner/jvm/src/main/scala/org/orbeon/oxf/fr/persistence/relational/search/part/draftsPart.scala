@@ -15,9 +15,9 @@ package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.Statement
 import org.orbeon.oxf.fr.persistence.relational.Statement.StatementPart
-import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
-import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
-import org.orbeon.oxf.fr.persistence.relational.search.adt._
+import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts.*
+import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts.*
+import org.orbeon.oxf.fr.persistence.relational.search.adt.*
 
 
 object draftsPart {

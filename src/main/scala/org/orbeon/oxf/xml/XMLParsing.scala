@@ -15,20 +15,20 @@ package org.orbeon.oxf.xml
 
 import java.io.{InputStream, Reader, StringReader}
 import java.{util => ju}
-import javax.xml.parsers._
+import javax.xml.parsers.*
 import org.orbeon.apache.xerces.impl.{Constants, XMLEntityManager, XMLErrorReporter}
 import org.orbeon.apache.xerces.xni.parser.XMLInputSource
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{LoggerFactory, SequenceReader, StringUtils}
 import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl
 import org.w3c.dom.Document
-import org.xml.sax._
+import org.xml.sax.*
 
 import java.net.URL
 import scala.util.Try

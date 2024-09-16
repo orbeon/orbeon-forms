@@ -14,11 +14,11 @@
 package org.orbeon.xbl
 
 import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.library.FRComponentParamSupport.{ancestorContainerNamesIt, closestAncestorSectionName}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.control.controls.{XFormsSwitchControl, XFormsVariableControl}
@@ -28,10 +28,10 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.AtomicValue
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.Constants
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 object Wizard {

@@ -14,7 +14,7 @@
 package org.orbeon.xforms
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
+import enumeratum.*
 
 
 sealed trait BindingErrorReason { val message: String }

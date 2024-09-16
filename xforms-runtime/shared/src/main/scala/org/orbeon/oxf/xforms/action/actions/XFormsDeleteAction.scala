@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.{Attribute, Document}
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -27,7 +27,7 @@ import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions
 
 import java.{util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.language.postfixOps
 
 /**

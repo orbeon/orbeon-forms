@@ -14,18 +14,18 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import cats.data.NonEmptyList
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils.InsertPosition
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{RepeatControl, RepeatIterationControl}
-import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl._
+import org.orbeon.oxf.xforms.control.*
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XXFormsDndEvent, XXFormsIndexChangedEvent, XXFormsNodesetChangedEvent, XXFormsSetindexEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
@@ -35,12 +35,12 @@ import org.orbeon.oxf.xforms.{BindingContext, ControlTree, XFormsContainingDocum
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import java.{util => ju}
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.collection.{mutable => m}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // Represents an xf:repeat container control.

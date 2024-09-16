@@ -16,15 +16,15 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.URLRewriterUtils
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
-import org.orbeon.oxf.xforms.processor.ScriptBuilder._
+import org.orbeon.oxf.xforms.processor.ScriptBuilder.*
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XHTMLOutput}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.{AssetsSupport, XBLAssets}
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
-import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.Constants
 import org.xml.sax.Attributes
 

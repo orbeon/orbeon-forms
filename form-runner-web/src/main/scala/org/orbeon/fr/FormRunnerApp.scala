@@ -17,10 +17,9 @@ import org.orbeon.facades.ResizeObserver
 import org.orbeon.web.DomEventNames
 import org.orbeon.xbl
 import org.orbeon.xforms.Session.SessionUpdate
-import org.orbeon.xforms._
 import org.orbeon.xforms.facade.Events
 import org.scalajs.dom
-import org.scalajs.dom._
+import org.scalajs.dom.*
 import org.scalajs.dom.raw.HTMLElement
 
 import scala.scalajs.js

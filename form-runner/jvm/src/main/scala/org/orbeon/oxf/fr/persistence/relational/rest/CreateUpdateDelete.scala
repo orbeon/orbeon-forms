@@ -13,23 +13,23 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.Version._
+import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.index.Index
-import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport._
+import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.*
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}
 import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.{PipelineContext, TransformerXMLReceiver}
 import org.orbeon.oxf.processor.generator.RequestGenerator
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{DateUtils, IndentedLogger, NetUtils, Whitespace, XPath}
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.*
 import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}

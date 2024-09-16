@@ -16,16 +16,16 @@ package org.orbeon.oxf.xforms.model
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsValueChangedEvent}
-import org.orbeon.oxf.xforms.model.StaticDataModel._
+import org.orbeon.oxf.xforms.model.StaticDataModel.*
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 import org.orbeon.xforms.NodeBindingErrorReason
-import org.w3c.dom.Node._
+import org.w3c.dom.Node.*
 
 
 /**

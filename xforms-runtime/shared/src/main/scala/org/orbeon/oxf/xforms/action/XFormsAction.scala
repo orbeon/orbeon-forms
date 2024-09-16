@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.action
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, Logging, XPathCache}
 import org.orbeon.oxf.xforms.analysis.EventHandler.PropertyQNames
 import org.orbeon.oxf.xforms.analysis.WithChildrenTrait
@@ -25,13 +25,13 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, PropertyValue}
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.om
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.xbl.Scope
 import shapeless.syntax.typeable.typeableOps
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 abstract class XFormsAction extends Logging {

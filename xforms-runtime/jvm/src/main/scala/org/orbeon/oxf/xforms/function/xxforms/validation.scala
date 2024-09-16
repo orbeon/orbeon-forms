@@ -18,12 +18,12 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.DependsOnContextItem
 import org.orbeon.saxon.`type`.ValidationFailure
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
-import org.orbeon.saxon.expr._
-import org.orbeon.saxon.value._
+import org.orbeon.saxon.expr.*
+import org.orbeon.saxon.value.*
 import org.orbeon.scaxon.Implicits
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 trait ValidationFunction[T] extends XFormsFunction with DependsOnContextItem {
 

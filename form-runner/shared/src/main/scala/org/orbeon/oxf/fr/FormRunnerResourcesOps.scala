@@ -13,10 +13,10 @@
   */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunnerCommon._
+import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.FormResources
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.net.URI

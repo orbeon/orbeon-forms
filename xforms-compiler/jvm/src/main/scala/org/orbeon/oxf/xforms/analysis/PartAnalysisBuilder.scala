@@ -13,25 +13,25 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.ReflectionUtils.loadClassByName
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, NumberUtils, WhitespaceMatching}
 import org.orbeon.oxf.xforms.XFormsProperties.{FunctionLibraryProperty, XblSupportProperty}
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
-import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model._
+import org.orbeon.oxf.xforms.analysis.controls.*
+import org.orbeon.oxf.xforms.analysis.model.*
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{XBLBindingBuilder, XBLSupport}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
-import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.xforms.XFormsNames.XFORMS_BIND_QNAME

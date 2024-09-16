@@ -13,22 +13,22 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import cats.syntax.option._
-import org.orbeon.oxf.util.CoreUtils._
+import cats.syntax.option.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaReadonlyQName
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiver, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.{CLASS_QNAME, ROLE_QNAME, TABINDEX_QNAME}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 /**

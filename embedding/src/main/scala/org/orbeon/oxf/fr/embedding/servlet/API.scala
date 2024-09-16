@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.fr.embedding.servlet
 
-import org.orbeon.oxf.fr.embedding.APISupport._
+import org.orbeon.oxf.fr.embedding.APISupport.*
 import org.orbeon.oxf.servlet.HttpServletRequest
 
 import java.io.Writer
 import java.{util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 object API {
 

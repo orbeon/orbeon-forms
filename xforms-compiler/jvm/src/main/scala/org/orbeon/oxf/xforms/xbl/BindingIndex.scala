@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 import scala.collection.mutable
 

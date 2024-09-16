@@ -1,7 +1,7 @@
 package org.orbeon.xforms.analysis
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
+import enumeratum.*
 
 
 sealed abstract class Phase(val name: String) extends EnumEntry with Lowercase

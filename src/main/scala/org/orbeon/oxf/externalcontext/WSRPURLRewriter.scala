@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import org.orbeon.oxf.util._
-import org.orbeon.wsrp.WSRPSupport._
+import org.orbeon.oxf.util.*
+import org.orbeon.wsrp.WSRPSupport.*
 
 import java.net.URL
 import java.util.concurrent.Callable

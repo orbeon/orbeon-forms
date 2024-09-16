@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Statement._
+import org.orbeon.oxf.fr.persistence.relational.Statement.*
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{ControlFilterType, ControlQuery, SearchRequest}
 
 

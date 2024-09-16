@@ -2,7 +2,7 @@ package org.orbeon.oxf.fr.email
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateValue
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.{Item, NodeInfo}

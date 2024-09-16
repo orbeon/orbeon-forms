@@ -17,7 +17,7 @@ import org.junit.Test
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatestplus.junit.AssertionsForJUnit
 

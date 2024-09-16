@@ -1,9 +1,9 @@
 package org.orbeon.oxf.xforms.state
 
-import java.io._
+import java.io.*
 
 import org.orbeon.oxf.util.WhitelistObjectInputStream
-import sbinary._
+import sbinary.*
 
 
 object XFormsCommonBinaryFormats {

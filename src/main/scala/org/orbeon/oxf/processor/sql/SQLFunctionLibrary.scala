@@ -17,14 +17,14 @@ import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.{CollectionUtils, FunctionContext, XPath}
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary}
-import org.orbeon.saxon.`type`.BuiltInAtomicType._
+import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.expr.StaticProperty._
+import org.orbeon.saxon.expr.StaticProperty.*
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.{Int64Value, StringValue}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 
 object SQLFunctionLibrary extends OrbeonFunctionLibrary {

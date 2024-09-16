@@ -14,17 +14,17 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.dom.Node
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.analysis.model.{MipName, StaticBind, Types}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.w3c.dom.Node.ELEMENT_NODE
 
 import java.{util => ju}
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // Holds MIPs associated with a given RuntimeBind iteration

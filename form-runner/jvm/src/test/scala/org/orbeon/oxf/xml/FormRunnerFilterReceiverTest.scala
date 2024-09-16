@@ -18,10 +18,10 @@ import org.orbeon.oxf.fr.persistence.relational.rest.RequestReader
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
-import org.orbeon.oxf.xml.JXQName._
-import org.orbeon.oxf.xml.ParserConfiguration._
+import org.orbeon.oxf.xml.JXQName.*
+import org.orbeon.oxf.xml.ParserConfiguration.*
 import org.orbeon.scaxon.DocumentAndElementsCollector
-import org.orbeon.scaxon.SAXEvents._
+import org.orbeon.scaxon.SAXEvents.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 

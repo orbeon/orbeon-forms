@@ -14,13 +14,13 @@
 package org.orbeon.xforms
 
 import cats.data.NonEmptyList
-import cats.syntax.option._
-import org.orbeon.oxf.util.CoreUtils._
+import cats.syntax.option.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.xforms
 import org.orbeon.xforms.facade.AjaxServer
 import org.scalajs.dom
-import org.scalajs.dom.experimental._
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.dom.experimental.*
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration

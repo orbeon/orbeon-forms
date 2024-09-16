@@ -13,7 +13,7 @@
   */
 package org.orbeon.fr
 
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalatest.funspec.AnyFunSpec
 

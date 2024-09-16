@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.properties
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.{OXFException, ValidationException}
-import org.orbeon.oxf.properties.PropertySet._
+import org.orbeon.oxf.properties.PropertySet.*
 import org.orbeon.oxf.util.CollectionUtils
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.MarkupUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants}
 import org.orbeon.xml.NamespaceMapping
@@ -29,7 +29,7 @@ import org.orbeon.xml.NamespaceMapping
 import java.net.URI
 import java.{lang => jl, util => ju}
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String], name: String) {

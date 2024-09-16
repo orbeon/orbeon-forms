@@ -20,10 +20,10 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.{IndentedLogger, WhitespaceMatching}
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.oxf.xforms.analysis.{Metadata, XFormsAnnotator, XFormsExtractor}
-import org.orbeon.oxf.xml.ParserConfiguration._
+import org.orbeon.oxf.xml.ParserConfiguration.*
 import org.orbeon.oxf.xml.{JXQName, _}
 import org.orbeon.scaxon.DocumentAndElementsCollector
-import org.orbeon.scaxon.SAXEvents._
+import org.orbeon.scaxon.SAXEvents.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 

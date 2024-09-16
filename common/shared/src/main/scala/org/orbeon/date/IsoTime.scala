@@ -1,9 +1,9 @@
 package org.orbeon.date
 
-import cats.syntax.option._
-import org.orbeon.date.IsoTime._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import cats.syntax.option.*
+import org.orbeon.date.IsoTime.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 
 
 case class IsoTime(

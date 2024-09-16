@@ -1,24 +1,24 @@
 package org.orbeon.oxf.xforms
 
-import cats.syntax.option._
-import io.circe.generic.auto._
-import io.circe.generic.semiauto._
-import io.circe.syntax._
+import cats.syntax.option.*
+import io.circe.generic.auto.*
+import io.circe.generic.semiauto.*
+import io.circe.syntax.*
 import io.circe.{Encoder, Json, KeyEncoder}
 import org.orbeon.dom
 import org.orbeon.dom.QName
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory, StaticXPath}
-import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.*
+import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.{Instance, MipName, Model, StaticBind}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
@@ -28,7 +28,7 @@ import shapeless.syntax.typeable.typeableOps
 import java.util.Base64
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 //

@@ -1,25 +1,25 @@
 package org.orbeon.oxf.fr.persistence.api
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.{ExternalContext, RequestAdapter, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunner.{createFormDataBasePath, providerPropertyAsBoolean}
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
-import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml, findProvider}
+import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
-import org.orbeon.oxf.fr._
-import org.orbeon.oxf.http._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.fr.*
+import org.orbeon.oxf.http.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.net.URI

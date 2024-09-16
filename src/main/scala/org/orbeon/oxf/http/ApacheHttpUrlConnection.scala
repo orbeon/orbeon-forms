@@ -18,9 +18,9 @@ import java.net.{HttpURLConnection, URL, URLDecoder}
 
 import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.collection.mutable
 
 // Expose `ApacheHttpClient` as `HttpURLConnection`

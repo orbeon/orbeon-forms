@@ -15,7 +15,7 @@ package org.orbeon.oxf.client
 
 import org.junit.FixMethodOrder
 import org.junit.runners.MethodSorters
-import org.orbeon.oxf.client.fb._
+import org.orbeon.oxf.client.fb.*
 import org.orbeon.oxf.client.fr.{ClientGridTest, ClientCurrencyTest}
 
 // List all client tests which we want to run with a single run of the driver

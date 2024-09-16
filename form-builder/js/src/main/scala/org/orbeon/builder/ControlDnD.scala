@@ -13,7 +13,7 @@
  */
 package org.orbeon.builder
 
-import autowire._
+import autowire.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.facades.{Dragula, DragulaOptions}
 import org.orbeon.web.DomEventNames
@@ -22,7 +22,7 @@ import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html.Element
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr

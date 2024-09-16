@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.xforms
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.ReflectionUtils.loadClassByName
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, PathMatcher, StringConversions}
 import org.orbeon.oxf.xforms.XFormsProperties.{NoUpdates, UploadSupportProperty}
 import org.orbeon.oxf.xforms.analysis.{Metadata, StaticStateDocument}
@@ -35,7 +35,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{DeploymentType, XFormsCrossPlatformSupport}
 
 import java.{util => ju}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

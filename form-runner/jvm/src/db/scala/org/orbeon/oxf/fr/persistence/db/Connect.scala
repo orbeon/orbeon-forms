@@ -13,15 +13,16 @@
  */
 package org.orbeon.oxf.fr.persistence.db
 
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider._
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.fr.persistence.relational.Provider.*
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 
 import java.sql.{Connection, DriverManager}
-import scala.sys.process._
+import scala.sys.process.*
 import scala.util.Try
+
 
 object Connect {
 

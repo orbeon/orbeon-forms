@@ -17,9 +17,9 @@ import org.orbeon.datatypes.Orientation
 import org.orbeon.facades.ResizeObserver
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.AjaxClient.AjaxResponseDetails
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.Events
 import org.scalajs.dom.{document, window}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}

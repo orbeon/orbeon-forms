@@ -5,7 +5,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SecretControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.forwardAutocompleteAttribute
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes

@@ -5,9 +5,9 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.xforms.{XFormsId, XFormsNames}
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 object ComponentParamSupport {

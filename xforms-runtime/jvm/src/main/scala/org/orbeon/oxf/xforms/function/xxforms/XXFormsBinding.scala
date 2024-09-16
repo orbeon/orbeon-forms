@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysisTreeXPathAnalyzer, PathMap
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{PathMap, StringLiteral, XPathContext}
 import org.orbeon.saxon.om.SequenceIterator
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 
 class XXFormsBinding extends XFormsFunction {

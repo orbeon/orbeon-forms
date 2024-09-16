@@ -17,7 +17,7 @@ import org.orbeon.oxf.util.{ByteEncoding, SecureUtils}
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, RuntimeDependentFunction}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.{DoubleValue, StringValue}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 import java.security.SecureRandom
 

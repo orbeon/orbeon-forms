@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.MapSet
 import org.orbeon.oxf.xml.XMLReceiver
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 
 
 /**

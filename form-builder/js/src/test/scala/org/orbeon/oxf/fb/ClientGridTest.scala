@@ -14,9 +14,9 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.Direction
-import org.orbeon.builder.HtmlElementCell._
+import org.orbeon.builder.HtmlElementCell.*
 import org.orbeon.oxf.fr.Cell
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalatest.funspec.AnyFunSpec
 

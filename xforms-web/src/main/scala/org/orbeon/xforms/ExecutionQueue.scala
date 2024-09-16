@@ -14,11 +14,11 @@
 package org.orbeon.xforms
 
 import cats.data.NonEmptyList
-import enumeratum._
+import enumeratum.*
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import scala.scalajs.js
 
 sealed trait ExecutionWait extends EnumEntry

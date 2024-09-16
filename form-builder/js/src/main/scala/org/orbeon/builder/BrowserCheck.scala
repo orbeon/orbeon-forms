@@ -13,13 +13,13 @@
   */
 package org.orbeon.builder
 
-import autowire._
+import autowire.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.facades.Bowser
 import org.orbeon.xforms.rpc.RpcClient
 
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
-import scala.concurrent.duration._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
+import scala.concurrent.duration.*
 import scala.scalajs.js.timers
 
 

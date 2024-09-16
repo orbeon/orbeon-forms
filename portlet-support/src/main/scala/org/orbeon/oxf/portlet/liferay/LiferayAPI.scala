@@ -17,7 +17,7 @@ import java.{lang => jl, util => ju}
 import javax.portlet.PortletRequest
 import javax.servlet.http.HttpServletRequest
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.{Success, Try}
 
 // For https://github.com/orbeon/orbeon-forms/issues/2843

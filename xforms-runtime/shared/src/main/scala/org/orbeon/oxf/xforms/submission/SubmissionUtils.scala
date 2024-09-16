@@ -22,8 +22,8 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -36,7 +36,7 @@ import java.io.{ByteArrayOutputStream, InputStream}
 import java.net.URI
 import scala.collection.mutable
 import scala.util.{Failure, Success}
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 
 
 object SubmissionUtils {

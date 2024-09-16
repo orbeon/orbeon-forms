@@ -16,16 +16,16 @@ package org.orbeon.oxf.xforms.event
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.logging.LifecycleLogger
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
-import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.event.events._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xforms.control.*
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
+import org.orbeon.oxf.xforms.event.events.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget}
 import org.orbeon.xforms.{EventNames, XFormsCrossPlatformSupport, XFormsId}
 

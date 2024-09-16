@@ -17,13 +17,13 @@ import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CollectionUtils.ListOps
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.analysis.model.Types
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames.{APPEARANCE_QNAME, XFORMS_STRING_QNAME}
 import org.orbeon.xml.NamespaceMapping
 

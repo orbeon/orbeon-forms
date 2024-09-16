@@ -18,7 +18,7 @@ import java.text.MessageFormat
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{PathMap, XPathContext}
 import org.orbeon.saxon.value.{StringValue, Value}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 class XXFormsFormatMessage extends XFormsFunction {
 

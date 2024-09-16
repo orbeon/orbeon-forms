@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FileUtils, IndentedLogger, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.SingleItemBinding
 import org.orbeon.oxf.xforms.analysis.controls.WithFileMetadata
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty, MutableControlProperty}
-import org.orbeon.oxf.xforms.control.controls.FileMetadata._
+import org.orbeon.oxf.xforms.control.controls.FileMetadata.*
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent

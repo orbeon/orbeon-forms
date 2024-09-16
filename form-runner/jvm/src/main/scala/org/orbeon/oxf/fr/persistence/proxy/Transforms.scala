@@ -1,23 +1,23 @@
 package org.orbeon.oxf.fr.persistence.proxy
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerPersistence.DataXml
 import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
-import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, ResourceResolver, URLRewriterUtils, XPath}
 import org.orbeon.oxf.xforms.model.BasicIdIndex
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 import java.io.{InputStream, OutputStream}
 import java.net.URI

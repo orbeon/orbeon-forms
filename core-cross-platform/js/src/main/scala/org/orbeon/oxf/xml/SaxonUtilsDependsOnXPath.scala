@@ -1,9 +1,9 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.saxon.model.BuiltInAtomicType
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 import org.orbeon.saxon.trans.XPathException
-import org.orbeon.saxon.value._
+import org.orbeon.saxon.value.*
 
 import java.math.{BigDecimal, BigInteger}
 

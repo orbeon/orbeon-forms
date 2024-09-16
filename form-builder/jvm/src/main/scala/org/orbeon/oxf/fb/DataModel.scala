@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.scaxon.XPath._
+import org.orbeon.scaxon.XPath.*
 import org.orbeon.xml.NamespaceMapping
 
 import scala.util.control.NonFatal

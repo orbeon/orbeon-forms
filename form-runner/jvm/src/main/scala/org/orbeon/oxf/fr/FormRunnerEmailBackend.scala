@@ -2,22 +2,22 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom.{Element, Text}
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.email.EmailMetadata.HeaderName.Custom
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateValue
 import org.orbeon.oxf.fr.email.EmailMetadataParsing
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xml.NamespaceMapping
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 trait FormRunnerEmailBackend {

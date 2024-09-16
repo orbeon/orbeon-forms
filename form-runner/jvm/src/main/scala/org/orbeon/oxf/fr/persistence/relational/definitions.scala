@@ -4,10 +4,10 @@ import cats.Eval
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.persistence.relational.index.Index.matchForControl
-import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.SimplePath.*
 
 import scala.xml.Elem
 

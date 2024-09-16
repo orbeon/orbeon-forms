@@ -1,13 +1,13 @@
 package org.orbeon.oxf.fr.pdf
 
-import io.circe._
+import io.circe.*
 import io.circe.syntax.EncoderOps
-import org.orbeon.oxf.fr.pdf.definitions20231._
+import org.orbeon.oxf.fr.pdf.definitions20231.*
 import org.orbeon.oxf.fr.ui.ScalaToXml
 import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams}
 import org.orbeon.oxf.properties.Property
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xml.NamespaceMapping
 

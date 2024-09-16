@@ -15,18 +15,18 @@ package org.orbeon.oxf.xforms.event
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.EventHandler
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
 import org.orbeon.oxf.xml.{SaxonUtils, SaxonUtilsDependsOnXPath}
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 import org.orbeon.xforms.XFormsId
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.analysis.Phase
 import org.orbeon.xforms.runtime.SimplePropertyValue
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 /**

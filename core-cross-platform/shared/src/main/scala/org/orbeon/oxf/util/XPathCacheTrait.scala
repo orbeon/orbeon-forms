@@ -7,7 +7,7 @@ import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.xml.NamespaceMapping
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 trait XPathCacheTrait {
 

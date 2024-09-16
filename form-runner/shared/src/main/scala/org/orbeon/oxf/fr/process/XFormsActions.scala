@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.fr.Names._
-import org.orbeon.oxf.fr.process.ProcessInterpreter._
+import org.orbeon.oxf.fr.Names.*
+import org.orbeon.oxf.fr.process.ProcessInterpreter.*
 import org.orbeon.oxf.xforms.CallbackInvocation
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 
 trait XFormsActions {

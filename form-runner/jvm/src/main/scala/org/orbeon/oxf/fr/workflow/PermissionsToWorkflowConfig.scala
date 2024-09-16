@@ -1,7 +1,7 @@
 package org.orbeon.oxf.fr.workflow
 
 import org.orbeon.oxf.fr.permission.{Operation => PermissionOperation, _}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 
 
 object PermissionsToWorkflowConfig {

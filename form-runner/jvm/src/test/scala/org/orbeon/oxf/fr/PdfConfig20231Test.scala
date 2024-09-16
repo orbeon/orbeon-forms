@@ -1,10 +1,10 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.pdf.PdfConfig20231
-import org.orbeon.oxf.fr.pdf.definitions20231._
+import org.orbeon.oxf.fr.pdf.definitions20231.*
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeConversions.*
 import org.scalatest.funspec.AnyFunSpec
 
 

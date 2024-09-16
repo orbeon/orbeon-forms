@@ -14,17 +14,17 @@
 package org.orbeon.oxf.util
 
 import cats.effect.IO
-import org.orbeon.connection._
+import org.orbeon.connection.*
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.HttpMethod.{GET, HttpMethodsWithRequestBody, POST}
 import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StatusCode}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.debug
 
 import java.net.URI
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 trait ResourceResolver {

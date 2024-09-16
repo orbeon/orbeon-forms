@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.event.events
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControl}
-import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEventTarget}
 import org.orbeon.xforms.analysis.model.ValidationLevel
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 class DOMActivateEvent(target: XFormsEventTarget, properties: PropertyGetter)

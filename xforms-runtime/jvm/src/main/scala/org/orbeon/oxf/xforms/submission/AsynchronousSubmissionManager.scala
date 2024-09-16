@@ -1,9 +1,9 @@
 package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 import scala.concurrent.duration.Duration

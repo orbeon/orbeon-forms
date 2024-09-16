@@ -15,7 +15,7 @@ package org.orbeon.oxf.externalcontext
 
 import org.orbeon.oxf.test.{ResourceManagerSupport, XMLSupport}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeConversions.*
 import org.scalatest.funspec.AnyFunSpec
 
 

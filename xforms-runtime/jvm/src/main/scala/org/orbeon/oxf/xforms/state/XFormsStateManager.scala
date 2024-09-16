@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.state
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.logging.LifecycleLogger
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsContainin
 
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.locks.ReentrantLock
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 object XFormsStateManager extends XFormsStateManagerTrait {

@@ -14,8 +14,8 @@
 package org.orbeon.fr
 
 import org.orbeon.oxf.util.PathUtils
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.xforms.{$, Page}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.URLSearchParams
@@ -26,7 +26,7 @@ import org.scalajs.jquery.JQueryEventObject
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
 import scala.scalajs.js.UndefOr
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 
 
 object FormRunnerPrivateAPI extends js.Object {

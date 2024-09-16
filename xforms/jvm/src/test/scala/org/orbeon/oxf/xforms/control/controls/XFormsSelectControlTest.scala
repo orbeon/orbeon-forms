@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.itemset.Item
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.saxon.om
 import org.scalatest.funspec.AnyFunSpecLike
 

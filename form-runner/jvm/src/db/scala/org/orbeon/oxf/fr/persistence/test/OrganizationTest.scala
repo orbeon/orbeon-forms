@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.test
 
 import org.junit.Test
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.relational.rest

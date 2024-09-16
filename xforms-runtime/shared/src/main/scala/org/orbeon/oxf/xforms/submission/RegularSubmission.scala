@@ -15,12 +15,12 @@ package org.orbeon.oxf.xforms.submission
 
 
 import cats.effect.IO
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.connection.{ConnectionContextSupport, ConnectionResultT, StreamedContent}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.xforms.XFormsCrossPlatformSupport

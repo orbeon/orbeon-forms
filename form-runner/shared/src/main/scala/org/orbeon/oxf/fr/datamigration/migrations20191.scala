@@ -17,16 +17,16 @@ import io.circe.parser
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
-import org.orbeon.oxf.fr.datamigration.MigrationSupport._
+import org.orbeon.oxf.fr.datamigration.MigrationSupport.*
 import org.orbeon.oxf.fr.{DataFormatVersion, InDocFormRunnerDocContext}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.xforms.XFormsNames.*
 
 import scala.util.{Failure, Success}
 

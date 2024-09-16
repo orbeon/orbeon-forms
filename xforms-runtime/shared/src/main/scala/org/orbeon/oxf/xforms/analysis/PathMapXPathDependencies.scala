@@ -14,18 +14,18 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.*
+import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Model, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
 

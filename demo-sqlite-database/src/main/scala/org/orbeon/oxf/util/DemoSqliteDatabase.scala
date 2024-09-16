@@ -21,11 +21,11 @@ import org.orbeon.oxf.fr.persistence.db.{Connect, DatasourceDescriptor}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.http.{Headers, HttpMethod, StatusCode}
 import org.orbeon.oxf.test.{PipelineSupport, TestHttpClient, WithResourceManagerSupport}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 
 import java.nio.file.{Files, Path, Paths}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 object DemoSqliteDatabase {
   object ResourceManagerSupportInitializer extends WithResourceManagerSupport {

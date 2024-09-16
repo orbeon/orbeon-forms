@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.FormRunnerCommon.*
+import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.email.EmailMetadata
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.NodeConversions
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatest.funspec.AnyFunSpecLike
 

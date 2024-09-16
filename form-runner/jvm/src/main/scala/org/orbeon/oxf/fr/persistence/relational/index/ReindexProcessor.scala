@@ -14,10 +14,10 @@
 package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.persistence.relational.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.*
 
 /**
  * Processor repopulating the relational indices. This doesn't create the tables, but deletes their content

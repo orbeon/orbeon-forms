@@ -19,9 +19,9 @@ import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor, PipelineReader}
 import org.orbeon.oxf.processor.{DOMSerializer, ProcessorSupport, XPLConstants}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{IndentedLogger, PipelineUtils}
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.{ParserConfiguration, XMLConstants}
 import org.orbeon.scaxon.NodeConversions
 

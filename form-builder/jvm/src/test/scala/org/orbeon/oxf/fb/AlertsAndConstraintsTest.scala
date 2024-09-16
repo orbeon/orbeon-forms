@@ -14,16 +14,16 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.dom.Document
-import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fb.FormBuilder.*
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.SchemaOps.findSchemaPrefix
 import org.orbeon.oxf.fr.XMLNames.XF
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.{xml => sx}

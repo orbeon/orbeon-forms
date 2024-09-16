@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.library
 
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, Type}
-import org.orbeon.saxon.expr.StaticProperty._
-import org.orbeon.saxon.`type`.BuiltInAtomicType._
-import org.orbeon.oxf.xforms.function.xxforms._
+import org.orbeon.saxon.expr.StaticProperty.*
+import org.orbeon.saxon.`type`.BuiltInAtomicType.*
+import org.orbeon.oxf.xforms.function.xxforms.*
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.oxf.xforms.function.{Bind, Event, If, XXFormsValid}
 import org.orbeon.oxf.xforms.function.exforms.EXFormsMIP

@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{JSON, LoggerFactory}
 
 import scala.util.control.NonFatal

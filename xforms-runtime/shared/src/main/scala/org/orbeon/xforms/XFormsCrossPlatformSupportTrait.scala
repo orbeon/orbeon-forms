@@ -22,9 +22,9 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StaticXPath._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StaticXPath.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{ByteEncoding, CoreCrossPlatformSupport, IndentedLogger, ResourceResolver, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl

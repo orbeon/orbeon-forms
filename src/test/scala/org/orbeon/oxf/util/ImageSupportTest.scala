@@ -1,6 +1,6 @@
 package org.orbeon.oxf.util
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.datatypes.Mediatype
 import org.orbeon.oxf.test.{PipelineSupport, ResourceManagerSupport}
 import org.orbeon.oxf.util.ImageMetadata.AllMetadata

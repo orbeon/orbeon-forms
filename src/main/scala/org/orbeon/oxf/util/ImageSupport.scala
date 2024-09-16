@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.util
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import net.coobird.thumbnailator.Thumbnails
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.datatypes.Mediatype
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod.GET
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.ImageMetadata.AllMetadata
 
 import java.awt.geom.AffineTransform
@@ -29,7 +29,7 @@ import java.io.{ByteArrayOutputStream, InputStream, OutputStream}
 import java.net.URI
 import javax.imageio.stream.MemoryCacheImageOutputStream
 import javax.imageio.{IIOImage, ImageIO, ImageWriteParam}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.{Failure, Success, Try}
 
 object ImageSupport {

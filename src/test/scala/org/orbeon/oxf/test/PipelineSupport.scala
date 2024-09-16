@@ -18,7 +18,7 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, TestExternalContext}
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 
 object PipelineSupport {
 

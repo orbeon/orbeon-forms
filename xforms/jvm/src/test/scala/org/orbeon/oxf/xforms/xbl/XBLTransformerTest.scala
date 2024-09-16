@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.XFormsStaticStateStaticProperties
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Global, Metadata, PartAnalysis, PartAnalysisContextForTree, XPathErrorDetails}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import org.scalatest.funspec.AnyFunSpec

@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunnerCommon._
+import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.email.{EmailMetadata, EmailMetadataConversion, EmailMetadataParsing, EmailMetadataSerialization}
 import org.orbeon.oxf.fr.permission.Operation
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
 
 import scala.collection.mutable

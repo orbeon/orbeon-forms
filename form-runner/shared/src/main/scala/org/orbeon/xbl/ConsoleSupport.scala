@@ -8,7 +8,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.{AtomicValue, SequenceExtent}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 
 
 

@@ -1,11 +1,11 @@
 package org.orbeon.dom.io
 
-import java.io._
+import java.io.*
 import java.net.URL
 
 import org.orbeon.dom.Document
-import org.orbeon.dom.io.SAXReader._
-import org.xml.sax._
+import org.orbeon.dom.io.SAXReader.*
+import org.xml.sax.*
 
 class DocumentException(message: String, throwable: Throwable) extends Exception(message, throwable) {
   def this(message: String)      = this(message, null)

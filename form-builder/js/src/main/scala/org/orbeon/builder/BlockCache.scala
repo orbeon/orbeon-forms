@@ -13,7 +13,7 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.xforms.$
 import org.scalajs.dom
 import org.scalajs.jquery.JQuery
@@ -132,7 +132,7 @@ object BlockCache {
     def elemNotInSectionTemplateOpt(domEl: dom.Element): Option[JQuery] = {
       val el = $(domEl)
       val parentSectionTemplate = el.parents(".fr-section-component")
-      
+
       ! parentSectionTemplate.is("*") option el
     }
   }

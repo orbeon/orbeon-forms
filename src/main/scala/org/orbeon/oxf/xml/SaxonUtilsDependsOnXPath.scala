@@ -15,7 +15,7 @@ package org.orbeon.oxf.xml
 
 import org.orbeon.oxf.util
 import org.orbeon.saxon.Configuration
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
 
 

@@ -20,17 +20,17 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.processor.ProcessorSupport
 import org.orbeon.oxf.processor.generator.DOMGenerator
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PipelineUtils
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.controls.{InstanceMetadataBuilder, LHHA}
 import org.orbeon.oxf.xforms.analysis.model.Instance
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.xbl.XBLAssetsBuilder.HeadElementBuilder
-import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.xml.dom.Extensions.*
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{EventNames, HeadElement}
 import org.orbeon.xml.NamespaceMapping
 

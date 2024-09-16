@@ -17,19 +17,19 @@ import cats.data.NonEmptyList
 import org.orbeon.connection.StreamedContent
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.http._
+import org.orbeon.oxf.fr.embedding.*
+import org.orbeon.oxf.http.*
 import org.orbeon.oxf.portlet.liferay.{LiferayAPI, LiferaySupport}
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 
 import java.net.URL
-import javax.portlet._
+import javax.portlet.*
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 import scala.util.matching.Regex
 

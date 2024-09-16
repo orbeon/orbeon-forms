@@ -17,7 +17,7 @@ package org.orbeon.xforms
 import cats.data.NonEmptyList
 import org.scalatest.funspec.AsyncFunSpec
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
 class ExecutionQueueTest extends AsyncFunSpec {

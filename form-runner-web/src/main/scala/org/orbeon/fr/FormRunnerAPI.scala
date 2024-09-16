@@ -14,12 +14,12 @@
 package org.orbeon.fr
 
 import org.orbeon.oxf.fr.Names
-import org.orbeon.xforms._
+import org.orbeon.xforms.*
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.|
 
 

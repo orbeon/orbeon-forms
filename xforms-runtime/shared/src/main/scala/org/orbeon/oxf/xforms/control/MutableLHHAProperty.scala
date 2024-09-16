@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty

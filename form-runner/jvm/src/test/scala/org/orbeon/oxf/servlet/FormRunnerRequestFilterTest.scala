@@ -23,7 +23,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 import org.scalatestplus.mockito.MockitoSugar
 
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpecLike with MockitoSugar {

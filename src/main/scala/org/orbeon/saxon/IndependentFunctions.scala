@@ -15,11 +15,11 @@ package org.orbeon.saxon
 
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon
-import org.orbeon.saxon.`type`.BuiltInAtomicType._
-import org.orbeon.saxon.`type`.Type._
+import org.orbeon.saxon.`type`.BuiltInAtomicType.*
+import org.orbeon.saxon.`type`.Type.*
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, Type}
-import org.orbeon.saxon.expr.StaticProperty._
-import org.orbeon.saxon.function._
+import org.orbeon.saxon.expr.StaticProperty.*
+import org.orbeon.saxon.function.*
 
 // TODO: Separate pure functions from this
 trait IndependentFunctions extends OrbeonFunctionLibrary {

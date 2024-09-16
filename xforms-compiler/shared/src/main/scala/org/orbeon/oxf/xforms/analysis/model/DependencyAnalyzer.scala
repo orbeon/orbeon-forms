@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis
 import org.orbeon.oxf.xml.SaxonUtils

@@ -1,9 +1,9 @@
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeConversions.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 

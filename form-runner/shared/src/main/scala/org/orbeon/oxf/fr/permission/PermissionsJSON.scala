@@ -1,8 +1,8 @@
 package org.orbeon.oxf.fr.permission
 
-import io.circe._
-import io.circe.parser._
-import org.orbeon.oxf.util.StringUtils._
+import io.circe.*
+import io.circe.parser.*
+import org.orbeon.oxf.util.StringUtils.*
 
 import scala.util.{Success, Try}
 

@@ -24,8 +24,8 @@ import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 
 import java.io.{FileInputStream, OutputStream}
 import scala.util.Try

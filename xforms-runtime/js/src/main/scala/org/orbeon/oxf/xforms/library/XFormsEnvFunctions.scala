@@ -13,17 +13,17 @@
  */
 package org.orbeon.oxf.xforms.library
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.debug
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
 import org.orbeon.oxf.xforms.function.XFormsFunction.relevantControl
-import org.orbeon.oxf.xforms.function._
+import org.orbeon.oxf.xforms.function.*
 import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
@@ -36,7 +36,7 @@ import org.orbeon.xforms.Namespaces
 
 
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 /**

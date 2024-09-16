@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.model
 import org.orbeon.dom.QName
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.NodeInfoFactory
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
-import org.orbeon.oxf.xml.dom.Converter._
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.oxf.xml.dom.Converter.*
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.language.postfixOps

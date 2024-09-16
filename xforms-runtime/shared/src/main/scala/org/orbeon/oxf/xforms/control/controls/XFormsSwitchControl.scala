@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.controls.{CaseControl, SwitchControl}
-import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsId
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 
 import java.{util => ju}
 

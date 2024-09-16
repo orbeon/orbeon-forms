@@ -17,15 +17,15 @@ import org.junit.Test
 import org.orbeon.dom
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.XFormsModel
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.Value
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.scalatestplus.junit.AssertionsForJUnit
 
 class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {

@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.rewrite.Rewrite
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.util.MarkupUtils.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysis, WithChildrenTrait}
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl

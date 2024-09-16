@@ -19,7 +19,7 @@ import org.orbeon.oxf.http.{HttpStatusCode, StatusCode}
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.xforms.BindingErrorReason
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.*
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.xforms.{ServerError, XFormsCrossPlatformSupport, XFormsNames}
 

@@ -21,23 +21,23 @@ import org.orbeon.dom
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.StaticXPath._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StaticXPath.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
-import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
 import org.scalajs.dom.DOMParser
-import org.scalajs.dom.ext._
+import org.scalajs.dom.ext.*
 import org.scalajs.dom.raw.{Blob, BlobPropertyBag, HTMLDocument}
 
-import java.io._
+import java.io.*
 import java.net.URI
 import javax.xml.transform.Transformer
 import javax.xml.transform.sax.TransformerHandler
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.typedarray.Uint8Array
 
 

@@ -15,13 +15,13 @@ package org.orbeon.builder.rpc
 
 import org.orbeon.datatypes.{AboveBelow, Direction}
 import org.orbeon.oxf.fb.UndoAction.ControlSettings
-import org.orbeon.oxf.fb._
-import org.orbeon.oxf.fr.FormRunnerCommon._
+import org.orbeon.oxf.fb.*
+import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 
 

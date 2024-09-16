@@ -1,11 +1,11 @@
 package org.orbeon.oxf.fr.process
 
 import cats.data.NonEmptyList
-import cats.syntax.option._
+import cats.syntax.option.*
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.oxf.util.ContentTypes
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 
 trait ProcessParams {

@@ -13,9 +13,9 @@
   */
 package org.orbeon.datatypes
 
-import org.orbeon.datatypes.Mediatype.TypeOrSubtype._
-import org.orbeon.datatypes.Mediatype._
-import org.orbeon.datatypes.MediatypeRange._
+import org.orbeon.datatypes.Mediatype.TypeOrSubtype.*
+import org.orbeon.datatypes.Mediatype.*
+import org.orbeon.datatypes.MediatypeRange.*
 
 
 // Concrete mediatype, as opposed to `MediatypeRange` below

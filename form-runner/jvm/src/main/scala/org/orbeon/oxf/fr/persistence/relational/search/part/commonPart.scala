@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.search.part
 import org.orbeon.oxf.fr.persistence.relational.Statement.{Setter, StatementPart}
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{ControlQuery, Query}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 
 
 object commonPart  {

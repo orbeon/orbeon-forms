@@ -4,8 +4,8 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.{AriaInvalid, AriaRequired}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
-import org.orbeon.oxf.xml.SaxSupport._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.SaxSupport.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.{Constants, XFormsId, XFormsNames}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl

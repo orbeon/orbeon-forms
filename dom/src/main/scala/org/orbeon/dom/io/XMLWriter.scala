@@ -1,9 +1,9 @@
 package org.orbeon.dom.io
 
-import java.io._
+import java.io.*
 import java.{lang => jl, util => ju}
 
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.orbeon.dom.tree.NamespaceStack
 
 object XMLWriter {

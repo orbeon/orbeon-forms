@@ -14,8 +14,8 @@
 package org.orbeon.xforms
 
 import cats.data.NonEmptyList
-import cats.syntax.option._
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import cats.syntax.option.*
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Future, Promise}

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.scalatest.funspec.AnyFunSpec
 
 

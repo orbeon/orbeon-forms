@@ -15,11 +15,11 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fb.UndoAction.MoveContainer
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerDocContext
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 trait SectionOps extends ContainerOps {
 

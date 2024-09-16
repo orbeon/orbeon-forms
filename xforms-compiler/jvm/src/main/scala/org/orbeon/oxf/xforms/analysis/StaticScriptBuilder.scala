@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.util.SecureUtils
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 
 import scala.collection.mutable
 

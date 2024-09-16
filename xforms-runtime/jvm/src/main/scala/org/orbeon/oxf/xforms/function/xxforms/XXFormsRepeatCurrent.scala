@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer
 import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.*
 
 /**
  * Return the current node of one of the enclosing xf:repeat iteration, either the closest

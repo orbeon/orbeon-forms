@@ -14,26 +14,26 @@
 package org.orbeon.oxf.util
 
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException
-import org.apache.commons.fileupload._
+import org.apache.commons.fileupload.*
 import org.apache.commons.fileupload.disk.{DiskFileItem, DiskFileItemFactory}
 import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.fileupload.util.Streams
 import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
 import org.orbeon.errorified.Exceptions
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.io.{CharsetNames, LimiterInputStream}
-import org.orbeon.oxf.externalcontext.ExternalContext._
+import org.orbeon.oxf.externalcontext.ExternalContext.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import java.io.OutputStream
 import java.{util => ju}
 import scala.collection.{mutable => m}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

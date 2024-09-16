@@ -14,11 +14,12 @@
 package org.orbeon.oxf.xforms.action.actions
 
 import cats.data.NonEmptyList
-import cats.syntax.option._
-import org.orbeon.dom._
+import cats.syntax.option.*
+import org.orbeon.dom.*
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.CollectionUtils.InsertPosition
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
@@ -30,13 +31,12 @@ import org.orbeon.saxon.om
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.xforms.XFormsNames
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import java.util
 import java.util.Collections
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
-import org.orbeon.oxf.util.Logging._
+import scala.jdk.CollectionConverters.*
 
 
 /**

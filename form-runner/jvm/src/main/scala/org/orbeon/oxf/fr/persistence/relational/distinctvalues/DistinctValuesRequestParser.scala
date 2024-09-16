@@ -18,10 +18,10 @@ import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt.{DistinctValuesRequest, Metadata}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 
 trait DistinctValuesRequestParser {

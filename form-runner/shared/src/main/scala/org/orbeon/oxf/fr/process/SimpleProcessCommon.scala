@@ -16,23 +16,23 @@ package org.orbeon.oxf.fr.process
 import cats.effect.IO
 import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.process.ProcessInterpreter.Action
 import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
 import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
 import org.orbeon.oxf.logging.LifecycleLogger
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeInfoConversions
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future

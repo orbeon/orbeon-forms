@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.AttributesAndElementsIterator
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 
 object ValidSupport {

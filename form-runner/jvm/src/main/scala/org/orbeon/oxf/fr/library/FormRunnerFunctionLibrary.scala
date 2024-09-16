@@ -16,27 +16,27 @@ package org.orbeon.oxf.fr.library
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
 import org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
-import org.orbeon.saxon.`type`.BuiltInAtomicType._
+import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.`type`.Type.ITEM_TYPE
-import org.orbeon.saxon.expr.StaticProperty._
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.StaticProperty.*
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.function.{AncestorOrganizations, Property, UserOrganizations, UserRoles}
 import org.orbeon.saxon.functions.SystemFunction
-import org.orbeon.saxon.om._
-import org.orbeon.saxon.value._
+import org.orbeon.saxon.om.*
+import org.orbeon.saxon.value.*
 import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xbl.Wizard
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI

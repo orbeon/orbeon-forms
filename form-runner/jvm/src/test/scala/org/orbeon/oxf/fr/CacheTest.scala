@@ -18,6 +18,7 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache
 import org.scalatest.funspec.AnyFunSpecLike
 
+
 class CacheTest
   extends DocumentTestBase
      with ResourceManagerSupport

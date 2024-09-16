@@ -15,29 +15,29 @@ package org.orbeon.oxf.xforms.model
 
 import org.orbeon.datatypes.{BasicLocationData, LocationData}
 import org.orbeon.dom
-import org.orbeon.dom._
+import org.orbeon.dom.*
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.Connection.isInternalPath
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.InstanceLoader
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.event._
-import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.event.*
+import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
 import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.NodeInfoConversions._
+import org.orbeon.scaxon.NodeInfoConversions.*
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import java.net.URI
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 // Caching information associated with an instance loaded with xxf:cache="true"

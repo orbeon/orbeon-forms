@@ -1,7 +1,7 @@
 package org.orbeon.sjsdom
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation._
+import scala.scalajs.js.annotation.*
 
 /** See [[https://streams.spec.whatwg.org/#reader-class ¶3.4. Class ReadableStreamReader]] of whatwg streams spec.
   *

@@ -15,14 +15,14 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.apache.commons.io.input.ReaderInputStream
 import org.orbeon.io.CharsetNames
-import org.orbeon.io.IOUtils._
+import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
-import org.orbeon.oxf.fr.Version._
+import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.persistence.relational.Provider.{PostgreSQL, SQLite, binarySize, partialBinary}
-import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.http._
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.fr.persistence.relational.*
+import org.orbeon.oxf.http.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger, NetUtils}
 
 import java.io.{ByteArrayInputStream, StringReader}

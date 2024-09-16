@@ -1,11 +1,11 @@
 package org.orbeon.dom.saxon
 
-import org.orbeon.dom._
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.dom.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.event.Receiver
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 import org.orbeon.saxon.pattern.{AnyNodeTest, NodeTest}
 import org.orbeon.saxon.value.{AtomicValue, StringValue, UntypedAtomicValue, Value}
 

@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.fb
 
-import cats.syntax.option._
-import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fb.ToolboxOps._
-import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr._
+import cats.syntax.option.*
+import org.orbeon.oxf.fb.FormBuilder.*
+import org.orbeon.oxf.fb.ToolboxOps.*
+import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.XMLNames.*
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.Converter._
-import org.orbeon.saxon.om._
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.oxf.xml.dom.Converter.*
+import org.orbeon.saxon.om.*
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.Namespaces
 import org.scalatest.funspec.AnyFunSpecLike
 

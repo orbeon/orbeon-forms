@@ -22,7 +22,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.externalcontext.{ExternalContext, SimpleSession}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.ResourceManagerSupport
-import org.orbeon.oxf.util.Multipart._
+import org.orbeon.oxf.util.Multipart.*
 import org.orbeon.oxf.util.NetUtils.inputStreamToByteArray
 import org.orbeon.oxf.util.FileRejectionReason.SizeTooLarge
 import org.orbeon.oxf.xforms.upload.AllowedMediatypes.AllowedAnyMediatype

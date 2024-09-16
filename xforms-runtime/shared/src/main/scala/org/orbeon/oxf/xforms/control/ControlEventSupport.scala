@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.ViewTrait
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.event._
-import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.event.*
+import org.orbeon.oxf.xforms.event.events.*
 
 
 trait ControlEventSupport extends ListenersTrait {

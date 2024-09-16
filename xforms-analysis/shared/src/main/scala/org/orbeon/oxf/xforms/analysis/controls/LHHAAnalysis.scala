@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.dom._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.dom.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.event.XFormsEvents.{XFORMS_FOCUS, XXFORMS_BLUR}
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping

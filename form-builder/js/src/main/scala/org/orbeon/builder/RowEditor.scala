@@ -13,7 +13,7 @@
  */
 package org.orbeon.builder
 
-import autowire._
+import autowire.*
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.builder.rpc.FormBuilderRpcApi
@@ -26,7 +26,7 @@ import org.scalajs.dom.document
 import org.scalajs.jquery.JQuery
 
 import scala.collection.immutable
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 
 object RowEditor {

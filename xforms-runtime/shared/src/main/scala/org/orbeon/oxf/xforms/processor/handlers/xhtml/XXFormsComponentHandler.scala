@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.{LhhaControlRef, LhhaPlacementType}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.{Attributes, Locator}
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import java.{lang => jl}
 

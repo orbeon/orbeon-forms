@@ -15,15 +15,15 @@ package org.orbeon.oxf.fb
 
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
+import enumeratum.*
 import org.orbeon.datatypes.{AboveBelow, Coordinate1, Direction}
 import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xforms.NodeInfoFactory._
+import org.orbeon.oxf.xforms.NodeInfoFactory.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 
 
 case class ControlPosition  (gridName: String,     coordinate: Coordinate1)

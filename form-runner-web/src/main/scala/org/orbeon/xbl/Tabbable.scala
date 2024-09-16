@@ -14,13 +14,13 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
-import org.orbeon.xbl.DndRepeat._
+import org.orbeon.xbl.DndRepeat.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames, Page}
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr

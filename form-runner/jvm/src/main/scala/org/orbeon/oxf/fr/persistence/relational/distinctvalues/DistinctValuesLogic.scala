@@ -15,11 +15,11 @@ package org.orbeon.oxf.fr.persistence.relational.distinctvalues
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt._
+import org.orbeon.oxf.fr.persistence.relational.Statement.*
+import org.orbeon.oxf.fr.persistence.relational.distinctvalues.adt.*
 import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
 import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchPermissions
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.IndentedLogger
 
 import java.sql.Connection

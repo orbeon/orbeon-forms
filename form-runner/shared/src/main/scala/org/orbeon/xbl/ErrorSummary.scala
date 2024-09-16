@@ -17,27 +17,27 @@ import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.xforms.NodeInfoFactory._
+import org.orbeon.oxf.xforms.NodeInfoFactory.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.control.{VisitableTrait, XFormsComponentControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent.xxfName
-import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.NodeInfoConversions._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.NodeInfoConversions.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
-import scala.collection.Searching._
-import scala.collection.Searching._
+import scala.collection.Searching.*
+import scala.collection.Searching.*
 import scala.collection.mutable.IndexedSeqOps
 import scala.collection.{IterableFactoryDefaults, IterableOnce, Iterator, SeqFactory, StrictOptimizedSeqOps, mutable}
 import scala.math.Ordering

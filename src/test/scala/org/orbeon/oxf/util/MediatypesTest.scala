@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.datatypes.Mediatype
 import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.funspec.AnyFunSpecLike

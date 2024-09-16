@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.saxon.om
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 trait ControlBindingSupport {
 

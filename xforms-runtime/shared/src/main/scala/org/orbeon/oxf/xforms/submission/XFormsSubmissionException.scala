@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData

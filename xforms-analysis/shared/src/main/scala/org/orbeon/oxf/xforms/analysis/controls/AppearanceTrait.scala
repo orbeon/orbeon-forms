@@ -17,7 +17,7 @@ import java.{lang => jl}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 
 
 trait AppearanceTrait extends ElementAnalysis {

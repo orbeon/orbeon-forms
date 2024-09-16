@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.xforms.event.XFormsEvent.{EmptyGetter, PropertyGetter}
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 
 

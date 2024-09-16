@@ -18,18 +18,18 @@ import org.orbeon.oxf.fr.permission.PermissionsAuthorization
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.parsePositiveIntParamOrThrow
 import org.orbeon.oxf.fr.persistence.relational.index.Index
-import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
-import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata._
-import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
-import org.orbeon.oxf.fr.persistence.relational.search.adt._
+import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts.*
+import org.orbeon.oxf.fr.persistence.relational.search.adt.Metadata.*
+import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts.*
+import org.orbeon.oxf.fr.persistence.relational.search.adt.*
 import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider, RelationalUtils}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
 import scala.util.{Failure, Success}
 

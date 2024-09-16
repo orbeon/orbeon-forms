@@ -18,7 +18,7 @@ import org.orbeon.oxf.processor.scope.ScopeGenerator
 import org.orbeon.oxf.xml.SaxonUtils.StringValueWithEquals
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
 
 object ScopeFunctionSupport {

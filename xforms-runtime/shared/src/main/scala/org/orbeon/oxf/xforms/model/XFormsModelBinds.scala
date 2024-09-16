@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper
 import org.orbeon.oxf.common.OrbeonLocationException
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.model.MipName._
+import org.orbeon.oxf.xforms.analysis.model.MipName.*
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Model, Types}
 import org.orbeon.oxf.xforms.analysis.{XPathDependencies, XPathErrorDetails}
@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.Implicits.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 

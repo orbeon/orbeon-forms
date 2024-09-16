@@ -16,15 +16,15 @@ package org.orbeon.oxf.xml
 import java.{lang => jl, util => ju}
 
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{FunctionContext, StaticXPath, XPath, XPathCache}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
-import org.orbeon.saxon.value._
+import org.orbeon.saxon.value.*
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.{dom => odom}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 // These are older XPath utilities used by XPL. Don't expand on this as it's kept mostly for legacy purposes.
 object XPathUtils {

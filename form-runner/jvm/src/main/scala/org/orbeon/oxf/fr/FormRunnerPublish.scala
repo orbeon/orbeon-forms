@@ -13,24 +13,24 @@
   */
 package org.orbeon.oxf.fr
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerPersistence.FormXhtml
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.runtime
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.MapFunctions
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.AtomicValue
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

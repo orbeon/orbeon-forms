@@ -115,12 +115,12 @@ import org.orbeon.apache.xerces.impl.Constants
 import org.orbeon.apache.xerces.jaxp.JAXPConstants
 import org.orbeon.apache.xerces.util.SAXMessageFormatter
 import org.orbeon.oxf.xml.ParserConfiguration
-import org.xml.sax._
+import org.xml.sax.*
 import org.xml.sax.helpers.DefaultHandler
 import javax.xml.parsers.SAXParserFactory
 import java.{util => ju}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /**
  * The only real difference between this class and org.orbeon.apache.xerces.jaxp.SAXParserImpl is that this class

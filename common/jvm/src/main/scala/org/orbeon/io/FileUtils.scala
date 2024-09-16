@@ -15,7 +15,7 @@ package org.orbeon.io
 
 import java.io.File
 import java.net.URI
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 
 object FileUtils {
 

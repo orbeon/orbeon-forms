@@ -15,15 +15,15 @@ package org.orbeon.oxf.xforms.processor.handlers
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.event.EventCollector
-import org.orbeon.oxf.xforms.processor.handlers.xhtml._
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.*
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsGlobalProperties}
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XH}
-import org.orbeon.oxf.xml._
-import org.orbeon.xforms.Namespaces._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.xml.*
+import org.orbeon.xforms.Namespaces.*
+import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.Attributes
 
 

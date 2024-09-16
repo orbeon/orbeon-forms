@@ -14,22 +14,22 @@
 package org.orbeon.oxf.util
 
 import java.util.{List => JList}
-import javax.xml.transform._
+import javax.xml.transform.*
 import javax.xml.transform.sax.SAXSource
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.saxon.OrbeonDOMObjectModel
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, GlobalDocumentNumberAllocator}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.oxf.xml.{ParserConfiguration, ShareableXPathStaticContext, XMLParsing}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.{AnyItemType, ItemType, Type}
 import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.functions.{FunctionLibrary, JavaExtensionLibrary}
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.*
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
 import org.orbeon.saxon.value.{AtomicValue, SequenceExtent, Value}

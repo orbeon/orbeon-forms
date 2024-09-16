@@ -15,8 +15,8 @@ package org.orbeon.oxf.xml
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OrbeonLocationException
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.saxon.om.StructuredQName
 import org.xml.sax.helpers.AttributesImpl

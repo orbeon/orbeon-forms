@@ -18,10 +18,10 @@ import org.orbeon.oxf.externalcontext.ServletPortletRequest
 import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.slf4j.LoggerFactory
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 // For backward compatibility
 class FormRunnerAuthFilter extends JavaxFormRunnerAuthFilter

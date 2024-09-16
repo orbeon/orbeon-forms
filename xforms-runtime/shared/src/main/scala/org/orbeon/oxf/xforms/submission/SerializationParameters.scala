@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.json.Converter
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.xforms.XFormsCrossPlatformSupport

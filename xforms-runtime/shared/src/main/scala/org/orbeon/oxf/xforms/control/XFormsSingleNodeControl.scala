@@ -14,22 +14,22 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xforms.analysis.model.{MipName, StaticBind, Types}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_ITERATION_MOVED
-import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.AtomicValue
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.xml.sax.helpers.AttributesImpl

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_NODESET_CHANGED
 import org.orbeon.oxf.xforms.event.{XFormsEventTarget, XFormsEvent}
 

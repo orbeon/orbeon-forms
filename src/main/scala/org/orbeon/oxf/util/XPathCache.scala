@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import java.util.{List => JList, Map => JMap}
 
 import org.apache.commons.pool.{BasePoolableObjectFactory, ObjectPool}
@@ -26,7 +26,7 @@ import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.functions.FunctionLibraryList
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
-import org.orbeon.saxon.sxpath._
+import org.orbeon.saxon.sxpath.*
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.SequenceExtent
 

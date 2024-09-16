@@ -15,18 +15,18 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fb.XMLNames.{FBInitialIterations, _}
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.{FormRunnerDocContext, FormRunnerTemplatesOps}
-import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.fr.NodeInfoCell.*
+import org.orbeon.oxf.fr.XMLNames.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 
 
 

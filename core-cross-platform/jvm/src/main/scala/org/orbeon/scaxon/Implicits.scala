@@ -14,11 +14,11 @@
 package org.orbeon.scaxon
 
 import org.orbeon.dom.QName
-import org.orbeon.saxon.om._
-import org.orbeon.saxon.value._
+import org.orbeon.saxon.om.*
+import org.orbeon.saxon.value.*
 import org.orbeon.scaxon.SimplePath.URIQualifiedName
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.{collection => coll}
 
 

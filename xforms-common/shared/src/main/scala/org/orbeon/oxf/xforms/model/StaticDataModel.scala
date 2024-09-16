@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.oxf.util.StaticXPath._
-import org.orbeon.saxon.om._
+import org.orbeon.oxf.util.StaticXPath.*
+import org.orbeon.saxon.om.*
 import org.orbeon.saxon.value.AtomicValue
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.{BindingErrorReason, NodeBindingErrorReason}
 
 

@@ -15,12 +15,12 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.oxf.fr.DataFormatVersion
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
-import org.orbeon.oxf.fr.datamigration._
+import org.orbeon.oxf.fr.datamigration.*
 import org.orbeon.saxon.om.{DocumentInfo, SequenceIterator}
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 
 // Form Builder migration operations called from XSLT/XForms. See also `GridDataMigrationTest`.
 object FormBuilderMigrationXPathApi {

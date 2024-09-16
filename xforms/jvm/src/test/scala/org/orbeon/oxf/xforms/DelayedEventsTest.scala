@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 class DelayedEventsTest

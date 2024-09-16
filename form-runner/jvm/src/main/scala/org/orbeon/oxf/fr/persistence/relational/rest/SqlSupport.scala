@@ -13,8 +13,8 @@
   */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.fr.persistence.relational.*
+import org.orbeon.oxf.util.CoreUtils.*
 
 import java.sql.{PreparedStatement, Timestamp}
 

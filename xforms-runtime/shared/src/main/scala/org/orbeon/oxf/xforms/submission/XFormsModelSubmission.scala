@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.log4s.Logger
 import org.orbeon.connection.{ConnectionResult, ConnectionResultT}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.http.StatusCode
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
-import org.orbeon.oxf.xforms.event._
-import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.event.*
+import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.submission.SubmissionParameters.createRefContext
 import org.orbeon.oxf.xforms.submission.SubmissionUtils.convertConnectResult
@@ -34,7 +34,7 @@ import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsError}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{RelevanceHandling, XFormsId}
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 import java.net.URI
 import scala.util.control.NonFatal

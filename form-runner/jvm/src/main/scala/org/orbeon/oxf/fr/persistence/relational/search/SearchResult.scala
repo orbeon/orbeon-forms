@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{ControlQuery, Document, SearchRequest}
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{DateUtils, IndentedLogger}
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.scaxon.NodeConversions

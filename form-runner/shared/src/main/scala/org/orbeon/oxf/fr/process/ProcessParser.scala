@@ -1,7 +1,7 @@
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.util.MarkupUtils._
-import org.parboiled2._
+import org.orbeon.oxf.util.MarkupUtils.*
+import org.parboiled2.*
 
 import scala.util.{Failure, Success}
 

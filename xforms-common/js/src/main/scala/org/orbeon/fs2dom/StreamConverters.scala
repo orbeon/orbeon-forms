@@ -18,7 +18,7 @@ package org.orbeon.fs2dom
 
 import cats.effect.kernel.{Async, Resource}
 import cats.effect.std.{Dispatcher, Queue}
-import cats.syntax.all._
+import cats.syntax.all.*
 import fs2.Stream
 import org.orbeon.sjsdom.{ReadableStream, ReadableStreamType, ReadableStreamUnderlyingSource}
 

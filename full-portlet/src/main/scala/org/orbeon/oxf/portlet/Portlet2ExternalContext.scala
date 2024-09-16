@@ -17,22 +17,22 @@ import org.orbeon.connection.StreamedContent
 import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.externalcontext._
+import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.fr.embedding.APISupport.{Redirect, StreamedContentOrRedirect}
-import org.orbeon.oxf.http._
+import org.orbeon.oxf.http.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.wsrp.WSRPSupport
 
-import java.io._
+import java.io.*
 import java.util.Locale
 import java.{util => ju}
-import javax.portlet._
-import scala.jdk.CollectionConverters._
+import javax.portlet.*
+import scala.jdk.CollectionConverters.*
 
 
 /*

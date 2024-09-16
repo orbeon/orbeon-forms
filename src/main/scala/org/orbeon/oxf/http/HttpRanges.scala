@@ -2,11 +2,11 @@ package org.orbeon.oxf.http
 
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.util.TryUtils._
+import org.orbeon.oxf.util.TryUtils.*
 import org.orbeon.oxf.util.TryUtils
 
 import java.io.{File, InputStream}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.{Failure, Success, Try}
 
 // ifRange is not supported yet (implement ifRange method if needed)

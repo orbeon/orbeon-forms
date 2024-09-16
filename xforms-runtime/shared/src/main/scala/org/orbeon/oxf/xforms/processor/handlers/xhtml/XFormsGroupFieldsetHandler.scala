@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.xforms.analysis.controls.{GroupControl, LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xml
 
 import org.xml.sax.Attributes
-import org.orbeon.scaxon.SAXEvents._
+import org.orbeon.scaxon.SAXEvents.*
 
 // Receiver which produces a subtree rooted at the first element matching the predicate provided.
 class FilterReceiver(receiver: XMLReceiver, matches: List[StartElement] => Boolean)

@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.externalcontext
 
-import java.io._
+import java.io.*
 import java.net.URL
 import java.{util => ju}
 import enumeratum.{Enum, EnumEntry}
@@ -21,9 +21,9 @@ import enumeratum.values.{IntEnum, IntEnumEntry}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.http.{Headers, HttpMethod, PathType}
 import org.orbeon.oxf.util.PathUtils
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.collection.immutable
 import scala.util.control.NonFatal
 

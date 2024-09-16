@@ -4,7 +4,7 @@ import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.parser.{ExpressionTool, OptimizerOptions}

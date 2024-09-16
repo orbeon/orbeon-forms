@@ -19,7 +19,7 @@ import java.{util => ju}
 
 import org.orbeon.oxf.fr.excel.{ExcelDateUtils, NumberToTextConverter}
 import org.orbeon.oxf.fr.excel.ExcelDateUtils.FormatType
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 
 import scala.util.Try
 

@@ -13,20 +13,20 @@
  */
 package org.orbeon.xbl
 
-import org.orbeon.facades.TinyMce._
+import org.orbeon.facades.TinyMce.*
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, DocumentAPI, Page}
 import org.scalajs.dom
 import org.scalajs.dom.{Element, MutationObserver, MutationObserverInit, MutationRecord, document, html}
-import org.scalajs.dom.ext._
+import org.scalajs.dom.ext.*
 import org.scalajs.jquery.JQueryPromise
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
-import org.orbeon.polyfills.HTMLPolyfills._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
+import org.orbeon.polyfills.HTMLPolyfills.*
 
 import scala.concurrent.Promise
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.{UndefOr, |}
 
 

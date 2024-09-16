@@ -14,27 +14,27 @@
 package org.orbeon.oxf.fr
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum._
+import enumeratum.*
 import org.log4s
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
-import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.fr.Names._
-import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.FormRunnerCommon.*
+import org.orbeon.oxf.fr.Names.*
+import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.{Property, PropertySet}
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.PathUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtils}
 import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xml.NamespaceMapping
 

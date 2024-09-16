@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.dom.Document
-import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeConversions.*
 import org.scalatest.funspec.AnyFunSpec
 
 

@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.{XFormsFunction, XXFormsInstanceTrait}
 import org.orbeon.oxf.xforms.model.XFormsInstance
-import org.orbeon.saxon.expr._
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.expr.*
+import org.orbeon.saxon.om.*
 import org.orbeon.xforms.XFormsId
 
 

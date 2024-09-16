@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.upload.api
 
-import enumeratum._
+import enumeratum.*
 
 sealed trait FileScanStatus extends EnumEntry
 object FileScanStatus extends Enum[FileScanStatus] {

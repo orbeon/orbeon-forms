@@ -16,13 +16,13 @@ package org.orbeon.oxf.xforms.event.events
 import java.util.{List => JList}
 
 import org.orbeon.oxf.xforms.event.XFormsEvent
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvents.*
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)

@@ -2,14 +2,14 @@ package org.orbeon.oxf.fr.persistence.proxy
 
 import org.orbeon.oxf.externalcontext.{Credentials, Organization, UserAndGroup}
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization._
-import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.*
+import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.persistence.relational.StageHeader
 import org.orbeon.oxf.fr.{FormRunnerAccessToken, Version}
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{DateUtils, IndentedLogger}
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.*
 import shapeless.syntax.typeable.typeableOps
 
 import java.time.Instant

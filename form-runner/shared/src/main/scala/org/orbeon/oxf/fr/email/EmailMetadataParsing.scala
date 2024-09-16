@@ -4,11 +4,11 @@ import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.XMLNames
 import org.orbeon.oxf.fr.email.EmailMetadata.{HeaderName, Legacy, TemplateValue}
 import org.orbeon.oxf.util.ContentTypes
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames
 
 import scala.util.Try

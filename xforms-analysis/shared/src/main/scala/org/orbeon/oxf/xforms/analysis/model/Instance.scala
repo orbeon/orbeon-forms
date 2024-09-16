@@ -15,16 +15,16 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.http.BasicCredentials
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, WithChildrenTrait}
-import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.xml.dom.Extensions.*
+import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
-import shapeless.syntax.typeable._
+import shapeless.syntax.typeable.*
 
 
 case class InstanceMetadata(

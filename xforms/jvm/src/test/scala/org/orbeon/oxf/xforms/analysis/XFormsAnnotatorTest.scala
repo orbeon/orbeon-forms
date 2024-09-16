@@ -15,19 +15,19 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, XPath, XPathCache}
 import org.orbeon.oxf.xforms.xbl
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.om.VirtualNode
-import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.NodeInfoConversions._
+import org.orbeon.scaxon.NodeConversions.*
+import org.orbeon.scaxon.NodeInfoConversions.*
 import org.orbeon.xforms.{BasicNamespaceMapping, XFormsNames}
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 class XFormsAnnotatorTest
   extends DocumentTestBase

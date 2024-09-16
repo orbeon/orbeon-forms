@@ -19,7 +19,7 @@ import java.{lang => jl, util => ju}
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.{CollectionUtils, DateUtils, NetUtils}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 object URLGeneratorBase {

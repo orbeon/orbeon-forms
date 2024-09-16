@@ -17,7 +17,7 @@
 package org.orbeon.oxf.fr.excel
 
 import org.orbeon.oxf.fr.excel.ExcelDateUtils.FormatType
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.CoreUtils.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.{util => ju}

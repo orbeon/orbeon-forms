@@ -19,26 +19,26 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
 import org.orbeon.oxf.fr.FormRunner.{setCreateUpdateResponse, updateAttachments}
-import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.fr.FormRunnerPersistence._
-import org.orbeon.oxf.fr.Names._
-import org.orbeon.oxf.fr._
-import org.orbeon.oxf.fr.process.ProcessInterpreter._
-import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.fr.FormRunnerCommon.*
+import org.orbeon.oxf.fr.FormRunnerPersistence.*
+import org.orbeon.oxf.fr.Names.*
+import org.orbeon.oxf.fr.*
+import org.orbeon.oxf.fr.process.ProcessInterpreter.*
+import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xbl.{ErrorSummary, Wizard}
-import org.orbeon.xforms.analysis.model.ValidationLevel._
+import org.orbeon.xforms.analysis.model.ValidationLevel.*
 
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}

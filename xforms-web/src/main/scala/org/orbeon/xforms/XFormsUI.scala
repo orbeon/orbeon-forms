@@ -17,11 +17,11 @@ import org.log4s.Logger
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.facades.HTMLDialogElement
-import org.orbeon.polyfills.HTMLPolyfills._
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.polyfills.HTMLPolyfills.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.MarkupUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport
 import org.orbeon.xforms.AjaxClient.fireEvent
 import org.orbeon.xforms.Constants.LhhacSeparator
@@ -29,21 +29,21 @@ import org.orbeon.xforms.facade.{Controls, Events, Init, Utils, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.URL
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
-import org.scalajs.dom.ext._
+import org.scalajs.dom.ext.*
 import org.scalajs.dom.html.{Input, Span}
 import org.scalajs.dom.{MouseEvent, html, raw, window}
 import org.scalajs.jquery.JQueryPromise
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import scalatags.JsDom
-import scalatags.JsDom.all._
-import shapeless.syntax.typeable._
+import scalatags.JsDom.all.*
+import shapeless.syntax.typeable.*
 
 import scala.collection.immutable
 import scala.concurrent.duration.{span => _, _}
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers.SetTimeoutHandle
 import scala.scalajs.js.{Dictionary, JSON, UndefOr, timers, |}

@@ -16,7 +16,7 @@ import org.orbeon.xml.NamespaceMapping
 
 import java.{util => ju}
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 

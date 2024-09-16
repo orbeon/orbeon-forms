@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.event
 
 import cats.data.NonEmptyList
 import org.orbeon.oxf.common.OrbeonLocationException
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis.*
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, PartEventHandlerAnalysis}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector

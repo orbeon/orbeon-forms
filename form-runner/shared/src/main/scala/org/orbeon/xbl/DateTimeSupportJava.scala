@@ -13,10 +13,10 @@
   */
 package org.orbeon.xbl
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.date.IsoTime
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.om
 

@@ -19,11 +19,11 @@ import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.{AppForm, Version}
-import org.orbeon.oxf.http._
+import org.orbeon.oxf.http.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 
 import java.time.Instant

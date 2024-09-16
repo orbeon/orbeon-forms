@@ -1,9 +1,9 @@
 package org.orbeon.oxf.xforms.analysis
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.orbeon.dom
 import org.orbeon.oxf.xforms.PartGlobalOps
-import org.orbeon.oxf.xforms.analysis.model._
+import org.orbeon.oxf.xforms.analysis.model.*
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om

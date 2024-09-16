@@ -20,7 +20,7 @@ import org.orbeon.datatypes.{BasicLocationData, LocationData}
 import org.orbeon.errorified.Exceptions
 import org.xml.sax.SAXParseException
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 object OrbeonLocationException extends OrbeonLocationExceptionTrait {

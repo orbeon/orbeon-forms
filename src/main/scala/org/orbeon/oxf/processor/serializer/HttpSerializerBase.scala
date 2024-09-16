@@ -19,20 +19,20 @@ import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseWrapper}
 import org.orbeon.oxf.http.{PathType, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ProcessorImpl._
+import org.orbeon.oxf.processor.ProcessorImpl.*
 import org.orbeon.oxf.processor.ProcessorUtils.selectBooleanValue
-import org.orbeon.oxf.processor.serializer.CachedSerializer._
+import org.orbeon.oxf.processor.serializer.CachedSerializer.*
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream
 import org.orbeon.oxf.processor.{CacheableInputReader, ProcessorInput, ProcessorInputOutputInfo}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{ContentTypes, LoggerFactory, URLRewriterUtils}
-import org.orbeon.oxf.xml.XPathUtils._
+import org.orbeon.oxf.xml.XPathUtils.*
 
 import java.io.OutputStream
 import java.net.SocketException
 import java.{lang => jl}
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 
 object HttpSerializerBase {

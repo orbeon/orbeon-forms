@@ -21,8 +21,8 @@ import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorOutput}
 import org.orbeon.oxf.util.FileItemSupport.FileItemOps
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.{Loggers, XFormsGlobalProperties}
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.{EncodeDecode, XMLReceiver}

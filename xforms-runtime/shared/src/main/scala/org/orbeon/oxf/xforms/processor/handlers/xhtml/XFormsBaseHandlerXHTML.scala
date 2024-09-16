@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import cats.syntax.option._
+import cats.syntax.option.*
 
 import java.{lang => jl}
 import org.orbeon.datatypes.LocationData
@@ -21,11 +21,11 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
 import org.orbeon.xforms.analysis.model.ValidationLevel
-import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.SaxSupport._
-import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.SaxSupport.*
+import org.orbeon.oxf.xml.dom.Extensions.*
+import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.Attributes

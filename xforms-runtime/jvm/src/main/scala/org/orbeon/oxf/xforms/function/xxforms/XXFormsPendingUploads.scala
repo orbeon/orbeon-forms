@@ -15,12 +15,13 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.Int64Value
 
 /**
  * xxf:pending-uploads() as xs:integer
  */
 class XXFormsPendingUploads extends XFormsFunction {
-  override def evaluateItem(xpathContext: XPathContext) =
+  override def evaluateItem(xpathContext: XPathContext): Item =
     new Int64Value(XFormsFunction.context.containingDocument.countPendingUploads)
 }

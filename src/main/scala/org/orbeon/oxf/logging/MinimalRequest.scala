@@ -19,33 +19,35 @@ import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.servlet.{HttpServletRequest, HttpSession}
 
+import java.util
+
 
 private class MinimalSession(session: HttpSession) extends Session {
 
   def getId = session.getId
 
-  def getCreationTime: Long                                           = throw new UnsupportedOperationException
-  def isNew: Boolean                                                  = throw new UnsupportedOperationException
-  def getLastAccessedTime: Long                                       = throw new UnsupportedOperationException
-  def removeListener(sessionListener: SessionListener): Unit          = throw new UnsupportedOperationException
-  def setMaxInactiveInterval(interval: Int): Unit                     = throw new UnsupportedOperationException
-  def addListener(sessionListener: SessionListener): Unit             = throw new UnsupportedOperationException
-  def invalidate(): Unit                                              = throw new UnsupportedOperationException
-  def getMaxInactiveInterval: Int                                     = throw new UnsupportedOperationException
+  def getCreationTime                                               : Long           = throw new UnsupportedOperationException
+  def isNew                                                         : Boolean        = throw new UnsupportedOperationException
+  def getLastAccessedTime                                           : Long           = throw new UnsupportedOperationException
+  def removeListener(sessionListener: SessionListener)              : Unit           = throw new UnsupportedOperationException
+  def setMaxInactiveInterval(interval: Int)                         : Unit           = throw new UnsupportedOperationException
+  def addListener(sessionListener: SessionListener)                 : Unit           = throw new UnsupportedOperationException
+  def invalidate()                                                  : Unit           = throw new UnsupportedOperationException
+  def getMaxInactiveInterval                                        : Int            = throw new UnsupportedOperationException
 
-  def getAttribute(name: String, scope: SessionScope)                 = throw new UnsupportedOperationException
-  def setAttribute(name: String, value: AnyRef, scope: SessionScope)  = throw new UnsupportedOperationException
-  def removeAttribute(name: String, scope: SessionScope)              = throw new UnsupportedOperationException
-  def getAttributeNames(scope: SessionScope): List[String]            = throw new UnsupportedOperationException
+  def getAttribute(name: String, scope: SessionScope)               : Option[AnyRef] = throw new UnsupportedOperationException
+  def setAttribute(name: String, value: AnyRef, scope: SessionScope): Unit           = throw new UnsupportedOperationException
+  def removeAttribute(name: String, scope: SessionScope)            : Unit           = throw new UnsupportedOperationException
+  override def getAttributeNames(scope: SessionScope)               : List[String]   = throw new UnsupportedOperationException
 
-  def getNativeSession: AnyRef = throw new UnsupportedOperationException
+  def getNativeSession                                              : AnyRef         = throw new UnsupportedOperationException
 }
 
 private class MinimalRequest(req: HttpServletRequest) extends RequestAdapter {
 
-  override lazy val getAttributesMap = new InitUtils.RequestMap(req)
-  override def getRequestPath        = req.getRequestPathInfo
-  override def getMethod             = HttpMethod.withNameInsensitive(req.getMethod)
+  override lazy val getAttributesMap: util.Map[String, AnyRef] = new InitUtils.RequestMap(req)
+  override def getRequestPath       : String                   = req.getRequestPathInfo
+  override def getMethod            : HttpMethod               = HttpMethod.withNameInsensitive(req.getMethod)
 
   private lazy val sessionWrapper = new MinimalSession(req.getSession(true))
 

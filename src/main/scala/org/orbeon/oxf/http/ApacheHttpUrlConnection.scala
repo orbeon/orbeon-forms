@@ -117,7 +117,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient[org.apache.h
   override def getOutputStream: OutputStream = throw new UnsupportedOperationException
 
   // Rarely used methods which we don't use and haven't implemented
-  override def usingProxy                = throw new UnsupportedOperationException
-  override def getHeaderFieldKey(n: Int) = throw new UnsupportedOperationException
-  override def getHeaderField(n: Int)    = throw new UnsupportedOperationException
+  override def usingProxy               : Boolean = throw new UnsupportedOperationException
+  override def getHeaderFieldKey(n: Int): String  = throw new UnsupportedOperationException
+  override def getHeaderField(n: Int)   : String  = throw new UnsupportedOperationException
 }

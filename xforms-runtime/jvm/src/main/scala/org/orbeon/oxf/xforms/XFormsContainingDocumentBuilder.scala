@@ -100,7 +100,7 @@ object XFormsContainingDocumentBuilder {
         val containerType = request.getContainerType
 
         val requestHeaders =
-          request.getHeaderValuesMap.asScala mapValues (_.toList) toMap
+          request.getHeaderValuesMap.asScala.view.mapValues(_.toList).toMap
 
         val versionedPathMatchers =
           Option(PipelineContext.get.getAttribute(PageFlowControllerProcessor.PathMatchers).asInstanceOf[ju.List[PathMatcher]]) getOrElse
@@ -112,7 +112,7 @@ object XFormsContainingDocumentBuilder {
           requestContextPath    = request.getClientContextPath("/"),
           requestPath           = Option(request.getAttributesMap.get(RendererBaseUriAttributeName).asInstanceOf[String]) getOrElse request.getRequestPath,
           requestHeaders        = requestHeaders,
-          requestParameters     = request.parameters mapValues StringConversions.objectArrayToStringArray mapValues (_.toList) toMap,
+          requestParameters     = request.parameters.view.mapValues(StringConversions.objectArrayToStringArray).mapValues(_.toList).toMap,
           containerType         = containerType,
           containerNamespace    = request.getContainerNamespace.trimAllToOpt.getOrElse(""),
           versionedPathMatchers = versionedPathMatchers.asScala.toList,

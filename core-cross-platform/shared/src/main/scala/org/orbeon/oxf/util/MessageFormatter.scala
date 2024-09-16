@@ -26,7 +26,7 @@ class MessageFormatter(val input: ParserInput) extends Parser {
   import MessageFormatter._
 
   def MessageRule: Rule1[Message] = rule {
-    zeroOrMore(FormatRule) ~> Message ~ EOI
+    zeroOrMore(FormatRule) ~> (Message.apply _) ~ EOI
   }
 
   def FormatRule: Rule1[Format] = rule {
@@ -75,7 +75,7 @@ class MessageFormatter(val input: ParserInput) extends Parser {
   }
 
   def NestedMessageRule: Rule1[Message] = rule {
-    zeroOrMore(NestedFormatRule) ~> Message
+    zeroOrMore(NestedFormatRule) ~> (Message.apply _)
   }
 
   def NestedFormatRule: Rule1[Format] = rule {

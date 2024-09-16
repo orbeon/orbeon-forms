@@ -211,7 +211,7 @@ class JavaxHttpServletRequest(httpServletRequest: javax.servlet.http.HttpServlet
       override def getReader: BufferedReader = wrapper.getReader
       override def getRemoteAddr: String = wrapper.getRemoteAddr
       override def getRemoteHost: String = wrapper.getRemoteHost
-      override def getRemoteUser: String = wrapper.getRemoteUser
+      override def getRemoteUser: String = wrapper.getRemoteUser()
       override def getRequestDispatcher(path: String): javax.servlet.RequestDispatcher = wrapper.getRequestDispatcher(path).getNativeRequestDispatcher.asInstanceOf[javax.servlet.RequestDispatcher]
       override def getRequestURI: String = wrapper.getRequestURI
       override def getRequestURL: StringBuffer = wrapper.getRequestURL
@@ -303,7 +303,7 @@ class JakartaHttpServletRequest(httpServletRequest: jakarta.servlet.http.HttpSer
       override def getReader: BufferedReader = wrapper.getReader
       override def getRemoteAddr: String = wrapper.getRemoteAddr
       override def getRemoteHost: String = wrapper.getRemoteHost
-      override def getRemoteUser: String = wrapper.getRemoteUser
+      override def getRemoteUser: String = wrapper.getRemoteUser()
       override def getRequestDispatcher(path: String): jakarta.servlet.RequestDispatcher = wrapper.getRequestDispatcher(path).getNativeRequestDispatcher.asInstanceOf[jakarta.servlet.RequestDispatcher]
       override def getRequestURI: String = wrapper.getRequestURI
       override def getRequestURL: StringBuffer = wrapper.getRequestURL

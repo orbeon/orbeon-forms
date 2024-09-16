@@ -396,6 +396,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         // Whether an external event name is explicitly allowed by the configuration.
         def isExplicitlyAllowedExternalEvent = {
           val externalEventsSet = doc.staticState.allowedExternalEvents
+
           ! XFormsEventFactory.isBuiltInEvent(event.eventName) && externalEventsSet(event.eventName)
         }
 

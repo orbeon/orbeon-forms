@@ -19,7 +19,7 @@ import org.orbeon.io.FileUtils
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ByteEncoding, ContentHandlerOutputStream, IndentedLogger, PathUtils}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector

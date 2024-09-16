@@ -21,7 +21,7 @@ import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.{properties, runtime}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, PathUtils}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}

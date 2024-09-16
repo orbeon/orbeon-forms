@@ -56,7 +56,7 @@ class AssetsAggregator extends ProcessorImpl {
             case class ReferenceElement(name: String, attributes: Attributes) extends HeadElement
             case class InlineElement   (name: String, attributes: Attributes) extends HeadElement {
               val content = new StringBuilder
-              override def text = Some(content.toString)
+              override def text: Option[String] = Some(content.toString)
             }
 
             // State
@@ -161,7 +161,7 @@ class AssetsAggregator extends ProcessorImpl {
                   element("link", xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "href" -> resource :: LinkBaseAtts)
 
                 aggregate(baselineCSS, outputCSSElement, namespaceOpt,  isCSS = true)
-                aggregate(supplementalCSS -- baselineCSS, outputCSSElement, namespaceOpt, isCSS = true)
+                aggregate(supplementalCSS.view.filterNot(baselineCSS).to(Set), outputCSSElement, namespaceOpt, isCSS = true)
                 preservedCSS foreach outputPreservedElement
               }
 
@@ -177,7 +177,7 @@ class AssetsAggregator extends ProcessorImpl {
                   element("script", xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "src" -> resource :: attsBase)
 
                 aggregate(baselineJS, outputJSElement, namespaceOpt, isCSS = false)
-                aggregate(supplementalJS -- baselineJS, outputJSElement, namespaceOpt, isCSS = false)
+                aggregate(supplementalJS.view.filterNot(baselineJS).to(Set), outputJSElement, namespaceOpt, isCSS = false)
                 preservedJS foreach outputPreservedElement
               }
 

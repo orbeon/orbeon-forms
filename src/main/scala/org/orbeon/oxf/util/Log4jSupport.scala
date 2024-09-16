@@ -54,13 +54,13 @@ object Log4jSupport {
           def tryUrl: Either[LoggerInitError, URL] =
             tryToEither(
               Try(URLFactory.createURL(propValue)),
-              LoggerInitError.MalformedUrl
+              LoggerInitError.MalformedUrl.apply
             )
 
           def tryToFindFile(url: URL): Either[LoggerInitError, InputStream] =
             tryToEither(
               Try(url.openStream()),
-              LoggerInitError.NotFound
+              LoggerInitError.NotFound.apply
             )
 
           // When a parsing error or other error occurs with the XML configuration, Log4j2 logs it but then
@@ -68,14 +68,14 @@ object Log4jSupport {
           def tryToParseFile(is: InputStream): Either[LoggerInitError, Unit] =
             tryToEither(
               XMLParsing.tryParsingXml(is, propValue, ParserConfiguration.XIncludeOnly),
-              LoggerInitError.InvalidXml
+              LoggerInitError.InvalidXml.apply
             )
 
           // `reconfigure()` logs and swallows all `Exception`s!
           def tryToConfigure(is: InputStream, url: URL): Either[LoggerInitError, Unit] =
             tryToEither(
               Try(useAndClose(is)(_ => Configurator.reconfigure(fn(log4jContext, is, url)))),
-              LoggerInitError.Other
+              LoggerInitError.Other.apply
             )
 
           val tryResult =

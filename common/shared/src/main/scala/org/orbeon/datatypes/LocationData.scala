@@ -67,7 +67,8 @@ case class BasicLocationData(file: String, line: Int, col: Int) extends Location
     LocationData.asString(this)
 }
 
-case class ExtendedLocationData private (
+// Scala 3: was private constructor. Any better solution?
+case class ExtendedLocationData (
   file        : String,
   line        : Int,
   col         : Int,

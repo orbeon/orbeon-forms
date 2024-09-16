@@ -22,6 +22,7 @@ import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.liferay.{LiferayAPI, LiferaySupport}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util._
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 

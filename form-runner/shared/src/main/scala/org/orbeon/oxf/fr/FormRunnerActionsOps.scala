@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.topLevelInstance

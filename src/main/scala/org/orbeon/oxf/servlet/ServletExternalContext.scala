@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 
 import java.io._
-import java.{util => ju}
+import java.{util, util => ju}
 import scala.jdk.CollectionConverters._
 
 
@@ -87,7 +87,7 @@ class ServletExternalContext(
     def getRequestedSessionId      = nativeRequest.getRequestedSessionId
     def getServletPath             = nativeRequest.getServletPath
     def getLocale                  = nativeRequest.getLocale
-    def getLocales                 = nativeRequest.getLocales
+    def getLocales: util.Enumeration[_] = nativeRequest.getLocales
     def isRequestedSessionIdValid  = nativeRequest.isRequestedSessionIdValid
 
     def getContainerType           = "servlet"
@@ -203,10 +203,10 @@ class ServletExternalContext(
       nativeRequest.getInputStream
     }
 
-    def getPortletMode = null
-    def getWindowState = null
+    def getPortletMode: String = null
+    def getWindowState: String = null
 
-    def getNativeRequest = nativeRequest
+    def getNativeRequest: AnyRef = nativeRequest
 
     private def handleInputEncoding(): Unit =
       if (! getInputStreamCalled)

@@ -44,7 +44,7 @@ class LocationSAXWriter extends SAXWriter {
           else
             _currentLocationData.col
 
-        def getPublicId = null
+        def getPublicId: String = null
       }
     )
 

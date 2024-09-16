@@ -375,7 +375,7 @@ class RestApiTest
 
           for ((size, position) <- Seq(0, 1, 1024, largestSize).zipWithIndex) {
             val bodyArray = new Array[Byte](size) |!> Random.nextBytes
-            val body      = bodyArray |> HttpCall.Binary
+            val body      = bodyArray |> HttpCall.Binary.apply
             val url       = HttpCall.crudURLPrefix(provider, formName) + s"data/123/file$position"
 
             HttpAssert.put(url, Specific(1), body, StatusCode.Created)
@@ -545,7 +545,7 @@ class RestApiTest
 
             val text    = dom.Text(new String(charArray))
             val element = dom.Element("gaga")   |!> (_.add(text))
-            val xmlBody = dom.Document(element) |> HttpCall.XML
+            val xmlBody = dom.Document(element) |> HttpCall.XML.apply
 
             val dataUrl = HttpCall.crudURLPrefix(provider) + s"data/$position/data.xml"
 

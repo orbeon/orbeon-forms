@@ -12,7 +12,8 @@ object XMLReceiverHelper {
 
   val CDATA = "CDATA"
 
-  private case class ElementInfo private (uri: String, name: String, qName: String)
+  // Scala 3: was private constructor. Any better solution?
+  private case class ElementInfo(uri: String, name: String, qName: String)
 
   def populateAttributes(attributesImpl: AttributesImpl, attributes: Array[String]): Unit =
     if (attributes != null)

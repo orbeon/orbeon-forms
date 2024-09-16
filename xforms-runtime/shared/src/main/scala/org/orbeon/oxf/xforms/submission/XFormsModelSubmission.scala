@@ -606,7 +606,7 @@ class XFormsModelSubmission(
       // so we don't go through the process at all.
       val instanceSatisfiesValidRequired =
         currentInstance.exists(_.readonly) ||
-        ! validate                         ||
+        (! validate)                       ||
         isSatisfiesValidity(documentToSubmit, relevanceHandling)
 
       if (! instanceSatisfiesValidRequired) {

@@ -127,7 +127,7 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
     def createCacheKey(sourceURI: String, handleXInclude: Boolean, requestBodyHash: Option[String]): InternalCacheKey =
       new InternalCacheKey(
         SharedInstanceKeyType,
-        sourceURI + "|" + handleXInclude.toString + (requestBodyHash map ('|' + _) getOrElse "")
+        sourceURI + "|" + handleXInclude.toString + (requestBodyHash map ("|" + _) getOrElse "")
       )
 
     // Make key also depend on handleXInclude and on request body hash if present

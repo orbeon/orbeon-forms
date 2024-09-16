@@ -396,8 +396,8 @@ object XFormsStaticStateDeserializer {
           val figuredOutDependencies = true
           val valueDependentPaths    = _valueDependentPaths
           val returnablePaths        = _returnablePaths
-          val dependentModels        = _dependentModels
-          val dependentInstances     = _dependentInstances
+          val dependentModels   : collection.Set[String] = _dependentModels
+          val dependentInstances: collection.Set[String] = _dependentInstances
         }
 
     var currentIndex = 0
@@ -440,11 +440,11 @@ object XFormsStaticStateDeserializer {
                     (commonBinding.modeValue, commonBinding.modeLHHA) match {
                       case (false, false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding)
                       case (false, true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding) with                          StaticLHHASupport {
-                        override def allowMinimalLabelHint: Boolean = commonBinding.allowMinimalLabelHint
+                        override def allowMinimalLabelHint: Boolean = this.commonBinding.allowMinimalLabelHint
                       }
                       case (true,  false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding) with ValueComponentTrait
                       case (true,  true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding) with ValueComponentTrait with StaticLHHASupport {
-                        override def allowMinimalLabelHint: Boolean = commonBinding.allowMinimalLabelHint
+                        override def allowMinimalLabelHint: Boolean = this.commonBinding.allowMinimalLabelHint
                       }
                     }
 

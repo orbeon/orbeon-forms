@@ -20,7 +20,8 @@ import org.orbeon.oxf.fr.process.TestProcessInterpreter.ConstantProcessId
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.{executionContext, runtime}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{FunctionContext, IndentedLogger, LoggerFactory}
+import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.BooleanValue
 import org.parboiled2.ParseError
@@ -45,8 +46,8 @@ trait TestProcessInterpreter extends ProcessInterpreter {
   def findProcessByName(scope: String, name: String): Option[String] = None
   def processError(t: Throwable) = ()
   var xpathContext: Item = null
-  val xpathFunctionLibrary = null
-  def xpathFunctionContext = null
+  val xpathFunctionLibrary: FunctionLibrary = null
+  def xpathFunctionContext: FunctionContext = null
 
   // Just store the continuation locally
   def clearSuspendedProcess(): Unit = _suspendedProcess = None

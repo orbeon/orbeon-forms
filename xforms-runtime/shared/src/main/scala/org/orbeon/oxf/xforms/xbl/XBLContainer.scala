@@ -113,7 +113,7 @@ class XBLContainer(
   def createChildContainer(associatedControl: XFormsControl, childPartAnalysis: NestedPartAnalysis): XBLContainer =
     new XBLContainer(associatedControl, self, childPartAnalysis.startScope) {
       // Start with specific part
-      override def partAnalysis = childPartAnalysis
+      override def partAnalysis: PartAnalysis = childPartAnalysis
     }
 
   // Update the effective id when repeat iterations change.

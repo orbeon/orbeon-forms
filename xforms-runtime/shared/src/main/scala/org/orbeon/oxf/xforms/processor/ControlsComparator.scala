@@ -323,17 +323,17 @@ class ControlsComparator(
             val commonSize = size1 min size2
 
             if (commonSize > 0)
-              diffChildren(children1.view(0, commonSize), children2.view(0, commonSize), fullUpdateBuffer)
+              diffChildren(children1.view.slice(0, commonSize), children2.view.slice(0, commonSize), fullUpdateBuffer)
 
             if (size2 > size1) {
 
               val mark = getMarkOrThrow(containerControl2)
 
               if (control1Opt.isDefined)
-                for (newIteration <- children2.view(size1, size2))
+                for (newIteration <- children2.view.slice(size1, size2))
                   processFullUpdateForContent(newIteration, None, receiver => mark.replay(new SkipRootElement(receiver)))
               else
-                diffChildren(Nil, children2.view(size1, size2), fullUpdateBuffer) // test mode
+                diffChildren(Nil, children2.view.slice(size1, size2), fullUpdateBuffer) // test mode
 
             } else if (size2 < size1) {
               outputDeleteRepeatElements(repeatControl2, size1 - size2)

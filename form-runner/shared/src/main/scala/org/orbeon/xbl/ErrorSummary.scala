@@ -489,7 +489,7 @@ object CustomJavaConversions {
       this
     }
     def remove(from: Int, n: Int): Unit = underlying.subList(from, from+n).clear()
-    override def iterableFactory = ???
+    override def iterableFactory: Nothing = ???
     override def subtractOne(elem: A): this.type = { underlying.remove(elem.asInstanceOf[AnyRef]); this }
   }
 

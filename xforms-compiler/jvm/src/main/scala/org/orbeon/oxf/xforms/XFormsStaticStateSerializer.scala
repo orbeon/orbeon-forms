@@ -291,12 +291,12 @@ object XFormsStaticStateSerializer {
       val prefix = a.fullPrefix
 
       val (simplyPrefixed, other) =
-        a.idMap.toIterable.partition { case (k, v) => v == prefix + k } // CHECK: `.toIterable` needed here?
+        a.idMap.partition { case (k, v) => v == prefix + k }
 
       if (simplyPrefixed.nonEmpty)
-        b += "simplyPrefixed" -> simplyPrefixed.map(_._1).asJson
+        b += "simplyPrefixed" -> simplyPrefixed.keys.asJson
       if (other.nonEmpty)
-        b += "other"          -> other.map(_._2).asJson
+        b += "other"          -> other.values.asJson
 
       Json.fromFields(b)
     }

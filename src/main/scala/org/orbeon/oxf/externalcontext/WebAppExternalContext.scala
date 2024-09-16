@@ -16,6 +16,7 @@ package org.orbeon.oxf.externalcontext
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.servlet.{HttpSession, ServletSessionImpl}
 
+
 // External context which only exposes the web app, without request or response
 // Session is None when called from init()/destroy()/contextInitialized()/contextDestroyed()
 // Session is Some(_) when called from sessionCreated()/sessionDestroyed()
@@ -23,12 +24,10 @@ class WebAppExternalContext(webAppContext: WebAppContext, httpSession: Option[Ht
 
   // Return null if we were not provided with a session. This allows detecting whether the session is available or not.
   private lazy val session: Session = httpSession map (new ServletSessionImpl(_)) orNull
-  def getSession(create: Boolean) = session
+  def getSession(create: Boolean): Session = session
 
-  def getWebAppContext = webAppContext
-  def getNativeRequest = null
-  def getNativeResponse = null
+  def getWebAppContext: WebAppContext = webAppContext
   override def getStartLoggerString = ""
-  def getRequest = null
-  def getResponse = null
+  def getRequest: ExternalContext.Request = null
+  def getResponse: ExternalContext.Response = null
 }

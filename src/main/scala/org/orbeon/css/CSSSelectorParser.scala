@@ -105,7 +105,7 @@ object CSSSelectorParser extends Parser {
   }
 
   def selector: Rule1[Selector] = rule {
-    simpleSelectorSequence ~ zeroOrMore(combinator ~ simpleSelectorSequence) ~~> Selector
+    simpleSelectorSequence ~ zeroOrMore(combinator ~ simpleSelectorSequence) ~~> Selector.apply
   }
 
   def combinator: Rule1[Combinator] = rule {
@@ -121,7 +121,7 @@ object CSSSelectorParser extends Parser {
   }
 
   def typeSelector: Rule1[TypeSelector] = rule {
-    optional(namespacePrefix) ~ elementName ~~> TypeSelector
+    optional(namespacePrefix) ~ elementName ~~> TypeSelector.apply
   }
 
   def namespacePrefix: Rule1[Option[String]] = rule {
@@ -131,10 +131,10 @@ object CSSSelectorParser extends Parser {
   def elementName: Rule1[String] = ident
 
   def universal: Rule1[UniversalSelector] = rule {
-    optional(namespacePrefix) ~~> UniversalSelector ~ "*"
+    optional(namespacePrefix) ~~> (UniversalSelector.apply _) ~ "*"
   }
 
-  def className = rule { "." ~ (ident ~~> ClassFilter) }
+  def className = rule { "." ~ (ident ~~> (ClassFilter.apply _)) }
 
   def attribute: Rule1[AttributeFilter] = rule {
     "[" ~
@@ -151,33 +151,33 @@ object CSSSelectorParser extends Parser {
         ) | (
           push(AttributePredicate.Exist)
         )
-      ) ~~> AttributeFilter ~
+      ) ~~> (AttributeFilter.apply _) ~
     "]"
   }
 
-  def pseudo: Rule1[PseudoClassFilter] = rule { ":" ~ optional(":") ~ (functionalPseudo | ident ~~> SimplePseudoClassFilter) }
+  def pseudo: Rule1[PseudoClassFilter] = rule { ":" ~ optional(":") ~ (functionalPseudo | ident ~~> SimplePseudoClassFilter.apply) }
 
   // FIXME: ident must not be "not" as that's handled by the negation
   def functionalPseudo: Rule1[FunctionalPseudoClassFilter] = rule {
-    ident ~ "(" ~ OptWhiteSpace ~ expression ~ ")" ~~> FunctionalPseudoClassFilter
+    ident ~ "(" ~ OptWhiteSpace ~ expression ~ ")" ~~> FunctionalPseudoClassFilter.apply
   }
 
   def expression: Rule1[List[Expr]] = rule {
-    oneOrMore((plus | minus | dimension | number ~~> NumberExpr | string ~~> StringExpr | ident ~~> IdentExpr) ~ OptWhiteSpace)
+    oneOrMore((plus | minus | dimension | number ~~> NumberExpr.apply | string ~~> StringExpr.apply | ident ~~> IdentExpr.apply) ~ OptWhiteSpace)
   }
 
   def negation: Rule1[NegationFilter] = rule {
-    ":not(" ~ OptWhiteSpace ~ negationArg ~~> NegationFilter ~ OptWhiteSpace ~ ")"
+    ":not(" ~ OptWhiteSpace ~ negationArg ~~> (NegationFilter.apply _) ~ OptWhiteSpace ~ ")"
   }
 
   def negationArg = rule {
     typeSelector | universal | hash | className | attribute | pseudo
   }
 
-  def hash = rule { "#" ~ (oneOrMore(nmchar) ~> IdFilter) }
+  def hash = rule { "#" ~ (oneOrMore(nmchar) ~> IdFilter.apply) }
   def plus = rule { OptWhiteSpace ~ "+" ~ push(PlusExpr) }
   def minus = rule { "-" ~ push(MinusExpr) }
-  def dimension = rule { number ~ ident ~~> DimensionExpr }
+  def dimension = rule { number ~ ident ~~> (DimensionExpr.apply _) }
   def number = rule { oneOrMore("0" - "9") ~> identity | group(zeroOrMore("0" - "9") ~ "." ~ oneOrMore("0" - "9")) ~> identity }
 
   def string  = rule { string1 | string2 }

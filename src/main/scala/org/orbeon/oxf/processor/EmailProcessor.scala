@@ -13,6 +13,10 @@
  */
 package org.orbeon.oxf.processor
 
+import jakarta.activation.{DataHandler, DataSource}
+import jakarta.mail.Message.RecipientType
+import jakarta.mail._
+import jakarta.mail.internet._
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element}
@@ -30,10 +34,6 @@ import org.orbeon.oxf.xml.dom.LocationSAXWriter
 
 import java.io._
 import java.util.{Properties => JProperties}
-import jakarta.activation.{DataHandler, DataSource}
-import jakarta.mail.Message.RecipientType
-import jakarta.mail._
-import jakarta.mail.internet._
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
 
@@ -387,14 +387,14 @@ private object EmailProcessor {
     optionalValueTrim(e.elementOpt(name)) orElse propertySet.getNonBlankString(name)
 
   trait ReadonlyDataSource extends DataSource {
-    def getOutputStream = throw new IOException("Write operation not supported")
+    def getOutputStream: OutputStream = throw new IOException("Write operation not supported")
   }
 
   class SimpleTextDataSource(val getName: String, val getContentType: String, text: String) extends ReadonlyDataSource {
-    def getInputStream  = new ByteArrayInputStream(text.getBytes(CharsetNames.Utf8))
+    def getInputStream: InputStream = new ByteArrayInputStream(text.getBytes(CharsetNames.Utf8))
   }
 
   class SimpleBinaryDataSource(val getName: String, val getContentType: String, data: Array[Byte]) extends ReadonlyDataSource {
-    def getInputStream  = new ByteArrayInputStream(data)
+    def getInputStream: InputStream = new ByteArrayInputStream(data)
   }
 }

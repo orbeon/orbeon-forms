@@ -15,6 +15,7 @@ package org.orbeon.fr
 
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util._
 import org.orbeon.xforms.{$, Page}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.URLSearchParams

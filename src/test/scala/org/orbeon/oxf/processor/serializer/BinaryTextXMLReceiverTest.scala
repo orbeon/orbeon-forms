@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.serializer
 
-import java.io.ByteArrayOutputStream
+import java.io.{ByteArrayOutputStream, OutputStream}
 import org.junit.Test
 import org.orbeon.oxf.externalcontext.ResponseAdapter
 import org.orbeon.oxf.http.{PathType, StatusCode}
@@ -74,6 +74,6 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
     override def setPageCaching(lastModified: Long, pathType: PathType): Unit = super.setPageCaching(lastModified, pathType)
     override def setHeader(name: String, value: String): Unit = super.setHeader(name, value)
 
-    override val getOutputStream = new ByteArrayOutputStream
+    override val getOutputStream: OutputStream = new ByteArrayOutputStream
   }
 }

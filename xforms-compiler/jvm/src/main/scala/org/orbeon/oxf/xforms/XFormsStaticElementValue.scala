@@ -99,7 +99,7 @@ object XFormsStaticElementValue {
 
             val isHTMLMediatype =
               if ((elem eq outerElem) || elem.getQName == XFormsNames.XFORMS_OUTPUT_QNAME)
-                ! outerIsHTML && LHHAAnalysis.isHTML(elem) || outerIsHTML && ! LHHAAnalysis.isPlainText(elem)
+                (! outerIsHTML && LHHAAnalysis.isHTML(elem) || outerIsHTML && ! LHHAAnalysis.isPlainText(elem))
               else // nested XHTML element
                 true
 

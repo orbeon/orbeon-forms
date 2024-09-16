@@ -378,7 +378,7 @@ class InstanceData private {
   @inline
   private def testMipForNonDefault(get: BindNode => Boolean, default: Boolean): Boolean =
     if ((bindNodes ne null) && ! bindNodes.isEmpty && bindNodes.asScala.exists(get(_) != default))
-      ! default
+      (! default)
     else
       default
 

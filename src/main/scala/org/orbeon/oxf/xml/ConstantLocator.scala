@@ -18,8 +18,8 @@ import org.xml.sax.Locator
 
 
 case class ConstantLocator(locationData: LocationData) extends Locator {
-  def getSystemId = locationData.file
-  def getLineNumber = locationData.line
-  def getColumnNumber = locationData.col
-  def getPublicId = null
+  def getSystemId    : String = locationData.file
+  def getLineNumber  : Int    = locationData.line
+  def getColumnNumber: Int    = locationData.col
+  def getPublicId    : String = null
 }

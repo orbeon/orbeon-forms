@@ -20,6 +20,8 @@ import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
 
+import scala.collection.immutable.ArraySeq
+
 
 trait DefaultFunctionSupport
   extends FunctionSupport
@@ -66,7 +68,7 @@ abstract class FunctionSupportJava extends FunctionSupport
 
 trait FunctionSupport extends SystemFunction {
 
-  def arguments: Seq[Expression] = getArguments
+  def arguments: Seq[Expression] = ArraySeq.unsafeWrapArray(getArguments)
 
   def stringArgument(i: Int)(implicit xpathContext: XPathContext): String =
     arguments(i).evaluateAsString(xpathContext).toString

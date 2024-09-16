@@ -307,8 +307,8 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     val otherSwitchControl = previousControlOpt.asInstanceOf[Option[XFormsSwitchControl]]
 
     val hasNestedContent =
-      isRelevant                    &&
-      ! staticControl.hasFullUpdate &&
+      isRelevant                      &&
+      (! staticControl.hasFullUpdate) &&
       getSelectedCaseEffectiveId != getOtherSelectedCaseEffectiveId(otherSwitchControl)
 
     val outputNestedContent = (ch: XMLReceiverHelper) => {

@@ -309,12 +309,11 @@ object ImportExportSupport {
     FormRunner.searchControlBindPathHoldersInDoc(List(control), ctx.dataRootElem.some, _ => true).headOption map {
       case cbphr @ ControlBindPathHoldersResources(_, bind, _, _, _) =>
 
-        val visible = {
-          ! (control.namespaceURI == XMLNames.FR && control.localname == "hidden")  && // `fr:hidden`
-          ! (control.namespaceURI == XMLNames.XF && control.localname == "trigger") && // `xf:trigger`
-          ! controlIsHiddenWithCss(control)                                         &&
-          ! FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, MipName.Relevant).contains(FormRunner.FalseExpr)
-        }
+        val visible =
+          (! (control.namespaceURI == XMLNames.FR && control.localname == "hidden"))  && // `fr:hidden`
+          (! (control.namespaceURI == XMLNames.XF && control.localname == "trigger")) && // `xf:trigger`
+          (! controlIsHiddenWithCss(control))                                         &&
+          (! FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, MipName.Relevant).contains(FormRunner.FalseExpr))
 
         (cbphr, visible)
     }

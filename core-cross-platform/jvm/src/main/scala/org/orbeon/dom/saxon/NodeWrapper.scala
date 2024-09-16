@@ -375,7 +375,7 @@ class NodeWrapper protected (
       else
         current = null
 
-    def getAnother = new AttributeEnumeration(start)
+    def getAnother: SequenceIterator = new AttributeEnumeration(start)
   }
 
   final private class NamespaceEnumeration private[saxon](var start: NodeWrapper) extends Navigator.BaseEnumeration {
@@ -388,7 +388,7 @@ class NodeWrapper protected (
       else
         current = null
 
-    def getAnother = new NamespaceEnumeration(start)
+    def getAnother: SequenceIterator = new NamespaceEnumeration(start)
 
     // NB: namespace nodes in the implementation do not support all
     // XPath functions, for example namespace nodes have no parent.
@@ -466,7 +466,7 @@ class NodeWrapper protected (
           current = null
       }
 
-    def getAnother = new ChildEnumeration(start, downwards, forwards)
+    def getAnother: SequenceIterator = new ChildEnumeration(start, downwards, forwards)
   }
 
   def isSameNodeInfo(other: NodeInfo): Boolean =

@@ -6,12 +6,12 @@ import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.{NamespaceResolver, StructuredQName}
-import org.orbeon.saxon.sxpath.{AbstractStaticContext, XPathStaticContext}
+import org.orbeon.saxon.sxpath.{AbstractStaticContext, XPathStaticContext, XPathVariable}
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.{QNameValue, SequenceType}
 import org.orbeon.xml.NamespaceMapping
 
-import java.{util => ju}
+import java.{util, util => ju}
 import javax.xml.transform.{Source, SourceLocator}
 import scala.jdk.CollectionConverters._
 
@@ -41,8 +41,8 @@ class ShareableXPathStaticContext(
   private var boundVariables = Set.empty[StructuredQName]
   def referencedVariables: Iterable[StructuredQName] = boundVariables
 
-  def declareVariable(qname: QNameValue) = throw new IllegalStateException                       // never used in Saxon
-  def declareVariable(namespaceURI: String, localName: String) = throw new IllegalStateException // shouldn't be called in our case
+  def declareVariable(qname: QNameValue): XPathVariable = throw new IllegalStateException                       // never used in Saxon
+  def declareVariable(namespaceURI: String, localName: String): XPathVariable = throw new IllegalStateException // shouldn't be called in our case
 
   def bindVariable(qName: StructuredQName): VariableReference = {
     // Q: Can this be called multiple time with the same name, and if so should we return the same VariableReference?
@@ -88,7 +88,7 @@ class ShareableXPathStaticContext(
       } else
         namespaceMapping.mapping.getOrElse(prefix, null)
 
-    def iteratePrefixes =
+    def iteratePrefixes: util.Iterator[_] =
       namespaceMapping.mapping.keySet.iterator.asJava
   }
 
@@ -99,8 +99,8 @@ class ShareableXPathStaticContext(
     uri
   }
 
-  def getNamespaceResolver = NSResolver
-  def setNamespaceResolver(resolver: NamespaceResolver) = throw new IllegalStateException
+  def getNamespaceResolver: NamespaceResolver = NSResolver
+  def setNamespaceResolver(resolver: NamespaceResolver): Unit = throw new IllegalStateException
 
   // Schema stuff which we don't support
   def importSchema(source: Source)        = getConfiguration.addSchemaSource(source, getConfiguration.getErrorListener)

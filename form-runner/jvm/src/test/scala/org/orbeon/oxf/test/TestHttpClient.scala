@@ -29,7 +29,8 @@ import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
 
-import java.{util => ju}
+import java.util.Locale
+import java.{util, util => ju}
 import scala.collection.mutable
 
 // HttpClient which simulates a call to Orbeon Forms without using a servlet. This acts as if the caller
@@ -113,9 +114,9 @@ object TestHttpClient {
 
             override val getContainerType                        = "servlet"
             override val getContainerNamespace                   = ""
-            override val getPortletMode                          = null
-            override val getWindowState                          = null
-            override val getNativeRequest                        = null
+            override val getPortletMode  : String                = null
+            override val getWindowState  : String                = null
+            override val getNativeRequest: AnyRef                = null
             override val getPathTranslated                       = ""
             override val getProtocol                             = "HTTP/1.1"
             override val getServerPort                           = ServerState.Port
@@ -123,12 +124,12 @@ object TestHttpClient {
             override val getRemoteHost                           = RemoteHost
             override val getRemoteAddr                           = RemoteAddr
             override val isSecure                                = Scheme == "https"
-            override val getLocale                               = null
-            override val getLocales                              = null
+            override val getLocale : Locale                      = null
+            override val getLocales: util.Enumeration[_]         = null
             override val getServerName                           = ServerState.Host
             override def getClientContextPath(urlString: String) = URLRewriterUtils.getClientContextPath(this, URLRewriterUtils.isPlatformPath(urlString))
             override def sessionInvalidate()                     = session.invalidate()
-            override val getRequestedSessionId                   = null
+            override val getRequestedSessionId: String           = null
 
             override val credentials                             = connectionCredentials
 

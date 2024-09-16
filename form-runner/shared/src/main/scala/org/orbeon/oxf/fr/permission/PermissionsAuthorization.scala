@@ -48,7 +48,7 @@ object ModeType {
 
 sealed trait ModeTypeAndOps { val modeType: ModeType }
 object ModeTypeAndOps {
-  case object Creation                                   extends ModeTypeAndOps { val modeType = ModeType.Creation }
+  case object Creation                                   extends ModeTypeAndOps { val modeType: ModeType = ModeType.Creation }
   case class  Other(modeType: ModeType, ops: Operations) extends ModeTypeAndOps
 }
 

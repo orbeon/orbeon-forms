@@ -22,6 +22,7 @@ import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType

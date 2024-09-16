@@ -33,7 +33,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
   private var _byteStream  : LocalByteArrayOutputStream = null
   private var _inputStream : InputStream                = null
 
-  def streamedContent = {
+  def streamedContent: StreamedContent = {
     val responseHeaders = capitalizedHeaders
     StreamedContent(
       inputStream   = getInputStream,
@@ -43,9 +43,9 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
     )
   }
 
-  def serverSideRedirect = _serverSideRedirect
+  def serverSideRedirect: Option[String] = _serverSideRedirect
 
-  def capitalizedHeaders =
+  def capitalizedHeaders: Map[String, List[String]] =
     _lowerCaseHeaders.toList map
     { case (k, v) => Headers.capitalizeCommonOrSplitHeader(k) -> v } toMap
 
@@ -70,9 +70,9 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
   def addHeader(name: String, value: String): Unit =
     _lowerCaseHeaders += name.toLowerCase  -> (_lowerCaseHeaders.getOrElse(name.toLowerCase , Nil) :+ value)
 
-  def getCharacterEncoding = null
+  def getCharacterEncoding: String = null
 
-  def getNamespacePrefix = rewriter.getNamespacePrefix
+  def getNamespacePrefix: String = rewriter.getNamespacePrefix
 
   def getOutputStream: OutputStream = {
     if (_byteStream eq null)
@@ -90,27 +90,27 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
 
   def isCommitted = false
 
-  def reset() = ()
+  def reset(): Unit = ()
 
-  def rewriteActionURL(urlString: String) =
+  def rewriteActionURL(urlString: String): String =
     rewriter.rewriteActionURL(urlString)
 
-  def rewriteRenderURL(urlString: String) =
+  def rewriteRenderURL(urlString: String): String =
     rewriter.rewriteRenderURL(urlString)
 
-  def rewriteActionURL(urlString: String, portletMode: String, windowState: String) =
+  def rewriteActionURL(urlString: String, portletMode: String, windowState: String): String =
     rewriter.rewriteActionURL(urlString, portletMode, windowState)
 
-  def rewriteRenderURL(urlString: String, portletMode: String, windowState: String) =
+  def rewriteRenderURL(urlString: String, portletMode: String, windowState: String): String =
     rewriter.rewriteRenderURL(urlString, portletMode, windowState)
 
-  def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode) =
+  def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode): String =
     rewriter.rewriteResourceURL(urlString, rewriteMode)
 
   def sendError(sc: Int): Unit =
     this._statusCode = sc
 
-  def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean) =
+  def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean): Unit =
     if (isServerSide) {
       this._serverSideRedirect = Some(location)
     } else {
@@ -132,12 +132,12 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
   def setContentType(contentType: String): Unit =
     setHeader(Headers.ContentType, contentType)
 
-  def setTitle(title: String) = ()
+  def setTitle(title: String): Unit = ()
 
   def getNativeResponse: AnyRef =
     throw new UnsupportedOperationException
 }
 
 private class LocalByteArrayOutputStream extends ByteArrayOutputStream {
-  def getByteArray = buf
+  def getByteArray: Array[Byte] = buf
 }

@@ -22,6 +22,7 @@ import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.BufferedPortlet._
 import org.orbeon.oxf.portlet.liferay.LiferayURL
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util._
 import org.orbeon.wsrp.WSRPSupport.PathParameterName
 
 import java.io.{OutputStream, PrintWriter}

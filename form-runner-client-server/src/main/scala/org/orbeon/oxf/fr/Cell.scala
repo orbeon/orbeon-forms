@@ -17,6 +17,7 @@ import enumeratum._
 import org.orbeon.datatypes.{Direction, Orientation}
 import org.orbeon.oxf.util.CoreUtils._
 
+import scala.collection.immutable.ArraySeq
 import scala.util.Try
 
 
@@ -93,7 +94,7 @@ object Cell {
 
       ops.children(tr, TdTestName) foreach { td =>
 
-        findStart(xy(iy), ix) match {
+        findStart(ArraySeq.unsafeWrapArray(xy(iy)), ix) match {
           case Some(start) =>
 
             val w = getNormalizedSizeAtt(td, "colspan")
@@ -402,8 +403,8 @@ object Cell {
       } locally {
 
         def findRun(from: Int): Option[(Int, Int)] = {
-          findStart(row, from) map { x =>
-            x -> (findEnd(row, x + 1) map (_ - 1) getOrElse (width - 1))
+          findStart(ArraySeq.unsafeWrapArray(row), from) map { x =>
+            x -> (findEnd(ArraySeq.unsafeWrapArray(row), x + 1) map (_ - 1) getOrElse (width - 1))
           }
         }
 

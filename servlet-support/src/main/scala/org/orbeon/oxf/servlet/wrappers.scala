@@ -18,6 +18,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util._
 
 import java.io._
 import java.{util => ju}
@@ -117,11 +118,11 @@ trait RequestEmptyBody extends HttpServletRequestWrapper {
   private lazy val inputStream  = newEmptyInputStream
   private lazy val reader       = newEmptyReader
 
-  override def getInputStream   = inputStream
-  override def getReader        = reader
+  override def getInputStream: InputStream = inputStream
+  override def getReader: BufferedReader = reader
 
-  override def getContentType   = null
-  override def getContentLength = -1
+  override def getContentType: String = null
+  override def getContentLength: Int = -1
 
   // TODO: filter headers content-type and content-length
 }

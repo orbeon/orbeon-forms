@@ -21,7 +21,7 @@ object NumericValidation {
   def tryParseAsLongOrBigDecimal(value: String): Option[Either[Long, BigDecimal]] =
     IntegerValue.stringToInteger(value) match {
       case v: Int64Value        => Some(Left(v.longValue))
-      case v: BigIntegerValue   => Some(Right(v.asDecimal))
+      case v: BigIntegerValue   => Some(Right(v.asDecimal()))
       case _: ValidationFailure =>
         BigDecimalValue.makeDecimalValue(value, validate = true) match {
           case v: DecimalValue      => Some(Right(v.getDecimalValue))

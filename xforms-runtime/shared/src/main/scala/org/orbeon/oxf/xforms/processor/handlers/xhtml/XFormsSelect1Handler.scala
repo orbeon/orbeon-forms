@@ -333,7 +333,7 @@ class XFormsSelect1Handler(
 
     val allowFullStaticReadonly =
       isMultiple && containingDocument.isReadonlyAppearanceStaticSelectFull ||
-        ! isMultiple && containingDocument.isReadonlyAppearanceStaticSelect1Full
+        (! isMultiple && containingDocument.isReadonlyAppearanceStaticSelect1Full)
 
     val mustOutputFull = isBooleanInput || (isFull && (allowFullStaticReadonly || !isStaticReadonly))
 

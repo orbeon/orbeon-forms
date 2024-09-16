@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import org.orbeon.oxf.util.{PathMatcher, PathUtils, URLRewriterUtils}
+import org.orbeon.oxf.util._
 import org.orbeon.wsrp.WSRPSupport._
 
 import java.net.URL

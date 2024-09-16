@@ -16,7 +16,8 @@ package org.orbeon.oxf.xml.dom
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.Element
 
-import scala.collection.immutable
+import scala.collection.immutable.ArraySeq
+
 
 object XmlExtendedLocationData {
 
@@ -28,7 +29,7 @@ object XmlExtendedLocationData {
   def apply(
     locationData : LocationData, // FIXME: Some `null` callers!
     description  : Option[String]                  = None,
-    params       : immutable.Seq[(String, String)] = Nil,
+    params       : Seq[(String, String)] = Nil,
     element      : Option[Element]                 = None
   ): ExtendedLocationData =
     ExtendedLocationData(
@@ -49,7 +50,7 @@ object XmlExtendedLocationData {
     apply(
       locationData,
       Option(description),
-      seqToPairs(params),
+      seqToPairs(ArraySeq.unsafeWrapArray(params)),
       Option(element)
     )
 

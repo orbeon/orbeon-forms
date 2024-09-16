@@ -46,7 +46,7 @@ import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers.SetTimeoutHandle
-import scala.scalajs.js.{JSON, timers, |}
+import scala.scalajs.js.{Dictionary, JSON, UndefOr, timers, |}
 import scala.util.control.NonFatal
 
 
@@ -1244,12 +1244,12 @@ object XFormsUI {
       controlId        = controlId,
       itemsetTree      = js.Array(
         new ItemsetItem {
-          val attributes = js.undefined // js.UndefOr[js.Dictionary[String]]
-          val children   = js.undefined
-          val label      = js.undefined
-          val value      = true.toString
-          val help       = js.undefined
-          val hint       = js.undefined
+          val attributes: UndefOr[Dictionary[String]]  = js.undefined // js.UndefOr[js.Dictionary[String]]
+          val children: UndefOr[js.Array[ItemsetItem]] = js.undefined
+          val label: UndefOr[String]                   = js.undefined
+          val value: String                            = true.toString
+          val help: UndefOr[String]                    = js.undefined
+          val hint: UndefOr[String]                    = js.undefined
         }
       ),
       isSelect         = true,

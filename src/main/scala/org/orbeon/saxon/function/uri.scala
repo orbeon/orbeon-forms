@@ -17,10 +17,12 @@ import java.net.URI
 
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.xml.FunctionSupport
+import org.orbeon.oxf.util._
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{AtomicValue, Int64Value, IntegerValue, StringValue}
 import org.orbeon.scaxon.Implicits._
+
 
 trait UriFunction[T <: AtomicValue] extends FunctionSupport {
 

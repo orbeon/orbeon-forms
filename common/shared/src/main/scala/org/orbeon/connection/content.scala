@@ -99,7 +99,7 @@ case class BufferedContent(
   contentType : Option[String],
   title       : Option[String]
 ) extends ContentT[InputStream] {
-  def stream   = new ByteArrayInputStream(body)
+  def stream: InputStream = new ByteArrayInputStream(body)
   def contentLength: Some[Long] = Some(body.size)
 }
 

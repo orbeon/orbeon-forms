@@ -119,5 +119,5 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
         null
     }
 
-  def copy = this
+  def copy: FunctionLibrary = this
 }

@@ -2,6 +2,7 @@ package org.orbeon.xbl
 
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.util._
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{DocumentAPI, Page}
 import org.scalajs.dom
@@ -60,6 +61,7 @@ object Recaptcha {
 
     private def findGrecaptcha: Option[js.Dynamic] = {
       val grecaptcha = window.asInstanceOf[js.Dynamic].grecaptcha
+
       ! js.isUndefined(grecaptcha) && ! js.isUndefined(grecaptcha.render) option grecaptcha
     }
 

@@ -38,7 +38,7 @@ object Mediatype {
   object TypeOrSubtype {
 
     // Try to follow IANA syntax
-    private val TokenMatch = """^((?:(?![()<>@,;:\\"/\[\]?=])[\u0021-\u007E])+)$""".r
+    private val TokenMatch = """^((?:(?![()<>@,;:\\"/\[\]?=])[!-~])+)$""".r // `\u0021-\u007E`
 
     case object WildcardType                extends TypeOrSubtype { override def toString = "*" }
     case class  SpecificType(value: String) extends TypeOrSubtype {

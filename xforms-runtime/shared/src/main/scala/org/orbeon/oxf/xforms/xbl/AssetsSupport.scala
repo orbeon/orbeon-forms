@@ -85,8 +85,10 @@ object AssetsSupport {
 
     val xblUsed = bindingAssets.iterator.collect{ case e: HeadElement.Reference => e.src }.to(mutable.LinkedHashSet)
 
+    val baselineAssetsToRemove = baselineAssets.iterator.to(Set)
+
     // Output remaining assets if any, with no CSS class
-    (xblUsed -- baselineAssets).foreach(s => outputElement(Some(s), None, None))
+    xblUsed.view.filterNot(baselineAssetsToRemove).foreach(s => outputElement(Some(s), None, None))
 
     // Output inline XBL assets
     bindingAssets.collect{ case e: HeadElement.Inline => outputElement(None, None, Option(e.text)) }

@@ -27,7 +27,7 @@ import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger, MarkupUtils, PathUtils}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._

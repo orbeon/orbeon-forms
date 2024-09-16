@@ -17,7 +17,7 @@ class DocumentInputSource(var document: Document) extends InputSource {
   }
 
   // This method is not supported as this source is always a linkDocument instance.
-  override def setCharacterStream(characterStream: Reader) =
+  override def setCharacterStream(characterStream: Reader): Unit =
     throw new UnsupportedOperationException
 
   /**

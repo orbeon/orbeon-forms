@@ -152,9 +152,8 @@ trait FormBuilderPermissionsOps {
 
       // Is this form metadata returned by the API?
       val keepForm =
-        allForms                                                   || // all forms are explicitly requested
-        (hasAdminPermissionForAppForm && ! ignoreAdminPermissions) || // admins can see everything
-        ! (
+        allForms                                                   ||     // all forms are explicitly requested
+        (hasAdminPermissionForAppForm && ! ignoreAdminPermissions) || ! ( // admins can see everything
           formName == Names.LibraryFormName ||     // filter libraries
           operations.isEmpty                ||     // filter forms on which user can't possibly do anything
           formEl.elemValue("available") == "false" // filter forms marked as not available

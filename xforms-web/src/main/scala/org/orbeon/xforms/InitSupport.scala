@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ContentTypes, LoggerFactory, PathUtils}
+import org.orbeon.oxf.util._
 import org.orbeon.web.DomEventNames
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms

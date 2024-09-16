@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import java.io.{OutputStreamWriter, PrintWriter}
+import java.io.{OutputStream, OutputStreamWriter, PrintWriter}
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseAdapter, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, StatusCode}
 import org.orbeon.oxf.processor.serializer.CachedSerializer
@@ -43,7 +43,7 @@ object PipelineResponse {
           private lazy val printWriter = new PrintWriter(new OutputStreamWriter(contentHandlerOutputStream, charset.getOrElse(CachedSerializer.DefaultEncoding)))
           private val originalResponse = externalContext.getResponse
 
-          override def getOutputStream = contentHandlerOutputStream
+          override def getOutputStream: OutputStream = contentHandlerOutputStream
 
           // Return this just because Tomcat 5.5, when doing a servlet forward, may ask for one, just to close it!
           override def getWriter = printWriter

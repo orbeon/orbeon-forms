@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
-import org.orbeon.oxf.xforms.analysis.model.Instance
-import org.orbeon.oxf.xforms.analysis.{NestedPartAnalysis, PartAnalysis, XPathErrorDetails}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, NestedPartAnalysis, PartAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.xbl.XBLAssets
 import org.orbeon.xforms.HeadElement
 import org.orbeon.xforms.xbl.Scope
@@ -62,7 +62,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     collectInParts(_.getStaticXPathErrors)
 
   // Models
-  def getModelsForScope(scope: Scope) = collectInParts(_.getModelsForScope(scope))
+  def getModelsForScope(scope: Scope): collection.Seq[Model] = collectInParts(_.getModelsForScope(scope))
   def getInstances(modelPrefixedId: String): i.Seq[Instance] = collectInParts(_.getInstances(modelPrefixedId))
 
   def containingScope(prefixedId: String) = findInParts(_.containingScope(prefixedId)).orNull
@@ -70,7 +70,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   def hasHandlerForEvent(eventName: String) = existsInParts(_.hasHandlerForEvent(eventName))
   def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean) = existsInParts(_.hasHandlerForEvent(eventName, includeAllEvents))
-  def keyboardHandlers = collectInParts(_.keyboardHandlers)
+  def keyboardHandlers: List[EventHandler] = collectInParts(_.keyboardHandlers)
 //  def getEventHandlersForObserver(observerPrefixedId: String) = collectInParts(_.getEventHandlersForObserver(observerPrefixedId))
 
   def getMark(prefixedId: String) = findInPartsOpt(_.getMark(prefixedId))
@@ -78,9 +78,9 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
   def findControlAnalysis(prefixedId: String) = findInParts(_.getControlAnalysis(prefixedId))
   def getControlAnalysis(prefixedId: String)  = findControlAnalysis(prefixedId).orNull
 
-  def controlsByName(controlName: String) = collectInParts(_.controlsByName(controlName))
+  def controlsByName(controlName: String): Iterable[ElementAnalysis] = collectInParts(_.controlsByName(controlName))
 
-  def repeats = collectInPartsReverse(_.repeats)
+  def repeats: collection.Seq[RepeatControl] = collectInPartsReverse(_.repeats)
   def getRepeatHierarchyString(ns: String) = parts map (_.getRepeatHierarchyString(ns)) mkString "," // just concat the repeat strings from all parts
 
   def hasAttributeControl(prefixedForAttribute: String) = existsInParts(_.hasAttributeControl(prefixedForAttribute))

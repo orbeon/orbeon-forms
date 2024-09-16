@@ -14,7 +14,6 @@
 package org.orbeon.oxf.util
 
 import java.util.{List => JList}
-
 import javax.xml.transform._
 import javax.xml.transform.sax.SAXSource
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
@@ -26,7 +25,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.oxf.xml.{ParserConfiguration, ShareableXPathStaticContext, XMLParsing}
 import org.orbeon.saxon.Configuration
-import org.orbeon.saxon.`type`.{AnyItemType, Type}
+import org.orbeon.saxon.`type`.{AnyItemType, ItemType, Type}
 import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.{FunctionLibrary, JavaExtensionLibrary}
@@ -62,9 +61,9 @@ object XPath extends XPathTrait {
 
     def getIdentifyingURI = "http://scala-lang.org/"
     def sendSource(source: Source, receiver: Receiver, pipe: PipelineConfiguration) = false
-    def getDocumentBuilder(result: Result) = null
-    def getNodeListCreator(node: scala.Any) = null
-    def unravel(source: Source, config: Configuration) = null
+    def getDocumentBuilder(result: Result): Receiver = null
+    def getNodeListCreator(node: scala.Any): PJConverter = null
+    def unravel(source: Source, config: Configuration): NodeInfo = null
 
     val SupportedScalaToSaxonClasses = List(classOf[Iterable[_]], classOf[Option[_]], classOf[Iterator[_]])
     val SupportedSaxonToScalaClasses = List(classOf[List[_]], classOf[Option[_]], classOf[Iterator[_]])
@@ -80,7 +79,7 @@ object XPath extends XPathTrait {
         case v: Iterator[_] => convert(v.toList, context) // we have to return a ValueRepresentation
       }
 
-      def getItemType = AnyItemType.getInstance
+      def getItemType: ItemType = AnyItemType.getInstance
     }
 
     val SaxonToScalaConverter = new PJConverter {

@@ -104,15 +104,15 @@ object SimplePath {
   }
 
   class OrTest(s1: Test, s2: Test) extends Test {
-    def test(nodeInfo: NodeInfo) = new CombinedNodeTest(s1.test(nodeInfo), Token.UNION, s2.test(nodeInfo))
+    def test(nodeInfo: NodeInfo): NodeTest = new CombinedNodeTest(s1.test(nodeInfo), Token.UNION, s2.test(nodeInfo))
   }
 
   class AndTest(s1: Test, s2: Test) extends Test {
-    def test(nodeInfo: NodeInfo) = new CombinedNodeTest(s1.test(nodeInfo), Token.INTERSECT, s2.test(nodeInfo))
+    def test(nodeInfo: NodeInfo): NodeTest = new CombinedNodeTest(s1.test(nodeInfo), Token.INTERSECT, s2.test(nodeInfo))
   }
 
   class ExceptTest(s1: Test, s2: Test) extends Test {
-    def test(nodeInfo: NodeInfo) = new CombinedNodeTest(s1.test(nodeInfo), Token.EXCEPT, s2.test(nodeInfo))
+    def test(nodeInfo: NodeInfo): NodeTest = new CombinedNodeTest(s1.test(nodeInfo), Token.EXCEPT, s2.test(nodeInfo))
   }
 
   // Match node types, like the XPath * or element(), @* or attribute(), document-node(), processing-instruction(),

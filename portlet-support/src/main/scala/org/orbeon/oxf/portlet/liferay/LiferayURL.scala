@@ -15,6 +15,7 @@ package org.orbeon.oxf.portlet.liferay
 
 import javax.portlet._
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util._
 import org.orbeon.wsrp.WSRPSupport
 
 import scala.jdk.CollectionConverters._

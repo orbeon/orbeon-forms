@@ -332,6 +332,7 @@ trait ValidationBindOps extends Logging {
       } catch {
         case NonFatal(t) =>
           handleMIPXPathException(t, bindNode, xpathMIP, MipName.Constraint, collector)
+
           ! Types.DEFAULT_VALID
       }
   }

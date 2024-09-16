@@ -28,7 +28,7 @@ import org.orbeon.oxf.servlet.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.{ContentTypes, PathUtils}
+import org.orbeon.oxf.util._
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory

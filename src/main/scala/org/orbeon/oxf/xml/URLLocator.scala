@@ -15,10 +15,11 @@ package org.orbeon.oxf.xml
 
 import org.xml.sax.Locator
 
+
 // Locator which provides the given URL as system id
 class URLLocator(url: String) extends Locator {
-  def getColumnNumber = -1
-  def getLineNumber   = -1
-  def getPublicId     = null
-  def getSystemId     = url
+  def getColumnNumber: Int    = -1
+  def getLineNumber  : Int    = -1
+  def getPublicId    : String = null
+  def getSystemId    : String = url
 }

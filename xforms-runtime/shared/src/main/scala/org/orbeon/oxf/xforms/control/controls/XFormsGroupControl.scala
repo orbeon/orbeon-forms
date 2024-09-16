@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.XFormsNames._
@@ -35,5 +35,5 @@ class XFormsGroupControl(
   // `xforms-static` class in the resulting HTML
   override def isStaticReadonly   = false
   override def supportAjaxUpdates = ! appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME)
-  override def valueType          = null
+  override def valueType: QName = null
 }

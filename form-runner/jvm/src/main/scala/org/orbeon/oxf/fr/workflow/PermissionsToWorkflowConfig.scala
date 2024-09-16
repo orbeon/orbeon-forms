@@ -114,7 +114,7 @@ object PermissionsToWorkflowConfig {
         accessTo       = Set(NewPage(StartedStage)),
         availability   = availability,
         summaryButtons = Vector.empty,
-        editButtons    = editButtons.map(ButtonName),
+        editButtons    = editButtons.map(ButtonName.apply),
         viewButtons    = Vector.empty
       )
   )
@@ -126,9 +126,9 @@ object PermissionsToWorkflowConfig {
         documentation  = "",
         accessTo       = Set(SummaryPage, ViewPage),
         availability   = availability,
-        summaryButtons = summaryViewButtons.map(ButtonName),
+        summaryButtons = summaryViewButtons.map(ButtonName.apply),
         editButtons    = Vector.empty,
-        viewButtons    = viewButtons.map(ButtonName)
+        viewButtons    = viewButtons.map(ButtonName.apply)
       )
   )
 
@@ -139,9 +139,9 @@ object PermissionsToWorkflowConfig {
         documentation  = "",
         accessTo       = Set(SummaryPage, EditPage, ViewPage),
         availability   = availability,
-        summaryButtons = summaryViewButtons.map(ButtonName),
-        editButtons    = editButtons.map(ButtonName),
-        viewButtons    = viewButtons.map(ButtonName)
+        summaryButtons = summaryViewButtons.map(ButtonName.apply),
+        editButtons    = editButtons.map(ButtonName.apply),
+        viewButtons    = viewButtons.map(ButtonName.apply)
       )
   )
 
@@ -152,9 +152,9 @@ object PermissionsToWorkflowConfig {
         documentation  = "",
         accessTo       = Set(SummaryPage, EditPage, ViewPage),
         availability   = availability,
-        summaryButtons = summaryViewButtons.map(ButtonName),
-        editButtons    = editButtons.map(ButtonName),
-        viewButtons    = viewButtons.map(ButtonName)
+        summaryButtons = summaryViewButtons.map(ButtonName.apply),
+        editButtons    = editButtons.map(ButtonName.apply),
+        viewButtons    = viewButtons.map(ButtonName.apply)
       )
   )
 
@@ -165,9 +165,9 @@ object PermissionsToWorkflowConfig {
         documentation  = "",
         accessTo       = Set(SummaryPage, EditPage, ViewPage),
         availability   = availability,
-        summaryButtons = summaryViewButtons.map(ButtonName),
-        editButtons    = editButtons.map(ButtonName),
-        viewButtons    = viewButtons.map(ButtonName)
+        summaryButtons = summaryViewButtons.map(ButtonName.apply),
+        editButtons    = editButtons.map(ButtonName.apply),
+        viewButtons    = viewButtons.map(ButtonName.apply)
       )
   )
 
@@ -178,9 +178,9 @@ object PermissionsToWorkflowConfig {
         documentation  = "",
         accessTo       = Set(SummaryPage),
         availability   = availability,
-        summaryButtons = summaryViewButtons.map(ButtonName),
-        editButtons    = editButtons.map(ButtonName),
-        viewButtons    = viewButtons.map(ButtonName)
+        summaryButtons = summaryViewButtons.map(ButtonName.apply),
+        editButtons    = editButtons.map(ButtonName.apply),
+        viewButtons    = viewButtons.map(ButtonName.apply)
       )
   )
 

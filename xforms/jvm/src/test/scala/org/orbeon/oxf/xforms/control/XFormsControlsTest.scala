@@ -91,10 +91,10 @@ class XFormsControlsTest
   describe("Diff class AVT changes") {
     val attributes = new AttributesImpl
     val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
-      override def extensionAttributeValue(attributeName: QName) = Some("foo bar gaga")
+      override def extensionAttributeValue(attributeName: QName): Option[String] = Some("foo bar gaga")
     }
     val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
-      override def extensionAttributeValue(attributeName: QName) = Some("bar toto")
+      override def extensionAttributeValue(attributeName: QName): Option[String] = Some("bar toto")
     }
     ControlAjaxSupport.addAjaxClasses(attributes, Some(control1), control2)
     it ("must report the correct attribute changes") {
@@ -105,7 +105,7 @@ class XFormsControlsTest
   describe("Diff new class AVT") {
     val attributes = new AttributesImpl
     val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
-      override def extensionAttributeValue(attributeName: QName) = Some("foo bar")
+      override def extensionAttributeValue(attributeName: QName): Option[String] = Some("foo bar")
     }
     ControlAjaxSupport.addAjaxClasses(attributes, None, control2)
     it ("must report the correct attribute changes") {

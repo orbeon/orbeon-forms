@@ -15,14 +15,17 @@ package org.orbeon.oxf.externalcontext
 
 import org.log4s.Logger
 
+import java.io.InputStream
+import java.net.URL
 import scala.collection.mutable
 
+
 class TestWebAppContext(logger: Logger, val attributes: mutable.Map[String, AnyRef]) extends WebAppContext {
-  def getResource(s: String)                     = throw new UnsupportedOperationException
-  def getResourceAsStream(s: String)             = throw new UnsupportedOperationException
-  def getRealPath(s: String)                     = null
-  val initParameters                             = Map.empty[String, String]
-  def log(message: String, throwable: Throwable) = logger.error(throwable)(message)
-  def log(message: String)                       = logger.info(message)
-  def getNativeContext                           = null
+  def getResource(s: String)                    : URL                 = throw new UnsupportedOperationException
+  def getResourceAsStream(s: String)            : InputStream         = throw new UnsupportedOperationException
+  def getRealPath(s: String)                    : String              = null
+  val initParameters                            : Map[String, String] = Map.empty
+  def log(message: String, throwable: Throwable): Unit                = logger.error(throwable)(message)
+  def log(message: String)                      : Unit                = logger.info(message)
+  def getNativeContext                          : AnyRef              = null
 }

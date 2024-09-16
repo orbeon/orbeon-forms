@@ -781,11 +781,11 @@ object ComponentControlBuilder {
     (modeValue, modeLHHA) match {
       case (false, false) => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding)
       case (false, true)  => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding) with                          StaticLHHASupport {
-        override def allowMinimalLabelHint: Boolean = commonBinding.allowMinimalLabelHint
+        override def allowMinimalLabelHint: Boolean = this.commonBinding.allowMinimalLabelHint
       }
       case (true,  false) => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding) with ValueComponentTrait
       case (true,  true)  => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding) with ValueComponentTrait with StaticLHHASupport {
-        override def allowMinimalLabelHint: Boolean = commonBinding.allowMinimalLabelHint
+        override def allowMinimalLabelHint: Boolean = this.commonBinding.allowMinimalLabelHint
       }
     }
 }
@@ -1010,9 +1010,9 @@ object EventHandlerBuilder {
       ) with WithExpressionOrConstantTrait {
         val (expressionOrConstant, _) =
           XFormsStaticElementValue.findElementExpressionOrConstantDirectOrNested(
-            outerElem       = element,
-            containerPrefix = containerScope.fullPrefix,
-            isWithinRepeat  = parent.exists(_.isWithinRepeat),
+            outerElem       = this.element,
+            containerPrefix = this.containerScope.fullPrefix,
+            isWithinRepeat  = this.parent.exists(_.isWithinRepeat),
             acceptHTML      = false,
             makeString      = StaticXPath.makeStringExpression
           )
@@ -1177,9 +1177,9 @@ object MessageActionBuilder {
 
         val (expressionOrConstant, _) =
           XFormsStaticElementValue.findElementExpressionOrConstantDirectOrNested(
-            outerElem       = element,
-            containerPrefix = containerScope.fullPrefix,
-            isWithinRepeat  = parent.exists(_.isWithinRepeat),
+            outerElem       = this.element,
+            containerPrefix = this.containerScope.fullPrefix,
+            isWithinRepeat  = this.parent.exists(_.isWithinRepeat),
             acceptHTML      = false,
             makeString      = StaticXPath.makeStringExpression
           )

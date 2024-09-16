@@ -210,8 +210,8 @@ object DynamicState {
       requestMethod      = Option(document.getRequestMethod),
       requestContextPath = Option(document.getRequestContextPath),
       requestPath        = Option(document.getRequestPath),
-      requestHeaders     = document.getRequestHeaders mapValues (_.toList) toList, // mapValues ok because of `toList`
-      requestParameters  = document.getRequestParameters mapValues (_.toList) toList, // mapValues ok because of `toList`
+      requestHeaders     = document.getRequestHeaders.view.mapValues(_.toList).toList, // mapValues ok because of `toList`
+      requestParameters  = document.getRequestParameters.view.mapValues(_.toList).toList, // mapValues ok because of `toList`
       containerType      = Option(document.getContainerType),
       containerNamespace = Option(document.getContainerNamespace),
       pathMatchers       = toByteSeq(document.getVersionedPathMatchers),

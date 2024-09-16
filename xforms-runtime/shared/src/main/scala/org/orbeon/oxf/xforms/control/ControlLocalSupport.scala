@@ -14,10 +14,14 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.common.OXFException
+
 import java.util.{Collections => JCollections}
 import ControlLocalSupport._
 import org.orbeon.oxf.xforms.state.ControlState
+
+import java.util
 import scala.jdk.CollectionConverters._
+
 
 trait ControlLocalSupport {
 
@@ -31,7 +35,7 @@ trait ControlLocalSupport {
    * Serialize this control's information which cannot be reconstructed from instances. The result is empty if no
    * serialization is needed, or a map of name/value pairs otherwise.
    */
-  def serializeLocal = JCollections.emptyMap[String, String]
+  def serializeLocal: util.Map[String, String] = JCollections.emptyMap[String, String]
 
   final def controlState = {
     val keyValues = serializeLocal

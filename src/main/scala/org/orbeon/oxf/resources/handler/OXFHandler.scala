@@ -15,7 +15,7 @@ package org.orbeon.oxf.resources.handler
 
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 
-import java.io.InputStream
+import java.io.{InputStream, OutputStream}
 import java.net.{URL, URLConnection, URLStreamHandler}
 
 
@@ -40,7 +40,7 @@ class OXFHandler extends URLStreamHandler {
       override def getInputStream: InputStream =
         ResourceManagerWrapper.instance.getContentAsStream(key)
 
-      override def getOutputStream = throw new UnsupportedOperationException
+      override def getOutputStream: OutputStream = throw new UnsupportedOperationException
 
       override def getLastModified: Long =
         ResourceManagerWrapper.instance.lastModified(key, false)

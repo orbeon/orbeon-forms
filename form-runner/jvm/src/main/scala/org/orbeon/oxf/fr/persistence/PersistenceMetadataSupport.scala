@@ -132,7 +132,7 @@ object PersistenceMetadataSupport {
     indentedLogger : IndentedLogger
   ): FormDefinitionVersion =
     incomingVersion match {
-      case SearchVersion.Unspecified  => PersistenceMetadataSupport.readLatestVersion(appForm).map(FormDefinitionVersion.Specific).getOrElse(FormDefinitionVersion.Latest)
+      case SearchVersion.Unspecified  => PersistenceMetadataSupport.readLatestVersion(appForm).map(FormDefinitionVersion.Specific.apply).getOrElse(FormDefinitionVersion.Latest)
       case SearchVersion.All          => FormDefinitionVersion.Latest
       case SearchVersion.Specific(v)  => FormDefinitionVersion.Specific(v)
     }

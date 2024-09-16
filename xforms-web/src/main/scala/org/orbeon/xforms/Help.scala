@@ -18,7 +18,7 @@ object Help {
 
   import Private._
 
-  $(dom.document).keyup(handleKeyUp: js.Function1[JQueryEventObject, js.Any])
+  $(dom.document).keyup((e: JQueryEventObject) => handleKeyUp(e))
 
   /**
    * We're asked to show the help popover for a control, either because the user clicked on the help icon,

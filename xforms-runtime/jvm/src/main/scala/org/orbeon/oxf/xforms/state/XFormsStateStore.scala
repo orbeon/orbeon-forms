@@ -94,8 +94,8 @@ object XFormsStateStore {
           val dynamicStateKey = if (isInitialState) createDynamicStateKey(documentUUID, isInitialState = true) else parts(1)
 
           // Gather values from cache for both keys and return state only if both are non-null
-          Stream(parts(0), dynamicStateKey) flatMap Caches.stateCache.get filter (_ != null) match {
-            case Stream(staticState: String, dynamicState: DynamicState) =>
+          LazyList(parts(0), dynamicStateKey) flatMap Caches.stateCache.get filter (_ != null) match {
+            case LazyList(staticState: String, dynamicState: DynamicState) =>
               Some(XFormsState(Some(parts(0)), Some(staticState), Some(dynamicState)))
             case _ =>
               None

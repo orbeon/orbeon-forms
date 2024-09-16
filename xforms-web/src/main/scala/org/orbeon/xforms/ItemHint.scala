@@ -68,7 +68,10 @@ object ItemHint {
             placement = placement,
             container = containerEl
           ))
-          jHintRegionEl.on("shown", shiftTooltipLeft(containerEl, jHintRegionEl): js.Function1[JQueryEventObject, Unit])
+          jHintRegionEl.on(
+            "shown",
+            (containerEl: JQuery, hintRegionEl: JQuery) => shiftTooltipLeft(containerEl, hintRegionEl)
+          )
           jHintRegionElDyn.tooltip("show")
         case (false, true) =>
           // We had a tooltip, but we don"t have anything for show anymore
@@ -83,7 +86,7 @@ object ItemHint {
    * Fixup position of tooltip element to be to the left of the checkbox/radio. Without this fixup, the tooltip is
    * shown to the left of the hint region, so it shows over the checkbox/radio.
    */
-  private def shiftTooltipLeft(containerEl: JQuery, hintRegionEl: JQuery)(ev: JQueryEventObject): Unit = {
+  private def shiftTooltipLeft(containerEl: JQuery, hintRegionEl: JQuery): Unit = {
     val tooltipEl = containerEl.children(".tooltip")
     if (tooltipEl.is(".left")) {
       val offset = Offset(tooltipEl)

@@ -21,7 +21,7 @@ import scala.xml.Elem
 trait ProxyPortletEdit extends GenericPortlet {
 
   import OrbeonProxyPortlet._
-  implicit def portletContext = getPortletContext
+  implicit def portletContext: PortletContext = getPortletContext
 
   case class NameLabel(name: String, label: String, publicName: String)
 
@@ -71,18 +71,18 @@ trait ProxyPortletEdit extends GenericPortlet {
     NameLabel("new",     "New Page")
   )
 
-  case object FormRunnerURL                 extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("form-runner-url",                  "Form Runner URL") }
-  case object EnableURLParameters           extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("enable-url-parameters",            "Enable form selection via URL parameters") }
-  case object EnablePublicRenderParameters  extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("enable-public-render-parameters",  "Enable form selection via public render parameters") }
-  case object EnableSessionParameters       extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("enable-session-parameters",        "Enable form selection via session parameters") }
-  case object AppName                       extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("app-name",                         "Form Runner app name",          Some("orbeon-app")) }
-  case object FormName                      extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("form-name",                        "Form Runner form name",         Some("orbeon-form")) }
-  case object DocumentId                    extends Pref { val tpe = InputControl;                  val nameLabel = NameLabel("document-id",                      "Form Runner document id",       Some("orbeon-document")) }
-  case object Draft                         extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("draft",                            "Form Runner document is draft", Some("orbeon-draft")) }
-  case object ReadOnly                      extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("read-only",                        "Readonly access") }
-  case object SendLiferayLanguage           extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("send-liferay-language",            "Send Liferay language") }
-  case object SendLiferayUser               extends Pref { val tpe = CheckboxControl;               val nameLabel = NameLabel("send-liferay-user",                "Send Liferay user") }
-  case object Page                          extends Pref { val tpe = SelectControl(PageNameLabels); val nameLabel = NameLabel("action",                           "Form Runner page",              Some("orbeon-page")) }
+  case object FormRunnerURL                 extends Pref { val tpe: ControlType = InputControl;                  val nameLabel = NameLabel("form-runner-url",                  "Form Runner URL") }
+  case object EnableURLParameters           extends Pref { val tpe: ControlType = CheckboxControl;               val nameLabel = NameLabel("enable-url-parameters",            "Enable form selection via URL parameters") }
+  case object EnablePublicRenderParameters  extends Pref { val tpe: ControlType = CheckboxControl;               val nameLabel = NameLabel("enable-public-render-parameters",  "Enable form selection via public render parameters") }
+  case object EnableSessionParameters       extends Pref { val tpe: ControlType = CheckboxControl;               val nameLabel = NameLabel("enable-session-parameters",        "Enable form selection via session parameters") }
+  case object AppName                       extends Pref { val tpe: ControlType = InputControl;                  val nameLabel = NameLabel("app-name",                         "Form Runner app name",          Some("orbeon-app")) }
+  case object FormName                      extends Pref { val tpe: ControlType = InputControl;                  val nameLabel = NameLabel("form-name",                        "Form Runner form name",         Some("orbeon-form")) }
+  case object DocumentId                    extends Pref { val tpe: ControlType = InputControl;                  val nameLabel = NameLabel("document-id",                      "Form Runner document id",       Some("orbeon-document")) }
+  case object Draft                         extends Pref { val tpe: ControlType = CheckboxControl;               val nameLabel = NameLabel("draft",                            "Form Runner document is draft", Some("orbeon-draft")) }
+  case object ReadOnly                      extends Pref { val tpe: ControlType = CheckboxControl;               val nameLabel = NameLabel("read-only",                        "Readonly access") }
+  case object SendLiferayLanguage           extends Pref { val tpe: ControlType = CheckboxControl;               val nameLabel = NameLabel("send-liferay-language",            "Send Liferay language") }
+  case object SendLiferayUser               extends Pref { val tpe: ControlType = CheckboxControl;               val nameLabel = NameLabel("send-liferay-user",                "Send Liferay user") }
+  case object Page                          extends Pref { val tpe: ControlType = SelectControl(PageNameLabels); val nameLabel = NameLabel("action",                           "Form Runner page",              Some("orbeon-page")) }
 
   val AllEditablePreferences: List[Pref] = List(
     Page,

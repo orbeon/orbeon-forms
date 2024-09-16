@@ -122,11 +122,11 @@ class OrbeonVariableReference(val name: StructuredQName) extends Expression with
       case _ => false
     }
 
-  override def computeHashCode: Int = name.hashCode
+  override def computeHashCode(): Int = name.hashCode
 
   override def getExpressionName: String = "$" + name.getDisplayName
 
-  def copy(rebindings: RebindingMap) =
+  def copy(rebindings: RebindingMap): Expression =
     new OrbeonVariableReference(name)
 
   def `export`(destination: ExpressionPresenter): Unit = {

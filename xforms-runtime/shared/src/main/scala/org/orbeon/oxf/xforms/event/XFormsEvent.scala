@@ -100,7 +100,7 @@ abstract class XFormsEvent(
   // - the property is not supported
   // - it is supported but no value is available for it
   final def property[T](name: String): Option[T] =
-    allProperties.applyOrElse(name, { name: String => warnUnsupportedIfNeeded(name); None }) map (_.asInstanceOf[T])
+    allProperties.applyOrElse(name, (name: String) => { warnUnsupportedIfNeeded(name); None }) map (_.asInstanceOf[T])
 
   // Return a property of the given type or the default value
   // WARNING: Remember that type erasure takes place! Property[T[U1]] will work even if the underlying type was T[U2]!
@@ -125,7 +125,7 @@ abstract class XFormsEvent(
       case other                => itemIterator(SaxonUtilsDependsOnXPath.anyToItemIfNeeded(other))
     }
 
-    allProperties.applyOrElse(name, { name: String => warnUnsupportedIfNeeded(name); None }) map handleOneLevel getOrElse emptyIterator
+    allProperties.applyOrElse(name, (name: String) => { warnUnsupportedIfNeeded(name); None }) map handleOneLevel getOrElse emptyIterator
   }
 
   private def warnDeprecatedIfNeeded(name: String): Unit =

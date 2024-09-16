@@ -37,7 +37,7 @@ class ProcessParser(val input: ParserInput) extends Parser {
   }
 
   def Condition: Rule1[ConditionNode] = rule {
-    "if" ~ OptWhiteSpace ~ "(" ~ OptWhiteSpace ~ XPath  ~ OptWhiteSpace ~ ")" ~ ThenBranch ~ optional(ElseBranch) ~> ConditionNode
+    "if" ~ OptWhiteSpace ~ "(" ~ OptWhiteSpace ~ XPath  ~ OptWhiteSpace ~ ")" ~ ThenBranch ~ optional(ElseBranch) ~> (ConditionNode.apply _)
   }
 
   def ThenBranch = rule { WhiteSpace ~ "then" ~ WhiteSpace ~ Expr }

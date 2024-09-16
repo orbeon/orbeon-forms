@@ -65,13 +65,13 @@ class ServletWebAppContext(val servletContext: ServletContext) extends WebAppCon
 
   def log(message: String, throwable: Throwable)  = servletContext.log(message, throwable)
   def log(message: String) = servletContext.log(message)
-  def getNativeContext = servletContext
+  def getNativeContext: AnyRef = servletContext
 
   protected def getInitParameter(s: String) = servletContext.getInitParameter(s)
-  protected def getInitParameterNames = servletContext.getInitParameterNames.asScala.toList
+  protected def getInitParameterNames: Seq[String] = servletContext.getInitParameterNames.asScala.toList
 
   protected def getAttribute(k: String) = servletContext.getAttribute(k)
-  protected def getAttributeNames = servletContext.getAttributeNames.asScala.toList
+  protected def getAttributeNames: Seq[String] = servletContext.getAttributeNames.asScala.toList
   protected def setAttribute(k: String, v: AnyRef) = servletContext.setAttribute(k, v)
   protected def removeAttribute(k: String) = servletContext.removeAttribute(k)
 }
@@ -85,13 +85,13 @@ class PortletWebAppContext(val portletContext: PortletContext) extends WebAppCon
 
   def log(message: String, throwable: Throwable)  = portletContext.log(message, throwable)
   def log(message: String) = portletContext.log(message)
-  def getNativeContext = portletContext
+  def getNativeContext: AnyRef = portletContext
 
   protected def getInitParameter(s: String) = portletContext.getInitParameter(s)
-  protected def getInitParameterNames = portletContext.getInitParameterNames.asScala.toList
+  protected def getInitParameterNames: Seq[String] = portletContext.getInitParameterNames.asScala.toList
 
   protected def getAttribute(k: String) = portletContext.getAttribute(k)
-  protected def getAttributeNames = portletContext.getAttributeNames.asScala.toList
+  protected def getAttributeNames: Seq[String] = portletContext.getAttributeNames.asScala.toList
   protected def setAttribute(k: String, v: AnyRef) = portletContext.setAttribute(k, v)
   protected def removeAttribute(k: String) = portletContext.removeAttribute(k)
 }

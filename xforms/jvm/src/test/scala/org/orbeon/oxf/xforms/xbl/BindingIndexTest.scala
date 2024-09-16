@@ -28,8 +28,8 @@ class BindingIndexTest extends AnyFunSpec {
     selectors        : List[Selector],
     namespaceMapping : NamespaceMapping
   ) extends IndexableBinding {
-    val path         = None
-    val lastModified = -1L
+    val path: Option[String] = None
+    val lastModified: Long = -1L
   }
 
   val FooURI     = "http://orbeon.org/oxf/xml/foo"

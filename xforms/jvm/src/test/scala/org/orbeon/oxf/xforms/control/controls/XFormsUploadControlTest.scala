@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.junit.Test
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl._
 import org.scalatestplus.junit.AssertionsForJUnit
 

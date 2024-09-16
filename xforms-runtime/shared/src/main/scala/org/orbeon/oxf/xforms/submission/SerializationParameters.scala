@@ -21,7 +21,7 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, ResourceResolver, XPath}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.xforms.XFormsCrossPlatformSupport

@@ -26,7 +26,7 @@ import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_URI
 import org.xml.sax.helpers.AttributesImpl
 
-import java.{util => ju}
+import java.{util, util => ju}
 
 
 private case class XXFormsDialogControlLocal(
@@ -142,7 +142,7 @@ class XXFormsDialogControl(
     super.performDefaultAction(event, collector)
   }
 
-  override def serializeLocal = {
+  override def serializeLocal: util.Map[String, String] = {
 
     val local = dialogCurrentLocal
     val result = new ju.HashMap[String, String](3)

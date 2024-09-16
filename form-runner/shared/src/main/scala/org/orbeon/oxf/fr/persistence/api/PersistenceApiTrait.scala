@@ -15,7 +15,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Connection, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, PathUtils, ResourceResolver, StaticXPath, URLRewriterUtils, XPath}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions

@@ -17,7 +17,8 @@ import java.{util => ju}
 import scala.jdk.CollectionConverters._
 
 
-case class NamespaceMapping private (hash: String, mapping: Map[String, String]) {
+// Scala 3: was private constructor. Any better solution?
+case class NamespaceMapping(hash: String, mapping: Map[String, String]) {
   require((hash ne null) && (mapping ne null))
 }
 

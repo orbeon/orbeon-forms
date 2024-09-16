@@ -43,8 +43,8 @@ object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
   def getJPConverter(targetClass: Class[_]): JPConverter =
     if (isRecognizedNodeClass(targetClass)) {
       new JPConverter {
-        def convert(obj: Any, context: XPathContext) = convertObjectToXPathValue(obj, context.getConfiguration)
-        def getItemType: ItemType                    = AnyNodeTest.getInstance
+        def convert(obj: Any, context: XPathContext): ValueRepresentation = convertObjectToXPathValue(obj, context.getConfiguration)
+        def getItemType: ItemType = AnyNodeTest.getInstance
       }
     } else {
       null

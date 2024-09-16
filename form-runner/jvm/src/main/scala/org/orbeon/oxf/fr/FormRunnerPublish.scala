@@ -22,7 +22,7 @@ import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.runtime
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, IndentedLogger}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xml.SaxonUtils

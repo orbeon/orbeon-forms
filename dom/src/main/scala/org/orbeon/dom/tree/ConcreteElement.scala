@@ -622,7 +622,7 @@ class ConcreteElement(var qname: QName)
       val namespaceSet = new ju.TreeSet[Namespace](new NamespaceNodeComparator)
 
       // Add all unique namespaces prefix/URI to the set
-      do {
+      while ({
         val ancestorContentIt = ancestor.nodeIterator
         while (ancestorContentIt.hasNext) {
           // ORBEON TODO: This is wrong if there are more than one mapping for a prefix in the ancestor chain, because the one closer from the root wins, and it should be the opposite.
@@ -632,7 +632,8 @@ class ConcreteElement(var qname: QName)
           }
         }
         ancestor = ancestor.getParent
-      } while (ancestor ne null)
+        ancestor ne null
+      }) ()
 
       // Add all non-existing mappings to the cloned element
       val it = namespaceSet.iterator

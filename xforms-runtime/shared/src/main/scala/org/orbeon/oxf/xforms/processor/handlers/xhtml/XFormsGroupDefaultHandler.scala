@@ -31,7 +31,7 @@ class XFormsGroupDefaultHandler(
   localname      : String,
   qName          : String,
   localAtts      : Attributes,
-  matched        : ContainerControl with StaticLHHASupport,
+  matched        : ContainerControl & StaticLHHASupport,
   handlerContext : HandlerContext
 ) extends
   XFormsGroupHandler(

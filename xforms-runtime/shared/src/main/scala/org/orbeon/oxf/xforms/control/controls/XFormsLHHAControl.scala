@@ -40,7 +40,7 @@ class XFormsLHHAControl(
 
   selfControl =>
 
-  override type Control <: LHHAAnalysis with ValueControl // Q: How can this compile? We have a class and an abstract class!
+  override type Control <: LHHAAnalysis & ValueControl // Q: How can this compile? We have a class and an abstract class!
 
   override def storeExternalValue(externalValue: String, collector: ErrorEventCollector): Unit =
     throw new OXFException("operation not allowed")

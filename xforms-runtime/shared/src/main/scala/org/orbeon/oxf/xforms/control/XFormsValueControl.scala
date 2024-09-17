@@ -39,7 +39,7 @@ import java.util as ju
 // Trait for for all controls that hold a value
 trait XFormsValueControl extends XFormsSingleNodeControl {
 
-  override type Control <: ViewTrait with StaticLHHASupport with ValueTrait with FormatTrait
+  override type Control <: ViewTrait & StaticLHHASupport & ValueTrait & FormatTrait
 
   // Value
   private[XFormsValueControl] var _value: String = null // TODO: use ControlProperty<String>?

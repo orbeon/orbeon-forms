@@ -452,14 +452,14 @@ object CustomJavaConversions {
   import java.util as ju
   import scala.jdk.CollectionConverters._
 
-  implicit class ListHasAsScala[A](l: ju.List[A] with ju.RandomAccess) {
+  implicit class ListHasAsScala[A](l: ju.List[A] & ju.RandomAccess) {
     def asScala: mutable.IndexedBuffer[A] = l match {
       case null                           => null
       case _                              => JRandomAccessListWrapper(l)
     }
   }
 
-  case class JRandomAccessListWrapper[A](underlying: ju.List[A] with ju.RandomAccess)
+  case class JRandomAccessListWrapper[A](underlying: ju.List[A] & ju.RandomAccess)
     extends mutable.IndexedBuffer[A]
       with IndexedSeqOps[A, JRandomAccessListWrapper, JRandomAccessListWrapper[A]]
       with StrictOptimizedSeqOps[A, JRandomAccessListWrapper, JRandomAccessListWrapper[A]]

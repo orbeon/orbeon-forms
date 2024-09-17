@@ -156,7 +156,7 @@ abstract class XFormsContainingDocumentSupport
 
 trait ContainingDocumentTransientState {
 
-  self: XBLContainer with ContainingDocumentDelayedEvents =>
+  self: XBLContainer & ContainingDocumentDelayedEvents =>
 
   import CollectionUtils._
 
@@ -678,7 +678,7 @@ trait ContainingDocumentRequest {
 
 trait ContainingDocumentDelayedEvents {
 
-  self: XBLContainer with ContainingDocumentEvent =>
+  self: XBLContainer & ContainingDocumentEvent =>
 
   private val _delayedEvents = mutable.ListBuffer[DelayedEvent]()
 

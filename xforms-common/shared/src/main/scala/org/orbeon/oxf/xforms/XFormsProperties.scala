@@ -236,6 +236,6 @@ object XFormsProperties {
       PropertyDefinition(LoginPageDetectionRegexpProperty,                "",                          propagateToClient = true)
   )
 
-  val SupportedDocumentProperties: Map[String, PropertyDefinition[? >: String with Boolean with Int]] =
+  val SupportedDocumentProperties: Map[String, PropertyDefinition[? >: String & Boolean & Int]] =
     SupportedDocumentPropertiesDefaults map (p => p.name -> p) toMap
 }

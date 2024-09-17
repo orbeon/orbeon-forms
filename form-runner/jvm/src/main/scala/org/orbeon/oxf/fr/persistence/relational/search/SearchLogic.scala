@@ -31,7 +31,7 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath.{Document as _, _}
+import org.orbeon.scaxon.SimplePath.{Document as _, *}
 
 import java.sql.Connection
 import scala.collection.mutable

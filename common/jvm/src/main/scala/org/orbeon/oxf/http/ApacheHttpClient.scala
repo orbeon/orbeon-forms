@@ -28,7 +28,7 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager
 import org.apache.http.params.{BasicHttpParams, HttpConnectionParams}
 import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext}
 import org.apache.http.util.EntityUtils
-import org.apache.http.{ProtocolException as _, _}
+import org.apache.http.{ProtocolException as _, *}
 import org.orbeon.connection.{ConnectionContextSupport, StreamedContent}
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.http.HttpMethod.*
@@ -36,7 +36,7 @@ import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.slf4j.LoggerFactory
 
-import java.net.{CookieStore as _, _}
+import java.net.{CookieStore as _, *}
 import java.security.KeyStore
 import javax.net.ssl.SSLContext
 

@@ -39,7 +39,7 @@ import scalatags.JsDom.all.*
 import shapeless.syntax.typeable.*
 
 import scala.collection.immutable
-import scala.concurrent.duration.{span as _, _}
+import scala.concurrent.duration.{span as _, *}
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global as g

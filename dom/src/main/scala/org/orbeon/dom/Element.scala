@@ -12,7 +12,7 @@ import scala.jdk.CollectionConverters.*
  */
 trait Element extends Branch {
 
-  override def jContent: ju.List[Node] with ju.RandomAccess
+  override def jContent: ju.List[Node] & ju.RandomAccess
 
   def getQName: QName
   def getNamespace: Namespace

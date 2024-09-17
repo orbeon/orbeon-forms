@@ -43,7 +43,7 @@ class ContentListFacade[T <: Node](val branch: AbstractBranch, val branchContent
     node
   }
 
-  override def addAll(collection: ju.Collection[_ <: T]): Boolean = {
+  override def addAll(collection: ju.Collection[? <: T]): Boolean = {
     var count = branchContent.size
     val iter = collection.iterator()
     while (iter.hasNext) {
@@ -53,7 +53,7 @@ class ContentListFacade[T <: Node](val branch: AbstractBranch, val branchContent
     count == branchContent.size
   }
 
-  override def addAll(index: Int, collection: ju.Collection[_ <: T]): Boolean = {
+  override def addAll(index: Int, collection: ju.Collection[? <: T]): Boolean = {
     var _index = index
 
     var count = branchContent.size
@@ -75,7 +75,7 @@ class ContentListFacade[T <: Node](val branch: AbstractBranch, val branchContent
     branchContent.clear()
   }
 
-  override def removeAll(c: ju.Collection[_]): Boolean = {
+  override def removeAll(c: ju.Collection[?]): Boolean = {
     val iter = c.iterator()
 
     while (iter.hasNext)
@@ -95,7 +95,7 @@ class ContentListFacade[T <: Node](val branch: AbstractBranch, val branchContent
 
   def toArray(a: Array[T]): Array[T] = branchContent.toArray[T](a)
 
-  override def containsAll(c: ju.Collection[_]): Boolean = branchContent.containsAll(c)
+  override def containsAll(c: ju.Collection[?]): Boolean = branchContent.containsAll(c)
 
   def get(index: Int): T = branchContent.get(index)
 

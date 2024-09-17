@@ -102,7 +102,7 @@ abstract class AbstractBranch extends AbstractNode with Branch {
   def node(index: Int): Node =
     internalContent.get(index) match {
       case node: Node => node
-      case _          => null
+      case null       => null
     }
 
   def nodeCount: Int = internalContent.size

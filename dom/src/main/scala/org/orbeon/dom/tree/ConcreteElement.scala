@@ -40,9 +40,9 @@ class ConcreteElement(var qname: QName)
 
   protected var _attributes     = new ju.ArrayList[Attribute](DefaultContentListSize)
   private var _internalContent  = new ju.ArrayList[Node](DefaultContentListSize)
-  protected def internalContent: ju.List[Node] with ju.RandomAccess = _internalContent
+  protected def internalContent: ju.List[Node] & ju.RandomAccess = _internalContent
 
-  def jContent: ju.List[Node] with ju.RandomAccess =
+  def jContent: ju.List[Node] & ju.RandomAccess =
     new ContentListFacade[Node](this, internalContent)
 
   /**

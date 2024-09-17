@@ -64,7 +64,7 @@ class Document extends AbstractBranch {
     for (i <- 0 until internalContent.size) {
       internalContent.get(i) match {
         case node: Node => childRemoved(node)
-        case _ =>
+        case null =>
       }
     }
 

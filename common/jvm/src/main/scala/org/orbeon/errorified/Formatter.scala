@@ -56,7 +56,7 @@ trait Formatter {
                 else
                     (trace take max / 2) ::: List(ScissorsHr) ::: (trace takeRight max / 2)
 
-            def nextTraces(causedTrace: Option[List[String]], rest: List[Error]): List[String] = rest headOption match {
+            def nextTraces(causedTrace: Option[List[String]], rest: List[Error]): List[String] = rest.headOption match {
                 case Some(error) =>
                     val (newTrace, newTraceCompact) = formattedDropCaused(causedTrace, error)
 

@@ -181,14 +181,14 @@ trait NodeWrapper
     case _                                               => ""
   }
 
-  def iterateAttributes(nodeTest: Predicate[_ >: om.NodeInfo]): AxisIterator = {
+  def iterateAttributes(nodeTest: Predicate[? >: om.NodeInfo]): AxisIterator = {
     var iter: AxisIterator = new AttributeEnumeration(this)
     if (nodeTest != AnyNodeTest.getInstance)
       iter = new Navigator.AxisFilter(iter, nodeTest)
     iter
   }
 
-  def iterateChildren(nodeTest: Predicate[_ >: om.NodeInfo]): AxisIterator = {
+  def iterateChildren(nodeTest: Predicate[? >: om.NodeInfo]): AxisIterator = {
     val elementOnly = isElementOnly(nodeTest)
     var iter: AxisIterator =
       new Navigator.EmptyTextFilter(new ChildEnumeration(this, downwards = true, forwards = true, elementsOnly = elementOnly))
@@ -197,7 +197,7 @@ trait NodeWrapper
     iter
   }
 
-  def iterateSiblings(nodeTest: Predicate[_ >: om.NodeInfo], forwards: Boolean): AxisIterator = {
+  def iterateSiblings(nodeTest: Predicate[? >: om.NodeInfo], forwards: Boolean): AxisIterator = {
     val elementOnly = isElementOnly(nodeTest)
     var iter: AxisIterator =
       new Navigator.EmptyTextFilter(new ChildEnumeration(this, downwards = false, forwards = forwards, elementsOnly = elementOnly))
@@ -213,7 +213,7 @@ trait NodeWrapper
       case _                 => false
     }
 
-  private def isElementOnly(nodeTest: Predicate[_ >: om.NodeInfo]): Boolean =
+  private def isElementOnly(nodeTest: Predicate[? >: om.NodeInfo]): Boolean =
     nodeTest.isInstanceOf[NodeTest] && nodeTest.asInstanceOf[NodeTest].getUType == UType.ELEMENT
 
   // Use generic way

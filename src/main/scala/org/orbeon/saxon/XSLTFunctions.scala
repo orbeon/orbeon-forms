@@ -65,5 +65,5 @@ trait XSLTFunctions extends OrbeonFunctionLibrary {
     )
   }
 
-  protected def environmentVariableClass: Class[_ <: EnvironmentVariable] = classOf[EnvironmentVariableEnabledByProperty]
+  protected def environmentVariableClass: Class[? <: EnvironmentVariable] = classOf[EnvironmentVariableEnabledByProperty]
 }

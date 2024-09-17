@@ -27,20 +27,20 @@ class JavaxServletContainerInitializer extends javax.servlet.ServletContainerIni
   type ServletContextListener = javax.servlet.ServletContextListener
   type HttpSessionListener    = javax.servlet.http.HttpSessionListener
 
-  override val orbeonServletClass: Class[_ <: JavaxOrJakartaServlet]       = classOf[JavaxOrbeonServlet]
-  override val limiterFilterClass: Class[_ <: JavaxOrJakartaFilter]        = classOf[JavaxLimiterFilter]
-  override val formRunnerAuthFilterClass: Class[_ <: JavaxOrJakartaFilter] = classOf[JavaxFormRunnerAuthFilter]
-  override val orbeonXFormsFilterClass: Class[_ <: JavaxOrJakartaFilter]   = classOf[JavaxOrbeonXFormsFilter]
+  override val orbeonServletClass: Class[? <: JavaxOrJakartaServlet]       = classOf[JavaxOrbeonServlet]
+  override val limiterFilterClass: Class[? <: JavaxOrJakartaFilter]        = classOf[JavaxLimiterFilter]
+  override val formRunnerAuthFilterClass: Class[? <: JavaxOrJakartaFilter] = classOf[JavaxFormRunnerAuthFilter]
+  override val orbeonXFormsFilterClass: Class[? <: JavaxOrJakartaFilter]   = classOf[JavaxOrbeonXFormsFilter]
 
   import org.orbeon.oxf.cache.JavaxShutdownListener
   import org.orbeon.oxf.webapp.{JavaxOrbeonServletContextListener, JavaxOrbeonSessionListener}
   import org.orbeon.oxf.xforms.{JavaxReplicationServletContextListener, JavaxXFormsServletContextListener}
 
-  override val orbeonServletContextListenerClass: Class[_ <: ServletContextListener]      = classOf[JavaxOrbeonServletContextListener]
-  override val replicationServletContextListenerClass: Class[_ <: ServletContextListener] = classOf[JavaxReplicationServletContextListener]
-  override val xFormsServletContextListenerClass: Class[_ <: HttpSessionListener]         = classOf[JavaxXFormsServletContextListener]
-  override val orbeonSessionListenerClass: Class[_ <: HttpSessionListener]                = classOf[JavaxOrbeonSessionListener]
-  override val shutdownListenerClass: Class[_ <: ServletContextListener]                  = classOf[JavaxShutdownListener]
+  override val orbeonServletContextListenerClass: Class[? <: ServletContextListener]      = classOf[JavaxOrbeonServletContextListener]
+  override val replicationServletContextListenerClass: Class[? <: ServletContextListener] = classOf[JavaxReplicationServletContextListener]
+  override val xFormsServletContextListenerClass: Class[? <: HttpSessionListener]         = classOf[JavaxXFormsServletContextListener]
+  override val orbeonSessionListenerClass: Class[? <: HttpSessionListener]                = classOf[JavaxOrbeonSessionListener]
+  override val shutdownListenerClass: Class[? <: ServletContextListener]                  = classOf[JavaxShutdownListener]
 
   override def onStartup(c: ju.Set[Class[_]], ctx: javax.servlet.ServletContext): Unit = startup(c, ServletContext(ctx))
 }
@@ -51,20 +51,20 @@ class JakartaServletContainerInitializer extends jakarta.servlet.ServletContaine
   type ServletContextListener = jakarta.servlet.ServletContextListener
   type HttpSessionListener    = jakarta.servlet.http.HttpSessionListener
 
-  override val orbeonServletClass: Class[_ <: JavaxOrJakartaServlet]       = classOf[JakartaOrbeonServlet]
-  override val limiterFilterClass: Class[_ <: JavaxOrJakartaFilter]        = classOf[JakartaLimiterFilter]
-  override val formRunnerAuthFilterClass: Class[_ <: JavaxOrJakartaFilter] = classOf[JakartaFormRunnerAuthFilter]
-  override val orbeonXFormsFilterClass: Class[_ <: JavaxOrJakartaFilter]   = classOf[JakartaOrbeonXFormsFilter]
+  override val orbeonServletClass: Class[? <: JavaxOrJakartaServlet]       = classOf[JakartaOrbeonServlet]
+  override val limiterFilterClass: Class[? <: JavaxOrJakartaFilter]        = classOf[JakartaLimiterFilter]
+  override val formRunnerAuthFilterClass: Class[? <: JavaxOrJakartaFilter] = classOf[JakartaFormRunnerAuthFilter]
+  override val orbeonXFormsFilterClass: Class[? <: JavaxOrJakartaFilter]   = classOf[JakartaOrbeonXFormsFilter]
 
   import org.orbeon.oxf.cache.JakartaShutdownListener
   import org.orbeon.oxf.webapp.{JakartaOrbeonServletContextListener, JakartaOrbeonSessionListener}
   import org.orbeon.oxf.xforms.{JakartaReplicationServletContextListener, JakartaXFormsServletContextListener}
 
-  override val orbeonServletContextListenerClass: Class[_ <: ServletContextListener]      = classOf[JakartaOrbeonServletContextListener]
-  override val replicationServletContextListenerClass: Class[_ <: ServletContextListener] = classOf[JakartaReplicationServletContextListener]
-  override val xFormsServletContextListenerClass: Class[_ <: HttpSessionListener]         = classOf[JakartaXFormsServletContextListener]
-  override val orbeonSessionListenerClass: Class[_ <: HttpSessionListener]                = classOf[JakartaOrbeonSessionListener]
-  override val shutdownListenerClass: Class[_ <: ServletContextListener]                  = classOf[JakartaShutdownListener]
+  override val orbeonServletContextListenerClass: Class[? <: ServletContextListener]      = classOf[JakartaOrbeonServletContextListener]
+  override val replicationServletContextListenerClass: Class[? <: ServletContextListener] = classOf[JakartaReplicationServletContextListener]
+  override val xFormsServletContextListenerClass: Class[? <: HttpSessionListener]         = classOf[JakartaXFormsServletContextListener]
+  override val orbeonSessionListenerClass: Class[? <: HttpSessionListener]                = classOf[JakartaOrbeonSessionListener]
+  override val shutdownListenerClass: Class[? <: ServletContextListener]                  = classOf[JakartaShutdownListener]
 
   override def onStartup(c: ju.Set[Class[_]], ctx: jakarta.servlet.ServletContext): Unit = startup(c, ServletContext(ctx))
 }
@@ -75,16 +75,16 @@ trait CommonContainerInitializer {
   type ServletContextListener <: ju.EventListener // javax/jakarta.servlet.ServletContextListener
   type HttpSessionListener    <: ju.EventListener // javax/jakarta.servlet.http.HttpSessionListener
 
-  def orbeonServletClass: Class[_ <: JavaxOrJakartaServlet]
-  def limiterFilterClass: Class[_ <: JavaxOrJakartaFilter]
-  def formRunnerAuthFilterClass: Class[_ <: JavaxOrJakartaFilter]
-  def orbeonXFormsFilterClass: Class[_ <: JavaxOrJakartaFilter]
+  def orbeonServletClass: Class[? <: JavaxOrJakartaServlet]
+  def limiterFilterClass: Class[? <: JavaxOrJakartaFilter]
+  def formRunnerAuthFilterClass: Class[? <: JavaxOrJakartaFilter]
+  def orbeonXFormsFilterClass: Class[? <: JavaxOrJakartaFilter]
 
-  def orbeonServletContextListenerClass: Class[_ <: ServletContextListener]
-  def replicationServletContextListenerClass: Class[_ <: ServletContextListener]
-  def xFormsServletContextListenerClass: Class[_ <: HttpSessionListener]
-  def orbeonSessionListenerClass: Class[_ <: HttpSessionListener]
-  def shutdownListenerClass: Class[_ <: ServletContextListener]
+  def orbeonServletContextListenerClass: Class[? <: ServletContextListener]
+  def replicationServletContextListenerClass: Class[? <: ServletContextListener]
+  def xFormsServletContextListenerClass: Class[? <: HttpSessionListener]
+  def orbeonSessionListenerClass: Class[? <: HttpSessionListener]
+  def shutdownListenerClass: Class[? <: ServletContextListener]
 
   private type ServletOrFilterRegistration = {
     def setInitParameter(name: String, value: String): Boolean
@@ -204,7 +204,7 @@ trait CommonContainerInitializer {
   private def registerServlet(
     ctx                : ServletContext,
     servletName        : String,
-    servletClass       : Class[_ <: JavaxOrJakartaServlet],
+    servletClass       : Class[? <: JavaxOrJakartaServlet],
     initParamPrefix    : String,
     mandatoryInitParams: Set[String]
   ): RegistrationResult = {
@@ -246,7 +246,7 @@ trait CommonContainerInitializer {
   private def registerFilter(
     ctx                : ServletContext,
     filterName         : String,
-    filterClass        : Class[_ <: JavaxOrJakartaFilter],
+    filterClass        : Class[? <: JavaxOrJakartaFilter],
     dispatcherTypes    : Set[DispatcherType],
     initParamPrefix    : String,
     mandatoryInitParams: Set[String]
@@ -290,7 +290,7 @@ trait CommonContainerInitializer {
   private def registerListener(
     ctx          : ServletContext,
     listenerName : String,
-    listenerClass: Class[_ <: ju.EventListener]
+    listenerClass: Class[? <: ju.EventListener]
   ): Unit = {
     val paramPrefix = this.paramPrefix(listenerName)
 

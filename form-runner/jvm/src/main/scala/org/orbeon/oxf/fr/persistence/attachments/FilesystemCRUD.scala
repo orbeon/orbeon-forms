@@ -179,7 +179,7 @@ object FilesystemCRUD {
   }
 
   object FunctionLibrary extends PipelineFunctionLibrary {
-    override protected lazy val environmentVariableClass: Class[_ <: EnvironmentVariable] = classOf[EnvironmentVariableAlwaysEnabled]
+    override protected lazy val environmentVariableClass: Class[? <: EnvironmentVariable] = classOf[EnvironmentVariableAlwaysEnabled]
   }
 
   def evaluateAsAvt(value: String, namespaceMapping: NamespaceMapping): String =

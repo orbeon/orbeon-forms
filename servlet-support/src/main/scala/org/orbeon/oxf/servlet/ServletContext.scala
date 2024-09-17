@@ -25,9 +25,9 @@ trait ServletContext {
   // javax/jakarta.servlet.ServletContext
   def getNativeServletContext: AnyRef
 
-  def addFilter(filterName: String, filterClass: Class[_ <: JavaxOrJakartaFilter]): FilterRegistration
-  def addListener(listenerClass: Class[_ <: java.util.EventListener]): Unit
-  def addServlet(servletName: String, servletClass: Class[_ <: JavaxOrJakartaServlet]): ServletRegistration
+  def addFilter(filterName: String, filterClass: Class[? <: JavaxOrJakartaFilter]): FilterRegistration
+  def addListener(listenerClass: Class[? <: java.util.EventListener]): Unit
+  def addServlet(servletName: String, servletClass: Class[? <: JavaxOrJakartaServlet]): ServletRegistration
   def getAttribute(name: String): AnyRef
   def getAttributeNames: java.util.Enumeration[String]
   def getContext(uripath: String): ServletContext
@@ -46,9 +46,9 @@ trait ServletContext {
 class JavaxServletContext(servletContext: javax.servlet.ServletContext) extends ServletContext {
   override def getNativeServletContext: javax.servlet.ServletContext = servletContext
 
-  override def addFilter(filterName: String, filterClass: Class[_ <: JavaxOrJakartaFilter]): FilterRegistration = FilterRegistration(servletContext.addFilter(filterName, filterClass.asInstanceOf[Class[_ <: javax.servlet.Filter]]))
-  override def addListener(listenerClass: Class[_ <: java.util.EventListener]): Unit = servletContext.addListener(listenerClass)
-  override def addServlet(servletName: String, servletClass: Class[_ <: JavaxOrJakartaServlet]): ServletRegistration = ServletRegistration(servletContext.addServlet(servletName, servletClass.asInstanceOf[Class[_ <: javax.servlet.Servlet]]))
+  override def addFilter(filterName: String, filterClass: Class[? <: JavaxOrJakartaFilter]): FilterRegistration = FilterRegistration(servletContext.addFilter(filterName, filterClass.asInstanceOf[Class[? <: javax.servlet.Filter]]))
+  override def addListener(listenerClass: Class[? <: java.util.EventListener]): Unit = servletContext.addListener(listenerClass)
+  override def addServlet(servletName: String, servletClass: Class[? <: JavaxOrJakartaServlet]): ServletRegistration = ServletRegistration(servletContext.addServlet(servletName, servletClass.asInstanceOf[Class[? <: javax.servlet.Servlet]]))
   override def getAttribute(name: String): AnyRef = servletContext.getAttribute(name)
   override def getAttributeNames: java.util.Enumeration[String] = servletContext.getAttributeNames
   override def getContext(uripath: String): ServletContext = ServletContext(servletContext.getContext(uripath))
@@ -67,9 +67,9 @@ class JavaxServletContext(servletContext: javax.servlet.ServletContext) extends 
 class JakartaServletContext(servletContext: jakarta.servlet.ServletContext) extends ServletContext {
   override def getNativeServletContext: jakarta.servlet.ServletContext = servletContext
 
-  override def addFilter(filterName: String, filterClass: Class[_ <: JavaxOrJakartaFilter]): FilterRegistration = FilterRegistration(servletContext.addFilter(filterName, filterClass.asInstanceOf[Class[_ <: jakarta.servlet.Filter]]))
-  override def addListener(listenerClass: Class[_ <: java.util.EventListener]): Unit = servletContext.addListener(listenerClass)
-  override def addServlet(servletName: String, servletClass: Class[_ <: JavaxOrJakartaServlet]): ServletRegistration = ServletRegistration(servletContext.addServlet(servletName, servletClass.asInstanceOf[Class[_ <: jakarta.servlet.Servlet]]))
+  override def addFilter(filterName: String, filterClass: Class[? <: JavaxOrJakartaFilter]): FilterRegistration = FilterRegistration(servletContext.addFilter(filterName, filterClass.asInstanceOf[Class[? <: jakarta.servlet.Filter]]))
+  override def addListener(listenerClass: Class[? <: java.util.EventListener]): Unit = servletContext.addListener(listenerClass)
+  override def addServlet(servletName: String, servletClass: Class[? <: JavaxOrJakartaServlet]): ServletRegistration = ServletRegistration(servletContext.addServlet(servletName, servletClass.asInstanceOf[Class[? <: jakarta.servlet.Servlet]]))
   override def getAttribute(name: String): AnyRef = servletContext.getAttribute(name)
   override def getAttributeNames: java.util.Enumeration[String] = servletContext.getAttributeNames
   override def getContext(uripath: String): ServletContext = ServletContext(servletContext.getContext(uripath))

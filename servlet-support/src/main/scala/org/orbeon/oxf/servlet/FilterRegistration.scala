@@ -42,14 +42,14 @@ trait FilterRegistration {
 
 class JavaxFilterRegistration(filterRegistration: javax.servlet.FilterRegistration) extends FilterRegistration {
   override def addMappingForUrlPatterns(dispatcherTypes: Set[DispatcherType], isMatchAfter: Boolean, urlPatterns: String*): Unit =
-    filterRegistration.addMappingForUrlPatterns(ju.EnumSet.copyOf(dispatcherTypes.map(_.asJavax).asJavaCollection), isMatchAfter, urlPatterns: _*)
+    filterRegistration.addMappingForUrlPatterns(ju.EnumSet.copyOf(dispatcherTypes.map(_.asJavax).asJavaCollection), isMatchAfter, urlPatterns*)
   override def setInitParameter(name: String, value: String): Boolean =
     filterRegistration.setInitParameter(name, value)
 }
 
 class JakartaFilterRegistration(filterRegistration: jakarta.servlet.FilterRegistration) extends FilterRegistration {
   override def addMappingForUrlPatterns(dispatcherTypes: Set[DispatcherType], isMatchAfter: Boolean, urlPatterns: String*): Unit =
-    filterRegistration.addMappingForUrlPatterns(ju.EnumSet.copyOf(dispatcherTypes.map(_.asJakarta).asJavaCollection), isMatchAfter, urlPatterns: _*)
+    filterRegistration.addMappingForUrlPatterns(ju.EnumSet.copyOf(dispatcherTypes.map(_.asJakarta).asJavaCollection), isMatchAfter, urlPatterns*)
   override def setInitParameter(name: String, value: String): Boolean =
     filterRegistration.setInitParameter(name, value)
 }

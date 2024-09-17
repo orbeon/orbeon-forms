@@ -26,11 +26,11 @@ trait ServletRegistration {
 }
 
 class JavaxServletRegistration(servletRegistration: javax.servlet.ServletRegistration) extends ServletRegistration {
-  override def addMapping(urlPatterns: String*): ju.Set[String] = servletRegistration.addMapping(urlPatterns: _*)
+  override def addMapping(urlPatterns: String*): ju.Set[String] = servletRegistration.addMapping(urlPatterns*)
   override def setInitParameter(name: String, value: String): Boolean = servletRegistration.setInitParameter(name, value)
 }
 
 class JakartaServletRegistration(servletRegistration: jakarta.servlet.ServletRegistration) extends ServletRegistration {
-  override def addMapping(urlPatterns: String*): ju.Set[String] = servletRegistration.addMapping(urlPatterns: _*)
+  override def addMapping(urlPatterns: String*): ju.Set[String] = servletRegistration.addMapping(urlPatterns*)
   override def setInitParameter(name: String, value: String): Boolean = servletRegistration.setInitParameter(name, value)
 }

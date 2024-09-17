@@ -75,7 +75,7 @@ object ContentToken {
       case "xml"         => ContentToken.Xml.some
       case "metadata"    => ContentToken.Metadata.some
       case "attachments" => ContentToken.Attachments.some
-      case rendered      => RenderedFormat.findRenderedFormatWithIsUrl(rendered).map(ContentToken.Rendered.tupled)
+      case rendered      => RenderedFormat.findRenderedFormatWithIsUrl(rendered).map((ContentToken.Rendered.apply _).tupled)
     }
 }
 

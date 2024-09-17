@@ -91,9 +91,9 @@ object StaticXPath extends StaticXPathTrait {
     val (receiver, result) = newTinyTreeReceiver
 
     val writer =
-      new SAXWriter                     |!>
-        (_.setContentHandler(receiver)) |!>
-        (_.setLexicalHandler(receiver))
+      new SAXWriter                   |!>
+        (_.contentHandler = receiver) |!>
+        (_.lexicalHandler = receiver)
 
     writer.write(doc)
 

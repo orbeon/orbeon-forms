@@ -9,7 +9,6 @@ import org.xml.sax.*
 import org.xml.sax.ext.LexicalHandler
 import org.xml.sax.helpers.{AttributesImpl, LocatorImpl}
 
-import scala.beans.BeanProperty
 
 private object SAXWriter {
 
@@ -26,19 +25,22 @@ private object SAXWriter {
  */
 class SAXWriter extends XMLReader {
 
-  @BeanProperty
   var contentHandler: ContentHandler = _
 
   private var dtdHandler: DTDHandler = _
 
-  @BeanProperty
   var entityResolver: EntityResolver = _
+  override def getContentHandler(): ContentHandler = contentHandler
+  override def getEntityResolver(): EntityResolver = entityResolver
+  override def getErrorHandler(): ErrorHandler = errorHandler
 
-  @BeanProperty
   var errorHandler: ErrorHandler = _
+  override def setContentHandler(ch: ContentHandler): Unit = contentHandler = ch
+  override def setEntityResolver(er: EntityResolver): Unit = entityResolver = er
+  override def setErrorHandler(eh: ErrorHandler): Unit = errorHandler = eh
 
-  @BeanProperty
   var lexicalHandler: LexicalHandler = _
+  def setLexicalHandler(lh: LexicalHandler): Unit = lexicalHandler = lh
 
   // Reusable attributes used by `createAttributes()` only
   private val attributes = new AttributesImpl
@@ -109,13 +111,13 @@ class SAXWriter extends XMLReader {
 
   def setProperty(name: String, value: AnyRef): Unit =
     LexicalHandlerNames find (_ == name) match {
-      case Some(_) => setLexicalHandler(value.asInstanceOf[LexicalHandler])
+      case Some(_) => lexicalHandler = value.asInstanceOf[LexicalHandler]
       case None    => properties.put(name, value)
     }
 
   def getProperty(name: String): AnyRef =
     LexicalHandlerNames find (_ == name) match {
-      case Some(_) => getLexicalHandler()
+      case Some(_) => lexicalHandler
       case None    => properties.get(name)
     }
 

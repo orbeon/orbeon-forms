@@ -93,9 +93,9 @@ object StaticXPath extends StaticXPathTrait {
 
     val writer =
       new SAXWriter                  |!>
-      (_.setContentHandler(handler)) |!>
-      (_.setLexicalHandler(handler)) |!>
-      (_.setDTDHandler(handler))
+      (_.contentHandler = handler) |!>
+      (_.lexicalHandler = handler) |!>
+      (_. setDTDHandler(handler))
 
     writer.write(doc)
 

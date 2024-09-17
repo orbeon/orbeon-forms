@@ -110,16 +110,28 @@
 
     <xsl:template match="fr:top-messages">
 
-        <!-- Lease message -->
-        <fr:lease fr-resources-ref="$fr-resources"/>
+        <!--
+            We can have 3 types of messages shown at the top of the form:
 
-        <!-- Availability message -->
+            1. Time window
+            2. Found document
+            3. Lease
+
+            At most one of the 3 should be shown, following a priority order as listed above. I.e. is both the
+            "availability" and "found document" messages apply, on the "availability" one is shown.
+         -->
+
+        <!-- Time window message -->
         <xf:group
-            ref="if ($_fr-document-available-too-early-or-late) then . else ()"
+            ref=".[$_fr-document-available-too-early-or-late]"
             class="alert alert-info fr-top-alert"
             xxf:element="div">
 
+            <xh:div class="fr-top-icon">
+                <xh:i class="fa fa-clock" aria-hidden="true"/>
+            </xh:div>
             <xf:output
+                class="fr-top-text"
                 mediatype="text/html"
                 value="
                     if   ($_fr-document-available-too-early)
@@ -130,7 +142,11 @@
 
         <!-- Found document messages -->
         <xf:group
-            ref="if (xxf:non-blank($_fr-persistence-instance/found-document-message-to-show)) then . else ()"
+            ref="
+                .[
+                    not($_fr-document-available-too-early-or-late) and
+                    xxf:non-blank($_fr-persistence-instance/found-document-message-to-show)
+                ]"
             class="alert alert-info fr-top-alert"
             xxf:element="div">
 
@@ -243,6 +259,16 @@
             </xf:group>
 
         </xf:group>
+
+        <!-- Lease message -->
+        <fr:lease
+            ref="
+                .[
+                    not($_fr-document-available-too-early-or-late) and
+                    xxf:is-blank($_fr-persistence-instance/found-document-message-to-show)
+                ]"
+            fr-resources-ref="$fr-resources"
+        />
 
     </xsl:template>
 

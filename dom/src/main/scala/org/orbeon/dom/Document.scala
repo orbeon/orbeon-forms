@@ -4,6 +4,9 @@ import java.{util => ju}
 
 import org.orbeon.dom.tree.AbstractBranch
 
+import scala.compiletime.uninitialized
+
+
 object Document {
 
   def apply(): Document =
@@ -30,11 +33,11 @@ class Document extends AbstractBranch {
 
   override def getDocument: Document = this
 
-  private var _rootElement: Element = _
+  private var _rootElement: Element = uninitialized
   def rootElementOpt: Option[Element] = Option(_rootElement)
   def getRootElement: Element = _rootElement
 
-  private var _internalContent: ju.List[Node] = _
+  private var _internalContent: ju.List[Node] = uninitialized
   protected def internalContent: ju.List[Node] = {
     if (_internalContent eq null) {
       _internalContent = new ju.ArrayList[Node](1)
@@ -159,7 +162,7 @@ class Document extends AbstractBranch {
     if (node ne null)
       node.setDocument(null)
 
-  protected def checkAddElementAllowed(element: Element): Unit = {
+  private def checkAddElementAllowed(element: Element): Unit = {
     val root = getRootElement
     if (root ne null) {
       throw new IllegalAddException(

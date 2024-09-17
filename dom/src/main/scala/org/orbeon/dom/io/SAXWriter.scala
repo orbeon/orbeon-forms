@@ -9,6 +9,8 @@ import org.xml.sax.*
 import org.xml.sax.ext.LexicalHandler
 import org.xml.sax.helpers.{AttributesImpl, LocatorImpl}
 
+import scala.compiletime.uninitialized
+
 
 private object SAXWriter {
 
@@ -25,21 +27,22 @@ private object SAXWriter {
  */
 class SAXWriter extends XMLReader {
 
-  var contentHandler: ContentHandler = _
+  var contentHandler: ContentHandler = uninitialized
 
-  private var dtdHandler: DTDHandler = _
+  private var dtdHandler: DTDHandler = uninitialized
 
-  var entityResolver: EntityResolver = _
+  var entityResolver: EntityResolver = uninitialized
+  var errorHandler: ErrorHandler = uninitialized
+  var lexicalHandler: LexicalHandler = uninitialized
+
   override def getContentHandler(): ContentHandler = contentHandler
   override def getEntityResolver(): EntityResolver = entityResolver
   override def getErrorHandler(): ErrorHandler = errorHandler
 
-  var errorHandler: ErrorHandler = _
   override def setContentHandler(ch: ContentHandler): Unit = contentHandler = ch
   override def setEntityResolver(er: EntityResolver): Unit = entityResolver = er
   override def setErrorHandler(eh: ErrorHandler): Unit = errorHandler = eh
 
-  var lexicalHandler: LexicalHandler = _
   def setLexicalHandler(lh: LexicalHandler): Unit = lexicalHandler = lh
 
   // Reusable attributes used by `createAttributes()` only

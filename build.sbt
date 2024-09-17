@@ -412,7 +412,7 @@ lazy val commonScalaJvmSettings = Seq(
 lazy val commonScalaJsSettings = Seq(
 
   libraryDependencies += "org.scala-js" %%% "scala-js-macrotask-executor" % ScalaJsMacrotaskExecutor,
-  libraryDependencies += "org.scala-js" %%% "scalajs-fake-insecure-java-securerandom" % ScalaJsFakeSecureRandomVersion,
+  libraryDependencies += ("org.scala-js" %%% "scalajs-fake-insecure-java-securerandom" % ScalaJsFakeSecureRandomVersion).cross(CrossVersion.for3Use2_13),
 
   packageJSDependencies / skip   := false,
   scalaJSLinkerConfig            ~= (_.withSourceMap(false).withESFeatures(_.withESVersion(ESVersion.ES2018))),
@@ -514,10 +514,11 @@ lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) 
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-dom",
-    crossScalaVersions := supportedScalaVersions
+    scalaVersion := scala3,
+    crossScalaVersions := scala3 :: supportedScalaVersions
   )
   .jsSettings(
-    libraryDependencies += "org.scala-js" %%% "scalajs-fake-weakreferences" % ScalaJsFakeWeakReferencesVersion
+    libraryDependencies += ("org.scala-js" %%% "scalajs-fake-weakreferences" % ScalaJsFakeWeakReferencesVersion).cross(CrossVersion.for3Use2_13)
   )
 
 lazy val domJVM = dom.jvm.dependsOn(commonJVM)

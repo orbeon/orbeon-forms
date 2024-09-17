@@ -5,6 +5,7 @@ import java.{lang => jl, util => ju}
 import org.orbeon.dom.*
 import org.xml.sax.Attributes
 
+import scala.compiletime.uninitialized
 import scala.jdk.CollectionConverters.*
 
 
@@ -51,7 +52,7 @@ class ConcreteElement(var qname: QName)
    * child of the root document, or null if it has not been added to a
    * document yet.
    */
-  private var _parentBranch: Branch = _
+  private var _parentBranch: Branch = uninitialized
 
   override def getParent: Element =
     _parentBranch match {

@@ -2,6 +2,8 @@ package org.orbeon.dom
 
 import java.{util => ju}
 
+import scala.compiletime.uninitialized
+
 
 object QName {
 
@@ -89,7 +91,7 @@ object QName {
 //
 class QName private (val localName: String, val namespace: Namespace, val qualifiedName: String) {
 
-  private var _hashCode: Int = _
+  private var _hashCode: Int = uninitialized
 
   override def hashCode(): Int = {
     if (_hashCode == 0) {

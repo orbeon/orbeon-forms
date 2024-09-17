@@ -19,10 +19,9 @@ import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions.*
-import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.analysis.model.ValidationLevel
+import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable.typeableOps
 
 import java.util.Base64
@@ -378,13 +377,13 @@ object XFormsStaticStateSerializer {
     )
 
     implicit val encodeLangRef           : Encoder[LangRef]           = deriveEncoder
-    implicit val encodeNamespace         : Encoder[dom.Namespace]     = deriveEncoder
+//    implicit val encodeNamespace         : Encoder[dom.Namespace]     = deriveEncoder
     implicit val encodeBasicCredentials  : Encoder[BasicCredentials]  = deriveEncoder
 
-    implicit val encodeNamespaceMapping: Encoder[NamespaceMapping] = (a: NamespaceMapping) => Json.obj(
-      "hash"    -> Json.fromString(a.hash),
-      "mapping" -> a.mapping.asJson
-    )
+//    implicit val encodeNamespaceMapping: Encoder[NamespaceMapping] = (a: NamespaceMapping) => Json.obj(
+//      "hash"    -> Json.fromString(a.hash),
+//      "mapping" -> a.mapping.asJson
+//    )
 
     def appendElemAndAtts(a: dom.Element, b: ListBuffer[(String, Json)]) = {
       b += "name" -> Json.fromInt(collectedQNamesWithPositions(a.getQName))

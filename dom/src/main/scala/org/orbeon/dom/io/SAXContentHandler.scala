@@ -9,6 +9,9 @@ import org.xml.sax.*
 import org.xml.sax.ext.LexicalHandler
 import org.xml.sax.helpers.DefaultHandler
 
+import scala.compiletime.uninitialized
+
+
 /**
  * `SAXContentHandler` builds a tree via SAX events.
  */
@@ -26,11 +29,11 @@ class SAXContentHandler(
   def getDocument = document
 
   // State
-  private var locator: Locator = _
+  private var locator: Locator = uninitialized
   private var declaredNamespaceIndex = 0
-  private var currentElement: Element = _
+  private var currentElement: Element = uninitialized
   private var textInTextBuffer = false
-  private var textBuffer: jl.StringBuilder = _
+  private var textBuffer: jl.StringBuilder = uninitialized
 
   override def setDocumentLocator(documentLocator: Locator): Unit =
     this.locator = documentLocator

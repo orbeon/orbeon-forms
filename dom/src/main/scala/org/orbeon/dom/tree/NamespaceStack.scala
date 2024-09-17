@@ -4,6 +4,9 @@ import java.{util => ju}
 
 import org.orbeon.dom.{Namespace, QName}
 
+import scala.compiletime.uninitialized
+
+
 /**
  * NamespaceStack implements a stack of namespaces and optionally maintains a
  * cache of all the fully qualified names (`QName`) which are in
@@ -25,7 +28,7 @@ class NamespaceStack {
    * A cache of current namespace context cache of mapping from qualifiedName
    * to QName
    */
-  private var currentNamespaceCache: ju.Map[String, QName] = _
+  private var currentNamespaceCache: ju.Map[String, QName] = uninitialized
 
   /**
     * A cache of mapping from qualifiedName to QName before any namespaces are
@@ -36,7 +39,7 @@ class NamespaceStack {
   /**
     * Caches the default namespace defined via xmlns=""
    */
-  private var _defaultNamespace: Namespace = _
+  private var _defaultNamespace: Namespace = uninitialized
   def getDefaultNamespace: Namespace = {
     if (_defaultNamespace eq null)
       _defaultNamespace = findDefaultNamespace

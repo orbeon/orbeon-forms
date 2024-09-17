@@ -20,10 +20,10 @@ import org.scalatest.funspec.AnyFunSpec
 
 class MediatypeTest extends AnyFunSpec {
 
-  val DisallowedChars               = """()<>@,;:\"/[]?=é天\u007F\u0000\u0010 """.to(List)
-  val MediatypesWithDisallowedChars = DisallowedChars map (char => s"application/fo${char}o")
+  val DisallowedChars                   : List[Char]   = """()<>@,;:\"/[]?=é天 """.to(List) ::: '\u007F' :: '\u0000' :: '\u0010' :: Nil
+  val MediatypesWithDisallowedChars     : List[String] = DisallowedChars map (char => s"application/fo${char}o")
 
-  val InvalidMediatypesOrMediatypeRanges = List("*/jpeg", "image/", "image") ::: MediatypesWithDisallowedChars
+  val InvalidMediatypesOrMediatypeRanges: List[String] = List("*/jpeg", "image/", "image") ::: MediatypesWithDisallowedChars
 
   describe("Invalid mediatypes") {
     for (mediatypeString <- List("*/*", "image/*") ::: InvalidMediatypesOrMediatypeRanges)

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.common.OXFException
 
-import scala.collection.{mutable => m}
+import scala.collection.mutable as m
 
 
 /**

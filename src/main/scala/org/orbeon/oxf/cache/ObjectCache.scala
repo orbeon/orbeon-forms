@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.cache
 
-import java.{util => ju}
+import java.util as ju
 
 import org.orbeon.oxf.properties.Properties
 

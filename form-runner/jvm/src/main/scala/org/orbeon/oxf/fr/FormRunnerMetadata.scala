@@ -297,7 +297,7 @@ object FormRunnerMetadata {
               <value>{valueControl.getValue(collector)}</value>
           }</control>
 
-    import scala.{xml => sxml}
+    import scala.xml as sxml
 
     def addAttribute(elem: Elem, name: String, value: String) =
       elem % sxml.Attribute(None, name, sxml.Text(value), sxml.Null)

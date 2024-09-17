@@ -1,6 +1,6 @@
 package org.orbeon.dom
 
-import java.{util => ju}
+import java.util as ju
 
 import scala.compiletime.uninitialized
 

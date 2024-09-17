@@ -25,7 +25,7 @@ import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable.*
 
-import java.{util => ju}
+import java.util as ju
 import scala.jdk.CollectionConverters.*
 
 

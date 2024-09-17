@@ -24,7 +24,7 @@ import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.net.URI
-import java.{util => ju}
+import java.util as ju
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 

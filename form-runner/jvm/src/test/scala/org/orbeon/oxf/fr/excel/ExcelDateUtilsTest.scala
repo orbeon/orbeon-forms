@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.excel.ExcelDateUtils.FormatType
 import org.orbeon.oxf.util.CoreUtils.*
 import org.scalatest.funspec.AnyFunSpecLike
 
-import java.{util => ju}
+import java.util as ju
 
 // ORBEON: Moved subset of original Apache POI class to Scala.
 class ExcelDateUtilsTest extends AnyFunSpecLike {

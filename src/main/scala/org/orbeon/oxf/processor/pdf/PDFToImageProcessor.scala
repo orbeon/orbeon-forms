@@ -15,9 +15,9 @@ package org.orbeon.oxf.processor.pdf
 
 import cats.syntax.option.*
 import org.apache.commons.fileupload.disk.DiskFileItem
-import org.icepdf.core.pobjects.{Page, Document => ICEDocument}
+import org.icepdf.core.pobjects.{Page, Document as ICEDocument}
 import org.icepdf.core.util.GraphicsRenderingHints
-import org.orbeon.dom.{Element => OrbeonDomElem}
+import org.orbeon.dom.Element as OrbeonDomElem
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl.*

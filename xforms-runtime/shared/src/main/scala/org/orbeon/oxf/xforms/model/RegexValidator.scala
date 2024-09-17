@@ -18,7 +18,7 @@ package org.orbeon.oxf.xforms.model
 
 import java.io.Serializable
 import java.util.regex.Pattern
-import java.{lang => jl}
+import java.lang as jl
 
 import org.orbeon.oxf.util.StringUtils.*
 

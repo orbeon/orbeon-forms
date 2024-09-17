@@ -30,7 +30,7 @@ import org.orbeon.wsrp.WSRPSupport
 
 import java.io.*
 import java.util.Locale
-import java.{util => ju}
+import java.util as ju
 import javax.portlet.*
 import scala.jdk.CollectionConverters.*
 

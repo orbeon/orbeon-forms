@@ -30,8 +30,9 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
 
 import java.util.Locale
-import java.{util, util => ju}
+import java.{util, util as ju}
 import scala.collection.mutable
+
 
 // HttpClient which simulates a call to Orbeon Forms without using a servlet. This acts as if the caller
 // is a client making a call to an Orbeon Forms server.

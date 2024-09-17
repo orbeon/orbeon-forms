@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.event.events.{XXFormsInvalidEvent, XXFormsRebuildSt
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.saxon.om
 
-import scala.collection.{mutable => m}
+import scala.collection.mutable as m
 
 trait XFormsModelRebuildRecalculateRevalidate {
 

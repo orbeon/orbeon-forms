@@ -20,7 +20,7 @@ import org.scalajs.dom.raw.{MutationObserver, MutationRecord}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.collection.{mutable => m}
+import scala.collection.mutable as m
 
 @JSExportTopLevel("OrbeonLanguage")
 object Language {

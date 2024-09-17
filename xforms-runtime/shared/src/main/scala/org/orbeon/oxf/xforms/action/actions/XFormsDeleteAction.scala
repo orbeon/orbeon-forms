@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions
 
-import java.{util => ju}
+import java.util as ju
 import scala.jdk.CollectionConverters.*
 import scala.language.postfixOps
 

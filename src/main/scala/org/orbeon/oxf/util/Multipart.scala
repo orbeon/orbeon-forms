@@ -31,8 +31,8 @@ import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import shapeless.syntax.typeable.*
 
 import java.io.OutputStream
-import java.{util => ju}
-import scala.collection.{mutable => m}
+import java.util as ju
+import scala.collection.mutable as m
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 

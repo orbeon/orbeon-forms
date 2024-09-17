@@ -21,7 +21,7 @@ import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.funspec.AnyFunSpecLike
 import org.scalatestplus.mockito.MockitoSugar
 
-import java.{util => ju}
+import java.util as ju
 import javax.portlet.filter.PortletRequestWrapper
 import javax.portlet.{PortletRequest, PortletSession}
 import scala.collection.immutable.TreeMap

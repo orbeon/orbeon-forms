@@ -18,7 +18,7 @@ import cats.data.NonEmptyList
 
 import java.io.BufferedReader
 import java.net.URI
-import java.{util => ju}
+import java.util as ju
 import scala.jdk.CollectionConverters.*
 
 

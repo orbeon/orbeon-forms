@@ -29,7 +29,8 @@ import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 
-import scala.collection.{mutable, Set => CSet}
+import scala.collection.{mutable, Set as CSet}
+
 
 class XFormsSelectControl(
   container   : XBLContainer,

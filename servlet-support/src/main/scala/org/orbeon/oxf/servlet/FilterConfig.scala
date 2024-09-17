@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.{util => ju}
+import java.util as ju
 
 object FilterConfig {
   def apply(filterConfig: javax.servlet.FilterConfig): JavaxFilterConfig     = new JavaxFilterConfig(filterConfig)

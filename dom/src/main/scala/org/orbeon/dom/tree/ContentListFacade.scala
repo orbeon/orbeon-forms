@@ -1,6 +1,6 @@
 package org.orbeon.dom.tree
 
-import java.{util => ju}
+import java.util as ju
 
 import org.orbeon.dom.{IllegalAddException, Node}
 

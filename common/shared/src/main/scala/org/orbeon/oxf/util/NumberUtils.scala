@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import java.{lang => jl}
+import java.lang as jl
 
 object NumberUtils {
 

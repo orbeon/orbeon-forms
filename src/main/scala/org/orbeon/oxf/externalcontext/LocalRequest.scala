@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.*
 
 import java.io.InputStream
-import java.{util => ju}
+import java.util as ju
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 

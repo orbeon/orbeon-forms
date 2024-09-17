@@ -1,6 +1,6 @@
 package org.orbeon.oxf.util
 
-import java.{util => ju}
+import java.util as ju
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.saxon.functions.FunctionLibrary

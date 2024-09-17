@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xml.dom
 
 import java.net.URI
-import java.{util => ju}
+import java.util as ju
 
 import org.orbeon.dom.*
 import org.orbeon.oxf.common.OXFException

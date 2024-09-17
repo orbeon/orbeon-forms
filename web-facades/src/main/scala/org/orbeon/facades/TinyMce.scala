@@ -17,7 +17,7 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.Dynamic.global as g
 import scala.scalajs.js.annotation.JSGlobal
 
 

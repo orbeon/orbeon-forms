@@ -30,7 +30,7 @@ import org.orbeon.oxf.xml.XPathUtils.*
 
 import java.io.OutputStream
 import java.net.SocketException
-import java.{lang => jl}
+import java.lang as jl
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import java.{lang => jl}
+import java.lang as jl
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.{OutputKeys, Result, Source}
 import org.orbeon.datatypes.LocationData

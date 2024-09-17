@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import java.util.{List => JList}
+import java.util.List as JList
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.*

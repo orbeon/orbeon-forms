@@ -25,7 +25,7 @@ import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
 import shapeless.syntax.typeable.*
 
-import java.{lang => jl}
+import java.lang as jl
 
 //
 // TODO:

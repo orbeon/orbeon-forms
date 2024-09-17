@@ -34,7 +34,7 @@ import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.xml.sax.helpers.AttributesImpl
 
-import scala.collection.{immutable => i}
+import scala.collection.immutable as i
 
 /**
 * Control with a single-node binding (possibly optional). Such controls can have MIPs (properties coming from a model).

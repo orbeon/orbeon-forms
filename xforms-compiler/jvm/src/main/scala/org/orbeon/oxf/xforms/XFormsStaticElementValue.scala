@@ -24,7 +24,7 @@ import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.Namespaces.XXF
 import org.orbeon.xforms.{Constants, XFormsNames}
 
-import java.{lang => jl}
+import java.lang as jl
 import scala.collection.mutable.ListBuffer
 
 

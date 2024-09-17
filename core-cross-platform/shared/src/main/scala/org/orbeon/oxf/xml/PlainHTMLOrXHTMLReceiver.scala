@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => HtmlURI}
+import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI as HtmlURI
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 

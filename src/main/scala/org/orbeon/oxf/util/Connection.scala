@@ -38,7 +38,7 @@ import org.orbeon.oxf.util.StringUtils.*
 
 import java.io.File
 import java.net.URI
-import java.{util => ju}
+import java.util as ju
 import scala.collection.Factory
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal

@@ -28,7 +28,7 @@ import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, rpc}
 import shapeless.syntax.typeable.*
 
-import scala.collection.{immutable => i}
+import scala.collection.immutable as i
 import scala.util.control.Breaks
 
 

@@ -15,7 +15,7 @@ package org.orbeon
 
 import org.scalajs.jquery.JQueryStatic
 
-import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.Dynamic.global as g
 
 package object xforms {
   val $: JQueryStatic = g.ORBEON.jQuery.asInstanceOf[JQueryStatic]

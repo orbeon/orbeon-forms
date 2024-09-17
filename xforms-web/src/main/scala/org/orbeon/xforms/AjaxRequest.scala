@@ -13,7 +13,7 @@
  */
 package org.orbeon.xforms
 
-import java.{lang => jl}
+import java.lang as jl
 import cats.data.NonEmptyList
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.xforms

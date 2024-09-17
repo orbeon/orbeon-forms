@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import java.{lang => jl}
+import java.lang as jl
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis

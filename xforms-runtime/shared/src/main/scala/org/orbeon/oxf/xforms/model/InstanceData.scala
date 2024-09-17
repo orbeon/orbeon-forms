@@ -23,7 +23,7 @@ import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
 
-import java.{util => ju}
+import java.util as ju
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 

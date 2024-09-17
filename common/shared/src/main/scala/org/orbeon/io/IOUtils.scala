@@ -16,7 +16,7 @@ package org.orbeon.io
 import org.orbeon.oxf.common.Defaults
 
 import java.io.*
-import java.{lang => jl}
+import java.lang as jl
 import scala.util.control.NonFatal
 
 

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import java.{lang => jl}
+import java.lang as jl
 import cats.syntax.option.*
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis

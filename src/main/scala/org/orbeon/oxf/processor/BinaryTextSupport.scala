@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor
 
 import java.io.{BufferedInputStream, InputStream, InputStreamReader}
-import java.{lang => jl}
+import java.lang as jl
 
 import org.orbeon.dom.*
 import org.orbeon.oxf.common.Defaults

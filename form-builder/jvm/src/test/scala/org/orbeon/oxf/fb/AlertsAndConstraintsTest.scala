@@ -26,7 +26,7 @@ import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.{xml => sx}
+import scala.xml as sx
 
 
 class AlertsAndConstraintsTest

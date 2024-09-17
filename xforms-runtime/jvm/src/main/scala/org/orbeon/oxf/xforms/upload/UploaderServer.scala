@@ -34,13 +34,13 @@ import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.*
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.control.XFormsValueControl
-import org.orbeon.oxf.xforms.upload.api.java.{FileScan2, FileScanProvider2, FileScanResult => JFileScanResult}
+import org.orbeon.oxf.xforms.upload.api.java.{FileScan2, FileScanProvider2, FileScanResult as JFileScanResult}
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
 import org.orbeon.xforms.Constants
 import shapeless.syntax.typeable.*
 
 import java.net.URI
-import scala.collection.{mutable => m}
+import scala.collection.mutable as m
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}

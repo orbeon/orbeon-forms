@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import java.{lang => jl}
+import java.lang as jl
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SwitchControl}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl

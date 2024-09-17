@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import com.google.crypto.tink.subtle.{AesGcmJce, Base64 => TinkBase64}
+import com.google.crypto.tink.subtle.{AesGcmJce, Base64 as TinkBase64}
 import org.apache.commons.pool.BasePoolableObjectFactory
 import org.log4s.Logger
 import org.orbeon.io.CharsetNames

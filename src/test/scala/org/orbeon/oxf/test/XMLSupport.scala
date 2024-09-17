@@ -14,7 +14,7 @@
 package org.orbeon.oxf.test
 
 import org.orbeon.dom.io.XMLWriter
-import org.orbeon.dom.{Document => JDocument, Element => JElement}
+import org.orbeon.dom.{Document as JDocument, Element as JElement}
 import org.orbeon.oxf.xml.TransformerUtils.*
 import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}

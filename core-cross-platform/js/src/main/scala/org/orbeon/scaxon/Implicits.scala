@@ -20,7 +20,7 @@ import org.orbeon.saxon.value.*
 import org.orbeon.scaxon.SimplePath.URIQualifiedName
 
 import scala.jdk.CollectionConverters.*
-import scala.{collection => coll}
+import scala.collection as coll
 
 
 object Implicits {

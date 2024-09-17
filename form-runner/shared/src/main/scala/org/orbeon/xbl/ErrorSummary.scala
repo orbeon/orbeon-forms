@@ -449,7 +449,7 @@ object ErrorSummary {
 // to be able to get a binary search.
 object CustomJavaConversions {
 
-  import java.{util => ju}
+  import java.util as ju
   import scala.jdk.CollectionConverters._
 
   implicit class ListHasAsScala[A](l: ju.List[A] with ju.RandomAccess) {

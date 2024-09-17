@@ -34,7 +34,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.ByteArrayInputStream
 import java.net.URI
-import scala.collection.{mutable => m}
+import scala.collection.mutable as m
 import scala.util.{Success, Try}
 
 

@@ -27,7 +27,7 @@ import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget, WireAjaxEv
 import org.orbeon.xforms.runtime.DelayedEvent
 import org.orbeon.xforms.{EventNames, Load, Message}
 
-import java.{util => ju}
+import java.util as ju
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 

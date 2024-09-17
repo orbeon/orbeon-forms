@@ -22,7 +22,8 @@ import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{newInstance, global => g}
+import scala.scalajs.js.Dynamic.{newInstance, global as g}
+
 
 object ErrorPanel {
 

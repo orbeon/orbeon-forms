@@ -118,7 +118,7 @@ import org.orbeon.oxf.xml.ParserConfiguration
 import org.xml.sax.*
 import org.xml.sax.helpers.DefaultHandler
 import javax.xml.parsers.SAXParserFactory
-import java.{util => ju}
+import java.util as ju
 
 import scala.jdk.CollectionConverters.*
 

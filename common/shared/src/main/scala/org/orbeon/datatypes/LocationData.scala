@@ -15,7 +15,7 @@ package org.orbeon.datatypes
 
 import org.orbeon.oxf.common.ValidationException
 
-import java.{lang => jl}
+import java.lang as jl
 import scala.collection.{Iterator, immutable}
 
 

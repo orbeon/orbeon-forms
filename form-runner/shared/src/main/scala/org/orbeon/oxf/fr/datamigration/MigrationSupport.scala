@@ -29,7 +29,7 @@ import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 
-import scala.collection.{immutable => i}
+import scala.collection.immutable as i
 
 
 object MigrationSupport {

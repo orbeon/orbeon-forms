@@ -15,7 +15,7 @@ package org.orbeon.oxf.controller
 
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
 
-import java.lang.{Boolean => JBoolean}
+import java.lang.Boolean as JBoolean
 import java.net.URI
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}

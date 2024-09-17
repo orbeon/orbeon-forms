@@ -22,7 +22,7 @@ import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.w3c.dom.Node.ELEMENT_NODE
 
-import java.{util => ju}
+import java.util as ju
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 

@@ -6,7 +6,7 @@ import org.orbeon.oxf.util.PathUtils.*
 import org.scalajs.dom
 
 import java.net.URI
-import java.{util => ju}
+import java.util as ju
 
 
 object URLRewriterUtils {

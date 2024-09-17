@@ -8,7 +8,7 @@ import org.orbeon.oxf.util.Logging.*
 import org.orbeon.scaxon.SimplePath.*
 
 import java.time.Instant
-import java.{util => ju}
+import java.util as ju
 
 
 object PersistenceApi extends PersistenceApiTrait {

@@ -11,7 +11,7 @@ import org.orbeon.saxon.tree.wrapper.{AbstractNodeWrapper, SiblingCountingNode}
 import org.orbeon.saxon.utils.Configuration
 
 import java.util.function.Predicate
-import java.{util => ju}
+import java.util as ju
 
 
 trait NodeWrapper

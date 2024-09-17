@@ -1,6 +1,6 @@
 package org.orbeon.oxf.util
 
-import java.{util => ju}
+import java.util as ju
 
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om

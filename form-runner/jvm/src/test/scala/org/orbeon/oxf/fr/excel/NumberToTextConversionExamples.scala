@@ -17,7 +17,7 @@
 package org.orbeon.oxf.fr.excel
 
 import java.util.Locale
-import java.{lang => jl}
+import java.lang as jl
 
 
 object NumberToTextConversionExamples {

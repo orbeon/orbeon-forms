@@ -1,7 +1,7 @@
 package org.orbeon.connection
 
 import java.net.URI
-import java.{util => ju}
+import java.util as ju
 
 
 case class DemoConnectionContext(tid: Long)

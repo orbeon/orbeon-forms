@@ -13,7 +13,7 @@
   */
 package org.orbeon.xml
 
-import java.{util => ju}
+import java.util as ju
 import scala.jdk.CollectionConverters.*
 
 

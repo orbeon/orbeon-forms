@@ -34,7 +34,7 @@ import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 
-import java.{util => ju}
+import java.util as ju
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 

@@ -1,6 +1,6 @@
 package org.orbeon.dom.io
 
-import java.{lang => jl, util => ju}
+import java.{lang as jl, util as ju}
 
 import org.orbeon.dom
 import org.orbeon.dom.*

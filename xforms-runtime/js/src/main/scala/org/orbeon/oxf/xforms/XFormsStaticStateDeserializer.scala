@@ -34,7 +34,7 @@ import shapeless.syntax.typeable.typeableOps
 
 import java.net.URI
 import java.util.Base64
-import java.{util => ju}
+import java.util as ju
 import scala.collection.mutable
 import scala.scalajs.js
 

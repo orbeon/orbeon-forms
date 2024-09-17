@@ -32,7 +32,7 @@ import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticCont
 import org.orbeon.saxon.tree.wrapper.VirtualNode
 import org.orbeon.saxon.utils.Configuration
 
-import java.{lang => jl}
+import java.lang as jl
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
 

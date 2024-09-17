@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xml
 
 import java.io.{InputStream, Reader, StringReader}
-import java.{util => ju}
+import java.util as ju
 import javax.xml.parsers.*
 import org.orbeon.apache.xerces.impl.{Constants, XMLEntityManager, XMLErrorReporter}
 import org.orbeon.apache.xerces.xni.parser.XMLInputSource

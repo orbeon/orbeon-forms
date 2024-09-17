@@ -28,7 +28,7 @@ import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 
-import java.util.{Locale, Iterator => JIterator}
+import java.util.{Locale, Iterator as JIterator}
 import scala.jdk.CollectionConverters.*
 
 

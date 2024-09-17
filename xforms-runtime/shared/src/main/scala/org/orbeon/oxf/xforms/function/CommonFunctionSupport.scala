@@ -19,7 +19,7 @@ import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.{mutable => m}
+import scala.collection.mutable as m
 
 
 trait CommonFunctionSupport {

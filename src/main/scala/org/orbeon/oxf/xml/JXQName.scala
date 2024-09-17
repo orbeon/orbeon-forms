@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import javax.xml.namespace.{QName => JQName}
+import javax.xml.namespace.QName as JQName
 
 // Helpers for javax.xml.namespace.QName
 object JXQName {

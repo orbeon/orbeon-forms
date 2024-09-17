@@ -29,7 +29,7 @@ import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget}
 import org.orbeon.xforms.{EventNames, XFormsCrossPlatformSupport, XFormsId}
 
-import java.{util => ju}
+import java.util as ju
 
 
 // Process events sent by the client, including sorting, filtering, and security

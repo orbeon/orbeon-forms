@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import java.util.{List => JList}
+import java.util.List as JList
 import javax.xml.transform.*
 import javax.xml.transform.sax.SAXSource
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}

@@ -18,7 +18,7 @@ import org.orbeon.wsrp.WSRPSupport.*
 
 import java.net.URL
 import java.util.concurrent.Callable
-import java.{util => ju}
+import java.util as ju
 
 
 // This URL rewriter rewrites URLs using the WSRP encoding

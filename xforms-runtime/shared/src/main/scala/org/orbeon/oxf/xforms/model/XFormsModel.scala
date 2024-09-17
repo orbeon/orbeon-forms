@@ -43,7 +43,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId, XFormsNames}
 
 import java.net.URI
-import java.{util => ju}
+import java.util as ju
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 

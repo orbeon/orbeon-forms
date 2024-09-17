@@ -17,7 +17,7 @@ import org.orbeon.saxon.utils.Configuration
 import org.orbeon.saxon.value.QNameValue
 import org.orbeon.xml.NamespaceMapping
 
-import java.{util => ju}
+import java.util as ju
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.{util => ju}
+import java.util as ju
 import scala.jdk.CollectionConverters.*
 
 sealed trait DispatcherType {

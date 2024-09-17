@@ -1,12 +1,12 @@
 package org.orbeon.connection
 
 import org.log4s
-import org.orbeon.oxf.http.{DateHeaders, HttpStatusCodeException, StatusCode, Headers => HttpHeaders}
+import org.orbeon.oxf.http.{DateHeaders, HttpStatusCodeException, StatusCode, Headers as HttpHeaders}
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger}
 
 import java.io.*
-import java.{lang => jl}
+import java.lang as jl
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 

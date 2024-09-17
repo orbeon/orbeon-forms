@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.upload.api.java
 import org.orbeon.oxf.xforms.upload.api
 import org.orbeon.oxf.xforms.upload.api.java
 
-import _root_.java.{util => ju}
+import _root_.java.util as ju
 import scala.util.Try
 
 

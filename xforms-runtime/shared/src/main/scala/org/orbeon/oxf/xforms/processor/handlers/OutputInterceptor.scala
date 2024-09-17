@@ -19,7 +19,7 @@ import org.orbeon.xforms.XFormsNames
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, ContentHandler}
 
-import java.{lang => jl}
+import java.lang as jl
 
 
 // Intercept SAX output and annotate resulting elements and/or text with classes and spans.

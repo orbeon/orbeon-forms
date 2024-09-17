@@ -26,7 +26,7 @@ import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_URI
 import org.xml.sax.helpers.AttributesImpl
 
-import java.{util, util => ju}
+import java.{util, util as ju}
 
 
 private case class XXFormsDialogControlLocal(

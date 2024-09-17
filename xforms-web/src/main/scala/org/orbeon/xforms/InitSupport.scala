@@ -35,7 +35,7 @@ import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import java.io.StringWriter
-import scala.collection.{mutable => m}
+import scala.collection.mutable as m
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary

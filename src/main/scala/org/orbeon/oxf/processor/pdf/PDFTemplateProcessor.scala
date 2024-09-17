@@ -41,8 +41,8 @@ import org.orbeon.xml.NamespaceMapping
 
 import java.io.{ByteArrayOutputStream, OutputStream}
 import java.net.URI
-import java.net.URLDecoder.{decode => decodeURL}
-import java.util.{List => JList}
+import java.net.URLDecoder.decode as decodeURL
+import java.util.List as JList
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 

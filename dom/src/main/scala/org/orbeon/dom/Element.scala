@@ -1,10 +1,11 @@
 package org.orbeon.dom
 
-import java.{util => ju, lang => jl}
+import java.{lang as jl, util as ju}
 
 import org.orbeon.dom.tree.ConcreteElement
 
 import scala.jdk.CollectionConverters.*
+
 
 /**
  * `Element` interface defines an XML element. An element can have

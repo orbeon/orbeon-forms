@@ -15,7 +15,7 @@ package org.orbeon.oxf.externalcontext
 
 import java.io.*
 import java.net.URL
-import java.{util => ju}
+import java.util as ju
 import enumeratum.{Enum, EnumEntry}
 import enumeratum.values.{IntEnum, IntEnumEntry}
 import org.orbeon.io.CharsetNames

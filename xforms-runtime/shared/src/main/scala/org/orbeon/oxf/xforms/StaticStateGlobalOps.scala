@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.xbl.XBLAssets
 import org.orbeon.xforms.HeadElement
 import org.orbeon.xforms.xbl.Scope
 
-import scala.collection.{immutable => i}
+import scala.collection.immutable as i
 
 // Global operations on parts including top-level part and descendant parts
 class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {

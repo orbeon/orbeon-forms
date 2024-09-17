@@ -32,7 +32,7 @@ import org.orbeon.xforms.{Constants, Namespaces, XXBLScope}
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
-import scala.collection.{mutable => m}
+import scala.collection.mutable as m
 
 
 object XFormsExtractor {

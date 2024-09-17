@@ -16,7 +16,7 @@
 ==================================================================== */
 package org.orbeon.oxf.fr.excel
 
-import java.{lang => jl, util => ju}
+import java.{lang as jl, util as ju}
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.*

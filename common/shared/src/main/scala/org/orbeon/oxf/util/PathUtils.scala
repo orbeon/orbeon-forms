@@ -16,7 +16,7 @@ package org.orbeon.oxf.util
 import org.orbeon.oxf.util.CollectionUtils.combineValues
 import org.orbeon.oxf.util.StringUtils.*
 
-import java.{util, lang => jl}
+import java.{util, lang as jl}
 
 
 object PathUtils {

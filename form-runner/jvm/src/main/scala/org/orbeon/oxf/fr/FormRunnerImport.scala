@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr
 
 import java.time.{Instant, ZoneOffset}
 import java.time.format.DateTimeFormatter
-import java.{util => ju}
+import java.util as ju
 
 import org.orbeon.oxf.fr.excel.{ExcelDateUtils, NumberToTextConverter}
 import org.orbeon.oxf.fr.excel.ExcelDateUtils.FormatType

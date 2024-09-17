@@ -14,7 +14,7 @@
 package org.orbeon.oxf.servlet
 
 import java.io.{OutputStream, PrintWriter}
-import java.{util => ju}
+import java.util as ju
 
 
 object ServletResponse {

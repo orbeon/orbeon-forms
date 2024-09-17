@@ -36,7 +36,7 @@ import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.{Constants, UrlType}
 import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
-import java.util.{List => JList}
+import java.util.List as JList
 import scala.jdk.CollectionConverters.*
 import scala.reflect.ClassTag
 import scala.util.Try

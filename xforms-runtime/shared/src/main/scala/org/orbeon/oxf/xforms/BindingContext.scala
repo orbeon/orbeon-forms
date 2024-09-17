@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.{util => ju}
+import java.util as ju
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException

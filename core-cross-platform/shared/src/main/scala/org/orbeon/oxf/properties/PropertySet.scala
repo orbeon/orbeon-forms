@@ -27,7 +27,7 @@ import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants}
 import org.orbeon.xml.NamespaceMapping
 
 import java.net.URI
-import java.{lang => jl, util => ju}
+import java.{lang as jl, util as ju}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 

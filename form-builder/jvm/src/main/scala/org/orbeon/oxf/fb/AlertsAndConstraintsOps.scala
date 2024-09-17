@@ -36,7 +36,7 @@ import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
-import scala.{xml => sx}
+import scala.xml as sx
 
 
 trait AlertsAndConstraintsOps extends ControlOps {

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import java.{util => ju}
+import java.util as ju
 import cats.syntax.option.*
 import org.orbeon.dom.*
 import org.orbeon.dom.saxon.DocumentWrapper

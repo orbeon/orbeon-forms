@@ -13,12 +13,13 @@
   */
 package org.orbeon.oxf.portlet.liferay
 
-import java.{lang => jl, util => ju}
+import java.{lang as jl, util as ju}
 import javax.portlet.PortletRequest
 import javax.servlet.http.HttpServletRequest
 
 import scala.jdk.CollectionConverters.*
 import scala.util.{Success, Try}
+
 
 // For https://github.com/orbeon/orbeon-forms/issues/2843
 // We must abstract over code which changed packages between Liferay 6.2 and 7.0. We achieve this using Java reflection.

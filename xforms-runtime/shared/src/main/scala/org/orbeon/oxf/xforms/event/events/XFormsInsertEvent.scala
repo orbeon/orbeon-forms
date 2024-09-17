@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import java.util.{List => JList}
+import java.util.List as JList
 
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent.*

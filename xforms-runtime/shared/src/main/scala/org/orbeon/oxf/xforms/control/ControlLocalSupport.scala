@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.common.OXFException
 
-import java.util.{Collections => JCollections}
+import java.util.Collections as JCollections
 import ControlLocalSupport.*
 import org.orbeon.oxf.xforms.state.ControlState
 

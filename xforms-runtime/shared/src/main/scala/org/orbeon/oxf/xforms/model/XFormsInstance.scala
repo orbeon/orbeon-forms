@@ -359,7 +359,7 @@ trait BasicIdIndex {
   import org.orbeon.scaxon.SimplePath._
   import org.w3c.dom.Node.ATTRIBUTE_NODE
 
-  import collection.{mutable => m}
+  import collection.mutable as m
 
   protected def documentInfo: DocumentNodeInfoType
 

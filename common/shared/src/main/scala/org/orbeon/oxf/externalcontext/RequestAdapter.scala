@@ -3,7 +3,7 @@ package org.orbeon.oxf.externalcontext
 import org.orbeon.oxf.http.HttpMethod
 
 import java.io.InputStream
-import java.{util => ju}
+import java.util as ju
 
 
 class RequestAdapter extends ExternalContext.Request {

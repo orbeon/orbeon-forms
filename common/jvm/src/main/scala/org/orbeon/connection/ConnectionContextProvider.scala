@@ -1,6 +1,6 @@
 package org.orbeon.connection
 
-import java.{util => ju}
+import java.util as ju
 import java.net.URI
 
 

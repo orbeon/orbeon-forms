@@ -23,7 +23,7 @@ import org.orbeon.xforms.XFormsId
 import org.xml.sax.{Attributes, Locator}
 import shapeless.syntax.typeable.*
 
-import java.{lang => jl}
+import java.lang as jl
 
 
 class XXFormsComponentHandler(

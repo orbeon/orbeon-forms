@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import java.{util => ju}
+import java.util as ju
 
 import org.apache.commons.pool.ObjectPool
 import org.orbeon.oxf.common.OXFException

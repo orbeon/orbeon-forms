@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import java.{lang => jl, util => ju}
+import java.{lang as jl, util as ju}
 
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator, SAXException}

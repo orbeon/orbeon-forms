@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.common
 
-import java.{util => ju}
+import java.util as ju
 
 import javax.xml.transform.TransformerException
 import org.orbeon.datatypes.{BasicLocationData, LocationData}

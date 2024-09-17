@@ -33,7 +33,7 @@ import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.helpers.AttributesImpl
 
-import java.{util => ju}
+import java.util as ju
 
 
 // Trait for for all controls that hold a value

@@ -5,7 +5,7 @@ import org.orbeon.io.IOUtils.{runQuietly, useAndClose}
 import org.orbeon.oxf.http.{EmptyInputStream, Headers}
 
 import java.io.{ByteArrayInputStream, InputStream}
-import scala.collection.{immutable => i}
+import scala.collection.immutable as i
 
 
 sealed trait ContentT[S] {

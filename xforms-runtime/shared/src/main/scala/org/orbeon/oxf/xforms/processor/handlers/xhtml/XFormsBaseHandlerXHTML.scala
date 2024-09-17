@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option.*
 
-import java.{lang => jl}
+import java.lang as jl
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis

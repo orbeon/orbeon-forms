@@ -19,7 +19,7 @@ import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
 
-import scala.collection.{mutable => m}
+import scala.collection.mutable as m
 import scala.jdk.CollectionConverters.*
 
 
@@ -44,7 +44,7 @@ class RuntimeBind(
     // NOTE: This should probably go into XFormsContextStack
     val bindingContext = contextStack.getCurrentBindingContext
 
-    import java.{util => ju}
+    import java.util as ju
 
     // @ref can be missing and defaults to the context item
     val items: ju.List[om.Item] =

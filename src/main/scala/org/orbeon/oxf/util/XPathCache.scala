@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import scala.jdk.CollectionConverters.*
-import java.util.{List => JList, Map => JMap}
+import java.util.{List as JList, Map as JMap}
 
 import org.apache.commons.pool.{BasePoolableObjectFactory, ObjectPool}
 import org.orbeon.datatypes.LocationData
@@ -31,6 +31,7 @@ import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.SequenceExtent
 
 import scala.util.control.NonFatal
+
 
 /**
  * XPath expressions cache.

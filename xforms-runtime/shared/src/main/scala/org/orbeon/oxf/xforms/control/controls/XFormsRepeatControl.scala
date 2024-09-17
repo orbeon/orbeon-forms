@@ -37,9 +37,9 @@ import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
 import shapeless.syntax.typeable.*
 
-import java.{util => ju}
+import java.util as ju
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
-import scala.collection.{mutable => m}
+import scala.collection.mutable as m
 import scala.jdk.CollectionConverters.*
 
 

@@ -88,7 +88,7 @@ class ExtractorTest
     )
 
     import JXQName._
-    import javax.xml.namespace.{QName => JQName}
+    import javax.xml.namespace.QName as JQName
 
     val XMLURI    = "http://www.w3.org/XML/1998/namespace"
     val XFormsURI = "http://www.w3.org/2002/xforms"

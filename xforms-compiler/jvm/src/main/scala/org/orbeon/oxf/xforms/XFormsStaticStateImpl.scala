@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{BindingLoader, XBLAssets}
-import org.orbeon.oxf.xforms.{XFormsProperties => P}
+import org.orbeon.oxf.xforms.XFormsProperties as P
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.xforms.xbl.Scope
 

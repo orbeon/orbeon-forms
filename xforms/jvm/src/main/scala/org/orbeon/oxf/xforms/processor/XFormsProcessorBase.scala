@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager, XForm
 import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
-import java.{lang => jl}
+import java.lang as jl
 import scala.util.control.NonFatal
 
 

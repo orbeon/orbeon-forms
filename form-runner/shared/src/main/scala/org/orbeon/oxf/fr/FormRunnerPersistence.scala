@@ -50,7 +50,7 @@ import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport}
 
 import java.net.URI
-import java.{util => ju}
+import java.util as ju
 import scala.jdk.CollectionConverters.*
 
 

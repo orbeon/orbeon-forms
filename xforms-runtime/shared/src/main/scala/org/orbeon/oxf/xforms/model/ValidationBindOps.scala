@@ -29,7 +29,7 @@ import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node
 
-import scala.collection.{mutable => m}
+import scala.collection.mutable as m
 import scala.util.control.NonFatal
 
 

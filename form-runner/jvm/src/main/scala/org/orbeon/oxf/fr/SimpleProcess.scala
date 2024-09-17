@@ -1,5 +1,5 @@
 package org.orbeon.oxf.fr
-import process.{SimpleProcess => NewSimpleProcess}
+import process.SimpleProcess as NewSimpleProcess
 
 // Trampoline for backward compatibility. See also:
 // https://github.com/orbeon/orbeon-forms/issues/1095

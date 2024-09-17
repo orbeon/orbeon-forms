@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsProperties.{UploadMaxSizeAggregatePerControlProperty, UploadMaxSizeAggregatePerFormProperty, UploadMaxSizeAggregateProperty, UploadMaxSizePerFileProperty, UploadMaxSizeProperty}
-import org.orbeon.oxf.xforms.{XFormsProperties => P}
+import org.orbeon.oxf.xforms.XFormsProperties as P
 
 
 abstract class XFormsStaticStateStaticPropertiesImpl(

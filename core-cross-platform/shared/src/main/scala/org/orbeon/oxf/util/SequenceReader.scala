@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import java.io.Reader
-import java.{util => ju}
+import java.util as ju
 
 import org.orbeon.oxf.common.OXFException
 

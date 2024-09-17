@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.datatypes.LocationData
 import cats.syntax.option.*
 
-import java.{util => ju}
+import java.util as ju
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.{FunctionContext, XPathCache}
 import org.orbeon.oxf.xforms.*

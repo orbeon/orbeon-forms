@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml.dom
 
-import java.{lang => jl, util => ju}
+import java.{lang as jl, util as ju}
 
 import org.orbeon.dom.*
 import org.orbeon.oxf.util.StringUtils.*

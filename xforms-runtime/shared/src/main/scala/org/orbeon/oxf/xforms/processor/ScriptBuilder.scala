@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEvents}
 import org.orbeon.oxf.xforms.{ShareableScript, XFormsContainingDocument}
 import org.orbeon.xforms.*
 
-import java.{lang => jl}
+import java.lang as jl
 import scala.collection.mutable
 
 

@@ -1,6 +1,6 @@
 package org.orbeon.dom.io
 
-import java.{util => ju}
+import java.util as ju
 
 import org.orbeon.dom.*
 import org.orbeon.dom.io.SAXWriter.*

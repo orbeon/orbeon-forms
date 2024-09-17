@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import java.{util => ju}
+import java.util as ju
 
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.URLFinder

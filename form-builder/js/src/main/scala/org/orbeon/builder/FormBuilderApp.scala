@@ -17,7 +17,7 @@ import org.orbeon.fr.*
 import org.orbeon.xforms.*
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.Dynamic.global as g
 
 
 // Scala.js starting point for Form Builder

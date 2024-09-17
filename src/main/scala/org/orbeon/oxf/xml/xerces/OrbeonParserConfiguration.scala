@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml.xerces
 
-import java.{util => ju}
+import java.util as ju
 
 import org.orbeon.apache.xerces.parsers.{XIncludeAwareParserConfiguration, XML11Configuration}
 import org.orbeon.apache.xerces.util.ParserConfigurationSettings

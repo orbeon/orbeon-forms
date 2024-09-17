@@ -11,7 +11,7 @@ import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.{QNameValue, SequenceType}
 import org.orbeon.xml.NamespaceMapping
 
-import java.{util, util => ju}
+import java.{util, util as ju}
 import javax.xml.transform.{Source, SourceLocator}
 import scala.jdk.CollectionConverters.*
 

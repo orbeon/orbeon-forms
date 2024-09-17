@@ -14,7 +14,7 @@
 package org.orbeon.oxf.servlet
 
 import java.io.{BufferedReader, InputStream}
-import java.{util => ju}
+import java.util as ju
 
 
 class HttpServletRequestWrapper(var request: HttpServletRequest) extends HttpServletRequest {

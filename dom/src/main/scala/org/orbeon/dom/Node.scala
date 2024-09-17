@@ -6,7 +6,8 @@ import org.orbeon.io.{IOUtils, StringBuilderWriter}
 
 import scala.jdk.CollectionConverters.*
 
-import java.{util => ju, lang => jl}
+import java.{lang as jl, util as ju}
+
 
 object Node {
 

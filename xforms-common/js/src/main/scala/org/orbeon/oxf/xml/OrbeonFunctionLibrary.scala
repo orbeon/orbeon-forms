@@ -11,7 +11,7 @@ import org.orbeon.saxon.om.{Function, Sequence, StructuredQName}
 import org.orbeon.saxon.trans.{SymbolicName, XPathException}
 import org.orbeon.saxon.value.SequenceType
 
-import java.{util => ju}
+import java.util as ju
 
 
 // Inspired from `BuiltInFunctionSet` and modified to support multiple namespaces.

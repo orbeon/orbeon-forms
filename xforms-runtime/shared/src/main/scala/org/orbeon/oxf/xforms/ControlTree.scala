@@ -25,8 +25,8 @@ import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.XFormsNames.*
 
-import java.{util => ju}
-import scala.collection.{mutable => m}
+import java.util as ju
+import scala.collection.mutable as m
 import scala.jdk.CollectionConverters.*
 
 

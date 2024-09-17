@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.converter
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo}
-import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => HtmlURI}
+import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI as HtmlURI
 import org.orbeon.oxf.xml.{PlainHTMLOrXHTMLReceiver, XMLReceiver}
 
 // Perform the following transformation on the input document:

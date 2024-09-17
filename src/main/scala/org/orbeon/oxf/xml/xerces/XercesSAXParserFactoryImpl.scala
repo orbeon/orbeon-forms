@@ -8,7 +8,7 @@ import org.orbeon.oxf.xml.ParserConfiguration
 import org.slf4j
 import org.xml.sax.SAXNotRecognizedException
 
-import java.{util => ju}
+import java.util as ju
 import javax.xml.parsers.{SAXParser, SAXParserFactory}
 
 

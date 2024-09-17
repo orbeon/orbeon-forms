@@ -33,7 +33,7 @@ import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.LocationSAXWriter
 
 import java.io.*
-import java.util.{Properties => JProperties}
+import java.util.Properties as JProperties
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
 

@@ -17,7 +17,7 @@ import org.orbeon.oxf.fr.embedding.APISupport.*
 import org.orbeon.oxf.servlet.HttpServletRequest
 
 import java.io.Writer
-import java.{util => ju}
+import java.util as ju
 import scala.jdk.CollectionConverters.*
 
 object API {

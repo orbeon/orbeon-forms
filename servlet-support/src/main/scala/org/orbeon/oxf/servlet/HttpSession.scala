@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.{util => ju}
+import java.util as ju
 
 object HttpSession {
   def apply(httpSession: javax.servlet.http.HttpSession): JavaxHttpSession     = new JavaxHttpSession(httpSession)

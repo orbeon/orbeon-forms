@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 
-import java.{lang => jl}
+import java.lang as jl
 
 
 abstract class XFormsGroupHandler(

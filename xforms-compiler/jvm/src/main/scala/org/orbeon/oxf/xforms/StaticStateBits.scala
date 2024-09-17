@@ -25,7 +25,7 @@ import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.xforms.XXBLScope
 
-import java.{lang => jl}
+import java.lang as jl
 import javax.xml.transform.stream.StreamResult
 
 

@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.*
 
 import java.io.*
-import java.{util, util => ju}
+import java.{util, util as ju}
 import scala.jdk.CollectionConverters.*
 
 

@@ -27,7 +27,7 @@ import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 
-import scala.collection.{immutable => i}
+import scala.collection.immutable as i
 import scala.util.Try
 
 

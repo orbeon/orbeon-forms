@@ -31,7 +31,7 @@ import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax.*
 import org.xml.sax.helpers.AttributesImpl
 
-import java.{lang => jl}
+import java.lang as jl
 
 
 /**

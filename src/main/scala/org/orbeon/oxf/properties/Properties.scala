@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{LoggerFactory, PipelineUtils}
 
 import java.util.concurrent.Semaphore
-import java.{util => ju}
+import java.util as ju
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 

@@ -13,7 +13,7 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 import scala.concurrent.duration.*
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.Dynamic.global as g
 import scala.scalajs.js.|
 import scala.util.Try
 

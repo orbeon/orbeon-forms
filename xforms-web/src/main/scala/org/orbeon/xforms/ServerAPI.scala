@@ -60,7 +60,7 @@ object ServerAPI {
 
     // Don't use `eval` as `Content-Security-Policy` header might block it
     val globalObject: js.Dynamic = {
-      import js.Dynamic.{global => g}
+      import js.Dynamic.global as g
       if (js.typeOf(g.global) != "undefined" && (g.global.Object eq g.Object)) {
         // Node.js environment detected
         g.global

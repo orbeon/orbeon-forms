@@ -30,7 +30,7 @@ import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.*
 
-import java.{util => ju}
+import java.util as ju
 
 /**
  * Represents an xf:switch container control.

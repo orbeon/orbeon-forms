@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import java.{util => ju}
+import java.util as ju
 
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.dom.Extensions

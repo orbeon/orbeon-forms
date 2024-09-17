@@ -3,7 +3,7 @@ package org.orbeon.oxf.http
 import org.orbeon.oxf.externalcontext.{ExternalContext, RequestAdapter}
 import org.scalatest.funspec.AnyFunSpecLike
 
-import java.{util => ju}
+import java.util as ju
 import scala.jdk.CollectionConverters.*
 import scala.language.postfixOps
 

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.servlet
 
 import java.io.{ByteArrayOutputStream, OutputStream, PrintWriter}
-import java.{util => ju}
+import java.util as ju
 
 
 class HttpServletResponseWrapper(var response: HttpServletResponse) extends HttpServletResponse {

@@ -24,7 +24,7 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.net.URI
 import java.time.Instant
-import java.{util => ju}
+import java.util as ju
 import scala.util.Try
 
 

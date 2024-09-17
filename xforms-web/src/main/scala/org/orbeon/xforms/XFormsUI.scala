@@ -39,10 +39,10 @@ import scalatags.JsDom.all.*
 import shapeless.syntax.typeable.*
 
 import scala.collection.immutable
-import scala.concurrent.duration.{span => _, _}
+import scala.concurrent.duration.{span as _, _}
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.Dynamic.global as g
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers.SetTimeoutHandle

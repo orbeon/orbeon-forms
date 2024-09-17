@@ -19,7 +19,7 @@ import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xml.NamespaceMapping
 
-import java.{util => ju}
+import java.util as ju
 import scala.util.Try
 import scala.util.control.NonFatal
 

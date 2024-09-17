@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
 import org.orbeon.oxf.xforms.analysis.TopLevelPartAnalysis
-import org.orbeon.oxf.xforms.{XFormsProperties => P}
+import org.orbeon.oxf.xforms.XFormsProperties as P
 import org.orbeon.oxf.xml.XMLUtils
 
 

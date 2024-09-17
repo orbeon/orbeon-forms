@@ -17,7 +17,7 @@ import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.Dynamic.global as g
 
 // Simple facade for Dragula. See https://github.com/bevacqua/dragula.
 object Dragula {

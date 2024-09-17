@@ -29,7 +29,7 @@ import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
-import scala.collection.{mutable => m}
+import scala.collection.mutable as m
 
 
 class PathMapXPathDependencies(

@@ -34,7 +34,7 @@ import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{DeploymentType, XFormsCrossPlatformSupport}
 
-import java.{util => ju}
+import java.util as ju
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 

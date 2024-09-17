@@ -36,7 +36,7 @@ import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
 import org.xml.sax.InputSource
 
 import java.io.{ByteArrayOutputStream, InputStream, Writer}
-import java.sql.{Array => _, _}
+import java.sql.{Array as _, _}
 import java.time.Instant
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}

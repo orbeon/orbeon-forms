@@ -87,10 +87,10 @@ object FriendlyCaptcha {
               sitekey           = publicKey
               language          = WebSupport.findHtmlLang.getOrElse("en"): String
               solutionFieldName = "-"
-              readyCallback     = (() => logger.debug("ready callback")): js.Function0[Unit]
-              startedCallback   = (() => logger.debug("started callback")): js.Function0[Unit]
-              doneCallback      = successfulResponse
-              errorCallback     = (e => logger.error(s"error callback: `$e`")): js.Function1[String, Unit]
+              readyCallback     = js.defined((() => logger.debug("ready callback")): js.Function0[Unit])
+              startedCallback   = js.defined((() => logger.debug("started callback")): js.Function0[Unit])
+              doneCallback      = js.defined(successfulResponse)
+              errorCallback     = js.defined((e => logger.error(s"error callback: `$e`")): js.Function1[String, Unit])
             }
           )
         )

@@ -25,6 +25,7 @@ import org.orbeon.sjsdom.{ReadableStream, ReadableStreamType, ReadableStreamUnde
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
 
+
 private[fs2dom] object StreamConverters {
 
   def readReadableStream[F[_]](
@@ -64,7 +65,7 @@ private[fs2dom] object StreamConverters {
         case Resource.ExitCase.Succeeded =>
           rs.cancel(js.undefined)
         case Resource.ExitCase.Errored(ex) =>
-          rs.cancel(ex.toString())
+          rs.cancel(js.defined(ex.toString()))
         case Resource.ExitCase.Canceled =>
           rs.cancel(js.undefined)
       }
@@ -83,11 +84,14 @@ private[fs2dom] object StreamConverters {
                 val source = new ReadableStreamUnderlyingSource[Uint8Array] {
                   `type` = ReadableStreamType.bytes
                   pull = js.defined { controller =>
-                    dispatcher.unsafeToPromise {
-                      chunks.take.flatMap {
-                        case Some(chunk) =>
-                          F.delay(controller.enqueue(chunk.toUint8Array))
-                        case None => F.delay(controller.close())
+                    js.defined {
+                      dispatcher.unsafeToPromise {
+                        chunks.take.flatMap {
+                          case Some(chunk) =>
+                            F.delay(controller.enqueue(chunk.toUint8Array))
+                          case None =>
+                            F.delay(controller.close())
+                        }
                       }
                     }
                   }

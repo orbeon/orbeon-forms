@@ -54,7 +54,7 @@ object XFormsXbl {
           this,
           "container",
           new js.PropertyDescriptor {
-            value        = containerElem
+            value        = js.defined(containerElem)
             writable     = false
             enumerable   = true
             configurable = true

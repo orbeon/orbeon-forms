@@ -20,12 +20,12 @@ import org.orbeon.oxf.http.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
 import org.orbeon.{fs2dom, sjsdom}
-import org.scalajs.dom.experimental.{Headers => JSHeaders, URL => JSURL}
+import org.scalajs.dom.experimental.{Headers as JSHeaders, URL as JSURL}
 
 import java.io.InputStream
 import java.net.URI
 import scala.scalajs.js
-import scala.scalajs.js.Iterator
+import scala.scalajs.js.{Iterator, |}
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.JSName
 import scala.scalajs.js.typedarray.Uint8Array
@@ -199,7 +199,7 @@ object Connection extends ConnectionTrait {
           val method  = methodString
           val url     = jsUrl
           val headers = requestHeaders
-          val body    = readableStreamOpt.orUndefined
+          val body    = readableStreamOpt.orUndefined.asInstanceOf[js.UndefOr[Uint8Array | sjsdom.ReadableStream[Uint8Array]]] // HACK: otherwise this doesn't compile with `-Xsource-features:v2.13.14`
         }
 
       val initialStream =

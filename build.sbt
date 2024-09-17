@@ -375,6 +375,7 @@ lazy val commonSettings = Seq(
     "-Ytasty-reader",      // for Scala 2.13 reading Scala 3 modules
     "-Xsource:3",          // for Scala 2.13 -> Scala 3 migration
     "-Wconf:cat=scala3-migration:w", // for Scala 2.13 -> Scala 3 migration
+    "-Xsource-features:v2.13.14",
     // Consider the following flags
 //    "-feature",
 //    "-unchecked",

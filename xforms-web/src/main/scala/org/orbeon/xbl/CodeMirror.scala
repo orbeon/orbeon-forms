@@ -1,5 +1,6 @@
 package org.orbeon.xbl
 
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.facades
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
@@ -11,6 +12,7 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.|
+
 
 object CodeMirror {
 
@@ -116,7 +118,8 @@ object CodeMirror {
           promise.success(())
         }
 
-        promise.future.toJSPromise
+        js.defined(promise.future.toJSPromise)
+          .asInstanceOf[js.UndefOr[js.Promise[Unit] | JQueryPromise]] // HACK: otherwise this doesn't compile with `-Xsource-features:v2.13.14`
       } else {
         js.undefined
       }
@@ -125,5 +128,3 @@ object CodeMirror {
     override def xformsGetValue(): String = this.editor.getValue()
   }
 }
-
-

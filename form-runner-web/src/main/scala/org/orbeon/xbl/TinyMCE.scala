@@ -182,7 +182,7 @@ object TinyMCE {
           // TODO: What in this case? `promise.Failure()`?
         }
       }
-      promise.future.toJSPromise
+      promise.future.toJSPromise.asInstanceOf[js.UndefOr[js.Promise[Unit] | JQueryPromise]] // HACK: otherwise this doesn't compile with `-Xsource-features:v2.13.14`
     }
 
     override def xformsFocus(): Unit =

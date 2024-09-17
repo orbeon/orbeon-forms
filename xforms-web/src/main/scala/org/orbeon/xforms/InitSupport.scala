@@ -289,7 +289,7 @@ object InitSupport {
 
         // Run user scripts
         initializations.userScripts foreach { case rpc.UserScript(functionName, targetId, observerId, paramsValues) =>
-          ServerAPI.callUserScript(formId, functionName, targetId, observerId, paramsValues.map(_.asInstanceOf[js.Any]) *)
+          ServerAPI.callUserScript(formId, functionName, targetId, observerId, paramsValues.map(_.asInstanceOf[js.Any])*)
         }
 
         // Run other code sent by server

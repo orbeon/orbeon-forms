@@ -38,7 +38,7 @@ object DomSupport {
       // TODO: Review once full order of JavaScript is determined in `App` doc.
       js.timers.setTimeout(0) {
         promise.success(())
-      }
+      }: Unit
     } else {
 
       lazy val readyStateChanged: js.Function1[dom.Event, _] = (_: dom.Event) =>

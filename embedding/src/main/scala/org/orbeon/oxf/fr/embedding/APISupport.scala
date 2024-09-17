@@ -251,7 +251,7 @@ object APISupport {
         Logger.debug(s"using ctx.outputStream for mediatype = `$other`")
         ctx.outputStream match {
           case Success(os) =>
-            useAndClose(content.stream)(IOUtils.copy(_, os))
+            useAndClose(content.stream)(IOUtils.copy(_, os): Unit)
           case Failure(t)  =>
             Logger.warn(s"unable to obtain `OutputStream` possibly because of a missing mediatype downstream", t)
             ctx.writer.write("unable to provide content")
@@ -267,7 +267,7 @@ object APISupport {
   def withSettings[T](req: HttpServletRequest, writer: => Writer)(body: EmbeddingSettings => T): Unit =
     Option(req.getAttribute(SettingsKey).asInstanceOf[EmbeddingSettings]) match {
       case Some(settings) =>
-        body(settings)
+        body(settings): Unit
       case None =>
         val msg = "ERROR: Orbeon Forms embedding filter is not configured."
         Logger.error(msg)

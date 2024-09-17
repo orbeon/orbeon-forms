@@ -82,7 +82,7 @@ trait Logging {
   // Run the given block only in debug mode
   def ifDebug[T](body: => T)(implicit logger: IndentedLogger): Unit =
     if (logger.debugEnabled)
-      body
+      body: Unit
 
   // Call from a result block to set result parameters
   def debugResults(parameters: => Seq[(String, String)])(implicit logger: IndentedLogger): Unit =

@@ -22,7 +22,7 @@ object CoreUtils {
     def |>  [B] (f: A => B            ): B = pipe(f)
     def pipeIf  (b: Boolean, f: A => A): A = if (b) f(a) else a
     // Kestrel / K Combinator (known as tap in Ruby/Underscore)
-    def kestrel[B](f: A => B): A = { f(a); a }
+    def kestrel[B](f: A => B): A = { f(a): Unit; a }
     def |!>    [B](f: A => B): A = kestrel(f)
   }
 

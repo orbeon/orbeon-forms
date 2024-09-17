@@ -91,7 +91,10 @@ object XPath {
       reporter,
       functionContext
     )
-    .collect { case node: om.NodeInfo => node }
+    .collect {
+      case node: om.NodeInfo => node
+      case other => throw new IllegalArgumentException(s"Expected a node for `$expr`, got: `${other.getClass.getName}`")
+    }
 
 
     // Evaluate an XPath expression as a value template

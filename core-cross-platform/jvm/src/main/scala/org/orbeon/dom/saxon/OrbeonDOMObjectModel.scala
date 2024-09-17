@@ -33,14 +33,14 @@ object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
 
   val getIdentifyingURI = "http://orbeon.org/oxf/xml/dom"
 
-  def getPJConverter(targetClass: Class[_]): PJConverter =
+  def getPJConverter(targetClass: Class[?]): PJConverter =
     if (isRecognizedNodeClass(targetClass))
-      (value: ValueRepresentation, targetClass: Class[_], _: XPathContext) =>
+      (value: ValueRepresentation, targetClass: Class[?], _: XPathContext) =>
         convertXPathValueToObject(Value.asValue(value), targetClass)
     else
       null
 
-  def getJPConverter(targetClass: Class[_]): JPConverter =
+  def getJPConverter(targetClass: Class[?]): JPConverter =
     if (isRecognizedNodeClass(targetClass)) {
       new JPConverter {
         def convert(obj: Any, context: XPathContext): ValueRepresentation = convertObjectToXPathValue(obj, context.getConfiguration)
@@ -50,7 +50,7 @@ object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
       null
     }
 
-  private def isRecognizedNodeClass(nodeClass: Class[_]) = classOf[Node].isAssignableFrom(nodeClass)
+  private def isRecognizedNodeClass(nodeClass: Class[?]) = classOf[Node].isAssignableFrom(nodeClass)
 
   private def convertObjectToXPathValue(obj: Any, config: Configuration): NodeInfo = {
 
@@ -64,7 +64,7 @@ object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
     }
   }
 
-  private def convertXPathValueToObject(value: Value, targetClass: Class[_]): AnyRef =
+  private def convertXPathValueToObject(value: Value, targetClass: Class[?]): AnyRef =
     value match {
       case singletonNode: SingletonNode =>
         singletonNode.getNode match {

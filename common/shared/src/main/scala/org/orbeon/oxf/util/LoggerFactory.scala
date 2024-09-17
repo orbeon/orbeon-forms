@@ -20,7 +20,7 @@ object LoggerFactory {
   val logger: org.log4s.Logger = createLogger("org.orbeon.oxf.util.LoggerFactory")
 
   def createLogger(name: String)   : log4s.Logger = org.log4s.getLogger(name)
-  def createLogger(clazz: Class[_]): log4s.Logger = org.log4s.getLogger(clazz.getName)
+  def createLogger(clazz: Class[?]): log4s.Logger = org.log4s.getLogger(clazz.getName)
 
-  def createLoggerJava(clazz: Class[_]): org.slf4j.Logger = createLogger(clazz).logger
+  def createLoggerJava(clazz: Class[?]): org.slf4j.Logger = createLogger(clazz).logger
 }

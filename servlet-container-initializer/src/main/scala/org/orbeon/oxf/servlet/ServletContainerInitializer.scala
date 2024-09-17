@@ -42,7 +42,7 @@ class JavaxServletContainerInitializer extends javax.servlet.ServletContainerIni
   override val orbeonSessionListenerClass: Class[? <: HttpSessionListener]                = classOf[JavaxOrbeonSessionListener]
   override val shutdownListenerClass: Class[? <: ServletContextListener]                  = classOf[JavaxShutdownListener]
 
-  override def onStartup(c: ju.Set[Class[_]], ctx: javax.servlet.ServletContext): Unit = startup(c, ServletContext(ctx))
+  override def onStartup(c: ju.Set[Class[?]], ctx: javax.servlet.ServletContext): Unit = startup(c, ServletContext(ctx))
 }
 
 class JakartaServletContainerInitializer extends jakarta.servlet.ServletContainerInitializer with CommonContainerInitializer {
@@ -66,7 +66,7 @@ class JakartaServletContainerInitializer extends jakarta.servlet.ServletContaine
   override val orbeonSessionListenerClass: Class[? <: HttpSessionListener]                = classOf[JakartaOrbeonSessionListener]
   override val shutdownListenerClass: Class[? <: ServletContextListener]                  = classOf[JakartaShutdownListener]
 
-  override def onStartup(c: ju.Set[Class[_]], ctx: jakarta.servlet.ServletContext): Unit = startup(c, ServletContext(ctx))
+  override def onStartup(c: ju.Set[Class[?]], ctx: jakarta.servlet.ServletContext): Unit = startup(c, ServletContext(ctx))
 }
 
 trait CommonContainerInitializer {
@@ -90,7 +90,7 @@ trait CommonContainerInitializer {
     def setInitParameter(name: String, value: String): Boolean
   }
 
-  def startup(c: ju.Set[Class[_]], ctx: ServletContext): Unit = {
+  def startup(c: ju.Set[Class[?]], ctx: ServletContext): Unit = {
     logger.info("Registering Orbeon servlets, filters, and listeners")
 
     // Servlets

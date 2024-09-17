@@ -100,7 +100,7 @@ object XPath extends XPathTrait {
         case v              => v
       }
 
-      def convert(value: ValueRepresentation, targetClass: Class[_], context: XPathContext): AnyRef =
+      def convert(value: ValueRepresentation, targetClass: Class[?], context: XPathContext): AnyRef =
         if (targetClass.isAssignableFrom(classOf[List[_]])) {
 
           val values =
@@ -117,13 +117,13 @@ object XPath extends XPathTrait {
         }
     }
 
-    def getJPConverter(targetClass: Class[_]) =
+    def getJPConverter(targetClass: Class[?]) =
       if (SupportedScalaToSaxonClasses exists (_.isAssignableFrom(targetClass)))
         ScalaToSaxonConverter
       else
         null
 
-    def getPJConverter(targetClass: Class[_]) =
+    def getPJConverter(targetClass: Class[?]) =
       if (SupportedSaxonToScalaClasses exists (_.isAssignableFrom(targetClass)))
         SaxonToScalaConverter
       else

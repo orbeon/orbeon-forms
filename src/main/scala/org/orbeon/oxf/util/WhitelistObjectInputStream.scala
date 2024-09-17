@@ -18,7 +18,7 @@ import java.io.{InputStream, ObjectInputStream, ObjectStreamClass}
 
 class WhitelistObjectInputStream(is: InputStream, classNames: Set[String], prefixes: List[String]) extends ObjectInputStream(is) {
 
-  override def resolveClass(desc: ObjectStreamClass): Class[_] = {
+  override def resolveClass(desc: ObjectStreamClass): Class[?] = {
 
     val name = desc.getName
 
@@ -31,7 +31,7 @@ class WhitelistObjectInputStream(is: InputStream, classNames: Set[String], prefi
 
 object WhitelistObjectInputStream {
 
-  def apply(is: InputStream, clazz: Class[_], prefixes: List[String]): WhitelistObjectInputStream =
+  def apply(is: InputStream, clazz: Class[?], prefixes: List[String]): WhitelistObjectInputStream =
     new WhitelistObjectInputStream(is, AllowedClasses ++ Set(clazz.getName), prefixes ::: AllowedPrefixes)
 
   private val AllowedPrefixes = List(

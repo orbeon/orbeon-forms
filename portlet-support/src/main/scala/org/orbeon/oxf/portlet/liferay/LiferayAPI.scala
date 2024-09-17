@@ -53,7 +53,7 @@ trait LiferayAPI {
       (className => Try(Class.forName(className))) collectFirst
       { case Success(clazz) => clazz }             get
 
-  private def liferayMethod(suffix: String, name: String, types: Class[_]*) =
+  private def liferayMethod(suffix: String, name: String, types: Class[?]*) =
     liferayClass(suffix).getMethod(name, types*)
 
   // Static methods. We can't use structural types as the methods are static.

@@ -12,15 +12,15 @@ object Exceptions {
 
     // Create a map of all classes and interfaces implemented by the throwable
     val throwableClasses = {
-      def superIterator     = Iterator.iterate[Class[_]](t.getClass)(_.getSuperclass) takeWhile (_ ne null)
+      def superIterator     = Iterator.iterate[Class[?]](t.getClass)(_.getSuperclass) takeWhile (_ ne null)
       def interfaceIterator = t.getClass.getInterfaces.iterator
 
       // NOTE: toMap's type parameters are needed with 2.9.2, but not with 2.10
-      (superIterator ++ interfaceIterator map (c => c.getName -> c)).toMap[String, Class[_]]
+      (superIterator ++ interfaceIterator map (c => c.getName -> c)).toMap[String, Class[?]]
     }
 
     // Invoke the given getter on t
-    def invokeGetter(clazz: Class[_], getter: String): Option[Throwable] =
+    def invokeGetter(clazz: Class[?], getter: String): Option[Throwable] =
       try {
         val method = clazz.getMethod(getter)
         val result = method.invoke(t)

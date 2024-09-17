@@ -576,6 +576,7 @@ lazy val xformsFilter = (project in file("xforms-filter"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-xforms-filter",
+    scalaVersion := scala3,
     libraryDependencies += "javax.servlet"             % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
     libraryDependencies += "jakarta.servlet"           % "jakarta.servlet-api" % JakartaServletApiVersion % Provided,
     libraryDependencies += "commons-io"                % "commons-io"          % CommonsIoVersion,

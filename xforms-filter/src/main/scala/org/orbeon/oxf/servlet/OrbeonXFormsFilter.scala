@@ -15,7 +15,7 @@ package org.orbeon.oxf.servlet
 
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.common.Defaults
-import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.http.{EmptyInputStream, EmptyReader, StatusCode}
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -32,8 +32,8 @@ private case class FilterSettings(context: ServletContext, orbeonContextPathOpt:
 // For backward compatibility
 class OrbeonXFormsFilter extends JavaxOrbeonXFormsFilter
 
-class JavaxOrbeonXFormsFilter   extends JavaxFilter  (new OrbeonXFormsFilterImpl)
-class JakartaOrbeonXFormsFilter extends JakartaFilter(new OrbeonXFormsFilterImpl)
+class JavaxOrbeonXFormsFilter   extends JavaxFilter  (OrbeonXFormsFilterImpl())
+class JakartaOrbeonXFormsFilter extends JakartaFilter(OrbeonXFormsFilterImpl())
 
 // This filter allows forwarding requests from your web app to an separate Orbeon Forms context.
 class OrbeonXFormsFilterImpl extends Filter {
@@ -58,9 +58,9 @@ class OrbeonXFormsFilterImpl extends Filter {
     settingsOpt foreach {
       case settings @ FilterSettings(servletContext, orbeonContextPathOpt, defaultEncoding) =>
 
-        val orbeonContext = (
+        val orbeonContext =
           orbeonContextPathOpt
-          map { orbeonContextPath =>
+          .map { orbeonContextPath =>
             servletContext.getContext(orbeonContextPath) ensuring (
               _ ne null,
               s"Can't find Orbeon Forms context called '$orbeonContextPath'. Check the " +
@@ -68,12 +68,11 @@ class OrbeonXFormsFilterImpl extends Filter {
               s"<Context crossContext='true'/> attribute."
             )
           }
-          getOrElse servletContext
-        )
+          .getOrElse(servletContext)
 
         def getOrbeonDispatcher(path: String) =
-          orbeonContext.getRequestDispatcher(path) ensuring
-          (_ ne null, "Can't find Orbeon Forms request dispatcher.")
+          orbeonContext.getRequestDispatcher(path)
+            .ensuring(_ ne null, "Can't find Orbeon Forms request dispatcher.")
 
         val httpRequest  = servletRequest.asInstanceOf[HttpServletRequest]
         val httpResponse = servletResponse.asInstanceOf[HttpServletResponse]
@@ -95,14 +94,14 @@ class OrbeonXFormsFilterImpl extends Filter {
             // want to allow further interactions with a page.
             // NOTE: With Tomcat this doesn't seem necessary. Other containers might work differently.
             if (subRequestPath.startsWith("/xforms-server"))
-              httpRequest.getSession(false) ensuring
-              (_ ne null, "Session has expired. Unable to process incoming request.")
+              httpRequest.getSession(false)
+                .ensuring(_ ne null, "Session has expired. Unable to process incoming request.")
 
             getOrbeonDispatcher(subRequestPath).forward(httpRequest, httpResponse)
           case _ =>
             // Forward the request to the Orbeon Forms renderer
-            val requestWrapper  = new FilterRequestWrapper(httpRequest)
-            val responseWrapper = new FilterResponseWrapper(httpResponse, defaultEncoding)
+            val requestWrapper  = FilterRequestWrapper(httpRequest)
+            val responseWrapper = FilterResponseWrapper(httpResponse, defaultEncoding)
 
             // Execute filter
             filterChain.doFilter(requestWrapper, responseWrapper)
@@ -162,7 +161,7 @@ class OrbeonXFormsFilterImpl extends Filter {
                   // The request wrapper provides an empty request body if the filtered resource already
                   // attempted to read the body.
                   val orbeonRequestWrapper =
-                    new OptionalBodyFilterRequestWrapper(httpRequest, requestWrapper.isRequestBodyRead)
+                    OptionalBodyFilterRequestWrapper(httpRequest, requestWrapper.isRequestBodyRead)
 
                   getOrbeonDispatcher(RendererPath).forward(orbeonRequestWrapper, httpResponse)
                 } else {
@@ -222,20 +221,13 @@ private class OptionalBodyFilterRequestWrapper(httpServletRequest: HttpServletRe
 
   override def getInputStream =
     if (forceEmptyBody)
-      new InputStream {
-        def read: Int = -1
-      }
+      EmptyInputStream
     else
       super.getInputStream
 
   override def getReader =
     if (forceEmptyBody)
-      new BufferedReader(
-        new Reader {
-          def read(cbuf: Array[Char], off: Int, len: Int) = 0
-          def close() = ()
-        }
-      )
+      BufferedReader(EmptyReader)
     else
       super.getReader
 }
@@ -276,7 +268,7 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
 
   override def getOutputStream = {
     if (_byteArrayOutputStream eq null) {
-      _byteArrayOutputStream = new ByteArrayOutputStream
+      _byteArrayOutputStream = ByteArrayOutputStream()
       _servletOutputStream   = response.servletOutputStream(_byteArrayOutputStream)
     }
     _servletOutputStream
@@ -284,8 +276,8 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
 
   override def getWriter = {
     if (_printWriter eq null) {
-      _stringWriter = new StringWriter
-      _printWriter = new PrintWriter(_stringWriter)
+      _stringWriter = StringWriter()
+      _printWriter = PrintWriter(_stringWriter)
     }
     _printWriter
   }
@@ -295,7 +287,7 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
     this._mediatype = ContentTypes.getContentTypeMediaType(contentType)
   }
 
-  override def resetBuffer(): Unit = {
+  override def resetBuffer(): Unit =
     if (_byteArrayOutputStream ne null) {
       runQuietly(_servletOutputStream.flush())
       _byteArrayOutputStream.reset()
@@ -304,11 +296,10 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
       val sb = _stringWriter.getBuffer
       sb.delete(0, sb.length)
     }
-  }
 
-  def mediaType = _mediatype
+  def mediaType: Option[String] = _mediatype
 
-  def content =
+  def content: Option[String] =
     if (_stringWriter ne null) {
       _printWriter.flush()
       Some(_stringWriter.toString)

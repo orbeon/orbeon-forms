@@ -17,7 +17,7 @@ import enumeratum.*
 import org.orbeon.connection.{ConnectionContextSupport, StreamedContent}
 import org.orbeon.oxf.util.StringUtils.*
 
-import java.io.InputStream
+import java.io.{InputStream, Reader}
 import scala.concurrent.duration.*
 
 
@@ -144,7 +144,7 @@ class URIReferences {
   def addReference(context: String, spec: String, credentials: BasicCredentials): Unit =
     references ::= URIReference(context, spec, credentials)
 
-  import scala.jdk.CollectionConverters._
+  import scala.jdk.CollectionConverters.*
 
   def getReferences: java.util.List[URIReference] = references.asJava
 }
@@ -227,4 +227,9 @@ trait HttpClient[CookieStore] {
 
 object EmptyInputStream extends InputStream {
   def read: Int = -1
+}
+
+object EmptyReader extends Reader {
+  def read(cbuf: Array[Char], off: Int, len: Int): Int = -1
+  def close(): Unit = ()
 }

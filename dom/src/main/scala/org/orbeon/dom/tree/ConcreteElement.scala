@@ -68,13 +68,15 @@ class ConcreteElement(var qname: QName)
     if (parent ne null) {
       // Check with ancestors and removes any redundant namespace declarations
 
-      val nyNamespace = getNamespace
-      if (nyNamespace != Namespace.EmptyNamespace) {
-        val myPrefix = nyNamespace.prefix
-        val parentNamespace = parent.getNamespaceForPrefix(myPrefix)
-        if (myPrefix == parentNamespace)// ORBEON TODO: comparing unrelated!
-          this.qname = QName(nyNamespace.getName)
-      }
+      // 2024-09-17: The following would never do anything as two unrelated types are compared. Commenting out until
+      // the day we can figure out what it was supposed to do.
+//      val nyNamespace = getNamespace
+//      if (nyNamespace != Namespace.EmptyNamespace) {
+//        val myPrefix = nyNamespace.prefix
+//        val parentNamespace = parent.getNamespaceForPrefix(myPrefix)
+//        if (myPrefix == parentNamespace)// ORBEON TODO: comparing unrelated!
+//          this.qname = QName(nyNamespace.getName)
+//      }
 
       val contentIt = internalContent.iterator
       while (contentIt.hasNext) {

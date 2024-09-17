@@ -125,7 +125,7 @@ class IndentedLogger(
   def startHandleOperation(`type`: String, message: String, parameters: String*): Unit =
     if (debugEnabled) {
       stack ::= new Operation(`type`, message)
-      logDebug(`type`, "start " + message, parameters: _*)
+      logDebug(`type`, "start " + message, parameters*)
       indentation.indentation += 1
     }
 
@@ -145,7 +145,7 @@ class IndentedLogger(
           logDebug(
             operation.`type`,
             s"end ${operation.message} with ${if (success) "success" else "failure"}",
-            newParams: _*
+            newParams*
           )
         case _ =>
       }
@@ -156,30 +156,30 @@ class IndentedLogger(
 
   def log(level: log4s.LogLevel, `type`: String, message: String, parameters: String*): Unit =
     if (!((level eq log4s.Debug) && ! debugEnabled))
-      log(level, indentation.indentation, `type`, message, parameters: _*)
+      log(level, indentation.indentation, `type`, message, parameters*)
 
   @varargs
   def logDebug(`type`: String, message: String, parameters: String*): Unit =
     if (debugEnabled)
-      IndentedLogger.log(logger(log4s.Debug), indentation.indentation, `type`, categoryOpt, message, parameters: _*)
+      IndentedLogger.log(logger(log4s.Debug), indentation.indentation, `type`, categoryOpt, message, parameters*)
 
   def logWarning(`type`: String, message: String, parameters: String*): Unit =
-    log(log4s.Warn, indentation.indentation, `type`, message, parameters: _*)
+    log(log4s.Warn, indentation.indentation, `type`, message, parameters*)
 
   def logInfo(`type`: String, message: String, parameters: String*): Unit =
-    log(log4s.Info, indentation.indentation, `type`, message, parameters: _*)
+    log(log4s.Info, indentation.indentation, `type`, message, parameters*)
 
   def logWarning(`type`: String, message: String, throwable: Throwable): Unit =
     log(log4s.Warn, indentation.indentation, `type`, message, "throwable", OrbeonFormatter.format(throwable))
 
   def logError(`type`: String, message: String, parameters: String*): Unit =
-    log(log4s.Error, indentation.indentation, `type`, message, parameters: _*)
+    log(log4s.Error, indentation.indentation, `type`, message, parameters*)
 
   def logError(`type`: String, message: String, throwable: Throwable): Unit =
     log(log4s.Error, indentation.indentation, `type`, message, "throwable", OrbeonFormatter.format(throwable))
 
   private def log(level: log4s.LogLevel, indentLevel: Int, `type`: String, message: String, parameters: String*): Unit =
-    IndentedLogger.log(logger(level), indentLevel, `type`, categoryOpt, message, parameters: _*)
+    IndentedLogger.log(logger(level), indentLevel, `type`, categoryOpt, message, parameters*)
 
   private class Operation(val `type`: String, val message: String) {
 

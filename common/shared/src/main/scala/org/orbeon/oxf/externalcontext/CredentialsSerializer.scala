@@ -86,14 +86,14 @@ object CredentialsSerializer {
       }
 
     def serializeOrganization(organization: Organization): Json =
-      Json.arr(organization.levels.iterator map encode map Json.fromString toVector: _*)
+      Json.arr(organization.levels.iterator.map(encode).map(Json.fromString).toVector*)
 
     Json.fromFields(
       List(
         Symbols.Username      -> Json.fromString(encode(credentials.userAndGroup.username)),
-        Symbols.Groups        -> Json.arr(credentials.userAndGroup.groupname map encode map Json.fromString toVector: _*),
-        Symbols.Roles         -> Json.arr(credentials.roles          map serializeRole              toVector: _*),
-        Symbols.Organizations -> Json.arr(credentials.organizations  map serializeOrganization      toVector: _*)
+        Symbols.Groups        -> Json.arr(credentials.userAndGroup.groupname.map(encode).map(Json.fromString).toVector*),
+        Symbols.Roles         -> Json.arr(credentials.roles                 .map(serializeRole).toVector*),
+        Symbols.Organizations -> Json.arr(credentials.organizations         .map(serializeOrganization).toVector*)
       )
     ).noSpaces
   }

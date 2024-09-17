@@ -111,9 +111,11 @@ object PdfConfig20231 extends ScalaToXml {
       case Param.ControlValueParam(name, controlNameOpt, controlCssClassOpt) =>
         name ->
           Json.obj(
-                                  ("type"              -> Json.fromString("control-value")) ::
-            controlNameOpt.map    ("control-name"      -> _.asJson).toList                  :::
-            controlCssClassOpt.map("control-css-class" -> _.asJson).toList: _*
+            (
+                                    ("type"              -> Json.fromString("control-value")) ::
+              controlNameOpt.map    ("control-name"      -> _.asJson).toList                  :::
+              controlCssClassOpt.map("control-css-class" -> _.asJson).toList
+            )*
           )
       case Param.ExpressionParam(name, expr) =>
         name ->

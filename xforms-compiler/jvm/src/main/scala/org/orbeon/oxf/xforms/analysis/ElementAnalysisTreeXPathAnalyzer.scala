@@ -72,8 +72,8 @@ object ElementAnalysisTreeXPathAnalyzer {
     // Return a map of static id => analysis for all the ancestor-or-self in scope.
     def getInScopeContexts: collection.Map[String, ElementAnalysis] =
       mutable.LinkedHashMap(
-        ElementAnalysis.getAllAncestorsInScope(e, e.scope, includeSelf = true) map
-          (elementAnalysis => elementAnalysis.staticId -> elementAnalysis): _*
+        ElementAnalysis.getAllAncestorsInScope(e, e.scope, includeSelf = true)
+          .map(elementAnalysis => elementAnalysis.staticId -> elementAnalysis)*
       )
 
     // Return analysis for closest ancestor repeat in scope.

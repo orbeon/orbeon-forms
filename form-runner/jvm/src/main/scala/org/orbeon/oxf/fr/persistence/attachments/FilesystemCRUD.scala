@@ -125,7 +125,7 @@ trait FilesystemCRUD extends CRUDMethods {
       attachmentInformation.version.map(_.toString).toSeq :+
       attachmentInformation.filename
 
-    val path = Paths.get(baseDirectory.toString, pathSegments: _*)
+    val path = Paths.get(baseDirectory.toString, pathSegments*)
 
     path.toFile
   }

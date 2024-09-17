@@ -188,7 +188,7 @@ object LabelEditor {
               container
             }
 
-          $(".fb-main").append(newInterceptors: _*)
+          $(".fb-main").append(newInterceptors*)
 
           labelClickInterceptors :::= newInterceptors
         }

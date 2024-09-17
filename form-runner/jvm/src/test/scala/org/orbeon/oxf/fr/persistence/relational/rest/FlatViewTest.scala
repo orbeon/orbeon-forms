@@ -32,7 +32,7 @@ class FlatViewTest extends ResourceManagerTestBase with XMLSupport with Assertio
     val expected = List("foo", "fo1", "bar", "fo2", "baz", "ba1", "qu1")
 
     def fixupDuplicates(values: Iterator[String], initialValues: Seq[String], maxLength: Int): Iterator[String] = {
-      val seen = mutable.HashSet[String](initialValues: _*)
+      val seen = mutable.HashSet[String](initialValues*)
       values map (v => FlatView.resolveDuplicate(v, maxLength)(seen))
     }
 

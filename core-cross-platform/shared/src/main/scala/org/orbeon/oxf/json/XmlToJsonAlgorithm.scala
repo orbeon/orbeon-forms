@@ -79,8 +79,8 @@ protected trait XmlToJsonAlgorithm {
         case Some(Symbols.Number)        => jsNullIfBlank(stringValue(elem), "number",  v => Json.fromJsonNumber(JsonNumber.fromString(v).getOrElse(throw new IllegalArgumentException(v))))
         case Some(Symbols.Boolean)       => jsNullIfBlank(stringValue(elem), "boolean", v => Json.fromBoolean(v.toBoolean))
         case Some(Symbols.Null)          => Json.Null
-        case Some(Symbols.Object)        => Json.obj(childrenElem(elem).map(elem => elemName(elem) -> processElement(elem)).toVector: _*)
-        case Some(Symbols.Array)         => Json.arr(childrenElem(elem).map(processElement).toVector: _*)
+        case Some(Symbols.Object)        => Json.obj(childrenElem(elem).map(elem => elemName(elem) -> processElement(elem)).toVector*)
+        case Some(Symbols.Array)         => Json.arr(childrenElem(elem).map(processElement).toVector*)
         case Some(other)                 =>
           if (strict)
             throwError(s"""unknown datatype `${Symbols.Type}="$other"`""")

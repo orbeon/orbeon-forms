@@ -218,7 +218,7 @@ class SharedUtilsTest extends AnyFunSpec {
     val zeroWidthSpaces   = "\u200b\u200c\u200d\ufeff" // last one is the BOM
     val nonBreakingSpaces = "\u00A0\u2007\u202F"
     val otherSpaces       = "\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000"
-    val isoControls       = new String(Array((0x00 to 0x1f) ++ (0x7f to 0x9f) map (_.toChar): _*))
+    val isoControls       = new String(Array(((0x00 to 0x1f) ++ (0x7f to 0x9f) map (_.toChar))*))
 
     val allToTrim         = zeroWidthSpaces + nonBreakingSpaces + otherSpaces + isoControls
 

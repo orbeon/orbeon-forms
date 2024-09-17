@@ -54,12 +54,12 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
 
     def apply(name: String, implementationClass: Class[_], op: Int, min: Int, itemType: ItemType, arity: Int, args: Arg*): Unit = {
       val uri = Namespace.currentURI getOrElse NamespaceConstant.FN
-      apply(uri, name, implementationClass, op, min, args.length, itemType, arity,  args: _*)
+      apply(uri, name, implementationClass, op, min, args.length, itemType, arity,  args*)
     }
 
     def apply(name: String, implementationClass: Class[_], op: Int, min: Int, max: Int, itemType: ItemType, arity: Int, args: Arg*): Unit = {
       val uri = Namespace.currentURI getOrElse NamespaceConstant.FN
-      apply(uri, name, implementationClass, op, min, max, itemType, arity,  args: _*)
+      apply(uri, name, implementationClass, op, min, max, itemType, arity,  args*)
     }
 
     def apply(uri: String, name: String, implementationClass: Class[_], op: Int, min: Int, max: Int, itemType: ItemType, arity: Int, args: Arg*): Unit = {

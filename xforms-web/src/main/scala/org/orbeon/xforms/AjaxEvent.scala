@@ -98,7 +98,7 @@ class AjaxEvent(args: js.Any*) extends js.Object {
   //
   private val argsDict: Dictionary[js.Any] =
     if (args.length > 1)
-      js.Dictionary(AjaxEvent.ParamNames.zip(args): _*)
+      js.Dictionary(AjaxEvent.ParamNames.zip(args)*)
     else
       args.head.asInstanceOf[js.Dictionary[js.Any]]
 

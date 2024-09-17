@@ -48,7 +48,7 @@ object SubmissionHeaders {
     enclosingElement.children collect { case e: HeaderControl => e } match {
       case headerElems if headerElems.nonEmpty =>
 
-        val headerNameValues = mutable.LinkedHashMap[String, List[String]](initialHeaders.toList: _*)
+        val headerNameValues = mutable.LinkedHashMap[String, List[String]](initialHeaders.toList*)
 
         // Process all nested <header> elements
         for (headerElem <- headerElems) {

@@ -536,7 +536,7 @@ object PathMapXPathAnalysisBuilder {
 //                unknown-dependencies={targetNode.hasUnknownDependencies.toString}>{step.toString}</step>
 //
 //          def getArcs(node: PathMapNode): Node =
-//            <arcs>{ Seq(node.getArcs: _*) map (arc => <arc>{ Seq(getStep(arc.getStep, arc.getTarget), getArcs(arc.getTarget)) }</arc>) }</arcs>
+//            <arcs>{ Seq(node.getArcs*) map (arc => <arc>{ Seq(getStep(arc.getStep, arc.getTarget), getArcs(arc.getTarget)) }</arc>) }</arcs>
 //
 //          for (root <- pathmap.getPathMapRoots) yield
 //            <root>{ Seq(explainAsXML(root.getRootExpression), getStep(root.getRootExpression, root), getArcs(root)) }</root>

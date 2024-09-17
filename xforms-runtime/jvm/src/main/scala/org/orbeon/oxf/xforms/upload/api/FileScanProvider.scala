@@ -30,5 +30,5 @@ trait FileScanProvider {
 
 object FileScanProvider {
   def convertHeadersToJava(headers: Seq[(String, Seq[String])]): ju.Map[String, Array[String]] =
-    mutable.LinkedHashMap(headers map { case (k, v) => k -> v.toArray }: _*).asJava
+    mutable.LinkedHashMap(headers.map{ case (k, v) => k -> v.toArray }*).asJava
 }

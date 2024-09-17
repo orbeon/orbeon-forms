@@ -369,7 +369,7 @@ private object FlatView {
   def deduplicatedColumnNames(columnNamesAsPaths: Seq[Seq[String]], maxIdentifierLength: Int): Map[Seq[String], String] = {
 
     val seen  = mutable.HashSet[String](
-      metadataColumns(tableAlias = FormDataTableAlias, includeAll = true, includeAlias = true).flatMap(_.nameOpt): _*
+      metadataColumns(tableAlias = FormDataTableAlias, includeAll = true, includeAlias = true).flatMap(_.nameOpt)*
     )
 
     (for {

@@ -77,7 +77,7 @@ class XFormsModel(
           staticSubmission <- staticModel.submissions
         } yield
           (staticSubmission.staticId, new XFormsModelSubmission(selfModel.container, staticSubmission, selfModel))
-        ): _*
+        )*
     )
 
   private val _actions: Map[String, XFormsModelAction] =
@@ -92,7 +92,7 @@ class XFormsModel(
             }
         } yield
           (staticEventHandler.staticId, new XFormsModelAction(parent, staticEventHandler))
-      ): _*
+      )*
     )
 
   val modelBindsOpt: Option[XFormsModelBinds] = XFormsModelBinds(selfModel)

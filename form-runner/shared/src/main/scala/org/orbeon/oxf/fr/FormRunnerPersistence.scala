@@ -671,7 +671,7 @@ trait FormRunnerPersistence {
     // https://github.com/orbeon/orbeon-forms/issues/4919
 
     val customGetHeaders =
-      Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*)
+      Map(attachmentVersionOpt.toList.map(v => OrbeonFormDefinitionVersion -> List(v.toString))*)
 
     val resolvedGetUri: URI =
       URI.create(rewriteServiceUrl(beforeUrl))

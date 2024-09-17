@@ -32,7 +32,8 @@ object TestForm {
       attributes    = xml.Null,
       scope         = xml.TopScope,
       minimizeEmpty = true,
-      child         = children: _*)
+      child         = children*
+    )
 }
 
 case class FormData(

@@ -78,7 +78,7 @@ object ServerAPI {
           thisArg = getElementOrNull(observerId),
           new js.Object { val target = getElementOrNull(targetId) } +: // `event.target`
           rest                                                         // custom arguments passed with `<xxf:param>` in `<xf:action>`
-          : _*                                                         // pass as individual arguments (#3205)
+          *                                                            // pass as individual arguments (#3205)
         )
     }
   }

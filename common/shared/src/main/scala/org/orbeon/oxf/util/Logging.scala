@@ -23,7 +23,7 @@ trait Logging {
 
   // Error with optional parameters
   def error(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
-    logger.logError("", message, flattenTuples(parameters): _*)
+    logger.logError("", message, flattenTuples(parameters)*)
 
   // Error with optional parameters
   def error(message: => String, throwable: Throwable)(implicit logger: IndentedLogger): Unit =
@@ -31,22 +31,22 @@ trait Logging {
 
   // Warn with optional parameters
   def warn(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
-    logger.logWarning("", message, flattenTuples(parameters): _*)
+    logger.logWarning("", message, flattenTuples(parameters)*)
 
   // Info with optional parameters
   def info(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
     if (logger.infoEnabled)
-      logger.logInfo("", message, flattenTuples(parameters): _*)
+      logger.logInfo("", message, flattenTuples(parameters)*)
 
   // Debug with optional parameters
   def debug(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
     if (logger.debugEnabled)
-      logger.logDebug("", message, flattenTuples(parameters): _*)
+      logger.logDebug("", message, flattenTuples(parameters)*)
 
   // Debug with optional parameters
   def log(logLevel: LogLevel, message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
     if (logger.debugEnabled)
-      logger.log(logLevel, "", message, flattenTuples(parameters): _*)
+      logger.log(logLevel, "", message, flattenTuples(parameters)*)
 
   // Debug block with optional parameters
   def withDebug[T](message: => String, parameters: => Seq[(String, String)] = Nil)(body: => T)(implicit logger: IndentedLogger): T = {
@@ -54,7 +54,7 @@ trait Logging {
     var success = true
     try {
       if (debugEnabled)
-        logger.startHandleOperation("", message, flattenTuples(parameters): _*)
+        logger.startHandleOperation("", message, flattenTuples(parameters)*)
 
       body
     } catch {
@@ -87,7 +87,7 @@ trait Logging {
   // Call from a result block to set result parameters
   def debugResults(parameters: => Seq[(String, String)])(implicit logger: IndentedLogger): Unit =
     if (logger.debugEnabled)
-      logger.setDebugResults(flattenTuples(parameters): _*)
+      logger.setDebugResults(flattenTuples(parameters)*)
 
   private def flattenTuples(tuples: Seq[(String, String)]) =
     tuples flatMap { case (n, v) => Seq(n, v) }

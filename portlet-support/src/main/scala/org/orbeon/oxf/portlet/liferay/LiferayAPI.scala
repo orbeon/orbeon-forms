@@ -53,7 +53,7 @@ trait LiferayAPI {
       { case Success(clazz) => clazz }             get
 
   private def liferayMethod(suffix: String, name: String, types: Class[_]*) =
-    liferayClass(suffix).getMethod(name, types: _*)
+    liferayClass(suffix).getMethod(name, types*)
 
   // Static methods. We can't use structural types as the methods are static.
   private lazy val getHttpServletRequestMethod     = liferayMethod("util.PortalUtil",                       "getHttpServletRequest",     classOf[PortletRequest])

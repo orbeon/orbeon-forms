@@ -171,7 +171,7 @@ object XFormsStaticStateDeserializer {
         a.attributeCountBufferPosition = attributeCountBufferPosition
         a.attributeCountBuffer         = attributeCountBuffer
         a.attributeCount               = attributeCount
-        a.stringBuilder                = new ju.ArrayList[String](ju.Arrays.asList(stringBuilder: _*))
+        a.stringBuilder                = new ju.ArrayList[String](ju.Arrays.asList(stringBuilder*))
         a.hasDocumentLocator           = hasDocumentLocator && false // XXX TODO: don't use location due to bug AND we don't need it
 
         a

@@ -191,7 +191,7 @@ object XFormsUI {
 
     val paramValues = paramElements map (_.textContent.asInstanceOf[js.Any])
 
-    ServerAPI.callUserScript(formID, functionName, targetId, observerId, paramValues.toList: _*)
+    ServerAPI.callUserScript(formID, functionName, targetId, observerId, paramValues.toList*)
   }
 
   // 2023-08-14: AjaxServer.js
@@ -601,7 +601,7 @@ object XFormsUI {
       )
     }
 
-    formElem.asInstanceOf[ElementExt].prepend(inputElemsToAddAndRemove: _*)
+    formElem.asInstanceOf[ElementExt].prepend(inputElemsToAddAndRemove*)
 
     try {
       formElem.submit()
@@ -1209,11 +1209,11 @@ object XFormsUI {
     def insertIntoDocument(nodes: List[html.Element], lastLhhaPosition: Int): Unit = {
       val childElements = documentElement.children
       if (childElements.isEmpty)
-        documentElement.asInstanceOf[ElementExt].append(nodes: _*)
+        documentElement.asInstanceOf[ElementExt].append(nodes*)
       else if (lastLhhaPosition == -1)
-        documentElement.asInstanceOf[ElementExt].prepend(nodes: _*)
+        documentElement.asInstanceOf[ElementExt].prepend(nodes*)
       else
-        childElements(lastLhhaPosition).asInstanceOf[ElementExt].after(nodes: _*)
+        childElements(lastLhhaPosition).asInstanceOf[ElementExt].after(nodes*)
     }
 
     def createNewInputElem(typeClassName: String): html.Input = {
@@ -1292,12 +1292,12 @@ object XFormsUI {
                 dom.document.createElement("optgroup").asInstanceOf[html.OptGroup].kestrel { optgroup =>
                   optgroup.label = itemElement.label.getOrElse("")
                   classOpt.foreach(optgroup.className = _)
-                  optgroup.replaceChildren(children.map(generateItem).toList: _*)
+                  optgroup.replaceChildren(children.map(generateItem).toList*)
                 }
             }
           }
 
-          select.replaceChildren(itemsetTree.toList.map(generateItem): _*)
+          select.replaceChildren(itemsetTree.toList.map(generateItem)*)
 
         case _ =>
           // This should not happen but if it does we'd like to know about it without entirely stopping the
@@ -1403,11 +1403,11 @@ object XFormsUI {
 
     afterOpt match {
       case None if into.firstElementChild eq null =>
-        into.asInstanceOf[ElementExt].append(itemsToInsertAsList: _*)
+        into.asInstanceOf[ElementExt].append(itemsToInsertAsList*)
       case None =>
-        into.firstElementChild.asInstanceOf[ElementExt].prepend(itemsToInsertAsList: _*)
+        into.firstElementChild.asInstanceOf[ElementExt].prepend(itemsToInsertAsList*)
       case Some(after) =>
-        after.asInstanceOf[ElementExt].after(itemsToInsertAsList: _*)
+        after.asInstanceOf[ElementExt].after(itemsToInsertAsList*)
     }
   }
 

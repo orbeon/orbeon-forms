@@ -20,8 +20,8 @@ import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.*
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsGlobalProperties}
-import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XH}
 import org.orbeon.oxf.xml.*
+import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI as XH
 import org.orbeon.xforms.Namespaces.*
 import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.Attributes
@@ -62,17 +62,6 @@ object XHTMLOutput {
     // Process the entire input
     template.saxStore.replay(new ExceptionWrapperXMLReceiver(ehc, "converting XHTML+XForms document to XHTML"))
   }
-
-  private object ComposeFcnOps {
-    // Scala 2.13 has this built-oin
-    // See https://blog.genuine.com/2019/12/composing-partial-functions-in-scala/
-    implicit class PartialCompose[A, B](pf: PartialFunction[A, B]) {
-      def andThenPF[C](that: PartialFunction[B, C]): PartialFunction[A, C] =
-        Function.unlift(x => pf.lift(x).flatMap(that.lift))
-    }
-  }
-
-  import ComposeFcnOps._
 
   val defaultPf: PartialFunction[BasicHandlerInput, ElementHandler[HandlerContext]] = {
     case (ns @ XF,  ln              , qn, atts, hc)                       => new NullHandler        (ns, ln, qn, atts, hc)
@@ -160,6 +149,6 @@ object XHTMLOutput {
       }
     }
 
-    findElementAnalysisPf.andThenPF(findHandlerTakeElementAnalysisPf)
+    findElementAnalysisPf.andThen(findHandlerTakeElementAnalysisPf)
   }
 }

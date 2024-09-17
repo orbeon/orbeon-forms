@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.persistence.test
 
 import org.junit.Test
+import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.fr.persistence.db.*
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider.*

@@ -15,10 +15,10 @@ package org.orbeon.oxf.client
 
 import org.junit.{After, AfterClass, BeforeClass}
 import org.openqa.selenium.*
-import org.openqa.selenium.chrome.ChromeDriverService
-import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.chrome.{ChromeDriverService, ChromeOptions}
+import org.openqa.selenium.firefox.{FirefoxDriver, FirefoxOptions}
 import org.openqa.selenium.interactions.Actions
-import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
+import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.support.ui.Select
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
@@ -340,12 +340,13 @@ object OrbeonClientBase {
         val service = ChromeDriverService.createDefaultService()
         service.start()
         serviceOpt = Some(service)
-        driverOpt = Some(new RemoteWebDriver(service.getUrl, DesiredCapabilities.chrome()))
+
+        driverOpt = Some(new RemoteWebDriver(service.getUrl, new ChromeOptions()))
       case "firefoxdriver" =>
         driverOpt = Some(new FirefoxDriver())
       case _ =>
         val capabilities = (
-          DesiredCapabilities.firefox()
+          new FirefoxOptions()
           |!> (_.setCapability("tunnel-identifier", System.getenv("TRAVIS_JOB_NUMBER")))
           |!> (_.setCapability("screen-resolution", "1440x900"))
           |!> (_.setCapability("name", "Orbeon Forms unit tests"))

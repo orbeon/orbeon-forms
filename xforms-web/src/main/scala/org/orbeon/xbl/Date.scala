@@ -15,6 +15,7 @@ package org.orbeon.xbl
 
 import cats.syntax.option.*
 import org.log4s.Logger
+import org.orbeon.polyfills.HTMLPolyfills._
 import org.orbeon.date.JSDateUtils
 import org.orbeon.facades.DatePicker.*
 import org.orbeon.oxf.util.CoreUtils.*
@@ -25,7 +26,7 @@ import org.orbeon.xforms.Constants.XFormsIosClass
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
-import org.scalajs.dom.html
+import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryPromise
 
 import scala.scalajs.js
@@ -133,7 +134,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
       opts.showOnFocus      = false
       opts.forceParse       = false
       opts.language         = Language.getLang()
-      opts.container        = ".orbeon"
+      opts.container        = containerElem.closest("dialog, .orbeon").orUndefined
 
       dateExternalValue foreach { case DateExternalValue(_, format, excludedDates, weekStart) =>
         opts.format = orbeonFormatToBootstrapFormat(format)

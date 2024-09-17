@@ -1,6 +1,8 @@
 package org.orbeon.facades
 
+import org.scalajs.dom.html
 import org.scalajs.jquery.JQuery
+
 import scala.scalajs.js
 
 object DatePicker {
@@ -20,16 +22,16 @@ object DatePicker {
   }
 
   class DatePickerOptions extends js.Object {
-    var format           : String            = "mm/dd/yyyy"
-    var autoclose        : Boolean           = false
-    var enableOnReadonly : Boolean           = true
-    var assumeNearbyYear : Boolean           = false
-    var showOnFocus      : Boolean           = true
-    var forceParse       : Boolean           = true
-    var datesDisabled    : js.Array[js.Date] = _
-    var language         : String            = "en"
-    var container        : String            = _
-    var weekStart        : js.UndefOr[Int]   = js.undefined
+    var format           : String                   = "mm/dd/yyyy"
+    var autoclose        : Boolean                  = false
+    var enableOnReadonly : Boolean                  = true
+    var assumeNearbyYear : Boolean                  = false
+    var showOnFocus      : Boolean                  = true
+    var forceParse       : Boolean                  = true
+    var datesDisabled    : js.Array[js.Date]        = _
+    var language         : String                   = "en"
+    var container        : js.UndefOr[html.Element] = js.undefined
+    var weekStart        : js.UndefOr[Int]          = js.undefined
   }
 
   implicit class DatePickerOps(private val datePicker: DatePicker) extends AnyVal {

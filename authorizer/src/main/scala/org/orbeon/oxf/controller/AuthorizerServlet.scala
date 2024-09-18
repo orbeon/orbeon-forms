@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.controller
 
+import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.servlet.*
+
 
 // For backward compatibility
 class AuthorizerServlet extends JavaxAuthorizerServlet
 
-class JavaxAuthorizerServlet   extends JavaxServiceHttpServlet  (new AuthorizerServletImpl)
-class JakartaAuthorizerServlet extends JakartaServiceHttpServlet(new AuthorizerServletImpl)
+class JavaxAuthorizerServlet   extends JavaxServiceHttpServlet  (AuthorizerServletImpl())
+class JakartaAuthorizerServlet extends JakartaServiceHttpServlet(AuthorizerServletImpl())
 
 // This servlet just returns an ok response when accessed
-class AuthorizerServletImpl extends ServiceHttpServlet {
-  override def service(request: HttpServletRequest, response: HttpServletResponse): Unit = {
-    response.setStatus(200)
+class AuthorizerServletImpl extends ServiceHttpServlet:
+  override def service(request: HttpServletRequest, response: HttpServletResponse): Unit =
+    response.setStatus(StatusCode.Ok)
     response.setContentType("text/plain")
-  }
-}

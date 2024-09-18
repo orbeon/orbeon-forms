@@ -46,8 +46,8 @@ import javax.xml.transform.stream.StreamResult
 object RequestReader {
 
   private object IdAtt {
-    val IdQName = JXQName("id")
-    def unapply(atts: Atts) = atts.atts collectFirst { case (IdQName, value) => value }
+    private val IdQName = JXQName("id")
+    def unapply(atts: Atts): Option[String] = atts.atts collectFirst { case (IdQName, value) => value }
   }
 
   // See https://github.com/orbeon/orbeon-forms/issues/2385
@@ -105,10 +105,9 @@ object RequestReader {
     metadata   : Boolean
   ): (String, Option[String]) = {
 
-    def newTransformer = (
-      TransformerUtils.getXMLIdentityTransformer
-      |!> (_.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"))
-    )
+    def newTransformer =
+      TransformerUtils.getXMLIdentityTransformer |!>
+        (_.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"))
 
     def newIdentityReceiver(writer: Writer): TransformerXMLReceiver = {
       val receiver    = TransformerUtils.getIdentityTransformerHandler
@@ -290,7 +289,8 @@ trait CreateUpdateDelete {
         //   2.1. 1st,   we read       from    orbeon_form_data                       (get data to index)
         //   2.2. 2nd,   we write      to      orbeon_i_current/orbeon_i_control_text (update the index)
         // This can lead to a deadlock, hence here doing a commit after deleting the drafts.
-        // The downside is that if writing the data (1.2) fails, with the commit we'll have lost the draft, which seems negligible.
+        // The downside is that if writing the data (1.2) fails, with the commit we'll have lost the draft, which seems
+        // negligible.
         connection.commit()
 
       case _ =>
@@ -443,7 +443,7 @@ trait CreateUpdateDelete {
       // the last modified time of the resource when it was extant. However, for our callers (purge API), it is
       // necessary to know the last modified time of the resource when it was marked as deleted, so we return that.
       //
-      // This is currently `None` for a force `DELETE`, but we could also try to return the information in that case
+      // This is currently `None` for a force `DELETE`, but we could also try to return the information in that case,
       // although we don't have a use for it at the moment.
       lastModifiedOpt.foreach { lastModified =>
         httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(lastModified))

@@ -109,8 +109,8 @@ trait ProxyPortletEdit extends GenericPortlet {
   override def doEdit(request: RenderRequest, response: RenderResponse): Unit =
     withRootException("edit render", new PortletException(_)) {
 
-      response setTitle "Orbeon Forms Preferences"
-      response.getWriter write
+      response.setTitle("Orbeon Forms Preferences")
+      response.getWriter.write(
         <div>
           <style>
             .orbeon-pref-form label {{ display: block; clear:both; font-weight: bold }}
@@ -135,6 +135,7 @@ trait ProxyPortletEdit extends GenericPortlet {
             </fieldset>
           </form>
         </div>.toString
+      )
     }
 
   // Handle preferences editor save/cancel

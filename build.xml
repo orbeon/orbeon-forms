@@ -172,9 +172,11 @@
 
             -dontwarn scala.collection.immutable.VM
             -dontwarn scala.reflect.**
+            -dontwarn scala.AnyKind
             -dontwarn scala.tools.nsc.**
             -dontwarn cats.effect.Signal**
             -dontwarn fs2.io.net.unixsocket.**
+            -dontwarn sun.misc.Unsafe
 
             -dontwarn org.osgi.annotation.**
             -dontwarn aQute.bnd.annotation.**
@@ -286,9 +288,11 @@
 
             -dontwarn scala.collection.immutable.VM
             -dontwarn scala.reflect.**
+            -dontwarn scala.AnyKind
             -dontwarn scala.tools.nsc.**
             -dontwarn cats.effect.Signal**
             -dontwarn fs2.io.net.unixsocket.**
+            -dontwarn sun.misc.Unsafe
 
             -dontwarn org.osgi.annotation.**
             -dontwarn aQute.bnd.annotation.**

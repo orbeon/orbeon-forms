@@ -145,8 +145,11 @@
                         <resource xml:lang="fr"><format>MJA</format></resource>
                         <resource xml:lang="de"><format>MTJ</format></resource>
                         <resource xml:lang="pl"><format>MDR</format></resource>
+                        <resource xml:lang="cs"><format>MDR</format></resource>
                         <resource xml:lang="hu"><format>HNÉ</format></resource>
 						<resource xml:lang="da"><format>MDÅ</format></resource>
+						<resource xml:lang="tr"><format>AGY</format></resource>
+						<resource xml:lang="es"><format>MDA</format></resource>
                     </_>
                 </xf:instance>
             </xf:model>

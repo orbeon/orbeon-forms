@@ -46,18 +46,23 @@
                 <!-- Maintain validity flag -->
                 <xf:setvalue event="xxforms-invalid" observer="ui" ref="@valid">false</xf:setvalue>
                 <xf:setvalue event="xxforms-valid"   observer="ui" ref="@valid">true</xf:setvalue>
+                <xf:var name="show-token-permissions"       value="xxf:property('oxf.fb.menu.permissions.token')"/>
                 <xf:var name="show-owner-group-permissions" value="xxf:property('oxf.fb.menu.permissions.owner-group')"/>
+                <xf:var name="show-list-permissions"        value="xxf:property('oxf.fb.menu.permissions.list')"/>
                 <xf:bind ref="instance('ui')">
                     <xf:bind ref="apply-trigger" readonly="instance()/@valid = 'false'"/>
                     <xf:bind ref="readonly-checked | readonly-unchecked" readonly="true()"/>
                     <xf:bind ref="permissions" id="permissions-bind">
                         <xf:bind ref="permission[1]"                               id="anyone-permission-bind"/>
-                        <xf:bind ref="permission[@for = 'anyone-with-token']"      id="anyone-with-token-bind"/>
+                        <xf:bind
+                            id="anyone-with-token-bind"
+                            ref="permission[@for = 'anyone-with-token']"
+                            relevant="$show-token-permissions"/>
                         <xf:bind ref="permission[@for = 'any-authenticated-user']" id="any-authenticated-user-bind"/>
                         <xf:bind
                             id="permission-bind"
                             ref="permission"
-                            relevant="$show-owner-group-permissions or empty(@for)">
+                            relevant="$show-owner-group-permissions or not(@for = ('owner', 'group-member'))">
 
                             <xf:bind
                                 ref="role"
@@ -225,7 +230,8 @@
                             bind="permissions-bind"
                             template="instance('permission-with-role-template')"
                             freeze="{
-                                3 +                                                     (: Anyone, Require token, Any authenticated user :)
+                                2 +                                                     (: Anyone, Any authenticated user :)
+                                (if ($show-token-permissions)       then 1 else 0) +    (: Maybe token :)
                                 (if ($show-owner-group-permissions) then 2 else 0) +    (: Maybe owner/group :)
                                 count($ui/always-show-roles/role)                       (: Fixed roles :)
                             }"
@@ -415,7 +421,9 @@
                                             (: TODO: make this a function :)
                                             let $op := 'list'
                                             return
-                                                if ($is-anyone) then
+                                                if (not($show-list-permissions)) then
+                                                    ()
+                                                else if ($is-anyone) then
                                                     operations
                                                 else if ($is-anyone-with-token) then
                                                     ()

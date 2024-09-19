@@ -49,7 +49,7 @@
             value="$metadata/form-name/string()"/>
 
         <!-- Store versions -->
-        <xf:action iterate="frf:globalLibraryAppName(), $app">
+        <xf:action iterate="frf:globalLibraryAppName(), frf:specialLibraryAppName(), $app">
             <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
                 <xf:property name="app"                        value="."/>
                 <xf:property name="form"                       value="'library'"/>
@@ -64,10 +64,11 @@
             targetid="fb-components-instance"/>
 
         <xf:send submission="fb-load-toolbox-submission">
-            <xf:property name="app"                    value="$app"/>
-            <xf:property name="form"                   value="$form"/>
-            <xf:property name="orbeon-library-version" value="$metadata/library-versions/orbeon/string()"/>
-            <xf:property name="app-library-version"    value="$metadata/library-versions/app/string()"/>
+            <xf:property name="app"                     value="$app"/>
+            <xf:property name="form"                    value="$form"/>
+            <xf:property name="global-library-version"  value="$metadata/library-versions/_/string()"/>
+            <xf:property name="special-library-version" value="$metadata/library-versions/orbeon/string()"/>
+            <xf:property name="app-library-version"     value="$metadata/library-versions/app/string()"/>
         </xf:send>
 
     </xf:action>
@@ -77,11 +78,7 @@
 
         <xf:var
             name="elem-name"
-            value="
-                if (event('app') = frf:globalLibraryAppName()) then
-                    'orbeon'
-                else
-                    'app'"/>
+            value="frf:elemNameForSectionTemplateApp(event('app'))"/>
 
         <!-- Keep list of available versions for the dropdown (assuming it has been cleared before) -->
         <xf:insert
@@ -147,11 +144,7 @@
 
         <xf:var
             name="elem-name"
-            value="
-                if (event('app') = frf:globalLibraryAppName()) then
-                    'orbeon'
-                else
-                    'app'"/>
+            value="frf:elemNameForSectionTemplateApp(event('app'))"/>
 
         <xf:var
             name="metadata"
@@ -175,8 +168,10 @@
             event('app')
         }&amp;form={
             event('form')
-        }&amp;orbeon-library-version={
-            event('orbeon-library-version')
+        }&amp;global-library-version={
+            event('global-library-version')
+        }&amp;special-library-version={
+            event('special-library-version')
         }&amp;app-library-version={
             event('app-library-version')
         }"
@@ -217,6 +212,7 @@
             </services>
             <actions/>
             <libraries>
+                <_/>
                 <orbeon/>
                 <app/>
             </libraries>

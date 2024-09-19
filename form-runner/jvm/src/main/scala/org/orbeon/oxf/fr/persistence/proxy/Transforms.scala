@@ -9,6 +9,7 @@ import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
+import org.orbeon.oxf.fr.library.FRComponentParamSupport.findLibraryVersions
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
@@ -39,21 +40,31 @@ object Transforms {
     externalContext : ExternalContext
   ): DocumentInfo = {
 
-      val orbeonLibraryVersion = (frDocCtx.metadataRootElem / "library-versions" / "orbeon").stringValue.trimAllToOpt.getOrElse(1)
-      val appLibraryVersion    = (frDocCtx.metadataRootElem / "library-versions" / "app").stringValue.trimAllToOpt.getOrElse(1)
+    val (globalLibraryVersionOpt, specialLibraryVersionOpt, appLibraryVersionOpt) =
+      findLibraryVersions(frDocCtx.metadataRootElem)
 
-      SubmissionUtils.readTinyTree(
-        headersGetter       = _ => None, // Q: Do we need any header forwarding here?
-        resolvedAbsoluteUrl = URI.create(
-          URLRewriterUtils.rewriteServiceURL(
-            externalContext.getRequest,
-            s"/fr/service/custom/orbeon/builder/toolbox?application=${appForm.app}&form=${appForm.form}&orbeon-library-version=$orbeonLibraryVersion&app-library-version=$appLibraryVersion",
-            UrlRewriteMode.Absolute
-          )
-        ),
-        handleXInclude = false
-      )._1
-    }
+    SubmissionUtils.readTinyTree(
+      headersGetter       = _ => None, // Q: Do we need any header forwarding here?
+      resolvedAbsoluteUrl = URI.create(
+        URLRewriterUtils.rewriteServiceURL(
+          externalContext.getRequest,
+          s"/fr/service/custom/orbeon/builder/toolbox?application=${
+            appForm.app
+          }&form=${
+            appForm.form
+          }&global-library-version=${
+            globalLibraryVersionOpt.getOrElse(1)
+          }&special-library-version=${
+            specialLibraryVersionOpt.getOrElse(1)
+          }&app-library-version=${
+            appLibraryVersionOpt.getOrElse(1)
+          }",
+          UrlRewriteMode.Absolute
+        )
+      ),
+      handleXInclude = false
+    )._1
+  }
 
   def readFormData(
     appForm         : AppForm,

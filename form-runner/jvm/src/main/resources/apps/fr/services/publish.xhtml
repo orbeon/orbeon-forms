@@ -72,14 +72,6 @@
                 name="form"
                 value="$metadata/form-name"/>
 
-            <xf:var
-                name="orbeon-library-version"
-                value="$metadata/library-versions/orbeon"/>
-
-            <xf:var
-                name="app-library-version"
-                value="$metadata/library-versions/app"/>
-
             <!-- Either provided via path or via URL parameter (can be missing) -->
             <xf:var
                 name="document-id"
@@ -287,10 +279,12 @@
                     $app
                 }&amp;form={
                     $form
-                }&amp;orbeon-library-version={
-                    $orbeon-library-version
+                }&amp;global-library-version={
+                    $metadata/library-versions/_/string()
+                }&amp;special-library-version={
+                    $metadata/library-versions/orbeon/string()
                 }&amp;app-library-version={
-                    $app-library-version
+                    $metadata/library-versions/app/string()
                 }"
                 replace="instance"
                 instance="fr-components-instance"

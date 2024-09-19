@@ -20,10 +20,9 @@ import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable.*
 
 
-
 object FRComponentParamSupport {
 
-  import org.orbeon.scaxon.SimplePath._
+  import org.orbeon.scaxon.SimplePath.*
 
   def componentParamValue(
     paramName            : QName,
@@ -161,45 +160,55 @@ object FRComponentParamSupport {
       fromPropertiesWithoutSuffix
   }
 
+  // Called by attachments XBL controls from XPath with `fr:attachment-form-version()`, to pass the header
+  // `Orbeon-Form-Definition-Version`.
   // https://github.com/orbeon/orbeon-forms/issues/4919
   def formAttachmentVersion(implicit p: FormRunnerParams): Int =
     if (frc.isDesignTime || p.mode == "test") {
-      // The form definition is not published yet and we need to figure out the library form version
+      // The form definition is not published yet, and we need to figure out the library form version
 
-      val appsIt =
+      val associatedControlOpt = XFormsFunction.context.container.associatedControlOpt
+
+      val sectionTemplateAppsIt =
         for {
-          staticControl <- XFormsFunction.context.container.associatedControlOpt.flatMap(_.staticControlOpt).iterator
+          staticControl <- associatedControlOpt.flatMap(_.staticControlOpt).iterator
           ancestor      <- ElementAnalysis.ancestorsIterator(staticControl, includeSelf = false)
           if ancestor.isInstanceOf[ComponentControl]
           app           <- frc.findAppFromSectionTemplateUri(ancestor.element.getNamespaceURI)
         } yield
           app
 
-      val appOpt = appsIt.nextOption()
+      sectionTemplateAppsIt.nextOption() match {
+        case Some(sectionTemplateApp) =>
 
-      if (appOpt.isDefined) {
+          def findLibraryVersionForApp(metadata: om.NodeInfo): Option[Int] = {
+            val (globalLibraryVersionOpt, specialLibraryVersionOpt, appLibraryVersionOpt) = findLibraryVersions(metadata)
+            sectionTemplateApp match {
+              case Names.GlobalLibraryAppName  => globalLibraryVersionOpt
+              case Names.SpecialLibraryAppName => specialLibraryVersionOpt
+              case _                           => appLibraryVersionOpt
+            }
+          }
 
-        val libraryVersionOpt =
-          for {
-            sourceControl                     <- XFormsFunction.context.container.associatedControlOpt
-            part                              = sourceControl.container.partAnalysis
-            metadata                          <- FRComponentParamSupport.findConstantMetadataRootElem(part)
-            (globalVersionOpt, appVersionOpt) = findLibraryVersions(metadata)
-            libraryVersion                    <- if (appOpt.contains(Names.GlobalLibraryAppName)) globalVersionOpt else appVersionOpt
-          } yield
-            libraryVersion
+          val libraryVersionOpt =
+            for {
+              sourceControl  <- associatedControlOpt
+              part           = sourceControl.container.partAnalysis
+              metadata       <- FRComponentParamSupport.findConstantMetadataRootElem(part)
+              libraryVersion <- findLibraryVersionForApp(metadata)
+            } yield
+              libraryVersion
 
-        libraryVersionOpt map (_.toInt) getOrElse 1
-
-      } else {
-        p.formVersion
+          libraryVersionOpt.getOrElse(1)
+        case None      =>
+          p.formVersion
       }
     } else {
       // All static attachments are copied to the published form definition and therefore use the form definition version
       p.formVersion
     }
 
-  def findLibraryVersions(metadataRootElem: om.NodeInfo): (Option[Int], Option[Int]) = {
+  def findLibraryVersions(metadataRootElem: om.NodeInfo): (Option[Int], Option[Int], Option[Int]) = {
 
     val libraryVersionsOpt =
       for
@@ -207,13 +216,11 @@ object FRComponentParamSupport {
       yield
         (
           libraryVersions elemValueOpt Names.GlobalLibraryVersionElemName map (_.toInt),
-          libraryVersions elemValueOpt Names.AppLibraryVersionElemName    map (_.toInt)
+          libraryVersions elemValueOpt Names.OrbeonLibraryVersionElemName map (_.toInt),
+          libraryVersions elemValueOpt Names.AppLibraryVersionElemName    map (_.toInt),
         )
 
-    libraryVersionsOpt match {
-      case Some(versions) => versions
-      case None           => (None, None)
-    }
+    libraryVersionsOpt.getOrElse((None, None, None))
   }
 
   def ancestorSectionsIt(control: XFormsControl): Iterator[XFormsComponentControl] =

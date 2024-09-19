@@ -34,9 +34,22 @@ trait FormRunnerSectionTemplateOps {
   private val MatchesComponentUriLibraryRegex = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
   private val MatchesSectionTemplateUriRegex  = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
 
-  // For XSLT callers
+  // For XSLT/XForms callers
+  // NOTE: This is used only by Form Builder. Move?
+
   //@XPathFunction
-  def globalLibraryAppName: String = Names.GlobalLibraryAppName
+  def globalLibraryAppName : String = Names.GlobalLibraryAppName
+
+  //@XPathFunction
+  def specialLibraryAppName: String = Names.SpecialLibraryAppName
+
+  //@XPathFunction
+  def elemNameForSectionTemplateApp(sectionTemplateApp: String): String =
+    sectionTemplateApp match {
+      case Names.GlobalLibraryAppName  => Names.GlobalLibraryVersionElemName
+      case Names.SpecialLibraryAppName => Names.OrbeonLibraryVersionElemName
+      case _                           => Names.AppLibraryVersionElemName
+    }
 
   def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: collection.Seq[NodeInfo]): Map[URIQualifiedName, DocumentWrapper] = {
 

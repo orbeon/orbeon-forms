@@ -46,20 +46,24 @@ object Names {
 
   // We have the following app/form names for libraries:
   //
-  // - orbeon/library
-  // - my-app/library
+  // - `_/library`
+  // - `orbeon/library`
+  // - `my-app/library`
   //
   // And within the form metadata, we have:
   //
   //     <library-versions>
-  //       <orbeon>3</orbeon>
+  //       <_>3</_>
+  //       <orbeon>5</orbeon>
   //       <app>2</app>
   //     </library-versions>
   //
   val LibraryVersionsElemName      = "library-versions"
-  val GlobalLibraryVersionElemName = "orbeon" // don't change this even if the global library name is customized as this is used in the form definition
+  val GlobalLibraryVersionElemName = "_"
+  val OrbeonLibraryVersionElemName = "orbeon" // don't change this even if `OrbeonLibraryAppName` is customized as this is used in the form definition
   val AppLibraryVersionElemName    = "app"
 
   val LibraryFormName              = "library"
-  val GlobalLibraryAppName         = "orbeon"
+  val GlobalLibraryAppName: String = GlobalLibraryVersionElemName
+  val SpecialLibraryAppName        = "orbeon" // this can, exceptionally, be customized by integrators (less useful with `GlobalLibraryAppName`)
 }

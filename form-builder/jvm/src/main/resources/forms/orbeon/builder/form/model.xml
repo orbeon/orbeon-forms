@@ -505,14 +505,14 @@
                     <xf:bind id="xbl-bind"                        ref="xbl"/>
                     <xf:bind id="library-versions-bind"           ref="library-versions">
                         <xf:bind
-                            ref="orbeon | app"
-                            name="orbeon-or-app"
+                            ref="_ | orbeon | app"
+                            name="global-or-special-or-app"
                             relevant="
-                                let $versions := bind('fb-toolbox-libraries-bind')/*[name() = name($orbeon-or-app)]
+                                let $versions := bind('fb-toolbox-libraries-bind')/*[name() = name($global-or-special-or-app)]
                                 return
                                     not(count($versions/version) = 1 and $versions/version = '1')"
                             readonly="
-                                let $versions := bind('fb-toolbox-libraries-bind')/*[name() = name($orbeon-or-app)]
+                                let $versions := bind('fb-toolbox-libraries-bind')/*[name() = name($global-or-special-or-app)]
                                 return
                                     count($versions/version) = 1"
                         />

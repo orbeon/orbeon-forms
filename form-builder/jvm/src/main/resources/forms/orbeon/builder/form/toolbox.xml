@@ -252,20 +252,13 @@
 
                                 <xf:var
                                     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-                                    name="is-global-library"
-                                    value="
-                                        frf:findAppFromSectionTemplateUri(
-                                            namespace-uri-for-prefix('component', .)
-                                        ) = frf:globalLibraryAppName()
-                                "/>
-
-                                <xf:var
                                     name="elem-name"
                                     value="
-                                        if ($is-global-library) then
-                                            'orbeon'
-                                        else
-                                            'app'"/>
+                                        frf:elemNameForSectionTemplateApp(
+                                            frf:findAppFromSectionTemplateUri(
+                                                namespace-uri-for-prefix('component', .)
+                                            )
+                                        )"/>
 
                                 <xf:select1 appearance="minimal" ref="bind('library-versions-bind')/*[name() = $elem-name]">
                                     <xf:label class="xforms-hidden" ref="$form-resources/library-version/label"/>

@@ -45,9 +45,9 @@
         <p:input name="data" href="#request"/>
         <p:input name="config">
             <request xsl:version="2.0">
-                <app>orbeon</app>
+                <app>_</app>
                 <form>library</form>
-                <form-version><xsl:value-of select="/request/parameters/parameter[name = 'orbeon-library-version']/value"/></form-version>
+                <form-version><xsl:value-of select="/request/parameters/parameter[name = 'global-library-version']/value"/></form-version>
                 <document/>
                 <mode/>
             </request>
@@ -55,16 +55,31 @@
         <p:output name="data" id="global-parameters"/>
     </p:processor>
 
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#request"/>
+        <p:input name="config">
+            <request xsl:version="2.0">
+                <app>orbeon</app>
+                <form>library</form>
+                <form-version><xsl:value-of select="/request/parameters/parameter[name = 'special-library-version']/value"/></form-version>
+                <document/>
+                <mode/>
+            </request>
+        </p:input>
+        <p:output name="data" id="special-parameters"/>
+    </p:processor>
+
     <p:processor name="oxf:unsafe-xslt">
         <p:input  name="config"     href="toolbox.xsl"/>
-        <p:input  name="data"               ><dummy/></p:input>
-        <p:input  name="global-template-xbl"><dummy/></p:input>
-        <p:input  name="custom-template-xbl"><dummy/></p:input>
+        <p:input  name="data"                ><dummy/></p:input>
+        <p:input  name="global-template-xbl" ><dummy/></p:input>
+        <p:input  name="special-template-xbl"><dummy/></p:input>
+        <p:input  name="app-template-xbl"    ><dummy/></p:input>
         <p:input  name="request"   href="#request"/>
         <p:output name="data"      id="components-but-not-section-templates"/>
     </p:processor>
 
-    <!-- Read template form for global orbeon library -->
+    <!-- Read template form for global (`_`) library -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="/apps/fr/detail/read-form.xpl"/>
         <p:input name="instance" href="#global-parameters"/>
@@ -90,30 +105,56 @@
         <p:output name="data" id="global-template-form-safe"/>
     </p:processor>
 
-    <!-- Read template form for application library -->
+    <!-- Read template form for special (`orbeon`) library -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="/apps/fr/detail/read-form.xpl"/>
-        <p:input name="instance" href="#parameters"/>
-        <p:output name="data" id="custom-template-form"/>
+        <p:input name="instance" href="#special-parameters"/>
+        <p:output name="data" id="special-template-form"/>
     </p:processor>
 
     <p:processor name="oxf:pipeline">
         <p:input name="config"     href="/forms/orbeon/builder/form/annotate.xpl"/>
-        <p:input name="data"       href="#custom-template-form"/>
+        <p:input name="data"       href="#special-template-form"/>
         <p:input name="bindings"   href="#components-but-not-section-templates"/>
-        <p:output name="data"      id="custom-template-form-annotated"/>
+        <p:output name="data"      id="special-template-form-annotated"/>
     </p:processor>
 
     <p:processor name="oxf:pipeline">
         <p:input name="config"     href="/forms/orbeon/builder/form/deannotate.xpl"/>
-        <p:input name="data"       href="#custom-template-form-annotated"/>
-        <p:output name="data"      id="custom-template-form-deannotated"/>
+        <p:input name="data"       href="#special-template-form-annotated"/>
+        <p:output name="data"      id="special-template-form-deannotated"/>
     </p:processor>
 
     <p:processor name="oxf:exception-catcher">
         <p:input name="config"><config><stack-trace>false</stack-trace></config></p:input>
-        <p:input name="data" href="#custom-template-form-deannotated"/>
-        <p:output name="data" id="custom-template-form-safe"/>
+        <p:input name="data" href="#special-template-form-deannotated"/>
+        <p:output name="data" id="special-template-form-safe"/>
+    </p:processor>
+
+    <!-- Read template form for application library -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="/apps/fr/detail/read-form.xpl"/>
+        <p:input name="instance" href="#parameters"/>
+        <p:output name="data" id="app-template-form"/>
+    </p:processor>
+
+    <p:processor name="oxf:pipeline">
+        <p:input name="config"     href="/forms/orbeon/builder/form/annotate.xpl"/>
+        <p:input name="data"       href="#app-template-form"/>
+        <p:input name="bindings"   href="#components-but-not-section-templates"/>
+        <p:output name="data"      id="app-template-form-annotated"/>
+    </p:processor>
+
+    <p:processor name="oxf:pipeline">
+        <p:input name="config"     href="/forms/orbeon/builder/form/deannotate.xpl"/>
+        <p:input name="data"       href="#app-template-form-annotated"/>
+        <p:output name="data"      id="app-template-form-deannotated"/>
+    </p:processor>
+
+    <p:processor name="oxf:exception-catcher">
+        <p:input name="config"><config><stack-trace>false</stack-trace></config></p:input>
+        <p:input name="data" href="#app-template-form-deannotated"/>
+        <p:output name="data" id="app-template-form-safe"/>
     </p:processor>
 
     <!-- Convert templates to XBL -->
@@ -127,17 +168,25 @@
 
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="config"     href="form-to-xbl.xsl"/>
-        <p:input name="data"       href="#custom-template-form-safe"/>
+        <p:input name="data"       href="#special-template-form-safe"/>
+        <p:input name="parameters" href="#special-parameters"/>
+        <p:output name="data"      id="special-template-xbl"/>
+    </p:processor>
+
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="config"     href="form-to-xbl.xsl"/>
+        <p:input name="data"       href="#app-template-form-safe"/>
         <p:input name="parameters" href="#parameters"/>
-        <p:output name="data"      id="custom-template-xbl"/>
+        <p:output name="data"      id="app-template-xbl"/>
     </p:processor>
 
     <!-- Aggregate results -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="config" href="toolbox.xsl"/>
         <p:input name="data"><dummy/></p:input>
-        <p:input name="global-template-xbl" href="#global-template-xbl"/>
-        <p:input name="custom-template-xbl" href="#custom-template-xbl"/>
+        <p:input name="global-template-xbl"  href="#global-template-xbl"/>
+        <p:input name="special-template-xbl" href="#special-template-xbl"/>
+        <p:input name="app-template-xbl"     href="#app-template-xbl"/>
         <p:input name="request" href="#request"/>
         <p:output name="data" id="components"/>
     </p:processor>

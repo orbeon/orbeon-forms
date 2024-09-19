@@ -71,13 +71,14 @@ trait FormRunnerPublish {
     // `xhtml` must always be a form definition and must have form metadata
     val frDocCtx: FormRunnerDocContext = new InDocFormRunnerDocContext(xhtml.rootElement)
 
-    val (globalVersionOpt, appVersionOpt) =
+    val (globalLibraryVersionOpt, specialLibraryVersionOpt, appLibraryVersionOpt) =
       FRComponentParamSupport.findLibraryVersions(frDocCtx.metadataRootElem)
 
     val basePathsWithVersions =
       fromBasePathWithVersionOpt.toList ::: List(
-        (FormRunner.createFormDefinitionBasePath(app,                        Names.LibraryFormName), appVersionOpt.getOrElse(1)),
-        (FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName, Names.LibraryFormName), globalVersionOpt.getOrElse(1))
+        (FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName,  Names.LibraryFormName), globalLibraryVersionOpt.getOrElse(1)),
+        (FormRunner.createFormDefinitionBasePath(Names.SpecialLibraryAppName, Names.LibraryFormName), specialLibraryVersionOpt.getOrElse(1)),
+        (FormRunner.createFormDefinitionBasePath(app,                         Names.LibraryFormName), appLibraryVersionOpt.getOrElse(1)),
       )
 
     implicit val externalContext         : ExternalContext                                    = CoreCrossPlatformSupport.externalContext

@@ -34,11 +34,9 @@ object FormLogic {
   ): List[Form] = {
 
     // At the moment, the only thing we filter at the SQL level are the app and form names
-    val appFormOpt = formRequest.appFormOpt
-
     val innerWhereClauses = List(
-      appFormOpt                   .map(appForm =>(s"app =  ?", (_.setString(_, appForm.app)): Setter)),
-      appFormOpt.flatMap(_.formOpt).map(form =>   (s"form = ?", (_.setString(_, form)): Setter))
+      formRequest.exactAppOpt .map(app  => (s"app =  ?", (_.setString(_, app )): Setter)),
+      formRequest.exactFormOpt.map(form => (s"form = ?", (_.setString(_, form)): Setter))
     ).flatten
 
     val setters = innerWhereClauses.map(_._2)
@@ -89,7 +87,7 @@ object FormLogic {
           cond = resultSet.next(),
           elem = {
             val (title, available, permissions) =
-              Option(resultSet.getString("form_metadata")).map { formMetadata =>
+              Option(resultSet.getString("form_metadata")).map(_.trim).filter(_.nonEmpty).map { formMetadata =>
                 val xml = StaticXPath.orbeonDomToTinyTree(IOSupport.readOrbeonDom(formMetadata)).rootElement
 
                 // Extract title, availability, and permissions from form metadata

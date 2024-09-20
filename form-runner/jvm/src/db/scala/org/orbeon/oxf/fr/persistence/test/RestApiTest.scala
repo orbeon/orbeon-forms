@@ -106,8 +106,8 @@ class RestApiTest
           // First time we put with "latest" (AKA unspecified)
           val first = HttpCall.XML(<gaga1/>.toDocument)
           HttpAssert.put(formURL, Unspecified, first, StatusCode.Created)
-          HttpAssert.get(formURL, Specific(1), HttpAssert.ExpectedBody (first, Operations.None, Some(1)))
-          HttpAssert.get(formURL, Unspecified, HttpAssert.ExpectedBody (first, Operations.None, Some(1)))
+          HttpAssert.get(formURL, Specific(1), HttpAssert.ExpectedBody(first, Operations.None, Some(1)))
+          HttpAssert.get(formURL, Unspecified, HttpAssert.ExpectedBody(first, Operations.None, Some(1)))
           HttpAssert.get(formURL, Specific(2), HttpAssert.ExpectedCode(StatusCode.NotFound))
           HttpAssert.del(formURL, Specific(2), StatusCode.NotFound)
 
@@ -604,6 +604,7 @@ class RestApiTest
                     <form-name>{DefaultFormName}</form-name>
                     <form-version>1</form-version>
                     <title xml:lang="en"/>
+                    <available>true</available>
                     <permissions>
                         <permission operations="create read -list"/>
                     </permissions>
@@ -619,10 +620,10 @@ class RestApiTest
             val doc = IOSupport.readOrbeonDom(new ByteArrayInputStream(bytes))
 
             for {
-              formElem             <- doc.getRootElement.elements("form")
-              lastModifiedTimeElem <- formElem.elements("last-modified-time")
+              formElem     <- doc.getRootElement.elements("form")
+              elemToDetach <- formElem.elements("last-modified-time") ++ formElem.elements("created")
             } locally {
-              lastModifiedTimeElem.detach()
+              elemToDetach.detach()
             }
 
             doc

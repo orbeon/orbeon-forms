@@ -39,7 +39,7 @@ class FormProcessor extends ProcessorImpl {
 
   override def createOutput(name: String): ProcessorOutput =
     addOutput(
-      name, new CacheableTransformerOutputImpl(self, name) {
+      name, new ProcessorOutputImpl(self, name) {
         def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
           implicit val externalContext: ExternalContext = NetUtils.getExternalContext

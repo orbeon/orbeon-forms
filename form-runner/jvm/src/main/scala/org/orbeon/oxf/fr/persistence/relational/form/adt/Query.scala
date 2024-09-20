@@ -40,8 +40,7 @@ case class Query[T](
     Seq(languageAttOpt, urlAttOpt, matchAttOpt, sortAttOpt).flatten.foldLeft(baseElem)((elem, attribute) => elem % attribute)
   }
 
-  def satisfies(form: Form, formRequestLanguageOpt: Option[String]): Boolean = {
-
+  def satisfies(form: Form, formRequestLanguageOpt: Option[String]): Boolean =
     matchTypeAndValueOpt match {
       case None                     => true // No match type and value means this is a sort-only query
       case Some((matchType, queryValue)) =>
@@ -62,7 +61,6 @@ case class Query[T](
           case Some(formValue) => matchType.satisfies(formValue, queryValue, metadata)
         }
     }
-  }
 }
 
 object Query {

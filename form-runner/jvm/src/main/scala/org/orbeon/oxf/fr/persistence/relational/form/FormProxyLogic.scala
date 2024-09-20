@@ -58,7 +58,7 @@ trait FormProxyLogic { this: PersistenceProxyProcessor.type =>
 
     val formRequest = FormRequest.parseOrThrowBadRequest(FormRequest(request, bodyFromPipelineOpt = None, appFormFromUrlOpt))
 
-    val providers     = getProviders(formRequest.appOpt, formRequest.formOpt, FormOrData.Form)
+    val providers     = getProviders(formRequest.exactAppOpt, formRequest.exactFormOpt, FormOrData.Form)
     val remoteServers = FormRunnerHome.remoteServers
 
     // As of 2024, the resource provider does not return any form metadata. Processing it first if present allows us
@@ -72,10 +72,10 @@ trait FormProxyLogic { this: PersistenceProxyProcessor.type =>
       credentials  <- formRequest.credentialsOpt(remoteServer)
     } yield RemoteMetadataProvider(remoteServer, credentials)
 
-    val localFormsMetadata = localMetadataProviders.map(localForms(request, _, formRequest))
+    val localFormsMetadata = localMetadataProviders.map(localForms(request, _, formRequest.formRequestForLocalProvider))
 
     val remoteFormsMetadata = remoteMetadataProviders.map { remoteMetadataProvider =>
-      remoteMetadataProvider.remoteServer -> remoteForms(request, remoteMetadataProvider, formRequest)
+      remoteMetadataProvider.remoteServer -> remoteForms(request, remoteMetadataProvider, formRequest.formRequestForRemoteServer)
     }
 
     val mergedFormsMetadata = merged(localFormsMetadata, remoteFormsMetadata, formRequest)
@@ -110,9 +110,11 @@ trait FormProxyLogic { this: PersistenceProxyProcessor.type =>
 
     val allKeys = (indexedLocalForms.keySet ++ indexedRemoteForms.keySet).toList
 
+    val latestFormVersionQueryOpt = formRequest.latestFormVersionQueryOpt
+
     // Keep only the latest version of each form if needed
     val keysToReturn =
-      if (formRequest.latestVersionOnly)
+      if (latestFormVersionQueryOpt.isDefined)
         allKeys.groupBy(_.appForm).map(_._2.maxBy(_.version.version)).toList
       else
         allKeys
@@ -143,7 +145,8 @@ trait FormProxyLogic { this: PersistenceProxyProcessor.type =>
     }
 
     // 1) Filter forms (by queries)
-    val filteredForms = formsWithLocalOperations.filter(form => formRequest.queries.forall(_.satisfies(form, formRequest.languageOpt)))
+    val queriesToCheck = formRequest.queries.diff(latestFormVersionQueryOpt.toSeq)
+    val filteredForms  = formsWithLocalOperations.filter(form => queriesToCheck.forall(_.satisfies(form, formRequest.languageOpt)))
 
     // 2) Sort forms (by queries)
     // TODO: implement general sorting

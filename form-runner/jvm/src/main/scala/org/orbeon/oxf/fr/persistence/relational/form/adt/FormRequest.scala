@@ -71,32 +71,45 @@ case class FormRequest(
   // We only support Exact queries on app/form names for now, as we need to call FormRunnerPersistence.getProviders
   // with exact names. Substring queries would make sense, though, and should be supported.
 
-  val appOpt: Option[String] =
+  private val exactAppQueryOpt: Option[Query[String]] =
     queries
-      .filter(_.metadata == Metadata.AppName)
-      .flatMap(_.matchTypeAndValueOpt.collect { case (MatchType.Exact, value: String) => value })
-      .headOption
+      .collectFirst { case query @ Query(Metadata.AppName, _, _, Some((MatchType.Exact, _)), _) => query }
+      .asInstanceOf[Option[Query[String]]] // TODO: fix type design/inference
 
-  val formOpt: Option[String] =
+  private val exactFormQueryOpt: Option[Query[String]] =
     queries
-      .filter(_.metadata == Metadata.FormName)
-      .flatMap(_.matchTypeAndValueOpt.collect { case (MatchType.Exact, value: String) => value })
-      .headOption
+      .collectFirst { case query @ Query(Metadata.FormName, _, _, Some((MatchType.Exact, _)), _) => query }
+      .asInstanceOf[Option[Query[String]]] // TODO: fix type design/inference
 
-  val appFormOpt: Option[AppFormOpt] =
-    AppFormOpt(appOpt, formOpt)
+  val latestFormVersionQueryOpt: Option[Query[FormDefinitionVersion]] =
+    queries
+      .collectFirst { case query @ Query(Metadata.FormVersion, _, _, Some((MatchType.Exact, FormDefinitionVersion.Latest)), _) => query }
+      .asInstanceOf[Option[Query[FormDefinitionVersion]]] // TODO: fix type design/inference
+
+  val exactAppOpt: Option[String] =
+    exactAppQueryOpt.flatMap(_.matchTypeAndValueOpt.map(_._2))
+
+  val exactFormOpt: Option[String] =
+    exactFormQueryOpt.flatMap(_.matchTypeAndValueOpt.map(_._2))
 
   // Compatibility mode: GET request with parameters encoded in URL; otherwise, POST request with parameters in body
-  val pathSuffix: String            = FormProcessor.pathSuffix(compatibilityMode.flatOption(appFormOpt))
+  val pathSuffix: String            = FormProcessor.pathSuffix(compatibilityMode.flatOption(AppFormOpt(exactAppOpt, exactFormOpt)))
   val httpMethod: HttpMethod        = if (compatibilityMode) HttpMethod.GET else HttpMethod.POST
   val httpBodyOpt: Option[NodeInfo] = (! compatibilityMode).option(toXML)
 
-  val latestVersionOnly: Boolean =
-    queries
-      .filter(_.metadata == Metadata.FormVersion)
-      .flatMap(_.matchTypeAndValueOpt.collect { case (MatchType.Exact, FormDefinitionVersion.Latest) => true })
-      .headOption
-      .getOrElse(false)
+  // Currently, only exact app/form queries will be processed by local providers and remote servers. Remote server
+  // credentials are only needed by the proxy. Pagination is also done by the proxy.
+
+  def formRequestForLocalProvider: FormRequest =
+    formRequestForRemoteServer
+
+  def formRequestForRemoteServer: FormRequest =
+    copy(
+      queries                 = Seq(exactAppQueryOpt, exactFormQueryOpt).flatten,
+      remoteServerCredentials = Map.empty,
+      pageNumberOpt           = None,
+      pageSizeOpt             = None
+    )
 }
 
 object FormRequest {

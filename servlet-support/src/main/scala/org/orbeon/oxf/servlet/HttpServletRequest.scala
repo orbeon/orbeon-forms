@@ -221,7 +221,7 @@ class JavaxHttpServletRequest(httpServletRequest: javax.servlet.http.HttpServlet
       override def getServerPort: Int = wrapper.getServerPort
       override def getServletContext: javax.servlet.ServletContext = wrapper.getServletContext.getNativeServletContext.asInstanceOf[javax.servlet.ServletContext]
       override def getServletPath: String = wrapper.getServletPath
-      override def getSession(create: Boolean): javax.servlet.http.HttpSession = wrapper.getSession(create).getNativeHttpSession.asInstanceOf[javax.servlet.http.HttpSession]
+      override def getSession(create: Boolean): javax.servlet.http.HttpSession = Option(wrapper.getSession(create)).map(_.getNativeHttpSession.asInstanceOf[javax.servlet.http.HttpSession]).orNull
       override def isRequestedSessionIdValid: Boolean = wrapper.isRequestedSessionIdValid
       override def isSecure: Boolean = wrapper.isSecure
       override def isUserInRole(role: String): Boolean = wrapper.isUserInRole(role)
@@ -313,7 +313,7 @@ class JakartaHttpServletRequest(httpServletRequest: jakarta.servlet.http.HttpSer
       override def getServerPort: Int = wrapper.getServerPort
       override def getServletContext: jakarta.servlet.ServletContext = wrapper.getServletContext.getNativeServletContext.asInstanceOf[jakarta.servlet.ServletContext]
       override def getServletPath: String = wrapper.getServletPath
-      override def getSession(create: Boolean): jakarta.servlet.http.HttpSession = wrapper.getSession(create).getNativeHttpSession.asInstanceOf[jakarta.servlet.http.HttpSession]
+      override def getSession(create: Boolean): jakarta.servlet.http.HttpSession = Option(wrapper.getSession(create)).map(_.getNativeHttpSession.asInstanceOf[jakarta.servlet.http.HttpSession]).orNull
       override def isRequestedSessionIdValid: Boolean = wrapper.isRequestedSessionIdValid
       override def isSecure: Boolean = wrapper.isSecure
       override def isUserInRole(role: String): Boolean = wrapper.isUserInRole(role)

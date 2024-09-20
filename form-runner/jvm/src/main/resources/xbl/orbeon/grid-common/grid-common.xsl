@@ -92,10 +92,12 @@
         name="static-col-count"
         select="
             if (array:size($rows-array) ge 1) then
-                sum(
-                    for $map in array:get($rows-array, 1)
-                        return map:get($map, 'w')
-                )
+                max(
+                    for $rownum  in 1 to array:size($rows-array),
+                        $cellmap in array:get($rows-array, $rownum)
+                    return
+                        xs:integer(map:get($cellmap, 'x')) + xs:integer(map:get($cellmap, 'w'))
+                ) - 1
             else
                 0
         "/>

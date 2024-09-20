@@ -85,7 +85,17 @@
 
     <xsl:variable
         name="static-row-count"
-        select="array:size($rows-array)"/>
+        select="
+            if (array:size($rows-array) ge 1) then
+                max(
+                    for $rownum  in 1 to array:size($rows-array),
+                        $cellmap in array:get($rows-array, $rownum)
+                    return
+                        xs:integer(map:get($cellmap, 'y')) + xs:integer(map:get($cellmap, 'h'))
+                ) - 1
+            else
+                0
+        "/>
 
     <!-- Only used for the CSS class -->
     <xsl:variable

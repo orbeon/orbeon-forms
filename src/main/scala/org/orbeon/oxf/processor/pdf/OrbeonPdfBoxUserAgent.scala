@@ -23,7 +23,7 @@ import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.ImageSupport.{compressJpegImage, findImageOrientation, findTransformation, transformImage}
 import org.orbeon.oxf.util.Logging.*
-import org.orbeon.oxf.util.TryUtils.TryOps
+import org.orbeon.oxf.util.TryUtils.*
 import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupportTrait, IndentedLogger, ResourceResolver, URLRewriterUtils}
 
 import java.io.*

@@ -67,7 +67,7 @@
                  the class will also be on the XBL element. -->
             <xf:select1 appearance="dropdown" ref="xxf:binding('fr-us-state-binding')" xbl:attr="appearance class autocomplete" id="select1">
                 <xf:itemset ref="instance()/state" xxbl:scope="inner">
-                    <xf:label ref="if (xxf:lang() = 'fr') then @name-fr else @name"/>
+                    <xf:label ref="concat(@abbreviation, ' - ', if (xxf:lang() = 'fr' and exists( @name-fr)) then @name-fr else @name)"/>
                     <xf:value ref="@abbreviation"/>
                 </xf:itemset>
             </xf:select1>

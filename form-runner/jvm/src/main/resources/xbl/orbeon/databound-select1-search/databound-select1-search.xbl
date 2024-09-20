@@ -306,6 +306,7 @@
 
                             <xf:instance id="orbeon-resources" xxf:readonly="true">
                                 <_>
+                                    <!-- Duplicated from `dropdown-select1.xbl` -->
                                     <resource xml:lang="en"><select>Please select:</select></resource>
                                     <resource xml:lang="fr"><select>Veuillez sélectionner:</select></resource>
                                     <resource xml:lang="es"><select>Seleccione por favor:</select></resource>
@@ -318,6 +319,11 @@
                                     <resource xml:lang="pt"><select>Por favor seleccione:</select></resource>
                                     <resource xml:lang="sv"><select>Välj:</select></resource>
                                     <resource xml:lang="da"><select>Vælg:</select></resource>
+                                    <resource xml:lang="pl"><select>Wybierz:</select></resource>
+                                    <resource xml:lang="cs"><select>Prosím vyberte:</select></resource>
+                                    <resource xml:lang="tr"><select>Lütfen seçin:</select></resource>
+                                    <resource xml:lang="zh-Hant"><select>請選擇:</select></resource>
+                                    <resource xml:lang="zh-Hans"><select>请选择:</select></resource>
                                 </_>
                             </xf:instance>
 

@@ -41,6 +41,7 @@
         <p:input name="config" href="oxf:/forms/orbeon/builder/service/toolbox.xsl"/>
         <p:input name="data"><dummy/></p:input>
         <p:input name="global-template-xbl" href="#global-template-xbl"/>
+        <p:input name="special-template-xbl"><dummy/></p:input>
         <p:input name="custom-template-xbl"><dummy/></p:input>
         <p:input name="request">
             <request>

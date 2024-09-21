@@ -1,6 +1,5 @@
 package org.orbeon.xbl
 
-import cats.implicits.catsSyntaxOptionId
 import org.orbeon.facades
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}

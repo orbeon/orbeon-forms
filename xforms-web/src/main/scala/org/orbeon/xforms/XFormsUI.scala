@@ -17,21 +17,19 @@ import org.log4s.Logger
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.facades.HTMLDialogElement
-import org.orbeon.polyfills.HTMLPolyfills.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.web.DomSupport
-import org.orbeon.xforms.AjaxClient.fireEvent
+import org.orbeon.polyfills.HTMLPolyfills.*
 import org.orbeon.xforms.Constants.LhhacSeparator
-import org.orbeon.xforms.facade.{Controls, Events, Init, Utils, XBL}
+import org.orbeon.xforms.facade.{Controls, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.URL
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
 import org.scalajs.dom.ext.*
 import org.scalajs.dom.html.{Input, Span}
-import org.scalajs.dom.{MouseEvent, html, raw, window}
+import org.scalajs.dom.{MouseEvent, html, raw}
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import scalatags.JsDom
@@ -56,7 +54,7 @@ object XFormsUI {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.XFormsUI")
 
-  import Private._
+  import Private.*
 
   // Algorithm for a single repeated checkbox click:
   //
@@ -541,8 +539,8 @@ object XFormsUI {
 
     val newTargetOpt =
       targetOpt flatMap {
-        case target if ! js.isUndefined(window.asInstanceOf[js.Dynamic].selectDynamic(target)) =>
-          // Pointing to a frame, so this won't open a new new window
+        case target if ! js.isUndefined(dom.window.asInstanceOf[js.Dynamic].selectDynamic(target)) =>
+          // Pointing to a frame, so this won't open a new window
           Some(target)
         case target =>
           // See if we're able to open a new window
@@ -552,7 +550,7 @@ object XFormsUI {
             else
               target
           // Don't use "noopener" as we do need to use that window to test on it!
-          val newWindow = window.open("about:blank", targetButNotBlank)
+          val newWindow = dom.window.open("about:blank", targetButNotBlank)
           if (! js.isUndefined(newWindow) && (newWindow ne null)) // unclear if can be `undefined` or `null` or both!
             Some(targetButNotBlank)
           else
@@ -635,8 +633,8 @@ object XFormsUI {
         }
 
       val timerIdOpt =
-        if (Utils.isIOS() && Utils.getZoomLevel() != 1.0) {
-          Utils.resetIOSZoom()
+        if (isIOS() && getZoomLevel != 1.0) {
+          resetIOSZoom()
             Some(
               timers.setTimeout(200.milliseconds) {
                 showModalProgressPanelRaw()
@@ -821,6 +819,39 @@ object XFormsUI {
       relevantOpt
     )
   }
+
+  @JSExport
+  def resetIOSZoom(): Unit = {
+    Option(dom.document.querySelector("meta[name = 'viewport']")).foreach { viewPortMeta =>
+      attValueOpt(viewPortMeta, "content").foreach { contentAttribute =>
+
+        val MaximumScale = "maximum-scale"
+
+        val pairsNoMaximumScale =
+          contentAttribute
+            .splitTo[List](",;")
+            .map(_.splitTo[List]("="))
+            .collect {
+              case List(NonAllBlank(key), NonAllBlank(value)) if key != MaximumScale => key -> value
+            }
+
+        def makeParamString(p: List[(String, String)]) =
+          p.map(kv => s"${kv._1}=${kv._2}").mkString(",")
+
+        // 2024-09-20: Not sure why we did things this way
+        viewPortMeta.setAttribute("content", makeParamString((MaximumScale -> "1.0") :: pairsNoMaximumScale))
+        viewPortMeta.setAttribute("content", makeParamString(pairsNoMaximumScale))
+      }
+    }
+  }
+
+  @JSExport
+  def isIOS(): Boolean =
+    dom.document.body.classList.contains("xforms-ios")
+
+  @JSExport
+  def getZoomLevel(): Double =
+    dom.document.documentElement.clientWidth.toDouble / dom.window.innerWidth
 
   private def updateControlAttributes(
     documentElement            : html.Element,

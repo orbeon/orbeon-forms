@@ -151,9 +151,6 @@ object Utils extends js.Object {
   def getRepeatIndexes(effectiveId: String)                                 : js.Array[String] = js.native
   def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : raw.Element      = js.native
   def overlayUseDisplayHidden(o: js.Object)                                 : Unit             = js.native
-  def isIOS()                                                               : Boolean          = js.native
-  def getZoomLevel()                                                        : Double           = js.native
-  def resetIOSZoom()                                                        : Unit             = js.native
 }
 
 // Minimal (i.e. incomplete) class/trait for the Broadcast Channel API

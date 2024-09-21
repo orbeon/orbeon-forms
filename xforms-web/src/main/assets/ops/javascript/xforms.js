@@ -371,87 +371,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 return "xforms-repeat-selected-item-" + depth;
             },
 
-            /**
-             * In a string `stack`, finds all occurrences of `needle`, replaces them by `replacement`,
-             * applies `builder` to the text between the needles, and returns the resulting sequence.
-             *
-             * @param  stack        : String
-             * @param  needle       : String
-             * @param  replacements : [T]
-             * @param  builder      : String -> T
-             * @return                [T]
-             */
-            replaceInText: function(stack, needle, replacements, builder) {
-                var parts = stack.split(needle);
-                var firstPart = _.first(parts);
-                var replaced = _.flatten(_.map(_.rest(parts), function (part) {
-                    return (part === "") ?
-                            replacements :
-                            _.flatten([replacements, [builder(part)]]);
-                }), true);
-                return _.flatten([[builder(firstPart)], replaced], true);
-            },
-
-
-            /**
-             * Replaces in a tree (DOM) a placeholder (needle) by some other content (a string or sequence of nodes),
-             * this in both text nodes and attribute values.
-             *
-             * @param  element      : Element
-             * @param  needle       : String
-             * @param  replacements : String | [Node]
-             * @param  isHTML       : Boolean
-             */
-            replaceInDOM: function(element, needle, replacements, isHTML) {
-
-                var createTextNode = _.bind(document.createTextNode, document);
-                var replacementNodes =
-                    isHTML ?
-                    (replacements == null ? [] : replacements) :
-                    [createTextNode(replacements)];
-                var replaceInText  = ORBEON.util.Utils.replaceInText;
-
-                function worker(node) {
-                    switch (node.nodeType) {
-
-                        case ELEMENT_TYPE:
-
-                            // Do replacements in attributes if we're doing a text replacement
-                            if (! isHTML) {
-                                _.each(node.attributes, function (attribute) {
-                                    var newValue = replaceInText(attribute.value, needle, replacements, _.identity).join("");
-                                    if (newValue != attribute.value)
-                                        $(node).attr(attribute.name, newValue);
-                                });
-                            }
-                            // Recurse on children
-                            _.each(node.childNodes, worker);
-
-                            break;
-
-                        case TEXT_TYPE:
-
-                            var newNodes = replaceInText(String(node.nodeValue),
-                                    needle,
-                                    replacementNodes,
-                                    createTextNode);
-                            var changed = newNodes.length > 1 ||
-                                    newNodes[0].nodeType != TEXT_TYPE ||
-                                    newNodes[0].nodeValue != node.nodeValue;
-
-                            if (changed) {
-                                // Clone, as if multiple replacements occurred, the sequence
-                                // will have multiple copies of the same object
-                                $(newNodes).clone().insertBefore(node);
-                                $(node).detach();
-                            }
-                            break;
-                    }
-                }
-
-                worker(element);
-            },
-
             // Escape a literal search string so it can be used in String.replace()
             escapeRegex: function(value) {
                 return value.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
@@ -529,45 +448,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 for (var arrayIndex = 0; arrayIndex < array.length; arrayIndex++) {
                     var arrayElement = array[arrayIndex];
                     if (overrideContext) fn.call(obj, arrayElement); else fn(arrayElement);
-                }
-            },
-
-            isIOS: function() {
-                return $(document.body).hasClass("xforms-ios");
-            },
-
-            getZoomLevel: function() {
-                return document.documentElement.clientWidth / window.innerWidth;
-            },
-
-            resetIOSZoom: function() {
-                var viewPortMeta = document.querySelector('meta[name="viewport"]');
-                if (viewPortMeta) {
-                    var contentAttribute = viewPortMeta.getAttribute('content');
-                    if (contentAttribute) {
-                        var parts = contentAttribute.split(/\s*[,;]\s*/);
-
-                        var pairs =
-                            _.map(parts, function(part) {
-                                return part.split(/\s*=\s*/);
-                            });
-
-                        var filteredWithoutMaximumScale =
-                            _.filter(pairs, function(pair) {
-                                return pair.length == 2 && pair[0] != "maximum-scale";
-                            });
-
-                        var newParametersWithoutMaximumScale =
-                            _.map(filteredWithoutMaximumScale, function(pair) {
-                                return pair.join('=');
-                            });
-
-                        var newParametersWithMaximumScale =
-                            newParametersWithoutMaximumScale.slice(0).concat('maximum-scale=1.0');
-
-                        viewPortMeta.setAttribute('content', newParametersWithMaximumScale.join(','));
-                        viewPortMeta.setAttribute('content', newParametersWithoutMaximumScale.join(','));
-                    }
                 }
             }
         }

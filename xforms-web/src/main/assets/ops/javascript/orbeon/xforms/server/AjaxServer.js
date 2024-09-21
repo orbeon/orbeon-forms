@@ -56,11 +56,11 @@
                         return document.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(repeatPrefixedId, parentIndexes));
                     }
 
-                    if (ORBEON.util.Utils.isIOS() && ORBEON.util.Utils.getZoomLevel() != 1.0) {
+                    if (ORBEON.xforms.XFormsUi.isIOS() && ORBEON.xforms.XFormsUi.getZoomLevel() != 1.0) {
                         var dialogsToShowArray = ORBEON.xforms.XFormsUi.findDialogsToShow(controlValuesElements);
                         if (dialogsToShowArray.length > 0) {
                             responseDialogIdsToShowAsynchronously = dialogsToShowArray;
-                            ORBEON.util.Utils.resetIOSZoom();
+                            ORBEON.xforms.XFormsUi.resetIOSZoom();
                         }
                     }
 

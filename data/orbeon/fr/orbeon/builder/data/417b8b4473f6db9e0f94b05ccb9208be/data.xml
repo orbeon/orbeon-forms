@@ -1,9 +1,8 @@
-<xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:sql="http://orbeon.org/oxf/xml/sql"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:math="http://www.w3.org/2005/xpath-functions/math"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:saxon="http://saxon.sf.net/"
@@ -143,16 +142,33 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <link-button/>
                         </grid-8>
                     </buttons>
-                    <us-address>
-                        <grid-1>
-                            <street-number>1600</street-number>
-                            <street-name>Pennsylvania Ave NW</street-name>
-                            <apt-suite/>
-                            <city>Washington</city>
-                            <state>DC</state>
-                            <zip>20500</zip>
-                        </grid-1>
-                    </us-address>
+                    <reusable-sections>
+                        <address-us>
+                            <grid-3>
+                                <us-address-street-1/>
+                                <us-address-city/>
+
+
+                                <us-address-street-2/>
+                                <us-address-state/>
+                                <us-address-zip/>
+
+
+                                <us-address-urbanization/>
+
+                            </grid-3>
+                        </address-us>
+                        <contact-information>
+                            <grid-5>
+                                <contact-information-first-name/>
+                                <contact-information-last-name/>
+                                <contact-information-phone/>
+                                <contact-information-email/>
+                                <control-4/>
+                            </grid-5>
+                        </contact-information>
+                    </reusable-sections>
+
                 </form>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
@@ -295,7 +311,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                  readonly="false()"/>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind name="us-address" id="us-address-bind" ref="us-address"/>
+
                 <xf:bind id="utility-controls-bind" ref="utility-controls" name="utility-controls">
                     <xf:bind id="grid-9-bind" ref="grid-9" name="grid-9">
                         <xf:bind id="explanatory-text-bind" ref="explanatory-text" name="explanatory-text"/>
@@ -306,6 +322,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind ref="calculated-value-clipboard" id="calculated-value-clipboard-bind"
                                  name="calculated-value-clipboard"/>
                     </xf:bind>
+                </xf:bind>
+                <xf:bind id="reusable-sections-bind" ref="reusable-sections" name="reusable-sections">
+                    <xf:bind id="address-us-bind" ref="address-us" name="address-us"/>
+                    <xf:bind id="contact-information-bind" ref="contact-information"
+                             name="contact-information"/>
                 </xf:bind>
             </xf:bind>
             <xf:instance xxf:readonly="true" id="fr-form-metadata">
@@ -318,13 +339,27 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     <description xml:lang="fr">Ce formulaire montre tous les contrôles supportés par Form Builder</description>
                     <updated-with-version>2020.1 PE</updated-with-version>
                     <updated-with-version>2022.1 PE</updated-with-version>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
                     <library-versions>
                         <orbeon>1</orbeon>
+                        <_>1</_>
                     </library-versions>
                     <xbl>
                         <fr:calculated-value appearance="full"/>
+                        <fr:date output-format="[D01]/[M01]/[Y]"/>
                     </xbl>
                     <data-migration>enabled</data-migration>
+
+
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
@@ -506,6 +541,17 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <buttons>
                             <label>Buttons</label>
                         </buttons>
+                        <reusable-sections>
+                            <label>Reusable sections</label>
+                        </reusable-sections>
+                        <contact-information>
+                            <label>Contact information</label>
+                            <help/>
+                        </contact-information>
+                        <address-us>
+                            <label>US address</label>
+                            <help/>
+                        </address-us>
                         <email>
                             <label>Email Address</label>
                             <hint>Email field with validation</hint>
@@ -764,9 +810,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <date-time-controls>
                             <label>Date and Time</label>
                         </date-time-controls>
-                        <us-address>
-                            <label>US Address Template</label>
-                        </us-address>
+
                         <attachment-controls>
                             <label>Image and File Attachments</label>
                         </attachment-controls>
@@ -944,6 +988,17 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <buttons>
                             <label>Boutons</label>
                         </buttons>
+                        <reusable-sections>
+                            <label>Sections réutilisables</label>
+                        </reusable-sections>
+                        <contact-information>
+                            <label>Adresse UK</label>
+                            <help/>
+                        </contact-information>
+                        <address-us>
+                            <label>Adresse US</label>
+                            <help/>
+                        </address-us>
                         <email>
                             <label>Adresse email</label>
                             <hint>Email field with validation</hint>
@@ -1202,9 +1257,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <date-time-controls>
                             <label>Contrôles date et heure</label>
                         </date-time-controls>
-                        <us-address>
-                            <label>Modèle Adresse US</label>
-                        </us-address>
+
                         <attachment-controls>
                             <label>Images et fichiers joints</label>
                         </attachment-controls>
@@ -1765,7 +1818,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </fr:c>
                         <fr:c x="7" y="3" w="6">
                             <fr:video-attachment xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                      xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                                  id="video-attachment-control"
                                                  bind="video-attachment-bind"
                                                  class="fr-attachment">
@@ -1862,10 +1915,28 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </fr:c>
                     </fr:grid>
                 </fr:section>
-                <fr:section id="us-address-control" bind="us-address-bind">
-                    <xf:label ref="$form-resources/us-address/label"/>
-                    <component:address xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"/>
+                <fr:section id="reusable-sections-section" bind="reusable-sections-bind">
+                    <xf:label ref="$form-resources/reusable-sections/label"/>
+                    <fr:section id="address-us-section" bind="address-us-bind">
+                        <xf:label ref="$form-resources/address-us/label"/>
+                        <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                                              xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                              xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                              xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                              xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                              id="address-us-content-control"/>
+                    </fr:section>
+                    <fr:section id="contact-information-section" bind="contact-information-bind">
+                        <xf:label ref="$form-resources/contact-information/label"/>
+                        <component:contact-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                                                       xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                       xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                                       xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                                       xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                       id="contact-information-content-control"/>
+                    </fr:section>
                 </fr:section>
+
             </fr:body>
         </fr:view>
     </xh:body>

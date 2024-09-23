@@ -420,16 +420,16 @@
 
     <xsl:variable
         name="wizard-subsections-nav"
-        as="xs:string"
+        as="xs:boolean"
         select="
             (
-                $fr-form-metadata/wizard-subsections-nav[
-                    . = ('true', 'false')
-                ],
-                p:property(string-join(('oxf.xforms.xbl.fr.wizard.subsections-nav', $app, $form), '.'))[
-                    . = ('true', 'false')
-                ],
-                'false'
+                xs:boolean(
+                    $fr-form-metadata/wizard-subsections-nav[
+                        . = ('true', 'false')
+                    ]
+                ),
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.subsections-nav', $app, $form), '.')),
+                false()
             )[1]"/>
 
     <xsl:variable
@@ -448,30 +448,30 @@
 
     <xsl:variable
         name="wizard-separate-toc"
-        as="xs:string"
+        as="xs:boolean"
         select="
             (
-                $fr-form-metadata/wizard-separate-toc[
-                    . = ('true', 'false')
-                ],
-                p:property(string-join(('oxf.xforms.xbl.fr.wizard.separate-toc', $app, $form), '.'))[
-                    . = ('true', 'false')
-                ],
-                'false'
+                xs:boolean(
+                    $fr-form-metadata/wizard-separate-toc[
+                        . = ('true', 'false')
+                    ]
+                ),
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.separate-toc', $app, $form), '.')),
+                false()
             )[1]"/>
 
     <xsl:variable
         name="wizard-section-status"
-        as="xs:string"
+        as="xs:boolean"
         select="
             (
-                $fr-form-metadata/wizard-section-status[
-                    . = ('true', 'false')
-                ],
-                p:property(string-join(('oxf.xforms.xbl.fr.wizard.section-status', $app, $form), '.'))[
-                    . = ('true', 'false')
-                ],
-                'false'
+                xs:boolean(
+                    $fr-form-metadata/wizard-section-status[
+                        . = ('true', 'false')
+                    ]
+                ),
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.section-status', $app, $form), '.')),
+                false()
             )[1]"/>
 
     <xsl:variable
@@ -1087,7 +1087,7 @@
                  Builder for example can open a dialog upon load. Another possible fix would be to fix setfocus to
                  understand that if a modal dialog is currently visible, setting focus to a control outside that dialog
                  should not have any effect. See https://github.com/orbeon/orbeon-forms/issues/2010  -->
-            <xsl:if test="$enable-initial-focus and $wizard-separate-toc = 'false'">
+            <xsl:if test="$enable-initial-focus and $wizard-separate-toc = false()">
                 <xf:setfocus
                     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                     event="xforms-ready"

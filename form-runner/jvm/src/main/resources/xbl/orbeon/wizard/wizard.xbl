@@ -182,7 +182,7 @@
                 <xf:bind ref="@initialized"   type="xs:boolean" xxf:default="false()"/>
 
                 <xf:bind ref="validate"                         xxf:default="Wizard:normalizeWizardMode(fr:component-param-value('validate'))"/>
-                <xf:bind ref="separate-toc"   type="xs:boolean" xxf:default="(fr:component-param-value('separate-toc'),   'false')[1]"/>
+                <xf:bind ref="separate-toc"   type="xs:boolean" xxf:default="(fr:component-param-value('separate-toc'), 'false')[1]"/>
                 <xf:bind ref="section-status" type="xs:boolean" xxf:default="../separate-toc/data(.) or fr:component-param-value('section-status') = 'true'"/>
 
                 <xf:bind ref="current-index"  type="xs:integer" xxf:default="1"/>

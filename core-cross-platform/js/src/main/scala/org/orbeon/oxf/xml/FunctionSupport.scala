@@ -65,9 +65,10 @@ import org.orbeon.saxon.om
 
 object FunctionSupport {
 
+  // We make a distinction between `null` and `None`: `null` correspond to the absence of an argument, in which case
+  // we use the context, while `None` corresponds to an empty sequence, which we leave unchanged.
   def stringArgumentOrContextOpt(s: Option[String])(implicit xpc: XPathContext): Option[String] =
     if (s eq null) Option(xpc.getContextItem) map (_.getStringValue) else s
-
   def itemArgumentOrContextOpt(i: Option[om.Item])(implicit xpc: XPathContext): Option[om.Item] =
-    i orElse Option(xpc.getContextItem)
+    if (i eq null) Option(xpc.getContextItem) else i
 }

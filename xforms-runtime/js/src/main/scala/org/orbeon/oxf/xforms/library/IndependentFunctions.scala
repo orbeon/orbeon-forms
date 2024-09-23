@@ -187,11 +187,11 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 //    )
 
   @XPathFunction()
-  def hasClass(className: String, elem: Option[om.NodeInfo] = None)(implicit xpc: XPathContext): Boolean =
+  def hasClass(className: String, elem: Option[om.NodeInfo] = null)(implicit xpc: XPathContext): Boolean =
     classesFromAttribute(elem).contains(className)
 
   @XPathFunction()
-  def classes(elem: Option[om.NodeInfo] = None)(implicit xpc: XPathContext): Iterable[String] =
+  def classes(elem: Option[om.NodeInfo] = null)(implicit xpc: XPathContext): Iterable[String] =
     classesFromAttribute(elem)
 
   @XPathFunction()

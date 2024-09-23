@@ -304,29 +304,6 @@
                     <xf:group appearance="xxf:internal" id="view">
                         <xf:model>
 
-                            <xf:instance id="orbeon-resources" xxf:readonly="true">
-                                <_>
-                                    <!-- Duplicated from `dropdown-select1.xbl` -->
-                                    <resource xml:lang="en"><select>Please select:</select></resource>
-                                    <resource xml:lang="fr"><select>Veuillez sélectionner:</select></resource>
-                                    <resource xml:lang="es"><select>Seleccione por favor:</select></resource>
-                                    <resource xml:lang="no"><select>Velg:</select></resource>
-                                    <resource xml:lang="ru"><select>Выберите:</select></resource>
-                                    <resource xml:lang="it"><select>Si prega di selezionare:</select></resource>
-                                    <resource xml:lang="de"><select>Bitte auswählen:</select></resource>
-                                    <resource xml:lang="fi"><select>Valitse:</select></resource>
-                                    <resource xml:lang="nl"><select>Selecteren:</select></resource>
-                                    <resource xml:lang="pt"><select>Por favor seleccione:</select></resource>
-                                    <resource xml:lang="sv"><select>Välj:</select></resource>
-                                    <resource xml:lang="da"><select>Vælg:</select></resource>
-                                    <resource xml:lang="pl"><select>Wybierz:</select></resource>
-                                    <resource xml:lang="cs"><select>Prosím vyberte:</select></resource>
-                                    <resource xml:lang="tr"><select>Lütfen seçin:</select></resource>
-                                    <resource xml:lang="zh-Hant"><select>請選擇:</select></resource>
-                                    <resource xml:lang="zh-Hans"><select>请选择:</select></resource>
-                                </_>
-                            </xf:instance>
-
                             <xf:instance id="local">
                                 <_>
                                     <resource-attr><xsl:value-of select="@resource"/></resource-attr>
@@ -529,7 +506,7 @@
                                 if (xxf:label-appearance('fr-databound-select1-search') = 'minimal') then
                                     xxf:label('fr-databound-select1-search')
                                 else
-                                    xxf:r('select')
+                                    xxf:r('components.labels.please-select', '|fr-fr-resources|')
                             }}"
                             data-service-performs-search="{$service-performs-search}"
                             data-min-input-length="{{$min-input-length}}"

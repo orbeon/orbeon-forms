@@ -37,6 +37,28 @@ object Select2 {
     val minimumInputLength : Int
   }
 
+  implicit class OptionsOps(val o: Options) extends AnyVal {
+    def copy(
+      newPlaceholder: js.UndefOr[Option] = o.placeholder,
+      newAjax: Ajax = o.ajax,
+      newAllowClear: Boolean = o.allowClear,
+      newDropdownParent: js.UndefOr[JQuery] = o.dropdownParent,
+      newWidth: String = o.width,
+      newTags: Boolean = o.tags,
+      newMinimumInputLength: Int = o.minimumInputLength
+    ): Options = {
+      new Options {
+        val placeholder = newPlaceholder
+        val ajax = newAjax
+        val allowClear = newAllowClear
+        val dropdownParent = newDropdownParent
+        val width = newWidth
+        val tags = newTags
+        val minimumInputLength = newMinimumInputLength
+      }
+    }
+  }
+
   trait Option extends js.Object {
     val id   : String
     val text : String

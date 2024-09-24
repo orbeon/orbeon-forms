@@ -49,8 +49,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private var onXFormsSelect1ValueChangeJs : Option[js.Function]              = None
   private var mutationObservers            : List[MutationObserver]           = Nil
   private var inputElementOpt              : Option[dom.Element]              = None
-  private var optionsWithTagsOpt           : Option[Select2.Options]          = None
-  private var optionsWithoutTagsOpt        : Option[Select2.Options]          = None
+  private var optionsOpt                   : Option[Select2.Options]          = None
   private var isOpenSelection              : Boolean                          = false
 
   override def init(): Unit = {
@@ -74,23 +73,22 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
             }
           }
 
-          def options(open: Boolean): Select2.Options =
+          optionsOpt = Some(
             new Select2.Options {
               val allowClear         = placeholderOpt.isDefined // allowClear can be enabled only if a placeholder is defined
               val dropdownParent     = containerElem.closest("dialog").map($(_)).orUndefined // For dropdown not to show under dialog
               val ajax               = if (isDatabound) Select2Ajax else null
               val width              = "100%" // For Select2 width to update as the viewport width changes
-              val tags               = open
+              val tags               = false
               val minimumInputLength = Option(queryElementWithData.getAttribute(DataMinimumInputLength)).filter(_.nonEmpty).map(_.toInt).getOrElse(0)
               val placeholder        = placeholderOpt.orUndefined
             }
-          optionsWithTagsOpt    = Some(options(open = true))
-          optionsWithoutTagsOpt = Some(options(open = false))
+          )
         }
 
         // Init Select2
         val jSelect = $(select)
-        optionsWithoutTagsOpt.foreach(jSelect.select2)
+        optionsOpt.foreach(jSelect.select2)
 
         // Register event listeners
         if (isDatabound) {
@@ -153,8 +151,6 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           onAttributeChange(elementWithData, DataValue          , updateValueLabel)
           onAttributeChange(elementWithData, DataLabel          , updateValueLabel)
           onAttributeChange(elementWithData, DataIsOpenSelection, updateOpenSelection)
-          // TODO:
-          // onAttributeChange(elementWithData, DataPlaceholder,  initOrUpdatePlaceholderCurrent)
         } else {
           // Register and remember listener on value change
           val listener: js.Function = onXFormsSelect1ValueChange _
@@ -162,6 +158,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           Controls.afterValueChange.subscribe(listener)
         }
 
+        onAttributeChange(elementWithData, DataPlaceholder, updatePlaceholder)
         makeClearAccessible()
         onElementAdded(containerElem, ".select2-selection__clear", makeClearAccessible)
       }
@@ -218,13 +215,33 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     if (newIsOpenSelection != isOpenSelection) {
       for {
         select  <- Option(querySelect)
-        options <- if (newIsOpenSelection) optionsWithTagsOpt else optionsWithoutTagsOpt
+        options <- optionsOpt
       } {
         val jSelect = $(select)
         jSelect.select2("destroy")
-        jSelect.select2(options)
+        jSelect.select2(options.copy(
+          newTags = newIsOpenSelection
+        ))
         isOpenSelection = newIsOpenSelection
       }
+    }
+  }
+
+  private def updatePlaceholder(): Unit = {
+    val newPlaceholder = queryElementWithData.getAttribute(DataPlaceholder)
+
+    // Update the optionsWithoutTagsOpt with the new placeholder
+    optionsOpt = optionsOpt.map { options =>
+      options.copy(newPlaceholder = new Select2.Option {
+        val id   = "0"
+        val text = newPlaceholder
+      })
+    }
+
+    // Re-initialize Select2 with the updated options
+    for (select <- Option(querySelect)) {
+      val jSelect = $(select)
+      optionsOpt.foreach(jSelect.select2)
     }
   }
 

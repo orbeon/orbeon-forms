@@ -171,7 +171,6 @@
                 </xf:itemset>
                 <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
             </xf:select1>
-            <xf:output value="xxf:r('components.labels.please-select', '|fr-fr-resources|')"/>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

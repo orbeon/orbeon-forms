@@ -617,11 +617,33 @@
             <!-- Reset search selection and navigation -->
             <xf:action event="fr-reset-search">
 
-                <xf:setvalue ref="instance('fr-selection-instance')"/>
                 <xf:setindex repeat="documents-repeat" index="1"/>
                 <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
 
                 <xf:send submission="fr-summary-search-submission"/>
+
+                <!-- Reset selection keeping selected document if they still exist -->
+                <xf:setvalue
+                    ref="instance('fr-selection-instance')"
+                    value="
+                        string-join(
+                            for $selection in xxf:split(instance('fr-selection-instance'))
+                            return
+                                let
+                                    $draft        := if (substring-before($selection, '/') = 'draft') then 'true' else 'false',
+                                    $name         := substring-after($selection, '/'),
+                                    $still-exists :=
+                                        exists(
+                                            instance('fr-search-results-instance')/document[
+                                                @name = $name and
+                                                @draft = $draft
+                                            ]
+                                        )
+                                return
+                                    if ($still-exists) then $selection else (),
+                            ' ')
+                    "/>
+
             </xf:action>
 
             <!-- Summary data -->
@@ -891,7 +913,7 @@
                         <!-- Do not reset selections when showing/hiding the bulk edit section -->
                         <xf:dispatch
                             event="DOMActivate"
-                            if="event('xxf:targetid')!='fr-bulk-edit-button'"
+                            if="event('xxf:targetid') != 'fr-bulk-edit-toggle'"
                             name="fr-reset-search"
                             targetid="fr-form-model"/>
 
@@ -1105,7 +1127,7 @@
                                 <xf:case value="true()"/>
                                 <xf:case value="false()">
                                     <xf:trigger
-                                        id="fr-bulk-edit-button"
+                                        id="fr-bulk-edit-toggle"
                                         appearance="full"
                                         ref="if (instance('fr-bulk-edit-instance')/query[@path and @summary-edit = 'true']) then $enabled else $disabled"
                                         class="fr-summary-bulk-show-button">
@@ -1555,7 +1577,7 @@
                                                     name="apply-allowed"
                                                     value="$bulk-edit-enabled and (($control-required and normalize-space(.)!='') or not($control-required))"/>
 
-                                                <xf:trigger appearance="xxf:mini" ref="if ($bulk-edit-enabled) then . else ''" class="fr-summary-bulk-apply">
+                                                <xf:trigger id="fr-bulk-edit-apply" appearance="xxf:mini" ref="if ($bulk-edit-enabled) then . else ''" class="fr-summary-bulk-apply">
                                                     <xf:label ref="$fr-resources/summary/bulk-edit/apply"/>
                                                     <xf:action event="DOMActivate" if="$apply-allowed">
                                                         <xf:dispatch name="apply" targetid="fr-bulk-apply">

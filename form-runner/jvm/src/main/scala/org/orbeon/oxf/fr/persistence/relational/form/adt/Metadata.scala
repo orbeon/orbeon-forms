@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.form.adt
 
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.fr.FormDefinitionVersion
+import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 
 import java.time.Instant
@@ -58,7 +59,7 @@ object Metadata {
   }
 
   trait InstantMetadata extends Metadata[Instant] {
-    override def valueFromString(string: String): Instant = Instant.parse(string)
+    override def valueFromString(string: String): Instant = RelationalUtils.instantFromString(string)
     override def valueAsString(value : Instant): String   = value.toString
 
     override val allowedMatchTypes: Set[MatchType] = Set(GreaterThanOrEqual, GreaterThan, LowerThan, Exact)
@@ -83,9 +84,6 @@ object Metadata {
     override val sqlColumn   = "app"
     override val supportsUrl = false
 
-    // Only allow Exact queries for now
-    override val allowedMatchTypes: Set[MatchType] = Set(Exact)
-
     override def valueOpt(form: Form, formMetadataOpt: Option[FormMetadata], language: => String): Option[String] =
       form.appForm.app.some
   }
@@ -94,9 +92,6 @@ object Metadata {
     override val string      = "form-name"
     override val sqlColumn   = "form"
     override val supportsUrl = false
-
-    // Only allow Exact queries for now
-    override val allowedMatchTypes: Set[MatchType] = Set(Exact)
 
     override def valueOpt(form: Form, formMetadataOpt: Option[FormMetadata], language: => String): Option[String] =
       form.appForm.form.some

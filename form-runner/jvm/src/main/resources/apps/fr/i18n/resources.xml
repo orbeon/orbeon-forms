@@ -705,6 +705,13 @@
                 <try-again>Please try again.</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name>Application Name</application-name>
+                <form-name>Form Name</form-name>
+                <form-title>Form Title</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="fr">
         <common>
@@ -1403,6 +1410,13 @@
                 <try-again>Réessayer.</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="es">
         <common>
@@ -2096,6 +2110,13 @@
                 <try-again todo="true">[Please try again.]</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="ca">
         <common>
@@ -2814,6 +2835,13 @@
                 <try-again todo="true">[Please try again.]</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="no">
         <common>
@@ -3498,6 +3526,13 @@
                 <try-again todo="true">[Please try again.]</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="ru">
         <common>
@@ -4181,6 +4216,13 @@
                 <try-again todo="true">[Please try again.]</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="it">
         <common>
@@ -4874,6 +4916,13 @@
                 <try-again todo="true">[Please try again.]</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="de">
         <common>
@@ -5567,6 +5616,13 @@
                 <try-again todo="true">[Please try again.]</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="fi">
         <common>
@@ -6260,6 +6316,13 @@
                 <try-again todo="true">[Please try again.]</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="sv">
         <common>
@@ -6953,6 +7016,13 @@
                 <try-again todo="true">[Please try again.]</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="nl">
         <common>
@@ -7646,6 +7716,13 @@
                 <try-again todo="true">[Please try again.]</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="pt">
         <common>
@@ -8339,6 +8416,13 @@
                 <try-again todo="true">[Please try again.]</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="da">
         <common>
@@ -9023,6 +9107,13 @@
                 <try-again todo="true">Please try again.</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="pl">
         <common>
@@ -9716,6 +9807,13 @@
                 <try-again>Proszę spróbuj ponownie.</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="tr">
         <common>
@@ -10409,6 +10507,13 @@
                 <try-again>Lütfen tekrar deneyin.</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="zh-Hans">
         <common>
@@ -11096,6 +11201,13 @@
                 <try-again>请重试。</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
     <resource xml:lang="zh-Hant">
         <common>
@@ -11788,5 +11900,12 @@
                 <try-again>請重試。</try-again>
             </login-error>
         </authentication>
+        <home-summary>
+            <titles>
+                <application-name todo="true">[Application Name]</application-name>
+                <form-name todo="true">[Form Name]</form-name>
+                <form-title todo="true">[Form Title]</form-title>
+            </titles>
+        </home-summary>
     </resource>
 </resources>

@@ -907,7 +907,7 @@
                     <xf:var name="show-created-by"       value="xxf:property(string-join(('oxf.fr.summary.show-created-by',       $app, $form), '.'))"/>
                     <xf:var name="show-last-modified-by" value="xxf:property(string-join(('oxf.fr.summary.show-last-modified-by', $app, $form), '.'))"/>
 
-                    <xf:group class="fr-summary-search">
+                    <xf:group class="fr-top-fields">
 
                         <!-- Search also when user presses "enter" in a field -->
                         <!-- Do not reset selections when showing/hiding the bulk edit section -->
@@ -982,7 +982,7 @@
                             name="bulk-edit-enabled"
                             value="count(xxf:split(instance('fr-selection-instance'))) > 0 and not($non-editable-documents-selected)"/>
 
-                        <xh:div class="fr-summary-search-top">
+                        <xh:div class="fr-main-top-fields">
 
                             <xf:select1
                                 appearance="minimal"
@@ -1084,9 +1084,9 @@
                             <xf:input
                                 id="fr-search-free-input"
                                 ref="if (case('fr-search-options-switch') = 'fr-search-free-case') then instance('fr-search-instance')/query else ''"
-                                class="fr-summary-search-free-input"/>
+                                class="fr-search-free-input"/>
 
-                            <xf:trigger class="fr-summary-search-search-button">
+                            <xf:trigger class="fr-search-button">
                                 <xf:label mediatype="text/html" value="$fr-resources/summary/search/search-forms"/>
                             </xf:trigger>
 
@@ -1095,7 +1095,7 @@
                             <xf:trigger
                                 appearance="full"
                                 ref="if (instance('fr-search-instance')/query[@path and @summary-search = 'true']) then $enabled else $disabled"
-                                class="fr-summary-search-show-button">
+                                class="fr-search-show-button">
 
                                 <!-- Switch label depending on which case is shown -->
                                 <xf:label
@@ -1181,7 +1181,7 @@
 
                                     <!-- Created, created by, last modified, last modified by, and workflow stage -->
 
-                                    <xf:group ref="''[$show-created]" class="fr-summary-search-item date-range-group">
+                                    <xf:group ref="''[$show-created]" class="fr-search-item date-range-group">
                                         <xf:select1 id="created-select" ref="instance('fr-metadata-search-instance')/created">
                                             <xf:label ref="$fr-resources/summary/titles/created"/>
                                             <xf:item>
@@ -1208,7 +1208,7 @@
                                             </fr:date>
                                         </xf:group>
                                     </xf:group>
-                                    <xf:group ref="''[$show-created-by]" class="fr-summary-search-item">
+                                    <xf:group ref="''[$show-created-by]" class="fr-search-item">
                                         <xf:select1 id="created-by-select" ref="instance('fr-metadata-search-instance')/created-by" appearance="search" disable-placeholder="true">
                                             <xf:label ref="$fr-resources/summary/titles/created-by"/>
                                             <xf:item>
@@ -1221,7 +1221,7 @@
                                             </xf:itemset>
                                         </xf:select1>
                                     </xf:group>
-                                    <xf:group ref="''[$show-last-modified]" class="fr-summary-search-item date-range-group">
+                                    <xf:group ref="''[$show-last-modified]" class="fr-search-item date-range-group">
                                         <xf:select1 id="last-modified-select" ref="instance('fr-metadata-search-instance')/last-modified">
                                             <xf:label ref="$fr-resources/summary/titles/last-modified"/>
                                             <xf:item>
@@ -1248,7 +1248,7 @@
                                             </fr:date>
                                         </xf:group>
                                     </xf:group>
-                                    <xf:group ref="''[$show-last-modified-by]" class="fr-summary-search-item">
+                                    <xf:group ref="''[$show-last-modified-by]" class="fr-search-item">
                                         <xf:select1 id="last-modified-by-select" ref="instance('fr-metadata-search-instance')/last-modified-by" appearance="search" disable-placeholder="true">
                                             <xf:label ref="$fr-resources/summary/titles/last-modified-by"/>
                                             <xf:item>
@@ -1261,7 +1261,7 @@
                                             </xf:itemset>
                                         </xf:select1>
                                     </xf:group>
-                                    <xf:group ref="''[$show-workflow-stage]" class="fr-summary-search-item">
+                                    <xf:group ref="''[$show-workflow-stage]" class="fr-search-item">
                                         <xf:select1 id="workflow-stage-select" ref="instance('fr-metadata-search-instance')/workflow-stage" appearance="search" disable-placeholder="true">
                                             <xf:label ref="$fr-resources/summary/titles/workflow-stage"/>
                                             <xf:item>
@@ -1278,7 +1278,7 @@
                                     <!-- Special form builder search: use input or select1 for app/form name -->
 
                                     <!-- Application -->
-                                    <xf:group ref="$app-query" class="fr-summary-search-item">
+                                    <xf:group ref="$app-query" class="fr-search-item">
                                         <xf:var name="control-name" value="@name"/>
                                         <xf:var
                                             name="label"
@@ -1313,7 +1313,7 @@
                                         </xf:select1>
                                     </xf:group>
                                     <!-- Form -->
-                                    <xf:group ref="$form-query" class="fr-summary-search-item">
+                                    <xf:group ref="$form-query" class="fr-search-item">
                                         <xf:var name="control-name" value="@name"/>
                                         <xf:var
                                             name="label"
@@ -1368,7 +1368,7 @@
                                                         )
                                                     )
                                                 ]"
-                                            class="fr-summary-search-item {'fr-summary-search-item-wide'[$control-control = 'open-select1']}">
+                                            class="fr-search-item {'fr-search-item-wide'[$control-control = 'open-select1']}">
 
                                             <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
 
@@ -1495,7 +1495,7 @@
 
                                         <xf:group
                                             ref=".[$is-supported-control]"
-                                            class="fr-summary-bulk-edit-item {'fr-summary-bulk-edit-item-wide'[$is-open-select1]}">
+                                            class="fr-bulk-edit-item {'fr-bulk-edit-item-wide'[$is-open-select1]}">
 
                                             <xh:div class="fr-component-group">
 
@@ -1577,7 +1577,7 @@
                                                     name="apply-allowed"
                                                     value="$bulk-edit-enabled and (($control-required and normalize-space(.)!='') or not($control-required))"/>
 
-                                                <xf:trigger id="fr-bulk-edit-apply" appearance="xxf:mini" ref="if ($bulk-edit-enabled) then . else ''" class="fr-summary-bulk-apply">
+                                                <xf:trigger id="fr-bulk-edit-apply" appearance="xxf:mini" ref="if ($bulk-edit-enabled) then . else ''" class="fr-bulk-apply">
                                                     <xf:label ref="$fr-resources/summary/bulk-edit/apply"/>
                                                     <xf:action event="DOMActivate" if="$apply-allowed">
                                                         <xf:dispatch name="apply" targetid="fr-bulk-apply">
@@ -1608,10 +1608,10 @@
 
                     <xf:group ref="instance('fr-search-results-instance')" xxf:update="full">
 
-                        <xh:div class="fr-summary-table-div">
+                        <xh:div class="fr-search-results">
                             <xf:var name="have-drafts" value="exists(document[@draft = 'true'])"/>
                             <xf:var name="have-read-only" value="exists(document[not(xxf:split(@operations) = ('*', 'update'))])"/>
-                            <xf:var name="labels-class" value="string-join(('fr-summary-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
+                            <xf:var name="labels-class" value="string-join(('fr-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
                             <!-- One column for each detail -->
                             <xf:var name="detail-positions" value="instance('fr-search-instance')/query[@name and @summary-show = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
 
@@ -1627,9 +1627,9 @@
 
                             <xh:table class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
-                                <xh:thead class="{'summary-column-header', 'sortable-column'[$sort-supported], 'non-sortable-column'[not($sort-supported)]}">
+                                <xh:thead class="{'column-header', 'sortable-column'[$sort-supported], 'non-sortable-column'[not($sort-supported)]}">
                                     <xh:tr>
-                                        <xh:th class="fr-summary-repeat-selection-checkbox"/>
+                                        <xh:th class="fr-repeat-selection-checkbox"/>
                                         <xh:th class="{$labels-class}"/>
 
                                         <xf:repeat ref="$metadata-columns">
@@ -1640,7 +1640,7 @@
                                                     <xf:trigger appearance="minimal">
                                                         <xf:label>
                                                             <xf:output value="$fr-resources/summary/titles/*[local-name() = $column]"/>
-                                                            <span class="summary-column-caret">
+                                                            <span class="column-caret">
                                                                 <xf:output value="
                                                                     if      (instance('fr-order-by-instance')/column != $column or not($sort-supported)) then ''
                                                                     else if (instance('fr-order-by-instance')/direction = 'asc') then                         '&#x25B2;'
@@ -1670,7 +1670,7 @@
                                                         <xf:output
                                                             mediatype="text/html"
                                                             value="resources[@lang = xxf:instance('fr-language-instance')]/label"/>
-                                                        <span class="summary-column-caret">
+                                                        <span class="column-caret">
                                                             <xf:output value="
                                                                 if      (instance('fr-order-by-instance')/column != @path or not($sort-supported))   then ''
                                                                 else if (instance('fr-order-by-instance')/direction = 'asc') then                         '&#x25B2;'
@@ -1743,7 +1743,7 @@
                                                         ()"
                                             />
                                             <xh:tr class="{if (xxf:split(instance('fr-selection-instance')) = $current-document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
-                                                <xh:td class="fr-summary-repeat-selection-checkbox">
+                                                <xh:td class="fr-repeat-selection-checkbox">
                                                     <xf:select appearance="full" ref="instance('fr-selection-instance')" id="document-selection">
                                                         <xf:item>
                                                             <xf:label/>
@@ -1775,7 +1775,7 @@
                                                                 else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
                                                                 then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
                                                                 else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
-                                                    <xh:td class="fr-summary-created">
+                                                    <xh:td class="fr-created">
                                                         <xf:group ref=".[exists($current-document-href-opt)]">
                                                             <xh:a href="{$current-document-href-opt}">
                                                                 <xf:output value="$created"/>
@@ -1806,7 +1806,7 @@
                                                                 else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
                                                                 then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
                                                                 else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
-                                                    <xh:td class="fr-summary-modified">
+                                                    <xh:td class="fr-modified">
                                                         <xf:group ref=".[exists($current-document-href-opt)]">
                                                             <xh:a href="{$current-document-href-opt}">
                                                                 <xf:output value="$last-modified"/>
@@ -1862,7 +1862,7 @@
                                                     <xf:var name="detail-position" value="."/>
                                                     <!-- Set context to current detail -->
                                                     <xf:group context="$document/details/detail[$detail-position]" appearance="xxf:internal">
-                                                        <xh:td class="fr-summary-td {'fr-align-right'[instance('fr-search-instance')/query[@name][$detail-position]/@control = ('number', 'currency')]}">
+                                                        <xh:td class="fr-td {'fr-align-right'[instance('fr-search-instance')/query[@name][$detail-position]/@control = ('number', 'currency')]}">
                                                             <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
                                                             <xf:var
                                                                 name="detail"

@@ -1,0 +1,271 @@
+// Copyright (C) 2024 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../../../../../bootstrap-src/less/variables";
+@import (reference) "form-runner-common";
+
+@spacing: 10px; // same as .fr-border
+
+.orbeon {
+
+  .fr-top-fields, .fr-search-results {
+    display: block;
+    margin: 0 0 @spacing 0;
+  }
+
+  .fr-top-fields {
+
+    .fr-main-top-fields {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: @spacing;
+    }
+
+    .fr-search-free-input {
+      flex-grow: 1;
+      input {
+        width: 100%;
+        &[readonly] {
+          background-color: darken(@wellBackground, 5%);
+        }
+      }
+    }
+
+    .fr-search-options legend, .fr-bulk-edit legend {
+      width: auto;
+      border-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    .fr-search-options, .fr-bulk-edit {
+      display: flex;
+      flex-wrap: wrap;
+
+      border: 1px solid #e1e1e8;
+      border-radius: @baseBorderRadius;
+
+      background-color: white;
+
+      padding: 0 @spacing 0 @spacing; // there is enough padding from the controls at the bottom already
+      margin: @spacing 0;
+
+      .fr-search-item, .fr-bulk-edit-item {
+        display: inline-block;
+        padding: @spacing;
+        box-sizing: border-box;
+
+        width: 215px;
+
+        .xforms-label {
+          margin-bottom: 2px;
+          display: block;
+        }
+
+        input[type = "text"], select {
+          width: 100%;
+        }
+        .input-prepend, .input-append { display: flex; }
+
+        .xbl-fr-open-select1 select {
+          width: auto;
+        }
+
+        .xbl-fr-time .input-append .xforms-input .xforms-type-time {
+          background-image: none;
+        }
+
+        .xbl-component, .fr-bulk-apply button {
+          width: 100%;
+        }
+
+        .fr-bulk-apply button {
+          margin-top: 5px;
+        }
+      }
+
+      .fr-search-item.fr-search-item-wide, .fr-bulk-edit-item.fr-bulk-edit-item-wide {
+        width: 430px;
+      }
+
+      .date-range-group {
+        width: 300px;
+
+        .after-before-container {
+          margin-top: 5px;
+          display: flex;
+          column-gap: 10px;
+        }
+      }
+    }
+  }
+
+  .fr-search-results {
+
+    overflow: auto;
+    background: white;
+    border-collapse: collapse;
+
+    .alert  {
+      display: block;
+      margin: 0;
+    }
+
+    table {
+      margin-bottom: 0;
+      max-width: none;                                        // Because table can scrolls beyond size of container
+    }
+
+    thead.column-header {
+      &.sortable-column {
+        tr {
+          th {
+            button.btn-link {
+              &:hover, &:focus {
+                color: inherit;
+                background-color: #f9f9f9;
+                cursor: pointer;
+              }
+            }
+          }
+        }
+      }
+      &.non-sortable-column {
+        tr {
+          th {
+            button.btn-link {
+              &:hover, &:focus {
+                cursor: default;
+              }
+            }
+          }
+        }
+      }
+
+      tr {
+        th {
+          padding: 0;
+
+          // Override the style of a "minimal" button
+          button.btn-link {
+            border: 0;
+            padding: 4px 5px;
+            width: 100%;
+            vertical-align: middle;
+            color: inherit;
+            text-decoration: none;
+            box-shadow: none;
+
+            // Bold by default in Bootstrap and overridden to "normal" in form-runner-bootstrap-override.less
+            font-weight: 500;
+
+            div.xforms-output {
+              display: inline-block;
+            }
+
+            .column-caret {
+              display: inline-block;
+              width: 15px;
+              height: 15px;
+              text-align: center;
+              vertical-align: baseline;
+              font-size: 80%;
+            }
+          }
+        }
+      }
+    }
+
+    // We can't use .table-striped, as xf:repeat adds delimiters, so we do our own zebra-striping
+    tbody tr:nth-child(4n+3) > td {
+      background-color: @tableBackgroundAccent;
+    }
+
+    tbody {
+      // Links in table must appear as normal text
+      a, a:hover {
+        text-decoration: none;
+        color: @textColor;
+        outline: 0;
+      }
+    }
+
+    td, th {
+
+      &.fr-align-right {
+        text-align: right;
+      }
+
+      .xforms-output .xforms-output-output {
+        white-space: nowrap;
+      }
+
+      // https://github.com/orbeon/orbeon-forms/issues/2955
+      // https://www.w3schools.com/cssref/pr_class_display.asp
+      position: relative;
+
+      &> .xforms-group > a[href] {
+
+        display: inline;
+
+        &:after {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+        }
+      }
+    }
+
+    th {
+      white-space: nowrap;
+    }
+
+    .fr-td .xforms-output.xforms-mediatype-text-html .xforms-output-output {
+
+      div, ul, ol, li {
+        display: inline;
+      }
+
+      div[style] {
+        padding-left: 0.2em !important; // there can be an inline style for indent, like `style="padding-left: 40px;"`
+      }
+
+      ol, ul {
+        margin-left: 0;
+      }
+
+      li {
+        margin-left: 0.2em;
+      }
+    }
+
+    .fr-repeat-labels, .fr-created, .fr-modified {
+      .narrow-td();
+    }
+
+    .fr-repeat-selection-checkbox {
+      .fr-plain-checkbox-container();
+    }
+  }
+
+  // TODO: use same styling as in form-runner-home?
+  .pagination {
+    .fr-paging-numbers > span {
+      min-width: 105px; // try to allow at least 3 times 3 digits so the size doesn't change too much when paging
+      text-align: center;
+    }
+  }
+}

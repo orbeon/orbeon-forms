@@ -177,7 +177,7 @@ val copyJarToLiferayWar            = taskKey[Option[File]]("Copy JAR file to Lif
 val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version from system properties.")
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 
-lazy val scala213 = "2.13.14"
+lazy val scala213 = "2.13.15"
 lazy val scala3   = "3.5.1"
 lazy val mainScalaVersion       = scala213
 lazy val supportedScalaVersions = List(scala213)

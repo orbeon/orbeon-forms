@@ -209,8 +209,6 @@
                 <delete-confirmation>Confirm Deletion</delete-confirmation>
                 <document-id>Document Id</document-id>
                 <created>Created</created>
-                <modified>Modified</modified>
-                <last-modified>Modified</last-modified>
                 <workflow-stage>Workflow stage</workflow-stage>
                 <created-by>Created By</created-by>
                 <last-modified-by>Modified By</last-modified-by>
@@ -508,17 +506,11 @@
                 <publish-confirmation>Confirm Form Availability Change</publish-confirmation>
                 <credentials>Remote Server Credentials</credentials>
                 <status>Status</status>
-                <app>Application</app>
-                <form>Form</form>
-                <version>Version</version>
-                <title>Form Title</title>
                 <view>View</view>
                 <new>New</new>
                 <local>Local</local>
                 <remote>Remote</remote>
                 <form-identification>Form Identification</form-identification>
-                <modified>Modified</modified>
-                <last-modified>Last Modified</last-modified>
                 <reindexing-confirmation>Confirm Reindexing</reindexing-confirmation>
                 <reencrypt-confirmation>Confirm Re-encryption</reencrypt-confirmation>
                 <purge-confirmation>Confirm Purge</purge-confirmation>
@@ -707,8 +699,10 @@
         </authentication>
         <home-summary>
             <titles>
+                <modified>Modified</modified>
                 <application-name>Application Name</application-name>
                 <form-name>Form Name</form-name>
+                <version>Version</version>
                 <form-title>Form Title</form-title>
             </titles>
         </home-summary>
@@ -913,8 +907,6 @@
                 <delete-confirmation>Confirmer la suppression</delete-confirmation>
                 <document-id>Document Id</document-id>
                 <created>Création</created>
-                <modified>Modification</modified>
-                <last-modified>Modification</last-modified>
                 <workflow-stage>Étape du workflow</workflow-stage>
                 <created-by>Créé par</created-by>
                 <last-modified-by>Modifié par</last-modified-by>
@@ -1213,17 +1205,11 @@
                 <publish-confirmation>Confirmer le changement de disponibilité de formulaires</publish-confirmation>
                 <credentials>Autorisation du serveur distant</credentials>
                 <status>Status</status>
-                <app>Application</app>
-                <form>Formulaire</form>
-                <version>Version</version>
-                <title>Titre du formulaire</title>
                 <view>Voir</view>
                 <new>Nouveau</new>
                 <local>Local</local>
                 <remote>Distant</remote>
                 <form-identification>Identification du formulaire</form-identification>
-                <modified>Modification</modified>
-                <last-modified>Dernière modification</last-modified>
                 <reindexing-confirmation>Confirmer le réindexage</reindexing-confirmation>
                 <reencrypt-confirmation>Confirmer le recryptage</reencrypt-confirmation>
                 <purge-confirmation>Confirmer la purge</purge-confirmation>
@@ -1412,9 +1398,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Modification</modified>
+                <application-name>Application</application-name>
+                <form-name>Formulaire</form-name>
+                <version>Version</version>
+                <form-title>Titre du formulaire</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -1615,8 +1603,6 @@
                 <delete-confirmation>Confirma Eliminación</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
                 <created>Creado</created>
-                <modified>Modificación</modified>
-                <last-modified>Modificación</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
@@ -1913,17 +1899,11 @@
                 <publish-confirmation>Confirmar Publicación/Despublicación</publish-confirmation>
                 <credentials>Credenciales del Servidor Remoto</credentials>
                 <status>Estado</status>
-                <app>Aplicación</app>
-                <form>Formulario</form>
-                <version todo="true">[Version]</version>
-                <title>Título</title>
                 <view>Ver</view>
                 <new>Nuevo</new>
                 <local>Local</local>
                 <remote>Remoto</remote>
                 <form-identification>Identificación de Fomulario</form-identification>
-                <modified>Modificado</modified>
-                <last-modified todo="true">Modificado</last-modified>
                 <reindexing-confirmation>Confirmar Reindexación</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
@@ -2112,9 +2092,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Modificado</modified>
+                <application-name>Aplicación</application-name>
+                <form-name>Formulario</form-name>
+                <version>Versión</version>
+                <form-title>Título</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -2313,8 +2295,6 @@
                 <delete-confirmation>Confirma Eliminació</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
                 <created>Creat</created>
-                <modified>Modificació</modified>
-                <last-modified>Modificació</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by>Creat per</created-by>
                 <last-modified-by>Última modificació per</last-modified-by>
@@ -2627,17 +2607,11 @@
                 <publish-confirmation>Confirmar Publicació/Despublicació</publish-confirmation>
                 <credentials>Credencials del servidor remot</credentials>
                 <status>Estat</status>
-                <app>Aplicació</app>
-                <form>Formulari</form>
-                <version todo="true">Versió</version>
-                <title>Títol</title>
                 <view>Veure</view>
                 <new>Nou</new>
                 <local>Local</local>
                 <remote>Remot</remote>
                 <form-identification>Identificació del fomulari</form-identification>
-                <modified>Modificat</modified>
-                <last-modified todo="true">Modificat</last-modified>
                 <reindexing-confirmation>Confirmar reindexació</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
@@ -2837,9 +2811,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Modificat</modified>
+                <application-name>Aplicació</application-name>
+                <form-name>Formulari</form-name>
+                <version>Versió</version>
+                <form-title>Títol</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -3034,8 +3010,6 @@
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
                 <created>Opprettet</created>
-                <modified>Sist endret</modified>
-                <last-modified>Sist endret</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
@@ -3329,17 +3303,11 @@
                 <publish-confirmation>Bekreft skjemapublisering/Opphev skjemapublisering</publish-confirmation>
                 <credentials>Ekstern serverlegitimasjon</credentials>
                 <status>Status</status>
-                <app>App</app>
-                <form>Skjema</form>
-                <version>Versjon</version>
-                <title>Tittel</title>
                 <view>Visning</view>
                 <new>Ny</new>
                 <local>Lokalt</local>
                 <remote>På server</remote>
                 <form-identification>Skjemaindentifikasjon</form-identification>
-                <modified>Endret</modified>
-                <last-modified>Sist endret</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
@@ -3528,9 +3496,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Endret</modified>
+                <application-name>App</application-name>
+                <form-name>Skjema</form-name>
+                <version>Versjon</version>
+                <form-title>Tittel</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -3725,8 +3695,6 @@
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
                 <created>Дата создания</created>
-                <modified>Дата изменения</modified>
-                <last-modified>Дата изменения</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
@@ -4019,17 +3987,11 @@
                 <publish-confirmation todo="true">[Confirm Form Publish/Unpublish]</publish-confirmation>
                 <credentials todo="true">[Remote Server Credentials]</credentials>
                 <status todo="true">[Status]</status>
-                <app todo="true">[App]</app>
-                <form todo="true">[Form]</form>
-                <version todo="true">[Version]</version>
-                <title todo="true">[Form Title]</title>
                 <view todo="true">[View]</view>
                 <new todo="true">[New]</new>
                 <local todo="true">[Local]</local>
                 <remote todo="true">[Remote]</remote>
                 <form-identification todo="true">[Form Identification]</form-identification>
-                <modified todo="true">[Modified]</modified>
-                <last-modified todo="true">[Modified]</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
@@ -4218,8 +4180,10 @@
         </authentication>
         <home-summary>
             <titles>
+                <modified>Дата изменения</modified>
                 <application-name todo="true">[Application Name]</application-name>
                 <form-name todo="true">[Form Name]</form-name>
+                <version todo="true">[Version]</version>
                 <form-title todo="true">[Form Title]</form-title>
             </titles>
         </home-summary>
@@ -4421,8 +4385,6 @@
                 <delete-confirmation>Conferma cancella</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
                 <created>Creato</created>
-                <modified>Modificato</modified>
-                <last-modified>Modificato</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
@@ -4719,17 +4681,11 @@
                 <publish-confirmation todo="true">Conferma la pubblicazione o la annullazione della pubblicazione del modulo</publish-confirmation>
                 <credentials>Credenziali server remoto</credentials>
                 <status>Stato</status>
-                <app>Applicazione</app>
-                <form>Modulo</form>
-                <version todo="true">[Version]</version>
-                <title>Titolo</title>
                 <view>Vizualizza</view>
                 <new>Nuovo</new>
                 <local>Locale</local>
                 <remote>Remoto</remote>
                 <form-identification>Identificazione del modulo</form-identification>
-                <modified>Modificato</modified>
-                <last-modified todo="true">Modificato</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
@@ -4918,9 +4874,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Modificato</modified>
+                <application-name>Applicazione</application-name>
+                <form-name>Modulo</form-name>
+                <version todo="true">[Version]</version>
+                <form-title>Titolo</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -5121,8 +5079,6 @@
                 <delete-confirmation>Löschen bestätigen</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
                 <created>Erstellt</created>
-                <modified>Änderungsdatum</modified>
-                <last-modified>Änderungsdatum</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
@@ -5419,17 +5375,11 @@
                 <publish-confirmation todo="true">Veröffentlichen/Verbergen bestätigen</publish-confirmation>
                 <credentials>Remote-Server Anmeldeinformationen</credentials>
                 <status>Status</status>
-                <app>Anwendung</app>
-                <form>Formular</form>
-                <version todo="true">[Version]</version>
-                <title>Titel</title>
                 <view>Ansicht</view>
                 <new>Neu</new>
                 <local>Lokal</local>
                 <remote>Remote-System</remote>
                 <form-identification>Formular Identifikation</form-identification>
-                <modified>Geändert am</modified>
-                <last-modified todo="true">Geändert am</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
@@ -5618,9 +5568,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Geändert am</modified>
+                <application-name>Anwendung</application-name>
+                <form-name>Formular</form-name>
+                <version>Version</version>
+                <form-title>Titel</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -5821,8 +5773,6 @@
                 <delete-confirmation>Vahvista poistaminen</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
                 <created>Luotu</created>
-                <modified>Viimeksi muokattu</modified>
-                <last-modified>Viimeksi muokattu</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
@@ -6119,17 +6069,11 @@
                 <publish-confirmation>Vahvista lomakkeen julkaisu/julkaisun poisto</publish-confirmation>
                 <credentials>Etäpalvelimen tunnistetiedot</credentials>
                 <status>Tila</status>
-                <app>Sovellus</app>
-                <form>Lomake</form>
-                <version todo="true">[Version]</version>
-                <title>Otsikko</title>
                 <view>Näytä</view>
                 <new>Uusi</new>
                 <local>Paikallinen</local>
                 <remote>Etä</remote>
                 <form-identification>Lomakkeen tunnistetiedot</form-identification>
-                <modified>Muokattu</modified>
-                <last-modified todo="true">Muokattu</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
@@ -6318,9 +6262,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Muokattu</modified>
+                <application-name>Sovellus</application-name>
+                <form-name>Lomake</form-name>
+                <version todo="true">[Version]</version>
+                <form-title>Otsikko</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -6521,8 +6467,6 @@
                 <delete-confirmation>Bekräfta borttag</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
                 <created>Skapad</created>
-                <modified>Ändrad</modified>
-                <last-modified>Ändrad</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
@@ -6819,17 +6763,11 @@
                 <publish-confirmation>Bekräfta publicering/upphävande av publicering</publish-confirmation>
                 <credentials>Serverns identitet</credentials>
                 <status>Status</status>
-                <app>Område</app>
-                <form>Formulär</form>
-                <version todo="true">[Version]</version>
-                <title>Titel</title>
                 <view>Visa</view>
                 <new>Skapa</new>
                 <local>Lokalt</local>
                 <remote>På servern</remote>
                 <form-identification>Identifiering av formulär</form-identification>
-                <modified>Senast ändrad</modified>
-                <last-modified todo="true">Senast ändrad</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
@@ -7018,9 +6956,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Senast ändrad</modified>
+                <application-name>Område</application-name>
+                <form-name>Formulär</form-name>
+                <version todo="true">[Version]</version>
+                <form-title>Titel</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -7221,8 +7161,6 @@
                 <delete-confirmation>Verwijderen bevestigen</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
                 <created>Aangemaakt</created>
-                <modified>Bewerkt</modified>
-                <last-modified>Bewerkt</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
@@ -7519,17 +7457,11 @@
                 <publish-confirmation>Bevestigen publiceren/publicatie verwijderen</publish-confirmation>
                 <credentials>Accountgegevens externe server</credentials>
                 <status>Status</status>
-                <app>Applicatie</app>
-                <form>Form</form>
-                <version todo="true">[Version]</version>
-                <title>Titel</title>
                 <view>Weergave</view>
                 <new>Nieuw</new>
                 <local>Lokaal</local>
                 <remote>Extern</remote>
                 <form-identification>Form-identificatie</form-identification>
-                <modified>Bewerkt</modified>
-                <last-modified todo="true">Bewerkt</last-modified>
                 <reindexing-confirmation>Bevestigen herindexeren</reindexing-confirmation>
                 <reencrypt-confirmation>Bevestigen her-encryptie</reencrypt-confirmation>
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
@@ -7718,9 +7650,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Bewerkt</modified>
+                <application-name>Applicatie</application-name>
+                <form-name>Form</form-name>
+                <version todo="true">[Version]</version>
+                <form-title>Titel</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -7921,8 +7855,6 @@
                 <delete-confirmation>Deseja apagar</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
                 <created>Criado</created>
-                <modified>Modificado</modified>
-                <last-modified>Modificado</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
@@ -8219,17 +8151,11 @@
                 <publish-confirmation>Confirmar (Não)Publicação de Formulário</publish-confirmation>
                 <credentials>Credenciais do Servidor Remoto</credentials>
                 <status>Estado</status>
-                <app>Aplicação</app>
-                <form>Formulário</form>
-                <version todo="true">[Version]</version>
-                <title>Título</title>
                 <view>Ver</view>
                 <new>Novo</new>
                 <local>Local</local>
                 <remote>Remoto</remote>
                 <form-identification>Identificação do Formulário</form-identification>
-                <modified>Modificado</modified>
-                <last-modified todo="true">Modificado</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
@@ -8418,9 +8344,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Modificado</modified>
+                <application-name>Aplicação</application-name>
+                <form-name>Formulário</form-name>
+                <version todo="true">[Version]</version>
+                <form-title>Título</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -8615,8 +8543,6 @@
                 <delete-confirmation>Bekræft sletning</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
                 <created>Oprettet</created>
-                <modified>Senest ændret</modified>
-                <last-modified>Senest ændret</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
@@ -8910,17 +8836,11 @@
                 <publish-confirmation>Bekræft blanket-offentliggørelse/afpublisering</publish-confirmation>
                 <credentials>Akkreditiver for Central Server</credentials>
                 <status>Status</status>
-                <app>App</app>
-                <form>Blanket</form>
-                <version todo="true">[Version]</version>
-                <title>Titel</title>
                 <view>Visning</view>
                 <new>Ny</new>
                 <local>Lokal</local>
                 <remote>Central</remote>
                 <form-identification>Blanket-indentifikation</form-identification>
-                <modified>Ændret</modified>
-                <last-modified todo="true">Ændret</last-modified>
                 <reindexing-confirmation>Bekræft genindeksering</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
@@ -9109,9 +9029,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Ændret</modified>
+                <application-name>App</application-name>
+                <form-name>Blanket</form-name>
+                <version todo="true">[Version]</version>
+                <form-title>Titel</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -9312,8 +9234,6 @@
                 <delete-confirmation>Potwierdź usunięcie</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
                 <created>Utworzony</created>
-                <modified>Zmodyfikowany</modified>
-                <last-modified>Zmodyfikowany</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
                 <last-modified-by todo="true">[Modified By]</last-modified-by>
@@ -9610,17 +9530,11 @@
                 <publish-confirmation>Potwierdź publikację/cofnięcie publikacji formularza</publish-confirmation>
                 <credentials>Dane dostępowe do zdalnego serwera</credentials>
                 <status>Status</status>
-                <app>Aplikacja</app>
-                <form>Formularz</form>
-                <version todo="true">[Version]</version>
-                <title>Tytuł</title>
                 <view>Podgląd</view>
                 <new>Nowy</new>
                 <local>Lokalny</local>
                 <remote>Zdalny</remote>
                 <form-identification>Identyfikacja formularza</form-identification>
-                <modified>Zmodyfikowany</modified>
-                <last-modified todo="true">Zmodyfikowany</last-modified>
                 <reindexing-confirmation>Potwierdź reindeksację</reindexing-confirmation>
                 <reencrypt-confirmation>Potwierdź ponowne szyfrowanie</reencrypt-confirmation>
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
@@ -9809,9 +9723,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Zmodyfikowany</modified>
+                <application-name>Aplikacja</application-name>
+                <form-name>Formularz</form-name>
+                <version todo="true">[Version]</version>
+                <form-title>Tytuł</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -10012,8 +9928,6 @@
                 <delete-confirmation>Silmeyi Onayla</delete-confirmation>
                 <document-id>Belge Kimliği</document-id>
                 <created>Oluşturuldu</created>
-                <modified>Değiştirildi</modified>
-                <last-modified>Son Değiştirilme</last-modified>
                 <workflow-stage>İş akışı aşaması</workflow-stage>
                 <created-by>Oluşturan</created-by>
                 <last-modified-by>Değiştiren</last-modified-by>
@@ -10310,17 +10224,11 @@
                 <publish-confirmation>Form Kullanılabilirlik Değişikliğini Onayla</publish-confirmation>
                 <credentials>Uzak Sunucu Kimlik Bilgileri</credentials>
                 <status>Durum</status>
-                <app>Uygulama</app>
-                <form>Form</form>
-                <version>Sürüm</version>
-                <title>Form Başlığı</title>
                 <view>Görüntüle</view>
                 <new>Yeni</new>
                 <local>Yerel</local>
                 <remote>Uzak</remote>
                 <form-identification>Form Tanımlama</form-identification>
-                <modified>Değiştirildi</modified>
-                <last-modified>Son Değiştirilme</last-modified>
                 <reindexing-confirmation>Yeniden İndekslemeyi Onayla</reindexing-confirmation>
                 <reencrypt-confirmation>Yeniden Şifrelemeyi Onayla</reencrypt-confirmation>
                 <purge-confirmation>Temizlemeyi Onayla</purge-confirmation>
@@ -10509,9 +10417,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>Değiştirildi</modified>
+                <application-name>Uygulama</application-name>
+                <form-name>Form</form-name>
+                <version>Sürüm</version>
+                <form-title>Form Başlığı</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -10706,8 +10616,6 @@
                 <delete-confirmation>确认删除</delete-confirmation>
                 <document-id>文档ID</document-id>
                 <created>创建时间</created>
-                <modified>修改时间</modified>
-                <last-modified>最后修改时间</last-modified>
                 <workflow-stage>工作流阶段</workflow-stage>
                 <created-by>创建者</created-by>
                 <last-modified-by>最后修改者</last-modified-by>
@@ -11004,17 +10912,11 @@
                 <publish-confirmation>确认表单可用性更改</publish-confirmation>
                 <credentials>远程服务器凭证</credentials>
                 <status>状态</status>
-                <app>应用</app>
-                <form>表单</form>
-                <version>版本</version>
-                <title>表单标题</title>
                 <view>查看</view>
                 <new>新建</new>
                 <local>本地</local>
                 <remote>远程</remote>
                 <form-identification>表单识别</form-identification>
-                <modified>修改时间</modified>
-                <last-modified>最后修改时间</last-modified>
                 <reindexing-confirmation>确认重新索引</reindexing-confirmation>
                 <reencrypt-confirmation>确认重新加密</reencrypt-confirmation>
                 <purge-confirmation>确认清除</purge-confirmation>
@@ -11203,9 +11105,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>修改时间</modified>
+                <application-name>应用</application-name>
+                <form-name>表单</form-name>
+                <version>版本</version>
+                <form-title>表单标题</form-title>
             </titles>
         </home-summary>
     </resource>
@@ -11406,8 +11310,6 @@
                 <delete-confirmation>確認刪除</delete-confirmation>
                 <document-id>文檔ID</document-id>
                 <created>創建時間</created>
-                <modified>修改時間</modified>
-                <last-modified>最後修改時間</last-modified>
                 <workflow-stage>工作流階段</workflow-stage>
                 <created-by>創建者</created-by>
                 <last-modified-by>最後修改者</last-modified-by>
@@ -11704,17 +11606,11 @@
                 <publish-confirmation>確認表單可用性更改</publish-confirmation>
                 <credentials>遠程服務器憑證</credentials>
                 <status>狀態</status>
-                <app>應用</app>
-                <form>表單</form>
-                <version>版本</version>
-                <title>表單標題</title>
                 <view>查看</view>
                 <new>新建</new>
                 <local>本地</local>
                 <remote>遠程</remote>
                 <form-identification>表單識別</form-identification>
-                <modified>修改時間</modified>
-                <last-modified>最後修改時間</last-modified>
                 <reindexing-confirmation>確認重新索引</reindexing-confirmation>
                 <reencrypt-confirmation>確認重新加密</reencrypt-confirmation>
                 <purge-confirmation>確認清除</purge-confirmation>
@@ -11902,9 +11798,11 @@
         </authentication>
         <home-summary>
             <titles>
-                <application-name todo="true">[Application Name]</application-name>
-                <form-name todo="true">[Form Name]</form-name>
-                <form-title todo="true">[Form Title]</form-title>
+                <modified>修改時間</modified>
+                <application-name>應用</application-name>
+                <form-name>表單</form-name>
+                <version>版本</version>
+                <form-title>表單標題</form-title>
             </titles>
         </home-summary>
     </resource>

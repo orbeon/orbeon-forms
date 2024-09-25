@@ -1164,7 +1164,7 @@
 
                                     <xf:group ref="$search-options/last-modified" class="fr-search-item date-range-group">
                                         <xf:select1 id="last-modified-select" ref=".">
-                                            <xf:label ref="$fr-resources/summary/titles/last-modified"/>
+                                            <xf:label ref="$fr-resources/home-summary/titles/modified"/>
                                             <xf:item>
                                                 <xf:label ref="$fr-resources/summary/labels/any"/>
                                                 <xf:value/>
@@ -1237,17 +1237,17 @@
                                         <xh:th/>
                                         <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
                                     </xf:group>
-                                    <xh:th><xf:output value="$fr-resources/home/titles/modified"/></xh:th>
+                                    <xh:th><xf:output value="$fr-resources/home-summary/titles/modified"/></xh:th>
                                     <xf:group ref=".[$show-remote]">
                                         <xf:group ref=".[$show-permissions]">
                                             <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
                                         </xf:group>
-                                        <xh:th><xf:output value="$fr-resources/home/titles/modified"/></xh:th>
+                                        <xh:th><xf:output value="$fr-resources/home-summary/titles/modified"/></xh:th>
                                     </xf:group>
-                                    <xh:th><xf:output value="$fr-resources/home/titles/app"/></xh:th>
-                                    <xh:th><xf:output value="$fr-resources/home/titles/form"/></xh:th>
-                                    <xh:th class="fr-align-right"><xf:output value="$fr-resources/home/titles/version"/></xh:th>
-                                    <xh:th><xf:output value="$fr-resources/home/titles/title"/></xh:th>
+                                    <xh:th><xf:output value="$fr-resources/home-summary/titles/application-name"/></xh:th>
+                                    <xh:th><xf:output value="$fr-resources/home-summary/titles/form-name"/></xh:th>
+                                    <xh:th class="fr-align-right"><xf:output value="$fr-resources/home-summary/titles/version"/></xh:th>
+                                    <xh:th><xf:output value="$fr-resources/home-summary/titles/form-title"/></xh:th>
                                 </xh:tr>
                             </xh:thead>
                             <xh:tbody>

@@ -57,6 +57,10 @@
                     <fr:summary-show/>
                 </fr:index>
             </xf:output>
+            <xf:output id="screenshot-control" bind="screenshot-bind">
+                <xf:label ref="$form-resources/screenshot/label"/>
+                <fr:index/>
+            </xf:output>
             <!-- Expose property -->
             <xf:output
                 class="fb-tinymce-config"
@@ -574,6 +578,14 @@
                                             if="event('description-mediatype') = 'text/html'"
                                             context="bind('description-bind')"
                                             origin="xf:attribute('mediatype', 'text/html')"/>
+
+                                        <xf:delete
+                                            bind="screenshot-bind"/>
+                                        <xf:insert
+                                            if="xxf:non-blank(event('screenshot'))"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="xf:element('screenshot', event('screenshot'))"/>
 
                                         <!-- Add/remove singleton setting as needed -->
                                         <xf:delete

@@ -77,9 +77,6 @@
 
 
 
-                    <library-versions>
-                        <orbeon>3</orbeon>
-                    </library-versions>
                     <grid-tab-order>default</grid-tab-order>
                     <email>
                         <templates>

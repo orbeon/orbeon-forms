@@ -1,4 +1,4 @@
-<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:saxon="http://saxon.sf.net/" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
     <xh:head>
         <xh:title>Action to copy complex content</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
@@ -7,8 +7,7 @@
 
             <fr:listener version="2018.2" controls="copy-data-button" events="activated" actions="my-action"/>
 
-            <fr:listener version="2018.2" controls="copy-data-button-no-warning" events="activated"
-                         actions="my-action-no-warning"/>
+            <fr:listener version="2018.2" controls="copy-data-button-no-warning" events="activated" actions="my-action-no-warning"/>
 
             <fr:action name="my-action" version="2018.2">
                 <fr:copy-content warn="true">
@@ -28,7 +27,7 @@
                 </fr:copy-content>
             </fr:action>
 
-            <!-- Main instance -->
+
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                 <form>
                     <section-1>
@@ -74,7 +73,7 @@
                 </form>
             </xf:instance>
 
-            <!-- Bindings -->
+
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
                     <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
@@ -85,8 +84,7 @@
                         </xf:bind>
                     </xf:bind>
                     <xf:bind id="buttons-grid-bind" ref="buttons-grid" name="buttons-grid">
-                        <xf:bind id="non-repeated-control-bind" ref="non-repeated-control" name="non-repeated-control"
-                                 xxf:whitespace="trim"/>
+                        <xf:bind id="non-repeated-control-bind" ref="non-repeated-control" name="non-repeated-control" xxf:whitespace="trim"/>
 
 
 
@@ -104,13 +102,12 @@
                     </xf:bind>
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
                         <xf:bind id="copy-data-button-bind" ref="copy-data-button" name="copy-data-button"/>
-                        <xf:bind id="copy-data-button-no-warning-bind" ref="copy-data-button-no-warning"
-                                 name="copy-data-button-no-warning"/>
+                        <xf:bind id="copy-data-button-no-warning-bind" ref="copy-data-button-no-warning" name="copy-data-button-no-warning"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
 
-            <!-- Metadata -->
+
             <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <metadata>
                     <application-name>orbeon</application-name>
@@ -118,28 +115,16 @@
                     <title xml:lang="en">Action to copy complex content</title>
                     <description xml:lang="en">This form illustrates the use of the `&lt;fr:copy-content&gt;` action.</description>
                     <created-with-version>2023.1 PE</created-with-version>
-                    <library-versions>
-                        <orbeon>3</orbeon>
-                    </library-versions>
-                    <email>
-                        <templates>
-                            <template name="default">
-                                <headers/>
-                                <exclude-from-all-control-values/>
-                            </template>
-                        </templates>
-                        <parameters/>
-                    </email>
-                    <grid-tab-order>default</grid-tab-order>
-                <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "section-1/grid-1", "iteration-name": "grid-1-iteration" },{ "path": "section-2/grid-2", "iteration-name": "grid-2-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"buttons-grid"},"afterElem":{"value":"grid-1"},"content":[{"value":"non-repeated-control"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-3"},"afterElem":{"value":"grid-2"},"content":[{"value":"copy-data-button"},{"value":"copy-data-button-no-warning"}],"topLevel":true}]}</migration></metadata>
+
+                <screenshot>/fr/service/persistence/crud/orbeon/copy-action/form/2c828cbbd83a866832a0a4d8e374bcddabb52fd2.bin</screenshot><grid-tab-order>default</grid-tab-order><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "section-1/grid-1", "iteration-name": "grid-1-iteration" },{ "path": "section-2/grid-2", "iteration-name": "grid-2-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"buttons-grid"},"afterElem":{"value":"grid-1"},"content":[{"value":"non-repeated-control"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-3"},"afterElem":{"value":"grid-2"},"content":[{"value":"copy-data-button"},{"value":"copy-data-button-no-warning"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
 
-            <!-- Attachments -->
+
             <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
                 <attachments/>
             </xf:instance>
 
-            <!-- All form resources -->
+
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
@@ -196,21 +181,14 @@
                     </resource>
                 </resources>
             </xf:instance>
-            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-1-template"><grid-1-iteration>
-                <control-1/>
-                <control-2/>
-                <control-6/></grid-1-iteration></xf:instance>
-            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-2-template"><grid-2-iteration>
-                <control-3/>
-                <control-4/>
-                <control-5/>
-                <control-7/></grid-2-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-1-template"><grid-1-iteration><control-1/><control-2/><control-6/></grid-1-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-2-template"><grid-2-iteration><control-3/><control-4/><control-5/><control-7/></grid-2-iteration></xf:instance>
 
         </xf:model>
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="section-1-section" bind="section-1-bind">
                     <xf:label ref="$form-resources/section-1/label"/>
                     <fr:grid id="grid-1-grid" bind="grid-1-bind" repeat="content" min="1" template="instance('grid-1-template')" apply-defaults="true" fb:initial-iterations="first">

@@ -39,7 +39,7 @@
 
                 <!-- Save event context information in local instance -->
                 <xf:setvalue
-                    iterate="'app', 'form', 'title', 'description', 'singleton', 'mode', 'created-with-version'"
+                    iterate="'app', 'form', 'title', 'description', 'screenshot', 'singleton', 'mode', 'created-with-version'"
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
 
@@ -156,7 +156,7 @@
 
                 <!-- Initialize specific control settings -->
                 <!-- NOTE: Part of this is duplicated in `dialog-control-settings.xbl`. -->
-                <xf:action>
+                <xf:action if="$i/mode/string() != 'new'">
 
                     <xf:delete
                         ref="instance('dynamic')/* | instance('control-details-metadata')/*"/>
@@ -345,6 +345,7 @@
                         <xf:property name="title"                                  value="$i/title/string()"/>
                         <xf:property name="description"                            value="$i/description/string()"/>
                         <xf:property name="description-mediatype"                  value="if ($i/description/@isHTML = 'true') then 'text/html' else 'text/plain'"/>
+                        <xf:property name="screenshot"                             value="$i/screenshot/string()"/>
                         <xf:property name="singleton"                              value="$i/singleton/string()"/>
                         <xf:property name="attachment-max-size-per-file"           value="$i/attachment-max-size-per-file/string()"/>
                         <xf:property name="attachment-max-size-aggregate-per-form" value="$i/attachment-max-size-aggregate-per-form/string()"/>
@@ -425,6 +426,7 @@
                         <title/>
                         <description isHTML=""/>
                         <singleton/>
+                        <screenshot/>
                         <wizard/>
                         <wizard-mode/>
                         <wizard-subsections-nav/>

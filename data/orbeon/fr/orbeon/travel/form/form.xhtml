@@ -1,6 +1,6 @@
-<xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:saxon="http://saxon.sf.net/" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" fr:data-format-version="4.0.0">
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
     <xh:head>
-        <xh:title>Travel Form</xh:title>
+        <xh:title>Travel Form with Master-Detail</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                 <form>
@@ -46,7 +46,7 @@
                             <xf:bind id="traveler-name-readonly-bind" ref="traveler-name-readonly" name="traveler-name-readonly" xxf:whitespace="trim" readonly="true()"/>
                             <xf:bind id="traveler-birth-date-readonly-bind" ref="traveler-birth-date-readonly" name="traveler-birth-date-readonly" type="xf:date" readonly="true()"/>
                             <xf:bind id="frequent-traveler-number-bind" ref="frequent-traveler-number" name="frequent-traveler-number" xxf:whitespace="trim"/>
-                            <xf:bind id="gender-bind" ref="gender" name="gender" required="true()" />
+                            <xf:bind id="gender-bind" ref="gender" name="gender" required="true()"/>
                             <xf:bind id="meal-bind" ref="meal" name="meal" required="true()" xxf:default="'none'"/>
                             <xf:bind id="comment-bind" ref="comment" name="comment"/>
                         </xf:bind>
@@ -61,21 +61,19 @@
             <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
                 <metadata>
                     <application-name>orbeon</application-name>
+
+
+
                     <form-name>travel</form-name>
                     <title xml:lang="en">Travel Form with Master-Detail</title>
                     <description xml:lang="en">This form showcases Orbeon Forms's support for synchronized master-detail views, with paging and custom repetition labels in the wizard.</description>
                     <library-versions>
-                        <orbeon>1</orbeon>
+                        <_>1</_>
                     </library-versions>
-                    <wizard>true</wizard>
-                    <wizard-mode>strict</wizard-mode>
-                    <data-migration>enabled</data-migration>
-                    <updated-with-version>2019.1-SNAPSHOT PE</updated-with-version>
-                    <updated-with-version>2017.2-SNAPSHOT PE</updated-with-version>
-                    <updated-with-version>2021.1-SNAPSHOT PE</updated-with-version>
-                    <migration version="4.8.0">[{ "path": "master-section/master-grid", "iteration-name": "master-grid-iteration" }]</migration>
-                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"detail-section"},{"value":"detail-section-iteration"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"traveler-name-readonly"},{"value":"traveler-birth-date-readonly"},{"value":"frequent-traveler-number"},{"value":"gender"},{"value":"meal"},{"value":"comment"}],"topLevel":true},{"containerPath":[{"value":"confirmation"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"confirmation-message"}],"topLevel":true}]}</migration>
-                </metadata>
+
+
+
+                <screenshot>/fr/service/persistence/crud/orbeon/travel/form/36eb291fbd28434c99e3c01c831b7f7276248862.bin</screenshot><wizard>true</wizard><wizard-mode>strict</wizard-mode><data-migration>enabled</data-migration><grid-tab-order>default</grid-tab-order><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2019.1-SNAPSHOT PE</updated-with-version><updated-with-version>2017.2-SNAPSHOT PE</updated-with-version><updated-with-version>2021.1-SNAPSHOT PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "master-section/master-grid", "iteration-name": "master-grid-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"detail-section"},{"value":"detail-section-iteration"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"traveler-name-readonly"},{"value":"traveler-birth-date-readonly"},{"value":"frequent-traveler-number"},{"value":"gender"},{"value":"meal"},{"value":"comment"}],"topLevel":true},{"containerPath":[{"value":"confirmation"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"confirmation-message"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
                 <attachments>
@@ -185,24 +183,8 @@
                     </resource>
                 </resources>
             </xf:instance>
-            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="master-grid-template">
-                <master-grid-iteration>
-                    <traveler-name/>
-                    <traveler-birth-date/>
-                </master-grid-iteration>
-            </xf:instance>
-            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="detail-section-template">
-                <detail-section-iteration>
-                    <grid-3>
-                        <traveler-name-readonly/>
-                        <traveler-birth-date-readonly/>
-                        <frequent-traveler-number/>
-                        <gender/>
-                        <meal/>
-                        <comment/>
-                    </grid-3>
-                </detail-section-iteration>
-            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="master-grid-template"><master-grid-iteration><traveler-name/><traveler-birth-date/></master-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="detail-section-template"><detail-section-iteration><grid-3><traveler-name-readonly/><traveler-birth-date-readonly/><frequent-traveler-number/><gender/><meal/><comment/></grid-3></detail-section-iteration></xf:instance>
             <fr:synchronize-repeated-content left="master-grid" right="detail-section" version="2018.2">
                 <fr:map left="traveler-name" right="traveler-name-readonly"/>
                 <fr:map left="traveler-birth-date" right="traveler-birth-date-readonly"/>
@@ -214,11 +196,7 @@
             <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="master-section-section" bind="master-section-bind">
                     <xf:label ref="$form-resources/master-section/label"/>
-                    <fr:grid id="master-grid-grid" bind="master-grid-bind" repeat="content"
-                             template="instance('master-grid-template')"
-                             apply-defaults="true"
-                             fb:initial-iterations="first"
-                             number-rows="true">
+                    <fr:grid id="master-grid-grid" bind="master-grid-bind" repeat="content" template="instance('master-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true">
                         <fr:c x="1" y="1" w="9">
                             <xf:input id="traveler-name-control" bind="traveler-name-bind">
                                 <xf:label ref="$form-resources/traveler-name/label"/>

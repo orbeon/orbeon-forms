@@ -136,8 +136,10 @@
                     <description xml:lang="en">This form illustrates the use of the `&lt;fr:copy-content&gt;` action.</description>
                     <created-with-version>2023.1 PE</created-with-version>
                     <library-versions>
-                        <orbeon>3</orbeon>
+                        <_>1</_>
                     </library-versions>
+
+
                     <email>
                         <templates>
                             <template name="default">
@@ -147,6 +149,7 @@
                         </templates>
                         <parameters/>
                     </email>
+                    <screenshot>/fr/service/persistence/crud/orbeon/builder/data/4da83f8626b0e8f3f29ae554780c060312e04d02/2c828cbbd83a866832a0a4d8e374bcddabb52fd2.bin</screenshot>
                     <grid-tab-order>default</grid-tab-order>
                 </metadata>
             </xf:instance>
@@ -233,7 +236,7 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl"
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
                      xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="section-1-section" bind="section-1-bind">
                     <xf:label ref="$form-resources/section-1/label"/>

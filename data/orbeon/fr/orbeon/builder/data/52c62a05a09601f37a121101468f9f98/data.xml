@@ -2,7 +2,8 @@
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math">
     <xh:head>
         <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model"
                   xxf:help-tooltip="false"
@@ -188,20 +189,35 @@
                     <description xml:lang="en">Orbeon Forms Bookshelf is a simple form allowing you to gather information about books.</description>
                     <title xml:lang="fr">Orbeon Forms Bookshelf</title>
                     <description xml:lang="fr">Orbeon Forms Bookshelf présente un formulaire simple qui vous permet de saisir des informations sur des livres.</description>
+                    <library-versions>
+                        <_>1</_>
+                    </library-versions>
                     <email>
-                        <subject>
-                            <template xml:lang="en">Orbeon Forms Bookshelf form for `{$title}` by {$author}</template>
-                            <template xml:lang="fr">Formulaire Orbeon Forms Bookshelf pour `{$title}` par {$author}</template>
-                            <fr:param type="ControlValueParam">
-                                <fr:name>title</fr:name>
-                                <fr:controlName>title</fr:controlName>
-                            </fr:param>
-                            <fr:param type="ControlValueParam">
-                                <fr:name>author</fr:name>
-                                <fr:controlName>author</fr:controlName>
-                            </fr:param>
-                        </subject>
+                        <templates>
+                            <template name="default" xml:lang="en">
+                                <headers/>
+                                <subject>Orbeon Forms Bookshelf form for `{$title}` by {$author}</subject>
+                                <exclude-from-all-control-values/>
+                            </template>
+                            <template name="default" xml:lang="fr">
+                                <headers/>
+                                <subject>Formulaire Orbeon Forms Bookshelf pour `{$title}` par {$author}</subject>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters>
+                            <param type="ControlValueParam">
+                                <name>title</name>
+                                <controlName>title</controlName>
+                            </param>
+                            <param type="ControlValueParam">
+                                <name>author</name>
+                                <controlName>author</controlName>
+                            </param>
+                        </parameters>
                     </email>
+                    <screenshot>/fr/service/persistence/crud/orbeon/builder/data/52c62a05a09601f37a121101468f9f98/b4f1c56ecce4fff54846f20a3c869c8526fc631d.bin</screenshot>
+                    <grid-tab-order>default</grid-tab-order>
                 </metadata>
             </xf:instance>
 

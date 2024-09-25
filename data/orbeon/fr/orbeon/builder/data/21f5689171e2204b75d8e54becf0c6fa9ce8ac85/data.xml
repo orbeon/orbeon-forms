@@ -150,7 +150,21 @@
                     <description xml:lang="en">This is a remittance form for the Springfield PTA Council.</description>
                     <created-with-version>2022.1-SNAPSHOT PE</created-with-version>
                     <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version>
+                    <library-versions>
+                        <_>1</_>
+                    </library-versions>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                    <screenshot>/fr/service/persistence/crud/orbeon/builder/data/21f5689171e2204b75d8e54becf0c6fa9ce8ac85/ebf0f47edaff6cab6fab79000363b07f4c6b3338.bin</screenshot>
                     <data-migration>enabled</data-migration>
+                    <grid-tab-order>default</grid-tab-order>
                 </metadata>
             </xf:instance>
 

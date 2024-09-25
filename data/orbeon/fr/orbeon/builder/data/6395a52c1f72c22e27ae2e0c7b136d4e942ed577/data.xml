@@ -911,7 +911,7 @@
                     <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
                     <library-versions>
-                        <orbeon>1</orbeon>
+                        <_>1</_>
                     </library-versions>
                     <grid-markup>html-table</grid-markup>
 
@@ -926,6 +926,8 @@
                         </templates>
                         <parameters/>
                     </email>
+                    <screenshot>/fr/service/persistence/crud/orbeon/builder/data/6395a52c1f72c22e27ae2e0c7b136d4e942ed577/486c430112867e07d1db916eef15ac0fd9bde296.bin</screenshot>
+                    <grid-tab-order>default</grid-tab-order>
                 </metadata>
             </xf:instance>
 
@@ -1861,7 +1863,7 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl"
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
                      xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="section-section" bind="section-bind">
                     <xf:label ref="$form-resources/section/label"/>

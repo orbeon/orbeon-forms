@@ -329,7 +329,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     <updated-with-version>2022.1 PE</updated-with-version>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
                     <library-versions>
-                        <orbeon>1</orbeon>
+                        <_>1</_>
                         <_>1</_>
                     </library-versions>
                     <xbl>
@@ -348,6 +348,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </templates>
                         <parameters/>
                     </email>
+                    <screenshot>/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/9d6db6998461fe76ae4e9d453f7d26f5bafce443.bin</screenshot>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">

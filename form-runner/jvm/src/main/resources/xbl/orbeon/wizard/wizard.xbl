@@ -1568,7 +1568,7 @@
                             </xf:switch>
                             <xsl:if test="p:property(string-join(('oxf.fr.detail.captcha.location', $static-app, $static-form), '.')) = 'inside-wizard'">
                                 <xf:var name="fr-resources"><xxf:value xxbl:scope="outer" value="$fr-resources"/></xf:var>
-                                <fr:captcha id="fr-captcha" namespace-name="{frf:captchaComponent($static-app, $static-form)}"/>
+                                <fr:captcha id="fr-captcha" namespace-name="{@captcha-namespace-name}"/>
                             </xsl:if>
                         </xh:div>
                         <!-- In case the view contains elements other than sections (like dialogs) -->

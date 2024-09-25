@@ -439,11 +439,12 @@
                             <xsl:attribute name="validate" select="."/>
                         </xsl:for-each>
 
-                        <xsl:attribute name="subsections-nav" select="$wizard-subsections-nav"/>
-                        <xsl:attribute name="subsections-toc" select="$wizard-subsections-toc"/>
-                        <xsl:attribute name="separate-toc"    select="$wizard-separate-toc"/>
-                        <xsl:attribute name="section-status"  select="$wizard-section-status"/>
-                        <xsl:attribute name="full-update"     select="$wizard-full-update"/>
+                        <xsl:attribute name="subsections-nav"        select="$wizard-subsections-nav"/>
+                        <xsl:attribute name="subsections-toc"        select="$wizard-subsections-toc"/>
+                        <xsl:attribute name="separate-toc"           select="$wizard-separate-toc"/>
+                        <xsl:attribute name="section-status"         select="$wizard-section-status"/>
+                        <xsl:attribute name="full-update"            select="$wizard-full-update"/>
+                        <xsl:attribute name="captcha-namespace-name" select="frf:captchaComponent($app, $form)"/>
 
                         <!--
                             This is the `incremental|explicit` Form Runner validation mode, which is passed to the wizard but

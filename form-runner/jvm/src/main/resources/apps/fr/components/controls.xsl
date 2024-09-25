@@ -270,7 +270,13 @@
                             '.',
                             local-name(),
                             ''',''fr-form-resources'',',
-                            fr:build-template-param-map(fr:param, $library-name, false(), ()),
+                            fr:build-template-param-map(
+                                fr:param,
+                                $library-name,
+                                false(),                  (: for-pdf :)
+                                @mediatype = 'text/html', (: for-text-html-mediatype :)
+                                ()
+                            ),
                         ')'
                     )"/>
         </xsl:copy>

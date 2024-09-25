@@ -131,6 +131,7 @@
         <xsl:param name="params"                                as="element(*)*"/>
         <xsl:param name="library-name"                          as="xs:string?"/>
         <xsl:param name="for-pdf"                               as="xs:boolean"/>
+        <xsl:param name="for-text-html-mediatype"               as="xs:boolean"/>
         <xsl:param name="custom-css-class-to-control-names-map" as="element(_)?"/>
 
         <xsl:value-of
@@ -149,6 +150,7 @@
                                         if ($type = ('ExpressionParam', 'formula')) then
                                             fr:maybe-replace(
                                                 concat(
+                                                    if ($for-text-html-mediatype) then 'xxf:escape-xml-minimal(' else '',
                                                     'string((',
                                                     frf:replaceVarReferencesWithFunctionCalls(
                                                         $p/(*:expr, *:value)[1],
@@ -157,13 +159,15 @@
                                                         $library-name,
                                                         ()
                                                     ),
-                                                    ')[1])'
+                                                    ')[1])',
+                                                    if ($for-text-html-mediatype) then ')' else ''
                                                 ),
                                                 $for-pdf
                                             )
                                         else if ($type = ('ControlValueParam', 'control-value')) then
                                             fr:maybe-replace(
                                                 concat(
+                                                    if ($for-text-html-mediatype) then 'xxf:escape-xml-minimal(' else '',
                                                     'string((',
                                                     frf:replaceVarReferencesWithFunctionCalls(
                                                         $p/(*:controlName, *:control-name, *:controlCssClass, *:control-css-class)[1],
@@ -183,7 +187,8 @@
                                                         $library-name,
                                                         ()
                                                     ),
-                                                    ')[1])'
+                                                    ')[1])',
+                                                    if ($for-text-html-mediatype) then ')' else ''
                                                 ),
                                                 $for-pdf
                                             )

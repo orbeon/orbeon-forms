@@ -1445,6 +1445,7 @@
                                                     $pdf-header-footer-config-elem/parameters/*,
                                                     (),
                                                     true(),
+                                                    false(),
                                                     $custom-css-class-to-control-names-map
                                                 )
                                             }

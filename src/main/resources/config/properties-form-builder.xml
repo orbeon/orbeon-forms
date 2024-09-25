@@ -138,44 +138,134 @@
         navigate(uri = "/fr/orbeon/builder/new")
     </property>
 
+    <!-- TODO: Once we have `continue-with-*` actions, we can reduce some of the duplication in the properties below. -->
     <property as="xs:string"  name="oxf.fr.detail.process.excel-export.orbeon.builder">
-        xf:dispatch(name = "fb-excel-export")
+        if ("
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            return
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+        ") then (
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form") then
+            suspend then
+            xf:dispatch(name = "fb-excel-export")
+        ) else
+            xf:dispatch(name = "fb-excel-export")
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.xml-export.orbeon.builder">
-        xf:dispatch(name = "fb-xml-export")
+        if ("
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            return
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+        ") then (
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form") then
+            suspend then
+            xf:dispatch(name = "fb-xml-export")
+        ) else
+            xf:dispatch(name = "fb-xml-export")
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.form-definition-xhtml-export.orbeon.builder">
+        if ("
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            return
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+        ") then (
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form") then
+            suspend then
+            xf:show(
+                dialog = "fb-publish-dialog",
+                app    = "{xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/application-name}",
+                form   = "{xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/form-name}"
+            )
+        ) else
         xf:dispatch(name = "fb-form-definition-xhtml")
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.test.orbeon.builder">
-        xf:dispatch(name = "fb-test-form")
+        if ("
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            return
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+        ") then (
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form") then
+            suspend then
+            xf:dispatch(name = "fb-test-form")
+        ) else
+            xf:dispatch(name = "fb-test-form")
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.test-formulas.orbeon.builder">
-        xf:dispatch(name = "fb-test-formulas")
+        if ("
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            return
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+        ") then (
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form") then
+            suspend then
+            xf:dispatch(name = "fb-test-formulas")
+        ) else
+            xf:dispatch(name = "fb-test-formulas")
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.test-offline.orbeon.builder">
-        xf:dispatch(name = "fb-test-offline")
+        if ("
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            return
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+        ") then (
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form") then
+            suspend then
+            xf:dispatch(name = "fb-test-offline")
+        ) else
+            xf:dispatch(name = "fb-test-offline")
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.test-pdf.orbeon.builder">
-        xf:dispatch(name = "fb-test-pdf-show-dialog")
+        if ("
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            return
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+        ") then (
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form") then
+            suspend then
+            xf:dispatch(name = "fb-test-pdf-show-dialog")
+        ) else
+            xf:dispatch(name = "fb-test-pdf-show-dialog")
     </property>
 
-    <property as="xs:string"  name="oxf.fr.detail.process.publish.orbeon.builder">
-        xf:show(
-            dialog = "fb-publish-dialog",
-            app    = "{xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/application-name}",
-            form   = "{xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/form-name}"
-        )
+<property as="xs:string"  name="oxf.fr.detail.process.publish.orbeon.builder">
+        if ("
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            return
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+        ") then (
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form") then
+            suspend then
+            xf:show(
+                dialog = "fb-publish-dialog",
+                app    = "{xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/application-name}",
+                form   = "{xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/form-name}"
+            )
+        ) else
+            xf:show(
+                dialog = "fb-publish-dialog",
+                app    = "{xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/application-name}",
+                form   = "{xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/form-name}"
+            )
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.save.orbeon.builder">
-        save-final
+        if ("
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            return
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+        ") then (
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form") then
+            suspend then
+            save-final
+        ) else
+            save-final
     </property>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.appearance.orbeon.builder"           value=""/>

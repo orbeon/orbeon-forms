@@ -180,6 +180,8 @@
     <!-- Mode = "new": just annotate template -->
     <xf:action ev:event="fb-data-ready" if="$mode = 'new'">
 
+<!--        <xf:message>xxx data ready for new</xf:message>-->
+
         <!-- Point to template -->
         <xf:var name="template" value="instance('fr-form-instance')"/>
 

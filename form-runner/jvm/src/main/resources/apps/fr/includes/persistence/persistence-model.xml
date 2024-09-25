@@ -366,6 +366,7 @@
         </xf:action>
 
         <!-- Notify that the data is ready -->
+        <!-- 2024-09-24: No users of this event. -->
         <xf:dispatch targetid="fr-form-model" name="fr-data-ready"/>
 
     </xf:action>
@@ -744,32 +745,32 @@
         id="fr-get-document-submission"
         method="get"
         serialization="none"
-        resource="/fr/service/persistence/crud/{
-                $app
-            }/{
-                $form
-            }/{
-                event('data-or-draft')
-            }/{
-                $document
-            }/data.xml?data-format-version={
-
-                (: Tell the persistence layer the format we expect for the configured provider. This gives
-                   the persistence layer a chance to check that the format is compatible and throw an error
-                   if not. Later, once the persistence proxy can perform conversions, we will be able to
-                   directly request the format we need. See https://github.com/orbeon/orbeon-forms/issues/3110 :)
-
-                frp:providerDataFormatVersion($app, $form)
-            }{
-                let $token-param := xxf:get-request-parameter(frf:AccessTokenParam())
-                return
-                    if (xxf:non-blank($token-param)) then
-                        concat('&amp;', frf:AccessTokenParam(), '=', encode-for-uri($token-param))
-                    else
-                        ''
-            }"
+        resource="{
+            if (xxf:non-blank(event('document-url'))) then
+                event('document-url')
+            else
+                concat(
+                    frf:createFormDataBasePath($app, $form, event('data-or-draft') = 'draft', $document),
+                    '/data.xml?data-format-version=',
+                    (: Tell the persistence layer the format we expect for the configured provider. This gives
+                       the persistence layer a chance to check that the format is compatible and throw an error
+                       if not. Later, once the persistence proxy can perform conversions, we will be able to
+                       directly request the format we need. See https://github.com/orbeon/orbeon-forms/issues/3110 :)
+                    frp:providerDataFormatVersion($app, $form),
+                    let $token-param := xxf:get-request-parameter(frf:AccessTokenParam())
+                    return
+                        if (xxf:non-blank($token-param)) then
+                            concat('&amp;', frf:AccessTokenParam(), '=', encode-for-uri($token-param))
+                        else
+                            ''
+                )
+        }"
         replace="instance"
         xxf:instance="fr-form-instance">
+
+        <xf:action event="xforms-submit-error">
+            <xf:message level="xxf:log-error">Error loading document: <xf:output value="event('error-message')"/></xf:message>
+        </xf:action>
 
         <xf:action event="xforms-submit-done">
 
@@ -1072,6 +1073,7 @@
     <xf:bind ref="instance('fr-urls-instance')/*" type="xs:anyURI"/>
 
     <!-- React to issue loading the document. We consider this fatal. -->
+    <!-- TODO: What if this is called later, for example when loading a draft? Can it happen? -->
     <xf:action event="xforms-submit-error" target="fr-get-document-submission" type="xpath">
         frf:sendError((event('response-status-code'), 500)[1])
     </xf:action>

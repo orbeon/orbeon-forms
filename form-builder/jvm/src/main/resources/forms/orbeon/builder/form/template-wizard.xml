@@ -25,6 +25,10 @@
                         <grid-1/>
 
                     </section-1>
+                    <section-2>
+                        <grid-2/>
+
+                    </section-2>
                 </form>
             </xf:instance>
 
@@ -34,6 +38,10 @@
                     <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"/>
 
                 </xf:bind>
+                <xf:bind id="section-2-bind" name="section-2" ref="section-2">
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2"/>
+
+                </xf:bind>
             </xf:bind>
 
             <!-- Metadata -->
@@ -41,12 +49,16 @@
                 <metadata>
                     <application-name/>
                     <form-name/>
-                    <title xml:lang="">Untitled Form</title>
-                    <description xml:lang=""/>
-                    <grid-tab-order>default</grid-tab-order>
+                    <title xml:lang="en">Untitled Form</title>
+                    <description xml:lang="en"/>
+
                     <library-versions>
                         <_>1</_>
+                        <orbeon>3</orbeon>
                     </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
+                    <wizard>true</wizard>
+                    <grid-tab-order>default</grid-tab-order>
                     <email>
                         <templates>
                             <template name="default">
@@ -67,10 +79,13 @@
             <!-- All form resources -->
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
-                    <resource xml:lang="">
+                    <resource xml:lang="en">
                         <section-1>
-                            <label/>
+                            <label>Wizard page 1</label>
                         </section-1>
+                        <section-2>
+                            <label>Wizard page 2</label>
+                        </section-2>
 
                     </resource>
                 </resources>
@@ -83,7 +98,17 @@
             <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
                      xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
                     <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-2-section" bind="section-2-bind">
+                    <xf:label ref="$form-resources/section-2/label"/>
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind">
                         <fr:c y="1" x="1" w="6">
 
                             </fr:c>

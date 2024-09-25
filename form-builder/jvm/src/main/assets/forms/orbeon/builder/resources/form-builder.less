@@ -697,6 +697,65 @@ body.orbeon {
         width: 1010px; // larger so that tab titles in French, in particular, fit
         max-width: none;
 
+        .fb-settings-mode-new, .fb-settings-mode-app-form {
+            .nav-tabs {
+                display: none;
+            }
+            .tab-content {
+                border-top: 1px solid #ddd;
+                border-radius: @baseBorderRadius; // nicer when there are no tabs (arguably in all cases)
+            }
+        }
+
+        .fb-dialog-form-settings-fields {
+
+            div.fb-template-cards { // try to make stronger
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1em;
+                min-height: 190px;
+                max-height: 390px;
+                overflow-y: scroll;
+                padding: 5px; // so that selection outline/shadow is not clipped
+                justify-content: space-evenly;
+
+                & > span {
+                    display: none;
+                }
+
+                .fb-template-card {
+                    width: 150px;
+                    height: 170px;
+                    display: flex;
+                    flex-direction: column;
+                    white-space: nowrap;
+                    border: 1px solid #ddd;
+                    padding: .5em;
+                    border-radius: 10px;
+                    row-gap: 2px;
+
+                    &.xforms-repeat-selected-item-1 {
+                        border-color: @focusBorderColor;
+                        .focusDecorations();
+                    }
+
+                    .fb-template-title {
+                        overflow-x: hidden;
+                        text-overflow: ellipsis;
+                        //text-decoration: underline;
+                        text-align: center;
+                        min-height: 2em;
+                        border-bottom: 2px solid #ddd;
+                    }
+                    .fb-template-screenshot {
+                        img {
+                            margin: 0;
+                        }
+                    }
+                }
+            }
+        }
+
         .popover.xforms-help-popover {
             // Override `white-space: pre-wrap` which we set by default following
             // https://github.com/orbeon/orbeon-forms/issues/1618. That works for

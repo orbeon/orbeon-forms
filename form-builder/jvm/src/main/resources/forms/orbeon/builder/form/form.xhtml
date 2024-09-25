@@ -737,11 +737,27 @@
                                                     event('control-settings-elems')[exists(@*)]
                                                 )"/>
 
+                                        <!-- Load a specific form template to get started -->
+                                        <xf:send
+                                            if="event('mode') = 'new' and xxf:non-blank(event('template-url'))"
+                                            submission="fr-get-document-submission">
+                                            <xf:property name="data-or-draft" value="'data'"/>
+                                            <xf:property name="document-url"  value="event('template-url')"/>
+                                            <xf:property name="for"           value="'load-template'" xxf:tunnel="true"/>
+                                        </xf:send>
+
+                                    </xf:action>
+                                    <!-- Continuation of `fr-get-document-submission` after success loading the form template -->
+                                    <xf:action
+                                        observer="fr-get-document-submission"
+                                        event="xforms-submit-done"
+                                        if="event('for') = 'load-template'">
+                                        <xf:dispatch name="fb-data-ready" targetid="fr-form-model"/>
                                     </xf:action>
                                     <!-- Update app/form name if changed -->
                                     <xf:action
                                             event="fb-update-metadata"
-                                            if="bind('application-name-bind') != event('app') or bind('form-name-bind') != event('form')">
+                                            if="event('mode') = 'new' or bind('application-name-bind') != event('app') or bind('form-name-bind') != event('form')">
 
                                         <!-- Copy data to main instance -->
                                         <xf:setvalue ref="bind('application-name-bind')" value="event('app')"/>
@@ -752,21 +768,28 @@
                                             <xf:property name="deannotate" value="true()"/>
                                         </xf:dispatch>
                                     </xf:action>
-                                    <!-- "Save as" -->
+                                    <!--  *After* app/form name change, continue the process in `app-form` mode -->
                                     <xf:action
                                             event="fb-update-metadata"
-                                            if="event('mode') = 'save-as'">
-                                        <!-- Create new document id -->
-                                        <xf:setvalue
-                                            ref="xxf:instance('fr-parameters-instance')/document"
-                                            value="secure:randomHexId()"/>
-                                        <!-- Actually save -->
-                                        <xf:action type="xpath">
-                                            fbf:saveAs(
-                                                fr:document-id()
-                                            )
-                                        </xf:action>
+                                            if="event('mode') = 'app-form'"
+                                            type="xpath">
+                                        fr:run-process('oxf.fr.detail.process', 'resume')
                                     </xf:action>
+                                    <!-- "Save as" -->
+<!--                                    <xf:action-->
+<!--                                            event="fb-update-metadata"-->
+<!--                                            if="event('mode') = 'save-as'">-->
+<!--                                        &lt;!&ndash; Create new document id &ndash;&gt;-->
+<!--                                        <xf:setvalue-->
+<!--                                            ref="xxf:instance('fr-parameters-instance')/document"-->
+<!--                                            value="secure:randomHexId()"/>-->
+<!--                                        &lt;!&ndash; Actually save &ndash;&gt;-->
+<!--                                        <xf:action type="xpath">-->
+<!--                                            fbf:saveAs(-->
+<!--                                                fr:document-id()-->
+<!--                                            )-->
+<!--                                        </xf:action>-->
+<!--                                    </xf:action>-->
                                 </fb:dialog-form-settings>
 
                                 <fb:dialog-email-settings

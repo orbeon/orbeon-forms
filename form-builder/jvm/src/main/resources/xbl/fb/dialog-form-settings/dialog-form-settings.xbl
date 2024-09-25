@@ -43,6 +43,10 @@
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
 
+                <xf:var name="is-new-form"      value="$i/mode = 'new'"/>
+                <xf:var name="is-app-form"      value="$i/mode = 'app-form'"/>
+                <xf:var name="is-form-settings" value="not($is-new-form or $is-app-form)"/>
+
                 <xf:setvalue
                     ref="$i/description/@isHTML"
                     value="event('description-mediatype') = 'text/html'"/>
@@ -156,7 +160,7 @@
 
                 <!-- Initialize specific control settings -->
                 <!-- NOTE: Part of this is duplicated in `dialog-control-settings.xbl`. -->
-                <xf:action if="$i/mode/string() != 'new'">
+                <xf:action if="$is-form-settings">
 
                     <xf:delete
                         ref="instance('dynamic')/* | instance('control-details-metadata')/*"/>
@@ -276,9 +280,21 @@
                         iterate="$invalid-app-form"
                         control="fb-{name()}-name-input"/>
                     <xf:setfocus
-                        iterate="$invalid-app-form[1]"
-                        control="fb-{name()}-name-input"/>
+                        control="fb-general-settings-grid"/>
                 </xf:action>
+
+                <!-- Load form templates -->
+                <xf:send
+                    if="$is-new-form"
+                    submission="search-form-templates-submission"/>
+                <xf:setfocus
+                    if="$is-new-form"
+                    control="fb-templates-grid"/>
+
+                <!-- Necessary or the tab will not open -->
+                <xf:setfocus
+                    if="$is-app-form or $is-form-settings"
+                    control="fb-general-settings-grid"/>
 
             </xbl:handler>
 
@@ -290,7 +306,6 @@
                 <xf:action if="$i/@valid = 'true'">
 
                     <xf:var name="form" value="xxf:instance('fb-form-instance')"/>
-
 
                     <!-- Tell custom settings to apply changes -->
                     <xf:dispatch name="fb-apply" targetid="fb-custom-form-settings">
@@ -405,11 +420,24 @@
                                     ($subform//xf:instance/*)[1]
                         "/>
 
+                        <xf:property
+                            name="template-url"
+                            value="
+                                if ($i/mode/string() = 'new') then
+                                    instance('template-forms')/*[index('form-template-repeat')]/url/string()
+                                else
+                                    ()
+                        "/>
+
                     </xf:dispatch>
 
                     <!-- Don't leave this stuff around -->
+                    <!-- We don't need any of the templates (even builtin ones) -->
                     <xf:delete
-                        ref="instance('dynamic')/* | instance('control-details-metadata')/*"/>
+                        ref="
+                            instance('dynamic')/* |
+                            instance('control-details-metadata')/* |
+                            instance('template-forms')/*"/>
 
                     <!-- Hide this dialog -->
                     <xxf:hide dialog="dialog"/>
@@ -489,8 +517,8 @@
 
                 <xf:bind
                     ref="app | form"
-                    required="true()"
-                    constraint="matches(., '^[A-Za-z0-9\-_]+$') and xxf:max-length(255)"
+                    required="../mode = 'app-form'"
+                    constraint="xxf:is-blank() or matches(., '^[A-Za-z0-9\-_]+$') and xxf:max-length(255)"
                     xxf:whitespace="trim"
                     readonly="false()"/>
                 <xf:bind
@@ -521,7 +549,7 @@
                     type="xs:boolean"/>
                 <xf:bind
                     ref="mode"
-                    constraint=". = ('new', 'edit', 'save-as')"/>
+                    constraint=". = ('new', 'edit', 'app-form')"/>
                 <xf:bind
                     ref="data-migration"
                     relevant="fr:is-pe()"/>
@@ -557,6 +585,162 @@
                     <_ i="" dynamic=""/>
                 </xf:instance>
 
+                <xf:instance id="template-forms">
+                    <_>
+                        <_>
+                            <url>oxf:/forms/orbeon/builder/form/template.xml</url>
+                            <title>Blank Form</title>
+                            <description>Use this template to start from scratch.</description>
+                            <screenshot></screenshot>
+                        </_>
+                        <_>
+                            <url>oxf:/forms/orbeon/builder/form/template-wizard.xml</url>
+                            <title>Wizard Form</title>
+                            <description>This template is configured to use the Wizard view.</description>
+                            <screenshot></screenshot>
+                        </_>
+                    </_>
+                    <_/>
+                </xf:instance>
+
+                <xf:instance id="fr-search-instance">
+                    <search xmlns="" return-all-indexed-fields="true">
+                        <query/>
+                        <query name="application-name"
+                               path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/application-name"
+                               match="substring">orbeon</query>
+                        <query name="form-name"
+                               path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/form-name"
+                               match="substring"/>
+                        <query name="title"
+                               path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/title"
+                               match="substring"/>
+                        <query name="description"
+                               path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/description"
+                               match="substring"/>
+                        <query name="screenshot"
+                               path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/screenshot"
+                               match="substring">.bin</query>
+                        <page-size/>
+                        <page-number>1</page-number>
+                        <lang/>
+                    </search>
+                </xf:instance>
+
+                <xf:var
+                    name="page-size"
+                    value="100"/>
+
+                <xf:submission
+                    id="search-form-templates-submission"
+                    ref="instance('fr-search-instance')"
+                    validate="false"
+                    method="post"
+                    resource="/fr/service/persistence/search/orbeon/builder"
+                    replace="none"
+                    mode="asynchronous"
+                    xxf:response-must-await="200ms"
+                >
+
+                    <xf:header>
+                        <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                        <xf:value value="1"/>
+                    </xf:header>
+
+<!--                    <xf:setvalue-->
+<!--                        event="xforms-submit-error"-->
+<!--                        ref="instance('fr-landing-form-metadata-instance')/@state"-->
+<!--                        value="'error'"/>-->
+
+                    <!-- Set language upon submitting -->
+                    <xf:action event="xforms-submit">
+                        <xf:setvalue ref="page-size" value="$page-size + 1"/>
+                        <xf:setvalue ref="lang" value="'en'"/>
+                        <!-- NOTE: xxf:lang() doesn't seem to work here -->
+    <!--                    <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>-->
+<!--                        <xf:setvalue-->
+<!--                            ref="instance('fr-landing-form-builder-instance')/@state"-->
+<!--                            value="'loading'"/>-->
+                    </xf:action>
+
+                    <xf:action event="xforms-submit-done">
+                        <xf:insert
+                            context="instance('template-forms')"
+                            ref="*"
+                            origin="
+                                for $doc in
+                                    xxf:sort(
+                                        event('response-body')/*/document[
+                                            (: Exclude library forms :)
+                                            details/detail[ends-with(@path, '/form-name')] != 'library'
+                                        ],
+                                        (: Sort alphabetically by title :)
+                                        details/detail[ends-with(@path, '/title')],
+                                        'text',
+                                        'ascending'
+                                    )
+                                return
+                                    xf:element(
+                                        '_',
+                                        (
+                                            xf:element(
+                                                'url',
+                                                concat('/fr/service/persistence/crud/orbeon/builder/data/', $doc/@name, '/data.xml')
+                                            ),
+                                            xf:element(
+                                                'title',
+                                                $doc/details/detail[ends-with(@path, '/title')]/string()
+                                            ),
+                                            xf:element(
+                                                'description',
+                                                $doc/details/detail[ends-with(@path, '/description')]/string()
+                                            ),
+                                            xf:element(
+                                                'screenshot',
+                                                $doc/details/detail[ends-with(@path, '/screenshot')]/string()
+                                            )
+                                        )
+                                    )"/>
+                        <xf:setindex repeat="form-template-repeat" index="1"/>
+                    </xf:action>
+                </xf:submission>
+
+                <xf:submission
+                    id="read-demo-forms-submission"
+                    method="get"
+                    serialization="none"
+                    resource="/fr/service/persistence/form/orbeon?all-versions=false&amp;ignore-admin-permissions=true"
+                    replace="none"
+                    mode="asynchronous"
+                    xxf:response-must-await="200ms"
+                >
+
+<!--                    <xf:setvalue-->
+<!--                        event="xforms-submit"-->
+<!--                        ref="instance('fr-landing-demo-forms-instance')/@state"-->
+<!--                        value="'loading'"/>-->
+
+<!--                    <xf:setvalue-->
+<!--                        event="xforms-submit-error"-->
+<!--                        ref="instance('fr-landing-form-metadata-instance')/@state"-->
+<!--                        value="'error'"/>-->
+
+                    <!-- Sort alphabetically by title -->
+                    <xf:action event="xforms-submit-done">
+                        <xf:insert
+                            ref="instance('template-forms')"
+                            origin="
+                                xf:element('forms',
+                                    xxf:sort(
+                                        event('response-body')/*/form,
+                                        title[1],
+                                        'text',
+                                        'ascending'
+                                    )
+                                )"/>
+                    </xf:action>
+                </xf:submission>
+
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -567,22 +751,18 @@
                 <xf:var name="fr-resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=fr-resources-ref"/></xf:var>
 
                 <xf:var name="is-new-form"      value="$i/mode = 'new'"/>
-                <xf:var name="is-save-as"       value="$i/mode = 'save-as'"/>
-                <xf:var name="is-form-settings" value="not($is-new-form or $is-save-as)"/>
+                <xf:var name="is-app-form"      value="$i/mode = 'app-form'"/>
+                <xf:var name="is-form-settings" value="not($is-new-form or $is-app-form)"/>
 
                 <!-- Once AVTs are supported: close="{not($is-new-form)}"  -->
                 <xxf:dialog id="dialog" close="false" class="fb-dialog-form-settings">
                     <!-- Dialog title -->
                     <xf:label
                         value="
-                            $resources/dialog-form-settings/(
-                                if ($is-new-form) then
-                                    ()
-                                else if ($is-save-as) then
-                                    save-as
-                                else
-                                    label
-                            )"/>
+                            if ($is-new-form) then
+                                ()
+                            else
+                                $resources/dialog-form-settings/label"/>
 
                     <!-- Expose mode to CSS -->
                     <xh:div class="fb-settings-mode-{{mode}}">
@@ -612,25 +792,35 @@
                         <xh:img src="/forms/orbeon/builder/images/label_64.png" alt=""/>
 
                         <fr:tabbable id="fb-tabbable" class="fb-dialog-form-settings-fields">
-                            <fr:tab>
-                                <fr:label ref="$resources/general-settings"/>
+                            <fr:tab visible="$is-new-form">
 
-                                <xf:var
-                                    name="message"
-                                    value="
-                                        if ($is-new-form) then
-                                            $resources/messages/new-metadata-output
-                                        else if ($is-save-as) then
-                                            $resources/messages/save-as-metadata-output
-                                        else
-                                            $resources/messages/edit-metadata-output
-                                "/>
-                                <xf:group ref=".[xxf:non-blank($message)]" xxf:element="p" class="alert alert-info">
-                                    <xf:output value="$message"/>
-                                </xf:group>
+                                <xh:p class="alert alert-info">
+                                    <xf:output value="$resources/messages/select-template-output"/>
+                                </xh:p>
 
-                                <fr:grid>
-                                    <fr:c x="1" y="1" w="6" h="1">
+                                <fr:grid id="fb-templates-grid">
+                                    <fr:c x="1" y="1" w="12" h="1">
+                                        <xh:div class="fb-template-cards">
+                                            <xf:repeat ref="instance('template-forms')/*" id="form-template-repeat">
+                                                <xh:div class="fb-template-card" title="{{title}}" tabindex="0">
+                                                    <xf:output class="fb-template-title" value="title"/>
+                                                    <xf:output class="fb-template-screenshot" mediatype="image/*" ref="screenshot[xxf:non-blank()]"/>
+                                                </xh:div>
+                                            </xf:repeat>
+                                        </xh:div>
+                                    </fr:c>
+                                </fr:grid>
+
+                            </fr:tab>
+                            <fr:tab visible="$is-app-form or $is-form-settings">
+                                <fr:label ref="$resources/general-settings[$is-form-settings]"/>
+
+                                <xh:p class="alert alert-{{if ($is-form-settings) then 'info' else 'error'}}">
+                                    <xf:output value="$resources/messages/new-metadata-output"/>
+                                </xh:p>
+
+                                <fr:grid id="fb-general-settings-grid">
+                                    <fr:c x="1" y="1" w="3" h="1">
                                         <!-- Application name -->
                                         <!-- Use an input if app name is a wildcard -->
                                         <xf:input ref="app[$app-chooser = 'input']" id="fb-app-name-input" xxf:autocomplete="off" autofocus="true">
@@ -652,7 +842,7 @@
                                             <xf:label ref="$resources/application-name/label"/>
                                         </xf:output>
                                     </fr:c>
-                                    <fr:c x="7" y="1" w="6" h="1">
+                                    <fr:c x="4" y="1" w="3" h="1">
                                         <!-- Form name -->
                                         <xf:input ref="form" id="fb-form-name-input" xxf:autocomplete="off">
                                             <xf:label ref="$resources/form-name/label"/>
@@ -661,7 +851,7 @@
                                             <xf:alert ref="$resources/form-name/alert"/>
                                         </xf:input>
                                     </fr:c>
-                                    <fr:c x="1" y="2" w="12" h="1">
+                                    <fr:c x="7" y="1" w="6" h="1">
                                         <!-- Title -->
                                         <xf:input ref="title" id="fb-title-input" xxf:autocomplete="off">
                                             <xf:label ref="$resources/title/label"/>
@@ -669,12 +859,7 @@
                                             <xf:alert ref="$resources/title/alert"/>
                                         </xf:input>
                                     </fr:c>
-                                    <fr:c x="1" y="4" w="12" h="1">
-                                        <fr:checkbox-input ref="description/@isHTML" appearance="full">
-                                            <xf:label ref="$resources/dialog-control-settings/use-html"/>
-                                        </fr:checkbox-input>
-                                    </fr:c>
-                                    <fr:c x="1" y="3" w="12" h="1">
+                                    <fr:c x="1" y="2" w="12" h="1">
                                         <xf:var name="is-html" value="description/@isHTML = 'true'"/>
                                         <xf:textarea ref="description[not($is-html)]" id="fb-description-textarea">
                                             <xf:label ref="$resources/description/label"/>
@@ -686,6 +871,11 @@
                                             <xf:hint ref="$resources/description/hint"/>
                                             <xf:alert ref="$resources/description/alert"/>
                                         </xf:textarea>
+                                    </fr:c>
+                                    <fr:c x="1" y="3" w="12" h="1">
+                                        <fr:checkbox-input ref="description/@isHTML" appearance="full">
+                                            <xf:label ref="$resources/dialog-control-settings/use-html"/>
+                                        </fr:checkbox-input>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>
@@ -1171,7 +1361,7 @@
                     <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
                     <xh:div class="fr-dialog-buttons" xml:space="preserve">
                         <xf:trigger id="fb-metadata-continue-trigger" appearance="xxf:primary">
-                            <xf:label mediatype="text/html" value="$resources/(if ($is-new-form) then continue else apply)/label"/>
+                            <xf:label mediatype="text/html" value="$resources/(if ($is-new-form or $is-app-form) then continue else apply)/label"/>
                         </xf:trigger>
                         <xf:output value="$resources/or/label"/>
                         <xf:trigger appearance="minimal">

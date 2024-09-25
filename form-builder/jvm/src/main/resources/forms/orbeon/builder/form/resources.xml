@@ -1387,8 +1387,8 @@
             <delete-action>Are you sure you want to delete action "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} will be deleted.</controls-will-be-deleted>
             <metadata-edit-title>Form Metadata</metadata-edit-title>
-            <new-metadata-output>Please provide an application and form name to identify your form. You can easily change those later.</new-metadata-output>
-            <edit-metadata-output/>
+            <select-template-output>Please select a form template to use as a starting point.</select-template-output>
+            <new-metadata-output>Please provide an application and form name to identify your form.</new-metadata-output>
             <save-as-metadata-output>Enter a new application name and form name to be used for the copy of this form:</save-as-metadata-output>
             <xpath-errors>There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} formula errors} in your form.</xpath-errors>
             <lhha-checkbox>Mark this checkbox if you'd like to type HTML tags</lhha-checkbox>
@@ -2792,8 +2792,8 @@
             <delete-action>Etes-vous sûr de vouloir supprimer l''action "{0}" ?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Aucun contrôle ne sera supprimé.|1#1 contrôle sera supprimé.|1&lt;{0,number,integer} contrôles seront supprimés.}</controls-will-be-deleted>
             <metadata-edit-title>Métadonnées</metadata-edit-title>
-            <new-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire. Vous pourrez les changer plus tard.</new-metadata-output>
-            <edit-metadata-output/>
+            <select-template-output>Veuillez sélectionner un modèle de formulaire comme point de départ.</select-template-output>
+            <new-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire.</new-metadata-output>
             <save-as-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire qui sera utilisé pour la copie de ce formulaire:</save-as-metadata-output>
             <xpath-errors>Il y a {0,choice,1#une erreur|1&lt;{0,number,integer} erreurs} XPath dans votre formulaire.</xpath-errors>
             <lhha-checkbox>Cochez cette case si vous souhaitez saisir des balises HTML</lhha-checkbox>
@@ -4207,8 +4207,8 @@
             <delete-action todo="true">Er du sikker på at du ønsker å slette handlingen "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ingen kontroller|1#1 kontroll|1&lt;{0,number,integer} kontroller} vil slettes.</controls-will-be-deleted>
             <metadata-edit-title>Metadata for skjemaet</metadata-edit-title>
-            <new-metadata-output>Angi et applikasjons- og et skjemanavn som vil brukes for å identifisere skjemaet (de kan endres senere).</new-metadata-output>
-            <edit-metadata-output/>
+            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <new-metadata-output>Angi et applikasjons- og et skjemanavn som vil brukes for å identifisere skjemaet.</new-metadata-output>
             <save-as-metadata-output todo="true">[Enter a new application name and form name to be used for the copy of this form:]</save-as-metadata-output>
             <xpath-errors todo="true">[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} errors} in your form.]</xpath-errors>
             <lhha-checkbox todo="true">[Mark this checkbox if you'd like to type HTML tags]</lhha-checkbox>
@@ -5621,8 +5621,8 @@
             <delete-action todo="true">Вы уверены, что хотите удалить действие "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Нет элементов для удаления.|1#1 элемент будет удален.|1&lt;{0,number,integer} элемента будут удалены.}</controls-will-be-deleted>
             <metadata-edit-title>Описание формы</metadata-edit-title>
-            <new-metadata-output>Задайте название приложения и название формы. (При необходимости их можно будет изменить потом.)</new-metadata-output>
-            <edit-metadata-output/>
+            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <new-metadata-output>Задайте название приложения и название формы.</new-metadata-output>
             <save-as-metadata-output>Задайте название приложения и название формы, куда необходимо сохранить данную форму:</save-as-metadata-output>
             <xpath-errors todo="true">[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} errors} in your form.]</xpath-errors>
             <lhha-checkbox todo="true">[Mark this checkbox if you'd like to type HTML tags]</lhha-checkbox>
@@ -7000,8 +7000,8 @@
             <delete-action>Sei sicuro di voler cancellare l''azione "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Nessun controllo verrà cancellato.|1#1 controllo verrà cancellato.|1&lt;{0,number,integer} controlli verranno cancellati.}</controls-will-be-deleted>
             <metadata-edit-title>metadati del modulo</metadata-edit-title>
-            <new-metadata-output>Si prega di fornire un nome per l'applicazione e per il modulo, che saranno utilizzati per identificare il tuo modulo (è possibile cambiarli più tardi).</new-metadata-output>
-            <edit-metadata-output/>
+            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <new-metadata-output>Si prega di fornire un nome per l'applicazione e per il modulo, che saranno utilizzati per identificare il tuo modulo.</new-metadata-output>
             <save-as-metadata-output>Inserisci un nuovo nome per l'applicazione e per il modulo che saranno usati per la copia di questo modulo:</save-as-metadata-output>
             <xpath-errors>{0,choice,1# Un errore XPath è stato trovato |1&lt; {0,number,integer} errori sono stati trovati} nel tuo modulo.</xpath-errors>
             <lhha-checkbox>Contrassegna questa casella se vuoi usare tag HTML</lhha-checkbox>
@@ -8380,8 +8380,8 @@
             <delete-action>Sind Sie sicher, dass Sie Aktion "{0}" löschen wollen?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Kein Steuerelement wird|1#1 Steuerelement wird|1&lt;{0,number,integer} Steuerelemente werden} gelöscht werden.</controls-will-be-deleted>
             <metadata-edit-title>Formularmetadaten</metadata-edit-title>
-            <new-metadata-output>Geben Sie einen Anwendungstitel und einen Formulartitel ein, welche für die Identifizierung Ihres Formulars verwendet werden (Sie können sie auch später ändern).</new-metadata-output>
-            <edit-metadata-output/>
+            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <new-metadata-output>Geben Sie einen Anwendungstitel und einen Formulartitel ein, welche für die Identifizierung Ihres Formulars verwendet werden.</new-metadata-output>
             <save-as-metadata-output>Geben Sie einen neuen Anwendungstitel und Formulartitel ein, welche für die Kopie dieses Formulars verwendet werden:
             </save-as-metadata-output>
             <xpath-errors>{0,choice,1#Ein XPath Fehler|1&lt;{0,number,integer} XPath Fehler} im Formular.</xpath-errors>
@@ -9790,8 +9790,8 @@
             <delete-action todo="true">Haluatko varmasti poistaa toiminnon "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ei ohjaimia|1#1 ohjain|1&lt;{0,number,integer} ohjainta} poistetaan.</controls-will-be-deleted>
             <metadata-edit-title>Lomakkeen metatiedot</metadata-edit-title>
-            <new-metadata-output>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen (voit muuttaa näitä myöhemmin).</new-metadata-output>
-            <edit-metadata-output/>
+            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <new-metadata-output>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen.</new-metadata-output>
             <save-as-metadata-output>Syötä uusi nimi sekä sovellukselle että lomakkeelle. Näitä käytetään tämän lomakkeen kopiota varten:</save-as-metadata-output>
             <xpath-errors>Lomakkeestasi löytyi {0,choice,1#yksi XPath virhe|1&lt; {0,number,integer} XPath virhettä}.</xpath-errors>
             <lhha-checkbox>Merkkaa tämä valintaruutu jos haluat kirjoittaa HTML-tageja</lhha-checkbox>
@@ -11197,8 +11197,8 @@
             <delete-action todo="true">Está seguro de eliminar la Acción "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} serán eliminados.</controls-will-be-deleted>
             <metadata-edit-title>Metadata del Formulario</metadata-edit-title>
-            <new-metadata-output>Por favor ingrese nombre de aplicación y de formulario, que serán usados para identificar su formulario (se pueden ingresar más adelante).</new-metadata-output>
-            <edit-metadata-output/>
+            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <new-metadata-output>Por favor ingrese nombre de aplicación y de formulario, que serán usados para identificar su formulario.</new-metadata-output>
             <save-as-metadata-output>Ingrese el nombre de la nueva apliación y formulario ha ser usado para copiar este formulario:</save-as-metadata-output>
             <xpath-errors>Hay {0,choice,1#is one XPath error|1&lt;are {0,number,integer} formula errors} en su formulario.</xpath-errors>
             <lhha-checkbox>Marque el checkbox si quiere ingresar etiquetas HTML</lhha-checkbox>
@@ -12584,8 +12584,8 @@
             <delete-action todo="true">Weet u zeker dat u de actie wilt verwijderen "{0}"?</delete-action>
             <controls-will-be-deleted>Er {0,choice,0#worden geen controls|1#wordt 1 control|1&lt;worden {0,number,integer} controls} verwijderd.</controls-will-be-deleted>
             <metadata-edit-title>Form metagegevens</metadata-edit-title>
-            <new-metadata-output>Geef de applicatienaam en formnaam op, die worden gebruikt ter identificatie van uw form (u kunt deze later nog wijzigen).</new-metadata-output>
-            <edit-metadata-output/>
+            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <new-metadata-output>Geef de applicatienaam en formnaam op, die worden gebruikt ter identificatie van uw form.</new-metadata-output>
             <save-as-metadata-output>Voer een nieuwe applicatienaam en formnaam in die worden gebruikt voor de kopie van dit form:</save-as-metadata-output>
             <xpath-errors>Er {0,choice,1#is een XPath fout|1&lt;zijn {0,number,integer} XPath fouten} in uw form.</xpath-errors>
             <lhha-checkbox>Activeer deze optie als u HTML tags wilt gebruiken</lhha-checkbox>
@@ -13998,8 +13998,8 @@
             <delete-action todo="true">Tem a certeza que deseja remover a acção "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Nenhum controlo será apagado|1#1 controlo será apagado|1&lt;{0,number,integer} controlos serão apagados} .</controls-will-be-deleted>
             <metadata-edit-title>Meta-dados do formulário</metadata-edit-title>
-            <new-metadata-output>Por favor forneça um nome para a aplicação e para o formulário que serão usados para identificar o seu formulário(ambos podem ser alterados posteriormente).</new-metadata-output>
-            <edit-metadata-output/>
+            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <new-metadata-output>Por favor forneça um nome para a aplicação e para o formulário que serão usados para identificar o seu formulário.</new-metadata-output>
             <save-as-metadata-output>Introduza um novo nome de aplicação e um nome de formulário para ser usado para cópia deste formulário:</save-as-metadata-output>
             <xpath-errors> {0,choice,1#Existe um erro de XPath |1&lt;Existem {0,number,integer} erros de XPath} no seu formulário.</xpath-errors>
             <lhha-checkbox>Seleccione esta checkbox se gostaria introduzir tags de HTML</lhha-checkbox>
@@ -15413,8 +15413,8 @@
             <delete-action todo="true">Bekräfta att du vill ta bort detta kommando "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ingen kontroll|1#1 kontroll|1&lt;{0,number,integer} kontroller} kommer att tas bort.</controls-will-be-deleted>
             <metadata-edit-title>Metadata</metadata-edit-title>
-            <new-metadata-output>Var god definiera namn på område och formulär. De kommer att användas för att identifiera formuläret (men går även att ändra senare).</new-metadata-output>
-            <edit-metadata-output/>
+            <select-template-output todo="true">Please select a form template to use as a starting point.</select-template-output>
+            <new-metadata-output>Var god definiera namn på område och formulär. De kommer att användas för att identifiera formuläret.</new-metadata-output>
             <save-as-metadata-output>Var god definiera namn på område och formulär att användas för kopian av formuläret:</save-as-metadata-output>
             <xpath-errors>Det finns {0,choice,1#ett XPath-fel|1&lt;{0,number,integer} XPath-fel} i formuläret.</xpath-errors>
             <lhha-checkbox>Kryssa denna ruta om du vill skriva HTML-taggar</lhha-checkbox>

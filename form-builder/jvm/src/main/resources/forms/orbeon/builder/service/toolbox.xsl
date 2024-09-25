@@ -19,8 +19,9 @@
             xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
             xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
-    <xsl:variable name="app"  as="xs:string" select="doc('input:request')/*/parameters/parameter[name = 'application']/value"/>
-    <xsl:variable name="form" as="xs:string" select="doc('input:request')/*/parameters/parameter[name = 'form']/value"/>
+    <!-- Support missing app/form parameters so we can load a toolbox just after selecting a form template -->
+    <xsl:variable name="app"  as="xs:string" select="(doc('input:request')/*/parameters/parameter[name = 'application']/value[p:non-blank()]/string(), '*')[1]"/>
+    <xsl:variable name="form" as="xs:string" select="(doc('input:request')/*/parameters/parameter[name = 'form']/value[p:non-blank()]/string(), '*')[1]"/>
 
     <!-- Find group names, e.g. "text", "selection", etc. -->
     <xsl:variable name="property-names" select="p:properties-start-with('oxf.fb.toolbox.group')" as="xs:string*" />

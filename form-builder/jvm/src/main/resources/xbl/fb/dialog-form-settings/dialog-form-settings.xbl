@@ -286,7 +286,13 @@
                 <!-- Load form templates -->
                 <xf:send
                     if="$is-new-form"
-                    submission="search-form-templates-submission"/>
+                    submission="search-form-templates-submission">
+                    <!-- Pass a string as we don't support sequences in tunnel parameters yet -->
+                    <xf:property
+                        name="remaining-app-names"
+                        value="if ($app-chooser = 'select1') then string-join($allowed-apps-if-has-roles, ' ') else ()"
+                        xxf:tunnel="true"/>
+                </xf:send>
                 <xf:setfocus
                     if="$is-new-form"
                     control="fb-templates-grid"/>
@@ -664,6 +670,14 @@
 
                     <!-- Set language upon submitting -->
                     <xf:action event="xforms-submit">
+                        <xf:setvalue
+                            ref="query[@name = 'application-name']"
+                            value="
+                                if (exists(event('remaining-app-names'))) then
+                                    xxf:split(event('remaining-app-names'))[1]
+                                else
+                                    ''"/>
+
                         <xf:setvalue ref="page-size" value="$page-size + 1"/>
                         <xf:setvalue ref="lang" value="'en'"/>
                         <!-- NOTE: xxf:lang() doesn't seem to work here -->
@@ -712,6 +726,22 @@
                                         )
                                     )"/>
                         <xf:setindex repeat="form-template-repeat" index="1"/>
+                        <xf:var
+                            name="remaining-app-names"
+                            value="
+                                if (exists(event('remaining-app-names'))) then
+                                    xxf:split(event('remaining-app-names'))[position() gt 1]
+                                else
+                                    ()"/>
+                        <xf:send
+                            if="exists($remaining-app-names)"
+                            submission="search-form-templates-submission">
+                            <!-- Pass a string as we don't support sequences in tunnel parameters yet -->
+                            <xf:property
+                                name="remaining-app-names"
+                                value="string-join($remaining-app-names, ' ')"
+                                xxf:tunnel="true"/>
+                        </xf:send>
                     </xf:action>
                 </xf:submission>
 

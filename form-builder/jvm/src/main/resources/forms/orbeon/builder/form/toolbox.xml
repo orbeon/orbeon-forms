@@ -53,6 +53,7 @@
                             <xf:property name="description"                               value="bind('description-bind')"/>
                             <xf:property name="description-mediatype"                     value="bind('description-bind')/@mediatype/string()"/>
                             <xf:property name="screenshot"                                value="bind('screenshot-bind')"/>
+                            <xf:property name="allow-template-use"                        value="bind('allow-template-use-bind')"/>
                             <xf:property name="created-with-version"                      value="bind('created-with-version-bind')"/>
                             <xf:property name="updated-with-versions"                     value="bind('metadata-bind')/updated-with-version/string()"/>
                             <xf:property name="singleton"                                 value="bind('singleton-bind')"/>

@@ -61,6 +61,10 @@
                 <xf:label ref="$form-resources/screenshot/label"/>
                 <fr:index/>
             </xf:output>
+            <xf:output id="allow-template-use-control" bind="allow-template-use-bind">
+                <xf:label ref="$form-resources/allow-template-use/label"/>
+                <fr:index/>
+            </xf:output>
             <!-- Expose property -->
             <xf:output
                 class="fb-tinymce-config"
@@ -586,6 +590,14 @@
                                             context="bind('metadata-bind')"
                                             ref="*"
                                             origin="xf:element('screenshot', event('screenshot'))"/>
+                                        <!-- Add/remove allow-template-use setting as needed -->
+                                        <xf:delete
+                                            bind="allow-template-use-bind"/>
+                                        <xf:insert
+                                            if="event('allow-template-use') = 'true'"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="xf:element('allow-template-use', event('allow-template-use'))"/>
 
                                         <!-- Add/remove singleton setting as needed -->
                                         <xf:delete
@@ -752,6 +764,10 @@
                                         observer="fr-get-document-submission"
                                         event="xforms-submit-done"
                                         if="event('for') = 'load-template'">
+                                        <!-- Don't enable the new form to be a template! -->
+                                        <xf:delete
+                                            bind="allow-template-use-bind"/>
+                                        <!-- Continue data setup -->
                                         <xf:dispatch name="fb-data-ready" targetid="fr-form-model"/>
                                     </xf:action>
                                     <!-- Update app/form name if changed -->

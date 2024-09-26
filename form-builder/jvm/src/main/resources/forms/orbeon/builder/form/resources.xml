@@ -381,6 +381,10 @@
                 <label>Singleton Form</label>
                 <hint>Only allow one accessible instance of form data for this form definition</hint>
             </singleton>
+            <allow-template-use>
+                <label>Allow use as form template</label>
+                <hint>If selected, this form will show in the list of form templates</hint>
+            </allow-template-use>
             <wizard>
                 <label>Wizard View</label>
                 <hint>Show top-level sections as separate wizard pages</hint>
@@ -1785,6 +1789,10 @@
                 <label>Formulaire singleton</label>
                 <hint> Ne permet qu'une instance de données accessible par l'utilisateur pour ce formulaire</hint>
             </singleton>
+            <allow-template-use>
+                <label>Permet l'usage comme modèle de formulaire</label>
+                <hint>Si sélectionné, ce formulaire sera montré dans la liste des modèles de formulaires</hint>
+            </allow-template-use>
             <wizard>
                 <label>Vue "wizard"</label>
                 <hint>Montrer les sections de premier niveau dans des pages de wizard séparées</hint>
@@ -3172,6 +3180,10 @@
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
             </singleton>
+            <allow-template-use>
+                <label todo="true">Allow use as form template</label>
+                <hint todo="true">If selected, this form will show in the list of form templates</hint>
+            </allow-template-use>
             <wizard>
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
@@ -4587,6 +4599,10 @@
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
             </singleton>
+            <allow-template-use>
+                <label todo="true">Allow use as form template</label>
+                <hint todo="true">If selected, this form will show in the list of form templates</hint>
+            </allow-template-use>
             <wizard>
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
@@ -6002,6 +6018,10 @@
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
             </singleton>
+            <allow-template-use>
+                <label todo="true">Allow use as form template</label>
+                <hint todo="true">If selected, this form will show in the list of form templates</hint>
+            </allow-template-use>
             <wizard>
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
@@ -7381,6 +7401,10 @@
                 <label>Nur eine einzige Formularinstanz erlauben</label>
                 <hint>Verhindert, dass Benutzer weitere Formulare dieses Typs erstellen, wenn sie bereits Zugriff auf ein Formular dieses Typs haben</hint>
             </singleton>
+            <allow-template-use>
+                <label todo="true">Allow use as form template</label>
+                <hint todo="true">If selected, this form will show in the list of form templates</hint>
+            </allow-template-use>
             <wizard>
                 <label>Wizard-Ansicht</label>
                 <hint>Zeigt die Haupt-Abschnitte als einzelne Seiten zum durchblättern</hint>
@@ -8763,6 +8787,10 @@
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
             </singleton>
+            <allow-template-use>
+                <label todo="true">Allow use as form template</label>
+                <hint todo="true">If selected, this form will show in the list of form templates</hint>
+            </allow-template-use>
             <wizard>
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
@@ -10170,6 +10198,10 @@
                 <label>Es Formulario único</label>
                 <hint>Impide que los usuarios ingresen nuevos formularios si existen formularios ingresados.</hint>
             </singleton>
+            <allow-template-use>
+                <label todo="true">Allow use as form template</label>
+                <hint todo="true">If selected, this form will show in the list of form templates</hint>
+            </allow-template-use>
             <wizard>
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
@@ -11578,6 +11610,10 @@
                 <label>Singleton form</label>
                 <hint>Sta slechts één toegankelijke instantie van de formgegevens toe voor deze formdefinitie</hint>
             </singleton>
+            <allow-template-use>
+                <label todo="true">Allow use as form template</label>
+                <hint todo="true">If selected, this form will show in the list of form templates</hint>
+            </allow-template-use>
             <wizard>
                 <label>Wizard weergave</label>
                 <hint>Of de bovenste secties als separate wizardpagina's moeten worden weergegeven</hint>
@@ -12965,6 +13001,10 @@
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
             </singleton>
+            <allow-template-use>
+                <label todo="true">Allow use as form template</label>
+                <hint todo="true">If selected, this form will show in the list of form templates</hint>
+            </allow-template-use>
             <wizard>
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
@@ -14379,6 +14419,10 @@
                 <label>Singulärt formulär</label>
                 <hint>Användare kan inte skapa ytterligare ifyllda formulär om de har tillgång något ifyllt formulär av denna typ</hint>
             </singleton>
+            <allow-template-use>
+                <label todo="true">Allow use as form template</label>
+                <hint todo="true">If selected, this form will show in the list of form templates</hint>
+            </allow-template-use>
             <wizard>
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>

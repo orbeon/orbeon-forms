@@ -408,6 +408,7 @@
                 <xf:property name="description"                               value="($requested-description, bind('description-bind'))[1]"/>
                 <xf:property name="description-mediatype"                     value="(if (exists($requested-description)) then 'text/plain' else (), bind('description-bind')/@mediatype/string())[1]"/>
                 <xf:property name="screenshot"                                value="bind('screenshot-bind')"/>
+                <xf:property name="allow-template-use"                        value="bind('allow-template-use-bind')"/>
                 <xf:property name="created-with-version"                      value="bind('created-with-version-bind')"/>
                 <xf:property name="updated-with-versions"                     value="bind('metadata-bind')/updated-with-version/string()"/>
                 <xf:property name="singleton"                                 value="bind('singleton-bind')"/>
@@ -449,6 +450,7 @@
                 <xf:property name="description"                               value="($requested-description, bind('description-bind'))[1]"/>
                 <xf:property name="description-mediatype"                     value="(if (exists($requested-description)) then 'text/plain' else (), bind('description-bind')/@mediatype/string())[1]"/>
                 <xf:property name="screenshot"                                value="bind('screenshot-bind')"/>
+                <xf:property name="allow-template-use"                        value="bind('allow-template-use-bind')"/>
                 <xf:property name="created-with-version"                      value="bind('created-with-version-bind')"/>
                 <xf:property name="updated-with-versions"                     value="bind('metadata-bind')/updated-with-version/string()"/>
                 <xf:property name="singleton"                                 value="bind('singleton-bind')"/>
@@ -491,6 +493,7 @@
                     <xf:bind id="title-bind"                      ref="title[@xml:lang = $fb-lang]"/>
                     <xf:bind id="description-bind"                ref="description[@xml:lang = $fb-lang]"/>
                     <xf:bind id="screenshot-bind"                 ref="screenshot"/>
+                    <xf:bind id="allow-template-use-bind"         ref="allow-template-use"/>
                     <xf:bind id="created-with-version-bind"       ref="created-with-version"/>
                     <xf:bind id="singleton-bind"                  ref="singleton"/>
                     <xf:bind id="wizard-bind"                     ref="wizard"/>

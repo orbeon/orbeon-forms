@@ -39,7 +39,7 @@
 
                 <!-- Save event context information in local instance -->
                 <xf:setvalue
-                    iterate="'app', 'form', 'title', 'description', 'screenshot', 'singleton', 'mode', 'created-with-version'"
+                    iterate="'app', 'form', 'title', 'description', 'screenshot', 'allow-template-use', 'singleton', 'mode', 'created-with-version'"
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
 
@@ -361,6 +361,7 @@
                         <xf:property name="description"                            value="$i/description/string()"/>
                         <xf:property name="description-mediatype"                  value="if ($i/description/@isHTML = 'true') then 'text/html' else 'text/plain'"/>
                         <xf:property name="screenshot"                             value="$i/screenshot/string()"/>
+                        <xf:property name="allow-template-use"                     value="$i/allow-template-use/string()"/>
                         <xf:property name="singleton"                              value="$i/singleton/string()"/>
                         <xf:property name="attachment-max-size-per-file"           value="$i/attachment-max-size-per-file/string()"/>
                         <xf:property name="attachment-max-size-aggregate-per-form" value="$i/attachment-max-size-aggregate-per-form/string()"/>
@@ -455,6 +456,7 @@
                         <description isHTML=""/>
                         <singleton/>
                         <screenshot/>
+                        <allow-template-use/>
                         <wizard/>
                         <wizard-mode/>
                         <wizard-subsections-nav/>
@@ -529,6 +531,11 @@
                     constraint="not($has-roles and not($allowed-apps-if-has-roles = ('*', .)))"/>
                 <xf:bind
                     ref="singleton"
+                    calculate="if (string() = '') then 'false' else ."
+                    readonly="false()"
+                    type="xs:boolean"/>
+                <xf:bind
+                    ref="allow-template-use"
                     calculate="if (string() = '') then 'false' else ."
                     readonly="false()"
                     type="xs:boolean"/>
@@ -608,7 +615,7 @@
                         <query/>
                         <query name="application-name"
                                path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/application-name"
-                               match="substring">orbeon</query>
+                               match="substring"/>
                         <query name="form-name"
                                path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/form-name"
                                match="substring"/>
@@ -620,7 +627,10 @@
                                match="substring"/>
                         <query name="screenshot"
                                path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/screenshot"
-                               match="substring">.bin</query>
+                               match="substring"/>
+                        <query name="screenshot"
+                               path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/allow-template-use"
+                               match="exact">true</query>
                         <page-size/>
                         <page-number>1</page-number>
                         <lang/>
@@ -890,6 +900,12 @@
                                             <fr:checkbox-input ref="singleton" id="fb-singleton-input">
                                                 <xf:label ref="$resources/dialog-form-settings/singleton/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/singleton/hint"/>
+                                            </fr:checkbox-input>
+                                        </xh:td>
+                                        <xh:td>
+                                            <fr:checkbox-input ref="allow-template-use" id="fb-allow-template-use-input">
+                                                <xf:label ref="$resources/dialog-form-settings/allow-template-use/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/allow-template-use/hint"/>
                                             </fr:checkbox-input>
                                         </xh:td>
                                     </xh:tr>

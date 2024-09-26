@@ -45,7 +45,7 @@ trait XFormsActions {
   private val StandardDispatchParams = Set("name", "targetid")
   private val StandardDialogParams   = Set("dialog")
 
-  private def collectCustomProperties(params: ActionParams, standardParamNames: Set[String]) = params.collect {
+  private def collectCustomProperties(params: ActionParams, standardParamNames: Set[String]): Map[String, Option[String]] = params.collect {
     case (Some(name), value) if ! standardParamNames(name) => name -> Option(evaluateValueTemplate(value))
   }
 

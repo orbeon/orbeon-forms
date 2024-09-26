@@ -73,7 +73,7 @@ object MatchType {
     override val string = "substring"
     override def satisfies[T](formValue: T, queryValue: T, metadata: Metadata[?]): Boolean =
       (formValue, queryValue) match {
-        case (formValue: String, queryValue: String) => formValue.contains(queryValue)
+        case (formValue: String, queryValue: String) => formValue.toLowerCase.contains(queryValue.toLowerCase)
         case _                                       => throwInvalidType(metadata)
       }
   }
@@ -81,15 +81,22 @@ object MatchType {
   object Exact              extends MatchType {
     override val string = "exact"
     override def satisfies[T](formValue: T, queryValue: T, metadata: Metadata[?]): Boolean =
-      formValue == queryValue
+      (formValue, queryValue) match {
+        case (formValue: String, queryValue: String) => formValue.toLowerCase == queryValue.toLowerCase
+        case _                                       => formValue == queryValue
+      }
   }
 
   object Token              extends MatchType {
     override val string = "token"
     override def satisfies[T](formValue: T, queryValue: T, metadata: Metadata[?]): Boolean =
       (formValue, queryValue) match {
-        case (formValue: List[String @unchecked], queryValue: List[String @unchecked]) => queryValue.forall(formValue.contains)
-        case _                                                                         => throwInvalidType(metadata)
+        case (formValues: List[String @unchecked], queryValues: List[String @unchecked]) =>
+          val lowerCaseFormValues = formValues.map(_.toLowerCase)
+          queryValues.forall(value => lowerCaseFormValues.contains(value.toLowerCase))
+
+        case _ =>
+          throwInvalidType(metadata)
       }
   }
 

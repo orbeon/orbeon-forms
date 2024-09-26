@@ -60,6 +60,18 @@
       padding: 0 @spacing 0 @spacing; // there is enough padding from the controls at the bottom already
       margin: @spacing 0;
 
+      &.root-fieldset span.local-or-remote-switch {
+        display: flex;
+
+        fieldset:not(:last-of-type) {
+          margin-right: 10px;
+        }
+
+        fieldset:last-of-type {
+          margin-right: 0;
+        }
+      }
+
       .fr-search-item, .fr-bulk-edit-item {
         display: inline-block;
         padding: @spacing;

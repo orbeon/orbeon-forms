@@ -543,74 +543,11 @@
                 frf:sendError(403)
             </xf:action>
 
-            <!-- Logic to convert date ranges (today, yesterday, etc. + custom dates) into actual date/time ranges for search -->
-            <xf:action event="fr-set-search-dates">
-                <xf:var name="src-range"  value="instance('fr-metadata-search-instance')/*[local-name() = event('src-range')]"/>
-                <xf:var name="src-after"  value="instance('fr-metadata-search-instance')/*[local-name() = event('src-after')]"/>
-                <xf:var name="src-before" value="instance('fr-metadata-search-instance')/*[local-name() = event('src-before')]"/>
-                <xf:var name="dst-gte"    value="instance('fr-search-instance')/query[@metadata = event('dst-metadata') and @match = 'gte']"/>
-                <xf:var name="dst-lt"     value="instance('fr-search-instance')/query[@metadata = event('dst-metadata') and @match = 'lt']"/>
+            <!-- Date range search logic -->
+            <xi:include href="../home-view/date-range-search.xhtml"/>
 
-                <xf:var name="start-of-tomorrow" value="xs:dateTime(xs:date(current-dateTime())) + xs:dayTimeDuration('P1D')"/>
-
-                <xf:action if="$src-range = ''">
-                    <!-- Any -->
-                    <xf:setvalue ref="$dst-gte"/>
-                    <xf:setvalue ref="$dst-lt"/>
-                </xf:action>
-                <xf:action if="$src-range = 'today'">
-                    <!-- Today = [ tomorrow - 1 day, tomorrow [ -->
-                    <xf:setvalue ref="$dst-gte" value="$start-of-tomorrow - xs:dayTimeDuration('P1D')"/>
-                    <xf:setvalue ref="$dst-lt"  value="$start-of-tomorrow"/>
-                </xf:action>
-                <xf:action if="$src-range = 'yesterday'">
-                    <!-- Yesterday = [ tomorrow - 2 days, tomorrow - 1 day [ -->
-                    <xf:setvalue ref="$dst-gte" value="$start-of-tomorrow - xs:dayTimeDuration('P2D')"/>
-                    <xf:setvalue ref="$dst-lt"  value="$start-of-tomorrow - xs:dayTimeDuration('P1D')"/>
-                </xf:action>
-                <xf:action if="$src-range = 'last-7-days'">
-                    <!-- Last 7 days = [ tomorrow - 7 days, tomorrow [ -->
-                    <xf:setvalue ref="$dst-gte" value="$start-of-tomorrow - xs:dayTimeDuration('P7D')"/>
-                    <xf:setvalue ref="$dst-lt"  value="$start-of-tomorrow"/>
-                </xf:action>
-                <xf:action if="$src-range = 'last-30-days'">
-                    <!-- Last 30 days = [ tomorrow - 30 days, tomorrow [ -->
-                    <xf:setvalue ref="$dst-gte" value="$start-of-tomorrow - xs:dayTimeDuration('P30D')"/>
-                    <xf:setvalue ref="$dst-lt"  value="$start-of-tomorrow"/>
-                </xf:action>
-                <xf:action if="$src-range = 'last-90-days'">
-                    <!-- Last 90 days = [ tomorrow - 90 days, tomorrow [ -->
-                    <xf:setvalue ref="$dst-gte" value="$start-of-tomorrow - xs:dayTimeDuration('P90D')"/>
-                    <xf:setvalue ref="$dst-lt"  value="$start-of-tomorrow"/>
-                </xf:action>
-                <xf:action if="$src-range = 'custom'">
-                    <!-- Custom = [ after, before [ -->
-
-                    <!-- After -->
-                    <xf:setvalue ref="$dst-gte"/>
-                    <xf:action if="$src-after != ''">
-                        <xf:setvalue
-                            ref="$dst-gte"
-                            value="
-                                if (exists($tz)) then
-                                     adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-after)), $tz)
-                                else
-                                    adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-after)))"/>
-                    </xf:action>
-
-                    <!-- Before -->
-                    <xf:setvalue ref="$dst-lt"/>
-                    <xf:action if="$src-before != ''">
-                        <xf:setvalue
-                            ref="$dst-lt"
-                            value="
-                                if (exists($tz)) then
-                                     adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-before)), $tz)
-                                else
-                                    adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-before)))"/>
-                    </xf:action>
-                </xf:action>
-
+            <!-- Refresh search results when date search fields updated -->
+            <xf:action event="fr-set-search-dates-done">
                 <xf:dispatch name="fr-reset-search" targetid="fr-form-model"/>
             </xf:action>
 
@@ -930,9 +867,11 @@
                             name="fr-set-search-dates"
                             targetid="fr-form-model">
 
+                            <xf:property name="src-elem"     value="instance('fr-metadata-search-instance')"/>
                             <xf:property name="src-range"    value="'created'"/>
                             <xf:property name="src-after"    value="'created-after'"/>
                             <xf:property name="src-before"   value="'created-before'"/>
+                            <xf:property name="dst-elem"     value="instance('fr-search-instance')"/>
                             <xf:property name="dst-metadata" value="'created'"/>
                         </xf:dispatch>
 
@@ -942,9 +881,11 @@
                             name="fr-set-search-dates"
                             targetid="fr-form-model">
 
+                            <xf:property name="src-elem"     value="instance('fr-metadata-search-instance')"/>
                             <xf:property name="src-range"    value="'last-modified'"/>
                             <xf:property name="src-after"    value="'last-modified-after'"/>
                             <xf:property name="src-before"   value="'last-modified-before'"/>
+                            <xf:property name="dst-elem"     value="instance('fr-search-instance')"/>
                             <xf:property name="dst-metadata" value="'last-modified'"/>
                         </xf:dispatch>
 
@@ -1087,7 +1028,7 @@
                                 class="fr-search-free-input"/>
 
                             <xf:trigger class="fr-search-button">
-                                <xf:label mediatype="text/html" value="$fr-resources/summary/search/search-forms"/>
+                                <xf:label mediatype="text/html" value="$fr-resources/home-summary/search/search-forms"/>
                             </xf:trigger>
 
                             <!-- Don't allow showing search options if there are no search fields specified -->
@@ -1100,7 +1041,7 @@
                                 <!-- Switch label depending on which case is shown -->
                                 <xf:label
                                     mediatype="text/html"
-                                    ref="$fr-resources/summary/search/(if (case('fr-search-options-switch') = 'fr-search-free-case') then show-search-options else close-search-options)"/>
+                                    ref="$fr-resources/home-summary/search/(if (case('fr-search-options-switch') = 'fr-search-free-case') then show-search-options else close-search-options)"/>
                                 <xf:action event="DOMActivate">
                                     <!-- Clear all queries when switching -->
                                     <xf:setvalue iterate="instance('fr-search-instance')/query" ref="."/>
@@ -1177,18 +1118,18 @@
                             <xf:case id="fr-search-free-case"/>
                             <xf:case id="fr-search-options-case">
                                 <xh:fieldset class="fr-search-options">
-                                    <xh:legend><xf:output ref="$fr-resources/summary/search/search-options"/></xh:legend>
+                                    <xh:legend><xf:output ref="$fr-resources/home-summary/search/search-options"/></xh:legend>
 
                                     <!-- Created, created by, last modified, last modified by, and workflow stage -->
 
                                     <xf:group ref="''[$show-created]" class="fr-search-item date-range-group">
                                         <xf:select1 id="created-select" ref="instance('fr-metadata-search-instance')/created">
-                                            <xf:label ref="$fr-resources/summary/titles/created"/>
+                                            <xf:label ref="$fr-resources/home-summary/titles/created"/>
                                             <xf:item>
-                                                <xf:label ref="$fr-resources/summary/labels/any"/>
+                                                <xf:label ref="$fr-resources/home-summary/search/any"/>
                                                 <xf:value/>
                                             </xf:item>
-                                            <xf:itemset ref="$fr-resources/summary/search/dates/item">
+                                            <xf:itemset ref="$fr-resources/home-summary/search/dates/item">
                                                 <xf:label ref="label"/>
                                                 <xf:value ref="value"/>
                                             </xf:itemset>
@@ -1201,10 +1142,10 @@
                                         </xf:select1>
                                         <xf:group ref="''[instance('fr-metadata-search-instance')/created = 'custom']" class="after-before-container">
                                             <fr:date id="created-after" ref="instance('fr-metadata-search-instance')/created-after" >
-                                                <xf:label ref="$fr-resources/summary/search/date-after"/>
+                                                <xf:label ref="$fr-resources/home-summary/search/date-after"/>
                                             </fr:date>
                                             <fr:date id="created-before" ref="instance('fr-metadata-search-instance')/created-before">
-                                                <xf:label ref="$fr-resources/summary/search/date-before"/>
+                                                <xf:label ref="$fr-resources/home-summary/search/date-before"/>
                                             </fr:date>
                                         </xf:group>
                                     </xf:group>
@@ -1212,7 +1153,7 @@
                                         <xf:select1 id="created-by-select" ref="instance('fr-metadata-search-instance')/created-by" appearance="search" disable-placeholder="true">
                                             <xf:label ref="$fr-resources/summary/titles/created-by"/>
                                             <xf:item>
-                                                <xf:label ref="$fr-resources/summary/labels/any"/>
+                                                <xf:label ref="$fr-resources/home-summary/search/any"/>
                                                 <xf:value/>
                                             </xf:item>
                                             <xf:itemset ref="instance('fr-search-labels-instance')/created-by/value">
@@ -1223,12 +1164,12 @@
                                     </xf:group>
                                     <xf:group ref="''[$show-last-modified]" class="fr-search-item date-range-group">
                                         <xf:select1 id="last-modified-select" ref="instance('fr-metadata-search-instance')/last-modified">
-                                            <xf:label ref="$fr-resources/home-summary/titles/modified"/>
+                                            <xf:label ref="$fr-resources/home-summary/titles/last-modified"/>
                                             <xf:item>
-                                                <xf:label ref="$fr-resources/summary/labels/any"/>
+                                                <xf:label ref="$fr-resources/home-summary/search/any"/>
                                                 <xf:value/>
                                             </xf:item>
-                                            <xf:itemset ref="$fr-resources/summary/search/dates/item">
+                                            <xf:itemset ref="$fr-resources/home-summary/search/dates/item">
                                                 <xf:label ref="label"/>
                                                 <xf:value ref="value"/>
                                             </xf:itemset>
@@ -1241,18 +1182,18 @@
                                         </xf:select1>
                                         <xf:group ref="''[instance('fr-metadata-search-instance')/last-modified = 'custom']" class="after-before-container">
                                             <fr:date id="last-modified-after" ref="instance('fr-metadata-search-instance')/last-modified-after" >
-                                                <xf:label ref="$fr-resources/summary/search/date-after"/>
+                                                <xf:label ref="$fr-resources/home-summary/search/date-after"/>
                                             </fr:date>
                                             <fr:date id="last-modified-before" ref="instance('fr-metadata-search-instance')/last-modified-before">
-                                                <xf:label ref="$fr-resources/summary/search/date-before"/>
+                                                <xf:label ref="$fr-resources/home-summary/search/date-before"/>
                                             </fr:date>
                                         </xf:group>
                                     </xf:group>
                                     <xf:group ref="''[$show-last-modified-by]" class="fr-search-item">
                                         <xf:select1 id="last-modified-by-select" ref="instance('fr-metadata-search-instance')/last-modified-by" appearance="search" disable-placeholder="true">
-                                            <xf:label ref="$fr-resources/summary/titles/last-modified-by"/>
+                                            <xf:label ref="$fr-resources/home-summary/titles/last-modified-by"/>
                                             <xf:item>
-                                                <xf:label ref="$fr-resources/summary/labels/any"/>
+                                                <xf:label ref="$fr-resources/home-summary/search/any"/>
                                                 <xf:value/>
                                             </xf:item>
                                             <xf:itemset ref="instance('fr-search-labels-instance')/last-modified-by/value">
@@ -1265,7 +1206,7 @@
                                         <xf:select1 id="workflow-stage-select" ref="instance('fr-metadata-search-instance')/workflow-stage" appearance="search" disable-placeholder="true">
                                             <xf:label ref="$fr-resources/summary/titles/workflow-stage"/>
                                             <xf:item>
-                                                <xf:label ref="$fr-resources/summary/labels/any"/>
+                                                <xf:label ref="$fr-resources/home-summary/search/any"/>
                                                 <xf:value/>
                                             </xf:item>
                                             <xf:itemset ref="instance('fr-search-labels-instance')/workflow-stage/value">
@@ -1400,7 +1341,7 @@
                                             <xf:select1 ref=".[not($control-control = 'open-select1') and frf:isSingleSelectionControl(@control)]" id="search-select1">
                                                 <xf:label mediatype="text/html" value="$label"/>
                                                 <xf:item>
-                                                    <xf:label ref="$fr-resources/summary/labels/any"/>
+                                                    <xf:label ref="$fr-resources/home-summary/search/any"/>
                                                     <xf:value/>
                                                 </xf:item>
                                                 <xf:itemset ref="$resources/item">
@@ -1438,7 +1379,7 @@
                                             <fr:box-select ref=".[frf:isMultipleSelectionControl(@control)]" id="search-select">
                                                 <xf:label mediatype="text/html" value="$label"/>
                                                 <xf:item>
-                                                    <xf:label ref="$fr-resources/summary/labels/any"/>
+                                                    <xf:label ref="$fr-resources/home-summary/search/any"/>
                                                     <xf:value/>
                                                 </xf:item>
                                                 <xf:itemset ref="$resources/item">
@@ -1639,7 +1580,7 @@
                                                 <xh:th>
                                                     <xf:trigger appearance="minimal">
                                                         <xf:label>
-                                                            <xf:output value="$fr-resources/summary/titles/*[local-name() = $column]"/>
+                                                            <xf:output value="($fr-resources/summary/titles/*[local-name() = $column], $fr-resources/home-summary/titles/*[local-name() = $column])[1]"/>
                                                             <span class="column-caret">
                                                                 <xf:output value="
                                                                     if      (instance('fr-order-by-instance')/column != $column or not($sort-supported)) then ''
@@ -1976,7 +1917,7 @@
                                     <xf:group ref=".[not(document)]">
                                         <xh:tr>
                                             <xh:td colspan="{7 + count(instance('fr-search-instance')/*[@summary-show = 'true'])}">
-                                                <xf:output id="fr-no-form-data" class="alert" mediatype="text/html" value="xxf:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
+                                                <xf:output id="fr-no-form-data" class="alert" mediatype="text/html" value="xxf:serialize($fr-resources/summary/messages/no-form-data-found/node(), 'html')"/>
                                             </xh:td>
                                         </xh:tr>
                                     </xf:group>

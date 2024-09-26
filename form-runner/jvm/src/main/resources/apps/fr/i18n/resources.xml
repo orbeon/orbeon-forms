@@ -208,10 +208,8 @@
                 <summary-title>Summary</summary-title>
                 <delete-confirmation>Confirm Deletion</delete-confirmation>
                 <document-id>Document Id</document-id>
-                <created>Created</created>
                 <workflow-stage>Workflow stage</workflow-stage>
                 <created-by>Created By</created-by>
-                <last-modified-by>Modified By</last-modified-by>
                 <selected>Selected</selected>
                 <refresh>This operation will refresh the page</refresh>
                 <toc>Table of Contents</toc>
@@ -226,41 +224,6 @@
                 <select-saved>Select explicitly saved only</select-saved>
                 <select-drafts>Select autosaved only</select-drafts>
             </buttons>
-            <search>
-                <search>Search</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Search Forms</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Search Options</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Search Options</close-search-options>
-                <search-options>Search options</search-options>
-                <dates>
-                    <item>
-                        <label>Today</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label>Yesterday</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label>Last 7 days</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label>Last 30 days</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label>Last 90 days</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label>Custom...</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after>After</date-after>
-                <date-before>Before</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit</show-bulk-edit>
                 <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit</close-bulk-edit>
@@ -274,7 +237,7 @@
                 <of>of</of>
             </paging>
             <messages>
-                <no-form-found>No form data was found.</no-form-found>
+                <no-form-data-found>No form data was found.</no-form-data-found>
                 <delete-confirmation>Are you sure you want to delete one or more forms? Note that when deleting a saved document, the corresponding autosaved documents are deleted as well.</delete-confirmation>
                 <version>Form Version {0,number,integer}</version>
             </messages>
@@ -284,7 +247,6 @@
                 <language-choice>Choose Language</language-choice>
                 <form-choice>Choose a Form</form-choice>
                 <free-search>Free Search</free-search>
-                <any>[Any]</any>
                 <clear-value>[Clear value]</clear-value>
                 <script>Full Version</script>
                 <refresh>Refresh</refresh>
@@ -516,7 +478,7 @@
                 <purge-confirmation>Confirm Purge</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>You don't have access to any deployed forms.</no-forms>
+                <no-form-found>You don't have access to any deployed forms.</no-form-found>
                 <publish-confirmation>Are you sure you want to {0,choice,0#make available|1#make unavailable|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} forms}? This operation cannot be undone.</publish-confirmation>
                 <reindexing-confirmation>While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?</reindexing-confirmation>
                 <reencrypt-confirmation>We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?</reencrypt-confirmation>
@@ -699,12 +661,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Modified</modified>
+                <created>Created</created>
+                <last-modified>Modified</last-modified>
+                <last-modified-by>Modified By</last-modified-by>
                 <application-name>Application Name</application-name>
                 <form-name>Form Name</form-name>
                 <version>Version</version>
                 <form-title>Form Title</form-title>
             </titles>
+            <search>
+                <search>Search</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Search Forms</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Search Options</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Search Options</close-search-options>
+                <search-options>Search options</search-options>
+                <any>[Any]</any>
+                <dates>
+                    <item>
+                        <label>Today</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label>Yesterday</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label>Last 7 days</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label>Last 30 days</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label>Last 90 days</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label>Custom...</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after>After</date-after>
+                <date-before>Before</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="fr">
@@ -906,10 +906,8 @@
                 <summary-title>Sommaire</summary-title>
                 <delete-confirmation>Confirmer la suppression</delete-confirmation>
                 <document-id>Document Id</document-id>
-                <created>Création</created>
                 <workflow-stage>Étape du workflow</workflow-stage>
                 <created-by>Créé par</created-by>
-                <last-modified-by>Modifié par</last-modified-by>
                 <selected>Sélection</selected>
                 <refresh>Cette opération rafraichit la page</refresh>
                 <toc>Table des matières</toc>
@@ -924,41 +922,6 @@
                 <select-saved>Sélectionner documents enregistrés explicitement seulement</select-saved>
                 <select-drafts>Sélectionner documents enregistrés automatiquement seulement</select-drafts>
             </buttons>
-            <search>
-                <search>Recherche</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Rechercher</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer les options de recherche</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher les options de recherche</close-search-options>
-                <search-options>Options de recherche</search-options>
-                <dates>
-                    <item>
-                        <label>Aujourd'hui</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label>Hier</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label>7 derniers jours</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label>30 derniers jours</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label>90 derniers jours</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label>Personnalisé...</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after>Après le</date-after>
-                <date-before>Avant le</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer la modification groupée</show-bulk-edit>
                 <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher la modification groupée</close-bulk-edit>
@@ -972,7 +935,7 @@
                 <of>sur</of>
             </paging>
             <messages>
-                <no-form-found>Aucun formulaire trouvé.</no-form-found>
+                <no-form-data-found>Aucun formulaire trouvé.</no-form-data-found>
                 <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires? Notez que lors de la suppression d'un document explicitement enregistré, les documents enregistrés automatiquement correspondants sont également supprimés.</delete-confirmation>
                 <version>Version de formulaire {0,number,integer}</version>
             </messages>
@@ -982,7 +945,6 @@
                 <language-choice>Choix de la langue</language-choice>
                 <form-choice>Choisisez un formulaire</form-choice>
                 <free-search>Recherche libre</free-search>
-                <any>[Tous]</any>
                 <clear-value>[Effacer la valeur]</clear-value>
                 <script>Version complète</script>
                 <refresh>Rafraîchir</refresh>
@@ -1215,7 +1177,7 @@
                 <purge-confirmation>Confirmer la purge</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>Vous n'avez accès à aucun formulaire déployé.</no-forms>
+                <no-form-found>Vous n'avez accès à aucun formulaire déployé.</no-form-found>
                 <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#rendre disponible|1#rendre non disponible|2#mettre à jour|3#supprimer} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}? Cette opération ne peut pas être annulée.</publish-confirmation>
                 <reindexing-confirmation>Pendant le réindexage, certaines fonctionnalités, comme les pages de sommaires de Form Runner, ne fonctionneront pas comme prévu. Nous vous recommandons donc d'effectuez le réindexage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de réindexage?</reindexing-confirmation>
                 <reencrypt-confirmation>Nous vous recommandons d'effectuez le recryptage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de recryptage?</reencrypt-confirmation>
@@ -1398,12 +1360,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Modification</modified>
+                <created>Création</created>
+                <last-modified>Modification</last-modified>
+                <last-modified-by>Modifié par</last-modified-by>
                 <application-name>Application</application-name>
                 <form-name>Formulaire</form-name>
                 <version>Version</version>
                 <form-title>Titre du formulaire</form-title>
             </titles>
+            <search>
+                <search>Recherche</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Rechercher</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer les options de recherche</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher les options de recherche</close-search-options>
+                <search-options>Options de recherche</search-options>
+                <any>[Tous]</any>
+                <dates>
+                    <item>
+                        <label>Aujourd'hui</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label>Hier</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label>7 derniers jours</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label>30 derniers jours</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label>90 derniers jours</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label>Personnalisé...</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after>Après le</date-after>
+                <date-before>Avant le</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="es">
@@ -1602,10 +1602,8 @@
                 <summary-title>Resumen</summary-title>
                 <delete-confirmation>Confirma Eliminación</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
-                <created>Creado</created>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
-                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Seleccionado</selected>
                 <refresh>Este botón actualizará la página</refresh>
                 <toc>Tabla de contenidos</toc>
@@ -1620,41 +1618,6 @@
                 <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
-            <search>
-                <search>Buscar</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Buscar formulario</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opciones</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cerrar opciones</close-search-options>
-                <search-options>Buscar opciones</search-options>
-                <dates>
-                    <item>
-                        <label todo="true">[Today]</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Yesterday]</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 7 days]</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 30 days]</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 90 days]</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Custom...]</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after todo="true">[After]</date-after>
-                <date-before todo="true">[Before]</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
@@ -1668,7 +1631,7 @@
                 <of>de</of>
             </paging>
             <messages>
-                <no-form-found>No se encontró el formulario.</no-form-found>
+                <no-form-data-found>No se encontró el formulario.</no-form-data-found>
                 <delete-confirmation>Esta seguro que desea borrar uno o más formularios? Nota cuando borra un formulario guardado, se borrarán los formularios en estado borrador también.</delete-confirmation>
                 <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
@@ -1678,7 +1641,6 @@
                 <language-choice>Seleccione Idioma</language-choice>
                 <form-choice>Seleccione Formulario</form-choice>
                 <free-search>Búsqueda Libre</free-search>
-                <any>Cualquiera</any>
                 <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Versión Completa</script>
                 <refresh>Actualizar</refresh>
@@ -1909,7 +1871,7 @@
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>No tiene permisos para ningún formulario de Producción</no-forms>
+                <no-form-found>No tiene permisos para ningún formulario de Producción</no-form-found>
                 <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?</publish-confirmation>
                 <reindexing-confirmation>Mientras se reindexa algunas funcionalidades no estarán disponibles, como ser el Form Runner. Por lo que se recomienda ejecutar la reindexación con el sistema fuera de línea. Esta seguro que quiere proceder con la reindexación ?</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
@@ -2092,12 +2054,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Modificado</modified>
+                <created>Creado</created>
+                <last-modified>Modificado</last-modified>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Aplicación</application-name>
                 <form-name>Formulario</form-name>
                 <version>Versión</version>
                 <form-title>Título</form-title>
             </titles>
+            <search>
+                <search>Buscar</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Buscar formulario</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opciones</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cerrar opciones</close-search-options>
+                <search-options>Buscar opciones</search-options>
+                <any>[Cualquiera]</any>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="ca">
@@ -2294,10 +2294,8 @@
                 <summary-title>Resúm</summary-title>
                 <delete-confirmation>Confirma Eliminació</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
-                <created>Creat</created>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by>Creat per</created-by>
-                <last-modified-by>Última modificació per</last-modified-by>
                 <selected>Seleccionat</selected>
                 <refresh>Aquest botó actualitzarà la pàgina</refresh>
                 <toc>Taula de continguts</toc>
@@ -2312,41 +2310,6 @@
                 <select-saved todo="true">Seleccionar només el guardat</select-saved>
                 <select-drafts todo="true">Seleccionar només esborranys</select-drafts>
             </buttons>
-            <search>
-                <search>Buscar</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Buscar formulari</search-forms>
-                <show-search-options>Mostrar opcions de cerca</show-search-options>
-                <close-search-options>Tancar opcions de cerca</close-search-options>
-                <search-options>Opcions de cerca</search-options>
-                <dates>
-                    <item>
-                        <label todo="true">[Today]</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Yesterday]</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 7 days]</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 30 days]</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 90 days]</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Custom...]</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after todo="true">[After]</date-after>
-                <date-before todo="true">[Before]</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
@@ -2360,7 +2323,7 @@
                 <of>de</of>
             </paging>
             <messages>
-                <no-form-found>No es va trobar el formulari.</no-form-found>
+                <no-form-data-found>No es va trobar el formulari.</no-form-data-found>
                 <delete-confirmation>Està segur que vol esborrar un o més formularis? Nota quan
                     s'esborra un formualri desat, s'esborraran els formularis en estat esborrat també</delete-confirmation>
                 <version todo="true">[Form Version {0,number,integer}]</version>
@@ -2371,7 +2334,6 @@
                 <language-choice>Triï idioma</language-choice>
                 <form-choice>Seleccioni formulari</form-choice>
                 <free-search>Cerca lliure</free-search>
-                <any>Qualsevol</any>
                 <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Versió completa</script>
                 <refresh>Actualitzar</refresh>
@@ -2617,7 +2579,7 @@
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>No té permisos per cap formulari de Producció</no-forms>
+                <no-form-found>No té permisos per cap formulari de Producció</no-form-found>
                 <publish-confirmation>Está segur de {0,choice,0#publish|1#unpublish|2#upgrade|3#delete}
                     {1,choice,1#one form|1&lt;{1,number,integer} formularis}?</publish-confirmation>
                 <reindexing-confirmation>Mentre es reindexen algunes funcionalitats no estaran
@@ -2811,12 +2773,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Modificat</modified>
+                <created>Creat</created>
+                <last-modified>Modificat</last-modified>
+                <last-modified-by>Última modificació per</last-modified-by>
                 <application-name>Aplicació</application-name>
                 <form-name>Formulari</form-name>
                 <version>Versió</version>
                 <form-title>Títol</form-title>
             </titles>
+            <search>
+                <search>Buscar</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Buscar formulari</search-forms>
+                <show-search-options>Mostrar opcions de cerca</show-search-options>
+                <close-search-options>Tancar opcions de cerca</close-search-options>
+                <search-options>Opcions de cerca</search-options>
+                <any>[Qualsevol]</any>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="no">
@@ -3009,10 +3009,8 @@
                 <summary-title>Oppsummering</summary-title>
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
-                <created>Opprettet</created>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
-                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Valgt</selected>
                 <refresh>Denne operasjonen vil laste siden på nytt</refresh>
                 <toc>Innholdsfortegnelse</toc>
@@ -3027,41 +3025,6 @@
                 <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
-            <search>
-                <search>Søk</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søk etter skjema</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søk</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Lukk alternativer for søk</close-search-options>
-                <search-options>Alternativer for søk</search-options>
-                <dates>
-                    <item>
-                        <label todo="true">[Today]</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Yesterday]</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 7 days]</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 30 days]</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 90 days]</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Custom...]</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after todo="true">[After]</date-after>
-                <date-before todo="true">[Before]</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
@@ -3075,7 +3038,7 @@
                 <of>av</of>
             </paging>
             <messages>
-                <no-form-found>Ingen skjema funnet.</no-form-found>
+                <no-form-data-found>Ingen skjema funnet.</no-form-data-found>
                 <delete-confirmation>Vil du slette markerte skjema? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
                 <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
@@ -3085,7 +3048,6 @@
                 <language-choice>Velg språk</language-choice>
                 <form-choice>Velg et skjema</form-choice>
                 <free-search>Fritekstsøk</free-search>
-                <any>[Vilkårlig]</any>
                 <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Full versjon</script>
                 <refresh>Oppdater</refresh>
@@ -3313,7 +3275,7 @@
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
-                <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
+                <no-form-found todo="true">[You don't have access to any deployed forms.]</no-form-found>
                 <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
@@ -3496,12 +3458,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Endret</modified>
+                <created>Opprettet</created>
+                <last-modified>Endret</last-modified>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>App</application-name>
                 <form-name>Skjema</form-name>
                 <version>Versjon</version>
                 <form-title>Tittel</form-title>
             </titles>
+            <search>
+                <search>Søk</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søk etter skjema</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søk</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Lukk alternativer for søk</close-search-options>
+                <search-options>Alternativer for søk</search-options>
+                <any>[Vilkårlig]</any>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="ru">
@@ -3694,10 +3694,8 @@
                 <summary-title>Общая информация</summary-title>
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
-                <created>Дата создания</created>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
-                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Выбрана</selected>
                 <refresh>Эта операция потребует перезагрузки страницы</refresh>
                 <toc>Оглавление</toc>
@@ -3712,41 +3710,6 @@
                 <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
-            <search>
-                <search>Поиск</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Поиск формы</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Показать настройки поиска</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Закрыть настройки поиска</close-search-options>
-                <search-options>настройки поиска</search-options>
-                <dates>
-                    <item>
-                        <label todo="true">[Today]</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Yesterday]</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 7 days]</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 30 days]</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 90 days]</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Custom...]</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after todo="true">[After]</date-after>
-                <date-before todo="true">[Before]</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
@@ -3760,7 +3723,7 @@
                 <of>из</of>
             </paging>
             <messages>
-                <no-form-found>Форм не найдено.</no-form-found>
+                <no-form-data-found>Форм не найдено.</no-form-data-found>
                 <delete-confirmation>Вы уверены, что хотите удалить формы? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
                 <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
@@ -3770,7 +3733,6 @@
                 <language-choice>Выберите язык</language-choice>
                 <form-choice>Выберите форму</form-choice>
                 <free-search>Поиск</free-search>
-                <any>[Что угодно]</any>
                 <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Полная версия</script>
                 <refresh>Обновить</refresh>
@@ -3997,7 +3959,7 @@
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
-                <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
+                <no-form-found todo="true">[You don't have access to any deployed forms.]</no-form-found>
                 <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
@@ -4180,12 +4142,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Дата изменения</modified>
+                <created>Дата создания</created>
+                <last-modified>Дата изменения</last-modified>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name todo="true">[Application Name]</application-name>
                 <form-name todo="true">[Form Name]</form-name>
                 <version todo="true">[Version]</version>
                 <form-title todo="true">[Form Title]</form-title>
             </titles>
+            <search>
+                <search>Поиск</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Поиск формы</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Показать настройки поиска</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Закрыть настройки поиска</close-search-options>
+                <search-options>настройки поиска</search-options>
+                <any>[Что угодно]</any>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="it">
@@ -4384,10 +4384,8 @@
                 <summary-title>Sommario</summary-title>
                 <delete-confirmation>Conferma cancella</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
-                <created>Creato</created>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
-                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Selezionato</selected>
                 <refresh>Questa operazione aggiorna la pagina</refresh>
                 <toc>Tabella dei contenuti</toc>
@@ -4402,41 +4400,6 @@
                 <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
-            <search>
-                <search>Cerca</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Cerca moduli</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostra opzioni</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Chiudi opzioni</close-search-options>
-                <search-options>Opzioni di ricerca</search-options>
-                <dates>
-                    <item>
-                        <label todo="true">[Today]</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Yesterday]</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 7 days]</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 30 days]</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 90 days]</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Custom...]</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after todo="true">[After]</date-after>
-                <date-before todo="true">[Before]</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
@@ -4450,7 +4413,7 @@
                 <of>di</of>
             </paging>
             <messages>
-                <no-form-found>I dati del modulo non sono stati trovati.</no-form-found>
+                <no-form-data-found>I dati del modulo non sono stati trovati.</no-form-data-found>
                 <delete-confirmation> Sei sicuro di voler cancellare uno o più moduli? Nota: Quando elimini un documento salvato, le bozze corrispondenti vengono eliminate pure.</delete-confirmation>
                 <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
@@ -4460,7 +4423,6 @@
                 <language-choice>Seleziona lingua</language-choice>
                 <form-choice>Seleziona un modulo</form-choice>
                 <free-search>Ricerca libera</free-search>
-                <any>[Tutti]</any>
                 <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Versione completa</script>
                 <refresh>Aggiorna</refresh>
@@ -4691,7 +4653,7 @@
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>Non hai accesso a nessuno dei moduli distributi.</no-forms>
+                <no-form-found>Non hai accesso a nessuno dei moduli distributi.</no-form-found>
                 <publish-confirmation todo="true">Sei sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di|2#aggiornare|3#cancellare} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
@@ -4874,12 +4836,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Modificato</modified>
+                <created>Creato</created>
+                <last-modified>Modificato</last-modified>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Applicazione</application-name>
                 <form-name>Modulo</form-name>
                 <version todo="true">[Version]</version>
                 <form-title>Titolo</form-title>
             </titles>
+            <search>
+                <search>Cerca</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Cerca moduli</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostra opzioni</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Chiudi opzioni</close-search-options>
+                <search-options>Opzioni di ricerca</search-options>
+                <any>[Tutti]</any>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="de">
@@ -5078,10 +5078,8 @@
                 <summary-title>Übersicht</summary-title>
                 <delete-confirmation>Löschen bestätigen</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
-                <created>Erstellt</created>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
-                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Ausgewählt</selected>
                 <refresh>Diese Operation wird die Seite aktualisieren</refresh>
                 <toc>Inhaltstabelle</toc>
@@ -5096,41 +5094,6 @@
                 <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
-            <search>
-                <search>Suchen</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Formular suchen</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Suchoptionen anzeigen</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Suchoptionen schließen</close-search-options>
-                <search-options>Suchoptionen</search-options>
-                <dates>
-                    <item>
-                        <label todo="true">[Today]</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Yesterday]</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 7 days]</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 30 days]</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 90 days]</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Custom...]</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after todo="true">[After]</date-after>
-                <date-before todo="true">[Before]</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
@@ -5144,7 +5107,7 @@
                 <of>von</of>
             </paging>
             <messages>
-                <no-form-found>Es wurde kein Formular gefunden.</no-form-found>
+                <no-form-data-found>Es wurde kein Formular gefunden.</no-form-data-found>
                 <delete-confirmation>Sind Sie sicher, dass Sie ein oder mehrere Formulare löschen wollen? Hinweis: Wenn Sie ein bereits gespeichertes Dokument löschen, werden auch die entsprechenden Entwürfe gelöscht.</delete-confirmation>
                 <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
@@ -5154,7 +5117,6 @@
                 <language-choice>Sprachauswahl</language-choice>
                 <form-choice>Wählen Sie ein Formular</form-choice>
                 <free-search>Freie Suche</free-search>
-                <any>[Alle]</any>
                 <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Vollversion</script>
                 <refresh>Aktualisieren</refresh>
@@ -5385,7 +5347,7 @@
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>Sie haben keinen Zugang zu den bereitgestellten Formularen.</no-forms>
+                <no-form-found>Sie haben keinen Zugang zu den bereitgestellten Formularen.</no-form-found>
                 <publish-confirmation todo="true">Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} Formulare} {0,choice,0#veröffentlichen |1#verbergen|2#aktualisiern|3#löschen} wollen?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
@@ -5568,12 +5530,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Geändert am</modified>
+                <created>Erstellt</created>
+                <last-modified>Geändert am</last-modified>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Anwendung</application-name>
                 <form-name>Formular</form-name>
                 <version>Version</version>
                 <form-title>Titel</form-title>
             </titles>
+            <search>
+                <search>Suchen</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Formular suchen</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Suchoptionen anzeigen</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Suchoptionen schließen</close-search-options>
+                <search-options>Suchoptionen</search-options>
+                <any>[Alle]</any>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="fi">
@@ -5772,10 +5772,8 @@
                 <summary-title>Yhteenveto</summary-title>
                 <delete-confirmation>Vahvista poistaminen</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
-                <created>Luotu</created>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
-                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Valittu</selected>
                 <refresh>Tämä toiminto lataa sivun uudelleen</refresh>
                 <toc>Sisällysluettelo</toc>
@@ -5790,41 +5788,6 @@
                 <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
-            <search>
-                <search>Etsi</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Etsi lomakkeita</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Näytä hakuvaihtoehdot</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Sulje hakuvaihtoehdot</close-search-options>
-                <search-options>Hakuvaihtoehdot</search-options>
-                <dates>
-                    <item>
-                        <label todo="true">[Today]</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Yesterday]</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 7 days]</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 30 days]</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 90 days]</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Custom...]</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after todo="true">[After]</date-after>
-                <date-before todo="true">[Before]</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
@@ -5838,7 +5801,7 @@
                 <of>/</of>
             </paging>
             <messages>
-                <no-form-found>Taulukkotietoja ei löytynyt.</no-form-found>
+                <no-form-data-found>Taulukkotietoja ei löytynyt.</no-form-data-found>
                 <delete-confirmation>Haluatko varmasti poistaa yhden tai yhden tai useampia taulukoita?</delete-confirmation>
                 <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
@@ -5848,7 +5811,6 @@
                 <language-choice>Valitse kieli</language-choice>
                 <form-choice>Valitse taulukko</form-choice>
                 <free-search>Vapaa haku</free-search>
-                <any>[mikä tahansa]</any>
                 <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Täysi versio</script>
                 <refresh>Lataa sivu uudelleen</refresh>
@@ -6079,7 +6041,7 @@
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>Sinulla ei ole pääsyä yhteenkään lomakkeeseen.</no-forms>
+                <no-form-found>Sinulla ei ole pääsyä yhteenkään lomakkeeseen.</no-form-found>
                 <publish-confirmation todo="true">Haluatko varmasti{0,choice,0#julkaista|1#merkata vanhaksi|2#upgrade|3#delete} {1,choice,1#yhden lomakkeen|1&lt;{1,number,integer} lomaketta}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
@@ -6262,12 +6224,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Muokattu</modified>
+                <created>Luotu</created>
+                <last-modified>Muokattu</last-modified>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Sovellus</application-name>
                 <form-name>Lomake</form-name>
                 <version todo="true">[Version]</version>
                 <form-title>Otsikko</form-title>
             </titles>
+            <search>
+                <search>Etsi</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Etsi lomakkeita</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Näytä hakuvaihtoehdot</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Sulje hakuvaihtoehdot</close-search-options>
+                <search-options>Hakuvaihtoehdot</search-options>
+                <any>[mikä tahansa]</any>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="sv">
@@ -6466,10 +6466,8 @@
                 <summary-title>Sammanställning</summary-title>
                 <delete-confirmation>Bekräfta borttag</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
-                <created>Skapad</created>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
-                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Vald</selected>
                 <refresh>Uppdatera sidan</refresh>
                 <toc>Innehållsförteckning</toc>
@@ -6484,41 +6482,6 @@
                 <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
-            <search>
-                <search>Sök</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Sök formulär</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Visa sökalternativ</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Dölj sökalternativ</close-search-options>
-                <search-options>Sökalternativ</search-options>
-                <dates>
-                    <item>
-                        <label todo="true">[Today]</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Yesterday]</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 7 days]</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 30 days]</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 90 days]</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Custom...]</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after todo="true">[After]</date-after>
-                <date-before todo="true">[Before]</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
@@ -6532,7 +6495,7 @@
                 <of>av</of>
             </paging>
             <messages>
-                <no-form-found>Inget formulär hittades.</no-form-found>
+                <no-form-data-found>Inget formulär hittades.</no-form-data-found>
                 <delete-confirmation>Bekräfta att du vill ta bort formulären. Om du tar bort ett sparat formulär så tas motsvarande utkast också bort.</delete-confirmation>
                 <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
@@ -6542,7 +6505,6 @@
                 <language-choice>Välj språk</language-choice>
                 <form-choice>Välj ett formulär</form-choice>
                 <free-search>Fri sökning</free-search>
-                <any>[Alla]</any>
                 <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Fullständig version</script>
                 <refresh>Visa på nytt</refresh>
@@ -6773,7 +6735,7 @@
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>Du har inte tillgång till några publicerade formulär.</no-forms>
+                <no-form-found>Du har inte tillgång till några publicerade formulär.</no-form-found>
                 <publish-confirmation todo="true">Bekräfta {0,choice,0#publicering|1#upphävande av publicering|2#uppgradering|3#delete} av {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}.</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
@@ -6956,12 +6918,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Senast ändrad</modified>
+                <created>Skapad</created>
+                <last-modified>Senast ändrad</last-modified>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Område</application-name>
                 <form-name>Formulär</form-name>
                 <version todo="true">[Version]</version>
                 <form-title>Titel</form-title>
             </titles>
+            <search>
+                <search>Sök</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Sök formulär</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Visa sökalternativ</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Dölj sökalternativ</close-search-options>
+                <search-options>Sökalternativ</search-options>
+                <any>[Alla]</any>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="nl">
@@ -7160,10 +7160,8 @@
                 <summary-title>Samenvatting</summary-title>
                 <delete-confirmation>Verwijderen bevestigen</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
-                <created>Aangemaakt</created>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
-                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Geselecteerd</selected>
                 <refresh>Deze bewerking zal de pagina doen verversen</refresh>
                 <toc>Inhoudsopgave</toc>
@@ -7178,41 +7176,6 @@
                 <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
-            <search>
-                <search>Zoeken</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Forms zoeken</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Zoekopties tonen</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zoekopties sluiten</close-search-options>
-                <search-options>Zoekopties</search-options>
-                <dates>
-                    <item>
-                        <label todo="true">[Today]</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Yesterday]</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 7 days]</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 30 days]</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 90 days]</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Custom...]</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after todo="true">[After]</date-after>
-                <date-before todo="true">[Before]</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
@@ -7226,7 +7189,7 @@
                 <of>van</of>
             </paging>
             <messages>
-                <no-form-found>Er zijn geen formgegevens gevonden.</no-form-found>
+                <no-form-data-found>Er zijn geen formgegevens gevonden.</no-form-data-found>
                 <delete-confirmation>Weet u zeker dat u één of meerdere form wilt verwijderen? Merk op dat u door het verwijderen van een opgeslagen document, ook de bijbehorende conceptversies verwijdert.</delete-confirmation>
                 <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
@@ -7236,7 +7199,6 @@
                 <language-choice>Taal kiezen</language-choice>
                 <form-choice>Een form kiezen</form-choice>
                 <free-search>Vrij zoeken</free-search>
-                <any>Elke</any>
                 <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Volledige versie</script>
                 <refresh>Verversen</refresh>
@@ -7467,7 +7429,7 @@
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>U hebt geen toegang tot de actieve forms.</no-forms>
+                <no-form-found>U hebt geen toegang tot de actieve forms.</no-form-found>
                 <publish-confirmation todo="true">Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgraden|3#delete}?</publish-confirmation>
                 <reindexing-confirmation>Tijdens het herindexeren werken bepaalde functies, zoals de Form Runner samenvattingpagina's, mogelijk niet zoals verwacht. We raden u om die reden aan om te herindexeren als uw systeem offline is. Weet u zeker dat het herindexeren wilt starten?</reindexing-confirmation>
                 <reencrypt-confirmation>We adviseren u het vernieuwen van de encryptie te doen als het systeem offline is. Weet u zeker dat u door wilt gaan met her-encryptie?</reencrypt-confirmation>
@@ -7650,12 +7612,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Bewerkt</modified>
+                <created>Aangemaakt</created>
+                <last-modified>Bewerkt</last-modified>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Applicatie</application-name>
                 <form-name>Form</form-name>
                 <version todo="true">[Version]</version>
                 <form-title>Titel</form-title>
             </titles>
+            <search>
+                <search>Zoeken</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Forms zoeken</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Zoekopties tonen</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zoekopties sluiten</close-search-options>
+                <search-options>Zoekopties</search-options>
+                <any>[Elke]</any>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="pt">
@@ -7854,10 +7854,8 @@
                 <summary-title>Sumário</summary-title>
                 <delete-confirmation>Deseja apagar</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
-                <created>Criado</created>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
-                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Seleccionado</selected>
                 <refresh>Esta operação irá refrescar a página</refresh>
                 <toc>Tablea de Conteúdos</toc>
@@ -7872,41 +7870,6 @@
                 <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
-            <search>
-                <search>Procurar</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Procurar formulários</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opções</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Fechar opções</close-search-options>
-                <search-options>Opções de procurar</search-options>
-                <dates>
-                    <item>
-                        <label todo="true">[Today]</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Yesterday]</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 7 days]</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 30 days]</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 90 days]</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Custom...]</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after todo="true">[After]</date-after>
-                <date-before todo="true">[Before]</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
@@ -7920,7 +7883,7 @@
                 <of>de</of>
             </paging>
             <messages>
-                <no-form-found>Não foram encontrados formulários.</no-form-found>
+                <no-form-data-found>Não foram encontrados formulários.</no-form-data-found>
                 <delete-confirmation>Tem certeza de que deseja apagar um ou mais formulários? Note que ao apagar um documento guardado, os rascunhos correspondentes também serão apagados.</delete-confirmation>
                 <version todo="true">[Form Version {0,number,integer}]</version>
             </messages>
@@ -7930,7 +7893,6 @@
                 <language-choice>Escolha o idioma</language-choice>
                 <form-choice>Escolha um Formulário</form-choice>
                 <free-search>Pesquisa Livre</free-search>
-                <any>[Qualquer]</any>
                 <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Versão Completa</script>
                 <refresh>Refrescar</refresh>
@@ -8161,7 +8123,7 @@
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>Não tem acesso a quaisquer formulários.</no-forms>
+                <no-form-found>Não tem acesso a quaisquer formulários.</no-form-found>
                 <publish-confirmation todo="true">Tem a certeza que quer {0,choice,0#publicar|1#não publicar|2#upgrade|3#delete} {1,choice,1#um formulário|1&lt;{1,number,integer} formulários}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
@@ -8344,12 +8306,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Modificado</modified>
+                <created>Criado</created>
+                <last-modified>Modificado</last-modified>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Aplicação</application-name>
                 <form-name>Formulário</form-name>
                 <version todo="true">[Version]</version>
                 <form-title>Título</form-title>
             </titles>
+            <search>
+                <search>Procurar</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Procurar formulários</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opções</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Fechar opções</close-search-options>
+                <search-options>Opções de procurar</search-options>
+                <any>[Qualquer]</any>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="da">
@@ -8542,10 +8542,8 @@
                 <summary-title>Resumé</summary-title>
                 <delete-confirmation>Bekræft sletning</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
-                <created>Oprettet</created>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
-                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Valgt</selected>
                 <refresh>Dette indlæser siden igen</refresh>
                 <toc>Indholdsfortegnelse</toc>
@@ -8560,41 +8558,6 @@
                 <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
-            <search>
-                <search>Søg</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søg efter blanket</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søgning</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Luk alternativer for søgnng</close-search-options>
-                <search-options>Alternativer for søgning</search-options>
-                <dates>
-                    <item>
-                        <label todo="true">[Today]</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Yesterday]</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 7 days]</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 30 days]</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 90 days]</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Custom...]</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after todo="true">[After]</date-after>
-                <date-before todo="true">[Before]</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
@@ -8608,7 +8571,7 @@
                 <of>af</of>
             </paging>
             <messages>
-                <no-form-found>Ingen blanketter fundet.</no-form-found>
+                <no-form-data-found>Ingen blanketter fundet.</no-form-data-found>
                 <delete-confirmation>Vil du slette den markerede blanket? Bemærk at når et gemt dokument slettes, slettes også de tilhørende kladder.</delete-confirmation>
                 <version todo="true">Form Version {0,number,integer}</version>
             </messages>
@@ -8618,7 +8581,6 @@
                 <language-choice>Vælg sprog</language-choice>
                 <form-choice>Vælg en blanket</form-choice>
                 <free-search>Fritekstsøgning</free-search>
-                <any>Vilkårlig</any>
                 <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Fuld version</script>
                 <refresh>Opdatér</refresh>
@@ -8846,7 +8808,7 @@
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>Du har ikke adgang til nogen udsendte blanketter.</no-forms>
+                <no-form-found>Du har ikke adgang til nogen udsendte blanketter.</no-form-found>
                 <publish-confirmation todo="true">Er du sikker på du vil {0,choice,0#offentliggøre|1#afpublisére|2#upgrade|3#delete} {1,choice,1#en blanket|1&lt;{1,number,integer} blanketter}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
@@ -9029,12 +8991,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Ændret</modified>
+                <created>Oprettet</created>
+                <last-modified>Ændret</last-modified>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>App</application-name>
                 <form-name>Blanket</form-name>
                 <version todo="true">[Version]</version>
                 <form-title>Titel</form-title>
             </titles>
+            <search>
+                <search>Søg</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søg efter blanket</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søgning</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Luk alternativer for søgnng</close-search-options>
+                <search-options>Alternativer for søgning</search-options>
+                <any>[Vilkårlig]</any>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="pl">
@@ -9233,10 +9233,8 @@
                 <summary-title>Podsumowanie</summary-title>
                 <delete-confirmation>Potwierdź usunięcie</delete-confirmation>
                 <document-id todo="true">Document Id</document-id>
-                <created>Utworzony</created>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">[Created By]</created-by>
-                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <selected>Wybrany</selected>
                 <refresh>Ta operacja spowoduje odświeżenie strony</refresh>
                 <toc>Spis treści</toc>
@@ -9251,41 +9249,6 @@
                 <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
-            <search>
-                <search>Szukaj</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Wyszukaj formularze</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Pokaż opcje wyszukiwania</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zamknij opcje wyszukiwania</close-search-options>
-                <search-options>Opcje wyszukiwania</search-options>
-                <dates>
-                    <item>
-                        <label todo="true">[Today]</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Yesterday]</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 7 days]</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 30 days]</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Last 90 days]</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label todo="true">[Custom...]</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after todo="true">[After]</date-after>
-                <date-before todo="true">[Before]</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
                 <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
@@ -9299,7 +9262,7 @@
                 <of>z</of>
             </paging>
             <messages>
-                <no-form-found>Nie znaleziono formularzy.</no-form-found>
+                <no-form-data-found>Nie znaleziono formularzy.</no-form-data-found>
                 <delete-confirmation>Czy jesteś pewien, że chcesz usunąć wybrany/-e fomularz/-e? Po usunięciu zapisanego dokumentu, powiązane szkice również zostaną usunięte.</delete-confirmation>
                 <version>Wersja formularza {0,number,integer}</version>
             </messages>
@@ -9309,7 +9272,6 @@
                 <language-choice>Wybierz język</language-choice>
                 <form-choice>Wybierz formularz</form-choice>
                 <free-search>Wyszukiwanie pełnotekstowe</free-search>
-                <any>[Dowolny]</any>
                 <clear-value todo="true">[[Clear value]]</clear-value>
                 <script>Pełna wersja</script>
                 <refresh>Odśwież</refresh>
@@ -9540,7 +9502,7 @@
                 <purge-confirmation todo="true">[Confirm Purge]</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>Nie masz dostępu do wdrożonych formularzy.</no-forms>
+                <no-form-found>Nie masz dostępu do wdrożonych formularzy.</no-form-found>
                 <publish-confirmation todo="true">Czy jesteś pewien, że chcesz {0,choice,0#opublikować|1#cofnąć publikację|2#zaktualizować|3#delete} {1,choice,1#jeden formularz|1&lt;{1,number,integer} formularzy}?</publish-confirmation>
                 <reindexing-confirmation>W trakcie reindeksacji niektóre funkcje, jak strony podsumowań Form Runner'a, mogą nie działać prawidłowo. Z tego powodu rekomendujemy, abyś wykonywał reindeksowanie, kiedy system jest offline. Czy jesteś pewien, że chcesz kontynuować reindeksację?</reindexing-confirmation>
                 <reencrypt-confirmation>Zalecamy ponowne szyfrowanie, gdy system jest w trybie offline. Czy na pewno chcesz kontynuować ponowne szyfrowanie?</reencrypt-confirmation>
@@ -9723,12 +9685,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Zmodyfikowany</modified>
+                <created>Utworzony</created>
+                <last-modified>Zmodyfikowany</last-modified>
+                <last-modified-by todo="true">[Modified By]</last-modified-by>
                 <application-name>Aplikacja</application-name>
                 <form-name>Formularz</form-name>
                 <version todo="true">[Version]</version>
                 <form-title>Tytuł</form-title>
             </titles>
+            <search>
+                <search>Szukaj</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Wyszukaj formularze</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Pokaż opcje wyszukiwania</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zamknij opcje wyszukiwania</close-search-options>
+                <search-options>Opcje wyszukiwania</search-options>
+                <any>[Dowolny]</any>
+                <dates>
+                    <item>
+                        <label todo="true">[Today]</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Yesterday]</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 7 days]</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 30 days]</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Last 90 days]</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label todo="true">[Custom...]</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after todo="true">[After]</date-after>
+                <date-before todo="true">[Before]</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="tr">
@@ -9927,10 +9927,8 @@
                 <summary-title>Özet</summary-title>
                 <delete-confirmation>Silmeyi Onayla</delete-confirmation>
                 <document-id>Belge Kimliği</document-id>
-                <created>Oluşturuldu</created>
                 <workflow-stage>İş akışı aşaması</workflow-stage>
                 <created-by>Oluşturan</created-by>
-                <last-modified-by>Değiştiren</last-modified-by>
                 <selected>Seçili</selected>
                 <refresh>Bu işlem sayfayı yenileyecektir</refresh>
                 <toc>İçindekiler</toc>
@@ -9945,41 +9943,6 @@
                 <select-saved>Sadece açıkça kaydedilenleri seç</select-saved>
                 <select-drafts>Sadece otomatik kaydedilenleri seç</select-drafts>
             </buttons>
-            <search>
-                <search>Ara</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Formlarda Ara</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Arama Seçeneklerini Göster</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Arama Seçeneklerini Gizle</close-search-options>
-                <search-options>Arama seçenekleri</search-options>
-                <dates>
-                    <item>
-                        <label>Bugün</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label>Dün</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label>Son 7 gün</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label>Son 30 gün</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label>Son 90 gün</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label>Özel...</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after>Sonra</date-after>
-                <date-before>Önce</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Toplu Düzenlemeyi Göster</show-bulk-edit>
                 <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Toplu Düzenlemeyi Gizle</close-bulk-edit>
@@ -9993,7 +9956,7 @@
                 <of>/</of>
             </paging>
             <messages>
-                <no-form-found>Hiçbir form verisi bulunamadı.</no-form-found>
+                <no-form-data-found>Hiçbir form verisi bulunamadı.</no-form-data-found>
                 <delete-confirmation>Bir veya daha fazla formu silmek istediğinizden emin misiniz? Kaydedilmiş bir belgeyi silerken, ilgili otomatik kaydedilmiş belgeler de silinir.</delete-confirmation>
                 <version>Form Sürümü {0,number,integer}</version>
             </messages>
@@ -10003,7 +9966,6 @@
                 <language-choice>Dil Seçin</language-choice>
                 <form-choice>Bir Form Seçin</form-choice>
                 <free-search>Serbest Arama</free-search>
-                <any>[Herhangi biri]</any>
                 <clear-value>[Değeri temizle]</clear-value>
                 <script>Tam Sürüm</script>
                 <refresh>Yenile</refresh>
@@ -10234,7 +10196,7 @@
                 <purge-confirmation>Temizlemeyi Onayla</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>Erişiminiz olan dağıtılmış form yok.</no-forms>
+                <no-form-found>Erişiminiz olan dağıtılmış form yok.</no-form-found>
                 <publish-confirmation>{1,choice,1#Bir formu|1&lt;{1,number,integer} formu} {0,choice,0#kullanılabilir yapmak|1#kullanılamaz yapmak|2#yükseltmek|3#silmek} istediğinizden emin misiniz? Bu işlem geri alınamaz.</publish-confirmation>
                 <reindexing-confirmation>Yeniden indeksleme sırasında, Form Runner özet sayfaları gibi bazı özellikler beklendiği gibi çalışmayacaktır. Bu nedenle, yeniden indeksleme işlemini sistem çevrimdışıyken gerçekleştirmenizi öneririz. Yeniden indekslemeye devam etmek istediğinizden emin misiniz?</reindexing-confirmation>
                 <reencrypt-confirmation>Yeniden şifreleme işlemini sistem çevrimdışıyken gerçekleştirmenizi öneririz. Yeniden şifrelemeye devam etmek istediğinizden emin misiniz?</reencrypt-confirmation>
@@ -10417,12 +10379,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>Değiştirildi</modified>
+                <created>Oluşturuldu</created>
+                <last-modified>Değiştirildi</last-modified>
+                <last-modified-by>Değiştiren</last-modified-by>
                 <application-name>Uygulama</application-name>
                 <form-name>Form</form-name>
                 <version>Sürüm</version>
                 <form-title>Form Başlığı</form-title>
             </titles>
+            <search>
+                <search>Ara</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Formlarda Ara</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Arama Seçeneklerini Göster</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Arama Seçeneklerini Gizle</close-search-options>
+                <search-options>Arama seçenekleri</search-options>
+                <any>[Herhangi biri]</any>
+                <dates>
+                    <item>
+                        <label>Bugün</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label>Dün</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label>Son 7 gün</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label>Son 30 gün</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label>Son 90 gün</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label>Özel...</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after>Sonra</date-after>
+                <date-before>Önce</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="zh-Hans">
@@ -10615,10 +10615,8 @@
                 <summary-title>摘要</summary-title>
                 <delete-confirmation>确认删除</delete-confirmation>
                 <document-id>文档ID</document-id>
-                <created>创建时间</created>
                 <workflow-stage>工作流阶段</workflow-stage>
                 <created-by>创建者</created-by>
-                <last-modified-by>最后修改者</last-modified-by>
                 <selected>已选择</selected>
                 <refresh>此操作将刷新页面</refresh>
                 <toc>目录</toc>
@@ -10633,41 +10631,6 @@
                 <select-saved>仅选择明确保存的</select-saved>
                 <select-drafts>仅选择自动保存的</select-drafts>
             </buttons>
-            <search>
-                <search>搜索</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; 搜索表单</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; 显示搜索选项</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 隐藏搜索选项</close-search-options>
-                <search-options>搜索选项</search-options>
-                <dates>
-                    <item>
-                        <label>今天</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label>昨天</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label>最近7天</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label>最近30天</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label>最近90天</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label>自定义...</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after>之后</date-after>
-                <date-before>之前</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; 显示批量编辑</show-bulk-edit>
                 <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 隐藏批量编辑</close-bulk-edit>
@@ -10681,7 +10644,7 @@
                 <of>共</of>
             </paging>
             <messages>
-                <no-form-found>未找到表单数据。</no-form-found>
+                <no-form-data-found>未找到表单数据。</no-form-data-found>
                 <delete-confirmation>您确定要删除一个或多个表单吗？请注意，删除已保存的文档时，相应的自动保存文档也会被删除。</delete-confirmation>
                 <version>表单版本 {0,number,integer}</version>
             </messages>
@@ -10691,7 +10654,6 @@
                 <language-choice>选择语言</language-choice>
                 <form-choice>选择表单</form-choice>
                 <free-search>自由搜索</free-search>
-                <any>[任何]</any>
                 <clear-value>[清除值]</clear-value>
                 <script>完整版本</script>
                 <refresh>刷新</refresh>
@@ -10922,7 +10884,7 @@
                 <purge-confirmation>确认清除</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>您没有访问任何已部署表单的权限。</no-forms>
+                <no-form-found>您没有访问任何已部署表单的权限。</no-form-found>
                 <publish-confirmation>您确定要{0,choice,0#设为可用|1#设为不可用|2#升级|3#删除}{1,choice,1#一个表单|1&lt;{1,number,integer}个表单}吗？此操作无法撤消。</publish-confirmation>
                 <reindexing-confirmation>在重新索引期间，一些功能（如Form Runner摘要页面）可能无法正常工作。因此，我们建议您在系统离线时执行重新索引。您确定要继续重新索引吗？</reindexing-confirmation>
                 <reencrypt-confirmation>我们建议您在系统离线时执行重新加密。您确定要继续重新加密吗？</reencrypt-confirmation>
@@ -11105,12 +11067,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>修改时间</modified>
+                <created>创建时间</created>
+                <last-modified>修改时间</last-modified>
+                <last-modified-by>最后修改者</last-modified-by>
                 <application-name>应用</application-name>
                 <form-name>表单</form-name>
                 <version>版本</version>
                 <form-title>表单标题</form-title>
             </titles>
+            <search>
+                <search>搜索</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; 搜索表单</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; 显示搜索选项</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 隐藏搜索选项</close-search-options>
+                <search-options>搜索选项</search-options>
+                <any>[任何]</any>
+                <dates>
+                    <item>
+                        <label>今天</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label>昨天</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label>最近7天</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label>最近30天</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label>最近90天</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label>自定义...</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after>之后</date-after>
+                <date-before>之前</date-before>
+            </search>
         </home-summary>
     </resource>
     <resource xml:lang="zh-Hant">
@@ -11309,10 +11309,8 @@
                 <summary-title>摘要</summary-title>
                 <delete-confirmation>確認刪除</delete-confirmation>
                 <document-id>文檔ID</document-id>
-                <created>創建時間</created>
                 <workflow-stage>工作流階段</workflow-stage>
                 <created-by>創建者</created-by>
-                <last-modified-by>最後修改者</last-modified-by>
                 <selected>已選擇</selected>
                 <refresh>此操作將刷新頁面</refresh>
                 <toc>目錄</toc>
@@ -11327,41 +11325,6 @@
                 <select-saved>僅選擇顯式保存的</select-saved>
                 <select-drafts>僅選擇自動保存的</select-drafts>
             </buttons>
-            <search>
-                <search>搜索</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; 搜索表單</search-forms>
-                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; 顯示搜索選項</show-search-options>
-                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 隱藏搜索選項</close-search-options>
-                <search-options>搜索選項</search-options>
-                <dates>
-                    <item>
-                        <label>今天</label>
-                        <value>today</value>
-                    </item>
-                    <item>
-                        <label>昨天</label>
-                        <value>yesterday</value>
-                    </item>
-                    <item>
-                        <label>過去7天</label>
-                        <value>last-7-days</value>
-                    </item>
-                    <item>
-                        <label>過去30天</label>
-                        <value>last-30-days</value>
-                    </item>
-                    <item>
-                        <label>過去90天</label>
-                        <value>last-90-days</value>
-                    </item>
-                    <item>
-                        <label>自定義...</label>
-                        <value>custom</value>
-                    </item>
-                </dates>
-                <date-after>之後</date-after>
-                <date-before>之前</date-before>
-            </search>
             <bulk-edit>
                 <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; 顯示批量編輯</show-bulk-edit>
                 <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 隱藏批量編輯</close-bulk-edit>
@@ -11375,7 +11338,7 @@
                 <of>共</of>
             </paging>
             <messages>
-                <no-form-found>未找到表單數據。</no-form-found>
+                <no-form-data-found>未找到表單數據。</no-form-data-found>
                 <delete-confirmation>您確定要刪除一個或多個表單嗎？請注意，刪除已保存的文檔時，相應的自動保存文檔也會被刪除。</delete-confirmation>
                 <version>表單版本 {0,number,integer}</version>
             </messages>
@@ -11385,7 +11348,6 @@
                 <language-choice>選擇語言</language-choice>
                 <form-choice>選擇表單</form-choice>
                 <free-search>自由搜索</free-search>
-                <any>[任意]</any>
                 <clear-value>[清除值]</clear-value>
                 <script>完整版本</script>
                 <refresh>刷新</refresh>
@@ -11616,7 +11578,7 @@
                 <purge-confirmation>確認清除</purge-confirmation>
             </titles>
             <messages>
-                <no-forms>您沒有訪問任何已部署表單的權限。</no-forms>
+                <no-form-found>您沒有訪問任何已部署表單的權限。</no-form-found>
                 <publish-confirmation>您確定要{0,choice,0#設置為可用|1#設置為不可用|2#升級|3#刪除} {1,choice,1#一個表單|1&lt;{1,number,integer}個表單}嗎？此操作無法撤消。</publish-confirmation>
                 <reindexing-confirmation>重新索引期間,某些功能(如Form Runner摘要頁面)將無法正常工作。因此,我們建議您在系統離線時執行重新索引。您確定要繼續重新索引嗎？</reindexing-confirmation>
                 <reencrypt-confirmation>我們建議您在系統離線時執行重新加密。您確定要繼續重新加密嗎？</reencrypt-confirmation>
@@ -11798,12 +11760,50 @@
         </authentication>
         <home-summary>
             <titles>
-                <modified>修改時間</modified>
+                <created>創建時間</created>
+                <last-modified>修改時間</last-modified>
+                <last-modified-by>最後修改者</last-modified-by>
                 <application-name>應用</application-name>
                 <form-name>表單</form-name>
                 <version>版本</version>
                 <form-title>表單標題</form-title>
             </titles>
+            <search>
+                <search>搜索</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; 搜索表單</search-forms>
+                <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; 顯示搜索選項</show-search-options>
+                <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 隱藏搜索選項</close-search-options>
+                <search-options>搜索選項</search-options>
+                <any>[任意]</any>
+                <dates>
+                    <item>
+                        <label>今天</label>
+                        <value>today</value>
+                    </item>
+                    <item>
+                        <label>昨天</label>
+                        <value>yesterday</value>
+                    </item>
+                    <item>
+                        <label>過去7天</label>
+                        <value>last-7-days</value>
+                    </item>
+                    <item>
+                        <label>過去30天</label>
+                        <value>last-30-days</value>
+                    </item>
+                    <item>
+                        <label>過去90天</label>
+                        <value>last-90-days</value>
+                    </item>
+                    <item>
+                        <label>自定義...</label>
+                        <value>custom</value>
+                    </item>
+                </dates>
+                <date-after>之後</date-after>
+                <date-before>之前</date-before>
+            </search>
         </home-summary>
     </resource>
 </resources>

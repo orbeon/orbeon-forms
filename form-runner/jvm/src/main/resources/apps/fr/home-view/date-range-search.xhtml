@@ -1,0 +1,75 @@
+<!-- Logic to convert date ranges (today, yesterday, etc. + custom dates) into actual date/time ranges for search -->
+<xf:action
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    event="fr-set-search-dates">
+
+    <xf:var name="src-elem"   value="event('src-elem')"/>
+    <xf:var name="src-range"  value="$src-elem/*[local-name() = event('src-range')]"/>
+    <xf:var name="src-after"  value="$src-elem/*[local-name() = event('src-after')]"/>
+    <xf:var name="src-before" value="$src-elem/*[local-name() = event('src-before')]"/>
+    <xf:var name="dst-elem"   value="event('dst-elem')"/>
+    <xf:var name="dst-gte"    value="$dst-elem/query[@metadata = event('dst-metadata') and @match = 'gte']"/>
+    <xf:var name="dst-lt"     value="$dst-elem/query[@metadata = event('dst-metadata') and @match = 'lt']"/>
+
+    <xf:var name="start-of-tomorrow" value="xs:dateTime(xs:date(current-dateTime())) + xs:dayTimeDuration('P1D')"/>
+
+    <xf:action if="$src-range = ''">
+        <!-- Any -->
+        <xf:setvalue ref="$dst-gte"/>
+        <xf:setvalue ref="$dst-lt"/>
+    </xf:action>
+    <xf:action if="$src-range = 'today'">
+        <!-- Today = [ tomorrow - 1 day, tomorrow [ -->
+        <xf:setvalue ref="$dst-gte" value="$start-of-tomorrow - xs:dayTimeDuration('P1D')"/>
+        <xf:setvalue ref="$dst-lt"  value="$start-of-tomorrow"/>
+    </xf:action>
+    <xf:action if="$src-range = 'yesterday'">
+        <!-- Yesterday = [ tomorrow - 2 days, tomorrow - 1 day [ -->
+        <xf:setvalue ref="$dst-gte" value="$start-of-tomorrow - xs:dayTimeDuration('P2D')"/>
+        <xf:setvalue ref="$dst-lt"  value="$start-of-tomorrow - xs:dayTimeDuration('P1D')"/>
+    </xf:action>
+    <xf:action if="$src-range = 'last-7-days'">
+        <!-- Last 7 days = [ tomorrow - 7 days, tomorrow [ -->
+        <xf:setvalue ref="$dst-gte" value="$start-of-tomorrow - xs:dayTimeDuration('P7D')"/>
+        <xf:setvalue ref="$dst-lt"  value="$start-of-tomorrow"/>
+    </xf:action>
+    <xf:action if="$src-range = 'last-30-days'">
+        <!-- Last 30 days = [ tomorrow - 30 days, tomorrow [ -->
+        <xf:setvalue ref="$dst-gte" value="$start-of-tomorrow - xs:dayTimeDuration('P30D')"/>
+        <xf:setvalue ref="$dst-lt"  value="$start-of-tomorrow"/>
+    </xf:action>
+    <xf:action if="$src-range = 'last-90-days'">
+        <!-- Last 90 days = [ tomorrow - 90 days, tomorrow [ -->
+        <xf:setvalue ref="$dst-gte" value="$start-of-tomorrow - xs:dayTimeDuration('P90D')"/>
+        <xf:setvalue ref="$dst-lt"  value="$start-of-tomorrow"/>
+    </xf:action>
+    <xf:action if="$src-range = 'custom'">
+        <!-- Custom = [ after, before [ -->
+
+        <!-- After -->
+        <xf:setvalue ref="$dst-gte"/>
+        <xf:action if="$src-after != ''">
+            <xf:setvalue
+                ref="$dst-gte"
+                value="
+                    if (exists($tz)) then
+                         adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-after)), $tz)
+                    else
+                        adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-after)))"/>
+        </xf:action>
+
+        <!-- Before -->
+        <xf:setvalue ref="$dst-lt"/>
+        <xf:action if="$src-before != ''">
+            <xf:setvalue
+                ref="$dst-lt"
+                value="
+                    if (exists($tz)) then
+                         adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-before)), $tz)
+                    else
+                        adjust-dateTime-to-timezone(xs:dateTime(xs:date($src-before)))"/>
+        </xf:action>
+    </xf:action>
+
+    <xf:dispatch name="fr-set-search-dates-done" targetid="fr-form-model"/>
+</xf:action>

@@ -184,6 +184,7 @@
             <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <metadata>
                     <application-name>orbeon</application-name>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
                     <form-name>bookshelf</form-name>
                     <title xml:lang="en">Orbeon Forms Bookshelf</title>
                     <description xml:lang="en">Orbeon Forms Bookshelf is a simple form allowing you to gather information about books.</description>
@@ -216,8 +217,8 @@
                             </param>
                         </parameters>
                     </email>
-                    <screenshot>/fr/service/persistence/crud/orbeon/builder/data/52c62a05a09601f37a121101468f9f98/b4f1c56ecce4fff54846f20a3c869c8526fc631d.bin</screenshot>
-                    <grid-tab-order>default</grid-tab-order>
+                    <screenshot filename="bookshelf.png" mediatype="image/png" size="524952">/fr/service/persistence/crud/orbeon/builder/data/52c62a05a09601f37a121101468f9f98/b4f1c56ecce4fff54846f20a3c869c8526fc631d.bin</screenshot>
+                    <allow-template-use>true</allow-template-use>
                 </metadata>
             </xf:instance>
 

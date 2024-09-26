@@ -174,13 +174,19 @@
             <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <metadata>
                     <application-name>orbeon</application-name>
+
                     <form-name>bookshelf</form-name>
                     <title xml:lang="en">Orbeon Forms Bookshelf</title>
                     <description xml:lang="en">Orbeon Forms Bookshelf is a simple form allowing you to gather information about books.</description>
                     <title xml:lang="fr">Orbeon Forms Bookshelf</title>
                     <description xml:lang="fr">Orbeon Forms Bookshelf présente un formulaire simple qui vous permet de saisir des informations sur des livres.</description>
-                    <library-versions/>
-                <screenshot>/fr/service/persistence/crud/orbeon/bookshelf/form/b4f1c56ecce4fff54846f20a3c869c8526fc631d.bin</screenshot><grid-tab-order>default</grid-tab-order><email><templates><template name="default" xml:lang="en"><headers/><subject>Orbeon Forms Bookshelf form for `{$title}` by {$author}</subject><exclude-from-all-control-values/></template><template name="default" xml:lang="fr"><headers/><subject>Formulaire Orbeon Forms Bookshelf pour `{$title}` par {$author}</subject><exclude-from-all-control-values/></template></templates><parameters><param type="ControlValueParam"><name>title</name><controlName>title</controlName></param><param type="ControlValueParam"><name>author</name><controlName>author</controlName></param></parameters></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "notes/note", "iteration-name": "note-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"details"}],"newGridElem":{"value":"details-grid"},"afterElem":null,"content":[{"value":"title"},{"value":"author"},{"value":"image"},{"value":"language"},{"value":"link"},{"value":"rating"},{"value":"publication-year"}],"topLevel":true},{"containerPath":[{"value":"details"}],"newGridElem":{"value":"review-grid"},"afterElem":{"value":"details-grid"},"content":[{"value":"review"}],"topLevel":true}]}</migration></metadata>
+                    <library-versions>
+
+                    </library-versions>
+
+                    <screenshot filename="bookshelf.png" mediatype="image/png" size="524952">/fr/service/persistence/crud/orbeon/bookshelf/form/b4f1c56ecce4fff54846f20a3c869c8526fc631d.bin</screenshot>
+                    <allow-template-use>true</allow-template-use>
+                <email><templates><template name="default" xml:lang="en"><headers/><subject>Orbeon Forms Bookshelf form for `{$title}` by {$author}</subject><exclude-from-all-control-values/></template><template name="default" xml:lang="fr"><headers/><subject>Formulaire Orbeon Forms Bookshelf pour `{$title}` par {$author}</subject><exclude-from-all-control-values/></template></templates><parameters><param type="ControlValueParam"><name>title</name><controlName>title</controlName></param><param type="ControlValueParam"><name>author</name><controlName>author</controlName></param></parameters></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "notes/note", "iteration-name": "note-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"details"}],"newGridElem":{"value":"details-grid"},"afterElem":null,"content":[{"value":"title"},{"value":"author"},{"value":"image"},{"value":"language"},{"value":"link"},{"value":"rating"},{"value":"publication-year"}],"topLevel":true},{"containerPath":[{"value":"details"}],"newGridElem":{"value":"review-grid"},"afterElem":{"value":"details-grid"},"content":[{"value":"review"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
 
 

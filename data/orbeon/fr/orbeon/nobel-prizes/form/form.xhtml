@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms">
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
     <xh:head>
         <xh:title>List of Nobel prizes</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
@@ -33,7 +33,8 @@
                         </xf:bind>
                         <xf:bind id="laureates-bind" ref="laureates" name="laureates">
                             <xf:bind id="laureates-iteration-bind" ref="laureates-iteration" name="laureates-iteration">
-                                <xf:bind id="known-name-bind" ref="known-name" name="known-name" xxf:whitespace="trim" readonly="true()"/><xf:bind id="motivation-bind" ref="motivation" name="motivation" xxf:whitespace="trim" readonly="true()"/>
+                                <xf:bind id="known-name-bind" ref="known-name" name="known-name" xxf:whitespace="trim" readonly="true()"/>
+                                <xf:bind id="motivation-bind" ref="motivation" name="motivation" xxf:whitespace="trim" readonly="true()"/>
 
 
                             </xf:bind>
@@ -56,7 +57,16 @@
 
 
 
-                <grid-tab-order>default</grid-tab-order><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "prizes/prizes-iteration/laureates", "iteration-name": "laureates-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"prizes"},{"value":"prizes-iteration"}],"newGridElem":{"value":"prize-overview"},"afterElem":null,"content":[{"value":"year"},{"value":"category"}],"topLevel":true}]}</migration></metadata>
+
+                    <library-versions>
+
+                    </library-versions>
+
+
+
+                    <screenshot filename="nobel-prizes.png" mediatype="image.png" size="301601">/fr/service/persistence/crud/orbeon/nobel-prizes/form/fc4088d80515f2169bff927e96c21f10b0f33ed0.bin</screenshot>
+                    <allow-template-use>true</allow-template-use>
+                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "prizes/prizes-iteration/laureates", "iteration-name": "laureates-iteration" }]</migration><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"prizes"},{"value":"prizes-iteration"}],"newGridElem":{"value":"prize-overview"},"afterElem":null,"content":[{"value":"year"},{"value":"category"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
 
 
@@ -68,10 +78,13 @@
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
-                        <known-name><label>Name</label><hint/>
+                        <known-name>
+                            <label>Name</label>
+                            <hint/>
 
 
-                        </known-name><motivation>
+                        </known-name>
+                        <motivation>
                             <label>Motivation</label>
                             <hint/>
                         </motivation>
@@ -150,14 +163,16 @@
                         <fr:c x="1" y="1" w="3">
                             <xf:input id="known-name-control" bind="known-name-bind">
                                 <xf:label ref="$form-resources/known-name/label"/>
-                                <xf:hint ref="$form-resources/known-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:hint ref="$form-resources/known-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
 
 
                             </xf:input>
                         </fr:c>
-                        <fr:c x="4" y="1" w="9"><xf:input id="motivation-control" bind="motivation-bind">
+                        <fr:c x="4" y="1" w="9">
+                            <xf:input id="motivation-control" bind="motivation-bind">
                                 <xf:label ref="$form-resources/motivation/label"/>
                                 <xf:hint ref="$form-resources/motivation/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>

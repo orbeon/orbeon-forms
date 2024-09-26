@@ -54,7 +54,6 @@
 
                     <library-versions>
                         <_>1</_>
-                        <orbeon>3</orbeon>
                     </library-versions>
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
                     <wizard>true</wizard>

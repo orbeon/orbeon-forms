@@ -604,7 +604,7 @@
                             <url>oxf:/forms/orbeon/builder/form/template-wizard.xml</url>
                             <title>Wizard Form</title>
                             <description>This template is configured to use the Wizard view.</description>
-                            <screenshot></screenshot>
+                            <screenshot>oxf:/forms/orbeon/builder/form/template-wizard.webp</screenshot>
                         </_>
                     </_>
                     <_/>

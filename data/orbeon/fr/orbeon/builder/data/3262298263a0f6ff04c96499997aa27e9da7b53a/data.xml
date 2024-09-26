@@ -77,7 +77,11 @@
 
 
 
-                    <grid-tab-order>default</grid-tab-order>
+                    <library-versions>
+                        <_>1</_>
+                    </library-versions>
+
+
                     <email>
                         <templates>
                             <template name="default">
@@ -87,6 +91,8 @@
                         </templates>
                         <parameters/>
                     </email>
+                    <screenshot filename="nobel-prizes.png" mediatype="image.png" size="301601">/fr/service/persistence/crud/orbeon/builder/data/3262298263a0f6ff04c96499997aa27e9da7b53a/fc4088d80515f2169bff927e96c21f10b0f33ed0.bin</screenshot>
+                    <allow-template-use>true</allow-template-use>
                 </metadata>
             </xf:instance>
 

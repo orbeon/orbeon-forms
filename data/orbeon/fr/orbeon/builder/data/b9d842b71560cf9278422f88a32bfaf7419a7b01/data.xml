@@ -155,6 +155,7 @@
             <xf:instance xxf:readonly="true" id="fr-form-metadata">
                 <metadata>
                     <application-name>orbeon</application-name>
+                    <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
                     <form-name>w9</form-name>
                     <title xml:lang="en">Request for Taxpayer Identification Number and Certification</title>
                     <description xml:lang="en">Use this form to provide your correct TIN to the person who is required to file an information return with the IRS to report, for example, income paid to you, real estate transactions, mortgage interest you paid, acquisition or abandonment of secured property, cancellation of debt, or contributions you made to an IRA.</description>
@@ -170,8 +171,8 @@
                         </templates>
                         <parameters/>
                     </email>
-                    <screenshot>/fr/service/persistence/crud/orbeon/builder/data/b9d842b71560cf9278422f88a32bfaf7419a7b01/594ff9ed7a9a40b8a9c2aee9d3ab7f9082ead3f1.bin</screenshot>
-                    <grid-tab-order>default</grid-tab-order>
+                    <screenshot filename="w9.png" mediatype="image/png" size="80478">/fr/service/persistence/crud/orbeon/builder/data/b9d842b71560cf9278422f88a32bfaf7419a7b01/594ff9ed7a9a40b8a9c2aee9d3ab7f9082ead3f1.bin</screenshot>
+                    <allow-template-use>true</allow-template-use>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">

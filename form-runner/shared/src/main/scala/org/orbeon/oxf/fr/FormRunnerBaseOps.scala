@@ -67,12 +67,12 @@ object FormRunnerParams {
 
   def apply(paramsRootElem: NodeInfo): FormRunnerParams =
     FormRunnerParams(
-      app         = paramsRootElem elemValue "app",
-      form        = paramsRootElem elemValue "form",
-      formVersion = (paramsRootElem elemValue "form-version").toIntOption.getOrElse(1), // in `test` mode, for example, `form-version` is blank
-      document    = paramsRootElem elemValue("document").trimAllToOpt,
+      app         = paramsRootElem.elemValue("app"),
+      form        = paramsRootElem.elemValue("form"),
+      formVersion = paramsRootElem.elemValue("form-version").toIntOption.getOrElse(1), // in `test` mode, for example, `form-version` is blank
+      document    = paramsRootElem.elemValue("document").trimAllToOpt,
       isDraft     = paramsRootElem.elemValue("draft").trimAllToOpt.map(_ == "true"),
-      mode        = paramsRootElem elemValue "mode"
+      mode        = paramsRootElem.elemValue("mode")
     )
 
   def apply(appForm: AppForm, mode: String): FormRunnerParams =

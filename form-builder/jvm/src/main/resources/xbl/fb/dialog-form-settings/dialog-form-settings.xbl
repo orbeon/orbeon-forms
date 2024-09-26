@@ -45,6 +45,10 @@
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
 
+                <xf:setvalue
+                    ref="$i/original-app"
+                    value="$i/app"/>
+
                 <xf:var name="is-new-form"      value="$i/mode = 'new'"/>
                 <xf:var name="is-app-form"      value="$i/mode = 'app-form'"/>
                 <xf:var name="is-form-settings" value="not($is-new-form or $is-app-form)"/>
@@ -464,6 +468,7 @@
                     <_ valid="true">
                         <for-action/>
                         <lang/>
+                        <original-app/>
                         <app/>
                         <form/>
                         <title/>
@@ -720,6 +725,10 @@
                                                 concat('/fr/service/persistence/crud/orbeon/builder/data/', $doc/@name, '/data.xml')
                                             ),
                                             xf:element(
+                                                'app',
+                                                $doc/details/detail[ends-with(@path, '/application-name')]/string()
+                                            ),
+                                            xf:element(
                                                 'title',
                                                 $doc/details/detail[ends-with(@path, '/title')]/string()
                                             ),
@@ -865,6 +874,32 @@
                                                     <xf:output class="fb-template-screenshot" mediatype="image/*" ref="screenshot[xxf:non-blank()]"/>
                                                 </xh:div>
                                             </xf:repeat>
+                                            <!-- If the user selects a template, and there is an app name associated,
+                                                 then set the app name to the selected template's app name. This makes
+                                                 sense because the user is more likely to be creating a form in an app
+                                                 that matches the template's app. The user can change this later.
+
+                                                 The user can have access to any app, or to a specific set. The search
+                                                 only searches for and returns templates from apps the user has access
+                                                 to. So it is safe to use those app names here.
+
+                                                 Some templates are in no app (like the "blank" template), which means
+                                                 they are global. If the user changes between a template with an app,
+                                                 and then a template without an app, we don't want the new app to be
+                                                 sticky. So we restore it to the original app. This makes sense because
+                                                 the user cannot directly change the app name in `new` mode.
+                                            -->
+                                            <xf:setvalue
+                                                event="xxforms-index-changed"
+                                                observer="form-template-repeat"
+                                                ref="$i/app"
+                                                value="
+                                                    (
+                                                        (: Selected app if present :)
+                                                        instance('template-forms')/*[event('xxf:new-index')]/app[xxf:non-blank()]/string(),
+                                                        (: Original app passed when the dialog opened otherwise :)
+                                                        $i/original-app
+                                                    )[1]"/>
                                         </xh:div>
                                     </fr:c>
                                 </fr:grid>

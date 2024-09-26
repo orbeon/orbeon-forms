@@ -108,7 +108,7 @@ trait FormRunnerComponents {
   private object Private {
 
     val Logger = LoggerFactory.createLogger(FormRunner.getClass)
-    val DefaultNorewriteSet = Set("fr-lang")
+    val DefaultNorewriteSet = Set("fr-lang", "fr-mode")
 
     def newIndentedLogger: IndentedLogger =
       new IndentedLogger(Logger)

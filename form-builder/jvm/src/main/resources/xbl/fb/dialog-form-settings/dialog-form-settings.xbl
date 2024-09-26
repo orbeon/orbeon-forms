@@ -454,6 +454,12 @@
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="model">
+
+                <!-- Maximum number of form templates to load -->
+                <xf:var
+                    name="max-templates"
+                    value="100"/>
+
                 <xf:instance id="local">
                     <_ valid="true">
                         <for-action/>
@@ -645,10 +651,6 @@
                     </search>
                 </xf:instance>
 
-                <xf:var
-                    name="page-size"
-                    value="100"/>
-
                 <xf:submission
                     id="search-form-templates-submission"
                     ref="instance('fr-search-instance')"
@@ -680,7 +682,11 @@
                                 else
                                     ''"/>
 
-                        <xf:setvalue ref="page-size" value="$page-size + 1"/>
+                        <!-- Return a single page and honor `$max-templates` -->
+                        <xf:setvalue
+                             ref="page-size"
+                             value="max(($max-templates - count(instance('template-forms')/*), 0))"/>
+
                         <xf:setvalue ref="lang" value="'en'"/>
                         <!-- NOTE: xxf:lang() doesn't seem to work here -->
     <!--                    <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>-->

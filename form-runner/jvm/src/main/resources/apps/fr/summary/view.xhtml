@@ -55,7 +55,7 @@
                 value="
                     if ($has-fb-roles) then
                         instance('fr-search-instance')/query[
-                            contains(@path, 'application-name') and
+                            ends-with(@path, '/application-name') and
                             @summary-search = 'true'
                         ]
                     else
@@ -67,7 +67,7 @@
                 value="
                     if ($app-query) then
                         instance('fr-search-instance')/query[
-                            contains(@path, 'form-name') and
+                            ends-with(@path, '/form-name') and
                             @summary-search = 'true'
                         ]
                     else
@@ -1022,10 +1022,43 @@
                                 </xh:ul>
                             </xh:div>
 
+                            <!-- Form Builder Only if there is a choice of app -->
+                            <!-- https://github.com/orbeon/orbeon-forms/issues/878 -->
+                            <xf:group ref="$app-query[$app-is-dropdown]">
+                                <xf:var name="control-name" value="@name"/>
+                                <xf:var
+                                    name="label"
+                                    value="
+                                        instance('fr-search-labels-instance')/
+                                            query[
+                                                @name = $control-name
+                                            ]/resources[
+                                                @lang = xxf:instance('fr-language-instance')
+                                            ]/label"/>
+                                <xf:select1 ref="." class="fr-app-name-select">
+                                    <xf:label class="xforms-hidden">
+                                        <xf:output mediatype="text/html" value="$label"/>
+                                    </xf:label>
+                                    <xf:itemset ref="xxf:instance('fb-permissions')/app">
+                                        <xf:label ref="concat($label, ': ', @name)"/>
+                                        <xf:value ref="@name"/>
+                                    </xf:itemset>
+
+                                    <xf:action event="xforms-value-changed">
+                                        <!-- Clear dependent form, actual value is recalculated just before submission if needed -->
+                                        <xf:setvalue ref="$form-query"/>
+
+                                        <xf:dispatch name="fr-reset-search" targetid="fr-form-model"/>
+                                    </xf:action>
+                                </xf:select1>
+                            </xf:group>
+
                             <xf:input
                                 id="fr-search-free-input"
                                 ref="if (case('fr-search-options-switch') = 'fr-search-free-case') then instance('fr-search-instance')/query else ''"
-                                class="fr-search-free-input"/>
+                                class="fr-search-free-input">
+                                <xf:label appearance="minimal" ref="$fr-resources/summary/labels/free-search"/>
+                            </xf:input>
 
                             <xf:trigger class="fr-search-button">
                                 <xf:label mediatype="text/html" value="$fr-resources/home-summary/search/search-forms"/>
@@ -1044,7 +1077,15 @@
                                     ref="$fr-resources/home-summary/search/(if (case('fr-search-options-switch') = 'fr-search-free-case') then show-search-options else close-search-options)"/>
                                 <xf:action event="DOMActivate">
                                     <!-- Clear all queries when switching -->
-                                    <xf:setvalue iterate="instance('fr-search-instance')/query" ref="."/>
+                                    <xf:setvalue
+                                        iterate="
+                                            instance('fr-search-instance')/query[
+                                                not(
+                                                    $app-is-dropdown and
+                                                    ends-with(@path, '/application-name')
+                                                )
+                                            ]"
+                                        ref="."/>
 
                                     <xf:toggle
                                         case="{
@@ -1219,7 +1260,7 @@
                                     <!-- Special form builder search: use input or select1 for app/form name -->
 
                                     <!-- Application -->
-                                    <xf:group ref="$app-query" class="fr-search-item">
+                                    <xf:group ref="$app-query[not($app-is-dropdown)]" class="fr-search-item">
                                         <xf:var name="control-name" value="@name"/>
                                         <xf:var
                                             name="label"
@@ -1230,28 +1271,11 @@
                                                     ]/resources[
                                                         @lang = xxf:instance('fr-language-instance')
                                                     ]/label"/>
-                                        <!-- Use an input if app name is a wildcard -->
-                                        <xf:input ref=".[not($app-is-dropdown)]">
+                                        <xf:input ref=".">
                                             <xf:label>
                                                 <xf:output mediatype="text/html" value="$label"/>
                                             </xf:label>
                                         </xf:input>
-                                        <xf:select1 ref=".[$app-is-dropdown]">
-                                            <xf:label>
-                                                <xf:output mediatype="text/html" value="$label"/>
-                                            </xf:label>
-                                            <xf:itemset ref="xxf:instance('fb-permissions')/app">
-                                                <xf:label ref="@name"/>
-                                                <xf:value ref="@name"/>
-                                            </xf:itemset>
-
-                                            <xf:action event="xforms-value-changed">
-                                                <!-- Clear dependent form, actual value is recalculated just before submission if needed -->
-                                                <xf:setvalue ref="$form-query"/>
-
-                                                <xf:dispatch name="fr-reset-search" targetid="fr-form-model"/>
-                                            </xf:action>
-                                        </xf:select1>
                                     </xf:group>
                                     <!-- Form -->
                                     <xf:group ref="$form-query" class="fr-search-item">

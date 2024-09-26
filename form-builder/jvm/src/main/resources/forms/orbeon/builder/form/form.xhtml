@@ -589,7 +589,17 @@
                                             if="xxf:non-blank(event('screenshot'))"
                                             context="bind('metadata-bind')"
                                             ref="*"
-                                            origin="xf:element('screenshot', event('screenshot'))"/>
+                                            origin="
+                                                xf:element(
+                                                    'screenshot',
+                                                    (
+                                                        xf:attribute('filename',  event('screenshot-filename')),
+                                                        xf:attribute('mediatype', event('screenshot-mediatype')),
+                                                        xf:attribute('size',      event('screenshot-size')),
+                                                        event('screenshot')
+                                                    )
+                                                )"/>
+
                                         <!-- Add/remove allow-template-use setting as needed -->
                                         <xf:delete
                                             bind="allow-template-use-bind"/>

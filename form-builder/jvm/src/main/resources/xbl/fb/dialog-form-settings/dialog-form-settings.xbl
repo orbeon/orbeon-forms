@@ -49,6 +49,11 @@
                     ref="$i/original-app"
                     value="$i/app"/>
 
+                <xf:setvalue
+                    iterate="'filename', 'mediatype', 'size'"
+                    ref="$i/screenshot/@*[name() = context()]"
+                    value="event(concat('screenshot-', context()))"/>
+
                 <xf:var name="is-new-form"      value="$i/mode = 'new'"/>
                 <xf:var name="is-app-form"      value="$i/mode = 'app-form'"/>
                 <xf:var name="is-form-settings" value="not($is-new-form or $is-app-form)"/>
@@ -372,6 +377,9 @@
                         <xf:property name="description"                            value="$i/description/string()"/>
                         <xf:property name="description-mediatype"                  value="if ($i/description/@isHTML = 'true') then 'text/html' else 'text/plain'"/>
                         <xf:property name="screenshot"                             value="$i/screenshot/string()"/>
+                        <xf:property name="screenshot-filename"                    value="$i/screenshot/@filename/string()"/>
+                        <xf:property name="screenshot-mediatype"                   value="$i/screenshot/@mediatype/string()"/>
+                        <xf:property name="screenshot-size"                        value="$i/screenshot/@size/string()"/>
                         <xf:property name="allow-template-use"                     value="$i/allow-template-use/string()"/>
                         <xf:property name="singleton"                              value="$i/singleton/string()"/>
                         <xf:property name="attachment-max-size-per-file"           value="$i/attachment-max-size-per-file/string()"/>
@@ -474,7 +482,7 @@
                         <title/>
                         <description isHTML=""/>
                         <singleton/>
-                        <screenshot/>
+                        <screenshot filename="" mediatype="" size=""/>
                         <allow-template-use/>
                         <wizard/>
                         <wizard-mode/>
@@ -1409,6 +1417,11 @@
                                             </xh:tr>
                                         </fr:grid>
                                     </xf:group>
+
+                                    <fr:image-attachment ref="screenshot" class="fb-dialog-form-settings-screenshot">
+                                        <xf:label ref="$resources/dialog-form-settings/screenshot/label"/>
+                                        <xf:hint  ref="$resources/dialog-form-settings/screenshot/hint"/>
+                                    </fr:image-attachment>
 
                                     <xf:group class="fb-dialog-form-settings-info-stats">
                                         <xf:label value="$resources/dialog-form-settings/stats"/>

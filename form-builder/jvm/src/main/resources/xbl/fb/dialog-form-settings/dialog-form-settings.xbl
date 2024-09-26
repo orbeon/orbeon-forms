@@ -39,7 +39,9 @@
 
                 <!-- Save event context information in local instance -->
                 <xf:setvalue
-                    iterate="'app', 'form', 'title', 'description', 'screenshot', 'allow-template-use', 'singleton', 'mode', 'created-with-version'"
+                    iterate="
+                        'for-action', 'app', 'form', 'title', 'description', 'screenshot', 'allow-template-use',
+                        'singleton', 'mode', 'created-with-version'"
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
 
@@ -270,19 +272,6 @@
                     <xf:property name="metadata-instance" value="frf:metadataInstanceRootOpt($form)"/>
                 </xf:dispatch>
 
-                <!-- If there are invalid initial app/form values, mark them as visited and focus on first -->
-                <xf:action>
-                    <xf:var
-                        name="invalid-app-form"
-                        value="$i/(app, form)[xxf:non-blank() and not(valid())]"/>
-
-                    <xxf:setvisited
-                        iterate="$invalid-app-form"
-                        control="fb-{name()}-name-input"/>
-                    <xf:setfocus
-                        control="fb-general-settings-grid"/>
-                </xf:action>
-
                 <!-- Load form templates -->
                 <xf:send
                     if="$is-new-form"
@@ -293,14 +282,26 @@
                         value="if ($app-chooser = 'select1') then string-join($allowed-apps-if-has-roles, ' ') else ()"
                         xxf:tunnel="true"/>
                 </xf:send>
+                <!-- Explicit focus is necessary or the tab might not consistently open -->
                 <xf:setfocus
                     if="$is-new-form"
                     control="fb-templates-grid"/>
 
-                <!-- Necessary or the tab will not open -->
-                <xf:setfocus
-                    if="$is-app-form or $is-form-settings"
-                    control="fb-general-settings-grid"/>
+                <!-- If there are invalid initial app/form values, mark them as visited and focus on first -->
+                <xf:action if="$is-app-form or $is-form-settings">
+                    <xf:var
+                        name="invalid-app-form"
+                        value="$i/(app, form)[not(valid())]"/>
+                    <xf:action if="exists($invalid-app-form)">
+                        <xf:setfocus
+                            iterate="$invalid-app-form[1]"
+                            control="fb-{name()}-name-input"/>
+                    </xf:action>
+                    <!-- Explicit focus is necessary or the tab might not consistently open -->
+                    <xf:setfocus
+                        if="empty($invalid-app-form)"
+                        control="fb-general-settings-grid"/>
+                </xf:action>
 
             </xbl:handler>
 
@@ -455,6 +456,7 @@
             <xf:model id="model">
                 <xf:instance id="local">
                     <_ valid="true">
+                        <for-action/>
                         <lang/>
                         <app/>
                         <form/>
@@ -525,7 +527,7 @@
 
                 <xf:bind
                     ref="app | form"
-                    required="../mode = 'app-form'"
+                    required="../mode != 'new'"
                     constraint="xxf:is-blank() or matches(., '^[A-Za-z0-9\-_]+$') and xxf:max-length(255)"
                     xxf:whitespace="trim"
                     readonly="false()"/>
@@ -800,8 +802,18 @@
                     <xf:label
                         value="
                             if ($is-new-form) then
+                                (: No title in this case :)
                                 ()
+                            else if (xxf:non-blank($i/for-action)) then
+                                (: The action must match a process button and we use the associated text label if present :)
+                                let $r := xxf:r(concat('buttons.', $i/for-action), '|fr-fr-resources|')
+                                return
+                                    if (exists($r)) then
+                                        string(xf:parse(concat('&lt;span>', $r, '&lt;/span>')))
+                                    else
+                                        $resources/dialog-form-settings/label
                             else
+                                (: Case of form settings :)
                                 $resources/dialog-form-settings/label"/>
 
                     <!-- Expose mode to CSS -->

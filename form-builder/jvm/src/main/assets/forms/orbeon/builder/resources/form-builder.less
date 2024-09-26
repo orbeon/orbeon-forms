@@ -713,19 +713,19 @@ body.orbeon {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 1em;
-                min-height: 190px;
-                max-height: 390px;
+                min-height: 234px; // empirically fit one line
+                max-height: 482px; // empirically fit two lines
                 overflow-y: scroll;
                 padding: 5px; // so that selection outline/shadow is not clipped
-                justify-content: space-evenly;
+                justify-content: space-around;
 
                 & > span {
                     display: none;
                 }
 
                 .fb-template-card {
-                    width: 150px;
-                    height: 170px;
+                    width: 190px; // empirically fit 4 cards in a row
+                    height: 220px;
                     display: flex;
                     flex-direction: column;
                     white-space: nowrap;

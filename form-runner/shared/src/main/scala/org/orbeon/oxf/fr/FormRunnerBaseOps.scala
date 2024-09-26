@@ -70,7 +70,7 @@ object FormRunnerParams {
       app         = paramsRootElem elemValue "app",
       form        = paramsRootElem elemValue "form",
       formVersion = (paramsRootElem elemValue "form-version").toIntOption.getOrElse(1), // in `test` mode, for example, `form-version` is blank
-      document    = paramsRootElem elemValue "document" trimAllToOpt,
+      document    = paramsRootElem elemValue("document").trimAllToOpt,
       isDraft     = paramsRootElem.elemValue("draft").trimAllToOpt.map(_ == "true"),
       mode        = paramsRootElem elemValue "mode"
     )
@@ -167,9 +167,10 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
         }
 
       val message =
-        s"The following Orbeon Forms configurations are incomplete:\n\n${
-          lines.map(l => s"- $l\n").mkString
-        }\nPlease visit this page for more: https://doc.orbeon.com/installation/configuration-banner\n"
+        s"""The following Orbeon Forms configurations are incomplete:\n
+           |${lines.map(l => s"- $l\n").mkString}
+           |Please visit this page for more: https://doc.orbeon.com/installation/configuration-banner
+           |""".stripMargin
 
       val hasErrorLevel =
         tokens.exists {

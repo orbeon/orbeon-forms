@@ -860,7 +860,7 @@
                                 </xh:p>
 
                                 <fr:grid id="fb-general-settings-grid">
-                                    <fr:c x="1" y="1" w="3" h="1">
+                                    <fr:c x="1" y="1" w="6" h="1">
                                         <!-- Application name -->
                                         <!-- Use an input if app name is a wildcard -->
                                         <xf:input ref="app[$app-chooser = 'input']" id="fb-app-name-input" xxf:autocomplete="off" autofocus="true">
@@ -882,7 +882,7 @@
                                             <xf:label ref="$resources/application-name/label"/>
                                         </xf:output>
                                     </fr:c>
-                                    <fr:c x="4" y="1" w="3" h="1">
+                                    <fr:c x="7" y="1" w="6" h="1">
                                         <!-- Form name -->
                                         <xf:input ref="form" id="fb-form-name-input" xxf:autocomplete="off">
                                             <xf:label ref="$resources/form-name/label"/>
@@ -891,7 +891,7 @@
                                             <xf:alert ref="$resources/form-name/alert"/>
                                         </xf:input>
                                     </fr:c>
-                                    <fr:c x="7" y="1" w="6" h="1">
+                                    <fr:c x="1" y="2" w="12" h="1">
                                         <!-- Title -->
                                         <xf:input ref="title" id="fb-title-input" xxf:autocomplete="off">
                                             <xf:label ref="$resources/title/label"/>
@@ -899,7 +899,7 @@
                                             <xf:alert ref="$resources/title/alert"/>
                                         </xf:input>
                                     </fr:c>
-                                    <fr:c x="1" y="2" w="12" h="1">
+                                    <fr:c x="1" y="3" w="12" h="1">
                                         <xf:var name="is-html" value="description/@isHTML = 'true'"/>
                                         <xf:textarea ref="description[not($is-html)]" id="fb-description-textarea">
                                             <xf:label ref="$resources/description/label"/>
@@ -912,7 +912,7 @@
                                             <xf:alert ref="$resources/description/alert"/>
                                         </xf:textarea>
                                     </fr:c>
-                                    <fr:c x="1" y="3" w="12" h="1">
+                                    <fr:c x="1" y="4" w="12" h="1">
                                         <fr:checkbox-input ref="description/@isHTML" appearance="full">
                                             <xf:label ref="$resources/dialog-control-settings/use-html"/>
                                         </fr:checkbox-input>

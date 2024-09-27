@@ -336,13 +336,7 @@ trait FormRunnerActionsCommon {
       ))
     }
 
-  def tryCaptcha(params: ActionParams): ActionResult =
-    ActionResult.trySync {
-      if (frc.showCaptcha) {
-        dispatch(name = "fr-verify", targetId = "fr-captcha")
-        dispatch(name = "fr-verify", targetId = "fr-view-component")
-      }
-    }
+  def tryCaptcha(params: ActionParams): ActionResult = ActionResult.Sync(Success(()))
 
   def tryCaptchaReset(params: ActionParams): ActionResult =
     ActionResult.trySync {

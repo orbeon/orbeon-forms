@@ -109,9 +109,6 @@
                     recurse="true"/>
 
             </xbl:handler>
-            <xbl:handler event="fr-verify" phase="target">
-                <xf:dispatch name="fr-verify" targetid="fr-captcha"/>
-            </xbl:handler>
             <!-- For client-side API -->
             <xbl:handler event="fr-wizard-focus" phase="target">
                 <xf:var

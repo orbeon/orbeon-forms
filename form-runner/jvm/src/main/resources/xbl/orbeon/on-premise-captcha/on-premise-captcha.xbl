@@ -25,11 +25,6 @@
         <xbl:resources>
              <xbl:style src="/xbl/orbeon/on-premise-captcha/on-premise-captcha.css"/>
         </xbl:resources>
-        <xbl:handlers>
-            <xbl:handler event="fr-verify" phase="target">
-                <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
-            </xbl:handler>
-        </xbl:handlers>
         <xbl:implementation>
             <!-- Local model -->
             <xf:model id="on-premise-captcha-model">
@@ -63,7 +58,7 @@
                     <xf:setvalue ref="instance()/expected-answer" value="OnPremiseCaptcha:answer()"/>
                     <xf:setvalue ref="instance()/image"           value="OnPremiseCaptcha:image(instance()/expected-answer)"/>
                 </xf:action>
-                <xf:action event="fr-verify xforms-value-changed">
+                <xf:action event="xforms-value-changed">
                     <xf:var      name="correct"     value="instance()/user-answer = instance()/expected-answer"/>
                     <xf:dispatch if="not($correct)" name="fr-verify-error" targetid="fr-on-premise-captcha"/>
                     <xf:dispatch if="$correct"      name="fr-verify-done"  targetid="fr-on-premise-captcha"/>

@@ -24,18 +24,12 @@
 
     <xbl:binding id="fr-recaptcha" element="fr|recaptcha" xxbl:mode="binding lhha">
         <xbl:handlers>
-            <xbl:handler event="fr-verify" phase="target">
-                <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
-            </xbl:handler>
             <xbl:handler event="fr-reload" phase="target">
                 <xf:setvalue ref="response"/>
                 <xf:action if="$version = '2'" type="javascript" >
                     var i = ORBEON.xforms.XBL.instanceForControl(this);
                     if (i) i.reset();
                 </xf:action>
-            </xbl:handler>
-            <xbl:handler event="fr-check-response" phase="target">
-                <xf:dispatch name="fr-check-response" targetid="component-inner-group"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -129,26 +123,14 @@
                                 <xf:param name="publicKeyV2" value="$conf/v2/public-key"/>
                                 <xf:param name="publicKeyV3" value="$conf/v3/public-key"/>
                                 <xf:param name="theme"       value="fr:component-param-value('theme')"/>
+                                <xf:param name="version"     value="$version"/>
                                 <xf:body>
                                     ORBEON.xforms.XBL.instanceForControl(this).render(publicKeyV2, publicKeyV3, theme);
+                                    if (version == "3")
+                                        ORBEON.xforms.XBL.instanceForControl(this).execute(publicKeyV3);
                                 </xf:body>
                             </xf:action>
-                        </xf:action>
 
-                        <xf:action event="fr-verify" phase="target">
-                            <!-- In v2, directly check if the response (if any) is valid -->
-                            <xf:dispatch if="$version = '2'" targetid="fr-recaptcha" name="fr-check-response"/>
-
-                            <!-- In v3, we need to "programmatically invoke the challenge" as the user doesn't interact with the UI -->
-                            <xf:action if="$version = '3'">
-                                <xf:action type="javascript">
-                                    <xf:param name="publicKeyV3" value="$conf/v3/public-key"/>
-                                    <xf:body>
-                                        ORBEON.xforms.XBL.instanceForControl(this).execute(publicKeyV3);
-                                    </xf:body>
-                                </xf:action>
-                                <xf:setvalue ref="xxf:instance('fr-persistence-instance')/captcha-suspend">true</xf:setvalue>
-                            </xf:action>
                         </xf:action>
 
                         <xf:action event="fr-check-response" phase="target">
@@ -190,22 +172,14 @@
                                 <xf:action if="not($is-success) and $version = '3'">
                                     <xf:setvalue ref="$version" value="'2'"/>
                                 </xf:action>
-                                <!-- Resume the process if needed -->
-                                <xf:action if="xxf:instance('fr-persistence-instance')/captcha-suspend = 'true'">
-                                    <!-- If validating again later, prevent the process from being suspended if the captcha is not invoked  -->
-                                    <xf:setvalue ref="xxf:instance('fr-persistence-instance')/captcha-suspend"/>
-                                    <!-- Resume the process (i.e. data validation/submission) -->
-                                    <xf:action type="xpath">fr:run-process('oxf.fr.detail.process', 'resume')</xf:action>
-                                </xf:action>
                             </xf:action>
                         </xf:action>
 
                         <!-- Provides access to the reCAPTCHA response exposed by the JavaScript API
                              http://code.google.com/apis/recaptcha/docs/display.html#recaptcha_methods -->
                         <xf:input ref="response" class="xbl-fr-recaptcha-response xforms-hidden">
-                            <!-- In v3, it's the response being received that will trigger the response verification -->
-                            <xf:action event="xforms-value-changed" if="xxf:non-blank(.) and $version = '3'">
-                                <xf:dispatch targetid="fr-recaptcha" name="fr-check-response"/>
+                            <xf:action event="xforms-value-changed" if="xxf:non-blank(.)">
+                                <xf:dispatch targetid="component-inner-group" name="fr-check-response"/>
                             </xf:action>
                         </xf:input>
 

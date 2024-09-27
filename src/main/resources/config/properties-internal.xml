@@ -409,9 +409,7 @@
         recover (error-message("upload-in-progress") then success)
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.require-valid.*.*">
-        captcha
-        then if ("xxf:instance('fr-persistence-instance')/captcha-suspend = 'true'") then suspend
-        then show-relevant-errors
+        show-relevant-errors
         then validate("error")
         recover (
             show-relevant-errors

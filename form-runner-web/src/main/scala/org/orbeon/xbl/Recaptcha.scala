@@ -52,8 +52,11 @@ object Recaptcha {
     }
 
     //@JSExport
-    def execute(publicKeyV3: String): Unit =
-      findGrecaptcha.foreach(_.execute(publicKeyV3, js.Dictionary("action"  -> "submit")).`then`(successfulResponse))
+    def execute(publicKeyV3: String): Unit = {
+      withGrecaptcha { grecaptcha =>
+        grecaptcha.execute(publicKeyV3, js.Dictionary("action"  -> "submit")).`then`(successfulResponse)
+      }
+    }
 
     //@JSExport
     def reset(): Unit =
@@ -71,20 +74,25 @@ object Recaptcha {
     }
 
     private def renderRecaptcha(publicKey: String, theme: String): Unit =
+      withGrecaptcha { grecaptcha =>
+        grecaptcha.render(
+          containerElem.querySelector(".xbl-fr-recaptcha-div"),
+          // TODO: facade
+          js.Dictionary(
+            "sitekey"  -> publicKey,
+            "theme"    -> theme,
+            "callback" -> successfulResponse
+          )
+        )
+      }
+
+    private def withGrecaptcha(block: js.Dynamic => Unit): Unit =
       findGrecaptcha match {
         case None =>
           val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
-          js.timers.setTimeout(shortDelay)(renderRecaptcha(publicKey, theme))
+          js.timers.setTimeout(shortDelay)(withGrecaptcha(block))
         case Some(grecaptcha) =>
-          grecaptcha.render(
-            containerElem.querySelector(".xbl-fr-recaptcha-div"),
-            // TODO: facade
-            js.Dictionary(
-              "sitekey"  -> publicKey,
-              "theme"    -> theme,
-              "callback" -> successfulResponse
-            )
-          )
+          block(grecaptcha)
       }
   }
 }

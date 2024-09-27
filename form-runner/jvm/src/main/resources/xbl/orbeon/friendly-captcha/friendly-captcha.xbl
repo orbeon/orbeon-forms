@@ -17,18 +17,12 @@
         </xbl:resources>
 
         <xbl:handlers>
-            <xbl:handler event="fr-verify" phase="target">
-                <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
-            </xbl:handler>
             <xbl:handler event="fr-reload" phase="target">
                 <xf:setvalue ref="solution"/>
                 <xf:action type="javascript" >
                     var i = ORBEON.xforms.XBL.instanceForControl(this);
                     if (i) i.reset();
                 </xf:action>
-            </xbl:handler>
-            <xbl:handler event="fr-check-response" phase="target">
-                <xf:dispatch name="fr-check-response" targetid="component-inner-group"/>
             </xbl:handler>
         </xbl:handlers>
 
@@ -105,12 +99,6 @@
                     </xf:action>
                 </xf:action>
 
-                <xf:action event="fr-verify" phase="target">
-                    <xf:dispatch
-                        targetid="fr-friendly-captcha"
-                        name="fr-check-response"/>
-                </xf:action>
-
                 <xf:action event="fr-check-response" phase="target">
                     <xf:var name="did-enter-value" value="xxf:non-blank(solution)"/>
 
@@ -140,19 +128,13 @@
                              action. There doesn't seem to be an elegant way to do this with XForms actions.
                              See https://github.com/orbeon/orbeon-forms/issues/1627 -->
                         <xf:dispatch if="$is-success" targetid="fr-friendly-captcha" name="fr-verify-done"/>
-
-                        <!-- Resume the process if needed -->
-                        <xf:action if="xxf:instance('fr-persistence-instance')/captcha-suspend = 'true'">
-                            <!-- If validating again later, prevent the process from being suspended if the captcha is not invoked  -->
-                            <xf:setvalue ref="xxf:instance('fr-persistence-instance')/captcha-suspend"/>
-                            <!-- Resume the process (i.e. data validation/submission) -->
-                            <xf:action type="xpath">fr:run-process('oxf.fr.detail.process', 'resume')</xf:action>
-                        </xf:action>
                     </xf:action>
                 </xf:action>
 
                 <!-- Provides access the friendly-captcha response exposed by the JavaScript API -->
-                <xf:input ref="solution" class="xbl-fr-friendly-captcha-response xforms-hidden"/>
+                <xf:input ref="solution" class="xbl-fr-friendly-captcha-response xforms-hidden">
+                    <xf:dispatch event="xforms-value-changed" name="fr-check-response" targetid="component-inner-group"/>
+                </xf:input>
 
                 <!-- Div in which the friendly-captcha is rendered -->
                 <!-- We don't use the `frc-captcha` CSS class because this has the side effect of causing the captcha to

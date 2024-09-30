@@ -538,7 +538,7 @@
 
                 <xf:bind
                     ref="app | form"
-                    required="../mode != 'new'"
+                    required="../mode = 'app-form'"
                     constraint="xxf:is-blank() or matches(., '^[A-Za-z0-9\-_]+$') and xxf:max-length(255)"
                     xxf:whitespace="trim"
                     readonly="false()"/>

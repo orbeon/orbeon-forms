@@ -231,7 +231,7 @@
             <xf:delete
                 ref="$metadata/allow-template-use"/>
             <xf:insert
-                if="event('allow-template-use') = 'true'"
+                if="event('allow-template-use') = true()"
                 context="$metadata"
                 ref="*"
                 origin="xf:element('allow-template-use', event('allow-template-use'))"/>

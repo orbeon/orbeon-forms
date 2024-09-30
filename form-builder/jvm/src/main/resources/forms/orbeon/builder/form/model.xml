@@ -183,7 +183,9 @@
 <!--        <xf:message>xxx data ready for new</xf:message>-->
 
         <!-- Point to template -->
-        <xf:var name="template" value="instance('fr-form-instance')"/>
+        <xf:var
+            name="template"
+            value="instance('fr-form-instance')"/>
 
         <!-- Set language in all blank @xml:lang on template -->
         <!-- See https://github.com/orbeon/orbeon-forms/issues/3457 -->
@@ -197,9 +199,12 @@
                     else
                         xxf:instance('fr-language-instance')"/>
 
-        <xf:var name="metadata" value="frf:metadataInstanceRootOpt($template)"/>
+        <xf:var
+            name="metadata"
+            value="frf:metadataInstanceRootOpt($template)"/>
 
-        <xf:delete ref="$metadata/created-with-version"/>
+        <xf:delete
+            ref="$metadata/created-with-version"/>
 
         <xf:insert
             xmlns:version="java:org.orbeon.oxf.common.Version"

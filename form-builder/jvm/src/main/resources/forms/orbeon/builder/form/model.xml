@@ -222,6 +222,18 @@
             ref="."
             value="$fb-lang"/>
 
+        <!-- Used after loading a template -->
+        <xf:action if="exists(event('allow-template-use'))">
+            <!-- Add/remove allow-template-use setting as needed -->
+            <xf:delete
+                ref="$metadata/allow-template-use"/>
+            <xf:insert
+                if="event('allow-template-use') = 'true'"
+                context="$metadata"
+                ref="*"
+                origin="xf:element('allow-template-use', event('allow-template-use'))"/>
+        </xf:action>
+
         <!-- Set initial form and first section titles on template -->
         <xf:var
             name="form-resources"

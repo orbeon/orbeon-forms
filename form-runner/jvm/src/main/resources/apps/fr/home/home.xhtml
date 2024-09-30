@@ -1066,22 +1066,6 @@
                                     </xf:trigger>
 
                                 </xf:group>
-
-                                <fr:trigger class="btn-group" ref="$epi/relevant-trigger">
-                                    <xf:label ref="$fr-resources/home/export-purge/export"/>
-                                    <xf:action event="DOMActivate" >
-                                        <xf:setvalue ref="$epi/mode" value="'export'"/>
-                                        <xxf:show dialog="fr-export-purge-dialog"/>
-                                    </xf:action>
-                                </fr:trigger>
-
-                                <fr:trigger class="btn-group" ref="$epi/relevant-trigger">
-                                    <xf:label ref="$fr-resources/home/export-purge/purge"/>
-                                    <xf:action event="DOMActivate" >
-                                        <xf:setvalue ref="$epi/mode" value="'purge'"/>
-                                        <xxf:show dialog="fr-export-purge-dialog"/>
-                                    </xf:action>
-                                </fr:trigger>
                             </xf:group>
 
                             <!-- Progress bars for reindexing -->

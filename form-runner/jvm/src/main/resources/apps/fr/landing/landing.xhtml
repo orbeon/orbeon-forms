@@ -110,7 +110,7 @@
             </xf:submission>
 
             <!-- Don't use `xxf:exclude-result-prefixes="#all"` as eXist search needs the `xh` and `xf` namespaces -->
-            <!-- With eXist, `return-all-indexed-fields="true"` is not supported, so pass the `<query>` elements anyway -->
+            <!-- TODO: Could we now get rid of the `<query>` elements since eXist support is no longer needed? -->
             <xf:instance id="fr-search-instance">
                 <search xmlns="" return-all-indexed-fields="true">
                     <query/>
@@ -348,15 +348,16 @@
                         </xh:span>
                     </fr:card-footer>
                 </fr:card>
-<!--                <fr:link-card img-src="/apps/fr/style/images/orbeon/crane.jpg" href="/fr/orbeon/builder/new">-->
-<!--                    <xf:label ref="xxf:r('landing.titles.form-builder-new', '|fr-fr-resources|')"/>-->
-<!--                </fr:link-card>-->
-<!--                <fr:link-card img-src="/apps/fr/style/images/orbeon/house.jpg" href="/fr/forms">-->
-<!--                    <xf:label ref="xxf:r('landing.titles.published-forms', '|fr-fr-resources|')"/>-->
-<!--                </fr:link-card>-->
-<!--                <fr:link-card img-src="/apps/fr/style/images/orbeon/cogs.jpg" href="/fr/admin">-->
-<!--                    <xf:label ref="xxf:r('landing.titles.form-runner-admin', '|fr-fr-resources|')"/>-->
-<!--                </fr:link-card>-->
+
+                <xf:repeat ref="$cards-tokens[matches(., '^[A-Za-z0-9\-_]+/[A-Za-z0-9\-_]+/[\d]+$')]">
+                    <xf:var name="tokens" value="xxf:split(., '/')"/>|
+                    <fr:card-form-data
+                        id="form-card"
+                        app="{$tokens[1]}"
+                        form="{$tokens[2]}"
+                        version="{$tokens[3]}"
+                    />
+                </xf:repeat>
             </xh:div>
         </fr:view>
     </xh:body>

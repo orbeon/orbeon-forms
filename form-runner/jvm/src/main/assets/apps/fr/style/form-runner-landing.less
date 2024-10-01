@@ -107,10 +107,21 @@ html {
         border-bottom: none;
     }
 
+    // Hide empty repeat items so they don't take part in the enclosing `display: flex`
+    .xforms-repeat-begin-end ~ span:not(:has(*)) {
+        display: none;
+    }
+
     .card-img-top {
         border-top: 40px solid transparent;
         border-right: 40px solid transparent;
         border-left: 40px solid transparent;
+    }
+
+    .card-img {
+        img {
+            width: 100%;
+        }
     }
 
     .card {

@@ -1,0 +1,433 @@
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xbl:binding
+        id="fr-form-card"
+        element="fr|form-card"
+        xxbl:mode="lhha custom-lhha binding"
+        class=""
+    >
+        <xbl:implementation>
+            <xf:model id="model">
+
+                <!-- FIXME: Read from property. Tried to pass it from parent but it doesn't work. -->
+                <xf:var
+                    name="page-size"
+                    value="8"/>
+
+                <xf:var
+                    name="tz"
+                    value="
+                        for $offset in frf:defaultTimezoneToOffsetString()
+                        return xs:dayTimeDuration($offset)"/>
+
+                <!-- FIXME: `xxf:lang()` doesn't work from here. -->
+                <xf:var
+                    name="datelang"
+                    value="(xxf:instance('fr-fr-language-instance')[frf:hasXPathNumberer(.)], 'en')[1]"/>
+
+                <xf:var name="app"     value="fr:component-param-value('app')"/>
+                <xf:var name="form"    value="fr:component-param-value('form')"/>
+                <xf:var name="version" value="xs:integer(fr:component-param-value('version'))"/>
+
+                <xf:instance id="fr-state-instance" xxf:exclude-result-prefixes="#all">
+                    <_ state="initial"/>
+                </xf:instance>
+
+                <!-- TODO -->
+<!--                <xf:var name="show-created"          value="xxf:property(string-join(('oxf.fr.summary.show-created'       ,   $app, $form), '.'))"/>-->
+<!--                <xf:var name="show-last-modified"    value="xxf:property(string-join(('oxf.fr.summary.show-last-modified' ,   $app, $form), '.'))"/>-->
+<!--                <xf:var name="show-workflow-stage"   value="xxf:property(string-join(('oxf.fr.summary.show-workflow-stage',   $app, $form), '.'))"/>-->
+<!--                <xf:var name="show-created-by"       value="xxf:property(string-join(('oxf.fr.summary.show-created-by',       $app, $form), '.'))"/>-->
+<!--                <xf:var name="show-last-modified-by" value="xxf:property(string-join(('oxf.fr.summary.show-last-modified-by', $app, $form), '.'))"/>-->
+
+                <!-- NOTE: A lot of what follows is duplicated from the Summary page. Ideally we should reuse code,
+                     through shared functions, a shared model, shared components, etc. -->
+                <xf:instance id="fr-source-form-instance" xxf:readonly="false" xxf:exclude-result-prefixes="#all"><!-- Set to false so that `xf:insert` works -->
+                    <_/>
+                </xf:instance>
+
+                <xf:instance id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                    <_/>
+                </xf:instance>
+
+                <!-- Used for obtaining item labels -->
+                <xf:var
+                    name="form-resources"
+                    value="instance('fr-form-resources')/(*[@xml:lang = xxf:instance('fr-fr-language-instance')], *)[1]"/>
+
+                <xf:instance id="fr-search-instance">
+                    <search>
+                        <query/>
+                        <query metadata="created"          match="gte"/>
+                        <query metadata="created"          match="lt"/>
+                        <query metadata="created-by"       match="exact"/>
+                        <query metadata="last-modified"    match="gte" sort="desc"/>
+                        <query metadata="last-modified"    match="lt"/>
+                        <query metadata="last-modified-by" match="exact"/>
+                        <query metadata="workflow-stage"   match="exact"/>
+                        <page-size>5</page-size>
+                        <page-number>1</page-number>
+                        <lang/>
+                    </search>
+                </xf:instance>
+
+                <!-- Contains search labels -->
+                <xf:instance id="fr-search-labels-instance" xxf:exclude-result-prefixes="#all">
+                    <_/>
+                </xf:instance>
+
+                <xf:submission
+                    id="fr-get-source-form-submission"
+                    method="get"
+                    serialization="none"
+                    resource="/fr/service/persistence/crud/{$app}/{$form}/form/form.xhtml"
+
+                    replace="instance"
+                    instance="fr-source-form-instance"
+
+                    xxf:readonly="true"
+                    xxf:cache="false"
+
+                    mode="asynchronous"
+                    xxf:response-must-await="200ms"
+                >
+
+                    <xf:header>
+                        <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                        <xf:value value="$version"/>
+                    </xf:header>
+
+                    <xf:insert
+                        event="xforms-submit-done"
+                        ref="instance('fr-form-metadata-instance')"
+                        origin="frf:metadataInstanceRootOpt(instance('fr-source-form-instance'))"/>
+
+                    <xf:setvalue
+                        event="xforms-submit-error"
+                        ref="instance('fr-state-instance')/@state"
+                        value="'error'"/>
+
+                </xf:submission>
+
+                <xf:instance id="fr-search-results-instance" xxf:exclude-result-prefixes="#all">
+                    <_ state="initial"/>
+                </xf:instance>
+
+                <xf:instance id="fr-form-metadata-instance" xxf:exclude-result-prefixes="#all">
+                    <_/>
+                </xf:instance>
+
+                <xf:submission
+                    id="fr-search-submission"
+                    ref="instance('fr-search-instance')"
+                    validate="false"
+                    method="post"
+                    resource="/fr/service/persistence/search/{$app}/{$form}"
+
+                    replace="instance"
+                    targetref="instance('fr-search-results-instance')"
+
+                    mode="asynchronous"
+                    xxf:response-must-await="200ms"
+                >
+
+                    <xf:header>
+                        <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                        <xf:value value="$version"/>
+                    </xf:header>
+
+                    <xf:setvalue
+                        event="xforms-submit-error"
+                        ref="instance('fr-state-instance')/@state"
+                        value="'error'"/>
+
+                    <!-- Set language upon submitting -->
+                    <xf:action event="xforms-submit">
+                        <xf:setvalue ref="page-size" value="$page-size + 1"/>
+                        <xf:setvalue ref="lang" value="'en'"/>
+                        <!-- NOTE: xxf:lang() doesn't seem to work here -->
+    <!--                    <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>-->
+<!--                        <xf:setvalue-->
+<!--                            ref="instance('fr-search-results-instance')/query[ends-with(@path, '/application-name')]"-->
+<!--                            value="fr:component-param-value('app')"/>-->
+<!--                        <xf:setvalue-->
+<!--                            ref="instance('fr-search-results-instance')/query[ends-with(@path, '/application-name')]"-->
+<!--                            value="fr:component-param-value('form')"/>-->
+                        <xf:setvalue
+                            ref="instance('fr-search-results-instance')/@state"
+                            value="'loading'"/>
+                    </xf:action>
+
+                </xf:submission>
+
+                <xf:action event="xforms-model-construct-done">
+                    <xf:send submission="fr-get-source-form-submission"/>
+                </xf:action>
+
+                <xf:action event="xforms-submit-done" observer="fr-get-source-form-submission">
+
+                    <!-- Load resources -->
+                    <!-- Dereference `@src` for Form Builder if needed -->
+                    <xf:insert
+                        ref="instance('fr-form-resources')"
+                        origin="
+                            let $resources-instance := instance('fr-source-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-resources']
+                            return
+                                if ($resources-instance/@src) then
+                                    doc($resources-instance/@src)
+                                else
+                                    $resources-instance/*
+                            "/>
+
+                    <xf:setvalue
+                        ref="instance('fr-search-instance')/page-size"
+                        value="$page-size"/>
+
+                    <!-- Create elements holding structured search data -->
+                    <xf:delete
+                        ref="
+                            instance('fr-search-labels-instance')/* |
+                            instance('fr-search-instance')/query[exists(@name)]"/>
+
+                    <xf:insert
+                        context="instance('fr-search-labels-instance')"
+                        origin="frf:searchableValues(instance('fr-source-form-instance')/root(), $app, $form, $version)/*"/>
+
+                    <xf:insert
+                        context="instance('fr-search-instance')"
+                        ref="query"
+                        origin="instance('fr-search-labels-instance')/query[exists(@path)]"/>
+
+                    <xf:delete
+                        ref="instance('fr-search-labels-instance')/query/*[name() != 'resources']"/>
+
+                    <xf:delete
+                        ref="instance('fr-search-instance')/query/*"/>
+
+                    <!-- Query initial list of documents -->
+                    <xf:send submission="fr-search-submission"/>
+
+                </xf:action>
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template>
+
+            <xf:var
+                name="detail-positions"
+                value="instance('fr-search-instance')/query[@name and @summary-show = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
+
+            <xf:var
+                name="documents"
+                value="instance('fr-search-results-instance')/document"/>
+
+            <xf:var
+                name="document-count-to-show"
+                value="if (instance('fr-search-results-instance')/@search-total = $page-size + 1) then $page-size + 1 else min((count($documents), $page-size))"/>
+
+            <xf:var
+                name="show-more"
+                value="$document-count-to-show lt instance('fr-search-results-instance')/@search-total/xs:integer(.)"/>
+
+            <fr:card
+                status="{(instance('fr-state-instance')/@state, 'done')[1]}"
+            >
+                <xf:label value="instance('fr-form-metadata-instance')/title"/>
+<!--                <xh:span class="badge rounded-pill bg-primary">-->
+<!--                        <xf:output value="instance('fr-search-results-instance')/@search-total" appearance="minimal"/>-->
+<!--                    </xh:span>-->
+                <fr:card-body>
+                    <xf:output value="instance('fr-form-metadata-instance')/description"/>
+<!--                    <xf:output-->
+<!--                        class="img-thumbnail"-->
+<!--                        mediatype="image/*"-->
+<!--                        ref="instance('fr-form-metadata-instance')/thumbnail[xxf:non-blank()]"-->
+<!--                        value="."/>-->
+                </fr:card-body>
+                <fr:card-thumbnail>
+                    <xh:img src="{instance('fr-form-metadata-instance')/thumbnail[xxf:non-blank()]}" class="img-thumbnail"/>
+                </fr:card-thumbnail>
+
+                    <xf:itemset ref="instance('fr-search-results-instance')/document[position() le $document-count-to-show]">
+                        <xf:label
+                            ref="
+                                string-join(
+                                    let $document := .
+                                    return
+                                        for $detail-position in $detail-positions
+                                        return
+                                            let $raw     := $document/details/detail[$detail-position],
+                                                $query   := instance('fr-search-instance')/query[exists(@name)][$detail-position],
+                                                $control := $query/@control,
+                                                $value   :=
+                                                    if ($control = 'textarea') then
+                                                        if (string-length($raw) > 20) then
+                                                            concat(substring($raw, 1, 20), '...')
+                                                        else
+                                                            $raw
+                                                    else if (frf:isMultipleSelectionControl($control)) then
+                                                        string-join(
+                                                            for $code in xxf:split($raw) return
+                                                                ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1],
+                                                            ', '
+                                                        )
+                                                    else if (frf:isSingleSelectionControl($control)) then
+                                                        for $code in $raw return
+                                                            ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1]
+                                                    else if ($control = 'secret') then
+                                                        if (normalize-space($raw) = '') then
+                                                            ''
+                                                        else
+                                                            '••••••••'
+                                                    else
+                                                        for $type in substring-after($query/@type, ':') return
+                                                            if ($type = 'date') then
+                                                                if ($raw castable as xs:date) then
+                                                                    format-date(
+                                                                        xs:date($raw),
+                                                                        xxf:r('summary.formats.date', '|fr-fr-resources|'),
+                                                                        $datelang,
+                                                                        (),
+                                                                        ()
+                                                                    )
+                                                                else
+                                                                    $raw
+                                                            else if ($type = 'time') then
+                                                                if ($raw castable as xs:time) then
+                                                                    format-time(
+                                                                        xs:time($raw),
+                                                                        xxf:r('summary.formats.time', '|fr-fr-resources|'),
+                                                                        $datelang,
+                                                                        (),
+                                                                        ()
+                                                                    )
+                                                                else
+                                                                    $raw
+                                                            else if ($type = 'dateTime') then
+                                                                if ($raw castable as xs:dateTime) then
+                                                                    format-dateTime(
+                                                                        xs:dateTime($raw),
+                                                                        xxf:r('summary.formats.dateTime', '|fr-fr-resources|'),
+                                                                        $datelang,
+                                                                        (),
+                                                                        ()
+                                                                    )
+                                                                else
+                                                                    $raw
+                                                            else if ($type = 'dayTimeDuration') then
+                                                                if ($raw castable as xs:dayTimeDuration) then
+                                                                    string-join(
+                                                                        (
+                                                                            if (days-from-duration($raw) = 0) then
+                                                                                ()
+                                                                            else
+                                                                                concat(days-from-duration($raw), ' d'),
+                                                                            if (hours-from-duration($raw) = 0) then
+                                                                                ()
+                                                                            else
+                                                                                concat(hours-from-duration($raw), ' h'),
+                                                                            if (minutes-from-duration($raw) = 0) then
+                                                                                ()
+                                                                            else
+                                                                                concat(minutes-from-duration($raw), ' min'),
+                                                                            if (seconds-from-duration($raw) = 0) then
+                                                                                ()
+                                                                            else
+                                                                                concat(seconds-from-duration($raw), ' sec')
+                                                                         ),
+                                                                         ' '
+                                                                    )
+                                                                else
+                                                                    $raw
+                                                            else
+                                                                $raw
+                                            return
+                                                if (xxf:is-blank($value)) then
+                                                    ' - '
+                                                else
+                                                    $value,
+                                    ' | '
+                                )"/>
+
+                        <xf:value
+                            ref="
+                                let
+                                    $current-document-name := @name,
+                                    $current-document-operations := xxf:split(@operations),
+                                    $edit-view-opt :=
+                                        if ($current-document-operations = ('*', 'update')) then
+                                            'edit'
+                                        else if ($current-document-operations = 'read') then
+                                            'view'
+                                        else
+                                            ''
+                                return
+                                    if (exists($edit-view-opt)) then
+                                        string-join(
+                                            (
+                                                '/fr',
+                                                $app,
+                                                $form,
+                                                $edit-view-opt,
+                                                $current-document-name
+                                            ),
+                                            '/'
+                                        )
+                                    else
+                                        ''"/>
+                    </xf:itemset>
+                    <xf:itemset ref=".[$show-more]">
+                        <xf:label ref="xxf:r('landing.show-more', '|fr-fr-resources|')"/>
+                        <xf:value ref="concat('/fr/', $app, '/', $form, '/summary?form-version=', $version)"/>
+                    </xf:itemset>
+]
+<!--                                    <xf:switch-->
+<!--                                        caseref="starts-with(normalize-space($detail), '&lt;div')"-->
+<!--                                        xxf:update="full">-->
+<!--                                        <xf:case value="true()">-->
+<!--                                            <xf:output mediatype="text/html" value="frf:maybeFilterHtml($detail)"/>-->
+<!--                                        </xf:case>-->
+<!--                                        <xf:case value="false()">-->
+<!--                                            <xf:output value="$detail"/>-->
+<!--                                        </xf:case>-->
+<!--                                    </xf:switch>-->
+<!--                    <xf:repeat ref="1 to $page-size + 1 - $document-count-to-show - (if ($show-more) then 1 else 0)">-->
+<!--                        <xh:li class="list-group-item text-truncate">-->
+<!--                            &#160;-->
+<!--                        </xh:li>-->
+<!--                    </xf:repeat>-->
+
+                <fr:card-footer>
+                    <xf:output value="
+                        (: TODO: Make this a reusable function :)
+                        let $date-time := $documents[1]/@last-modified/xs:dateTime(.),
+                            $v :=
+                                if (exists($tz)) then
+                                    adjust-dateTime-to-timezone(
+                                        $date-time,
+                                        $tz
+                                    )
+                                else
+                                    adjust-dateTime-to-timezone(
+                                        $date-time
+                                    )
+                        return
+                            if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
+                            then format-dateTime($v, xxf:r('common.formats.within-day', '|fr-fr-resources|'), xxf:lang(), (), ())
+                            else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
+                            then format-dateTime($v, xxf:r('common.formats.day-this-year', '|fr-fr-resources|'), xxf:lang(), (), ())
+                            else format-dateTime($v, xxf:r('common.formats.short-date', '|fr-fr-resources|'), xxf:lang(), (), ())">
+                        <xf:label ref="xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')"/>
+                    </xf:output>
+                </fr:card-footer>
+
+            </fr:card>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

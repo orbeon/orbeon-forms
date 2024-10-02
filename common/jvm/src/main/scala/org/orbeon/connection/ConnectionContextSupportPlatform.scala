@@ -12,10 +12,11 @@ trait ConnectionContextSupportPlatform extends ConnectionContextSupportTrait {
 
   private implicit val logger: slf4j.Logger = LoggerFactory.createLogger("org.orbeon.connection.context").logger
 
-  type ConnectionContext = AnyRef
+  // 2024-10-02: Don't use just a type alias to `AnyRef`, as we use implicits!
+  case class ConnectionContext(wrapped: AnyRef)
 
   def findContext(extension: Map[String, Any]): Option[ConnectionContext] =
-    connectionContextProviderOpt.flatMap(provider => Option(provider.getContext(extension.asJava)))
+    connectionContextProviderOpt.flatMap(provider => Option(provider.getContext(extension.asJava)).map(ConnectionContext.apply))
 
   def withContext[T](
     url          : URI,
@@ -28,7 +29,7 @@ trait ConnectionContextSupportPlatform extends ConnectionContextSupportTrait {
     connectionCtx: Option[ConnectionContext]
   ): T =
     (connectionContextProviderOpt, connectionCtx) match {
-      case (Some(provider), Some(ctx)) =>
+      case (Some(provider), Some(ConnectionContext(ctx))) =>
         provider.pushContext(ctx, url, method.entryName, headers.view.mapValues(_.toArray).to(Map).asJava, extension.asJava)
         try
           body

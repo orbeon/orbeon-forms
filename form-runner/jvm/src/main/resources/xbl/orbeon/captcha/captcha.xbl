@@ -77,8 +77,6 @@
                                                 )
                                             )
                                         ) = 'true'"/>
-                                <xf:var name="fr-resources"><xxf:value xxbl:scope="outer" value="$fr-resources"/></xf:var>
-
                                 <xf:group ref=".[$captcha-visible]">
                                     <!-- Success: remember the captcha passed, which also influences validity -->
                                     <xf:action event="fr-verify-done">

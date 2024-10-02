@@ -108,6 +108,7 @@
                     visited="true"
                     recurse="true"/>
 
+
             </xbl:handler>
             <!-- For client-side API -->
             <xbl:handler event="fr-wizard-focus" phase="target">
@@ -299,9 +300,299 @@
                             )
                         ) = true()"/>
 
+                <xsl:variable
+                    name="captcha-location"
+                    select="p:property(string-join(('oxf.fr.detail.captcha.location', $static-app, $static-form), '.'))"/>
+
+                <xsl:variable
+                    name="captcha-location-index"
+                    select="
+                        if ($captcha-location = ('inside-wizard-first-page'))
+                        then '1'
+                        else 'last()'"/>
+
                 <xsl:template match="/*">
-                    <xf:group appearance="xxf:internal">
+                    <xf:group appearance="xxf:internal" xxbl:scope="outer">
+
+                        <!-- Statically-known section and grid ids -->
+                        <xf:var
+                            name="nav-section-or-grid-ids"
+                            value="({
+                                string-join(
+                                    for $id in $static-nav-section-or-grid-ids
+                                        return concat('''', $id, ''''),
+                                    ','
+                                )
+                            })"/>
+
+                        <xf:var
+                            name="nav-matching-top-level-section-ids"
+                            value="({
+                                string-join(
+                                    for $id in $static-matching-top-level-section-ids
+                                        return concat('''', $id, ''''),
+                                    ','
+                                )
+                            })"/>
+
+                        <xf:var
+                            name="top-level-section-ids"
+                            value="({
+                                string-join(
+                                    for $id in $static-top-level-section-ids
+                                        return concat('''', $id, ''''),
+                                    ','
+                                )
+                            })"/>
+
+                        <xf:var
+                            name="sections-with-paging-section-ids"
+                            value="({
+                                string-join(
+                                    for $id in $static-sections-with-paging-section-ids
+                                        return concat('''', $id, ''''),
+                                    ','
+                                )
+                            })"/>
+
+                        <xf:var
+                            name="sections-with-paging-case-ids"
+                            value="({
+                                string-join(
+                                    for $id in $static-sections-with-paging-case-ids
+                                        return concat('''', $id, ''''),
+                                    ','
+                                )
+                            })"/>
+
+                        <xf:var
+                            name="validated-mode"
+                            value="xxf:instance('local')/validate/data(.) != 'free'"/>
+
+                        <xf:var
+                            name="separate-toc-mode"
+                            value="xxf:instance('local')/separate-toc/data(.)"/>
+
+                        <xf:var
+                            name="relevant-nav-section-or-grid-ids"
+                            value="
+                                $nav-section-or-grid-ids[
+                                    for $section-or-grid-bind in bind(frf:bindId(frf:controlNameFromId(.)))
+                                    return
+                                        xxf:relevant($section-or-grid-bind) and (
+                                            not(
+                                                . = $sections-with-paging-section-ids and
+                                                empty($section-or-grid-bind/*)
+                                            )
+                                        )
+                                ]"/>
+
+                        <xf:var
+                            name="relevant-top-level-section-ids"
+                            value="
+                                $top-level-section-ids[
+                                    for $top-level-section-bind in bind(frf:bindId(frf:controlNameFromId(.)))
+                                    return
+                                        xxf:relevant($top-level-section-bind)
+                                ]"/>
+
+                        <xf:var
+                            name="relevant-nav-case-ids"
+                            value="
+                                for $section-id in $relevant-nav-section-or-grid-ids
+                                return concat($section-id, '-case')"/>
+
+                        <xf:var
+                            name="relevant-top-level-case-ids"
+                            value="
+                                for $section-id in $relevant-top-level-section-ids
+                                return concat($section-id, '-case')"/>
+
+                        <!-- HACK: Dependency bug, using `xf:random()` to force recalculation -->
+                        <xf:var
+                            name="current-top-level-case-id"
+                            value="(xxf:instance('local')/current-top-level-case-id/string(), xf:random())[1]"/>
+
+                        <xf:var name="allow-url-param">
+                            <xxf:value xxbl:scope="inner" value="xs:string(fr:component-param-value('allow-url-param')) = 'true'"/>
+                        </xf:var>
+
+                        <!-- NOTE: Initially, current-case-id might be empty, so default to the first relevant case id. -->
+                        <xf:var
+                            name="current-nav-case-id"
+                            value="
+                                (
+                                    xxf:instance('local')/current-case-id[xxf:non-blank()]/string(),
+                                    $relevant-nav-case-ids
+                                )[1]"/>
+
+                        <xf:var
+                            name="nav-case-index"
+                            value="index-of($relevant-nav-case-ids, $current-nav-case-id)"/>
+
+                        <xf:var
+                            name="top-level-case-index"
+                            value="index-of($relevant-top-level-case-ids, $current-top-level-case-id)"/>
+
+                        <xf:var
+                            name="prev-nav-case-ids"
+                            value="$relevant-nav-case-ids[position() lt $nav-case-index]"/>
+
+                        <xf:var
+                            name="next-nav-case-ids"
+                            value="$relevant-nav-case-ids[position() gt $nav-case-index]"/>
+
+                        <xf:var
+                            name="next-top-level-case-ids"
+                            value="$relevant-top-level-case-ids[position() gt $top-level-case-index]"/>
+
+                        <xf:var
+                            name="current-section-uses-paging"
+                            value="$current-nav-case-id = $sections-with-paging-case-ids"/>
+
+                        <!-- Communicate the name and index of the current page to the client if needed
+                             https://github.com/orbeon/orbeon-forms/issues/2848 -->
+                        <xf:var
+                            name="current-page-name-with-index"
+                            value="
+                                let $page-name := frf:controlNameFromIdOpt(Wizard:sectionIdFromCaseIdOpt($current-nav-case-id))
+                                return
+                                    if ($current-section-uses-paging) then
+                                        concat(
+                                            $page-name,
+                                            '/',
+                                            xxf:instance('local')/current-index/string(.)
+                                        )
+                                    else
+                                        $page-name">
+                            <!-- Also set when the page appears so that the URL is up-to-date. This will also
+                                 fix the URL if the requested URL is pointing to a non-existing section or
+                                 index. -->
+                            <xf:action
+                                    type="javascript"
+                                    event="xforms-enabled xforms-value-changed"
+                                    if="$current-page-name-with-index">
+                                <xf:param name="pageNameWithIndex" value="$current-page-name-with-index"/>
+                                <xf:body>ORBEON.fr.private.API.updateWizardPageName(pageNameWithIndex)</xf:body>
+                            </xf:action>
+                        </xf:var>
+
+                        <xf:var
+                            name="current-repeat-id-and-index-opt"
+                            value="
+                                if ($current-section-uses-paging) then
+                                    let $section-id    := Wizard:sectionIdFromCaseIdOpt($current-nav-case-id),
+                                        $repeat-id     := concat($section-id, '-repeater-repeat'),
+                                        $current-index := xxf:instance('local')/current-index/data(.)
+                                    return
+                                        ($repeat-id, $current-index)
+                                else
+                                    ()
+                            "/>
+
+                        <xf:var
+                            name="prev-repeat-id-and-index-opt"
+                            value="
+                                if ($current-section-uses-paging) then
+                                    let $section-id    := Wizard:sectionIdFromCaseIdOpt($current-nav-case-id),
+                                        $repeat-id     := concat($section-id, '-repeater-repeat'),
+                                        $current-index := xxf:instance('local')/current-index/data(.)
+                                    return
+                                        if ($current-index gt 1) then
+                                            ($repeat-id, $current-index - 1)
+                                        else
+                                            ()
+                                else
+                                    ()
+                            "/>
+
+                        <xf:var
+                            name="next-repeat-id-and-index-opt"
+                            value="
+                                if ($current-section-uses-paging) then
+                                    let $section-id    := Wizard:sectionIdFromCaseIdOpt($current-nav-case-id),
+                                        $repeat-id     := concat($section-id, '-repeater-repeat'),
+                                        $current-index := xxf:instance('local')/current-index/data(.),
+                                        $section-bind  := bind(frf:bindId(frf:controlNameFromId($section-id))),
+                                        $last-index    := count($section-bind/*)
+                                    return
+                                        if ($current-index lt $last-index) then
+                                            ($repeat-id, $current-index + 1)
+                                        else
+                                            ()
+                                else
+                                    ()
+                            "/>
+
+                        <xf:var
+                            name="next-nested-case-id-opt"
+                            value="
+                                let $next-nav-case-id := $next-nav-case-ids[1]
+                                return
+                                    $next-nav-case-id[
+                                        Wizard:sectionIdFromCaseIdOpt($current-top-level-case-id) =
+                                            $nav-matching-top-level-section-ids[
+                                                index-of(
+                                                    $nav-section-or-grid-ids,
+                                                    Wizard:sectionIdFromCaseIdOpt($next-nav-case-id)
+                                                )
+                                            ]
+                                    ]
+                            "/>
+
+                        <xf:var
+                            name="next-top-level-case-id-opt"
+                            value="
+                                let $next-top-level-case-id := $next-top-level-case-ids[1]
+                                return
+                                    (: Exists and is available :)
+                                    $next-top-level-case-id[
+                                        exists(
+                                            index-of(
+                                                xxf:split(xxf:instance('available-top-level-sections')),
+                                                frf:controlNameFromIdOpt(Wizard:sectionIdFromCaseIdOpt($next-top-level-case-id))
+                                            )
+                                        )
+                                    ]
+                            "/>
+
+                        <xf:var
+                            id="fr-wizard-allow-prev"
+                            name="allow-prev"
+                            value="
+                                exists($prev-repeat-id-and-index-opt) or
+                                exists($prev-nav-case-ids)
+                            "/>
+
+                        <xf:var
+                            id="fr-wizard-allow-next"
+                            name="allow-next"
+                            value="
+                                (: We can go to the next top-level section :)
+                                exists($next-top-level-case-id-opt) or
+                                (: We can go to the next repeated section iteration :)
+                                exists($next-repeat-id-and-index-opt) or
+                                (: Next is in the same top-level section :)
+                                exists($next-nested-case-id-opt)
+                            "/>
+
+                        <!-- Wizard.scala uses this via the variable `id` -->
+                        <xf:var
+                            id="fr-wizard-is-first-nav"
+                            name="is-first-nav"
+                            value="empty($prev-nav-case-ids)"/>
+
+                        <!-- Wizard.scala uses this via the variable `id` -->
+                        <xf:var
+                            id="fr-wizard-is-last-nav"
+                            name="is-last-nav"
+                            value="empty($next-nav-case-ids)"/>
+
+                        <xf:var name="prev-button-ref" value="if (not($is-first-nav)) then xxf:instance('local')/readwrite else ''"/>
+                        <xf:var name="next-button-ref" value="if (not($is-last-nav))  then xxf:instance('local')/readwrite else ''"/>
+
                         <xf:group
+                            xxbl:scope="inner"
                             class="fr-wizard-toc{{
                                 ' xforms-hidden'         [not($local/show-toc/data(.))],
                                 ' fr-wizard-separate-toc'[$local/separate-toc/data(.)]
@@ -327,283 +618,6 @@
                                 id="fr-wizard-outer-group"
                                 class="fr-wizard-toc-inner"
                                 xxf:element="div">
-
-                                <!-- Statically-known section and grid ids -->
-                                <xf:var
-                                    name="nav-section-or-grid-ids"
-                                    value="({
-                                        string-join(
-                                            for $id in $static-nav-section-or-grid-ids
-                                                return concat('''', $id, ''''),
-                                            ','
-                                        )
-                                    })"/>
-
-                                <xf:var
-                                    name="nav-matching-top-level-section-ids"
-                                    value="({
-                                        string-join(
-                                            for $id in $static-matching-top-level-section-ids
-                                                return concat('''', $id, ''''),
-                                            ','
-                                        )
-                                    })"/>
-
-                                <xf:var
-                                    name="top-level-section-ids"
-                                    value="({
-                                        string-join(
-                                            for $id in $static-top-level-section-ids
-                                                return concat('''', $id, ''''),
-                                            ','
-                                        )
-                                    })"/>
-
-                                <xf:var
-                                    name="sections-with-paging-section-ids"
-                                    value="({
-                                        string-join(
-                                            for $id in $static-sections-with-paging-section-ids
-                                                return concat('''', $id, ''''),
-                                            ','
-                                        )
-                                    })"/>
-
-                                <xf:var
-                                    name="sections-with-paging-case-ids"
-                                    value="({
-                                        string-join(
-                                            for $id in $static-sections-with-paging-case-ids
-                                                return concat('''', $id, ''''),
-                                            ','
-                                        )
-                                    })"/>
-
-                                <xf:var
-                                    name="validated-mode"
-                                    value="xxf:instance('local')/validate/data(.) != 'free'"/>
-
-                                <xf:var
-                                    name="separate-toc-mode"
-                                    value="xxf:instance('local')/separate-toc/data(.)"/>
-
-                                <xf:var
-                                    name="relevant-nav-section-or-grid-ids"
-                                    value="
-                                        $nav-section-or-grid-ids[
-                                            for $section-or-grid-bind in bind(frf:bindId(frf:controlNameFromId(.)))
-                                            return
-                                                xxf:relevant($section-or-grid-bind) and (
-                                                    not(
-                                                        . = $sections-with-paging-section-ids and
-                                                        empty($section-or-grid-bind/*)
-                                                    )
-                                                )
-                                        ]"/>
-
-                                <xf:var
-                                    name="relevant-top-level-section-ids"
-                                    value="
-                                        $top-level-section-ids[
-                                            for $top-level-section-bind in bind(frf:bindId(frf:controlNameFromId(.)))
-                                            return
-                                                xxf:relevant($top-level-section-bind)
-                                        ]"/>
-
-                                <xf:var
-                                    name="relevant-nav-case-ids"
-                                    value="
-                                        for $section-id in $relevant-nav-section-or-grid-ids
-                                        return concat($section-id, '-case')"/>
-
-                                <xf:var
-                                    name="relevant-top-level-case-ids"
-                                    value="
-                                        for $section-id in $relevant-top-level-section-ids
-                                        return concat($section-id, '-case')"/>
-
-                                <!-- HACK: Dependency bug, using `xf:random()` to force recalculation -->
-                                <xf:var
-                                    name="current-top-level-case-id"
-                                    value="(xxf:instance('local')/current-top-level-case-id/string(), xf:random())[1]"/>
-
-                                <xf:var name="allow-url-param">
-                                    <xxf:value xxbl:scope="inner" value="xs:string(fr:component-param-value('allow-url-param')) = 'true'"/>
-                                </xf:var>
-
-                                <!-- NOTE: Initially, current-case-id might be empty, so default to the first relevant case id. -->
-                                <xf:var
-                                    name="current-nav-case-id"
-                                    value="
-                                        (
-                                            xxf:instance('local')/current-case-id[xxf:non-blank()]/string(),
-                                            $relevant-nav-case-ids
-                                        )[1]"/>
-
-                                <xf:var
-                                    name="nav-case-index"
-                                    value="index-of($relevant-nav-case-ids, $current-nav-case-id)"/>
-
-                                <xf:var
-                                    name="top-level-case-index"
-                                    value="index-of($relevant-top-level-case-ids, $current-top-level-case-id)"/>
-
-                                <xf:var
-                                    name="prev-nav-case-ids"
-                                    value="$relevant-nav-case-ids[position() lt $nav-case-index]"/>
-
-                                <xf:var
-                                    name="next-nav-case-ids"
-                                    value="$relevant-nav-case-ids[position() gt $nav-case-index]"/>
-
-                                <xf:var
-                                    name="next-top-level-case-ids"
-                                    value="$relevant-top-level-case-ids[position() gt $top-level-case-index]"/>
-
-                                <xf:var
-                                    name="current-section-uses-paging"
-                                    value="$current-nav-case-id = $sections-with-paging-case-ids"/>
-
-                                <!-- Communicate the name and index of the current page to the client if needed
-                                     https://github.com/orbeon/orbeon-forms/issues/2848 -->
-                                <xf:var
-                                    name="current-page-name-with-index"
-                                    value="
-                                        let $page-name := frf:controlNameFromIdOpt(Wizard:sectionIdFromCaseIdOpt($current-nav-case-id))
-                                        return
-                                            if ($current-section-uses-paging) then
-                                                concat(
-                                                    $page-name,
-                                                    '/',
-                                                    xxf:instance('local')/current-index/string(.)
-                                                )
-                                            else
-                                                $page-name">
-                                    <!-- Also set when the page appears so that the URL is up-to-date. This will also
-                                         fix the URL if the requested URL is pointing to a non-existing section or
-                                         index. -->
-                                    <xf:action
-                                            type="javascript"
-                                            event="xforms-enabled xforms-value-changed"
-                                            if="$current-page-name-with-index">
-                                        <xf:param name="pageNameWithIndex" value="$current-page-name-with-index"/>
-                                        <xf:body>ORBEON.fr.private.API.updateWizardPageName(pageNameWithIndex)</xf:body>
-                                    </xf:action>
-                                </xf:var>
-
-                                <xf:var
-                                    name="current-repeat-id-and-index-opt"
-                                    value="
-                                        if ($current-section-uses-paging) then
-                                            let $section-id    := Wizard:sectionIdFromCaseIdOpt($current-nav-case-id),
-                                                $repeat-id     := concat($section-id, '-repeater-repeat'),
-                                                $current-index := xxf:instance('local')/current-index/data(.)
-                                            return
-                                                ($repeat-id, $current-index)
-                                        else
-                                            ()
-                                    "/>
-
-                                <xf:var
-                                    name="prev-repeat-id-and-index-opt"
-                                    value="
-                                        if ($current-section-uses-paging) then
-                                            let $section-id    := Wizard:sectionIdFromCaseIdOpt($current-nav-case-id),
-                                                $repeat-id     := concat($section-id, '-repeater-repeat'),
-                                                $current-index := xxf:instance('local')/current-index/data(.)
-                                            return
-                                                if ($current-index gt 1) then
-                                                    ($repeat-id, $current-index - 1)
-                                                else
-                                                    ()
-                                        else
-                                            ()
-                                    "/>
-
-                                <xf:var
-                                    name="next-repeat-id-and-index-opt"
-                                    value="
-                                        if ($current-section-uses-paging) then
-                                            let $section-id    := Wizard:sectionIdFromCaseIdOpt($current-nav-case-id),
-                                                $repeat-id     := concat($section-id, '-repeater-repeat'),
-                                                $current-index := xxf:instance('local')/current-index/data(.),
-                                                $section-bind  := bind(frf:bindId(frf:controlNameFromId($section-id))),
-                                                $last-index    := count($section-bind/*)
-                                            return
-                                                if ($current-index lt $last-index) then
-                                                    ($repeat-id, $current-index + 1)
-                                                else
-                                                    ()
-                                        else
-                                            ()
-                                    "/>
-
-                                <xf:var
-                                    name="next-nested-case-id-opt"
-                                    value="
-                                        let $next-nav-case-id := $next-nav-case-ids[1]
-                                        return
-                                            $next-nav-case-id[
-                                                Wizard:sectionIdFromCaseIdOpt($current-top-level-case-id) =
-                                                    $nav-matching-top-level-section-ids[
-                                                        index-of(
-                                                            $nav-section-or-grid-ids,
-                                                            Wizard:sectionIdFromCaseIdOpt($next-nav-case-id)
-                                                        )
-                                                    ]
-                                            ]
-                                    "/>
-
-                                <xf:var
-                                    name="next-top-level-case-id-opt"
-                                    value="
-                                        let $next-top-level-case-id := $next-top-level-case-ids[1]
-                                        return
-                                            (: Exists and is available :)
-                                            $next-top-level-case-id[
-                                                exists(
-                                                    index-of(
-                                                        xxf:split(xxf:instance('available-top-level-sections')),
-                                                        frf:controlNameFromIdOpt(Wizard:sectionIdFromCaseIdOpt($next-top-level-case-id))
-                                                    )
-                                                )
-                                            ]
-                                    "/>
-
-                                <xf:var
-                                    id="fr-wizard-allow-prev"
-                                    name="allow-prev"
-                                    value="
-                                        exists($prev-repeat-id-and-index-opt) or
-                                        exists($prev-nav-case-ids)
-                                    "/>
-
-                                <xf:var
-                                    id="fr-wizard-allow-next"
-                                    name="allow-next"
-                                    value="
-                                        (: We can go to the next top-level section :)
-                                        exists($next-top-level-case-id-opt) or
-                                        (: We can go to the next repeated section iteration :)
-                                        exists($next-repeat-id-and-index-opt) or
-                                        (: Next is in the same top-level section :)
-                                        exists($next-nested-case-id-opt)
-                                    "/>
-
-                                <!-- Wizard.scala uses this via the variable `id` -->
-                                <xf:var
-                                    id="fr-wizard-is-first-nav"
-                                    name="is-first-nav"
-                                    value="empty($prev-nav-case-ids)"/>
-
-                                <!-- Wizard.scala uses this via the variable `id` -->
-                                <xf:var
-                                    id="fr-wizard-is-last-nav"
-                                    name="is-last-nav"
-                                    value="empty($next-nav-case-ids)"/>
-
-                                <xf:var name="prev-button-ref" value="if (not($is-first-nav)) then xxf:instance('local')/readwrite else ''"/>
-                                <xf:var name="next-button-ref" value="if (not($is-last-nav))  then xxf:instance('local')/readwrite else ''"/>
 
                                 <xf:action event="fr-prev-internal">
                                     <xf:action if="$allow-prev">
@@ -1366,221 +1380,243 @@
                                 -->
                             </xf:group>
                         </xf:group>
-                        <xh:div class="fr-wizard-body{{if (xxf:instance('local')/show-body/data(.)) then '' else ' xforms-hidden'}}">
 
-                            <!-- FIXME: Don't like that this is a top-level `switch` id! -->
-                            <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" xxbl:scope="outer">
-                                <xsl:if test="@full-update = 'true'">
-                                    <xsl:attribute name="xxf:update">full</xsl:attribute>
-                                </xsl:if>
+                        <xf:group appearance="xxf:internal" xxbl:scope="inner">
+                            <xh:div class="fr-wizard-body{{if (xxf:instance('local')/show-body/data(.)) then '' else ' xforms-hidden'}}">
 
-                                <!-- We need a way to listen to each case, but we don't want to duplicate the script and
-                                     anyway event.target doesn't work within case (which would be a bug) -->
-                                <!-- TODO: Move to Scala.js. -->
-                                <xf:action type="javascript" event="fr-section-scroll" target="#observer">
-                                    <![CDATA[
-                                    var $ = ORBEON.jQuery;
-                                    var target = event.target;
-                                    var sectionTitle = $(target).closest('.xbl-fr-wizard').find('.fr-wizard-body .xforms-case-selected .fr-section-title')[0];
+                                <!-- FIXME: Don't like that this is a top-level `switch` id! -->
+                                <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" xxbl:scope="outer">
+                                    <xsl:if test="@full-update = 'true'">
+                                        <xsl:attribute name="xxf:update">full</xsl:attribute>
+                                    </xsl:if>
 
-                                    if (sectionTitle) {
-                                        var r = sectionTitle.getBoundingClientRect();
-                                        if (r.top < 0 || r.bottom > $(window).height()) {
-                                            window.scrollTo($(window).scrollLeft(), $(sectionTitle).offset().top);
+                                    <!-- We need a way to listen to each case, but we don't want to duplicate the script and
+                                         anyway event.target doesn't work within case (which would be a bug) -->
+                                    <!-- TODO: Move to Scala.js. -->
+                                    <xf:action type="javascript" event="fr-section-scroll" target="#observer">
+                                        <![CDATA[
+                                        var $ = ORBEON.jQuery;
+                                        var target = event.target;
+                                        var sectionTitle = $(target).closest('.xbl-fr-wizard').find('.fr-wizard-body .xforms-case-selected .fr-section-title')[0];
+
+                                        if (sectionTitle) {
+                                            var r = sectionTitle.getBoundingClientRect();
+                                            if (r.top < 0 || r.bottom > $(window).height()) {
+                                                window.scrollTo($(window).scrollLeft(), $(sectionTitle).offset().top);
+                                            }
                                         }
-                                    }
-                                    ]]>
-                                </xf:action>
-                                <!-- Wrap each top-level fr:section within each own case -->
-                                <xsl:for-each select="fr:section">
-                                    <xsl:variable name="static-section-id" select="@id"/>
-                                    <xf:case id="{$static-section-id}-case">
-                                        <xsl:if test="/*/@sectionref">
-                                            <xsl:attribute
-                                                name="value"
-                                                select="concat('''', frf:controlNameFromId($static-section-id), '''')"
-                                                xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
-                                        </xsl:if>
-
-                                        <!-- Visit current section when leaving it -->
-                                        <xf:dispatch
-                                            event="xforms-deselect"
-                                            target="#observer"
-
-                                            name="fr-wizard-section-deselected"
-                                            targetid="fr-wizard-section-deselected">
-                                            <xf:property name="control" value="event('xxf:targetid')"/>
-                                        </xf:dispatch>
-
-                                        <!-- Check that incoming `xforms-focus` is allowed -->
-                                        <!-- TODO: See https://github.com/orbeon/orbeon-forms/issues/3323. -->
-
-                                        <!-- Un-visit all subsequent sections upon error in current section in `strict` mode -->
-                                        <!-- Use `delay="0"`, so we dispatch all the `fr-wizard-unvisit-following` after all the
-                                             `xforms-invalid`, avoiding a `StackOverflowError` on large forms -->
-                                        <xf:dispatch
-                                            event="xforms-invalid"
-                                            if="xxf:instance('local')/validate/data(.) = 'strict'"
-
-                                            name="fr-wizard-unvisit-following"
-                                            targetid="fr-wizard-unvisit-following"
-                                            delay="0"/>
-
-                                        <!-- Subsection nav enabled AND the top-level section is not part of the nav, which
-                                             means we navigate it's subsections/grids. -->
-                                        <xsl:variable
-                                            name="has-subsections-nav"
-                                            select="$static-subsections-nav and not($static-nav-section-or-grid-ids = @id)"/>
-
-                                        <xf:action event="xforms-select" target="#observer">
-
-                                            <!--
-                                                Keep `current-case-id` and `current-top-level-case-id` up to date.
-
-                                                NOTE: The `xforms-select` event is dispatched at the end of the `xf:toggle` but
-                                                before focus has been adjusted.
-                                            -->
-                                            <xsl:if test="not($has-subsections-nav)">
-                                                <!-- `current-case-id` is the same as `current-top-level-case-id` -->
-                                                <xf:setvalue
-                                                    ref="xxf:instance('local')/current-case-id"
-                                                    value="event('xxf:targetid')"/>
-                                            </xsl:if>
-                                            <xsl:if test="$has-subsections-nav">
-                                                <!-- Either the top-level case doesn't change, and then the nexted
-                                                     switch's event handler sets this value; or the top-level case
-                                                     changed, and there is a chance that the nested switch didn't
-                                                     change its case, in which case we make sure we set it here. If
-                                                     the nested switch changed its case, it already set the value,
-                                                     but that's ok. -->
-                                                <xf:setvalue
-                                                    ref="xxf:instance('local')/current-case-id"
-                                                    value="case('{$static-section-id}-switch')"/>
+                                        ]]>
+                                    </xf:action>
+                                    <!-- Wrap each top-level fr:section within each own case -->
+                                    <xsl:for-each select="fr:section">
+                                        <xsl:variable name="static-section-id" select="@id"/>
+                                        <xf:case id="{$static-section-id}-case">
+                                            <xsl:if test="/*/@sectionref">
+                                                <xsl:attribute
+                                                    name="value"
+                                                    select="concat('''', frf:controlNameFromId($static-section-id), '''')"
+                                                    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
                                             </xsl:if>
 
-                                            <xf:setvalue
-                                                ref="xxf:instance('local')/current-top-level-case-id"
-                                                value="event('xxf:targetid')"/>
+                                            <!-- Visit current section when leaving it -->
+                                            <xf:dispatch
+                                                event="xforms-deselect"
+                                                target="#observer"
 
-                                            <xf:dispatch name="fr-section-scroll" targetid="switch"/>
-
-                                            <xf:var
-                                                name="section-id"
-                                                value="Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid'))"
-                                                xxbl:scope="inner"/>
-
-                                            <xf:dispatch targetid="{{Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid'))}}" name="fr-expand"/>
-
-                                            <!-- NOTE: 2020-01-23: This is dispatched only for *top-level* pages. -->
-                                            <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
-                                                <xf:property name="section-binding" value="xxf:binding(Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid')))" xxbl:scope="outer"/>
-                                                <xf:property name="section-name"    value="frf:controlNameFromIdOpt($section-id)"/>
-                                                <xf:property name="validate"        value="$local/validate/data(.)"/>
-                                                <xf:property name="separate-toc"    value="$local/separate-toc/data(.)"/>
+                                                name="fr-wizard-section-deselected"
+                                                targetid="fr-wizard-section-deselected">
+                                                <xf:property name="control" value="event('xxf:targetid')"/>
                                             </xf:dispatch>
 
-                                        </xf:action>
+                                            <!-- Check that incoming `xforms-focus` is allowed -->
+                                            <!-- TODO: See https://github.com/orbeon/orbeon-forms/issues/3323. -->
 
-                                        <xf:group appearance="xxf:internal"><!-- Q: Why this group? -->
-                                            <!-- This is where the original section's attribute are being copied, including `id` and `bind` -->
-                                            <xsl:copy><!-- `<fr:section>` -->
-                                                <xsl:attribute name="view-appearance">wizard</xsl:attribute>
-                                                <xsl:attribute name="collapsible">false</xsl:attribute>
-                                                <xsl:apply-templates select="@* except (@collapse | @collapsible | @open)"/>
-                                                <!-- Tell the section whether it needs to be initially open or not (optimization).
-                                                     We can't enable this yet in `lax|strict` mode, see:
-                                                     https://github.com/orbeon/orbeon-forms/issues/4790#issuecomment-791652516 -->
-                                                <xsl:attribute
-                                                    name="content-nonrelevant-if-collapsed"
-                                                    select="$static-lazy-section-relevance"/>
-                                                <xsl:attribute
-                                                    name="open"
-                                                    select="concat('{case(''switch'') = ''', $static-section-id, '-case''}')"/>
+                                            <!-- Un-visit all subsequent sections upon error in current section in `strict` mode -->
+                                            <!-- Use `delay="0"`, so we dispatch all the `fr-wizard-unvisit-following` after all the
+                                                 `xforms-invalid`, avoiding a `StackOverflowError` on large forms -->
+                                            <xf:dispatch
+                                                event="xforms-invalid"
+                                                if="xxf:instance('local')/validate/data(.) = 'strict'"
 
-                                                <!-- Update the `changed` token -->
-                                                <xf:action event="xforms-value-changed">
+                                                name="fr-wizard-unvisit-following"
+                                                targetid="fr-wizard-unvisit-following"
+                                                delay="0"/>
+
+                                            <!-- Subsection nav enabled AND the top-level section is not part of the nav, which
+                                                 means we navigate it's subsections/grids. -->
+                                            <xsl:variable
+                                                name="has-subsections-nav"
+                                                select="$static-subsections-nav and not($static-nav-section-or-grid-ids = @id)"/>
+
+                                            <xf:action event="xforms-select" target="#observer">
+
+                                                <!--
+                                                    Keep `current-case-id` and `current-top-level-case-id` up to date.
+
+                                                    NOTE: The `xforms-select` event is dispatched at the end of the `xf:toggle` but
+                                                    before focus has been adjusted.
+                                                -->
+                                                <xsl:if test="not($has-subsections-nav)">
+                                                    <!-- `current-case-id` is the same as `current-top-level-case-id` -->
                                                     <xf:setvalue
-                                                        ref="@fr:section-status"
-                                                        value="
-                                                            let $tokens := distinct-values(xxf:split(.))
-                                                            return
-                                                                if (empty(index-of($tokens, 'changed'))) then
-                                                                    string-join(($tokens, 'changed'), ' ')
-                                                                else
-                                                                    ."/>
-                                                </xf:action>
+                                                        ref="xxf:instance('local')/current-case-id"
+                                                        value="event('xxf:targetid')"/>
+                                                </xsl:if>
+                                                <xsl:if test="$has-subsections-nav">
+                                                    <!-- Either the top-level case doesn't change, and then the nexted
+                                                         switch's event handler sets this value; or the top-level case
+                                                         changed, and there is a chance that the nested switch didn't
+                                                         change its case, in which case we make sure we set it here. If
+                                                         the nested switch changed its case, it already set the value,
+                                                         but that's ok. -->
+                                                    <xf:setvalue
+                                                        ref="xxf:instance('local')/current-case-id"
+                                                        value="case('{$static-section-id}-switch')"/>
+                                                </xsl:if>
 
-                                                <xsl:choose>
-                                                    <xsl:when test="$has-subsections-nav">
+                                                <xf:setvalue
+                                                    ref="xxf:instance('local')/current-top-level-case-id"
+                                                    value="event('xxf:targetid')"/>
 
-                                                        <!-- Don't forget the enclosing section lHHA -->
-                                                        <xsl:apply-templates select="xf:label | xf:help | xf:hint | xf:alert"/>
+                                                <xf:dispatch name="fr-section-scroll" targetid="switch"/>
 
-                                                        <!-- Subsections -->
-                                                        <xf:switch id="{$static-section-id}-switch" xxf:element="div" xxf:update="full">
-                                                            <xsl:for-each select="fr:section | fr:grid">
-                                                                <!-- fr:grid might not have an id, and we need one to toggle -->
-                                                                <xsl:variable name="section-or-grid-id" select="(@id, concat(generate-id(), '-wizard-grid'))[1]"/>
-                                                                <xf:case id="{$section-or-grid-id}-case">
-                                                                    <xxf:setvisited
-                                                                        event="xforms-deselect"
-                                                                        target="#observer"
-                                                                        control="{{event('xxf:targetid')}}"
-                                                                        visited="true"
-                                                                        recurse="true"/>
-                                                                    <xf:action event="xforms-select" target="#observer">
-                                                                        <!-- Keep `current-case-id` up to date in case switch happened via toggling. -->
-                                                                        <xf:setvalue
-                                                                            ref="xxf:instance('local')/current-case-id"
-                                                                            value="event('xxf:targetid')"/>
+                                                <xf:var
+                                                    name="section-id"
+                                                    value="Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid'))"
+                                                    xxbl:scope="inner"/>
 
-                                                                        <xf:dispatch name="fr-section-scroll" targetid="switch"/>
+                                                <xf:dispatch targetid="{{Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid'))}}" name="fr-expand"/>
 
-                                                                    </xf:action>
-                                                                    <xf:group appearance="xxf:internal">
-                                                                        <xsl:copy>
-                                                                            <xsl:if test="self::fr:section">
-                                                                                <xsl:attribute name="view-appearance">wizard</xsl:attribute>
-                                                                                <xsl:attribute name="collapsible">false</xsl:attribute>
-                                                                            </xsl:if>
-                                                                            <xsl:if test="not(@id)">
-                                                                                <xsl:attribute name="id" select="$section-or-grid-id"/>
-                                                                            </xsl:if>
-                                                                            <xsl:apply-templates select="(@* except (@collapse | @collapsible | @open)) | node()"/>
-                                                                        </xsl:copy>
-                                                                    </xf:group>
-                                                                </xf:case>
-                                                            </xsl:for-each>
-                                                        </xf:switch>
-                                                    </xsl:when>
-                                                    <xsl:otherwise>
-                                                        <!-- No subsection nav -->
-                                                        <xsl:apply-templates select="node()"/>
-                                                    </xsl:otherwise>
-                                                </xsl:choose>
-                                            </xsl:copy>
-                                        </xf:group>
-                                    </xf:case>
-                                </xsl:for-each>
-                            </xf:switch>
-                            <xsl:if test="p:property(string-join(('oxf.fr.detail.captcha.location', $static-app, $static-form), '.')) = 'inside-wizard'">
-                                <xf:var name="fr-resources"><xxf:value xxbl:scope="outer" value="$fr-resources"/></xf:var>
-                                <fr:captcha id="fr-captcha" namespace-name="{@captcha-namespace-name}"/>
-                            </xsl:if>
-                        </xh:div>
-                        <!-- In case the view contains elements other than sections (like dialogs) -->
-                        <xsl:variable name="fr-wizard-other-content" as="node()*">
-                            <xsl:apply-templates select="* except fr:section"/>
-                        </xsl:variable>
-                        <!-- Only place content if at least one element is present, so we avoid issues with table borders -->
-                        <xsl:if test="exists($fr-wizard-other-content/self::*)">
-                            <xh:div class="fr-wizard-other">
-                                <xh:div class="fr-wizard-cell-placeholder"/>
-                                <xf:group appearance="xxf:internal" xxbl:scope="outer">
-                                    <xsl:copy-of select="$fr-wizard-other-content"/>
-                                </xf:group>
+                                                <!-- NOTE: 2020-01-23: This is dispatched only for *top-level* pages. -->
+                                                <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
+                                                    <xf:property name="section-binding" value="xxf:binding(Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid')))" xxbl:scope="outer"/>
+                                                    <xf:property name="section-name"    value="frf:controlNameFromIdOpt($section-id)"/>
+                                                    <xf:property name="validate"        value="$local/validate/data(.)"/>
+                                                    <xf:property name="separate-toc"    value="$local/separate-toc/data(.)"/>
+                                                </xf:dispatch>
+
+                                            </xf:action>
+
+                                            <xf:group appearance="xxf:internal"><!-- Q: Why this group? -->
+                                                <!-- This is where the original section's attribute are being copied, including `id` and `bind` -->
+                                                <xsl:copy><!-- `<fr:section>` -->
+                                                    <xsl:attribute name="view-appearance">wizard</xsl:attribute>
+                                                    <xsl:attribute name="collapsible">false</xsl:attribute>
+                                                    <xsl:apply-templates select="@* except (@collapse | @collapsible | @open)"/>
+                                                    <!-- Tell the section whether it needs to be initially open or not (optimization).
+                                                         We can't enable this yet in `lax|strict` mode, see:
+                                                         https://github.com/orbeon/orbeon-forms/issues/4790#issuecomment-791652516 -->
+                                                    <xsl:attribute
+                                                        name="content-nonrelevant-if-collapsed"
+                                                        select="$static-lazy-section-relevance"/>
+                                                    <xsl:attribute
+                                                        name="open"
+                                                        select="concat('{case(''switch'') = ''', $static-section-id, '-case''}')"/>
+
+                                                    <!-- Update the `changed` token -->
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue
+                                                            ref="@fr:section-status"
+                                                            value="
+                                                                let $tokens := distinct-values(xxf:split(.))
+                                                                return
+                                                                    if (empty(index-of($tokens, 'changed'))) then
+                                                                        string-join(($tokens, 'changed'), ' ')
+                                                                    else
+                                                                        ."/>
+                                                    </xf:action>
+
+                                                    <xsl:choose>
+                                                        <xsl:when test="$has-subsections-nav">
+
+                                                            <!-- Don't forget the enclosing section lHHA -->
+                                                            <xsl:apply-templates select="xf:label | xf:help | xf:hint | xf:alert"/>
+
+                                                            <!-- Subsections -->
+                                                            <xf:switch id="{$static-section-id}-switch" xxf:element="div" xxf:update="full">
+                                                                <xsl:for-each select="fr:section | fr:grid">
+                                                                    <!-- fr:grid might not have an id, and we need one to toggle -->
+                                                                    <xsl:variable name="section-or-grid-id" select="(@id, concat(generate-id(), '-wizard-grid'))[1]"/>
+                                                                    <xf:case id="{$section-or-grid-id}-case">
+                                                                        <xxf:setvisited
+                                                                            event="xforms-deselect"
+                                                                            target="#observer"
+                                                                            control="{{event('xxf:targetid')}}"
+                                                                            visited="true"
+                                                                            recurse="true"/>
+                                                                        <xf:action event="xforms-select" target="#observer">
+                                                                            <!-- Keep `current-case-id` up to date in case switch happened via toggling. -->
+                                                                            <xf:setvalue
+                                                                                ref="xxf:instance('local')/current-case-id"
+                                                                                value="event('xxf:targetid')"/>
+
+                                                                            <xf:dispatch name="fr-section-scroll" targetid="switch"/>
+
+                                                                        </xf:action>
+                                                                        <xf:group appearance="xxf:internal">
+                                                                            <xsl:copy>
+                                                                                <xsl:if test="self::fr:section">
+                                                                                    <xsl:attribute name="view-appearance">wizard</xsl:attribute>
+                                                                                    <xsl:attribute name="collapsible">false</xsl:attribute>
+                                                                                </xsl:if>
+                                                                                <xsl:if test="not(@id)">
+                                                                                    <xsl:attribute name="id" select="$section-or-grid-id"/>
+                                                                                </xsl:if>
+                                                                                <xsl:apply-templates select="(@* except (@collapse | @collapsible | @open)) | node()"/>
+                                                                            </xsl:copy>
+                                                                        </xf:group>
+                                                                        <xsl:if test="$captcha-location = ('inside-wizard-first-page', 'inside-wizard-last-page')">
+                                                                            <fr:captcha namespace-name="{/*/@captcha-namespace-name}">
+                                                                                <xsl:attribute name="ref">
+                                                                                    .[
+                                                                                        '<xsl:value-of select="$section-or-grid-id"/>-case' =
+                                                                                        $relevant-nav-case-ids[<xsl:value-of select="$captcha-location-index"/>]
+                                                                                    ]
+                                                                                </xsl:attribute>
+                                                                            </fr:captcha>
+                                                                        </xsl:if>
+                                                                    </xf:case>
+                                                                </xsl:for-each>
+                                                            </xf:switch>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <!-- No subsection nav -->
+                                                            <xsl:apply-templates select="node()"/>
+                                                            <xsl:if test="$captcha-location = ('inside-wizard-first-page', 'inside-wizard-last-page')">
+                                                                <fr:captcha namespace-name="{/*/@captcha-namespace-name}">
+                                                                    <xsl:attribute name="ref">
+                                                                        .[
+                                                                            '<xsl:value-of select="$static-section-id"/>-case' =
+                                                                            $relevant-top-level-case-ids[<xsl:value-of select="$captcha-location-index"/>]
+                                                                        ]
+                                                                    </xsl:attribute>
+                                                                </fr:captcha>
+                                                            </xsl:if>
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
+                                                </xsl:copy>
+                                            </xf:group>
+                                        </xf:case>
+                                    </xsl:for-each>
+                                </xf:switch>
+                                <xsl:if test="$captcha-location = 'inside-wizard'">
+                                    <fr:captcha id="fr-captcha" namespace-name="{/*/@captcha-namespace-name}"/>
+                                </xsl:if>
                             </xh:div>
-                        </xsl:if>
+                            <!-- In case the view contains elements other than sections (like dialogs) -->
+                            <xsl:variable name="fr-wizard-other-content" as="node()*">
+                                <xsl:apply-templates select="* except fr:section"/>
+                            </xsl:variable>
+                            <!-- Only place content if at least one element is present, so we avoid issues with table borders -->
+                            <xsl:if test="exists($fr-wizard-other-content/self::*)">
+                                <xh:div class="fr-wizard-other">
+                                    <xh:div class="fr-wizard-cell-placeholder"/>
+                                    <xf:group appearance="xxf:internal" xxbl:scope="outer">
+                                        <xsl:copy-of select="$fr-wizard-other-content"/>
+                                    </xf:group>
+                                </xh:div>
+                            </xsl:if>
+                        </xf:group>
                     </xf:group>
                 </xsl:template>
 

@@ -25,11 +25,13 @@
 
     <xbl:binding
         id="fr-captcha"
-        element="fr|captcha">
+        element="fr|captcha"
+        xxbl:mode="binding">
 
         <xbl:handlers>
             <xbl:handler event="fr-reload" phase="target">
                 <xf:dispatch name="fr-reload" targetid="captcha"/>
+                <xf:setvalue ref="instance()/valid">false</xf:setvalue>
                 <xf:setvalue ref="xxf:instance('fr-persistence-instance')/captcha">false</xf:setvalue>
             </xbl:handler>
         </xbl:handlers>
@@ -63,9 +65,11 @@
                                             )
                                         ) = 'true'"/>
                                 <xf:var name="fr-resources"><xxf:value xxbl:scope="outer" value="$fr-resources"/></xf:var>
-                                <xh:div class="{{if (not($captcha-visible)) then 'xforms-disabled' else ''}}">
+
+                                <xf:group ref=".[$captcha-visible]">
                                     <!-- Success: remember the captcha passed, which also influences validity -->
                                     <xf:action event="fr-verify-done">
+                                        <xf:setvalue ref="instance()/valid">true</xf:setvalue>
                                         <xf:setvalue ref="$captcha">true</xf:setvalue>
                                     </xf:action>
                                     <!-- Failure: load another challenge -->
@@ -82,10 +86,10 @@
                                     >
                                         <xsl:attribute name="id">captcha</xsl:attribute>
                                         <xsl:attribute name="ref">$captcha</xsl:attribute>
-                                        <xf:label ref="$fr-resources/detail/labels/captcha-label"/>
-                                        <xf:alert ref="$fr-resources/detail/labels/captcha-alert"/>
+                                        <xf:label ref="xxf:r('detail.labels.captcha-label', '|fr-fr-resources|')"/>
+                                        <xf:alert ref="xxf:r('detail.labels.captcha-alert', '|fr-fr-resources|')"/>
                                     </xsl:element>
-                                </xh:div>
+                                </xf:group>
                             </xf:group>
                         </xsl:if>
                     </xf:group>

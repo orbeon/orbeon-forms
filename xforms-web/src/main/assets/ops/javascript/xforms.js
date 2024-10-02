@@ -211,16 +211,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 return null;
             },
 
-            getChildElementByClass: function(parent, clazz) {
-                for (var i = 0; i < parent.childNodes.length; i++) {
-                    var child = parent.childNodes[i];
-                    if (ORBEON.util.Dom.isElement(child) && child.classList.contains(clazz)) {
-                        return child;
-                    }
-                }
-                return null;
-            },
-
             /**
              * Use W3C DOM API to get the content of an element.
              */
@@ -276,11 +266,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
          * Utility methods that don't in any other category
          */
         Utils: {
-            logMessage: function(message) {
-                if (typeof console != "undefined") {
-                    console.log(message); // Normal use; do not remove
-                }
-            },
 
             /**
              * See: http://wiki.orbeon.com/forms/projects/ui/mobile-and-tablet-support#TOC-Problem-and-solution
@@ -1897,31 +1882,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 if (foundRepeatBegin) break;
                 // Explore parent
                 node = node.parentNode;
-            }
-        },
-
-        /**
-         * Called for each minimal dialog when there is a click on the document.
-         * We have one listener per dialog, which listens to those events all the time,
-         * not just when the dialog is open.
-         */
-        dialogMinimalBodyClick: function (event, yuiDialog) {
-            // If this dialog is visible
-            if (yuiDialog.element.style.visibility != "hidden") {
-                // Abort if one of the parents is drop-down dialog
-                var current = YAHOO.util.Event.getTarget(event);
-                var foundDropDownParent = false;
-                while (current != null && current != document) {
-                    if ($(current).is('.xforms-dialog-appearance-minimal')) {
-                        foundDropDownParent = true;
-                        break;
-                    }
-                    current = current.parentNode;
-                }
-                if (! foundDropDownParent) {
-                    var event = new ORBEON.xforms.AjaxEvent(null, yuiDialog.id, null, "xxforms-dialog-close");
-                    ORBEON.xforms.AjaxClient.fireEvent(event);
-                }
             }
         },
 

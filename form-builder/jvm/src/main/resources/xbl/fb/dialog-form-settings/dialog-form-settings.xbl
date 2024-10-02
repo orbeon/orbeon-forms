@@ -278,12 +278,12 @@
 
                 <!-- Load form templates -->
                 <xf:send
-                    if="$is-new-form"
+                    if="$is-new-form and $max-templates gt count(instance('template-forms')/*)"
                     submission="search-form-templates-submission">
                     <!-- Pass a string as we don't support sequences in tunnel parameters yet -->
                     <xf:property
                         name="remaining-app-names"
-                        value="if ($app-chooser = 'select1') then string-join($allowed-apps-if-has-roles, ' ') else ()"
+                        value="if ($app-chooser = ('select1', 'output')) then string-join($allowed-apps-if-has-roles, ' ') else ()"
                         xxf:tunnel="true"/>
                 </xf:send>
                 <!-- Explicit focus is necessary or the tab might not consistently open -->
@@ -751,7 +751,7 @@
                                 else
                                     ()"/>
                         <xf:send
-                            if="exists($remaining-app-names)"
+                            if="exists($remaining-app-names) and $max-templates gt count(instance('template-forms')/*)"
                             submission="search-form-templates-submission">
                             <!-- Pass a string as we don't support sequences in tunnel parameters yet -->
                             <xf:property
@@ -869,7 +869,7 @@
                                     <fr:c x="1" y="1" w="12" h="1">
                                         <xh:div class="fb-template-cards">
                                             <xf:repeat ref="instance('template-forms')/*" id="form-template-repeat">
-                                                <xh:div class="fb-template-card" title="{{title}}" tabindex="0">
+                                                <xh:div class="fb-template-card" title="{{title}}">
                                                     <xf:output class="fb-template-title" value="title"/>
                                                     <xf:output class="fb-template-screenshot" mediatype="image/*" ref="screenshot[xxf:non-blank()]"/>
                                                 </xh:div>

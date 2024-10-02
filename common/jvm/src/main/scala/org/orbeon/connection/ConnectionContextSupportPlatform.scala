@@ -14,7 +14,7 @@ trait ConnectionContextSupportPlatform extends ConnectionContextSupportTrait {
 
   type ConnectionContext = AnyRef
 
-  def getContext(extension: Map[String, Any]): Option[ConnectionContext] =
+  def findContext(extension: Map[String, Any]): Option[ConnectionContext] =
     connectionContextProviderOpt.flatMap(provider => Option(provider.getContext(extension.asJava)))
 
   def withContext[T](

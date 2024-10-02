@@ -133,7 +133,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
           )(
             logger           = detailsLogger,
             externalContext  = externalContext,
-            connectionCtx    = ConnectionContextSupport.getContext(Map.empty),
+            connectionCtx    = ConnectionContextSupport.findContext(Map.empty),
             resourceResolver = submission.containingDocument.staticState.resourceResolverOpt
           ).map(createConnectResult(_))
         )

@@ -97,7 +97,7 @@ trait FormRunnerSummary {
 
     implicit val externalContext         : ExternalContext                                    = CoreCrossPlatformSupport.externalContext
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait                      = CoreCrossPlatformSupport
-    implicit val connectionCtx           : Option[ConnectionContextSupport.ConnectionContext] = ConnectionContextSupport.getContext(Map.empty)
+    implicit val connectionCtx           : Option[ConnectionContextSupport.ConnectionContext] = ConnectionContextSupport.findContext(Map.empty)
     implicit val xfcd                    : XFormsContainingDocument                           = inScopeContainingDocument
     implicit val indentedLogger          : IndentedLogger                                     = xfcd.getIndentedLogger("form-runner")
 

@@ -9,7 +9,7 @@ trait ConnectionContextSupportTrait {
 
   type ConnectionContext
 
-  def getContext(extension: Map[String, Any]): Option[ConnectionContext]
+  def findContext(extension: Map[String, Any]): Option[ConnectionContext]
 
   def withContext[T](
     url      : URI,

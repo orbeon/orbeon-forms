@@ -8,7 +8,7 @@ trait ConnectionContextSupportPlatform extends ConnectionContextSupportTrait {
 
   type ConnectionContext = Unit
 
-  def getContext(extension: Map[String, Any]): Option[Unit] = None
+  def findContext(extension: Map[String, Any]): Option[Unit] = None
 
   def withContext[T](
     url          : URI,

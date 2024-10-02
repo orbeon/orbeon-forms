@@ -16,33 +16,73 @@ package org.orbeon.oxf.fr.persistence.relational.form.adt
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.fr.FormDefinitionVersion
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
+import org.orbeon.oxf.fr.persistence.relational.form.adt.Select.*
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 
 import java.time.Instant
 
 
 sealed trait Metadata[T] {
-  def string     : String
-  def sqlColumn  : String
-  def supportsUrl: Boolean
+  def string   : String
+  def sqlColumn: String
 
   def valueFromString(string: String): T
   def valueAsString(value: T): String
 
-  def valueOpt(form: Form, formMetadataOpt: Option[FormMetadata], language: => String): Option[T]
-
   def allowedMatchTypes: Set[MatchType]
+
+  def selectedValueOpt(form: Form, select: Select, language: => String): Option[T]
+
+  protected def throwInvalidSelect(select: Select): Nothing =
+    throw new IllegalArgumentException(s"Invalid select type ${select.string} for metadata $string")
 }
 
 object Metadata {
 
   import MatchType.*
 
-  trait BooleanMetadata extends Metadata[Boolean] {
+  trait MultiValueSupport[T] {
+    this: Metadata[T] =>
+
+    def selectedValueOpt(form: Form, select: Select, language: => String): Option[T] = {
+      def allValues = (form.localMetadataOpt.toList ++ form.remoteMetadata.values).map(value(_, language))
+
+      select match {
+        case Local       => form.localMetadataOpt.map(value(_, language))
+        case Remote(url) => form.remoteMetadata.get(url).map(value(_, language))
+        case Min         => min(allValues)
+        case Max         => max(allValues)
+        case Or          => or (allValues)
+        case And         => and(allValues)
+      }
+    }
+
+    def value(formMetadata: FormMetadata, language: => String): T
+
+    // Unsupported by default
+    def min(values: List[T]): Option[T] = throwInvalidSelect(Min)
+    def max(values: List[T]): Option[T] = throwInvalidSelect(Max)
+    def or (values: List[T]): Option[T] = throwInvalidSelect(Or)
+    def and(values: List[T]): Option[T] = throwInvalidSelect(And)
+  }
+
+  trait BooleanMetadata extends Metadata[Boolean] with MultiValueSupport[Boolean] {
     override def valueFromString(string: String): Boolean = string.toBoolean
     override def valueAsString(value: Boolean): String    = value.toString
 
     override val allowedMatchTypes: Set[MatchType] = Set(Exact)
+
+    override def or(values: List[Boolean]): Option[Boolean] =
+      values match {
+        case Nil => None
+        case _   => values.reduce(_ || _).some
+      }
+
+    override def and(values: List[Boolean]): Option[Boolean] =
+      values match {
+        case Nil => None
+        case _   => values.reduce(_ && _).some
+      }
   }
 
   trait FormDefinitionVersionMetadata extends Metadata[FormDefinitionVersion] {
@@ -58,11 +98,23 @@ object Metadata {
     override val allowedMatchTypes: Set[MatchType] = Set(GreaterThanOrEqual, GreaterThan, LowerThan, Exact)
   }
 
-  trait InstantMetadata extends Metadata[Instant] {
+  trait InstantMetadata extends Metadata[Instant] with MultiValueSupport[Instant] {
     override def valueFromString(string: String): Instant = RelationalUtils.instantFromString(string)
     override def valueAsString(value : Instant): String   = value.toString
 
     override val allowedMatchTypes: Set[MatchType] = Set(GreaterThanOrEqual, GreaterThan, LowerThan, Exact)
+
+    override def min(values: List[Instant]): Option[Instant] =
+      values match {
+        case Nil => None
+        case _   => values.min.some
+      }
+
+    override def max(values: List[Instant]): Option[Instant] =
+      values match {
+        case Nil => None
+        case _   => values.max.some
+      }
   }
 
   trait StringMetadata extends Metadata[String] {
@@ -72,92 +124,107 @@ object Metadata {
     override val allowedMatchTypes: Set[MatchType] = Set(Exact, Substring)
   }
 
-  trait StringListMetadata extends Metadata[List[String]] {
-    override def valueFromString(string: String): List[String] = string.splitTo[List]()
-    override def valueAsString(value: List[String]): String    = value.mkString(" ")
+  // For pattern matching
+  case class StringOption(stringOpt: Option[String])
+
+  trait StringOptionMetadata extends Metadata[StringOption] with MultiValueSupport[StringOption] {
+    override def valueFromString(string: String): StringOption = StringOption(Some(string).filter(_.nonEmpty))
+    override def valueAsString(value: StringOption): String    = value.stringOpt.getOrElse("")
+
+    override val allowedMatchTypes: Set[MatchType] = Set(Exact, Substring)
+  }
+
+  trait OperationsListMetadata extends Metadata[OperationsList] with MultiValueSupport[OperationsList] {
+    override def valueFromString(string: String): OperationsList = OperationsList(string.splitTo[List]())
+    override def valueAsString(value: OperationsList): String    = value.ops.mkString(" ")
 
     override val allowedMatchTypes: Set[MatchType] = Set(Exact, Token)
+
+    // Operations union
+    override def or(values: List[OperationsList]): Option[OperationsList] =
+      values match {
+        case Nil => None
+        case _   => OperationsList(values.flatMap(_.ops).distinct).some
+      }
+
+    // Operations intersection
+    override def and(values: List[OperationsList]): Option[OperationsList] =
+      values match {
+        case Nil => None
+        case _   => OperationsList(values.map(_.ops).reduce(_.intersect(_))).some
+      }
   }
 
-  case object AppName        extends StringMetadata {
-    override val string      = "application-name"
-    override val sqlColumn   = "app"
-    override val supportsUrl = false
+  case object AppName extends StringMetadata {
+    override val string    = "application-name"
+    override val sqlColumn = "app"
 
-    override def valueOpt(form: Form, formMetadataOpt: Option[FormMetadata], language: => String): Option[String] =
-      form.appForm.app.some
+    override def selectedValueOpt(form: Form, select: Select, language: => String): Option[String] =
+      if (select == Local) form.appForm.app.some else throwInvalidSelect(select)
   }
 
-  case object FormName       extends StringMetadata {
-    override val string      = "form-name"
-    override val sqlColumn   = "form"
-    override val supportsUrl = false
+  case object FormName extends StringMetadata {
+    override val string    = "form-name"
+    override val sqlColumn = "form"
 
-    override def valueOpt(form: Form, formMetadataOpt: Option[FormMetadata], language: => String): Option[String] =
-      form.appForm.form.some
+    override def selectedValueOpt(form: Form, select: Select, language: => String): Option[String] =
+      if (select == Local) form.appForm.form.some else throwInvalidSelect(select)
   }
 
-  case object FormVersion    extends FormDefinitionVersionMetadata {
-    override val string      = "form-version"
-    override val sqlColumn   = "form_version"
-    override val supportsUrl = false
+  case object FormVersion extends FormDefinitionVersionMetadata {
+    override val string    = "form-version"
+    override val sqlColumn = "form_version"
 
-    override def valueOpt(form: Form, formMetadataOpt: Option[FormMetadata], language: => String): Option[FormDefinitionVersion] =
-      form.version.some
+    override def selectedValueOpt(form: Form, select: Select, language: => String): Option[FormDefinitionVersion] =
+      if (select == Local) form.version.some else throwInvalidSelect(select)
   }
 
-  case object Created        extends InstantMetadata {
-    override val string      = "created"
-    override val sqlColumn   = "created"
-    override val supportsUrl = true
+  case object Created extends InstantMetadata {
+    override val string    = "created"
+    override val sqlColumn = "created"
 
-    override def valueOpt(form: Form, formMetadataOpt: Option[FormMetadata], language: => String): Option[Instant] =
-      formMetadataOpt.map(_.created)
+    override def value(formMetadata: FormMetadata, language: => String): Instant =
+      formMetadata.created
   }
 
-  case object LastModified   extends InstantMetadata {
-    override val string      = "last-modified"
-    override val sqlColumn   = "last_modified_time"
-    override val supportsUrl = true
+  case object LastModified extends InstantMetadata {
+    override val string    = "last-modified"
+    override val sqlColumn = "last_modified_time"
 
-    override def valueOpt(form: Form, formMetadataOpt: Option[FormMetadata], language: => String): Option[Instant] =
-      formMetadataOpt.map(_.lastModifiedTime)
+    override def value(formMetadata: FormMetadata, language: => String): Instant =
+      formMetadata.lastModifiedTime
   }
 
-  case object LastModifiedBy extends StringMetadata {
-    override val string      = "last-modified-by"
-    override val sqlColumn   = "last_modified_by"
-    override val supportsUrl = true
+  case object LastModifiedBy extends StringOptionMetadata {
+    override val string    = "last-modified-by"
+    override val sqlColumn = "last_modified_by"
 
-    override def valueOpt(form: Form, formMetadataOpt: Option[FormMetadata], language: => String): Option[String] =
-      formMetadataOpt.flatMap(_.lastModifiedByOpt)
+    override def value(formMetadata: FormMetadata, language: => String): StringOption =
+      StringOption(formMetadata.lastModifiedByOpt)
   }
 
-  case object Title          extends StringMetadata {
-    override val string      = "title"
-    override val sqlColumn   = "form_metadata"
-    override val supportsUrl = true
+  case object Title extends StringOptionMetadata {
+    override val string    = "title"
+    override val sqlColumn = "form_metadata"
 
-    override def valueOpt(form: Form, formMetadataOpt: Option[FormMetadata], language: => String): Option[String] =
-      formMetadataOpt.flatMap(_.title.get(language))
+    override def value(formMetadata: FormMetadata, language: => String): StringOption =
+      StringOption(formMetadata.title.get(language))
   }
 
-  case object Available      extends BooleanMetadata {
-    override val string      = "available"
-    override val sqlColumn   = "form_metadata"
-    override val supportsUrl = true
+  case object Available extends BooleanMetadata {
+    override val string    = "available"
+    override val sqlColumn = "form_metadata"
 
-    override def valueOpt(form: Form, formMetadataOpt: Option[FormMetadata], language: => String): Option[Boolean] =
-      formMetadataOpt.map(_.available)
+    override def value(formMetadata: FormMetadata, language: => String): Boolean =
+      formMetadata.available
   }
 
-  case object Operations     extends StringListMetadata {
-    override val string      = "operations"
-    override val sqlColumn   = "form_metadata"
-    override val supportsUrl = true
+  case object Operations extends OperationsListMetadata {
+    override val string    = "operations"
+    override val sqlColumn = "form_metadata"
 
-    override def valueOpt(form: Form, formMetadataOpt: Option[FormMetadata], language: => String): Option[List[String]] =
-      formMetadataOpt.map(_.operations)
+    override def value(formMetadata: FormMetadata, language: => String): OperationsList =
+      formMetadata.operations
   }
 
   val values: Seq[Metadata[?]] = Seq(AppName, FormName, FormVersion, Created, LastModified, LastModifiedBy, Title, Available, Operations)

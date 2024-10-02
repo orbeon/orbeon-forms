@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.form.adt
 
 import org.orbeon.oxf.fr.FormDefinitionVersion
+import org.orbeon.oxf.fr.persistence.relational.form.adt.Metadata.StringOption
 
 import java.time.Instant
 
@@ -56,44 +57,59 @@ object MatchType {
 
   object GreaterThanOrEqual extends InequalityMatchType {
     override val string = "gte"
+
     override def satisfies(compareToValue: Int): Boolean = compareToValue >= 0
   }
 
-  object GreaterThan        extends InequalityMatchType {
+  object GreaterThan extends InequalityMatchType {
     override val string = "gt"
+
     override def satisfies(compareToValue: Int): Boolean = compareToValue > 0
   }
 
-  object LowerThan          extends InequalityMatchType {
+  object LowerThan extends InequalityMatchType {
     override val string = "lt"
+
     override def satisfies(compareToValue: Int): Boolean = compareToValue < 0
   }
 
-  object Substring          extends MatchType {
+  object Substring extends MatchType {
     override val string = "substring"
+
     override def satisfies[T](formValue: T, queryValue: T, metadata: Metadata[?]): Boolean =
       (formValue, queryValue) match {
-        case (formValue: String, queryValue: String) => formValue.toLowerCase.contains(queryValue.toLowerCase)
-        case _                                       => throwInvalidType(metadata)
+        case (formValue: String, queryValue: String) =>
+          formValue.toLowerCase.contains(queryValue.toLowerCase)
+
+        case (formValue: StringOption, queryValue: StringOption) =>
+          (for {
+            formString  <- formValue.stringOpt
+            queryString <- queryValue.stringOpt
+          } yield formString.toLowerCase.contains(queryString.toLowerCase)).getOrElse(false)
+
+        case _ => throwInvalidType(metadata)
       }
   }
 
-  object Exact              extends MatchType {
+  object Exact extends MatchType {
     override val string = "exact"
+
     override def satisfies[T](formValue: T, queryValue: T, metadata: Metadata[?]): Boolean =
       (formValue, queryValue) match {
-        case (formValue: String, queryValue: String) => formValue.toLowerCase == queryValue.toLowerCase
-        case _                                       => formValue == queryValue
+        case (formValue: String, queryValue: String)             => formValue.toLowerCase == queryValue.toLowerCase
+        case (formValue: StringOption, queryValue: StringOption) => formValue.stringOpt.map(_.toLowerCase) == queryValue.stringOpt.map(_.toLowerCase)
+        case _                                                   => formValue == queryValue
       }
   }
 
-  object Token              extends MatchType {
+  object Token extends MatchType {
     override val string = "token"
+
     override def satisfies[T](formValue: T, queryValue: T, metadata: Metadata[?]): Boolean =
       (formValue, queryValue) match {
-        case (formValues: List[String @unchecked], queryValues: List[String @unchecked]) =>
-          val lowerCaseFormValues = formValues.map(_.toLowerCase)
-          queryValues.forall(value => lowerCaseFormValues.contains(value.toLowerCase))
+        case (formValues: OperationsList, queryValues: OperationsList) =>
+          val lowerCaseFormValues = formValues.ops.map(_.toLowerCase)
+          queryValues.ops.forall(value => lowerCaseFormValues.contains(value.toLowerCase))
 
         case _ =>
           throwInvalidType(metadata)

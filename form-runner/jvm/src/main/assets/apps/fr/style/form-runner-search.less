@@ -60,15 +60,26 @@
       padding: 0 @spacing 0 @spacing; // there is enough padding from the controls at the bottom already
       margin: @spacing 0;
 
-      &.root-fieldset span.local-or-remote-switch {
-        display: flex;
+      &.root-fieldset {
+        padding-bottom: 10px;
 
-        fieldset:not(:last-of-type) {
-          margin-right: 10px;
+        &:not(.no-inner-fieldset) {
+          column-gap: 10px;
+          row-gap: 3px;
         }
 
-        fieldset:last-of-type {
-          margin-right: 0;
+        fieldset {
+          margin: 0;
+        }
+
+        &.no-inner-fieldset {
+          fieldset {
+            display: contents;
+
+            legend {
+              display: none;
+            }
+          }
         }
       }
 

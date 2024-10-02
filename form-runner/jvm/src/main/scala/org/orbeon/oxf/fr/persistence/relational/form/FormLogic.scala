@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.form
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.relational.Statement.{Setter, StatementPart, executeQuery}
-import org.orbeon.oxf.fr.persistence.relational.form.adt.{Form, FormMetadata, FormRequest}
+import org.orbeon.oxf.fr.persistence.relational.form.adt.{Form, FormMetadata, FormRequest, OperationsList}
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.util.CollectionUtils.fromIteratorExt
@@ -114,7 +114,7 @@ object FormLogic {
               created           = resultSet.getTimestamp("created").toInstant,
               available         = available,
               permissionsOpt    = permissions,
-              operations        = Nil
+              operations        = OperationsList(Nil)
             ).some
 
             Form(

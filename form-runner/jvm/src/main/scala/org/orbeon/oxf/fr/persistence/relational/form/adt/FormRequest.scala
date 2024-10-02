@@ -19,6 +19,7 @@ import org.orbeon.oxf.fr.FormRunnerHome.RemoteServer
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.instantFromString
 import org.orbeon.oxf.fr.persistence.relational.form.FormProcessor
+import org.orbeon.oxf.fr.persistence.relational.form.adt.Select.{Local, Remote}
 import org.orbeon.oxf.fr.{AppFormOpt, FormDefinitionVersion}
 import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
@@ -140,22 +141,22 @@ object FormRequest {
 
     val appOpt = appFormFromUrlOpt.map(_.app)
     val appQuery = appOpt.toSeq.map { app =>
-      Query(Metadata.AppName, languageOpt = None, urlOpt = None, (MatchType.Exact, app).some, orderDirectionOpt = None)
+      Query(Metadata.AppName, languageOpt = None, select = Local, (MatchType.Exact, app).some, orderDirectionOpt = None)
     }
 
     val formOpt = appFormFromUrlOpt.flatMap(_.formOpt)
     val formQuery = formOpt.toSeq.map { form =>
-      Query(Metadata.FormName, languageOpt = None, urlOpt = None, (MatchType.Exact, form).some, orderDirectionOpt = None)
+      Query(Metadata.FormName, languageOpt = None, select = Local, (MatchType.Exact, form).some, orderDirectionOpt = None)
     }
 
     val allVersions      = request.getFirstParamAsString("all-versions").getOrElse("false").toBoolean
     val allVersionsQuery = (! allVersions).seq {
-      Query(Metadata.FormVersion, languageOpt = None, urlOpt = None, (MatchType.Exact, FormDefinitionVersion.Latest).some, orderDirectionOpt = None)
+      Query(Metadata.FormVersion, languageOpt = None, select = Local, (MatchType.Exact, FormDefinitionVersion.Latest).some, orderDirectionOpt = None)
     }
 
     val modifiedSinceOpt   = request.getFirstParamAsString("modified-since").map(instantFromString)
     val modifiedSinceQuery = modifiedSinceOpt.toSeq.map { modifiedSince =>
-      Query(Metadata.LastModified, languageOpt = None, urlOpt = None, (MatchType.GreaterThan, modifiedSince).some, orderDirectionOpt = None)
+      Query(Metadata.LastModified, languageOpt = None, select = Local, (MatchType.GreaterThan, modifiedSince).some, orderDirectionOpt = None)
     }
 
     FormRequest(
@@ -196,7 +197,7 @@ object FormRequest {
 
     // Check that query URLs match credentials URLs
     val remoteServerUrls = remoteServerCredentials.keySet
-    queries.flatMap(_.urlOpt).distinct.foreach { queryUrl =>
+    queries.map(_.select).collect { case Remote(url) => url }.distinct.foreach { queryUrl =>
       if (! remoteServerUrls.contains(queryUrl)) {
         throw new IllegalArgumentException(s"Query URL `$queryUrl` does not match any remote server credentials")
       }

@@ -130,10 +130,6 @@
                     <error/>
 
                     <initializing>true</initializing>
-                    <any-has-admin-permission/>
-                    <!-- NOTE: At this point, we don't have information about the remote forms permissions. So we just
-                         assume that we have the same permission that we have local forms. -->
-                    <!--<any-has-remote-admin-permission/>-->
 
                     <local-unpublish-action/>
                     <local-publish-action/>
@@ -208,7 +204,6 @@
             </xf:instance>
 
             <xf:var name="selection"                value="xxf:split(selection)"/>
-            <xf:var name="any-has-admin-permission" value="any-has-admin-permission = 'true'"/>
 
             <!-- Binds for admin tasks -->
             <xf:bind ref="instance('fr-form-instance')[$is-admin]">
@@ -226,14 +221,14 @@
                 <xf:bind ref="local-delete-action"     readonly="not(exists($selection) and (frf:canUnpublishLocal(../selection,  $forms) or frf:canPublishLocal(../selection,  $forms)))"/>
                 <xf:bind ref="remote-delete-action"    readonly="not(exists($selection) and (frf:canUnpublishRemote(../selection, $forms) or frf:canPublishRemote(../selection, $forms)))"/>
 
-                <xf:bind ref="all-select"              readonly="not($any-has-admin-permission)"/>
-                <xf:bind ref="none-select"             readonly="not($any-has-admin-permission)"/>
-                <xf:bind ref="local-unpublish-select"  readonly="not($any-has-admin-permission) or not(frf:canSelectUnpublishedLocal(../selection, $forms))"/>
-                <xf:bind ref="local-publish-select"    readonly="not($any-has-admin-permission) or not(frf:canSelectPublishedLocal(../selection, $forms))"/>
-                <xf:bind ref="remote-unpublish-select" readonly="not($any-has-admin-permission) or not(frf:canSelectUnpublishedRemote(../selection, $forms))"/>
-                <xf:bind ref="remote-publish-select"   readonly="not($any-has-admin-permission) or not(frf:canSelectPublishedRemote(../selection, $forms))"/>
-                <xf:bind ref="local-newer-select"      readonly="not($any-has-admin-permission) or not(frf:canSelectLocalNewer(../selection, $forms))"/>
-                <xf:bind ref="remote-newer-select"     readonly="not($any-has-admin-permission) or not(frf:canSelectRemoteNewer(../selection, $forms))"/>
+                <xf:bind ref="all-select"              readonly="not($is-admin)"/>
+                <xf:bind ref="none-select"             readonly="not($is-admin)"/>
+                <xf:bind ref="local-unpublish-select"  readonly="not($is-admin) or not(frf:canSelectUnpublishedLocal(../selection, $forms))"/>
+                <xf:bind ref="local-publish-select"    readonly="not($is-admin) or not(frf:canSelectPublishedLocal(../selection, $forms))"/>
+                <xf:bind ref="remote-unpublish-select" readonly="not($is-admin) or not(frf:canSelectUnpublishedRemote(../selection, $forms))"/>
+                <xf:bind ref="remote-publish-select"   readonly="not($is-admin) or not(frf:canSelectPublishedRemote(../selection, $forms))"/>
+                <xf:bind ref="local-newer-select"      readonly="not($is-admin) or not(frf:canSelectLocalNewer(../selection, $forms))"/>
+                <xf:bind ref="remote-newer-select"     readonly="not($is-admin) or not(frf:canSelectRemoteNewer(../selection, $forms))"/>
             </xf:bind>
 
             <xf:bind ref="instance('fr-form-instance')">
@@ -259,12 +254,8 @@
             </xf:submission>
 
             <!-- Refresh page every 2s, as long as we either have a re-index or re-encryption in progress -->
-            <xf:action
-                event="xforms-ready"
-                if="instance('fr-form-instance')/any-has-admin-permission = 'true'">
-                <xf:dispatch
-                        name="ping-event"
-                        target="fr-form-model"/>
+            <xf:action event="xforms-ready" if="$is-admin">
+                <xf:dispatch name="ping-event" target="fr-form-model"/>
             </xf:action>
             <xf:action event="ping-event">
                 <xf:setvalue ref="instance('fr-form-instance')/pinging" value="'true'"/>
@@ -337,16 +328,15 @@
                         <query metadata="last-modified-by" match="exact"/>
                         <query metadata="title"            match="substring"/>
                         <query metadata="available"        match="exact"/>
-                        <query metadata="operations"       match="token"/>
+                        <query metadata="operations"       match="token" select="or"/>
                     </local>
                     <remote>
-                        <query metadata="created"          match="gte"   url=""/>
-                        <query metadata="created"          match="lt"    url=""/>
-                        <query metadata="last-modified"    match="gte"   url=""/>
-                        <query metadata="last-modified"    match="lt"    url=""/>
-                        <query metadata="last-modified-by" match="exact" url=""/>
-                        <query metadata="available"        match="exact" url=""/>
-                        <query metadata="operations"       match="token" url=""/>
+                        <query metadata="created"          match="gte"   select=""/>
+                        <query metadata="created"          match="lt"    select=""/>
+                        <query metadata="last-modified"    match="gte"   select=""/>
+                        <query metadata="last-modified"    match="lt"    select=""/>
+                        <query metadata="last-modified-by" match="exact" select=""/>
+                        <query metadata="available"        match="exact" select=""/>
                     </remote>
                 </_>
             </xf:instance>
@@ -416,12 +406,17 @@
                                      xf:attribute('password', $current-remote-server/password)))"/>
 
                         <!-- Set URL for queries related to remote server values -->
-                        <xf:setvalue iterate="$queries/remote/query" ref="@url" value="$current-remote-server/url"/>
+                        <xf:setvalue iterate="$queries/remote/query" ref="@select" value="$current-remote-server/url"/>
                     </xf:action>
 
                     <!-- Always display latest versions on Published Forms page-->
                     <xf:action if="not($is-admin)">
                         <xf:setvalue ref="$search-options/local/form-version" value="'latest'"/>
+                    </xf:action>
+
+                    <!-- Retrieve forms with 'admin' operation only (local or remote) -->
+                    <xf:action if="$is-admin">
+                        <xf:setvalue ref="$search-options/local/operations" value="'admin'"/>
                     </xf:action>
 
                     <!-- Local queries -->
@@ -476,7 +471,8 @@
                                 ref="*"
                                 origin="xf:element('query',
                                         (xf:attribute('metadata', $query/@metadata),
-                                         xf:attribute('sort',     $query/@sort)))"/>
+                                         xf:attribute('sort',     $query/@sort),
+                                         if ($query/@select != '') then xf:attribute('select', $query/@select) else ()))"/>
                         </xf:action>
                     </xf:action>
                 </xf:action>
@@ -486,15 +482,13 @@
 
             <xf:action event="process-results">
 
-                <!-- Only show admin ops column if at least one form has op -->
-                <xf:var name="has-admin"        value="saxon:expression('xxf:split(@operations) = ''admin''')"/>
-<!--                <xf:var name="has-remote-admin" value="saxon:expression('exists(remote-server/last-modified-time)')"/>-->
+                <!-- 2024-10-02: we used to check here if any of the returned forms had the 'admin' (local) operation,
+                     and only show the admin selection / status columns if that was the case (on the Forms Admin page).
+                     We now ask the form metadata API to return only forms that have the 'admin' operation (local or
+                     remote). -->
 
-                <xf:setvalue
-                    ref="instance()/any-has-admin-permission"
-                    value="$is-admin and xxf:exists(instance('fr-metadata')/form, $has-admin)"/>
-
-                <!-- Because `any-has-admin-permission` is used in an `xf:bind/@ref` -->
+                <!--2024-10-02: the following rebuild doesn't seem to be necessary anymore, but we'll keep it for now
+                    (previous comment was: "Because `any-has-admin-permission` is used in an `xf:bind/@ref`"). -->
                 <xf:rebuild xxf:deferred="true"/>
 
             </xf:action>
@@ -747,7 +741,7 @@
         <xf:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources"/>
         <xf:var name="fr-lang"      model="fr-resources-model" value="$fr-lang"/>
 
-        <xf:var name="show-permissions" value="$is-admin and $any-has-admin-permission"/>
+        <xf:var name="show-permissions" value="$is-admin"/>
         <xf:var name="show-remote"      value="$remote-set"/>
 
         <fr:view fluid="true">
@@ -1168,15 +1162,17 @@
                         <xf:switch id="fr-search-options-switch">
                             <xf:case id="fr-search-options-hidden"/>
                             <xf:case id="fr-search-options-shown">
-                                <xh:fieldset class="fr-search-options root-fieldset">
+                                <xh:fieldset class="{'fr-search-options', 'root-fieldset', 'no-inner-fieldset'[not($show-remote)]}">
                                     <xh:legend><xf:output ref="$fr-resources/home-summary/search/search-options"/></xh:legend>
 
                                     <xf:var name="search-options" value="instance('fr-form-instance')/search-options"/>
 
-                                    <xf:switch caseref="$show-remote" class="local-or-remote-switch">
-                                        <xf:case value="false()">
+                                    <xf:group class="fields-group">
+                                        <xh:fieldset class="fr-search-options">
+                                            <xh:legend><xf:output ref="$fr-resources/home/titles/local"/></xh:legend>
+
                                             <xf:group ref="$search-options/local/available[$show-permissions]" class="fr-search-item">
-                                                <xf:select1 id="status-select" ref=".">
+                                                <xf:select1 id="status-select-local" ref=".">
                                                     <xf:label ref="$fr-resources/home/titles/status"/>
                                                     <xf:item>
                                                         <xf:label ref="$fr-resources/home-summary/search/any"/>
@@ -1192,8 +1188,9 @@
                                                     </xf:item>
                                                 </xf:select1>
                                             </xf:group>
+
                                             <xf:group ref="$search-options/local/last-modified" class="fr-search-item date-range-group">
-                                                <xf:select1 id="last-modified-select" ref=".">
+                                                <xf:select1 id="last-modified-select-local" ref=".">
                                                     <xf:label ref="$fr-resources/home-summary/titles/last-modified"/>
                                                     <xf:item>
                                                         <xf:label ref="$fr-resources/home-summary/search/any"/>
@@ -1211,14 +1208,72 @@
                                                     </xf:action>
                                                 </xf:select1>
                                                 <xf:group ref="''[$search-options/local/last-modified = 'custom']" class="after-before-container">
-                                                    <fr:date id="last-modified-after" ref="$search-options/local/last-modified-after" >
+                                                    <fr:date id="last-modified-after-local" ref="$search-options/local/last-modified-after" >
                                                         <xf:label ref="$fr-resources/home-summary/search/date-after"/>
                                                     </fr:date>
-                                                    <fr:date id="last-modified-before" ref="$search-options/local/last-modified-before">
+                                                    <fr:date id="last-modified-before-local" ref="$search-options/local/last-modified-before">
                                                         <xf:label ref="$fr-resources/home-summary/search/date-before"/>
                                                     </fr:date>
                                                 </xf:group>
                                             </xf:group>
+                                        </xh:fieldset>
+                                    </xf:group>
+
+                                    <xf:group ref="''[$show-remote]" class="fields-group">
+                                        <xh:fieldset class="fr-search-options">
+                                            <xh:legend><xf:output ref="$fr-resources/home/titles/remote"/></xh:legend>
+
+                                            <xf:group ref="$search-options/remote/available[$show-permissions]" class="fr-search-item">
+                                                <xf:select1 id="status-select-remote" ref=".">
+                                                    <xf:label ref="$fr-resources/home/titles/status"/>
+                                                    <xf:item>
+                                                        <xf:label ref="$fr-resources/home-summary/search/any"/>
+                                                        <xf:value/>
+                                                    </xf:item>
+                                                    <xf:item>
+                                                        <xf:label ref="$fr-resources/home/labels/available"/>
+                                                        <xf:value>true</xf:value>
+                                                    </xf:item>
+                                                    <xf:item>
+                                                        <xf:label ref="$fr-resources/home/labels/unavailable"/>
+                                                        <xf:value>false</xf:value>
+                                                    </xf:item>
+                                                </xf:select1>
+                                            </xf:group>
+
+                                            <xf:group ref="$search-options/remote/last-modified" class="fr-search-item date-range-group">
+                                                <xf:select1 id="last-modified-select-remote" ref=".">
+                                                    <xf:label ref="$fr-resources/home-summary/titles/last-modified"/>
+                                                    <xf:item>
+                                                        <xf:label ref="$fr-resources/home-summary/search/any"/>
+                                                        <xf:value/>
+                                                    </xf:item>
+                                                    <xf:itemset ref="$fr-resources/home-summary/search/dates/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+
+                                                    <xf:action event="xforms-value-changed">
+                                                        <!-- Reset after/before fields -->
+                                                        <xf:setvalue ref="$search-options/remote/last-modified-after"/>
+                                                        <xf:setvalue ref="$search-options/remote/last-modified-before"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                <xf:group ref="''[$search-options/remote/last-modified = 'custom']" class="after-before-container">
+                                                    <fr:date id="last-modified-after-remote" ref="$search-options/remote/last-modified-after" >
+                                                        <xf:label ref="$fr-resources/home-summary/search/date-after"/>
+                                                    </fr:date>
+                                                    <fr:date id="last-modified-before-remote" ref="$search-options/remote/last-modified-before">
+                                                        <xf:label ref="$fr-resources/home-summary/search/date-before"/>
+                                                    </fr:date>
+                                                </xf:group>
+                                            </xf:group>
+                                        </xh:fieldset>
+                                    </xf:group>
+
+                                    <xf:group class="fields-group">
+                                        <xh:fieldset class="fr-search-options">
+                                            <xh:legend><xf:output ref="$fr-resources/home/titles/form-identification"/></xh:legend>
 
                                             <xf:group ref="$search-options/local/application-name" class="fr-search-item">
                                                 <xf:input ref=".">
@@ -1237,7 +1292,7 @@
                                             </xf:group>
 
                                             <xf:group ref="$search-options/local/form-version" class="fr-search-item">
-                                                <xf:select1 id="form-version-select-local" ref=".">
+                                                <xf:select1 id="form-version-select-remote" ref=".">
                                                     <xf:label ref="$fr-resources/home-summary/titles/version"/>
                                                     <!-- Re-using export/purge dialog labels for now -->
                                                     <xf:item>
@@ -1258,148 +1313,8 @@
                                                     </xf:label>
                                                 </xf:input>
                                             </xf:group>
-                                        </xf:case>
-                                        <xf:case value="true()">
-                                            <xh:fieldset class="fr-search-options">
-                                                <xh:legend><xf:output ref="$fr-resources/home/titles/local"/></xh:legend>
-
-                                                <xf:group ref="$search-options/local/available[$show-permissions]" class="fr-search-item">
-                                                    <xf:select1 id="status-select-local" ref=".">
-                                                        <xf:label ref="$fr-resources/home/titles/status"/>
-                                                        <xf:item>
-                                                            <xf:label ref="$fr-resources/home-summary/search/any"/>
-                                                            <xf:value/>
-                                                        </xf:item>
-                                                        <xf:item>
-                                                            <xf:label ref="$fr-resources/home/labels/available"/>
-                                                            <xf:value>true</xf:value>
-                                                        </xf:item>
-                                                        <xf:item>
-                                                            <xf:label ref="$fr-resources/home/labels/unavailable"/>
-                                                            <xf:value>false</xf:value>
-                                                        </xf:item>
-                                                    </xf:select1>
-                                                </xf:group>
-                                                <xf:group ref="$search-options/local/last-modified" class="fr-search-item date-range-group">
-                                                    <xf:select1 id="last-modified-select-local" ref=".">
-                                                        <xf:label ref="$fr-resources/home-summary/titles/last-modified"/>
-                                                        <xf:item>
-                                                            <xf:label ref="$fr-resources/home-summary/search/any"/>
-                                                            <xf:value/>
-                                                        </xf:item>
-                                                        <xf:itemset ref="$fr-resources/home-summary/search/dates/item">
-                                                            <xf:label ref="label"/>
-                                                            <xf:value ref="value"/>
-                                                        </xf:itemset>
-
-                                                        <xf:action event="xforms-value-changed">
-                                                            <!-- Reset after/before fields -->
-                                                            <xf:setvalue ref="$search-options/local/last-modified-after"/>
-                                                            <xf:setvalue ref="$search-options/local/last-modified-before"/>
-                                                        </xf:action>
-                                                    </xf:select1>
-                                                    <xf:group ref="''[$search-options/local/last-modified = 'custom']" class="after-before-container">
-                                                        <fr:date id="last-modified-after-local" ref="$search-options/local/last-modified-after" >
-                                                            <xf:label ref="$fr-resources/home-summary/search/date-after"/>
-                                                        </fr:date>
-                                                        <fr:date id="last-modified-before-local" ref="$search-options/local/last-modified-before">
-                                                            <xf:label ref="$fr-resources/home-summary/search/date-before"/>
-                                                        </fr:date>
-                                                    </xf:group>
-                                                </xf:group>
-                                            </xh:fieldset>
-                                            <xh:fieldset class="fr-search-options">
-                                                <xh:legend><xf:output ref="$fr-resources/home/titles/remote"/></xh:legend>
-
-                                                <xf:group ref="$search-options/remote/available[$show-permissions]" class="fr-search-item">
-                                                    <xf:select1 id="status-select-remote" ref=".">
-                                                        <xf:label ref="$fr-resources/home/titles/status"/>
-                                                        <xf:item>
-                                                            <xf:label ref="$fr-resources/home-summary/search/any"/>
-                                                            <xf:value/>
-                                                        </xf:item>
-                                                        <xf:item>
-                                                            <xf:label ref="$fr-resources/home/labels/available"/>
-                                                            <xf:value>true</xf:value>
-                                                        </xf:item>
-                                                        <xf:item>
-                                                            <xf:label ref="$fr-resources/home/labels/unavailable"/>
-                                                            <xf:value>false</xf:value>
-                                                        </xf:item>
-                                                    </xf:select1>
-                                                </xf:group>
-                                                <xf:group ref="$search-options/remote/last-modified" class="fr-search-item date-range-group">
-                                                    <xf:select1 id="last-modified-select-remote" ref=".">
-                                                        <xf:label ref="$fr-resources/home-summary/titles/last-modified"/>
-                                                        <xf:item>
-                                                            <xf:label ref="$fr-resources/home-summary/search/any"/>
-                                                            <xf:value/>
-                                                        </xf:item>
-                                                        <xf:itemset ref="$fr-resources/home-summary/search/dates/item">
-                                                            <xf:label ref="label"/>
-                                                            <xf:value ref="value"/>
-                                                        </xf:itemset>
-
-                                                        <xf:action event="xforms-value-changed">
-                                                            <!-- Reset after/before fields -->
-                                                            <xf:setvalue ref="$search-options/remote/last-modified-after"/>
-                                                            <xf:setvalue ref="$search-options/remote/last-modified-before"/>
-                                                        </xf:action>
-                                                    </xf:select1>
-                                                    <xf:group ref="''[$search-options/remote/last-modified = 'custom']" class="after-before-container">
-                                                        <fr:date id="last-modified-after-remote" ref="$search-options/remote/last-modified-after" >
-                                                            <xf:label ref="$fr-resources/home-summary/search/date-after"/>
-                                                        </fr:date>
-                                                        <fr:date id="last-modified-before-remote" ref="$search-options/remote/last-modified-before">
-                                                            <xf:label ref="$fr-resources/home-summary/search/date-before"/>
-                                                        </fr:date>
-                                                    </xf:group>
-                                                </xf:group>
-                                            </xh:fieldset>
-                                            <xh:fieldset class="fr-search-options">
-                                                <xh:legend><xf:output ref="$fr-resources/home/titles/form-identification"/></xh:legend>
-
-                                                <xf:group ref="$search-options/local/application-name" class="fr-search-item">
-                                                    <xf:input ref=".">
-                                                        <xf:label>
-                                                            <xf:output mediatype="text/html" value="$fr-resources/home-summary/titles/application-name"/>
-                                                        </xf:label>
-                                                    </xf:input>
-                                                </xf:group>
-
-                                                <xf:group ref="$search-options/local/form-name" class="fr-search-item">
-                                                    <xf:input ref=".">
-                                                        <xf:label>
-                                                            <xf:output mediatype="text/html" value="$fr-resources/home-summary/titles/form-name"/>
-                                                        </xf:label>
-                                                    </xf:input>
-                                                </xf:group>
-
-                                                <xf:group ref="$search-options/local/form-version" class="fr-search-item">
-                                                    <xf:select1 id="form-version-select-remote" ref=".">
-                                                        <xf:label ref="$fr-resources/home-summary/titles/version"/>
-                                                        <!-- Re-using export/purge dialog labels for now -->
-                                                        <xf:item>
-                                                            <xf:label ref="$fr-resources/home/export-purge/all-versions"/>
-                                                            <xf:value/>
-                                                        </xf:item>
-                                                        <xf:item>
-                                                            <xf:label ref="$fr-resources/home/export-purge/latest-version"/>
-                                                            <xf:value>latest</xf:value>
-                                                        </xf:item>
-                                                    </xf:select1>
-                                                </xf:group>
-
-                                                <xf:group ref="$search-options/local/title" class="fr-search-item">
-                                                    <xf:input ref=".">
-                                                        <xf:label>
-                                                            <xf:output mediatype="text/html" value="$fr-resources/home-summary/titles/form-title"/>
-                                                        </xf:label>
-                                                    </xf:input>
-                                                </xf:group>
-                                            </xh:fieldset>
-                                        </xf:case>
-                                    </xf:switch>
+                                        </xh:fieldset>
+                                    </xf:group>
                                 </xh:fieldset>
                             </xf:case>
                         </xf:switch>
@@ -1461,9 +1376,6 @@
                                     <xf:var name="remote-available"     value="frf:isRemoteAvailable(.)"/>
                                     <xf:var name="remote-unavailable"   value="frf:isRemoteUnavailable(.)"/>
                                     <xf:var name="ops"                  value="xxf:split(@operations)"/>
-                                    <!-- As of 2024-09-06, remote-ops is used only to show that a remote form without local
-                                         form counterpart is available or unavailable (in that case, ops will not contain
-                                         the 'admin' operation).-->
                                     <xf:var name="remote-ops"           value="xxf:split(remote-server[1]/@operations)"/>
                                     <xf:var name="form-version"         value="(form-version/string(), '1')[1]"/>
 
@@ -1499,7 +1411,7 @@
                                             <xh:td class="fr-home-select">
                                                 <xf:select
                                                     appearance="full"
-                                                    ref="instance()/selection[$ops = 'admin']"
+                                                    ref="instance()/selection[$ops = 'admin' or $remote-ops = 'admin']"
                                                     id="document-selection">
                                                     <xf:item>
                                                         <xf:label/>

@@ -27,6 +27,9 @@ import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import java.time.Instant
 
 
+// Use a case class, so we'll be able to pattern match on it
+case class OperationsList(ops: List[String])
+
 case class FormMetadata(
   lastModifiedTime : Instant,
   lastModifiedByOpt: Option[String],
@@ -34,7 +37,7 @@ case class FormMetadata(
   title            : Map[String, String],
   available        : Boolean,
   permissionsOpt   : Option[NodeInfo], // Keep permissions as untyped XML for now
-  operations       : List[String]
+  operations       : OperationsList
 ) {
 
   // As of 2024-09-09, we only extract the titles, form availability, and permissions from the metadata SQL column. The
@@ -63,7 +66,7 @@ case class FormMetadata(
       permissionsXmlOpt.toSeq
 
     // Always include operations as an attribute, even if no operation is available (for compatibility reasons)
-    val attributes = Seq(xml.Attribute(None.orNull, "operations", operations.mkString(" "), xml.Null))
+    val attributes = Seq(xml.Attribute(None.orNull, "operations", operations.ops.mkString(" "), xml.Null))
 
     (elems, attributes)
   }
@@ -92,7 +95,7 @@ case class FormMetadata(
       adminOperation ++ otherOperations
     }
 
-    copy(operations = operations)
+    copy(operations = OperationsList(operations))
   }
 }
 
@@ -109,7 +112,7 @@ object FormMetadata {
         }.toMap,
         available         = xml.elemValueOpt("available").map(_.toBoolean).getOrElse(true),
         permissionsOpt    = xml.child("permissions").headOption,
-        operations        = xml.attValue("operations").splitTo[List]()
+        operations        = OperationsList(xml.attValue("operations").splitTo[List]())
       )
     }
 }
@@ -176,7 +179,7 @@ case class Form(
     }
 
     val localAndRemoteMetadata                    = localMetadataWithOperationsOpt.toSeq ++ remoteMetadata.values.toSeq
-    val atLeastOneLocalOrRemoteFormWithOperations = localAndRemoteMetadata.exists(_.operations.nonEmpty)
+    val atLeastOneLocalOrRemoteFormWithOperations = localAndRemoteMetadata.exists(_.operations.ops.nonEmpty)
     val atLeastOneLocalOrRemoteFormAvailable      = localAndRemoteMetadata.exists(_.available)
 
     val keepForm =

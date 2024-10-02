@@ -75,7 +75,19 @@
                 <xsl:template match="/*">
                     <xf:group id="component-inner-group">
 
-                        <xf:action event="xxforms-visible" phase="target">
+                        <xf:action
+                            event="xxforms-visible"
+                            phase="target"
+                            if="
+                                (:
+                                    In `fr:captcha`, on `xxforms-visible`, we make the `fr:recaptcha` non-relevant if
+                                    the captcha is already resolved. However, we still receive the `xxforms-visible`
+                                    here, which triggers the execution of the reCAPTCHA initialization JavaScript,
+                                    something we neither need nor want, as it would cause an error, hence this guard.
+                                :)
+                                xxf:instance('fr-persistence-instance')/captcha = 'false'
+                            ">
+
                             <!-- Copy public keys to local model -->
                             <xf:setvalue
                                 ref="$conf/v2/public-key"

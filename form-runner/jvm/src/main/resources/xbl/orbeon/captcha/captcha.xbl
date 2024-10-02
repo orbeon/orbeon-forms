@@ -28,6 +28,16 @@
         element="fr|captcha"
         xxbl:mode="binding">
 
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="_">
+                    <_>
+                        <valid-on-visible/>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
         <xbl:handlers>
             <xbl:handler event="fr-reload" phase="target">
                 <xf:dispatch name="fr-reload" targetid="captcha"/>
@@ -49,7 +59,10 @@
                         as="xs:boolean"/>
                     <xf:group xxf:appearance="internal">
                         <xsl:if test="$captcha-enabled">
-                            <xf:group ref=".[frf:isNewOrEditMode()]" class="fr-captcha">
+                            <xf:action event="xxforms-visible" phase="target">
+                                <xf:setvalue ref="instance()/valid-on-visible" value="xxf:instance('fr-persistence-instance')/captcha"/>
+                            </xf:action>
+                            <xf:group ref=".[frf:isNewOrEditMode() and instance()/valid-on-visible = 'false']" class="fr-captcha">
                                 <xf:var
                                     name="captcha"
                                     value="xxf:instance('fr-persistence-instance')/captcha"/>

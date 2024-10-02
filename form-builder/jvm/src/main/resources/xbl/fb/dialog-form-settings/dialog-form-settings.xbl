@@ -40,7 +40,7 @@
                 <!-- Save event context information in local instance -->
                 <xf:setvalue
                     iterate="
-                        'for-action', 'app', 'form', 'title', 'description', 'screenshot', 'allow-template-use',
+                        'for-button-name', 'app', 'form', 'title', 'description', 'screenshot', 'allow-template-use',
                         'singleton', 'mode', 'created-with-version'"
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
@@ -466,7 +466,7 @@
 
                 <xf:instance id="local">
                     <_ valid="true">
-                        <for-action/>
+                        <for-button-name/>
                         <lang/>
                         <original-app/>
                         <app/>
@@ -819,9 +819,9 @@
                             if ($is-new-form) then
                                 (: No title in this case :)
                                 ()
-                            else if (xxf:non-blank($i/for-action)) then
+                            else if (xxf:non-blank($i/for-button-name)) then
                                 (: The action must match a process button and we use the associated text label if present :)
-                                let $r := xxf:r(concat('buttons.', $i/for-action), '|fr-fr-resources|')
+                                let $r := xxf:r(concat('buttons.', $i/for-button-name), '|fr-fr-resources|')
                                 return
                                     if (exists($r)) then
                                         string(xf:parse(concat('&lt;span>', $r, '&lt;/span>')))

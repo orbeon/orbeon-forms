@@ -145,7 +145,7 @@
             return
                 xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
         ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-action = "excel-export") then
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "excel-export") then
             suspend then
             xf:dispatch(name = "fb-excel-export")
         ) else
@@ -158,7 +158,7 @@
             return
                 xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
         ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-action = "xml-export") then
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "xml-export") then
             suspend then
             xf:dispatch(name = "fb-xml-export")
         ) else
@@ -171,7 +171,7 @@
             return
                 xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
         ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-action = "form-definition-xhtml-export") then
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "form-definition-xhtml-export") then
             suspend then
             xf:show(
                 dialog = "fb-publish-dialog",
@@ -188,7 +188,7 @@
             return
                 xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
         ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-action = "test") then
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "test") then
             suspend then
             xf:dispatch(name = "fb-test-form")
         ) else
@@ -201,7 +201,7 @@
             return
                 xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
         ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-action = "test-formulas") then
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "test-formulas") then
             suspend then
             xf:dispatch(name = "fb-test-formulas")
         ) else
@@ -214,7 +214,7 @@
             return
                 xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
         ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-action = "test-offline") then
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "test-offline") then
             suspend then
             xf:dispatch(name = "fb-test-offline")
         ) else
@@ -227,7 +227,7 @@
             return
                 xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
         ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-action = "test-pdf") then
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "test-pdf") then
             suspend then
             xf:dispatch(name = "fb-test-pdf-show-dialog")
         ) else
@@ -240,7 +240,7 @@
             return
                 xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
         ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-action = "publish") then
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "publish") then
             suspend then
             xf:show(
                 dialog = "fb-publish-dialog",
@@ -261,7 +261,7 @@
             return
                 xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
         ") then (
-            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-action = "save") then
+            xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "save") then
             suspend then
             save-final
         ) else

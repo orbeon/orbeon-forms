@@ -44,7 +44,7 @@
                     <xf:action ev:event="DOMActivate">
                         <!-- Open the dialog in "edit" mode -->
                         <xxf:show dialog="dialog-form-settings">
-                            <xf:property name="for-action"                                value="event('for-action')"/>
+                            <xf:property name="for-button-name"                           value="event('for-button-name')"/>
                             <xf:property name="lang"                                      value="$fb-lang"/>
                             <xf:property name="langs"                                     value="$resources/resource/@xml:lang/string()"/>
                             <xf:property name="mode"                                      value="(event('mode'), 'edit')[1]"/>

@@ -170,7 +170,7 @@ trait FormProxyLogic { this: PersistenceProxyProcessor.type =>
         sortedForms
       }
 
-    FormResponse(paginatedForms)
+    FormResponse(paginatedForms, searchTotal = sortedForms.size)
   }
 
   private def localForms(

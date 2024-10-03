@@ -19,15 +19,16 @@ import org.orbeon.scaxon.SimplePath.NodeInfoOps
 
 
 case class FormResponse(
-  forms: List[Form]
+  forms: List[Form],
+  searchTotal: Int
 ) {
   def toXML: NodeInfo =
-    <forms>{
+    <forms search-total={searchTotal.toString}>{
       forms.map(_.toXML).map(nodeInfoToElem)
     }</forms>
 }
 
 object FormResponse {
   def apply(xml: NodeInfo): FormResponse =
-    FormResponse(xml.child("form").map(Form.apply).toList)
+    FormResponse(xml.child("form").map(Form.apply).toList, searchTotal = xml.attValue("search-total").toInt)
 }

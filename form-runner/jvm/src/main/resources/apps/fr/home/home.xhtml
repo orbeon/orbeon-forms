@@ -764,7 +764,7 @@
                         <!-- Search also when dropdown value changes -->
                         <xf:dispatch
                             event="xforms-value-changed"
-                            target="status-select status-select-local status-select-remote last-modified-select last-modified-select-local last-modified-select-remote last-modified-after last-modified-after-local last-modified-after-remote last-modified-before last-modified-before-local last-modified-before-remote form-version-select form-version-select-local form-version-select-remote"
+                            target="status-select-local status-select-remote last-modified-select-local last-modified-select-remote last-modified-after-local last-modified-after-remote last-modified-before-local last-modified-before-remote form-version-select"
                             name="fr-initialize"
                             targetid="fr-form-model">
 
@@ -1292,7 +1292,7 @@
                                             </xf:group>
 
                                             <xf:group ref="$search-options/local/form-version" class="fr-search-item">
-                                                <xf:select1 id="form-version-select-remote" ref=".">
+                                                <xf:select1 id="form-version-select" ref=".">
                                                     <xf:label ref="$fr-resources/home-summary/titles/version"/>
                                                     <!-- Re-using export/purge dialog labels for now -->
                                                     <xf:item>

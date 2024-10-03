@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.form
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.relational.Statement.{Setter, StatementPart, executeQuery}
-import org.orbeon.oxf.fr.persistence.relational.form.adt.{Form, FormMetadata, FormRequest, OperationsList}
+import org.orbeon.oxf.fr.persistence.relational.form.adt.{Form, FormMetadata, FormRequest, FormResponse, OperationsList}
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.util.CollectionUtils.fromIteratorExt
@@ -31,7 +31,7 @@ object FormLogic {
   )(implicit
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger
-  ): List[Form] = {
+  ): FormResponse = {
 
     // At the moment, the only thing we filter at the SQL level are the app and form names
     val innerWhereClauses = List(
@@ -83,48 +83,53 @@ object FormLogic {
 
     RelationalUtils.withConnection { connection =>
       executeQuery(connection, statementPart.sql, List(statementPart)) { resultSet =>
-        Iterator.iterateWhile(
-          cond = resultSet.next(),
-          elem = {
-            val (title, available, permissions) =
-              Option(resultSet.getString("form_metadata")).map(_.trim).filter(_.nonEmpty).map { formMetadata =>
-                val xml = StaticXPath.orbeonDomToTinyTree(IOSupport.readOrbeonDom(formMetadata)).rootElement
 
-                // Extract title, availability, and permissions from form metadata
-                val title       = (xml / "title").map { title =>
-                  title.attValue("*:lang") -> title.stringValue
-                }.toMap
-                val available   = xml.elemValueOpt("available").map(_.toBoolean).getOrElse(true)
-                val permissions = xml.child("permissions").headOption
+        val forms =
+          Iterator.iterateWhile(
+            cond = resultSet.next(),
+            elem = {
+              val (title, available, permissions) =
+                Option(resultSet.getString("form_metadata")).map(_.trim).filter(_.nonEmpty).map { formMetadata =>
+                  val xml = StaticXPath.orbeonDomToTinyTree(IOSupport.readOrbeonDom(formMetadata)).rootElement
 
-                (title, available, permissions)
-              } getOrElse {
-                (Map.empty[String, String], true, None)
-              }
+                  // Extract title, availability, and permissions from form metadata
+                  val title       = (xml / "title").map { title =>
+                    title.attValue("*:lang") -> title.stringValue
+                  }.toMap
+                  val available   = xml.elemValueOpt("available").map(_.toBoolean).getOrElse(true)
+                  val permissions = xml.child("permissions").headOption
 
-            val appForm = AppForm(
-              app  = resultSet.getString("application_name"),
-              form = resultSet.getString("form_name")
-            )
+                  (title, available, permissions)
+                } getOrElse {
+                  (Map.empty[String, String], true, None)
+                }
 
-            val localMetadataOpt = FormMetadata(
-              title             = title,
-              lastModifiedTime  = resultSet.getTimestamp("last_modified_time").toInstant,
-              lastModifiedByOpt = Option(resultSet.getString("last_modified_by")),
-              created           = resultSet.getTimestamp("created").toInstant,
-              available         = available,
-              permissionsOpt    = permissions,
-              operations        = OperationsList(Nil)
-            ).some
+              val appForm = AppForm(
+                app  = resultSet.getString("application_name"),
+                form = resultSet.getString("form_name")
+              )
 
-            Form(
-              appForm          = appForm,
-              version          = FormDefinitionVersion.Specific(resultSet.getInt("form_version")),
-              localMetadataOpt = localMetadataOpt,
-              remoteMetadata   = Map.empty
-            )
-          }
-        ).toList
+              val localMetadataOpt = FormMetadata(
+                title             = title,
+                lastModifiedTime  = resultSet.getTimestamp("last_modified_time").toInstant,
+                lastModifiedByOpt = Option(resultSet.getString("last_modified_by")),
+                created           = resultSet.getTimestamp("created").toInstant,
+                available         = available,
+                permissionsOpt    = permissions,
+                operations        = OperationsList(Nil)
+              ).some
+
+              Form(
+                appForm          = appForm,
+                version          = FormDefinitionVersion.Specific(resultSet.getInt("form_version")),
+                localMetadataOpt = localMetadataOpt,
+                remoteMetadata   = Map.empty
+              )
+            }
+          ).toList
+
+        // No paging for now, return all results
+        FormResponse(forms, searchTotal = forms.size)
       }
     }
   }

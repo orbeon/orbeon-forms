@@ -70,7 +70,7 @@ class FormProcessor extends ProcessorImpl {
 
             val forms = FormLogic.forms(provider, formRequest)
 
-            NodeConversions.elemToSAX(nodeInfoToElem(FormResponse(forms).toXML), xmlReceiver)
+            NodeConversions.elemToSAX(nodeInfoToElem(forms.toXML), xmlReceiver)
           } catch {
             case e: IllegalArgumentException =>
               throw HttpStatusCodeException(StatusCode.BadRequest, throwable = Some(e))

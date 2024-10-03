@@ -23,24 +23,16 @@
                             <last-name/>
                             <email/>
                             <phone/>
+                            <order-number/>
+                            <topic/>
+                            <comments/>
                         </grid-1>
 
 
 
 
                     </contact>
-                    <message>
-                        <grid-2>
-                            <order-number/>
-                            <topic/>
-                        </grid-2>
-                        <grid-3>
-                            <comments/>
-                        </grid-3>
 
-
-
-                    </message>
                 </form>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
@@ -56,20 +48,10 @@
                                  xxf:whitespace="trim"/>
                         <xf:bind id="phone-bind" ref="phone" constraint=". = '' or matches(., '^\d{10}$')"
                                  name="phone"/>
-                    </xf:bind>
-
-
-
-
-                </xf:bind>
-                <xf:bind id="message-bind" ref="message" name="message">
-                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
                         <xf:bind id="order-number-bind" ref="order-number" type="xs:string" required="true()"
                                  xxf:whitespace="trim"
                                  name="order-number"/>
                         <xf:bind id="topic-bind" ref="topic" type="xs:string" required="true()" name="topic"/>
-                    </xf:bind>
-                    <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
                         <xf:bind id="comments-bind" ref="comments" type="xs:string" required="true()"
                                  name="comments"/>
                     </xf:bind>
@@ -84,9 +66,9 @@
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
                     <form-name>contact</form-name>
                     <title xml:lang="en">Orbeon Demo: Feedback Form</title>
-                    <description xml:lang="en">The Contact form is a simple form which can be created in a few minutes with Form Builder.</description>
-                    <title xml:lang="fr">Formulaire de contact simple</title>
-                    <description xml:lang="fr">Le formulaire Contact peut être créé à l'aide de Form Builder en quelques minutes.</description>
+                    <description xml:lang="en">This simple form can be created in a few minutes with Form Builder.</description>
+                    <title xml:lang="fr">Orbeon Demo: Formulaire de retour</title>
+                    <description xml:lang="fr">Ce formulaire peut être créé à l'aide de Form Builder en quelques minutes.</description>
                     <logo mediatype="" filename="" size=""/>
                     <library-versions>
                         <_>1</_>
@@ -113,12 +95,37 @@
             <xf:instance xxf:readonly="true" id="fr-form-resources">
                 <resources>
                     <resource xml:lang="en">
-                        <comments>
-                            <label>Questions and Comments</label>
-                            <hint>Your questions and/or comments</hint>
+
+
+
+                        <contact>
+
+
+                        </contact>
+                        <first-name>
+                            <label>First Name</label>
+                            <hint>Your first or given name</hint>
 
                             <alert/>
-                        </comments>
+                        </first-name>
+                        <last-name>
+                            <label>Last Name</label>
+                            <hint>Your last name</hint>
+
+                            <alert/>
+                        </last-name>
+                        <email>
+                            <label>Email</label>
+                            <hint>Your email address</hint>
+
+                            <alert/>
+                        </email>
+                        <phone>
+                            <label>Phone Number</label>
+                            <hint>Optional phone number</hint>
+
+                            <alert/>
+                        </phone>
                         <order-number>
                             <label>Order Number</label>
                             <hint>The related order number</hint>
@@ -151,46 +158,46 @@
                                 <value>other</value>
                             </item>
                         </topic>
+                        <comments>
+                            <label>Questions and Comments</label>
+                            <hint>Your questions and/or comments</hint>
+
+                            <alert/>
+                        </comments>
+
+                    </resource>
+                    <resource xml:lang="fr">
+
+
+
                         <contact>
-                            <label>Contact Information</label>
+
 
                         </contact>
                         <first-name>
-                            <label>First Name</label>
-                            <hint>Your first or given name</hint>
+                            <label>Prénom</label>
+                            <hint>Votre prénom</hint>
 
                             <alert/>
                         </first-name>
                         <last-name>
-                            <label>Last Name</label>
-                            <hint>Your last name</hint>
+                            <label>Nom de famille</label>
+                            <hint>Votre nom de famille</hint>
 
                             <alert/>
                         </last-name>
                         <email>
                             <label>Email</label>
-                            <hint>Your email address</hint>
+                            <hint>Your adresse email</hint>
 
                             <alert/>
                         </email>
                         <phone>
-                            <label>Phone Number</label>
-                            <hint>Optional phone number</hint>
+                            <label>Numéro de téléphone</label>
+                            <hint>Numéro de téléphone optionnel</hint>
 
                             <alert/>
                         </phone>
-                        <message>
-                            <label>Message</label>
-
-                        </message>
-                    </resource>
-                    <resource xml:lang="fr">
-                        <comments>
-                            <label>Questions et commentaires</label>
-                            <hint>Vos questions et/ou commentaires</hint>
-
-                            <alert/>
-                        </comments>
                         <order-number>
                             <label>Numéro de commande</label>
                             <hint>Numéro de commande relatif</hint>
@@ -223,38 +230,13 @@
                                 <value>other</value>
                             </item>
                         </topic>
-                        <contact>
-                            <label>Informations de contact</label>
-
-                        </contact>
-                        <first-name>
-                            <label>Prénom</label>
-                            <hint>Votre prénom</hint>
+                        <comments>
+                            <label>Questions et commentaires</label>
+                            <hint>Vos questions et/ou commentaires</hint>
 
                             <alert/>
-                        </first-name>
-                        <last-name>
-                            <label>Nom de famille</label>
-                            <hint>Votre nom de famille</hint>
+                        </comments>
 
-                            <alert/>
-                        </last-name>
-                        <email>
-                            <label>Email</label>
-                            <hint>Your adresse email</hint>
-
-                            <alert/>
-                        </email>
-                        <phone>
-                            <label>Numéro de téléphone</label>
-                            <hint>Numéro de téléphone optionnel</hint>
-
-                            <alert/>
-                        </phone>
-                        <message>
-                            <label>Votre message</label>
-
-                        </message>
                     </resource>
                 </resources>
             </xf:instance>
@@ -266,7 +248,7 @@
                      xmlns:oxf="http://www.orbeon.com/oxf/processors"
                      xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
                 <fr:section id="contact-section" bind="contact-bind">
-                    <xf:label ref="$form-resources/contact/label"/>
+
 
                     <fr:grid columns="2" id="grid-1-grid" bind="grid-1-bind">
                         <fr:c y="1" x="1" w="6">
@@ -320,13 +302,7 @@
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:us-phone>
                             </fr:c>
-                    </fr:grid>
-                </fr:section>
-                <fr:section id="message-section" bind="message-bind">
-                    <xf:label ref="$form-resources/message/label"/>
-
-                    <fr:grid columns="2" id="grid-2-grid" bind="grid-2-bind">
-                        <fr:c y="1" x="1" w="6">
+                        <fr:c x="1" y="3" w="6">
                                 <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder"
                                       xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
                                       bind="order-number-bind"
@@ -340,7 +316,7 @@
                                     </fr:index>
                                 </xf:input>
                             </fr:c>
-                        <fr:c y="1" x="7" w="6">
+                        <fr:c x="7" y="3" w="6">
                                 <xf:select1 bind="topic-bind" id="topic-control" appearance="dropdown">
                                     <xf:label ref="$form-resources/topic/label"/>
                                     <xf:hint ref="$form-resources/topic/hint"/>
@@ -352,9 +328,7 @@
                                     </xf:itemset>
                                 </xf:select1>
                             </fr:c>
-                    </fr:grid>
-                    <fr:grid columns="1" id="grid-3-grid" bind="grid-3-bind">
-                        <fr:c y="1" x="1" w="12">
+                        <fr:c x="1" y="4" w="12">
                                 <xf:textarea xmlns="http://orbeon.org/oxf/xml/form-builder"
                                          xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
                                          bind="comments-bind"

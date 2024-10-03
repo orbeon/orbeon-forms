@@ -4,10 +4,8 @@
         <last-name>Simpson</last-name>
         <email>chunkylover53@aol.com</email>
         <phone>9395550113</phone>
-    </contact>
-    <message>
         <order-number>O888</order-number>
         <topic>returns</topic>
         <comments>D'oh!</comments>
-    </message>
+    </contact>
 </form>

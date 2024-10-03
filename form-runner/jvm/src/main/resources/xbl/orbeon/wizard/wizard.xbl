@@ -302,7 +302,7 @@
 
                 <xsl:variable
                     name="captcha-location"
-                    select="p:property(string-join(('oxf.fr.detail.captcha.location', $static-app, $static-form), '.'))"/>
+                    select="/*/@captcha-location"/>
 
                 <xsl:variable
                     name="captcha-location-index"

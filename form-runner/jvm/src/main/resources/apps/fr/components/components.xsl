@@ -484,6 +484,15 @@
             )[1]"/>
 
     <xsl:variable
+        name="captcha-location"
+        as="xs:string"
+        select="
+            (
+                p:property(string-join(('oxf.fr.detail.captcha.location', $app, $form), '.')),
+                true()
+            )[1]"/>
+
+    <xsl:variable
         name="grid-markup"
         as="xs:string"
         select="

@@ -444,6 +444,7 @@
                         <xsl:attribute name="separate-toc"           select="$wizard-separate-toc"/>
                         <xsl:attribute name="section-status"         select="$wizard-section-status"/>
                         <xsl:attribute name="full-update"            select="$wizard-full-update"/>
+                        <xsl:attribute name="captcha-location"       select="$captcha-location"/>
                         <xsl:attribute name="captcha-namespace-name" select="frf:captchaComponent($app, $form)"/>
 
                         <!--

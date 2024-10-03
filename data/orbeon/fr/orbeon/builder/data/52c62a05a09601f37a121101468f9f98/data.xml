@@ -186,10 +186,10 @@
                     <application-name>orbeon</application-name>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
                     <form-name>bookshelf</form-name>
-                    <title xml:lang="en">Orbeon Forms Bookshelf</title>
-                    <description xml:lang="en">Orbeon Forms Bookshelf is a simple form allowing you to gather information about books.</description>
-                    <title xml:lang="fr">Orbeon Forms Bookshelf</title>
-                    <description xml:lang="fr">Orbeon Forms Bookshelf présente un formulaire simple qui vous permet de saisir des informations sur des livres.</description>
+                    <title xml:lang="en">Orbeon Demo: Bookshelf</title>
+                    <description xml:lang="en">Bookshelf is a simple form allowing you to gather information about books.</description>
+                    <title xml:lang="fr">Orbeon Demo: Bookshelf</title>
+                    <description xml:lang="fr">Bookshelf présente un formulaire simple qui vous permet de saisir des informations sur des livres.</description>
                     <library-versions>
                         <_>1</_>
                     </library-versions>
@@ -197,12 +197,12 @@
                         <templates>
                             <template name="default" xml:lang="en">
                                 <headers/>
-                                <subject>Orbeon Forms Bookshelf form for `{$title}` by {$author}</subject>
+                                <subject>Bookshelf form for `{$title}` by {$author}</subject>
                                 <exclude-from-all-control-values/>
                             </template>
                             <template name="default" xml:lang="fr">
                                 <headers/>
-                                <subject>Formulaire Orbeon Forms Bookshelf pour `{$title}` par {$author}</subject>
+                                <subject>Formulaire Bookshelf pour `{$title}` par {$author}</subject>
                                 <exclude-from-all-control-values/>
                             </template>
                         </templates>

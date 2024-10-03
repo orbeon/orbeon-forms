@@ -321,7 +321,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>controls</form-name>
-                    <title xml:lang="en">All Form Controls</title>
+                    <title xml:lang="en">Orbeon Demo: All Form Controls</title>
                     <description xml:lang="en">This form shows all the built-in controls supported by Form Builder</description>
                     <title xml:lang="fr">Tous les contrôles de formulaire</title>
                     <description xml:lang="fr">Ce formulaire montre tous les contrôles supportés par Form Builder</description>

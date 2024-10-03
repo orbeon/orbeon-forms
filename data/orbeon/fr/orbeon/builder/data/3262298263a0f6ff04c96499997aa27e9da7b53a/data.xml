@@ -15,7 +15,7 @@
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:math="http://www.w3.org/2005/xpath-functions/math">
     <xh:head>
-        <xh:title>List of Nobel prizes</xh:title>
+        <xh:title>Orbeon Demo: List of Nobel prizes</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 
             <!-- Main instance -->
@@ -67,7 +67,7 @@
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>nobel-prizes</form-name>
-                    <title xml:lang="en">List of Nobel prizes</title>
+                    <title xml:lang="en">Orbeon Demo: List of Nobel prizes</title>
                     <description xml:lang="en" mediatype="text/html">&lt;div&gt;This form demonstrates:&lt;/div&gt;&lt;div&gt;
 &lt;ol&gt;&lt;li&gt;How to call an external API that returns data in JSON format.&lt;/li&gt;&lt;li&gt;How to use that data to fill out a repeated grid in the form.&lt;/li&gt;&lt;/ol&gt;
 &lt;div&gt;For more, see &lt;a href="https://doc.orbeon.com/form-builder/advanced/services-and-actions/action-syntax-examples#example-1-list-of-nobel-prize-winners" target="_blank" rel="noopener"&gt;Action syntax examples&lt;/a&gt;.&lt;/div&gt;

@@ -15,7 +15,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns:xf="http://www.w3.org/2002/xforms">
     <xh:head>
-        <xh:title>Springfield PTA Remittance Form</xh:title>
+        <xh:title>Orbeon Demo: Springfield PTA Remittance Form</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 
 
@@ -146,7 +146,7 @@
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>pta-remittance</form-name>
-                    <title xml:lang="en">Springfield PTA Remittance Form</title>
+                    <title xml:lang="en">Orbeon Demo: Springfield PTA Remittance Form</title>
                     <description xml:lang="en">This is a remittance form for the Springfield PTA Council.</description>
                     <created-with-version>2022.1-SNAPSHOT PE</created-with-version>
                     <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version>

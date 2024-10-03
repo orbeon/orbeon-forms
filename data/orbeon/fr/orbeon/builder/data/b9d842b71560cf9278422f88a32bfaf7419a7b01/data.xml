@@ -14,7 +14,7 @@
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:math="http://www.w3.org/2005/xpath-functions/math">
     <xh:head>
-        <xh:title>Request for Taxpayer Identification Number and Certification</xh:title>
+        <xh:title>Orbeon Demo: Request for Taxpayer Identification Number and Certification</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
             <xf:instance id="fr-form-instance" xxf:index="id">
                 <form>
@@ -157,7 +157,7 @@
                     <application-name>orbeon</application-name>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
                     <form-name>w9</form-name>
-                    <title xml:lang="en">Request for Taxpayer Identification Number and Certification</title>
+                    <title xml:lang="en">Orbeon Demo: Request for Taxpayer Identification Number and Certification</title>
                     <description xml:lang="en">Use this form to provide your correct TIN to the person who is required to file an information return with the IRS to report, for example, income paid to you, real estate transactions, mortgage interest you paid, acquisition or abandonment of secured property, cancellation of debt, or contributions you made to an IRA.</description>
                     <library-versions>
                         <_>1</_>

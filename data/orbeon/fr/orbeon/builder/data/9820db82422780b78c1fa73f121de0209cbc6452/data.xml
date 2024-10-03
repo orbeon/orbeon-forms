@@ -15,7 +15,7 @@
          xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
-        <xh:title>Appearance of Labels Inline or as Placeholders</xh:title>
+        <xh:title>Orbeon Demo: Appearance of Labels Inline or as Placeholders</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true"
                   xxf:label.appearance="full minimal"
                   xxf:analysis.calculate="true">
@@ -127,7 +127,7 @@
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>placeholders</form-name>
-                    <title xml:lang="en">Appearance of Labels Inline or as Placeholders</title>
+                    <title xml:lang="en">Orbeon Demo: Appearance of Labels Inline or as Placeholders</title>
                     <description xml:lang="en">This form illustrates how core form controls can have labels or hints that are presented inline on top of the fields, or as "placeholders" within the field.</description>
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>

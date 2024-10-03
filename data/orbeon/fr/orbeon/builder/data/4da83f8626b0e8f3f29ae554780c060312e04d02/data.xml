@@ -15,7 +15,7 @@
          xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
-        <xh:title>Action to copy complex content</xh:title>
+        <xh:title>Orbeon Demo: Action to copy complex content</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
 
             <fr:listener version="2018.2" events="form-load-after-controls" actions="my-action"/>
@@ -132,7 +132,7 @@
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>copy-action</form-name>
-                    <title xml:lang="en">Action to copy complex content</title>
+                    <title xml:lang="en">Orbeon Demo: Action to copy complex content</title>
                     <description xml:lang="en">This form illustrates the use of the `&lt;fr:copy-content&gt;` action.</description>
                     <created-with-version>2023.1 PE</created-with-version>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>

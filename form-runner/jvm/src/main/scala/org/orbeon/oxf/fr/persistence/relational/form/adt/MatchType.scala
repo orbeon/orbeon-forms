@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.form.adt
 
-import org.orbeon.oxf.fr.FormDefinitionVersion
 import org.orbeon.oxf.fr.persistence.relational.form.adt.Metadata.StringOption
-
-import java.time.Instant
 
 
 sealed trait MatchType {
@@ -28,49 +25,41 @@ sealed trait MatchType {
 }
 
 object MatchType {
-  implicit class FormDefinitionVersionOps(formDefinitionVersion: FormDefinitionVersion) {
-    // Incomplete implementation. The form version will always be specific. For the time being, we don't support
-    // inequality tests with "latest" as a query value.
-    def compareTo(other: FormDefinitionVersion): Int =
-      (formDefinitionVersion, other) match {
-        case (FormDefinitionVersion.Specific(version1), FormDefinitionVersion.Specific(version2)) =>
-          version1.compareTo(version2)
-
-        case (FormDefinitionVersion.Specific(_), FormDefinitionVersion.Latest) =>
-          throw new IllegalArgumentException("Inequality queries are not supported with 'latest' yet")
-
-        case _ =>
-          throw new IllegalArgumentException("Unexpected form definition version")
-      }
-  }
-
-  trait InequalityMatchType extends MatchType {
+  trait ComparisonMatchType extends MatchType {
     override def satisfies[T](formValue: T, queryValue: T, metadata: Metadata[?]): Boolean =
-      (formValue, queryValue) match {
-        case (formValue: Instant, queryValue: Instant)                             => satisfies(formValue.compareTo(queryValue))
-        case (formValue: FormDefinitionVersion, queryValue: FormDefinitionVersion) => satisfies(formValue.compareTo(queryValue))
-        case _                                                                     => throwInvalidType(metadata)
-      }
+      satisfies(Order.compare(formValue, queryValue))
 
-    def satisfies(compareToValue: Int): Boolean
+    def satisfies(compareValue: Int): Boolean
   }
 
-  object GreaterThanOrEqual extends InequalityMatchType {
+  object GreaterThanOrEqual extends ComparisonMatchType {
     override val string = "gte"
 
-    override def satisfies(compareToValue: Int): Boolean = compareToValue >= 0
+    override def satisfies(compareValue: Int): Boolean = compareValue >= 0
   }
 
-  object GreaterThan extends InequalityMatchType {
+  object GreaterThan extends ComparisonMatchType {
     override val string = "gt"
 
-    override def satisfies(compareToValue: Int): Boolean = compareToValue > 0
+    override def satisfies(compareValue: Int): Boolean = compareValue > 0
   }
 
-  object LowerThan extends InequalityMatchType {
+  object LowerThanOrEqual extends ComparisonMatchType {
+    override val string = "lte"
+
+    override def satisfies(compareValue: Int): Boolean = compareValue <= 0
+  }
+
+  object LowerThan extends ComparisonMatchType {
     override val string = "lt"
 
-    override def satisfies(compareToValue: Int): Boolean = compareToValue < 0
+    override def satisfies(compareValue: Int): Boolean = compareValue < 0
+  }
+
+  object Exact extends ComparisonMatchType {
+    override val string = "exact"
+
+    override def satisfies(compareValue: Int): Boolean = compareValue == 0
   }
 
   object Substring extends MatchType {
@@ -91,17 +80,6 @@ object MatchType {
       }
   }
 
-  object Exact extends MatchType {
-    override val string = "exact"
-
-    override def satisfies[T](formValue: T, queryValue: T, metadata: Metadata[?]): Boolean =
-      (formValue, queryValue) match {
-        case (formValue: String, queryValue: String)             => formValue.toLowerCase == queryValue.toLowerCase
-        case (formValue: StringOption, queryValue: StringOption) => formValue.stringOpt.map(_.toLowerCase) == queryValue.stringOpt.map(_.toLowerCase)
-        case _                                                   => formValue == queryValue
-      }
-  }
-
   object Token extends MatchType {
     override val string = "token"
 
@@ -116,7 +94,7 @@ object MatchType {
       }
   }
 
-  val values: Seq[MatchType] = Seq(GreaterThanOrEqual, GreaterThan, LowerThan, Substring, Exact, Token)
+  val values: Seq[MatchType] = Seq(GreaterThanOrEqual, GreaterThan, LowerThanOrEqual, LowerThan, Exact, Substring, Token)
 
   def apply(string: String): MatchType =
     values.find(_.string == string).getOrElse(throw new IllegalArgumentException(s"Invalid match type: $string"))

@@ -13,25 +13,26 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.form.adt
 
-object OrderDirection {
-  def apply(s: String): OrderDirection = s.toLowerCase.trim match {
-    case Ascending .string => Ascending
-    case Descending.string => Descending
-    case _                 => throw new IllegalArgumentException(s"Invalid order direction: $s")
-  }
-}
 
 sealed trait OrderDirection {
   val string: String
   val sql: String
 }
 
-case object Ascending  extends OrderDirection {
-  override val string = "asc"
-  override val sql    = "ASC"
-}
+object OrderDirection {
+  case object Ascending  extends OrderDirection {
+    override val string = "asc"
+    override val sql    = "ASC"
+  }
 
-case object Descending extends OrderDirection {
-  override val string = "desc"
-  override val sql    = "DESC"
+  case object Descending extends OrderDirection {
+    override val string = "desc"
+    override val sql    = "DESC"
+  }
+
+  def apply(s: String): OrderDirection = s.toLowerCase.trim match {
+    case Ascending .string => Ascending
+    case Descending.string => Descending
+    case _                 => throw new IllegalArgumentException(s"Invalid order direction: $s")
+  }
 }

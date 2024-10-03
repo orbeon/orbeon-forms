@@ -27,7 +27,7 @@ import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor.OutgoingRequest.headersFromRequest
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.PersistenceBase
-import org.orbeon.oxf.fr.persistence.relational.form.adt.{Form, FormRequest, FormResponse}
+import org.orbeon.oxf.fr.persistence.relational.form.adt.*
 import org.orbeon.oxf.http.{BasicCredentials, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.PathUtils.PathOps
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, StaticXPath}
@@ -146,14 +146,12 @@ trait FormProxyLogic { this: PersistenceProxyProcessor.type =>
 
     // 1) Filter forms (by queries)
     val queriesToCheck = formRequest.queries.diff(latestFormVersionQueryOpt.toSeq)
-    val filteredForms  = formsWithLocalOperations.filter(form => queriesToCheck.forall(_.satisfies(form, formRequest.languageOpt)))
+    val filteredForms  = formsWithLocalOperations.filter(form => queriesToCheck.forall(_.satisfies(form, formRequest)))
 
     // 2) Sort forms (by queries)
-    // TODO: implement general sorting
-    val sortedForms = filteredForms.sortBy { form =>
-      // Sort forms by local OR remote last modified time
-      -(form.localMetadataOpt.toSeq ++ form.remoteMetadata.toSeq.sortBy(_._1).map(_._2)).head.lastModifiedTime.toEpochMilli
-    }
+    val sortQuery    = formRequest.sortQueryOpt.getOrElse(Query.defaultSortQuery)
+    val formOrdering = Order.formOrdering(sortQuery, formRequest)
+    val sortedForms  = filteredForms.sorted(formOrdering)
 
     // 3) Paginate forms
     val paginatedForms =

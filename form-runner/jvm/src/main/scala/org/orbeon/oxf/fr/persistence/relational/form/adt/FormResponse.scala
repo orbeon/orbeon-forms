@@ -30,5 +30,8 @@ case class FormResponse(
 
 object FormResponse {
   def apply(xml: NodeInfo): FormResponse =
-    FormResponse(xml.child("form").map(Form.apply).toList, searchTotal = xml.attValue("search-total").toInt)
+    FormResponse(
+      forms       = xml.child("form").map(Form.apply).toList,
+      searchTotal = xml.attValueOpt("search-total").map(_.toInt).getOrElse(0)
+    )
 }

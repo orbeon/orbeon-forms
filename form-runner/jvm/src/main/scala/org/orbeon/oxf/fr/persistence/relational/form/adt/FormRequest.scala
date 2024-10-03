@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.FormRunnerHome.RemoteServer
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.instantFromString
 import org.orbeon.oxf.fr.persistence.relational.form.FormProcessor
-import org.orbeon.oxf.fr.persistence.relational.form.adt.Select.{Local, Remote}
+import org.orbeon.oxf.fr.persistence.relational.form.adt.Select.Remote
 import org.orbeon.oxf.fr.{AppFormOpt, FormDefinitionVersion}
 import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
@@ -111,6 +111,10 @@ case class FormRequest(
       pageNumberOpt           = None,
       pageSizeOpt             = None
     )
+
+  // Support only one sort query for now
+  def sortQueryOpt: Option[Query[?]] =
+    queries.find(_.orderDirectionOpt.isDefined)
 }
 
 object FormRequest {
@@ -139,25 +143,17 @@ object FormRequest {
 
     // Convert parameters extracted from URL to Query instances
 
-    val appOpt = appFormFromUrlOpt.map(_.app)
-    val appQuery = appOpt.toSeq.map { app =>
-      Query(Metadata.AppName, languageOpt = None, select = Local, (MatchType.Exact, app).some, orderDirectionOpt = None)
-    }
+    val appOpt   = appFormFromUrlOpt.map(_.app)
+    val appQuery = appOpt.toSeq.map(Query.exactAppQuery)
 
-    val formOpt = appFormFromUrlOpt.flatMap(_.formOpt)
-    val formQuery = formOpt.toSeq.map { form =>
-      Query(Metadata.FormName, languageOpt = None, select = Local, (MatchType.Exact, form).some, orderDirectionOpt = None)
-    }
+    val formOpt   = appFormFromUrlOpt.flatMap(_.formOpt)
+    val formQuery = formOpt.toSeq.map(Query.exactFormQuery)
 
     val allVersions      = request.getFirstParamAsString("all-versions").getOrElse("false").toBoolean
-    val allVersionsQuery = (! allVersions).seq {
-      Query(Metadata.FormVersion, languageOpt = None, select = Local, (MatchType.Exact, FormDefinitionVersion.Latest).some, orderDirectionOpt = None)
-    }
+    val allVersionsQuery = (! allVersions).seq(Query.latestVersionsQuery)
 
     val modifiedSinceOpt   = request.getFirstParamAsString("modified-since").map(instantFromString)
-    val modifiedSinceQuery = modifiedSinceOpt.toSeq.map { modifiedSince =>
-      Query(Metadata.LastModified, languageOpt = None, select = Local, (MatchType.GreaterThan, modifiedSince).some, orderDirectionOpt = None)
-    }
+    val modifiedSinceQuery = modifiedSinceOpt.toSeq.map(Query.modifiedSinceQuery)
 
     FormRequest(
       compatibilityMode       = true,

@@ -14,11 +14,13 @@
 package org.orbeon.oxf.fr.persistence.relational.form.adt
 
 import cats.implicits.catsSyntaxOptionId
-import org.orbeon.oxf.fr.FormRunner.getDefaultLang
+import org.orbeon.oxf.fr.FormDefinitionVersion
 import org.orbeon.oxf.fr.persistence.relational.form.adt.Select.*
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
+
+import java.time.Instant
 
 case class Query[T](
   metadata            : Metadata[T],
@@ -40,15 +42,17 @@ case class Query[T](
     Seq(languageAttOpt, selectAttOpt, matchAttOpt, sortAttOpt).flatten.foldLeft(baseElem)((elem, attribute) => elem % attribute)
   }
 
-  def satisfies(form: Form, formRequestLanguageOpt: Option[String]): Boolean =
+  def effectiveLanguageOpt(formRequest: FormRequest): Option[String] =
+    languageOpt orElse formRequest.languageOpt
+
+  def satisfies(form: Form, formRequest: FormRequest): Boolean =
     matchTypeAndValueOpt match {
-      case None                     => true // No match type and value means this is a sort-only query
+      case None =>
+        // No match type and value means this is a sort-only query
+        true
+
       case Some((matchType, queryValue)) =>
-
-        // Should we cache the language at least for the duration of the whole API request? Make it lazy for the time being.
-        lazy val language = languageOpt orElse formRequestLanguageOpt getOrElse getDefaultLang(form.appForm.some)
-
-        metadata.selectedValueOpt(form, select, language) match {
+        metadata.selectedValueOpt(form, select, effectiveLanguageOpt(formRequest)) match {
           case None            => false // No form value was found (e.g. query on local metadata, but only remote metadata is available)
           case Some(formValue) => matchType.satisfies(formValue, queryValue, metadata)
         }
@@ -92,4 +96,49 @@ object Query {
       orderDirectionOpt    = orderDirectionOpt
     )
   }
+
+  def exactAppQuery(app: String): Query[String] =
+    Query(
+      metadata             = Metadata.AppName,
+      languageOpt          = None,
+      select               = Local,
+      matchTypeAndValueOpt = (MatchType.Exact, app).some,
+      orderDirectionOpt    = None
+    )
+
+  def exactFormQuery(form: String): Query[String] =
+    Query(
+      metadata             = Metadata.FormName,
+      languageOpt          = None,
+      select               = Local,
+      matchTypeAndValueOpt = (MatchType.Exact, form).some,
+      orderDirectionOpt    = None
+    )
+
+  val latestVersionsQuery: Query[FormDefinitionVersion] =
+    Query(
+      metadata             = Metadata.FormVersion,
+      languageOpt          = None,
+      select               = Local,
+      matchTypeAndValueOpt = (MatchType.Exact, FormDefinitionVersion.Latest).some,
+      orderDirectionOpt    = None
+    )
+
+  def modifiedSinceQuery(modifiedSince: Instant): Query[Instant] =
+    Query(
+      metadata             = Metadata.LastModified,
+      languageOpt          = None,
+      select               = Local,
+      matchTypeAndValueOpt = (MatchType.GreaterThan, modifiedSince).some,
+      orderDirectionOpt    = None
+    )
+
+  val defaultSortQuery: Query[Instant] =
+    Query[Instant](
+      metadata             = Metadata.LastModified,
+      languageOpt          = None,
+      select               = Max, // Most recent between local and remote forms
+      matchTypeAndValueOpt = None,
+      orderDirectionOpt    = OrderDirection.Descending.some
+    )
 }

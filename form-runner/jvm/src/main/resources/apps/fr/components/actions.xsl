@@ -539,7 +539,7 @@
                     <xsl:if test="exists($action/@if)">
                         <xsl:attribute
                             name="if"
-                            select="frf:replaceVarReferencesWithFunctionCalls($action/@if  (: xxx null :), $action/@if, false(), $library-name, ())"/>
+                            select="frf:replaceVarReferencesWithFunctionCalls($action/@if, $action/@if, false(), $library-name, ())"/>
                     </xsl:if>
 
                     <!-- 1. Choose to iterate or not on `$iterate-control-name`.

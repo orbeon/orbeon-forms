@@ -914,13 +914,13 @@
 
                                         <!-- Languages are not separated, so we cannot see the description in the current language :( -->
                                         <xf:var
-                                            name="description"
+                                            name="description-opt"
                                             value="instance('template-forms')/*[index('form-template-repeat')]/description[xxf:non-blank()]/xxf:trim()"/>
 
                                         <!-- Same heuristic as in the Form Builder Summary page -->
                                         <xf:group
                                             xxf:element="div"
-                                            ref="$description"
+                                            ref="$description-opt"
                                             class="alert fr-form-description">
 
                                             <xf:switch caseref="starts-with(., '&lt;div&gt;')">

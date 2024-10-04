@@ -100,8 +100,6 @@
                 <xf:bind id="object-details-bind" ref="object-details" name="object-details">
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
                         <xf:bind id="object-type-bind" ref="object-type" name="object-type"/>
-                        <xf:bind id="object-subtype-bind" ref="object-subtype" name="object-subtype"/>
-                        <xf:bind id="object-brand-bind" ref="object-brand" name="object-brand"/>
                         <xf:bind id="object-model-bind" ref="object-model" name="object-model"
                                  xxf:whitespace="trim"/>
                         <xf:bind id="object-serial-number-bind" ref="object-serial-number"
@@ -131,6 +129,10 @@
                                  constraint="xxf:upload-mediatypes('image/*')"/>
                         <xf:bind id="object-attachments-bind" ref="object-attachments" name="object-attachments"/>
                         <xf:bind id="object-description-bind" ref="object-description" name="object-description"
+                                 xxf:whitespace="trim"/>
+                        <xf:bind id="object-subtype-bind" ref="object-subtype" name="object-subtype"
+                                 xxf:whitespace="trim"/>
+                        <xf:bind id="object-brand-bind" ref="object-brand" name="object-brand"
                                  xxf:whitespace="trim"/>
                     </xf:bind>
                 </xf:bind>
@@ -162,6 +164,8 @@
                         <orbeon>1</orbeon>
                         <_>1</_>
                     </library-versions>
+                    <screenshot filename="inventory.png" mediatype="image/png" size="151677">/fr/service/persistence/crud/orbeon/builder/data/fb974dd165f865f7aedc1760daaeeef79a14c67c/dfea7f443d17be08ec1ba42351fe76b81b9c61df.bin</screenshot>
+                    <allow-template-use>true</allow-template-use>
                     <email>
                         <templates>
                             <template name="default">
@@ -171,8 +175,6 @@
                         </templates>
                         <parameters/>
                     </email>
-                    <screenshot filename="inventory.png" mediatype="image/png" size="151677">/fr/service/persistence/crud/orbeon/builder/data/fb974dd165f865f7aedc1760daaeeef79a14c67c/dfea7f443d17be08ec1ba42351fe76b81b9c61df.bin</screenshot>
-                    <allow-template-use>true</allow-template-use>
                 </metadata>
             </xf:instance>
 
@@ -299,23 +301,8 @@
                             <hint/>
                         </object-subtype>
                         <object-brand>
-                            <label>Brand</label>
+                            <label>Object brand</label>
                             <hint/>
-                            <item>
-                                <label>Brand 1</label>
-                                <hint/>
-                                <value>brand-1</value>
-                            </item>
-                            <item>
-                                <label>Brand 2</label>
-                                <hint/>
-                                <value>brand-2</value>
-                            </item>
-                            <item>
-                                <label>Brand 3</label>
-                                <hint/>
-                                <value>brand-3</value>
-                            </item>
                         </object-brand>
                         <object-model>
                             <label>Model</label>
@@ -539,39 +526,22 @@
                             </fr:open-select1>
                         </fr:c>
                         <fr:c x="7" y="2" w="6">
-                            <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="object-subtype-control"
-                                             appearance="minimal"
-                                             bind="object-subtype-bind">
+                            <xf:input id="object-subtype-control" bind="object-subtype-bind">
                                 <xf:label ref="$form-resources/object-subtype/label"/>
                                 <xf:hint ref="$form-resources/object-subtype/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                                <xf:itemset ref="$form-resources/object-subtype/item">
-                                    <xf:label ref="label"/>
-                                    <xf:value ref="value"/>
-                                    <xf:hint ref="hint"/>
-                                </xf:itemset>
-                            </fr:open-select1>
+                            </xf:input>
                         </fr:c>
                         <fr:c x="1" y="3" w="6">
-                            <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="object-brand-control"
-                                             appearance="minimal"
-                                             bind="object-brand-bind">
+                            <xf:input id="object-brand-control" bind="object-brand-bind">
                                 <xf:label ref="$form-resources/object-brand/label"/>
                                 <xf:hint ref="$form-resources/object-brand/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                                <xf:itemset ref="$form-resources/object-brand/item">
-                                    <xf:label ref="label"/>
-                                    <xf:value ref="value"/>
-                                    <xf:hint ref="hint"/>
-                                </xf:itemset>
-                                <fr:index>
-                                    <fr:summary-show/>
-                                </fr:index>
-                            </fr:open-select1>
+                            </xf:input>
                         </fr:c>
                         <fr:c x="7" y="3" w="6">
                             <xf:input id="object-model-control" bind="object-model-bind">

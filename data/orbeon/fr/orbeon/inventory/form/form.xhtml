@@ -16,7 +16,7 @@
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="accquisition-details-bind" name="accquisition-details" ref="accquisition-details"><xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"><xf:bind id="acquisition-date-bind" name="acquisition-date" ref="acquisition-date" xxf:whitespace="trim" required="true()" type="xs:date"/><xf:bind id="acquisition-id-bind" ref="acquisition-id" name="acquisition-id" type="xs:integer" constraint="xxf:positive()" required="true()"/><xf:bind id="acquisition-price-base-bind" ref="acquisition-price-base" name="acquisition-price-base" type="xf:decimal" constraint="xxf:fraction-digits(2)"/><xf:bind id="acquisition-price-additional-bind" ref="acquisition-price-additional" name="acquisition-price-additional" type="xf:decimal" constraint="xxf:fraction-digits(2)"/><xf:bind id="acquisition-price-total-bind" ref="acquisition-price-total" name="acquisition-price-total" type="xf:decimal" constraint="xxf:fraction-digits(2)" calculate="$acquisition-price-base + $acquisition-price-additional"/><xf:bind id="acquisition-location-bind" ref="acquisition-location" name="acquisition-location" xxf:whitespace="trim"/><xf:bind id="acquisition-comment-bind" ref="acquisition-comment" name="acquisition-comment"/></xf:bind>
 
-                </xf:bind><xf:bind id="object-details-bind" ref="object-details" name="object-details"><xf:bind id="grid-3-bind" ref="grid-3" name="grid-3"><xf:bind id="object-type-bind" ref="object-type" name="object-type"/><xf:bind id="object-subtype-bind" ref="object-subtype" name="object-subtype"/><xf:bind id="object-brand-bind" ref="object-brand" name="object-brand"/><xf:bind id="object-model-bind" ref="object-model" name="object-model" xxf:whitespace="trim"/><xf:bind id="object-serial-number-bind" ref="object-serial-number" name="object-serial-number" xxf:whitespace="trim"/><xf:bind id="object-manufacturing-year-bind" ref="object-manufacturing-year" name="object-manufacturing-year" xxf:whitespace="trim" type="xf:integer"/><xf:bind id="object-manufacturing-decade-bind" ref="object-manufacturing-decade" name="object-manufacturing-decade" xxf:whitespace="trim" calculate="let $y := $object-manufacturing-year&#xA;return&#xA;  if ($y castable as xs:integer) then&#xA;    $y idiv 10 * 10&#xA;  else&#xA;    ''" type="xf:integer"/><xf:bind id="object-color-bind" ref="object-color" name="object-color" xxf:whitespace="trim"/><xf:bind id="object-base-weight-lbs-bind" ref="object-base-weight-lbs" name="object-base-weight-lbs" type="xf:decimal"/><xf:bind id="object-total-weight-lbs-bind" ref="object-total-weight-lbs" name="object-total-weight-lbs" type="xf:decimal"/><xf:bind id="object-link-bind" ref="object-link" name="object-link" xxf:whitespace="trim"/><xf:bind id="object-comment-bind" ref="object-comment" name="object-comment"/><xf:bind id="object-image-bind" ref="object-image" name="object-image" type="xf:anyURI" constraint="xxf:upload-mediatypes('image/*')"/><xf:bind id="object-attachments-bind" ref="object-attachments" name="object-attachments"/><xf:bind id="object-description-bind" ref="object-description" name="object-description" xxf:whitespace="trim"/></xf:bind></xf:bind><xf:bind id="appraisal-bind" ref="appraisal" name="appraisal"><xf:bind id="grid-4-bind" ref="grid-4" name="grid-4"><xf:bind id="appraisal-condition-bind" ref="appraisal-condition" name="appraisal-condition"/><xf:bind id="appraisal-score-bind" ref="appraisal-score" name="appraisal-score"/><xf:bind id="appraisal-current-value-bind" ref="appraisal-current-value" name="appraisal-current-value" type="xf:decimal" constraint="xxf:fraction-digits(2)"/><xf:bind id="appraisal-comment-bind" ref="appraisal-comment" name="appraisal-comment"/></xf:bind></xf:bind>
+                </xf:bind><xf:bind id="object-details-bind" ref="object-details" name="object-details"><xf:bind id="grid-3-bind" ref="grid-3" name="grid-3"><xf:bind id="object-type-bind" ref="object-type" name="object-type"/><xf:bind id="object-model-bind" ref="object-model" name="object-model" xxf:whitespace="trim"/><xf:bind id="object-serial-number-bind" ref="object-serial-number" name="object-serial-number" xxf:whitespace="trim"/><xf:bind id="object-manufacturing-year-bind" ref="object-manufacturing-year" name="object-manufacturing-year" xxf:whitespace="trim" type="xf:integer"/><xf:bind id="object-manufacturing-decade-bind" ref="object-manufacturing-decade" name="object-manufacturing-decade" xxf:whitespace="trim" calculate="let $y := $object-manufacturing-year&#xA;return&#xA;  if ($y castable as xs:integer) then&#xA;    $y idiv 10 * 10&#xA;  else&#xA;    ''" type="xf:integer"/><xf:bind id="object-color-bind" ref="object-color" name="object-color" xxf:whitespace="trim"/><xf:bind id="object-base-weight-lbs-bind" ref="object-base-weight-lbs" name="object-base-weight-lbs" type="xf:decimal"/><xf:bind id="object-total-weight-lbs-bind" ref="object-total-weight-lbs" name="object-total-weight-lbs" type="xf:decimal"/><xf:bind id="object-link-bind" ref="object-link" name="object-link" xxf:whitespace="trim"/><xf:bind id="object-comment-bind" ref="object-comment" name="object-comment"/><xf:bind id="object-image-bind" ref="object-image" name="object-image" type="xf:anyURI" constraint="xxf:upload-mediatypes('image/*')"/><xf:bind id="object-attachments-bind" ref="object-attachments" name="object-attachments"/><xf:bind id="object-description-bind" ref="object-description" name="object-description" xxf:whitespace="trim"/><xf:bind id="object-subtype-bind" ref="object-subtype" name="object-subtype" xxf:whitespace="trim"/><xf:bind id="object-brand-bind" ref="object-brand" name="object-brand" xxf:whitespace="trim"/></xf:bind></xf:bind><xf:bind id="appraisal-bind" ref="appraisal" name="appraisal"><xf:bind id="grid-4-bind" ref="grid-4" name="grid-4"><xf:bind id="appraisal-condition-bind" ref="appraisal-condition" name="appraisal-condition"/><xf:bind id="appraisal-score-bind" ref="appraisal-score" name="appraisal-score"/><xf:bind id="appraisal-current-value-bind" ref="appraisal-current-value" name="appraisal-current-value" type="xf:decimal" constraint="xxf:fraction-digits(2)"/><xf:bind id="appraisal-comment-bind" ref="appraisal-comment" name="appraisal-comment"/></xf:bind></xf:bind>
             </xf:bind>
 
 
@@ -105,19 +105,7 @@
             <label>Model Car</label>
             <hint/>
             <value>model-car</value>
-          </item></object-type><object-subtype><label>Object subtype</label><hint/></object-subtype><object-brand><label>Brand</label><hint/><item>
-            <label>Brand 1</label>
-            <hint/>
-            <value>brand-1</value>
-          </item><item>
-            <label>Brand 2</label>
-            <hint/>
-            <value>brand-2</value>
-          </item><item>
-            <label>Brand 3</label>
-            <hint/>
-            <value>brand-3</value>
-          </item></object-brand><object-model><label>Model</label><hint/></object-model><object-serial-number><label>Serial number</label><hint/></object-serial-number><object-manufacturing-year><label>Manufacturing year</label><hint/></object-manufacturing-year><object-manufacturing-decade><label>Manufacturing decade</label><hint/></object-manufacturing-decade><object-base-weight-lbs><label>Base weight</label><hint/></object-base-weight-lbs><object-total-weight-lbs><label>Total weight</label><hint/></object-total-weight-lbs><object-color><label>Color</label><hint/></object-color><object-link><label>Link</label><hint/></object-link><object-image><label>Image</label><hint/></object-image><object-attachments><label>Attachments</label><hint/></object-attachments><object-comment><label>Comment</label><hint/></object-comment>
+          </item></object-type><object-subtype><label>Object subtype</label><hint/></object-subtype><object-brand><label>Object brand</label><hint/></object-brand><object-model><label>Model</label><hint/></object-model><object-serial-number><label>Serial number</label><hint/></object-serial-number><object-manufacturing-year><label>Manufacturing year</label><hint/></object-manufacturing-year><object-manufacturing-decade><label>Manufacturing decade</label><hint/></object-manufacturing-decade><object-base-weight-lbs><label>Base weight</label><hint/></object-base-weight-lbs><object-total-weight-lbs><label>Total weight</label><hint/></object-total-weight-lbs><object-color><label>Color</label><hint/></object-color><object-link><label>Link</label><hint/></object-link><object-image><label>Image</label><hint/></object-image><object-attachments><label>Attachments</label><hint/></object-attachments><object-comment><label>Comment</label><hint/></object-comment>
                         <accquisition-details>
                             <label>Acquisition</label>
                         </accquisition-details><object-details><label>Description</label></object-details><appraisal><label>Appraisal</label></appraisal>
@@ -163,23 +151,12 @@
                         <xf:hint ref="$form-resources/acquisition-price-additional/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                    </fr:currency></fr:c><fr:c x="7" y="2" w="3"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="acquisition-price-total-control" bind="acquisition-price-total-bind">
-                                <fr:index>
-                                    <fr:summary-show/>
-                                </fr:index>
+                    </fr:currency></fr:c><fr:c x="7" y="2" w="3"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="acquisition-price-total-control" bind="acquisition-price-total-bind"><fr:index><fr:summary-show/></fr:index>
                         <xf:label ref="$form-resources/acquisition-price-total/label"/>
                         <xf:hint ref="$form-resources/acquisition-price-total/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </fr:currency>
-                        </fr:c>
-                        <fr:c x="10" y="2" w="3" h="1"/>
-                        <fr:c x="1" y="3" w="12">
-                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                         xmlns:f="http://orbeon.org/oxf/xml/formatting"
-                                         mediatype="text/html"
-                                         id="acquisition-comment-control"
-                                         bind="acquisition-comment-bind">
+                    </fr:currency></fr:c><fr:c x="10" y="2" w="3" h="1"/><fr:c x="1" y="3" w="12"><xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="acquisition-comment-control" bind="acquisition-comment-bind">
                         <xf:label ref="$form-resources/acquisition-comment/label"/>
                         <xf:hint ref="$form-resources/acquisition-comment/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
@@ -187,10 +164,7 @@
                     </xf:textarea></fr:c></fr:grid>
                 </fr:section><fr:section id="object-details-section" bind="object-details-bind"><xf:label ref="$form-resources/object-details/label"/>
           <fr:grid id="grid-3-grid" bind="grid-3-bind">
-              <fr:c x="1" y="1" w="12"><xf:input id="object-description-control" bind="object-description-bind">
-                                <fr:index>
-                                    <fr:summary-show/>
-                                </fr:index>
+              <fr:c x="1" y="1" w="12"><xf:input id="object-description-control" bind="object-description-bind"><fr:index><fr:summary-show/></fr:index>
                         <xf:label ref="$form-resources/object-description/label"/>
                         <xf:hint ref="$form-resources/object-description/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
@@ -205,27 +179,17 @@
                             <xf:value ref="value"/>
                             <xf:hint ref="hint"/>
                         </xf:itemset>
-                    </fr:open-select1></fr:c><fr:c x="7" y="2" w="6"><fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="object-subtype-control" appearance="minimal" bind="object-subtype-bind">
+                    </fr:open-select1></fr:c><fr:c x="7" y="2" w="6"><xf:input id="object-subtype-control" bind="object-subtype-bind">
                         <xf:label ref="$form-resources/object-subtype/label"/>
                         <xf:hint ref="$form-resources/object-subtype/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                        <xf:itemset ref="$form-resources/object-subtype/item">
-                            <xf:label ref="label"/>
-                            <xf:value ref="value"/>
-                            <xf:hint ref="hint"/>
-                        </xf:itemset>
-                    </fr:open-select1></fr:c><fr:c x="1" y="3" w="6"><fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="object-brand-control" appearance="minimal" bind="object-brand-bind">
+                    </xf:input></fr:c><fr:c x="1" y="3" w="6"><xf:input id="object-brand-control" bind="object-brand-bind">
                         <xf:label ref="$form-resources/object-brand/label"/>
                         <xf:hint ref="$form-resources/object-brand/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                        <xf:itemset ref="$form-resources/object-brand/item">
-                            <xf:label ref="label"/>
-                            <xf:value ref="value"/>
-                            <xf:hint ref="hint"/>
-                        </xf:itemset>
-                    <fr:index><fr:summary-show/></fr:index></fr:open-select1></fr:c><fr:c x="7" y="3" w="6"><xf:input id="object-model-control" bind="object-model-bind">
+                    </xf:input></fr:c><fr:c x="7" y="3" w="6"><xf:input id="object-model-control" bind="object-model-bind">
                         <xf:label ref="$form-resources/object-model/label"/>
                         <xf:hint ref="$form-resources/object-model/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 

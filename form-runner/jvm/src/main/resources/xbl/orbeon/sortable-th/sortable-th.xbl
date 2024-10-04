@@ -1,0 +1,63 @@
+<!--
+  Copyright (C) 2024 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:d="DAV:">
+
+    <xbl:binding
+        id="fr-sortable-th"
+        element="fr|sortable-th"
+        xxbl:mode="binding">
+
+        <xbl:template>
+            <xf:var name="label"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="ref=label"/></xf:var>
+            <xf:var name="instance"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="ref=instance"/></xf:var>
+
+            <xf:var name="sort-supported"  xbl:attr="xbl:text=sort-supported"/>
+            <xf:var name="local-or-remote" xbl:attr="xbl:text=local-or-remote"/>
+            <xf:var name="column"          xbl:attr="xbl:text=column"/>
+
+            <xf:var
+                name="no-caret"
+                value="$instance/local-or-remote != $local-or-remote or $instance/column != $column or not($sort-supported)"/>
+
+            <!-- TODO class -->
+
+            <xh:th>
+                <xf:trigger appearance="minimal">
+                    <xf:label>
+                        <xf:output value="$label"/>
+                        <xh:span class="column-caret">
+                            <xf:output value="
+                                if      ($no-caret)                   then ''
+                                else if ($instance/direction = 'asc') then '&#x25B2;'
+                                else                                       '&#x25BC;'
+                            "/>
+                        </xh:span>
+                    </xf:label>
+                    <xf:action event="DOMActivate" if="$sort-supported">
+                        <xf:dispatch name="fr-order-by" targetid="fr-form-model" xxbl:scope="outer">
+                            <xf:property name="local-or-remote" value="$local-or-remote" xxbl:scope="inner"/>
+                            <xf:property name="column"          value="$column"          xxbl:scope="inner"/>
+                        </xf:dispatch>
+                    </xf:action>
+                </xf:trigger>
+            </xh:th>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

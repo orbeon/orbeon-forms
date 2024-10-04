@@ -323,7 +323,7 @@
                         <query metadata="form-version"     match="exact"/>
                         <query metadata="created"          match="gte"/>
                         <query metadata="created"          match="lt"/>
-                        <query metadata="last-modified"    match="gte"/>
+                        <query metadata="last-modified"    match="gte" sort="desc"/>
                         <query metadata="last-modified"    match="lt"/>
                         <query metadata="last-modified-by" match="exact"/>
                         <query metadata="title"            match="substring"/>
@@ -340,9 +340,19 @@
                     </remote>
                 </_>
             </xf:instance>
+
+            <xf:instance id="fr-order-by">
+                <order-by>
+                    <local-or-remote>local</local-or-remote>
+                    <column>last-modified</column>
+                    <direction>desc</direction>
+                </order-by>
+            </xf:instance>
+
             <xf:instance id="fr-metadata-request" xxf:exclude-result-prefixes="#all">
                 <search all-forms="false" ignore-admin-permissions="false" xml:lang=""/>
             </xf:instance>
+
             <xf:instance id="fr-metadata" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
             <xf:var name="forms" value="instance('fr-metadata')/form"/>
 
@@ -350,6 +360,43 @@
             <xf:bind ref="instance('fr-metadata')/form/last-modified-time"               type="xs:dateTime"/>
             <xf:bind ref="instance('fr-metadata')/form/remote-server/created"            type="xs:dateTime"/>
             <xf:bind ref="instance('fr-metadata')/form/remote-server/last-modified-time" type="xs:dateTime"/>
+
+            <!-- TODO: In view.xhtml, we call frf:isSortSupported($app, $form). What should we do here? -->
+            <xf:var name="sort-supported" value="true()"/>
+
+            <xf:action event="fr-order-by">
+                <xf:var name="local-or-remote" value="event('local-or-remote')"/>
+                <xf:var name="column"          value="event('column')"/>
+
+                <!-- If same column, toggle direction -->
+                <xf:setvalue
+                    if="instance('fr-order-by')/column = $column"
+                    ref="instance('fr-order-by')/direction"
+                    value="
+                        if (instance('fr-order-by')/direction = 'asc') then 'desc'
+                        else                                                'asc'
+                "/>
+
+                <!-- If different column, choose default direction -->
+                <xf:setvalue
+                    if="instance('fr-order-by')/column != $column"
+                    ref="instance('fr-order-by')/direction"
+                    value="if ($column = ('created', 'last-modified')) then 'desc' else 'asc'"/>
+
+                <xf:setvalue ref="instance('fr-order-by')/local-or-remote" value="$local-or-remote"/>
+                <xf:setvalue ref="instance('fr-order-by')/column"          value="$column"/>
+
+                <!-- Set sort attribute in search query -->
+                <xf:delete ref="instance('fr-metadata-queries')/(local | remote)/query/@sort"/>
+                <xf:insert
+                    context="instance('fr-metadata-queries')/*[local-name() = $local-or-remote]/query[@metadata = $column]"
+                    origin="xf:attribute('sort', instance('fr-order-by')/direction)"/>
+
+                <!-- Update search results (do not reset pagination, etc.) -->
+                <xf:dispatch name="fr-initialize" targetid="fr-form-model">
+                    <xf:property name="keep-selection" value="'true'"/>
+                </xf:dispatch>
+            </xf:action>
 
             <xf:var
                 name="remote-set"
@@ -1320,9 +1367,9 @@
                         </xf:switch>
                     </xf:group>
 
-                    <xf:group xxf:update="full">
+                    <xf:group xxf:update="full" class="fr-search-results">
                         <xh:table class="fr-forms-table table table-bordered table-condensed table-hover">
-                            <xh:thead>
+                            <xh:thead class="{'column-header', 'sortable-column'[$sort-supported], 'non-sortable-column'[not($sort-supported)]}">
 								<xf:group ref=".[$show-remote]">
 									<xh:tr>
 										<xf:group ref=".[$show-permissions]">
@@ -1336,19 +1383,60 @@
 								<xh:tr>
                                     <xf:group ref=".[$show-permissions]">
                                         <xh:th/>
-                                        <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
+                                        <fr:sortable-th
+                                            label="$fr-resources/home/titles/status"
+                                            sort-supported="$sort-supported"
+                                            instance="instance('fr-order-by')"
+                                            local-or-remote="local"
+                                            column="available"/>
                                     </xf:group>
-                                    <xh:th><xf:output value="$fr-resources/home-summary/titles/last-modified"/></xh:th>
+                                    <fr:sortable-th
+                                        label="$fr-resources/home-summary/titles/last-modified"
+                                        sort-supported="$sort-supported"
+                                        instance="instance('fr-order-by')"
+                                        local-or-remote="local"
+                                        column="last-modified"/>
                                     <xf:group ref=".[$show-remote]">
                                         <xf:group ref=".[$show-permissions]">
-                                            <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
+                                            <fr:sortable-th
+                                                label="$fr-resources/home/titles/status"
+                                                sort-supported="$sort-supported"
+                                                instance="instance('fr-order-by')"
+                                                local-or-remote="remote"
+                                                column="available"/>
                                         </xf:group>
-                                        <xh:th><xf:output value="$fr-resources/home-summary/titles/last-modified"/></xh:th>
+                                        <fr:sortable-th
+                                            label="$fr-resources/home-summary/titles/last-modified"
+                                            sort-supported="$sort-supported"
+                                            instance="instance('fr-order-by')"
+                                            local-or-remote="remote"
+                                            column="last-modified"/>
                                     </xf:group>
-                                    <xh:th><xf:output value="$fr-resources/home-summary/titles/application-name"/></xh:th>
-                                    <xh:th><xf:output value="$fr-resources/home-summary/titles/form-name"/></xh:th>
-                                    <xh:th class="fr-align-right"><xf:output value="$fr-resources/home-summary/titles/version"/></xh:th>
-                                    <xh:th><xf:output value="$fr-resources/home-summary/titles/form-title"/></xh:th>
+                                    <fr:sortable-th
+                                        label="$fr-resources/home-summary/titles/application-name"
+                                        sort-supported="$sort-supported"
+                                        instance="instance('fr-order-by')"
+                                        local-or-remote="local"
+                                        column="application-name"/>
+                                    <fr:sortable-th
+                                        label="$fr-resources/home-summary/titles/form-name"
+                                        sort-supported="$sort-supported"
+                                        instance="instance('fr-order-by')"
+                                        local-or-remote="local"
+                                        column="form-name"/>
+                                    <fr:sortable-th
+                                        class="fr-align-right"
+                                        label="$fr-resources/home-summary/titles/version"
+                                        sort-supported="$sort-supported"
+                                        instance="instance('fr-order-by')"
+                                        local-or-remote="local"
+                                        column="form-version"/>
+                                    <fr:sortable-th
+                                        label="$fr-resources/home-summary/titles/form-title"
+                                        sort-supported="$sort-supported"
+                                        instance="instance('fr-order-by')"
+                                        local-or-remote="local"
+                                        column="title"/>
                                 </xh:tr>
                             </xh:thead>
                             <xh:tbody>

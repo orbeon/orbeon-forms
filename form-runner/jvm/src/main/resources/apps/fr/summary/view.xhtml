@@ -299,7 +299,7 @@
                 </search>
             </xf:instance>
 
-            <xf:instance id="fr-order-by-instance">
+            <xf:instance id="fr-order-by">
                 <order-by>
                     <column>last-modified</column>
                     <direction>desc</direction>
@@ -477,8 +477,8 @@
                     value="xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
 
                 <!-- Reset order by directive to default -->
-                <xf:setvalue ref="instance('fr-order-by-instance')/column"    value="'last-modified'"/>
-                <xf:setvalue ref="instance('fr-order-by-instance')/direction" value="'desc'"/>
+                <xf:setvalue ref="instance('fr-order-by')/column"    value="'last-modified'"/>
+                <xf:setvalue ref="instance('fr-order-by')/direction" value="'desc'"/>
 
                 <!-- Create elements holding structured search data -->
                 <xf:delete
@@ -786,20 +786,20 @@
 
                 <!-- If same column, toggle direction -->
                 <xf:setvalue
-                    if="instance('fr-order-by-instance')/column = $column"
-                    ref="instance('fr-order-by-instance')/direction"
+                    if="instance('fr-order-by')/column = $column"
+                    ref="instance('fr-order-by')/direction"
                     value="
-                        if (instance('fr-order-by-instance')/direction = 'asc') then 'desc'
-                        else                                                         'asc'
+                        if (instance('fr-order-by')/direction = 'asc') then 'desc'
+                        else                                                'asc'
                     "/>
 
                 <!-- If different column, choose default direction -->
                 <xf:setvalue
-                    if="instance('fr-order-by-instance')/column != $column"
-                    ref="instance('fr-order-by-instance')/direction"
+                    if="instance('fr-order-by')/column != $column"
+                    ref="instance('fr-order-by')/direction"
                     value="if ($column = ('created', 'last-modified')) then 'desc' else 'asc'"/>
 
-                <xf:setvalue ref="instance('fr-order-by-instance')/column" value="$column"/>
+                <xf:setvalue ref="instance('fr-order-by')/column" value="$column"/>
 
                 <!-- Set sort attribute in search query -->
                 <xf:delete ref="instance('fr-search-instance')/query/@sort"/>
@@ -809,7 +809,7 @@
                             instance('fr-search-instance')/query[@metadata = $column]
                         else
                             instance('fr-search-instance')/query[@path = $column]"
-                    origin="xf:attribute('sort', instance('fr-order-by-instance')/direction)"/>
+                    origin="xf:attribute('sort', instance('fr-order-by')/direction)"/>
 
                 <!-- Update search results (do not reset pagination, etc.) -->
                 <xf:send submission="fr-summary-search-submission"/>
@@ -1608,9 +1608,9 @@
                                                             <xf:output value="($fr-resources/summary/titles/*[local-name() = $column], $fr-resources/home-summary/titles/*[local-name() = $column])[1]"/>
                                                             <span class="column-caret">
                                                                 <xf:output value="
-                                                                    if      (instance('fr-order-by-instance')/column != $column or not($sort-supported)) then ''
-                                                                    else if (instance('fr-order-by-instance')/direction = 'asc') then                         '&#x25B2;'
-                                                                    else                                                                                      '&#x25BC;'
+                                                                    if      (instance('fr-order-by')/column != $column or not($sort-supported)) then ''
+                                                                    else if (instance('fr-order-by')/direction = 'asc') then                         '&#x25B2;'
+                                                                    else                                                                             '&#x25BC;'
                                                                 "/>
                                                             </span>
                                                         </xf:label>
@@ -1638,9 +1638,9 @@
                                                             value="resources[@lang = xxf:instance('fr-language-instance')]/label"/>
                                                         <span class="column-caret">
                                                             <xf:output value="
-                                                                if      (instance('fr-order-by-instance')/column != @path or not($sort-supported))   then ''
-                                                                else if (instance('fr-order-by-instance')/direction = 'asc') then                         '&#x25B2;'
-                                                                else                                                                                      '&#x25BC;'
+                                                                if      (instance('fr-order-by')/column != @path or not($sort-supported)) then ''
+                                                                else if (instance('fr-order-by')/direction = 'asc') then                       '&#x25B2;'
+                                                                else                                                                           '&#x25BC;'
                                                             "/>
                                                         </span>
                                                     </xf:label>

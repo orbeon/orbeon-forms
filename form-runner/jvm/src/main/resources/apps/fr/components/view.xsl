@@ -76,7 +76,7 @@
         </xsl:if>
         <xsl:if test="p:property(string-join(('oxf.fr.detail.captcha.location', $app, $form), '.')) = 'form-bottom'">
             <fr:row>
-                <fr:captcha id="fr-captcha" namespace-name="{frf:captchaComponent($app, $form)}"/>
+                <fr:captcha id="fr-captcha" namespace-name="{frf:captchaComponent($app, $form)}" captcha-visible="{$captcha-visible}"/>
             </fr:row>
         </xsl:if>
 
@@ -445,6 +445,7 @@
                         <xsl:attribute name="section-status"         select="$wizard-section-status"/>
                         <xsl:attribute name="full-update"            select="$wizard-full-update"/>
                         <xsl:attribute name="captcha-location"       select="$captcha-location"/>
+                        <xsl:attribute name="captcha-visible"        select="$captcha-visible"/>
                         <xsl:attribute name="captcha-namespace-name" select="frf:captchaComponent($app, $form)"/>
 
                         <!--

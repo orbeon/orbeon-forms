@@ -1583,7 +1583,7 @@
                                                             <!-- No subsection nav -->
                                                             <xsl:apply-templates select="node()"/>
                                                             <xsl:if test="$captcha-location = ('inside-wizard-first-page', 'inside-wizard-last-page')">
-                                                                <fr:captcha namespace-name="{/*/@captcha-namespace-name}">
+                                                                <fr:captcha namespace-name="{/*/@captcha-namespace-name}" captcha-visible="{/*/@captcha-visible}">
                                                                     <xsl:attribute name="ref">
                                                                         .[
                                                                             '<xsl:value-of select="$static-section-id"/>-case' =
@@ -1600,7 +1600,11 @@
                                     </xsl:for-each>
                                 </xf:switch>
                                 <xsl:if test="$captcha-location = 'inside-wizard'">
-                                    <fr:captcha id="fr-captcha" namespace-name="{/*/@captcha-namespace-name}"/>
+                                    <fr:captcha
+                                        id="fr-captcha"
+                                        namespace-name="{/*/@captcha-namespace-name}"
+                                        captcha-visible="{/*/@captcha-visible}"
+                                        xxbl:scope="outer"/>
                                 </xsl:if>
                             </xh:div>
                             <!-- In case the view contains elements other than sections (like dialogs) -->

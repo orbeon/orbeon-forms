@@ -493,6 +493,20 @@
             )[1]"/>
 
     <xsl:variable
+        name="captcha-visible"
+        as="xs:string"
+        select="
+            (
+                frf:replaceVarReferencesWithFunctionCallsInProperty(
+                    (: propertyName :) string-join(('oxf.fr.detail.captcha.visible', $app, $form), '.'),
+                    (: avt          :) true(),
+                    (: libraryName  :) (),
+                    (: norewrite    :) ()
+                ),
+                true()
+            )[1]"/>
+
+    <xsl:variable
         name="grid-markup"
         as="xs:string"
         select="

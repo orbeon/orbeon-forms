@@ -68,15 +68,7 @@
                                     value="xxf:instance('fr-persistence-instance')/captcha"/>
                                 <xf:var
                                     name="captcha-visible"
-                                    value="
-                                        xxf:evaluate-avt(
-                                            xxf:property(
-                                                    string-join(
-                                                    ('oxf.fr.detail.captcha.visible', fr:app-name(), fr:form-name()),
-                                                    '.'
-                                                )
-                                            )
-                                        ) = 'true'"/>
+                                    value="fr:component-param-value('captcha-visible') = 'true'"/>
                                 <xf:group ref=".[$captcha-visible]">
                                     <!-- Success: remember the captcha passed, which also influences validity -->
                                     <xf:action event="fr-verify-done">

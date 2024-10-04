@@ -180,12 +180,12 @@
         // =============================================================================================================
         .fr-grid.fr-repeat {
 
-            &.fr-repeat-multiple-rows.fr-grid-table { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
+            &.fr-repeat-multiple-rows.fr-grid-table:has(.fr-grid-repeat-iteration) { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
                 & > .fr-grid-head {
                     display: none;
                 }
             }
-            &.fr-repeat-multiple-rows.fr-grid-css {
+            &.fr-repeat-multiple-rows.fr-grid-css:has(.fr-grid-repeat-iteration) {
                 & > .fr-grid-repeat-top-row {
                     display: none;
                 }
@@ -193,7 +193,7 @@
 
             // We never have a header row in narrow layout
             @media (max-width: 640px) {
-                &.fr-repeat-single-row, &.fr-repeat-multiple-rows { // to make rule stronger
+                &.fr-repeat-single-row, &.fr-repeat-multiple-rows:has(.fr-grid-repeat-iteration) { // to make rule stronger
                     &.fr-grid-table > .fr-grid-head { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
                         display: none;
                     }

@@ -426,6 +426,10 @@
                                                 <xsl:attribute name="class">fr-grid-master-row</xsl:attribute>
                                                 <xsl:copy-of select="$header-left-side-block"/>
                                                 <xsl:copy-of select="$head-content"/>
+                                                <xsl:if test="empty($head-content/*)">
+                                                    <!-- For the "+" to be on the left if we have 0 columns -->
+                                                    <xsl:element name="{$th-elem}"/>
+                                                </xsl:if>
                                                 <xsl:copy-of select="$header-right-side-block"/>
                                             </xsl:element>
                                         </xsl:element>

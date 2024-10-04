@@ -526,7 +526,7 @@
                                 <xf:var
                                     name="value"
                                     context="$original-context"
-                                    value="{frf:replaceVarReferencesWithFunctionCalls(. , $value, false(), $library-name, ())}">
+                                    value="{frf:replaceVarReferencesWithFunctionCallsFromString(. , $value, false(), $library-name, ())}">
                                     <xsl:copy-of select="fr:build-context-att(., @expression-context)"/>
                                 </xf:var>
                             </xsl:when>
@@ -535,7 +535,7 @@
                             <xsl:when test="./self::fr:value">
                                 <xsl:variable name="ref" select="@ref/string()" as="xs:string"/>
                                 <xf:setvalue
-                                    ref="{frf:replaceVarReferencesWithFunctionCalls(. , $ref, false(), $library-name, ())}"
+                                    ref="{frf:replaceVarReferencesWithFunctionCallsFromString(. , $ref, false(), $library-name, ())}"
                                     value="$value"/>
                             </xsl:when>
                             <xsl:when test="./self::fr:sql-param">
@@ -622,7 +622,7 @@
                 <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
             </xf:dispatch>
         </xf:action>
-        <xf:action iterate="{frf:replaceVarReferencesWithFunctionCalls(. , @ref, false(), $library-name, ())}">
+        <xf:action iterate="{frf:replaceVarReferencesWithFunctionCallsFromString(. , @ref, false(), $library-name, ())}">
             <xsl:copy-of select="fr:build-context-att($data-iterate-elem, @expression-context)"/>
 
             <!-- Apply only up to the first delimiter for https://github.com/orbeon/orbeon-forms/issues/4067 -->
@@ -666,7 +666,7 @@
             <xf:property name="action-type"  value="'{name(.)}'"/>
         </xxf:log>
 
-        <xf:var name="{$var-name}" value="{frf:replaceVarReferencesWithFunctionCalls(. , @condition, false(), $library-name, ())}">
+        <xf:var name="{$var-name}" value="{frf:replaceVarReferencesWithFunctionCallsFromString(. , @condition, false(), $library-name, ())}">
             <xsl:copy-of select="fr:build-context-att(., @expression-context)"/>
         </xf:var>
         <xf:action if="${$var-name}">
@@ -777,7 +777,7 @@
         </xxf:log>
 
         <xf:action class="fr-action-impl">
-            <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name, ())}"/>
+            <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCallsFromString(. , $value-expr, false(), $library-name, ())}"/>
 
             <xf:recalculate/>
 
@@ -930,7 +930,7 @@
                 <xf:var
                     name="response-items"
                     context="$items-expr-context"
-                    value="{frf:replaceVarReferencesWithFunctionCalls($elem , $items-expr, false(), $library-name, ())}">
+                    value="{frf:replaceVarReferencesWithFunctionCallsFromString($elem , $items-expr, false(), $library-name, ())}">
                     <xsl:copy-of select="fr:build-context-att(., $context)"/>
                 </xf:var>
 
@@ -946,11 +946,11 @@
                 <!-- Should use a version of `XFormsItemUtils.evaluateItemset()`
                      See https://github.com/orbeon/orbeon-forms/issues/3125 -->
                 <xf:action iterate="$response-items">
-                    <xf:var name="item-label" value="{frf:replaceVarReferencesWithFunctionCalls($elem , $label-expr, false(), $library-name, ())}"/>
-                    <xf:var name="item-value" value="{frf:replaceVarReferencesWithFunctionCalls($elem , $value-expr, false(), $library-name, ())}"/>
+                    <xf:var name="item-label" value="{frf:replaceVarReferencesWithFunctionCallsFromString($elem , $label-expr, false(), $library-name, ())}"/>
+                    <xf:var name="item-value" value="{frf:replaceVarReferencesWithFunctionCallsFromString($elem , $value-expr, false(), $library-name, ())}"/>
                     <xsl:choose>
                         <xsl:when test="exists($hint-expr)">
-                            <xf:var name="item-hint"  value="{frf:replaceVarReferencesWithFunctionCalls($elem , $hint-expr, false(), $library-name, ())}"/>
+                            <xf:var name="item-hint"  value="{frf:replaceVarReferencesWithFunctionCallsFromString($elem , $hint-expr, false(), $library-name, ())}"/>
                             <xf:insert
                                 context="$new-choices-holder"
                                 ref="*"
@@ -1154,7 +1154,7 @@
         </xxf:log>
 
         <xf:action class="fr-action-impl">
-            <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name, ())}"/>
+            <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCallsFromString(. , $value-expr, false(), $library-name, ())}"/>
 
             <xf:recalculate/>
 
@@ -1189,7 +1189,7 @@
             <xf:property name="action-type"  value="'{name(.)}'"/>
         </xxf:log>
         <xf:action class="fr-action-impl">
-            <xf:var name="message"><xsl:value-of select="frf:replaceVarReferencesWithFunctionCalls(. , @message, true(), $library-name, ())"/></xf:var>
+            <xf:var name="message"><xsl:value-of select="frf:replaceVarReferencesWithFunctionCallsFromString(. , @message, true(), $library-name, ())"/></xf:var>
             <xf:message value="xxf:evaluate-avt($message)"/>
         </xf:action>
     </xsl:template>

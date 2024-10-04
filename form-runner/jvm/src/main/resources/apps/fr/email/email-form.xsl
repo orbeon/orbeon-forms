@@ -123,7 +123,7 @@
                                         if ($p/@type = 'ExpressionParam') then
                                             (: NOTE: The Form Runner function library is not in scope in this XSLT transformation.
                                                Could we scope it? :)
-                                            string(($data/saxon:evaluate(frf:replaceVarReferencesWithFunctionCalls($p/expr, $p/expr, false(), (), ())))[1])
+                                            string(($data/saxon:evaluate(frf:replaceVarReferencesWithFunctionCallsFromString($p/expr, $p/expr, false(), (), ())))[1])
                                         else if ($p/@type = 'ControlValueParam') then
                                             (: 1. Just match by element name. This will also catch values in section templates if any. We
                                                could either use `fr:control-[string|typed]-value()`, or use `searchControlsTopLevelOnly`
@@ -172,7 +172,7 @@
             select="
             (
                 for $expression in enable-if-true
-                return frf:evaluatedExpressionAsBoolean($xhtml, frf:replaceVarReferencesWithFunctionCalls($expression, $expression, false(), (), ())),
+                return frf:evaluatedExpressionAsBoolean($xhtml, frf:replaceVarReferencesWithFunctionCallsFromString($expression, $expression, false(), (), ())),
                 true()
             )[1]
             "/>

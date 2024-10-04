@@ -34,7 +34,7 @@ class XPathVariableRenameTest extends AnyFunSpec {
     for ((avt, xpath, expected) <- Expected) {
       it(s"must pass for `$xpath`") {
         val result =
-          FormRunnerRename.replaceVarReferencesWithFunctionCalls(
+          FormRunnerRename.replaceVarReferencesWithFunctionCallsFromString(
             xpath,
             NamespaceMapping(Map(XSD_PREFIX -> XSD_URI)),
             FormRunnerFunctionLibrary,

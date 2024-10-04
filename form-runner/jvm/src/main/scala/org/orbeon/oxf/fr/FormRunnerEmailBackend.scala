@@ -116,7 +116,7 @@ trait FormRunnerEmailBackend {
       case TemplateValue.Expression(expression) =>
 
         val expressionWithProcessedVarReferences =
-          FormRunner.replaceVarReferencesWithFunctionCalls(
+          FormRunner.replaceVarReferencesWithFunctionCallsFromString(
             elemOrAtt   = formDefinitionCtx.modelElem,
             xpathString = expression,
             avt         = false,

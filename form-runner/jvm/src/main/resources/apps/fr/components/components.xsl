@@ -497,7 +497,7 @@
         as="xs:string"
         select="
             (
-                frf:replaceVarReferencesWithFunctionCallsInProperty(
+                frf:replaceVarReferencesWithFunctionCallsFromProperty(
                     (: propertyName :) string-join(('oxf.fr.detail.captcha.visible', $app, $form), '.'),
                     (: avt          :) true(),
                     (: libraryName  :) (),

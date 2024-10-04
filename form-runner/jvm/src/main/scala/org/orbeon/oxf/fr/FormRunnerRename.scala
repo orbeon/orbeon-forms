@@ -18,7 +18,7 @@ import java.util.regex.Matcher
 
 object FormRunnerRename {
 
-  def replaceVarReferencesWithFunctionCalls(
+  def replaceVarReferencesWithFunctionCallsFromString(
     xpathString      : String,
     namespaceMapping : NamespaceMapping,
     functionLibrary  : FunctionLibrary,

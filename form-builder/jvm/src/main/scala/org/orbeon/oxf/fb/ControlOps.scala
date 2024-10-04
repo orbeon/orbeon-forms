@@ -705,7 +705,7 @@ trait ControlOps extends ResourcesOps {
   def findLegacyActions(implicit ctx: FormBuilderDocContext): NodeColl =
     ctx.modelElem child FBActionTest filter (_.id.endsWith("-binding"))
 
-  // See also `controls.xsl` for the handling of `replaceVarReferencesWithFunctionCalls()`. Unfortunately there is
+  // See also `controls.xsl` for the handling of `replaceVarReferencesWithFunctionCallsFromString()`. Unfortunately there is
   // duplication of logic here.
   def renameControlReferences(
     oldName        : String,

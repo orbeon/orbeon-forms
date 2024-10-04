@@ -5,6 +5,7 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{FileUtils, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
@@ -19,7 +20,7 @@ trait FormRunnerComponents {
 
   // In an XPath expression, replace non-local variable references.
   //@XPathFunction
-  def replaceVarReferencesWithFunctionCalls(
+  def replaceVarReferencesWithFunctionCallsFromString( // xxx FromString
     elemOrAtt   : NodeInfo,
     xpathString : String,
     avt         : Boolean,
@@ -36,7 +37,7 @@ trait FormRunnerComponents {
     )
 
   //@XPathFunction
-  def replaceVarReferencesWithFunctionCallsInProperty(
+  def replaceVarReferencesWithFunctionCallsFromProperty(
     propertyName : String,
     avt          : Boolean,
     libraryName  : String,
@@ -144,7 +145,7 @@ trait FormRunnerComponents {
         else
           s"frf:controlVariableValue('$name', ${libraryName.trimAllToOpt.map("'" + _ + "'").getOrElse("()")})"
 
-      FormRunnerRename.replaceVarReferencesWithFunctionCalls(
+      FormRunnerRename.replaceVarReferencesWithFunctionCallsFromString(
         xpathString,
         namespaceMapping,
         library,

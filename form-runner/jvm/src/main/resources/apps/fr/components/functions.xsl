@@ -152,7 +152,7 @@
                                                 concat(
                                                     if ($for-text-html-mediatype) then 'xxf:escape-xml-minimal(' else '',
                                                     'string((',
-                                                    frf:replaceVarReferencesWithFunctionCalls(
+                                                    frf:replaceVarReferencesWithFunctionCallsFromString(
                                                         $p/(*:expr, *:value)[1],
                                                         $p/(*:expr, *:value)[1],
                                                         false(),
@@ -169,7 +169,7 @@
                                                 concat(
                                                     if ($for-text-html-mediatype) then 'xxf:escape-xml-minimal(' else '',
                                                     'string((',
-                                                    frf:replaceVarReferencesWithFunctionCalls(
+                                                    frf:replaceVarReferencesWithFunctionCallsFromString(
                                                         $p/(*:controlName, *:control-name, *:controlCssClass, *:control-css-class)[1],
                                                         if (exists($p/(*:controlName, *:control-name))) then
                                                             concat('$', $p/(*:controlName, *:control-name)[1])
@@ -234,7 +234,7 @@
                                             if (exists($p/*:visible)) then
                                                 concat(
                                                     'if (',
-                                                    frf:replaceVarReferencesWithFunctionCalls(
+                                                    frf:replaceVarReferencesWithFunctionCallsFromString(
                                                         $p/*:visible,
                                                         $p/*:visible,
                                                         false(),

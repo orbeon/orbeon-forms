@@ -598,7 +598,7 @@ class RestApiTest
           HttpAssert.put(currentFormURL, Unspecified, HttpCall.XML(formDefinition), StatusCode.Created)
 
           val expectedBody =
-            <forms>
+            <forms search-total="1">
                 <form operations="create read">
                     <application-name>{provider.entryName}</application-name>
                     <form-name>{DefaultFormName}</form-name>

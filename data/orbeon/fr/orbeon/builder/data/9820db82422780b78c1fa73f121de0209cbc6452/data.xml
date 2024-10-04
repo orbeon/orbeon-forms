@@ -145,7 +145,7 @@
                         </templates>
                         <parameters/>
                     </email>
-                    <screenshot>/fr/service/persistence/crud/orbeon/builder/data/9820db82422780b78c1fa73f121de0209cbc6452/da9614c57ed97311e53c8c1929fc10dd4fff84b6.bin</screenshot>
+                    <thumbnail>/fr/service/persistence/crud/orbeon/builder/data/9820db82422780b78c1fa73f121de0209cbc6452/da9614c57ed97311e53c8c1929fc10dd4fff84b6.bin</thumbnail>
                     <grid-tab-order>default</grid-tab-order>
                 </metadata>
             </xf:instance>

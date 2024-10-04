@@ -164,7 +164,7 @@
                         <orbeon>1</orbeon>
                         <_>1</_>
                     </library-versions>
-                    <screenshot filename="inventory.png" mediatype="image/png" size="151677">/fr/service/persistence/crud/orbeon/builder/data/fb974dd165f865f7aedc1760daaeeef79a14c67c/dfea7f443d17be08ec1ba42351fe76b81b9c61df.bin</screenshot>
+                    <thumbnail filename="inventory.png" mediatype="image/png" size="151677">/fr/service/persistence/crud/orbeon/builder/data/fb974dd165f865f7aedc1760daaeeef79a14c67c/dfea7f443d17be08ec1ba42351fe76b81b9c61df.bin</thumbnail>
                     <allow-template-use>true</allow-template-use>
                     <email>
                         <templates>

@@ -348,7 +348,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </templates>
                         <parameters/>
                     </email>
-                    <screenshot>/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/9d6db6998461fe76ae4e9d453f7d26f5bafce443.bin</screenshot>
+                    <thumbnail>/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/9d6db6998461fe76ae4e9d453f7d26f5bafce443.bin</thumbnail>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">

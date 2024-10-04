@@ -40,7 +40,7 @@
                 <!-- Save event context information in local instance -->
                 <xf:setvalue
                     iterate="
-                        'for-button-name', 'app', 'form', 'title', 'description', 'screenshot', 'allow-template-use',
+                        'for-button-name', 'app', 'form', 'title', 'description', 'thumbnail', 'allow-template-use',
                         'singleton', 'mode', 'created-with-version'"
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
@@ -51,8 +51,8 @@
 
                 <xf:setvalue
                     iterate="'filename', 'mediatype', 'size'"
-                    ref="$i/screenshot/@*[name() = context()]"
-                    value="event(concat('screenshot-', context()))"/>
+                    ref="$i/thumbnail/@*[name() = context()]"
+                    value="event(concat('thumbnail-', context()))"/>
 
                 <xf:var name="is-new-form"      value="$i/mode = 'new'"/>
                 <xf:var name="is-app-form"      value="$i/mode = 'app-form'"/>
@@ -376,10 +376,10 @@
                         <xf:property name="title"                                  value="$i/title/string()"/>
                         <xf:property name="description"                            value="$i/description/string()"/>
                         <xf:property name="description-mediatype"                  value="if ($i/description/@isHTML = 'true') then 'text/html' else 'text/plain'"/>
-                        <xf:property name="screenshot"                             value="$i/screenshot/string()"/>
-                        <xf:property name="screenshot-filename"                    value="$i/screenshot/@filename/string()"/>
-                        <xf:property name="screenshot-mediatype"                   value="$i/screenshot/@mediatype/string()"/>
-                        <xf:property name="screenshot-size"                        value="$i/screenshot/@size/string()"/>
+                        <xf:property name="thumbnail"                              value="$i/thumbnail/string()"/>
+                        <xf:property name="thumbnail-filename"                     value="$i/thumbnail/@filename/string()"/>
+                        <xf:property name="thumbnail-mediatype"                    value="$i/thumbnail/@mediatype/string()"/>
+                        <xf:property name="thumbnail-size"                         value="$i/thumbnail/@size/string()"/>
                         <xf:property name="allow-template-use"                     value="$i/allow-template-use/string()"/>
                         <xf:property name="singleton"                              value="$i/singleton/string()"/>
                         <xf:property name="attachment-max-size-per-file"           value="$i/attachment-max-size-per-file/string()"/>
@@ -482,7 +482,7 @@
                         <title/>
                         <description isHTML=""/>
                         <singleton/>
-                        <screenshot filename="" mediatype="" size=""/>
+                        <thumbnail filename="" mediatype="" size=""/>
                         <allow-template-use/>
                         <wizard/>
                         <wizard-mode/>
@@ -625,13 +625,13 @@
                             <url>oxf:/forms/orbeon/builder/form/template.xml</url>
                             <title>Blank Form</title>
                             <description>Use this template to start from scratch.</description>
-                            <screenshot></screenshot>
+                            <thumbnail></thumbnail>
                         </_>
                         <_>
                             <url>oxf:/forms/orbeon/builder/form/template-wizard.xml</url>
                             <title>Wizard Form</title>
                             <description>This template is configured to use the Wizard view.</description>
-                            <screenshot>oxf:/forms/orbeon/builder/form/template-wizard.webp</screenshot>
+                            <thumbnail>oxf:/forms/orbeon/builder/form/template-wizard.webp</thumbnail>
                         </_>
                     </_>
                     <_/>
@@ -652,10 +652,10 @@
                         <query name="description"
                                path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/description"
                                match="substring"/>
-                        <query name="screenshot"
-                               path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/screenshot"
+                        <query name="thumbnail"
+                               path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/thumbnail"
                                match="substring"/>
-                        <query name="screenshot"
+                        <query name="thumbnail"
                                path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/allow-template-use"
                                match="exact">true</query>
                         <page-size/>
@@ -745,8 +745,8 @@
                                                 $doc/details/detail[ends-with(@path, '/description')]/string()
                                             ),
                                             xf:element(
-                                                'screenshot',
-                                                $doc/details/detail[ends-with(@path, '/screenshot')]/string()
+                                                'thumbnail',
+                                                $doc/details/detail[ends-with(@path, '/thumbnail')]/string()
                                             )
                                         )
                                     )"/>
@@ -879,7 +879,7 @@
                                             <xf:repeat ref="instance('template-forms')/*" id="form-template-repeat">
                                                 <xh:div class="fb-template-card" title="{{title}}">
                                                     <xf:output class="fb-template-title" value="title"/>
-                                                    <xf:output class="fb-template-screenshot" mediatype="image/*" ref="screenshot[xxf:non-blank()]"/>
+                                                    <xf:output class="fb-template-thumbnail" mediatype="image/*" ref="thumbnail[xxf:non-blank()]"/>
                                                 </xh:div>
                                             </xf:repeat>
                                             <!-- If the user selects a template, and there is an app name associated,
@@ -1418,9 +1418,9 @@
                                         </fr:grid>
                                     </xf:group>
 
-                                    <fr:image-attachment ref="screenshot" class="fb-dialog-form-settings-screenshot">
-                                        <xf:label ref="$resources/dialog-form-settings/screenshot/label"/>
-                                        <xf:hint  ref="$resources/dialog-form-settings/screenshot/hint"/>
+                                    <fr:image-attachment ref="thumbnail" class="fb-dialog-form-settings-thumbnail">
+                                        <xf:label ref="$resources/dialog-form-settings/thumbnail/label"/>
+                                        <xf:hint  ref="$resources/dialog-form-settings/thumbnail/hint"/>
                                     </fr:image-attachment>
 
                                     <xf:group class="fb-dialog-form-settings-info-stats">

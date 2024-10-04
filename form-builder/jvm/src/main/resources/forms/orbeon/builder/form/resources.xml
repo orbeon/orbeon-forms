@@ -496,10 +496,10 @@
             <current-version>Current Version</current-version>
             <created-with-version>Created with Version</created-with-version>
             <updated-with-versions>Updated with Versions</updated-with-versions>
-            <screenshot>
-                <label>Form Screenshot</label>
+            <thumbnail>
+                <label>Form Thumbnail</label>
                 <hint>Used for form templates and the landing page</hint>
-            </screenshot>
+            </thumbnail>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Control Settings: "{1}" / "{0}" ({2})</label>
@@ -1908,10 +1908,10 @@
             <current-version>Version courante</current-version>
             <created-with-version>Créé avec la version</created-with-version>
             <updated-with-versions>Mis à jour avec les versions</updated-with-versions>
-            <screenshot>
-                <label>Copie d'écran</label>
+            <thumbnail>
+                <label>Image d'aperçu</label>
                 <hint>Pour les modèles et la page d'accueil</hint>
-            </screenshot>
+            </thumbnail>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Paramètres du contrôle: "{1}" / "{0}" ({2})</label>
@@ -3303,10 +3303,10 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
-            <screenshot>
-                <label todo="true">Form Screenshot</label>
+            <thumbnail>
+                <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
-            </screenshot>
+            </thumbnail>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Rediger elementdetaljer: "{1}" / "{0}" ({2})</label>
@@ -4726,10 +4726,10 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
-            <screenshot>
-                <label todo="true">Form Screenshot</label>
+            <thumbnail>
+                <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
-            </screenshot>
+            </thumbnail>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Настройки элемента: "{1}" / "{0}" ({2})</label>
@@ -6149,10 +6149,10 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
-            <screenshot>
-                <label todo="true">Form Screenshot</label>
+            <thumbnail>
+                <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
-            </screenshot>
+            </thumbnail>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Impostazioni di controllo: "{1}" / "{0}" ({2})</label>
@@ -7536,10 +7536,10 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
-            <screenshot>
-                <label todo="true">Form Screenshot</label>
+            <thumbnail>
+                <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
-            </screenshot>
+            </thumbnail>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Einstellungen Steuerelemente: "{1}" / "{0}" ({2})</label>
@@ -8926,10 +8926,10 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
-            <screenshot>
-                <label todo="true">Form Screenshot</label>
+            <thumbnail>
+                <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
-            </screenshot>
+            </thumbnail>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Kontrolliyksityiskohdat: "{1}" / "{0}" ({2})</label>
@@ -10341,10 +10341,10 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
-            <screenshot>
-                <label todo="true">Form Screenshot</label>
+            <thumbnail>
+                <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
-            </screenshot>
+            </thumbnail>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Configuración de Controles: "{1}" / "{0}" ({2})</label>
@@ -11757,10 +11757,10 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
-            <screenshot>
-                <label todo="true">Form Screenshot</label>
+            <thumbnail>
+                <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
-            </screenshot>
+            </thumbnail>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Control-instellingen: "{1}" / "{0}" ({2})</label>
@@ -13152,10 +13152,10 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
-            <screenshot>
-                <label todo="true">Form Screenshot</label>
+            <thumbnail>
+                <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
-            </screenshot>
+            </thumbnail>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Configurações do Controlo: "{1}" / "{0}" ({2})</label>
@@ -14574,10 +14574,10 @@
             <current-version todo="true">[Current Version]</current-version>
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
-            <screenshot>
-                <label todo="true">Form Screenshot</label>
+            <thumbnail>
+                <label todo="true">Form Thumbnail</label>
                 <hint todo="true">Used for form templates and the landing page</hint>
-            </screenshot>
+            </thumbnail>
         </dialog-form-settings>
         <dialog-control-settings>
             <label>Inställningar för kontroll: "{1}" / "{0}" ({2})</label>

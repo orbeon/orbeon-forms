@@ -162,7 +162,7 @@
                         </templates>
                         <parameters/>
                     </email>
-                    <screenshot>/fr/service/persistence/crud/orbeon/builder/data/21f5689171e2204b75d8e54becf0c6fa9ce8ac85/ebf0f47edaff6cab6fab79000363b07f4c6b3338.bin</screenshot>
+                    <thumbnail>/fr/service/persistence/crud/orbeon/builder/data/21f5689171e2204b75d8e54becf0c6fa9ce8ac85/ebf0f47edaff6cab6fab79000363b07f4c6b3338.bin</thumbnail>
                     <data-migration>enabled</data-migration>
                     <grid-tab-order>default</grid-tab-order>
                 </metadata>

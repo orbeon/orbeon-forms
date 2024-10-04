@@ -171,7 +171,7 @@
                         </templates>
                         <parameters/>
                     </email>
-                    <screenshot filename="w9.png" mediatype="image/png" size="80478">/fr/service/persistence/crud/orbeon/builder/data/b9d842b71560cf9278422f88a32bfaf7419a7b01/594ff9ed7a9a40b8a9c2aee9d3ab7f9082ead3f1.bin</screenshot>
+                    <thumbnail filename="w9.png" mediatype="image/png" size="80478">/fr/service/persistence/crud/orbeon/builder/data/b9d842b71560cf9278422f88a32bfaf7419a7b01/594ff9ed7a9a40b8a9c2aee9d3ab7f9082ead3f1.bin</thumbnail>
                     <allow-template-use>true</allow-template-use>
                 </metadata>
             </xf:instance>

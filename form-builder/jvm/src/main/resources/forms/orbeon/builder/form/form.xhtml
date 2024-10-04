@@ -57,8 +57,8 @@
                     <fr:summary-show/>
                 </fr:index>
             </xf:output>
-            <xf:output id="screenshot-control" bind="screenshot-bind">
-                <xf:label ref="$form-resources/screenshot/label"/>
+            <xf:output id="thumbnail-control" bind="thumbnail-bind">
+                <xf:label ref="$form-resources/thumbnail/label"/>
                 <fr:index/>
             </xf:output>
             <xf:output id="allow-template-use-control" bind="allow-template-use-bind">
@@ -584,19 +584,19 @@
                                             origin="xf:attribute('mediatype', 'text/html')"/>
 
                                         <xf:delete
-                                            bind="screenshot-bind"/>
+                                            bind="thumbnail-bind"/>
                                         <xf:insert
-                                            if="xxf:non-blank(event('screenshot'))"
+                                            if="xxf:non-blank(event('thumbnail'))"
                                             context="bind('metadata-bind')"
                                             ref="*"
                                             origin="
                                                 xf:element(
-                                                    'screenshot',
+                                                    'thumbnail',
                                                     (
-                                                        xf:attribute('filename',  event('screenshot-filename')),
-                                                        xf:attribute('mediatype', event('screenshot-mediatype')),
-                                                        xf:attribute('size',      event('screenshot-size')),
-                                                        event('screenshot')
+                                                        xf:attribute('filename',  event('thumbnail-filename')),
+                                                        xf:attribute('mediatype', event('thumbnail-mediatype')),
+                                                        xf:attribute('size',      event('thumbnail-size')),
+                                                        event('thumbnail')
                                                     )
                                                 )"/>
 

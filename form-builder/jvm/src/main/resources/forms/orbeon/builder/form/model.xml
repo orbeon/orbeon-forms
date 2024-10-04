@@ -235,10 +235,10 @@
                 context="$metadata"
                 ref="*"
                 origin="xf:element('allow-template-use', event('allow-template-use'))"/>
-            <!-- Also remove the screenshot -->
+            <!-- Also remove the thumbnail -->
             <xf:delete
                 if="event('allow-template-use') = false()"
-                ref="$metadata/screenshot"/>
+                ref="$metadata/thumbnail"/>
         </xf:action>
 
         <!-- Set initial form and first section titles on template -->
@@ -426,10 +426,10 @@
                 <xf:property name="title"                                     value="($requested-title,       bind('title-bind'))[1]"/>
                 <xf:property name="description"                               value="($requested-description, bind('description-bind'))[1]"/>
                 <xf:property name="description-mediatype"                     value="(if (exists($requested-description)) then 'text/plain' else (), bind('description-bind')/@mediatype/string())[1]"/>
-                <xf:property name="screenshot"                                value="bind('screenshot-bind')"/>
-                <xf:property name="screenshot-filename"                       value="bind('screenshot-bind')/@filename"/>
-                <xf:property name="screenshot-mediatype"                      value="bind('screenshot-bind')/@mediatype"/>
-                <xf:property name="screenshot-size"                           value="bind('screenshot-bind')/@size"/>
+                <xf:property name="thumbnail"                                 value="bind('thumbnail-bind')"/>
+                <xf:property name="thumbnail-filename"                        value="bind('thumbnail-bind')/@filename"/>
+                <xf:property name="thumbnail-mediatype"                       value="bind('thumbnail-bind')/@mediatype"/>
+                <xf:property name="thumbnail-size"                            value="bind('thumbnail-bind')/@size"/>
                 <xf:property name="allow-template-use"                        value="bind('allow-template-use-bind')"/>
                 <xf:property name="created-with-version"                      value="bind('created-with-version-bind')"/>
                 <xf:property name="updated-with-versions"                     value="bind('metadata-bind')/updated-with-version/string()"/>
@@ -471,10 +471,10 @@
                 <xf:property name="title"                                     value="($requested-title,       bind('title-bind'))[1]"/>
                 <xf:property name="description"                               value="($requested-description, bind('description-bind'))[1]"/>
                 <xf:property name="description-mediatype"                     value="(if (exists($requested-description)) then 'text/plain' else (), bind('description-bind')/@mediatype/string())[1]"/>
-                <xf:property name="screenshot"                                value="bind('screenshot-bind')"/>
-                <xf:property name="screenshot-filename"                       value="bind('screenshot-bind')/@filename"/>
-                <xf:property name="screenshot-mediatype"                      value="bind('screenshot-bind')/@mediatype"/>
-                <xf:property name="screenshot-size"                           value="bind('screenshot-bind')/@size"/>
+                <xf:property name="thumbnail"                                 value="bind('thumbnail-bind')"/>
+                <xf:property name="thumbnail-filename"                        value="bind('thumbnail-bind')/@filename"/>
+                <xf:property name="thumbnail-mediatype"                       value="bind('thumbnail-bind')/@mediatype"/>
+                <xf:property name="thumbnail-size"                            value="bind('thumbnail-bind')/@size"/>
                 <xf:property name="allow-template-use"                        value="bind('allow-template-use-bind')"/>
                 <xf:property name="created-with-version"                      value="bind('created-with-version-bind')"/>
                 <xf:property name="updated-with-versions"                     value="bind('metadata-bind')/updated-with-version/string()"/>
@@ -517,7 +517,7 @@
                     <xf:bind id="form-name-bind"                  ref="form-name"/>
                     <xf:bind id="title-bind"                      ref="title[@xml:lang = $fb-lang]"/>
                     <xf:bind id="description-bind"                ref="description[@xml:lang = $fb-lang]"/>
-                    <xf:bind id="screenshot-bind"                 ref="screenshot"/>
+                    <xf:bind id="thumbnail-bind"                  ref="thumbnail"/>
                     <xf:bind id="allow-template-use-bind"         ref="allow-template-use"/>
                     <xf:bind id="created-with-version-bind"       ref="created-with-version"/>
                     <xf:bind id="singleton-bind"                  ref="singleton"/>

@@ -237,6 +237,10 @@
                 context="$metadata"
                 ref="*"
                 origin="xf:element('allow-template-use', event('allow-template-use'))"/>
+            <!-- Also remove the screenshot -->
+            <xf:delete
+                if="event('allow-template-use') = false()"
+                ref="$metadata/screenshot"/>
         </xf:action>
 
         <!-- Set initial form and first section titles on template -->

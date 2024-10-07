@@ -500,7 +500,7 @@
                 frf:replaceVarReferencesWithFunctionCallsFromProperty(
                     (: propertyName :) string-join(('oxf.fr.detail.captcha.visible', $app, $form), '.'),
                     (: avt          :) true(),
-                    (: libraryName  :) (),
+                    (: libraryName  :) (), (: Ok to be empty since this the XPath is not used inside a section template :)
                     (: norewrite    :) ()
                 ),
                 true()

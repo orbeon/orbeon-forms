@@ -361,9 +361,6 @@
             <xf:bind ref="instance('fr-metadata')/form/remote-server/created"            type="xs:dateTime"/>
             <xf:bind ref="instance('fr-metadata')/form/remote-server/last-modified-time" type="xs:dateTime"/>
 
-            <!-- TODO: In view.xhtml, we call frf:isSortSupported($app, $form). What should we do here? -->
-            <xf:var name="sort-supported" value="true()"/>
-
             <xf:action event="fr-order-by">
                 <xf:var name="local-or-remote" value="event('local-or-remote')"/>
                 <xf:var name="column"          value="event('column')"/>
@@ -1369,9 +1366,9 @@
 
                     <xf:group xxf:update="full" class="fr-search-results">
                         <xh:table class="fr-forms-table table table-bordered table-condensed table-hover">
-                            <xh:thead class="{'column-header', 'sortable-column'[$sort-supported], 'non-sortable-column'[not($sort-supported)]}">
+                            <xh:thead>
 								<xf:group ref=".[$show-remote]">
-									<xh:tr>
+									<xh:tr class="header-groups">
 										<xf:group ref=".[$show-permissions]">
 											<xh:th/>
 										</xf:group>
@@ -1384,56 +1381,55 @@
                                     <xf:group ref=".[$show-permissions]">
                                         <xh:th/>
                                         <fr:sortable-th
+                                            class="fr-status"
                                             label="$fr-resources/home/titles/status"
-                                            sort-supported="$sort-supported"
                                             instance="instance('fr-order-by')"
                                             local-or-remote="local"
                                             column="available"/>
                                     </xf:group>
                                     <fr:sortable-th
+                                        class="fr-last-modified"
                                         label="$fr-resources/home-summary/titles/last-modified"
-                                        sort-supported="$sort-supported"
                                         instance="instance('fr-order-by')"
                                         local-or-remote="local"
                                         column="last-modified"/>
                                     <xf:group ref=".[$show-remote]">
                                         <xf:group ref=".[$show-permissions]">
                                             <fr:sortable-th
+                                                class="fr-status"
                                                 label="$fr-resources/home/titles/status"
-                                                sort-supported="$sort-supported"
                                                 instance="instance('fr-order-by')"
                                                 local-or-remote="remote"
                                                 column="available"/>
                                         </xf:group>
                                         <fr:sortable-th
+                                            class="fr-last-modified"
                                             label="$fr-resources/home-summary/titles/last-modified"
-                                            sort-supported="$sort-supported"
                                             instance="instance('fr-order-by')"
                                             local-or-remote="remote"
                                             column="last-modified"/>
                                     </xf:group>
                                     <fr:sortable-th
+                                        class="fr-application-name"
                                         label="$fr-resources/home-summary/titles/application-name"
-                                        sort-supported="$sort-supported"
                                         instance="instance('fr-order-by')"
                                         local-or-remote="local"
                                         column="application-name"/>
                                     <fr:sortable-th
+                                        class="fr-form-name"
                                         label="$fr-resources/home-summary/titles/form-name"
-                                        sort-supported="$sort-supported"
                                         instance="instance('fr-order-by')"
                                         local-or-remote="local"
                                         column="form-name"/>
                                     <fr:sortable-th
-                                        class="fr-align-right"
+                                        class="fr-version"
                                         label="$fr-resources/home-summary/titles/version"
-                                        sort-supported="$sort-supported"
                                         instance="instance('fr-order-by')"
                                         local-or-remote="local"
                                         column="form-version"/>
                                     <fr:sortable-th
+                                        class="fr-title"
                                         label="$fr-resources/home-summary/titles/form-title"
-                                        sort-supported="$sort-supported"
                                         instance="instance('fr-order-by')"
                                         local-or-remote="local"
                                         column="title"/>
@@ -1517,7 +1513,7 @@
                                                     </xf:item>
                                                 </xf:select>
                                             </xh:td>
-                                            <xh:td class="fr-home-status">
+                                            <xh:td class="fr-status">
                                                 <xf:output
                                                     ref=".[$ops = 'admin' and ($local-available or $local-unavailable)]"
                                                     class="label{if ($local-available) then ' label-success' else ''}"
@@ -1532,7 +1528,7 @@
                                                     value="$fr-resources/home/labels/newer"/>
                                             </xh:td>
                                         </xf:group>
-                                        <xh:td class="fr-home-modified">
+                                        <xh:td class="fr-modified">
                                             <xf:output
                                                     ref="last-modified-time"
                                                     value="
@@ -1555,7 +1551,7 @@
                                         </xh:td>
                                         <xf:group ref=".[$show-remote]">
                                             <xf:group ref=".[$show-permissions]">
-                                                <xh:td class="fr-home-status">
+                                                <xh:td class="fr-status">
                                                     <xf:output
                                                         ref=".[($ops = 'admin' or $remote-ops = 'admin') and ($remote-available or $remote-unavailable)]"
                                                         class="label{if ($remote-available) then ' label-success' else ''}"
@@ -1570,7 +1566,7 @@
                                                         value="$fr-resources/home/labels/newer"/>
                                                 </xh:td>
                                             </xf:group>
-                                            <xh:td class="fr-home-modified">
+                                            <xh:td class="fr-modified">
                                                 <xf:output
                                                     ref="remote-server[1]/last-modified-time"
                                                     value="
@@ -1592,25 +1588,25 @@
                                                             else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
                                             </xh:td>
                                         </xf:group>
-                                        <xh:td>
+                                        <xh:td class="fr-application-name">
                                             <xh:a href="{$link}" class="{if ($link) then '' else 'xforms-hidden'}">
                                                 <xf:output ref=".[$link]" value="application-name"/>
                                             </xh:a>
                                             <xf:output ref=".[not($link)]" value="application-name"/>
                                         </xh:td>
-                                        <xh:td>
+                                        <xh:td class="fr-form-name">
                                             <xh:a href="{$link}" class="{if ($link) then '' else 'xforms-hidden'}">
                                                 <xf:output ref=".[$link]" value="form-name"/>
                                             </xh:a>
                                             <xf:output ref=".[not($link)]" value="form-name"/>
                                         </xh:td>
-                                        <xh:td class="fr-align-right">
+                                        <xh:td class="fr-version">
                                             <xh:a href="{$link}" class="{if ($link) then '' else 'xforms-hidden'}">
                                                 <xf:output ref=".[$link]" value="$form-version"/>
                                             </xh:a>
                                             <xf:output ref=".[not($link)]" value="$form-version"/>
                                         </xh:td>
-                                        <xh:td>
+                                        <xh:td class="fr-title">
                                             <xf:var
                                                 name="title"
                                                 value="

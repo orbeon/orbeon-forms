@@ -150,35 +150,30 @@
       max-width: none;                                        // Because table can scrolls beyond size of container
     }
 
-    thead.column-header {
-      &.sortable-column {
-        tr {
-          th {
-            button.btn-link {
-              &:hover, &:focus {
-                color: inherit;
-                background-color: #f9f9f9;
-                cursor: pointer;
-              }
-            }
-          }
-        }
-      }
-      &.non-sortable-column {
-        tr {
-          th {
-            button.btn-link {
-              &:hover, &:focus {
-                cursor: default;
-              }
-            }
-          }
-        }
-      }
-
+    thead {
       tr {
+        &.header-groups {
+          th {
+            padding: 4px 5px;
+          }
+        }
+
         th {
           padding: 0;
+
+          &.fr-sortable-th button.btn-link {
+            &:hover, &:focus {
+              color: inherit;
+              background-color: #f9f9f9;
+              cursor: pointer;
+            }
+          }
+
+          &:not(.fr-sortable-th) button.btn-link {
+            &:hover, &:focus {
+              cursor: default;
+            }
+          }
 
           // Override the style of a "minimal" button
           button.btn-link {
@@ -189,21 +184,26 @@
             color: inherit;
             text-decoration: none;
             box-shadow: none;
+            white-space: nowrap;
 
             // Bold by default in Bootstrap and overridden to "normal" in form-runner-bootstrap-override.less
             font-weight: 500;
 
-            div.xforms-output {
-              display: inline-block;
+            div {
+              display: inline;
             }
 
-            .column-caret {
+            .caret-container {
               display: inline-block;
               width: 15px;
               height: 15px;
               text-align: center;
               vertical-align: baseline;
               font-size: 80%;
+
+              &.no-caret {
+                display: none;
+              }
             }
           }
         }
@@ -228,6 +228,35 @@
 
       &.fr-align-right {
         text-align: right;
+      }
+
+      &.fr-status {
+        width: 120px;
+      }
+
+      &.fr-created, &.fr-last-modified {
+        width: 120px;
+        white-space: nowrap;
+      }
+
+      &.fr-created-by, &.fr-last-modified-by {
+        width: 240px;
+      }
+
+      &.fr-workflow-stage {
+        width: 240px;
+      }
+
+      &.fr-application-name, &.fr-form-name {
+        width: 240px;
+      }
+
+      &.fr-version {
+        width: 80px;
+        text-align: right;
+      }
+
+      &.fr-title {
       }
 
       .xforms-output .xforms-output-output {

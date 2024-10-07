@@ -85,7 +85,10 @@ case class IndexedControl(
             <resources lang={lang}>{
               val labelElemOpt =
                 resourceHolder elemValueOpt "label" map { label =>
-                  <label>{if (htmlLabel) label else label.escapeXmlMinimal}</label>
+                  if (htmlLabel)
+                    <label mediatype="text/html">{label}</label>
+                  else
+                    <label>{label.escapeXmlMinimal}</label>
                 }
 
               val itemElems = resourceHolder child "item" map { item =>

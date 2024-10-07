@@ -22,32 +22,34 @@
     <xbl:binding
         id="fr-sortable-th"
         element="fr|sortable-th"
-        xxbl:mode="binding">
+        xxbl:mode="">
 
         <xbl:template>
             <xf:var name="label"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="ref=label"/></xf:var>
             <xf:var name="instance"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="ref=instance"/></xf:var>
 
-            <xf:var name="sort-supported"  xbl:attr="xbl:text=sort-supported"/>
-            <xf:var name="local-or-remote" xbl:attr="xbl:text=local-or-remote"/>
-            <xf:var name="column"          xbl:attr="xbl:text=column"/>
+            <xf:var name="sort-supported"  value="string(fr:component-param-value('sort-supported')) != 'false'"/> <!-- Default: true -->
+            <xf:var name="local-or-remote" value="fr:component-param-value('local-or-remote')"/>
+            <xf:var name="column"          value="fr:component-param-value('column')"/>
 
             <xf:var
                 name="no-caret"
                 value="$instance/local-or-remote != $local-or-remote or $instance/column != $column or not($sort-supported)"/>
 
-            <!-- TODO class -->
+            <xf:var
+                name="caret-value"
+                value="
+                    if      ($no-caret)                   then ''
+                    else if ($instance/direction = 'asc') then '&#x25B2;'
+                    else                                       '&#x25BC;'
+                "/>
 
-            <xh:th>
+            <xh:th class="{'fr-sortable-th'[$sort-supported], fr:component-param-value('class')[xxf:non-blank()]}">
                 <xf:trigger appearance="minimal">
                     <xf:label>
-                        <xf:output value="$label"/>
-                        <xh:span class="column-caret">
-                            <xf:output value="
-                                if      ($no-caret)                   then ''
-                                else if ($instance/direction = 'asc') then '&#x25B2;'
-                                else                                       '&#x25BC;'
-                            "/>
+                        <xf:output value="string(xf:parse(concat('&lt;span>', $label, '&lt;/span>')))"/>
+                        <xh:span class="{'caret-container', 'no-caret'[$no-caret]}">
+                            <xf:output value="$caret-value"/>
                         </xh:span>
                     </xf:label>
                     <xf:action event="DOMActivate" if="$sort-supported">

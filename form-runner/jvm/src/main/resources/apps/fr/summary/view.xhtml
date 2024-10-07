@@ -779,8 +779,6 @@
 
             </xf:submission>
 
-            <xf:var name="sort-supported" value="frf:isSortSupported($app, $form)"/>
-
             <xf:action event="fr-order-by">
                 <xf:var name="column" value="event('column')"/>
 
@@ -1593,64 +1591,35 @@
 
                             <xh:table class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
-                                <xh:thead class="{'column-header', 'sortable-column'[$sort-supported], 'non-sortable-column'[not($sort-supported)]}">
+                                <xh:thead>
                                     <xh:tr>
                                         <xh:th class="fr-repeat-selection-checkbox"/>
                                         <xh:th class="{$labels-class}"/>
+
+                                        <xf:var name="sort-supported" value="frf:isSortSupported($app, $form)"/>
 
                                         <xf:repeat ref="$metadata-columns">
                                             <xf:var name="column" value="."/>
 
                                             <xf:group>
-                                                <xh:th>
-                                                    <xf:trigger appearance="minimal">
-                                                        <xf:label>
-                                                            <xf:output value="($fr-resources/summary/titles/*[local-name() = $column], $fr-resources/home-summary/titles/*[local-name() = $column])[1]"/>
-                                                            <span class="column-caret">
-                                                                <xf:output value="
-                                                                    if      (instance('fr-order-by')/column != $column or not($sort-supported)) then ''
-                                                                    else if (instance('fr-order-by')/direction = 'asc') then                         '&#x25B2;'
-                                                                    else                                                                             '&#x25BC;'
-                                                                "/>
-                                                            </span>
-                                                        </xf:label>
-                                                        <xf:action event="DOMActivate" if="$sort-supported">
-                                                            <xf:dispatch
-                                                                name="fr-order-by"
-                                                                targetid="fr-form-model">
-                                                                <xf:property name="column" value="$column"/>
-                                                            </xf:dispatch>
-                                                        </xf:action>
-                                                    </xf:trigger>
-                                                </xh:th>
+                                                <fr:sortable-th
+                                                    class="{concat('fr-', $column)}"
+                                                    label="($fr-resources/summary/titles/*[local-name() = $column], $fr-resources/home-summary/titles/*[local-name() = $column])[1]"
+                                                    sort-supported="{$sort-supported}"
+                                                    instance="instance('fr-order-by')"
+                                                    column="{$column}"/>
                                             </xf:group>
                                         </xf:repeat>
                                         <xf:group ref="''[empty($detail-positions)]">
                                             <xh:th/>
                                         </xf:group>
                                         <xf:repeat ref="instance('fr-search-labels-instance')/query[@summary-show = 'true']" id="fr-summary-repeat-column-number">
-                                            <xh:th class="{if (@control = ('number', 'currency')) then 'fr-align-right' else ''}">
-                                                <xf:trigger appearance="minimal">
-                                                    <xf:label>
-                                                        <!-- Output showing as the header of the column -->
-                                                        <xf:output
-                                                            mediatype="text/html"
-                                                            value="resources[@lang = xxf:instance('fr-language-instance')]/label"/>
-                                                        <span class="column-caret">
-                                                            <xf:output value="
-                                                                if      (instance('fr-order-by')/column != @path or not($sort-supported)) then ''
-                                                                else if (instance('fr-order-by')/direction = 'asc') then                       '&#x25B2;'
-                                                                else                                                                           '&#x25BC;'
-                                                            "/>
-                                                        </span>
-                                                    </xf:label>
-                                                    <xf:action event="DOMActivate" if="$sort-supported">
-                                                        <xf:dispatch name="fr-order-by" targetid="fr-form-model">
-                                                            <xf:property name="column" value="@path"/>
-                                                        </xf:dispatch>
-                                                    </xf:action>
-                                                </xf:trigger>
-                                            </xh:th>
+                                            <fr:sortable-th
+                                                class="{if (@control = ('number', 'currency')) then 'fr-align-right' else ''}"
+                                                label="resources[@lang = xxf:instance('fr-language-instance')]/label"
+                                                sort-supported="{$sort-supported}"
+                                                instance="instance('fr-order-by')"
+                                                column="{@path}"/>
                                         </xf:repeat>
                                     </xh:tr>
                                 </xh:thead>

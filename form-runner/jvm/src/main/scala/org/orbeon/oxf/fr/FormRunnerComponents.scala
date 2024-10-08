@@ -5,7 +5,6 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{FileUtils, IndentedLogger, LoggerFactory}
-import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
@@ -14,13 +13,11 @@ import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xml.NamespaceMapping
 
 
-
 trait FormRunnerComponents {
-
 
   // In an XPath expression, replace non-local variable references.
   //@XPathFunction
-  def replaceVarReferencesWithFunctionCallsFromString( // xxx FromString
+  def replaceVarReferencesWithFunctionCallsFromString(
     elemOrAtt   : NodeInfo,
     xpathString : String,
     avt         : Boolean,

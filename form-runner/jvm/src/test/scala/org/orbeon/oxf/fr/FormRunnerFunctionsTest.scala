@@ -540,4 +540,180 @@ class FormRunnerFunctionsTest
         assert(RelationalUtils.databaseConfigurationPresent(PropertySet(properties), get) == expected)
       }
   }
+
+  describe("List form data attachments") {
+
+    val appName = "issue"
+    val formName = "6530"
+    val documentId = "ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783"
+
+    import org.orbeon.saxon.om
+    import org.orbeon.scaxon.NodeConversions.*
+    import org.orbeon.scaxon.SimplePath.*
+
+    val data: om.NodeInfo =
+      <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+        <my-section>
+            <_ filename="IMG_9847.jpg" mediatype="image/jpeg" size="124073">/fr/service/persistence/crud/issue/6530/data/ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783/045c3dfbe8b56144f996fc3f9c2e59e19735b3f8.bin</_>
+            <multiple>
+                <_ filename="IMG_9842.jpg" mediatype="image/jpeg" size="115511">/fr/service/persistence/crud/issue/6530/data/ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783/c8a7e3e9f23e9e3c0d27943c2eb8fcd382ac1711.bin</_>
+                <_ filename="IMG_9844.jpg" mediatype="image/jpeg" size="122218">/fr/service/persistence/crud/issue/6530/data/ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783/6f6e4b83923bf72e0e4e1dba602746824ffc5ccd.bin</_>
+            </multiple>
+        </my-section>
+    </form>
+
+    val formDefinition: om.NodeInfo =
+      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:ev="http://www.w3.org/2001/xml-events"
+             xmlns:xi="http://www.w3.org/2001/XInclude"
+             xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+             xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+             xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+             xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+             xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+             xmlns:exf="http://www.exforms.org/exf/1-0"
+             xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+             xmlns:saxon="http://saxon.sf.net/"
+             xmlns:sql="http://orbeon.org/oxf/xml/sql"
+             xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+             xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+        <xh:head>
+            <xh:title>List form data attachments API to return control name instead of _ #6530</xh:title>
+            <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+                <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                    <form>
+                        <my-section>
+                            <my-grid>
+                                <_ filename="" mediatype="" size=""/>
+                                <multiple/>
+                            </my-grid>
+                        </my-section>
+                    </form>
+                </xf:instance>
+
+                <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                    <xf:bind id="my-section-bind" name="my-section" ref="my-section">
+                        <xf:bind id="my-grid-bind" ref="my-grid" name="my-grid">
+                            <xf:bind id="_-bind" ref="_" name="_" type="xf:anyURI"/>
+                            <xf:bind id="multiple-bind" ref="multiple" name="multiple"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+
+                <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <metadata>
+                        <application-name>issue</application-name>
+                        <form-name>6530</form-name>
+                        <title xml:lang="en">List form data attachments API to return control name instead of _ #6530</title>
+                        <description xml:lang="en"/>
+                        <migration version="2019.1.0">{{"migrations":[{{"containerPath":[{{"value":"my-section"}}],"newGridElem":{{"value":"my-grid"}},"afterElem":null,"content":[{{"value":"_"}},{{"value":"multiple"}}],"topLevel":true}}]}}</migration>
+                    </metadata>
+                </xf:instance>
+
+                <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                    <attachments/>
+                </xf:instance>
+
+                <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                    <resources>
+                        <resource xml:lang="en">
+                            <_>
+                                <label/>
+                                <hint/>
+                            </_>
+                            <multiple>
+                                <label/>
+                                <hint/>
+                            </multiple>
+                            <my-section/>
+                            <my-grid/>
+                        </resource>
+                    </resources>
+                </xf:instance>
+            </xf:model>
+        </xh:head>
+        <xh:body>
+            <fr:view>
+                <fr:body>
+                    <fr:section id="my-section-section" bind="my-section-bind">
+                        <fr:grid id="my-grid-grid" bind="my-grid-bind">
+                            <fr:c y="1" x="1" w="6">
+                                <fr:attachment id="_-control"
+                                               bind="_-bind"
+                                               class="fr-attachment">
+                                    <xf:label ref="$form-resources/_/label"/>
+                                    <xf:hint ref="$form-resources/_/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:attachment>
+                            </fr:c>
+                            <fr:c y="1" x="7" w="6">
+                                <fr:attachment multiple="true"
+                                               id="multiple-control"
+                                               bind="multiple-bind"
+                                               class="fr-attachment">
+                                    <xf:label ref="$form-resources/multiple/label"/>
+                                    <xf:hint ref="$form-resources/multiple/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:attachment>
+                            </fr:c>
+                        </fr:grid>
+                    </fr:section>
+                </fr:body>
+            </fr:view>
+        </xh:body>
+    </xh:html>
+
+    it("must return the expected attachments") {
+
+      val expected =
+        List(
+          (
+            "attachment",
+            LazyList(
+              ("filename", "IMG_9847.jpg"),
+              ("mediatype", "image/jpeg"),
+              ("size", "124073"),
+              ("name", "_")
+            ),
+            "/fr/service/persistence/crud/issue/6530/data/ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783/045c3dfbe8b56144f996fc3f9c2e59e19735b3f8.bin"
+          ),
+          (
+            "attachment",
+            LazyList(
+              ("filename", "IMG_9842.jpg"),
+              ("mediatype", "image/jpeg"),
+              ("size", "115511"),
+              ("name", "multiple")
+            ),
+            "/fr/service/persistence/crud/issue/6530/data/ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783/c8a7e3e9f23e9e3c0d27943c2eb8fcd382ac1711.bin"
+          ),
+          (
+            "attachment",
+            LazyList(
+              ("filename", "IMG_9844.jpg"),
+              ("mediatype", "image/jpeg"),
+              ("size", "122218"),
+              ("name", "multiple")
+            ),
+            "/fr/service/persistence/crud/issue/6530/data/ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783/6f6e4b83923bf72e0e4e1dba602746824ffc5ccd.bin"
+          )
+        )
+
+      val result =
+        FormRunner.collectDataAttachmentNodesJava(
+          app            = appName,
+          form           = formName,
+          formDefinition = formDefinition,
+          data           = data,
+          fromBasePath   = FormRunner.createFormDataBasePath(appName, formName, isDraft = false, documentId),
+        )
+        .asScala
+        .map(n => (n.name, n /@ @* map (a => a.name -> a.stringValue), n.stringValue))
+
+      assert(result == expected)
+    }
+  }
 }

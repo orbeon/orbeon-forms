@@ -21,6 +21,7 @@ import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent.TunnelProperties
 import org.orbeon.oxf.xforms.event.*
@@ -68,6 +69,8 @@ class XFormsModelSubmission(
   import Private._
 
   val containingDocument: XFormsContainingDocument = container.containingDocument
+  def modelOpt: Option[XFormsModel] = model.modelOpt
+  def elementAnalysis: ElementAnalysis = staticSubmission
 
   // All the submission types in the order they must be checked
   val submissions: List[BaseSubmission] =

@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentationType}
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.*
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.control.Controls
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -63,7 +64,10 @@ class XFormsModel(
 
   selfModel =>
 
-  val containingDocument: XFormsContainingDocument = container.containingDocument
+  def containingDocument: XFormsContainingDocument = container.containingDocument
+  val modelOpt: Option[XFormsModel] = this.some
+  def elementAnalysis: ElementAnalysis = staticModel
+
   val sequenceNumber: Int = containingDocument.nextModelSequenceNumber()
 
   implicit val indentedLogger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)

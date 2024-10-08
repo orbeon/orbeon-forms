@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.xforms.model
 
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
@@ -30,6 +32,10 @@ class RuntimeBind(
   isSingleNodeContext : Boolean,
   collector           : ErrorEventCollector
 ) extends XFormsObject {
+
+  def container: XBLContainer = model.container
+  def modelOpt: Option[XFormsModel] = Some(model)
+  def elementAnalysis: ElementAnalysis = staticBind
 
   // TODO: Construction should be done in `RuntimeBind.apply()`.
 

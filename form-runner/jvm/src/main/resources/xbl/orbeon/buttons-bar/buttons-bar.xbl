@@ -104,12 +104,12 @@
                                                 ),
                                             $visible-opt :=
                                                 if (xxf:non-blank($visible-expression)) then
-                                                    boolean(xxf:instance('fr-form-instance')/xxf:evaluate($visible-expression))
+                                                    boolean(xxf:instance('fr-form-instance')/xxf:evaluate-in-context($visible-expression, 'fr-form-instance'))
                                                 else
                                                     (),
                                             $enabled-opt :=
                                                 if (xxf:non-blank($enabled-expression)) then
-                                                    boolean(xxf:instance('fr-form-instance')/xxf:evaluate($enabled-expression))
+                                                    boolean(xxf:instance('fr-form-instance')/xxf:evaluate-in-context($enabled-expression, 'fr-form-instance'))
                                                 else
                                                     ()
                                         return

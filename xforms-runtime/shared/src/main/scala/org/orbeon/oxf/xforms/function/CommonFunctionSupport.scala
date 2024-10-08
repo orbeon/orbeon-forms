@@ -61,6 +61,18 @@ trait CommonFunctionSupport {
     }
   }
 
+  object Context {
+    def apply(xformsObject: XFormsObject): Context = {
+      Context(
+        container         = xformsObject.container,
+        bindingContext    = BindingContext.empty(xformsObject.elementAnalysis.element, xformsObject.elementAnalysis.scope),
+        sourceEffectiveId = xformsObject.effectiveId,
+        modelOpt          = xformsObject.modelOpt,
+        bindNodeOpt       = None
+      )
+    }
+  }
+
   def context: Context =
     XPath.functionContext map (_.asInstanceOf[Context]) orNull
 

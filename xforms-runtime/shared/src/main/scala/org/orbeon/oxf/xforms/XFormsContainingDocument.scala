@@ -20,15 +20,17 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, PathMatcher}
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PartAnalysis, PathMapXPathDependencies, XPathDependencies}
+import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, ElementAnalysis, PartAnalysis, PathMapXPathDependencies, XPathDependencies}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.state.InstancesControls
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager
 import org.orbeon.oxf.xforms.upload.UploadSupport
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.xforms.DeploymentType
@@ -71,6 +73,10 @@ class XFormsContainingDocument(
   self =>
 
   // Members that depends from `staticState`
+  def container: XBLContainer = self
+  def modelOpt: Option[XFormsModel] = findDefaultModel
+  def elementAnalysis: ElementAnalysis = staticState.topLevelPart.getDefaultModel // Q: Anything better?
+
   val functionLibrary   : FunctionLibrary      = staticState.topLevelPart.functionLibrary
   val staticOps         : StaticStateGlobalOps = new StaticStateGlobalOps(staticState.topLevelPart)
   val xpathDependencies : XPathDependencies    =

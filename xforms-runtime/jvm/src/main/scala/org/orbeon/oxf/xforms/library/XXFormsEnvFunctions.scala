@@ -13,14 +13,16 @@
  */
 package org.orbeon.oxf.xforms.library
 
-import org.orbeon.saxon.`type`.{BuiltInAtomicType, Type}
-import org.orbeon.saxon.expr.StaticProperty.*
-import org.orbeon.saxon.`type`.BuiltInAtomicType.*
+import org.orbeon.oxf.xforms.function.*
+import org.orbeon.oxf.xforms.function.exforms.EXFormsMIP
 import org.orbeon.oxf.xforms.function.xxforms.*
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
-import org.orbeon.oxf.xforms.function.{Bind, Event, If, XXFormsValid}
-import org.orbeon.oxf.xforms.function.exforms.EXFormsMIP
+import org.orbeon.saxon
+import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type.{ITEM_TYPE, NODE_TYPE}
+import org.orbeon.saxon.`type`.{BuiltInAtomicType, Type}
+import org.orbeon.saxon.expr.StaticProperty.*
+
 
 /*
  * Orbeon extension functions that depend on the XForms environment.
@@ -356,6 +358,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
     Fun(ExcludedDatesValidation.PropertyName, classOf[ExcludedDatesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(DATE, ALLOWS_ZERO_OR_MORE)
+    )
+
+    Fun("evaluate-in-context", classOf[XXFEvaluateInContext], op = saxon.functions.Evaluate.EVALUATE, min = 2, max = 2, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
     )
   }
 }

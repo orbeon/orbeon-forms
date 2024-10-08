@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysis, WithChildr
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xforms.model.StaticDataModel
+import org.orbeon.oxf.xforms.model.{StaticDataModel, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLConstants}
@@ -61,6 +61,9 @@ class XFormsControl(
      with MaybeFocusableTrait {
 
   self =>
+
+  def modelOpt: Option[XFormsModel] = bindingContext.modelOpt
+  def elementAnalysis: ElementAnalysis = staticControl
 
   // Type of the associated static control
   type Control <: ElementAnalysis // TODO: Use more specific to represent controls. Note that those can also be actions.

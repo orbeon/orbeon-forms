@@ -14,19 +14,22 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.xforms.*
-import org.orbeon.oxf.xforms.analysis.EventHandler
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler}
 import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEventHandler, XFormsEventTarget}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
 
+
 class XFormsModelAction(parent: XFormsEventTarget, eventHandler: EventHandler)
   extends XFormsEventHandler
   with XFormsObject {
 
-  val effectiveId        = XFormsId.getRelatedEffectiveId(parent.effectiveId, eventHandler.staticId)
-  def container          = parent.container
-  def containingDocument = parent.containingDocument
+  val effectiveId                      = XFormsId.getRelatedEffectiveId(parent.effectiveId, eventHandler.staticId)
+  def container                        = parent.container
+  def containingDocument               = parent.containingDocument
+  def modelOpt: Option[XFormsModel]    = parent.modelOpt
+  def elementAnalysis: ElementAnalysis = eventHandler
 
   // This is called by `Dispatch`
   def bindingContext: BindingContext =

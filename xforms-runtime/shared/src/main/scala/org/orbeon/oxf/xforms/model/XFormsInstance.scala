@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.InstanceLoader
 import org.orbeon.oxf.xforms.*
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.*
@@ -119,6 +120,8 @@ class XFormsInstance(
   requireNewIndex()
 
   def containingDocument = parent.containingDocument
+  def modelOpt: Option[XFormsModel] = parent.modelOpt
+  def elementAnalysis: ElementAnalysis = instance
 
   // Getters
   def instanceCaching = _instanceCaching

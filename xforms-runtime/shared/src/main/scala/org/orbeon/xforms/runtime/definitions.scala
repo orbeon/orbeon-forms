@@ -2,8 +2,11 @@ package org.orbeon.xforms.runtime
 
 import org.orbeon.dom
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.event.XFormsEvent.{EmptyGetter, PropertyGetter, SimpleProperties}
+import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xforms.submission.SubmissionParameters
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 
 case class ErrorInfo(
@@ -12,8 +15,11 @@ case class ErrorInfo(
 )
 
 trait XFormsObject {
-  def effectiveId        : String
-  def containingDocument : XFormsContainingDocument
+  def effectiveId       : String
+  def containingDocument: XFormsContainingDocument
+  def container         : XBLContainer
+  def modelOpt          : Option[XFormsModel]
+  def elementAnalysis   : ElementAnalysis
 }
 
 case class SimplePropertyValue(

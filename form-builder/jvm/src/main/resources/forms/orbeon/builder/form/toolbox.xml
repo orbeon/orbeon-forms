@@ -47,7 +47,7 @@
                             <xf:property name="for-button-name"                           value="event('for-button-name')"/>
                             <xf:property name="lang"                                      value="$fb-lang"/>
                             <xf:property name="langs"                                     value="$resources/resource/@xml:lang/string()"/>
-                            <xf:property name="mode"                                      value="(event('mode'), 'edit')[1]"/>
+                            <xf:property name="mode"                                      value="(event('mode'), 'form-settings')[1]"/>
                             <xf:property name="app"                                       value="bind('application-name-bind')"/>
                             <xf:property name="form"                                      value="bind('form-name-bind')"/>
                             <xf:property name="title"                                     value="bind('title-bind')"/>

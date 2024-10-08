@@ -583,7 +583,7 @@
                     type="xs:boolean"/>
                 <xf:bind
                     ref="mode"
-                    constraint=". = ('new', 'edit', 'app-form')"/>
+                    constraint=". = ('new', 'app-form', 'form-settings')"/>
                 <xf:bind
                     ref="data-migration"
                     relevant="fr:is-pe()"/>

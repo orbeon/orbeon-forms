@@ -561,7 +561,7 @@ trait FormRunnerPersistence {
         else if (possiblePathsLeafToRoot.contains(path.tail))
           Option(holder -> path.tail.head.value)
         else
-          Nil
+          None
       }
       .map { case (holder, controlName) =>
         NodeInfoFactory.elementInfo(

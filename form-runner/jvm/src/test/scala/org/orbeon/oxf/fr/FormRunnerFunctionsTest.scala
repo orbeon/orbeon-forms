@@ -672,31 +672,31 @@ class FormRunnerFunctionsTest
         List(
           (
             "attachment",
-            LazyList(
-              ("filename", "IMG_9847.jpg"),
-              ("mediatype", "image/jpeg"),
-              ("size", "124073"),
-              ("name", "_")
+            List(
+              ("filename"  -> "IMG_9847.jpg"),
+              ("mediatype" -> "image/jpeg"),
+              ("size"      -> "124073"),
+              ("name"      -> "_")
             ),
             "/fr/service/persistence/crud/issue/6530/data/ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783/045c3dfbe8b56144f996fc3f9c2e59e19735b3f8.bin"
           ),
           (
             "attachment",
-            LazyList(
-              ("filename", "IMG_9842.jpg"),
-              ("mediatype", "image/jpeg"),
-              ("size", "115511"),
-              ("name", "multiple")
+            List(
+              ("filename"  -> "IMG_9842.jpg"),
+              ("mediatype" -> "image/jpeg"),
+              ("size"      -> "115511"),
+              ("name"      -> "multiple")
             ),
             "/fr/service/persistence/crud/issue/6530/data/ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783/c8a7e3e9f23e9e3c0d27943c2eb8fcd382ac1711.bin"
           ),
           (
             "attachment",
-            LazyList(
-              ("filename", "IMG_9844.jpg"),
-              ("mediatype", "image/jpeg"),
-              ("size", "122218"),
-              ("name", "multiple")
+            List(
+              ("filename"  -> "IMG_9844.jpg"),
+              ("mediatype" -> "image/jpeg"),
+              ("size"      -> "122218"),
+              ("name"      -> "multiple")
             ),
             "/fr/service/persistence/crud/issue/6530/data/ee1e28d0ea1e1666d2d76bd0ce9dac3304a6e783/6f6e4b83923bf72e0e4e1dba602746824ffc5ccd.bin"
           )

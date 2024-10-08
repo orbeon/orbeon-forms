@@ -33,7 +33,7 @@ object NodeInfoFactory {
   def elementInfo(
     qName                             : dom.QName,
     content                           : collection.Seq[om.Item] = Nil,
-    removeInstanceDataFromClonedNodes : Boolean   = true
+    removeInstanceDataFromClonedNodes : Boolean                 = true
   ): om.NodeInfo = {
     val newElement = Wrapper.wrap(dom.Element(qName))
     if (content.nonEmpty)

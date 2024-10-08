@@ -55,7 +55,7 @@ class FormRunnerFunctionsTest
     for ((formOrData, expected) <- Expected)
       it(s"must get headers for ${formOrData.entryName}") {
         val headersAsXml = getPersistenceHeadersAsXML(AppForm("cities", "form1"), formOrData)
-        assert(TransformerUtils.tinyTreeToString(headersAsXml) === expected)
+        assert(TransformerUtils.tinyTreeToString(headersAsXml) == expected)
       }
   }
 
@@ -66,7 +66,7 @@ class FormRunnerFunctionsTest
 
     it("`oxf.fr.default-language` not set so `en` is the default") {
       withTestExternalContext { _ =>
-        assert("en" === getDefaultLang(getAppForm(App, Form)))
+        assert("en" == getDefaultLang(getAppForm(App, Form)))
       }
     }
 
@@ -81,27 +81,27 @@ class FormRunnerFunctionsTest
       for (v <- List(null, "   "))
         it (s"must default to `en` for `$v` requested language") {
           withTestExternalContext { _ =>
-            assert(Some("en") === findRequestedLang(getAppForm(App, Form), v))
+            assert(Some("en") == findRequestedLang(getAppForm(App, Form), v))
           }
         }
 
       for (v <- List("es", "en"))
         it(s"must find requested language for `$v`") {
           withTestExternalContext { _ =>
-            assert(Some(v) === findRequestedLang(getAppForm(App, Form), v))
+            assert(Some(v) == findRequestedLang(getAppForm(App, Form), v))
           }
         }
 
       it("must find language in session if present and not requested") {
         withTestExternalContext { _ =>
           NetUtils.getExternalContext.getRequest.getSession(true).setAttribute("fr-language", "fr")
-          assert(Some("fr") === findRequestedLang(getAppForm(App, Form), null))
+          assert(Some("fr") == findRequestedLang(getAppForm(App, Form), null))
         }
       }
 
       it("must use requested language even if a language is present in session") {
         withTestExternalContext { _ =>
-          assert(Some("it") === findRequestedLang(getAppForm(App, Form), "it"))
+          assert(Some("it") == findRequestedLang(getAppForm(App, Form), "it"))
         }
       }
     }
@@ -111,19 +111,19 @@ class FormRunnerFunctionsTest
       describe("Selection") {
         it(s"default language is put first`") {
             withTestExternalContext { _ =>
-              assert(List("en", "fr", "it") === getFormLangSelection(App, Form, List("fr", "it", "en").asJava))
+              assert(List("en", "fr", "it") == getFormLangSelection(App, Form, List("fr", "it", "en").asJava))
             }
         }
 
         it(s"other languages order is preserved") {
             withTestExternalContext { _ =>
-              assert(List("fr", "it", "es") === getFormLangSelection(App, Form, List("fr", "it", "es").asJava))
+              assert(List("fr", "it", "es") == getFormLangSelection(App, Form, List("fr", "it", "es").asJava))
             }
         }
 
         it(s"no language available") {
             withTestExternalContext { _ =>
-              assert(Nil                    === getFormLangSelection(App, Form, Nil.asJava))
+              assert(Nil                    == getFormLangSelection(App, Form, Nil.asJava))
             }
         }
       }
@@ -139,7 +139,7 @@ class FormRunnerFunctionsTest
         for ((expected, requested, available) <- Expected)
           it(s"must select language for `$requested` and available `$available`") {
             withTestExternalContext { _ =>
-              assert(expected === selectFormLang(App, Form, requested, available.asJava))
+              assert(expected == selectFormLang(App, Form, requested, available.asJava))
             }
           }
       }
@@ -154,7 +154,7 @@ class FormRunnerFunctionsTest
         for ((expected, requested, available) <- Expected)
           it(s"must select language for `$requested` and available `$available`") {
             withTestExternalContext { _ =>
-              assert(expected === selectFormRunnerLang(App, Form, requested,available.asJava))
+              assert(expected == selectFormRunnerLang(App, Form, requested,available.asJava))
             }
           }
       }
@@ -169,9 +169,9 @@ class FormRunnerFunctionsTest
     it("must select the correct language") {
       withTestExternalContext { _ =>
         for (lang <- List("zh-Hans", "zh-Hant"))
-          assert(lang === selectFormRunnerLang(App, Form, lang, List("en", "zh-Hans", "zh-Hant", "es").asJava))
+          assert(lang == selectFormRunnerLang(App, Form, lang, List("en", "zh-Hans", "zh-Hant", "es").asJava))
 
-        assert("en" === selectFormRunnerLang(App, Form, "en_US", List("en", "zh-Hans", "zh-Hant", "es").asJava))
+        assert("en" == selectFormRunnerLang(App, Form, "en_US", List("en", "zh-Hans", "zh-Hant", "es").asJava))
       }
     }
   }
@@ -248,13 +248,13 @@ class FormRunnerFunctionsTest
           val controlIndexes = controlIds map doc.staticOps.getControlPosition
 
           // Static control position follows source document order
-          assert(controlIndexes.sorted === controlIndexes)
+          assert(controlIndexes.sorted == controlIndexes)
 
           val effectiveAbsoluteIds =
             doc.controls.getCurrentControlTree.effectiveIdsToControls map
             { case (id, _) => XFormsId.effectiveIdToAbsoluteId(id) } toList
 
-          assert(effectiveAbsoluteIds.sortBy(ErrorSummary.controlSearchIndexes)(ErrorSummary.IntIteratorOrdering) === effectiveAbsoluteIds)
+          assert(effectiveAbsoluteIds.sortBy(ErrorSummary.controlSearchIndexes)(ErrorSummary.IntIteratorOrdering) == effectiveAbsoluteIds)
         }
       }
     }
@@ -263,8 +263,8 @@ class FormRunnerFunctionsTest
   describe("Analyze known constraint") {
 
     import FormRunnerCommonConstraint.analyzeKnownConstraint
-    import org.orbeon.oxf.xml.XMLConstants._
-    import org.orbeon.xforms.XFormsNames._
+    import org.orbeon.oxf.xml.XMLConstants.*
+    import org.orbeon.xforms.XFormsNames.*
 
     val Library = XFormsFunctionLibrary
 
@@ -302,7 +302,7 @@ class FormRunnerFunctionsTest
 
     for ((expected, expr) <- data)
       it(s"must pass checking `$expr`") {
-        assert(expected === analyzeKnownConstraint(expr, Mapping, Library))
+        assert(expected == analyzeKnownConstraint(expr, Mapping, Library))
       }
   }
 

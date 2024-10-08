@@ -235,7 +235,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   def searchControlsInFormBySubElement(
     subElements       : Set[String],
-    dataFormatVersion : DataFormatVersion)(implicit
+    dataFormatVersion : DataFormatVersion
+  )(implicit
     ctx               : FormRunnerDocContext
   ): List[ControlBindPathHoldersResources] =
     searchControlsInFormByControlPredicate(
@@ -254,14 +255,16 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   def searchControlsInFormByClass(
     classes           : Set[String],
-    dataFormatVersion : DataFormatVersion)(implicit
+    dataFormatVersion : DataFormatVersion
+  )(implicit
     ctx               : FormRunnerDocContext
   ): List[ControlBindPathHoldersResources] =
     searchControlsInFormByControlPredicate(frc.hasAnyClassPredicate(classes), dataFormatVersion)
 
   def searchControlsInFormByControlPredicate(
     controlPredicate  : NodeInfo => Boolean,
-    dataFormatVersion : DataFormatVersion)(implicit
+    dataFormatVersion : DataFormatVersion // used to adjust `path`
+  )(implicit
     ctx               : FormRunnerDocContext
   ): List[ControlBindPathHoldersResources] = {
     val headOpt = (ctx.formDefinitionRootElem / "*:head").headOption
@@ -506,10 +509,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
     val FBLangPredicate         = "[@xml:lang = $fb-lang]"
     val PossibleControlSuffixes = List("control", "grid", "section", "repeat")
-
-    // Find a bind by predicate
-    def findBind(inDoc: NodeInfo, p: NodeInfo => Boolean): Option[NodeInfo] =
-      findTopLevelBind(inDoc).toSeq descendant "*:bind" find p
 
     // 2017-04-25: Don't use enclosing parentheses anymore. This now ensures that the `ref` is a single
     // reference to an XML element. See https://github.com/orbeon/orbeon-forms/issues/3174.

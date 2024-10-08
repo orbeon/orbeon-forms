@@ -25,7 +25,7 @@ import org.orbeon.oxf.common.{Defaults, OXFException}
 import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.FormModel
-import org.orbeon.oxf.fr.datamigration.MigrationSupport
+import org.orbeon.oxf.fr.datamigration.{MigrationSupport, PathElem}
 import Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod}
@@ -44,6 +44,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -532,8 +533,48 @@ trait FormRunnerPersistence {
   // Return all nodes which refer to data attachments
   // Used by attachments service
   //@XPathFunction
-  def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String): ju.List[NodeInfo] =
-    collectUnsavedAttachments(data.getRoot, AttachmentMatch.BasePaths(includes = List(fromBasePath), excludes = Nil)).map(_.holder).asJava
+  def collectDataAttachmentNodesJava(
+    app           : String,
+    form          : String,
+    formDefinition: NodeInfo,
+    data          : NodeInfo,
+    fromBasePath  : String
+  ): ju.List[NodeInfo] = {
+
+    // We have to
+    // https://github.com/orbeon/orbeon-forms/issues/6530
+    implicit val ctx: FormRunnerDocContext = new InDocFormRunnerDocContext(formDefinition)
+
+    val possiblePathsLeafToRoot =
+      frc.searchControlsInFormByControlPredicate(
+        controlPredicate  = _ => true, // don't exclude any controls as don't have a list of attachment control types
+        dataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
+      ).map(_.path.reverse).toSet
+
+    collectUnsavedAttachments(data.getRoot, AttachmentMatch.BasePaths(includes = List(fromBasePath), excludes = Nil))
+      .map(_.holder)
+      .flatMap { holder =>
+        val path = holder.ancestorOrSelf(*).init.map(n => PathElem(n.name)).toList
+
+        if (possiblePathsLeafToRoot.contains(path))
+          Option(holder -> path.head.value)
+        else if (possiblePathsLeafToRoot.contains(path.tail))
+          Option(holder -> path.tail.head.value)
+        else
+          Nil
+      }
+      .map { case (holder, controlName) =>
+        NodeInfoFactory.elementInfo(
+          QName("attachment"),
+          (holder /@ @*) ++: (
+            NodeInfoFactory.attributeInfo("name", controlName) ::
+            StringValue.makeStringValue(holder.stringValue)    ::
+            Nil
+          )
+        )
+      }
+      .asJava
+  }
 
   // Called upon `xxforms-state-restored`
   //@XPathFunction

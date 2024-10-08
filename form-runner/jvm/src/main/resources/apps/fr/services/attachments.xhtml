@@ -33,15 +33,43 @@
 
             <xf:instance id="fr-request" src="input:instance"/>
 
-            <xf:instance id="fr-response"      xxf:exclude-result-prefixes="#all"><attachments/></xf:instance>
-            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all"><dummy/></xf:instance>
+            <xf:instance id="fr-response"             xxf:exclude-result-prefixes="#all"><attachments/></xf:instance>
+            <xf:instance id="fr-form-instance"        xxf:exclude-result-prefixes="#all"><_/></xf:instance>
+            <xf:instance id="fr-source-form-instance" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
 
             <xf:var name="requested-document-id" value="xxf:get-request-parameter('document')"/>
             <!-- 2022-10-18: This doesn't support searching in autosave drafts. -->
             <xf:var name="data-base-path"        value="frf:createFormDataBasePath(fr:app-name(), fr:form-name(), false(), $requested-document-id)"/>
 
-            <xf:action event="xforms-model-construct-done">
-                <xf:send submission="read-form-data"/>
+            <!--  Upon initialization -->
+            <xf:send
+                event="xforms-model-construct-done"
+
+                submission="fr-get-source-form-submission"/>
+            <!--  Continuation -->
+            <xf:send
+                observer="fr-get-source-form-submission"
+                event="xforms-submit-done"
+
+                submission="read-form-data"/>
+            <!-- Continuation -->
+            <xf:action
+                observer="read-form-data"
+                event="xforms-submit-done">
+
+                <!-- NOTE: This returns data attachments only, not form definition attachments. -->
+                <xf:insert
+                    context="instance('fr-response')"
+                    origin="
+                        frf:collectDataAttachmentNodesJava(
+                            fr:app-name(),
+                            fr:form-name(),
+                            instance('fr-source-form-instance'),
+                            instance('fr-form-instance'),
+                            $data-base-path
+                        )"/>
+
+                <xf:send submission="send-result"/>
             </xf:action>
 
             <!-- Read form data for the duplicate button -->
@@ -58,35 +86,23 @@
                     }"
                 replace="instance"
                 instance="fr-form-instance"
-                xmlns:frp="java:org.orbeon.oxf.fr.FormRunnerPersistenceJava">
+                xmlns:frp="java:org.orbeon.oxf.fr.FormRunnerPersistenceJava"/>
 
-                <!-- Duplicate form data and attachments under new document id, using the same form version if any is specified -->
-                <xf:action event="xforms-submit-done">
+            <xf:submission
+                id="fr-get-source-form-submission"
+                method="get"
+                serialization="none"
+                resource="/fr/service/persistence/crud/{fr:app-name()}/{fr:form-name()}/form/form.xhtml"
+                replace="instance"
+                instance="fr-source-form-instance"
+                xxf:readonly="true"
+                xxf:cache="false"
+                xxf:xinclude="true">
 
-                    <!-- NOTE: This returns data attachments only, not form definition attachments. -->
-                    <xf:action iterate="frf:collectDataAttachmentNodesJava(instance('fr-form-instance'), $data-base-path)">
-                        <xf:var name="node" value="."/>
-                        <xf:insert
-                            context="instance('fr-response')"
-                            origin="
-                                xf:element(
-                                    'attachment',
-                                    (
-                                        xf:attribute('name', name($node)),
-                                        $node/@*,
-                                        string($node)
-                                    )
-                                )"/>
-                    </xf:action>
-
-                    <xf:send submission="send-result"/>
-                </xf:action>
-
-                <!-- Clear form data when submission terminates -->
-                <xf:insert
-                    event="xforms-submit-done xforms-submit-error"
-                    ref="instance('fr-form-instance')"
-                    origin="xf:element('dummy')"/>
+                <xf:header>
+                    <xf:name>Orbeon-For-Document-Id</xf:name>
+                    <xf:value value="$requested-document-id"/>
+                </xf:header>
 
             </xf:submission>
 
@@ -97,6 +113,12 @@
                 action="echo:"
                 ref="instance('fr-response')"
                 replace="all"/>
+
+            <!-- Clear form data when submission terminates -->
+            <xf:insert
+                event="xforms-submit-done xforms-submit-error"
+                ref="instance('fr-form-instance')"
+                origin="xf:element('_')"/>
 
             <xf:action type="xpath" event="xforms-submit-error">
                 frf:sendError(500)

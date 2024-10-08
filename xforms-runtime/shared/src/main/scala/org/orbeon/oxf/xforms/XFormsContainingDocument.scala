@@ -72,11 +72,11 @@ class XFormsContainingDocument(
 
   self =>
 
-  // Members that depends from `staticState`
   def container: XBLContainer = self
   def modelOpt: Option[XFormsModel] = findDefaultModel
   def elementAnalysis: ElementAnalysis = staticState.topLevelPart.getDefaultModel // Q: Anything better?
 
+  // Members which depend from `staticState`
   val functionLibrary   : FunctionLibrary      = staticState.topLevelPart.functionLibrary
   val staticOps         : StaticStateGlobalOps = new StaticStateGlobalOps(staticState.topLevelPart)
   val xpathDependencies : XPathDependencies    =

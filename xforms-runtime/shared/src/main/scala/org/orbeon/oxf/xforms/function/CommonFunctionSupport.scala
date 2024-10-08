@@ -74,7 +74,7 @@ trait CommonFunctionSupport {
   }
 
   def context: Context =
-    XPath.functionContext map (_.asInstanceOf[Context]) orNull
+    XPath.functionContext.map(_.asInstanceOf[Context]).orNull
 
   // This ADT or something like it should be defined somewhere else
   sealed trait QNameType
@@ -175,7 +175,7 @@ trait CommonFunctionSupport {
     elementAnalysisForSource flatMap (XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, _))
 
   def getContainingDocument(implicit xpc: XPathContext): XFormsContainingDocument =
-    Option(context) map (_.container.containingDocument) orNull
+    Option(context).map(_.container.containingDocument).orNull
 
   def getQNameFromItem(
     evaluatedExpression: om.Item)(implicit

@@ -13,13 +13,16 @@
  */
 package org.orbeon.saxon
 
-import org.orbeon.oxf.xml.OrbeonFunctionLibrary
+import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.xml.{DefaultFunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction}
 import org.orbeon.saxon
 import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type.*
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, Type}
 import org.orbeon.saxon.expr.StaticProperty.*
+import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.*
+import org.orbeon.saxon.om.SequenceIterator
 
 // TODO: Separate pure functions from this
 trait IndependentFunctions extends OrbeonFunctionLibrary {

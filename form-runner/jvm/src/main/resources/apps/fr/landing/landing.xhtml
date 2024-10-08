@@ -100,7 +100,8 @@
                     <xf:insert
                         ref="instance('fr-landing-form-metadata-instance')"
                         origin="
-                            xf:element('forms',
+                            xf:element(
+                                'forms',
                                 xxf:sort(
                                     event('response-body')/*/form,
                                     xs:dateTime(last-modified-time),
@@ -137,7 +138,8 @@
                     <xf:insert
                         ref="instance('fr-landing-demo-forms-instance')"
                         origin="
-                            xf:element('forms',
+                            xf:element(
+                                'forms',
                                 xxf:sort(
                                     event('response-body')/*/form,
                                     title[1],

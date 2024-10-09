@@ -47,11 +47,6 @@
         <Logger name="net.sf.ehcache.distribution"                           level="debug"/>
         -->
 
-        <!-- Prevent extra display of eXist paging activity -->
-        <Logger name="org.exist.storage.btree.Paged" level="warn"/>
-        <Logger name="org.exist.storage.DBBroker"    level="warn"/>
-        <Logger name="org.exist.storage.BrokerPool"  level="warn"/>
-
         <Root level="info">
             <AppenderRef ref="SingleFileAppender"/>
         </Root>

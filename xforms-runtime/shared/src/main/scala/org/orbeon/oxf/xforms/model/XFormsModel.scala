@@ -222,6 +222,12 @@ class XFormsModel(
 
     deferredActionContext.markStructuralChange(NoDefaultsStrategy, None)
 
+    // So that variables are up-to-date in the handler for `xxforms-instances-ready
+    // https://github.com/orbeon/orbeon-forms/issues/6544`
+    EventCollector.withBufferCollector { collector =>
+      resetAndEvaluateVariables(collector)
+    }
+
     // Custom event after instances are ready
     Dispatch.dispatchEvent(new XXFormsInstancesReadyEvent(selfModel), EventCollector.ToReview)
 

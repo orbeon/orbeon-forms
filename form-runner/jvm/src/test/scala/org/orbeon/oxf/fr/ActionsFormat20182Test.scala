@@ -34,7 +34,7 @@ class ActionsFormat20182Test
     describe("Binary HTTP service within `fr:data-iterate` conditionally sets attachment") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("tests", "actions-format-20182", "new", document = "", initialize = true)
+        runFormRunner("issue", "4067", "new", document = "", initialize = true)
 
       val doc = docOpt.get
 
@@ -62,7 +62,7 @@ class ActionsFormat20182Test
     describe("HTTP service error within `fr:data-iterate`") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("tests", "actions-format-20182-error", "new", document = "", initialize = true)
+        runFormRunner("issue", "4075", "new", document = "", initialize = true)
 
       val doc = docOpt.get
 
@@ -78,7 +78,7 @@ class ActionsFormat20182Test
     describe("#4116: explicit iteration context with `fr:data-iterate`") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("tests", "actions-format-20182-context", "new", document = "", initialize = true)
+        runFormRunner("issue", "4116", "new", document = "", initialize = true)
 
       val doc = docOpt.get
 
@@ -95,7 +95,7 @@ class ActionsFormat20182Test
     describe("#4204: nested `fr:data-iterate`") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("tests", "actions-format-20182-data-iterate", "new", document = "", initialize = true)
+        runFormRunner("issue", "4204", "new", document = "", initialize = true)
 
       val doc = docOpt.get
 
@@ -125,7 +125,7 @@ class ActionsFormat20182Test
     describe("#5484: `fr:copy-content`") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("tests", "actions-format-20182-copy-content", "new", initialize = true)
+        runFormRunner("issue", "5484", "new", initialize = true)
 
       val doc = docOpt.get
 

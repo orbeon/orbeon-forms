@@ -39,6 +39,7 @@ class SimpleDataMigrationTest
   def runFormRunnerAndAssertData(
     incomingData         : (NodeInfo, DataFormatVersion),
     expectedDataOpt      : Option[NodeInfo],
+    appName              : String,
     formName             : String,
     dataMigrationBehavior: DataMigrationBehavior
   ): Unit = {
@@ -51,7 +52,7 @@ class SimpleDataMigrationTest
 
     val (processorService, docOpt, _) =
       runFormRunner(
-        app        = "tests",
+        app        = appName,
         form       = formName,
         mode       = "new",
         document   = "",
@@ -345,16 +346,17 @@ class SimpleDataMigrationTest
       </form>
 
     val Expected = List(
-      ("migration of elements in main form and section templates with holes", "data-migration",          IncomingFormData          -> DataFormatVersion.V480, DataMigrationBehavior.HolesOnly, ExpectedFormData.some),
-      ("migration disallowed when extra elements are present"               , "data-migration",          IncomingFormDataWithExtra -> DataFormatVersion.V480, DataMigrationBehavior.HolesOnly, None), // https://github.com/orbeon/orbeon-forms/issues/5217
-      ("migration with moves including in repeats"                          , "data-migration-improved", IncomingFormDataWithMoves -> DataFormatVersion.V400, DataMigrationBehavior.Enabled,   ExpectedFormDataWithMoves.some),
+      ("migration of elements in main form and section templates with holes", "tests", "data-migration", IncomingFormData          -> DataFormatVersion.V480, DataMigrationBehavior.HolesOnly, ExpectedFormData.some),
+      ("migration disallowed when extra elements are present"               , "tests", "data-migration", IncomingFormDataWithExtra -> DataFormatVersion.V480, DataMigrationBehavior.HolesOnly, None), // https://github.com/orbeon/orbeon-forms/issues/5217
+      ("migration with moves including in repeats"                          , "issue", "5415v1",         IncomingFormDataWithMoves -> DataFormatVersion.V400, DataMigrationBehavior.Enabled,   ExpectedFormDataWithMoves.some),
     )
 
-    for ((desc, formName, incomingData, migrationBehavior, expectedDataOpt) <- Expected)
+    for ((desc, appName, formName, incomingData, migrationBehavior, expectedDataOpt) <- Expected)
       it(desc) {
         runFormRunnerAndAssertData(
           incomingData,
           expectedDataOpt,
+          appName,
           formName,
           migrationBehavior
         )

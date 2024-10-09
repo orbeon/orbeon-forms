@@ -642,7 +642,7 @@
 
     <test description="For #5484: `fr:copy-content` action" name="oxf:unsafe-xslt">
         <input name="config" href="test-actions.xsl"/>
-        <input name="data" href="/forms/tests/actions-format-20182-copy-content/form/form.xhtml"/>
+        <input name="data" href="/forms/issue/5484/form/form.xhtml"/>
         <output name="data">
             <xf:model id="fr-form-model" xxf:expose-xpath-types="true"
                       xxf:analysis.calculate="true">

@@ -17,7 +17,7 @@ class LegacyActionsTest
     describe("#6544: Legacy action causes error with $fr-mode variable") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("tests", "actions-format-legacy", "new", initialize = true)
+        runFormRunner("issue", "6544", "new", initialize = true)
 
       // Before fix for #6544, this throws as the document initialization fails
       val doc = docOpt.get

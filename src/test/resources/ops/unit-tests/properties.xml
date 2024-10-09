@@ -57,6 +57,7 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider2.city-name"                 value="São Paulo"/>
     <property as="xs:integer" name="oxf.fr.persistence.provider2.population"                value="11244369"/>
 
+    <property as="xs:string"   name="oxf.fr.persistence.provider.issue.*.form"              value="resource"/>
     <property as="xs:string"   name="oxf.fr.persistence.provider.tests.*.form"              value="resource"/>
 
     <property as="xs:boolean" name="oxf.fr.persistence.form-definition-cache.enable"        value="false"/>             <!-- So tests can avoid stepping on each other -->

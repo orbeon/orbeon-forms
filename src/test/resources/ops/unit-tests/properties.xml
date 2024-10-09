@@ -77,4 +77,16 @@
         'form.xml'
     </property>
 
+    <property as="xs:string"  name="oxf.fr.detail.buttons.issue.6542">
+        summary save-final review
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.button.save-final.visible.issue.6542">
+        $my-field = ('show-enabled', 'show-disabled')
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.button.save-final.enabled.issue.6542">
+        $my-field = 'show-enabled'
+    </property>
+
 </properties>

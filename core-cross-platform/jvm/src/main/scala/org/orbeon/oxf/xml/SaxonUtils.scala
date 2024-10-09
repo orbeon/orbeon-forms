@@ -69,14 +69,24 @@ object SaxonUtils {
       (e.iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] flatMap iterateExpressionTree)
 
   def iterateExternalVariableReferences(expr: Expression): Iterator[String] =
-    SaxonUtils.iterateExpressionTree(expr) collect {
+    iterateExpressionTree(expr) collect {
       case vr: VariableReference if ! vr.isInstanceOf[LocalVariableReference] =>
         vr.getBinding.getVariableQName.getLocalName
     }
 
   def iterateFunctions(expr: Expression, fnName: StructuredQName): Iterator[FunctionCall] =
-    SaxonUtils.iterateExpressionTree(expr) collect {
+    iterateExpressionTree(expr) collect {
       case fn: FunctionCall if fn.getFunctionName == fnName => fn
+    }
+
+  def containsFnWithParam(expr: Expression, fnName: StructuredQName, arity: Int, oldName: String, argPos: Int): Boolean =
+    SaxonUtils.iterateFunctions(expr, fnName) exists {
+      case fn if fn.getArguments.size == arity =>
+        fn.getArguments.apply(argPos) match {
+          case s: StringLiteral if s.getStringValue == oldName => true
+          case _                                               => false
+        }
+      case _ => false
     }
 
   // Parse the given qualified name and return the separated prefix and local name

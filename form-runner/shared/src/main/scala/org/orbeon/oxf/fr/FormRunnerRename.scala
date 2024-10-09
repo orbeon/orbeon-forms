@@ -3,11 +3,11 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.XMLNames.{FR, FRPrefix}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{IndentedLogger, XPath}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.DependencyAnalyzer
 import org.orbeon.oxf.xml.{SaxonUtils, ShareableXPathStaticContext}
-import org.orbeon.saxon.expr.{Expression, StringLiteral}
+import org.orbeon.saxon.expr.Expression
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.{NodeInfo, StructuredQName}
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
@@ -56,7 +56,8 @@ object FormRunnerRename {
     functionLibrary  : FunctionLibrary,
     avt              : Boolean,
     oldName          : String,
-    newName          : String)(implicit
+    newName          : String
+  )(implicit
     logger          : IndentedLogger
   ): Option[String] = {
 
@@ -88,10 +89,10 @@ object FormRunnerRename {
         xpathStringMaybeWithVarReplacement.contains(s"""'$oldName'""") ||
         xpathStringMaybeWithVarReplacement.contains(s""""$oldName""")
       ) && (
-        containsFnWithParam(expr, FRControlStringValueName, 2, oldName, 0) ||
-        containsFnWithParam(expr, FRControlTypedValueName,  2, oldName, 0) ||
-        containsFnWithParam(expr, FRControlStringValueName, 3, oldName, 2) ||
-        containsFnWithParam(expr, FRControlTypedValueName,  3, oldName, 2)
+        SaxonUtils.containsFnWithParam(expr, FRControlStringValueName, 2, oldName, 0) ||
+        SaxonUtils.containsFnWithParam(expr, FRControlTypedValueName,  2, oldName, 0) ||
+        SaxonUtils.containsFnWithParam(expr, FRControlStringValueName, 3, oldName, 2) ||
+        SaxonUtils.containsFnWithParam(expr, FRControlTypedValueName,  3, oldName, 2)
       ) option {
         replaceQuotedStringUseRegex(
           xpathStringMaybeWithVarReplacement,
@@ -107,7 +108,8 @@ object FormRunnerRename {
   def findUnresolvedVariableReferences(
     elemOrAtt     : NodeInfo,
     avt           : Boolean,
-    validBindNames: => String => Boolean)(implicit // by-name so we can avoid costly computation if not needed
+    validBindNames: => String => Boolean // by-name so we can avoid costly computation if not needed
+  )(implicit
     logger        : IndentedLogger
   ): Iterator[String] =
     elemOrAtt.stringValue.trimAllToOpt match {
@@ -129,18 +131,61 @@ object FormRunnerRename {
         Iterator.empty
     }
 
+  // Return `None` if the property doesn't exist or is blank
+  def replaceVarReferencesWithFunctionCallsFromPropertyImpl(
+    propertyName   : String,
+    avt            : Boolean,
+    libraryName    : Option[String],
+    norewrite      : Set[String],
+    functionLibrary: FunctionLibrary
+    )(implicit
+      logger     : IndentedLogger
+  ): Option[String] =
+    for {
+      property <- CoreCrossPlatformSupport.properties.getPropertyOpt(propertyName)
+      value    <- property.nonBlankStringValue
+    } yield
+      property.associatedValue { _ =>
+        replaceVarReferencesWithFunctionCalls(
+          xpathString      = value,
+          namespaceMapping = property.namespaceMapping,
+          library          = functionLibrary,
+          avt              = avt,
+          libraryNameOpt   = libraryName,
+          norewrite        = norewrite
+        )
+      }
+
+    private val DefaultNorewriteSet : Set[String] = Set("fr-lang", "fr-mode")
+
+    def replaceVarReferencesWithFunctionCalls(
+      xpathString     : String,
+      namespaceMapping: NamespaceMapping,
+      library         : FunctionLibrary,
+      avt             : Boolean,
+      libraryNameOpt  : Option[String],
+      norewrite       : Set[String]
+    )(implicit
+      logger          : IndentedLogger
+    ): String = {
+      val combinedNorewrite : Set[String]       = DefaultNorewriteSet ++ norewrite
+      val nameMapping       : String => String  = name =>
+        if (combinedNorewrite.contains(name))
+          s"$$$name"
+        else
+          s"frf:controlVariableValue('$name', ${libraryNameOpt.flatMap(_.trimAllToOpt).map("'" + _ + "'").getOrElse("()")})"
+
+      replaceVarReferencesWithFunctionCallsFromString(
+        xpathString,
+        namespaceMapping,
+        library,
+        avt,
+        nameMapping
+      )
+    }
+
   private val FRControlStringValueName = new StructuredQName(FRPrefix, FR, "control-string-value")
   private val FRControlTypedValueName  = new StructuredQName(FRPrefix, FR, "control-typed-value")
-
-  private def containsFnWithParam(expr: Expression, fnName: StructuredQName, arity: Int, oldName: String, argPos: Int): Boolean =
-    SaxonUtils.iterateFunctions(expr, fnName) exists {
-      case fn if fn.getArguments.size == arity =>
-        fn.getArguments()(argPos) match {
-          case s: StringLiteral if s.getStringValue == oldName => true
-          case _                                               => false
-        }
-      case _ => false
-    }
 
   // What follows is a heuristic, as we don't have exact positions provided by the XPath parser. So we try to avoid
   // matching subsequences by saying that the name must not be followed by a character that can be part of an NCName.
@@ -166,7 +211,8 @@ object FormRunnerRename {
     xpathString     : String,
     namespaceMapping: NamespaceMapping,
     functionLibrary : FunctionLibrary,
-    avt             : Boolean)(implicit
+    avt             : Boolean
+  )(implicit
     logger          : IndentedLogger
   ): Expression =
     XPath.compileExpressionMinimal(

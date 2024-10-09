@@ -61,7 +61,7 @@
                                 'oxf.fr.import.buttons'
                             else
                                 'oxf.fr.detail.buttons',
-                        $visibility-property :=
+                        $visibility-property-prefix :=
                             if (exists($visibility-property-opt)) then
                                 $visibility-property-opt
                             else
@@ -74,7 +74,7 @@
                                     ('wizard-toc', 'wizard-prev', 'wizard-next')[fr:is-wizard-body-shown()],
                                     'clear',
                                     'validate',
-                                    'save'[fr:is-browser-environment()]
+                                    'save-final'[fr:is-browser-environment()]
                                 )
                             else
                                 xxf:split(xxf:property(string-join(($buttons-property, fr:app-name(), fr:form-name()), '.'))),
@@ -88,30 +88,26 @@
                                 $parts-and-refs :=
                                     for $part in $parts
                                     return
-                                        let $visible-expression :=
-                                                xxf:property(
-                                                    string-join(
-                                                        ($visibility-property, $part, 'visible', fr:app-name(), fr:form-name()),
-                                                        '.'
+                                        let $visible-opt :=
+                                                xs:boolean(
+                                                    xxf:instance('fr-form-instance')/fr:evaluate-from-property(
+                                                        string-join(
+                                                            ($visibility-property-prefix, $part, 'visible', fr:app-name(), fr:form-name()),
+                                                            '.'
+                                                        ),
+                                                        'fr-form-instance'
                                                     )
                                                 ),
-                                            $enabled-expression :=
-                                                xxf:property(
-                                                    string-join(
-                                                        ($visibility-property, $part, 'enabled', fr:app-name(), fr:form-name()),
-                                                        '.'
-                                                    )
-                                                ),
-                                            $visible-opt :=
-                                                if (xxf:non-blank($visible-expression)) then
-                                                    boolean(xxf:instance('fr-form-instance')/xxf:evaluate-in-context($visible-expression, 'fr-form-instance'))
-                                                else
-                                                    (),
                                             $enabled-opt :=
-                                                if (xxf:non-blank($enabled-expression)) then
-                                                    boolean(xxf:instance('fr-form-instance')/xxf:evaluate-in-context($enabled-expression, 'fr-form-instance'))
-                                                else
-                                                    ()
+                                                xs:boolean(
+                                                    xxf:instance('fr-form-instance')/fr:evaluate-from-property(
+                                                        string-join(
+                                                            ($visibility-property-prefix, $part, 'enabled', fr:app-name(), fr:form-name()),
+                                                            '.'
+                                                        ),
+                                                        'fr-form-instance'
+                                                    )
+                                                )
                                         return
                                             for $ref in
                                                 if (exists($visible-opt) or exists($enabled-opt)) then

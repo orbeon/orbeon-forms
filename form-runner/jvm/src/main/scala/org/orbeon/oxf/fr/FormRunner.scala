@@ -10,6 +10,6 @@ object FormRunner
      with FormRunnerHome
      with FormRunnerPublish
      with FormRunnerEncodeDecode
-     with FormRunnerComponents
+     with FormRunnerComponentsCompileTime
      with FormRunnerRevisionHistory
      with FormRunnerPlatformJVM

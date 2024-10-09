@@ -20,11 +20,13 @@ import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
+import org.orbeon.oxf.xml.{DefaultFunctionSupport, FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
+import org.orbeon.saxon
 import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.`type`.Type.ITEM_TYPE
@@ -43,10 +45,9 @@ import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 
 
-
 object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
-  import FormRunnerFunctions._
+  import FormRunnerFunctions.*
 
   Namespace(List(XMLNames.FR)) {
 
@@ -146,6 +147,11 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     )
 
     Fun("is-embedded", classOf[FRIsEmbedded], op = 0, min = 0, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("evaluate-from-property", classOf[FREvaluateFromProperty], op = saxon.functions.Evaluate.EVALUATE, min = 2, max = 2, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
   }
@@ -430,5 +436,28 @@ private object FormRunnerFunctions {
   class FRIsEmbedded extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(context: XPathContext): BooleanValue =
       FormRunner.isEmbedded(stringArgumentOpt(0)(context))
+  }
+
+  class FREvaluateFromProperty extends DefaultFunctionSupport with RuntimeDependentFunction {
+    override def iterate(xpathContext: XPathContext): SequenceIterator = {
+
+      implicit val xpc   : XPathContext           = xpathContext
+      implicit val xfc   : XFormsFunction.Context = XFormsFunction.context
+      implicit val logger: IndentedLogger         = FormRunner.newIndentedLogger
+
+      FormRunnerRename.replaceVarReferencesWithFunctionCallsFromPropertyImpl(
+        propertyName    = stringArgument(0),
+        avt             = false,
+        libraryName     = None,
+        norewrite       = Set.empty,
+        functionLibrary = FormRunner.componentsFunctionLibrary
+      )
+      .map { rewrittenXPathString =>
+        EvaluateSupport.evaluateInContext(
+          rewrittenXPathString,
+          stringArgument(1)
+        )
+      }
+    }
   }
 }

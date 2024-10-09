@@ -1,7 +1,7 @@
 package org.orbeon.oxf.fr
 
+import org.log4s.Logger
 import org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{FileUtils, IndentedLogger, LoggerFactory}
@@ -13,8 +13,9 @@ import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xml.NamespaceMapping
 
 
-trait FormRunnerComponents {
+trait FormRunnerComponentsCompileTime {
 
+  // Called from XSLT only
   // In an XPath expression, replace non-local variable references.
   //@XPathFunction
   def replaceVarReferencesWithFunctionCallsFromString(
@@ -24,15 +25,16 @@ trait FormRunnerComponents {
     libraryName : String,
     norewrite   : Array[String]
   ): String =
-    Private.replaceVarReferencesWithFunctionCalls(
+    FormRunnerRename.replaceVarReferencesWithFunctionCalls(
       xpathString      = xpathString,
-      namespaceMapping = Private.namespaceMappingForNode(elemOrAtt),
-      library          = Private.componentsFunctionLibrary,
+      namespaceMapping = namespaceMappingForNode(elemOrAtt),
+      library          = componentsFunctionLibrary,
       avt              = avt,
-      libraryName      = libraryName,
-      norewrite        = norewrite
-    )
+      libraryNameOpt   = libraryName.trimAllToOpt,
+      norewrite        = norewrite.toSet
+    )(newIndentedLogger)
 
+  // Called from XSLT only
   //@XPathFunction
   def replaceVarReferencesWithFunctionCallsFromProperty(
     propertyName : String,
@@ -40,19 +42,15 @@ trait FormRunnerComponents {
     libraryName  : String,
     norewrite    : Array[String]
   ): String =
-    Properties.instance.getPropertySet.getPropertyOpt(propertyName) match {
-      case Some(property) =>
-        Private.replaceVarReferencesWithFunctionCalls(
-          xpathString      = property.stringValue,
-          namespaceMapping = property.namespaceMapping,
-          library          = Private.componentsFunctionLibrary,
-          avt              = avt,
-          libraryName      = libraryName,
-          norewrite        = norewrite
-        )
-      case None => ""
-    }
+  FormRunnerRename.replaceVarReferencesWithFunctionCallsFromPropertyImpl(
+    propertyName    = propertyName,
+    avt             = avt,
+    libraryName     = libraryName.trimAllToOpt,
+    norewrite       = norewrite.toSet,
+    functionLibrary = componentsFunctionLibrary
+  )(newIndentedLogger).getOrElse("") // xxx should be null, so result is empty sequence, right?
 
+  // Called from XSLT only
   //@XPathFunction
   def knownConstraintsToAutomaticHint(
     attributesWithXPath : Array[NodeInfo]
@@ -61,9 +59,9 @@ trait FormRunnerComponents {
     val constraints = attributesWithXPath.toList.flatMap (attributeWithXPath =>
       FormRunnerCommonConstraint.analyzeKnownConstraint(
         attributeWithXPath.getStringValue,
-        Private.namespaceMappingForNode(attributeWithXPath),
-        Private.componentsFunctionLibrary
-      )(Private.newIndentedLogger)
+        namespaceMappingForNode(attributeWithXPath),
+        componentsFunctionLibrary
+      )(newIndentedLogger)
     )
 
     def hintResourceXPath(key: String): String =
@@ -120,46 +118,16 @@ trait FormRunnerComponents {
     }
   }
 
-  private object Private {
+  def componentsFunctionLibrary: FunctionLibrary =
+    new FunctionLibraryList                         |!>
+      (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>
+      (_.addFunctionLibrary(FormRunnerFunctionLibrary))
 
-    val Logger = LoggerFactory.createLogger(FormRunner.getClass)
-    val DefaultNorewriteSet = Set("fr-lang", "fr-mode")
+  def newIndentedLogger: IndentedLogger =
+    new IndentedLogger(FormRunnerLogger)
 
-    // Worker method to avoid code duplication
-    def replaceVarReferencesWithFunctionCalls(
-      xpathString      : String,
-      namespaceMapping : NamespaceMapping,
-      library          : FunctionLibrary,
-      avt              : Boolean,
-      libraryName      : String,
-      norewrite        : Array[String]
-    ): String = {
-      // Construct the nameMapping function internally
-      val combinedNorewrite = DefaultNorewriteSet ++ norewrite.toSet
-      val nameMapping: String => String = name =>
-        if (combinedNorewrite.contains(name))
-          s"$$$name"
-        else
-          s"frf:controlVariableValue('$name', ${libraryName.trimAllToOpt.map("'" + _ + "'").getOrElse("()")})"
+  private val FormRunnerLogger: Logger = LoggerFactory.createLogger(FormRunner.getClass)
 
-      FormRunnerRename.replaceVarReferencesWithFunctionCallsFromString(
-        xpathString,
-        namespaceMapping,
-        library,
-        avt,
-        nameMapping
-      )(newIndentedLogger)
-    }
-
-    def newIndentedLogger: IndentedLogger =
-      new IndentedLogger(Logger)
-
-    def namespaceMappingForNode(elemOrAtt: NodeInfo): NamespaceMapping =
-      NamespaceMapping(elemOrAtt.namespaceMappings.toMap)
-
-    def componentsFunctionLibrary: FunctionLibrary =
-        new FunctionLibraryList                         |!>
-          (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>
-          (_.addFunctionLibrary(FormRunnerFunctionLibrary))
-  }
+  private def namespaceMappingForNode(elemOrAtt: NodeInfo): NamespaceMapping =
+    NamespaceMapping(elemOrAtt.namespaceMappings.toMap)
 }

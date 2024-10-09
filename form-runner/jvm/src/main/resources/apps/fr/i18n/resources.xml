@@ -11747,6 +11747,7 @@
                 <title>Form Runner 登錄</title>
                 <username>用戶名</username>
                 <password>密碼</password>
+                <login>登入</login>
             </login>
             <logout-done>
                 <title>Form Runner 登出</title>

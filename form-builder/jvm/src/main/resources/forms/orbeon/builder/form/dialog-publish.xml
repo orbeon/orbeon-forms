@@ -57,7 +57,7 @@
     <xf:switch>
         <!-- Initial case -->
         <xf:case id="fb-publish-dialog-message-start">
-            <xh:div>
+            <xh:div class="fb-publish-dialog-body">
                 <xh:table class="table table-bordered">
                     <xh:tr>
                         <xh:th>
@@ -206,7 +206,7 @@
         </xf:case>
         <!-- Success case -->
         <xf:case id="fb-publish-dialog-success">
-            <xh:div>
+            <xh:div class="fb-publish-dialog-body">
                 <xf:output
                     class="alert alert-success"
                     value="
@@ -254,7 +254,7 @@
         </xf:case>
         <!-- Error case -->
         <xf:case id="fb-publish-dialog-error">
-            <xh:div>
+            <xh:div class="fb-publish-dialog-body">
                 <xh:p>
                     <xf:output value="$form-resources/dialog-publish/publish-error"/>
                 </xh:p>

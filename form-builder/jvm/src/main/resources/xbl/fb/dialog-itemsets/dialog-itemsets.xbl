@@ -150,7 +150,7 @@
                         <xf:label ref="$resources/messages/lhha-checkbox"/>
                     </fr:checkbox-input>
 
-                    <xf:group ref="$i/items">
+                    <xf:group ref="$i/items" appearance="xxf:internal">
 <!--                        <xf:var name="control-element" value="fbf:findControlByNameOrEmpty($i/control-name)"/>-->
                         <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
                              decide to remove support for legacy mode. -->

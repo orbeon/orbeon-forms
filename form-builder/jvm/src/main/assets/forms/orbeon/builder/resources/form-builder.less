@@ -697,6 +697,10 @@ body.orbeon {
         width: 1010px; // larger so that tab titles in French, in particular, fit
         max-width: none;
 
+        .fb-settings-mode-edit {
+            min-height: 0;
+        }
+
         .fb-settings-mode-new, .fb-settings-mode-app-form {
             .nav-tabs {
                 display: none;
@@ -767,11 +771,6 @@ body.orbeon {
 
             // Make popover a bit narrower so it fits in the dialog
             max-width: 350px;
-        }
-
-        .tab-content {
-            // Override Boostrap default so the help tooltips are not clipped
-            overflow: visible;
         }
 
         div[class ^= "fb-settings-mode-"] {
@@ -1188,6 +1187,27 @@ body.orbeon {
         }
     }
 
+    // For main area of the dialog to be scrollable
+    .fb-dialog-control-settings, .fb-dialog-form-settings {
+        .xbl-fr-tabbable {
+            min-height: 0;
+            display: flex;
+            & > div {
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+            }
+        }
+    }
+
+    .fb-dialog-itemsets {
+        .fb-dialog-body {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+    }
+
     .fb-dialog-control-settings {
 
         width: 1000px;
@@ -1389,6 +1409,15 @@ body.orbeon {
     // Publish dialog
     .fb-publish-dialog {
         width: 500px;
+
+        .xforms-switch {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .fb-publish-dialog-body {
+            overflow: auto;
+        }
 
         .table {
             background-color: white;

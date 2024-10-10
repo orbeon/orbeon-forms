@@ -1365,7 +1365,7 @@
                     </xf:group>
 
                     <xf:group xxf:update="full" class="fr-search-results">
-                        <xh:table class="fr-forms-table table table-bordered table-condensed table-hover">
+                        <xh:table class="{'fr-forms-table', 'table', 'table-bordered', 'table-condensed', 'table-hover'[not(empty($forms))]}">
                             <xh:thead>
 								<xf:group ref=".[$show-remote]">
 									<xh:tr class="header-groups">
@@ -1379,7 +1379,7 @@
 								</xf:group>
 								<xh:tr>
                                     <xf:group ref=".[$show-permissions]">
-                                        <xh:th/>
+                                        <xh:th class="fr-home-select"/>
                                         <fr:sortable-th
                                             class="fr-status"
                                             label="$fr-resources/home/titles/status"

@@ -22,6 +22,7 @@
     <xbl:binding
         id="fr-sortable-th"
         element="fr|sortable-th"
+        xxbl:container="th"
         xxbl:mode="">
 
         <xbl:template>
@@ -44,22 +45,20 @@
                     else                                       '&#x25BC;'
                 "/>
 
-            <xh:th class="{'fr-sortable-th'[$sort-supported], fr:component-param-value('class')[xxf:non-blank()]}">
-                <xf:trigger appearance="minimal">
-                    <xf:label>
-                        <xf:output value="string(xf:parse(concat('&lt;span>', $label, '&lt;/span>')))"/>
-                        <xh:span class="{'caret-container', 'no-caret'[$no-caret]}">
-                            <xf:output value="$caret-value"/>
-                        </xh:span>
-                    </xf:label>
-                    <xf:action event="DOMActivate" if="$sort-supported">
-                        <xf:dispatch name="fr-order-by" targetid="fr-form-model" xxbl:scope="outer">
-                            <xf:property name="local-or-remote" value="$local-or-remote" xxbl:scope="inner"/>
-                            <xf:property name="column"          value="$column"          xxbl:scope="inner"/>
-                        </xf:dispatch>
-                    </xf:action>
-                </xf:trigger>
-            </xh:th>
+            <xf:trigger appearance="minimal" class="{'fr-sortable-th'[$sort-supported]}">
+                <xf:label>
+                    <xf:output value="string(xf:parse(concat('&lt;span>', $label, '&lt;/span>')))"/>
+                    <xh:span class="{'caret-container', 'no-caret'[$no-caret]}">
+                        <xf:output value="$caret-value"/>
+                    </xh:span>
+                </xf:label>
+                <xf:action event="DOMActivate" if="$sort-supported">
+                    <xf:dispatch name="fr-order-by" targetid="fr-form-model" xxbl:scope="outer">
+                        <xf:property name="local-or-remote" value="$local-or-remote" xxbl:scope="inner"/>
+                        <xf:property name="column"          value="$column"          xxbl:scope="inner"/>
+                    </xf:dispatch>
+                </xf:action>
+            </xf:trigger>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

@@ -361,6 +361,13 @@
             <xf:bind ref="instance('fr-metadata')/form/remote-server/created"            type="xs:dateTime"/>
             <xf:bind ref="instance('fr-metadata')/form/remote-server/last-modified-time" type="xs:dateTime"/>
 
+            <!-- This will be used by the export/purge dialog as long as we don't have an API to retrieve distinct
+                 values for application names, form names, and versions -->
+            <xf:instance id="fr-all-metadata-request" xxf:exclude-result-prefixes="#all">
+                <search all-forms="false" ignore-admin-permissions="false"/>
+            </xf:instance>
+            <xf:instance id="fr-all-metadata" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
+
             <xf:action event="fr-order-by">
                 <xf:var name="local-or-remote" value="event('local-or-remote')"/>
                 <xf:var name="column"          value="event('column')"/>
@@ -523,6 +530,16 @@
 
                 <xf:setvalue event="xforms-submit-done" ref="instance()/initializing">false</xf:setvalue>
             </xf:submission>
+
+            <xf:submission
+                id="read-all-metadata"
+                resource="/fr/service/persistence/form"
+                method="post"
+                ref="instance('fr-all-metadata-request')"
+                serialization="application/xml"
+                mediatype="application/xml"
+                replace="instance"
+                targetref="instance('fr-all-metadata')"/>
 
             <xf:action event="process-results">
 

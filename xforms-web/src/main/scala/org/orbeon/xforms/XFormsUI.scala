@@ -1560,15 +1560,21 @@ object XFormsUI {
       )
     }
 
-    // Prevent Esc from closing the dialog if the `xxf:dialog` has `close="false"`
     private val dialogKeydownListener: js.Function1[dom.KeyboardEvent, Unit] = (event: dom.KeyboardEvent) => {
       val targetElem    = event.target.asInstanceOf[html.Element]
       val dialogElem    = targetElem.closest("dialog").get
+
+      // Prevent Esc from closing the dialog if the `xxf:dialog` has `close="false"`
       val supportsClose = dialogElem.classList.contains("xforms-dialog-close-true")
       if (event.key == "Escape" && ! supportsClose) {
         event.preventDefault()
         event.stopPropagation()
       }
+
+      // Cmd-Enter or Ctrl-Enter is equivalent to clicking the primary button
+      if (event.key == "Enter" && (event.metaKey || event.ctrlKey))
+        for (primaryButton <- Option(dialogElem.querySelector("button.btn-primary").asInstanceOf[html.Button]))
+          primaryButton.click()
     }
   }
 }

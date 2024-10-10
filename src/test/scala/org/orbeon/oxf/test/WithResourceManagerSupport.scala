@@ -17,8 +17,9 @@ import org.log4s.Logger
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.XMLProcessorRegistry
 import org.orbeon.oxf.processor.generator.DOMGenerator
+import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.util.{Log4jSupport, LoggerFactory, PipelineUtils}
+import org.orbeon.oxf.util.{Log4jSupport, PipelineUtils}
 import org.orbeon.oxf.xml.ParserConfiguration
 
 import scala.jdk.CollectionConverters.*
@@ -43,7 +44,7 @@ trait WithResourceManagerSupport {
 
     val propsIt =
       for {
-        name <- properties.propertyNames.asScala collect { case s: String => s}
+        name <- properties.propertyNames.asScala collect { case s: String => s }
         if name.startsWith("oxf.resources.")
       } yield
          name -> (properties.getProperty(name): AnyRef) // `AnyRef` because we pass a `WebAppContext` in one case
@@ -54,7 +55,7 @@ trait WithResourceManagerSupport {
     ResourceManagerWrapper.init(propsMap.asJava)
 
     // Initialize properties
-    org.orbeon.oxf.properties.Properties.init(propertiesUrl)
+    Properties.init(propertiesUrl)
 
     // Initialize logger
     Log4jSupport.initLogger()

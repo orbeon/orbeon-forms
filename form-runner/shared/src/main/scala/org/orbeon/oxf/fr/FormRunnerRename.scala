@@ -138,8 +138,8 @@ object FormRunnerRename {
     libraryName    : Option[String],
     norewrite      : Set[String],
     functionLibrary: FunctionLibrary
-    )(implicit
-      logger     : IndentedLogger
+  )(implicit
+    logger         : IndentedLogger
   ): Option[String] =
     for {
       property <- CoreCrossPlatformSupport.properties.getPropertyOpt(propertyName)

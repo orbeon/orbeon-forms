@@ -14,6 +14,7 @@
 package org.orbeon.oxf.controller
 
 import cats.syntax.option.*
+import org.log4s
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element, QName}
@@ -54,7 +55,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
 
   override def start(pc: PipelineContext): Unit = {
 
-    implicit val logger = new IndentedLogger(Logger)
+    implicit val logger: IndentedLogger = new IndentedLogger(Logger)
 
     // Get or compile page flow
     val pageFlow =
@@ -91,12 +92,12 @@ class PageFlowControllerProcessor extends ProcessorImpl {
       }
     }
 
-    def logError(t: Throwable) = {
+    def logError(t: Throwable): Unit = {
       error("error caught", logParams)
       error(OrbeonFormatter.format(t))
     }
 
-    def logNotFound(t: Option[Throwable]) = {
+    def logNotFound(t: Option[Throwable]): Unit = {
 
       def rootResource = t map getRootThrowable collect {
         case e: ResourceNotFoundException => e.resource
@@ -106,19 +107,19 @@ class PageFlowControllerProcessor extends ProcessorImpl {
       info("not found", logParams ++ (rootResource map ("resource" -> _)))
     }
 
-    def logHttpStatusCode(e: HttpStatusCodeException) = {
+    def logHttpStatusCode(e: HttpStatusCodeException): Unit = {
       val code = e.code.toString
       info(s"HTTP status code $code", logParams :+ ("status-code" -> code))
     }
 
-    def logMethodNotAllowed() =
+    def logMethodNotAllowed(): Unit =
       info("method not allowed", logParams)
 
     // For services: only log and set response code
-    def sendError(t: Throwable)                                             = { logError(t);           ec.getResponse.setStatus(StatusCode.InternalServerError) }
-    def sendHttpStatusCode(e: HttpStatusCodeException)                      = { logHttpStatusCode(e);  ec.getResponse.setStatus(e.code); }
-    def sendNotFound(t: Option[Throwable], code: Int = StatusCode.NotFound) = { logNotFound(t);        ec.getResponse.setStatus(code) }
-    def sendMethodNotAllowed()                                              = { logMethodNotAllowed(); ec.getResponse.setStatus(StatusCode.MethodNotAllowed) }
+    def sendError(t: Throwable)                                            : Unit = { logError(t);           ec.getResponse.setStatus(StatusCode.InternalServerError) }
+    def sendHttpStatusCode(e: HttpStatusCodeException)                     : Unit = { logHttpStatusCode(e);  ec.getResponse.setStatus(e.code); }
+    def sendNotFound(t: Option[Throwable], code: Int = StatusCode.NotFound): Unit = { logNotFound(t);        ec.getResponse.setStatus(code) }
+    def sendMethodNotAllowed()                                             : Unit = { logMethodNotAllowed(); ec.getResponse.setStatus(StatusCode.MethodNotAllowed) }
 
     // For pages: log and try to run routes
     def runErrorRoute(t: Throwable, log: Boolean = true): Unit = {
@@ -233,7 +234,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
     val urlBase              = Option(locationData) map (_.file) orNull
 
     // Gather properties
-    implicit val properties = getPropertySet
+    implicit val properties: PropertySet = getPropertySet
 
     def controllerProperty(name: String, default: Option[String] = None, allowEmpty: Boolean = false) =
       att(configRoot, name) orElse Option(properties.getStringOrURIAsString(name, default.orNull, allowEmpty))
@@ -322,11 +323,10 @@ class PageFlowControllerProcessor extends ProcessorImpl {
     val pageIdToSetValuesDocument =
       pagesElementsWithIds map (p => p.id.get -> getSetValuesDocument(p.element)) filter (_._2 ne null) toMap
 
-    val pathMatchers = (
+    val pathMatchers =
       routeElements
-      collect { case files: FileElement if files.versioned => files }
-      map     (f => PathMatcher(f.path, f.mimeType.orNull, f.versioned))
-    )
+        .collect { case files: FileElement if files.versioned => files }
+        .map     (f => PathMatcher(f.path, f.mimeType.orNull, f.versioned))
 
     // Compile the pipeline for the given page element
     def compile(page: PageOrServiceElement) = {
@@ -379,7 +379,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
     )
   }
 
-  def createPipelineAST(
+  private def createPipelineAST(
     element                   : Element,
     controllerValidity        : AnyRef,
     stepProcessorContext      : StepProcessorContext,
@@ -435,7 +435,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
 
 object PageFlowControllerProcessor {
 
-  val Logger = LoggerFactory.createLogger(classOf[PageFlowControllerProcessor])
+  val Logger: log4s.Logger = LoggerFactory.createLogger(classOf[PageFlowControllerProcessor])
 
   val ControllerInput = "controller"
   val ControllerNamespaceURI = "http://www.orbeon.com/oxf/controller"
@@ -623,7 +623,7 @@ object PageFlowControllerProcessor {
         unauthorized()
   }
 
-  def unauthorized() = throw HttpStatusCodeException(StatusCode.Forbidden)
+  def unauthorized(): Nothing = throw HttpStatusCodeException(StatusCode.Forbidden)
 
   case class PageFlow(
     routes            : Seq[Route],
@@ -634,17 +634,17 @@ object PageFlowControllerProcessor {
     file              : Option[String]
   )
 
-  def att(e: Element, name: String) = e.attributeValueOpt(name)
+  def att(e: Element, name: String): Option[String] = e.attributeValueOpt(name)
   def idAtt(e: Element) = att(e, "id")
 
   // `@path-info` for backward compatibility
-  def getPath(e: Element) = att(e, "path") orElse att(e, "path-info") ensuring (_.isDefined) get
+  def getPath(e: Element): String = att(e, "path") orElse att(e, "path-info") ensuring (_.isDefined) get
 
   // Support "regexp" and "oxf:perl5-matcher" for backward compatibility
   val RegexpQNames = Set(QName("regexp"), QName("perl5-matcher", OXF_PROCESSORS_NAMESPACE))
 
   // Compile and convert glob expression if needed
-  def compilePattern(e: Element, path: String, default: QName) =
+  def compilePattern(e: Element, path: String, default: QName): Pattern =
     RegexpMatcher.compilePattern(
       path,
       glob = ! RegexpQNames(e.resolveAttValueQName(MatcherProperty, unprefixedIsNoNamespace = true) getOrElse default)

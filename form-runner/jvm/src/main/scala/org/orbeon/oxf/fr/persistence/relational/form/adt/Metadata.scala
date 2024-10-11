@@ -17,7 +17,7 @@ import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.fr.FormDefinitionVersion
 import org.orbeon.oxf.fr.FormRunner.getDefaultLang
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
-import org.orbeon.oxf.fr.persistence.relational.form.adt.Select.*
+import org.orbeon.oxf.fr.persistence.relational.form.adt.LocalRemoteOrCombinator.*
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 
 import java.time.Instant
@@ -32,10 +32,14 @@ sealed trait Metadata[T] {
 
   def allowedMatchTypes: Set[MatchType]
 
-  def selectedValueOpt(form: Form, select: Select, languageOpt: => Option[String]): Option[T]
+  def valueOpt(
+    form                   : Form,
+    localRemoteOrCombinator: LocalRemoteOrCombinator,
+    languageOpt            : => Option[String]
+  ): Option[T]
 
-  protected def throwInvalidSelect(select: Select): Nothing =
-    throw new IllegalArgumentException(s"Invalid select type ${select.string} for metadata $string")
+  protected def throwInvalidUrlOrCombinator(localRemoteOrCombinator: LocalRemoteOrCombinator): Nothing =
+    throw new IllegalArgumentException(s"Invalid URL/combinator ${localRemoteOrCombinator.string} for metadata $string")
 }
 
 object Metadata {
@@ -45,12 +49,17 @@ object Metadata {
   trait MultiValueSupport[T] {
     this: Metadata[T] =>
 
-    def selectedValueOpt(form: Form, select: Select, languageOpt: => Option[String]): Option[T] = {
+    def valueOpt(
+      form                   : Form,
+      localRemoteOrCombinator: LocalRemoteOrCombinator,
+      languageOpt            : => Option[String]
+    ): Option[T] = {
+
       lazy val language = languageOpt.getOrElse(getDefaultLang(form.appForm.some))
 
       def allValues = (form.localMetadataOpt.toList ++ form.remoteMetadata.values).map(value(_, language))
 
-      select match {
+      localRemoteOrCombinator match {
         case Local       => form.localMetadataOpt.map(value(_, language))
         case Remote(url) => form.remoteMetadata.get(url).map(value(_, language))
         case Min         => min(allValues)
@@ -63,10 +72,10 @@ object Metadata {
     def value(formMetadata: FormMetadata, language: => String): T
 
     // Unsupported by default
-    def min(values: List[T]): Option[T] = throwInvalidSelect(Min)
-    def max(values: List[T]): Option[T] = throwInvalidSelect(Max)
-    def or (values: List[T]): Option[T] = throwInvalidSelect(Or)
-    def and(values: List[T]): Option[T] = throwInvalidSelect(And)
+    def min(values: List[T]): Option[T] = throwInvalidUrlOrCombinator(Min)
+    def max(values: List[T]): Option[T] = throwInvalidUrlOrCombinator(Max)
+    def or (values: List[T]): Option[T] = throwInvalidUrlOrCombinator(Or)
+    def and(values: List[T]): Option[T] = throwInvalidUrlOrCombinator(And)
   }
 
   trait BooleanMetadata extends Metadata[Boolean] with MultiValueSupport[Boolean] {
@@ -162,24 +171,36 @@ object Metadata {
     override val string    = "application-name"
     override val sqlColumn = "app"
 
-    override def selectedValueOpt(form: Form, select: Select, languageOpt: => Option[String]): Option[String] =
-      if (select == Local) form.appForm.app.some else throwInvalidSelect(select)
+    override def valueOpt(
+      form                   : Form,
+      localRemoteOrCombinator: LocalRemoteOrCombinator,
+      languageOpt            : => Option[String]
+    ): Option[String] =
+      if (localRemoteOrCombinator == Local) form.appForm.app.some else throwInvalidUrlOrCombinator(localRemoteOrCombinator)
   }
 
   case object FormName extends StringMetadata {
     override val string    = "form-name"
     override val sqlColumn = "form"
 
-    override def selectedValueOpt(form: Form, select: Select, languageOpt: => Option[String]): Option[String] =
-      if (select == Local) form.appForm.form.some else throwInvalidSelect(select)
+    override def valueOpt(
+      form                   : Form,
+      localRemoteOrCombinator: LocalRemoteOrCombinator,
+      languageOpt            : => Option[String]
+    ): Option[String] =
+      if (localRemoteOrCombinator == Local) form.appForm.form.some else throwInvalidUrlOrCombinator(localRemoteOrCombinator)
   }
 
   case object FormVersion extends FormDefinitionVersionMetadata {
     override val string    = "form-version"
     override val sqlColumn = "form_version"
 
-    override def selectedValueOpt(form: Form, select: Select, languageOpt: => Option[String]): Option[FormDefinitionVersion] =
-      if (select == Local) form.version.some else throwInvalidSelect(select)
+    override def valueOpt(
+      form                   : Form,
+      localRemoteOrCombinator: LocalRemoteOrCombinator,
+      languageOpt            : => Option[String]
+    ): Option[FormDefinitionVersion] =
+      if (localRemoteOrCombinator == Local) form.version.some else throwInvalidUrlOrCombinator(localRemoteOrCombinator)
   }
 
   case object Created extends InstantMetadata {

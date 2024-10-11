@@ -144,29 +144,19 @@ trait FormProxyLogic { this: PersistenceProxyProcessor.type =>
       )
     }
 
-    // 1) Filter forms (by queries)
-    val queriesToCheck = formRequest.queries.diff(latestFormVersionQueryOpt.toSeq)
+    // 1) Filter forms
+    val queriesToCheck = formRequest.filterQueries.diff(latestFormVersionQueryOpt.toSeq)
     val filteredForms  = formsWithLocalOperations.filter(form => queriesToCheck.forall(_.satisfies(form, formRequest)))
 
-    // 2) Sort forms (by queries)
-    val sortQuery    = formRequest.sortQueryOpt.getOrElse(Query.defaultSortQuery)
-    val formOrdering = Order.formOrdering(sortQuery, formRequest)
+    // 2) Sort forms
+    val formOrdering = Order.formOrdering(formRequest.sortQuery, formRequest)
     val sortedForms  = filteredForms.sorted(formOrdering)
 
     // 3) Paginate forms
-    val paginatedForms =
-      if (formRequest.pageNumberOpt.isDefined || formRequest.pageSizeOpt.isDefined) {
-        // Use same defaults as in search API
-        val pageNumber = formRequest.pageNumberOpt.getOrElse(1)
-        val pageSize   = formRequest.pageSizeOpt.getOrElse(10)
-
-        val startIndex = (pageNumber - 1) * pageSize
-        val endIndex   = startIndex + pageSize
-
-        sortedForms.slice(startIndex, endIndex)
-      } else {
-        sortedForms
-      }
+    val paginatedForms = formRequest.paginationOpt match {
+      case Some(pagination) => sortedForms.slice(pagination.startIndex, pagination.endIndex)
+      case None             => sortedForms
+    }
 
     FormResponse(paginatedForms, searchTotal = sortedForms.size)
   }

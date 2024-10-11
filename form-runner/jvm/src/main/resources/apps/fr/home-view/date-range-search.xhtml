@@ -22,8 +22,8 @@
     <xf:var name="src-after"  value="$src-elem/*[local-name() = event('src-after')]"/>
     <xf:var name="src-before" value="$src-elem/*[local-name() = event('src-before')]"/>
     <xf:var name="dst-elem"   value="event('dst-elem')"/>
-    <xf:var name="dst-gte"    value="$dst-elem/query[@metadata = event('dst-metadata') and @match = 'gte']"/>
-    <xf:var name="dst-lt"     value="$dst-elem/query[@metadata = event('dst-metadata') and @match = 'lt']"/>
+    <xf:var name="dst-gte"    value="$dst-elem/*[@metadata = event('dst-metadata') and @match = 'gte']"/>
+    <xf:var name="dst-lt"     value="$dst-elem/*[@metadata = event('dst-metadata') and @match = 'lt']"/>
 
     <xf:var name="start-of-tomorrow" value="xs:dateTime(xs:date(current-dateTime())) + xs:dayTimeDuration('P1D')"/>
 

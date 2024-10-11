@@ -318,25 +318,25 @@
             <xf:instance id="fr-metadata-queries">
                 <_>
                     <local>
-                        <query metadata="application-name" match="substring"/>
-                        <query metadata="form-name"        match="substring"/>
-                        <query metadata="form-version"     match="exact"/>
-                        <query metadata="created"          match="gte"/>
-                        <query metadata="created"          match="lt"/>
-                        <query metadata="last-modified"    match="gte" sort="desc"/>
-                        <query metadata="last-modified"    match="lt"/>
-                        <query metadata="last-modified-by" match="exact"/>
-                        <query metadata="title"            match="substring"/>
-                        <query metadata="available"        match="exact"/>
-                        <query metadata="operations"       match="token" select="or"/>
+                        <filter metadata="application-name" match="substring"/>
+                        <filter metadata="form-name"        match="substring"/>
+                        <filter metadata="form-version"     match="exact"/>
+                        <filter metadata="created"          match="gte"/>
+                        <filter metadata="created"          match="lt"/>
+                        <filter metadata="last-modified"    match="gte"/>
+                        <filter metadata="last-modified"    match="lt"/>
+                        <filter metadata="last-modified-by" match="exact"/>
+                        <filter metadata="title"            match="substring"/>
+                        <filter metadata="available"        match="exact"/>
+                        <filter metadata="operations"       match="token" combinator="or"/>
                     </local>
                     <remote>
-                        <query metadata="created"          match="gte"   select=""/>
-                        <query metadata="created"          match="lt"    select=""/>
-                        <query metadata="last-modified"    match="gte"   select=""/>
-                        <query metadata="last-modified"    match="lt"    select=""/>
-                        <query metadata="last-modified-by" match="exact" select=""/>
-                        <query metadata="available"        match="exact" select=""/>
+                        <filter metadata="created"          match="gte"   url=""/>
+                        <filter metadata="created"          match="lt"    url=""/>
+                        <filter metadata="last-modified"    match="gte"   url=""/>
+                        <filter metadata="last-modified"    match="lt"    url=""/>
+                        <filter metadata="last-modified-by" match="exact" url=""/>
+                        <filter metadata="available"        match="exact" url=""/>
                     </remote>
                 </_>
             </xf:instance>
@@ -390,12 +390,6 @@
                 <xf:setvalue ref="instance('fr-order-by')/local-or-remote" value="$local-or-remote"/>
                 <xf:setvalue ref="instance('fr-order-by')/column"          value="$column"/>
 
-                <!-- Set sort attribute in search query -->
-                <xf:delete ref="instance('fr-metadata-queries')/(local | remote)/query/@sort"/>
-                <xf:insert
-                    context="instance('fr-metadata-queries')/*[local-name() = $local-or-remote]/query[@metadata = $column]"
-                    origin="xf:attribute('sort', instance('fr-order-by')/direction)"/>
-
                 <!-- Update search results (do not reset pagination, etc.) -->
                 <xf:dispatch name="fr-initialize" targetid="fr-form-model">
                     <xf:property name="keep-selection" value="'true'"/>
@@ -441,25 +435,6 @@
 
                     <xf:delete ref="instance('fr-metadata-request')/*"/>
 
-                    <!-- Remote servers-->
-                    <xf:action if="instance()/current-remote-server gt 0 and $remote-set">
-                        <xf:var
-                            name="current-remote-server"
-                            value="instance()/remote-servers/remote-server[data(instance()/current-remote-server)]"/>
-
-                        <!-- Set remote server credentials -->
-                        <xf:insert
-                            context="instance('fr-metadata-request')"
-                            ref="*"
-                            origin="xf:element('remote-server',
-                                    (xf:attribute('url',      $current-remote-server/url),
-                                     xf:attribute('username', $current-remote-server/username),
-                                     xf:attribute('password', $current-remote-server/password)))"/>
-
-                        <!-- Set URL for queries related to remote server values -->
-                        <xf:setvalue iterate="$queries/remote/query" ref="@select" value="$current-remote-server/url"/>
-                    </xf:action>
-
                     <!-- Always display latest versions on Published Forms page-->
                     <xf:action if="not($is-admin)">
                         <xf:setvalue ref="$search-options/local/form-version" value="'latest'"/>
@@ -470,19 +445,19 @@
                         <xf:setvalue ref="$search-options/local/operations" value="'admin'"/>
                     </xf:action>
 
-                    <!-- Local queries -->
+                    <!-- Local filters -->
                     <xf:action iterate="('operations', 'available', 'last-modified-by', 'application-name', 'form-name', 'form-version', 'title')">
                         <xf:var name="field" value="."/>
                         <xf:setvalue
-                            ref="$queries/local/query[@metadata = $field]"
+                            ref="$queries/local/filter[@metadata = $field]"
                             value="$search-options/local/*[local-name() = $field]"/>
                     </xf:action>
 
-                    <!-- Remote queries -->
+                    <!-- Remote filters -->
                     <xf:action iterate="('operations', 'available', 'last-modified-by')">
                         <xf:var name="field" value="."/>
                         <xf:setvalue
-                            ref="$queries/remote/query[@metadata = $field]"
+                            ref="$queries/remote/filter[@metadata = $field]"
                             value="$search-options/remote/*[local-name() = $field]"/>
                     </xf:action>
 
@@ -502,29 +477,44 @@
                         </xf:action>
                     </xf:action>
 
-                    <!-- Copy non-empty queries -->
-                    <xf:action iterate="instance('fr-metadata-queries')/(local | remote)/query">
-                        <xf:var name="query" value="."/>
+                    <!-- Copy non-empty filters -->
+                    <xf:action iterate="instance('fr-metadata-queries')/(local | remote)/filter">
+                        <xf:var name="filter" value="."/>
 
-                        <!-- Match query (with or without sort directive) -->
-                        <xf:action if="exists($query/@match) and string($query) != ''">
+                        <xf:action if="exists($filter/@match) and string($filter) != ''">
                             <xf:insert
                                 context="instance('fr-metadata-request')"
                                 ref="*"
-                                origin="$query"/>
+                                origin="$filter"/>
                         </xf:action>
+                    </xf:action>
 
-                        <!-- Sort query -->
-                        <xf:action if="exists($query/@sort) and string($query) = ''">
-                            <!-- Do not copy match attribute (we're only sorting) -->
-                            <xf:insert
-                                context="instance('fr-metadata-request')"
-                                ref="*"
-                                origin="xf:element('query',
-                                        (xf:attribute('metadata', $query/@metadata),
-                                         xf:attribute('sort',     $query/@sort),
-                                         if ($query/@select != '') then xf:attribute('select', $query/@select) else ()))"/>
-                        </xf:action>
+                    <!-- Sort directive -->
+                    <xf:insert
+                        context="instance('fr-metadata-request')"
+                        ref="*"
+                        origin="xf:element('sort',
+                                    (xf:attribute('metadata',  instance('fr-order-by')/column),
+                                     xf:attribute('direction', instance('fr-order-by')/direction),
+                                     if (instance('fr-order-by')/local-or-remote = 'remote') then xf:attribute('url', '') else ()))"/>
+
+                    <!-- Remote servers-->
+                    <xf:action if="instance()/current-remote-server gt 0 and $remote-set">
+                        <xf:var
+                            name="current-remote-server"
+                            value="instance()/remote-servers/remote-server[data(instance()/current-remote-server)]"/>
+
+                        <!-- Set remote server credentials -->
+                        <xf:insert
+                            context="instance('fr-metadata-request')"
+                            ref="*"
+                            origin="xf:element('remote-server',
+                                (xf:attribute('url',      $current-remote-server/url),
+                                 xf:attribute('username', $current-remote-server/username),
+                                 xf:attribute('password', $current-remote-server/password)))"/>
+
+                        <!-- Set URL for filter/sort queries related to remote server values -->
+                        <xf:setvalue iterate="instance('fr-metadata-request')/(filter|sort)[exists(@url)]" ref="@url" value="$current-remote-server/url"/>
                     </xf:action>
                 </xf:action>
 

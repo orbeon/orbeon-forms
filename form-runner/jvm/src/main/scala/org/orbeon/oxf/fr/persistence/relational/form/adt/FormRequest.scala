@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.FormRunnerHome.RemoteServer
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.instantFromString
 import org.orbeon.oxf.fr.persistence.relational.form.FormProcessor
-import org.orbeon.oxf.fr.persistence.relational.form.adt.Select.Remote
+import org.orbeon.oxf.fr.persistence.relational.form.adt.LocalRemoteOrCombinator.Remote
 import org.orbeon.oxf.fr.{AppFormOpt, FormDefinitionVersion}
 import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
@@ -37,31 +37,34 @@ case class FormRequest(
   allForms               : Boolean,
   ignoreAdminPermissions : Boolean,
   languageOpt            : Option[String],
-  queries                : Seq[Query[?]],
   remoteServerCredentials: Map[String, BasicCredentials],
+  filterQueries          : Seq[FilterQuery[?]],
+  // Support only one sort query for now
+  sortQuery              : SortQuery[?],
   // Support no-pagination mode for compatibility reasons (i.e. old API returns all results)
-  pageNumberOpt          : Option[Int] = None,
-  pageSizeOpt            : Option[Int] = None
+  paginationOpt          : Option[Pagination]
 ) {
+
   def toXML: NodeInfo = {
     val baseElem =
       <search>{
-        val queriesXml       = queries.map(_.toXML).map(nodeInfoToElem)
         val remoteServersXml = remoteServerCredentials.toSeq.sortBy(_._1).flatMap { case (url, credentials) =>
           credentials.password.map { password =>
             <remote-server url={url} username={credentials.username} password={password}/>
           }
         }
-        val pageNumberXml    = pageNumberOpt.map(pageNumber => <page-number>{pageNumber}</page-number>)
-        val pageSizeXml      = pageSizeOpt  .map(pageSize   => <page-size>{pageSize}</page-size>)
 
-        remoteServersXml ++ queriesXml ++ pageNumberXml ++ pageSizeXml
+        val filterQueriesXml = filterQueries.map(_.toXML).map(nodeInfoToElem)
+        val sortQueryXml     = sortQuery.toXML
+        val paginationXml    = paginationOpt.map(_.toXML).map(nodeInfoToElem)
+
+        remoteServersXml ++ filterQueriesXml :+ sortQueryXml :+ paginationXml
        }</search>
 
     // toString method on Boolean returns "false"/"true"
-    val allFormsAttOpt               = allForms.some.              map(_.toString).map(xml.Attribute(None.orNull, "all-forms"               , _, xml.Null))
-    val ignoreAdminPermissionsAttOpt = ignoreAdminPermissions.some.map(_.toString).map(xml.Attribute(None.orNull, "ignore-admin-permissions", _, xml.Null))
-    val languageAttOpt               = languageOpt                                .map(xml.Attribute(None.orNull, "xml:lang"                , _, xml.Null))
+    val allFormsAttOpt               = allForms.some.              map(_.toString).map(Form.attribute("all-forms"               , _))
+    val ignoreAdminPermissionsAttOpt = ignoreAdminPermissions.some.map(_.toString).map(Form.attribute("ignore-admin-permissions", _))
+    val languageAttOpt               = languageOpt                                .map(Form.attribute("xml:lang"                , _))
 
     Seq(allFormsAttOpt, ignoreAdminPermissionsAttOpt, languageAttOpt).flatten.foldLeft(baseElem)((elem, attribute) => elem % attribute)
   }
@@ -72,26 +75,26 @@ case class FormRequest(
   // We only support Exact queries on app/form names for now, as we need to call FormRunnerPersistence.getProviders
   // with exact names. Substring queries would make sense, though, and should be supported.
 
-  private val exactAppQueryOpt: Option[Query[String]] =
-    queries
-      .collectFirst { case query @ Query(Metadata.AppName, _, _, Some((MatchType.Exact, _)), _) => query }
-      .asInstanceOf[Option[Query[String]]] // TODO: fix type design/inference
+  private val exactAppQueryOpt: Option[FilterQuery[String]] =
+    filterQueries
+      .collectFirst { case query @ FilterQuery(Metadata.AppName, _, _, MatchType.Exact, _) => query }
+      .asInstanceOf[Option[FilterQuery[String]]] // TODO: fix type design/inference
 
-  private val exactFormQueryOpt: Option[Query[String]] =
-    queries
-      .collectFirst { case query @ Query(Metadata.FormName, _, _, Some((MatchType.Exact, _)), _) => query }
-      .asInstanceOf[Option[Query[String]]] // TODO: fix type design/inference
+  private val exactFormQueryOpt: Option[FilterQuery[String]] =
+    filterQueries
+      .collectFirst { case query @ FilterQuery(Metadata.FormName, _, _, MatchType.Exact, _) => query }
+      .asInstanceOf[Option[FilterQuery[String]]] // TODO: fix type design/inference
 
-  val latestFormVersionQueryOpt: Option[Query[FormDefinitionVersion]] =
-    queries
-      .collectFirst { case query @ Query(Metadata.FormVersion, _, _, Some((MatchType.Exact, FormDefinitionVersion.Latest)), _) => query }
-      .asInstanceOf[Option[Query[FormDefinitionVersion]]] // TODO: fix type design/inference
+  val latestFormVersionQueryOpt: Option[FilterQuery[FormDefinitionVersion]] =
+    filterQueries
+      .collectFirst { case query @ FilterQuery(Metadata.FormVersion, _, _, MatchType.Exact, FormDefinitionVersion.Latest) => query }
+      .asInstanceOf[Option[FilterQuery[FormDefinitionVersion]]] // TODO: fix type design/inference
 
   val exactAppOpt: Option[String] =
-    exactAppQueryOpt.flatMap(_.matchTypeAndValueOpt.map(_._2))
+    exactAppQueryOpt.map(_.value)
 
   val exactFormOpt: Option[String] =
-    exactFormQueryOpt.flatMap(_.matchTypeAndValueOpt.map(_._2))
+    exactFormQueryOpt.map(_.value)
 
   // Compatibility mode: GET request with parameters encoded in URL; otherwise, POST request with parameters in body
   val pathSuffix: String            = FormProcessor.pathSuffix(compatibilityMode.flatOption(AppFormOpt(exactAppOpt, exactFormOpt)))
@@ -106,15 +109,10 @@ case class FormRequest(
 
   def formRequestForRemoteServer: FormRequest =
     copy(
-      queries                 = Seq(exactAppQueryOpt, exactFormQueryOpt).flatten,
       remoteServerCredentials = Map.empty,
-      pageNumberOpt           = None,
-      pageSizeOpt             = None
+      filterQueries           = Seq(exactAppQueryOpt, exactFormQueryOpt).flatten,
+      paginationOpt           = None
     )
-
-  // Support only one sort query for now
-  def sortQueryOpt: Option[Query[?]] =
-    queries.find(_.orderDirectionOpt.isDefined)
 }
 
 object FormRequest {
@@ -144,24 +142,26 @@ object FormRequest {
     // Convert parameters extracted from URL to Query instances
 
     val appOpt   = appFormFromUrlOpt.map(_.app)
-    val appQuery = appOpt.toSeq.map(Query.exactAppQuery)
+    val appQuery = appOpt.toSeq.map(FilterQuery.exactAppQuery)
 
     val formOpt   = appFormFromUrlOpt.flatMap(_.formOpt)
-    val formQuery = formOpt.toSeq.map(Query.exactFormQuery)
+    val formQuery = formOpt.toSeq.map(FilterQuery.exactFormQuery)
 
     val allVersions      = request.getFirstParamAsString("all-versions").getOrElse("false").toBoolean
-    val allVersionsQuery = (! allVersions).seq(Query.latestVersionsQuery)
+    val allVersionsQuery = (! allVersions).seq(FilterQuery.latestVersionsQuery)
 
     val modifiedSinceOpt   = request.getFirstParamAsString("modified-since").map(instantFromString)
-    val modifiedSinceQuery = modifiedSinceOpt.toSeq.map(Query.modifiedSinceQuery)
+    val modifiedSinceQuery = modifiedSinceOpt.toSeq.map(FilterQuery.modifiedSinceQuery)
 
     FormRequest(
       compatibilityMode       = true,
       allForms                = request.getFirstParamAsString("all-forms")               .getOrElse("false").toBoolean,
       ignoreAdminPermissions  = request.getFirstParamAsString("ignore-admin-permissions").getOrElse("false").toBoolean,
       languageOpt             = None,
-      queries                 = appQuery ++ formQuery ++ allVersionsQuery ++ modifiedSinceQuery,
-      remoteServerCredentials = Map.empty
+      remoteServerCredentials = Map.empty,
+      filterQueries           = appQuery ++ formQuery ++ allVersionsQuery ++ modifiedSinceQuery,
+      sortQuery               = SortQuery.defaultSortQuery,
+      paginationOpt           = None
     )
   }
 
@@ -178,8 +178,6 @@ object FormRequest {
 
     val searchElement = xml.rootElement
 
-    val queries = searchElement.child("query").map(Query.apply).toList
-
     val remoteServerCredentials = (searchElement / "remote-server").map { remoteServer =>
       val url         = remoteServer.attValue("url")
       val credentials = BasicCredentials(
@@ -191,9 +189,11 @@ object FormRequest {
       url -> credentials
     }.toMap
 
+    val filterQueries = searchElement.child("filter").map(FilterQuery.apply)
+
     // Check that query URLs match credentials URLs
     val remoteServerUrls = remoteServerCredentials.keySet
-    queries.map(_.select).collect { case Remote(url) => url }.distinct.foreach { queryUrl =>
+    filterQueries.map(_.localRemoteOrCombinator).collect { case Remote(url) => url }.distinct.foreach { queryUrl =>
       if (! remoteServerUrls.contains(queryUrl)) {
         throw new IllegalArgumentException(s"Query URL `$queryUrl` does not match any remote server credentials")
       }
@@ -204,10 +204,10 @@ object FormRequest {
       allForms                = searchElement.attValueOpt("all-forms")               .contains(true.toString),
       ignoreAdminPermissions  = searchElement.attValueOpt("ignore-admin-permissions").contains(true.toString),
       languageOpt             = searchElement.attValueOpt("*:lang"),
-      queries                 = queries,
       remoteServerCredentials = remoteServerCredentials,
-      pageNumberOpt           = searchElement.elemValueOpt("page-number").map(_.toInt),
-      pageSizeOpt             = searchElement.elemValueOpt("page-size")  .map(_.toInt)
+      filterQueries           = filterQueries,
+      sortQuery               = searchElement.child("sort")      .headOption.map(SortQuery .apply).getOrElse(SortQuery.defaultSortQuery),
+      paginationOpt           = searchElement.child("pagination").headOption.map(Pagination.apply)
     )
   }
 }

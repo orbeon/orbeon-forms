@@ -56,24 +56,21 @@ case object Order {
   }
 
   def formOrdering(
-    sortQuery  : Query[?],
+    sortQuery  : SortQuery[?],
     formRequest: FormRequest
   ): Ordering[Form] = {
 
-    val metadata       = sortQuery.metadata
-    val languageOpt    = sortQuery.effectiveLanguageOpt(formRequest)
-    val select         = sortQuery.select
-    val orderDirection = sortQuery.orderDirectionOpt.getOrElse(OrderDirection.Ascending)
-
     val ordering = Ordering.fromLessThan[Form] { (formX, formY) =>
 
-      val xOpt = metadata.selectedValueOpt(formX, select, languageOpt)
-      val yOpt = metadata.selectedValueOpt(formY, select, languageOpt)
+      val languageOpt = sortQuery.effectiveLanguageOpt(formRequest)
+
+      val xOpt = sortQuery.metadata.valueOpt(formX, sortQuery.localRemoteOrCombinator, languageOpt)
+      val yOpt = sortQuery.metadata.valueOpt(formY, sortQuery.localRemoteOrCombinator, languageOpt)
 
       Order.compare(xOpt, yOpt) < 0
     }
 
-    orderDirection match {
+    sortQuery.orderDirection match {
       case OrderDirection.Ascending  => ordering
       case OrderDirection.Descending => ordering.reverse
     }

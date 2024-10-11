@@ -66,7 +66,7 @@ case class FormMetadata(
       permissionsXmlOpt.toSeq
 
     // Always include operations as an attribute, even if no operation is available (for compatibility reasons)
-    val attributes = Seq(xml.Attribute(None.orNull, "operations", operations.ops.mkString(" "), xml.Null))
+    val attributes = Seq(Form.attribute("operations", operations.ops.mkString(" ")))
 
     (elems, attributes)
   }
@@ -215,4 +215,14 @@ object Form {
         url -> metadataOpt.get
       }.toMap
     )
+
+  def attribute(name: String, value: String): xml.Attribute =
+    xml.Attribute(None.orNull, name, value, xml.Null)
+
+  def elem(name: String, value: String, atts: (String, String)*): xml.Elem = {
+    val attributes = atts.foldRight[xml.MetaData](xml.Null) {
+      case ((name, value), acc) => xml.Attribute(None, name, xml.Text(value), acc)
+    }
+    xml.Elem(None.orNull, name, attributes, xml.TopScope, minimizeEmpty = true, Seq(xml.Text(value)) *)
+  }
 }

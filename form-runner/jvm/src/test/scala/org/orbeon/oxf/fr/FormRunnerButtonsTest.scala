@@ -1,5 +1,7 @@
 package org.orbeon.oxf.fr
 
+import org.orbeon.dom.QName
+import org.orbeon.oxf.fr.XMLNames.{FR, FRPrefix}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
@@ -24,13 +26,16 @@ class FormRunnerButtonsTest
       // Before fix for #6544, this throws as the document initialization fails
       val doc = docOpt.get
 
-      val ButtonComponentNames = Set("ladda-button", "trigger")
+      val ButtonComponentQNames = Set(
+        QName("ladda-button", FRPrefix, FR),
+        QName("trigger",      FRPrefix, FR),
+      )
 
       def findButtonControl(name: String): Option[XFormsSingleNodeControl] =
         ControlsIterator(doc.controls.getCurrentControlTree)
           .collectFirst {
             case control: XFormsSingleNodeControl
-              if ButtonComponentNames(control.staticControl.localName) &&
+              if ButtonComponentQNames(control.staticControl.element.getQName) &&
                 control.extensionAttributeValue(XFormsNames.CLASS_QNAME).exists(_.splitTo[List]().contains(s"fr-$name-button")) =>
               control
           }

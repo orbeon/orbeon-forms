@@ -1,5 +1,6 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
+import org.orbeon.oxf.controller.XmlNativeRoute
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
@@ -7,33 +8,36 @@ import org.orbeon.oxf.fr.persistence.relational.Statement.*
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ProcessorImpl
+import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger, NetUtils, XPath}
-import org.orbeon.oxf.xml.{DeferredXMLReceiver, DeferredXMLReceiverImpl, TransformerUtils}
+import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger}
+import org.orbeon.oxf.xml.DeferredXMLReceiver
 
-import java.io.OutputStream
-import javax.xml.transform.stream.StreamResult
 import scala.util.matching.Regex
 
 
-class History extends ProcessorImpl {
+object HistoryRoute extends XmlNativeRoute {
 
-  import History._
+  import History.*
 
-  override def start(pipelineContext: PipelineContext): Unit = {
+  def process(
+    matchResult: MatchResult
+  )(implicit
+    pc         : PipelineContext,
+    ec         : ExternalContext
+  ): Unit = {
 
-    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
-
-    val httpRequest  = externalContext.getRequest
-    val httpResponse = externalContext.getResponse
+    val httpRequest  = ec.getRequest
+    val httpResponse = ec.getResponse
 
     implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
 
     try {
       require(httpRequest.getMethod == HttpMethod.GET)
+
+      implicit val receiver: DeferredXMLReceiver = getResponseXmlReceiver
 
       httpRequest.getRequestPath match {
         case ServicePathRe(provider, app, form, documentId, filenameOrNull) =>
@@ -44,8 +48,7 @@ class History extends ProcessorImpl {
             form,
             documentId,
             Option(filenameOrNull),
-            PersistenceMetadataSupport.isInternalAdminUser(httpRequest.getFirstParamAsString),
-            httpResponse.getOutputStream
+            PersistenceMetadataSupport.isInternalAdminUser(httpRequest.getFirstParamAsString)
           )
         case _ =>
           httpResponse.setStatus(StatusCode.NotFound)
@@ -58,8 +61,6 @@ class History extends ProcessorImpl {
 }
 
 private object History {
-
-  private val xmlIndentation = 2
 
   case class Request(
     pageSize  : Int,
@@ -84,9 +85,9 @@ private object History {
     form               : String,
     documentId         : String,
     filenameOpt        : Option[String],
-    isInternalAdminUser: Boolean, // 2024-07-18: Unused, see https://github.com/orbeon/orbeon-forms/issues/6416
-    outputStream       : OutputStream
+    isInternalAdminUser: Boolean // 2024-07-18: Unused, see https://github.com/orbeon/orbeon-forms/issues/6416
   )(implicit
+    receiver           : DeferredXMLReceiver,
     externalContext    : ExternalContext,
     indentedLogger     : IndentedLogger
   ): Unit = {
@@ -183,28 +184,9 @@ private object History {
         }
       }
 
-      // xxx TODO: remove duplication with export, and put this somewhere common
-      implicit val receiver: DeferredXMLReceiver =
-        new DeferredXMLReceiverImpl(
-          TransformerUtils.getIdentityTransformerHandler(XPath.GlobalConfiguration) |!>
-            (t => TransformerUtils.applyOutputProperties(
-              t.getTransformer,
-              "xml",
-              null,
-              null,
-              null,
-              null,
-              true,
-              null,
-              true,
-              xmlIndentation
-            )) |!>
-            (_.setResult(new StreamResult(outputStream)))
-        )
-
       executeQuery(connection, sql, List(StatementPart("", setters))) { rs =>
 
-        import org.orbeon.oxf.xml.XMLReceiverSupport._
+        import org.orbeon.oxf.xml.XMLReceiverSupport.*
 
         var position = 0
 

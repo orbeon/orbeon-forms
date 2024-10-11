@@ -16,10 +16,9 @@ import java.io.{InputStream, OutputStream}
 object FieldEncryption {
 
   def encryptDataIfNecessary(
-    request            : Request,
-    requestInputStream : InputStream,
-    appForm            : AppForm,
-    isForXmlData       : Boolean // vs. attachment data
+    request     : Request,
+    appForm     : AppForm,
+    isForXmlData: Boolean // vs. attachment data
   )(implicit
     logger             : IndentedLogger
   ): Option[(InputStream, Option[Long])] = None

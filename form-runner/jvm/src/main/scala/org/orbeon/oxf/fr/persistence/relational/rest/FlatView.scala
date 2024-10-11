@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.io.IOUtils.*
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.XMLNames.*
@@ -63,8 +64,10 @@ private object FlatView {
     connection         : Connection,
     fullyQualifiedNames: Boolean,
     maxIdentifierLength: Int
+  )(implicit
+    externalContext    : ExternalContext
   ): Unit =
-    RequestReader.xmlDocument().foreach { documentInfo =>
+    RequestReader.xmlDocument.foreach { documentInfo =>
       createFlatViewsForDocument(req, version, connection, documentInfo, fullyQualifiedNames, maxIdentifierLength)
     }
 

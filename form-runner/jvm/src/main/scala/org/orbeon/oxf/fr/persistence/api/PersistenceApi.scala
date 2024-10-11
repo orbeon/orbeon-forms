@@ -1,7 +1,7 @@
 package org.orbeon.oxf.fr.persistence.api
 
 import org.orbeon.oxf.fr.AppFormOpt
-import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
+import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxy
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.IndentedLogger
@@ -35,7 +35,7 @@ object PersistenceApi extends PersistenceApiTrait {
     debug(s"calling form metadata API")
 
     val formMetadataDocElem =
-      PersistenceProxyProcessor.localAndRemoteFormsMetadata(
+      PersistenceProxy.localAndRemoteFormsMetadata(
         makeOutgoingRequest(HttpMethod.GET, incomingHeaders, List(
           "all-forms"                -> allForms.toString,
           "all-versions"             -> allVersions.toString,

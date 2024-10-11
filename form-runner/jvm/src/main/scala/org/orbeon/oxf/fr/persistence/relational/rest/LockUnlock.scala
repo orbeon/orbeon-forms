@@ -16,11 +16,10 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import enumeratum.*
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, NetUtils}
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger}
 
 import java.sql.Connection
 import scala.util.Try
@@ -88,10 +87,10 @@ trait LockUnlock {
       ))
     }
 
-    def readTimeoutFromHeader: Int = {
+    def readTimeoutFromHeader(implicit externalContext: ExternalContext): Int = {
       // Header has the form `Timeout: Second-600` header
       val prefix            = Headers.TimeoutValuePrefix
-      val request           = NetUtils.getExternalContext.getRequest
+      val request           = externalContext.getRequest
       val headerValue       = request.getFirstHeaderIgnoreCase(Headers.Timeout)
       val timeoutString     = headerValue.flatMap(hv => hv.startsWith(prefix).option(hv.substring(prefix.length)))
       val timeoutInt        = timeoutString.flatMap(ts => Try(ts.toInt).toOption)
@@ -107,9 +106,8 @@ trait LockUnlock {
     ): Unit = {
 
       import LeaseStatus.*
-      val bodyInputStream = PersistenceProxyProcessor.requestInputStream(NetUtils.getExternalContext.getRequest)
 
-      val reqLockInfo = LockInfo.parse(bodyInputStream)
+      val reqLockInfo = LockInfo.parse(externalContext.getRequest.getInputStream)
       RelationalUtils.withConnection { connection =>
         def callThunk(leaseStatus: LeaseStatus): Unit =
           thunk(connection, leaseStatus, req.dataPart, reqLockInfo)

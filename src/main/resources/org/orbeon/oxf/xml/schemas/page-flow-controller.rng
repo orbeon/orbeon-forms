@@ -67,6 +67,9 @@
                                 <data type="anyURI"/>
                             </attribute>
                         </optional>
+                        <optional>
+                            <attribute name="class"/>
+                        </optional>
 
                         <zeroOrMore>
                             <element name="c:setvalue">

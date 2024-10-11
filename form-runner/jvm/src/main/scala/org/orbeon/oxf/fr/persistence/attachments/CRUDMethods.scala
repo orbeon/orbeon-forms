@@ -17,6 +17,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
 import org.orbeon.oxf.http.HttpRanges
 
+
 trait CRUDMethods {
   def head  (attachmentInformation: AttachmentInformation, httpRanges: HttpRanges)(implicit httpRequest: Request, httpResponse: Response): Unit
   def get   (attachmentInformation: AttachmentInformation, httpRanges: HttpRanges)(implicit httpRequest: Request, httpResponse: Response): Unit

@@ -24,7 +24,7 @@ import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.processor.XFormsAssetServer;
+import org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -262,7 +262,7 @@ public class FileSerializer extends ProcessorImpl {
                     {
                         final String localURL = ((DiskFileItem) fileItem).getStoreLocation().toURI().toString();
                         if ("session".equals(config.scope) && config.proxyResult)
-                            resultURL = XFormsAssetServer.jProxyURI(localURL, config.requestedContentType);
+                            resultURL = XFormsAssetServerRoute.jProxyURI(localURL, config.requestedContentType);
                         else
                             resultURL = localURL;
                     }

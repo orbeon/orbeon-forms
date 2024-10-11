@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import org.orbeon.oxf.controller.Authorizer
+import org.orbeon.oxf.controller.{Authorizer, NativeRoute}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
@@ -21,7 +21,7 @@ import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ProcessorImpl
+import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
@@ -30,23 +30,25 @@ import java.time.Instant
 import scala.util.{Failure, Success}
 
 
-class CRUD
-    extends ProcessorImpl
-    with Read
-    with CreateUpdateDelete
-    with LockUnlock {
+object CRUDRoute
+  extends NativeRoute
+  with    Read
+  with    CreateUpdateDelete
+  with    LockUnlock {
 
-  private val logger = LoggerFactory.createLogger(classOf[CRUD])
+  private val logger = LoggerFactory.createLogger(CRUDRoute.getClass)
 
-  import CRUD._
+  def process(
+    matchResult: MatchResult
+  )(implicit
+    pc         : PipelineContext,
+    ec         : ExternalContext
+  ): Unit = {
 
-  override def start(pipelineContext: PipelineContext): Unit = {
-
-    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
     implicit val indentedLogger : IndentedLogger  = new IndentedLogger(logger)
 
-    implicit val httpRequest: ExternalContext.Request  = externalContext.getRequest
-    val httpResponse  : ExternalContext.Response = externalContext.getResponse
+    implicit val httpRequest: ExternalContext.Request  = ec.getRequest
+    val httpResponse  : ExternalContext.Response = ec.getResponse
 
     try {
 
@@ -65,20 +67,17 @@ class CRUD
         httpResponse.setStatus(e.code)
     }
   }
-}
 
-private object CRUD {
+  private val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
+  private val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r
 
-  val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
-  val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r
-
-  def headerValueIgnoreCase(name: String)(implicit httpRequest: ExternalContext.Request): Option[String] =
+  private def headerValueIgnoreCase(name: String)(implicit httpRequest: ExternalContext.Request): Option[String] =
     httpRequest.getFirstHeaderIgnoreCase(name)
 
-  def requestWorkflowStage(implicit httpRequest: ExternalContext.Request): Option[String] =
+  private def requestWorkflowStage(implicit httpRequest: ExternalContext.Request): Option[String] =
     headerValueIgnoreCase(StageHeader.HeaderName)
 
-  def getLockUnlockRequest(requestPath: String)(implicit httpRequest: ExternalContext.Request): LockUnlockRequest =
+  private def getLockUnlockRequest(requestPath: String)(implicit httpRequest: ExternalContext.Request): LockUnlockRequest =
     requestPath match {
       case CrudDataPath(provider, _, _, dataOrDraft, documentId, _) =>
         val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage, forceDelete = false)
@@ -87,7 +86,7 @@ private object CRUD {
         throw HttpStatusCodeException(StatusCode.BadRequest)
     }
 
-  def getCrudRequest(
+  private def getCrudRequest(
     requestPath: String
   )(implicit
     httpRequest   : ExternalContext.Request,

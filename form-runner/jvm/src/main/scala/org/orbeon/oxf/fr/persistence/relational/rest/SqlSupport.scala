@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.relational.*
 import org.orbeon.oxf.util.CoreUtils.*
 
@@ -71,6 +72,8 @@ object SqlSupport {
     versionToSet           : Int,
     currentTimestamp       : Timestamp,
     currentUserOrganization: => Option[OrganizationId]
+  )(implicit
+    externalContext: ExternalContext
   ): List[Col]  = {
 
     val xmlCol = Provider.xmlColUpdate(req.provider)
@@ -195,7 +198,7 @@ object SqlSupport {
           name          = "file_content",
           value         = DynamicColValue(
             placeholder = "?",
-            paramSetter = param(_.setBytes, RequestReader.bytes().orNull)
+            paramSetter = param(_.setBytes, RequestReader.bytes.orNull)
           )
         )
     ) ::: (

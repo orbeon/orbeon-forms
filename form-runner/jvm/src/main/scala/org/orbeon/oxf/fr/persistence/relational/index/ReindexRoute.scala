@@ -13,11 +13,13 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index
 
+import org.orbeon.oxf.controller.NativeRoute
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.relational.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ProcessorImpl
+import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.*
+
 
 /**
  * Processor repopulating the relational indices. This doesn't create the tables, but deletes their content
@@ -26,16 +28,20 @@ import org.orbeon.oxf.util.*
  * - mapped to `fr:persistence-reindex` in `processors.xml`
  * - mapped to `/fr/service/[provider]/reindex` in `fr/page-flow.xml`
  */
-class ReindexProcessor extends ProcessorImpl {
+object ReindexRoute extends NativeRoute {
 
   private val ReindexPathRegex    = """/fr/service/([^/]+)/reindex""".r
 
-  override def start(pipelineContext: PipelineContext): Unit = {
+  def process(
+    matchResult: MatchResult
+  )(implicit
+    pc         : PipelineContext,
+    ec         : ExternalContext
+  ): Unit = {
 
-    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
-    implicit val indentedLogger : IndentedLogger  = RelationalUtils.newIndentedLogger
+    implicit val indentedLogger: IndentedLogger  = RelationalUtils.newIndentedLogger
 
-    val ReindexPathRegex(providerToken) = NetUtils.getExternalContext.getRequest.getRequestPath
+    val ReindexPathRegex(providerToken) = ec.getRequest.getRequestPath
     RelationalUtils.withConnection(Index.reindex(Provider.withName(providerToken), _, WhatToReindex.AllData))
   }
 }

@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.form.adt
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.fr.FormRunnerHome.RemoteServer
-import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
+import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxy
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.instantFromString
 import org.orbeon.oxf.fr.persistence.relational.form.FormProcessor
 import org.orbeon.oxf.fr.persistence.relational.form.adt.LocalRemoteOrCombinator.Remote
@@ -168,7 +168,7 @@ object FormRequest {
   private def fromPostRequest(request: Request, bodyFromPipelineOpt: Option[NodeInfo]): FormRequest = {
 
     val bodyXml = bodyFromPipelineOpt.getOrElse {
-      StaticXPath.orbeonDomToTinyTree(readOrbeonDom(PersistenceProxyProcessor.requestInputStream(request)))
+      StaticXPath.orbeonDomToTinyTree(readOrbeonDom(PersistenceProxy.requestInputStream(request)))
     }
 
     FormRequest(bodyXml)

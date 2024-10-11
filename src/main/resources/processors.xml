@@ -471,16 +471,8 @@
         <class name="org.orbeon.oxf.xforms.processor.XFormsToXHTML"/>
     </processor>
 
-    <processor name="oxf:xforms-resource-server">
-        <class name="org.orbeon.oxf.xforms.processor.XFormsAssetServer"/>
-    </processor>
-
     <processor name="oxf:xforms-compiler">
         <class name="org.orbeon.oxf.xforms.processor.XFormsCompiler"/>
-    </processor>
-
-    <processor name="oxf:xforms-upload">
-        <class name="org.orbeon.oxf.xforms.processor.UploaderProcessor"/>
     </processor>
 
     <processor name="oxf:xforms-submission">
@@ -669,29 +661,11 @@
     </processor>
 
     <!-- Form Runner / Form Builder processors -->
-    <processor name="fr:persistence-proxy">
-        <class name="org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor"/>
-    </processor>
-    <processor name="fr:relational-persistence-reindex">
-        <class name="org.orbeon.oxf.fr.persistence.relational.index.ReindexProcessor"/>
-    </processor>
-    <processor name="fr:relational-crud">
-        <class name="org.orbeon.oxf.fr.persistence.relational.rest.CRUD"/>
-    </processor>
-    <processor name="fr:relational-history">
-        <class name="org.orbeon.oxf.fr.persistence.relational.rest.History"/>
-    </processor>
     <processor name="fr:relational-form">
         <class name="org.orbeon.oxf.fr.persistence.relational.form.FormProcessor"/>
     </processor>
-    <processor name="fr:relational-search">
-        <class name="org.orbeon.oxf.fr.persistence.relational.search.SearchProcessor"/>
-    </processor>
     <processor name="fr:relational-distinct-values">
         <class name="org.orbeon.oxf.fr.persistence.relational.distinctvalues.DistinctValuesProcessor"/>
-    </processor>
-    <processor name="fr:attachments-crud">
-        <class name="org.orbeon.oxf.fr.persistence.attachments.CRUD"/>
     </processor>
     <processor name="fr:resources-patcher">
         <class name="org.orbeon.oxf.fr.ResourcesPatcher"/>

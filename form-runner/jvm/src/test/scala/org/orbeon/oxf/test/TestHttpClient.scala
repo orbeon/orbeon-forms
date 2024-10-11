@@ -86,7 +86,7 @@ object TestHttpClient {
         new ProcessorDefinition(QName(name, OXF_PROCESSORS_NAMESPACE))
 
       val pfcProcessorDefinition =
-        newProcessorDef("page-flow") |!> (_.addInput("controller", "oxf:/page-flow.xml"))
+        newProcessorDef("page-flow") |!> (_.addInput("controller", "oxf:/apps/fr/page-flow.xml"))
 
       new ProcessorService(pfcProcessorDefinition, None)
     }

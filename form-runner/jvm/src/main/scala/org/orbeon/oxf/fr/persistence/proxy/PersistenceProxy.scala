@@ -18,25 +18,26 @@ import org.log4s
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
+import org.orbeon.oxf.controller.NativeRoute
 import org.orbeon.oxf.externalcontext.*
-import org.orbeon.oxf.fr.FormRunnerPersistence.*
+import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.*
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization.findCurrentCredentialsFromSession
+import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.permission.*
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.findCurrentCredentialsFromSession
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyPermissions.ResponseHeaders
 import org.orbeon.oxf.fr.persistence.relational.form.FormProxyLogic
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
-import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.*
+import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ProcessorImpl
+import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.processor.generator.RequestGenerator
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.{ElementFilterXMLReceiver, ParserConfiguration, TransformerUtils, XMLParsing}
@@ -62,19 +63,22 @@ import scala.util.{Failure, Success, Try}
  * - sets persistence implementation headers
  * - calls all active persistence implementations to aggregate form metadata
  */
-class PersistenceProxyProcessor extends ProcessorImpl {
+object PersistenceProxyRoute extends NativeRoute {
 
-  import PersistenceProxyProcessor._
+  import PersistenceProxy.*
 
-  // Start the processor
-  override def start(pipelineContext: PipelineContext): Unit = {
-    implicit val ec: ExternalContext = NetUtils.getExternalContext
-    implicit val indentedLogger: IndentedLogger = new IndentedLogger(PersistenceProxyProcessor.Logger)
+  def process(
+    matchResult: MatchResult
+  )(implicit
+    pc         : PipelineContext,
+    ec         : ExternalContext
+  ): Unit = {
+    implicit val indentedLogger: IndentedLogger = new IndentedLogger(PersistenceProxy.Logger)
     proxyRequest(ec.getRequest, ec.getResponse)
   }
 }
 
-private[persistence] object PersistenceProxyProcessor extends FormProxyLogic {
+private[persistence] object PersistenceProxy extends FormProxyLogic {
 
   val RawDataFormatVersion           = "raw"
   val AllowedDataFormatVersionParams = Set() ++ (DataFormatVersion.values map (_.entryName)) + RawDataFormatVersion
@@ -82,7 +86,7 @@ private[persistence] object PersistenceProxyProcessor extends FormProxyLogic {
   val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.HEAD, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST, HttpMethod.LOCK, HttpMethod.UNLOCK)
   val GetOrPutMethods                = Set[HttpMethod](HttpMethod.GET, HttpMethod.PUT)
 
-  val Logger: log4s.Logger = LoggerFactory.createLogger(PersistenceProxyProcessor.getClass)
+  val Logger: log4s.Logger = LoggerFactory.createLogger(PersistenceProxy.getClass)
 
   case class OutgoingRequest(
     method : HttpMethod,
@@ -172,7 +176,7 @@ private[persistence] object PersistenceProxyProcessor extends FormProxyLogic {
 
   // TODO: Could just pass `ec` and no separate `request`/`response`
   // Proxy the request to the appropriate persistence implementation
-  private def proxyRequest(
+  def proxyRequest(
     request        : Request,
     response       : Response
   )(implicit
@@ -601,20 +605,17 @@ private[persistence] object PersistenceProxyProcessor extends FormProxyLogic {
   ): Option[StreamedContent] =
     HttpMethod.HttpMethodsWithRequestBody(request.getMethod).option {
 
-      val requestInputStream = PersistenceProxyProcessor.requestInputStream(request)
-
       val withEncryptionOpt =
         encrypt.flatOption {
           FieldEncryption.encryptDataIfNecessary(
             request,
-            requestInputStream,
             appForm,
             isDataXmlRequest
           )
         }
 
       val (bodyInputStream, bodyContentLength) =
-        withEncryptionOpt.getOrElse(requestInputStream -> request.contentLengthOpt)
+        withEncryptionOpt.getOrElse(request.getInputStream -> request.contentLengthOpt)
 
       StreamedContent(
         bodyInputStream,

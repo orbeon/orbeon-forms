@@ -33,7 +33,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.model.InstanceData
-import org.orbeon.oxf.xforms.processor.XFormsAssetServer
+import org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.*
@@ -175,7 +175,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger,
     resourceResolver: Option[ResourceResolver]
   ): URI =
-    XFormsAssetServer.proxyURI(
+    XFormsAssetServerRoute.proxyURI(
       urlString        = urlString,
       filename         = filename,
       contentType      = contentType,

@@ -19,7 +19,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
+import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxy
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.*
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}
@@ -72,18 +72,18 @@ object RequestReader {
       case _  => false
     }
 
-  def requestInputStream(): Option[InputStream] =
-    Option(PersistenceProxyProcessor.requestInputStream(NetUtils.getExternalContext.getRequest)).filter(_ != EmptyInputStream)
+  def requestInputStream(implicit externalContext: ExternalContext): Option[InputStream] =
+    Option(externalContext.getRequest.getInputStream).filter(_ != EmptyInputStream)
 
-  def bytes(): Option[Array[Byte]] =
-    requestInputStream().map { is =>
+  def bytes(implicit externalContext: ExternalContext): Option[Array[Byte]] =
+    requestInputStream.map { is =>
       val os = new ByteArrayOutputStream
       IOUtils.copyStreamAndClose(is, os)
       os.toByteArray
     }
 
-  def dataAndMetadataAsString(provider: Provider, metadata: Boolean): (Option[String], Option[String]) =
-    requestInputStream().map { is =>
+  def dataAndMetadataAsString(provider: Provider, metadata: Boolean)(implicit externalContext: ExternalContext): (Option[String], Option[String]) =
+    requestInputStream.map { is =>
       val (data, metadataOpt) = dataAndMetadataAsString(provider, is, metadata)
       (Some(data), metadataOpt)
     }.getOrElse {
@@ -159,8 +159,8 @@ object RequestReader {
   }
 
   // Used by FlatView
-  def xmlDocument(): Option[DocumentInfo] =
-    requestInputStream().map { is =>
+  def xmlDocument(implicit externalContext: ExternalContext): Option[DocumentInfo] =
+    requestInputStream.map { is =>
       TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, "", false, false)
     }
 }
@@ -175,10 +175,12 @@ trait CreateUpdateDelete {
 
   // TODO: consider splitting into `deleteDrafts()` and `store()`
   private def store(
-    connection    : Connection,
-    req           : CrudRequest,
-    delete        : Boolean,
-    versionToSet  : Int
+    connection     : Connection,
+    req            : CrudRequest,
+    delete         : Boolean,
+    versionToSet   : Int
+  )(implicit
+    externalContext: ExternalContext
   ):Option[Instant] = {
 
     val table = SqlSupport.tableName(req)

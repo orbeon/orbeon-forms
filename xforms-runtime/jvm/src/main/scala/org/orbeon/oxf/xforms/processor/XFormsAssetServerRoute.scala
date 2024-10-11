@@ -15,18 +15,20 @@ package org.orbeon.oxf.xforms.processor
 
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.{CharsetNames, IOUtils}
+import org.orbeon.oxf.controller.NativeRoute
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.{Headers, HttpRanges, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
+import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
+import org.orbeon.oxf.processor.ResourceServer
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.PathUtils.*
-import org.orbeon.oxf.util.*
+import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.XFormsAssetPaths.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquireLock
-import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.oxf.xforms.xbl.{BindingLoader, GlobalBindingIndex}
 import org.orbeon.xforms.{Constants, XFormsCrossPlatformSupport}
@@ -40,23 +42,24 @@ import scala.util.{Failure, Success, Try}
 /**
   * Serve XForms engine JavaScript and CSS resources by combining them.
   */
-class XFormsAssetServer extends ProcessorImpl {
-
-  import org.orbeon.oxf.xforms.processor.XFormsAssetServer._
+object XFormsAssetServerRoute extends NativeRoute {
 
   // Unneeded for JVM platform
   private implicit val resourceResolver: Option[ResourceResolver] = None
 
-  override def start(pipelineContext: PipelineContext): Unit = {
-
-    implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
-
-    val requestPath = externalContext.getRequest.getRequestPath
-    val response    = externalContext.getResponse
-
-    val requestTime = System.currentTimeMillis
+  def process(
+    matchResult: MatchResult
+  )(implicit
+    pc         : PipelineContext,
+    ec         : ExternalContext
+  ): Unit = {
 
     implicit val indentedLogger: IndentedLogger = Loggers.newIndentedLogger("resources")
+
+    val requestPath = ec.getRequest.getRequestPath
+    val response    = ec.getResponse
+
+    val requestTime = System.currentTimeMillis
 
     requestPath match {
       case DynamicResourceRegex(_) =>
@@ -70,7 +73,7 @@ class XFormsAssetServer extends ProcessorImpl {
           val pathWithContext =
             response.rewriteRenderURL(
               // https://github.com/orbeon/orbeon-forms/issues/6170
-              if (externalContext.getRequest.getFirstParamAsString(Constants.UrlRewriteParameter).contains("noprefix"))
+              if (ec.getRequest.getFirstParamAsString(Constants.UrlRewriteParameter).contains("noprefix"))
                 PathUtils.recombineQuery(path, List(Constants.UrlRewriteParameter -> "noprefix"))
               else
                 path
@@ -81,7 +84,7 @@ class XFormsAssetServer extends ProcessorImpl {
 
         val updatesPropOpt =
           for {
-            paramValue <- externalContext.getRequest.getFirstParamAsString(Constants.UpdatesParameter)
+            paramValue <- ec.getRequest.getFirstParamAsString(Constants.UpdatesParameter)
             propName   = (XFormsAssetsBuilder.AssetsBaselineProperty :: Constants.UpdatesParameter :: paramValue :: Nil).mkString(".")
             prop       <- CoreCrossPlatformSupport.properties.getPropertyOpt(propName)
           } yield
@@ -147,7 +150,7 @@ class XFormsAssetServer extends ProcessorImpl {
             // can make sense for the client.
             response.setResourceCaching(
               lastModified = requestTime,
-              expires      = requestTime + externalContext.getRequest.getSession(true).getMaxInactiveInterval * 1000
+              expires      = requestTime + ec.getRequest.getSession(true).getMaxInactiveInterval * 1000
             )
 
             IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
@@ -155,8 +158,8 @@ class XFormsAssetServer extends ProcessorImpl {
                 case Some(initializationDateOpt) =>
                   initializationDateOpt foreach { case (initializationScriptsOpt, jsonInitializationData) =>
 
-                    val namespaceOpt   = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingNamespaceParameter)
-                    val contextPathOpt = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingContextParameter)
+                    val namespaceOpt   = ec.getRequest.getFirstParamAsString(Constants.EmbeddingNamespaceParameter)
+                    val contextPathOpt = ec.getRequest.getFirstParamAsString(Constants.EmbeddingContextParameter)
 
                     initializationScriptsOpt foreach { initializationScripts =>
                       writer.write(
@@ -361,11 +364,8 @@ class XFormsAssetServer extends ProcessorImpl {
     debug("caching not requested, serving directly", Seq("request path" -> externalContext.getRequest.getRequestPath))
     XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal, isCssNoPrefix)
   }
-}
 
-object XFormsAssetServer {
-
-  import XFormsAssetPaths._
+  import XFormsAssetPaths.*
 
   private val DynamicResourcesSessionKey = "orbeon.resources.dynamic."
 

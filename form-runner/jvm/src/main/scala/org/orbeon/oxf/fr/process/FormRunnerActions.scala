@@ -33,7 +33,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent
-import org.orbeon.oxf.xforms.processor.XFormsAssetServer
+import org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute
 import org.orbeon.oxf.xforms.submission.ReplaceType
 import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.scaxon.Implicits.*
@@ -437,7 +437,7 @@ trait FormRunnerActions
 
       // Remove resource and temporary file if any
       childElems map (_.stringValue) flatMap trimAllToOpt foreach { path =>
-        XFormsAssetServer.tryToRemoveDynamicResource(path, removeFile = true)
+        XFormsAssetServerRoute.tryToRemoveDynamicResource(path, removeFile = true)
       }
 
       // Clear stored paths

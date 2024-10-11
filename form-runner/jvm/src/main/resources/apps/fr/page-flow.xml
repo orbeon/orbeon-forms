@@ -13,23 +13,38 @@
   -->
 <controller xmlns="http://www.orbeon.com/oxf/controller" matcher="regexp">
 
+    <!-- ==== XForms================================================================================================ -->
+
+    <page path="/xforms-server/upload" public-methods="POST"     methods="POST"     class="org.orbeon.oxf.xforms.processor.XFormsUploadRoute"/>
+    <page path="/xforms-server(/.*)?"  public-methods="POST"     methods="POST"     class="org.orbeon.oxf.xforms.route.XFormsServerRoute"/>
+    <page path="/xforms-server(/.*)?"  public-methods="HEAD GET" methods="HEAD GET" class="org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute"/>
+
+    <!-- ==== Files ================================================================================================ -->
+
+    <files path="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|map|png|jpg|xml|xsd|ico|html|txt|svg|ttf|eot|woff|woff2)"/>
+
     <!-- ==== Entry point for persistence services ================================================================= -->
 
-    <service path="/fr/service/persistence/.*" model="persistence/proxy.xpl"/>
+    <service
+        path="/fr/service/persistence/.*"
+        class="org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyRoute"/>
 
     <!-- ==== Built-in relational persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
-         model="persistence/relational/crud.xpl"/>
+    <service
+        path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
+        class="org.orbeon.oxf.fr.persistence.relational.rest.CRUDRoute"/>
 
     <!-- Search -->
-    <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/search/([^/^.]+)/([^/^.]+)"
-             view="persistence/relational/search.xpl"/>
+    <service
+        path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/search/([^/^.]+)/([^/^.]+)"
+        class="org.orbeon.oxf.fr.persistence.relational.search.SearchRoute"/>
 
     <!-- Distinct values (control values, created by / modified by users, workflow stages) -->
-    <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/distinct-values/([^/^.]+)/([^/^.]+)"
-             view="persistence/relational/distinct-values.xpl"/>
+    <service
+        path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/distinct-values/([^/^.]+)/([^/^.]+)"
+        class="org.orbeon.oxf.fr.persistence.relational.distinctvalues.DistinctValuesRoute"/>
 
     <!-- Deployed forms services -->
     <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/form(/([^/]+)(/([^/]+))?)?"
@@ -44,11 +59,12 @@
     <service
         path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/history/([^/]+/[^/]+/[^/]+)"
         methods="GET"
-        model="persistence/relational/history.xpl"/>
+        class="org.orbeon.oxf.fr.persistence.relational.rest.HistoryRoute"/>
 
     <!-- Create, Read, Update and Delete operations (attachments) -->
-    <service path="/fr/service/(filesystem)/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))"
-             model="persistence/attachments/crud.xpl"/>
+    <service
+        path="/fr/service/(filesystem)/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))"
+        class="org.orbeon.oxf.fr.persistence.attachments.CRUDRoute"/>
 
     <!-- ==== Built-in resource manager-based persistence services ================================================= -->
 
@@ -59,7 +75,10 @@
 
     <!-- Deployed forms services -->
     <service path="/fr/service/resource/form(/([^/]+)(/([^/]+))?)?" view="persistence/resource/form.xpl"/>
-    <service path="/fr/service/([^/]+)/reindex" model="persistence/reindex.xpl"/>
+
+    <service
+        path="/fr/service/([^/]+)/reindex"
+        class="org.orbeon.oxf.fr.persistence.relational.index.ReindexRoute"/>
 
     <!-- ==== Internationalization ================================================================================= -->
 
@@ -173,8 +192,11 @@
 
     <!-- NOTE: Put those here as some URLs starting with /fr/service or /fr/page can erroneously match on those -->
 
+    <!-- Home and legacy landing paths -->
+    <page path="/(welcome/?|home/?)?"><action><result page="fr-landing"/></action></page>
+
     <!-- Landing page -->
-    <page path="/fr/" model="landing/landing.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
+    <page id="fr-landing" path="/fr/" model="landing/landing.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
         <setvalue ref="/*/app">*</setvalue>
         <setvalue ref="/*/form">*</setvalue>
         <setvalue ref="/*/mode">landing</setvalue>
@@ -272,9 +294,21 @@
         <setvalue ref="/*/mode">home</setvalue>
     </page>
 
+    <!-- ==== Other applications's services and pages ============================================================== -->
+
+    <service path="/([^/]+)/service/.+" model="apps/${1}/page-flow.xml" public-methods="#all"/>
+    <page    path="/([^/]+)/.*"         model="apps/${1}/page-flow.xml" public-methods="#all"/>
+
     <!-- ==== Epilogue and handlers ================================================================================ -->
 
-    <!-- NOTE: Use top-level handlers -->
-    <epilogue url="oxf:/config/epilogue.xpl"/>
+    <page id="not-found"    path="/not-found"    view="/config/not-found.xhtml"/>
+    <page id="unauthorized" path="/unauthorized" view="/config/unauthorized.xhtml"/>
+    <page id="error"        path="/error"        model="/config/error.xpl"/>
+
+    <not-found-handler      page="not-found"/>
+    <unauthorized-handler   page="unauthorized"/>
+    <error-handler          page="error"/>
+
+    <epilogue url="/config/epilogue.xpl"/>
 
 </controller>

@@ -28,6 +28,7 @@ import java.io.*
 import java.nio.file.{Files, Path, Paths}
 import scala.util.{Failure, Success}
 
+
 trait FilesystemCRUD extends CRUDMethods {
   private val logger = LoggerFactory.createLogger(classOf[FilesystemCRUD])
 

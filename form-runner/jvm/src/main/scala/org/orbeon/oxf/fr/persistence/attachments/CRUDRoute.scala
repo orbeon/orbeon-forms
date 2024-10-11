@@ -13,26 +13,40 @@
  */
 package org.orbeon.oxf.fr.persistence.attachments
 
+import org.orbeon.oxf.controller.NativeRoute
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.{AppForm, FormOrData, Version}
 import org.orbeon.oxf.http.{HttpMethod, HttpRanges, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
+import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
+import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 
 import scala.util.{Failure, Success}
 
-class CRUD extends ProcessorImpl {
-  private val logger = LoggerFactory.createLogger(classOf[CRUD])
 
-  override def start(pipelineContext: PipelineContext): Unit = {
-    implicit val httpRequest:  Request  = NetUtils.getExternalContext.getRequest
-    implicit val httpResponse: Response = NetUtils.getExternalContext.getResponse
+object CRUDRoute extends NativeRoute {
+
+  private val logger = LoggerFactory.createLogger(CRUDRoute.getClass)
+
+  import CRUD.*
+
+  def process(
+    matchResult: MatchResult
+  )(implicit
+    pc         : PipelineContext,
+    ec         : ExternalContext
+  ): Unit = {
+
+    implicit val httpRequest:  Request  = ec.getRequest
+    implicit val httpResponse: Response = ec.getResponse
+    implicit val indentedLogger: IndentedLogger = new IndentedLogger(logger)
 
     try {
-      logger.info(s"Attachments provider service: ${httpRequest.getMethod} ${httpRequest.getRequestPath}")
+      info(s"Attachments provider service: ${httpRequest.getMethod} ${httpRequest.getRequestPath}")
 
-      val (provider, attachmentInformation) = CRUD.providerAndAttachmentInformation(httpRequest)
+      val (provider, attachmentInformation) = providerAndAttachmentInformation(httpRequest)
 
       HttpRanges(httpRequest) match {
         case Success(ranges) =>
@@ -45,7 +59,7 @@ class CRUD extends ProcessorImpl {
           }
 
         case Failure(throwable) =>
-          logger.error(throwable)(s"Error while processing request ${httpRequest.getRequestPath}")
+          error(s"Error while processing request ${httpRequest.getRequestPath}", throwable)
           httpResponse.setStatus(StatusCode.BadRequest)
       }
     } catch {
@@ -55,7 +69,8 @@ class CRUD extends ProcessorImpl {
   }
 }
 
-object CRUD {
+private[attachments] object CRUD {
+
   private val FormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
   private val DataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/data/([^/]+)/([^/]+)".r
 
@@ -67,7 +82,7 @@ object CRUD {
     filename   : String
   )
 
-  private def providerAndAttachmentInformation(httpRequest: Request): (Provider, AttachmentInformation) = {
+  def providerAndAttachmentInformation(httpRequest: Request): (Provider, AttachmentInformation) = {
     val versionFromHeaders = httpRequest.getFirstHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt)
 
     httpRequest.getRequestPath match {

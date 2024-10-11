@@ -23,8 +23,8 @@ import org.orbeon.oxf.fr.FormRunner.{formBuilderPermissions, orbeonRolesFromCurr
 import org.orbeon.oxf.fr.FormRunnerHome.RemoteServer
 import org.orbeon.oxf.fr.FormRunnerPersistence.{getPersistenceURLHeadersFromProvider, getProviders}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization
-import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor
-import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyProcessor.OutgoingRequest.headersFromRequest
+import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxy
+import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxy.OutgoingRequest.headersFromRequest
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.PersistenceBase
 import org.orbeon.oxf.fr.persistence.relational.form.adt.*
@@ -38,7 +38,7 @@ import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import java.net.ConnectException
 
 
-trait FormProxyLogic { this: PersistenceProxyProcessor.type =>
+trait FormProxyLogic { this: PersistenceProxy.type =>
 
   sealed trait MetadataProvider
 

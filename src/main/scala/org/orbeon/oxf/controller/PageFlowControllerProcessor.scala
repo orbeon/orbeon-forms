@@ -37,13 +37,61 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.URLRewriterUtils.*
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.webapp.ProcessorService
+import org.orbeon.oxf.xml.{DeferredXMLReceiver, DeferredXMLReceiverImpl, TransformerUtils, XMLReceiver}
 import org.orbeon.oxf.xml.dom.Extensions.*
+import org.orbeon.oxf.xml.dom.IOSupport
+import org.orbeon.saxon.om.DocumentInfo
 
 import java.util.regex.Pattern
 import java.util as ju
+import javax.xml.transform.stream.StreamResult
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
+
+trait NativeRoute {
+  def process(
+    matchResult: MatchResult
+  )(implicit
+    pc         : PipelineContext,
+    ec         : ExternalContext
+  ): Unit
+}
+
+trait XmlNativeRoute extends NativeRoute {
+
+  final def readRequestBodyAsTinyTree(implicit ec: ExternalContext): DocumentInfo =
+    TransformerUtils.readTinyTree(
+      XPath.GlobalConfiguration,
+      ec.getRequest.getInputStream,
+      null,
+      false,
+      false
+    )
+
+  final def readRequestBodyAsDomDocument(implicit ec: ExternalContext): Document =
+    IOSupport.readOrbeonDom(ec.getRequest.getInputStream)
+
+  final def getResponseXmlReceiver(implicit ec: ExternalContext): DeferredXMLReceiver =
+    new DeferredXMLReceiverImpl(
+      TransformerUtils.getIdentityTransformerHandler(XPath.GlobalConfiguration) |!>
+        (t => TransformerUtils.applyOutputProperties(
+          t.getTransformer,
+          "xml",
+          null,
+          null,
+          null,
+          null,
+          true,
+          null,
+          true,
+          XmlIndentation
+        )) |!>
+        (_.setResult(new StreamResult(ec.getResponse.getOutputStream)))
+    )
+
+  private val XmlIndentation = 2
+}
 
 // Orbeon Forms application controller
 class PageFlowControllerProcessor extends ProcessorImpl {
@@ -293,6 +341,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
               defaultSubmission = None,
               model             = submissionModel,
               view              = None,
+              clazz             = None,
               element           = configRoot,
               supportedMethods  = Set(HttpMethod.POST),
               publicMethods     = SubmissionPublicMethods,
@@ -481,6 +530,7 @@ object PageFlowControllerProcessor {
     defaultSubmission : Option[String],
     model             : Option[String],
     view              : Option[String],
+    clazz             : Option[String],
     element           : Element,
     supportedMethods  : HttpMethod => Boolean,
     publicMethods     : HttpMethod => Boolean,
@@ -512,12 +562,12 @@ object PageFlowControllerProcessor {
 
       val isPage = e.getName == "page"
 
-      def methodAttributeFn(attName: String) = att(e, attName) map {
+      def methodAttributeFn(attName: String): Option[HttpMethod => Boolean] = att(e, attName) map {
         case att if att == AllPublicMethods => (_: HttpMethod) => true
         case att                            => att.tokenizeToSet map HttpMethod.withNameInsensitive
       }
 
-      def defaultPublicMethods = if (isPage) defaultPagePublicMethods else defaultServicePublicMethods
+      def defaultPublicMethods: Set[HttpMethod] = if (isPage) defaultPagePublicMethods else defaultServicePublicMethods
 
       val path = getPath(e)
       PageOrServiceElement(
@@ -527,6 +577,7 @@ object PageFlowControllerProcessor {
         defaultSubmission = att(e, "default-submission"),
         model             = att(e, "model"),
         view              = att(e, "view"),
+        clazz             = att(e, "class"),
         element           = e,
         supportedMethods  = methodAttributeFn("methods")        getOrElse (_ => true),
         publicMethods     = methodAttributeFn("public-methods") getOrElse defaultPublicMethods,
@@ -575,13 +626,16 @@ object PageFlowControllerProcessor {
 
     // Compile pipeline lazily
     lazy val pipelineConfig = compile(routeElement)
+//    lazy val clazzInstance  = routeElement.clazz.map(c => Class.forName(c).getDeclaredConstructor().newInstance().asInstanceOf[NativeRoute])
+    lazy val clazzInstance  = routeElement.clazz.map(c => Class.forName(c + "$").getDeclaredField("MODULE$").get(null).asInstanceOf[NativeRoute])
 
     // Run a page
     def process(
       pc            : PipelineContext,
       ec            : ExternalContext,
       matchResult   : MatchResult,
-      mustAuthorize : Boolean = true)(implicit
+      mustAuthorize : Boolean = true
+    )(implicit
       logger        : IndentedLogger
     ): Unit = {
 
@@ -591,19 +645,25 @@ object PageFlowControllerProcessor {
       if (mustAuthorize)
         authorize(ec)
 
-      // PipelineConfig is reusable, but PipelineProcessor is not
-      val pipeline = new PipelineProcessor(pipelineConfig)
+      clazzInstance match {
+        case Some(route) =>
+          route.process(matchResult)(pc, ec)
+        case None =>
 
-      // Provide matches input using a digest, because that's equivalent to how the PFC was working when the
-      // matches were depending on oxf:request. If we don't do this, then
-      val matchesProcessor = new DigestedProcessor(RegexpMatcher.writeXML(_, matchResult))
+        // PipelineConfig is reusable, but PipelineProcessor is not
+        val pipeline = new PipelineProcessor(pipelineConfig)
 
-      // Connect matches input and start pipeline
-      PipelineUtils.connect(matchesProcessor, "data", pipeline, "matches")
+        // Provide matches input using a digest, because that's equivalent to how the PFC was working when the
+        // matches depended on `oxf:request`. If we don't do this, then
+        val matchesProcessor = new DigestedProcessor(RegexpMatcher.writeXML(_, matchResult))
 
-      matchesProcessor.reset(pc)
-      pipeline.reset(pc)
-      pipeline.start(pc)
+        // Connect matches input and start pipeline
+        PipelineUtils.connect(matchesProcessor, "data", pipeline, "matches")
+
+        matchesProcessor.reset(pc)
+        pipeline.reset(pc)
+        pipeline.start(pc)
+      }
     }
   }
 

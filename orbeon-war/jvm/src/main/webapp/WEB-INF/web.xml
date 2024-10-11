@@ -61,11 +61,11 @@
     <!--Set main processor-->
     <context-param>
         <param-name>oxf.orbeon-main-servlet.main-processor.name</param-name>
-        <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+        <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
     </context-param>
     <context-param>
-        <param-name>oxf.orbeon-main-servlet.main-processor.input.config</param-name>
-        <param-value>oxf:/config/prologue-servlet.xpl</param-value>
+        <param-name>oxf.orbeon-main-servlet.main-processor.input.controller</param-name>
+        <param-value>oxf:/apps/fr/page-flow.xml</param-value>
     </context-param>
     <!--Set error processor-->
     <context-param>

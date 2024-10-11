@@ -26,7 +26,7 @@ import org.orbeon.scaxon.SimplePath.*
 
 trait DistinctValuesRequestParser {
 
-  this: DistinctValuesProcessor =>
+  this: DistinctValuesRoute.type =>
 
   val DistinctValuesPath = "/fr/service/([^/]+)/distinct-values/([^/]+)/([^/]+)".r
 

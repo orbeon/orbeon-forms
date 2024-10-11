@@ -102,7 +102,7 @@ trait CommonContainerInitializer {
       initParamPrefix     = "oxf.",
       mandatoryInitParams = Set(
         "oxf.main-processor.name",
-        "oxf.main-processor.input.config",
+        "oxf.main-processor.input.controller",
         "oxf.error-processor.name",
         "oxf.error-processor.input.controller",
         "oxf.http.accept-methods"

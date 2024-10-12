@@ -29,7 +29,7 @@ class RegexpProcessor extends ProcessorImpl {
   addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA))
   addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA))
 
-  override def createOutput(name: String) =
+  override def createOutput(name: String): ProcessorOutput =
     addOutput(name, new CacheableTransformerOutputImpl(self, name) {
       def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
         // Read inputs
@@ -73,11 +73,11 @@ object RegexpMatcher {
     xmlReceiver.endDocument()
   }
 
-  def compilePattern(path: String, glob: Boolean = false) =
+  def compilePattern(path: String, glob: Boolean = false): Pattern =
     Pattern.compile(if (glob) globToRegexp(path.toCharArray) else path)
 
   case class MatchResult(matches: Boolean, groupsWithNulls: Seq[String] = Nil) {
-    def group(i: Int) = groupsWithNulls(i)
+    def group(i: Int): String = groupsWithNulls(i)
   }
 
   object MatchResult {
@@ -89,5 +89,6 @@ object RegexpMatcher {
   }
 
   // For Java callers
-  def jMatchResult(pattern: Pattern, s: String) = MatchResult(pattern, s)
+  // 2024-10-11: Only used by `URLRewriterUtils`,
+  def jMatchResult(pattern: Pattern, s: String): MatchResult = MatchResult(pattern, s)
 }

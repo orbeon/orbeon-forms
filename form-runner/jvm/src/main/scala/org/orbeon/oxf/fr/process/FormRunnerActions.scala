@@ -444,11 +444,16 @@ trait FormRunnerActions
       delete(childElems)
     }
 
-  private val ParamsToExcludeUponModeChange = StateParamNames + DataFormatVersionName + DataMigrationBehaviorName
+  private val ParamsToExcludeUponModeChange =
+    StateParamNames                   +
+    DataMigrationBehaviorName         +
+    DataFormatVersionName             +
+    InternalAuthorizedOperationsParam +
+    InternalWorkflowStageParam
 
-  private def prependUserAndStandardParamsForModeChange(pathQuery: String, dataFormatVersion: DataFormatVersion) = {
+  private def prependUserAndStandardParamsForModeChange(pathQuery: String, dataFormatVersion: DataFormatVersion): String = {
 
-    val (path, params) = splitQueryDecodeParams(pathQuery)
+    val (originalPath, originalParams) = splitQueryDecodeParams(pathQuery)
 
     val dataMigrationParams =
       (DataMigrationBehaviorName -> DataMigrationBehavior.Disabled.entryName) ::
@@ -463,15 +468,17 @@ trait FormRunnerActions
         FormRunner.documentWorkflowStage.toList.map(stage => InternalWorkflowStageParam -> FormRunnerOperationsEncryption.encryptString(stage))
       }
 
+    def filterParams[T](p: List[(String, T)]): List[(String, T)] =
+      p filterNot { case (name, _) => ParamsToExcludeUponModeChange(name) }
+
     val userParams =
       for {
-        (name, values) <- inScopeContainingDocument.getRequestParameters.toList
-        if ! ParamsToExcludeUponModeChange(name)
+        (name, values) <- filterParams(inScopeContainingDocument.getRequestParameters.toList)
         value          <- values
       } yield
         name -> value
 
-    recombineQuery(path, dataMigrationParams ::: internalParams ::: userParams ::: params)
+    recombineQuery(originalPath, dataMigrationParams ::: internalParams ::: userParams ::: filterParams(originalParams))
   }
 
   private def buildRenderedFormatPath(

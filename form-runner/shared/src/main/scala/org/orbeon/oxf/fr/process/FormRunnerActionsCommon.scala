@@ -350,7 +350,7 @@ trait FormRunnerActionsCommon {
     frc.FormVersionParam -> (() => FormRunnerParams().formVersion.toString,                   _ => false )
   )
 
-  protected val StateParamNames = StateParams map (_._1) toSet
+  protected val StateParamNames = StateParams.map(_._1).toSet
 
   // Automatically prepend `fr-language`, `orbeon-embeddable` and `form-version` based on their current value unless
   // they are already specified in the given path.

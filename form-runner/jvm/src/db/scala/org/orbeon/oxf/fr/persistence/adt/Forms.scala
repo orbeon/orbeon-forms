@@ -93,7 +93,12 @@ case class FormWithData(
 
   val appForm : AppForm  = appFormVersion._1
   val version : Version  = Specific(appFormVersion._2)
-  val testForm: TestForm = TestForm(appForm, title, controls = Seq(TestForm.Control("control label")))
+  val testForm: TestForm = TestForm(
+    appForm          = appForm,
+    titlesByLanguage = Map("en" -> title),
+    controls         = Seq(TestForm.Control("control label")),
+    operations       = None
+  )
 
   def save(): FormWithData = {
     testForm.putFormDefinition(version)

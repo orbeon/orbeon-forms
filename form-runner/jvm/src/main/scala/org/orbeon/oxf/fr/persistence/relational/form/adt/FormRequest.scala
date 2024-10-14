@@ -58,7 +58,7 @@ case class FormRequest(
         val sortQueryXml     = sortQuery.toXML
         val paginationXml    = paginationOpt.map(_.toXML).map(nodeInfoToElem)
 
-        remoteServersXml ++ filterQueriesXml :+ sortQueryXml :+ paginationXml
+        (remoteServersXml ++ filterQueriesXml :+ sortQueryXml) ++ paginationXml.toSeq
        }</search>
 
     // toString method on Boolean returns "false"/"true"

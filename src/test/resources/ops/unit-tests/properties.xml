@@ -29,7 +29,7 @@
     <property as="xs:anyURI"  name="oxf.log4j-config"                                       value="oxf:/ops/unit-tests/log4j.xml"/>
     <property as="xs:anyURI"  name="oxf.log4j2-config"                                      value="oxf:/ops/unit-tests/log4j2.xml"/>
     <property as="xs:boolean" name="oxf.resources.versioned"                                value="false"/>
-    <property as="xs:string"  name="oxf.schemas.urn://adress-book"                          value="oxf:/ops/unit-tests/address-book-schema.xml"/>
+    <property as="xs:string"  name="oxf.schemas.urn://address-book"                         value="oxf:/ops/unit-tests/address-book-schema.xml"/>
     <property as="xs:string"  name="oxf.crypto.password"                                    value="ForTestsOnly!T42mMw*pgH9.EfTZx!4r"/>
     <property as="xs:string"  name="oxf.fr.access-token.password"                           value="ForTestsOnly!rVmBiyH8df.Ct72Zapen"/>
     <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"                     value="http://example.org/cool/service"/>
@@ -47,6 +47,9 @@
     <property as="xs:string"  name="oxf.fr.authentication.container.roles"                  value="orbeon admin user"/>
 
     <property as="xs:string"  name="oxf.fr.persistence.provider.cities.*.form"              value="provider1"/>
+
+    <!-- Make provider1 inactive so that FormMetadataApiTest works -->
+    <property as="xs:boolean" name="oxf.fr.persistence.provider1.active"                    value="false"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider1.uri"                       value="/fr/service/provider1"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.provider1.city-uri"                  value="http://en.wikipedia.org/wiki/Mexico_City"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider1.city-name"                 value="Mexico City"/>
@@ -57,8 +60,8 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider2.city-name"                 value="São Paulo"/>
     <property as="xs:integer" name="oxf.fr.persistence.provider2.population"                value="11244369"/>
 
-    <property as="xs:string"   name="oxf.fr.persistence.provider.issue.*.form"              value="resource"/>
-    <property as="xs:string"   name="oxf.fr.persistence.provider.tests.*.form"              value="resource"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.issue.*.form"               value="resource"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.tests.*.form"               value="resource"/>
 
     <property as="xs:boolean" name="oxf.fr.persistence.form-definition-cache.enable"        value="false"/>             <!-- So tests can avoid stepping on each other -->
 

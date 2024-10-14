@@ -97,5 +97,5 @@ object MatchType {
   val values: Seq[MatchType] = Seq(GreaterThanOrEqual, GreaterThan, LowerThanOrEqual, LowerThan, Exact, Substring, Token)
 
   def apply(string: String): MatchType =
-    values.find(_.string == string).getOrElse(throw new IllegalArgumentException(s"Invalid match type: $string"))
+    values.find(_.string == string.toLowerCase).getOrElse(throw new IllegalArgumentException(s"Invalid match type: $string"))
 }

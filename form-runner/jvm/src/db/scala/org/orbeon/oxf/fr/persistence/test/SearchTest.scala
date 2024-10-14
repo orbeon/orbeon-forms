@@ -61,7 +61,7 @@ class SearchTest
       withTestExternalContext { implicit externalContext =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
-          val SearchURL = HttpCall.searchURLPrefix(provider)
+          val SearchURL = HttpCall.searchURL(provider)
 
           val searchRequest =
             <search>
@@ -463,7 +463,7 @@ class SearchTest
       withTestExternalContext { implicit externalContext =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
-          val SearchURL = HttpCall.searchURLPrefix(provider)
+          val SearchURL = HttpCall.searchURL(provider)
 
           val searchRequest =
             <search>{
@@ -481,7 +481,7 @@ class SearchTest
       withTestExternalContext { implicit externalContext =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
-          val SearchURL = HttpCall.searchURLPrefix(provider)
+          val SearchURL = HttpCall.searchURL(provider)
 
           def searchRequest(metadata: String, `match`: String, value: String) =
             <search>{
@@ -513,7 +513,7 @@ class SearchTest
       withTestExternalContext { implicit externalContext =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
-          val SearchURL = HttpCall.searchURLPrefix(provider)
+          val SearchURL = HttpCall.searchURL(provider)
 
           val searchRequest =
             <search>{
@@ -530,7 +530,7 @@ class SearchTest
       withTestExternalContext { implicit externalContext =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
-          val SearchURL = HttpCall.searchURLPrefix(provider)
+          val SearchURL = HttpCall.searchURL(provider)
 
           val searchRequestSortByControl =
             <search>{
@@ -566,7 +566,7 @@ class SearchTest
       withTestExternalContext { implicit externalContext =>
         Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
-          val SearchURL = HttpCall.searchURLPrefix(provider)
+          val SearchURL = HttpCall.searchURL(provider)
 
           val searchRequestSortOnly =
             <search>{
@@ -622,7 +622,7 @@ class SearchTest
           eventually(timeout(Span(10, Seconds)), interval(Span(1, Second))) {
             assertCall(
               actualRequest  = HttpCall.SolicitedRequest(
-                path              = HttpCall.searchURLPrefix(provider),
+                path              = HttpCall.searchURL(provider),
                 version           = Unspecified,
                 method            = POST,
                 body              = Some(HttpCall.XML(searchRequest(formData.zip(formDataDates)))),

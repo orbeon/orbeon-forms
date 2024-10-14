@@ -254,5 +254,5 @@ object Metadata {
   val values: Seq[Metadata[?]] = Seq(AppName, FormName, FormVersion, Created, LastModified, LastModifiedBy, Title, Available, Operations)
 
   def apply(string: String): Metadata[?] =
-    values.find(_.string == string).getOrElse(throw new IllegalArgumentException(s"Invalid metadata: $string"))
+    values.find(_.string == string.toLowerCase).getOrElse(throw new IllegalArgumentException(s"Invalid metadata: $string"))
 }

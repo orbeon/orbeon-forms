@@ -770,7 +770,7 @@
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="data" schema-href="oxf:/ops/unit-tests/address-book-schema.xml"/>
-                <p:param type="output" name="data" schema-uri="urn://adress-book"/>
+                <p:param type="output" name="data" schema-uri="urn://address-book"/>
                 <p:processor name="oxf:identity">
                     <p:input name="data" href="#data"/>
                     <p:output name="data" ref="data"/>
@@ -886,7 +886,7 @@
                             </card>
                         </addressBook>
                     </p:input>
-                    <p:output name="data" ref="data" schema-uri="urn://adress-book"/>
+                    <p:output name="data" ref="data" schema-uri="urn://address-book"/>
                 </p:processor>
             </p:config>
         </input>

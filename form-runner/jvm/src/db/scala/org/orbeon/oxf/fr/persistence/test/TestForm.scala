@@ -18,8 +18,18 @@ import java.time.Instant
 
 
 object TestForm {
-  def apply(provider: Provider, controls: Seq[TestForm.Control], formName: String = DefaultFormName): TestForm =
-    TestForm(AppForm(provider.entryName, formName), title = formName, controls)
+  def apply(
+    provider  : Provider,
+    controls  : Seq[TestForm.Control],
+    formName  : String = DefaultFormName,
+    operations: Option[String] = None
+  ): TestForm =
+    TestForm(
+      appForm          = AppForm(provider.entryName, formName),
+      titlesByLanguage = Map("en" -> formName),
+      controls         = controls,
+      operations       = operations
+    )
 
   case class Control(label: String)
 
@@ -46,7 +56,12 @@ case class FormData(
 
 case class FormDataDates(createdBy: Instant, lastModifiedBy: Instant)
 
-case class TestForm(appForm: AppForm, title: String, controls: Seq[TestForm.Control]) {
+case class TestForm(
+  appForm         : AppForm,
+  titlesByLanguage: Map[String, String],
+  controls        : Seq[TestForm.Control],
+  operations      : Option[String]
+) {
 
   def controlPath(index: Int): String = s"section-1/${TestForm.controlName(index)}"
 
@@ -54,7 +69,9 @@ case class TestForm(appForm: AppForm, title: String, controls: Seq[TestForm.Cont
   def formDataURL(id: String): String = HttpCall.crudURLPrefix(appForm) + s"data/$id/$DataXml"
 
   def putFormDefinition(
-    version                 : Version)(implicit
+    version                 : Version,
+    credentials             : Option[Credentials] = None,
+    update                  : Boolean = false)(implicit
     logger                  : IndentedLogger,
     externalContext         : ExternalContext,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -63,7 +80,8 @@ case class TestForm(appForm: AppForm, title: String, controls: Seq[TestForm.Cont
       url          = formDefinitionURL,
       version      = version,
       body         = HttpCall.XML(formDefinition),
-      expectedCode = StatusCode.Created
+      expectedCode = if (update) StatusCode.NoContent else StatusCode.Created,
+      credentials  = credentials
     )
 
   def putFormData(
@@ -141,7 +159,7 @@ case class TestForm(appForm: AppForm, title: String, controls: Seq[TestForm.Cont
         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
       <xh:head>
-        <xh:title>{title}</xh:title>
+        <xh:title>{titlesByLanguage.getOrElse("en", titlesByLanguage.headOption.getOrElse(""))}</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
           <!-- Main instance -->
           <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
@@ -166,11 +184,19 @@ case class TestForm(appForm: AppForm, title: String, controls: Seq[TestForm.Cont
           <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
             <metadata>
               <application-name>{appForm.app}</application-name>
-              <form-name>{appForm.form}</form-name>
-              <title xml:lang="en">{title}</title>
+              <form-name>{appForm.form}</form-name>{
+                titlesByLanguage.map { case (language, title) =>
+                  <title xml:lang={language}>{title}</title>
+                }
+              }
               <description xml:lang="en"></description>
-              <created-with-version>2022.1-SNAPSHOT PE</created-with-version>
-              <email>
+              <created-with-version>2022.1-SNAPSHOT PE</created-with-version>{
+                operations.toSeq.map { ops =>
+                  <permissions>
+                    <permission operations={ops}/>
+                  </permissions>
+                }
+              }<email>
                 <templates>
                   <template name="default">
                     <form-fields></form-fields>

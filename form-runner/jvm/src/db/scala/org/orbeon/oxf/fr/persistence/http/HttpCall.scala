@@ -114,22 +114,22 @@ private[persistence] object HttpCall {
       }
     )
 
-  def assertCall(
-    actualRequest            : SolicitedRequest,
-    assertResponse           : Response => Unit)(implicit
-    logger                   : IndentedLogger,
-    externalContext          : ExternalContext,
-    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
-  ): Unit = {
+  def request[T](
+    solicitedRequest        : SolicitedRequest,
+    responseProcessor       : Response => T)(implicit
+    logger                  : IndentedLogger,
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): T = {
     useAndClose(
       request(
-        path        = actualRequest.path,
-        method      = actualRequest.method,
-        version     = actualRequest.version,
-        stage       = actualRequest.stage,
-        body        = actualRequest.body,
-        credentials = actualRequest.credentials,
-        timeout     = actualRequest.timeout
+        path        = solicitedRequest.path,
+        method      = solicitedRequest.method,
+        version     = solicitedRequest.version,
+        stage       = solicitedRequest.stage,
+        body        = solicitedRequest.body,
+        credentials = solicitedRequest.credentials,
+        timeout     = solicitedRequest.timeout
       )
     ) { closableHttpResponse =>
 
@@ -147,9 +147,18 @@ private[persistence] object HttpCall {
         }
       )
 
-      assertResponse(response)
+      responseProcessor(response)
     }
   }
+
+  def assertCall(
+    actualRequest            : SolicitedRequest,
+    assertResponse           : Response => Unit)(implicit
+    logger                   : IndentedLogger,
+    externalContext          : ExternalContext,
+    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+  ): Unit =
+    request(actualRequest, assertResponse)
 
   private def request(
     path                     : String,
@@ -225,11 +234,11 @@ private[persistence] object HttpCall {
   }
 
   val DefaultFormName = "my-form"
-  def crudURLPrefix         (appForm: AppForm): String                                       = s"crud/${appForm.app}/${appForm.form}/"
-  def crudURLPrefix         (provider: Provider, formName: String = DefaultFormName): String = crudURLPrefix(AppForm(provider.entryName, formName))
-  def searchURLPrefix       (provider: Provider, formName: String = DefaultFormName): String = s"search/${provider.entryName}/$formName"
-  def metadataURL           (provider: Provider, formName: String = DefaultFormName): String = s"form/${provider.entryName}/$formName"
-  def distinctValueURLPrefix(provider: Provider, formName: String = DefaultFormName): String = s"distinct-values/${provider.entryName}/$formName"
+  def crudURLPrefix   (appForm: AppForm): String                                       = s"crud/${appForm.app}/${appForm.form}/"
+  def crudURLPrefix   (provider: Provider, formName: String = DefaultFormName): String = crudURLPrefix(AppForm(provider.entryName, formName))
+  def searchURL       (provider: Provider, formName: String = DefaultFormName): String = s"search/${provider.entryName}/$formName"
+  def formMetadataURL (provider: Provider, formName: String = DefaultFormName): String = s"form/${provider.entryName}/$formName"
+  def distinctValueURL(provider: Provider, formName: String = DefaultFormName): String = s"distinct-values/${provider.entryName}/$formName"
 
   def post(
     url                      : String,

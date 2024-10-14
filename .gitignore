@@ -29,3 +29,13 @@ package-lock.json
 form-runner/test-db.sqlite
 # jenv
 .java-version
+# JS dev
+.angular
+node_modules/
+package-lock.json
+angular/dist/
+angular-test/dist/
+react/dist/
+react-test/dist/
+# FormMetadataApiTest
+src/test/resources/properties-form-metadata-api-test.xml

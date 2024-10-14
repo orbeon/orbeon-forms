@@ -167,7 +167,7 @@ class DistinctValuesTest
 
         testForm.putFormData(version, formData)
 
-        val url = HttpCall.distinctValueURLPrefix(provider)
+        val url = HttpCall.distinctValueURL(provider)
 
         eventually(timeout(Span(10, Seconds)), interval(Span(1, Second))) {
 

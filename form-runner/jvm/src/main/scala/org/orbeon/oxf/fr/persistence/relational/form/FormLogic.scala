@@ -16,13 +16,13 @@ package org.orbeon.oxf.fr.persistence.relational.form
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.relational.Statement.{Setter, StatementPart, executeQuery}
-import org.orbeon.oxf.fr.persistence.relational.form.adt.{Form, FormMetadata, FormRequest, FormResponse, OperationsList}
+import org.orbeon.oxf.fr.persistence.relational.form.adt.*
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.util.CollectionUtils.fromIteratorExt
-import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
-import org.orbeon.oxf.xml.dom.IOSupport
+import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 object FormLogic {
   def forms(
@@ -90,7 +90,12 @@ object FormLogic {
             elem = {
               val (title, available, permissions) =
                 Option(resultSet.getString("form_metadata")).map(_.trim).filter(_.nonEmpty).map { formMetadata =>
-                  val xml = StaticXPath.orbeonDomToTinyTree(IOSupport.readOrbeonDom(formMetadata)).rootElement
+                  val xml = XFormsCrossPlatformSupport.stringToTinyTree(
+                    configuration  = XPath.GlobalConfiguration,
+                    string         = formMetadata,
+                    handleXInclude = false,
+                    handleLexical  = false
+                  ).rootElement
 
                   // Extract title, availability, and permissions from form metadata
                   val title       = (xml / "title").map { title =>

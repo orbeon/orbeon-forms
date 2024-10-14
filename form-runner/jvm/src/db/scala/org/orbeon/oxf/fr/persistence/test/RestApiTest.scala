@@ -592,7 +592,7 @@ class RestApiTest
         Connect.withOrbeonTables("extract metadata") { (_, provider) =>
 
           val currentFormURL     = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
-          val currentMetadataURL = HttpCall.metadataURL(provider)
+          val currentMetadataURL = HttpCall.formMetadataURL(provider)
           val formDefinition     = buildFormDefinition(provider, AnyoneCanCreateAndRead)
 
           HttpAssert.put(currentFormURL, Unspecified, HttpCall.XML(formDefinition), StatusCode.Created)

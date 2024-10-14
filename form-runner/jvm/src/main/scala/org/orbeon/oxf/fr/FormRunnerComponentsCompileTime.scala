@@ -42,7 +42,7 @@ trait FormRunnerComponentsCompileTime {
     libraryName  : String,
     norewrite    : Array[String]
   ): String =
-  FormRunnerRename.replaceVarReferencesWithFunctionCallsFromPropertyImpl(
+  FormRunnerRename.replaceVarReferencesWithFunctionCallsFromPropertyAsString(
     propertyName    = propertyName,
     avt             = avt,
     libraryName     = libraryName.trimAllToOpt,

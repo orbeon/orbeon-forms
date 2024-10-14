@@ -764,5 +764,5 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     xpc        : XPathContext,
     xfc        : XFormsFunction.Context
   ): List[Item] =
-    EvaluateSupport.evaluateInContext(expr, effectiveId)
+    EvaluateSupport.evaluateInContextFromXPathString(expr, effectiveId)
 }

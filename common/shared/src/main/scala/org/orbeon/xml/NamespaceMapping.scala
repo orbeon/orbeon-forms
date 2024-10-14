@@ -20,6 +20,9 @@ import scala.jdk.CollectionConverters.*
 // Scala 3: was private constructor. Any better solution?
 case class NamespaceMapping(hash: String, mapping: Map[String, String]) {
   require((hash ne null) && (mapping ne null))
+
+  def amend(prefix: String, uri: String): NamespaceMapping =
+    NamespaceMapping(mapping + (prefix -> uri))
 }
 
 // We used to compute a hash with `SecureUtils.defaultMessageDigest`. The hash was used for 2

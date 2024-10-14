@@ -1,10 +1,14 @@
 package org.orbeon.oxf.util
 
-import java.util as ju
+import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver}
 
+import java.util as ju
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
+import org.orbeon.saxon.om.Item
 import org.orbeon.xml.NamespaceMapping
+
+import java.util.List as JList
 
 
 // Marker for XPath function context
@@ -45,7 +49,8 @@ trait XPathTrait {
     contextPosition     : Int,
     compiledExpression  : StaticXPath.CompiledExpression,
     functionContext     : FunctionContext,
-    variableResolver    : StaticXPath.VariableResolver)(implicit
+    variableResolver    : StaticXPath.VariableResolver
+  )(implicit
     reporter            : Reporter
   ): String =
     Option(
@@ -56,22 +61,40 @@ trait XPathTrait {
         functionContext,
         variableResolver
       )
-    ) map (_.toString) orNull
+    ).map(_.toString).orNull
 
   def evaluateSingle(
     contextItems        : ju.List[om.Item],
     contextPosition     : Int,
     compiledExpression  : StaticXPath.CompiledExpression,
     functionContext     : FunctionContext,
-    variableResolver    : StaticXPath.VariableResolver)(implicit
+    variableResolver    : StaticXPath.VariableResolver
+  )(implicit
     reporter            : Reporter
   ): Any
+
+  def evaluateKeepItems(
+    contextItems        : JList[Item],
+    contextPosition     : Int,
+    compiledExpression  : CompiledExpression,
+    functionContext     : FunctionContext,
+    variableResolver    : VariableResolver
+  )(implicit
+    reporter            : Reporter
+  ): LazyList[Item]
 
   def isXPath2ExpressionOrValueTemplate(
     xpathString      : String,
     namespaceMapping : NamespaceMapping,
     functionLibrary  : FunctionLibrary,
-    avt              : Boolean)(implicit
+    avt              : Boolean
+  )(implicit
     logger           : IndentedLogger
   ): Boolean
+
+  def adjustContextItem(contextItems: ju.List[om.Item], contextPosition: Int): (om.Item, Int) =
+    if (contextPosition > 0 && contextPosition <= contextItems.size)
+      (contextItems.get(contextPosition - 1), contextPosition)
+    else
+      (null, 0)
 }

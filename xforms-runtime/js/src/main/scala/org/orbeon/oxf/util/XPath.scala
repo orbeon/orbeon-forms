@@ -11,15 +11,18 @@ import org.orbeon.saxon.expr.parser.{ExpressionTool, OptimizerOptions}
 import org.orbeon.saxon.expr.{Expression, XPathContextMajor, XPathContextMinor}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
+import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathDynamicContext, XPathExpression, XPathStaticContext}
 import org.orbeon.saxon.tree.iter.ManualIterator
 import org.orbeon.saxon.utils.Configuration
 import org.orbeon.saxon.value.AtomicValue
+import org.orbeon.scaxon.Implicits
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xml.NamespaceMapping
 
 import java.util as ju
+import java.util.List as JList
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -44,7 +47,8 @@ object XPath extends XPathTrait {
     contextPosition     : Int,
     compiledExpression  : CompiledExpression,
     functionContext     : FunctionContext,
-    variableResolver    : VariableResolver)(implicit
+    variableResolver    : VariableResolver
+  )(implicit
     reporter            : Reporter
   ): Any =
     withEvaluation(compiledExpression) { xpathExpression =>
@@ -81,6 +85,43 @@ object XPath extends XPathTrait {
       }
     }
 
+  def evaluateKeepItems(
+    contextItems        : JList[Item],
+    contextPosition     : Int,
+    compiledExpression  : CompiledExpression,
+    functionContext     : FunctionContext,
+    variableResolver    : VariableResolver
+  )(implicit
+    reporter            : Reporter
+  ): LazyList[Item] =
+    withEvaluation(compiledExpression) { xpathExpression =>
+
+      Logger.debug(s"`XPath.evaluateKeepItems()` for `${compiledExpression.string}`")
+
+      val (contextItem, contextPos) = adjustContextItem(contextItems, contextPosition)
+
+      val (dynamicContext, xpathContext) =
+        newDynamicAndMajorContexts(xpathExpression, contextItem, contextPos, contextItems.size())
+
+      xpathContext.getController.setUserData(
+        classOf[ShareableXPathStaticContext].getName,
+        "variableResolver",
+        variableResolver
+      )
+
+      if (DebugExplainExpressions) {
+        import org.orbeon.saxon.lib.StandardLogger
+
+        import _root_.java.io.PrintStream
+
+        xpathExpression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
+      }
+
+      withFunctionContext(functionContext) {
+        Implicits.asScalaIterator(xpathExpression.iterate(dynamicContext)).to(LazyList)
+      }
+    }
+
   def isXPath2ExpressionOrValueTemplate(
     xpathString      : String,
     namespaceMapping : NamespaceMapping,
@@ -110,12 +151,6 @@ object XPath extends XPathTrait {
       AttributeValueTemplate.make(xpathString, staticContext)
     else
       ExpressionTool.make(xpathString, staticContext, 0, -1, null)
-
-  def adjustContextItem(contextItems: ju.List[om.Item], contextPosition: Int): (om.Item, Int) =
-    if (contextPosition > 0 && contextPosition <= contextItems.size)
-      (contextItems.get(contextPosition - 1), contextPosition)
-    else
-      (null, 0)
 
   def newDynamicAndMajorContexts(
     expression      : XPathExpression,

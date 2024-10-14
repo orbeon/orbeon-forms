@@ -13,6 +13,6 @@ class XXFEvaluateInContext extends DefaultFunctionSupport with RuntimeDependentF
     implicit val xpc: XPathContext = xpathContext
     implicit val xfc: XFormsFunction.Context = XFormsFunction.context
 
-    EvaluateSupport.evaluateInContext(stringArgument(0), stringArgument(1))
+    EvaluateSupport.evaluateInContextFromXPathString(stringArgument(0), stringArgument(1))
   }
 }

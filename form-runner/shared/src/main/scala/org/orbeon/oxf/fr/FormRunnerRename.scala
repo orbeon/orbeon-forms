@@ -2,8 +2,9 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.XMLNames.{FR, FRPrefix}
 import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, XPath}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, StaticXPath, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.DependencyAnalyzer
 import org.orbeon.oxf.xml.{SaxonUtils, ShareableXPathStaticContext}
@@ -132,7 +133,7 @@ object FormRunnerRename {
     }
 
   // Return `None` if the property doesn't exist or is blank
-  def replaceVarReferencesWithFunctionCallsFromPropertyImpl(
+  def replaceVarReferencesWithFunctionCallsFromPropertyAsString(
     propertyName   : String,
     avt            : Boolean,
     libraryName    : Option[String],
@@ -153,6 +154,38 @@ object FormRunnerRename {
           avt              = avt,
           libraryNameOpt   = libraryName,
           norewrite        = norewrite
+        )
+      }
+
+  def replaceVarReferencesWithFunctionCallsFromPropertyAsExpr(
+    propertyName   : String,
+    avt            : Boolean,
+    libraryName    : Option[String],
+    norewrite      : Set[String],
+    functionLibrary: FunctionLibrary
+  )(implicit
+    logger         : IndentedLogger
+  ): Option[CompiledExpression] =
+    for {
+      property <- CoreCrossPlatformSupport.properties.getPropertyOpt(propertyName)
+      value    <- property.nonBlankStringValue
+    } yield
+      property.associatedValue { _ =>
+        val newValue =
+          replaceVarReferencesWithFunctionCalls(
+            xpathString      = value,
+            namespaceMapping = property.namespaceMapping,
+            library          = functionLibrary,
+            avt              = avt,
+            libraryNameOpt   = libraryName,
+            norewrite        = norewrite
+          )
+        StaticXPath.compileExpression(
+          xpathString      = newValue,
+          namespaceMapping = property.namespaceMapping.amend("frf", "java:org.orbeon.oxf.fr.FormRunner"), // TODO: we also amend in `FormRunnerEmailBackend`
+          locationData     = null,
+          functionLibrary  = functionLibrary,
+          avt              = avt
         )
       }
 

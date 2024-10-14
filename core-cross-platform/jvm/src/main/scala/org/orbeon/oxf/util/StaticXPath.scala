@@ -181,7 +181,8 @@ object StaticXPath extends StaticXPathTrait {
     namespaceMapping : NamespaceMapping,
     locationData     : LocationData,
     functionLibrary  : FunctionLibrary,
-    avt              : Boolean)(implicit
+    avt              : Boolean
+  )(implicit
     logger           : IndentedLogger
   ): CompiledExpression =
     CompiledExpression(

@@ -272,16 +272,13 @@ object XPath extends XPathTrait {
     contextPosition     : Int,
     compiledExpression  : CompiledExpression,
     functionContext     : FunctionContext,
-    variableResolver    : VariableResolver)(implicit
+    variableResolver    : VariableResolver
+  )(implicit
     reporter            : Reporter
   ): Any =
     withEvaluation(compiledExpression) { xpathExpression =>
 
-      val (contextItem, position) =
-        if (contextPosition > 0 && contextPosition <= contextItems.size)
-          (contextItems.get(contextPosition - 1), contextPosition)
-        else
-          (null, 0)
+      val (contextItem, position) = adjustContextItem(contextItems, contextPosition)
 
       val dynamicContext = xpathExpression.createDynamicContext(contextItem, position)
       val xpathContext   = dynamicContext.getXPathContextObject.asInstanceOf[XPathContextMajor]
@@ -300,6 +297,33 @@ object XPath extends XPathTrait {
           case null                     => null
           case _                        => throw new IllegalStateException // Saxon guarantees that an Item is either AtomicValue or NodeInfo
         }
+      }
+    }
+
+  def evaluateKeepItems(
+    contextItems        : JList[Item],
+    contextPosition     : Int,
+    compiledExpression  : CompiledExpression,
+    functionContext     : FunctionContext,
+    variableResolver    : VariableResolver
+  )(implicit
+    reporter            : Reporter
+  ): LazyList[Item] =
+    withEvaluation(compiledExpression) { xpathExpression =>
+
+      val (contextItem, position) = adjustContextItem(contextItems, contextPosition)
+
+      val dynamicContext = xpathExpression.createDynamicContext(contextItem, position)
+      val xpathContext   = dynamicContext.getXPathContextObject.asInstanceOf[XPathContextMajor]
+
+      xpathContext.getController.setUserData(
+        classOf[ShareableXPathStaticContext].getName,
+        "variableResolver",
+        variableResolver
+      )
+
+      withFunctionContext(functionContext) {
+        Implicits.asScalaIterator(xpathExpression.iterate(dynamicContext)).to(LazyList)
       }
     }
 
@@ -358,7 +382,8 @@ object XPath extends XPathTrait {
     xpathString      : String,
     namespaceMapping : NamespaceMapping,
     functionLibrary  : FunctionLibrary,
-    avt              : Boolean)(implicit
+    avt              : Boolean
+  )(implicit
     logger           : IndentedLogger
   ): Boolean =
     (avt || xpathString.nonAllBlank) &&

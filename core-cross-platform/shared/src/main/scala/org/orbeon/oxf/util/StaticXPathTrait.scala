@@ -21,6 +21,7 @@ import org.orbeon.saxon.om
 import org.orbeon.saxon.sxpath.{XPathExpression, XPathStaticContext}
 import org.orbeon.xml.NamespaceMapping
 
+
 // TODO: Check what really belongs to the form compilation and split out the rest.
 trait StaticXPathTrait {
 

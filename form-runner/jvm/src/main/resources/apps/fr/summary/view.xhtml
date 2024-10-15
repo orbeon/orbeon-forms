@@ -1711,11 +1711,9 @@
                                                                 then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
                                                                 else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
                                                     <xh:td class="fr-created">
-                                                        <xf:group ref=".[exists($current-document-href-opt)]">
-                                                            <xh:a href="{$current-document-href-opt}">
-                                                                <xf:output value="$created"/>
-                                                            </xh:a>
-                                                        </xf:group>
+                                                        <xh:a href="{$current-document-href-opt}" xxf:control="true" ref=".[exists($current-document-href-opt)]">
+                                                            <xf:output value="$created"/>
+                                                        </xh:a>
                                                         <xf:group ref=".[empty($current-document-href-opt)]">
                                                             <xf:output value="$created"/>
                                                         </xf:group>
@@ -1742,11 +1740,9 @@
                                                                 then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
                                                                 else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
                                                     <xh:td class="fr-modified">
-                                                        <xf:group ref=".[exists($current-document-href-opt)]">
-                                                            <xh:a href="{$current-document-href-opt}">
-                                                                <xf:output value="$last-modified"/>
-                                                            </xh:a>
-                                                        </xf:group>
+                                                        <xh:a href="{$current-document-href-opt}" xxf:control="true" ref=".[exists($current-document-href-opt)]">
+                                                            <xf:output value="$last-modified"/>
+                                                        </xh:a>
                                                         <xf:group ref=".[empty($current-document-href-opt)]">
                                                             <xf:output value="$last-modified"/>
                                                         </xf:group>
@@ -1766,11 +1762,9 @@
                                                 </xf:group>
                                                 <xf:group ref="''[$show-last-modified-by]">
                                                     <xh:td class="fr-td">
-                                                        <xf:group ref=".[exists($current-document-href-opt)]">
-                                                            <xh:a href="{$current-document-href-opt}">
-                                                                <xf:output value="$document/@last-modified-by"/>
-                                                            </xh:a>
-                                                        </xf:group>
+                                                        <xh:a href="{$current-document-href-opt}" xxf:control="true" ref=".[exists($current-document-href-opt)]">
+                                                            <xf:output value="$document/@last-modified-by"/>
+                                                        </xh:a>
                                                         <xf:group ref=".[empty($current-document-href-opt)]">
                                                             <xf:output value="$document/@last-modified-by"/>
                                                         </xf:group>
@@ -1778,11 +1772,9 @@
                                                 </xf:group>
                                                 <xf:group ref="''[$show-workflow-stage]">
                                                     <xh:td class="fr-td">
-                                                        <xf:group ref=".[exists($current-document-href-opt)]">
-                                                            <xh:a href="{$current-document-href-opt}">
-                                                                <xf:output value="$document/@workflow-stage"/>
-                                                            </xh:a>
-                                                        </xf:group>
+                                                        <xh:a href="{$current-document-href-opt}" xxf:control="true" ref=".[exists($current-document-href-opt)]">
+                                                            <xf:output value="$document/@workflow-stage"/>
+                                                        </xh:a>
                                                         <xf:group ref=".[empty($current-document-href-opt)]">
                                                             <xf:output value="$document/@workflow-stage"/>
                                                         </xf:group>
@@ -1887,21 +1879,21 @@
                                                                                 else
                                                                                     $raw
                                                                 "/>
-                                                            <xf:group ref=".[xxf:non-blank($edit-view-opt)]">
-                                                                <!-- We use CSS to make the link area take the entire cell, without wrapping around the content -->
-                                                                <xh:a href="{$current-document-href-opt}"/>
-                                                            </xf:group>
                                                             <!-- https://github.com/orbeon/orbeon-forms/issues/2955 -->
-                                                            <xf:switch
-                                                                caseref="($is-fb and starts-with(normalize-space($detail), '&lt;div&gt;'))"
-                                                                xxf:update="full">
-                                                                <xf:case value="true()">
-                                                                    <xf:output mediatype="text/html" value="$detail"/>
-                                                                </xf:case>
-                                                                <xf:case value="false()">
-                                                                    <xf:output value="$detail"/>
-                                                                </xf:case>
-                                                            </xf:switch>
+                                                            <!-- https://github.com/orbeon/orbeon-forms/issues/6550 -->
+                                                            <xh:a href="{$current-document-href-opt}">
+                                                                <!-- Q: Why `$is-fb`? Other forms too could have HTML. -->
+                                                                <xf:switch
+                                                                    caseref="starts-with(normalize-space($detail), '&lt;div&gt;')"
+                                                                    xxf:update="full">
+                                                                    <xf:case value="true()">
+                                                                        <xf:output mediatype="text/html" value="frf:maybeFilterHtml($detail)"/>
+                                                                    </xf:case>
+                                                                    <xf:case value="false()">
+                                                                        <xf:output value="$detail"/>
+                                                                    </xf:case>
+                                                                </xf:switch>
+                                                            </xh:a>
                                                         </xh:td>
                                                     </xf:group>
                                                 </xf:repeat>

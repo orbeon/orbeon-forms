@@ -224,6 +224,21 @@
       }
     }
 
+    td {
+
+      padding: 0;
+
+      & > a {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
     td, th {
 
       &.fr-align-right {
@@ -266,20 +281,6 @@
       // https://github.com/orbeon/orbeon-forms/issues/2955
       // https://www.w3schools.com/cssref/pr_class_display.asp
       position: relative;
-
-      &> .xforms-group > a[href] {
-
-        display: inline;
-
-        &:after {
-          content: '';
-          position: absolute;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-        }
-      }
     }
 
     th {
@@ -311,6 +312,7 @@
 
     .fr-repeat-selection-checkbox {
       .fr-plain-checkbox-container();
+      padding: 4px 5px;
     }
   }
 

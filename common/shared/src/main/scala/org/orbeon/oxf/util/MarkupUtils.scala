@@ -149,10 +149,16 @@ object MarkupUtils {
     }
   }
 
-  val VoidElements = Set(
+  val VoidElements: Set[String] = Set(
     // HTML 5: http://www.w3.org/TR/html5/syntax.html#void-elements
-    "area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr", // Legacy
-    "basefont", "frame", "isindex"
+    "area", "base",  "br",    "col",    "command", "embed", "hr",       "img",   "input", "keygen",
+    "link", "meta",  "param", "source", "track",   "wbr",   "basefont", "frame", "isindex"
+  )
+
+  val SafeElements: Set[String] = Set(
+    "a",  "b",      "i",     "ul",    "li",  "ol", "p",  "span",       "u",   "div",
+    "br", "strong", "em",    "pre",   "img", "h1", "h2", "h3",         "h4",  "h5",
+    "h6", "font",   "table", "tbody", "tr",  "td", "th", "blockquote", "sub", "sup",
   )
 
   private val CrRegex = """\r""".r

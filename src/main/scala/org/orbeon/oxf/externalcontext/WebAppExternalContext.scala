@@ -28,6 +28,7 @@ class WebAppExternalContext(webAppContext: WebAppContext, httpSession: Option[Ht
 
   def getWebAppContext: WebAppContext = webAppContext
   override def getStartLoggerString = ""
+  override def getEndLoggerString = ""
   def getRequest: ExternalContext.Request = null
   def getResponse: ExternalContext.Response = null
 }

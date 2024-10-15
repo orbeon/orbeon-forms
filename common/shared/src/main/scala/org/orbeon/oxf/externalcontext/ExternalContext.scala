@@ -266,7 +266,18 @@ trait ExternalContext {
         getRequest.queryStringOpt.getOrElse("")
       )
 
-    s"Received request: ${getRequest.getMethod} $pathQuery"
+    s"Start request: ${getRequest.getMethod} $pathQuery"
+  }
+
+  def getEndLoggerString: String = {
+
+    val pathQuery =
+      PathUtils.appendQueryString(
+        getRequest.getRequestURI,
+        getRequest.queryStringOpt.getOrElse("")
+      )
+
+    s"End request:   ${getRequest.getMethod} $pathQuery"
   }
 }
 

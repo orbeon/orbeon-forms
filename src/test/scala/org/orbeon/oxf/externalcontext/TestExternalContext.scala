@@ -372,5 +372,6 @@ class TestExternalContext(
     session
   }
 
-  override def getStartLoggerString = "Running test processor"
+  override def getStartLoggerString = "Start running test processor"
+  override def getEndLoggerString = "End running test processor"
 }

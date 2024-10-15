@@ -96,17 +96,17 @@ object InitUtils {
               logger.debug(e.throwable map OrbeonFormatter.format getOrElse "")
           case e: ResourceNotFoundException =>
             externalContext.getResponse.sendError(StatusCode.NotFound)
-            logger.info("Resource not found" + (Option(e.resource) map (": " + _) getOrElse "") + " " + locationMessage)
+            logger.info(s"Resource not found${Option(e.resource).map(": " + _).getOrElse("")} $locationMessage")
           case _ =>
             throw t
         }
     } finally {
       if (logger.isInfoEnabled) {
         val timing = System.currentTimeMillis - tsBegin
-        val requestPath = Option(externalContext.getRequest) map (_.getRequestPath) getOrElse "Done running processor"
-        logger.info(requestPath  + " - Timing: " + timing)
+        logger.info(s"${externalContext.getEndLoggerString} - Timing: $timing")
       }
-      try pipelineContext.destroy(success)
+      try
+        pipelineContext.destroy(success)
       catch {
         case NonFatal(t) =>
           logger.debug("Exception while destroying context after exception" + OrbeonFormatter.format(t))
@@ -122,8 +122,8 @@ object InitUtils {
     // Connect its inputs based on the definition
     for ((inputName, value) <- processorDefinition.getEntries.asScala) {
 
-      import DOMGenerator._
-      import PipelineUtils._
+      import DOMGenerator.*
+      import PipelineUtils.*
       import ProcessorImpl.OUTPUT_DATA
 
       def connectInput(file: Option[String], create: (String, Long, String) => DOMGenerator): Unit =

@@ -369,7 +369,7 @@ object XFormsAssetServer {
 
   private val DynamicResourcesSessionKey = "orbeon.resources.dynamic."
 
-  // Transform an URI accessible from the server into a URI accessible from the client.
+  // Transform a URI accessible from the server into a URI accessible from the client.
   // The mapping expires with the session.
   def proxyURI(
     urlString       : String,

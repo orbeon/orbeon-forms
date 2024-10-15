@@ -661,12 +661,6 @@
     </processor>
 
     <!-- Form Runner / Form Builder processors -->
-    <processor name="fr:relational-form">
-        <class name="org.orbeon.oxf.fr.persistence.relational.form.FormProcessor"/>
-    </processor>
-    <processor name="fr:relational-distinct-values">
-        <class name="org.orbeon.oxf.fr.persistence.relational.distinctvalues.DistinctValuesProcessor"/>
-    </processor>
     <processor name="fr:resources-patcher">
         <class name="org.orbeon.oxf.fr.ResourcesPatcher"/>
     </processor>

@@ -47,13 +47,10 @@
         class="org.orbeon.oxf.fr.persistence.relational.distinctvalues.DistinctValuesRoute"/>
 
     <!-- Deployed forms services -->
-    <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/form(/([^/]+)(/([^/]+))?)?"
-             methods="GET POST"
-             default-submission="persistence/form-instance.xml"
-             view="persistence/relational/form.xpl">
-        <setvalue ref="/*/app" matcher-group="3"/>
-        <setvalue ref="/*/form" matcher-group="5"/>
-    </service>
+    <service
+        path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver|sqlite)/form(/([^/]+)(/([^/]+))?)?"
+        methods="GET POST"
+        class="org.orbeon.oxf.fr.persistence.relational.form.PublishedFormMetadataRoute"/>
 
     <!-- Data history -->
     <service

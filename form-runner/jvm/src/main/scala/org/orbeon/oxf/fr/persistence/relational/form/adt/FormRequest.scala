@@ -18,7 +18,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.fr.FormRunnerHome.RemoteServer
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxy
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.instantFromString
-import org.orbeon.oxf.fr.persistence.relational.form.FormProcessor
+import org.orbeon.oxf.fr.persistence.relational.form.PublishedFormMetadataRoute
 import org.orbeon.oxf.fr.persistence.relational.form.adt.LocalRemoteOrCombinator.Remote
 import org.orbeon.oxf.fr.{AppFormOpt, FormDefinitionVersion}
 import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, HttpStatusCodeException, StatusCode}
@@ -97,7 +97,7 @@ case class FormRequest(
     exactFormQueryOpt.map(_.value)
 
   // Compatibility mode: GET request with parameters encoded in URL; otherwise, POST request with parameters in body
-  val pathSuffix: String            = FormProcessor.pathSuffix(compatibilityMode.flatOption(AppFormOpt(exactAppOpt, exactFormOpt)))
+  val pathSuffix: String            = PublishedFormMetadataRoute.pathSuffix(compatibilityMode.flatOption(AppFormOpt(exactAppOpt, exactFormOpt)))
   val httpMethod: HttpMethod        = if (compatibilityMode) HttpMethod.GET else HttpMethod.POST
   val httpBodyOpt: Option[NodeInfo] = (! compatibilityMode).option(toXML)
 

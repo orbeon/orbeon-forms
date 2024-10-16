@@ -1266,6 +1266,7 @@ lazy val coreCrossPlatformJVM = coreCrossPlatform.jvm
     commonJVM,
     domJVM
   )
+  .settings(unmanagedJarsSettings) // for TagSoup
   .settings(
     libraryDependencies ++= CoreLibraryDependencies
   )

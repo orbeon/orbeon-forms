@@ -24,13 +24,10 @@ import org.orbeon.oxf.util.CoreCrossPlatformSupport.{properties, runtime}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
-import org.orbeon.oxf.xml.{HTMLBodyXMLReceiver, SimpleHtmlSerializer}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.time.{LocalDateTime, ZoneId}
-import javax.xml.transform.sax.SAXResult
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
@@ -73,34 +70,15 @@ trait FormRunnerSummary {
       .map(offsetToDuration)
       .orNull
 
-  private val ElemNamesToFilterOut = Set(
-    "a",      // specifically for the Summary page, we don't want nested links
-    "script", // we don't want scripts under any circumstance
-    "style"   // we don't want styles under any circumstance
-  )
+  private val ElemNamesToFilterOut = Set("a")
 
   //@XPathFunction
   def maybeFilterHtml(htmlString: String): String =
-    htmlString.trimAllToOpt.filter(_.startsWith("<div>")).map { nonBlankHtmlString =>
-      val sb = new java.lang.StringBuilder
-      XFormsCrossPlatformSupport.htmlStringToResult(
-        nonBlankHtmlString,
-        null,
-        new SAXResult(
-          new HTMLBodyXMLReceiver(
-            // This does the same as `clean-html.xsl`
-            new SimpleHtmlSerializer(
-              sb,
-              n      => ElemNamesToFilterOut(n) && ! MarkupUtils.SafeElements(n),
-              (n, v) => n.startsWith("on") || v.contains("javascript:")
-            ),
-            ""
-          )
-        )
-      )
-      sb.toString
-    }
-    .getOrElse(htmlString)
+    htmlString
+      .trimAllToOpt
+      .filter(_.startsWith("<div>"))
+      .map(HtmlParsing.sanitizeHtmlString(_, ElemNamesToFilterOut))
+      .getOrElse(htmlString)
 
   //@XPathFunction
   def searchableValues(formDoc: DocumentInfo, app: String, form: String, version: Int): NodeInfo = {

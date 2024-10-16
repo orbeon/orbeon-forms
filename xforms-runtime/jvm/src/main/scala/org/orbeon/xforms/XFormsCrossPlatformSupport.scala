@@ -104,7 +104,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   private val TagSoupHtmlSchema = new HTMLSchema
 
-  def htmlStringToResult(value: String, locationData: LocationData, result: Result): Unit = {
+  private def htmlStringToResult(value: String, locationData: LocationData, result: Result): Unit = {
     try {
       val xmlReader = new org.ccil.cowan.tagsoup.Parser
       xmlReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, TagSoupHtmlSchema)

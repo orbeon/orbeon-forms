@@ -226,7 +226,9 @@
 
     td {
 
-      padding: 0;
+      &:has(a:not(.xforms-hidden)) {
+        padding: 0;
+      }
 
       & > a {
         display: block;

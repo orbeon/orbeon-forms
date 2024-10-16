@@ -93,6 +93,7 @@
              model="/forms/${1}/service/crud.xpl">
     </service>
 
+    <!-- xxx no use of this? search.xpl is not present -->
     <service path="/fr/service/custom/([^/^.]+)/search/[^/]+/[^/]+"
              view="/forms/${1}/service/search.xpl"/>
 
@@ -293,8 +294,8 @@
 
     <!-- ==== Other applications's services and pages ============================================================== -->
 
-    <service path="/([^/]+)/service/.+" model="apps/${1}/page-flow.xml" public-methods="#all"/>
-    <page    path="/([^/]+)/.*"         model="apps/${1}/page-flow.xml" public-methods="#all"/>
+    <service path="/([^/]+)/service/.+" model="/apps/${1}/page-flow.xml" public-methods="#all"/>
+    <page    path="/([^/]+)/.*"         model="/apps/${1}/page-flow.xml" public-methods="#all"/>
 
     <!-- ==== Epilogue and handlers ================================================================================ -->
 

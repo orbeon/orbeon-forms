@@ -209,14 +209,6 @@ public abstract class ProcessorImpl implements Processor {
         return outputCount;
     }
 
-    // NOTE: As of 2009-06-26, this is never called.
-    public void deleteOutput(ProcessorOutput output) {
-        final Collection outputs = outputMap.values();
-        outputs.remove(output);
-        // NOTE: This won't be correct with the TeeProcessor.
-        outputCount--;
-    }
-
     protected void addInputInfo(ProcessorInputOutputInfo inputInfo) {
         inputsInfo.add(inputInfo);
     }

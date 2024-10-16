@@ -111,15 +111,6 @@ public interface Processor {
     ProcessorOutput createOutput(String name);
 
     /**
-     * Deletes an output previously created with <code>createOutput(String
-     * name)</code>
-     *
-     * @param  output  Name of the output to delete
-     * @see    #createOutput(java.lang.String)
-     */
-    void deleteOutput(ProcessorOutput output);
-
-    /**
      * @param   name  Name of the output
      * @return  The outputs that have been previously created with
      *          <code>createOutput(String name)</code>. Returns

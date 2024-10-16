@@ -1650,7 +1650,7 @@
                </xxf:dynamic-state>
                <xxf:action>
                    <xxf:control-values>
-                       <xxf:control id="my-trigger" label="&lt;img alt=&quot;press&quot; src=&quot;https://placekitten.com/g/100/100&quot;&gt; "/>
+                       <xxf:control id="my-trigger" label="&lt;img src=&quot;https://placekitten.com/g/100/100&quot; alt=&quot;press&quot;&gt; "/>
                    </xxf:control-values>
                </xxf:action>
            </xxf:event-response>

@@ -9,6 +9,7 @@ import org.orbeon.oxf.util.CoreUtils.*
 import java.io
 import java.net.URI
 import javax.cache.Caching
+import javax.cache.configuration.MutableConfiguration
 import scala.jdk.CollectionConverters.*
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -18,15 +19,17 @@ object JCacheSupport extends CacheProviderApi {
 
   import CacheSupport.Logger._
 
-  def get(cacheName: String): Option[CacheApi] =
-    cacheManager.getCache[io.Serializable, io.Serializable](cacheName) match {
-      case null =>
-        debug(s"did not find JCache cache for `$cacheName`")
-        None
-      case cache =>
-        debug(s"found JCache cache for `$cacheName`")
-        new JCacheCacheApi(cache).some
-    }
+  def get(cacheName: String): Option[CacheApi] = {
+    val cacheOpt = Option(cacheManager.getCache[io.Serializable, io.Serializable](cacheName))
+    val cache = cacheOpt.getOrElse(
+      cacheManager.createCache
+        [io.Serializable, io.Serializable, MutableConfiguration[io.Serializable, io.Serializable]]
+        (cacheName, new MutableConfiguration[io.Serializable, io.Serializable]())
+    )
+    // We always return a `Some` since our implementation for JCache always creates a cache if one doesn't
+    // already exist, while our implementation for EHCache 2 doesn't.
+    Some(new JCacheCacheApi(cache))
+  }
 
   def close(): Unit =
     provider.close() // xxx TODO: what if provider used by others? should we close it, or just the cache manager?

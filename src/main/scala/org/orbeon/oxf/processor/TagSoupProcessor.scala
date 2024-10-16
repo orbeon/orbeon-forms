@@ -31,7 +31,7 @@ class TagSoupProcessor extends ProcessorImpl {
     addOutput(name, new ProcessorOutputImpl(this, name) {
       def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
-        // Read input as binary document in byte array
+        // Read input as binary document
         val inputValue = {
           val writer = new StringWriter
           readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA, new TextXMLReceiver(writer))

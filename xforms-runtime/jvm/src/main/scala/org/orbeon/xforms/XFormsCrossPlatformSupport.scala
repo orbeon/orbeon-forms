@@ -24,18 +24,18 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.PathUtils.splitQuery
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, SaxonConfiguration}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.*
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xforms.processor.XFormsAssetServerRoute
 import org.orbeon.oxf.xforms.upload.UploaderServer
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.xml.sax.InputSource
@@ -43,8 +43,8 @@ import org.xml.sax.InputSource
 import java.io.*
 import java.net.URI
 import java.nio.charset.Charset
-import javax.xml.transform.dom.{DOMResult, DOMSource}
-import javax.xml.transform.sax.TransformerHandler
+import javax.xml.transform.dom.DOMResult
+import javax.xml.transform.sax.{SAXResult, TransformerHandler}
 import javax.xml.transform.{Result, Transformer}
 import scala.util.control.NonFatal
 
@@ -149,19 +149,13 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   //        }
   //    }
   def streamHTMLFragment(
-    value        : String,
-    locationData : LocationData,
-    xhtmlPrefix  : String)(implicit
-    xmlReceiver  : XMLReceiver
-  ): Unit = {
-    if (value.nonAllBlank) {
-      // don't parse blank values
-      val htmlDocument = htmlStringToDocumentTagSoup(value, locationData)
-      // Stream fragment to the output
-      if (htmlDocument != null)
-        TransformerUtils.sourceToSAX(new DOMSource(htmlDocument), new HTMLBodyXMLReceiver(xmlReceiver, xhtmlPrefix))
-    }
-  }
+    value       : String,
+    locationData: LocationData,
+    xhtmlPrefix : String)(implicit
+    xmlReceiver : XMLReceiver
+  ): Unit =
+    if (value.nonAllBlank)
+      htmlStringToResult(value, locationData, new SAXResult(new HTMLBodyXMLReceiver(xmlReceiver, "")))
 
   def proxyURI(
     urlString      : String,

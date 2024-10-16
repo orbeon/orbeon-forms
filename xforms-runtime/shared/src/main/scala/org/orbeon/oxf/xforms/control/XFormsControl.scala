@@ -20,7 +20,6 @@ import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.rewrite.Rewrite
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysis, WithChildrenTrait}
@@ -30,13 +29,12 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.{StaticDataModel, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLConstants}
+import org.orbeon.oxf.xml.{SimpleHtmlSerializer, XMLConstants}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.RepeatSeparatorString
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
-import org.xml.sax.Attributes
 
 
 /**
@@ -282,55 +280,17 @@ object XFormsControl {
     if (rawValue eq null)
       return null
 
-    val sb = new StringBuilder(rawValue.length * 2) // just an approx of the size it may take
+    val sb = new java.lang.StringBuilder(rawValue.length * 2) // just an approx of the size it may take
     // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
     val rewriter = XFormsCrossPlatformSupport.externalContext.getResponse
     XFormsCrossPlatformSupport.streamHTMLFragment(
       rawValue,
       locationData,
-      "xhtml")(
+      "xhtml"
+    )(
       Rewrite.getRewriteXMLReceiver(
         rewriter,
-        new ForwardingXMLReceiver {
-
-          private var isStartElement = false
-
-          override def characters(chars: Array[Char], start: Int, length: Int): Unit = {
-            sb.append(new String(chars, start, length).escapeXmlMinimal) // NOTE: not efficient to create a new String here
-            isStartElement = false
-          }
-
-          override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
-            sb.append('<')
-            sb.append(localname)
-            val attributeCount = attributes.getLength
-
-            for (i <- 0 until attributeCount) {
-              val currentName = attributes.getLocalName(i)
-              val currentValue = attributes.getValue(i)
-              sb.append(' ')
-              sb.append(currentName)
-              sb.append("=\"")
-              sb.append(currentValue)
-              sb.append('"')
-            }
-
-            sb.append('>')
-            isStartElement = true
-          }
-
-          override def endElement(uri: String, localname: String, qName: String): Unit = {
-            if (! isStartElement || ! VoidElements(localname)) {
-              // We serialize to HTML: don't close elements that just opened (will cover `<br>`, `<hr>`, etc.). Be sure not
-              // to drop closing elements of other tags though!
-              sb.append("</")
-              sb.append(localname)
-              sb.append('>')
-            }
-            isStartElement = false
-          }
-
-        },
+        new SimpleHtmlSerializer(sb),
         fragment = true,
         XMLConstants.XHTML_NAMESPACE_URI
       )

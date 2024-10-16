@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.fr.persistence.relational
 
-import enumeratum.EnumEntry.Lowercase
 import enumeratum.*
+import enumeratum.EnumEntry.Lowercase
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.fr.AppForm
@@ -208,18 +208,7 @@ object Provider extends Enum[Provider] {
   ): RowNumSQL = {
 
     val mySQLMajorVersion =
-      (provider == MySQL).option {
-        val mySQLVersion = {
-          val sql = "SHOW VARIABLES LIKE \"version\""
-          useAndClose(connection.prepareStatement(sql)) { ps =>
-            useAndClose(ps.executeQuery()) { rs =>
-              rs.next()
-              rs.getString("value")
-            }
-          }
-        }
-        mySQLVersion.splitTo(".").head.toInt
-      }
+      (provider == MySQL).option(connection.getMetaData.getDatabaseMajorVersion)
 
     mySQLMajorVersion match {
       case Some(v) if v < 8 =>

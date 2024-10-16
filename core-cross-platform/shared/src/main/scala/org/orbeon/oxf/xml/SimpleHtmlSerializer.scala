@@ -8,7 +8,6 @@ class SimpleHtmlSerializer(
   sb                 : java.lang.StringBuilder,
   filterOutElemByName: String => Boolean           = _      => false,
   filterOutAtt       : (String, String) => Boolean = (_, _) => false,
-
 ) extends XMLReceiverAdapter {
 
   private var isStartElement = false

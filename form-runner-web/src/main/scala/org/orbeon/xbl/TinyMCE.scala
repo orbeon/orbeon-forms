@@ -32,14 +32,21 @@ import scala.scalajs.js.{UndefOr, |}
 
 object TinyMCE {
 
-  // If the TinyMCE adds a toolbar directly under the body, and we have a dialog open, move the toolbox inside the
-  // dialog. We need this for the toolbar not to show under the dialog.
+  // When the TinyMCE adds positioned elements to the DOM directly under the body, and we have a dialog open,
+  // move them inside the dialog, so they don't show under the dialog.
   document.addEventListener("DOMContentLoaded", { (_: dom.Event) =>
+
+    val PositionedElementClasses = List(
+      "tox-tinymce-inline", // Inline toolbar
+      "tox-tinymce-aux"     // Dialog, e.g. link editor
+    )
+
     val observer = new MutationObserver({ (mutations, _) =>
       mutations.foreach { mutation =>
           mutation.addedNodes.foreach {
             case element: Element =>
-              if (element.classList.contains("tox-tinymce-inline")) {
+              val classes = element.classList.asInstanceOf[js.Array[String]].toList
+              if (PositionedElementClasses.exists(classes.contains)) {
                 val openDialog = document.querySelector("dialog[open]")
                 if (openDialog != null) {
                   openDialog.appendChild(element)

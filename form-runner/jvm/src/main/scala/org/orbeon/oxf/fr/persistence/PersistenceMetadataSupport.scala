@@ -142,7 +142,8 @@ object PersistenceMetadataSupport {
     def readMaybeFromCache[T <: Serializable](
       appForm       : AppForm,
       version       : FormDefinitionVersion,
-      cacheOpt      : Option[CacheApi])(
+      cacheOpt      : Option[CacheApi]
+    )(
       read          : => Try[T]
     )(implicit
       indentedLogger: IndentedLogger

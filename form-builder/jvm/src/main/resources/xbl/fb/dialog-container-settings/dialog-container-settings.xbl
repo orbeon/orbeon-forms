@@ -66,8 +66,8 @@
                 <xf:setvalue ref="$i/original-custom-iteration-name" value="if ($i/was-custom-iteration-name = true()) then fbf:findRepeatIterationNameOrEmpty($form, $i/control-name) else ''"/>
                 <xf:setvalue ref="$i/custom-iteration-name"          value="$i/original-custom-iteration-name"/>
 
-                <xf:setvalue ref="$i/iteration-relevant"             value="fbf:readDenormalizedCalculatedMipForIteration($i/control-name, 'relevant')"/>
-                <xf:setvalue ref="$i/iteration-readonly"             value="fbf:readDenormalizedCalculatedMipForIteration($i/control-name, 'readonly')"/>
+                <xf:setvalue ref="$i/iteration-relevant"             value="if ($i/was-repeat = true()) then fbf:readDenormalizedCalculatedMipForIteration($i/control-name, 'relevant') else 'true()'"/>
+                <xf:setvalue ref="$i/iteration-readonly"             value="if ($i/was-repeat = true()) then fbf:readDenormalizedCalculatedMipForIteration($i/control-name, 'readonly') else 'false()'"/>
 
                 <xf:setvalue ref="$i/appearance"                     value="($control/@appearance, 'default')[1]"/>
 

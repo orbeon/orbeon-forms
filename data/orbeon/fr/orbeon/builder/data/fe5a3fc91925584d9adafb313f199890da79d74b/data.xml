@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:saxon="http://saxon.sf.net/" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>Demo form: Purchase Order</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <invoice-header>
+                        <grid-1><control-1 filename="orbeon-navbar-logo.png" mediatype="image/png" size="17250">/fr/service/persistence/crud/orbeon/builder/data/fe5a3fc91925584d9adafb313f199890da79d74b/36cd953f4eba10f8a77878f4d1bc9a56aab64334.bin</control-1><company-byline/><invoice-date/><due-date/><invoice-number/></grid-1>
+
+                    </invoice-header><invoice-from><grid-3>
+                            <us-address-street-1/><us-address-city/>
+
+
+                            <us-address-street-2/><us-address-state/><us-address-zip/>
+
+
+                            <us-address-urbanization/>
+
+                        </grid-3></invoice-from><invoice-to><grid-3>
+                            <us-address-street-1/><us-address-city/>
+
+
+                            <us-address-street-2/><us-address-state/><us-address-zip/>
+
+
+                            <us-address-urbanization/>
+
+                        </grid-3></invoice-to><invoice-items><grid-3><grid-3-iteration><units/><description/><unit-price/><line-total/></grid-3-iteration></grid-3><grid-4><total/></grid-4><bottom-notes-grid><bottom-notes/></bottom-notes-grid></invoice-items>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="invoice-header-bind" name="invoice-header" ref="invoice-header">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"><xf:bind id="company-byline-bind" ref="company-byline" name="company-byline"/><xf:bind id="control-1-bind" ref="control-1" name="control-1" type="xf:anyURI"/><xf:bind id="invoice-date-bind" ref="invoice-date" name="invoice-date" type="xf:date"/><xf:bind id="due-date-bind" ref="due-date" name="due-date" type="xf:date"/><xf:bind id="invoice-number-bind" ref="invoice-number" name="invoice-number" xxf:whitespace="trim"/></xf:bind>
+
+                </xf:bind><xf:bind id="invoice-from-bind" ref="invoice-from" name="invoice-from"/><xf:bind id="invoice-to-bind" ref="invoice-to" name="invoice-to"/><xf:bind id="invoice-items-bind" ref="invoice-items" name="invoice-items"><xf:bind id="grid-3-bind" ref="grid-3" name="grid-3"><xf:bind id="grid-3-iteration-bind" ref="grid-3-iteration" name="grid-3-iteration"><xf:bind id="unit-price-bind" ref="unit-price" name="unit-price" type="xf:decimal" constraint="xxf:fraction-digits(2)"/><xf:bind id="line-total-bind" ref="line-total" name="line-total" type="xf:decimal" constraint="xxf:fraction-digits(2)" calculate="$units * $unit-price"/><xf:bind id="description-bind" ref="description" name="description" xxf:whitespace="trim"/><xf:bind id="units-bind" ref="units" name="units" type="xf:decimal"/></xf:bind></xf:bind><xf:bind id="grid-4-bind" ref="grid-4" name="grid-4"><xf:bind id="total-bind" ref="total" name="total" type="xf:decimal" constraint="xxf:fraction-digits(2)" calculate="sum($line-total, 0.0)"/></xf:bind><xf:bind id="bottom-notes-grid-bind" ref="bottom-notes-grid" name="bottom-notes-grid"><xf:bind id="bottom-notes-bind" ref="bottom-notes" name="bottom-notes"/></xf:bind></xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>purchase-order</form-name>
+                    <title xml:lang="en">Demo form: Purchase Order</title>
+                    <description xml:lang="en"/>
+                    
+                    <library-versions>
+                        <_>1</_><orbeon>3</orbeon>
+                    </library-versions>
+                    <created-with-version>2024.1-SNAPSHOT PE</created-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
+                <thumbnail filename="invoice.png" mediatype="image/png" size="156609">/fr/service/persistence/crud/orbeon/builder/data/fe5a3fc91925584d9adafb313f199890da79d74b/137931bf03f9be219e23c92505ffec7ece316f84.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en"><control-1><label/><hint/></control-1><company-byline><text>&lt;div&gt;&lt;span style="font-size: 18pt;"&gt;Orbeon, Inc.&lt;/span&gt;&lt;/div&gt;
+&lt;div&gt;Manage your web forms' entire lifecycle&lt;/div&gt;</text></company-byline><invoice-date><label>Invoice Date</label><hint/></invoice-date><due-date><label>Due Date</label><hint/></due-date><invoice-number><label>Invoice Number</label><hint/></invoice-number><total><label>Total</label><hint/></total><bottom-notes><text>&lt;div&gt;Should you prefer to pay by credit card instead of by bank transfer, please add to the total amount mentioned above either 2.9% if using a credit card issued by a US bank, and 4.4% otherwise.&lt;/div&gt;
+&lt;div&gt; &lt;/div&gt;</text></bottom-notes><units><label>Units</label><hint/></units><description><label>Description</label><hint/></description><unit-price><label>Per Unit</label><hint/></unit-price><line-total><label>Total</label><hint/></line-total><invoice-from><label>From</label><help/></invoice-from>
+                        <invoice-header>
+                            
+                        </invoice-header><invoice-items><label>Items</label></invoice-items><invoice-to><label>Bill To</label></invoice-to><grid-3/><bottom-notes-grid/>
+
+                    </resource>
+                </resources>
+            </xf:instance><xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-3-template"><grid-3-iteration><unit-price/><line-total/><description/><units/></grid-3-iteration></xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="invoice-header-section" bind="invoice-header-bind">
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="1"><fr:image xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-1-control" class="fr-static-attachment" bind="control-1-bind">
+                         <xf:label ref="$form-resources/control-1/label"/>
+                         <xf:hint ref="$form-resources/control-1/hint"/>
+                         
+                         <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </fr:image>
+
+                            </fr:c><fr:c x="2" y="1" w="5"><fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="company-byline-control" bind="company-byline-bind"><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        <fr:text ref="$form-resources/company-byline/text" mediatype="text/html"/>
+                    </fr:explanation></fr:c>
+                        <fr:c y="1" x="7" w="2"><fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="invoice-date-control" bind="invoice-date-bind" field-width="natural">
+                        <xf:label ref="$form-resources/invoice-date/label"/>
+                        <xf:hint ref="$form-resources/invoice-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </fr:date></fr:c><fr:c x="9" y="1" w="2" h="1"><fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="due-date-control" bind="due-date-bind" field-width="natural">
+                        <xf:label ref="$form-resources/due-date/label"/>
+                        <xf:hint ref="$form-resources/due-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </fr:date></fr:c><fr:c x="11" y="1" w="2"><xf:input id="invoice-number-control" bind="invoice-number-bind">
+                        <xf:label ref="$form-resources/invoice-number/label"/>
+                        <xf:hint ref="$form-resources/invoice-number/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </xf:input></fr:c>
+                    </fr:grid>
+                </fr:section><fr:section id="invoice-from-section" bind="invoice-from-bind"><xf:label ref="$form-resources/invoice-from/label"/><component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" id="invoice-from-content-control" bind="invoice-from-content-bind"/></fr:section><fr:section id="invoice-to-section" bind="invoice-to-bind"><xf:label ref="$form-resources/invoice-to/label"/><component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" id="invoice-to-content-control" bind="invoice-to-content-bind"/></fr:section><fr:section id="invoice-items-section" bind="invoice-items-bind"><xf:label ref="$form-resources/invoice-items/label"/><fr:grid id="grid-3-grid" bind="grid-3-bind" repeat="content" min="1" template="instance('grid-3-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true">
+          <fr:c x="1" y="1" w="2"><fr:number xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="units-control" bind="units-bind">
+                        <xf:label ref="$form-resources/units/label"/>
+                        <xf:hint ref="$form-resources/units/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </fr:number></fr:c><fr:c x="3" y="1" w="6" h="1"><xf:input id="description-control" bind="description-bind">
+                        <xf:label ref="$form-resources/description/label"/>
+                        <xf:hint ref="$form-resources/description/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </xf:input></fr:c><fr:c x="9" y="1" w="2"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="unit-price-control" bind="unit-price-bind" field-align="right">
+                        <xf:label ref="$form-resources/unit-price/label"/>
+                        <xf:hint ref="$form-resources/unit-price/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </fr:currency></fr:c><fr:c x="11" y="1" w="2" h="1"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="line-total-control" bind="line-total-bind" field-align="right">
+                        <xf:label ref="$form-resources/line-total/label"/>
+                        <xf:hint ref="$form-resources/line-total/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </fr:currency></fr:c>
+        </fr:grid><fr:grid id="grid-4-grid" bind="grid-4-bind">
+          <fr:c x="1" y="1" w="10"/><fr:c x="11" y="1" w="2"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="total-control" bind="total-bind" field-align="right">
+                        <xf:label ref="$form-resources/total/label"/>
+                        <xf:hint ref="$form-resources/total/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                    </fr:currency></fr:c>
+        </fr:grid><fr:grid id="bottom-notes-grid-grid" bind="bottom-notes-grid-bind">
+          <fr:c x="1" y="1" w="12"><fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="bottom-notes-control" bind="bottom-notes-bind"><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        <fr:text ref="$form-resources/bottom-notes/text" mediatype="text/html"/>
+                    </fr:explanation></fr:c>
+        </fr:grid></fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

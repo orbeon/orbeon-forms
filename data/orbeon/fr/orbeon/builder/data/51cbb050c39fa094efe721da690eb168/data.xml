@@ -64,7 +64,7 @@
                 <metadata>
                     <application-name>orbeon</application-name>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
-                    <form-name>contact</form-name>
+                    <form-name>feedback</form-name>
                     <title xml:lang="en">Orbeon Demo: Feedback Form</title>
                     <description xml:lang="en">This simple form can be created in a few minutes with Form Builder.</description>
                     <title xml:lang="fr">Orbeon Demo: Formulaire de retour</title>

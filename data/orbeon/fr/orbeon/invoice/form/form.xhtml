@@ -188,6 +188,9 @@
                         <fr:text ref="$form-resources/company-byline/text" mediatype="text/html"/>
                     </fr:explanation></fr:c>
                         <fr:c y="1" x="7" w="2"><fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="invoice-date-control" bind="invoice-date-bind" field-width="natural">
+                        <fr:index>
+                            <fr:summary-show/>
+                        </fr:index>
                         <xf:label ref="$form-resources/invoice-date/label"/>
                         <xf:hint ref="$form-resources/invoice-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
@@ -198,6 +201,9 @@
 
 
                     </fr:date></fr:c><fr:c x="11" y="1" w="2"><xf:input id="invoice-number-control" bind="invoice-number-bind">
+                        <fr:index>
+                            <fr:summary-show/>
+                        </fr:index>
                         <xf:label ref="$form-resources/invoice-number/label"/>
                         <xf:hint ref="$form-resources/invoice-number/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 
@@ -228,6 +234,9 @@
                     </fr:currency></fr:c>
         </fr:grid><fr:grid id="grid-4-grid" bind="grid-4-bind">
           <fr:c x="1" y="1" w="10"/><fr:c x="11" y="1" w="2"><fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="total-control" bind="total-bind" field-align="right">
+                        <fr:index>
+                            <fr:summary-show/>
+                        </fr:index>
                         <xf:label ref="$form-resources/total/label"/>
                         <xf:hint ref="$form-resources/total/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
 

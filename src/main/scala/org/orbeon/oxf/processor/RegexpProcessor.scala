@@ -89,6 +89,6 @@ object RegexpMatcher {
   }
 
   // For Java callers
-  // 2024-10-11: Only used by `URLRewriterUtils`,
+  // 2024-10-11: Only used by `URLRewriterUtils`
   def jMatchResult(pattern: Pattern, s: String): MatchResult = MatchResult(pattern, s)
 }

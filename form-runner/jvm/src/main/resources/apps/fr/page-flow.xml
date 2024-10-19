@@ -93,10 +93,6 @@
              model="/forms/${1}/service/crud.xpl">
     </service>
 
-    <!-- xxx no use of this? search.xpl is not present -->
-    <service path="/fr/service/custom/([^/^.]+)/search/[^/]+/[^/]+"
-             view="/forms/${1}/service/search.xpl"/>
-
     <!-- Custom services provided by the application -->
     <service path="/fr/service/custom/([^/^.]+)/([^/^.]+)"
              view="/forms/${1}/service/${2}.xpl"/>

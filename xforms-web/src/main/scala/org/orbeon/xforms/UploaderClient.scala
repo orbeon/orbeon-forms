@@ -41,7 +41,7 @@ object UploaderClient {
 
   // Cancel the uploads currently in process. This can be called by the control, which delegates canceling to
   // `UploadServer` as it can't know about other controls being "uploaded" at the same time. Indeed, we can have
-  // uploads for multiple files at the same time, and for each one of the them, we want to clear the upload field,
+  // uploads for multiple files at the same time, and for each one of them, we want to clear the upload field,
   // and switch back to the empty state so users can again select a file to upload.
   def cancel(doAbort: Boolean, eventName: String): Unit = {
 
@@ -50,10 +50,10 @@ object UploaderClient {
 
     currentEventOpt foreach { processingEvent =>
       AjaxClient.fireEvent(
-          AjaxEvent(
-            eventName = eventName,
-            targetId  = processingEvent.upload.container.id
-          )
+        AjaxEvent(
+          eventName = eventName,
+          targetId  = processingEvent.upload.container.id
+        )
       )
       processingEvent.upload.clear()
       processingEvent.upload.setState("empty")
@@ -138,13 +138,11 @@ object UploaderClient {
             .flatMap(XFormsUI.firstChildWithLocalName(_, "server-events"))
             .foreach(serverEventsElem =>
               fireEvent(
-                new AjaxEvent(
-                  js.Dictionary[js.Any](
-                    "form"         -> currentForm.elem,
-                    "value"        -> serverEventsElem.textContent,
-                    "eventName"    -> EventNames.XXFormsServerEvents,
-                    "showProgress" -> true
-                  )
+                AjaxEvent.withoutTargetId(
+                  eventName    = EventNames.XXFormsServerEvents,
+                  form         = currentForm.elem,
+                  value        = serverEventsElem.textContent,
+                  showProgress = true
                 )
               )
             )
@@ -178,7 +176,7 @@ object UploaderClient {
     // Once we are done processing the events (either because the uploads have been completed or canceled), handle the
     // remaining events.
     def continueWithRemainingEvents(): Unit = {
-      currentEventOpt foreach (_.upload.uploadDone())
+      currentEventOpt.foreach(_.upload.uploadDone())
       currentEventOpt = None
       currentAbortControllerOpt = None
 
@@ -186,7 +184,7 @@ object UploaderClient {
         case Some(nel) =>
           asyncUploadRequest(nel)
         case None =>
-          executionQueuePromiseOpt.foreach (_.success(()))
+          executionQueuePromiseOpt.foreach(_.success(()))
           executionQueuePromiseOpt = None
       }
     }
@@ -198,7 +196,7 @@ object UploaderClient {
     private def askForProgressUpdate(currentForm: xforms.Form): Unit =
       // Keep asking for progress update at regular interval until there is no upload in progress
       js.timers.setTimeout(currentForm.configuration.delayBeforeUploadProgressRefresh) {
-        currentEventOpt foreach { processingEvent =>
+        currentEventOpt.foreach { processingEvent =>
           AjaxClient.fireEvent(
             AjaxEvent(
               eventName    = EventNames.XXFormsUploadProgress,

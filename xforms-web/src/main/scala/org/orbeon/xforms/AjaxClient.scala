@@ -182,7 +182,7 @@ object AjaxClient {
         val keyboard = false    // Can't use esc to close the dialog
       })
   }
-  
+
   @JSExport
   def createDelayedPollEvent(
     delay  : js.UndefOr[Double],
@@ -269,7 +269,7 @@ object AjaxClient {
   // determined by the `session-heartbeat-delay` property.
   def sendHeartBeat(): Unit =
     AjaxClient.fireEvent(
-      AjaxEvent(
+      AjaxEvent.withoutTargetId(
         eventName = EventNames.XXFormsSessionHeartbeat,
         form      = Support.allFormElems.headOption.getOrElse(throw new IllegalStateException("no form found"))
       )

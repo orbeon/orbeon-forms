@@ -72,14 +72,18 @@ object AjaxEvent {
     )
 
   // Creator for events that don't have a `targetId`
-  def apply(
+  def withoutTargetId(
     eventName    : String,
-    form         : html.Form
+    form         : html.Form,
+    value        : js.UndefOr[String] = js.undefined,
+    showProgress : Boolean            = DefaultShowProgress,
   ): AjaxEvent =
     new AjaxEvent(
       js.Dictionary[js.Any](
-        "form"      -> form,
-        "eventName" -> eventName
+        "form"         -> form,
+        "eventName"    -> eventName,
+        "value"        -> value,
+        "showProgress" -> showProgress,
       )
     )
 }

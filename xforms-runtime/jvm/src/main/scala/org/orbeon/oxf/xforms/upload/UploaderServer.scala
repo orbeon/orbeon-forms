@@ -282,16 +282,15 @@ object UploaderServer {
       }
     }
 
-    def interrupted(): Unit = {
+    def interrupted(): Unit =
       // - don't remove `UploadProgress` objects from the session
       // - instead mark all entries added so far as being in state `Interrupted` if not already the case
       for (sessionKey <- sessionKeys)
-        runQuietly (
+        runQuietly {
           getUploadProgress(sessionKey)
-          collect { case p @ UploadProgress(_, _, _, UploadState.Started | UploadState.Completed(_) ) => p }
-          foreach (_.state = UploadState.Interrupted(None))
-        )
-    }
+          .collect { case p @ UploadProgress(_, _, _, UploadState.Started | UploadState.Completed(_) ) => p }
+          .foreach (_.state = UploadState.Interrupted(None))
+        }
 
     private def getUploadProgress(sessionKey: String): Option[UploadProgress[DiskFileItem]] =
       session.getAttribute(sessionKey) collect {

@@ -633,7 +633,7 @@ object XFormsUI {
         }
 
       val timerIdOpt =
-        if (isIOS() && getZoomLevel != 1.0) {
+        if (isIOS() && getZoomLevel() != 1.0) {
           resetIOSZoom()
             Some(
               timers.setTimeout(200.milliseconds) {
@@ -1549,13 +1549,11 @@ object XFormsUI {
     // Users closed the dialog (Esc): the browser dispatches the `cancel` event, we inform the server
     // Declared as `val` to ensure function identity, for the `removeEventListener` to work
     private val dialogCancelListener: js.Function1[dom.Event, Unit] = (event: dom.Event) => {
-      val dialogElem    = event.target.asInstanceOf[html.Element]
+      val dialogElem = event.target.asInstanceOf[html.Element]
       AjaxClient.fireEvent(
-        new AjaxEvent(
-          js.Dictionary[js.Any](
-            "eventName" -> "xxforms-dialog-close",
-            "targetId"  -> dialogElem.id
-          )
+        AjaxEvent(
+          eventName = "xxforms-dialog-close",
+          targetId  = dialogElem.id,
         )
       )
     }

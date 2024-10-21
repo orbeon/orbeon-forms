@@ -260,7 +260,7 @@ object InitSupport {
           case StateResult.Initialized => //nop
           case StateResult.Restored =>
             AjaxClient.fireEvent(
-              AjaxEvent(
+              AjaxEvent.withoutTargetId(
                 eventName = EventNames.XXFormsAllEventsRequired,
                 form      = formElem
               )

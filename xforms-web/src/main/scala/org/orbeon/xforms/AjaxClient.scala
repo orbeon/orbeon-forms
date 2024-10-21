@@ -44,7 +44,7 @@ object AjaxClient {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.AjaxClient")
 
-  import Private._
+  import Private.*
 
   def initialize(configuration: rpc.ConfigurationProperties): Unit = {
     EventQueue.shortDelay       = configuration.internalShortDelay.millis

@@ -30,7 +30,7 @@ import scala.util.{Failure, Success}
 
 object UploaderClient {
 
-  import Private._
+  import Private.*
 
   def addFile(upload: Upload, file: dom.raw.File, wait: FiniteDuration): Unit =
     uploadEventQueue.add(

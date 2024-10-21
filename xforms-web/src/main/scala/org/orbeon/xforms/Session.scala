@@ -66,7 +66,7 @@ object Session {
     private var maxNewestEventTimeAmongAllPages: Long = -1L
 
     private lazy val sessionActivityBroadcastChannelOpt = {
-      val broadcastChannelAvailable = !js.isUndefined(js.Dynamic.global.window.BroadcastChannel)
+      val broadcastChannelAvailable = ! js.isUndefined(js.Dynamic.global.window.BroadcastChannel)
 
       if (broadcastChannelAvailable) {
         val broadcastChannel = new BroadcastChannel("orbeon-session-activity")

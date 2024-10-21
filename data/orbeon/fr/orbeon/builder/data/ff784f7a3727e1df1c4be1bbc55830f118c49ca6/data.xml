@@ -36,13 +36,13 @@
                     <application-name>orbeon</application-name>
                     <form-name>emergency-medical-consent</form-name>
                     <title xml:lang="en">Orbeon Demo: Consent for emergency medical treatment</title>
-                    <description xml:lang="en">This is a simple form to give consent for emergency medical treatment to a minor. It also makes use of section template from the global library.</description>
-                    
+                    <description xml:lang="en" mediatype="text/html">&lt;div style="display: flex; align-items: center; column-gap: 1em;"&gt;&lt;img style="width: 50px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Star_of_life2.svg/2560px-Star_of_life2.svg.png"&gt;This is a simple form to give consent for emergency medical treatment to a minor. It also makes use of section template fro the global library.&lt;/div&gt;</description>
+
                     <library-versions>
-                        <_>1</_><orbeon>3</orbeon>
+                        <orbeon>1</orbeon>
                     </library-versions>
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
-                <thumbnail filename="emergency-medical-consent.png" mediatype="image/png" size="151270">/fr/service/persistence/crud/orbeon/builder/data/ff784f7a3727e1df1c4be1bbc55830f118c49ca6/fee5a9ed8f5ebedf7b6f72b169e0c716f9133c81.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata>
+                <thumbnail filename="emergency-medical-consent.png" mediatype="image/png" size="160175">/fr/service/persistence/crud/orbeon/builder/data/ff784f7a3727e1df1c4be1bbc55830f118c49ca6/fee5a9ed8f5ebedf7b6f72b169e0c716f9133c81.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata>
             </xf:instance>
 
             <!-- Attachments -->
@@ -55,7 +55,7 @@
                 <resources>
                     <resource xml:lang="en"><signature-date><label>Date</label><hint/></signature-date><signature><label>Signature</label><hint/></signature><control-1><text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;I hereby give consent to the following organization to obtain emergency care prescribed by a licensed physician.&lt;/div&gt;</text></control-1><organization-name><label>Organization name</label><hint/></organization-name><minor-name><label>Minor full name</label><hint/></minor-name><allergies><label>Allergies or other concerns</label><hint/></allergies>
                         <consent-section>
-                            
+
                         </consent-section><signature-section/><contact-information><help/></contact-information><contact-address/><consent-grid/>
 
                     </resource>
@@ -77,31 +77,31 @@
                         <fr:c x="1" y="2" w="6"><xf:input id="organization-name-control" bind="organization-name-bind"><fr:index><fr:summary-show/></fr:index>
                         <xf:label ref="$form-resources/organization-name/label"/>
                         <xf:hint ref="$form-resources/organization-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:input></fr:c><fr:c x="7" y="2" w="6"><xf:input id="minor-name-control" bind="minor-name-bind"><fr:index><fr:summary-show/></fr:index>
                         <xf:label ref="$form-resources/minor-name/label"/>
                         <xf:hint ref="$form-resources/minor-name/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:input></fr:c><fr:c x="1" y="3" w="12"><xf:textarea id="allergies-control" bind="allergies-bind">
                         <xf:label ref="$form-resources/allergies/label"/>
                         <xf:hint ref="$form-resources/allergies/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </xf:textarea></fr:c>
                     </fr:grid>
-                </fr:section><fr:section id="contact-information-section" bind="contact-information-bind"><component:contact-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" id="contact-information-content-control"/></fr:section><fr:section id="contact-address-section" bind="contact-address-bind"><component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" id="contact-address-content-control" bind="contact-address-content-bind"/></fr:section><fr:section id="signature-section-section" bind="signature-section-bind"><fr:grid id="grid-2-grid" bind="grid-2-bind">
+                </fr:section><fr:section id="contact-information-section" bind="contact-information-bind"><component:contact-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" id="contact-information-content-control"/></fr:section><fr:section id="contact-address-section" bind="contact-address-bind"><component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" id="contact-address-content-control" bind="contact-address-content-bind"/></fr:section><fr:section id="signature-section-section" bind="signature-section-bind"><fr:grid id="grid-2-grid" bind="grid-2-bind">
               <fr:c x="1" y="1" w="3"/><fr:c x="4" y="1" w="3" h="1"/><fr:c x="7" y="1" w="2"><fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:DateSupport="java:org.orbeon.xbl.DateSupportJava" id="signature-date-control" bind="signature-date-bind"><fr:index><fr:summary-show/></fr:index>
                         <xf:label ref="$form-resources/signature-date/label"/>
                         <xf:hint ref="$form-resources/signature-date/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </fr:date></fr:c><fr:c x="9" y="1" w="4" h="1"><fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="signature-control" bind="signature-bind">
                         <xf:label ref="$form-resources/signature/label"/>
                         <xf:hint ref="$form-resources/signature/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-                        
-                        
+
+
                     </fr:handwritten-signature></fr:c>
             </fr:grid></fr:section>
             </fr:body>

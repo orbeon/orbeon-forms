@@ -59,8 +59,7 @@
                     <description xml:lang="en">This form allows you to request documents from an organization.</description>
 
                     <library-versions>
-                        <_>1</_>
-                        <orbeon>3</orbeon>
+                        <orbeon>1</orbeon>
                     </library-versions>
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
@@ -152,10 +151,10 @@
                 <fr:section id="requester-section-section" bind="requester-section-bind">
                     <xf:label ref="$form-resources/requester-section/label"/>
                     <fr:section id="contact-information-section" bind="contact-information-bind">
-                        <component:contact-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" id="contact-information-content-control"/>
+                        <component:contact-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" id="contact-information-content-control"/>
                     </fr:section>
                     <fr:section id="address-us-section" bind="address-us-bind">
-                        <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" id="address-us-content-control"/>
+                        <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" id="address-us-content-control"/>
                     </fr:section>
                 </fr:section>
                 <fr:section id="requested-documents-section" bind="requested-documents-bind">

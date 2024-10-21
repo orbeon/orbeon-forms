@@ -329,8 +329,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     <updated-with-version>2022.1 PE</updated-with-version>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
                     <library-versions>
-                        <_>1</_>
-                        <_>1</_>
+                        <orbeon>1</orbeon>
                     </library-versions>
                     <xbl>
                         <fr:calculated-value appearance="full"/>
@@ -1883,7 +1882,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     <xf:label ref="$form-resources/reusable-sections/label"/>
                     <fr:section id="address-us-section" bind="address-us-bind">
                         <xf:label ref="$form-resources/address-us/label"/>
-                        <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                        <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"
                                               xmlns="http://orbeon.org/oxf/xml/form-builder"
                                               xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
                                               xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
@@ -1892,7 +1891,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     </fr:section>
                     <fr:section id="contact-information-section" bind="contact-information-bind">
                         <xf:label ref="$form-resources/contact-information/label"/>
-                        <component:contact-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library"
+                        <component:contact-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"
                                                        xmlns="http://orbeon.org/oxf/xml/form-builder"
                                                        xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
                                                        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"

@@ -191,7 +191,7 @@
                     <title xml:lang="fr">Orbeon Demo: Bookshelf</title>
                     <description xml:lang="fr">Bookshelf présente un formulaire simple qui vous permet de saisir des informations sur des livres.</description>
                     <library-versions>
-                        <_>1</_>
+                        <orbeon>1</orbeon>
                     </library-versions>
                     <email>
                         <templates>

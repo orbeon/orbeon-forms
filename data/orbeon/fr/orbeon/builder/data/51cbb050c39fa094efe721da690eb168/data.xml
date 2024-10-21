@@ -71,7 +71,7 @@
                     <description xml:lang="fr">Ce formulaire peut être créé à l'aide de Form Builder en quelques minutes.</description>
                     <logo mediatype="" filename="" size=""/>
                     <library-versions>
-                        <_>1</_>
+                        <orbeon>1</orbeon>
                     </library-versions>
                     <email>
                         <templates>

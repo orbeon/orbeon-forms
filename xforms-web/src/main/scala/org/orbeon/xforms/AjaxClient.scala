@@ -182,37 +182,7 @@ object AjaxClient {
         val keyboard = false    // Can't use esc to close the dialog
       })
   }
-
-  // Create a timer which after the specified delay will fire a server event
-  // 2020-07-21: Only for upload response
-  @JSExport
-  def createDelayedServerEvent(
-    encodedEvent : String,
-    delay        : Double,  // for JavaScript caller (2023-05-23: always `0`)
-    showProgress : Boolean, // 2023-05-23: always `true`
-    discardable  : Boolean, // 2023-05-23: always `false`
-    formId       : String
-  ): Unit = {
-
-    val form = Page.getXFormsFormFromNamespacedIdOrThrow(formId)
-
-    val timerId = timers.setTimeout(delay) {
-      fireEvent(
-        new AjaxEvent(
-          js.Dictionary[js.Any](
-            "form"         -> form.elem,
-            "value"        -> encodedEvent,
-            "eventName"    -> EventNames.XXFormsServerEvents,
-            "showProgress" -> showProgress
-          )
-        )
-      )
-    }
-
-    if (discardable)
-      form.addDiscardableTimerId(timerId)
-  }
-
+  
   @JSExport
   def createDelayedPollEvent(
     delay  : js.UndefOr[Double],

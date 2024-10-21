@@ -17,7 +17,7 @@ import cats.data.NonEmptyList
 import cats.syntax.option.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.xforms
-import org.orbeon.xforms.facade.AjaxServer
+import org.orbeon.xforms.AjaxClient.fireEvent
 import org.scalajs.dom
 import org.scalajs.dom.experimental.*
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -127,7 +127,28 @@ object UploaderClient {
           // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
           currentEvent.upload.clear()
           // The Ajax response only contains "server events"
-          AjaxServer.handleResponseDom(responseXml, currentForm.namespacedFormId, ignoreErrors = false)
+
+          // <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+          //   <xxf:action>
+          //       <xxf:server-events>
+          //  ...
+
+          // https://github.com/orbeon/orbeon-forms/issues/6548
+          XFormsUI.firstChildWithLocalName(responseXml.documentElement, "action")
+            .flatMap(XFormsUI.firstChildWithLocalName(_, "server-events"))
+            .foreach(serverEventsElem =>
+              fireEvent(
+                new AjaxEvent(
+                  js.Dictionary[js.Any](
+                    "form"         -> currentForm.elem,
+                    "value"        -> serverEventsElem.textContent,
+                    "eventName"    -> EventNames.XXFormsServerEvents,
+                    "showProgress" -> true
+                  )
+                )
+              )
+            )
+
           // Are we done, or do we still need to handle events for other forms?
           continueWithRemainingEvents()
         case Success((_, responseText, responseXmlOpt)) =>

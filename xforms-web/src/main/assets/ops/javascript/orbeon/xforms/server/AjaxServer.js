@@ -298,16 +298,6 @@
                                     break;
                                 }
 
-                                // 2020-07-21: Only for upload response
-                                case "server-events": {
-                                    var serverEventsElement = childNode;
-                                    var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
-
-                                    ORBEON.xforms.AjaxClient.createDelayedServerEvent(serverEvents, 0, true, false, formID);
-
-                                    break;
-                                }
-
                                 case "poll": {
                                     var pollElement = childNode;
                                     var delayOrNull = ORBEON.util.Dom.getAttribute(pollElement, "delay");

@@ -1736,15 +1736,23 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 } else if (! $(target).closest(".xforms-disable-hint-as-tooltip").is("*") && control) {
 
                     // Hint tooltip
+                    // Only show hint if the mouse is over a child of the control, so we don't show both the hint and the alert or help
                     if (control != target) {
-                        // Only show hint if the mouse is over a child of the control, so we don't show both the hint and the alert or help
-                        var message = ORBEON.xforms.Controls.getHintMessage(control);
+
+                        // Find closest ancestor or self control with a non-empty hint, for compound control like the datetime
+                        var candidateMessageHolder = control;
+                        var candidateMessage       = "";
+                        while (candidateMessageHolder != null && candidateMessage == "") {
+                            candidateMessage       = ORBEON.xforms.Controls.getHintMessage(candidateMessageHolder);
+                            candidateMessageHolder = ORBEON.xforms.Events._findParentXFormsControl(candidateMessageHolder.parentNode);
+                        }
+
                         if ($(control).is('.xforms-trigger, .xforms-submit')) {
                             // Remove the title, to avoid having both the YUI tooltip and the browser tooltip based on the title showing up
                             var formElement = ORBEON.util.Dom.getElementByTagName(control, ["a", "button"]);
                             formElement.title = "";
                         }
-                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.hintTooltipForControl, control, target, "-orbeon-hint-tooltip", message, event);
+                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.hintTooltipForControl, control, target, "-orbeon-hint-tooltip", candidateMessage, event);
                     }
                 }
 

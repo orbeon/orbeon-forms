@@ -1893,7 +1893,59 @@
                                     <xf:group ref=".[not(document)]">
                                         <xh:tr>
                                             <xh:td colspan="{7 + count(instance('fr-search-instance')/*[@summary-show = 'true'])}">
-                                                <xf:output id="fr-no-form-data" class="alert" mediatype="text/html" value="xxf:serialize($fr-resources/summary/messages/no-form-data-found/node(), 'html')"/>
+
+                                                <!-- Logic from `fr:buttons-bar`, specialized -->
+                                                <!-- TODO: Duplication is not desirable and this should ideally be a function. -->
+                                                <xf:var
+                                                    name="ref"
+                                                    value="
+                                                        let $buttons-property           := 'oxf.fr.summary.buttons',
+                                                            $visibility-property-prefix := 'oxf.fr.summary.button',
+                                                            $part                       := 'new'
+                                                        return
+                                                            let $visible-opt :=
+                                                                    xs:boolean(
+                                                                        xxf:instance('fr-form-instance')/fr:evaluate-from-property(
+                                                                            string-join(
+                                                                                ($visibility-property-prefix, $part, 'visible', fr:app-name(), fr:form-name()),
+                                                                                '.'
+                                                                            ),
+                                                                            'fr-form-instance'
+                                                                        )
+                                                                    ),
+                                                                $enabled-opt :=
+                                                                    xs:boolean(
+                                                                        xxf:instance('fr-form-instance')/fr:evaluate-from-property(
+                                                                            string-join(
+                                                                                ($visibility-property-prefix, $part, 'enabled', fr:app-name(), fr:form-name()),
+                                                                                '.'
+                                                                            ),
+                                                                            'fr-form-instance'
+                                                                        )
+                                                                    )
+                                                            return
+                                                                for $ref in
+                                                                    if (exists($visible-opt) or exists($enabled-opt)) then
+                                                                        (
+                                                                            if (exists($enabled-opt) and not($enabled-opt)) then
+                                                                                ''
+                                                                            else
+                                                                                xxf:instance('fr-triggers-instance')/other
+                                                                        )[
+                                                                            empty($visible-opt) or $visible-opt
+                                                                        ]
+                                                                    else
+                                                                        xxf:instance('fr-triggers-instance')/other
+                                                                return
+                                                                    $ref[xxf:relevant()]
+                                                "/>
+
+                                                <xh:div class="fr-no-form-data alert">
+                                                    <xf:output mediatype="text/html" value="xxf:serialize($fr-resources/summary/messages/no-form-data-found/node(), 'html')"/>
+                                                    <fr:process-button name="new" ref="$ref">
+                                                        <xf:label value="xxf:r('buttons.new-long', '|fr-fr-resources|')" mediatype="text/html"/>
+                                                    </fr:process-button>
+                                                </xh:div>
                                             </xh:td>
                                         </xh:tr>
                                     </xf:group>

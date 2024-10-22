@@ -37,6 +37,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Delete</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Import</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; New</new>
+            <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Create New Data</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicate</duplicate>
 
             <!-- Standard process buttons -->
@@ -732,6 +733,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Supprimer</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importer</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nouveau</new>
+            <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Créer de nouvelles données</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Dupliquer</duplicate>
 
             <!-- Standard process buttons -->
@@ -1431,6 +1433,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Eliminar</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importar</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nuevo</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicar</duplicate>
 
             <!-- Standard process buttons -->
@@ -2125,6 +2128,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Eliminar</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importar</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nou</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicar</duplicate>
 
             <!-- Standard process buttons -->
@@ -2844,6 +2848,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Slett</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importer</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nytt skjema</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Dupliser</duplicate>
 
             <!-- Standard process buttons -->
@@ -3529,6 +3534,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Удалить</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Импорт</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Новая</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; [Duplicate]</duplicate>
 
             <!-- Standard process buttons -->
@@ -4213,6 +4219,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Cancella</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importa</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nuovo</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Copia</duplicate>
 
             <!-- Standard process buttons -->
@@ -4907,6 +4914,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Löschen</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importieren</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Neu</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Kopieren</duplicate>
 
             <!-- Standard process buttons -->
@@ -5601,6 +5609,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Poista</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Tuo</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Uusi</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Kopioi</duplicate>
 
             <!-- Standard process buttons -->
@@ -6295,6 +6304,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Ta bort</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importera</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Skapa</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicera</duplicate>
 
             <!-- Standard process buttons -->
@@ -6989,6 +6999,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Verwijderen</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importeren</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nieuw</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Dupliceren</duplicate>
 
             <!-- Standard process buttons -->
@@ -7683,6 +7694,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Apagar</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importar</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Novo</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicar</duplicate>
 
             <!-- Standard process buttons -->
@@ -8377,6 +8389,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove-sign"&gt;&lt;/i&gt; Slet</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importér</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Ny blanket</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplikér</duplicate>
 
             <!-- Standard process buttons -->
@@ -9062,6 +9075,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Usuń</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importuj</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nowy</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplikuj</duplicate>
 
             <!-- Standard process buttons -->
@@ -9756,6 +9770,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Sil</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; İçe Aktar</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Yeni</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Çoğalt</duplicate>
 
             <!-- Standard process buttons -->
@@ -10450,6 +10465,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; 删除</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; 导入</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; 新建</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; 复制</duplicate>
 
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; 保存</save>
@@ -11138,6 +11154,7 @@
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; 刪除</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; 導入</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; 新建</new>
+            <new-long todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create New Data]</new-long>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; 複製</duplicate>
 
             <!-- 標準流程按鈕 -->

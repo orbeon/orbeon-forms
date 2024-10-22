@@ -51,6 +51,8 @@
                 <xf:group ref=".[$is-inline]" xxf:internal="true">
                     <fr:ladda-button ref="." name="{$button-name}" class="fr-{$button-name}-button">
                         <xf:label mediatype="text/html" value="$button-label"/>
+                        <!-- 2024-10-21: This currently will be used instead of the above, but ideally we'd need to remove the other label. -->
+                        <xbl:content includes=":root > xf:label"/>
                     </fr:ladda-button>
                 </xf:group>
 
@@ -58,6 +60,8 @@
                 <xf:group ref=".[not($is-inline)]" xxf:internal="true">
                     <fr:trigger ref="." name="{$button-name}" class="fr-{$button-name}-button{if ($is-modal) then ' xforms-trigger-appearance-modal' else ''}">
                         <xf:label mediatype="text/html" value="$button-label"/>
+                        <!-- 2024-10-21: This currently will be used instead of the above, but ideally we'd need to remove the other label. -->
+                        <xbl:content includes=":root > xf:label"/>
                     </fr:trigger>
                 </xf:group>
 

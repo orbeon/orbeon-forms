@@ -216,6 +216,7 @@
 
     <!-- New, edit or view document (supports POST of XML, or GET)  -->
     <page path="/fr/([^/^.]+)/([^/^.]+)/(new|edit|view)(/([^/^.]+))?"
+          public-methods="GET HEAD POST"
           model="detail/detail-model.xpl" view="html-view.xpl">
     </page>
 

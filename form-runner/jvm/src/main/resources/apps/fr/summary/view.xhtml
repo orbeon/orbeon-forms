@@ -1711,12 +1711,10 @@
                                                                 then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
                                                                 else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
                                                     <xh:td class="fr-created">
-                                                        <xh:a href="{$current-document-href-opt}" xxf:control="true" ref=".[exists($current-document-href-opt)]">
-                                                            <xf:output value="$created"/>
+                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
+                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$created"/>
                                                         </xh:a>
-                                                        <xf:group ref=".[empty($current-document-href-opt)]">
-                                                            <xf:output value="$created"/>
-                                                        </xf:group>
+                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$created"/>
                                                     </xh:td>
                                                 </xf:group>
                                                 <xf:group ref="''[$show-last-modified]">
@@ -1740,49 +1738,41 @@
                                                                 then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
                                                                 else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
                                                     <xh:td class="fr-modified">
-                                                        <xh:a href="{$current-document-href-opt}" xxf:control="true" ref=".[exists($current-document-href-opt)]">
-                                                            <xf:output value="$last-modified"/>
+                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
+                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$last-modified"/>
                                                         </xh:a>
-                                                        <xf:group ref=".[empty($current-document-href-opt)]">
-                                                            <xf:output value="$last-modified"/>
-                                                        </xf:group>
+                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$last-modified"/>
                                                     </xh:td>
                                                 </xf:group>
                                                 <xf:group ref="''[$show-created-by]">
                                                     <xh:td class="fr-td">
-                                                        <xf:group ref=".[exists($current-document-href-opt)]">
-                                                            <xh:a href="{$current-document-href-opt}">
-                                                                <xf:output value="$document/@created-by"/>
-                                                            </xh:a>
-                                                        </xf:group>
-                                                        <xf:group ref=".[empty($current-document-href-opt)]">
-                                                            <xf:output value="$document/@created-by"/>
-                                                        </xf:group>
+                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
+                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$document/@created-by"/>
+                                                        </xh:a>
+                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$document/@created-by"/>
                                                     </xh:td>
                                                 </xf:group>
                                                 <xf:group ref="''[$show-last-modified-by]">
                                                     <xh:td class="fr-td">
-                                                        <xh:a href="{$current-document-href-opt}" xxf:control="true" ref=".[exists($current-document-href-opt)]">
-                                                            <xf:output value="$document/@last-modified-by"/>
+                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
+                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$document/@last-modified-by"/>
                                                         </xh:a>
-                                                        <xf:group ref=".[empty($current-document-href-opt)]">
-                                                            <xf:output value="$document/@last-modified-by"/>
-                                                        </xf:group>
+                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$document/@last-modified-by"/>
                                                     </xh:td>
                                                 </xf:group>
                                                 <xf:group ref="''[$show-workflow-stage]">
                                                     <xh:td class="fr-td">
-                                                        <xh:a href="{$current-document-href-opt}" xxf:control="true" ref=".[exists($current-document-href-opt)]">
-                                                            <xf:output value="$document/@workflow-stage"/>
+                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">
+                                                            <xf:output ref=".[exists($current-document-href-opt)]" value="$document/@workflow-stage"/>
                                                         </xh:a>
-                                                        <xf:group ref=".[empty($current-document-href-opt)]">
-                                                            <xf:output value="$document/@workflow-stage"/>
-                                                        </xf:group>
+                                                        <xf:output ref=".[empty($current-document-href-opt)]" value="$document/@workflow-stage"/>
                                                     </xh:td>
                                                 </xf:group>
                                                 <!-- Empty column if no summary fields looks nicer -->
                                                 <xf:group ref="if (empty($detail-positions)) then '' else ()">
-                                                    <xh:td/>
+                                                    <xh:td>
+                                                        <xh:a href="{$current-document-href-opt}" class="{'xforms-hidden'[empty($current-document-href-opt)]}">&#160;</xh:a>
+                                                    </xh:td>
                                                 </xf:group>
                                                 <!-- Iterate over detail-positions so that repeat iterations are not recreated  -->
                                                 <xf:repeat ref="$detail-positions" id="document-details-repeat">

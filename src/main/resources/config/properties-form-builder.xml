@@ -173,13 +173,9 @@
         ") then (
             xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "form-definition-xhtml-export") then
             suspend then
-            xf:show(
-                dialog = "fb-publish-dialog",
-                app    = "{xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/application-name}",
-                form   = "{xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/form-name}"
-            )
+            xf:dispatch(name = "fb-form-definition-xhtml")
         ) else
-        xf:dispatch(name = "fb-form-definition-xhtml")
+            xf:dispatch(name = "fb-form-definition-xhtml")
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.test.orbeon.builder">

@@ -290,7 +290,7 @@
 
     <page path="/fr/.*"><action><result page="not-found"/></action></page>
 
-    <!-- ==== Other applications's services and pages ============================================================== -->
+    <!-- ==== Other applications' services and pages =============================================================== -->
 
     <service path="/([^/]+)/service/.+" model="/apps/${1}/page-flow.xml" public-methods="#all"/>
     <page    path="/([^/]+)/.*"         model="/apps/${1}/page-flow.xml" public-methods="#all"/>

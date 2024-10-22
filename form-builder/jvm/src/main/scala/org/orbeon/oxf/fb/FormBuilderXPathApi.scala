@@ -93,13 +93,17 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def saveThenExport(exportFormat: String): Unit =
     saveThenContinue("saveThenExport()") {
-      XFormsAPI.sendThrowOnError(
-        "fb-export-submission",
-        List(
-          PropertyValue("export-format", Some(exportFormat))
-        )
-      )
+      justExport(exportFormat)
     }
+
+  //@XPathFunction
+  def justExport(exportFormat: String): Unit =
+    XFormsAPI.sendThrowOnError(
+      "fb-export-submission",
+      List(
+        PropertyValue("export-format", Some(exportFormat))
+      )
+    )
 
   //@XPathFunction
   def saveAs(documentId: String): Unit =

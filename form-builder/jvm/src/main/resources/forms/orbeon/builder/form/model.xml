@@ -962,7 +962,7 @@
     <xf:action event="fb-excel-export">
         <!-- See https://github.com/orbeon/orbeon-forms/issues/2611 -->
         <xf:action type="xpath">
-            fbf:saveThenExport(
+            fbf:justExport(
                 'excel-with-named-ranges'
             )
         </xf:action>
@@ -971,7 +971,7 @@
     <xf:action event="fb-xml-export">
         <!-- See https://github.com/orbeon/orbeon-forms/issues/2611 -->
         <xf:action type="xpath">
-            fbf:saveThenExport(
+            fbf:justExport(
                 'xml-form-structure-and-data'
             )
         </xf:action>
@@ -1020,6 +1020,8 @@
             }&amp;export-format={
                 event('export-format')
             }"
+        xxf:target="fb-test-iframe"
+        xxf:show-progress="false"
         replace="all"/>
 
     <xf:submission

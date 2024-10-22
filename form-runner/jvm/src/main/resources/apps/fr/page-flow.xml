@@ -288,6 +288,8 @@
         <setvalue ref="/*/mode">home</setvalue>
     </page>
 
+    <page path="/fr/.*"><action><result page="not-found"/></action></page>
+
     <!-- ==== Other applications's services and pages ============================================================== -->
 
     <service path="/([^/]+)/service/.+" model="/apps/${1}/page-flow.xml" public-methods="#all"/>

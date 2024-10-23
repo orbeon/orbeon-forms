@@ -1167,7 +1167,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
       "com.lihaoyi"            %%% "scalatags"        % ScalatagsVersion,
       "org.scala-lang.modules" %%% "scala-xml"        % ScalaXmlVersion,
       "org.log4s"              %%% "log4s"            % Log4sVersion,
-      "org.scala-js"           %%% "scalajs-dom"      % ScalaJsDomVersion withSources(),
+      "org.scala-js"           %%% "scalajs-dom"      % ScalaJsDomVersion    withSources(),
       "io.udash"               %%% "udash-jquery"     % ScalaJsJQueryVersion withSources(),
       "com.beachape"           %%% "enumeratum"       % EnumeratumVersion,
       "com.beachape"           %%% "enumeratum-circe" % EnumeratumCirceVersion,

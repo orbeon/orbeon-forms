@@ -14,12 +14,11 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.Ladda
-import org.orbeon.jquery.*
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, EventListenerSupport}
-import org.scalajs.dom.html
-import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
+import org.orbeon.xforms.{AjaxClient, EventListenerSupport}
 import org.scalajs.dom
+import org.scalajs.dom.html
 
 import scala.scalajs.js
 
@@ -43,7 +42,8 @@ object LaddaButton {
     var state: State = State.Begin
     var ladda: Option[Ladda] = None
 
-    private def findButton: html.Element = containerElem.querySelector("button").asInstanceOf[html.Element]
+    private def findButton: html.Element = containerElem.querySelectorT("button")
+
     private val eventListenerSupport = new EventListenerSupport {}
 
     override def init(): Unit = {

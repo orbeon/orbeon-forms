@@ -17,12 +17,12 @@ import autowire.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.facades.{Dragula, DragulaOptions}
 import org.orbeon.web.DomEventNames
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.rpc.RpcClient
-import org.scalajs.dom.html.Element
-import org.scalajs.dom.{document, html}
-import io.udash.wrappers.jquery.JQueryEvent
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom
+import org.scalajs.dom.html
+import org.scalajs.dom.html.Element
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
@@ -50,7 +50,7 @@ private object ControlDnD {
 
         // Create the mirror inside the first container, so the proper CSS applies to the mirror
         override val mirrorContainer: UndefOr[Element] =
-          $(".fb-body .fr-grid-td").get(0).get.asInstanceOf[html.Element]
+          dom.document.querySelectorT(".fb-body .fr-grid-td")
 
         override def isContainer(el: html.Element) =
           el.classList.contains("fr-grid-td")
@@ -84,7 +84,7 @@ private object ControlDnD {
 
         // Create the mirror inside the first container, so the proper CSS applies to the mirror
         override val mirrorContainer: UndefOr[Element] =
-          $(".fb-tools fieldset.xforms-group").get(0).get.asInstanceOf[html.Element]
+          dom.document.querySelectorT(".fb-tools fieldset.xforms-group")
 
         override def isContainer(el: html.Element) =
           (

@@ -41,6 +41,8 @@ import scala.scalajs.js
 import scala.scalajs.js.Dictionary
 import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import org.orbeon.web.DomSupport.*
+
 
 
 @JSExportTopLevel("OrbeonInitSupport")
@@ -425,7 +427,7 @@ object InitSupport {
 
     def initializeJavaScriptControls(controls: List[rpc.Control]): Unit =
       controls foreach { case rpc.Control(id, valueOpt) =>
-        Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control =>
+        dom.document.getElementByIdOpt(id) foreach { control =>
           val classList = control.classList
           if (XFormsXbl.isComponent(control)) {
             // Custom XBL component initialization
@@ -444,7 +446,7 @@ object InitSupport {
 
     def destroyJavaScriptControls(controls: List[rpc.Control]): Unit =
       controls foreach { case rpc.Control(id, _) =>
-        Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control =>
+        dom.document.getElementByIdOpt(id) foreach { control =>
           if (XFormsXbl.isComponent(control)) {
             for {
               instance <- Option(XBL.instanceForControl(control))
@@ -468,7 +470,7 @@ object InitSupport {
           if (observer == Constants.DocumentId)
             Mousetrap // TODO: should observe on embedding element?
           else
-            Mousetrap(dom.document.getElementById(observer).asInstanceOf[html.Element])
+            Mousetrap(dom.document.getElementByIdT(observer))
 
         val modifierStrings =
           modifiers.toList map (_.entryName)

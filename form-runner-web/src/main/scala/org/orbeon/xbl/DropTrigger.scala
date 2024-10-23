@@ -2,12 +2,11 @@ package org.orbeon.xbl
 
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, KeyboardShortcuts}
-import org.scalajs.dom.ext.*
-import org.scalajs.dom.html
-import io.udash.wrappers.jquery.JQueryEvent
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, KeyboardShortcuts}
 import org.scalajs.dom
+import org.scalajs.dom.html
 
 import scala.scalajs.js
 import scala.util.chaining.scalaUtilChainingOps
@@ -46,9 +45,8 @@ object DropTrigger {
       logger.debug("init")
       containerElem.addEventListener("click", onActivate)
       registered =
-        containerElem.querySelectorAll("kbd[data-orbeon-keyboard-shortcut]")
-          .flatMap { e =>
-            val kbd = e.asInstanceOf[html.Element]
+        containerElem.querySelectorAllT("kbd[data-orbeon-keyboard-shortcut]")
+          .flatMap { kbd =>
             KeyboardShortcuts.bindShortcutFromKbd(
               clickElem     = kbd,
               rawShortcut   = kbd.dataset("orbeonKeyboardShortcut"),

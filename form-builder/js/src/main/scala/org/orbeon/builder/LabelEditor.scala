@@ -14,19 +14,20 @@
 package org.orbeon.builder
 
 import autowire.*
+import io.udash.wrappers.jquery.JQuery
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.jquery.Offset
-import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.web.DomEventNames
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom
-import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
+
 
 object LabelEditor {
 
@@ -176,7 +177,7 @@ object LabelEditor {
 
           val newInterceptors =
             List.fill(sections.size - labelClickInterceptors.size) {
-              val container = dom.document.createElement("div").asInstanceOf[html.Element]
+              val container = dom.document.createElementT("div")
               container.className = "fb-section-label-editor-click-interceptor"
               container.addEventListener(
                 "click",

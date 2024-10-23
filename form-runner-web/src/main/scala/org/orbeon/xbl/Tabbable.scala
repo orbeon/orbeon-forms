@@ -13,14 +13,15 @@
   */
 package org.orbeon.xbl
 
+import io.udash.wrappers.jquery.JQuery
 import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl.DndRepeat.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventListenerSupport, EventNames, Page}
+import org.orbeon.xforms.*
+import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
-import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
-import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
@@ -54,7 +55,7 @@ object Tabbable {
 
       if (containerElem.classList.contains("fr-tabbable-dnd")) {
 
-        val firstRepeatContainer = containerElem.querySelector(NavTabsSelector).asInstanceOf[html.Element]
+        val firstRepeatContainer = containerElem.querySelectorT(NavTabsSelector)
 
         val newDrake =
           Dragula(

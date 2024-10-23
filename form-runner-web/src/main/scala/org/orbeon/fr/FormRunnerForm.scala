@@ -1,17 +1,15 @@
 package org.orbeon.fr
 
 import org.orbeon.oxf.fr.ControlOps
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
-import org.orbeon.xforms
-import org.orbeon.xforms.{$, AjaxClient, DocumentAPI, XFormsId, XFormsXbl}
+import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters
 import scala.scalajs.js.JSConverters.{JSRichFutureNonThenable, JSRichIterableOnce, JSRichOption}
 
 
@@ -30,14 +28,13 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
   def activateProcessButton(buttonName: String): Unit = {
 
     def fromProcessButton =
-      Option(dom.document.querySelector(s".fr-buttons .xbl-fr-process-button .fr-$buttonName-button button"))
+      dom.document.querySelectorOpt(s".fr-buttons .xbl-fr-process-button .fr-$buttonName-button button")
 
     def fromDropTrigger =
-      Option(dom.document.querySelector(s".fr-buttons .xbl-fr-drop-trigger button.fr-$buttonName-button, .fr-buttons .xbl-fr-drop-trigger li a.fr-$buttonName-button"))
+      dom.document.querySelectorOpt(s".fr-buttons .xbl-fr-drop-trigger button.fr-$buttonName-button, .fr-buttons .xbl-fr-drop-trigger li a.fr-$buttonName-button")
 
     fromProcessButton
       .orElse(fromDropTrigger)
-      .map(_.asInstanceOf[html.Element])
       .foreach(_.click())
   }
 
@@ -62,7 +59,7 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
     val elemOpt =
       findControlsByName(controlName).lift(index.getOrElse(0)).flatMap {
         case e if e.classList.contains("xbl-fr-dropdown-select1") =>
-          Some(e.querySelector(".xforms-select1").asInstanceOf[html.Element])
+          e.querySelectorOpt(".xforms-select1")
         case e if XFormsXbl.isJavaScriptLifecycle(e) =>
           Some(e)
         case e if XFormsXbl.isComponent(e) =>
@@ -85,9 +82,9 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
 
       val elemToClickOpt =
         if (e.classList.contains("xforms-trigger"))
-          Option(e.querySelector("button").asInstanceOf[html.Element])
+          e.querySelectorOpt("button")
         else if (e.classList.contains("xforms-input"))
-          Option(e.querySelector("input").asInstanceOf[html.Element])
+          e.querySelectorOpt("input")
         else
           None
 

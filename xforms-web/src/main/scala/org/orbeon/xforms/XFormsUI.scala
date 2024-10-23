@@ -13,6 +13,7 @@
  */
 package org.orbeon.xforms
 
+import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.dom.{Namespace, QName}
@@ -21,16 +22,14 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.polyfills.HTMLPolyfills.*
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.Constants.LhhacSeparator
 import org.orbeon.xforms.facade.{Controls, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.URL
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
-import org.scalajs.dom.ext.*
 import org.scalajs.dom.html.{Input, Span}
 import org.scalajs.dom.{MouseEvent, html, raw}
-import io.udash.wrappers.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import scalatags.JsDom
 import scalatags.JsDom.all.*
@@ -257,7 +256,7 @@ object XFormsUI {
   def handleInit(elem: raw.Element, controlsWithUpdatedItemsets: js.Dictionary[Boolean]): Unit = {
 
     val controlId       = attValueOrThrow(elem, "id")
-    val documentElement = dom.document.getElementById(controlId).asInstanceOf[html.Element]
+    val documentElement = dom.document.getElementByIdT(controlId)
     val relevantOpt     = booleanAttValueOpt(elem, "relevant")
     val readonlyOpt     = booleanAttValueOpt(elem, "readonly")
 
@@ -393,7 +392,7 @@ object XFormsUI {
   ): Unit = {
 
     val newControlValue  = elem.textContent
-    val documentElement  = dom.document.getElementById(controlId).asInstanceOf[html.Element]
+    val documentElement  = dom.document.getElementByIdT(controlId)
 
     def containsAnyOf(e: raw.Element, tokens: List[String]) = {
       val classList = e.classList
@@ -698,7 +697,7 @@ object XFormsUI {
     else
       updateFullAppearanceItemset(
         documentElement  = documentElement,
-        into             = documentElement.querySelector("span.xforms-items").asInstanceOf[html.Element],
+        into             = documentElement.querySelectorT("span.xforms-items"),
         afterOpt         = None,
         controlId        = controlId,
         itemsetTree      = itemsetTree,
@@ -728,14 +727,14 @@ object XFormsUI {
     val newSchemaTypeOpt    = attValueOpt(elem, "type")
     val newVisitedOpt       = booleanAttValueOpt(elem, "visited")
 
-    var documentElement = dom.document.getElementById(controlId).asInstanceOf[html.Element]
+    var documentElement = dom.document.getElementByIdT(controlId)
 
     // Done to fix #2935; can be removed when we have taken care of #2940
     if (documentElement == null && (controlId  == "fb-static-upload-empty" || controlId == "fb-static-upload-non-empty"))
       return
 
     if (documentElement == null) {
-      documentElement = dom.document.getElementById(s"group-begin-$controlId").asInstanceOf[html.Element]
+      documentElement = dom.document.getElementByIdT(s"group-begin-$controlId")
       if (documentElement == null) {
         logger.error(s"Can't find element or iteration with ID '$controlId'")
         // TODO: throw?
@@ -938,7 +937,7 @@ object XFormsUI {
   private def handleItemset(elem: raw.Element, controlId: String, controlsWithUpdatedItemsets : js.Dictionary[Boolean]): Unit = {
 
     val itemsetTree     = Option(JSON.parse(elem.textContent).asInstanceOf[js.Array[ItemsetItem]]).getOrElse(js.Array())
-    val documentElement = dom.document.getElementById(controlId).asInstanceOf[html.Element]
+    val documentElement = dom.document.getElementByIdT(controlId)
     val groupName       = attValueOpt(elem, "group")
 
     controlsWithUpdatedItemsets(controlId) = true
@@ -966,7 +965,7 @@ object XFormsUI {
     if (! documentElement.classList.contains("xforms-static") && staticReadonlyOpt.map(_.toBoolean).exists(_ == true)) {
       if (isLeafControl) {
         val parentElement = documentElement.parentNode.asInstanceOf[html.Element]
-        val newDocumentElement = dom.document.createElement("span").asInstanceOf[html.Element]
+        val newDocumentElement = dom.document.createElementT("span")
         newDocumentElement.setAttribute("id", controlId)
 
         newDocumentElement.classList = documentElement.classList;
@@ -1004,7 +1003,7 @@ object XFormsUI {
     newLevelOpt    : Option[String],
   ): Unit = {
     if (AriaControlClasses.exists(documentElement.classList.contains)) {
-      Option(documentElement.querySelector("input, textarea, select").asInstanceOf[html.Element]).foreach { firstInput =>
+      documentElement.querySelectorOpt("input, textarea, select").foreach { firstInput =>
 
         requiredOpt.foreach {
           case true  => firstInput.setAttribute("aria-required", true.toString)

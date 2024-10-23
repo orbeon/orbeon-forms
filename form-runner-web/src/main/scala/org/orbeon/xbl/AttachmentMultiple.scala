@@ -22,6 +22,7 @@ import org.orbeon.xforms.{EventListenerSupport, Page, Upload}
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.html
+import org.orbeon.web.DomSupport.*
 
 import scala.scalajs.js
 
@@ -67,9 +68,9 @@ object AttachmentMultiple {
 
     private object Private {
 
-      def dropElem          = containerElem.querySelector(".fr-attachment-drop")
-      def selectAnchor      = containerElem.querySelector(".fr-attachment-select").asInstanceOf[html.Anchor]
-      def uploadControlElem = containerElem.querySelector(".xforms-upload").asInstanceOf[html.Element]
+      def dropElem          = containerElem.querySelectorT(".fr-attachment-drop")
+      def selectAnchor      = containerElem.querySelectorT(".fr-attachment-select").asInstanceOf[html.Anchor]
+      def uploadControlElem = containerElem.querySelectorT(".xforms-upload")
       def uploadInputOpt    = Option(containerElem.querySelector(".xforms-upload-select").asInstanceOf[html.Input])
 
       object EventSupport extends EventListenerSupport

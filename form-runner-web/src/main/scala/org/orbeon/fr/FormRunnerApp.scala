@@ -15,10 +15,12 @@ package org.orbeon.fr
 
 import org.orbeon.facades.ResizeObserver
 import org.orbeon.web.DomEventNames
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl
-import org.orbeon.xforms.Session.SessionUpdate
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.Events
+import org.orbeon.xforms.Session.SessionUpdate
+import org.orbeon.xforms.facade.{Bootstrap, Events}
 import org.scalajs.dom
 import org.scalajs.dom.*
 import org.scalajs.dom.raw.HTMLElement
@@ -121,7 +123,7 @@ object FormRunnerApp extends App {
       var didExpireTimerOpt: Option[timers.SetTimeoutHandle] = None
 
       if (dialog.classList.contains("fr-feature-enabled")) {
-        val renewSessionButton = dialog.querySelector("button").asInstanceOf[html.Element]
+        val renewSessionButton = dialog.querySelectorT("button")
         GlobalEventListenerSupport.addListener(renewSessionButton, DomEventNames.Click, (event: dom.raw.EventTarget) => {
           renewSession()
 

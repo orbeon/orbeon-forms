@@ -14,6 +14,7 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.Autosize
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom.html
 
@@ -31,7 +32,7 @@ object AutosizeTextarea {
 
     // For static readonly
     private def preElem: Option[html.Element] =
-      Option(containerElem.querySelector("pre").asInstanceOf[html.Element])
+      containerElem.querySelectorOpt("pre")
 
     override def init(): Unit =
       textareaElem.foreach(Autosize.apply)

@@ -20,6 +20,8 @@ import org.orbeon.xforms.EventNames.*
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget, WireAjaxEventWithoutTarget}
 import org.scalajs.dom
 import org.scalajs.dom.html
+import org.orbeon.web.DomSupport.*
+
 
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
@@ -133,7 +135,7 @@ class AjaxEvent(args: js.Any*) extends js.Object {
       case (Some(_), None) =>
         throw new IllegalArgumentException("targetId")
       case (None, Some(targetId)) =>
-        Option(dom.document.getElementById(targetId)).flatMap(e => Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(e.asInstanceOf[html.Element])) match {
+        dom.document.getElementByIdOpt(targetId).flatMap(e => Page.findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(e)) match {
           case Some(form) =>
             form -> targetId.some // here we could check that the namespaces match!
           case None =>

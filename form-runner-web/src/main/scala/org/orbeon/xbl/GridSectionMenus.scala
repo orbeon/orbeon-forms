@@ -24,6 +24,8 @@ import org.scalajs.dom.{document, html, window}
 import io.udash.wrappers.jquery.JQueryEvent
 import org.scalajs.dom
 import org.scalajs.dom.ext.*
+import org.orbeon.web.DomSupport.*
+
 
 import scala.scalajs.js
 
@@ -35,7 +37,7 @@ trait GridSectionMenus {
 
   // Keep pointing to menu so we can move it around as needed
   // Old comment: NOTE: When scripts are in the head, this returns undefined. Should be fixed!
-  val globalMenuElem: html.Element = document.querySelector(s".fr-$componentName-dropdown-menu").asInstanceOf[html.Element]
+  val globalMenuElem: html.Element = document.querySelectorT(s".fr-$componentName-dropdown-menu")
 
   sealed trait Operation extends EnumEntry with Hyphencase
   object Operation extends Enum[Operation] {

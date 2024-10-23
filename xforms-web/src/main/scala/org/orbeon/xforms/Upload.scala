@@ -15,13 +15,13 @@ package org.orbeon.xforms
 
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.*
 import org.orbeon.xforms.controls.Upload.*
 import org.scalajs.dom
 import org.scalajs.dom.raw.File
 import org.scalajs.dom.{FileList, html}
-import io.udash.wrappers.jquery.JQueryEvent
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.Future
@@ -70,7 +70,7 @@ class Upload {
 
   self =>
 
-  import Upload._
+  import Upload.*
 
   private var _container: html.Element = null
   def container: html.Element = self._container
@@ -192,10 +192,10 @@ class Upload {
   }
 
   private def findDescendantElem(className: String): Option[html.Element] =
-    Option(_container.querySelector(s".$className")) map (_.asInstanceOf[html.Element])
+    _container.querySelectorOpt(s".$className")
 
   private def findProgressBar: Option[html.Element] =
     findDescendantElem(s"$UploadProgressClass-bar") map {
-      _.querySelector(".bar").asInstanceOf[html.Element]
+      _.querySelectorT(".bar")
     }
 }

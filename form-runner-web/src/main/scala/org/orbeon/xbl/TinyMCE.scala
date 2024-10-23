@@ -13,16 +13,15 @@
  */
 package org.orbeon.xbl
 
+import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.facades.TinyMce.*
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, DocumentAPI, Page}
 import org.scalajs.dom
-import org.scalajs.dom.{Element, MutationObserver, MutationObserverInit, MutationRecord, document, html}
-import org.scalajs.dom.ext.*
-import io.udash.wrappers.jquery.JQueryPromise
+import org.scalajs.dom.*
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
-import org.orbeon.polyfills.HTMLPolyfills.*
 
 import scala.concurrent.Promise
 import scala.scalajs.js
@@ -91,8 +90,7 @@ object TinyMCE {
         }
 
         def fromDataAtt: Option[TinyMceConfig] =
-          containerElem.querySelector(".tinymce-base-url")
-            .asInstanceOf[html.Element]
+          containerElem.querySelectorT(".tinymce-base-url")
             .dataset
             .get("tinymceConfig")
             .flatMap(_.trimAllToOpt)

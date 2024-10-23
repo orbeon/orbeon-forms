@@ -12,6 +12,39 @@ import scala.scalajs.js
 
 object DomSupport {
 
+  implicit class DomElemOps[T <: dom.Element](private val elem: T) extends AnyVal {
+
+    def querySelectorAllT(selectors: String): dom.NodeList[T] =
+      elem.querySelectorAll(selectors).asInstanceOf[dom.NodeList[T]]
+
+    def querySelectorT(selectors: String): T =
+      elem.querySelector(selectors).asInstanceOf[T]
+
+    def querySelectorOpt(selectors: String): Option[T] =
+      Option(elem.querySelector(selectors).asInstanceOf[T])
+  }
+
+  implicit class DomDocOps(private val doc: html.Document) extends AnyVal {
+
+    def getElementByIdT(elementId: String): html.Element =
+      doc.getElementById(elementId).asInstanceOf[html.Element]
+
+    def getElementByIdOpt(elementId: String): Option[html.Element] =
+      Option(doc.getElementById(elementId).asInstanceOf[html.Element])
+
+    def createElementT(tagName: String): html.Element =
+      doc.createElement(tagName).asInstanceOf[html.Element]
+
+    def querySelectorAllT(selectors: String): dom.NodeList[html.Element] =
+      doc.querySelectorAll(selectors).asInstanceOf[dom.NodeList[html.Element]]
+
+    def querySelectorT(selectors: String): html.Element =
+      doc.querySelector(selectors).asInstanceOf[html.Element]
+
+    def querySelectorOpt(selectors: String): Option[html.Element] =
+      Option(querySelectorT(selectors))
+  }
+
   private var lastUsedSuffix: Int = 0
 
   val AtLeastDomInteractiveStates = Set(DocumentReadyState.interactive, DocumentReadyState.complete)

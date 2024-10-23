@@ -146,19 +146,21 @@ object Tabbable {
       // 2016-10-13: We use our own logic to show/hide tabs based on position as we want to be able to
       // support dynamically repeated tabs.
 
-      eventListenerSupport.addListener(containerElem, "click", (e: dom.Event) =>
-        if (e.target.asInstanceOf[dom.Element].matches("[data-toggle = 'tabbable']")) {
+      eventListenerSupport.addListener(containerElem, "click", (e: dom.Event) => {
+        val targetElem  = e.target.asInstanceOf[dom.Element]
+        val matchedElem = targetElem.closest("[data-toggle = 'tabbable']")
+        if (matchedElem != null && containerElem.contains(matchedElem)) {
           e.preventDefault()  // don't allow anchor navigation
           e.stopPropagation() // prevent ancestor tab handlers from running
 
-          val newLi = $(containerElem).parent(ExcludeRepeatClassesSelector)
+          val newLi = $(matchedElem).parent(ExcludeRepeatClassesSelector)
 
           if (! newLi.is(ActiveSelector)) {
             val tabPosition = newLi.prevAll(ExcludeRepeatClassesSelector).length
             selectTab(tabPosition)
           }
         }
-      )
+      })
     }
 
     override def destroy(): Unit = {

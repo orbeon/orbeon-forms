@@ -14,7 +14,7 @@
 package org.orbeon.xforms.embedding
 
 import org.orbeon.sjsdom
-import org.scalajs.dom.experimental.{Headers, URL}
+import org.scalajs.dom.{Headers, URL}
 
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array

@@ -13,25 +13,21 @@
   */
 package org.orbeon.xbl
 
-import enumeratum.EnumEntry.Hyphencase
 import enumeratum.*
-import org.orbeon.polyfills.HTMLPolyfills.*
+import enumeratum.EnumEntry.Hyphencase
+import io.udash.wrappers.jquery.JQueryEvent
 import org.orbeon.oxf.util.CoreUtils.asUnit
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.Utils
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
-import org.scalajs.dom.raw.KeyboardEvent
-import org.scalajs.dom.{document, html, window}
-import io.udash.wrappers.jquery.JQueryEvent
 import org.scalajs.dom
-import org.scalajs.dom.ext.*
-import org.orbeon.web.DomSupport.*
-
+import org.scalajs.dom.{KeyboardEvent, document, html}
 
 import scala.scalajs.js
 
 trait GridSectionMenus {
 
-  import Util._
+  import Util.*
 
   def componentName: String
 

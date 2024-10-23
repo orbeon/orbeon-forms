@@ -4,9 +4,9 @@ import org.orbeon.fr.DockerSupport.{removeContainerByImage, runContainer}
 import org.orbeon.oxf.util.FutureUtils.{eventually, eventuallyAsTry}
 import org.orbeon.web
 import org.scalajs.dom
-import org.scalajs.dom.experimental.{HttpMethod, RequestInit, RequestRedirect, Response}
+import org.scalajs.dom.{HttpMethod, RequestInit, RequestRedirect, Response}
 import org.scalajs.dom.html
-import org.scalajs.dom.raw.Window
+import org.scalajs.dom.Window
 import org.scalatest.AsyncTestSuite
 
 import scala.async.Async.{async, await}

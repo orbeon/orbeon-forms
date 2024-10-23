@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.xforms
 import org.orbeon.xforms.AjaxClient.fireEvent
 import org.scalajs.dom
-import org.scalajs.dom.experimental.*
+import org.scalajs.dom.AbortController
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.Promise
@@ -32,7 +32,7 @@ object UploaderClient {
 
   import Private.*
 
-  def addFile(upload: Upload, file: dom.raw.File, wait: FiniteDuration): Unit =
+  def addFile(upload: Upload, file: dom.File, wait: FiniteDuration): Unit =
     uploadEventQueue.add(
       event    = UploadEvent(upload, file),
       wait     = wait,
@@ -64,7 +64,7 @@ object UploaderClient {
 
   private object Private {
 
-    case class UploadEvent(upload: Upload, file: dom.raw.File)
+    case class UploadEvent(upload: Upload, file: dom.File)
 
     // While an upload is in progress:
     var currentEventOpt          : Option[UploadEvent]     = None // event for the field being uploaded

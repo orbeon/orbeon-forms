@@ -26,10 +26,7 @@ import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.Constants.LhhacSeparator
 import org.orbeon.xforms.facade.{Controls, XBL}
 import org.scalajs.dom
-import org.scalajs.dom.experimental.URL
-import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
-import org.scalajs.dom.html.{Input, Span}
-import org.scalajs.dom.{MouseEvent, html, raw}
+import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import scalatags.JsDom
 import scalatags.JsDom.all.*
@@ -63,7 +60,7 @@ object XFormsUI {
   //
   // This matches what GMail does AFAICT.
   @JSExport
-  def handleShiftSelection(clickEvent: MouseEvent, controlElem: html.Element): Unit =
+  def handleShiftSelection(clickEvent: dom.MouseEvent, controlElem: html.Element): Unit =
     if (controlElem.classList.contains("xforms-select-appearance-full")) {
       // Only for "checkbox" controls
       val checkboxInputs = controlElem.getElementsByTagName("input")
@@ -159,14 +156,14 @@ object XFormsUI {
 
   // 2022-03-16: AjaxServer.js
   @JSExport
-  def firstChildWithLocalName(node: raw.Element, name: String): js.UndefOr[raw.Element] =
+  def firstChildWithLocalName(node: dom.Element, name: String): js.UndefOr[dom.Element] =
     node.childNodes.collectFirst {
-      case n: raw.Element if n.localName == name => n
+      case n: dom.Element if n.localName == name => n
     } .orUndefined
 
   // 2022-03-16: AjaxServer.js
   @JSExport
-  def findDialogsToShow(controlValuesElems: js.Array[raw.Element]): js.Array[String] = {
+  def findDialogsToShow(controlValuesElems: js.Array[dom.Element]): js.Array[String] = {
     for {
       controlValuesElem <- controlValuesElems.iterator
       dialogElem        <- childrenWithLocalName(controlValuesElem, "dialog")
@@ -179,7 +176,7 @@ object XFormsUI {
 
   // 2022-03-16: AjaxServer.js
   @JSExport
-  def handleScriptElem(formID: String, scriptElem: raw.Element): Unit = {
+  def handleScriptElem(formID: String, scriptElem: dom.Element): Unit = {
 
     val functionName  = attValueOrThrow(scriptElem, "name")
     val targetId      = attValueOrThrow(scriptElem, "target-id")
@@ -193,12 +190,12 @@ object XFormsUI {
 
   // 2023-08-14: AjaxServer.js
   @JSExport
-  def handleCallbackElem(formID: String, callbackElem: raw.Element): Unit =
+  def handleCallbackElem(formID: String, callbackElem: dom.Element): Unit =
     ServerAPI.callUserCallback(formID, attValueOrThrow(callbackElem, "name"))
 
   // 2022-03-16: AjaxServer.js
   @JSExport
-  def handleDeleteRepeatElements(controlValuesElems: js.Array[raw.Element]): Unit =
+  def handleDeleteRepeatElements(controlValuesElems: js.Array[dom.Element]): Unit =
     controlValuesElems.iterator foreach { controlValuesElem =>
       childrenWithLocalName(controlValuesElem, "delete-repeat-elements") foreach { deleteElem =>
 
@@ -213,7 +210,7 @@ object XFormsUI {
           dom.document.getElementById("repeat-end-" + appendRepeatSuffix(deleteId, parentIndexes))
 
         // Find last element to delete
-        var lastNodeToDelete: raw.Node = repeatEnd.previousSibling
+        var lastNodeToDelete: dom.Node = repeatEnd.previousSibling
 
         // Perform delete
         for (_ <- 0 until count) {
@@ -221,7 +218,7 @@ object XFormsUI {
           var wasDelimiter = false
           while (! wasDelimiter) {
             lastNodeToDelete match {
-              case lastElemToDelete: raw.Element =>
+              case lastElemToDelete: dom.Element =>
 
                 val classList = lastElemToDelete.classList
 
@@ -253,7 +250,7 @@ object XFormsUI {
 
   // 2022-03-16: AjaxServer.js
   @JSExport
-  def handleInit(elem: raw.Element, controlsWithUpdatedItemsets: js.Dictionary[Boolean]): Unit = {
+  def handleInit(elem: dom.Element, controlsWithUpdatedItemsets: js.Dictionary[Boolean]): Unit = {
 
     val controlId       = attValueOrThrow(elem, "id")
     val documentElement = dom.document.getElementByIdT(controlId)
@@ -294,7 +291,7 @@ object XFormsUI {
   // 2022-03-16: AjaxServer.js
   @JSExport
   def handleValues(
-    controlElem                 : raw.Element,
+    controlElem                 : dom.Element,
     controlId                   : String,
     recreatedInput              : Boolean,
     controlsWithUpdatedItemsets : js.Dictionary[Boolean]
@@ -305,7 +302,7 @@ object XFormsUI {
   // 2022-04-12: AjaxServer.js
   @JSExport
   def handleDialog(
-    controlElem : raw.Element,
+    controlElem : dom.Element,
     formId      : String
   ): Unit = {
 
@@ -324,7 +321,7 @@ object XFormsUI {
 
   // 2022-04-12: AjaxServer.js
   @JSExport
-  def handleAttribute(controlElem : raw.Element): Unit = {
+  def handleAttribute(controlElem : dom.Element): Unit = {
 
     val newAttributeValue = controlElem.textContent
     val forAttribute      = controlElem.getAttribute("for")
@@ -337,7 +334,7 @@ object XFormsUI {
 
   // 2022-04-12: AjaxServer.js
   @JSExport
-  def handleText(controlElem : raw.Element): Unit = {
+  def handleText(controlElem : dom.Element): Unit = {
 
     val newTextValue = controlElem.textContent
     val forAttribute = controlElem.getAttribute("for")
@@ -350,7 +347,7 @@ object XFormsUI {
   // 2022-04-12: AjaxServer.js
   @JSExport
   def handleRepeatIteration(
-    controlElem : raw.Element,
+    controlElem : dom.Element,
     formID      : String
   ): Unit = {
 
@@ -385,7 +382,7 @@ object XFormsUI {
   }
 
   def handleValue(
-    elem                        : raw.Element,
+    elem                        : dom.Element,
     controlId                   : String,
     recreatedInput              : Boolean,
     controlsWithUpdatedItemsets : js.Dictionary[Boolean]
@@ -394,7 +391,7 @@ object XFormsUI {
     val newControlValue  = elem.textContent
     val documentElement  = dom.document.getElementByIdT(controlId)
 
-    def containsAnyOf(e: raw.Element, tokens: List[String]) = {
+    def containsAnyOf(e: dom.Element, tokens: List[String]) = {
       val classList = e.classList
       tokens.exists(classList.contains)
     }
@@ -420,7 +417,7 @@ object XFormsUI {
             // If this is a control for which we recreated the itemset, we want to set its value
             controlsWithUpdatedItemsets.get(controlId).contains(true) ||
             (
-              // Update only if the new value is different than the value already have in the HTML area
+              // Update only if the new value is different from the value already have in the HTML area
               normalizedCurrentValue != normalizedNewControlValue
                 // Update only if the value in the control is the same now as it was when we sent it to the server,
                 // so not to override a change done by the user since the control value was last sent to the server
@@ -469,10 +466,10 @@ object XFormsUI {
 
   // 2022-03-16: AjaxServer.js
   @JSExport
-  def handleErrorsElem(formID: String, ignoreErrors: Boolean, errorsElem: raw.Element): Unit = {
+  def handleErrorsElem(formID: String, ignoreErrors: Boolean, errorsElem: dom.Element): Unit = {
 
     val serverErrors =
-      errorsElem.childNodes collect { case n: raw.Element => n } map { errorElem =>
+      errorsElem.childNodes collect { case n: dom.Element => n } map { errorElem =>
         // <xxf:error exception="org.orbeon.saxon.trans.XPathException" file="gaga.xhtml" line="24" col="12">
         //     Invalid date "foo" (Year is less than four digits)
         // </xxf:error>
@@ -500,7 +497,7 @@ object XFormsUI {
   @JSExport
   def handleSubmission(
     formID           : String,
-    submissionElement: raw.Element,
+    submissionElement: dom.Element,
     notifyReplace    : js.Function0[Unit]
   ): Unit = {
 
@@ -527,7 +524,7 @@ object XFormsUI {
           targetOpt.flatMap(target => Option(dom.document.getElementById(target))).exists(_.tagName.equalsIgnoreCase("iframe"))
 
         if (isTargetAnIframe) {
-          val url = new URL(path, dom.document.location.href)
+          val url = new dom.URL(path, dom.document.location.href)
           url.searchParams.delete("t")
           url.searchParams.append("t", java.util.UUID.randomUUID().toString)
           url.href
@@ -708,7 +705,7 @@ object XFormsUI {
 
   @JSExport
   def handleControl(
-    elem                       : raw.Element,
+    elem                       : dom.Element,
     recreatedInputs            : js.Dictionary[html.Element],
     controlsWithUpdatedItemsets: js.Dictionary[Boolean],
     formID                     : String
@@ -856,7 +853,7 @@ object XFormsUI {
 
   private def updateControlAttributes(
     documentElement            : html.Element,
-    elem                       : raw.Element,
+    elem                       : dom.Element,
     newLevelOpt                : Option[String],
     progressStateOpt           : Option[String],
     progressReceivedOpt        : Option[String],
@@ -934,7 +931,7 @@ object XFormsUI {
       Controls.setRelevant(documentElement, relevant = false)
   }
 
-  private def handleItemset(elem: raw.Element, controlId: String, controlsWithUpdatedItemsets : js.Dictionary[Boolean]): Unit = {
+  private def handleItemset(elem: dom.Element, controlId: String, controlsWithUpdatedItemsets : js.Dictionary[Boolean]): Unit = {
 
     val itemsetTree     = Option(JSON.parse(elem.textContent).asInstanceOf[js.Array[ItemsetItem]]).getOrElse(js.Array())
     val documentElement = dom.document.getElementByIdT(controlId)
@@ -950,7 +947,7 @@ object XFormsUI {
         .apply(controlId, itemsetTree)
   }
 
-  private def handleSwitchCase(elem: raw.Element): Unit = {
+  private def handleSwitchCase(elem: dom.Element): Unit = {
     val id      = attValueOrThrow(elem, "id")
     val visible = attValueOrThrow(elem, "visibility") == "visible"
     Controls.toggleCase(id, visible)
@@ -997,7 +994,7 @@ object XFormsUI {
 
   private def updateCustomAttributes(
     documentElement: html.Element,
-    elem           : raw.Element,
+    elem           : dom.Element,
     requiredOpt    : Option[Boolean],
     newVisitedOpt  : Option[Boolean],
     newLevelOpt    : Option[String],
@@ -1302,7 +1299,7 @@ object XFormsUI {
     documentElement: html.Element,
     itemsetTree    : js.Array[ItemsetItem]
   ): Unit =
-    ((documentElement.getElementsByTagName("select")(0): js.UndefOr[raw.Element]): Any) match {
+    ((documentElement.getElementsByTagName("select")(0): js.UndefOr[dom.Element]): Any) match {
         case select: html.Select =>
 
           val selectedValues =
@@ -1369,7 +1366,7 @@ object XFormsUI {
     // Clear existing items if needed
     clearChildrenOpt.foreach(_.apply(into))
 
-    val domParser = new DOMParser
+    val domParser = new dom.DOMParser
 
     val itemsToInsertIt: Iterator[html.Span] =
       itemsetTree.iterator.zipWithIndex.map { case (itemElement, itemIndex) =>
@@ -1379,19 +1376,19 @@ object XFormsUI {
         val itemLabelNodesOpt =
           itemElement.label.toOption.map { label =>
             domParser
-              .parseFromString(label, SupportedType.`text/html`)
+              .parseFromString(label, dom.MIMEType.`text/html`)
               .querySelector("html > body")
               .childNodes
           }
 
-        val helpOpt: Option[JsDom.TypedTag[Span]] = itemElement.help.toOption.filter(_.nonAllBlank).map { helpString =>
+        val helpOpt: Option[JsDom.TypedTag[html.Span]] = itemElement.help.toOption.filter(_.nonAllBlank).map { helpString =>
           span(cls := "xforms-help")(helpString)
         }
 
-        val hintOpt: Option[JsDom.TypedTag[Span]] = itemElement.hint.toOption.filter(_.nonAllBlank).map { hintString =>
+        val hintOpt: Option[JsDom.TypedTag[html.Span]] = itemElement.hint.toOption.filter(_.nonAllBlank).map { hintString =>
           span(cls := "xforms-hint") {
             domParser
-              .parseFromString(hintString, SupportedType.`text/html`)
+              .parseFromString(hintString, dom.MIMEType.`text/html`)
               .querySelector("html > body")
               .childNodes
               .toList
@@ -1403,7 +1400,7 @@ object XFormsUI {
           else                                  "xforms-deselected"
         span(cls := (selectedClass :: classOpt.toList mkString " ")) {
 
-          def createInput: JsDom.TypedTag[Input] =
+          def createInput: JsDom.TypedTag[html.Input] =
             input(
               id       := XFormsId.appendToEffectiveId(controlId, Constants.LhhacSeparator + "e" + itemIndex),
               tpe      := (if (isSelect) "checkbox" else "radio"),
@@ -1448,10 +1445,10 @@ object XFormsUI {
     // TODO: This is missing from the version of `scala-js-dom` we use, but present in newer versions. Once we upgrade
     //  we can remove this.
     trait ElementExt extends js.Object {
-      def append(nodes: (raw.Node | String)*): Unit
-      def prepend(nodes: (raw.Node | String)*): Unit
-      def after(nodes: (raw.Node | String)*): Unit
-      def before(nodes: (raw.Node | String)*): Unit
+      def append(nodes: (dom.Node | String)*): Unit
+      def prepend(nodes: (dom.Node | String)*): Unit
+      def after(nodes: (dom.Node | String)*): Unit
+      def before(nodes: (dom.Node | String)*): Unit
     }
 
     // Global information about the last checkbox to check
@@ -1461,10 +1458,10 @@ object XFormsUI {
     def nestedInputElems(target: dom.Element): collection.Seq[html.Input] =
       target.getElementsByTagName("input").map(_.asInstanceOf[html.Input])
 
-    private def findLoaderElem: Option[raw.Element] =
+    private def findLoaderElem: Option[dom.Element] =
       Option(dom.document.querySelector("body > .orbeon-loader"))
 
-    private def createLoaderElem: raw.Element = {
+    private def createLoaderElem: dom.Element = {
       val newDiv = dom.document.createElement("div")
       newDiv.classList.add("orbeon-loader")
       dom.document.body.appendChild(newDiv)
@@ -1474,9 +1471,9 @@ object XFormsUI {
     val HandleValueIgnoredControls    = List("xforms-trigger", "xforms-submit", "xforms-upload")
     val HandleValueOutputOnlyControls = List("xforms-output", "xforms-static", "xforms-label", "xforms-hint", "xforms-help")
 
-    def childrenWithLocalName(node: raw.Element, name: String): Iterator[raw.Element] =
+    def childrenWithLocalName(node: dom.Element, name: String): Iterator[dom.Element] =
       node.childNodes.iterator collect {
-        case n: raw.Element if n.localName == name => n
+        case n: dom.Element if n.localName == name => n
       }
 
     def appendRepeatSuffix(id: String, suffix: String): String =
@@ -1485,18 +1482,18 @@ object XFormsUI {
       else
         id + Constants.RepeatSeparator + suffix
 
-    def attValueOrThrow(elem: raw.Element, name: String): String =
+    def attValueOrThrow(elem: dom.Element, name: String): String =
       attValueOpt(elem, name).getOrElse(throw new IllegalArgumentException(name))
 
     // Just in case, normalize following:
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute#non-existing_attributes
-    def attValueOpt(elem: raw.Element, name: String): Option[String] =
+    def attValueOpt(elem: dom.Element, name: String): Option[String] =
       if (elem.hasAttribute(name))
         Option(elem.getAttribute(name)) // `Some()` should be ok but just in case...
       else
         None
 
-    def booleanAttValueOpt(elem: raw.Element, name: String): Option[Boolean] =
+    def booleanAttValueOpt(elem: dom.Element, name: String): Option[Boolean] =
       attValueOpt(elem, name).map(_.toBoolean)
 
     def showModalProgressPanelRaw(): Unit = {

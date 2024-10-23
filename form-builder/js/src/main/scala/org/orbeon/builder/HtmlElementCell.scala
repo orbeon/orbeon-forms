@@ -14,10 +14,10 @@
 package org.orbeon.builder
 
 import org.orbeon.oxf.fr.{CellOps, ClientNames}
-import org.orbeon.polyfills.HTMLPolyfills.*
-import org.scalajs.dom.ext.*
+import org.orbeon.web.DomSupport.DomElemOps
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
+
 
 // This contains grid/cell operations acting on `html.Element`, which is on the output of the form
 // as seen in the browser.
@@ -26,12 +26,12 @@ object HtmlElementCell {
   implicit object HtmlElementCellOps extends CellOps[html.Element] {
 
     def attValueOpt    (u: html.Element, name: String): Option[String]     = Option(u.getAttribute(name))
-    def children       (u: html.Element, name: String): List[html.Element] = u.children.to(List).asInstanceOf[List[html.Element]]
+    def children       (u: html.Element, name: String): List[html.Element] = u.childrenT.to(List)
     def parent         (u: Element)                   : Element            = u.parentElement
     def hasChildElement(u: Element)                   : Boolean            = u.children.nonEmpty
 
-    def cellsForGrid   (u: Element)                   : List[html.Element] = u.querySelectorAll(".fr-grid-td").to(List).asInstanceOf[List[html.Element]]
-    def gridForCell    (u: Element)                   : Element            = u.closest(".xbl-fr-grid").asInstanceOf[html.Element]
+    def cellsForGrid   (u: Element)                   : List[html.Element] = u.querySelectorAllT(".fr-grid-td").to(List)
+    def gridForCell    (u: Element)                   : Element            = u.closestT(".xbl-fr-grid")
 
     def maxGridWidth(u: Element): Int =
       if (u.firstElementChild.classList.contains("fr-grid-24")) 24 else 12

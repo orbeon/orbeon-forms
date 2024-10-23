@@ -65,7 +65,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
 
     if (isNativePicker) {
       inputHtmlEl.`type` = "date"
-      EventSupport.addListener(inputHtmlEl, DomEventNames.Change, (_: dom.raw.Event) => onDateSelectedUpdateStateAndSendValueToServer())
+      EventSupport.addListener(inputHtmlEl, DomEventNames.Change, (_: dom.Event) => onDateSelectedUpdateStateAndSendValueToServer())
 
       // Also set `disabled` on iOS (see #5376)
       if (inputHtmlEl.readOnly)

@@ -15,7 +15,7 @@ object JsFileSupport {
 
   val UploadUriScheme = "upload"
 
-  def createTemporaryFileUri(file: dom.raw.File, size: Long, mediatype: Option[String]): URI = {
+  def createTemporaryFileUri(file: dom.File, size: Long, mediatype: Option[String]): URI = {
     val uri = new URI(UploadUriScheme, java.util.UUID.randomUUID.toString, null)
     temporaryFiles += uri -> FileDetails(file, size, mediatype)
     uri
@@ -47,7 +47,7 @@ object JsFileSupport {
 
   private object Private {
 
-    case class FileDetails(file: dom.raw.File, size: Long, mediatype: Option[String]) {
+    case class FileDetails(file: dom.File, size: Long, mediatype: Option[String]) {
 
       // The URL must be associated only once, as each call to `URL.createObjectURL()` creates a new URL.
       private var mustRevokeObjectUrl: Boolean = false

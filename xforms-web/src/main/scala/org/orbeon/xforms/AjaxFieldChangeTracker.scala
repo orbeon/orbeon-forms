@@ -17,7 +17,7 @@ import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.Events
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.dom.raw.UIEvent
+import org.scalajs.dom.UIEvent
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 

@@ -19,8 +19,7 @@ import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom
-import org.scalajs.dom.{AbortSignal, Element, EventTarget, Fetch, FocusEvent, FormData, HttpMethod, RequestCredentials, RequestInit, RequestRedirect, experimental, html}
-import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
+import org.scalajs.dom.*
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
@@ -50,7 +49,7 @@ object Support {
 
   private def parseStringAsXml(xmlString: String): Option[dom.Document] =
     try {
-      Option((new DOMParser).parseFromString(xmlString, SupportedType.`application/xml`)) filter
+      Option((new DOMParser).parseFromString(xmlString, dom.MIMEType.`application/xml`)) filter
         (_.documentElement.getElementsByTagName("parsererror").length == 0)
     } catch {
       case NonFatal(_) =>

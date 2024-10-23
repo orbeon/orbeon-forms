@@ -25,7 +25,7 @@ import scala.scalajs.js.|
 @JSExportTopLevel("OrbeonPage")
 object Page {
 
-  import Private._
+  import Private.*
 
   @JSExport
   // Make the `lazy val` accessible to JavaScript through a function
@@ -96,7 +96,7 @@ object Page {
         case elem: html.Element =>
           elem.asInstanceOf[js.Dynamic].form match {
             case formElem: html.Form =>
-              // TODO: `fruitless type test: a value of type scala.scalajs.js.Dynamic cannot also be a org.scalajs.dom.raw.HTMLFormElement`
+              // TODO: `fruitless type test: a value of type scala.scalajs.js.Dynamic cannot also be a org.scalajs.dom.HTMLFormElement`
               //  But is that warning correct? Do we ever take this branch?
               Some(formElem)
             case _ =>

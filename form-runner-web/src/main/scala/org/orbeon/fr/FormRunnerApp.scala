@@ -23,7 +23,6 @@ import org.orbeon.xforms.Session.SessionUpdate
 import org.orbeon.xforms.facade.{Bootstrap, Events}
 import org.scalajs.dom
 import org.scalajs.dom.*
-import org.scalajs.dom.raw.HTMLElement
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global as g
@@ -83,8 +82,8 @@ object FormRunnerApp extends App {
     Events.orbeonLoadedEvent.subscribe(() => {
 
       // Add `scroll-padding-top` and `scroll-padding-bottom` to prevent the focused form field from being below the top navbar or button bar
-      def addScrollPadding(rawElement: raw.Element, cssClass: String): Unit = {
-        val htmlElement = rawElement.asInstanceOf[HTMLElement]
+      def addScrollPadding(rawElement: dom.Element, cssClass: String): Unit = {
+        val htmlElement = rawElement.asInstanceOf[html.Element]
         val position    = window.getComputedStyle(htmlElement).position
         if (position == "fixed" || position == "sticky") {
           val resizeObserver = new ResizeObserver(() => {
@@ -124,7 +123,7 @@ object FormRunnerApp extends App {
 
       if (dialog.classList.contains("fr-feature-enabled")) {
         val renewSessionButton = dialog.querySelectorT("button")
-        GlobalEventListenerSupport.addListener(renewSessionButton, DomEventNames.Click, (event: dom.raw.EventTarget) => {
+        GlobalEventListenerSupport.addListener(renewSessionButton, DomEventNames.Click, (event: dom.EventTarget) => {
           renewSession()
 
           // Since we sent a heartbeat when the session was renewed, the local newest event time has been updated and

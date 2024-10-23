@@ -22,7 +22,7 @@ import org.orbeon.xforms.AjaxClient.handleFailure
 import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalajs.dom.FormData
-import org.scalajs.dom.experimental.AbortController
+import org.scalajs.dom.AbortController
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.duration.*

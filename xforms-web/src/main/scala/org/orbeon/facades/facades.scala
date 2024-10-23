@@ -15,7 +15,7 @@ package org.orbeon.facades
 
 import org.scalajs.dom
 import org.scalajs.dom.{html, raw}
-import org.scalajs.dom.raw.HTMLLinkElement
+import org.scalajs.dom.HTMLLinkElement
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js

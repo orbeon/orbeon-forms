@@ -13,17 +13,14 @@
   */
 package org.orbeon.fr
 
-import org.orbeon.oxf.util.PathUtils
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.*
-import org.orbeon.xforms.{$, Page}
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.xforms.Page
 import org.scalajs.dom
-import org.scalajs.dom.experimental.URLSearchParams
-import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
-import org.scalajs.dom.raw.HTMLFormElement
-import io.udash.wrappers.jquery.JQueryEvent
+import org.scalajs.dom.{DOMParser, HTMLFormElement, URLSearchParams}
 
 import scala.scalajs.js
+
 import scala.scalajs.js.Dynamic.global
 import scala.scalajs.js.UndefOr
 import scala.scalajs.js.JSConverters.*
@@ -59,7 +56,7 @@ object FormRunnerPrivateAPI extends js.Object {
       </form>
 
     val domParser    = new DOMParser
-    val formDocument = domParser.parseFromString(formElem.toString, SupportedType.`text/html`)
+    val formDocument = domParser.parseFromString(formElem.toString, dom.MIMEType.`text/html`)
     val formElement  = formDocument.querySelector("form").asInstanceOf[HTMLFormElement]
     dom.document.body.appendChild(formElement)
     formElement.submit()

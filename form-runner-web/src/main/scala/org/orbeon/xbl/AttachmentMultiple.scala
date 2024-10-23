@@ -94,7 +94,7 @@ object AttachmentMultiple {
         def removeClass() =
           dropElem.classList.remove("fr-attachment-dragover")
 
-        def addListenerOnDropElem(name: String, fn: dom.raw.DragEvent => Unit): Unit =
+        def addListenerOnDropElem(name: String, fn: dom.DragEvent => Unit): Unit =
           EventSupport.addListener(dropElem, name, fn)
 
         addListenerOnDropElem(
@@ -135,7 +135,7 @@ object AttachmentMultiple {
         EventSupport.addListener(
           dropElem,
           DomEventNames.KeyDown,
-          (ev: dom.raw.KeyboardEvent) => {
+          (ev: dom.KeyboardEvent) => {
             if (ev.key == "Enter" || ev.key == " ") {
               ev.preventDefault() // so that the page doesn't scroll
               uploadInputOpt foreach (_.click())
@@ -146,7 +146,7 @@ object AttachmentMultiple {
         EventSupport.addListener(
           selectAnchor,
           DomEventNames.Click,
-          (_: dom.raw.EventTarget) => uploadInputOpt foreach (_.click())
+          (_: dom.EventTarget) => uploadInputOpt foreach (_.click())
         )
       }
     }

@@ -20,7 +20,6 @@ import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.*
 import org.orbeon.xforms.controls.Upload.*
 import org.scalajs.dom
-import org.scalajs.dom.raw.File
 import org.scalajs.dom.{FileList, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
@@ -41,18 +40,18 @@ object Upload {
 
   // Sequence the sending of a list of files, see:
   // https://github.com/orbeon/orbeon-forms/issues/6167
-  def processFileList(fileList: FileList, upload: Upload): Future[List[File]] = {
+  def processFileList(fileList: FileList, upload: Upload): Future[List[dom.File]] = {
 
     val delay = Page.getXFormsFormFromHtmlElemOrThrow(upload.container).configuration.delayBeforeIncrementalRequest.millis
 
-    def processOne(file: dom.raw.File): Future[dom.raw.File] =
+    def processOne(file: dom.File): Future[dom.File] =
       XFormsApp.clientServerChannel.addFile(
         upload,
         file,
         delay
       ).map(_ => file)
 
-    def processRemaining(files: List[dom.raw.File]): Future[List[dom.raw.File]] =
+    def processRemaining(files: List[dom.File]): Future[List[dom.File]] =
       files match {
         case Nil =>
           Future.successful(Nil)

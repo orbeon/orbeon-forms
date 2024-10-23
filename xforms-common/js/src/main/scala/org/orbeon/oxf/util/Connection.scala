@@ -20,7 +20,7 @@ import org.orbeon.oxf.http.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
 import org.orbeon.{fs2dom, sjsdom}
-import org.scalajs.dom.experimental.{Headers as JSHeaders, URL as JSURL}
+import org.scalajs.dom.{Headers as JSHeaders, URL as JSURL}
 
 import java.io.InputStream
 import java.net.URI

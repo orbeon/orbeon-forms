@@ -13,12 +13,11 @@
   */
 package org.orbeon.builder
 
-import org.orbeon.jquery.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.*
 import org.scalajs.dom
-import io.udash.wrappers.jquery.JQueryEvent
 import org.scalajs.dom.html
+
 
 object DialogItemset {
 

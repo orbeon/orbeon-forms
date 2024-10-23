@@ -14,7 +14,7 @@
 package org.orbeon.fr
 
 import org.scalajs.dom
-import org.scalajs.dom.experimental.{RequestInfo, RequestInit, Response}
+import org.scalajs.dom.{RequestInfo, RequestInit, Response}
 
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr

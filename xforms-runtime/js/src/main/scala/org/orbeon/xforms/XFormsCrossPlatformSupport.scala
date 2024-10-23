@@ -21,16 +21,14 @@ import org.orbeon.dom
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.StaticXPath.*
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.StaticXPath.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
-import org.scalajs.dom.DOMParser
-import org.scalajs.dom.ext.*
-import org.scalajs.dom.raw.{Blob, BlobPropertyBag, HTMLDocument}
+import org.scalajs.dom.{Blob, BlobPropertyBag, DOMParser, HTMLDocument}
 
 import java.io.*
 import java.net.URI

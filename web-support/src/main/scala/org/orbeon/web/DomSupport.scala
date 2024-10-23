@@ -3,7 +3,7 @@ package org.orbeon.web
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.web.DomEventNames.*
 import org.scalajs.dom
-import org.scalajs.dom.{DocumentReadyState, document, html}
+import org.scalajs.dom.{DocumentReadyState, HTMLCollection, document, html}
 
 import scala.annotation.tailrec
 import scala.concurrent.{Future, Promise}
@@ -14,7 +14,7 @@ object DomSupport {
 
   implicit class DomElemOps[T <: dom.Element](private val elem: T) extends AnyVal {
 
-    def querySelectorAllT(selectors: String): dom.NodeList[T] =
+    def querySelectorAllT(selectors: String): collection.Seq[T] =
       elem.querySelectorAll(selectors).asInstanceOf[dom.NodeList[T]]
 
     def querySelectorT(selectors: String): T =
@@ -22,6 +22,12 @@ object DomSupport {
 
     def querySelectorOpt(selectors: String): Option[T] =
       Option(elem.querySelector(selectors).asInstanceOf[T])
+
+    def closestT(selector: String): T =
+      elem.closest(selector).asInstanceOf[T]
+
+    def childrenT: collection.Seq[T] =
+      elem.children.asInstanceOf[HTMLCollection[T]]
   }
 
   implicit class DomDocOps(private val doc: html.Document) extends AnyVal {
@@ -35,7 +41,7 @@ object DomSupport {
     def createElementT(tagName: String): html.Element =
       doc.createElement(tagName).asInstanceOf[html.Element]
 
-    def querySelectorAllT(selectors: String): dom.NodeList[html.Element] =
+    def querySelectorAllT(selectors: String): collection.Seq[html.Element] =
       doc.querySelectorAll(selectors).asInstanceOf[dom.NodeList[html.Element]]
 
     def querySelectorT(selectors: String): html.Element =

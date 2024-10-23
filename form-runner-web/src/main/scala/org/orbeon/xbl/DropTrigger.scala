@@ -10,6 +10,7 @@ import io.udash.wrappers.jquery.JQueryEvent
 import org.scalajs.dom
 
 import scala.scalajs.js
+import scala.util.chaining.scalaUtilChainingOps
 
 
 object DropTrigger {
@@ -22,25 +23,24 @@ object DropTrigger {
 
     private var registered: List[String] = Nil
 
-    private val onActivate: dom.Event => Unit = (e: dom.Event) => {
-      if (e.target.asInstanceOf[html.Element].matches(ListenerSelector)) {
-
-        logger.debug(s"reacting to event ${e.`type`}")
-
-        AjaxClient.fireEvent(
-          AjaxEvent(
-            eventName  = "fr-activate",
-            targetId   = containerElem.id,
-            properties = Map(
-              "fr-value" -> e.currentTarget.asInstanceOf[html.Element].dataset("orbeonValue")
+    private val onActivate: dom.Event => Unit = (e: dom.Event) =>
+      e.target.asInstanceOf[html.Element]
+        .closest(ListenerSelector)
+        .asInstanceOf[html.Element]
+        .pipe(Option(_))
+        .foreach { buttonOrA =>
+          AjaxClient.fireEvent(
+            AjaxEvent(
+              eventName  = "fr-activate",
+              targetId   = containerElem.id,
+              properties = Map(
+                "fr-value" -> buttonOrA.dataset("orbeonValue")
+              )
             )
           )
-        )
-
-        // Avoid navigation to "#"
-        e.preventDefault()
-      }
-    }
+          // Avoid navigation to "#"
+          e.preventDefault()
+        }
 
     override def init(): Unit = {
       logger.debug("init")

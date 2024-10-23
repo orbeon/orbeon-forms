@@ -19,6 +19,8 @@ import org.orbeon.oxf.fr.Cell
 import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalatest.funspec.AnyFunSpec
+import org.orbeon.web.DomSupport.*
+
 
 class ClientGridTest extends AnyFunSpec {
 
@@ -104,8 +106,8 @@ class ClientGridTest extends AnyFunSpec {
 
     it(s"must must analyze as expected") {
       assert(
-        expectedASCII ===
-          Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles($(GridSelector)(0), simplify = false, transpose = false))._1)
+        expectedASCII ==
+          Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(dom.document.querySelectorT(GridSelector), simplify = false, transpose = false))._1)
     }
 
     // NOTE: The logic which allows expanding cells can be improved. Right now (2017-10-03), it won't

@@ -13,21 +13,19 @@
  */
 package org.orbeon.xbl
 
+import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
 import org.orbeon.facades.Select2
 import org.orbeon.facades.Select2.{Success, toJQuerySelect2}
 import org.orbeon.web.DomSupport
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
-import org.orbeon.polyfills.HTMLPolyfills.*
 import org.scalajs.dom
-import org.scalajs.dom.ext.*
-import org.scalajs.dom.raw.{Element, Node}
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
-import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
 
 import scala.collection.mutable
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.JSRichOption
+
 
 object Select1Search {
   XBL.declareCompanion(name = "fr|dropdown-select1-search" , js.constructorOf[Select1SearchCompanion])
@@ -269,7 +267,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private def servicePerformsSearch = Option(queryElementWithData.getAttribute(DataServicePerformsSearch)).contains("true")
 
   // TODO: not specific to the autocomplete, should be moved to a utility class
-  private def onAttributeChange(element: Element, attributeName: String, listener: () => Unit): Unit = {
+  private def onAttributeChange(element: dom.Element, attributeName: String, listener: () => Unit): Unit = {
     val observer = new MutationObserver((_, _) => listener())
     mutationObservers = observer :: mutationObservers
 
@@ -279,11 +277,11 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     ))
   }
 
-  private def onElementAdded(container: Element, selector: String, listener: () => Unit): Unit = {
+  private def onElementAdded(container: dom.Element, selector: String, listener: () => Unit): Unit = {
     val observer = new MutationObserver((mutations, _) => {
       mutations.foreach { mutation =>
         mutation.addedNodes.foreach { node =>
-          if (node.nodeType == Node.ELEMENT_NODE && node.asInstanceOf[Element].matches(selector)) {
+          if (node.nodeType == dom.Node.ELEMENT_NODE && node.asInstanceOf[dom.Element].matches(selector)) {
             listener()
           }
         }

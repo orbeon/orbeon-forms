@@ -19,6 +19,7 @@ import org.scalatest.funspec.AnyFunSpec
 
 import scala.scalajs.js
 
+
 class ClientUserAgentAndJQueryTest extends AnyFunSpec {
 
   describe("The environment's user agent string") {
@@ -33,7 +34,7 @@ class ClientUserAgentAndJQueryTest extends AnyFunSpec {
       assert(! js.isUndefined($))
     }
     it ("must match the version we are expecting") {
-      val jQueryVersion = $.fn.asInstanceOf[js.Dynamic].jquery.asInstanceOf[String]
+      val jQueryVersion = $.asInstanceOf[js.Dynamic].fn.jquery.asInstanceOf[String]
       assert(jQueryVersion.startsWith("3.6"))
     }
   }

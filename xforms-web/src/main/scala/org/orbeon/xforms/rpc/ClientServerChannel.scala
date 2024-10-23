@@ -21,7 +21,7 @@ trait ClientServerChannel {
 
   def addFile(
     upload: Upload,
-    file  : dom.raw.File,
+    file  : dom.File,
     wait  : FiniteDuration
   ): Future[Unit]
 

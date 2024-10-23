@@ -17,10 +17,9 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.Constants.*
 import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom
-import org.scalajs.dom.raw
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+
 
 object ServerAPI {
 
@@ -32,7 +31,7 @@ object ServerAPI {
     rest         : js.Any*
   ): Unit = {
 
-    def getElementOrNull(id: String): raw.Element = {
+    def getElementOrNull(id: String): dom.Element = {
 
       def fromId =
         Option(dom.document.getElementById(id))

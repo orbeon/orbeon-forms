@@ -14,7 +14,7 @@
 package org.orbeon.facades
 
 import org.scalajs.dom
-import org.scalajs.dom.{html, raw}
+import org.scalajs.dom.html
 import org.scalajs.dom.HTMLLinkElement
 
 import scala.concurrent.{Future, Promise}
@@ -41,9 +41,9 @@ class ClipboardJS(selector: String, config: ClipboardJSConfig) extends js.Object
 }
 
 trait ClipboardJSConfig extends js.Object {
-  val target: js.UndefOr[js.Function1[html.Element, raw.Element]] = js.undefined
+  val target: js.UndefOr[js.Function1[html.Element, dom.Element]] = js.undefined
   val text: js.UndefOr[js.Function1[html.Element, String]] = js.undefined
-  val container: js.UndefOr[js.Function1[html.Element, raw.Element]] = js.undefined
+  val container: js.UndefOr[js.Function1[html.Element, dom.Element]] = js.undefined
 }
 
 @js.native

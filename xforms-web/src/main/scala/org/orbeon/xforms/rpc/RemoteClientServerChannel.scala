@@ -18,11 +18,10 @@ import cats.syntax.option.*
 import org.orbeon.oxf.http.StatusCode.{LoginTimeOut, ServiceUnavailable}
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.xforms
-import org.orbeon.xforms.AjaxClient.handleFailure
 import org.orbeon.xforms.*
+import org.orbeon.xforms.AjaxClient.handleFailure
 import org.scalajs.dom
-import org.scalajs.dom.FormData
-import org.scalajs.dom.AbortController
+import org.scalajs.dom.{AbortController, FormData}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.duration.*
@@ -34,7 +33,7 @@ import scala.util.{Failure, Success}
 
 object RemoteClientServerChannel extends ClientServerChannel {
 
-  import Private._
+  import Private.*
 
   def sendEvents(
     requestForm      : xforms.Form,
@@ -58,7 +57,7 @@ object RemoteClientServerChannel extends ClientServerChannel {
 
   def addFile(
     upload: Upload,
-    file  : dom.raw.File,
+    file  : dom.File,
     wait  : FiniteDuration
   ): Future[Unit] =
     Future.successful(UploaderClient.addFile(upload, file, wait))

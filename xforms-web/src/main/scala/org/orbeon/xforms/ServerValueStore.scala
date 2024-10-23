@@ -14,16 +14,16 @@
 package org.orbeon.xforms
 
 import org.scalajs.dom
-import org.scalajs.dom.raw
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+
 
 // Store for values as we think they are known to the server
 @JSExportTopLevel("OrbeonServerValueStore")
 object ServerValueStore {
 
-  private case class ControlValue(controlElem: raw.Element, value: String)
+  private case class ControlValue(controlElem: dom.Element, value: String)
 
   private var idToControlValue = Map[String, ControlValue]()
 

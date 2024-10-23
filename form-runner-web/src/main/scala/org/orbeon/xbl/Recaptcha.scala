@@ -6,7 +6,6 @@ import org.orbeon.oxf.util.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{DocumentAPI, Page}
 import org.scalajs.dom
-import org.scalajs.dom.raw.HTMLScriptElement
 import org.scalajs.dom.{html, window}
 
 import scala.scalajs.js
@@ -40,7 +39,7 @@ object Recaptcha {
 
         containerElem.appendChild(
           dom.document
-            .createElement("script").asInstanceOf[HTMLScriptElement]
+            .createElement("script").asInstanceOf[html.Script]
             |!> (_.src = PathUtils.recombineQuery(ReCaptchaScript, langParameterSeq ++ v3SiteKeySeq))
         )
       }

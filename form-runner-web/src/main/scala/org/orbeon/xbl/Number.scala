@@ -18,10 +18,10 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.XBL
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants, EventListenerSupport}
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.jquery.{JQueryEventObject, JQueryPromise}
+import io.udash.wrappers.jquery.{JQueryEvent, JQueryPromise}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.duration.*
@@ -32,7 +32,6 @@ import scala.scalajs.js.{Promise, UndefOr, timers, |}
 object Number {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Number")
-  private val ListenerSuffix = ".number"
   private val TestNum = 1.1
 
   XBL.declareCompanion("fr|number",   js.constructorOf[NumberCompanion])
@@ -50,6 +49,7 @@ object Number {
 
     val stateEncoder: Encoder[State] = implicitly[Encoder[State]]
     val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
+    private val eventListenerSupport = new EventListenerSupport {}
 
     var visibleInputElemOpt: Option[html.Input] = None
 
@@ -61,84 +61,73 @@ object Number {
       companion.visibleInputElemOpt = Some(visibleInputElem)
 
       // Switch the input type after cleaning up the value for edition
-      $(visibleInputElem).on(s"${DomEventNames.TouchStart}$ListenerSuffix ${DomEventNames.FocusIn}$ListenerSuffix", {
-        (_: html.Element, e: JQueryEventObject) => {
-          if (! isMarkedReadonly) {
+      eventListenerSupport.addListeners(visibleInputElem, List(DomEventNames.FocusIn, DomEventNames.TouchStart), (e: dom.Event) => {
+        if (! isMarkedReadonly) {
 
-            logger.debug(s"reacting to event ${e.`type`}")
+          logger.debug(s"reacting to event ${e.`type`}")
 
-            stateOpt foreach { state =>
-              // Don't set value if not needed, so not to unnecessarily disturb the cursor position
-              if (readValue(visibleInputElem, state.decimalSeparator) != state.editValue)
-                writeValue(visibleInputElem, state.decimalSeparator, state.editValue)
-            }
-
-            setInputTypeIfNeeded("number")
+          stateOpt foreach { state =>
+            // Don't set value if not needed, so not to unnecessarily disturb the cursor position
+            if (readValue(visibleInputElem, state.decimalSeparator) != state.editValue)
+              writeValue(visibleInputElem, state.decimalSeparator, state.editValue)
           }
+
+          setInputTypeIfNeeded("number")
         }
-      }: js.ThisFunction)
+      })
 
       // Restore input type, send the value to the server, and updates value after server response
-      $(visibleInputElem).on(s"${DomEventNames.FocusOut}$ListenerSuffix", {
-        (_: html.Element, e: JQueryEventObject) => {
-          if (! isMarkedReadonly) {
-            logger.debug(s"reacting to event ${e.`type`}")
+      eventListenerSupport.addListener(visibleInputElem, DomEventNames.FocusOut, (e: dom.Event) => {
+        if (! isMarkedReadonly) {
+          logger.debug(s"reacting to event ${e.`type`}")
 
+          updateStateAndSendValueToServer(readValue)
+          setInputTypeIfNeeded("text")
+
+          // Always update visible value with XForms value:
+          //
+          // - relying just on value change event from server is not enough
+          // - value change is not dispatched if the server value hasn't changed
+          // - if the visible changed, but XForms hasn't, we still need to show XForms value
+          // - see: https://github.com/orbeon/orbeon-forms/issues/1026
+          //
+          // So either:
+          //
+          // - the Ajax response called `updateWithServerValues()` and then `updateVisibleValue()`
+          // - or it didn't, and we force `updateVisibleValue()` after the response is processed
+          //
+          // We also call `updateVisibleValue()` immediately in `updateStateAndSendValueToServer()` if the
+          // edit value hasn't changed.
+          //
+          AjaxClient.allEventsProcessedF("number") foreach { _ =>
+            updateVisibleValue()
+          }
+        }
+      })
+
+      eventListenerSupport.addListener(visibleInputElem, DomEventNames.KeyPress, (e: dom.KeyboardEvent) => {
+        if (! isMarkedReadonly) {
+
+          logger.debug(s"reacting to event ${e.`type`}")
+
+          if (Set(10, 13)(e.keyCode)) {
+            e.preventDefault()
             updateStateAndSendValueToServer(readValue)
-            setInputTypeIfNeeded("text")
-
-            // Always update visible value with XForms value:
-            //
-            // - relying just value change event from server is not enough
-            // - value change is not dispatched if the server value hasn't changed
-            // - if the visible changed, but XForms hasn't, we still need to show XForms value
-            // - see: https://github.com/orbeon/orbeon-forms/issues/1026
-            //
-            // So either:
-            //
-            // - the Ajax response called `updateWithServerValues()` and then `updateVisibleValue()`
-            // - or it didn't, and we force `updateVisibleValue()` after the response is processed
-            //
-            // We also call `updateVisibleValue()` immediately in `updateStateAndSendValueToServer()` if the
-            // edit value hasn't changed.
-            //
-//            val formId = $(containerElem).parents("form").attr("id").get
-            AjaxClient.allEventsProcessedF("number") foreach { _ =>
-              updateVisibleValue()
-            }
-          }
-        }
-      }: js.ThisFunction)
-
-      $(visibleInputElem).on(s"${DomEventNames.KeyPress}$ListenerSuffix", {
-        (_: html.Element, e: JQueryEventObject) => {
-          if (! isMarkedReadonly) {
-
-            logger.debug(s"reacting to event ${e.`type`}")
-
-            if (Set(10, 13)(e.which)) {
-              e.preventDefault()
-              updateStateAndSendValueToServer(readValue)
-              AjaxClient.fireEvent(
-                AjaxEvent(
-                  eventName = DomEventNames.DOMActivate,
-                  targetId  = containerElem.id
-                )
+            AjaxClient.fireEvent(
+              AjaxEvent(
+                eventName = DomEventNames.DOMActivate,
+                targetId  = containerElem.id
               )
-            }
+            )
           }
         }
-      }: js.ThisFunction)
+      })
     }
 
     override def destroy(): Unit = {
-
       logger.debug("destroy")
-
-      visibleInputElemOpt foreach { visibleInputElem =>
-        $(visibleInputElem).off()
-        companion.visibleInputElemOpt = None
-      }
+      eventListenerSupport.clearAllListeners()
+      companion.visibleInputElemOpt = None
     }
 
     override def xformsUpdateReadonly(readonly: Boolean): Unit = {
@@ -164,7 +153,7 @@ object Number {
       companion.visibleInputElemOpt foreach (_.focus())
     }
 
-    override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise] =
+    override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] =
       updateStateAndSendValueToServer((_, _) => newValue)
 
     private object Private {

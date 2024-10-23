@@ -6,8 +6,7 @@ import org.orbeon.xforms.Placement.PositionDetails
 import org.orbeon.xforms.facade.Controls
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.dom.raw.KeyboardEvent
-import org.scalajs.jquery.{JQuery, JQueryEventObject}
+import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -18,7 +17,7 @@ object Help {
 
   import Private._
 
-  $(dom.document).keyup((e: JQueryEventObject) => handleKeyUp(e))
+  dom.document.addEventListener("keyup", handleKeyUp _)
 
   /**
    * We're asked to show the help popover for a control, either because the user clicked on the help icon,
@@ -87,14 +86,14 @@ object Help {
   private object Private {
 
     // Hide help when user presses the escape key
-    def handleKeyUp(e: JQueryEventObject): js.Any = {
-      val keyboardEvent = e.asInstanceOf[KeyboardEvent]
+    def handleKeyUp(e: dom.Event): js.Any = {
+      val keyboardEvent = e.asInstanceOf[dom.KeyboardEvent]
       if (keyboardEvent.keyCode == 27)
         hideAllHelpPopovers()
     }
 
     def hideAllHelpPopovers(): Unit =
-      $("form.xforms-form .xforms-help-popover").toArray() foreach { popover =>
+      $("form.xforms-form .xforms-help-popover").toArray.foreach { popover =>
         $(popover).prev().asInstanceOf[js.Dynamic].popover("destroy")
       }
 
@@ -105,11 +104,10 @@ object Help {
       if (! jPopover.children(".close").is("*")) {
         val close = $("""<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>""")
         jPopover.prepend(close)
-        close.on(
+        close.get().foreach(_.addEventListener(
           "click",
-          ((_: JQueryEventObject) =>
-            jControlEl.asInstanceOf[js.Dynamic].popover("destroy")): js.Function1[JQueryEventObject, js.Any]
-        )
+          (_: dom.Event) => jControlEl.asInstanceOf[js.Dynamic].popover("destroy")
+        ))
       }
 
     /**
@@ -123,8 +121,8 @@ object Help {
       // [1] It is unclear to me why we need to add the arrow width, as it should be counted in the width
       //     of the popover, which has a margin to reserve space for the arrow.
       val padding     = 2 // space left between popover and document border
-      val arrowWidth  = popover.children(".arrow").outerWidth() // [1]
-      val arrowHeight = popover.children(".arrow").outerHeight()
+      val arrowWidth  = popover.children(".arrow").outerWidth().getOrElse(0d) // [1]
+      val arrowHeight = popover.children(".arrow").outerHeight().getOrElse(0d)
 
       // 2022-03-18: Not sure to what this comment applies.
       // [2] Bootstrap already positioned the popover mostly correctly, but since we can reduced its
@@ -146,11 +144,11 @@ object Help {
             elPos.offset.top - elPos.scrollTop - padding - arrowHeight
         }
 
-      if (popover.outerHeight() > maxHeight) {
+      if (popover.outerHeight().getOrElse(0d) > maxHeight) {
         val title = popover.children(".popover-title")
         val content = popover.children(".popover-content")
         popover.css("height", maxHeight.toString + "px")
-        content.css("height", (maxHeight - title.outerHeight()).toString + "px")
+        content.css("height", (maxHeight - title.outerHeight().getOrElse(0d)).toString + "px")
       }
 
       // Adjust position
@@ -162,15 +160,15 @@ object Help {
           placement match {
             case Placement.Right | Placement.Left =>
               // Similar to the way Bootstrap would position the popover
-              val bootstrapTop = elPos.offset.top + (elPos.height - popover.outerHeight()) / 2
+              val bootstrapTop = elPos.offset.top + (elPos.height - popover.outerHeight().getOrElse(0d)) / 2
               // Top of the popover "against" the top of the viewport (modulo margin and padding)
               val topOfViewportTop = elPos.margins.top + elPos.scrollTop + padding
               Math.max(bootstrapTop, topOfViewportTop)
             case Placement.Top =>
-              elPos.offset.top - popover.outerHeight() - arrowHeight
+              elPos.offset.top - popover.outerHeight().getOrElse(0d) - arrowHeight
             case Placement.Over =>
               // Center relative to viewport
-              Math.max(0, (($(dom.window).height() - popover.outerHeight()) / 2) + $(dom.window).scrollTop())
+              Math.max(0, (($(dom.window).height() - popover.outerHeight().getOrElse(0d)) / 2) + $(dom.window).scrollTop())
             case Placement.Bottom =>
               popoverOffset.top
           }
@@ -181,12 +179,12 @@ object Help {
             case Placement.Right =>
               elPos.offset.left + elPos.width + arrowWidth
             case Placement.Left =>
-              elPos.offset.left - popover.outerWidth() - arrowWidth
+              elPos.offset.left - popover.outerWidth().getOrElse(0d) - arrowWidth
             case Placement.Top | Placement.Bottom =>
               elPos.offset.left
             case Placement.Over =>
               // Center relative to viewport
-              Math.max(0, (($(dom.window).width() - popover.outerWidth()) / 2) + $(dom.window).scrollLeft())
+              Math.max(0, (($(dom.window).width() - popover.outerWidth().getOrElse(0d)) / 2) + $(dom.window).scrollLeft())
           }
         }
 
@@ -200,7 +198,7 @@ object Help {
         case Placement.Right | Placement.Left =>
           val controlTopDoc = elPos.offset.top + elPos.height / 2
           val controlTopPopover = controlTopDoc - newPopoverOffset.top
-          val arrowTop = (controlTopPopover / popover.outerHeight()) * 100
+          val arrowTop = (controlTopPopover / popover.outerHeight().getOrElse(0d)) * 100
           popover.children(".arrow").css("top", arrowTop.toString + "%")
         case Placement.Top | Placement.Bottom =>
           popover.children(".arrow").css("left", "10%")
@@ -214,7 +212,7 @@ object Help {
 
     def jCommonAncestor(jElems: JQuery): Option[html.Element] =
       if (jElems.length >= 2)
-        DomSupport.findCommonAncestor(jElems.toArray().toList.collect { case e: html.Element => e })
+        DomSupport.findCommonAncestor(jElems.toArray.toList.collect { case e: html.Element => e })
       else
         None
   }

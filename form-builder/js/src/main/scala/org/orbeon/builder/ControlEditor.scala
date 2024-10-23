@@ -23,7 +23,8 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQuery
+import io.udash.wrappers.jquery.JQuery
+import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 
@@ -105,7 +106,7 @@ object ControlEditor {
 
       // Right editor
       jControlEl.append(controlEditorRight)
-      positionEditor(controlEditorRight, cell.width - controlEditorRight.outerWidth())
+      positionEditor(controlEditorRight, cell.width - controlEditorRight.outerWidth().getOrElse(0d))
 
       // Show/hide itemset icon
       val itemsetIcon = controlEditorRight.find(".fb-control-edit-items")
@@ -115,14 +116,14 @@ object ControlEditor {
       jControlEl.append(controlEditorTop)
       positionTopEditor(controlEditorTop, 0)
 
-      controlEditorTop.children().get(0).textContent = controlName
+      controlEditorTop.children().get(0).get.textContent = controlName
     }
     firstControlElemWithNameOpt.map(e => $(e._1)).getOrElse(cell.el).append(controlEditorLeft)
     positionEditor(controlEditorLeft, 0)
 
     // Enable/disable split/merge icons
     val allowedDirections = {
-      val cellEl = cell.el.get(0).asInstanceOf[html.Element]
+      val cellEl = cell.el.get(0).get.asInstanceOf[html.Element]
       Cell.canChangeSize(cellEl)
     }
     for (((cssClass, direction), _) <- SplitMergeCssClassDirectionOps) {
@@ -144,7 +145,7 @@ object ControlEditor {
   // Control actions
   ControlActionNames.foreach { actionName =>
     val actionEl = controlEditorRight.find(s".fb-control-$actionName")
-    actionEl.on("click.orbeon.builder.control-editor", () => asUnit {
+    actionEl.get().foreach(_.addEventListener("click", (_: dom.Event) => {
       currentCellOpt.foreach { currentCell =>
 
         val controlId = currentCell.el.children().attr("id").get
@@ -155,18 +156,18 @@ object ControlEditor {
           case "edit-items"   => RpcClient[FormBuilderRpcApi].controlEditItems  (controlId = controlId).call()
         }
       }
-    })
+    }))
   }
 
   // Expand/shrink actions
   for (((cssClass, _), ops) <- SplitMergeCssClassDirectionOps) {
     val iconEl = controlEditorLeft.find(s".$cssClass")
-    iconEl.on("click.orbeon.builder.control-editor", () => asUnit {
+    iconEl.get().foreach(_.addEventListener("click", (_: dom.Event) => {
       if (! iconEl.is(".disabled"))
         currentCellOpt.foreach { currentCell =>
           val cellId = currentCell.el.attr("id").get
           ops(cellId)
         }
-    })
+    }))
   }
 }

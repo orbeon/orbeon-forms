@@ -19,7 +19,7 @@ import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom
 import org.scalajs.dom.ext.*
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQueryEventObject
+import io.udash.wrappers.jquery.JQueryEvent
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{newInstance, global as g}
@@ -66,29 +66,25 @@ object ErrorPanel {
         ((_: js.Any) => toggleDetails(panelElem, show = false)): js.Function
       )
 
-      jPanelElem.onWithSelector(
-        events   = "click",
-        selector = ".xforms-error-panel-show-details",
-        handler  = (_: JQueryEventObject) => toggleDetails(panelElem, show = true)
-      )
+      Option(panelElem.querySelector(".xforms-error-panel-show-details")).foreach(_.addEventListener(
+        `type` = "click",
+        listener = (_: dom.Event) => toggleDetails(panelElem, show = true)
+      ))
 
-      jPanelElem.onWithSelector(
-        events   = "click",
-        selector = ".xforms-error-panel-hide-details",
-        handler  = (_: JQueryEventObject) => toggleDetails(panelElem, show = false)
-      )
+      Option(panelElem.querySelector(".xforms-error-panel-hide-details")).foreach(_.addEventListener(
+        `type` = "click",
+        listener = (_: dom.Event) => toggleDetails(panelElem, show = false)
+      ))
 
-      jPanelElem.onWithSelector(
-        events   = "click",
-        selector = ".xforms-error-panel-close",
-        handler  = (_: JQueryEventObject) => panel.hide()
-      )
+      Option(panelElem.querySelector(".xforms-error-panel-close")).foreach(_.addEventListener(
+        `type` = "click",
+        listener = (_: dom.Event) => panel.hide()
+      ))
 
-      jPanelElem.onWithSelector(
-        events   = "click",
-        selector = ".xforms-error-panel-reload",
-        handler  = (_: JQueryEventObject) => dom.window.location.reload(flag = true)
-      )
+      Option(panelElem.querySelector(".xforms-error-panel-reload")).foreach(_.addEventListener(
+        `type` = "click",
+        listener = (_: dom.Event) => dom.window.location.reload()
+      ))
 
       panel
     }
@@ -104,7 +100,7 @@ object ErrorPanel {
     Option(detailsOrNull) match {
       case Some(details) =>
         jErrorPanelElem.find(".xforms-error-panel-details").html(details)
-        toggleDetails(jErrorPanelElem(0), show = true)
+        toggleDetails(jErrorPanelElem.get(0).get, show = true)
       case None =>
         jErrorPanelElem.find(".xforms-error-panel-details-hidden").addClass("xforms-disabled")
         jErrorPanelElem.find(".xforms-error-panel-details-shown").addClass("xforms-disabled")
@@ -121,7 +117,7 @@ object ErrorPanel {
 
   private object Private {
 
-    def toggleDetails(errorPanelElem: html.Element, show: Boolean): Unit = {
+    def toggleDetails(errorPanelElem: dom.Element, show: Boolean): Unit = {
 
       val jErrorPanelElem = $(errorPanelElem)
 

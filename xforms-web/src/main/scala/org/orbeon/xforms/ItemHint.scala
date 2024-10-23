@@ -2,7 +2,8 @@ package org.orbeon.xforms
 
 import org.orbeon.jquery.*
 import org.scalajs.dom
-import org.scalajs.jquery.{JQuery, JQueryEventObject}
+import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
+import org.scalajs.dom.html
 
 import scala.scalajs.js
 
@@ -13,16 +14,13 @@ object ItemHint {
    * Show, update, init, or destroy the tooltip on mouseover on a hint region
    *
    * [1] In Form Builder, the tooltip is absolutely positioned inside a div.fb-hover that gets inserted inside the
-   *     the cell, and which is position: relative. Thus if we don't have a width on the tooltip, the browser tries
+   *     cell, and which is position: relative. Thus, if we don't have a width on the tooltip, the browser tries
    *     to set its width to the tooltip doesn't "come out" of the div.fb-hover, which makes it extremely narrow
    *     since the tooltip is shown all the way to the right of the cell. To avoid this, if we detect that situation,
    *     we set the container to be the parent of the div.fb-hover (which is the td).
    */
-  $(dom.document).onWithSelector(
-    "mouseover",
-    ".xforms-form .xforms-items .xforms-hint-region",
-    (ev: JQueryEventObject) => {
-
+  dom.document.addEventListener("mouseover", (ev: dom.Event) => {
+    if (ev.target.asInstanceOf[html.Element].matches(".xforms-form .xforms-items .xforms-hint-region")) {
       val hintRegionEl     = ev.target
       val jHintRegionEl    = $(hintRegionEl)
       val jHintRegionElDyn = jHintRegionEl.asInstanceOf[js.Dynamic]
@@ -32,11 +30,11 @@ object ItemHint {
       // with `fullOptJS`.
       val hintHtml: js.UndefOr[String] = jHintRegionEl.nextAll(".xforms-hint").html()
 
-      val tooltipData        = jHintRegionEl.data("tooltip")
+      val tooltipData        = jHintRegionEl.data("tooltip").map(_.asInstanceOf[js.Dynamic]).orNull
       val haveHint           = hintHtml.exists(_.nonEmpty)
-      val tooltipInitialized = ! js.isUndefined(tooltipData)
+      val tooltipInitialized = tooltipData != null
 
-      // Compute placement, and don"t use "over" since tooltips don"t support it
+      // Compute placement, and don't use "over" since tooltips don"t support it
       val placement: js.Function = () => {
         val p = Placement.getPlacement(Placement.getPositionDetails(jHintRegionEl))
         if (p == Placement.Over) "bottom" else p.entryName
@@ -68,19 +66,19 @@ object ItemHint {
             placement = placement,
             container = containerEl
           ))
-          jHintRegionEl.on(
+          jHintRegionEl.get().foreach(_.addEventListener(
             "shown",
-            (containerEl: JQuery, hintRegionEl: JQuery) => shiftTooltipLeft(containerEl, hintRegionEl)
-          )
+            (event: dom.Event) => ??? //shiftTooltipLeft(event.containerEl, hintRegionEl)
+          ))
           jHintRegionElDyn.tooltip("show")
         case (false, true) =>
-          // We had a tooltip, but we don"t have anything for show anymore
+          // We had a tooltip, but we don't have anything for show anymore
           jHintRegionElDyn.tooltip("destroy")
         case (false, false) =>
-        // NOP if not initialized and we don"t have a tooltip
+        // NOP if not initialized and we don't have a tooltip
       }
     }
-  )
+  })
 
   /**
    * Fixup position of tooltip element to be to the left of the checkbox/radio. Without this fixup, the tooltip is
@@ -91,7 +89,7 @@ object ItemHint {
     if (tooltipEl.is(".left")) {
       val offset = Offset(tooltipEl)
       // Add 5px spacing between arrow and checkbox/radio
-      Offset.offset(tooltipEl, offset.copy(left = Offset(hintRegionEl.parent()).left - tooltipEl.outerWidth() - 5))
+      Offset.offset(tooltipEl, offset.copy(left = Offset(hintRegionEl.parent()).left - tooltipEl.outerWidth().getOrElse(0d) - 5))
     }
   }
 }

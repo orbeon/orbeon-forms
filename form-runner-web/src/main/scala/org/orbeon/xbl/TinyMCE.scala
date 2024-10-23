@@ -20,7 +20,7 @@ import org.orbeon.xforms.{$, DocumentAPI, Page}
 import org.scalajs.dom
 import org.scalajs.dom.{Element, MutationObserver, MutationObserverInit, MutationRecord, document, html}
 import org.scalajs.dom.ext.*
-import org.scalajs.jquery.JQueryPromise
+import io.udash.wrappers.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import org.orbeon.polyfills.HTMLPolyfills.*
 
@@ -45,7 +45,7 @@ object TinyMCE {
       mutations.foreach { mutation =>
           mutation.addedNodes.foreach {
             case element: Element =>
-              val classes = element.classList.asInstanceOf[js.Array[String]].toList
+              val classes = element.classList.toList
               if (PositionedElementClasses.exists(classes.contains)) {
                 val openDialog = document.querySelector("dialog[open]")
                 if (openDialog != null) {
@@ -149,7 +149,7 @@ object TinyMCE {
     private def clientToServer(): Unit =
       tinyMceObjectOpt foreach { tinyMceObject =>
         // https://github.com/orbeon/orbeon-forms/issues/5963
-        if (containerElem.closest("form").isDefined) {
+        if (containerElem.closest("form") != null) {
           val rawContent = tinyMceObject.getContent()
           // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
           val cleanedContent = if (rawContent == "<div>\u00a0</div>") "" else rawContent
@@ -179,7 +179,7 @@ object TinyMCE {
         if (rawContent == "<div>\u00a0</div>") "" else rawContent
       } getOrElse ""
 
-    override def xformsUpdateValue(newValue: String): UndefOr[js.Promise[Unit] | JQueryPromise] = {
+    override def xformsUpdateValue(newValue: String): UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] = {
       val promise = Promise[Unit]()
       withInitializedTinyMce { tinyMceObject =>
         if (! hasFocus()) { // Heuristic: if TinyMCE has focus, users might still be editing so don't update
@@ -189,7 +189,7 @@ object TinyMCE {
           // TODO: What in this case? `promise.Failure()`?
         }
       }
-      promise.future.toJSPromise.asInstanceOf[js.UndefOr[js.Promise[Unit] | JQueryPromise]] // HACK: otherwise this doesn't compile with `-Xsource-features:v2.13.14`
+      promise.future.toJSPromise.asInstanceOf[js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]]] // HACK: otherwise this doesn't compile with `-Xsource-features:v2.13.14`
     }
 
     override def xformsFocus(): Unit =

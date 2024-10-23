@@ -21,7 +21,8 @@ import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html.Element
 import org.scalajs.dom.{document, html}
-import org.scalajs.jquery.JQueryEventObject
+import io.udash.wrappers.jquery.JQueryEvent
+import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
@@ -35,16 +36,13 @@ private object ControlDnD {
     val MoveClass = "fb-dnd-move"
 
     var shiftPressed = false
-
-    $(document).on(
-      "keyup keydown",
-      (event: JQueryEventObject) => {
-        // Surprisingly, `event.shiftKey` can be `undefined`
-        val keyboardEventDyn = event.asInstanceOf[js.Dynamic]
-        val shiftKeyOpt      = keyboardEventDyn.shiftKey.asInstanceOf[js.UndefOr[Boolean]]
-        shiftPressed         = shiftKeyOpt.getOrElse(false)
-      }
-    )
+    def updateShiftPressed(event: dom.KeyboardEvent): Unit = {
+      // Surprisingly, `event.shiftKey` can be `undefined`
+      val shiftKeyOpt = event.shiftKey.asInstanceOf[js.UndefOr[Boolean]]
+      shiftPressed    = shiftKeyOpt.getOrElse(false)
+    }
+    dom.document.addEventListener("keyup"  , updateShiftPressed _)
+    dom.document.addEventListener("keydown", updateShiftPressed _)
 
     val drake = Dragula(
       js.Array(),
@@ -52,7 +50,7 @@ private object ControlDnD {
 
         // Create the mirror inside the first container, so the proper CSS applies to the mirror
         override val mirrorContainer: UndefOr[Element] =
-          $(".fb-body .fr-grid-td").get(0).asInstanceOf[html.Element]
+          $(".fb-body .fr-grid-td").get(0).get.asInstanceOf[html.Element]
 
         override def isContainer(el: html.Element) =
           el.classList.contains("fr-grid-td")
@@ -86,7 +84,7 @@ private object ControlDnD {
 
         // Create the mirror inside the first container, so the proper CSS applies to the mirror
         override val mirrorContainer: UndefOr[Element] =
-          $(".fb-tools fieldset.xforms-group").get(0).asInstanceOf[html.Element]
+          $(".fb-tools fieldset.xforms-group").get(0).get.asInstanceOf[html.Element]
 
         override def isContainer(el: html.Element) =
           (

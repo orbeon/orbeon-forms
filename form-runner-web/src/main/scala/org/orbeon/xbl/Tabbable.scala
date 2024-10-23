@@ -16,10 +16,11 @@ package org.orbeon.xbl
 import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
 import org.orbeon.xbl.DndRepeat.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames, Page}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventListenerSupport, EventNames, Page}
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
-import org.scalajs.jquery.{JQuery, JQueryEventObject}
+import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
+import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
@@ -47,12 +48,13 @@ object Tabbable {
 
     private var dragState : Option[DragState] = None
     private var drake     : Option[Drake]     = None
+    private val eventListenerSupport = new EventListenerSupport {}
 
     override def init(): Unit = {
 
       if (containerElem.classList.contains("fr-tabbable-dnd")) {
 
-        val firstRepeatContainer = $(containerElem).find(NavTabsSelector)(0)
+        val firstRepeatContainer = containerElem.querySelector(NavTabsSelector).asInstanceOf[html.Element]
 
         val newDrake =
           Dragula(
@@ -84,7 +86,7 @@ object Tabbable {
 
           dragState = Some(
             DragState(
-              currentDragStartPrev     = jEl.prev()(0),
+              currentDragStartPrev     = jEl.prev().get(0).get.asInstanceOf[html.Element],
               currentDragStartPosition = jEl.prevAll(IsDndMovesSelector + ExcludeRepeatClassesSelector).length
             )
           )
@@ -143,24 +145,24 @@ object Tabbable {
 
       // 2016-10-13: We use our own logic to show/hide tabs based on position as we want to be able to
       // support dynamically repeated tabs.
-      $(containerElem).on("click.tabbable.data-api", "[data-toggle = 'tabbable']", {
-        (bound: html.Element, e: JQueryEventObject) => {
 
+      eventListenerSupport.addListener(containerElem, "click", (e: dom.Event) =>
+        if (e.target.asInstanceOf[dom.Element].matches("[data-toggle = 'tabbable']")) {
           e.preventDefault()  // don't allow anchor navigation
           e.stopPropagation() // prevent ancestor tab handlers from running
 
-          val newLi = $(bound).parent(ExcludeRepeatClassesSelector)
+          val newLi = $(containerElem).parent(ExcludeRepeatClassesSelector)
 
           if (! newLi.is(ActiveSelector)) {
             val tabPosition = newLi.prevAll(ExcludeRepeatClassesSelector).length
             selectTab(tabPosition)
           }
         }
-      }: js.ThisFunction)
+      )
     }
 
     override def destroy(): Unit = {
-      $(containerElem).off("click.tabbable.data-api")
+      eventListenerSupport.clearAllListeners()
       drake foreach (_.destroy())
       drake = None
     }
@@ -192,12 +194,12 @@ object Tabbable {
       if (tabPosition > allLis.length - 1)
           return
 
-      val newLi = $(allLis(tabPosition))
+      val newLi = allLis.at(tabPosition)
       if (newLi.is(ActiveSelector))
           return
 
       val allTabPanes = newLi.closest(NavTabsSelector).nextAll().children(TabPaneSelector).filter(ExcludeRepeatClassesSelector)
-      val newTabPane  = allTabPanes(tabPosition)
+      val newTabPane  = allTabPanes.at(tabPosition)
 
       allLis.removeClass(ActiveClass)
       allTabPanes.removeClass(ActiveClass)

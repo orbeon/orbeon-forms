@@ -13,7 +13,7 @@
   */
 package org.orbeon.builder.facade
 
-import org.scalajs.jquery.JQuery
+import io.udash.wrappers.jquery.JQuery
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal

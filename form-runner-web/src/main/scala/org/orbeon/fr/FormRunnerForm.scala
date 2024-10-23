@@ -2,14 +2,17 @@ package org.orbeon.fr
 
 import org.orbeon.oxf.fr.ControlOps
 import org.orbeon.xforms
-import org.orbeon.xforms.*
+import org.orbeon.xforms
+import org.orbeon.xforms.{$, AjaxClient, DocumentAPI, XFormsId, XFormsXbl}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters.*
+import scala.scalajs.js.JSConverters
+import scala.scalajs.js.JSConverters.{JSRichFutureNonThenable, JSRichIterableOnce, JSRichOption}
 
 
 // Form Runner-specific facade as we don't want to expose internal `xforms.Form` members
@@ -41,7 +44,7 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
   def findControlsByName(controlName: String): js.Array[Element] =
     $(form.elem)
       .find(s".xforms-control[id *= '$controlName-control'], .xbl-component[id *= '$controlName-control']")
-      .toArray() collect {
+      .toArray collect {
       // The result must be an `html.Element` already
       case e: html.Element => e
     } filter {

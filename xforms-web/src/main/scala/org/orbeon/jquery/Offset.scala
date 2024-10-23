@@ -13,23 +13,24 @@
   */
 package org.orbeon.jquery
 
-import org.scalajs.jquery.JQuery
+import io.udash.wrappers.jquery.JQuery
 
 import scala.scalajs.js
 
 
+// TODO: facade no longer needed, should directly use `io.udash.wrappers.jquery.Offset`
 case class Offset(left: Double, top: Double)
 
 object Offset {
 
   def apply(v: JQuery): Offset = {
-    val dyn = v.offset().asInstanceOf[js.Dynamic]
-    Offset(dyn.left.asInstanceOf[Double], dyn.top.asInstanceOf[Double])
+    val dyn = v.offset()
+    Offset(dyn.left, dyn.top)
   }
 
   def offset(el: JQuery, offset: Offset): Unit =
-    el.offset(js.Dictionary(
-      "left" -> offset.left,
-      "top"  -> offset.top
+    el.offset(io.udash.wrappers.jquery.Offset(
+      left = offset.left,
+      top  = offset.top
     ))
 }

@@ -13,7 +13,7 @@
   */
 package org.orbeon
 
-import org.scalajs.jquery.JQueryStatic
+import _root_.io.udash.wrappers.jquery._
 
 import scala.scalajs.js.Dynamic.global as g
 

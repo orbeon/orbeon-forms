@@ -26,7 +26,7 @@ import org.orbeon.xforms.facade.{AjaxServer, Events}
 import org.scalajs.dom
 import org.scalajs.dom.ext.*
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQueryEventObject
+import io.udash.wrappers.jquery.JQueryEvent
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.collection.mutable
@@ -173,10 +173,10 @@ object AjaxClient {
           dialogEl.attr("aria-labelledby", titleId)
       }
 
-      dialogEl.find("button").one("click.xf", ((_: JQueryEventObject) => {
+      dialogEl.find("button").one("click.xf", (_, _) => {
         // Reloading the page will redirect us to the login page if necessary
         dom.window.location.href = dom.window.location.href
-      }): js.Function1[JQueryEventObject, js.Any])
+      })
       dialogEl.asInstanceOf[js.Dynamic].modal(new js.Object {
         val backdrop = "static" // Click on the background doesn't hide dialog
         val keyboard = false    // Can't use esc to close the dialog

@@ -14,7 +14,7 @@
 package org.orbeon
 
 import org.scalajs.dom.html
-import org.scalajs.jquery.{JQuery, JQueryEventObject, JQueryStatic}
+import _root_.io.udash.wrappers.jquery.{JQuery, JQueryEvent, JQueryStatic}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
@@ -27,22 +27,9 @@ package object jquery {
 
     @inline private def asJsAny(body: => Any): js.Any = { body; () }
 
-    def onWithSelector(events: String, selector: String, handler: JQueryEventObject => _): Unit =
-      j.on(
-        events   = events,
-        selector = selector,
-        handler  = ((e: JQueryEventObject) => asJsAny(handler(e))): js.Function1[JQueryEventObject, js.Any]
-      )
-
-    def headElem      : Option[html.Element]           = j.length > 0 option j(0)
+    def headElem      : Option[html.Element]           = j.get(0).map(_.asInstanceOf[html.Element])
     def headJQuery    : Option[JQuery]                 = j.length > 0 option j.first()
-    def headElemJQuery: Option[(html.Element, JQuery)] = j.length > 0 option (j(0), j.first())
+    def headElemJQuery: Option[(html.Element, JQuery)] = j.length > 0 option (headElem.get, j.first())
   }
 
-  implicit class JqueryStaticOps(private val j: JQueryStatic) extends AnyVal {
-
-    // Expose jQuery's `$(function)` as a `Future`
-    def readyF(implicit executor: ExecutionContext): Future[Unit] =
-      j.when(j.asInstanceOf[js.Dynamic].ready).asInstanceOf[js.Thenable[js.Any]].toFuture map (_ => ())
-  }
 }

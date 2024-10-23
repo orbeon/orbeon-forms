@@ -19,7 +19,8 @@ import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom.{document, html}
-import org.scalajs.jquery.JQuery
+import io.udash.wrappers.jquery.JQuery
+import org.scalajs.dom
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic
@@ -72,12 +73,12 @@ object WPaint {
         wpaintElC = $("""<div class="fr-wpaint-container-c" tabindex="-1"/>""")
         wpaintElB.append(wpaintElC)
         // When looses focus, send drawing to the server right away (incremental)
-        wpaintElC.on(DomEventNames.FocusOut, sendAnnotationToServer _)
+        wpaintElC.get().foreach(_.addEventListener(DomEventNames.FocusOut, (_: dom.Event) => sendAnnotationToServer()))
         wpaintElC.css("width",  imageEl.width() )
         wpaintElC.css("height", imageEl.height())
         val annotation = annotationEl.attr("src").get
         val startStrokeColor = {
-          val classes = wpaintElA.get(0).classList.asInstanceOf[js.Array[String]]
+          val classes = wpaintElA.get(0).get.classList
           val ClassPrefix = "fr-wpaint-start-stroke-color-"
           val colorOpt = classes.toList.find(_.startsWith(ClassPrefix)).map(_.substringAfter(ClassPrefix))
           colorOpt.map("#" + _).orUndefined
@@ -91,7 +92,7 @@ object WPaint {
       }
 
       // Re-register listener, as imagesLoaded() calls listener only once
-      imageEl.one("load", backgroundImageChanged _)
+      imageEl.one("load", (_, _) => backgroundImageChanged())
     }
 
     // Test canvas support, see http://stackoverflow.com/a/2746983/5295

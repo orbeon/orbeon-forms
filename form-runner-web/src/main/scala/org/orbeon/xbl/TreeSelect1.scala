@@ -13,12 +13,13 @@
   */
 package org.orbeon.xbl
 
+import io.udash.wrappers.jquery.JQueryEvent
 import org.orbeon.facades.{Fancytree, FancytreeEventData, FancytreeJsonNode}
 import org.orbeon.xforms
 import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{Item, XBL, XBLCompanion}
+import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 
@@ -115,11 +116,12 @@ object TreeSelect1 {
             jTreeContainerDynamic.fancytree("option", "toggleEffect", false)
 
             // Always allow click on expanders but don't allow selection when readonly
-            val onClick: js.Function = (event: JQueryEventObject, data: FancytreeEventData) =>
+            val onClick: js.Function = (event: JQueryEvent, data: FancytreeEventData) =>
               (data.targetType exists (_ == "expander")) || ! this.isReadonly
 
-            val onActivate: js.Function = (event: JQueryEventObject, data: FancytreeEventData) =>
+            val onActivate: js.Function2[js.Any, JQueryEvent, Unit] = (_ :js.Any, event: JQueryEvent) => {
               if (! this.isReadonly) {
+                val data: FancytreeEventData = event.data.asInstanceOf[FancytreeEventData] // TODO: does this work?
                 val newValue = data.node.key ensuring (_ ne null)
 
                 if (this.currentValue != newValue) {
@@ -131,9 +133,10 @@ object TreeSelect1 {
                   )
                 }
               }
+              ()
+            }
 
-            jTreeContainer.on("fancytreeclick",    onClick)
-            jTreeContainer.on("fancytreeactivate", onActivate)
+            jTreeContainer.asInstanceOf[js.Dynamic].on("fancytreeactivate", onActivate)
 
             this.treeConfiguration = Some(jTreeContainerDynamic.fancytree("getTree").asInstanceOf[Fancytree])
         }

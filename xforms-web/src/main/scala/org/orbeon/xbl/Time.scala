@@ -21,8 +21,9 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBL
-import org.scalajs.dom.html
-import org.scalajs.jquery.{JQueryEventObject, JQueryPromise}
+import org.scalajs.dom.{Element, html}
+import io.udash.wrappers.jquery.{JQueryEvent, JQueryPromise}
+import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
@@ -48,6 +49,7 @@ object Time {
 
     val stateEncoder: Encoder[State] = implicitly[Encoder[State]]
     val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
+    private val eventListenerSupport = new EventListenerSupport {}
 
     var visibleInputElemOpt: Option[html.Input] = None
 
@@ -58,8 +60,8 @@ object Time {
       val visibleInputElem = containerElem.querySelector("input").asInstanceOf[html.Input]
       companion.visibleInputElemOpt = Some(visibleInputElem)
 
-      $(visibleInputElem).on(s"${DomEventNames.TouchStart}$ListenerSuffix ${DomEventNames.FocusIn}$ListenerSuffix", {
-        (_: html.Element, e: JQueryEventObject) => {
+      eventListenerSupport.addListeners(visibleInputElem, List(DomEventNames.TouchStart, DomEventNames.FocusIn),
+        (e: dom.Event) => {
           if (! isMarkedReadonly) {
 
             logger.debug(s"reacting to event ${e.`type`}")
@@ -76,10 +78,10 @@ object Time {
             }
           }
         }
-      }: js.ThisFunction)
+      )
 
-      $(visibleInputElem).on(s"${DomEventNames.FocusOut}$ListenerSuffix", {
-        (_: html.Element, e: JQueryEventObject) => {
+      eventListenerSupport.addListener(visibleInputElem, DomEventNames.FocusOut,
+        (e: dom.Event) => {
           if (! isMarkedReadonly) {
             logger.debug(s"reacting to event ${e.`type`}")
 
@@ -106,15 +108,15 @@ object Time {
             }
           }
         }
-      }: js.ThisFunction)
+      )
 
-      $(visibleInputElem).on(s"${DomEventNames.KeyPress}$ListenerSuffix", {
-        (_: html.Element, e: JQueryEventObject) => {
+      eventListenerSupport.addListener(visibleInputElem, DomEventNames.KeyPress,
+        (e: dom.KeyboardEvent) => {
           if (! isMarkedReadonly) {
 
             logger.debug(s"reacting to event ${e.`type`}")
 
-            if (Set(10, 13)(e.which)) {
+            if (Set(10, 13)(e.keyCode)) {
               e.preventDefault()
               updateStateAndSendValueToServer(readValue)
               AjaxClient.fireEvent(
@@ -126,17 +128,13 @@ object Time {
             }
           }
         }
-      }: js.ThisFunction)
+      )
     }
 
     override def destroy(): Unit = {
-
       logger.debug("destroy")
-
-      visibleInputElemOpt foreach { visibleInputElem =>
-        $(visibleInputElem).off()
-        companion.visibleInputElemOpt = None
-      }
+      eventListenerSupport.clearAllListeners()
+      companion.visibleInputElemOpt = None
     }
 
     override def xformsUpdateReadonly(readonly: Boolean): Unit = {
@@ -162,7 +160,7 @@ object Time {
       companion.visibleInputElemOpt foreach (_.focus())
     }
 
-    override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise] =
+    override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] =
       updateStateAndSendValueToServer(_ => newValue)
 
     private object Private {

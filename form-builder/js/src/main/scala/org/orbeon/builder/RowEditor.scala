@@ -19,11 +19,12 @@ import enumeratum.{Enum, EnumEntry}
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{AboveBelow, Orientation}
 import org.orbeon.jquery.Offset
-import org.orbeon.oxf.util.CoreUtils.{asUnit, _}
+import org.orbeon.oxf.util.CoreUtils.{asUnit, *}
 import org.orbeon.xforms.$
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.document
-import org.scalajs.jquery.JQuery
+import io.udash.wrappers.jquery.JQuery
+import org.scalajs.dom
 
 import scala.collection.immutable
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -40,7 +41,7 @@ object RowEditor {
       // Check the current grid is still in the document, as we might have an outdated reference in case we read it in
       // `onUnderPointerChange`, since the current grid is also updated in another listener to `onUnderPointerChange`
       val gridIsInDocument =
-        $.contains(document.documentElement, currentGridBody.el.get(0))
+        $.contains(document.documentElement, currentGridBody.el.get(0).get)
       gridIsInDocument option f(currentGridBody)
     }
 
@@ -139,7 +140,7 @@ object RowEditor {
 
   RowEditor.values foreach { rowEditor =>
     val iconEl = rowEditorContainer.children(rowEditor.className)
-    iconEl.on("click.orbeon.builder.section-grid-editor", () => asUnit {
+    iconEl.get().foreach(_.addEventListener("click", (_: dom.Event) => {
       withCurrentGridBody { currentGridBody =>
         currentRowPosOpt foreach { currentRowPos =>
 
@@ -154,7 +155,7 @@ object RowEditor {
           }
         }
       }
-    })
+    }))
   }
 
 }

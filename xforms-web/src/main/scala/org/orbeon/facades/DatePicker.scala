@@ -1,7 +1,7 @@
 package org.orbeon.facades
 
-import org.scalajs.dom.html
-import org.scalajs.jquery.JQuery
+import org.scalajs.dom.{Element, html}
+import io.udash.wrappers.jquery.JQuery
 
 import scala.scalajs.js
 
@@ -30,7 +30,7 @@ object DatePicker {
     var forceParse       : Boolean                  = true
     var datesDisabled    : js.Array[js.Date]        = _
     var language         : String                   = "en"
-    var container        : js.UndefOr[html.Element] = js.undefined
+    var container        : js.UndefOr[Element]      = js.undefined
     var weekStart        : js.UndefOr[Int]          = js.undefined
   }
 
@@ -45,6 +45,6 @@ object DatePicker {
     def clearDates()                        : Unit              = datePicker.datepicker("clearDates", Nil)
     def update()                            : Unit              = datePicker.datepicker("update")
     def showDatepicker()                    : Unit              = datePicker.datepicker("show")
-    def options                             : DatePickerOptions = datePicker.data("datepicker").o.asInstanceOf[DatePickerOptions]
+    def options                             : DatePickerOptions = datePicker.data("datepicker").get.asInstanceOf[DatePickerOptions]
   }
 }

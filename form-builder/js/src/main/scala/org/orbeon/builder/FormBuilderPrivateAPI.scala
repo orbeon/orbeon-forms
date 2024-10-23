@@ -15,7 +15,7 @@ package org.orbeon.builder
 
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Support}
 import org.scalajs.dom
-import org.scalajs.jquery.JQueryCallback
+import io.udash.wrappers.jquery.{JQueryCallback, JQueryCallbacks}
 
 import scala.scalajs.js
 
@@ -32,14 +32,14 @@ object FormBuilderPrivateAPI extends js.Object {
     )
   }
 
-  def controlAdded: JQueryCallback =
+  def controlAdded: JQueryCallbacks[js.Function1[String, js.Any], String] =
     ControlLabelHintTextEditor.controlAdded
 
   def updateTestIframeAndDispatch(eventName: String): Unit = {
 
     // Reset the displayed page as the iframe might show the result from a previous test
     val oldIFrame = $(".fb-test-iframe")
-    val newIFrame = $(oldIFrame(0).outerHTML)
+    val newIFrame = $(oldIFrame.get(0).get.outerHTML)
     val iframeContainer = oldIFrame.parent()
     oldIFrame.remove()
     iframeContainer.append(newIFrame)

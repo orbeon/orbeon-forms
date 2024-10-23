@@ -3,7 +3,7 @@ package org.orbeon.web
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.web.DomEventNames.*
 import org.scalajs.dom
-import org.scalajs.dom.{document, html}
+import org.scalajs.dom.{DocumentReadyState, document, html}
 
 import scala.annotation.tailrec
 import scala.concurrent.{Future, Promise}
@@ -14,8 +14,8 @@ object DomSupport {
 
   private var lastUsedSuffix: Int = 0
 
-  val AtLeastDomInteractiveStates = Set(InteractiveReadyState, CompleteReadyState)
-  val DomCompleteStates           = Set(CompleteReadyState)
+  val AtLeastDomInteractiveStates = Set(DocumentReadyState.interactive, DocumentReadyState.complete)
+  val DomCompleteStates           = Set(DocumentReadyState.complete)
 
   sealed trait DomReadyState
   case object DomReadyState {

@@ -16,7 +16,7 @@ package org.orbeon.xforms.facade
 import org.orbeon.xforms.YUICustomEvent
 import org.scalajs.dom
 import org.scalajs.dom.{FocusEvent, UIEvent, html, raw}
-import org.scalajs.jquery.JQueryPromise
+import io.udash.wrappers.jquery.JQueryPromise
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
@@ -67,12 +67,12 @@ class XBLCompanion extends js.Object {
   def destroy()                               : Unit                                         = ()
 
   def xformsGetValue()                        : String                                       = null
-  def xformsUpdateValue(newValue: String)     : js.UndefOr[js.Promise[Unit] | JQueryPromise] = ()
+  def xformsUpdateValue(newValue: String)     : js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] = ()
   def xformsUpdateReadonly(readonly: Boolean) : Unit                                         = ()
   def xformsFocus()                           : Unit                                         = ()
 
   // https://github.com/orbeon/orbeon-forms/issues/5383
-  def setUserValue(newValue: String)          : js.UndefOr[js.Promise[Unit] | JQueryPromise] = ()
+  def setUserValue(newValue: String)          : js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] = ()
 
   // Helpers
   private def containerElem: html.Element = this.asInstanceOf[js.Dynamic].container.asInstanceOf[html.Element]
@@ -92,7 +92,7 @@ object XBL extends js.Object {
 @js.native
 object Controls extends js.Object {
   def isReadonly(control: html.Element)                                                                  : Boolean                                      = js.native
-  def setCurrentValue(control: html.Element, newControlValue: String, force: Boolean)                    : js.UndefOr[js.Promise[Unit] | JQueryPromise] = js.native
+  def setCurrentValue(control: html.Element, newControlValue: String, force: Boolean)                    : js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] = js.native
   def getCurrentValue(elem: html.Element)                                                                : js.UndefOr[String]                           = js.native
   def setFocus(controlId: String)                                                                        : Unit                                         = js.native
   def removeFocus(controlId: String)                                                                     : Unit                                         = js.native

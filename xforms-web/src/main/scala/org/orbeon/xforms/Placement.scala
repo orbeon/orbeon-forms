@@ -2,7 +2,7 @@ package org.orbeon.xforms
 
 import org.orbeon.jquery.Offset
 import org.scalajs.dom
-import org.scalajs.jquery.JQuery
+import io.udash.wrappers.jquery.JQuery
 
 import scala.scalajs.js
 
@@ -46,8 +46,8 @@ object Placement {
     def getElPosition = {
       val o = Offset(el)
       (
-        el.outerWidth(),
-        el.outerHeight(),
+        el.outerWidth().getOrElse(0d),
+        el.outerHeight().getOrElse(0d),
         $(dom.document).scrollTop(), // Will this work if we"re in a scrollable area?
         Offset(
           left = o.left,
@@ -58,15 +58,16 @@ object Placement {
 
     val (widthV, heightV, scrollTopV, offsetV) =
       if (el.is(":hidden")) {
-        val originalStyle = el.attr("style")
+        val originalStyleOpt = el.attr("style")
         el.css("display", "inline-block")
 
         val r = getElPosition
 
-        if (js.isUndefined(originalStyle))
-          el.removeAttr("style")
-        else
-          el.attr("style", originalStyle)
+        originalStyleOpt match {
+          case None => el.removeAttr("style")
+          case Some(originalStyle) => el.attr("style", originalStyle)
+
+        }
 
         r
       } else {
@@ -74,7 +75,10 @@ object Placement {
       }
 
     val autoOverflowElemOpt =
-      Iterator.iterate(el(0))(_.parentElement).takeWhile(_ ne null).find { e =>
+      Iterator.iterate(el.get(0).get)(_.parentNode match {
+        case e: dom.Element => e
+        case _              => null
+      }).takeWhile(_ ne null).find { e =>
         dom.window.getComputedStyle(e).overflow == "auto"
       }
 
@@ -87,8 +91,8 @@ object Placement {
           val jAutoOverflowElem = $(autoOverflowElem)
 
           val overflowOffset = Offset(jAutoOverflowElem)
-          val overflowWidth  = jAutoOverflowElem.outerWidth()
-          val overflowHeight = jAutoOverflowElem.outerHeight()
+          val overflowWidth  = jAutoOverflowElem.outerWidth().getOrElse(0d)
+          val overflowHeight = jAutoOverflowElem.outerHeight().getOrElse(0d)
 
           (
             overflowOffset.top,

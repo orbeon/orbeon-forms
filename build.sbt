@@ -30,8 +30,8 @@ val ScalaJsMacrotaskExecutor         = "1.1.1"
 val SaxonJsVersion                   = "10.0.0.78-SNAPSHOT"
 val XercesVersion                    = "2.11.0.11-SNAPSHOT"
 val SaxVersion                       = "2.0.2.8-SNAPSHOT"
-val ScalaJsDomVersion                = "1.2.0"
-val ScalaJsJQueryVersion             = "0.9.6"
+val ScalaJsDomVersion                = "2.8.0"
+val ScalaJsJQueryVersion             = "3.3.0"
 val ScalaJsStubsVersion              = "1.1.0" // can be different from Scala.js version
 val ScalaJsFakeWeakReferencesVersion = "1.0.0" // switch to `scalajs-weakreferences` when browser support is there
 val ScalaJsFakeSecureRandomVersion   = "1.0.0" // switch to `scalajs-java-securerandom` when we upgrade to JSDOM 20+
@@ -55,7 +55,7 @@ val ScalaParallelCollectionsVersion = "1.0.4"
 val ScalaAsyncVersion             = "1.0.1"
 val Parboiled2Version             = "2.5.1"
 val AutowireVersion               = "0.3.3"
-val ScalatagsVersion              = "0.9.4"
+val ScalatagsVersion              = "0.13.1"
 val SbinaryVersion                = "0.5.1"
 val Log4sVersion                  = "1.10.0"
 val PPrintVersion                 = "0.9.0"
@@ -738,12 +738,12 @@ lazy val formRunnerJS = formRunner.js
 
     libraryDependencies            ++= Seq(
       "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
-      "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
+      "io.udash"            %%% "udash-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
 //      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
     ),
 
-    jsDependencies                      += "org.webjars" % "jquery" % "3.6.1" / "3.6.1/jquery.js",
+    jsDependencies                      += "org.webjars" % "jquery" % "3.6.1" / "jquery.js",
     Test / jsDependencies               += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
     Test / unmanagedResourceDirectories += (xformsWeb / baseDirectory).value / "src" / "main" / "assets",
 
@@ -786,7 +786,7 @@ lazy val formRunnerCommonJS = formRunnerCommon.js
 
     libraryDependencies            ++= Seq(
       "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
-      "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
+      "io.udash"            %%% "udash-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
 //      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
     ),
@@ -844,7 +844,7 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
 
     libraryDependencies            ++= Seq(
       "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
-      "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
+      "io.udash"            %%% "udash-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
 //      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
     ),
@@ -896,11 +896,11 @@ lazy val formBuilderJS = formBuilder.js
   .enablePlugins(JSDependenciesPlugin)
   .settings(
 
-    jsDependencies += "org.webjars" % "jquery" % "3.6.1" / "3.6.1/jquery.js",
+    jsDependencies += "org.webjars" % "jquery" % "3.6.1" / "jquery.js",
 
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
-      "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
+      "io.udash"  %%% "udash-jquery" % ScalaJsJQueryVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -964,7 +964,7 @@ lazy val xformsJS = xforms.js
 
     libraryDependencies ++= Seq(
       "org.scala-js"      %%% "scalajs-dom"      % ScalaJsDomVersion,
-      "be.doeraene"       %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
+      "io.udash"       %%% "udash-jquery"   % ScalaJsJQueryVersion,
       "com.beachape"      %%% "enumeratum"       % EnumeratumVersion,
       "com.beachape"      %%% "enumeratum-circe" % EnumeratumCirceVersion,
 //      "io.github.cquiroz" %%% "scala-java-time"  % ScalaJsTimeVersion,
@@ -1171,14 +1171,14 @@ lazy val xformsWeb = (project in file("xforms-web"))
       "com.lihaoyi"            %%% "scalatags"        % ScalatagsVersion,
       "org.scala-lang.modules" %%% "scala-xml"        % ScalaXmlVersion,
       "org.log4s"              %%% "log4s"            % Log4sVersion,
-      "org.scala-js"           %%% "scalajs-dom"      % ScalaJsDomVersion,
-      "be.doeraene"            %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
+      "org.scala-js"           %%% "scalajs-dom"      % ScalaJsDomVersion withSources(),
+      "io.udash"               %%% "udash-jquery"     % ScalaJsJQueryVersion withSources(),
       "com.beachape"           %%% "enumeratum"       % EnumeratumVersion,
       "com.beachape"           %%% "enumeratum-circe" % EnumeratumCirceVersion,
       "io.github.cquiroz"      %%% "scala-java-time"  % ScalaJsTimeVersion,
     ),
 
-    jsDependencies                      += "org.webjars" % "jquery" % "3.6.1" / "3.6.1/jquery.js",
+    jsDependencies                      += "org.webjars" % "jquery" % "3.6.1" / "jquery.js",
     Test / jsDependencies               += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
     Test / unmanagedResourceDirectories += baseDirectory.value / "src" / "main" / "assets",
 
@@ -1238,7 +1238,7 @@ lazy val webFacades = (project in file("web-facades"))
 
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom"      % ScalaJsDomVersion,
-      "be.doeraene"  %%% "scalajs-jquery"   % ScalaJsJQueryVersion
+      "io.udash"  %%% "udash-jquery"   % ScalaJsJQueryVersion
     )
   )
 
@@ -1450,7 +1450,7 @@ lazy val orbeonWarJS = orbeonWar.js
 
     libraryDependencies            ++= Seq(
       "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
-      "be.doeraene"            %%% "scalajs-jquery" % ScalaJsJQueryVersion,
+      "io.udash"            %%% "udash-jquery" % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%%  "scala-async"   % ScalaAsyncVersion,
     ),
 

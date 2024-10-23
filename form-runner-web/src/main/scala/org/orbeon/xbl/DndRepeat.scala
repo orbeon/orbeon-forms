@@ -43,9 +43,9 @@ object DndRepeat {
   private class DndRepeatCompanion(containerElem: html.Element) extends XBLCompanion {
 
     case class DragState(
-      currentDragStartPrev     : html.Element,
+      currentDragStartPrev     : dom.Element,
       currentDragStartPosition : Int,
-      excludedTargets          : List[html.Element]
+      excludedTargets          : List[dom.Element]
     )
 
     private var dragState : Option[DragState] = None
@@ -80,12 +80,12 @@ object DndRepeat {
           }
         )
 
-      newDrake.onDrag((el: html.Element, source: html.Element) => {
+      newDrake.onDrag((el: dom.Element, source: html.Element) => {
 
         val jEl = $(el)
 
-        def findElemLevel(el: html.Element) =
-          el.className.splitTo[List]() collectFirst { case FindDndLevelRe(level) => level.toInt }
+        def findElemLevel(el: dom.Element) =
+          el.classList collectFirst { case FindDndLevelRe(level) => level.toInt }
 
         val startLevelOpt = findElemLevel(el)
 
@@ -93,16 +93,16 @@ object DndRepeat {
 
         val nextDndItemIt =
           for (i <- 0 until nextAllItems.length iterator)
-            yield nextAllItems(i)
+            yield nextAllItems.get(i)
 
         val excludedTargets = startLevelOpt match {
-          case Some(startLevel) => nextDndItemIt.takeWhile(e => findElemLevel(e).exists(_ > startLevel)).to(List)
+          case Some(startLevel) => nextDndItemIt.flatten.takeWhile(e => findElemLevel(e).exists(_ > startLevel)).to(List)
           case None             => Nil
         }
 
         dragState = Some(
           DragState(
-            currentDragStartPrev     = jEl.prev()(0),
+            currentDragStartPrev     = jEl.prev().get(0).get,
             currentDragStartPosition = jEl.prevAll(IsDndItemSelector).length,
             excludedTargets          = excludedTargets
           )

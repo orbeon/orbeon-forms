@@ -16,7 +16,8 @@ package org.orbeon.builder
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.xforms.$
 import org.scalajs.dom
-import org.scalajs.jquery.JQuery
+import io.udash.wrappers.jquery.JQuery
+import org.scalajs.dom.document
 
 case class Block(
   el     : JQuery,
@@ -33,8 +34,8 @@ object Block {
       el     = elem,
       left   = elemOffset.left,
       top    = elemOffset.top,
-      width  = elem.outerWidth(),
-      height = elem.outerHeight()
+      width  = elem.outerWidth().getOrElse(0d),
+      height = elem.outerHeight().getOrElse(0d)
     )
   }
 }
@@ -126,14 +127,13 @@ object BlockCache {
       }
     })
 
-    def collectElems(selector: String): Iterator[dom.Element] =
-      $(selector).toArray().iterator collect { case e: dom.Element => e }
+    def collectElems(selector: String): List[dom.Element] =
+      $(selector).get().toList collect { case e: dom.Element => e }
 
     def elemNotInSectionTemplateOpt(domEl: dom.Element): Option[JQuery] = {
       val el = $(domEl)
-      val parentSectionTemplate = el.parents(".fr-section-component")
-
-      ! parentSectionTemplate.is("*") option el
+      val parentSectionTemplate: JQuery = el.parents(".fr-section-component")
+      if (! parentSectionTemplate.is("*")) Some(el) else None
     }
   }
 }

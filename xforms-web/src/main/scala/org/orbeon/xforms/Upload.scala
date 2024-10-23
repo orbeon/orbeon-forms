@@ -21,7 +21,7 @@ import org.orbeon.xforms.controls.Upload.*
 import org.scalajs.dom
 import org.scalajs.dom.raw.File
 import org.scalajs.dom.{FileList, html}
-import org.scalajs.jquery.JQueryEventObject
+import io.udash.wrappers.jquery.JQueryEvent
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.Future
@@ -103,7 +103,7 @@ class Upload {
 
       // Register listener on the cancel link
       findDescendantElem(UploadCancelClass) foreach { cancelAnchor =>
-        $(cancelAnchor).on(ClickEvent, self.cancelButtonActivated _)
+        cancelAnchor.addEventListener(ClickEvent, self.cancelButtonActivated _)
       }
     }
   }
@@ -186,7 +186,7 @@ class Upload {
       (throw new IllegalStateException)
 
   // When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
-  private def cancelButtonActivated(event: JQueryEventObject): Unit = {
+  private def cancelButtonActivated(event: dom.Event): Unit = {
     logger.debug("cancel button activated")
     event.preventDefault()
     XFormsApp.clientServerChannel.cancel(doAbort = true, XXFormsUploadCancel)

@@ -16,9 +16,10 @@ package org.orbeon.xbl
 import org.orbeon.facades.Ladda
 import org.orbeon.jquery.*
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient}
+import org.orbeon.xforms.{$, AjaxClient, EventListenerSupport}
 import org.scalajs.dom.html
-import org.scalajs.jquery.{JQuery, JQueryEventObject}
+import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
+import org.scalajs.dom
 
 import scala.scalajs.js
 
@@ -43,23 +44,24 @@ object LaddaButton {
     var state: State = State.Begin
     var ladda: Option[Ladda] = None
 
-    private def findButton: JQuery = $(containerElem).find("button")
+    private def findButton: html.Element = containerElem.querySelector("button").asInstanceOf[html.Element]
+    private val eventListenerSupport = new EventListenerSupport {}
 
     override def init(): Unit = {
 
-      val jButton = findButton
-      jButton.attr("data-style", "slide-left")
+      val button = findButton
+      button.setAttribute("data-style", "slide-left")
 
-      val isPrimary = jButton.parents(".xforms-trigger-appearance-xxforms-primary").is("*")
-      jButton.attr("data-spinner-color", if (isPrimary) "white" else "black")
-      jButton.addClass("ladda-button")
+      val isPrimary = button.closest(".xforms-trigger-appearance-xxforms-primary") != null
+      button.setAttribute("data-spinner-color", if (isPrimary) "white" else "black")
+      button.classList.add("ladda-button")
 
-      ladda = Some(Ladda.create(jButton(0)))
+      ladda = Some(Ladda.create(button))
 
-      jButton.onWithSelector(
-        events   = ClickEventName,
-        selector = null,
-        handler  = (_: JQueryEventObject) => {
+      eventListenerSupport.addListener(
+        target = button,
+        name   = ClickEventName,
+        fn     = (_: dom.Event) => {
           if (state == State.Begin)
             js.timers.setTimeout(0) { // defer so we don't prevent other `click` listeners from being called
               ladda.foreach (_.start())
@@ -83,7 +85,7 @@ object LaddaButton {
 
     override def destroy(): Unit = {
       // TODO: remove from `AjaxClient.beforeSendingEvent` and `AjaxClient.ajaxResponseReceived`
-      findButton.off(events = ClickEventName, selector = null)
+      eventListenerSupport.clearAllListeners()
       ladda.foreach (_.remove())
       ladda = None
     }

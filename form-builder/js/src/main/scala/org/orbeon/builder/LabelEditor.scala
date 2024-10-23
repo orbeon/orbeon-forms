@@ -22,7 +22,8 @@ import org.orbeon.xforms.facade.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom
-import org.scalajs.jquery.{JQuery, JQueryEventObject}
+import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
+import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
@@ -80,14 +81,14 @@ object LabelEditor {
         val labelInput = labelInputOpt.getOrElse {
           val labelInput = $("<input class='fb-edit-section-label'/>")
           $(".fb-main").append(labelInput)
-          labelInput.on("blur", () => asUnit { if (labelInput.is(":visible")) sendNewLabelValue() })
-          labelInput.on(DomEventNames.KeyPress, (e: JQueryEventObject) => asUnit {
-            if (e.which == 13) {
+          labelInput.get().foreach(_.addEventListener("blur", (_: dom.Event) => { if (labelInput.is(":visible")) sendNewLabelValue() }))
+          labelInput.get().foreach(_.addEventListener(DomEventNames.KeyPress, (e: dom.KeyboardEvent) => {
+            if (e.keyCode == 13) {
               // Avoid "enter" from being dispatched to other control that might get the focus
               e.preventDefault()
               sendNewLabelValue()
             }
-          })
+          }))
           // We close the editor on Ajax response as processing the response can modify the form in ways that make the
           // label editor irrelevant, badly positioned, etc. We do this unless the response is empty, which is typically
           // the case for heartbeat responses.
@@ -111,8 +112,8 @@ object LabelEditor {
         // Set placeholder, done every time to account for a value change when changing current language
         locally {
           val placeholderOutput = SectionGridEditor.sectionGridEditorContainer.children(".fb-type-section-title-label")
-          val placeholderValue  = Controls.getCurrentValue(placeholderOutput.get(0).asInstanceOf[dom.html.Element])
-          labelInput.attr("placeholder", placeholderValue)
+          val placeholderValue  = Controls.getCurrentValue(placeholderOutput.get(0).get.asInstanceOf[dom.html.Element])
+          labelInput.attr("placeholder", placeholderValue.get)
         }
 
         // Populate and show input
@@ -125,7 +126,7 @@ object LabelEditor {
             // Interceptor offset is normalized, so we need to remove the scrollTop when setting the offset
             Position.scrollTop() +
             // Vertically center input inside click interceptor
-            (clickInterceptor.height() - labelInput.outerHeight()) / 2,
+            (clickInterceptor.height() - labelInput.outerHeight().getOrElse(0d)) / 2,
           left = interceptorOffset.left
         )
         Offset.offset(labelInput, inputOffset)
@@ -153,7 +154,7 @@ object LabelEditor {
       val labelAnchor = section.el.find(SectionLabelSelector)
       if (labelAnchor.text() == "") {
         val outputWithHintMessage = SectionGridEditor.sectionGridEditorContainer.children(".fb-enter-section-title-label")
-        val hintMessage = Controls.getCurrentValue(outputWithHintMessage.get(0).asInstanceOf[dom.html.Element]).get
+        val hintMessage = Controls.getCurrentValue(outputWithHintMessage.get(0).get.asInstanceOf[dom.html.Element]).get
         clickInterceptor.text(hintMessage)
       }
     }
@@ -175,17 +176,32 @@ object LabelEditor {
 
           val newInterceptors =
             List.fill(sections.size - labelClickInterceptors.size) {
-              val container = $("<div class='fb-section-label-editor-click-interceptor'>")
-              container.on("click.orbeon.builder.label-editor", (e: JQueryEventObject) => showLabelEditor($(e.target)))
-              container.on("mouseover", (e: JQueryEventObject) => asUnit {
-                  updateHighlight((cssClass: String, el: JQuery) => { el.addClass(cssClass); () }, $(e.target))
+              val container = dom.document.createElement("div").asInstanceOf[html.Element]
+              container.className = "fb-section-label-editor-click-interceptor"
+              container.addEventListener(
+                "click",
+                (e: dom.Event) => { showLabelEditor($(e.target.asInstanceOf[dom.Element])) }
+              )
+              container.addEventListener(
+                "mouseover",
+                (e: dom.Event) => {
+                  updateHighlight(
+                    (cssClass: String, el: JQuery) => { el.addClass(cssClass); () },
+                    $(e.target)
+                  )
                   showClickHintIfTitleEmpty($(e.target))
+                }
+              )
+
+              container.addEventListener("mouseout", (e: dom.Event) => {
+                updateHighlight(
+                  (cssClass: String, el: JQuery) => { el.removeClass(cssClass); () },
+                  $(e.target)
+                )
+                e.target.asInstanceOf[dom.Element].textContent = ""
               })
-              container.on("mouseout", (e: JQueryEventObject) => asUnit {
-                updateHighlight((cssClass: String, el: JQuery) => { el.removeClass(cssClass); () }, $(e.target))
-                $(e.target).text("")
-              })
-              container
+
+              $(container)
             }
 
           $(".fb-main").append(newInterceptors*)

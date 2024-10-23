@@ -266,7 +266,7 @@ object InitSupport {
               )
             )
           case StateResult.Reloaded =>
-            dom.window.location.reload(flag = true)
+            dom.window.location.reload()
             return None
         }
 
@@ -388,14 +388,11 @@ object InitSupport {
 
     private def initializeGlobalEventListenersIfNeeded(): Unit =
       if (! topLevelListenerRegistered) {
-        // We are using jQuery for `change` because the Select2 component, used for the dropdowns with search, dispatches that jQuery
-        // event, and if just using the DOM API our code handling `change` in `xforms.js` isn't being notified, and the value isn't
-        // updated on the server
-        GlobalEventListenerSupport.addJQueryListener(dom.document, DomEventNames.Change, Events.change)
 
         // We are not using jQuery for `focusin` and `focusout` as jQuery registers its own listeners on `focus` and `blur`, maybe
         // for compatibility with older browsers that didn't support `focusin` and `focusout`, and since they are different events,
         // we're then unable stopping the propagation of those events
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Change,    Events.change)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusIn,   Events.focus)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusOut,  Events.blur)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyPress,  Events.keypress)
@@ -416,7 +413,7 @@ object InitSupport {
         // https://github.com/orbeon/orbeon-forms/issues/4552
         GlobalEventListenerSupport.addListener(dom.window,
           DomEventNames.PageHide,
-          (ev: dom.raw.PageTransitionEvent) => {
+          (ev: dom.PageTransitionEvent) => {
             if (ev.persisted)
               Page.loadingIndicator().hideIfAlreadyVisible()
           }

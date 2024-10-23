@@ -21,7 +21,7 @@ import org.scalajs.dom
 import org.scalajs.dom.experimental.URLSearchParams
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
 import org.scalajs.dom.raw.HTMLFormElement
-import org.scalajs.jquery.JQueryEventObject
+import io.udash.wrappers.jquery.JQueryEvent
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
@@ -31,12 +31,10 @@ import scala.scalajs.js.JSConverters.*
 
 object FormRunnerPrivateAPI extends js.Object {
 
-  private val ListenerSuffix = ".orbeon-beforeunload"
-  private val ListenerEvents = s"beforeunload$ListenerSuffix"
+  private val ListenerEvents = "beforeunload"
 
   // 2018-05-07: Some browsers, including Firefox and Chrome, no longer use the message provided here.
-  private val Message = "You may lose some unsaved changes."
-
+  private val ReturnMessage: (dom.Event) => String = (_) => "You may lose some unsaved changes."
   private val NewEditViewPathRe = """(.*/fr/)([^/]+)/([^/]+)/(new|edit|view)(?:/([^/]+))?$""".r
 
   def setDataStatus(uuid: String, safe: Boolean): Unit = {
@@ -44,15 +42,8 @@ object FormRunnerPrivateAPI extends js.Object {
     // https://github.com/orbeon/orbeon-forms/issues/4286
     Page.findFormByUuid(uuid) foreach (_.isFormDataSafe = safe)
 
-    if (safe)
-      $(global.window).off(
-        ListenerEvents
-      )
-    else
-      $(global.window).on(
-        ListenerEvents,
-        ((_: JQueryEventObject) => Message): js.Function
-      )
+    if (safe) dom.window.removeEventListener(ListenerEvents, ReturnMessage)
+    else      dom.window.addEventListener   (ListenerEvents, ReturnMessage)
   }
 
   def submitLogin(

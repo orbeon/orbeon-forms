@@ -15,12 +15,11 @@ package org.orbeon.xforms
 
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ContentTypes
-import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom
-import org.scalajs.dom.*
-import org.scalajs.dom.experimental.*
+import org.scalajs.dom.{AbortSignal, Element, EventTarget, Fetch, FocusEvent, FormData, HttpMethod, RequestCredentials, RequestInit, RequestRedirect, experimental, html}
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,8 +29,6 @@ import scala.util.control.NonFatal
 
 
 object Support {
-
-  import org.scalajs.dom.ext._
 
   def allFormElems: Iterable[html.Form] =
     dom.document.forms collect { case f: html.Form if isXFormsFormElem(f) => f }

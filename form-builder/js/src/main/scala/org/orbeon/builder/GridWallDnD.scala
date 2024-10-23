@@ -23,9 +23,10 @@ import org.orbeon.oxf.fr.{Cell, GridModel, WallPosition}
 import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQuery
-
+import io.udash.wrappers.jquery.JQuery
+import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
+
 import scala.collection.mutable
 import scala.scalajs.js
 
@@ -36,9 +37,9 @@ object GridWallDnD {
   private implicit class CellBlockOps(private val cell: Block) extends AnyVal {
     def x          : Int          = cell.el.attr("data-fr-x").get.toInt
     def y          : Int          = cell.el.attr("data-fr-y").get.toInt
-    def w          : Int          = cell.el.attr("data-fr-w").toOption.map(_.toInt).getOrElse(1)
-    def h          : Int          = cell.el.attr("data-fr-h").toOption.map(_.toInt).getOrElse(1)
-    def underlying : html.Element = cell.el.get(0).asInstanceOf[html.Element]
+    def w          : Int          = cell.el.attr("data-fr-w").map(_.toInt).getOrElse(1)
+    def h          : Int          = cell.el.attr("data-fr-h").map(_.toInt).getOrElse(1)
+    def underlying : html.Element = cell.el.get(0).get.asInstanceOf[html.Element]
   }
 
   locally {
@@ -166,15 +167,15 @@ object GridWallDnD {
             case Orientation.Vertical   => dndContainer.height(currentCell.height)
             case Orientation.Horizontal => dndContainer.width (currentCell.width)
           }
-          dndContainer.on("mouseenter", () => {
+          dndContainer.get().foreach(_.addEventListener("mouseenter", (_: dom.Event) => {
             mouseOnWall = true
             ControlEditor.mask()
-          })
-          dndContainer.on("mouseleave", () => {
+          }))
+          dndContainer.get().foreach(_.addEventListener("mouseleave", (_: dom.Event) => {
             mouseOnWall = false
             if (! DndShadow.isDragging)
               ControlEditor.unmask()
-          })
+          }))
         }
       }
 

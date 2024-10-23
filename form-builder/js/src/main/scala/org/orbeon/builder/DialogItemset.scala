@@ -17,7 +17,8 @@ import org.orbeon.jquery.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.*
 import org.scalajs.dom
-import org.scalajs.jquery.JQueryEventObject
+import io.udash.wrappers.jquery.JQueryEvent
+import org.scalajs.dom.html
 
 object DialogItemset {
 
@@ -28,13 +29,11 @@ object DialogItemset {
       label.trimAllToOpt map (_.replaceAll("""\s+""", "-").toLowerCase)
 
     // Automatically set a corresponding value when the user changes a label
-    $(dom.window.document).onWithSelector(
-      events   = "change.orbeon",
-      selector = LabelInputSelector,
-      handler  = (event: JQueryEventObject) => {
+    dom.document.addEventListener("change", (event: dom.Event) =>
+      if (event.target.asInstanceOf[dom.Element].matches(LabelInputSelector)) {
 
-        val labelXFormsInput = $(event.target).closest(".fb-itemset-label-input")(0)
-        val valueXFormsInput = $(labelXFormsInput).closest(".fr-grid-tr").find(".fb-itemset-value-input")(0)
+        val labelXFormsInput = $(event.target).closest(".fb-itemset-label-input").get(0).get.asInstanceOf[html.Element]
+        val valueXFormsInput = $(labelXFormsInput).closest(".fr-grid-tr").find(".fb-itemset-value-input").get(0).get.asInstanceOf[html.Element]
 
         if (DocumentAPI.getValue(valueXFormsInput).toOption exists (_.isAllBlank)) {
           DocumentAPI.getValue(labelXFormsInput).toOption flatMap suggestValueFromLabel foreach { suggestedValue =>

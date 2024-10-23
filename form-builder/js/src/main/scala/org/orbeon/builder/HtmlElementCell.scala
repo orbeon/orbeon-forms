@@ -13,8 +13,7 @@
   */
 package org.orbeon.builder
 
-import org.orbeon.oxf.fr.CellOps
-import org.orbeon.oxf.fr.ClientNames.*
+import org.orbeon.oxf.fr.{CellOps, ClientNames}
 import org.orbeon.polyfills.HTMLPolyfills.*
 import org.scalajs.dom.ext.*
 import org.scalajs.dom.html
@@ -32,27 +31,27 @@ object HtmlElementCell {
     def hasChildElement(u: Element)                   : Boolean            = u.children.nonEmpty
 
     def cellsForGrid   (u: Element)                   : List[html.Element] = u.querySelectorAll(".fr-grid-td").to(List).asInstanceOf[List[html.Element]]
-    def gridForCell    (u: Element)                   : Element            = u.closest(".xbl-fr-grid").get
+    def gridForCell    (u: Element)                   : Element            = u.closest(".xbl-fr-grid").asInstanceOf[html.Element]
 
     def maxGridWidth(u: Element): Int =
       if (u.firstElementChild.classList.contains("fr-grid-24")) 24 else 12
 
-    def x(u: html.Element): Option[Int] = attValueOpt(u, AttX) map (_.toInt)
-    def y(u: html.Element): Option[Int] = attValueOpt(u, AttY) map (_.toInt)
-    def w(u: html.Element): Option[Int] = attValueOpt(u, AttW) map (_.toInt)
-    def h(u: html.Element): Option[Int] = attValueOpt(u, AttH) map (_.toInt)
+    def x(u: html.Element): Option[Int] = attValueOpt(u, ClientNames.AttX) map (_.toInt)
+    def y(u: html.Element): Option[Int] = attValueOpt(u, ClientNames.AttY) map (_.toInt)
+    def w(u: html.Element): Option[Int] = attValueOpt(u, ClientNames.AttW) map (_.toInt)
+    def h(u: html.Element): Option[Int] = attValueOpt(u, ClientNames.AttH) map (_.toInt)
 
     def updateX(u: html.Element, x: Int): Unit =
-      u.setAttribute(AttX, x.toString)
+      u.setAttribute(ClientNames.AttX, x.toString)
 
     def updateY(u: html.Element, y: Int): Unit =
-      u.setAttribute(AttY, y.toString)
+      u.setAttribute(ClientNames.AttY, y.toString)
 
     def updateH(u: html.Element, h: Int): Unit =
       if (h > 1)
-        u.setAttribute(AttH, h.toString)
+        u.setAttribute(ClientNames.AttH, h.toString)
       else
-        u.removeAttribute(AttH)
+        u.removeAttribute(ClientNames.AttH)
 
     def updateW(u: Element, w: Int): Unit =
       u.setAttribute("data-w", w.toString)

@@ -29,7 +29,7 @@ import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
 import org.scalajs.dom.document
-import org.scalajs.jquery.{JQuery, JQueryCallback, JQueryEventObject}
+import io.udash.wrappers.jquery.{JQuery, JQueryCallback, JQueryCallbacks, JQueryEvent, jQ}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
@@ -45,7 +45,7 @@ object ControlLabelHintTextEditor {
     case object Text  extends EditorType
   }
 
-  val controlAdded: JQueryCallback = $.Callbacks(flags = "")
+  val controlAdded: JQueryCallbacks[js.Function1[String, js.Any], String] = $.callbacks[js.Function1[String, js.Any], String](flags = "")
 
   locally {
     val LabelHintSelectorList = List(".xforms-label", ".xforms-hint", ".xforms-text .xforms-output-output") map (".fb-main .fr-editable " + _)
@@ -79,11 +79,8 @@ object ControlLabelHintTextEditor {
       document.addEventListener("focusin", clickOrFocus _, useCapture = true)
 
       // Click on label/hint
-      $(document).on(
-        s"${DomEventNames.Click}${Private.ListenerSuffix}",
-        LabelHintSelector,
-        (event: JQueryEventObject) => {
-
+      document.addEventListener(DomEventNames.Click, (event: dom.Event) =>
+        if (event.target.asInstanceOf[dom.Element].matches(LabelHintSelector)) {
           // Close current editor, if there is one open
           resourceEditorEndEdit()
           resourceEditorCurrentLabelHint = $(event.currentTarget)
@@ -95,32 +92,31 @@ object ControlLabelHintTextEditor {
                 // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
                 resourceEditorCurrentLabelHint
               } else {
-                val explanation = resourceEditorCurrentLabelHint.parents(ExplanationSelector).toArray()
-                val controls = resourceEditorCurrentLabelHint.parents(ControlSelector).toArray()
-                val parents = $($.merge(explanation, controls))
+                val explanation = resourceEditorCurrentLabelHint.parents(ExplanationSelector).toArray
+                val controls    = resourceEditorCurrentLabelHint.parents(ControlSelector).toArray
+                val parents     = $(explanation ++ controls)
                 parents.first()
               }
             )
           resourceEditorStartEdit(resourceEditorCurrentLabelHint)
-        })
-
-        // New control added
-        controlAdded.add((containerId: String) => {
-          val container = $(document.getElementById(containerId))
-          resourceEditorCurrentControlOpt = Some(container.find(ControlSelector))
-          val repeat = container.parents(".fr-repeat-single-row").first()
-          resourceEditorCurrentLabelHint =
-              if (repeat.is("*")) {
-                val column = container.index() + 1
-                repeat.find(s".fr-grid-head .fr-grid-th:nth-child($column) .xforms-label")
-              } else
-                container.find(".xforms-label, .xforms-text .xforms-output-output").first()
-          if (resourceEditorCurrentLabelHint.is("*"))
-              resourceEditorStartEdit(resourceEditorCurrentLabelHint)
         }
       )
 
-      (): js.Any
+      // New control added
+      controlAdded.add((containerId: String) => {
+        val container = $(document.getElementById(containerId))
+        resourceEditorCurrentControlOpt = Some(container.find(ControlSelector))
+        val repeat = container.parents(".fr-repeat-single-row").first()
+        resourceEditorCurrentLabelHint =
+            if (repeat.is("*")) {
+              val column = container.index() + 1
+              repeat.find(s".fr-grid-head .fr-grid-th:nth-child($column) .xforms-label")
+            } else
+              container.find(".xforms-label, .xforms-text .xforms-output-output").first()
+        if (resourceEditorCurrentLabelHint.is("*"))
+            resourceEditorStartEdit(resourceEditorCurrentLabelHint)
+      })
+
     }
 
     // Show editor on click on label
@@ -130,7 +126,8 @@ object ControlLabelHintTextEditor {
         currentLabelHint.removeAttr("for")
         // Show, position, and populate editor
         // Get position before showing editor, so showing doesn't move things in the page
-        Private.containerDiv.width(currentLabelHint.outerWidth())
+        //val x: Double =
+        Private.containerDiv.width(currentLabelHint.outerWidth().get)
         // Cannot just use `show()` because we have `display: none` originally, which would default to `display: block`.
         // This is because we can't use an inline `style` attribute anymore, see https://github.com/orbeon/orbeon-forms/issues/3565
         Private.containerDiv.css("display", "flex")
@@ -189,7 +186,6 @@ object ControlLabelHintTextEditor {
       private val URLBaseMagic = "1b713b2e6d7fd45753f4b8a6270b776e"
 
       private val TinyMceEmptyContent = "<div>\u00A0</div>"
-      val ListenerSuffix      = s".orbeon.builder.lht-editor"
 
       // State
       var tinyMceObjectOpt  : Option[TinyMceEditor] = None
@@ -211,17 +207,17 @@ object ControlLabelHintTextEditor {
          $(".fb-main").append(containerDiv)
 
         // Event handlers
-        textInput.on(s"${DomEventNames.KeyPress}$ListenerSuffix", (e: JQueryEventObject) => asUnit {
+        textInput.get(0).foreach(_.addEventListener(DomEventNames.KeyPress, (e: dom.KeyboardEvent) => {
           // End edit when users press enter
-          if (e.which == 13) {
+          if (e.keyCode == 13) {
             e.preventDefault()
             resourceEditorEndEdit()
           }
-        })
-        checkboxInput.on(s"${DomEventNames.Click}$ListenerSuffix", () => asUnit {
+        }))
+        checkboxInput.get(0).foreach(_.addEventListener(DomEventNames.Click, (_: dom.Event) => {
           // When checkbox clicked, set focus back on the text field, where it was before
           textInput.focus()
-        })
+        }))
       }
 
       // Read/write class telling us if the label/hint/text is in HTML, set in grid.xml
@@ -302,7 +298,7 @@ object ControlLabelHintTextEditor {
 
       // Set width of TinyMCE to the width of the container
       def setTinyMceWidth(): Unit =
-        $(tinyMceContainerDiv).width(containerDiv.outerWidth())
+        $(tinyMceContainerDiv).width(containerDiv.outerWidth().get)
 
       def getValue: String =
         getEditorType match {

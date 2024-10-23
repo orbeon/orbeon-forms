@@ -27,7 +27,7 @@ import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.{document, html}
-import org.scalajs.jquery.JQueryPromise
+import io.udash.wrappers.jquery.JQueryPromise
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
@@ -81,7 +81,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
     destroyImpl()
   }
 
-  override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise] =
+  override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] =
     updateStateAndSendValueToServer(newValue)
 
   private def destroyImpl(): Unit =
@@ -134,7 +134,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
       opts.showOnFocus      = false
       opts.forceParse       = false
       opts.language         = Language.getLang()
-      opts.container        = containerElem.closest("dialog, .orbeon").orUndefined
+      opts.container        = containerElem.closest("dialog, .orbeon")
 
       dateExternalValue foreach { case DateExternalValue(_, format, excludedDates, weekStart) =>
         opts.format = orbeonFormatToBootstrapFormat(format)

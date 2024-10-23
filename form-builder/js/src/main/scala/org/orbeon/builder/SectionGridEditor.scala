@@ -22,8 +22,8 @@ import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
-import org.scalajs.jquery.JQuery
-
+import io.udash.wrappers.jquery.JQuery
+import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 
@@ -81,7 +81,7 @@ object SectionGridEditor {
           sectionGridEditorContainer,
           Offset(
             // Use `.fr-body` left rather than the section left to account for sub-sections indentation
-            left = Offset($(".fr-body")).left - sectionGridEditorContainer.outerWidth(),
+            left = Offset($(".fr-body")).left - sectionGridEditorContainer.outerWidth().getOrElse(0d),
             top  = sectionGridBody.top - Position.scrollTop()
           )
         )
@@ -142,7 +142,7 @@ object SectionGridEditor {
 
       val iconEl = allIconsWith(s".fb-${editor.entryName}")
 
-      iconEl.on("click.orbeon.builder.section-grid-editor", () => asUnit {
+      iconEl.get().foreach(_.addEventListener("click", (_: dom.Event) => {
         currentSectionGridOpt foreach { currentSectionGrid =>
 
           val sectionGridId = currentSectionGrid.el.attr("id").get
@@ -160,7 +160,7 @@ object SectionGridEditor {
             case ContainerMerge       => client.containerMerge      (sectionGridId).call()
           }
         }
-      })
+      }))
     }
   }
 }

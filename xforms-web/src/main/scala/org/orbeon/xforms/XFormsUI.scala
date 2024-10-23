@@ -30,7 +30,7 @@ import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
 import org.scalajs.dom.ext.*
 import org.scalajs.dom.html.{Input, Span}
 import org.scalajs.dom.{MouseEvent, html, raw}
-import org.scalajs.jquery.JQueryPromise
+import io.udash.wrappers.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import scalatags.JsDom
 import scalatags.JsDom.all.*
@@ -365,14 +365,16 @@ object XFormsUI {
       .foreach(Controls.setRepeatIterationRelevance(formID, repeatId, iteration, _))
   }
 
-  def maybeFutureToScalaFuture(promiseOrUndef: js.UndefOr[js.Promise[Unit] | JQueryPromise]): Future[Unit] = {
+  def maybeFutureToScalaFuture(promiseOrUndef: js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]]): Future[Unit] = {
 
     val promiseOrUndefDyn = promiseOrUndef.asInstanceOf[js.Dynamic]
 
     if (XFormsXbl.isObjectWithMethod(promiseOrUndefDyn, "done")) {
       // JQuery future or similar
       val promise = Promise[Unit]()
-      promiseOrUndef.asInstanceOf[JQueryPromise].done((() => promise.success(())): js.Function)
+      promiseOrUndef
+        .asInstanceOf[JQueryPromise[js.Function1[js.Any, js.Any], js.Any]]
+        .done((_: js.Any) => { promise.success(()); () })
       promise.future
     } else if (XFormsXbl.isObjectWithMethod(promiseOrUndefDyn, "then")) {
       // JavaScript future
@@ -1560,7 +1562,7 @@ object XFormsUI {
 
     private val dialogKeydownListener: js.Function1[dom.KeyboardEvent, Unit] = (event: dom.KeyboardEvent) => {
       val targetElem    = event.target.asInstanceOf[html.Element]
-      val dialogElem    = targetElem.closest("dialog").get
+      val dialogElem    = targetElem.closest("dialog")
 
       // Prevent Esc from closing the dialog if the `xxf:dialog` has `close="false"`
       val supportsClose = dialogElem.classList.contains("xforms-dialog-close-true")

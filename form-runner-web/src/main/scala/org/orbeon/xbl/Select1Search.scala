@@ -23,7 +23,7 @@ import org.scalajs.dom
 import org.scalajs.dom.ext.*
 import org.scalajs.dom.raw.{Element, Node}
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
-import org.scalajs.jquery.{JQuery, JQueryEventObject}
+import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
 
 import scala.collection.mutable
 import scala.scalajs.js
@@ -76,7 +76,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           optionsOpt = Some(
             new Select2.Options {
               val allowClear         = placeholderOpt.isDefined // allowClear can be enabled only if a placeholder is defined
-              val dropdownParent     = containerElem.closest("dialog").map($(_)).orUndefined // For dropdown not to show under dialog
+              val dropdownParent     = Option(containerElem.closest("dialog")).map($(_)).orUndefined // For dropdown not to show under dialog
               val ajax               = if (isDatabound) Select2Ajax else null
               val width              = "100%" // For Select2 width to update as the viewport width changes
               val tags               = false
@@ -93,10 +93,10 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         // Register event listeners
         if (isDatabound) {
           // Listen on `select2:close` instead of `change` as the latter is not triggered the first time an open value is selected
-          jSelect.on("select2:close", onChangeDispatchFrChange _)
+          jSelect.asInstanceOf[js.Dynamic].on("select2:close", ((_: js.Any, _: JQueryEvent) => onChangeDispatchFrChange()): js.Function2[js.Any, JQueryEvent, Unit])
         }
-        jSelect.on("select2:open", onOpen _)
-        jSelect.data("select2").on("results:focus", onResultsFocus _)
+        jSelect.asInstanceOf[js.Dynamic].on("select2:open", ((_: js.Any, e: JQueryEvent) => onOpen(e)): js.Function2[js.Any, JQueryEvent, Unit])
+        jSelect.asInstanceOf[js.Dynamic].on("results:focus", ((_: js.Any, e: JQueryEvent) => onResultsFocus(e)): js.Function2[js.Any, JQueryEvent, Unit])
 
         // Add `aria-labelledby` pointing to the label, `aria-describedby` pointing to the help and hint
         val comboboxElement = containerElem.querySelector(".select2-selection")
@@ -304,7 +304,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       $(containerElem).find("select").trigger("change")
   }
 
-  private def onOpen(event: JQueryEventObject): Unit = {
+  private def onOpen(event: JQueryEvent): Unit = {
     val dropdownElement = document.querySelector(".select2-dropdown")
     val inputElement    = dropdownElement.querySelector("input")
     val listboxElement  = dropdownElement.querySelector("[role=listbox]")
@@ -315,8 +315,8 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     inputElementOpt = Some(inputElement)
   }
 
-  private def onResultsFocus(event: JQueryEventObject): Unit = {
-    val focusedElement   = event.asInstanceOf[js.Dynamic].element.asInstanceOf[JQuery].get(0).asInstanceOf[html.Element]
+  private def onResultsFocus(event: JQueryEvent): Unit = {
+    val focusedElement   = event.asInstanceOf[js.Dynamic].element.asInstanceOf[JQuery].get(0).get.asInstanceOf[html.Element]
     val focusedElementId = DomSupport.generateIdIfNeeded(focusedElement)
     inputElementOpt.foreach(_.setAttribute("aria-activedescendant", focusedElementId))
   }

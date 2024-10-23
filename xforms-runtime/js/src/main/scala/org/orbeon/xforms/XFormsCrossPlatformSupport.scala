@@ -102,10 +102,10 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     // The Scala.js implementation uses the HTML environment's `DOMParser`, unlike on the JVM where
     // we have to use a library like `TagSoup`.
     val parser = new DOMParser()
-    val doc    = parser.parseFromString(value, "text/html").asInstanceOf[HTMLDocument]
+    val doc    = parser.parseFromString(value, org.scalajs.dom.MIMEType.`text/html`).asInstanceOf[HTMLDocument]
 
-    def outputFragment(nodes: org.scalajs.dom.NodeList): Unit = {
-      nodes foreach {
+    def outputFragment(nodes: org.scalajs.dom.NodeList[org.scalajs.dom.Node]): Unit = {
+      nodes.toList.foreach {
         case v: org.scalajs.dom.Element =>
           withElement(
             v.tagName,

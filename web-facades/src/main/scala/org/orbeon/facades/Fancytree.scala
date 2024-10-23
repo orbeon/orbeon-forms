@@ -13,7 +13,7 @@
   */
 package org.orbeon.facades
 
-import org.scalajs.jquery.JQueryPromise
+import io.udash.wrappers.jquery.JQueryPromise
 
 import scala.scalajs.js
 
@@ -21,7 +21,7 @@ import scala.scalajs.js
 trait Fancytree extends js.Object {
   val activeNode                : FancytreeNode = js.native
   def activateKey(key: String)  : FancytreeNode = js.native
-  def reload(source: js.Object) : JQueryPromise = js.native
+  def reload(source: js.Object) : Unit          = js.native
 }
 
 @js.native

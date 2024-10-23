@@ -4,7 +4,7 @@ import org.orbeon.facades
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQueryPromise
+import io.udash.wrappers.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.{Future, Promise}
@@ -106,7 +106,7 @@ object CodeMirror {
       else          this.editor.setOption("readOnly", false)
     }
 
-    override def xformsUpdateValue(newValue: String): js.UndefOr[js.Promise[Unit] | JQueryPromise] = {
+    override def xformsUpdateValue(newValue: String): js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] = {
       val doUpdate = ! this.hasFocus && newValue != this.editor.getValue()
       if (doUpdate) {
         val editor = this.editor
@@ -118,7 +118,7 @@ object CodeMirror {
         }
 
         js.defined(promise.future.toJSPromise)
-          .asInstanceOf[js.UndefOr[js.Promise[Unit] | JQueryPromise]] // HACK: otherwise this doesn't compile with `-Xsource-features:v2.13.14`
+          .asInstanceOf[js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]]] // HACK: otherwise this doesn't compile with `-Xsource-features:v2.13.14`
       } else {
         js.undefined
       }

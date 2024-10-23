@@ -20,8 +20,9 @@ import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms.facade.Utils
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom.raw.KeyboardEvent
-import org.scalajs.dom.{document, html}
-import org.scalajs.jquery.JQueryEventObject
+import org.scalajs.dom.{document, html, window}
+import io.udash.wrappers.jquery.JQueryEvent
+import org.scalajs.dom
 import org.scalajs.dom.ext.*
 
 import scala.scalajs.js
@@ -34,9 +35,7 @@ trait GridSectionMenus {
 
   // Keep pointing to menu so we can move it around as needed
   // Old comment: NOTE: When scripts are in the head, this returns undefined. Should be fixed!
-  val globalMenuElem: js.UndefOr[html.Element] = $(s".fr-$componentName-dropdown-menu")(0)
-
-  val ListenerSuffix = s".orbeon-$componentName"
+  val globalMenuElem: html.Element = document.querySelector(s".fr-$componentName-dropdown-menu").asInstanceOf[html.Element]
 
   sealed trait Operation extends EnumEntry with Hyphencase
   object Operation extends Enum[Operation] {
@@ -56,24 +55,24 @@ trait GridSectionMenus {
   private var currentComponentOpt: Option[CurrentComponent] = None
 
   // Initialization
-  globalMenuElem foreach { _ =>
+  if (globalMenuElem != null) {
     // Click on our own button moves and shows the menu
-    $(document).on(s"click$ListenerSuffix",   s".fr-$componentName-dropdown-button", moveAndShowMenuHandler _)
-    $(document).on(s"keydown$ListenerSuffix", s".fr-$componentName-dropdown-button", delegateKeyEventToBootstrapButtonHandler _)
-    $(document).on(s"click$ListenerSuffix",   s".fr-$componentName-remove-button",   removeIterationHandler _)
+    document.addEventListener("click"  , (e: dom.Event) => if (e.target.asInstanceOf[dom.Element].matches(s".fr-$componentName-dropdown-button")) moveAndShowMenuHandler(e))
+    document.addEventListener("keydown", (e: dom.Event) => if (e.target.asInstanceOf[dom.Element].matches(s".fr-$componentName-dropdown-button")) delegateKeyEventToBootstrapButtonHandler(e))
+    document.addEventListener("click",   (e: dom.Event) => if (e.target.asInstanceOf[dom.Element].matches(s".fr-$componentName-remove-button"))   removeIterationHandler(e))
 
     // Listeners for all menu actions
     Operation.values foreach { op =>
-      $(document).on(s"click$ListenerSuffix", s".fr-$componentName-dropdown-menu .fr-${op.entryName}", actionHandler(op))
+      document.addEventListener("click", (e: dom.Event) => if (e.target.asInstanceOf[dom.Element].matches(s".fr-$componentName-dropdown-menu, .fr-${op.entryName}")) actionHandler(op))
     }
   }
 
-  def removeIterationHandler(e: JQueryEventObject): Unit = {
+  def removeIterationHandler(e: dom.Event): Unit = {
 
     val jTarget = $(e.target)
 
     val jButton = jTarget.closest(s".fr-$componentName-remove-button")
-    val button  = jButton(0)
+    val button  = jButton.get(0).get.asInstanceOf[html.Element]
 
     componentId(e).zip(findIterationForElemWithId(button)) foreach {
       case (currentComponentId, currentIteration) =>
@@ -81,7 +80,7 @@ trait GridSectionMenus {
     }
   }
 
-  def moveAndShowMenuHandler(e: JQueryEventObject): Unit = {
+  def moveAndShowMenuHandler(e: dom.Event): Unit = {
 
     moveMenu(e)
 
@@ -100,19 +99,19 @@ trait GridSectionMenus {
 
   // Move the menu just below the button
   // Both callers are in response to  events flowing through `.fr-$componentName-dropdown-button`.
-  def moveMenu(e: JQueryEventObject): Unit = {
+  def moveMenu(e: dom.Event): Unit = {
 
     val target    = e.target.asInstanceOf[html.Element]
-    val button    = target.closest(s".fr-$componentName-dropdown-button").get
-    val dropdown  = target.closest(".dropdown").get
+    val button    = target.closest(s".fr-$componentName-dropdown-button").asInstanceOf[html.Element]
+    val dropdown  = target.closest(".dropdown")
 
     // Move globalMenuElem in the DOM just below the button (for positioning, dialog)
-    dropdown.parentNode.insertBefore(globalMenuElem.get, dropdown.nextSibling)
+    dropdown.parentNode.insertBefore(globalMenuElem, dropdown.nextSibling)
 
-    globalMenuElem.get.style.position = "absolute"
+    globalMenuElem.style.position = "absolute"
 
     Operation.values foreach { op =>
-      val menuItems = globalMenuElem.get.querySelectorAll(s".dropdown-menu .fr-${op.entryName}").toList.asInstanceOf[List[html.Element]]
+      val menuItems = globalMenuElem.querySelectorAll(s".dropdown-menu .fr-${op.entryName}").toList.asInstanceOf[List[html.Element]]
       menuItems.foreach { item =>
         val canDo       = iteration(e).classList.contains(s"can-${op.entryName}")
         val toggleClass = if (canDo) item.classList.remove _ else item.classList.add _
@@ -125,8 +124,8 @@ trait GridSectionMenus {
     }
   }
 
-  // Handle `keydown` events that arrive on our button and delegate the to the Bootstrap menu button
-  def delegateKeyEventToBootstrapButtonHandler(e: JQueryEventObject): Unit = {
+  // Handle `keydown` events that arrive at our button and delegate the to the Bootstrap menu button
+  def delegateKeyEventToBootstrapButtonHandler(e: dom.Event): Unit = {
 
     moveMenu(e)
 
@@ -150,11 +149,11 @@ trait GridSectionMenus {
           val altKey   = keyboardEvent.altKey
           val metaKey  = keyboardEvent.metaKey
         }
-      ).asInstanceOf[JQueryEventObject]
+      ).asInstanceOf[JQueryEvent]
     )
   }
 
-  def actionHandler(op: Operation): JQueryEventObject => js.Any = e => asUnit {
+  def actionHandler(op: Operation): JQueryEvent => js.Any = e => asUnit {
     currentComponentOpt foreach {
       case CurrentComponent(currentComponentId, currentIteration) =>
         dispatchActionEvent(op, currentComponentId, currentIteration)
@@ -173,16 +172,16 @@ trait GridSectionMenus {
 
   private object Util {
 
-    def iteration(e: JQueryEventObject): html.Element =
-      $(e.target).closest(s".fr-$componentName-repeat-iteration")(0)
+    def iteration(e: dom.Event): html.Element =
+      $(e.target).closest(s".fr-$componentName-repeat-iteration").get(0).get.asInstanceOf[html.Element]
 
     def findIterationForElemWithId(elemWithId: html.Element): Option[Int] =
-      $(elemWithId).attr("id").toOption map Utils.getRepeatIndexes flatMap (_.lastOption) map (_.toInt)
+      $(elemWithId).attr("id") map Utils.getRepeatIndexes flatMap (_.lastOption) map (_.toInt)
 
-    def componentElem(e: JQueryEventObject): js.UndefOr[html.Element] =
-      $(e.target).closest(s".xbl-fr-$componentName")(0)
+    def componentElem(e: dom.Event): js.UndefOr[html.Element] =
+      $(e.target).closest(s".xbl-fr-$componentName").get(0).get.asInstanceOf[js.UndefOr[html.Element]]
 
-    def componentId(e: JQueryEventObject): Option[String] =
-      $(componentElem(e)).attr("id").toOption
+    def componentId(e: dom.Event): Option[String] =
+      $(componentElem(e)).attr("id")
   }
 }

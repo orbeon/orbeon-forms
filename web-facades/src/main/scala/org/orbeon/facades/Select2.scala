@@ -13,7 +13,7 @@
  */
 package org.orbeon.facades
 
-import org.scalajs.jquery.JQuery
+import io.udash.wrappers.jquery.JQuery
 
 import scala.scalajs.js
 

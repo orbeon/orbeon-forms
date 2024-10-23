@@ -16,7 +16,7 @@ package org.orbeon.xforms
 import enumeratum.*
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
-import org.scalajs.dom.ext.SessionStorage
+import org.scalajs.dom
 
 import scala.collection.immutable
 import scala.scalajs.js.annotation.JSExport
@@ -72,14 +72,15 @@ object StateHandling {
 
   private object XFormsSessionStorage {
 
+
     def get(formId: String): Option[Int] =
-      SessionStorage(key(formId)).flatMap(_.toIntOption)
+      Option(dom.window.sessionStorage.getItem(key(formId))).flatMap(_.toIntOption)
 
     def set(formId: String, sequence: Int): Unit =
-      SessionStorage.update(key(formId), sequence.toString)
+      dom.window.sessionStorage.setItem(key(formId), sequence.toString)
 
     def remove(formId: String): Unit =
-      SessionStorage.remove(key(formId))
+      dom.window.sessionStorage.removeItem(key(formId))
 
     private val KeyPrefix = "xf-"
     private def key(formId: String): String =

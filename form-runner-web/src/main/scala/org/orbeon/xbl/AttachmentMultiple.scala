@@ -17,7 +17,8 @@ import org.log4s.Logger
 import org.orbeon.facades.Bowser
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
-import org.orbeon.xforms.*
+import org.orbeon.xforms
+import org.orbeon.xforms.{EventListenerSupport, Page, Upload}
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -99,7 +100,7 @@ object AttachmentMultiple {
           DomEventNames.Drop,
           ev => {
             removeClass()
-            if (ev.dataTransfer.types contains "Files") {
+            if (ev.dataTransfer.types.toList contains "Files") {
               logger.debug(s"${ev.`type`} with files")
               ev.preventDefault()
               Upload.processFileList(ev.dataTransfer.files, Page.getUploadControl(uploadControlElem))
@@ -112,7 +113,7 @@ object AttachmentMultiple {
           ev => {
             ev.preventDefault() // Necessary to indicate the drop target
             // "add an entry to L consisting of the string "Files""
-            if (ev.dataTransfer.types contains "Files") {
+            if (ev.dataTransfer.types.toList contains "Files") {
               logger.debug(s"${ev.`type`} with files")
               addClass()
             }

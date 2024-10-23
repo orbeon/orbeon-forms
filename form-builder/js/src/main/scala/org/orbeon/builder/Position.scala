@@ -22,7 +22,8 @@ import org.orbeon.xforms.AjaxClient.AjaxResponseDetails
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.Events
 import org.scalajs.dom.{document, window}
-import org.scalajs.jquery.{JQuery, JQueryEventObject}
+import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
+import org.scalajs.dom
 
 import scala.scalajs.js
 import scala.util.Try
@@ -32,12 +33,12 @@ object Position {
   // Keeps track of pointer position
   var pointerPos: Offset = Offset(0, 0)
 
-  $(document).on("mousemove.orbeon.builder", (event: JQueryEventObject) => asUnit {
+  document.addEventListener("mousemove", (event: dom.MouseEvent) => {
     pointerPos =
       Offset(
         left = event.pageX,
         top  = event.pageY
-    )
+      )
   })
 
   // How much we need to add to offset to account for the form having been scrolled
@@ -55,9 +56,9 @@ object Position {
 
   // Calls listener when what is under the pointer has potentially changed
   def onUnderPointerChange(fn: => Unit): Unit = {
-    $(document).on("mousemove.orbeon.builder", () => fn)
+    dom.document.addEventListener("mousemove", (_: dom.Event) => fn)
     // Resizing the window might change what is under the pointer the last time we saw it in the window
-    $(window).on("resize.orbeon.builder", () => fn)
+    dom.window.addEventListener("resize", (_: dom.Event) => fn)
     AjaxClient.ajaxResponseProcessed.add(_ => fn)
   }
 
@@ -68,7 +69,7 @@ object Position {
     Events.componentChangedLayoutEvent.subscribe(fn)
 
     // Can be removed once we only support Safari 14, which implements the `ResizeObserver`
-    $(window).on("resize.orbeon.builder", fn)
+    dom.window.addEventListener("resize", (_: dom.Event) => fn)
 
     // `ResizeObserver` catches window resizes, but also Form Builder being moved or resized by the embedding app
     Events.orbeonLoadedEvent.subscribe(() => {

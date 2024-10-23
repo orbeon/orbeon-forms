@@ -22,8 +22,8 @@ val TimezonesToInclude = Set(
 val includeTimezone: String => Boolean = tz =>
   TimezonesToInclude(tz) || tz.startsWith("Australia/")
 
-val DefaultOrbeonFormsVersion     = "2024.1-SNAPSHOT"
-val DefaultOrbeonEdition          = "CE"
+val DefaultOrbeonFormsVersion        = "2024.1-SNAPSHOT"
+val DefaultOrbeonEdition             = "CE"
 
 // Scala libraries for Scala.js only
 val ScalaJsMacrotaskExecutor         = "1.1.1"
@@ -43,47 +43,47 @@ val Parboiled1Version                = "1.3.1"
 val ScalaLoggingVersion              = "3.9.4"
 
 // Shared Scala libraries
-val CatsVersion                   = "2.12.0"
-val CatsFs2Version                = "3.11.0"
-val ScalaTestVersion              = "3.2.19"
-val CirceVersion                  = "0.14.10"
-val EnumeratumVersion             = "1.7.5"
-val EnumeratumCirceVersion        = "1.7.5"
-val ShapelessVersion              = "2.3.7"
-val ScalaXmlVersion               = "2.3.0"  // see https://github.com/orbeon/orbeon-forms/issues/4927
-val ScalaParallelCollectionsVersion = "1.0.4"
-val ScalaAsyncVersion             = "1.0.1"
-val Parboiled2Version             = "2.5.1"
-val AutowireVersion               = "0.3.3"
-val ScalatagsVersion              = "0.13.1"
-val SbinaryVersion                = "0.5.1"
-val Log4sVersion                  = "1.10.0"
-val PPrintVersion                 = "0.9.0"
+val CatsVersion                      = "2.12.0"
+val CatsFs2Version                   = "3.11.0"
+val ScalaTestVersion                 = "3.2.19"
+val CirceVersion                     = "0.14.10"
+val EnumeratumVersion                = "1.7.5"
+val EnumeratumCirceVersion           = "1.7.5"
+val ShapelessVersion                 = "2.3.7"
+val ScalaXmlVersion                  = "2.3.0"  // see https://github.com/orbeon/orbeon-forms/issues/4927
+val ScalaParallelCollectionsVersion  = "1.0.4"
+val ScalaAsyncVersion                = "1.0.1"
+val Parboiled2Version                = "2.5.1"
+val AutowireVersion                  = "0.3.3"
+val ScalatagsVersion                 = "0.13.1"
+val SbinaryVersion                   = "0.5.1"
+val Log4sVersion                     = "1.10.0"
+val PPrintVersion                    = "0.9.0"
 
 // Java libraries
-val SaxonJvmVersion               = "9.1.0.8.3"
-val JUnitInterfaceVersion         = "0.13.3"
-val Slf4jVersion                  = "2.0.16"
-val HttpComponentsVersion         = "4.5.14"
-val Log4j2Version                 = "2.24.0"
-val CommonsIoVersion              = "2.15.1"
-val OpenHtmlToPdfVersion          = "1.0.10"
-val PdfBoxVersion                 = "2.0.27"
-val TinkVersion                   = "1.6.1"
-val GsonVersionForTink            = "2.9.0"
-val ProtobufJavaVersionForTink    = "3.25.5"
-val JavaMailApiVersion            = "2.1.3"
-val AngusMailVersion              = "2.0.3"
-val JavaActivationVersion         = "2.0.1"
-val AntVersion                    = "1.10.11"
-val ThumbnailatorVersion          = "0.4.16"
+val SaxonJvmVersion                  = "9.1.0.8.3"
+val JUnitInterfaceVersion            = "0.13.3"
+val Slf4jVersion                     = "2.0.16"
+val HttpComponentsVersion            = "4.5.14"
+val Log4j2Version                    = "2.24.0"
+val CommonsIoVersion                 = "2.15.1"
+val OpenHtmlToPdfVersion             = "1.0.10"
+val PdfBoxVersion                    = "2.0.27"
+val TinkVersion                      = "1.6.1"
+val GsonVersionForTink               = "2.9.0"
+val ProtobufJavaVersionForTink       = "3.25.5"
+val JavaMailApiVersion               = "2.1.3"
+val AngusMailVersion                 = "2.0.3"
+val JavaActivationVersion            = "2.0.1"
+val AntVersion                       = "1.10.11"
+val ThumbnailatorVersion             = "0.4.16"
 
 // "Provided" Java libraries
-val JavaxServletApiVersion        = "4.0.1"
-val JakartaServletApiVersion      = "6.1.0"
-val PortletApiVersion             = "3.0.1"
-val LiferayPortalServiceVersion   = "6.2.5"
-val LiferayPortalKernelVersion    = "144.0.0"
+val JavaxServletApiVersion           = "4.0.1"
+val JakartaServletApiVersion         = "6.1.0"
+val PortletApiVersion                = "3.0.1"
+val LiferayPortalServiceVersion      = "6.2.5"
+val LiferayPortalKernelVersion       = "144.0.0"
 
 
 val CoreLibraryDependencies = Seq(
@@ -737,10 +737,9 @@ lazy val formRunnerJS = formRunner.js
     Compile / scalaJSUseMainModuleInitializer := false,
 
     libraryDependencies            ++= Seq(
-      "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
-      "io.udash"            %%% "udash-jquery"  % ScalaJsJQueryVersion,
-      "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
-//      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
+      "org.scala-js"           %%% "scalajs-dom"  % ScalaJsDomVersion,
+      "io.udash"               %%% "udash-jquery" % ScalaJsJQueryVersion,
+      "org.scala-lang.modules" %%% "scala-xml"    % ScalaXmlVersion
     ),
 
     jsDependencies                      += "org.webjars" % "jquery" % "3.6.1" / "jquery.js",
@@ -785,10 +784,9 @@ lazy val formRunnerCommonJS = formRunnerCommon.js
   .settings(
 
     libraryDependencies            ++= Seq(
-      "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
-      "io.udash"            %%% "udash-jquery"  % ScalaJsJQueryVersion,
-      "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
-//      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
+      "org.scala-js"           %%% "scalajs-dom"   % ScalaJsDomVersion,
+      "io.udash"               %%% "udash-jquery"  % ScalaJsJQueryVersion,
+      "org.scala-lang.modules" %%% "scala-xml"     % ScalaXmlVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -844,9 +842,8 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
 
     libraryDependencies            ++= Seq(
       "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
-      "io.udash"            %%% "udash-jquery"  % ScalaJsJQueryVersion,
-      "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
-//      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
+      "io.udash"               %%% "udash-jquery"    % ScalaJsJQueryVersion,
+      "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -881,7 +878,7 @@ lazy val formBuilderJVM = formBuilder.jvm
   .settings(
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-builder.jar`
-    // This stores the optimized version. For development we need something else.
+    // This stores the optimized version. For development, we need something else.
     (Compile / packageBin / mappings) ++= scalaJsFiles((formBuilderJS / Compile / fullOptJS).value.data, FormBuilderResourcesPathInWar)
   )
 
@@ -899,8 +896,8 @@ lazy val formBuilderJS = formBuilder.js
     jsDependencies += "org.webjars" % "jquery" % "3.6.1" / "jquery.js",
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
-      "io.udash"  %%% "udash-jquery" % ScalaJsJQueryVersion
+      "org.scala-js" %%% "scalajs-dom"  % ScalaJsDomVersion,
+      "io.udash"     %%% "udash-jquery" % ScalaJsJQueryVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -950,7 +947,7 @@ lazy val xformsJVM = xforms.jvm
     Assets / unmanagedSourceDirectories += (xformsWeb / baseDirectory).value / "src" / "main" / "assets",
 
     // Package Scala.js output into `orbeon-xforms.jar`
-    // This stores the optimized version. For development we need something else.
+    // This stores the optimized version. For development, we need something else.
     (Compile / packageBin / mappings) ++= scalaJsFiles((xformsWeb     / Compile / fullOptJS).value.data, XFormsResourcesPathInWar),
   )
 
@@ -963,11 +960,10 @@ lazy val xformsJS = xforms.js
   .settings(
 
     libraryDependencies ++= Seq(
-      "org.scala-js"      %%% "scalajs-dom"      % ScalaJsDomVersion,
-      "io.udash"       %%% "udash-jquery"   % ScalaJsJQueryVersion,
-      "com.beachape"      %%% "enumeratum"       % EnumeratumVersion,
-      "com.beachape"      %%% "enumeratum-circe" % EnumeratumCirceVersion,
-//      "io.github.cquiroz" %%% "scala-java-time"  % ScalaJsTimeVersion,
+      "org.scala-js"  %%% "scalajs-dom"      % ScalaJsDomVersion,
+      "io.udash"      %%% "udash-jquery"     % ScalaJsJQueryVersion,
+      "com.beachape"  %%% "enumeratum"       % EnumeratumVersion,
+      "com.beachape"  %%% "enumeratum-circe" % EnumeratumCirceVersion,
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -1237,8 +1233,8 @@ lazy val webFacades = (project in file("web-facades"))
     name := "orbeon-web-facades",
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom"      % ScalaJsDomVersion,
-      "io.udash"  %%% "udash-jquery"   % ScalaJsJQueryVersion
+      "org.scala-js" %%% "scalajs-dom"  % ScalaJsDomVersion,
+      "io.udash"     %%% "udash-jquery" % ScalaJsJQueryVersion
     )
   )
 
@@ -1449,9 +1445,9 @@ lazy val orbeonWarJS = orbeonWar.js
     ),
 
     libraryDependencies            ++= Seq(
-      "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
-      "io.udash"            %%% "udash-jquery" % ScalaJsJQueryVersion,
-      "org.scala-lang.modules" %%%  "scala-async"   % ScalaAsyncVersion,
+      "org.scala-js"           %%% "scalajs-dom"  % ScalaJsDomVersion,
+      "io.udash"               %%% "udash-jquery" % ScalaJsJQueryVersion,
+      "org.scala-lang.modules" %%%  "scala-async" % ScalaAsyncVersion,
     ),
 
     Test / parallelExecution                := false,

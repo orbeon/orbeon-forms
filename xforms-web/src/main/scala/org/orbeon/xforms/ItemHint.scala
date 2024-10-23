@@ -20,8 +20,8 @@ object ItemHint {
    *     we set the container to be the parent of the div.fb-hover (which is the td).
    */
   dom.document.addEventListener("mouseover", (ev: dom.Event) => {
-    if (ev.target.asInstanceOf[html.Element].matches(".xforms-form .xforms-items .xforms-hint-region")) {
-      val hintRegionEl     = ev.target
+    val hintRegionEl = ev.target.asInstanceOf[dom.Element].closest(".xforms-form .xforms-items .xforms-hint-region")
+    if (hintRegionEl != null) {
       val jHintRegionEl    = $(hintRegionEl)
       val jHintRegionElDyn = jHintRegionEl.asInstanceOf[js.Dynamic]
 
@@ -66,10 +66,7 @@ object ItemHint {
             placement = placement,
             container = containerEl
           ))
-          jHintRegionEl.get().foreach(_.addEventListener(
-            "shown",
-            (event: dom.Event) => ??? //shiftTooltipLeft(event.containerEl, hintRegionEl)
-          ))
+          jHintRegionElDyn.on("shown", (_ => shiftTooltipLeft(containerEl, jHintRegionEl)): js.Function1[JQueryEvent, Unit])
           jHintRegionElDyn.tooltip("show")
         case (false, true) =>
           // We had a tooltip, but we don't have anything for show anymore

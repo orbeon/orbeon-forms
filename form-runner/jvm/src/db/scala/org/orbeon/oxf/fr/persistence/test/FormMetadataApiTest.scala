@@ -101,10 +101,18 @@ case class ActiveProviderResourceManagerSupport(
           ""
       }
 
+    // TODO: We should list all possible providers from property files here instead of hardcoding them, but this is
+    //       made complicated by the fact that the properties are global and we're currently initializing test
+    //       properties at this point. This is needed for CE as properties exist for providers that are not present
+    //       in the Provider enum.
+    val providersToMakeInactive =
+      Set("DB2", "MySQL", "Oracle", "PostgreSQL", "SQLite", "SQLServer").map(_.toLowerCase) ++
+      Provider.values.map(_.entryName)
+
     // Active and inactive providers (we test one provider at a time)
-    val activeProvidersProperties = Provider.values.map { provider =>
-      val active = activeProviderOpt.forall(_ == provider)
-      s"""<property as="xs:boolean" name="oxf.fr.persistence.${provider.entryName}.active" value="$active"/>"""
+    val activeProvidersProperties = providersToMakeInactive.map { providerEntryName =>
+      val active = activeProviderOpt.map(_.entryName).forall(_ == providerEntryName)
+      s"""<property as="xs:boolean" name="oxf.fr.persistence.$providerEntryName.active" value="$active"/>"""
     }.mkString("\n")
 
     s"""<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"

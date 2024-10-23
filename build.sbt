@@ -1316,6 +1316,7 @@ lazy val core = (project in file("src"))
     DebugTest / javaOptions            += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
     libraryDependencies                ++= CoreLibraryDependencies,
     libraryDependencies                 += "org.scala-lang.modules" %% "scala-parallel-collections" % ScalaParallelCollectionsVersion % Test,
+    libraryDependencies                 += "org.scala-lang"         %  "scala-library"              % scalaVersion.value withSources() // Scala library sources to be automatically downloaded by IntelliJ
   )
 
 // Common types for Javax and Jakarta servlets

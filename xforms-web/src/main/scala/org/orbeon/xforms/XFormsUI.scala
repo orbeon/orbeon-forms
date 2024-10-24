@@ -137,9 +137,9 @@ object XFormsUI {
   @JSExport
   def setRadioCheckboxClasses(target: html.Element): Unit = {
     for (checkboxInput <- nestedInputElems(target)) {
-      var parentSpan = checkboxInput.parentNode.asInstanceOf[html.Element] // boolean checkboxes are directly inside a span
+      var parentSpan = checkboxInput.parentElement // boolean checkboxes are directly inside a `span`
       if (parentSpan.tagName.equalsIgnoreCase("label"))
-        parentSpan = parentSpan.parentNode.asInstanceOf[html.Element]      // while xf:select checkboxes have a label in between
+        parentSpan = parentSpan.parentElement      // while `xf:select` checkboxes have a `label` in between
 
       if (checkboxInput.checked) {
         parentSpan.classList.add("xforms-selected")
@@ -959,9 +959,9 @@ object XFormsUI {
     staticReadonlyOpt: Option[String],
     isLeafControl    : Boolean
   ): html.Element =
-    if (! documentElement.classList.contains("xforms-static") && staticReadonlyOpt.map(_.toBoolean).exists(_ == true)) {
+    if (! documentElement.classList.contains("xforms-static") && staticReadonlyOpt.exists(_.toBoolean)) {
       if (isLeafControl) {
-        val parentElement = documentElement.parentNode.asInstanceOf[html.Element]
+        val parentElement = documentElement.parentElement
         val newDocumentElement = dom.document.createElementT("span")
         newDocumentElement.setAttribute("id", controlId)
 

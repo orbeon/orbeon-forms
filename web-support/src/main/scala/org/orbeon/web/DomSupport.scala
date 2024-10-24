@@ -28,6 +28,12 @@ object DomSupport {
 
     def childrenT: collection.Seq[T] =
       elem.children.asInstanceOf[HTMLCollection[T]]
+
+    def parentElementOpt: Option[T] =
+      Option(elem.asInstanceOf[js.Dynamic].parentElement.asInstanceOf[T])
+
+    def ancestorOrSelfElem: Iterator[T] =
+      Iterator.iterate(elem)(_.asInstanceOf[js.Dynamic].parentElement.asInstanceOf[T]).takeWhile(_ ne null)
   }
 
   implicit class DomDocOps(private val doc: html.Document) extends AnyVal {
@@ -53,8 +59,8 @@ object DomSupport {
 
   private var lastUsedSuffix: Int = 0
 
-  val AtLeastDomInteractiveStates = Set(DocumentReadyState.interactive, DocumentReadyState.complete)
-  val DomCompleteStates           = Set(DocumentReadyState.complete)
+  private val AtLeastDomInteractiveStates = Set(DocumentReadyState.interactive, DocumentReadyState.complete)
+  private val DomCompleteStates           = Set(DocumentReadyState.complete)
 
   sealed trait DomReadyState
   case object DomReadyState {
@@ -62,7 +68,7 @@ object DomSupport {
     case object Complete    extends DomReadyState // doc and all sub-resources have finished loading, `load` about to fire
   }
 
-  def interactiveReadyState(doc: html.Document, state: DomReadyState): Boolean =
+  private def interactiveReadyState(doc: html.Document, state: DomReadyState): Boolean =
     state == DomReadyState.Interactive && AtLeastDomInteractiveStates(doc.readyState) ||
     state == DomReadyState.Complete    && DomCompleteStates(doc.readyState)
 
@@ -92,14 +98,11 @@ object DomSupport {
     promise.future
   }
 
-  def ancestorOrSelfElem(elem: html.Element): Iterator[html.Element] =
-    Iterator.iterate(elem)(_.parentElement).takeWhile(_ ne null)
-
   def findCommonAncestor(elems: List[html.Element]): Option[html.Element] = {
 
     def findFirstCommonAncestorForPair(elem1: html.Element, elem2: html.Element): Option[html.Element] =
-      ancestorOrSelfElem(elem1).toList.reverseIterator
-        .zip(ancestorOrSelfElem(elem2).toList.reverseIterator)
+      elem1.ancestorOrSelfElem.toList.reverseIterator
+        .zip(elem2.ancestorOrSelfElem.toList.reverseIterator)
         .takeWhile { case (e1, e2) => e1.isSameNode(e2) }
         .lastOption()
         .map(_._1)

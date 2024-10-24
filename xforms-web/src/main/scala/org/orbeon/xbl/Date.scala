@@ -14,20 +14,19 @@
 package org.orbeon.xbl
 
 import cats.syntax.option.*
+import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
-import org.orbeon.polyfills.HTMLPolyfills._
 import org.orbeon.date.JSDateUtils
 import org.orbeon.facades.DatePicker.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
-import org.orbeon.xforms.Constants.XFormsIosClass
 import org.orbeon.xforms.*
+import org.orbeon.xforms.Constants.XFormsIosClass
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
-import org.scalajs.dom.{document, html}
-import io.udash.wrappers.jquery.JQueryPromise
+import org.scalajs.dom.html
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
@@ -43,8 +42,8 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
 
   companion =>
 
-  import Date._
-  import io.circe.generic.auto._
+  import Date.*
+  import io.circe.generic.auto.*
   import io.circe.{Decoder, Encoder}
 
   type State = DateExternalValue

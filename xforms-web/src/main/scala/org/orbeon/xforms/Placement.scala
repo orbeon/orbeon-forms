@@ -3,6 +3,7 @@ package org.orbeon.xforms
 import org.orbeon.jquery.Offset
 import org.scalajs.dom
 import io.udash.wrappers.jquery.JQuery
+import org.orbeon.web.DomSupport.DomElemOps
 
 import scala.scalajs.js
 
@@ -75,10 +76,7 @@ object Placement {
       }
 
     val autoOverflowElemOpt =
-      Iterator.iterate(el.get(0).get)(_.parentNode match {
-        case e: dom.Element => e
-        case _              => null
-      }).takeWhile(_ ne null).find { e =>
+      el.get(0).get.ancestorOrSelfElem.find { e =>
         dom.window.getComputedStyle(e).overflow == "auto"
       }
 

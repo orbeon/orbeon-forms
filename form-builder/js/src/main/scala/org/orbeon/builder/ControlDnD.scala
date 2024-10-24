@@ -88,16 +88,15 @@ private object ControlDnD {
 
         override def isContainer(el: html.Element) =
           (
-            (el ne null)                                    &&
-            (el.parentElement ne null)                      &&
-            el.parentElement.classList.contains("fb-tools") &&
+            (el ne null)                                                 &&
+            el.parentElementOpt.exists(_.classList.contains("fb-tools")) &&
             el.classList.contains("xforms-group")
           ) || el.classList.contains("fr-grid-td")
 
         override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) =
           (handle ne null)                 &&
           handle.classList.contains("btn") &&
-          handle.parentElement.classList.contains("fb-add-control")
+          handle.parentElementOpt.exists(_.classList.contains("fb-add-control"))
 
         // Can only drop into an empty cell
         override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) =

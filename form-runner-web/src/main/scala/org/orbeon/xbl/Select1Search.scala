@@ -61,7 +61,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         // as at that point the `<span class="select2-selection--single">` looses the focus, and since Select2 places that element inside
         // the element that represents the `<xf:select1>`, if that event is left to propagate, the XForms code takes that event as the
         // `<xf:select1>` having lost the focus
-        Support.stopFocusOutPropagation(select.parentNode.asInstanceOf[html.Element], _.target, "select2-selection--single")
+        Support.stopFocusOutPropagation(select.parentElement, _.target, "select2-selection--single")
 
         locally {
           val placeholderOpt = Option(elementWithData.getAttribute(DataPlaceholder)).filter(_.nonEmpty).map { placeholder =>
